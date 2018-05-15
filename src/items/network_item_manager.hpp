@@ -72,6 +72,9 @@ private:
         *  otherwise undefined. */
         int m_kart_id;
 
+        /** In case of new items the position of the new item. */
+        Vec3 m_xyz;
+
         /** Constructor for collecting an existing item.
          *  \param ticks Time of the event.
          *  \param item_id The index of the item that was collected.
@@ -85,9 +88,12 @@ private:
         // --------------------------------------------------------------------
         /** Constructor for creating a new item (i.e. a bubble gum is dropped).
          */
-        ItemEventInfo(int ticks, ItemState::ItemType type,  int item_id,
-                      Vec3 xyz)            
-        {        
+        ItemEventInfo(int ticks, ItemState::ItemType type, int index,
+                      const Vec3 &xyz)            
+        {
+            m_ticks = ticks;
+            m_index = index;
+            m_xyz   = xyz;
         }   // ItemEventInfo(new item)
         // --------------------------------------------------------------------
         /** Constructor for switching items. */
@@ -103,6 +109,7 @@ private:
     Synchronised< std::vector<ItemEventInfo> > m_item_events;
 
     void forwardTime(int ticks);
+    virtual unsigned int insertItem(Item *item) OVERRIDE;
 
     NetworkItemManager();
     virtual ~NetworkItemManager();
@@ -117,6 +124,8 @@ public:
     virtual void reset();
     virtual void setItemConfirmationTime(int host_id, int ticks) OVERRIDE;
     virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;
+    virtual Item* dropNewItem(ItemState::ItemType type,
+                              AbstractKart *kart) OVERRIDE;
     virtual BareNetworkString* saveState() OVERRIDE;
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------

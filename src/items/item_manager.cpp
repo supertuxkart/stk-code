@@ -217,8 +217,10 @@ ItemManager::~ItemManager()
 /** Inserts the new item into the items management data structures, if possible
  *  reusing an existing, unused entry (e.g. due to a removed bubble gum). Then
  *  the item is also added to the quad-wise list of items.
+ *  \param item The item to be added.
+ *  \return Index of the newly added item in the list of all items.
  */
-void ItemManager::insertItem(Item *item)
+unsigned int ItemManager::insertItem(Item *item)
 {
     // Find where the item can be stored in the index list: either in a
     // previously deleted entry, otherwise at the end.
@@ -246,30 +248,46 @@ void ItemManager::insertItem(Item *item)
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
     }   // if m_items_in_quads
+    return index;
 }   // insertItem
 
 //-----------------------------------------------------------------------------
-/** Creates a new item.
+/** Creates a new item at the location of the kart (e.g. kart drops a
+ *  bubblegum).
  *  \param type Type of the item.
- *  \param xyz  Position of the item.
- *  \param normal The normal of the terrain to set roll and pitch.
- *  \param parent In case of a dropped item used to avoid that a kart
- *         is affected by its own items.
+ *  \param kart The kart that drops the new item.
  */
-Item* ItemManager::newItem(ItemState::ItemType type, const Vec3& xyz,
-                           const Vec3 &normal, AbstractKart *parent)
+Item* ItemManager::dropNewItem(ItemState::ItemType type, AbstractKart *kart)
 {
+    Vec3 hit_point;
+    Vec3 normal;
+    const Material* material_hit;
+    Vec3 pos = kart->getXYZ();
+    Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
+    Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
+                                                        &hit_point,
+                                                        &material_hit,
+                                                        &normal);
+    // This can happen if the kart is 'over nothing' when dropping
+    // the bubble gum
+    if (!material_hit) return NULL;
+
+    normal.normalize();
+
+    pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
+
+
     ItemState::ItemType mesh_type = type;
-    if (type == ItemState::ITEM_BUBBLEGUM && parent->getIdent() == "nolok")
+    if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
     {
         mesh_type = ItemState::ITEM_BUBBLEGUM_NOLOK;
     }
 
-    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
+    Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type]);
 
     insertItem(item);
-    if(parent != NULL) item->setParent(parent);
+    if(kart != NULL) item->setParent(kart);
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
@@ -277,21 +295,55 @@ Item* ItemManager::newItem(ItemState::ItemType type, const Vec3& xyz,
                        m_item_lowres_mesh[(int)new_type]);
     }
     return item;
-}   // newItem
+}   // dropNewItem
 
 //-----------------------------------------------------------------------------
-/** Creates a new trigger item.
+/** Places a new item on the track/arena. It is used for the initial placement
+ *  of the items - either according to the scene.xml file, or random item
+ *  placement.
+ *  \param type Type of the item.
  *  \param xyz  Position of the item.
+ *  \param normal The normal of the terrain to set roll and pitch.
  */
-Item* ItemManager::newItem(const Vec3& xyz, float distance,
-                           TriggerItemListener* listener)
+Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
+                             const Vec3 &normal)
+{
+    // Make sure this subroutine is not used otherwise (since networking
+    // needs to be aware of items added to the track, so this would need
+    // to be added).
+    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE);
+    ItemState::ItemType mesh_type = type;
+
+    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
+                          m_item_lowres_mesh[mesh_type]);
+
+    insertItem(item);
+    if (m_switch_ticks >= 0)
+    {
+        ItemState::ItemType new_type = m_switch_to[item->getType()];
+        item->switchTo(new_type, m_item_mesh[(int)new_type],
+                       m_item_lowres_mesh[(int)new_type]);
+    }
+    return item;
+}   // placeItem
+
+//-----------------------------------------------------------------------------
+/** Creates a new trigger item. This is not synched between client and 
+ *  server, since the triggers are created at startup only and should
+ *  therefore always be in sync.
+ *  \param xyz  Position of the item.
+ *  \param listener The listener object that gets called when a kart
+ *         triggers this trigger.
+ */
+Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
+                                TriggerItemListener* listener)
 {
     Item* item;
     item = new Item(xyz, distance, listener);
     insertItem(item);
 
     return item;
-}   // newItem
+}   // placeTrigger
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
@@ -605,17 +657,17 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
         Vec3 hit_point;
         const TriangleMesh& tm = Track::getCurrentTrack()->getTriangleMesh();
         bool success = tm.castRay(loc, an->getCenter() + (-10000*quad_normal),
-            &hit_point, &m, &normal);
+                                   &hit_point, &m, &normal);
 
         if (success)
         {
-            newItem(type, hit_point, normal);
+            placeItem(type, hit_point, normal);
         }
         else
         {
             Log::warn("[ItemManager]","Raycast to surface failed"
                       "from node %d", used_location[i]);
-            newItem(type, an->getCenter(), quad_normal);
+            placeItem(type, an->getCenter(), quad_normal);
         }
     }
 

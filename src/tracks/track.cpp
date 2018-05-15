@@ -2448,7 +2448,7 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    ItemManager::get()->newItem(type, drop ? hit_point : loc, normal);
+    ItemManager::get()->placeItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------

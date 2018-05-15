@@ -234,8 +234,6 @@ void Powerup::use()
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
     {
-        //if (m_type == POWERUP_SWITCH) m_sound_use = SFXManager::get()->newSFX(SFXManager::SOUND_SWAP);
-        //else
         m_sound_use = SFXManager::get()->createSoundSource("shoot");
     }
 
@@ -275,26 +273,14 @@ void Powerup::use()
         // use the bubble gum the traditional way, if the kart is looking back
         if (m_kart->getControls().getLookBack())
         {
-            Vec3 hit_point;
-            Vec3 normal;
-            const Material* material_hit;
-            Vec3 pos = m_kart->getXYZ();
-            Vec3 to  = pos+ m_kart->getTrans().getBasis() * Vec3(0, -10000, 0);
-            Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to, 
-                                                                &hit_point,
-                                                                &material_hit,
-                                                                &normal);
-            // This can happen if the kart is 'over nothing' when dropping
-            // the bubble gum
-            if(!material_hit)
-                return;
-            normal.normalize();
+            Item *new_item = 
+                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+
+            // E.g. ground not found in raycast.
+            if(!new_item) return;
 
             Powerup::adjustSound();
             m_sound_use->play();
-
-            pos = hit_point + m_kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
-            ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
         }
         else // if the kart is looking forward, use the bubblegum as a shield
         {

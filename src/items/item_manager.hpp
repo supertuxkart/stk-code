@@ -24,6 +24,7 @@
 #include "items/item.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
 #include <SColor.h>
 
@@ -104,20 +105,21 @@ private:
      *  value is <0, it indicates that the items are not switched atm. */
     int m_switch_ticks;
 
-    void  insertItem(Item *item);
     void  deleteItem(Item *item);
 
-public:
-    // Make those private so only create/destroy functions can call them.
-                   ItemManager();
-    virtual       ~ItemManager();
-    void           setSwitchItems(const std::vector<int> &switch_items);
+protected:
+    virtual unsigned int insertItem(Item *item);
+    void setSwitchItems(const std::vector<int> &switch_items);
+             ItemManager();
+    virtual ~ItemManager();
 
 public:
-    Item*          newItem         (ItemState::ItemType type, const Vec3& xyz,
-                                    const Vec3 &normal,
-                                    AbstractKart* parent=NULL);
-    Item*          newItem         (const Vec3& xyz, float distance,
+
+    virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
+                                    const Vec3 &normal);
+    virtual Item*  dropNewItem     (ItemState::ItemType type,
+                                    AbstractKart* parent);
+    virtual Item*  placeTrigger    (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
     void           update          (int ticks);
     void           updateGraphics  (float dt);

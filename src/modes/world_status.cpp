@@ -40,6 +40,7 @@ WorldStatus::WorldStatus()
 {
     main_loop->setFrameBeforeLoadingWorld();
     m_clock_mode        = CLOCK_CHRONO;
+    m_phase             = SETUP_PHASE;
 
     m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
     m_start_sound       = SFXManager::get()->createSoundSource("start_race");

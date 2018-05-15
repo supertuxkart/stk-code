@@ -609,25 +609,7 @@ void Attachment::update(int ticks)
             m_bubble_explode_sound->setPosition(m_kart->getXYZ());
             m_bubble_explode_sound->play();
 
-            // drop a small bubble gum
-            Vec3 hit_point;
-            Vec3 normal;
-            const Material* material_hit;
-            
-            Track::getCurrentTrack()->getTriangleMesh().castRay(m_kart->getXYZ(),
-                            m_kart->getTrans().getBasis() * Vec3(0, -10000, 0),
-                            &hit_point,&material_hit, &normal                    );
-            // This can happen if the kart is 'over nothing' when dropping
-            // the bubble gum
-            if(material_hit)
-            {
-                normal.normalize();
-
-                Vec3 pos = hit_point + m_kart->getTrans().getBasis() 
-                                     * Vec3(0, -0.05f, 0);
-                ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, 
-                                            normal, m_kart            );
-            }
+            ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
         break;
     }   // switch

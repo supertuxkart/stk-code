@@ -80,6 +80,26 @@ void NetworkItemManager::saveInitialState()
 }   // saveInitialState
 
 //-----------------------------------------------------------------------------
+/** Called when an item is inserted. It makes sure the vector for the
+ *  confirmed state has the right size.
+ *  \param item The item to be added.
+ *  \returns Index of the newly inserted item.
+ */
+unsigned int NetworkItemManager::insertItem(Item *item)
+{
+    unsigned int index = ItemManager::insertItem(item);
+    if(index>=m_confirmed_state.size())
+    {
+        m_confirmed_state.push_back(NULL);
+    }
+    else
+    {
+        *m_confirmed_state[index] = *m_all_items[index];
+    }
+    return index;
+}   // insertItem
+
+//-----------------------------------------------------------------------------
 /** Called when a kart collects an item. In network games only the server
  *  acts on this event.
  *  \param item The item that was collected.
@@ -105,7 +125,27 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
     }
 }   // collectedItem
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Called when a new item is created, e.g. bubble gum.
+ *  \param type Type of the item.
+ *  \param parent In case of a dropped item used to avoid that a kart
+ *         is affected by its own items.
+ */
+Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
+                                   AbstractKart *kart)
+{
+    Item *item = ItemManager::dropNewItem(type, kart);
+    if(!item) return NULL;
+
+    m_item_events.lock();
+    m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(), type, 
+                                         item->getItemId(),
+                                         kart->getXYZ()           );
+    m_item_events.unlock();
+    return item;
+}   // newItem
+
+// ----------------------------------------------------------------------------
 /** Called by the GameProtocol when a confirmation for an item event is 
  *  received by a host. Once all hosts have confirmed an event, it can be
  *  deleted and won't be send to any clients again.
@@ -267,7 +307,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     {
         Item *item = m_all_items[i];
         const ItemState *is = m_confirmed_state[i];
-        *(ItemState*)item = *is;
+        if(is) 
+            *(ItemState*)item = *is;
     }
 
     // Now we save the current local
