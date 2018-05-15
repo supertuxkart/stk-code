@@ -238,3 +238,25 @@ void TrackObjectManager::removeObject(TrackObject* obj)
     m_all_objects.remove(obj);
     delete obj;
 }   // removeObject
+
+// ----------------------------------------------------------------------------
+void TrackObjectManager::removeForRewind()
+{
+    for (TrackObject* curr : m_all_objects)
+    {
+        if (curr->getPhysicalObject() &&
+            curr->getPhysicalObject()->isDynamic())
+            curr->getPhysicalObject()->removeBody();
+    }
+}   // removeForRewind
+
+// ----------------------------------------------------------------------------
+void TrackObjectManager::addForRewind()
+{
+    for (TrackObject* curr : m_all_objects)
+    {
+        if (curr->getPhysicalObject() &&
+            curr->getPhysicalObject()->isDynamic())
+            curr->getPhysicalObject()->addBody();
+    }
+}   // addForRewind

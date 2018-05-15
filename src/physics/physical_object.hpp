@@ -207,6 +207,8 @@ public:
                  bool interpolate_normal) const;
 
     // ------------------------------------------------------------------------
+    bool isDynamic() const { return m_is_dynamic; }
+    // ------------------------------------------------------------------------
     /** Returns the ID of this physical object. */
     std::string getID()          { return m_id; }
     // ------------------------------------------------------------------------
