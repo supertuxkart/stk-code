@@ -1,5 +1,5 @@
 //  SuperTuxKart - A fun racing game with go-karts
-//  Copyright (C) 2017 QwertyChouskie
+//  Copyright (C) 2017-18 QwertyChouskie
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -25,15 +25,16 @@ using namespace Online;
 
 namespace Online
 {
-    void LinkHelper::OpenURL (std::string url) {
+    void LinkHelper::OpenURL (std::string url)
+    {
 #ifdef _WIN32
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #else 
-#ifdef APPLE
+  #ifdef APPLE
         std::string op = std::string("open ").append(url);
-#else
+  #else
         std::string op = std::string("xdg-open ").append(url);
-#endif
+  #endif
         system(op.c_str());
 #endif
     }
