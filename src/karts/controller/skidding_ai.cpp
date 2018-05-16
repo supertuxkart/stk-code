@@ -1988,20 +1988,9 @@ void SkiddingAI::computeNearestKarts()
         unsigned int kart_id = m_world->getPlayerKart(i)->getWorldKartId();
         overall_distance.push_back(m_world->getOverallDistance(kart_id));
     }
-
-    // Sort the list (the list is very short, so a basic bubble sort suffice)
-    for(unsigned int i=0; i<n-1; i++)
-    {
-        for(unsigned int j=0; j<n-1-i; i++)
-        {
-            if (overall_distance[j] > overall_distance[j+1])
-            {
-                float swap = overall_distance[j+1];
-                overall_distance[j+1] = overall_distance[j];
-                overall_distance[j] = swap;
-            }
-        }
-    }
+   
+    // Sort the list
+    std::sort(overall_distance.begin(), overall_distance.end());
 
     for(unsigned int i=0; i<n; i++)
     {
