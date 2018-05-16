@@ -149,19 +149,19 @@ public:
     /** Filename of the title music to play.*/
     MusicInformation *m_title_music;
 
-    /** Maximum time of a replay. */
-    int m_replay_max_time;
+    /** Maximum number of transform events of a replay. */
+    int m_replay_max_frames;
 
-    /** Minimum time between consecutive saved tranform events.  */
+    /** Maximum time between consecutive saved tranform events.  */
     float m_replay_dt;
 
-    /** Maximum difference between interpolated and actual position. If the
-     *  difference is larger than this, a new event is generated. */
-    float m_replay_delta_pos2;
+    /** If the speed difference with the last transform event
+     *  is larger than this, a new event is generated. */
+    float m_replay_delta_speed;
 
-    /** A heading difference of more than that will trigger a new event to
+    /** A steering difference of more than that will trigger a new event to
      *  be generated. */
-    float m_replay_delta_angle;
+    float m_replay_delta_steering;
 
     /** The minimap size */
     float m_minimap_size;

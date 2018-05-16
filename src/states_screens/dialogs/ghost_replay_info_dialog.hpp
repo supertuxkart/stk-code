@@ -20,9 +20,7 @@
 #define HEADER_GHOST_REPLAY_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "replay/replay_play.hpp"
 
 /** \brief Dialog that allows a user to do action with ghost replay file
@@ -33,21 +31,32 @@ class GhostReplayInfoDialog : public GUIEngine::ModalDialog
 
 private:
 
-    bool m_self_destroy;
+    bool  m_self_destroy;
 
-    bool m_record_race;
-    bool m_watch_only;
+    bool  m_record_race;
+    bool  m_watch_only;
+    bool  m_compare_ghost;
 
-    const unsigned int m_replay_id;
+    unsigned int m_replay_id; // May be updated on list refreshes
+
+    uint64_t m_compare_replay_uid;
+
     ReplayPlay::ReplayData m_rd;
 
-    GUIEngine::RibbonWidget* m_action_widget;
-    GUIEngine::IconButtonWidget* m_back_widget;
-    GUIEngine::CheckBoxWidget* m_record_widget;
-    GUIEngine::CheckBoxWidget* m_watch_widget;
+    GUIEngine::RibbonWidget*      m_action_widget;
+    GUIEngine::IconButtonWidget*  m_back_widget;
+    GUIEngine::CheckBoxWidget*    m_record_widget;
+    GUIEngine::CheckBoxWidget*    m_watch_widget;
+    GUIEngine::CheckBoxWidget*    m_compare_widget;
+
+    GUIEngine::ListWidget*        m_replay_info_widget;
+    GUIEngine::IconButtonWidget*  m_track_screenshot_widget;
+
+    void updateReplayDisplayedInfo();
+    void refreshMainScreen();
 
 public:
-    GhostReplayInfoDialog(unsigned int replay_id);
+    GhostReplayInfoDialog(unsigned int replay_id, uint64_t compare_replay_uid, bool compare_ghost);
     ~GhostReplayInfoDialog();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

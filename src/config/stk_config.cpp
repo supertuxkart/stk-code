@@ -150,9 +150,9 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_ticks,             "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
-    CHECK_NEG(m_replay_max_time,           "replay max-time"            );
-    CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
-    CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
+    CHECK_NEG(m_replay_max_frames,         "replay max-frames"          );
+    CHECK_NEG(m_replay_delta_steering,     "replay delta-steering"      );
+    CHECK_NEG(m_replay_delta_speed,        "replay delta-speed     "    );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_minimap_size,              "minimap size"               );
     CHECK_NEG(m_minimap_ai_icon,           "minimap ai_icon"            );
@@ -164,7 +164,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
-    m_replay_delta_pos2 *= m_replay_delta_pos2;
     m_default_kart_properties->checkAllSet(filename);
 }   // load
 
@@ -195,9 +194,9 @@ void STKConfig::init_defaults()
     m_min_server_version         = -100;
     m_max_server_version         = -100;
     m_max_display_news           = -100;
-    m_replay_max_time            = -100;
-    m_replay_delta_angle         = -100;
-    m_replay_delta_pos2          = -100;
+    m_replay_max_frames          = -100;
+    m_replay_delta_steering      = -100;
+    m_replay_delta_speed         = -100;
     m_replay_dt                  = -100;
     m_minimap_size               = -100;
     m_minimap_ai_icon            = -100;
@@ -405,10 +404,10 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if(const XMLNode *replay_node = root->getNode("replay"))
     {
-        replay_node->get("delta-angle", &m_replay_delta_angle);
-        replay_node->get("delta-pos",   &m_replay_delta_pos2 );
-        replay_node->get("delta-t",     &m_replay_dt         );
-        replay_node->get("max-time",    &m_replay_max_time   );
+        replay_node->get("delta-steering", &m_replay_delta_steering);
+        replay_node->get("delta-speed", &m_replay_delta_speed      );
+        replay_node->get("delta-t",     &m_replay_dt               );
+        replay_node->get("max-frames",    &m_replay_max_frames     );
 
     }
 

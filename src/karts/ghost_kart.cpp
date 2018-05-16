@@ -16,21 +16,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/attachment.hpp"
+#include "items/powerup.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "graphics/render_info.hpp"
+#include "modes/easter_egg_hunt.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "replay/replay_recorder.hpp"
 
 #include "LinearMath/btQuaternion.h"
 
 GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
-                     int position)
+                     int position, float color_hue)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  PLAYER_DIFFICULTY_NORMAL,
-                 std::make_shared<RenderInfo>(0.0f, true/*transparent*/))
+                 std::make_shared<RenderInfo>(color_hue, true/*transparent*/))
 {
 }   // GhostKart
 
@@ -41,12 +46,14 @@ void GhostKart::reset()
     Kart::reset();
     // This will set the correct start position
     update(0);
+    m_last_egg_idx = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
 void GhostKart::addReplayEvent(float time,
                                const btTransform &trans,
                                const ReplayBase::PhysicInfo &pi,
+                               const ReplayBase::BonusInfo &bi,
                                const ReplayBase::KartReplayEvent &kre)
 {
     GhostController* gc = dynamic_cast<GhostController*>(getController());
@@ -54,6 +61,7 @@ void GhostKart::addReplayEvent(float time,
 
     m_all_transform.push_back(trans);
     m_all_physic_info.push_back(pi);
+    m_all_bonus_info.push_back(bi);
     m_all_replay_events.push_back(kre);
 
     // Use first frame of replay to calculate default suspension
@@ -130,10 +138,65 @@ void GhostKart::update(int ticks)
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed,
         /*lean*/0.0f, idx);
 
+    // Attachment management
+    // Note that this doesn't get ticks value from replay file,
+    // and can't get the exact ticks values when it depends from kart
+    // properties. It also doesn't manage the case where a shield is
+    // renewed. These inaccuracies are minor as it is used for
+    // graphical effect only.
+
+    Attachment::AttachmentType attach_type =
+        ReplayRecorder::codeToEnumAttach(m_all_bonus_info[idx].m_attachment);
+    int attach_ticks = 0;
+    if (attach_type == Attachment::ATTACH_BUBBLEGUM_SHIELD)
+        attach_ticks = stk_config->time2Ticks(10);
+    else if (attach_type == Attachment::ATTACH_BOMB)
+        attach_ticks = stk_config->time2Ticks(30);
+    // The replay history will take care of clearing,
+    // just make sure it won't expire by itself
+    else
+        attach_ticks = stk_config->time2Ticks(300);
+
+    if ( attach_type == Attachment::ATTACH_NOTHING )
+        m_attachment->clear();
+    // Setting again reinitialize the graphical size of the attachment,
+    // so do so only if the type change
+    else if ( attach_type != m_attachment->getType())
+        m_attachment->set(attach_type,attach_ticks);
+
+    // So that the attachment's model size is updated
+    m_attachment->update(ticks);
+
+    // Nitro and zipper amount (shown in the GUI in watch-only mode)
+    m_powerup->reset();
+
+    // Update item amount and type
+    PowerupManager::PowerupType item_type =
+        ReplayRecorder::codeToEnumItem(m_all_bonus_info[idx].m_item_type); 
+    m_powerup->set(item_type, m_all_bonus_info[idx].m_item_amount);
+
+    // Update special values in easter egg and battle modes
+    if (race_manager->isEggHuntMode())
+    {
+        if (idx > m_last_egg_idx &&
+            m_all_bonus_info[idx].m_special_value >
+            m_all_bonus_info[m_last_egg_idx].m_special_value)
+        {
+            EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
+            assert(world);
+            world->collectedEasterEggGhost(getWorldKartId());
+            m_last_egg_idx = idx;
+        }
+    }
+
+    m_collected_energy = (1- rd)*m_all_bonus_info[idx    ].m_nitro_amount
+                         +  rd  *m_all_bonus_info[idx + 1].m_nitro_amount;
+
+    // Graphical effects for nitro, zipper and skidding
     getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_usage,
-        m_all_replay_events[idx].m_zipper_usage,
-        m_all_replay_events[idx].m_skidding_state,
-        m_all_replay_events[idx].m_red_skidding);
+                                   m_all_replay_events[idx].m_zipper_usage,
+                                   m_all_replay_events[idx].m_skidding_effect,
+                                   m_all_replay_events[idx].m_red_skidding);
     getKartGFX()->update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -159,6 +222,92 @@ float GhostKart::getSpeed() const
     const GhostController* gc =
         dynamic_cast<const GhostController*>(getController());
 
+    unsigned int current_index = gc->getCurrentReplayIndex();
+    const float rd             = gc->getReplayDelta();
+
     assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
-    return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
+
+    if (current_index == m_all_physic_info.size())
+        return m_all_physic_info[current_index].m_speed;
+
+    return (1-rd)*m_all_physic_info[current_index    ].m_speed
+           +  rd *m_all_physic_info[current_index + 1].m_speed;
 }   // getSpeed
+
+// ----------------------------------------------------------------------------
+/** Returns the time at which the kart was at a given distance.
+  * Returns -1.0f if none */
+float GhostKart::getTimeForDistance(float distance)
+{
+    const GhostController* gc =
+        dynamic_cast<const GhostController*>(getController());
+    
+    int current_index = gc->getCurrentReplayIndex();
+
+    // Second, get the current distance
+    float current_distance = m_all_replay_events[current_index].m_distance;
+
+    // This determines in which direction we will search a matching frame
+    bool search_forward = (current_distance < distance);
+
+    // These are used to compute the time
+    // upper_frame is set to current index so that the timer still runs
+    // after the ghost has finished the race
+    int lower_frame_index = current_index-1;
+    unsigned int upper_frame_index = current_index;
+    float upper_ratio     = 0.0f;
+
+    // Third, search frame by frame in the good direction
+    // Binary search is not used because the kart might go backwards
+    // at some point (accident, rescue, wrong interpolation later corrected)
+    // The distances are stored in the replay file rather than being
+    // dynamically computed. Version 3 replay files thus don't support
+    // the live time difference, but this reduces tremendously the overhead
+    while (1)
+    {
+        // If we have reached the end of the replay file without finding the
+        // searched distance, break
+        if (upper_frame_index >= m_all_replay_events.size() ||
+            lower_frame_index < 0 )
+            break;
+
+        // The target distance was reached between those two frames
+        if (m_all_replay_events[lower_frame_index].m_distance <= distance &&
+            m_all_replay_events[upper_frame_index].m_distance >= distance )
+        {
+            float lower_diff =
+                distance - m_all_replay_events[lower_frame_index].m_distance;
+            float upper_diff =
+                m_all_replay_events[upper_frame_index].m_distance - distance;
+
+            if ((lower_diff + upper_diff) == 0)
+                upper_ratio = 0.0f;
+            else
+                upper_ratio = lower_diff/(lower_diff+upper_diff);
+                
+            break;
+        }
+
+        if (search_forward)
+        {
+            lower_frame_index++;
+            upper_frame_index++;
+        }
+        else
+        {
+            lower_frame_index--;
+            upper_frame_index--;
+        }
+    }
+
+    float ghost_time;
+
+    if (upper_frame_index >= m_all_replay_events.size() ||
+        lower_frame_index < 0 )
+        ghost_time = -1.0f;
+    else
+        ghost_time = gc->getTimeAtIndex(lower_frame_index)*(1.0f-upper_ratio)
+                    +gc->getTimeAtIndex(upper_frame_index)*(upper_ratio);
+
+    return ghost_time;
+}
