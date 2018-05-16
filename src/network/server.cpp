@@ -62,15 +62,25 @@ Server::Server(const XMLNode& xml)
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
     xml.get("distance", &m_distance);
-    m_server_owner_name = "-";
+    m_server_owner_name = L"-";
+
+    // Show owner name as Official right now if official server hoster account
+    bool official = false;
+    xml.get("official", &official);
+    if (official)
+    {
+        // I18N: Official means this server is hosted by STK team
+        m_server_owner_name = _("Official");
+        return;
+    }
 
     // Display server owner name if he's your friend or localhost
-    Online::OnlineProfile* opp = PlayerManager::getCurrentPlayer()->getProfile();
+    Online::OnlineProfile* opp =
+        PlayerManager::getCurrentPlayer()->getProfile();
     // Check localhost owner
     if (opp && opp->getID() == m_server_owner)
     {
-        m_server_owner_name =
-            StringUtils::wideToUtf8(opp->getUserName());
+        m_server_owner_name = opp->getUserName();
     }
     else if (opp && opp->hasFetchedFriends())
     {
@@ -83,8 +93,7 @@ Server::Server(const XMLNode& xml)
                     Online::ProfileManager::get()->getProfileByID(user_id);
                 if (friend_profile)
                 {
-                    m_server_owner_name =
-                        StringUtils::wideToUtf8(friend_profile->getUserName());
+                    m_server_owner_name = friend_profile->getUserName();
                 }
             }
         }
