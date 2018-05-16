@@ -180,6 +180,9 @@ private:
     /** Distance to the player, used for rubber-banding. */
     float m_distance_to_player;
 
+    /** Number of players ahead, used for rubber-banding. */
+    int m_num_players_ahead;
+
     /** A random number generator to decide if the AI should skid or not. */
     RandomGenerator m_random_skid;
 
