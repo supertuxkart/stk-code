@@ -127,11 +127,9 @@ void AIProperties::checkAllSet(const std::string &filename) const
  *  on the distance from the player. */
 float AIProperties::getSpeedCap(float distance, int ai_position, int num_ai) const
 {
-    float wfirst;
-    if (num_ai == 1)
-        wfirst = 1;
-    else
-        wfirst = 1 - ( (float) (ai_position-1) / (float) (num_ai-1) );
+    float wfirst = 1.0f
+    if (num_ai >= 2)
+        wfirst = 1.0f - ( (float) (ai_position-1) / (float) (num_ai-1) );
 
     return wfirst      * m_first_speed_cap.get(distance)
            +(1-wfirst) * m_last_speed_cap.get(distance);
