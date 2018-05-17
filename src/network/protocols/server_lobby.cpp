@@ -878,10 +878,9 @@ void ServerLobby::computeNewRankings()
     for (unsigned i = 0; i < players.size(); i++)
     {
         m_rankings[i] += ranking_change[i];
-        // This isn't entirely correct when rankings are negatives, but
-        // the max will always be positive
-        if ((int) (m_rankings[i]+0.5f) > m_max_ranking[i])
-            m_max_ranking[i] = (int) (m_rankings[i]+0.5f);
+
+        if (m_rankings[i] > m_max_ranking[i])
+            m_max_ranking[i] = m_rankings[i];
         m_num_ranked_races[i]++;
     }
 } //computeNewRankings
@@ -892,20 +891,20 @@ void ServerLobby::computeNewRankings()
  */
 float ServerLobby::computeRankingFactor(unsigned int player_id)
 {
-    int max_points = m_max_ranking[player_id];
+    double max_points = m_max_ranking[player_id];
     int num_races  = m_num_ranked_races[player_id];
 
-    if (     max_points >= (int) (BASE_RANKING_POINTS * 2.0f))
+    if (     max_points >= (BASE_RANKING_POINTS * 2.0f))
         return 0.4f;
-    else if (max_points >= (int) (BASE_RANKING_POINTS * 1.75f)  || num_races > 500)
+    else if (max_points >= (BASE_RANKING_POINTS * 1.75f)  || num_races > 500)
         return 0.5f;
-    else if (max_points >= (int) (BASE_RANKING_POINTS * 1.5f)   || num_races > 250)
+    else if (max_points >= (BASE_RANKING_POINTS * 1.5f)   || num_races > 250)
         return 0.6f;
-    else if (max_points >= (int) (BASE_RANKING_POINTS * 1.25f)  || num_races > 100)
+    else if (max_points >= (BASE_RANKING_POINTS * 1.25f)  || num_races > 100)
         return 0.7f;
     // The base ranking points are not distributed all at once
     // So it's not guaranteed a player reach them
-    else if (max_points >= (int) (BASE_RANKING_POINTS        )  || num_races > 50)
+    else if (max_points >= (BASE_RANKING_POINTS        )  || num_races > 50)
         return 0.8f;
     else
         return 1.0f; 
@@ -914,15 +913,15 @@ float ServerLobby::computeRankingFactor(unsigned int player_id)
 
 //-----------------------------------------------------------------------------
 /** Manages the distribution of the base points.
- *  Gives half of the points immediately and the other half progressively
- *  by smaller and smaller chuncks from race 1 to 46.
+ *  Gives half of the points progressively
+ *  by smaller and smaller chuncks from race 1 to 45.
+ *  The first half is distributed when the player enters
+ *  for the first time in the ranked server.
  */
 float ServerLobby::distributeBasePoints(unsigned int player_id)
 {
     int num_races  = m_num_ranked_races[player_id];
-    if (num_races == 0)
-        return BASE_RANKING_POINTS/2.0f;
-    else if (num_races <= 45)
+    if (num_races < 45)
         return (BASE_RANKING_POINTS/2000.0f * std::max((45-num_races),4)*2.0f);
     else
         return 0.0f;
