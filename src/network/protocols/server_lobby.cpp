@@ -927,8 +927,8 @@ float ServerLobby::getModeFactor()
 }
 
 //-----------------------------------------------------------------------------
-/** Returns the mode factor, used to make ranking move slower in more random
- *  modes.
+/** Returns the mode spread factor, used so that a similar difference in
+ *  skill will result in a similar ranking difference in more random modes.
  */
 float ServerLobby::getModeSpread()
 {
