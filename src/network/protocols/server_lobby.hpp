@@ -140,6 +140,8 @@ private:
     void computeNewRankings();
     float computeRankingFactor(unsigned int player_id);
     float distributeBasePoints(unsigned int player_id);
+    float getModeFactor();
+    float getModeSpread();
 
 public:
              ServerLobby();

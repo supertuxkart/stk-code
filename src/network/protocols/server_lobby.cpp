@@ -790,7 +790,7 @@ void ServerLobby::computeNewRankings()
             m_max_ranking.size()       == players.size() );
 
     // No ranking yet for battle mode
-    // TODO : separate rankings for time-trial and normal and FTL ??
+    // TODO : separate rankings for time-trial and normal ??
     if (!race_manager->modeHasLaps())
         return;
 
@@ -834,23 +834,25 @@ void ServerLobby::computeNewRankings()
 
             // Compute the expected result using an ELO-like function
             double diff = (double) player2_ranking - player1_ranking;
-            expected_result = 1.0f/(1.0f+std::pow(10.0f, diff/(BASE_RANKING_POINTS/2.0f)));
+            expected_result = 1.0f/(1.0f+std::pow(10.0f, diff/(BASE_RANKING_POINTS*getModeSpread()/(2.0f))));
 
             // Compute the result and race ranking importance
             float player_factors = std::max(player1_factor,
                                             computeRankingFactor(j) );
+         
+            float mode_factor = getModeFactor();
 
             if (!players[i])
             {
                 result = 0.0f;
                 ranking_importance =
-                    MAX_SCALING_TIME*MAX_POINTS_PER_SECOND*player_factors;
+                    mode_factor*MAX_SCALING_TIME*MAX_POINTS_PER_SECOND*player_factors;
             }
             else if (!players[j])
             {
                 result = 1.0f;
                 ranking_importance =
-                    MAX_SCALING_TIME*MAX_POINTS_PER_SECOND*player_factors;
+                    mode_factor*MAX_SCALING_TIME*MAX_POINTS_PER_SECOND*player_factors;
             }
             else
             {
@@ -866,7 +868,7 @@ void ServerLobby::computeNewRankings()
                     result = (player1_time - player2_time)/(player2_time/20);
                     result = std::max( (double) 0.0f, 0.5f - result);
                 }
-                ranking_importance = std::min ( std::max (player1_time, player2_time),
+                ranking_importance = mode_factor * std::min ( std::max (player1_time, player2_time),
                                                 MAX_SCALING_TIME ) * MAX_POINTS_PER_SECOND * player_factors;
             }
             // Compute the ranking change
@@ -910,6 +912,36 @@ float ServerLobby::computeRankingFactor(unsigned int player_id)
         return 1.0f; 
 
 } //computeRankingFactor
+
+//-----------------------------------------------------------------------------
+/** Returns the mode race importance factor,
+ *  used to make ranking move slower in more random modes.
+ */
+float ServerLobby::getModeFactor()
+{
+    if (race_manager->isTimeTrialMode())
+        return 1.0f;
+
+    //else
+    return 0.4f;
+}
+
+//-----------------------------------------------------------------------------
+/** Returns the mode factor, used to make ranking move slower in more random
+ *  modes.
+ */
+float ServerLobby::getModeSpread()
+{
+    if (race_manager->isTimeTrialMode())
+        return 1.0f;
+
+    //else
+    //TODO : the value used here for normal races is a wild guess.
+    // When hard data to the spread tendencies of time-trial
+    // and normal mode becomes available, update this to make
+    // the spreads more comparable
+    return 1.4f;
+}
 
 //-----------------------------------------------------------------------------
 /** Manages the distribution of the base points.
@@ -1553,3 +1585,4 @@ bool ServerLobby::waitingForPlayers() const
     return m_state.load() == ACCEPTING_CLIENTS &&
         !m_game_setup->isGrandPrixStarted();
 }   // waitingForPlayers
+
