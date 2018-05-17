@@ -580,13 +580,13 @@ namespace StringUtils
 
         // Convert the times to string and add the missing zeroes if any
 
-        std::string s_min = std::to_string(min);
+        std::string s_min = toString(min);
         if (min < 10)
             s_min = std::string("0") + s_min;
-        std::string s_sec = std::to_string(sec);
+        std::string s_sec = toString(sec);
         if (sec < 10)
             s_sec = std::string("0") + s_sec;
-        std::string s_subsec = std::to_string(subseconds);
+        std::string s_subsec = toString(subseconds);
 
         // If subseconds is 0 ; it is already in the string,
         // so skip one step
