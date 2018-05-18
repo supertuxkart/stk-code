@@ -389,6 +389,23 @@ int XMLNode::get(const std::string &attribute, float *value) const
 }   // get(int)
 
 // ----------------------------------------------------------------------------
+int XMLNode::get(const std::string &attribute, double *value) const
+{
+    std::string s;
+    if (!get(attribute, &s)) return 0;
+
+    if (!StringUtils::parseString<double>(s, value))
+    {
+        Log::warn("[XMLNode]", "WARNING: Expected double but found '%s' for"
+            " attribute '%s' of node '%s' in file %s", s.c_str(),
+            attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        return 0;
+    }
+
+    return 1;
+}   // get(int)
+
+// ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, bool *value) const
 {
     std::string s;

@@ -158,6 +158,7 @@ namespace irr
 
 		bool restoreResolution();
 		bool changeResolution();
+		void grabPointer(bool grab);
 
 #ifdef _IRR_COMPILE_WITH_X11_
 		bool createInputContext();
@@ -434,6 +435,8 @@ namespace irr
 		bool UseGLXWindow;
 		bool ExternalWindow;
 		int AutorepeatSupport;
+		bool SupportsNetWM;
+		bool NeedsGrabPointer;
 
 		struct SKeyMap
 		{

@@ -105,7 +105,8 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
 	WindowHasFocus(false), WindowMinimized(false),
 	UseXVidMode(false), UseXRandR(false), UseGLXWindow(false),
-	ExternalWindow(false), AutorepeatSupport(0)
+	ExternalWindow(false), AutorepeatSupport(0), SupportsNetWM(false),
+	NeedsGrabPointer(false)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceLinux");
@@ -477,6 +478,19 @@ bool CIrrDeviceLinux::changeResolution()
 		
 		if (s == Success)
 			UseXRandR = true;
+			
+		if (UseXRandR && SupportsNetWM)
+		{
+			XRRPanning* panning = XRRGetPanning(display, res, output->crtc);
+			
+			if ((panning->width != Width && panning->width != 0) ||
+				(panning->height != Height && panning->height != 0))
+			{
+				NeedsGrabPointer = true;
+			}
+			
+			XRRFreePanning(panning);
+		}
 
 		XRRFreeCrtcInfo(crtc);
 		XRRFreeOutputInfo(output);
@@ -614,6 +628,40 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 #endif
 #endif
 
+void CIrrDeviceLinux::grabPointer(bool grab)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (grab)
+	{
+		int result = 0;
+		
+		for (int i = 0; i < 500; i++)
+		{
+			const unsigned int mask = ButtonPressMask | ButtonReleaseMask | 
+									  PointerMotionMask | FocusChangeMask;
+	
+			int result = XGrabPointer(display, window, True, mask, 
+									  GrabModeAsync, GrabModeAsync, 
+									  window, None, CurrentTime);
+											
+			if (result == GrabSuccess)
+				break;
+	
+			usleep(1000);
+		}
+		
+		if (result != GrabSuccess)
+		{
+			os::Printer::log("Couldn't grab pointer.", ELL_WARNING);
+		}
+	}
+	else
+	{
+		XUngrabPointer(display, CurrentTime);
+	}
+#endif
+}
+
 bool CIrrDeviceLinux::createWindow()
 {
 #ifdef _IRR_COMPILE_WITH_X11_
@@ -632,6 +680,24 @@ bool CIrrDeviceLinux::createWindow()
 	}
 
 	screennr = DefaultScreen(display);
+	
+	Atom *list;
+	Atom type;
+	int form;
+	unsigned long remain, len;
+
+	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+								  WMCheck, 0L, 1L, False, XA_WINDOW,
+								  &type, &form, &len, &remain,
+								  (unsigned char **)&list);
+								  
+	
+	if (s == Success)
+	{
+		XFree(list);
+		SupportsNetWM = (len > 0);
+	}
 
 	changeResolution();
 
@@ -954,30 +1020,10 @@ bool CIrrDeviceLinux::createWindow()
 		attributes.event_mask |= PointerMotionMask |
 				ButtonPressMask | KeyPressMask |
 				ButtonReleaseMask | KeyReleaseMask;
-				
-	bool netWM = false;
-	
-	Atom *list;
-	Atom type;
-	int form;
-	unsigned long remain, len;
-
-	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
-	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
-								  WMCheck, 0L, 1L, False, XA_WINDOW,
-								  &type, &form, &len, &remain,
-								  (unsigned char **)&list);
-								  
-	
-	if (s == Success)
-	{
-		XFree(list);
-		netWM = (len > 0);
-	}
 
 	if (!CreationParams.WindowId)
 	{
-		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
+		attributes.override_redirect = !SupportsNetWM && CreationParams.Fullscreen;
 
 		// create new Window
 		window = XCreateWindow(display,
@@ -1010,7 +1056,7 @@ bool CIrrDeviceLinux::createWindow()
 		
 		bool has_display_size = (Width == display_width && Height == display_height);
 		
-		if (netWM && (CreationParams.Fullscreen || has_display_size))
+		if (SupportsNetWM && (CreationParams.Fullscreen || has_display_size))
 		{
 			Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
 			Atom WMStateAtom1 = None;
@@ -1077,10 +1123,15 @@ bool CIrrDeviceLinux::createWindow()
 			if (!changed)
 			{
 				os::Printer::log("Warning! Got timeout when changing window state", ELL_WARNING);
-			}        
+			}
+			
+			if (NeedsGrabPointer)
+			{
+				grabPointer(true);
+			}
 		}
 			
-		if (!netWM && CreationParams.Fullscreen)
+		if (!SupportsNetWM && CreationParams.Fullscreen)
 		{
 			XSetInputFocus(display, window, RevertToParent, CurrentTime);
 			int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
@@ -1178,7 +1229,7 @@ bool CIrrDeviceLinux::createWindow()
 	CreationParams.WindowSize.Width = Width;
 	CreationParams.WindowSize.Height = Height;
 	
-	if (netWM == true)
+	if (SupportsNetWM == true)
 	{
 		Atom opaque_region = XInternAtom(display, "_NET_WM_OPAQUE_REGION", true);
 		
@@ -1614,10 +1665,18 @@ bool CIrrDeviceLinux::run()
 				break;
 
 			case FocusIn:
+				if (NeedsGrabPointer)
+				{
+					grabPointer(true);
+				}
 				WindowHasFocus=true;
 				break;
 
 			case FocusOut:
+				if (NeedsGrabPointer)
+				{
+					grabPointer(false);
+				}
 				WindowHasFocus=false;
 				break;
 
