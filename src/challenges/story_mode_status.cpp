@@ -21,6 +21,7 @@
 
 #include "challenges/challenge_status.hpp"
 #include "challenges/challenge_data.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -30,21 +31,28 @@
 //-----------------------------------------------------------------------------
 StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
-    m_points             = 0;
-    m_next_unlock_points = 0;
-    m_first_time         = true;
-    m_easy_challenges    = 0;
-    m_medium_challenges  = 0;
-    m_hard_challenges    = 0;
-    m_best_challenges    = 0;
-    m_current_challenge  = NULL;
+    m_points                  = 0;
+    m_next_unlock_points      = 0;
+    m_first_time              = true;
+    m_easy_challenges         = 0;
+    m_medium_challenges       = 0;
+    m_hard_challenges         = 0;
+    m_best_challenges         = 0;
+    m_current_challenge       = NULL;
+    m_story_mode_finished     = false;
+    m_valid_speedrun_finished = false;
+    m_story_mode_milliseconds = 0;
+    m_speedrun_milliseconds   = 0;
 
     // If there is saved data, load it
     if(node)
     {
         node->get("first-time", &m_first_time);
+        node->get("finished", &m_story_mode_finished);
+        node->get("speedrun-finished", &m_valid_speedrun_finished);
+        node->get("story-ms", &m_story_mode_milliseconds);
+        node->get("speedrun-ms", &m_speedrun_milliseconds);
     }   // if node
-
 }   // StoryModeStatus
 
 //-----------------------------------------------------------------------------
@@ -353,9 +361,27 @@ void StoryModeStatus::grandPrixFinished()
 /** Writes the data of this StoryModeStatus to the specified stream.
  *  \param out UTF stream to write to.
  */
-void StoryModeStatus::save(UTFWriter &out)
+void StoryModeStatus::save(UTFWriter &out, bool current_player)
 {
-    out << L"      <story-mode first-time=\"" << m_first_time  << L"\">\n";
+    if (story_mode_timer->playerLoaded() && current_player)
+    {
+        // Make sure the timer pauses time is correct
+        if (story_mode_timer->isStoryModePaused())
+        {
+            story_mode_timer->unpauseTimer(/*loading*/ false);
+            story_mode_timer->updateTimer();
+            story_mode_timer->pauseTimer(/*loading*/ false);
+        }
+
+        m_speedrun_milliseconds = story_mode_timer->getSpeedrunTime();
+        m_story_mode_milliseconds = story_mode_timer->getStoryModeTime();
+    }
+
+    out << L"      <story-mode first-time=\"" << m_first_time  << L"\"";
+    out << L" finished=\"" << m_story_mode_finished  << L"\"";
+    out << L" speedrun-finished=\"" << m_valid_speedrun_finished  << L"\"\n";
+    out << L"                  story-ms=\"" << m_story_mode_milliseconds  << L"\"";
+    out << L" speedrun-ms=\"" << m_speedrun_milliseconds  << L"\">\n";
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
