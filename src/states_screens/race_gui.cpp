@@ -23,6 +23,7 @@ using namespace irr;
 
 #include <algorithm>
 
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -245,6 +246,13 @@ void RaceGUI::renderGlobal(float dt)
     if(!world->isRacePhase()) return;
     if (!m_enabled) return;
 
+    // Display the story mode timer if not in speedrun mode
+    // If in speedrun mode, it is taken care of in GUI engine
+    // as it must be displayed in all the game's screens
+    if (UserConfigParams::m_display_story_mode_timer &&
+        !UserConfigParams::m_speedrun_mode &&
+        race_manager->raceWasStartedFromOverworld())
+        irr_driver->displayStoryModeTimer();
 
     if (!m_is_tutorial)
     {

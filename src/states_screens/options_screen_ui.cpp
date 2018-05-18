@@ -20,6 +20,7 @@
 #include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "config/hardware_stats.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -43,6 +44,7 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
+#include "states_screens/dialogs/speedrun_mode_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -137,6 +139,25 @@ void OptionsScreenUI::init()
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
+
+    CheckBoxWidget* story_timer = getWidget<CheckBoxWidget>("story-mode-timer");
+    assert( story_timer != NULL );
+    story_timer->setState( UserConfigParams::m_display_story_mode_timer );
+    CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
+    assert( speedrun_timer != NULL );
+    if (UserConfigParams::m_speedrun_mode)
+    {
+        if (!story_mode_timer->playerCanRun())
+        {
+            UserConfigParams::m_speedrun_mode = false;
+            new SpeedrunModeDialog();
+        }
+    }
+    speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
+    speedrun_timer->setVisible( UserConfigParams::m_display_story_mode_timer );
+    getWidget<LabelWidget>("speedrun-timer-text")
+        ->setVisible(UserConfigParams::m_display_story_mode_timer);
+
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
@@ -279,6 +300,40 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
         assert( fps != NULL );
         UserConfigParams::m_display_fps = fps->getState();
+    }
+    else if (name == "story-mode-timer")
+    {
+        CheckBoxWidget* story_timer = getWidget<CheckBoxWidget>("story-mode-timer");
+        assert( story_timer != NULL );
+        UserConfigParams::m_display_story_mode_timer = story_timer->getState();
+
+        CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
+        assert( speedrun_timer != NULL );
+        speedrun_timer->setVisible( UserConfigParams::m_display_story_mode_timer );
+        getWidget<LabelWidget>("speedrun-timer-text")
+            ->setVisible(UserConfigParams::m_display_story_mode_timer);
+
+        // Disable speedrun mode if the story mode timer is disabled
+        if (!UserConfigParams::m_display_story_mode_timer)
+        {
+            UserConfigParams::m_speedrun_mode = false;
+            speedrun_timer->setState(false);
+        }
+
+    }
+    else if (name == "speedrun-timer")
+    {
+        CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
+        assert( speedrun_timer != NULL );
+        if (speedrun_timer->getState())
+        {
+            if (!story_mode_timer->playerCanRun())
+            {
+                speedrun_timer->setState(false);
+                new SpeedrunModeDialog();
+            }
+        }
+        UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
     }
     else if (name=="enable-internet")
     {

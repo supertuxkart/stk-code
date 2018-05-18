@@ -20,6 +20,7 @@
 #include "states_screens/race_gui_overworld.hpp"
 
 #include "challenges/challenge_status.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -215,6 +216,13 @@ void RaceGUIOverworld::renderGlobal(float dt)
         drawTrophyPoints();
     }
 
+    // Display the story mode timer if not in speedrun mode
+    // If in speedrun mode, it is taken care of in GUI engine
+    // as it must be displayed in all the game's screens
+    if (UserConfigParams::m_display_story_mode_timer &&
+        !UserConfigParams::m_speedrun_mode)
+        irr_driver->displayStoryModeTimer();
+
     // minimap has no mipmaps so disable material2D
     //irr_driver->getVideoDriver()->enableMaterial2D(false);
     drawGlobalMiniMap();
@@ -288,12 +296,14 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     font->setShadow(video::SColor(255,0,0,0));
 
+    float place_between_trophies =
+        PlayerManager::getCurrentPlayer()->isLocked("difficulty_best") ? size*2.0f : size*1.0f;
+
     if (!m_close_to_a_challenge)
     {
         draw2DImage(m_trophy1, dest, source, NULL,
                                                   NULL, true /* alpha */);
     }
-
     dest += core::position2di((int)(size*1.5f), 0);
     std::string easyTrophies = StringUtils::toString(player->getNumEasyTrophies());
     core::stringw easyTrophiesW(easyTrophies.c_str());
@@ -302,7 +312,7 @@ void RaceGUIOverworld::drawTrophyPoints()
         font->draw(easyTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
     }
 
-    dest += core::position2di(size*2, 0);
+    dest += core::position2di(place_between_trophies, 0);
     if (!m_close_to_a_challenge)
     {
         draw2DImage(m_trophy2, dest, source, NULL,
@@ -317,7 +327,7 @@ void RaceGUIOverworld::drawTrophyPoints()
         font->draw(mediumTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
     }
 
-    dest += core::position2di(size*2, 0);
+    dest += core::position2di(place_between_trophies, 0);
     if (!m_close_to_a_challenge)
     {
         draw2DImage(m_trophy3, dest, source, NULL,
@@ -331,7 +341,7 @@ void RaceGUIOverworld::drawTrophyPoints()
         font->draw(hardTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
     }
 
-    dest += core::position2di(size*2, 0);
+    dest += core::position2di(place_between_trophies, 0);
     if (!m_close_to_a_challenge && !PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
         draw2DImage(m_trophy4, dest, source, NULL, NULL, true /* alpha */);
