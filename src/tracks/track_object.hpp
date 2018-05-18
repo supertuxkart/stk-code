@@ -119,6 +119,7 @@ public:
                              const PhysicalObject::Settings* physicsSettings);
     virtual      ~TrackObject();
     virtual void update(float dt);
+    virtual void updateGraphics(float dt);
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
               const core::vector3df& scale, bool updateRigidBody,
               bool isAbsoluteCoord);

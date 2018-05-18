@@ -137,7 +137,14 @@ public:
         return m_texture_trans;
     }
     // ------------------------------------------------------------------------
-    void setUpdateOffset(int offset)              { m_update_offset = offset; }
+    void setUpdateOffset(int offset)
+    {
+        // Avoid skipping of vertex buffer update if this function is called
+        // more than once per frame
+        if (m_update_offset != -1 && offset > m_update_offset)
+            return;
+        m_update_offset = offset;
+    }
     // ------------------------------------------------------------------------
     bool isVisible() const                                { return m_visible; }
     // ------------------------------------------------------------------------

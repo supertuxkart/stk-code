@@ -65,14 +65,6 @@ private:
     /** Set to >0 when a graphical jump is to be done. */
     float m_remaining_jump_time;
 
-    /** A vertical offset used to make the kart do a graphical 'jump' when
-     *  skidding is started. */
-    float m_gfx_jump_offset;
-
-    /** Keeps track of a graphical jump speed (which simulates the physics,
-     *  i.e. gravity is used to reduce the jump speed. */
-    float m_jump_speed;
-
 public:
     /** SKID_NONE: Kart is currently not skidding.
      *  SKID_ACCUMULATE_LEFT: Kart is skidding to the left and accumulating
@@ -104,7 +96,8 @@ public:
          Skidding(Kart *kart);
         ~Skidding();
     void reset();
-    void update(float dt, bool is_on_ground, float steer,
+    float updateGraphics(float dt);
+    void update(int dt, bool is_on_ground, float steer,
                 KartControl::SkidControl skidding);
     void saveState(BareNetworkString *buffer);
     void rewindTo(BareNetworkString *buffer);
@@ -124,12 +117,6 @@ public:
      *  a fraction of the maximum steering angle ( so in [-1, 1]). */
     float getSteeringFraction() { return m_real_steering; }
     // ------------------------------------------------------------------------
-    /** Returns an additional height offset that is used to show a graphical
-     *  jump when a skid starts. So when this is >0 the wheels appear not to
-     *  touch the ground (though in reality the physical kart does, but also
-     *  see physical jumping implemented in this object). */
-    float getGraphicalJumpOffset() const { return m_gfx_jump_offset; }
-    // ------------------------------------------------------------------------
     /** Returns the skidding state. */
     SkidState getSkidState() const { return m_skid_state; }
     // ------------------------------------------------------------------------
@@ -139,7 +126,8 @@ public:
      *  stopped skidding now. This function returns false if the kart is
      *  actually using the skid bonus. */
     bool getSkidBonusReady() const { return m_skid_bonus_ready; }
-
+    // ------------------------------------------------------------------------
+    bool isJumping() const { return m_remaining_jump_time > 0;  }
 };   // Skidding
 
 

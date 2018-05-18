@@ -62,8 +62,6 @@ const float ANIM_TO = 7.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
-DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
-
 // ============================================================================
 
 #if 0
@@ -83,7 +81,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::string model,
 // -------------------------------------------------------------------------------------
 
 
-FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart,
+FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(const KartProperties* kart,
                                                       irr::core::stringw msg)
 {
     m_unlocked_kart      = kart;
@@ -204,7 +202,7 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
+void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked)
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     int points_before = player->getPoints();
@@ -212,9 +210,10 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
 
     std::vector<std::string> tracks;
     std::vector<std::string> gps;
+    std::vector<std::string> karts;
 
     player->computeActive();
-    unlock_manager->findWhatWasUnlocked(points_before, points_now, tracks, gps);
+    unlock_manager->findWhatWasUnlocked(points_before, points_now, tracks, gps, karts, unlocked);
 
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
@@ -224,26 +223,41 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
     {
         addUnlockedGP(grand_prix_manager->getGrandPrix(gps[i]));
     }
+    for (unsigned int i = 0; i < karts.size(); i++)
+    {
+        addUnlockedKart(kart_properties_manager->getKart(karts[i]));
+    }
 }
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
+void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty, bool is_grandprix)
 {
     core::stringw msg;
+
+    int gp_factor = is_grandprix ? GP_FACTOR : 1;
+    RaceManager::Difficulty max_unlocked_difficulty = RaceManager::DIFFICULTY_BEST;
+
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        max_unlocked_difficulty = RaceManager::DIFFICULTY_HARD;
+
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
             msg = _("You completed the easy challenge! Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         case RaceManager::DIFFICULTY_MEDIUM:
             msg = _("You completed the intermediate challenge! Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         case RaceManager::DIFFICULTY_HARD:
             msg = _("You completed the difficult challenge! Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
+            break;
+        case RaceManager::DIFFICULTY_BEST:
+            msg = _("You completed the SuperTux challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_BEST]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         default:
             assert(false);
@@ -261,6 +275,9 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
         case RaceManager::DIFFICULTY_HARD:
             model = file_manager->getAsset(FileManager::MODEL,"trophy_gold.spm");
             break;
+        case RaceManager::DIFFICULTY_BEST:
+            model = file_manager->getAsset(FileManager::MODEL,"trophy_platinum.spm");
+            break;
         default:
             assert(false);
             return;
@@ -271,12 +288,15 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
 }
 
 // ----------------------------------------------------------------------------
-// unused for now, maybe will be useful later?
 
-void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart,
-                                              irr::core::stringw msg)
+void FeatureUnlockedCutScene::addUnlockedKart(const KartProperties* unlocked_kart)
 {
-    assert(unlocked_kart != NULL);
+    if (unlocked_kart == NULL)
+    {
+        Log::error("FeatureUnlockedCutScene::addUnlockedKart", "Unlocked kart does not exist");
+        return;
+    }
+    irr::core::stringw msg = _("You unlocked %s!", unlocked_kart->getName());
     m_unlocked_stuff.push_back( new UnlockedThing(unlocked_kart, msg) );
 }  // addUnlockedKart
 
@@ -428,8 +448,6 @@ void FeatureUnlockedCutScene::init()
             Log::error("FeatureUnlockedCutScene::init", "Malformed unlocked goody");
         }
     }
-
-    PlayerManager::getCurrentPlayer()->clearUnlocked();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -683,7 +701,7 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         {
             // simulate all the steps of the animation until we reach the end
             onUpdate(0.4f);
-            World::getWorld()->updateWorld(0.4f);
+            World::getWorld()->updateWorld(stk_config->time2Ticks(0.4f));
         }
     }
     else

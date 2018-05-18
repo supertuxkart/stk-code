@@ -1,20 +1,24 @@
 <?xml version="1.0"?>
-<challenge version="2">
-    <track id="lighthouse" laps="3"/>
+<challenge version="3">
+    <unlock_list list="false"/>
+    <track id="lighthouse" laps="4"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="135"/>
+    <requirements trophies="125"/>
     
+    <best>
+        <karts number="10"/>
+        <requirements position="1" time="120"/>
+    </best>
     <hard>
-        <karts number="5"/>
-        <requirements time="110" position="1"/>
+        <karts number="9"/>
+        <requirements position="1"  time="140"/>
     </hard>
     <medium>
-        <karts number="4"/>
-        <requirements time="145" position="1"/>
+        <karts number="8"/>
+        <requirements position="1" time="190"/>
     </medium>
     <easy>
-        <karts number="3"/>
-        <requirements time="185"/>
+        <karts number="7"/>
+        <requirements time="250"/>
     </easy>
 </challenge>
-

@@ -6,6 +6,7 @@
 # Benamara Mohamed <mohamedsdev@gmail.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Ibrahim Al-Darra <achtenacht88@gmail.com>, 2017
+# A.Karim S., 2018
 # Moaaz Mohamed <moaaztdb@gmail.com>, 2017
 # صفا الفليج <safaalfulaij@hotmail.com>, 2015
 msgid ""
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Ibrahim Al-Darra <achtenacht88@gmail.com>\n"
+"PO-Revision-Date: 2018-01-14 08:54+0000\n"
+"Last-Translator: A.Karim S.\n"
 "Language-Team: Arabic (http://www.transifex.com/supertuxkart/supertuxkart/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,7 +41,7 @@ msgstr "اضرب 10 عربات بكرة بولنغ."
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
-msgstr "عدوّ الأقواس"
+msgstr "عدو القوس"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
@@ -118,7 +119,7 @@ msgstr "ساحة لعب البطاريق"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the beaten track"
-msgstr ""
+msgstr "استثنائي"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 msgid "To the moon and back"
@@ -297,7 +298,7 @@ msgstr "الإضاءة قائمة على الصورة"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Bloom"
-msgstr ""
+msgstr "تفتح"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -307,7 +308,7 @@ msgstr "أعمدة النور (أشعة الله)"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Ambient Occlusion"
-msgstr ""
+msgstr "إنسداد المحيطة"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -357,12 +358,12 @@ msgstr "شخصيّات متحرّكة"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Rendered image quality"
-msgstr ""
+msgstr "جودة الصورة المصيرة"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Geometry detail"
-msgstr ""
+msgstr "تفاصيل الهندسة"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -466,7 +467,7 @@ msgstr "تابع"
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr ""
+msgstr "تسجيل السباق لشبح الاعادة"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -487,7 +488,7 @@ msgstr "ابدأ السّباق"
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr ""
+msgstr "إختيار شبح الإعادة"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -497,7 +498,7 @@ msgstr "الاقتصار على إظهار إعادات موافقة لمستو�
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record ghost replay"
-msgstr ""
+msgstr "تسجيل شبح الإعادة"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -610,7 +611,7 @@ msgstr "أوضاع اللعب"
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Multi-player"
-msgstr ""
+msgstr "متعدد اللاعبين"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -623,11 +624,11 @@ msgstr ""
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Bananas"
-msgstr ""
+msgstr "موز"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Start the tutorial"
-msgstr ""
+msgstr "بدء الدورة التعليمية"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -744,7 +745,7 @@ msgstr "اتبع المتزعّم: اسعَ إلى المرتبة الثّاني
 #. I18N: In the help menu
 msgid ""
 "3 Strikes Battle: Hit others with weapons until they lose all their lives."
-msgstr ""
+msgstr "معركة 3 ضربات: إضرب الآخرين بالأسلحة حتى يفقدو كل أرواحهم"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -799,24 +800,24 @@ msgstr ""
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr ""
+msgstr "الإرتطام بموزة يمكن أن يؤدي إلى تعلق أحد الأشياء التالية بالكارت:"
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Anchor - slows down the kart."
-msgstr ""
+msgstr "المرساة - تبطيء الكارت كثيرا"
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Parachute - slows down the kart less than the anchor."
-msgstr ""
+msgstr "مظلة - تبطيء الكارت قليلا"
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after a short amount of time to throw the kart up in the "
 "air. Bump into another kart to transfer the bomb to another player."
-msgstr ""
+msgstr "قنبلة - تنفجر بعد فترة قصيرة من الوقت لترمي الكارت في الهواء. إصدم كارت آخر لنقل القنبلة إلى لاعب آخر."
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -849,7 +850,7 @@ msgstr "متعدّدة اللاعبين"
 #: src/states_screens/main_menu_screen.cpp:78
 #: src/states_screens/online_profile_friends.cpp:222
 msgid "Online"
-msgstr ""
+msgstr "عبر الإنترنت"
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
@@ -905,46 +906,46 @@ msgstr "أنهِ"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Touch Device Settings"
-msgstr ""
+msgstr "إعدادات جهاز اللمس"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Device enabled"
-msgstr ""
+msgstr "جهاز مفعّل"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Inverted buttons"
-msgstr ""
+msgstr "أزرار مقلوبة"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr ""
+msgstr "أزرار السلّم"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Accelerometer"
-msgstr ""
+msgstr "مقياس التسارع"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Advanced"
-msgstr ""
+msgstr "متقدم"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr ""
+msgstr "منطقة مقطوعة"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity"
-msgstr ""
+msgstr "حساسية"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr ""
+msgstr "استعادة الضبط الافتراضي"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -973,7 +974,7 @@ msgstr "أكّد"
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Submit"
-msgstr ""
+msgstr "سلّم"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -1169,7 +1170,7 @@ msgstr "اخرج"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View"
-msgstr ""
+msgstr "المنظر"
 
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
@@ -1205,11 +1206,11 @@ msgstr "نظرة عامّة"
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:110
 msgid "Servers"
-msgstr ""
+msgstr "الخوادم"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Local Networking"
-msgstr ""
+msgstr "الشبكة المحلية"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -1224,12 +1225,12 @@ msgstr "أنشئ خادومًا"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Global Networking"
-msgstr ""
+msgstr "الشبكة العامة"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Quick Play"
-msgstr ""
+msgstr "لعب سريع"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
@@ -1502,7 +1503,7 @@ msgstr "أنت تلعب مثل"
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit their settings"
-msgstr ""
+msgstr "إضغط على ENTER أو نقر مزدوج فوق لاعب لتعديل إعداداته"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
@@ -1757,7 +1758,7 @@ msgstr "احذف"
 
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
-msgstr ""
+msgstr "هاوية أنتيدلوفيان"
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
@@ -1765,7 +1766,7 @@ msgstr "جزيرة النّزال"
 
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
-msgstr ""
+msgstr "مدينة كانديلا"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -1777,7 +1778,7 @@ msgstr "معبد الكاكّاو"
 
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
-msgstr ""
+msgstr "معبر كورنفيلد"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
@@ -1797,12 +1798,12 @@ msgstr "المزرعة"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr ""
+msgstr "ملعب كرة القدم الجليدي"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr ""
+msgstr "ما المشكلة؟ قائدك العظيم نو مفقود؟"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1828,7 +1829,7 @@ msgstr "ولكنّك أيّها الغبيّ الصّغير المثير للش�
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
-msgstr ""
+msgstr "حلبة لاس دوناس"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
@@ -1884,7 +1885,7 @@ msgstr "المعبد"
 
 #. I18N: ../stk-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
-msgstr ""
+msgstr "جزيرة البركان"
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -1924,7 +1925,7 @@ msgstr "هكسلي"
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
-msgstr ""
+msgstr "كيكي"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
@@ -1964,7 +1965,7 @@ msgstr "ويلبر"
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr ""
+msgstr "كزو"
 
 #: src/achievements/achievement.cpp:209
 #, c-format
@@ -1985,7 +1986,7 @@ msgstr "خطأ في تنزيل الأخبار: '%s'."
 #: src/states_screens/race_result_gui.cpp:1424
 #, c-format
 msgid "Laps: %i"
-msgstr ""
+msgstr "لفات: %i"
 
 #: src/challenges/challenge_data.cpp:272
 msgid "Follow the leader"
@@ -2045,16 +2046,16 @@ msgstr "ملفّ ضبطك كان قديمًا جدًّا، لذلك حُذف و�
 
 #: src/graphics/irr_driver.cpp:535
 msgid "Video recording started."
-msgstr ""
+msgstr "بدأ تسجيل الفيديو"
 
 #: src/graphics/irr_driver.cpp:541
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr ""
+msgstr "تم حفظ الفيديو خلال \"%s\"."
 
 #: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
-msgstr ""
+msgstr "تقدم الترميز:"
 
 #: src/graphics/irr_driver.cpp:1682
 #, c-format
@@ -2110,98 +2111,98 @@ msgstr "زرّ الفأرة الأوسط"
 #: src/input/binding.cpp:122
 msgctxt "input_key"
 msgid "X1 Mouse Button"
-msgstr ""
+msgstr "س1 زر الفأرة"
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:124
 msgctxt "input_key"
 msgid "X2 Mouse Button"
-msgstr ""
+msgstr "س2 زر الفأرة"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:126
 msgctxt "input_key"
 msgid "Backspace"
-msgstr ""
+msgstr "Backspace"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:128
 msgctxt "input_key"
 msgid "Tab"
-msgstr ""
+msgstr "Tab"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:130
 msgctxt "input_key"
 msgid "Clear"
-msgstr ""
+msgstr "Clear"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Return"
-msgstr ""
+msgstr "Return"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:134
 msgctxt "input_key"
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:136
 msgctxt "input_key"
 msgid "Control"
-msgstr ""
+msgstr "Ctrl"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:138
 msgctxt "input_key"
 msgid "Alt/Menu"
-msgstr ""
+msgstr "Alt/Menu"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:140
 msgctxt "input_key"
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:142
 msgctxt "input_key"
 msgid "Caps Lock"
-msgstr ""
+msgstr "Caps Lock"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:144
 msgctxt "input_key"
 msgid "Kana"
-msgstr ""
+msgstr "كانا"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:146
 msgctxt "input_key"
 msgid "Junja"
-msgstr ""
+msgstr "جونجا"
 
 #. I18N: input configuration screen: keyboard key
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:149
 msgctxt "input_key"
 msgid "Final"
-msgstr ""
+msgstr "النهائي"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:151
 msgctxt "input_key"
 msgid "Escape"
-msgstr ""
+msgstr "Escape"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:153
 msgctxt "input_key"
 msgid "Convert"
-msgstr ""
+msgstr "Convert"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:155
@@ -2225,67 +2226,67 @@ msgstr ""
 #: src/input/binding.cpp:161
 msgctxt "input_key"
 msgid "Space"
-msgstr ""
+msgstr "Space"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:163
 msgctxt "input_key"
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:165
 msgctxt "input_key"
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:167
 msgctxt "input_key"
 msgid "End"
-msgstr ""
+msgstr "End"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:169
 msgctxt "input_key"
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:171
 msgctxt "input_key"
 msgid "Left"
-msgstr ""
+msgstr "يسار"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:173
 msgctxt "input_key"
 msgid "Up"
-msgstr ""
+msgstr "أعلى"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:175
 msgctxt "input_key"
 msgid "Right"
-msgstr ""
+msgstr "يمين"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:177
 msgctxt "input_key"
 msgid "Down"
-msgstr ""
+msgstr "أسفل"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:179
 msgctxt "input_key"
 msgid "Select"
-msgstr ""
+msgstr "Select"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:181
 msgctxt "input_key"
 msgid "Print"
-msgstr ""
+msgstr "طبع"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:183
@@ -2297,37 +2298,37 @@ msgstr ""
 #: src/input/binding.cpp:185
 msgctxt "input_key"
 msgid "Print Screen"
-msgstr ""
+msgstr "طبع الشاشة"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:187
 msgctxt "input_key"
 msgid "Insert"
-msgstr ""
+msgstr "Insert"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:189
 msgctxt "input_key"
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:191
 msgctxt "input_key"
 msgid "Help"
-msgstr ""
+msgstr "مساعدة"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:229
 msgctxt "input_key"
 msgid "Left Logo"
-msgstr ""
+msgstr "الشعار الأيسر"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:231
 msgctxt "input_key"
 msgid "Right Logo"
-msgstr ""
+msgstr "الشعار الأيمن"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:233
@@ -2339,7 +2340,7 @@ msgstr ""
 #: src/input/binding.cpp:235
 msgctxt "input_key"
 msgid "Sleep"
-msgstr ""
+msgstr "Sleep"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:237
@@ -2411,7 +2412,7 @@ msgstr ""
 #: src/input/binding.cpp:261
 msgctxt "input_key"
 msgid "- (Subtract)"
-msgstr ""
+msgstr "- (الطرح)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:263
@@ -2423,61 +2424,61 @@ msgstr ""
 #: src/input/binding.cpp:265
 msgctxt "input_key"
 msgid "/ (Divide)"
-msgstr ""
+msgstr "/ (القسمة)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:291
 msgctxt "input_key"
 msgid "Num Lock"
-msgstr ""
+msgstr "Num Lock"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:293
 msgctxt "input_key"
 msgid "Scroll Lock"
-msgstr ""
+msgstr "Scroll Lock"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:295
 msgctxt "input_key"
 msgid "Left Shift"
-msgstr ""
+msgstr "Shift الأيسر"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:297
 msgctxt "input_key"
 msgid "Right Shift"
-msgstr ""
+msgstr "Shift الأيمن"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:299
 msgctxt "input_key"
 msgid "Left Control"
-msgstr ""
+msgstr "Ctrl الأيسر"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:301
 msgctxt "input_key"
 msgid "Right Control"
-msgstr ""
+msgstr "Ctrl الأيمن"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:303
 msgctxt "input_key"
 msgid "Left Menu"
-msgstr ""
+msgstr "Menu الأيسر"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:305
 msgctxt "input_key"
 msgid "Right Menu"
-msgstr ""
+msgstr "Menu الأيمن"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:311
 msgctxt "input_key"
 msgid "Attn"
-msgstr ""
+msgstr "Attn"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:313
@@ -2501,13 +2502,13 @@ msgstr ""
 #: src/input/binding.cpp:319
 msgctxt "input_key"
 msgid "Play"
-msgstr ""
+msgstr "لعب"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:321
 msgctxt "input_key"
 msgid "Zoom"
-msgstr ""
+msgstr "تكبير"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:323
@@ -2519,7 +2520,7 @@ msgstr ""
 #: src/input/binding.cpp:325
 msgctxt "input_key"
 msgid "Oem Clear"
-msgstr ""
+msgstr "OEM Clear"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:334 src/input/binding.cpp:339
@@ -2588,102 +2589,102 @@ msgstr "أبيض"
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
 msgid "Left trigger"
-msgstr ""
+msgstr "المحفز الأيسر"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:244
 msgid "Right thumb right"
-msgstr ""
+msgstr "الإبهام الأيمن إلى اليمين"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:246
 msgid "Right thumb left"
-msgstr ""
+msgstr "الإبهام الأيمن إلى اليسار"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of trigger on gamepads
 #: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:240
 msgid "Right thumb down"
-msgstr ""
+msgstr "الإبهام الأيمن إلى الأسفل"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:242
 msgid "Right thumb up"
-msgstr ""
+msgstr "الإبهام الأيمن إلى الأعلى"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:248
 msgid "Right trigger"
-msgstr ""
+msgstr "المحفز الأيمن"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:191 src/input/gamepad_config.cpp:253
 msgid "DPad right"
-msgstr ""
+msgstr "دي-باد يمين"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:193 src/input/gamepad_config.cpp:255
 msgid "DPad left"
-msgstr ""
+msgstr "دي-باد يسار"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:251
 msgid "DPad down"
-msgstr ""
+msgstr "دي-باد أسفل"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of trigger on gamepads
 #: src/input/gamepad_config.cpp:197 src/input/gamepad_config.cpp:249
 msgid "DPad up"
-msgstr ""
+msgstr "دي-باد أعلى"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:212
 msgid "Left bumper"
-msgstr ""
+msgstr "ماص الصدمات الأيسر"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:214
 msgid "Right bumper"
-msgstr ""
+msgstr "ماص الصدمات الأيمن"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
 msgid "Start"
-msgstr ""
+msgstr "إبدأ"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
 msgid "Left thumb button"
-msgstr ""
+msgstr "زر الإبهام الأيسر"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:222
 msgid "Right thumb button"
-msgstr ""
+msgstr "زر الإبهام الأيمن"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:231
 msgid "Left thumb right"
-msgstr ""
+msgstr "الإبهام الأيسر إلى اليمين"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:233
 msgid "Left thumb left"
-msgstr ""
+msgstr "الإبهام الأيسر إلى اليسار"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:235
 msgid "Left thumb down"
-msgstr ""
+msgstr "الإبهام الأيسر إلى الأسفل"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:237
 msgid "Left thumb up"
-msgstr ""
+msgstr "الإبهام الأيسر إلى الأعلى"
 
 #: src/input/input_manager.cpp:807
 #, c-format
@@ -2731,11 +2732,11 @@ msgstr "لا تتسارع قبل إشارة الإطلاق"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
-msgstr ""
+msgstr "يمكنك الحصول على 3 أرواح على الأكثر!"
 
 #: src/karts/controller/spare_tire_ai.cpp:153
 msgid "+1 life."
-msgstr ""
+msgstr "+1 روح"
 
 #: src/karts/kart.cpp:908 src/karts/kart.cpp:913
 msgid "You won the race!"
@@ -2758,7 +2759,7 @@ msgstr ""
 
 #: src/main.cpp:1654
 msgid "Your screen resolution is too low to run STK."
-msgstr ""
+msgstr "ميز الشاشة منخفض جدا لتشغيل اللعبة."
 
 #: src/main.cpp:1668
 msgid ""
@@ -2798,7 +2799,7 @@ msgstr "%s لِـ %s"
 
 #: src/modes/linear_world.cpp:374
 msgid "New fastest lap"
-msgstr ""
+msgstr "أسرع لفة جديدة"
 
 #: src/modes/linear_world.cpp:891
 msgid "WRONG WAY!"
@@ -2808,12 +2809,12 @@ msgstr "الاتّجاه الخطأ!"
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "تم إنتاج %i إطار إحتياطي للكارت"
+msgstr[1] "تم إنتاج %i إطار إحتياطي للكارت"
+msgstr[2] "تم إنتاج %i إطاران إحتياطيان للكارت"
+msgstr[3] "تم إنتاج %i إطارات إحتياطية للكارت"
+msgstr[4] "تم إنتاج %i إطار إحتياطي للكارت"
+msgstr[5] "تم إنتاج %i إطار إحتياطي للكارت"
 
 #: src/modes/world.cpp:1202
 msgid "You have been eliminated!"
@@ -2827,11 +2828,11 @@ msgstr "لقد استُبعد '%s'."
 #: src/network/protocols/server_lobby.cpp:318
 #, c-format
 msgid "Failed to register server: %s"
-msgstr ""
+msgstr "أخفق تسجيل الخادم: %s"
 
 #: src/network/servers_manager.cpp:198
 msgid "No LAN server detected"
-msgstr ""
+msgstr "لم يتم اكتشاف أي خادم لان"
 
 #: src/online/online_player_profile.cpp:419
 #, c-format
@@ -2913,12 +2914,12 @@ msgstr "كرة قدم"
 
 #: src/replay/replay_recorder.cpp:183
 msgid "Incomplete replay file will not be saved."
-msgstr ""
+msgstr "ملف الإعادة غير المكتمل لن يتم حفظه."
 
 #: src/replay/replay_recorder.cpp:219
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr ""
+msgstr "تم حفظ الإعادة خلال \"%s\"."
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
@@ -2964,7 +2965,7 @@ msgstr "تاريخ التّحديث"
 msgid ""
 "Access to the Internet is disabled. (To enable it, go to options and select "
 "tab 'User Interface')"
-msgstr ""
+msgstr "الإتصال بالأنترنت معطل. (لتفعيله، إنتقل إلى الخيارات وإختر التبويب 'واجهة المستخدم')"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:343
@@ -3014,16 +3015,16 @@ msgstr "حلبة عشوائية"
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%d حلبة غير متوفرة عند اللعب الإنفرادي. "
+msgstr[1] "%d حلبة غير متوفرة عند اللعب الإنفرادي."
+msgstr[2] "%d حلبتان غير متوفرة عند اللعب الإنفرادي. "
+msgstr[3] "%d حلبات غير متوفرة عند اللعب الإنفرادي. "
+msgstr[4] "%d حلبة غير متوفرة عند اللعب الإنفرادي. "
+msgstr[5] "%d حلبة غير متوفرة عند اللعب الإنفرادي."
 
 #: src/states_screens/create_server_screen.cpp:82
 msgid "Create LAN Server"
-msgstr ""
+msgstr "إنشاء خادم لان"
 
 #: src/states_screens/create_server_screen.cpp:87
 #, c-format
@@ -3164,7 +3165,7 @@ msgstr "معطّل"
 #: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options_screen_video.cpp:462
 msgid "Important only"
-msgstr ""
+msgstr "مهم فقط"
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
@@ -3183,7 +3184,7 @@ msgstr "ممكّن للكلّ"
 #: src/states_screens/dialogs/custom_video_settings.cpp:102
 #: src/states_screens/options_screen_video.cpp:469
 msgid "Low"
-msgstr ""
+msgstr "منخفظ"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
@@ -3193,21 +3194,21 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:103
 #: src/states_screens/options_screen_video.cpp:472
 msgid "High"
-msgstr ""
+msgstr "مرتفع"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:94
 #: src/states_screens/options_screen_video.cpp:466
 msgid "Very Low"
-msgstr ""
+msgstr "منخفظ جدا"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very high
 #: src/states_screens/dialogs/custom_video_settings.cpp:97
 #: src/states_screens/options_screen_video.cpp:475
 msgid "Very High"
-msgstr ""
+msgstr "مرتفع جدا"
 
 #: src/states_screens/dialogs/message_dialog.cpp:129
 #: src/states_screens/edit_gp_screen.cpp:257
@@ -3217,11 +3218,11 @@ msgstr "لا"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:60
 msgid "Tablet"
-msgstr ""
+msgstr "حاسوب لوحي"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:61
 msgid "Phone"
-msgstr ""
+msgstr "هاتف"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
@@ -3264,7 +3265,7 @@ msgstr "تحدّي نيترو"
 #: src/states_screens/dialogs/select_challenge.cpp:151
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
-msgstr ""
+msgstr "سباق شبح الإعادة"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:75
 msgid "Server successfully created. You can now join it."
@@ -3309,7 +3310,7 @@ msgstr "يجلب آخر تصويت"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
-msgstr ""
+msgstr "يمكنك تكييف التقييم السابق من خلال النقر على النجوم في الأسفل."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:195
 msgid ""
@@ -3323,7 +3324,7 @@ msgstr "نجح التّصويت! يمكنك إغلاق النّافذة."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:247
 msgid "Performing vote"
-msgstr ""
+msgstr "إجراء التصويت"
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/tracks_and_gp_screen.cpp:292
@@ -3401,11 +3402,11 @@ msgstr "لقد أزلت قفل سباق الجائزة الكبرى %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:82
 msgid "Finish Time"
-msgstr ""
+msgstr "وقت الإنتهاء"
 
 #: src/states_screens/ghost_replay_selection.cpp:83
 msgid "User"
-msgstr ""
+msgstr "مستخدم"
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
@@ -3479,7 +3480,7 @@ msgstr "مقفل"
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
-msgstr ""
+msgstr "الجميع:\nإضغطو على زر 'Select' للإنضمام إلى اللعبة"
 
 #: src/states_screens/main_menu_screen.cpp:510
 msgid ""
@@ -3635,7 +3636,7 @@ msgstr "إلباث اللعبة"
 #. I18N: Key binding name
 #: src/states_screens/options_screen_device.cpp:250
 msgid "Up"
-msgstr "الأعلى"
+msgstr "أعلى"
 
 #. I18N: Key binding name
 #: src/states_screens/options_screen_device.cpp:253
@@ -3695,7 +3696,7 @@ msgstr "أجهزة لمس"
 msgid ""
 "In multiplayer mode, players can select handicapped (more difficult) "
 "profiles on the kart selection screen"
-msgstr ""
+msgstr "في وضع متعددة اللاعبين، يمكن إختيار تشكيلات الإعاقة (أكثر صعوبة) على شاشة اختيار الكارت"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:191
@@ -3749,13 +3750,13 @@ msgstr "غشاوة الحركة: %s"
 #: src/states_screens/options_screen_video.cpp:501
 #, c-format
 msgid "Anti-aliasing: %s"
-msgstr ""
+msgstr "تنعيم: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:504
 #, c-format
 msgid "Ambient occlusion: %s"
-msgstr ""
+msgstr "إنسداد المحيطة: %s"
 
 #: src/states_screens/options_screen_video.cpp:508
 #, c-format
@@ -3771,7 +3772,7 @@ msgstr "الظّلال: %i"
 #: src/states_screens/options_screen_video.cpp:513
 #, c-format
 msgid "Bloom: %s"
-msgstr ""
+msgstr "تفتح: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:517
@@ -3783,7 +3784,7 @@ msgstr "التّوهّج (الحدود): %s"
 #: src/states_screens/options_screen_video.cpp:521
 #, c-format
 msgid "Light shaft (God rays): %s"
-msgstr ""
+msgstr "شعاع الضوء (إشعاعات الغسق): %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:525
@@ -3800,7 +3801,7 @@ msgstr "الإضاءة العموميّة: %s"
 #: src/states_screens/options_screen_video.cpp:534
 #, c-format
 msgid "Rendered image quality: %s"
-msgstr ""
+msgstr "جودة الصورة المصيرة: %s"
 
 #: src/states_screens/race_gui.cpp:358 src/states_screens/race_gui.cpp:360
 msgid "Challenge Failed"
@@ -3857,7 +3858,7 @@ msgstr "الرّتبة"
 
 #: src/states_screens/race_gui_overworld.cpp:518
 msgid "Press fire to start the tutorial"
-msgstr ""
+msgstr "اضغط على إطلاق لبدء الدورة التعليمية"
 
 #: src/states_screens/race_gui_overworld.cpp:557
 msgid "Type: Grand Prix"
@@ -3920,7 +3921,7 @@ msgstr "إنّه تعادل"
 #: src/states_screens/race_result_gui.cpp:1098
 #: src/states_screens/race_result_gui.cpp:1154
 msgid "(Own Goal)"
-msgstr ""
+msgstr "(هدف خاص)"
 
 #: src/states_screens/race_result_gui.cpp:1220
 #, c-format
@@ -3938,12 +3939,12 @@ msgstr "النّتائج العليا"
 #: src/states_screens/race_result_gui.cpp:1432
 #, c-format
 msgid "Difficulty: %s"
-msgstr ""
+msgstr "الصعوبة: %s"
 
 #: src/states_screens/race_result_gui.cpp:1440
 #, c-format
 msgid "Best lap time: %s"
-msgstr ""
+msgstr "أفضل وقت للفة: %s"
 
 #: src/states_screens/race_setup_screen.cpp:87
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -3972,7 +3973,7 @@ msgstr "استكشف المسارات للعثور على كلّ البيضات 
 
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Race against ghost karts and try to beat them!"
-msgstr ""
+msgstr "سابق ضد أشباح الكارت وحاول التغلب عليهم!"
 
 #: src/states_screens/register_screen.cpp:218
 #: src/states_screens/register_screen.cpp:225
@@ -4045,7 +4046,7 @@ msgstr "مسار لِـ %s"
 #: src/states_screens/track_info_screen.cpp:120
 #, c-format
 msgid "Max players supported: %d"
-msgstr ""
+msgstr "الحد الأقصى لعدد اللاعبين: %d"
 
 #. I18N: In the track info screen
 #: src/states_screens/track_info_screen.cpp:213
@@ -4055,7 +4056,7 @@ msgstr "تسابق بالعكس"
 #. I18N: In the track info screen
 #: src/states_screens/track_info_screen.cpp:218
 msgid "Random item location"
-msgstr ""
+msgstr "موقع الشيء عشوائي"
 
 #: src/states_screens/user_screen.cpp:111
 msgid "Exit game"
@@ -4125,7 +4126,7 @@ msgstr "اجمع صناديق الهدايا وأطلق السّلاح بِـ <%
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
-msgstr ""
+msgstr "إضغط على <%s> للنظر إلى الخلف. إرمي السلاح بواسطة <%s> أثناء الضغط على <%s> للرمي من الخلف!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:53
 #: ../stk-assets/tracks/tutorial/triggers.as:54

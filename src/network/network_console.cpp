@@ -16,173 +16,111 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/network_console.hpp"
-
-#include "main_loop.hpp"
+#include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
-#include "network/protocols/client_lobby.hpp"
-#include "network/protocols/server_lobby.hpp"
-#include "network/protocols/stop_server.hpp"
 #include "network/stk_peer.hpp"
-#include "utils/log.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
+#include "main_loop.hpp"
 
 #include <iostream>
 
-
-NetworkConsole::NetworkConsole()
+namespace NetworkConsole
 {
-    m_localhost = NULL;
-    m_thread_keyboard = NULL;
-}
+// ----------------------------------------------------------------------------
+void showHelp()
+{
+    std::cout << "Available command:" << std::endl;
+    std::cout << "help, Print this." << std::endl;
+    std::cout << "quit, Shut down the server." << std::endl;
+    std::cout << "kickall, Kick all players out of STKHost." << std::endl;
+    std::cout << "kick #, kick # peer of STKHost." << std::endl;
+    std::cout << "kickban #, kick and ban # peer of STKHost." << std::endl;
+    std::cout << "listpeers, List all peers with host ID and IP." << std::endl;
+    std::cout << "listban, List IP ban list of server." << std::endl;
+}   // showHelp
 
 // ----------------------------------------------------------------------------
-NetworkConsole::~NetworkConsole()
-{
-#ifndef ANDROID
-    if (m_thread_keyboard)
-        pthread_cancel(*m_thread_keyboard);//, SIGKILL);
-#endif
-}
-
-// ----------------------------------------------------------------------------
-void NetworkConsole::run()
-{
-    // listen keyboard console input
-    m_thread_keyboard = new pthread_t;
-    pthread_create(m_thread_keyboard, NULL, mainLoop, this);
-
-    Log::info("NetworkConsole", "Ready.");
-}   // run
-
-// ----------------------------------------------------------------------------
-void* NetworkConsole::mainLoop(void* data)
+void mainLoop(STKHost* host)
 {
     VS::setThreadName("NetworkConsole");
-    NetworkConsole *me = static_cast<NetworkConsole*>(data);
+    showHelp();
     std::string str = "";
-    bool stop = false;
-    while (!stop)
+    while (!host->requestedShutdown())
     {
         getline(std::cin, str);
-        if (str == "quit")
+        std::stringstream ss(str);
+        int number = -1;
+        ss >> str >> number;
+        if (str == "help")
         {
-            stop = true;
+            showHelp();
         }
-        else if (str == "kickall" && NetworkConfig::get()->isServer())
+        else if (str == "quit")
         {
-            me->kickAllPlayers();
+            host->requestShutdown();
         }
-        else if (str == "start" && NetworkConfig::get()->isServer())
+        else if (str == "kickall")
         {
-            ServerLobby* protocol = 
-                dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            protocol->signalRaceStartToClients();
+            auto peers = host->getPeers();
+            for (unsigned int i = 0; i < peers.size(); i++)
+            {
+                peers[i]->kick();
+            }
         }
-        else if (str == "selection" && NetworkConfig::get()->isServer())
+        else if (str == "kick" && number != -1 &&
+            NetworkConfig::get()->isServer())
         {
-            ServerLobby* protocol =
-                    dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            protocol->startSelection();
+            std::shared_ptr<STKPeer> peer = host->findPeerByHostId(number);
+            if (peer)
+                peer->kick();
+            else
+                std::cout << "Unknown host id: " << number << std::endl;
         }
-        else if (str == "select" && NetworkConfig::get()->isClient())
+        else if (str == "kickban" && number != -1 &&
+            NetworkConfig::get()->isServer())
         {
-            std::string str2;
-            getline(std::cin, str2);
-            ServerLobby* protocol =
-                dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            ClientLobby* clrp = dynamic_cast<ClientLobby*>(protocol);
-            std::vector<NetworkPlayerProfile*> players =
-                                         STKHost::get()->getMyPlayerProfiles();
-            // For now send a vote for each local player
-            for(unsigned int i=0; i<players.size(); i++)
+            std::shared_ptr<STKPeer> peer = host->findPeerByHostId(number);
+            if (peer)
             {
-                clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
-                                           str2);
-            }   // for i in players
+                peer->kick();
+                UserConfigParams::m_server_ban_list
+                    [peer->getAddress().toString(false/*show_port*/)] = 0;
+                LobbyProtocol::get<ServerLobby>()->updateBanList();
+            }
+            else
+                std::cout << "Unknown host id: " << number << std::endl;
         }
-        else if (str == "vote" && NetworkConfig::get()->isClient())
+        else if (str == "listpeers")
         {
-            std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
-            std::string str2;
-            getline(std::cin, str2);
-            LobbyProtocol* protocol = LobbyProtocol::get();
-            ClientLobby* clrp =
-                               dynamic_cast<ClientLobby*>(protocol);
-            std::vector<NetworkPlayerProfile*> players =
-                                     STKHost::get()->getMyPlayerProfiles();
-            if (str2 == "track")
+            auto peers = host->getPeers();
+            if (peers.empty())
+                std::cout << "No peers exist" << std::endl;
+            for (unsigned int i = 0; i < peers.size(); i++)
             {
-                std::cin >> str2;
-                // For now send a vote for each local player
-                for(unsigned int i=0; i<players.size(); i++)
-                    clrp->voteTrack(i, str2);
+                std::cout << peers[i]->getHostId() << ": " <<
+                    peers[i]->getAddress().toString() << std::endl;
             }
-            else if (str2 == "laps")
+        }
+        else if (str == "listban")
+        {
+            for (auto& ban : UserConfigParams::m_server_ban_list)
             {
-                int cnt;
-                std::cin >> cnt;
-                for(unsigned int i=0; i<players.size(); i++)
-                    clrp->voteLaps(i, cnt);
+                if (ban.first == "0.0.0.0")
+                    continue;
+                std::cout << "IP: " << ban.first << " online id: " <<
+                    ban.second << std::endl;
             }
-            else if (str2 == "reversed")
-            {
-                bool cnt;
-                std::cin >> cnt;
-                for(unsigned int i=0; i<players.size(); i++)
-                    clrp->voteReversed(i, cnt);
-            }
-            else if (str2 == "major")
-            {
-                int cnt;
-                std::cin >> cnt;
-                for(unsigned int i=0; i<players.size(); i++)
-                    clrp->voteMajor(i, cnt);
-            }
-            else if (str2 == "minor")
-            {
-                int cnt;
-                std::cin >> cnt;
-                for(unsigned int i=0; i<players.size(); i++)
-                    clrp->voteMinor(i, cnt);
-            }
-            else if (str2 == "race#")
-            {
-                int cnt;
-                std::cin >> cnt;
-                for(unsigned int i=0; i<players.size(); i++)
-                    clrp->voteRaceCount(i, cnt);
-            }
-            std::cout << "\n";
         }
         else
         {
-            Log::info("Console", "Unknown command '%s'.", str.c_str());
+            std::cout << "Unknown command: " << str << std::endl;
         }
     }   // while !stop
-
-    Protocol *p = new StopServer();
-    while(p->getState() != PROTOCOL_STATE_TERMINATED)
-    {
-        StkTime::sleep(1);
-    }
-
-    delete p;
-
     main_loop->abort();
-
-    return NULL;
 }   // mainLoop
 
-// ----------------------------------------------------------------------------
-void NetworkConsole::kickAllPlayers()
-{
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        peers[i]->disconnect();
-    }
-}   // kickAllPlayers
+}

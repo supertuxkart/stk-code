@@ -23,6 +23,7 @@
 
 #include "items/flyable.hpp"
 #include "tracks/track_sector.hpp"
+#include "utils/cpp2011.hpp"
 
 class AbstractKart;
 class SFXBase;
@@ -79,7 +80,7 @@ private:
     /** If the ball overtakes its target or starts to aim at the kart which
      *  originally shot the rubber ball, after this amount of time the
      *  ball will be deleted. */
-    static float m_st_delete_time;
+    static int m_st_delete_ticks;
 
     /** Timer before another rubber ball can be picked up. This is to ensure
      *  that there are not too many rubber balls on the track in races with many
@@ -166,7 +167,7 @@ private:
      *  originally shot the rubber ball, after a certain amount of time the
      *  ball will be deleted. This timer tracks this time. If it is < 0
      *  it indicates that the ball is targeting another kart atm. */
-    float        m_delete_timer;
+    int          m_delete_ticks;
 
     /** The current maximum height of the ball. This value will be
      *  reduced if the ball gets closer to the target. */
@@ -192,8 +193,8 @@ private:
                                          float *f=NULL);
     void         getNextControlPoint();
     float        updateHeight();
-    void         interpolate(Vec3 *next_xyz, float dt);
-    void         moveTowardsTarget(Vec3 *next_xyz, float dt);
+    void         interpolate(Vec3 *next_xyz, int ticks);
+    void         moveTowardsTarget(Vec3 *next_xyz, int ticks);
     void         initializeControlPoints(const Vec3 &xyz);
     float        getTunnelHeight(const Vec3 &next_xyz, 
                                      const float vertical_offset) const;
@@ -202,7 +203,7 @@ public:
                  RubberBall  (AbstractKart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
-    virtual bool updateAndDelete(float dt);
+    virtual bool updateAndDelete(int ticks) OVERRIDE;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     virtual void setAnimation(AbstractKartAnimation *animation);
     // ------------------------------------------------------------------------

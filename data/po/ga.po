@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Aaron Kearns <ajkearns6@gmail.com>, 2017
+# Aaron Kearns <ajkearns6@gmail.com>, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2018-02-21 22:27+0000\n"
+"Last-Translator: Aaron Kearns <ajkearns6@gmail.com>\n"
 "Language-Team: Irish (http://www.transifex.com/supertuxkart/supertuxkart/language/ga/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
-msgstr ""
+msgstr "Christoffel Columbus"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
@@ -544,7 +544,7 @@ msgstr "Athainmnigh"
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
 msgid "Save Grand Prix"
-msgstr ""
+msgstr "Sábháil Grand Prix"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: ./data/gui/help2.stkgui
@@ -1892,7 +1892,7 @@ msgstr "Gairdín Zen"
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
-msgstr ""
+msgstr "Adiumy"
 
 #. I18N: ../stk-assets/karts/amanda/kart.xml
 msgid "Amanda"
@@ -1904,7 +1904,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
-msgstr ""
+msgstr "Emule"
 
 #. I18N: ../stk-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
@@ -1916,7 +1916,7 @@ msgstr "Gnu"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
-msgstr ""
+msgstr "Hexley"
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
@@ -1936,7 +1936,7 @@ msgstr "Pidgin"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
-msgstr ""
+msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
@@ -2172,13 +2172,13 @@ msgstr ""
 #: src/input/binding.cpp:144
 msgctxt "input_key"
 msgid "Kana"
-msgstr ""
+msgstr "Kana"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:146
 msgctxt "input_key"
 msgid "Junja"
-msgstr ""
+msgstr "Junja"
 
 #. I18N: input configuration screen: keyboard key
 #. I18N: input configuration screen: keyboard key

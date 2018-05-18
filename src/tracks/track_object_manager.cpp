@@ -141,6 +141,19 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
 /** Updates all track objects.
  *  \param dt Time step size.
  */
+void TrackObjectManager::updateGraphics(float dt)
+{
+    TrackObject* curr;
+    for_in(curr, m_all_objects)
+    {
+        curr->updateGraphics(dt);
+    }
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** Updates all track objects.
+ *  \param dt Time step size.
+ */
 void TrackObjectManager::update(float dt)
 {
     TrackObject* curr;
@@ -225,3 +238,25 @@ void TrackObjectManager::removeObject(TrackObject* obj)
     m_all_objects.remove(obj);
     delete obj;
 }   // removeObject
+
+// ----------------------------------------------------------------------------
+void TrackObjectManager::removeForRewind()
+{
+    for (TrackObject* curr : m_all_objects)
+    {
+        if (curr->getPhysicalObject() &&
+            curr->getPhysicalObject()->isDynamic())
+            curr->getPhysicalObject()->removeBody();
+    }
+}   // removeForRewind
+
+// ----------------------------------------------------------------------------
+void TrackObjectManager::addForRewind()
+{
+    for (TrackObject* curr : m_all_objects)
+    {
+        if (curr->getPhysicalObject() &&
+            curr->getPhysicalObject()->isDynamic())
+            curr->getPhysicalObject()->addBody();
+    }
+}   // addForRewind

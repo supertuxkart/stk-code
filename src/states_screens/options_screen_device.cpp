@@ -45,8 +45,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenDevice );
-
 // ----------------------------------------------------------------------------
 
 OptionsScreenDevice::OptionsScreenDevice() : Screen("options_device.stkgui")

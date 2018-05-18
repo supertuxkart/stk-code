@@ -375,7 +375,10 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
         case PA_RESCUE:
         case PA_MENU_CANCEL:
-            if (pressedDown) GUIEngine::getStateManager()->escapePressed();
+            if (pressedDown&& !isWithinATextBox())
+            {
+                GUIEngine::getStateManager()->escapePressed();
+            }
             break;
 
         case PA_FIRE:
@@ -813,7 +816,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 
                 const int playerID = input_manager->getPlayerKeyboardID();
                 if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
-                if (!w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
+                if (playerID != -1 && !w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
 
                 break;
             }

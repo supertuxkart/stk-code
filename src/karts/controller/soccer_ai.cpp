@@ -107,7 +107,7 @@ void SoccerAI::reset()
  *  after goal.
  *  \param dt Time step size.
  */
-void SoccerAI::update(float dt)
+void SoccerAI::update(int ticks)
 {
 #ifdef BALL_AIM_DEBUG
     Vec3 red = m_world->getBallAimPosition(SOCCER_TEAM_RED);
@@ -125,11 +125,11 @@ void SoccerAI::update(float dt)
         resetAfterStop();
         m_controls->setBrake(false);
         m_controls->setAccel(0.0f);
-        AIBaseController::update(dt);
+        AIBaseController::update(ticks);
         return;
     }
 
-    ArenaAI::update(dt);
+    ArenaAI::update(ticks);
 }   // update
 
 //-----------------------------------------------------------------------------

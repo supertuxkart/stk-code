@@ -95,11 +95,12 @@ void ThreeStrikesBattle::reset()
 {
     WorldWithRank::reset();
 
-    m_next_sta_spawn_time =
+    float next_spawn_time =
         race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
         race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
         race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
         25.0f : 20.0f;
+    m_next_sta_spawn_ticks = stk_config->time2Ticks(next_spawn_time);
 
     const unsigned int kart_amount = (unsigned int)m_karts.size();
     for(unsigned int n=0; n<kart_amount; n++)
@@ -349,12 +350,12 @@ const std::string& ThreeStrikesBattle::getIdent() const
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time step - should be 1.
  */
-void ThreeStrikesBattle::update(float dt)
+void ThreeStrikesBattle::update(int ticks)
 {
-    WorldWithRank::update(dt);
-    WorldWithRank::updateTrack(dt);
+    WorldWithRank::update(ticks);
+    WorldWithRank::updateTrack(ticks);
 
     spawnSpareTireKarts();
     if (Track::getCurrentTrack()->hasNavMesh())
@@ -625,7 +626,7 @@ void ThreeStrikesBattle::addKartLife(unsigned int id)
 void ThreeStrikesBattle::spawnSpareTireKarts()
 {
     if (m_spare_tire_karts.empty() ||
-        getTicksSinceStart() < m_next_sta_spawn_time)
+        getTicksSinceStart() < m_next_sta_spawn_ticks)
         return;
 
     // The lifespan for sta: inc_factor / period * 1000 / 2
@@ -639,10 +640,11 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
     default:                           inc_factor = 0.55f; lifespan = 27.5f;  break;
     }
 
+    int lifespan_ticks = stk_config->time2Ticks(lifespan);
     // Spawn spare tire kart when necessary
-    m_next_sta_spawn_time = stk_config->time2Ticks(lifespan) 
-                          + getTicksSinceStart() * inc_factor
-                          + getTicksSinceStart();
+    m_next_sta_spawn_ticks = int( lifespan_ticks
+                                + getTicksSinceStart() * inc_factor
+                                + getTicksSinceStart()             );
     int kart_has_few_lives = 0;
     for (unsigned int i = 0; i < m_kart_info.size(); i++)
     {
@@ -663,7 +665,7 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
         SpareTireAI* sta = dynamic_cast<SpareTireAI*>
             (m_spare_tire_karts[i]->getController());
         assert(sta);
-        sta->spawn(lifespan);
+        sta->spawn(lifespan_ticks);
     }
 }   // spawnSpareTireKarts
 

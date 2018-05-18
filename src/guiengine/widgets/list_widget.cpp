@@ -44,6 +44,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sort_default = true;
     m_sort_col = 0;
     m_sortable = true;
+    m_header_created = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -121,6 +122,18 @@ void ListWidget::add()
     m_element = list_box;
     m_element->setTabOrder( list_box->getID() );
 
+    createHeader();
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::createHeader()
+{
+    if (m_header_created)
+        return;
+
+    const int header_height = GUIEngine::getFontHeight() + 15;
+
     if (m_header.size() > 0)
     {
         //const int col_size = m_w / m_header.size();
@@ -166,7 +179,8 @@ void ListWidget::add()
 
         m_check_inside_me = true;
     }
-}
+    m_header_created = true;
+} // createHeader
 
 // -----------------------------------------------------------------------------
 
@@ -179,7 +193,22 @@ void ListWidget::clear()
     assert(list != NULL);
 
     list->clear();
-}
+} //clear
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::clearColumns()
+{
+    m_header.clear();
+    for (unsigned int n=0; n<m_header_elements.size(); n++)
+    {
+        m_header_elements[n].elementRemoved();
+        m_children.remove( m_header_elements.get(n) );
+    }
+
+    m_header_elements.clearAndDeleteAll();
+    m_header_created = false;
+} //clearColumns
 
 // -----------------------------------------------------------------------------
 

@@ -9,7 +9,7 @@
         <div layout="horizontal-row" width="100%" height="fit">
             <checkbox id="pixelshaders"/>
             <spacer width="10" height="10"/>
-            <label text="Pixel Shaders" I18N="Video settings"/>
+            <label text="Pixel shaders" I18N="Video settings"/>
         </div>
 
         <spacer height="4" width="10" />
@@ -61,7 +61,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="ssao"/>
                 <spacer width="10" height="10"/>
-                <label text="Ambient Occlusion" I18N="Video settings"/>
+                <label text="Ambient occlusion" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
@@ -81,7 +81,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="glow"/>
                 <spacer width="10" height="10"/>
-                <label text="Glow (outlines)" I18N="Video settings"/>
+                <label text="Glow (Outlines)" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
@@ -119,7 +119,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="animated_characters"/>
                 <spacer width="10" height="10"/>
-                <label text="Animated Characters" I18N="Video settings"/>
+                <label text="Animated characters" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
@@ -134,9 +134,9 @@
         <spacer height="20" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Particles Effects" I18N="Video settings" width="40%"/>
+            <label text="Particle effects" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="particles_effects" min_value="0" max_value="2" width="50%" />
+            <gauge id="particles_effects" min_value="1" max_value="2" width="50%" />
         </div>
 
         <spacer height="4" width="10" />

@@ -63,7 +63,17 @@ public:
                 m_listeners[n].onTextUpdated();
             }
         }
-
+        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.Key == IRR_KEY_RETURN)
+        {
+            for (unsigned int n=0; n<m_listeners.size(); n++)
+            {
+                if (m_listeners[n].onEnterPressed(Text))
+                {
+                    Text = L"";
+                    CursorPos = 0;
+                }
+            }
+        }
         return out;
     }
 

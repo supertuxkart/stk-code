@@ -66,7 +66,10 @@ public:
     {
         // The script engine must release each string 
         // constant that it has requested
-        assert(stringCache.size() == 0);
+        if (!stringCache.empty())
+        {
+            printf("Scripting engine was not cleared properly.\n");
+        }
     }
 
     const void *GetStringConstant(const char *data, asUINT length)

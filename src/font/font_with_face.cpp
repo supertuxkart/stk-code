@@ -18,6 +18,7 @@
 
 #include "font/font_with_face.hpp"
 
+#include "config/user_config.hpp"
 #include "font/face_ttf.hpp"
 #include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
@@ -28,6 +29,7 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/string_utils.hpp"
 
 #include <array>
@@ -208,7 +210,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 
     const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
 #ifndef SERVER_ONLY
-    if (bits->buffer != NULL)
+    if (bits->buffer != NULL && !ProfileWorld::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
         glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
@@ -331,23 +333,24 @@ void FontWithFace::setDPI()
     const int screen_width = irr_driver->getFrameSize().Width;
     const int screen_height = irr_driver->getFrameSize().Height;
     
-#ifdef ANDROID
-    float scale = screen_height / 480.0f;
-    m_face_dpi = getScalingFactorTwo() * getScalingFactorOne() * scale;
-
-#else
-    float scale = std::max(0, screen_width - 640) / 564.0f;
-
-    // attempt to compensate for small screens
-    if (screen_width < 1200)
-        scale = std::max(0, screen_width - 640) / 750.0f;
-    if (screen_width < 900 || screen_height < 700)
-        scale = std::min(scale, 0.05f);
-
-    m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
-        getScalingFactorTwo());
-#endif
-
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        float scale = screen_height / 480.0f;
+        m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
+    }
+    else
+    {
+        float scale = std::max(0, screen_width - 640) / 564.0f;
+    
+        // attempt to compensate for small screens
+        if (screen_width < 1200)
+            scale = std::max(0, screen_width - 640) / 750.0f;
+        if (screen_width < 900 || screen_height < 700)
+            scale = std::min(scale, 0.05f);
+    
+        m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
+            getScalingFactorTwo());
+    }
 }   // setDPI
 
 // ----------------------------------------------------------------------------

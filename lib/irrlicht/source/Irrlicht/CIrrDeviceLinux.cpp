@@ -105,7 +105,8 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
 	WindowHasFocus(false), WindowMinimized(false),
 	UseXVidMode(false), UseXRandR(false), UseGLXWindow(false),
-	ExternalWindow(false), AutorepeatSupport(0)
+	ExternalWindow(false), AutorepeatSupport(0), SupportsNetWM(false),
+	NeedsGrabPointer(false)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceLinux");
@@ -477,6 +478,19 @@ bool CIrrDeviceLinux::changeResolution()
 		
 		if (s == Success)
 			UseXRandR = true;
+			
+		if (UseXRandR && SupportsNetWM)
+		{
+			XRRPanning* panning = XRRGetPanning(display, res, output->crtc);
+			
+			if ((panning->width != Width && panning->width != 0) ||
+				(panning->height != Height && panning->height != 0))
+			{
+				NeedsGrabPointer = true;
+			}
+			
+			XRRFreePanning(panning);
+		}
 
 		XRRFreeCrtcInfo(crtc);
 		XRRFreeOutputInfo(output);
@@ -614,6 +628,40 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 #endif
 #endif
 
+void CIrrDeviceLinux::grabPointer(bool grab)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (grab)
+	{
+		int result = 0;
+		
+		for (int i = 0; i < 500; i++)
+		{
+			const unsigned int mask = ButtonPressMask | ButtonReleaseMask | 
+									  PointerMotionMask | FocusChangeMask;
+	
+			int result = XGrabPointer(display, window, True, mask, 
+									  GrabModeAsync, GrabModeAsync, 
+									  window, None, CurrentTime);
+											
+			if (result == GrabSuccess)
+				break;
+	
+			usleep(1000);
+		}
+		
+		if (result != GrabSuccess)
+		{
+			os::Printer::log("Couldn't grab pointer.", ELL_WARNING);
+		}
+	}
+	else
+	{
+		XUngrabPointer(display, CurrentTime);
+	}
+#endif
+}
+
 bool CIrrDeviceLinux::createWindow()
 {
 #ifdef _IRR_COMPILE_WITH_X11_
@@ -632,6 +680,24 @@ bool CIrrDeviceLinux::createWindow()
 	}
 
 	screennr = DefaultScreen(display);
+	
+	Atom *list;
+	Atom type;
+	int form;
+	unsigned long remain, len;
+
+	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+								  WMCheck, 0L, 1L, False, XA_WINDOW,
+								  &type, &form, &len, &remain,
+								  (unsigned char **)&list);
+								  
+	
+	if (s == Success)
+	{
+		XFree(list);
+		SupportsNetWM = (len > 0);
+	}
 
 	changeResolution();
 
@@ -954,30 +1020,10 @@ bool CIrrDeviceLinux::createWindow()
 		attributes.event_mask |= PointerMotionMask |
 				ButtonPressMask | KeyPressMask |
 				ButtonReleaseMask | KeyReleaseMask;
-				
-	bool netWM = false;
-	
-	Atom *list;
-	Atom type;
-	int form;
-	unsigned long remain, len;
-
-	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
-	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
-								  WMCheck, 0L, 1L, False, XA_WINDOW,
-								  &type, &form, &len, &remain,
-								  (unsigned char **)&list);
-								  
-	
-	if (s == Success)
-	{
-		XFree(list);
-		netWM = (len > 0);
-	}
 
 	if (!CreationParams.WindowId)
 	{
-		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
+		attributes.override_redirect = !SupportsNetWM && CreationParams.Fullscreen;
 
 		// create new Window
 		window = XCreateWindow(display,
@@ -1010,7 +1056,7 @@ bool CIrrDeviceLinux::createWindow()
 		
 		bool has_display_size = (Width == display_width && Height == display_height);
 		
-		if (netWM && (CreationParams.Fullscreen || has_display_size))
+		if (SupportsNetWM && (CreationParams.Fullscreen || has_display_size))
 		{
 			Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
 			Atom WMStateAtom1 = None;
@@ -1077,10 +1123,15 @@ bool CIrrDeviceLinux::createWindow()
 			if (!changed)
 			{
 				os::Printer::log("Warning! Got timeout when changing window state", ELL_WARNING);
-			}        
+			}
+			
+			if (NeedsGrabPointer)
+			{
+				grabPointer(true);
+			}
 		}
 			
-		if (!netWM && CreationParams.Fullscreen)
+		if (!SupportsNetWM && CreationParams.Fullscreen)
 		{
 			XSetInputFocus(display, window, RevertToParent, CurrentTime);
 			int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
@@ -1178,7 +1229,7 @@ bool CIrrDeviceLinux::createWindow()
 	CreationParams.WindowSize.Width = Width;
 	CreationParams.WindowSize.Height = Height;
 	
-	if (netWM == true)
+	if (SupportsNetWM == true)
 	{
 		Atom opaque_region = XInternAtom(display, "_NET_WM_OPAQUE_REGION", true);
 		
@@ -1493,7 +1544,7 @@ int CIrrDeviceLinux::getNumlockMask(Display* display)
 
 EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 {
-	EKEY_CODE keyCode = (EKEY_CODE)0;
+	int keyCode = 0;
 	SKeyMap mp;
 	
 	// First check for numpad keys
@@ -1515,30 +1566,25 @@ EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 	const s32 idx = KeyMap.binary_search(mp);
 	if (idx != -1)
 	{
-		keyCode = (EKEY_CODE)KeyMap[idx].Win32Key;
+		keyCode = KeyMap[idx].Win32Key;
 	}
 	if (keyCode == 0)
 	{
 		// Any value is better than none, that allows at least using the keys.
 		// Worst case is that some keys will be identical, still better than _all_
 		// unknown keys being identical.
-		if ( !mp.X11Key )
+		if (mp.X11Key)
 		{
-			keyCode = (EKEY_CODE)event.xkey.keycode;
-			os::Printer::log("No such X11Key, using event keycode", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
-		}
-		else if (idx == -1)
-		{
-			keyCode = (EKEY_CODE)mp.X11Key;
-			os::Printer::log("EKEY_CODE not found, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+			keyCode = (int)IRR_KEY_CODES_COUNT + mp.X11Key;
 		}
 		else
 		{
-			keyCode = (EKEY_CODE)mp.X11Key;
-			os::Printer::log("EKEY_CODE is 0, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+			keyCode = (int)IRR_KEY_CODES_COUNT + event.xkey.keycode;
 		}
+		
+		os::Printer::log("EKEY_CODE is 0, fallback keycode", core::stringc(keyCode).c_str(), ELL_INFORMATION);
 	}
-	return keyCode;
+	return (EKEY_CODE)keyCode;
 }
 #endif
 
@@ -1619,10 +1665,18 @@ bool CIrrDeviceLinux::run()
 				break;
 
 			case FocusIn:
+				if (NeedsGrabPointer)
+				{
+					grabPointer(true);
+				}
 				WindowHasFocus=true;
 				break;
 
 			case FocusOut:
+				if (NeedsGrabPointer)
+				{
+					grabPointer(false);
+				}
 				WindowHasFocus=false;
 				break;
 
@@ -2441,16 +2495,16 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_ISO_Level3_Shift, IRR_KEY_RMENU));
 	KeyMap.push_back(SKeyMap(XK_Menu, IRR_KEY_MENU));
 	KeyMap.push_back(SKeyMap(XK_space, IRR_KEY_SPACE));
-	KeyMap.push_back(SKeyMap(XK_exclam, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_quotedbl, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_section, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_exclam, IRR_KEY_EXCLAM));
+	KeyMap.push_back(SKeyMap(XK_quotedbl, IRR_KEY_QUOTEDBL));
+	KeyMap.push_back(SKeyMap(XK_section, IRR_KEY_SECTION)); //?
 	KeyMap.push_back(SKeyMap(XK_numbersign, IRR_KEY_OEM_2));
-	KeyMap.push_back(SKeyMap(XK_dollar, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_dollar, IRR_KEY_DOLLAR));
 	KeyMap.push_back(SKeyMap(XK_percent, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_ampersand, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_ampersand, IRR_KEY_AMPERSAND));
 	KeyMap.push_back(SKeyMap(XK_apostrophe, IRR_KEY_OEM_7));
-	KeyMap.push_back(SKeyMap(XK_parenleft, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_parenright, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_parenleft, IRR_KEY_PARENLEFT));
+	KeyMap.push_back(SKeyMap(XK_parenright, IRR_KEY_PARENRIGHT));
 	KeyMap.push_back(SKeyMap(XK_asterisk, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_plus, IRR_KEY_PLUS)); //?
 	KeyMap.push_back(SKeyMap(XK_comma, IRR_KEY_COMMA)); //?
@@ -2467,14 +2521,14 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_7, IRR_KEY_7));
 	KeyMap.push_back(SKeyMap(XK_8, IRR_KEY_8));
 	KeyMap.push_back(SKeyMap(XK_9, IRR_KEY_9));
-	KeyMap.push_back(SKeyMap(XK_colon, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_colon, IRR_KEY_COLON));
 	KeyMap.push_back(SKeyMap(XK_semicolon, IRR_KEY_OEM_1));
 	KeyMap.push_back(SKeyMap(XK_less, IRR_KEY_OEM_102));
 	KeyMap.push_back(SKeyMap(XK_equal, IRR_KEY_PLUS));
 	KeyMap.push_back(SKeyMap(XK_greater, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_question, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_at, IRR_KEY_2)); //?
-	KeyMap.push_back(SKeyMap(XK_mu, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_mu, IRR_KEY_MU)); //?
 	KeyMap.push_back(SKeyMap(XK_EuroSign, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_A, IRR_KEY_A));
 	KeyMap.push_back(SKeyMap(XK_B, IRR_KEY_B));
@@ -2542,6 +2596,12 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_udiaeresis, IRR_KEY_OEM_1));
 	KeyMap.push_back(SKeyMap(XK_Super_L, IRR_KEY_LWIN));
 	KeyMap.push_back(SKeyMap(XK_Super_R, IRR_KEY_RWIN));
+	KeyMap.push_back(SKeyMap(XK_agrave, IRR_KEY_AGRAVE));
+	KeyMap.push_back(SKeyMap(XK_ccedilla, IRR_KEY_CCEDILLA ));
+	KeyMap.push_back(SKeyMap(XK_eacute, IRR_KEY_EACUTE));
+	KeyMap.push_back(SKeyMap(XK_egrave, IRR_KEY_EGRAVE));
+	KeyMap.push_back(SKeyMap(XK_ugrave, IRR_KEY_UGRAVE));
+	KeyMap.push_back(SKeyMap(XK_twosuperior, IRR_KEY_TWOSUPERIOR));
 
 	KeyMap.sort();
 #endif

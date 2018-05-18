@@ -28,7 +28,6 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "network/network_player_profile.hpp"
 #include "states_screens/kart_selection.hpp"
 #include <IGUIEnvironment.h>
 
@@ -36,7 +35,6 @@ using namespace GUIEngine;
 
 PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                                    StateManager::ActivePlayer* associated_player,
-                                   NetworkPlayerProfile* associated_user,
                                    core::recti area, const int player_id,
                                    std::string kart_group,
                                    const int irrlicht_widget_id) : Widget(WTYPE_DIV)
@@ -49,14 +47,13 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_ready_text = NULL;
     m_parent_screen = parent;
 
-    m_associated_user = associated_user;
     m_associated_player = associated_player;
     x_speed = 1.0f;
     y_speed = 1.0f;
     w_speed = 1.0f;
     h_speed = 1.0f;
     m_ready = false;
-    m_handicapped = false;
+    m_difficulty = PLAYER_DIFFICULTY_NORMAL;
     m_not_updated_yet = true;
 
     m_irrlicht_widget_id = irrlicht_widget_id;
@@ -115,10 +112,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         {
             m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
         }
-    }
-    else if (m_associated_user) // online user, FIXME is that useful ?
-    {
-        m_player_ident_spinner->setBadge(OK_BADGE);
     }
 
     if (irrlicht_widget_id == -1)
@@ -184,7 +177,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                        "kart '%s' nor any other kart.",
                        default_kart.c_str());
     }
-    m_kartInternalName = props->getIdent();
+    m_kart_internal_name = props->getIdent();
 
     const KartModel &kart_model = props->getMasterKartModel();
     
@@ -374,8 +367,6 @@ void PlayerKartWidget::add()
     irr::core::stringw name; // name of the player
     if (m_associated_player)
         name = m_associated_player->getProfile()->getName();
-    if (m_associated_user)
-        name = m_associated_user->getName();
     core::stringw label = translations->fribidize(name);
 
     if (m_parent_screen->m_multiplayer)
@@ -478,12 +469,12 @@ bool PlayerKartWidget::isReady()
 }   // isReady
 
 // ------------------------------------------------------------------------
-/** \return Whether this player is handicapped or not */
-bool PlayerKartWidget::isHandicapped()
+/** \return Per player difficulty */
+PerPlayerDifficulty PlayerKartWidget::getDifficulty()
 {
     assert(m_magic_number == 0x33445566);
-    return m_handicapped;
-}   // isHandicapped
+    return m_difficulty;
+}   // getDifficulty
 
 // -------------------------------------------------------------------------
 /** Updates the animation (moving/shrinking/etc.) */
@@ -636,13 +627,19 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
             m_associated_player->setPlayerProfile(profile);
             if(UserConfigParams::m_per_player_difficulty && spinner_value % 2 != 0)
             {
-                m_handicapped = true;
+                m_difficulty = PLAYER_DIFFICULTY_HANDICAP;
                 m_model_view->setBadge(ANCHOR_BADGE);
+                m_kart_stats->setValues(
+                    kart_properties_manager->getKart(m_kart_internal_name),
+                    PLAYER_DIFFICULTY_HANDICAP);
             }
             else
             {
-                m_handicapped = false;
+                m_difficulty = PLAYER_DIFFICULTY_NORMAL;
                 m_model_view->unsetBadge(ANCHOR_BADGE);
+                m_kart_stats->setValues(
+                    kart_properties_manager->getKart(m_kart_internal_name),
+                    PLAYER_DIFFICULTY_NORMAL);
             }
             m_model_view->getModelViewRenderInfo()->setHue(
                 m_associated_player->getConstProfile()->getDefaultKartColor());
@@ -728,7 +725,7 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 void PlayerKartWidget::setKartInternalName(const std::string& whichKart)
 {
     assert(m_magic_number == 0x33445566);
-    m_kartInternalName = whichKart;
+    m_kart_internal_name = whichKart;
 }   // setKartInternalName
 
 // -------------------------------------------------------------------------
@@ -736,7 +733,7 @@ void PlayerKartWidget::setKartInternalName(const std::string& whichKart)
 const std::string& PlayerKartWidget::getKartInternalName() const
 {
     assert(m_magic_number == 0x33445566);
-    return m_kartInternalName;
+    return m_kart_internal_name;
 }   // getKartInternalName
 
 // -------------------------------------------------------------------------
@@ -748,3 +745,15 @@ EventPropagation PlayerKartWidget::onSpinnerConfirmed()
     return EVENT_BLOCK;
 }   // onSpinnerConfirmed
 
+// -------------------------------------------------------------------------
+void PlayerKartWidget::enableHandicapForNetwork()
+{
+    m_difficulty = PLAYER_DIFFICULTY_HANDICAP;
+    m_model_view->setBadge(ANCHOR_BADGE);
+    m_kart_stats->setValues(
+        kart_properties_manager->getKart(m_kart_internal_name),
+        PLAYER_DIFFICULTY_HANDICAP);
+    core::stringw label = _("%s (handicapped)",
+        m_player_ident_spinner->getCustomText());
+    m_player_ident_spinner->setCustomText(label);
+}   // enableHandicapForNetwork

@@ -50,7 +50,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE {}
 };   // class HidePublicAddress
 
 #endif // HIDE_PUBLIC_ADDRESS_HPP

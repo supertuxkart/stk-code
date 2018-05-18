@@ -26,6 +26,7 @@
 #include "config/user_config.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -60,8 +61,13 @@ Attachment::Attachment(AbstractKart* kart)
 
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
-    m_node = irr_driver->addAnimatedMesh(
-                         attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
+    if (kart->isGhostKart())
+        m_node = irr_driver->addAnimatedMesh(
+            attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb",
+            NULL, std::make_shared<RenderInfo>(0.0f, true));
+    else
+        m_node = irr_driver->addAnimatedMesh(
+            attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
 #ifdef DEBUG
     std::string debug_name = kart->getIdent()+" (attachment)";
     m_node->setName(debug_name.c_str());
@@ -202,9 +208,10 @@ void Attachment::set(AttachmentType type, int ticks,
     RewindManager *rwm = RewindManager::get();
     if(rwm->isEnabled() && !rwm->isRewinding())
     {
-        BareNetworkString *buffer = new BareNetworkString(2);
-        saveState(buffer);
-        rwm->addEvent(this, buffer);
+        // FIXME!!!! For now commented out
+        //BareNetworkString *buffer = new BareNetworkString(2);
+        //saveState(buffer);
+        //rwm->addEvent(this, buffer, /*confirmed*/true);
     }
 #endif
 }   // set
@@ -360,8 +367,9 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        float f = std::max(item->getDisableTime(), kp->getExplosionDuration() + 2.0f);
-        item->setDisableTime(f);
+        int ticks = std::max(item->getDisableTicks(), 
+                             stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
+        item->setDisableTicks(ticks);
         break;
         }
     case ATTACH_ANVIL:
@@ -484,7 +492,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
 }   // handleCollisionWithKart
 
 //-----------------------------------------------------------------------------
-void Attachment::update(float dt)
+void Attachment::update(int ticks)
 {
     if(m_type==ATTACH_NOTHING) return;
 
@@ -493,7 +501,7 @@ void Attachment::update(float dt)
     if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
         return;
 
-    m_ticks_left--;  // dt always physics time step
+    m_ticks_left -= ticks;
 
 
     bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
@@ -516,6 +524,7 @@ void Attachment::update(float dt)
         m_node->setVisible((division & 0x1) == 0);
     }
 
+    float dt = stk_config->ticks2Time(ticks);
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
@@ -527,7 +536,7 @@ void Attachment::update(float dt)
 
     if(m_plugin)
     {
-        bool discard = m_plugin->updateAndTestFinished(dt);
+        bool discard = m_plugin->updateAndTestFinished(ticks);
         if(discard)
         {
             clear();  // also removes the plugin
@@ -603,9 +612,8 @@ void Attachment::update(float dt)
     }
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
-        if (m_ticks_left < 0)
+        if (m_ticks_left <= 0)
         {
-            m_ticks_left = 0;
             if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
             m_bubble_explode_sound =
                 SFXManager::get()->createSoundSource("bubblegum_explode");

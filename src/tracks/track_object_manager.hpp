@@ -59,6 +59,7 @@ public:
     void add(const XMLNode &xml_node, scene::ISceneNode* parent,
              ModelDefinitionLoader& model_def_loader,
              TrackObject* parent_library);
+    void updateGraphics(float dt);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
@@ -75,6 +76,8 @@ public:
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }
+    void removeForRewind();
+    void addForRewind();
 
 };   // class TrackObjectManager
 

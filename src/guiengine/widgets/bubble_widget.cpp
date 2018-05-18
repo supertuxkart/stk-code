@@ -76,7 +76,9 @@ void BubbleWidget::replaceText()
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
     else if (translations->isRTLText(message))          align = EGUIA_LOWERRIGHT;
 
-    EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
+    EGUI_ALIGNMENT valign = EGUIA_CENTER;
+    if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
+    if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
 
     // find expanded bubble size
     int text_height = irrwidget->getTextHeight();

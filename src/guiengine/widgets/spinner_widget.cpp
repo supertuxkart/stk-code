@@ -328,7 +328,7 @@ void SpinnerWidget::addLabel(stringw label)
 void SpinnerWidget::setValue(const int new_value)
 {
     m_value = new_value;
-    m_customText = "";
+    m_custom_text = "";
 
     if (m_graphical)
     {
@@ -402,30 +402,30 @@ void SpinnerWidget::setActive(bool active)
     if (active)
     {
         setText(L"");
-        if (m_customText.empty())
+        if (m_custom_text.empty())
         {
             setValue(getValue()); // Update the display
         }
         else
         {
-            setCustomText(m_customText);
+            setCustomText(m_custom_text);
         }
     }
     else
     {
         // Save it temporary because setValue(which is uses for update in
         // this case) overwrites it
-        core::stringw customText = m_customText;
+        core::stringw custom_text = m_custom_text;
         setText(L"-");
         setValue(getValue()); // Update the display
-        m_customText = customText;
+        m_custom_text = custom_text;
     }
 }   // setActive
 
 // -----------------------------------------------------------------------------
 void SpinnerWidget::setCustomText(const core::stringw& text)
 {
-    m_customText = text;
+    m_custom_text = text;
     if (m_children.size() > 0)
     {
         m_children[1].m_element->setText(text.c_str());

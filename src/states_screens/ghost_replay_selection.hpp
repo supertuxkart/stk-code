@@ -44,19 +44,40 @@ private:
 
     GUIEngine::ListWidget*     m_replay_list_widget;
     GUIEngine::CheckBoxWidget* m_replay_difficulty_toggle_widget;
+    GUIEngine::CheckBoxWidget* m_replay_version_toggle_widget;
+    GUIEngine::CheckBoxWidget* m_best_times_toggle_widget;
+    GUIEngine::CheckBoxWidget* m_compare_toggle_widget;
+    GUIEngine::RibbonWidget*   m_mode_tabs;
     RaceManager::Difficulty    m_cur_difficulty;
     std::string                m_file_to_be_deleted;
+    std::vector<unsigned int>  m_best_times_index;
     bool                       m_same_difficulty;
+    bool                       m_same_version;
+    bool                       m_best_times;
     bool                       m_sort_desc;
+    bool                       m_is_comparing;
+    bool                       m_active_mode_is_linear;
+    RaceManager::MinorRaceModeType m_active_mode;
+    // The index id of a replay file can change with sorting, etc.
+    // Using the UID guarantees exact matchess
+    uint64_t                   m_replay_to_compare_uid;
+
 
 public:
 
-    void refresh(bool forced_update = true);
+    void setCompareReplayUid(uint64_t uid) { m_replay_to_compare_uid = uid; }
+    void setCompare(bool compare) { m_is_comparing = compare; }
+
+    void refresh(bool forced_update = true, bool update_columns = false);
 
     /** Load the addons into the main list.*/
     void loadList();
 
     void onDeleteReplay(std::string& filename);
+
+    const RaceManager::MinorRaceModeType getActiveMode() { return m_active_mode; }
+
+    const bool isActiveModeLinear() { return m_active_mode_is_linear; }
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

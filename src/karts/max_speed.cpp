@@ -18,12 +18,13 @@
 
 #include "karts/max_speed.hpp"
 
-#include <algorithm>
-#include <assert.h>
-
+#include "config/stk_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
+
+#include <algorithm>
+#include <assert.h>
 
 /** This class handles maximum speed for karts. Several factors can influence
  *  the maximum speed a kart can drive, some will decrease the maximum speed,
@@ -88,8 +89,8 @@ void MaxSpeed::reset()
  *  \param fade_out_time How long the maximum speed will fade out linearly.
  */
 void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
-                                float engine_force, float duration,
-                                float fade_out_time)
+                                float engine_force, int duration,
+                                int fade_out_time)
 {
     // Allow fade_out_time 0 if add_speed is set to 0.
     assert(add_speed==0.0f || fade_out_time>0.01f);
@@ -117,8 +118,8 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
  */
 void MaxSpeed::instantSpeedIncrease(unsigned int category,
                                    float add_max_speed, float speed_boost,
-                                   float engine_force, float duration,
-                                   float fade_out_time)
+                                   float engine_force, int duration,
+                                   int fade_out_time)
 {
     increaseMaxSpeed(category, add_max_speed, engine_force, duration,
                      fade_out_time);
@@ -144,9 +145,9 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
  *  -m_fade_out_time and 0, the maximum speed will linearly decrease.
  *  \param dt Time step size.
  */
-void MaxSpeed::SpeedIncrease::update(float dt)
+void MaxSpeed::SpeedIncrease::update(int ticks)
 {
-    m_duration -= dt;
+    m_duration -= ticks;
     // End of increased max speed reached.
     if(m_duration < -m_fade_out_time)
     {
@@ -157,15 +158,15 @@ void MaxSpeed::SpeedIncrease::update(float dt)
     if(m_duration >0) return;
 
     // Now we are in the fade out period: decrease time linearly
-    m_current_speedup -= dt*m_max_add_speed/m_fade_out_time;
+    m_current_speedup -= ticks*m_max_add_speed/m_fade_out_time;
 }   // SpeedIncrease::update
 
 // ----------------------------------------------------------------------------
 void MaxSpeed::SpeedIncrease::saveState(BareNetworkString *buffer) const
 {
     buffer->addFloat(m_max_add_speed);
-    buffer->addFloat(m_duration);
-    buffer->addFloat(m_fade_out_time);
+    buffer->addUInt32(m_duration);
+    buffer->addUInt32(m_fade_out_time);
     buffer->addFloat(m_current_speedup);
     buffer->addFloat(m_engine_force);
 }   // saveState
@@ -177,8 +178,8 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
     if(is_active)
     {
         m_max_add_speed   = buffer->getFloat();
-        m_duration        = buffer->getFloat();
-        m_fade_out_time   = buffer->getFloat();
+        m_duration        = buffer->getUInt32();
+        m_fade_out_time   = buffer->getUInt32();
         m_current_speedup = buffer->getFloat();
         m_engine_force    = buffer->getFloat();
     }
@@ -198,11 +199,11 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
  *         value is changed to something else).
  */
 void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
-                           float fade_in_time, float duration)
+                           int fade_in_ticks, int duration)
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
     m_speed_decrease[category].m_max_speed_fraction = max_speed_fraction;
-    m_speed_decrease[category].m_fade_in_time       = fade_in_time;
+    m_speed_decrease[category].m_fade_in_ticks      = fade_in_ticks;
     m_speed_decrease[category].m_duration           = duration;
 }   // setSlowdown
 
@@ -210,12 +211,12 @@ void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
 /** Handles the speed increase for a certain category.
  *  \param dt Time step size.
  */
-void MaxSpeed::SpeedDecrease::update(float dt)
+void MaxSpeed::SpeedDecrease::update(int ticks)
 {
-    if(m_duration>-1.0f)
+    if(m_duration>-1)
     {
         // It's a timed slowdown
-        m_duration -= dt;
+        m_duration -= ticks;
         if(m_duration<0)
         {
             m_duration           = 0;
@@ -226,10 +227,11 @@ void MaxSpeed::SpeedDecrease::update(float dt)
     }
 
     float diff = m_current_fraction - m_max_speed_fraction;
-    if(diff > 0)
+
+    if (diff > 0)
     {
-        if (diff * m_fade_in_time > dt)
-            m_current_fraction -= dt/m_fade_in_time;
+        if (diff * m_fade_in_ticks > ticks)
+            m_current_fraction -= float(ticks) / float(m_fade_in_ticks);
         else
             m_current_fraction = m_max_speed_fraction;
     }
@@ -245,9 +247,9 @@ void MaxSpeed::SpeedDecrease::update(float dt)
 void MaxSpeed::SpeedDecrease::saveState(BareNetworkString *buffer) const
 {
     buffer->addFloat(m_max_speed_fraction);
-    buffer->addFloat(m_fade_in_time);
+    buffer->addUInt32(m_fade_in_ticks);
     buffer->addFloat(m_current_fraction);
-    buffer->addFloat(m_duration);
+    buffer->addUInt32(m_duration);
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -259,9 +261,9 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
     if(is_active)
     {
         m_max_speed_fraction = buffer->getFloat();
-        m_fade_in_time       = buffer->getFloat();
+        m_fade_in_ticks      = buffer->getUInt32();
         m_current_fraction   = buffer->getFloat();
-        m_duration           = buffer->getFloat();
+        m_duration           = buffer->getUInt32();
     }
     else   // make sure it is not active
     {
@@ -273,7 +275,7 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
 /** Returns how much increased speed time is left over in the given category.
  *  \param category Which category to report on.
  */
-float MaxSpeed::getSpeedIncreaseTimeLeft(unsigned int category)
+int MaxSpeed::getSpeedIncreaseTicksLeft(unsigned int category)
 {
     return m_speed_increase[category].getTimeLeft();
 }   // getSpeedIncreaseTimeLeft
@@ -285,7 +287,7 @@ float MaxSpeed::getSpeedIncreaseTimeLeft(unsigned int category)
  *  change to any of the speed increase/decrease objects will be done.
  *  \param dt Time step size (dt=0 only updates the current maximum speed).
  */
-void MaxSpeed::update(float dt)
+void MaxSpeed::update(int ticks)
 {
 
     // First compute the minimum max-speed fraction, which
@@ -295,7 +297,7 @@ void MaxSpeed::update(float dt)
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
-        slowdown.update(dt);
+        slowdown.update(ticks);
         slowdown_factor = std::min(slowdown_factor,
                                    slowdown.getSlowdownFraction());
     }
@@ -308,7 +310,7 @@ void MaxSpeed::update(float dt)
     for(unsigned int i=MS_INCREASE_MIN; i<MS_INCREASE_MAX; i++)
     {
         SpeedIncrease &speedup = m_speed_increase[i];
-        speedup.update(dt);
+        speedup.update(ticks);
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
     }
@@ -395,6 +397,7 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
     {
         m_speed_increase[i].rewindTo(buffer, (active_speedups & b) == b);
     }
-
+    // Make sure to update the physics
+    update(0);
 }   // rewindoTo
 

@@ -32,9 +32,9 @@ protected:
     bool           m_prev_brake;
     bool           m_prev_nitro;
 
-    float          m_penalty_time;
+    int            m_penalty_ticks;
 
-    virtual void  steer(float, int);
+    virtual void  steer(int ticks, int steer_val);
     // ------------------------------------------------------------------------
     /** Called when this kart started too early and got a start penalty. */
     virtual void  displayPenaltyWarning() {}
@@ -43,12 +43,17 @@ protected:
 public:
                  PlayerController(AbstractKart *kart);
     virtual     ~PlayerController  ();
-    virtual void update            (float) OVERRIDE;
-    virtual void action            (PlayerAction action, int value) OVERRIDE;
+    virtual void update            (int ticks) OVERRIDE;
+    virtual bool action            (PlayerAction action, int value,
+                                    bool dry_run = false           ) OVERRIDE;
+    virtual void actionFromNetwork(PlayerAction action, int value,
+                                   int value_l, int value_r);
     virtual void skidBonusTriggered() OVERRIDE;
     virtual void reset             () OVERRIDE;
     virtual void handleZipper(bool play_sound) OVERRIDE;
     virtual void resetInputState();
+    virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
+    virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void  collectedItem(const Item &item, int add_info=-1,
                                 float previous_energy=0            ) OVERRIDE
@@ -88,6 +93,9 @@ public:
     virtual void finishedRace(float time) OVERRIDE
     {
     }   // finishedRace
+    // ------------------------------------------------------------------------
+    /** Returns the name of the player profile. */
+    core::stringw getName() const OVERRIDE;
 
 };   // class PlayerController
 

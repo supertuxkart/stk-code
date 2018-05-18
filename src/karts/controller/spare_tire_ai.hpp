@@ -35,7 +35,7 @@ private:
     int m_idx;
 
     /** Store the time before calling \ref unspawn. */
-    float m_timer;
+    int m_timer;
 
     // ------------------------------------------------------------------------
     virtual void  findTarget() OVERRIDE;
@@ -47,11 +47,11 @@ public:
     // ------------------------------------------------------------------------
     virtual void crashed(const AbstractKart *k) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void update(float delta) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
     // ------------------------------------------------------------------------
-    void         spawn(float time_to_last);
+    void         spawn(int ticks_to_last);
     // ------------------------------------------------------------------------
     void         unspawn();
     // ------------------------------------------------------------------------

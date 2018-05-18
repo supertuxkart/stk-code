@@ -28,6 +28,7 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
@@ -117,8 +118,8 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_item_id           = -1;
     m_collected         = false;
     m_original_type     = ITEM_NONE;
-    m_deactive_time     = 0;
-    m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
+    m_deactive_ticks    = 0;
+    m_ticks_till_return = 0;  // not strictly necessary, see isCollected()
     m_emitter           = NULL;
     m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
     switch(m_type)
@@ -264,8 +265,8 @@ Item::~Item()
 void Item::reset()
 {
     m_collected         = false;
-    m_time_till_return  = 0.0f;
-    m_deactive_time     = 0.0f;
+    m_ticks_till_return = 0;
+    m_deactive_ticks    = 0;
     switch(m_type)
     {
     case ITEM_BUBBLEGUM:
@@ -295,24 +296,24 @@ void Item::reset()
  */
 void Item::setParent(AbstractKart* parent)
 {
-    m_event_handler = parent;
-    m_emitter       = parent;
-    m_deactive_time = 1.5f;
+    m_event_handler  = parent;
+    m_emitter        = parent;
+    m_deactive_ticks = stk_config->time2Ticks(1.5f);
 }   // setParent
 
 //-----------------------------------------------------------------------------
 /** Updated the item - rotates it, takes care of items coming back into
  *  the game after it has been collected.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void Item::update(float dt)
+void Item::update(int ticks)
 {
-    if(m_deactive_time > 0) m_deactive_time -= dt;
+    if(m_deactive_ticks > 0) m_deactive_ticks -= ticks;
 
     if(m_collected)
     {
-        m_time_till_return -= dt;
-        if(m_time_till_return<0)
+        m_ticks_till_return -= ticks;
+        if(m_ticks_till_return<0)
         {
             m_collected=false;
 
@@ -321,13 +322,14 @@ void Item::update(float dt)
                 m_node->setScale(core::vector3df(1,1,1));
             }
         }   // time till return <0 --> is fully visible again
-        else if ( m_time_till_return <=1.0f )
+        else if ( m_ticks_till_return <= stk_config->time2Ticks(1.0f) )
         {
             if (m_node != NULL)
             {
                 // Make it visible by scaling it from 0 to 1:
                 m_node->setVisible(true);
-                m_node->setScale(core::vector3df(1,1,1)*(1-m_time_till_return));
+                float t = stk_config->ticks2Time(m_ticks_till_return);
+                m_node->setScale(core::vector3df(1,1,1)*(1-t));
             }
         }   // time till return < 1
     }   // if collected
@@ -336,7 +338,11 @@ void Item::update(float dt)
 
         if(!m_rotate || m_node == NULL) return;
         // have it rotate
-        m_rotation_angle += dt * M_PI ;
+        if (!RewindManager::get()->isRewinding())
+        {
+            float dt = stk_config->ticks2Time(ticks);
+            m_rotation_angle += dt * M_PI;
+        }
         if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
 
         btMatrix3x3 m;
@@ -362,7 +368,7 @@ void Item::collected(const AbstractKart *kart, float t)
     m_event_handler = kart;
     if(m_type==ITEM_EASTER_EGG)
     {
-        m_time_till_return=99999;
+        m_ticks_till_return=stk_config->time2Ticks(99999);
         EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
         assert(world);
         world->collectedEasterEgg(kart);
@@ -377,16 +383,16 @@ void Item::collected(const AbstractKart *kart, float t)
         // Deactivates the item for a certain amount of time. It is used to
         // prevent bubble gum from hitting a kart over and over again (in each
         // frame) by giving it time to drive away.
-        m_deactive_time = 0.5f;
+        m_deactive_ticks = stk_config->time2Ticks(0.5f);
         // Set the time till reappear to -1 seconds --> the item will
         // reappear immediately.
-        m_time_till_return = -1;
+        m_ticks_till_return = -1;
     }
     else
     {
         // Note if the time is negative, in update the m_collected flag will
         // be automatically set to false again.
-        m_time_till_return = t;
+        m_ticks_till_return = stk_config->time2Ticks(t);
         if (m_node != NULL)
         {
             m_node->setVisible(false);
@@ -400,7 +406,7 @@ void Item::collected(const AbstractKart *kart, float t)
 
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
     {
-        m_time_till_return *= 3;
+        m_ticks_till_return *= 3;
     }
 }   // isCollected
 

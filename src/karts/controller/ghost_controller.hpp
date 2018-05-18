@@ -47,7 +47,7 @@ public:
              GhostController(AbstractKart *kart, core::stringw display_name);
     virtual ~GhostController() {};
     virtual void reset() OVERRIDE;
-    virtual void update (float dt) OVERRIDE;
+    virtual void update (int ticks) OVERRIDE;
     virtual bool disableSlipstreamBonus() const OVERRIDE { return true; }
     virtual void crashed(const Material *m) OVERRIDE {}
     virtual void crashed(const AbstractKart *k) OVERRIDE {}
@@ -58,9 +58,13 @@ public:
     virtual void setPosition(int p) OVERRIDE {}
     virtual bool isPlayerController() const OVERRIDE { return false; }
     virtual bool isLocalPlayerController() const OVERRIDE { return false; }
-    virtual void action(PlayerAction action, int value) OVERRIDE;
+    virtual bool action(PlayerAction action, int value,
+                        bool dry_run=false) OVERRIDE;
     virtual void skidBonusTriggered() OVERRIDE {}
     virtual void newLap(int lap) OVERRIDE {}
+    virtual void saveState(BareNetworkString *buffer) const {};
+    virtual void rewindTo(BareNetworkString *buffer) {};
+
     void         addReplayTime(float time);
     // ------------------------------------------------------------------------
     bool         isReplayEnd() const
@@ -75,6 +79,14 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getCurrentReplayIndex() const
                                                    { return m_current_index; }
+
+    // ------------------------------------------------------------------------
+    float        getTimeAtIndex(unsigned int index) const
+    {
+        assert(index < m_all_times.size());
+        return m_all_times[index];
+    }
+
     // ------------------------------------------------------------------------
     /** Return the display name; if not set, use default display name (kart name) */
     core::stringw getName() const OVERRIDE

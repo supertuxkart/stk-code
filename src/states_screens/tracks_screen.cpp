@@ -21,16 +21,19 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
-#include "states_screens/waiting_for_others.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -43,15 +46,18 @@ using namespace irr::video;
 
 static const char ALL_TRACK_GROUPS_ID[] = "all";
 
-DEFINE_SCREEN_SINGLETON( TracksScreen );
-
 // -----------------------------------------------------------------------------
 
 void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
     // -- track selection screen
-    if (name == "tracks")
+    if ((name == "lap-spinner" || name == "reverse") &&
+        STKHost::existHost() && m_selected_track != NULL)
+    {
+        voteForPlayer();
+    }
+    else if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if(!w2) return;
@@ -83,30 +89,17 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             m_random_track_list.push_back(selection);
 
         }   // selection=="random_track"
-        Track *track = track_manager->getTrack(selection);
+        m_selected_track = track_manager->getTrack(selection);
 
-        if (track)
+        if (m_selected_track)
         {
-            if(STKHost::existHost())
+            if (STKHost::existHost())
             {
-                Protocol* protocol = LobbyProtocol::get();
-                ClientLobby* clrp =
-                              dynamic_cast<ClientLobby*>(protocol);
-                assert(clrp);   // server never shows the track screen.
-                // FIXME SPLITSCREEN: we need to supply the global player id of the
-                // player selecting the track here. For now ... just vote the same
-                // track for each local player.
-                std::vector<NetworkPlayerProfile*> players =
-                                         STKHost::get()->getMyPlayerProfiles();
-                for(unsigned int i=0; i<players.size(); i++)
-                {
-                    clrp->voteTrack(players[i]->getGlobalPlayerId(),selection);
-                }
-                WaitingForOthersScreen::getInstance()->push();
+                voteForPlayer();
             }
             else
             {
-                TrackInfoScreen::getInstance()->setTrack(track);
+                TrackInfoScreen::getInstance()->setTrack(m_selected_track);
                 TrackInfoScreen::getInstance()->push();
             }
         }   // if clicked_track
@@ -125,10 +118,80 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
+bool TracksScreen::onEscapePressed()
+{
+    if (m_network_tracks)
+    {
+        // Remove this screen
+        StateManager::get()->popMenu();
+        STKHost::get()->shutdown();
+    }
+    return true; // remove the screen
+}   // onEscapePressed
 
+// -----------------------------------------------------------------------------
+void TracksScreen::tearDown()
+{
+    m_network_tracks = false;
+    m_vote_timeout = -1.0f;
+    m_selected_track = NULL;
+}   // tearDown
+
+// -----------------------------------------------------------------------------
+void TracksScreen::loadedFromFile()
+{
+    m_reversed = NULL;
+    m_laps = NULL;
+    m_votes = NULL;
+}   // loadedFromFile
+
+// -----------------------------------------------------------------------------
 void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
+
+    Widget* rect_box = getWidget("rect-box");
+
+    if (m_bottom_box_height == -1)
+        m_bottom_box_height = rect_box->m_h;
+
+    if (m_network_tracks)
+    {
+        rect_box->setVisible(true);
+        rect_box->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_bottom_box_height);
+        getWidget("lap-text")->setVisible(true);
+        //I18N: In track screen
+        getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
+        m_laps = getWidget<SpinnerWidget>("lap-spinner");
+        assert(m_laps != NULL);
+        m_laps->setVisible(true);
+        getWidget("reverse-text")->setVisible(true);
+        //I18N: In track screen
+        getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
+        m_reversed = getWidget<CheckBoxWidget>("reverse");
+        assert(m_reversed != NULL);
+        m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
+        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
+        getWidget("vote")->setVisible(true);
+        calculateLayout();
+    }
+    else
+    {
+        rect_box->setVisible(false);
+        rect_box->m_properties[GUIEngine::PROP_HEIGHT] = "0";
+        m_laps = NULL;
+        m_reversed = NULL;
+        getWidget("lap-text")->setVisible(false);
+        getWidget("lap-spinner")->setVisible(false);
+        getWidget("reverse-text")->setVisible(false);
+        getWidget("reverse")->setVisible(false);
+        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "98%";
+        getWidget("vote")->setVisible(false);
+        calculateLayout();
+    }
+    m_votes = getWidget<LabelWidget>("vote-text");
+    m_votes->setVisible(false);
+
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
@@ -147,12 +210,24 @@ void TracksScreen::beforeAddingWidget()
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     tracks_widget->setItemCountHint( (int)track_manager->getNumberOfTracks()+1 );
+
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
-
 void TracksScreen::init()
 {
+    // change the back button image (because it makes the game quit)
+    if (m_network_tracks)
+    {
+        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
+        back_button->setImage("gui/main_quit.png");
+    }
+    else
+    {
+        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
+        back_button->setImage("gui/back.png");
+    }
+
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
@@ -171,6 +246,23 @@ void TracksScreen::init()
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
     STKTexManager::getInstance()->unsetTextureErrorMessage();
+    if (m_network_tracks)
+    {
+        if (UserConfigParams::m_num_laps == 0 ||
+            UserConfigParams::m_num_laps > 20)
+            UserConfigParams::m_num_laps = 1;
+        m_laps->setValue(UserConfigParams::m_num_laps);
+        m_reversed->setState(m_reverse_checked);
+    }
+
+    if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
+    {
+        assert(!m_random_track_list.empty());
+        NetworkString vote(PROTOCOL_LOBBY_ROOM);
+        vote.addUInt8(LobbyProtocol::LE_VOTE);
+        vote.encodeString(m_random_track_list[0]).addUInt8(1).addUInt8(0);
+        STKHost::get()->sendToServer(&vote, true);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -187,19 +279,17 @@ void TracksScreen::buildTrackList()
     m_random_track_list.clear();
 
     const std::string& curr_group_name = tabs->getSelectionIDString(0);
-
-    if (!(curr_group_name == DEFAULT_GROUP_NAME ||
-        curr_group_name == ALL_TRACK_GROUPS_ID) && m_offical_track)
-    {
-        tracks_widget->setText(_("Only official tracks are supported."));
-        tracks_widget->updateItemDisplay();
-        return;
-    }
-
     const int track_amount = (int)track_manager->getNumberOfTracks();
 
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
+	bool is_network = (STKHost::existHost());
+    std::shared_ptr<ClientLobby> clrp;
+    if (is_network)
+    {
+        clrp = LobbyProtocol::get<ClientLobby>();
+        assert(clrp);
+    }
     PtrVector<Track, REF> tracks;
     for (int n = 0; n < track_amount; n++)
     {
@@ -208,14 +298,18 @@ void TracksScreen::buildTrackList()
             && !curr->hasEasterEggs())
             continue;
         if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
-        if (m_offical_track && !curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
+        if (!curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
-
+        if (is_network &&
+            clrp->getAvailableTracks().find(curr->getIdent()) ==
+            clrp->getAvailableTracks().end())
+        {
+            continue;
+        }
         tracks.push_back(curr);
     }   // for n<track_amount
 
-	bool is_network = (STKHost::existHost());
     tracks.insertionSort();
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
@@ -247,7 +341,6 @@ void TracksScreen::buildTrackList()
 }   // buildTrackList
 
 // -----------------------------------------------------------------------------
-
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
@@ -258,3 +351,58 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 }   // setFocusOnTrack
 
 // -----------------------------------------------------------------------------
+void TracksScreen::setVoteTimeout(float timeout)
+{
+    if (m_vote_timeout != -1.0f)
+        return;
+    m_vote_timeout = (float)StkTime::getRealTime() + timeout;
+}   // setVoteTimeout
+
+// -----------------------------------------------------------------------------
+void TracksScreen::voteForPlayer()
+{
+    assert(STKHost::existHost());
+    assert(m_selected_track);
+    assert(m_laps);
+    assert(m_reversed);
+    // Remember reverse globally for each stk instance
+    m_reverse_checked = m_reversed->getState();
+    UserConfigParams::m_num_laps = m_laps->getValue();
+    NetworkString vote(PROTOCOL_LOBBY_ROOM);
+    vote.addUInt8(LobbyProtocol::LE_VOTE);
+    vote.encodeString(m_selected_track->getIdent())
+        .addUInt8(m_laps->getValue()).addUInt8(m_reversed->getState());
+    STKHost::get()->sendToServer(&vote, true);
+}   // voteForPlayer
+
+// -----------------------------------------------------------------------------
+void TracksScreen::onUpdate(float dt)
+{
+    assert(m_votes);
+    if (m_vote_timeout == -1.0f)
+    {
+        m_votes->setText(L"", false);
+        return;
+    }
+
+    m_votes->setVisible(true);
+    int remaining_time = (int)(m_vote_timeout - StkTime::getRealTime());
+    if (remaining_time < 0)
+        remaining_time = 0;
+    //I18N: In tracks screen, about voting of tracks in network
+    core::stringw message = _("Remaining time: %d\n", remaining_time);
+    unsigned height = GUIEngine::getFont()->getDimension(L"X").Height;
+    const unsigned total_height = m_votes->getDimension().Height;
+    m_vote_messages.lock();
+    for (auto& p : m_vote_messages.getData())
+    {
+        height += GUIEngine::getFont()->getDimension(L"X").Height * 2;
+        if (height > total_height)
+            break;
+        message += p.second;
+        message += L"\n";
+    }
+    m_vote_messages.unlock();
+    m_votes->setText(message, true);
+
+}   // onUpdate

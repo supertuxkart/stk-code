@@ -82,7 +82,7 @@ public:
     virtual              ~ProfileWorld();
     /** Returns identifier for this world. */
     virtual  std::string getInternalCode() const {return "PROFILE"; }
-    virtual  void        update(float dt);
+    virtual  void        update(int ticks);
     virtual  bool        isRaceOver();
     virtual  void        enterRaceOverState();
 

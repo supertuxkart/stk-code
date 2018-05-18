@@ -78,7 +78,7 @@ private:
     int m_total_hit;
 
     std::vector<AbstractKart*> m_spare_tire_karts;
-    float m_next_sta_spawn_time;
+    int m_next_sta_spawn_ticks;
 
 public:
     /** Used to show a nice graph when battle is over */
@@ -113,7 +113,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void kartHit(const unsigned int kart_id) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node)
                                                                       OVERRIDE;

@@ -23,16 +23,28 @@
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
+#include "network/transport_address.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
 #include <enet/enet.h>
 
+#include <atomic>
+#include <memory>
+#include <set>
 #include <vector>
 
 class NetworkPlayerProfile;
 class NetworkString;
+class STKHost;
 class TransportAddress;
+
+enum PeerDisconnectInfo : unsigned int
+{
+    PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
+    PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
+    PDI_KICK = 2, //!< Kick disconnection
+};   // PeerDisconnectInfo
 
 /*! \class STKPeer
  *  \brief Represents a peer.
@@ -45,61 +57,115 @@ protected:
     ENetPeer* m_enet_peer;
 
     /** The token of this client. */
-    uint32_t m_client_server_token;
+    std::atomic<uint32_t> m_client_server_token;
 
     /** True if the token for this peer has been set. */
-    bool m_token_set;
+    std::atomic_bool m_token_set;
 
     /** Host id of this peer. */
     int m_host_id;
 
-    /** True if this peer is authorised to control a server. */
-    bool m_is_authorised;
-public:
-             STKPeer(ENetPeer *enet_peer);
-    virtual ~STKPeer();
+    TransportAddress m_peer_address;
 
-    virtual void sendPacket(NetworkString *data,
-                            bool reliable = true);
+    STKHost* m_host;
+
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > m_players;
+
+    float m_connected_time;
+
+    /** Available karts and tracks from this peer */
+    std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
+
+public:
+             STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
+             ~STKPeer() {}
+    // ------------------------------------------------------------------------
+    void sendPacket(NetworkString *data, bool reliable = true);
+    // ------------------------------------------------------------------------
     void disconnect();
+    // ------------------------------------------------------------------------
+    void kick();
+    // ------------------------------------------------------------------------
+    void reset();
+    // ------------------------------------------------------------------------
     bool isConnected() const;
-    bool exists() const;
-    uint32_t getAddress() const;
-    uint16_t getPort() const;
+    const TransportAddress& getAddress() const { return m_peer_address; }
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
-    std::vector<NetworkPlayerProfile*> getAllPlayerProfiles();
+    // ------------------------------------------------------------------------
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& getPlayerProfiles()
+                                                          { return m_players; }
+    // ------------------------------------------------------------------------
+    bool hasPlayerProfiles() const               { return !m_players.empty(); }
+    // ------------------------------------------------------------------------
+    void cleanPlayerProfiles()                           { m_players.clear(); }
+    // ------------------------------------------------------------------------
+    void addPlayer(std::shared_ptr<NetworkPlayerProfile> p)
+                                                    { m_players.push_back(p); }
     // ------------------------------------------------------------------------
     /** Sets the token for this client. */
-    void setClientServerToken(const uint32_t& token)
+    void setClientServerToken(const uint32_t token)
     {
-        m_client_server_token = token; 
-        m_token_set = true; 
+        m_client_server_token.store(token);
+        m_token_set.store(true);
     }   // setClientServerToken
     // ------------------------------------------------------------------------
-    void unsetClientServerToken() { m_token_set = false; }
+    /** Unsets the token for this client. (used in server to invalidate peer)
+     */
+    void unsetClientServerToken()
+    {
+        m_client_server_token.store(0);
+        m_token_set.store(false);
+    }
     // ------------------------------------------------------------------------
     /** Returns the token of this client. */
-    uint32_t getClientServerToken() const { return m_client_server_token; }
+    uint32_t getClientServerToken() const
+                                       { return m_client_server_token.load(); }
     // ------------------------------------------------------------------------
     /** Returns if the token for this client is known. */
-    bool isClientServerTokenSet() const { return m_token_set; }
-    // ------------------------------------------------------------------------
-    /** Sets the host if of this peer. */
-    void setHostId(int host_id) { m_host_id = host_id; }
+    bool isClientServerTokenSet() const          { return m_token_set.load(); }
     // ------------------------------------------------------------------------
     /** Returns the host id of this peer. */
-    int getHostId() const { return m_host_id; }
+    uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
-    /** Sets if this peer is authorised to control the server. */
-    void setAuthorised(bool authorised) { m_is_authorised = authorised; }
+    float getConnectedTime() const                 { return m_connected_time; }
     // ------------------------------------------------------------------------
-    /** Returns if this peer is authorised to control the server. The server
-     *  uses this to check if a peer is allowed certain commands; and a client
-     *  uses this function (in which case this peer is actually the server
-     *  peer) to see if this client is allowed certain command (i.e. to
-     *  display additional GUI elements). */
-    bool isAuthorised() const { return m_is_authorised; }
+    void setAvailableKartsTracks(std::set<std::string>& k,
+                                 std::set<std::string>& t)
+              { m_available_kts = std::make_pair(std::move(k), std::move(t)); }
+    // ------------------------------------------------------------------------
+    void eraseServerKarts(const std::set<std::string>& server_karts,
+                          std::set<std::string>& karts_erase)
+    {
+        if (m_available_kts.first.empty())
+            return;
+        for (const std::string& server_kart : server_karts)
+        {
+            if (m_available_kts.first.find(server_kart) ==
+                m_available_kts.first.end())
+            {
+                karts_erase.insert(server_kart);
+            }
+        }
+    }
+    // ------------------------------------------------------------------------
+    void eraseServerTracks(const std::set<std::string>& server_tracks,
+                           std::set<std::string>& tracks_erase)
+    {
+        if (m_available_kts.second.empty())
+            return;
+        for (const std::string& server_track : server_tracks)
+        {
+            if (m_available_kts.second.find(server_track) ==
+                m_available_kts.second.end())
+            {
+                tracks_erase.insert(server_track);
+            }
+        }
+    }
+    // ------------------------------------------------------------------------
+    uint32_t getPing() const;
+
 };   // STKPeer
 
 #endif // STK_PEER_HPP

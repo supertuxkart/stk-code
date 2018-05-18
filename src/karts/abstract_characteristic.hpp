@@ -193,11 +193,13 @@ public:
         NITRO_MAX,
 
         // Slipstream
-        SLIPSTREAM_DURATION,
+        SLIPSTREAM_DURATION_FACTOR,
+        SLIPSTREAM_BASE_SPEED,
         SLIPSTREAM_LENGTH,
         SLIPSTREAM_WIDTH,
-        SLIPSTREAM_COLLECT_TIME,
-        SLIPSTREAM_USE_TIME,
+        SLIPSTREAM_INNER_FACTOR,
+        SLIPSTREAM_MIN_COLLECT_TIME,
+        SLIPSTREAM_MAX_COLLECT_TIME,
         SLIPSTREAM_ADD_POWER,
         SLIPSTREAM_MIN_SPEED,
         SLIPSTREAM_MAX_SPEED_INCREASE,
@@ -359,11 +361,13 @@ public:
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
 
-    float getSlipstreamDuration() const;
+    float getSlipstreamDurationFactor() const;
+    float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    float getSlipstreamCollectTime() const;
-    float getSlipstreamUseTime() const;
+    float getSlipstreamInnerFactor() const;
+    float getSlipstreamMinCollectTime() const;
+    float getSlipstreamMaxCollectTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;
@@ -392,4 +396,3 @@ public:
 };
 
 #endif
-

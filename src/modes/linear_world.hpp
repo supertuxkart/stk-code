@@ -55,6 +55,21 @@ private:
      *  get valid finish times estimates. */
     float       m_distance_increase;
 
+    /** This stores the live time difference between a ghost kart
+     *  and a second kart racing against it (normal or ghost). 
+     */
+
+    float       m_live_time_difference;
+
+    /** True if the live_time_difference is invalid */
+    bool        m_valid_reference_time;
+
+    /** This calculate the time difference between the second kart in the race
+     *  (there must be at least two) and the first kart in the race
+     *  (who must be a ghost).
+     */
+    void  updateLiveDifference();
+
     // ------------------------------------------------------------------------
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.
@@ -62,8 +77,8 @@ private:
     class KartInfo
     {
     public:
-        /** Number of finished(!) laps. */
-        int         m_race_lap;
+        /** Number of finished laps. */
+        int         m_finished_laps;
 
         /** Time at finishing last lap. */
         int         m_ticks_at_last_lap;
@@ -78,17 +93,22 @@ private:
          *  track-length plus distance-along-track). */
         float       m_overall_distance;
 
+        /** Accumulates the time a kart has been driving in the wrong
+         *  direction so that a message can be displayed. */
+        float       m_wrong_way_timer;
+
         /** Initialises all fields. */
         KartInfo()  { reset(); }
         // --------------------------------------------------------------------
         /** Re-initialises all data. */
         void reset()
         {
-            m_race_lap          = -1;
+            m_finished_laps     = -1;
             m_lap_start_ticks   = 0;
             m_ticks_at_last_lap = INT_MAX;
             m_estimated_finish  = -1.0f;
             m_overall_distance  = 0.0f;
+            m_wrong_way_timer   = 0.0f;
         }   // reset
     };
     // ------------------------------------------------------------------------
@@ -113,12 +133,16 @@ public:
     virtual void  init() OVERRIDE;
     virtual      ~LinearWorld();
 
-    virtual void  update(float delta) OVERRIDE;
-    float         getDistanceDownTrackForKart(const int kart_id) const;
+    virtual void  update(int ticks) OVERRIDE;
+    virtual void  updateGraphics(float dt) OVERRIDE;
+    float         getDistanceDownTrackForKart(const int kart_id,
+                                            bool account_for_checklines) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
     int           getTicksAtLapForKart(const int kart_id) const;
+    float         getLiveTimeDifference() const { return m_live_time_difference; }
+    bool          hasValidTimeDifference() const { return m_valid_reference_time; }
 
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
@@ -141,10 +165,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
-    int getKartLaps(unsigned int kart_index) const OVERRIDE
+    int getFinishedLapsOfKart(unsigned int kart_index) const OVERRIDE
     {
         assert(kart_index < m_kart_info.size());
-        return m_kart_info[kart_index].m_race_lap;
+        return m_kart_info[kart_index].m_finished_laps;
     }   // getkartLap
     // ------------------------------------------------------------------------
     void setLastTriggeredCheckline(unsigned int kart_index, int index);
@@ -161,6 +185,18 @@ public:
     float getFastestLap() const
     {
         return stk_config->ticks2Time(m_fastest_lap_ticks);
+    }
+    // ------------------------------------------------------------------------
+    /** Network use: get fastest lap in ticks */
+    int getFastestLapTicks() const
+    {
+        return m_fastest_lap_ticks;
+    }
+    // ------------------------------------------------------------------------
+    /** Network use: set fastest lap in ticks */
+    void setFastestLapTicks(int ticks)
+    {
+        m_fastest_lap_ticks = ticks;
     }
 };   // LinearWorld
 

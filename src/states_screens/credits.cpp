@@ -30,10 +30,9 @@ using irr::core::stringc;
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
-DEFINE_SCREEN_SINGLETON( CreditsScreen );
 
 using namespace GUIEngine;
 const float TIME_SECTION_FADE = 0.8f;
@@ -91,6 +90,10 @@ bool CreditsScreen::getLineAsWide(std::ifstream& file, core::stringw* out)
 
     std::string line;
     std::getline(file, line);
+
+    // Replace "STKVERSION" with the actual version number
+    line = StringUtils::findAndReplace(line, "$STKVERSION$", STK_VERSION);
+
     *out = StringUtils::utf8ToWide(line);
     return file.good();
 

@@ -7,14 +7,15 @@
 # Dmitry Dubrov <dimprogpro@hotmail.ru>, 2015
 # Oleg <laol-tomsk@mail.ru>, 2015
 # Val Och <v19930312@gmail.com>, 2016
+# Vladislav Tananaev <vlad.tananaev@gmail.com>, 2018
 # Олег Лазарев <laoltomsk@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Олег Лазарев <laoltomsk@gmail.com>\n"
+"PO-Revision-Date: 2018-03-07 14:35+0000\n"
+"Last-Translator: Andrei Stepanov\n"
 "Language-Team: Russian (http://www.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -597,7 +598,7 @@ msgstr "Оружие"
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr "Режим игры"
+msgstr "Режимы игры"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -744,7 +745,7 @@ msgstr "Следуйте за лидером: будьте на втором м�
 #. I18N: In the help menu
 msgid ""
 "3 Strikes Battle: Hit others with weapons until they lose all their lives."
-msgstr "Битва Трех Ударов: атакуйте других с помощью оружия до тех пор, пока они не потеряют все свои жизни."
+msgstr "Битва трёх ударов: атакуйте других с помощью оружия до тех пор, пока они не потеряют все свои жизни."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -1178,7 +1179,7 @@ msgstr "Вид"
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
-msgstr "..."
+msgstr "…"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
@@ -1334,7 +1335,7 @@ msgstr "Вы можете играть без создания сетевого 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "Terms and Agreement"
-msgstr "Условия и Соглашение"
+msgstr "Условия и соглашение"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -1467,7 +1468,7 @@ msgstr "Вернуться к списку устройств"
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr "Нажмите Enter или дважды кликните по устройству, чтобы настроить его"
+msgstr "Нажмите «Enter» или дважды кликните по устройству, чтобы настроить его"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -1479,7 +1480,7 @@ msgstr "Добавить устройство"
 msgid ""
 "* Which config to use will be inferred from which 'Select' key is pressed to"
 " join the game."
-msgstr "* Выбор конфигурации будет зависеть от того,  с какого устройства нажата кнопка \"Выбрать\" при соединении к игре."
+msgstr "* Выбор конфигурации будет зависеть от того,  с какого устройства нажата кнопка «Выбрать» при соединении к игре."
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -1502,7 +1503,7 @@ msgstr "Вы играете за"
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit their settings"
-msgstr "Нажмите Enter или дважды кликните по игроку для редактирования его настроек"
+msgstr "Нажмите «Enter» или дважды кликните по игроку для редактирования его настроек"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
@@ -1686,7 +1687,7 @@ msgstr "Количество голов для победы"
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Maximum time (min.)"
-msgstr "Максимальное время (мин)"
+msgstr "Максимальное время (мин.)"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1824,7 +1825,7 @@ msgstr "Если ты победишь меня в гонке, то я осво�
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr "Но вы, жалкие дурачки, никогда не сможете победить меня — Короля Картов !"
+msgstr "Но вы, жалкие дурачки, никогда не сможете победить меня — Короля Картов!"
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
@@ -1964,28 +1965,28 @@ msgstr "Вильбер"
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr "XFCE-мышь"
+msgstr "Ксю"
 
 #: src/achievements/achievement.cpp:209
 #, c-format
 msgid "Completed achievement \"%s\"."
-msgstr "Получено достижение \"%s\"."
+msgstr "Получено достижение «%s»."
 
 #: src/addons/addons_manager.cpp:104 src/addons/news_manager.cpp:322
 msgid "Failed to connect to the SuperTuxKart add-ons server."
-msgstr "Не удалось подключиться к серверу аддонов SuperTuxKart."
+msgstr "Не удалось подключиться к серверу дополнений SuperTuxKart."
 
 #: src/addons/news_manager.cpp:179
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr "Ошибка при получении новостей: %s."
+msgstr "Ошибка при получении новостей:  «%s»."
 
 #. I18N: number of laps to race in a challenge
 #: src/challenges/challenge_data.cpp:266
 #: src/states_screens/race_result_gui.cpp:1424
 #, c-format
 msgid "Laps: %i"
-msgstr "Кругов: %i"
+msgstr "Кол-во кругов: %i"
 
 #: src/challenges/challenge_data.cpp:272
 msgid "Follow the leader"
@@ -2050,7 +2051,7 @@ msgstr "Началась запись видео."
 #: src/graphics/irr_driver.cpp:541
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr "Видео сохранено в \"%s\"."
+msgstr "Видео сохранено в «%s»."
 
 #: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
@@ -2698,13 +2699,13 @@ msgstr "Это может делать только хозяин игры!"
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr "Подсоедините wiimote к менеджеру Bluetooth, затем нажмите Ок. Подробную инструкцию смотрите на supertuxkart.net/Wiimote"
+msgstr "Подсоедините контроллер Wii к менеджеру Bluetooth, затем нажмите ОК. Подробную инструкцию смотрите на supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:391
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok. Detailed instructions at supertuxkart.net/Wiimote"
-msgstr "Чтобы попасть в меню поиска, одновременно нажмите кнопки 1+2 на своем wiimote, затем нажмите ОК. Подробную инструкцию смотрите на supertuxkart.net/Wiimote"
+msgstr "Чтобы попасть в меню поиска, одновременно нажмите кнопки 1+2 на своём контроллере Wii, затем нажмите ОК. Подробную инструкцию смотрите на supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:414
 #, c-format
@@ -2725,7 +2726,7 @@ msgstr "Штрафное время!!!"
 
 #: src/karts/controller/local_player_controller.cpp:243
 msgid "Don't accelerate before go"
-msgstr "Не жмите газ до слова \"Вперёд\"!"
+msgstr "Не жмите газ до слова «Вперёд»!"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
@@ -2818,7 +2819,7 @@ msgstr "Вы дисквалифицированы!"
 #: src/modes/world.cpp:1205
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "'%s' выбыл из гонки."
+msgstr "'%s' выбыл(-а) из гонки."
 
 #: src/network/protocols/server_lobby.cpp:318
 #, c-format
@@ -2886,12 +2887,12 @@ msgstr "Таблица результатов устарела,\nвсе резу
 #. I18N: Game mode
 #: src/race/race_manager.hpp:179
 msgid "Follow the Leader"
-msgstr "Следуйте за Лидером"
+msgstr "Следуйте за лидером"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:181
 msgid "3 Strikes Battle"
-msgstr "Битва Трёх Ударов"
+msgstr "Битва трёх ударов"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:183
@@ -2956,7 +2957,7 @@ msgstr "Дата обновления"
 msgid ""
 "Access to the Internet is disabled. (To enable it, go to options and select "
 "tab 'User Interface')"
-msgstr "Доступ в Интернет отсутствует. (Для включения доступа, перейдите в настройки и выберите вкладку \"Интерфейс\")"
+msgstr "Доступ в Интернет отсутствует. (Для включения доступа, перейдите в настройки и выберите вкладку «Интерфейс»)"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:343
@@ -3052,13 +3053,13 @@ msgstr "избранное"
 #: src/states_screens/dialogs/addons_loading.cpp:166
 #, c-format
 msgid "%s MB"
-msgstr "%s Мбайт"
+msgstr "%s МБ"
 
 #: src/states_screens/dialogs/addons_loading.cpp:173
 #: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "%s KB"
-msgstr "%s Кбайт"
+msgstr "%s КБ"
 
 #: src/states_screens/dialogs/addons_loading.cpp:178
 #, c-format
@@ -3089,7 +3090,7 @@ msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
-msgstr "Для того, чтобы добавить Геймпад/Джойстик, просто запустите SuperTuxKart, когда он подключен. Он автоматически появится в списке устройств.\n\nЧтобы добавить настройки клавиатуры, вы можете нажать на кнопку, находящуюся ниже. Но учтите, что большинство клавиатур поддерживают только ограниченное количество одновременных нажатий клавиш и поэтому не подходят для многопользовательской игры. (Однако вы можете решить эту проблему подключением нескольких клавиатур к компьютеру. Но даже в этом случае нужно назначать различные сочетания клавиш.)"
+msgstr "Для того, чтобы добавить Геймпад/Джойстик, просто запустите SuperTuxKart, когда он подключён. Он автоматически появится в списке устройств.\n\nЧтобы добавить настройки клавиатуры, вы можете нажать на кнопку, находящуюся ниже. Но учтите, что большинство клавиатур поддерживают только ограниченное количество одновременных нажатий клавиш и поэтому не подходят для многопользовательской игры. (Однако вы можете решить эту проблему подключением нескольких клавиатур к компьютеру. Но даже в этом случае нужно назначать различные сочетания клавиш.)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
@@ -3434,7 +3435,7 @@ msgstr "Имя не задано."
 
 #: src/states_screens/grand_prix_editor_screen.cpp:359
 msgid "Another grand prix with this name already exists."
-msgstr "Уже существует Гран-при с таким же названием."
+msgstr "Гран-при с таким же названием уже существует."
 
 #: src/states_screens/grand_prix_editor_screen.cpp:365
 msgid "Name is too long."
@@ -3467,7 +3468,7 @@ msgstr "Заблокировано"
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
-msgstr "Всем:\nДля присоединения к игре нажмите клавишу \"Выбрать\" "
+msgstr "Всем:\nДля присоединения к игре нажмите клавишу «Выбрать»"
 
 #: src/states_screens/main_menu_screen.cpp:510
 msgid ""
@@ -3512,7 +3513,7 @@ msgstr "Профиль %s"
 
 #: src/states_screens/online_profile_friends.cpp:75
 msgid "Since"
-msgstr "С"
+msgstr " Дата"
 
 #: src/states_screens/online_profile_friends.cpp:76
 msgid "Status"
@@ -3683,7 +3684,7 @@ msgstr "Сенсорное устройство"
 msgid ""
 "In multiplayer mode, players can select handicapped (more difficult) "
 "profiles on the kart selection screen"
-msgstr "В многопользовательском режиме игроки могут выбрать профили гандикапа (сложности) на экране выбора карта."
+msgstr "В многопользовательском режиме игроки могут выбрать профили гандикапа (сложности) на экране выбора карта"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:191
@@ -3731,7 +3732,7 @@ msgstr "Динамическое освещение: %s"
 #: src/states_screens/options_screen_video.cpp:498
 #, c-format
 msgid "Motion blur: %s"
-msgstr "Размытие при движении: %s"
+msgstr "Размытие в движении: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:501
@@ -3890,7 +3891,7 @@ msgstr "Вы действительно хотите прервать Гран-�
 #: src/states_screens/race_result_gui.cpp:499
 #: src/states_screens/race_result_gui.cpp:865
 msgid "Eliminated"
-msgstr "Выбыл из гонки"
+msgstr "Выбыл(-а) из гонки"
 
 #: src/states_screens/race_result_gui.cpp:1012
 msgid "Red Team Wins"
@@ -3939,7 +3940,7 @@ msgstr "Все возможности доступны, так что собир
 
 #: src/states_screens/race_setup_screen.cpp:94
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr "Не содержит бонусов, только ваши навыки вождения имеют значение!"
+msgstr "Никаких бонусов, важны только ваши навыки вождения!"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:107
@@ -3986,7 +3987,7 @@ msgstr "Электронная почта должна содержать от 4
 
 #: src/states_screens/register_screen.cpp:299
 msgid "Email is invalid!"
-msgstr "Недоступная электронная почта!"
+msgstr "Недействительная электронная почта!"
 
 #: src/states_screens/register_screen.cpp:362
 msgid ""
@@ -4074,7 +4075,7 @@ msgstr "Вы действительно хотите удалить игрока
 #. formats.
 #: src/utils/time.cpp:50
 msgid "%d/%m/%Y"
-msgstr "%д.%м.%Г"
+msgstr "%d.%m.%Y"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,

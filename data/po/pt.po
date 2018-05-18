@@ -5,6 +5,8 @@
 # Translators:
 # Bruno Ramalhete <bram.512@gmail.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
+# Pedro TheGamerOficialTM <pedromiguelafonso4@gmail.com>, 2017
+# Pedro TheGamerOficialTM <pedromiguelafonso4@gmail.com>, 2017
 # Rui <xymarior@yandex.com>, 2016-2017
 # Rui <xymarior@yandex.com>, 2016
 msgid ""
@@ -12,8 +14,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Rui <xymarior@yandex.com>\n"
+"PO-Revision-Date: 2017-11-25 11:08+0000\n"
+"Last-Translator: Pedro TheGamerOficialTM <pedromiguelafonso4@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/supertuxkart/supertuxkart/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -95,11 +97,11 @@ msgstr "Apanhar um mínimo de 5 bananas por corrida."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "É segredo"
+msgstr "É um segredo"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
-msgstr "Realmente... um segredo."
+msgstr "Realmente... é um segredo."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
@@ -121,7 +123,7 @@ msgstr "Fora do circuito habitual"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 msgid "To the moon and back"
-msgstr "Ira à Lua e voltar"
+msgstr "Ir à Lua e voltar"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 msgid "At World's End"
@@ -385,7 +387,7 @@ msgstr "Todas as Pistas"
 #. I18N: ./data/gui/edit_gp.stkgui
 #. I18N: Title in edit grand prix screen
 msgid "Edit Grand Prix"
-msgstr "Editar Grande Prémio"
+msgstr "Editar o grande prémio"
 
 #. I18N: ./data/gui/edit_gp.stkgui
 #. I18N: Menu item
@@ -481,7 +483,7 @@ msgstr "Visualizar apenas o rever"
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
-msgstr "Iniciar corrida"
+msgstr "Iniciar a corrida"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -491,7 +493,7 @@ msgstr "Seleção de Rever Fantasma"
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr "Mostrar rever apenas na dificuldade atual"
+msgstr "Mostrar apenas na dificuldade atual"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -523,7 +525,7 @@ msgstr "Continuar o Grande Prémio gravado"
 #. I18N: ./data/gui/grand_prix_editor.stkgui
 #. I18N: Title in grand prix editor screen
 msgid "Grand Prix editor"
-msgstr "Editor de Grande Prémio"
+msgstr "Editor do grande prémio"
 
 #. I18N: ./data/gui/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -646,19 +648,19 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the"
 " bar at the right of the game screen."
-msgstr "Se apanhares garrafas de nitro podes conseguir velocidades estonteantes sempre que carregares na tecla apropriada. Podes ver o quantidade de nitro na barra à direita do ecrã de jogo."
+msgstr "Se apanhares garrafas de nitro podes conseguir velocidades brutais sempre que carregares na tecla apropriada. Podes ver a quantidade de nitro na barra à direita do ecrã do jogo."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "Se vires um botão com um cadeado destes, é porque tens que completar um desafio para o desbloquear."
+msgstr "Se vires um botão com um cadeado destes, é porque tens que completar uma corrida para o desbloquear."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr "A tecla \"Derrapar\" permite derrapar em curvas apertadas e ganhar aceleração."
+msgstr "A tecla \"Derrapar\" permite derrapar em curvas apertadas e ganhar velocidade."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -679,7 +681,7 @@ msgstr "Pastilha Elástica - protege-te com um escudo ou utiliza-a quando olhare
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr "Bolo - é atirado ao rival mais próximo. Deve ser utilizado para pequenas distâncias e em reta."
+msgstr "Bolo - é atirado ao rival mais próximo. Deve ser utilizado para distâncias pequenas e em reta."
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -729,7 +731,7 @@ msgstr "Corrida Normal: todas as armas são permitidas. Apanha-as e utiliza-as!"
 msgid ""
 "Time Trial: Contains no powerups, so only your driving skills matter! This "
 "mode allows you to record the race for replaying."
-msgstr "Corrida Contra o Tempo: não existem powerups por isso apenas contam as tuas capacidades de condução. Este modo permite gravar a corrida para poderes revê-la."
+msgstr "Corrida Contra o Tempo: não existem powerups por isso, apenas contam as tuas capacidades de condução. Este modo permite gravar a corrida para poderes revê-la."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -737,7 +739,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "Seguir o Líder: disputa o segundo lugar, porque o último carro será desqualificado sempre que o cronómetro atinja o valor zero. Atenção: não deves ultrapassar o líder ou serás também eliminado."
+msgstr "Seguir o Líder: Disputa o segundo lugar, porque o último carro será desqualificado sempre que o cronómetro atinja o valor zero. Atenção: não deves ultrapassar o líder ou serás também eliminado."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -762,7 +764,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Grande parte destes modos também podem ser jogados como Grande Prémio. Em vez de fazer uma corrida, joga várias de seguida. Quanto melhor for a tua posição, mais pontos ganhas. No fim, o jogador que tiver mais pontos ganha a taça."
+msgstr "* Grande parte destes modos também podem ser jogados como Grande Prémio. Em vez de fazeres uma corrida, jogas várias de seguida. Quanto melhor for a tua posição, mais pontos ganhas. No fim, o jogador que tiver mais pontos ganha a taça."
 
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
@@ -781,7 +783,7 @@ msgid ""
 "keyboard(s), however each player will need a different set of keys, and keep"
 " in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr "Precisas de diversos dispositivos (ter diversos comandos ou joysticks é a melhor maneira para jogos multi-jogadores). Acede às definições e configura os comandos. Também podem jogar no teclado, mas neste caso, cada jogador terá que usar diversas teclas e esta não é a melhor forma de jogar, uma vez que a maioria dos teclados não permitem que se primam várias teclas ao mesmo tempo."
+msgstr "Primeiro, precisas de diversos dispositivos (ter diversos comandos ou joysticks é a melhor maneira para jogos multi-jogadores). Acede às definições e configura os comandos. Também podes jogar no teclado, mas neste caso, cada jogador terá que usar diversas teclas e esta não é a melhor forma de jogar, uma vez que a maioria dos teclados não permitem que se primam várias teclas ao mesmo tempo."
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -792,7 +794,7 @@ msgid ""
 " the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr "Assim que configurares os dispositivos, podes jogar. Escolhe uma corrida multi-jogador no menu principal. Para escolher um veículo, cada jogador tem que pressionar a tecla de \"Disparo\" do comando, joystick ou teclado para entrar no jogo. Cada jogador pode usar o seu dispositivo para escolher o veículo. O jogo começará assim que todos os jogadores escolham o veículo. Para esta operação, não se pode utilizar o rato."
+msgstr "Assim que configurares os dispositivos, podes jogar. Escolhe uma corrida multi-jogador no menu principal. Para escolher um veículo, cada jogador tem que pressionar a tecla de \"Disparo\" do comando, joystick ou teclado para entrar no jogo. Cada jogador pode usar o seu dispositivo para escolher o veículo. O jogo começará assim que todos os jogadores escolherem um veículo. Para esta operação, não podes utilizar o rato."
 
 #. I18N: ./data/gui/help5.stkgui
 msgid ""
@@ -808,7 +810,7 @@ msgstr "Âncora - reduz a velocidade do kart."
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Parachute - slows down the kart less than the anchor."
-msgstr "Pára-quedas - reduz a velocidade do kart, mas menos que a âncora."
+msgstr "Pára-quedas - reduz a velocidade do kart, mas reduz menos que a âncora."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
@@ -948,24 +950,24 @@ msgstr "Restaurar padrão"
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Password Change"
-msgstr "Alterar Palavra-chave"
+msgstr "Alterar a palavra-passe"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Current Password"
-msgstr "Palavra-chave atual"
+msgstr "Palavra-passe atual"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "New Password"
-msgstr "Nova Palavra-chave"
+msgstr "Nova palavra-passe"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Confirm"
-msgstr "Confirmação"
+msgstr "Confirmar"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -992,7 +994,7 @@ msgstr "Fechar"
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Server Creation"
-msgstr "Criação de Servidor"
+msgstr "Criação do Servidor"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1073,7 +1075,7 @@ msgstr "Modo de jogo"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:175
 msgid "Normal Race"
-msgstr "Corrida simples"
+msgstr "Corrida normal"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
@@ -1188,7 +1190,7 @@ msgstr "Amigos"
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
 msgid "Look for more friends:"
-msgstr "Porcurar mais amigos:"
+msgstr "Procurar mais amigos:"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/user_search.stkgui
@@ -1213,7 +1215,7 @@ msgstr "Rede Local"
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Find Server"
-msgstr "Localizar Servidor"
+msgstr "Encontrar Servidor"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -1223,7 +1225,7 @@ msgstr "Criar Servidor"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Global Networking"
-msgstr "Rede Mundial"
+msgstr "Rede Global"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -1239,7 +1241,7 @@ msgstr "Definições da Conta"
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr "Palavra-chave:"
+msgstr "Palavra-passe:"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
@@ -1250,20 +1252,20 @@ msgstr "Alterar"
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "Recuperação de Conta"
+msgstr "Recuperação da Conta"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr "Vais receber um email com informações detalhadas sobre como repôr a palavra-chave. Por favor tem paciência e lembra-te de verificar a pasta de emails indesejados ou spam."
+msgstr "Vais receber um email com informações detalhadas sobre como alterar a palavra-chave. Por favor tem paciência e lembra-te de verificar a pasta de emails indesejados ou spam."
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr "Preenche o nome de utilizador e o endereço de email que introduziste ao criar a conta para poderes repôr a tua palavra-passe."
+msgstr "Preenche o nome de utilizador e o endereço de email que introduziste ao criar a conta para poderes alterar a tua palavra-passe."
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -1526,7 +1528,7 @@ msgstr "Tema"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr "Mostrar Quadros Por Segundo"
+msgstr "Mostrar FPS"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1581,7 +1583,7 @@ msgstr "Resolução"
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Fullscreen"
-msgstr "Ecrã total"
+msgstr "Ecrã inteiro"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1711,7 +1713,7 @@ msgstr "Equipa Azul"
 #. I18N: In the track and grand prix selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Grand Prix"
-msgstr "Grande prémio"
+msgstr "Grande Prémio"
 
 #. I18N: ./data/gui/track_info.stkgui
 msgid "= Highscores ="
@@ -1811,12 +1813,12 @@ msgstr "Sim, ele está no meu castelo e servir-me-á para sempre..."
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "Mas como sou uma criatura justa, proponho um acordo."
+msgstr "Mas como sou uma criatura justa, proponho-te um acordo."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr "Se me conseguires vencer na corrida, eu liberto-o."
+msgstr "Se me conseguires vencer na corrida, eu liberto o teu líder."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1935,7 +1937,7 @@ msgstr "Nolok"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
-msgstr "Pombo"
+msgstr "Pidgin"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
@@ -1943,11 +1945,11 @@ msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
-msgstr "Sara a Corredora"
+msgstr "Sara The Racer"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
-msgstr "Sara a Feiticeira"
+msgstr "Sara The Wizard"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -1977,7 +1979,7 @@ msgstr "Não foi possível ligar ao servidor de extras do SuperTuxKart."
 #: src/addons/news_manager.cpp:179
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr "Erro ao descarregar notícias: '%s'."
+msgstr "Erro ao descarregar as notícias: '%s'."
 
 #. I18N: number of laps to race in a challenge
 #: src/challenges/challenge_data.cpp:266
@@ -2139,7 +2141,7 @@ msgstr "Clear"
 #: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Return"
-msgstr "Mudar de linha"
+msgstr "Return"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:134
@@ -2169,7 +2171,7 @@ msgstr "Pausa"
 #: src/input/binding.cpp:142
 msgctxt "input_key"
 msgid "Caps Lock"
-msgstr "Maiúsculas"
+msgstr "Caps Lock"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:144
@@ -2571,7 +2573,7 @@ msgstr "Configura os atalhos de teclado."
 
 #: src/input/device_manager.cpp:544
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "O ficheiro de configuração não é compatível com esta versão do SuperTuxKart."
+msgstr "O teu ficheiro de configuração não é compatível com esta versão do SuperTuxKart."
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167

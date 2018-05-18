@@ -48,8 +48,6 @@
 using irr::gui::IGUIStaticText;
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( GPInfoScreen );
-
 /** Constructor, initialised some variables which might be used before
  *  loadedFromFile is called.
  */
@@ -234,9 +232,9 @@ void GPInfoScreen::init()
     {
         const int local_players = race_manager->getNumLocalPlayers();
         int min_ai = 0;
-        int num_ai = UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX]
-            - local_players;
-        
+        int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
+            [RaceManager::MAJOR_MODE_GRAND_PRIX]) - local_players;
+
         // A ftl reace needs at least three karts to make any sense
         if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
