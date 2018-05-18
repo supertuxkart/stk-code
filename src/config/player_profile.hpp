@@ -236,6 +236,23 @@ public:
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
     // ------------------------------------------------------------------------
+    void setFinished() { m_story_mode_status->setFinished(); }
+    // ------------------------------------------------------------------------
+    bool isFinished() const { return m_story_mode_status->isFinished(); }
+    // ------------------------------------------------------------------------
+    void setSpeedrunFinished() { m_story_mode_status->setSpeedrunFinished(); }
+    // ------------------------------------------------------------------------
+    bool isSpeedrunFinished() { return m_story_mode_status->isSpeedrunFinished(); }
+    // ------------------------------------------------------------------------
+    void setStoryModeTimer(int milliseconds)  {  m_story_mode_status->setStoryModeTimer(milliseconds); }
+    // ------------------------------------------------------------------------
+    int getStoryModeTimer()  {  return m_story_mode_status->getStoryModeTimer(); }
+    // ------------------------------------------------------------------------
+    void setSpeedrunTimer(int milliseconds)  {  m_story_mode_status->setSpeedrunTimer(milliseconds); }
+    // ------------------------------------------------------------------------
+    int getSpeedrunTimer()  {  return m_story_mode_status->getSpeedrunTimer(); }
+
+
     void clearUnlocked()
     {
         m_story_mode_status->clearUnlocked();
