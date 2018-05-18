@@ -39,7 +39,6 @@ SpeedrunModeDialog::SpeedrunModeDialog() : ModalDialog(0.7f, 0.7f)
 
 void SpeedrunModeDialog::onEnterPressedInternal()
 {
-    onEscapePressed();
     //FIXME : the dismiss avoids the dialog being repeated
     //        but it flashes once before disappearing
     ModalDialog::dismiss();

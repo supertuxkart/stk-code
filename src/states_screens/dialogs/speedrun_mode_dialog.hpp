@@ -23,8 +23,8 @@
 #include "utils/cpp2011.hpp"
 
 /**
- * \brief Dialog shown after a resolution switch sot he user may confirm if
- *        the resolution works.
+ * \brief Dialog shown when the user launch the game with speedrun mode
+ *        enabled or try to enable it in the options, while it's invalid.
  * \ingroup states_screens
  */
 class SpeedrunModeDialog : public GUIEngine::ModalDialog
