@@ -1680,8 +1680,6 @@ video::SColorf IrrDriver::getAmbientLight() const
  */
 void IrrDriver::displayStoryModeTimer()
 {
-    bool use_digit_font = true;//FIXME story_mode_timer->isSpeedrunning();
-
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
 
     core::stringw timer_string;
@@ -1691,20 +1689,7 @@ void IrrDriver::displayStoryModeTimer()
     core::dimension2du area = font->getDimension(L"99:99.99");
     int regular_timer_width = area.Width;
     int additional_height = 0;
-    if (!use_digit_font)
-    {
-        if(story_mode_timer->playerCanRun())
-        {
-            font = GUIEngine::getLargeFont();
-            font->setScale(1.4f);
-        }
-        else
-        {
-            font = GUIEngine::getSmallFont();
-        }
-        area = font->getDimension(L"Run not started.");
-    }
-    else if (UserConfigParams::m_speedrun_mode)
+    if (UserConfigParams::m_speedrun_mode)
     {
         area = font->getDimension(L"99:99:99.999");
     }
