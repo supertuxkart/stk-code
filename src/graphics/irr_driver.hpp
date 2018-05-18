@@ -207,6 +207,7 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
+    void displayStoryModeTimer();
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColorf &light,

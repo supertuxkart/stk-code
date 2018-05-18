@@ -17,6 +17,8 @@
 
 #include "graphics/irr_driver.hpp"
 
+#include "challenges/story_mode_timer.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/2dutils.hpp"
@@ -1670,6 +1672,61 @@ video::SColorf IrrDriver::getAmbientLight() const
 {
     return m_scene_manager->getAmbientLight();
 }
+
+// ----------------------------------------------------------------------------
+/** Displays the timer for Story Mode on the screen.
+ *  This can't be done in race or overworld GUIs as
+ *  the speedrun timer has to be displayed on all screens.
+ */
+void IrrDriver::displayStoryModeTimer()
+{
+    bool use_digit_font = true;//FIXME story_mode_timer->isSpeedrunning();
+
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+
+    core::stringw timer_string;
+    timer_string = story_mode_timer->getTimerString().c_str();
+
+    //The normal timer size ; to not write over it
+    core::dimension2du area = font->getDimension(L"99:99.99");
+    int regular_timer_width = area.Width;
+    int additional_height = 0;
+    if (!use_digit_font)
+    {
+        if(story_mode_timer->playerCanRun())
+        {
+            font = GUIEngine::getLargeFont();
+            font->setScale(1.4f);
+        }
+        else
+        {
+            font = GUIEngine::getSmallFont();
+        }
+        area = font->getDimension(L"Run not started.");
+    }
+    else if (UserConfigParams::m_speedrun_mode)
+    {
+        area = font->getDimension(L"99:99:99.999");
+    }
+    else
+    {
+        area = font->getDimension(L"99:99:99");
+    }
+
+    int screen_width = irr_driver->getActualScreenSize().Width;
+    int screen_height = irr_driver->getActualScreenSize().Height;
+    int speedrun_string_width = area.Width;
+    int dist_from_right = speedrun_string_width + regular_timer_width + screen_width*4/100;
+
+    core::rect<s32> position(screen_width - dist_from_right, screen_height*2/100,
+                             screen_width                  , screen_height*6/100);
+   
+   	if ( (UserConfigParams::m_speedrun_mode && story_mode_timer->speedrunIsFinished()) ||
+         (!UserConfigParams::m_speedrun_mode && PlayerManager::getCurrentPlayer()->isFinished()) )
+   		font->draw(timer_string.c_str(), position, video::SColor(255, 0, 255, 0), false, false, NULL, true);
+    else
+        font->draw(timer_string.c_str(), position, video::SColor(255, 220, 255, 0), false, false, NULL, true);
+} // displayStoryModeTimer
 
 // ----------------------------------------------------------------------------
 /** Displays the FPS on the screen.
