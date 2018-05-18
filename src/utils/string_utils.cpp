@@ -504,7 +504,7 @@ namespace StringUtils
      *  \param time Time in seconds.
      *  \param precision The number of seconds decimals - 3 to display ms, default 2
      */
-    std::string timeToString(float time, unsigned int precision, bool display_minutes_if_zero, bool display_hours)
+    std::string timeToString(float time, unsigned int precision, bool display_minutes_if_zero)
     {
         //Time more detailed than ms are mostly meaningless
         if (precision > 3)
@@ -546,15 +546,12 @@ namespace StringUtils
             else
                 final_append = "";
             // concatenate the strings with +
-            if (display_hours)
-                return (std::string("00:00:00") + final_append);
-            else if (display_minutes_if_zero)
+            if (display_minutes_if_zero)
                 return (std::string("00:00") + final_append);
             else
                 return (std::string("00") + final_append);
         }
-        else if((int_time >= 60*60*precision_power && !display_hours) ||
-                int_time >= 100*60*60*precision_power)
+        else if(int_time >= 100*60*precision_power)  // up to 99:59.999
         {
             std::string final_append;
             if (precision == 3)
@@ -566,10 +563,7 @@ namespace StringUtils
             else
                 final_append = "";
             // concatenate the strings with +
-            if (display_hours)
-                return (std::string("99:59:59") + final_append);
-            else
-                return (std::string("59:59") + final_append);
+            return (std::string("99:59") + final_append);
         }
 
         // Principle of the computation in pseudo-code
@@ -581,22 +575,18 @@ namespace StringUtils
         int_time       = int_time/precision_power;
         int sec        = int_time % 60;
         int_time       = int_time/60;
-        int min        = int_time % 60;
-        int_time       = int_time/60;
-        int hours      = int_time;
+        if (int_time >= 100) int_time = 99;
+        int min        = int_time;
 
         // Convert the times to string and add the missing zeroes if any
 
-        std::string s_hours = toString(hours);
-        if (hours < 10)
-            s_hours = std::string("0") + s_hours;
-        std::string s_min = toString(min);
+        std::string s_min = std::to_string(min);
         if (min < 10)
             s_min = std::string("0") + s_min;
-        std::string s_sec = toString(sec);
+        std::string s_sec = std::to_string(sec);
         if (sec < 10)
             s_sec = std::string("0") + s_sec;
-        std::string s_subsec = toString(subseconds);
+        std::string s_subsec = std::to_string(subseconds);
 
         // If subseconds is 0 ; it is already in the string,
         // so skip one step
@@ -612,15 +602,14 @@ namespace StringUtils
         if(negative_time)
             s_neg = "-";
 
-        std::string s_hours_min_and_sec = s_sec;
-        if (display_minutes_if_zero || min > 0 || display_hours)
-            s_hours_min_and_sec = s_min + std::string(":") + s_sec;
-        if (display_hours)
-            s_hours_min_and_sec = s_hours + std::string(":") + s_hours_min_and_sec;
+        std::string s_min_and_sec = s_sec;
+        if (display_minutes_if_zero || min > 0)
+            s_min_and_sec = s_min + std::string(":") + s_sec;
+
         if (precision == 0)
-            return (s_neg + s_hours_min_and_sec);
+            return (s_neg + s_min_and_sec);
         else
-            return (s_neg + s_hours_min_and_sec + std::string(".") + s_subsec);
+            return (s_neg + s_min_and_sec + std::string(".") + s_subsec);
     }   // timeToString
 
     // ------------------------------------------------------------------------
