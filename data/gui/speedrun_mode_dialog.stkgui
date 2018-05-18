@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+        <header text_align="center" width="80%" align="center"
+                I18N="In the 'speedrun mode' dialog, that's shown when the mode can't be enabled"
+                text="Speedrun mode"/>
+
+<!-- Is there a cleaner way to force wrapping at specific points ? -->
+        <label id="text" width="80%" height="65%" align="center" word_wrap="true" proportion="1"
+               I18N="In the 'speedrun mode' dialog, that's shown when the mode can't be enabled"
+               text="Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.
+
+Closing the game before the story mode's completion invalidates the timer.
+
+To use the speedrun mode, please use a new profile." />
+
+        <spacer height="25" width="10" />
+
+        <button id="accept" I18N="In the 'speedrun mode' dialog, that's shown when the mode can't be enabled"
+                text="ok" align="center"/>
+
+        <spacer height="15" width="10" />
+    </div>
+</stkgui>
