@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2009-2018
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,41 +15,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACE_PAUSED_DIALOG_HPP
-#define HEADER_RACE_PAUSED_DIALOG_HPP
+
+#ifndef HEADER_SPEEDRUN_MODE_DIALOG_HPP
+#define HEADER_SPEEDRUN_MODE_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 
-namespace GUIEngine
-{
-    class RibbonWidget;
-}
-
 /**
- * \brief Dialog shown when the race is paused
+ * \brief Dialog shown after a resolution switch sot he user may confirm if
+ *        the resolution works.
  * \ingroup states_screens
  */
-class RacePausedDialog : public GUIEngine::ModalDialog
+class SpeedrunModeDialog : public GUIEngine::ModalDialog
 {
-
-private:
-    bool m_from_overworld;
-    
-protected:
-    virtual void loadedFromFile();
-
 public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    RacePausedDialog(const float percentWidth, const float percentHeight);
-    virtual ~RacePausedDialog();
+
+    SpeedrunModeDialog();
+    void onEnterPressedInternal() OVERRIDE;
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
     
-    void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual void beforeAddingWidgets() OVERRIDE;
+    virtual bool onEscapePressed() OVERRIDE;
 };
+  
 
 #endif

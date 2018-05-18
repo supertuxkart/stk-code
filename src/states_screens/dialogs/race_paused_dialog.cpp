@@ -21,6 +21,7 @@
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -55,10 +56,12 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
     {
         loadFromFile("overworld_dialog.stkgui");
+        m_from_overworld = true;
     }
     else
     {
         loadFromFile("race_paused_dialog.stkgui");
+        m_from_overworld = false;
     }
 
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
@@ -167,6 +170,11 @@ GUIEngine::EventPropagation
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+
+            if (m_from_overworld)
+            {
+                story_mode_timer->pauseTimer(/*loading screen*/ false);
+            }
 
             if (race_manager->raceWasStartedFromOverworld())
             {
