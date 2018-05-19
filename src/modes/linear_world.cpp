@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -620,6 +621,13 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 
     float full_distance = race_manager->getNumLaps()
                         * Track::getCurrentTrack()->getTrackLength();
+
+    // For ghost karts, use the replay data rather than estimating
+    if (kart->isGhostKart())
+    {
+        GhostKart* gk = dynamic_cast<GhostKart*>(kart);
+        return gk->getGhostFinishTime();
+    }
 
     if(full_distance == 0)
         full_distance = 1.0f;   // For 0 lap races avoid warning below
