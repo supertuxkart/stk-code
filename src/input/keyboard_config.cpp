@@ -69,7 +69,7 @@ void KeyboardConfig::setDefaultBinds()
     setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, IRR_KEY_LEFT);
     setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, IRR_KEY_RIGHT);
     setBinding(PA_MENU_SELECT, Input::IT_KEYBOARD, IRR_KEY_RETURN);
-    setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, IRR_KEY_BACK);
+    setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, IRR_KEY_ESCAPE);
 }
 
 //------------------------------------------------------------------------------
