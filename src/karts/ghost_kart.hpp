@@ -53,16 +53,16 @@ public:
                             int position, float color_hue);
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
-    virtual void  reset();
+    virtual void  reset() OVERRIDE;
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */
-    virtual void  updateWeight() {};
+    virtual void  updateWeight() OVERRIDE  {};
     // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
-    virtual void  applyEngineForce (float force) {};
+    virtual void  applyEngineForce (float force) OVERRIDE {};
     // ------------------------------------------------------------------------
     // Not needed to create any physics for a ghost kart.
-    virtual void  createPhysics() {};
+    virtual void  createPhysics() OVERRIDE {};
     // ------------------------------------------------------------------------
     const float   getSuspensionLength(int index, int wheel) const
                { return m_all_physic_info[index].m_suspension_length[wheel]; }
@@ -74,13 +74,13 @@ public:
                                  const ReplayBase::KartReplayEvent &kre);
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
-    virtual bool  isGhostKart() const                         { return true; }
+    virtual bool  isGhostKart() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     /** Ghost can't be hunted. */
-    virtual bool  isInvulnerable() const                      { return true; }
+    virtual bool  isInvulnerable() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
-    virtual float getSpeed() const;
+    virtual float getSpeed() const OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns the time at which the kart was at a given distance.
@@ -88,7 +88,7 @@ public:
     float getTimeForDistance(float distance);
 
     // ------------------------------------------------------------------------
-    virtual void  kartIsInRestNow() {};
+    virtual void  kartIsInRestNow() OVERRIDE {};
     // ------------------------------------------------------------------------
     
 };   // GhostKart

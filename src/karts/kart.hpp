@@ -267,21 +267,21 @@ public:
                         PerPlayerDifficulty difficulty,
                         std::shared_ptr<RenderInfo> ri);
     virtual       ~Kart();
-    virtual void   init(RaceManager::KartType type);
-    virtual void   kartIsInRestNow();
+    virtual void   init(RaceManager::KartType type) OVERRIDE;
+    virtual void   kartIsInRestNow() OVERRIDE;
     virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
-    virtual void   updateWeight     ();
-    virtual float  getSpeedForTurnRadius(float radius) const;
+    virtual void   updateWeight     () OVERRIDE;
+    virtual float  getSpeedForTurnRadius(float radius) const OVERRIDE;
     virtual float  getMaxSteerAngle(float speed) const;
-    virtual bool   isInRest         () const;
+    virtual bool   isInRest         () const OVERRIDE;
     virtual void   applyEngineForce (float force);
 
-    virtual void   flyUp();
-    virtual void   flyDown();
+    virtual void   flyUp() OVERRIDE;
+    virtual void   flyDown() OVERRIDE;
 
-    virtual void   startEngineSFX   ();
-    virtual void   adjustSpeed      (float f);
+    virtual void   startEngineSFX   () OVERRIDE;
+    virtual void   adjustSpeed      (float f) OVERRIDE;
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
                                     float engine_force, int duration,
                                     int fade_out_time) OVERRIDE;
@@ -289,36 +289,36 @@ public:
                                     float speed_boost, float engine_force, 
                                     int duration, int fade_out_time) OVERRIDE;
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
-                               int fade_in_time);
-    virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const;
-    virtual void  setBoostAI     (bool boosted);
-    virtual bool  getBoostAI     () const;
-    virtual void  collectedItem(Item *item, int random_attachment);
+                               int fade_in_time) OVERRIDE;
+    virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const OVERRIDE;
+    virtual void  setBoostAI     (bool boosted) OVERRIDE;
+    virtual bool  getBoostAI     () const OVERRIDE;
+    virtual void  collectedItem(Item *item, int random_attachment) OVERRIDE;
     virtual float getStartupBoost() const;
 
-    virtual const Material *getMaterial() const;
-    virtual const Material *getLastMaterial() const;
+    virtual const Material *getMaterial() const OVERRIDE;
+    virtual const Material *getLastMaterial() const OVERRIDE;
     /** Returns the pitch of the terrain depending on the heading. */
-    virtual float getTerrainPitch(float heading) const;
+    virtual float getTerrainPitch(float heading) const OVERRIDE;
 
-    virtual void   reset            ();
+    virtual void   reset            () OVERRIDE;
     virtual void   handleZipper     (const Material *m=NULL,
-                                     bool play_sound=false);
-    virtual void   setSquash        (float time, float slowdown);
+                                     bool play_sound=false) OVERRIDE;
+    virtual void   setSquash        (float time, float slowdown) OVERRIDE;
 
-    virtual void   crashed          (AbstractKart *k, bool update_attachments);
-    virtual void   crashed          (const Material *m, const Vec3 &normal);
-    virtual float  getHoT           () const;
-    virtual void   update           (int ticks);
-    virtual void   finishedRace     (float time, bool from_server=false);
-    virtual void   setPosition      (int p);
-    virtual void   beep             ();
-    virtual void   showZipperFire   ();
-    virtual float  getCurrentMaxSpeed() const;
+    virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
+    virtual void   crashed          (const Material *m, const Vec3 &normal) OVERRIDE;
+    virtual float  getHoT           () const OVERRIDE;
+    virtual void   update           (int ticks) OVERRIDE;
+    virtual void   finishedRace     (float time, bool from_server=false) OVERRIDE;
+    virtual void   setPosition      (int p) OVERRIDE;
+    virtual void   beep             () OVERRIDE;
+    virtual void   showZipperFire   () OVERRIDE;
+    virtual float  getCurrentMaxSpeed() const OVERRIDE;
 
-    virtual bool   playCustomSFX    (unsigned int type);
-    virtual void   setController(Controller *controller);
-    virtual void   setXYZ(const Vec3& a);
+    virtual bool   playCustomSFX    (unsigned int type) OVERRIDE;
+    virtual void   setController(Controller *controller) OVERRIDE;
+    virtual void   setXYZ(const Vec3& a) OVERRIDE;
 
     // ========================================================================
     // Powerup related functions.
