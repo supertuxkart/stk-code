@@ -216,8 +216,14 @@ void PlayerProfile::save(UTFWriter &out)
     out << L"            remember-password=\""         << m_remember_password << L"\"\n";
     out << L"            default-kart-color=\""        << m_default_kart_color << L"\">\n";
     {
+        bool is_current_player = false;
+        PlayerProfile *player = PlayerManager::getCurrentPlayer();
+
+        if (player != NULL && (getName() == player->getName()));
+            is_current_player = true;
+
         if(m_story_mode_status)
-            m_story_mode_status->save(out);
+            m_story_mode_status->save(out, is_current_player);
 
         if(m_achievements_status)
             m_achievements_status->save(out);
@@ -278,4 +284,3 @@ bool PlayerProfile::operator<(const PlayerProfile &other)
 }   // operator<
 
 // -----------------------------------------------------------------------------
-
