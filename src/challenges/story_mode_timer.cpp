@@ -35,18 +35,30 @@ void StoryModeTimer::reset()
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
 
+    // May happen when there is no player profile at all
+    if (player == NULL)
+    {
+        m_valid_speedrun_ended    = false;
+        m_story_mode_ended        = false;
+        m_stored_speedrun_milliseconds   = 0;
+        m_stored_story_mode_milliseconds = 0;
+    }
+    else
+    {
+        m_valid_speedrun_ended    = player->isSpeedrunFinished();
+        m_story_mode_ended        = player->isFinished();
+        m_stored_speedrun_milliseconds   = player->getSpeedrunTimer();
+        m_stored_story_mode_milliseconds = player->getStoryModeTimer();
+    }
+
     m_valid_speedrun_started  = false;
-    m_valid_speedrun_ended    = player->isSpeedrunFinished();
     m_story_mode_started      = false;
-    m_story_mode_ended        = player->isFinished();
     m_speedrun_pause_active   = false;
     m_story_mode_pause_active = false;
     m_loading_pause           = false;
     m_player_can_speedrun     = false;
     m_speedrun_milliseconds   = 0;
     m_story_mode_milliseconds = 0;
-    m_stored_speedrun_milliseconds   = player->getSpeedrunTimer();
-    m_stored_story_mode_milliseconds = player->getStoryModeTimer();
     std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
     m_speedrun_total_pause_time = now-now;//the zero() function doesn't work
     m_story_mode_total_pause_time = now-now;
@@ -206,6 +218,11 @@ void StoryModeTimer::updateStoryModeTimer()
 void StoryModeTimer::testPlayerRun()
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
+
+    // May happen when there is no player profile at all
+    // Will be called again until a player profile is created
+    if (player == NULL)
+        return;
 
     if (player->isFirstTime())
     {
