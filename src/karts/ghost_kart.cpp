@@ -27,6 +27,7 @@
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "replay/replay_recorder.hpp"
+#include "tracks/track.hpp"
 
 #include "LinearMath/btQuaternion.h"
 
@@ -233,6 +234,23 @@ float GhostKart::getSpeed() const
     return (1-rd)*m_all_physic_info[current_index    ].m_speed
            +  rd *m_all_physic_info[current_index + 1].m_speed;
 }   // getSpeed
+
+// ----------------------------------------------------------------------------
+/** Compute the time at which the ghost finished the race */
+void GhostKart::computeFinishTime()
+{
+    // In egg hunts, the finish time is the moment at which all egs are collected
+    if (race_manager->isEggHuntMode())
+    {
+        m_finish_time = 0; //FIXME : do a real computation
+    }
+    else // linear races
+    {
+        float full_distance = race_manager->getNumLaps()
+                            * Track::getCurrentTrack()->getTrackLength();
+        m_finish_time = getTimeForDistance(full_distance);
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Returns the time at which the kart was at a given distance.
