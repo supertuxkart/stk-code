@@ -716,12 +716,15 @@ void STKHost::mainLoop()
 
     while (m_exit_timeout.load() > StkTime::getRealTime())
     {
-        auto server_peer = getServerPeerForClient();
-        if (!is_server && server_peer &&
-            StkTime::getRealTime() - server_peer->getConnectedTime() > 3.0)
+        if (!is_server)
         {
-            // Back to default ping interval for client
-            server_peer->setPingInterval(0);
+            auto server_peer = getServerPeerForClient();
+            if (server_peer &&
+                StkTime::getRealTime() - server_peer->getConnectedTime() > 3.0)
+            {
+                // Back to default ping interval for client
+                server_peer->setPingInterval(0);
+            }
         }
 
         auto sl = LobbyProtocol::get<ServerLobby>();
@@ -793,12 +796,6 @@ void STKHost::mainLoop()
             {
                 auto stk_peer = std::make_shared<STKPeer>
                     (event.peer, this, m_next_unique_host_id++);
-                if (!is_server)
-                {
-                    // This allow client to get the correct ping as fast as
-                    // possible
-                    stk_peer->setPingInterval(10);
-                }
                 std::unique_lock<std::mutex> lock(m_peers_mutex);
                 m_peers[event.peer] = stk_peer;
                 lock.unlock();
