@@ -62,6 +62,7 @@
 #include "physics/physics.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -1715,9 +1716,9 @@ void IrrDriver::displayFPS()
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
-                    false );
-
+        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms",
+            NetworkingLobby::getInstance()->getServerPing()),
+            core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
 
@@ -1738,22 +1739,26 @@ void IrrDriver::displayFPS()
     {
         fps_string = StringUtils::insertValues
                     (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d, Total skinning joints: %d",
+                      "%d Shadows - LightDist : %d, Total skinning joints: %d, "
+                      "Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
                     SP::sp_shadow_poly_count, m_last_light_bucket_distance,
-                    m_skinning_joint);
+                    m_skinning_joint,
+                    NetworkingLobby::getInstance()->getServerPing());
     }
     else
     {
         if (CVS->isGLSL())
         {
-            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
-                SP::sp_solid_poly_count / 1000);
+            fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
+                max, SP::sp_solid_poly_count / 1000,
+                NetworkingLobby::getInstance()->getServerPing());
         }
         else
         {
-            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
-            (int)roundf(kilotris));
+            fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
+                max, (int)roundf(kilotris),
+                NetworkingLobby::getInstance()->getServerPing());
         }
     }
 

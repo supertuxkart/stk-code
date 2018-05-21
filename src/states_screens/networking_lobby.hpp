@@ -125,7 +125,7 @@ public:
                        int/*icon id*/> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
-
+    uint32_t getServerPing() const;
 };   // class NetworkingLobby
 
 #endif

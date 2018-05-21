@@ -240,15 +240,22 @@ void NetworkingLobby::onUpdate(float delta)
         {
             m_start_button->setVisible(true);
         }
-        if (auto p = m_server_peer.lock())
-        {
-            //I18N: In the networking lobby, display ping when connected
-            const uint32_t ping = p->getPing();
-            if (ping != 0)
-                m_header->setText(_("Lobby (ping: %dms)", ping), false);
-        }
+        //I18N: In the networking lobby, display ping when connected
+        const uint32_t ping = getServerPing();
+        if (ping != 0)
+            m_header->setText(_("Lobby (ping: %dms)", ping), false);
     }
 }   // onUpdate
+
+// ----------------------------------------------------------------------------
+uint32_t NetworkingLobby::getServerPing() const
+{
+    if (auto p = m_server_peer.lock())
+    {
+        return p->getPing();
+    }
+    return 0;
+}   // getServerPing
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::sendChat(irr::core::stringw text)
