@@ -63,7 +63,17 @@ using namespace GUIEngine;
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
+    m_server_info_height = 0;
+
+    m_back_widget = NULL;
+    m_header = NULL;
+    m_text_bubble = NULL;
+    m_exit_widget = NULL;
+    m_start_button = NULL;
     m_player_list = NULL;
+    m_chat_box = NULL;
+    m_send_button = NULL;
+    m_icon_bank = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
