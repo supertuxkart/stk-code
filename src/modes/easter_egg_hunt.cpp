@@ -248,9 +248,16 @@ void EasterEggHunt::terminateRace()
 }
 //-----------------------------------------------------------------------------
 /** In Easter Egg mode the finish time is just the time the race is over,
- *  since there are no AI karts.
+ *  since there are no AI karts and no other players, except for ghosts.
  */
 float EasterEggHunt::estimateFinishTimeForKart(AbstractKart* kart)
 {
+    // For ghost karts, use the replay data
+    if (kart->isGhostKart())
+    {
+        GhostKart* gk = dynamic_cast<GhostKart*>(kart);
+        return gk->getGhostFinishTime();
+    }
+
     return getTime();
 }   // estimateFinishTimeForKart
