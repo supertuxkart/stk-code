@@ -43,7 +43,7 @@ using namespace irr::gui;
 MultitouchSettingsDialog::MultitouchSettingsDialog(const float w, const float h)
         : ModalDialog(w, h)
 {
-    loadFromFile("multitouch_settings.stkgui");
+    loadFromFile("android/multitouch_settings.stkgui");
 }
 
 // -----------------------------------------------------------------------------
