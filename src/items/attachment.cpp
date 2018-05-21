@@ -61,7 +61,7 @@ Attachment::Attachment(AbstractKart* kart)
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     m_node = irr_driver->addAnimatedMesh(
-                         attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
+                 attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
 #ifdef DEBUG
     std::string debug_name = kart->getIdent()+" (attachment)";
     m_node->setName(debug_name.c_str());
@@ -313,15 +313,19 @@ void Attachment::rewind(BareNetworkString *buffer)
 }   // rewind
 
 // -----------------------------------------------------------------------------
-/** Randomly selects the new attachment. For a server process, the
-*   attachment can be passed into this function.
-*  \param item The item that was collected.
-*/
+/** Selects the new attachment. In order to simplify synchronisation with the
+ *  server, the new item is based on the current world time. 
+ *  \param item The item that was collected.
+ */
 void Attachment::hitBanana(Item *item)
 {
-    if(m_kart->getController()->canGetAchievements())
+    // Don't keep on getting achievements due to rewind!
+    if (m_kart->getController()->canGetAchievements() &&
+        !RewindManager::get()->isRewinding())
+    {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,
-                                           "banana",1                      );
+                                           "banana", 1);
+    }
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
@@ -341,37 +345,43 @@ void Attachment::hitBanana(Item *item)
         return;
     }
 
-    int new_attachment = -1;
+    AttachmentType new_attachment = ATTACH_NOTHING;
     const KartProperties *kp = m_kart->getKartProperties();
+    // Use this as a basic random number to make sync with server easier.
+    // Divide by 16 to increase probablity to have same time as server in
+    // case of a few physics frames different between client and server.
+    int ticks = World::getWorld()->getTimeTicks() / 16;
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion", "explosion_bomb.xml");
+        HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion",
+                                      "explosion_bomb.xml"          );
         if(m_kart->getController()->isLocalPlayerController())
             he->setLocalPlayerKartHit();
         projectile_manager->addHitEffect(he);
         ExplosionAnimation::create(m_kart);
         clear();
-        new_attachment = m_random.get(3);
+        new_attachment = AttachmentType(ticks % 3);
         // Disable the banana on which the kart just is for more than the
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        int ticks = std::max(item->getTicksTillReturn(), 
-                             stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
+        int ticks = 
+            std::max(item->getTicksTillReturn(), 
+                     stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
         item->setTicksTillReturn(ticks);
         break;
         }
     case ATTACH_ANVIL:
         // if the kart already has an anvil, attach a new anvil,
         // and increase the overall time
-        new_attachment = 1;
+        new_attachment = ATTACH_ANVIL;
         leftover_ticks  = m_ticks_left;
         break;
     case ATTACH_PARACHUTE:
-        new_attachment = 0;
+        new_attachment = ATTACH_PARACHUTE;
         leftover_ticks  = m_ticks_left;
         break;
     default:
@@ -380,16 +390,16 @@ void Attachment::hitBanana(Item *item)
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
 
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
-            new_attachment = m_random.get(2);
+            new_attachment = AttachmentType(ticks % 2);
         else
-            new_attachment = m_random.get(3);
+            new_attachment = AttachmentType(ticks % 3);
     }   // switch
 
     if (add_a_new_item)
     {
         switch (new_attachment)
         {
-        case 0:
+        case ATTACH_PARACHUTE:
             set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_ticks);
             m_initial_speed = m_kart->getSpeed();
 
@@ -397,7 +407,7 @@ void Attachment::hitBanana(Item *item)
             // braking won't remove parachute
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
             break ;
-        case 1:
+        case ATTACH_ANVIL:
             set(ATTACH_ANVIL, stk_config->time2Ticks(kp->getAnvilDuration())
                 + leftover_ticks                                      );
             // if ( m_kart == m_kart[0] )
@@ -407,7 +417,7 @@ void Attachment::hitBanana(Item *item)
             m_kart->adjustSpeed(kp->getAnvilSpeedFactor());
             m_kart->updateWeight();
             break ;
-        case 2:
+        case ATTACH_BOMB:
             set( ATTACH_BOMB, stk_config->time2Ticks(stk_config->m_bomb_time)
                             + leftover_ticks                                 );
 
@@ -443,7 +453,8 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         else  // only this kart has a bomb, move it to the other
         {
             // if there are only two karts, let them switch bomb from one to other
-            if (getPreviousOwner() != other || World::getWorld()->getNumKarts() <= 2)
+            if (getPreviousOwner() != other ||
+                World::getWorld()->getNumKarts() <= 2)
             {
                 // Don't move if this bomb was from other kart originally
                 other->getAttachment()
@@ -457,7 +468,8 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         }
     }   // type==BOMB
     else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
-            (attachment_other->getPreviousOwner()!=m_kart || World::getWorld()->getNumKarts() <= 2))
+             (attachment_other->getPreviousOwner()!=m_kart || 
+               World::getWorld()->getNumKarts() <= 2         )      )
     {
         // Don't attach a bomb when the kart is shielded
         if(m_kart->isShielded())

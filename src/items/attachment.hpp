@@ -56,9 +56,13 @@ public:
     enum AttachmentType
     {
         ATTACH_FIRST = 0,
+        // It is importabt that parachute, bomb and anvil stay in this order,
+        // since the attachment type is mapped to a random integer (and bomb
+        // must be last, since a bomb will not be given in battle mode).
         ATTACH_PARACHUTE = 0,
-        ATTACH_BOMB,
-        ATTACH_ANVIL,
+        ATTACH_ANVIL = 1,
+        ATTACH_BOMB = 2,
+        // End of fixed order attachments, the rest can be changed.
         ATTACH_SWATTER,
         // Note that the next 2 symbols are only used as an index into the mesh
         // array; it will NEVER be actually assigned as an attachment type
