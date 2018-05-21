@@ -31,10 +31,17 @@
  */
 ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
 {
+    m_type    = (EventType)buffer->getUInt8();
     m_ticks   = buffer->getTime();
     m_kart_id = buffer->getInt8();
     m_index   = buffer->getUInt16();
-    *count   -= 7;
+    *count -= 8;
+    if (m_type == IEI_NEW)
+    {
+        m_xyz = buffer->getVec3();
+        *count -= 12;
+    }
+
 }   // ItemEventInfo(BareNetworkString, int *count)
 
 //-----------------------------------------------------------------------------
@@ -44,10 +51,10 @@ ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
 void ItemEventInfo::saveState(BareNetworkString *buffer)
 {
     assert(NetworkConfig::get()->isServer());
-    buffer->addTime(m_ticks).addUInt8(m_kart_id).addUInt16(m_index);
-    if(isNewItem())
-    {
-    }
+    buffer->addUInt8(m_type).addTime(m_ticks).addUInt8(m_kart_id)
+           .addUInt16(m_index);
+    if(m_type == IEI_NEW)
+        buffer->add(m_xyz);
 }   // saveState
 
  

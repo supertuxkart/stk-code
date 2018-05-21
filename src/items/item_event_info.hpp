@@ -34,6 +34,9 @@ class BareNetworkString;
 class ItemEventInfo
 {
 private:
+    /** Type of this event. */
+    enum EventType {IEI_COLLECT, IEI_NEW, IEI_SWITCH} m_type;
+
     /** Time at which this event happens. */
     int m_ticks;
 
@@ -56,7 +59,7 @@ public:
     ItemEventInfo(int ticks, int index, int kart_id)
         : m_ticks(ticks), m_index(index), m_kart_id(kart_id)
     {
-        assert(kart_id >= 0);
+        m_type = IEI_COLLECT;
     }   // ItemEventInfo(collected existing item)
 
     // --------------------------------------------------------------------
@@ -65,15 +68,17 @@ public:
      *  need to encode the new item type.
      */
     ItemEventInfo(int ticks, ItemState::ItemType type, int index,
-                  const Vec3 &xyz)
-        : m_ticks(ticks), m_index(index), m_kart_id(-1), m_xyz(xyz)
+                  int kart_id, const Vec3 &xyz)
+        : m_ticks(ticks), m_index(index), m_kart_id(kart_id), m_xyz(xyz)
     {
+        m_type = IEI_NEW;
     }   // ItemEventInfo(new item)
 
     // --------------------------------------------------------------------
     /** Constructor for switching items. */
-    ItemEventInfo(int ticks) : m_ticks(ticks), m_kart_id(-2)
+    ItemEventInfo(int ticks) : m_ticks(ticks)
     {
+        m_type = IEI_SWITCH;
     }   // ItemEventInfo(switch)
 
     // --------------------------------------------------------------------
@@ -82,13 +87,13 @@ public:
 
     // --------------------------------------------------------------------
     /** Returns if this event represents a new item. */
-    bool isNewItem() const { return m_kart_id == -1; }
+    bool isNewItem() const { return m_type == IEI_NEW; }
     // --------------------------------------------------------------------
     /** Returns true if this event represents collection of an item. */
-    bool isItemCollection() const { return m_kart_id >= 0; }
+    bool isItemCollection() const { return m_type == IEI_COLLECT; }
     // --------------------------------------------------------------------
     /** Returns true if this event represent a switch usage. */
-    bool isSwitch() const { return m_kart_id == -2; }
+    bool isSwitch() const { return m_type == IEI_SWITCH; }
     // --------------------------------------------------------------------
     /** Returns the index of this item. */
     int getIndex() const { return m_index; }
@@ -100,7 +105,6 @@ public:
      *  to be called when this event is an item collection. */
     int getKartId() const
     {
-        assert(isItemCollection());
         return m_kart_id;
     }   // getKartId
     // --------------------------------------------------------------------
@@ -111,6 +115,13 @@ public:
         assert(isNewItem());
         return m_xyz;
     }   // getXYZ
+    // --------------------------------------------------------------------
+    /** Returns the type of this item. Note at this stage only bubble gums
+     *  can be created during a race. */
+    ItemState::ItemType getNewItemType() const
+    {
+        return ItemState::ITEM_BUBBLEGUM;
+    }   // getNewItemType
 
 };   // class ItemEventInfo
 

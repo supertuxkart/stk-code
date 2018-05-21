@@ -256,13 +256,15 @@ unsigned int ItemManager::insertItem(Item *item)
  *  bubblegum).
  *  \param type Type of the item.
  *  \param kart The kart that drops the new item.
+ *  \param xyz Can be used to overwrite the item location (used in networking).
  */
-Item* ItemManager::dropNewItem(ItemState::ItemType type, AbstractKart *kart)
+Item* ItemManager::dropNewItem(ItemState::ItemType type,
+                               AbstractKart *kart, const Vec3 *xyz)
 {
     Vec3 hit_point;
     Vec3 normal;
     const Material* material_hit;
-    Vec3 pos = kart->getXYZ();
+    Vec3 pos = xyz ? *xyz : kart->getXYZ();
     Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
     Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
                                                         &hit_point,
@@ -286,8 +288,8 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type, AbstractKart *kart)
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type]);
 
-    insertItem(item);
     if(kart != NULL) item->setParent(kart);
+    insertItem(item);
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];

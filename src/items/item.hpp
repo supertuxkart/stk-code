@@ -63,6 +63,7 @@ public:
  */
 class ItemState
 {
+    LEAK_CHECK();
 public:
     /**
     * The list of all items. Important for the switch item function:
@@ -257,7 +258,6 @@ class Item : public ItemState, public NoCopy
 {
 
 private:
-    LEAK_CHECK();
 
     /** Stores the original rotation of an item. This is used in
      *  case of a switch to restore the rotation of a bubble gum
@@ -305,7 +305,10 @@ private:
 
     /** The closest point to the left and right of this item at which it
      *  would not be collected. Used by the AI to avoid items. */
-    Vec3         *m_avoidance_points[2];
+    Vec3 *m_avoidance_points[2];
+
+    /** True if this item is predicted to exists. Used in networking only. */
+    bool m_is_predicted;
 
     void          setType(ItemType type);
     void          initItem(ItemType type, const Vec3 &xyz);
@@ -313,7 +316,8 @@ private:
 
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-                       scene::IMesh* mesh, scene::IMesh* lowres_mesh);
+                       scene::IMesh* mesh, scene::IMesh* lowres_mesh,
+                       bool is_predicted=false);
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();
@@ -367,6 +371,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the XYZ position of the item. */
     const Vec3& getXYZ() const { return m_xyz; }
+    // ------------------------------------------------------------------------
+    /** Sets if this is a predicted item or not. */
+    void setPredicted(bool p) { m_is_predicted = p; }
+    // ------------------------------------------------------------------------
+    /** Returns if this item is predicted or not. */
+    bool isPredicted() const { return m_is_predicted; }
     // ------------------------------------------------------------------------
     /** Returns the index of the graph node this item is on. */
     int getGraphNode() const { return m_graph_node; }

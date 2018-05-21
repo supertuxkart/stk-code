@@ -102,14 +102,23 @@ void ItemState::collected(const AbstractKart *kart)
 }   // collected
 
 // ============================================================================
-
+/** Constructor for an item.
+ *  \param type Type of the item.
+ *  \param xyz Location of the item.
+ *  \param normal The normal upon which the item is placed (so that it can
+ *         be aligned properly with the ground).
+ *  \param mesh The mesh to be used for this item.
+ *  \param is_predicted True if the creation of the item is predicted by
+ *         a client. Only used in networking.
+ */
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           scene::IMesh* mesh, scene::IMesh* lowres_mesh)
+           scene::IMesh* mesh, scene::IMesh* lowres_mesh, bool is_predicted)
     : ItemState(type)
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
     m_distance_2        = 1.2f;
+    m_is_predicted      = is_predicted;
     initItem(type, xyz);
 
     m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
@@ -118,9 +127,9 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
 
-    LODNode* lodnode    = new LODNode("item",
-                                      irr_driver->getSceneManager()->getRootSceneNode(),
-                                      irr_driver->getSceneManager());
+    LODNode* lodnode = 
+        new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
+                    irr_driver->getSceneManager());
     scene::ISceneNode* meshnode = 
         irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
@@ -161,6 +170,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     : ItemState(ITEM_TRIGGER)
 {
+    m_is_predicted      = false;
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
     m_original_rotation = btQuaternion(0, 0, 0, 1);

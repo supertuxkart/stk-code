@@ -90,7 +90,8 @@ unsigned int NetworkItemManager::insertItem(Item *item)
     unsigned int index = ItemManager::insertItem(item);
     if(index>=m_confirmed_state.size())
     {
-        m_confirmed_state.push_back(NULL);
+        ItemState *is = new ItemState(*item);
+        m_confirmed_state.push_back(is);
     }
     else
     {
@@ -109,6 +110,7 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
 {
     if(NetworkConfig::get()->isServer())
     {
+        // The server saves the collected item as item event info
         m_item_events.lock();
         m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(), 
                                              item->getItemId(),
@@ -118,8 +120,7 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
     }
     else
     {
-        // If we are predicting (i.e. not rewinding), the client
-        // predicts item collection:
+        // The client predicts item collection:
         ItemManager::collectedItem(item, kart);
     }
 }   // collectedItem
@@ -127,18 +128,30 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
 // ----------------------------------------------------------------------------
 /** Called when a new item is created, e.g. bubble gum.
  *  \param type Type of the item.
- *  \param parent In case of a dropped item used to avoid that a kart
+ *  \param kart In case of a dropped item used to avoid that a kart
  *         is affected by its own items.
+ *  \param xyz Location of the item. If specified will override the
+ *         kart position (used in networking only).
  */
 Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
-                                   AbstractKart *kart)
+                                      AbstractKart *kart, const Vec3 *xyz)
 {
-    Item *item = ItemManager::dropNewItem(type, kart);
+    Item *item = ItemManager::dropNewItem(type, kart, xyz);
     if(!item) return NULL;
 
+    if (NetworkConfig::get()->isClient())
+    {
+        // If this is called when replaying a server event, the calling
+        // function restoreState will set the item to be not-predicted.
+        item->setPredicted(true);
+        return item;
+    }
+
+    // Server: store the data for this event:
     m_item_events.lock();
-    m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(), type, 
-                                         item->getItemId(),
+    m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(),
+                                         type, item->getItemId(),
+                                         kart->getWorldKartId(),
                                          kart->getXYZ()           );
     m_item_events.unlock();
     return item;
@@ -203,8 +216,7 @@ BareNetworkString* NetworkItemManager::saveState()
     uint16_t n = (uint16_t)m_item_events.getData().size();
     if(n==0)
     {
-        BareNetworkString *s =
-            new BareNetworkString();
+        BareNetworkString *s = new BareNetworkString();
         m_item_events.unlock();
         return s;
     }
@@ -245,13 +257,42 @@ void NetworkItemManager::forwardTime(int ticks)
  */
 void NetworkItemManager::restoreState(BareNetworkString *buffer, int count) 
 {
+    assert(NetworkConfig::get()->isClient());
     // The state at World::getTimeTicks() needs to be restored. The confirmed
-    // state in this instance was taken at m_confirmed_state_time. So first
-    // apply the new events to the confirmed state till we reach the end of
-    // all new events (which must be <= getTimeTicks() (since the server will
-    // only send events till the specified state time). Then forward the
-    // state to getTimeTicks().
+    // state in this instance was taken at m_confirmed_state_time. First
+    // forward this confirmed state to the current time (i.e. world time).
+    // This is done in several steps:
+    // 1) First remove all client-side predicted items from the list of all
+    //    items, and store them for now in a predictem_item cache. Predicted
+    //    item only happen between m_confirmed_state_time and 'now'.
+    // 2) Apply all events included in this state to the confirmed state.
+    //    a) When a collection event is found, adjust the confirmed item state
+    //       only (this state will later be copied to the current item state).
+    //    b) When a new item is created, search in the item cache to see
+    //       if a predicted item for this slot already exists to speed up
+    //       item creation (if not, create a new item). Put this new item
+    //       into the current item state as well as in the confirmed state
+    //       (in the same index position).
+    // 3) Once all new events have been applied to the confirmed state the
+    //    time must be <= world time. Forward the confirmed state to 
+    //    world time, and update m_confirmed_state_time to the world time.
+    // From here the replay can happen.
 
+    // 1) Remove predicted items:
+    for (unsigned int i=0; i<m_all_items.size(); i++)
+    {
+        Item *item = m_all_items[i];
+        if(item && item->isPredicted())
+        {
+            Log::verbose("NIM", "Deleting item %d at %d",
+                item->getItemId(), World::getWorld()->getTimeTicks());
+            delete item;
+            m_all_items[i] = NULL;
+
+        }
+    }
+
+    // 2) Apply all events to current confirmed state:
     int current_time = m_confirmed_state_time;
     while(count > 0)
     {
@@ -272,14 +313,22 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         if (dt>0) forwardTime(dt);
 
         // TODO: apply the various events types, atm only collection is supported:
-        ItemState *item_state = m_confirmed_state[iei.getIndex()];
         if(iei.isItemCollection())
         {
+            ItemState *item_state = m_confirmed_state[iei.getIndex()];
             // An item on the track was collected:
             AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
             m_confirmed_state[iei.getIndex()]->collected(kart);
         }
-
+        else if(iei.isNewItem())
+        {
+            AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
+            Item *item = dropNewItem(ItemState::ITEM_BUBBLEGUM,
+                                     kart, &iei.getXYZ()        );
+            item->setPredicted(false);
+            Log::verbose("NIM", "item %d not predicted at %d due to server info",
+                item->getItemId(), World::getWorld()->getTimeTicks());
+        }
         current_time = iei.getTicks();
     }   // while count >0
 
@@ -297,8 +346,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     {
         Item *item = m_all_items[i];
         const ItemState *is = m_confirmed_state[i];
-        if(is) 
-            *(ItemState*)item = *is;
+        if (is && item) *(ItemState*)item = *is;
     }
 
     // Now we save the current local
