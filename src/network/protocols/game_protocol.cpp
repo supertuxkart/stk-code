@@ -196,9 +196,10 @@ void GameProtocol::handleControllerAction(Event *event)
     }
     if (NetworkConfig::get()->isServer())
     {
-        // Send update to all clients except the original sender.
-        STKHost::get()->sendPacketExcept(event->getPeer(),
-                                         &data, false);
+        // Send update to all clients except the original sender if the event
+        // is after the server time
+        if (!will_trigger_rewind)
+            STKHost::get()->sendPacketExcept(event->getPeer(), &data, false);
 
         if (not_rewound == 0 ||
             m_initial_ticks.find(event->getPeer()) == m_initial_ticks.end())
