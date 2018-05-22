@@ -232,6 +232,13 @@ void CentralVideoSettings::init()
             hasColorBufferFloat = true;
             Log::info("GLDriver", "EXT Color Buffer Float Present");
         }
+        
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
+            hasGLExtension("GL_EXT_texture_compression_s3tc"))
+        {
+            hasTextureCompression = true;
+            Log::info("GLDriver", "EXT Texture Compression S3TC Present");
+        }
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_VERTEX_ID_WORKING))
         {

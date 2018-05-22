@@ -216,12 +216,12 @@ if (BUILD_RECORDER)
     endif()
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     find_library(SQUISH_LIBRARY NAMES squish libsquish)
     find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
     if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
@@ -479,14 +479,12 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
-endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY})
+    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)
