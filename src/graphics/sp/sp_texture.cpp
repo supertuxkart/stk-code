@@ -68,18 +68,26 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
         return;
     }
 
-    std::string cache_subdir = "hd/";
+    std::string cache_subdir = "hd";
     if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
     {
-        cache_subdir = "hd/";
+        cache_subdir = "hd";
     }
     else
     {
-        cache_subdir = StringUtils::insertValues("resized_%i/",
+        cache_subdir = StringUtils::insertValues("resized_%i",
             (int)UserConfigParams::m_max_texture_size);
     }
+    
+#ifdef USE_GLES2
+    if (m_undo_srgb && !CVS->isEXTTextureCompressionS3TCSRGBUsable())
+    {
+        cache_subdir += "-linear";
+    }
+#endif
+
     m_cache_directory = file_manager->getCachedTexturesDir() +
-        cache_subdir + container_id;
+        cache_subdir + "/" + container_id;
     file_manager->checkAndCreateDirectoryP(m_cache_directory);
 
 #endif
@@ -204,7 +212,11 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
 #ifndef USE_GLES2
         }
 #endif
-        if (m_undo_srgb && !use_tex_compress)
+
+        bool force_undo_srgb = use_tex_compress && 
+                                  !CVS->isEXTTextureCompressionS3TCSRGBUsable();
+
+        if (m_undo_srgb && (!use_tex_compress || force_undo_srgb))
         {
             data[i * 4] = srgb255ToLinear(data[i * 4]);
             data[i * 4 + 1] = srgb255ToLinear(data[i * 4 + 1]);
@@ -223,7 +235,7 @@ bool SPTexture::compressedTexImage2d(std::shared_ptr<video::IImage> texture,
 {
 #if !defined(SERVER_ONLY) && !defined(ANDROID)
     unsigned format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    if (m_undo_srgb)
+    if (m_undo_srgb && CVS->isEXTTextureCompressionS3TCSRGBUsable())
     {
         format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
     }

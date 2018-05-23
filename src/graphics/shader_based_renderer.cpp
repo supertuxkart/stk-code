@@ -123,10 +123,8 @@ void ShaderBasedRenderer::renderSkybox(const scene::ICameraSceneNode *camera) co
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderSSAO() const
 {
-#if defined(USE_GLES2)
     if (!CVS->isEXTColorBufferFloatUsable())
         return;
-#endif
 
     m_rtts->getFBO(FBO_SSAO).bind();
     glClearColor(1., 1., 1., 1.);
