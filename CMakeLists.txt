@@ -26,7 +26,7 @@ option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when av
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
-    "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
+    "NOT SERVER_ONLY;NOT APPLE" OFF)
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)

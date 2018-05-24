@@ -200,6 +200,7 @@ void CentralVideoSettings::init()
             hasSamplerObjects = true;
             hasVertexType2101010Rev = true;
             hasInstancedArrays = true;
+            hasPixelBufferObject = true;
         }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
