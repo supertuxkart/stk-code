@@ -928,8 +928,13 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Recording >",-1,true, true);
             sub = mnu->getSubMenu(4);
+
+#ifdef ENABLE_RECORDER
             sub->addItem(L"Start recording", DEBUG_START_RECORDING);
             sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
+#else
+            sub->addItem(L"Recording not available.\nPlease re-compile STK with\nlibopenglrecorder to enable recording.");
+#endif
 
             mnu->addItem(L"Change camera target >",-1,true, true);
             sub = mnu->getSubMenu(5);
