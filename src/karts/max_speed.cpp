@@ -352,7 +352,7 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
         if (active_slowdown & b)
-            m_speed_decrease->saveState(buffer);
+            m_speed_decrease[i].saveState(buffer);
     }
 
     // Now save the speedup state
@@ -386,7 +386,7 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        m_speed_decrease->rewindTo(buffer, (active_slowdown & b) == b);
+        m_speed_decrease[i].rewindTo(buffer, (active_slowdown & b) == b);
     }
 
     // Restore the speedup state
