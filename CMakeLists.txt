@@ -30,7 +30,14 @@ CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    
+    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
+       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
+        option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
+    else()
+        option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    endif()
+
 endif()
 
 if(UNIX OR MINGW)
