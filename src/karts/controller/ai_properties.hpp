@@ -78,7 +78,8 @@ protected:
     InterpolationArray m_skid_probability;
 
     /** To cap maximum speed if the kart is ahead of the player. */
-    InterpolationArray m_speed_cap;
+    InterpolationArray m_first_speed_cap;
+    InterpolationArray m_last_speed_cap;
 
     /** To determine the probability of selecting an item. */
     InterpolationArray m_collect_item_probability;
@@ -146,10 +147,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed the AI should drive at, depending
      *  on the distance from the player. */
-    float getSpeedCap(float distance) const
-    {
-        return m_speed_cap.get(distance);
-    }   // getSpeedCap
+    float getSpeedCap(float distance, int ai_position, int num_ai) const;
+
     // ------------------------------------------------------------------------
     /** Returns the probability to collect an item depending on the distance
      *  to the first player kart. */

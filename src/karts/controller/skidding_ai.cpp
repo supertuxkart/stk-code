@@ -308,9 +308,16 @@ void SkiddingAI::update(int ticks)
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
 
+    int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
+    int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+
+    float speed_cap = m_ai_properties->getSpeedCap(m_distance_to_player,
+                                                   position_among_ai,
+                                                   num_ai);
+
     m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
-                        m_ai_properties->getSpeedCap(m_distance_to_player),
-                        /*fade_in_time*/0);
+                        speed_cap, /*fade_in_time*/0);
+
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
@@ -1965,23 +1972,58 @@ void SkiddingAI::computeNearestKarts()
             -m_world->getOverallDistance(m_kart_behind->getWorldKartId());
     }
 
-    // Compute distance to nearest player kart
-    float max_overall_distance = 0.0f;
+    // Compute distance to target player kart
+
+    float target_overall_distance = 0.0f;
+    float own_overall_distance = m_world->getOverallDistance(m_kart->getWorldKartId());
+    m_num_players_ahead = 0;
+
     unsigned int n = ProfileWorld::isProfileMode()
                    ? 0 : race_manager->getNumPlayers();
+
+    std::vector<float> overall_distance;
+    // Get the players distances
     for(unsigned int i=0; i<n; i++)
     {
-        unsigned int kart_id =
-            m_world->getPlayerKart(i)->getWorldKartId();
-        if(m_world->getOverallDistance(kart_id)>max_overall_distance)
-            max_overall_distance = m_world->getOverallDistance(kart_id);
+        unsigned int kart_id = m_world->getPlayerKart(i)->getWorldKartId();
+        overall_distance.push_back(m_world->getOverallDistance(kart_id));
     }
-    if(max_overall_distance==0.0f)
-        max_overall_distance = 999999.9f;   // force best driving
+   
+    // Sort the list
+    std::sort(overall_distance.begin(), overall_distance.end());
+
+    for(unsigned int i=0; i<n; i++)
+    {
+        if(overall_distance[i]>own_overall_distance)
+            m_num_players_ahead++;
+    }
+
+    if(ProfileWorld::isProfileMode())
+        target_overall_distance = 999999.9f;   // force best driving
+    // In higher difficulties, rubber band towards the first player,
+    // if at all (SuperTux has currently no rubber banding at all)
+    else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+             race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST)
+    {
+        target_overall_distance = overall_distance[n-1]; // Highest player distance
+    }
+    // Distribute the AIs to players
+    else
+    {
+        int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
+        int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+        // Converts a position among AI to a position among players
+        float ideal_target = ((position_among_ai-1) / ((float) num_ai-1)
+                             * ((float) race_manager->getNumPlayers()-1)) + 1.0f;
+        // Substract 1 as index start from 0 and add 0.5 to get rounding
+        // The cast truncate the decimals, so it won't go over n-1
+        // as the highest possible ideal_target is n
+        int target_index = (int) (ideal_target - 0.5f);
+        assert (target_index >= 0 && target_index <= n-1);
+        target_overall_distance = overall_distance[target_index];
+    }
     // Now convert 'maximum overall distance' to distance to player.
-    m_distance_to_player =
-                m_world->getOverallDistance(m_kart->getWorldKartId())
-                - max_overall_distance;
+    m_distance_to_player = own_overall_distance - target_overall_distance;
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------

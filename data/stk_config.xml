@@ -295,10 +295,12 @@
            distance ahead, the value for the largest distance is used,
            and similarly if the kart is more than the minimum value
            behind).
-         speed-cap: Fraction of maximum speed the kart should drive
-           at. Used to slow down karts that are ahead of the player.
-           Note that setting this to a value >1 does NOT increase
-           the speed the kart can drive at!
+         first-speed-cap: Fraction of maximum speed the first AI kart
+           should drive at. Used to slow down karts that are ahead of
+           the player. Note that setting this to a value >1 does NOT
+           increase the speed the kart can drive at!
+         last-speed-cap: same as first-speed-cap, but for last AI kart.
+           AI karts in-between use an average of it with first-speed-cap.
          collect-item-probability: Probability of the AI actually
            trying to collect an item (if an item is selected for
            collection in the first place).
@@ -315,7 +317,8 @@
                 item-skill="1"
                 collect-avoid-items="false"
                 handle-bomb="false"
-                speed-cap="-10:1.0 -5:0.9 5:0.8 20:0.7 50:0.6"
+                first-speed-cap="-100:1.0 -50:0.9 0:0.85 100:0.65"
+                last-speed-cap="-150:0.92 -50:0.75 50:0.6"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="0:0"
@@ -333,7 +336,8 @@
                 item-skill="2"
                 collect-avoid-items="true"
                 handle-bomb="false"
-                speed-cap="10:1.0 50:0.8"
+                first-speed-cap="20:1.0 60:0.9 100:0.85"
+                last-speed-cap="-50:0.94 0:0.85 100:0.75"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="-10:1.0 0:0"
@@ -351,7 +355,8 @@
                 item-skill="3"
                 collect-avoid-items="true"
                 handle-bomb="true"
-                speed-cap="20:1.0 50:0.8"
+                first-speed-cap="50:1.0 150:0.9"
+                last-speed-cap="0:0.96 80:0.8"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="10:1.0 20:0"
@@ -369,7 +374,8 @@
                 item-skill="4"
                 collect-avoid-items="true"
                 handle-bomb="true"
-                speed-cap="0:1.0"
+                first-speed-cap="0:1.0"
+                last-speed-cap="0:1.0"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="0:1.0"
