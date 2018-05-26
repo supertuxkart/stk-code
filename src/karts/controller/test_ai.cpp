@@ -313,10 +313,7 @@ void SkiddingAI::update(int ticks)
 
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
-
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
-                        m_ai_properties->getSpeedCap(m_distance_to_player),
-                        /*fade_in_time*/0);
+   
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();

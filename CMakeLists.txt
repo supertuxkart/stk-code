@@ -26,11 +26,18 @@ option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when av
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
-    "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
+    "NOT SERVER_ONLY;NOT APPLE" OFF)
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    
+    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
+       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
+        option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
+    else()
+        option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    endif()
+
 endif()
 
 if(UNIX OR MINGW)
@@ -216,12 +223,12 @@ if (BUILD_RECORDER)
     endif()
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     find_library(SQUISH_LIBRARY NAMES squish libsquish)
     find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
     if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
@@ -479,14 +486,12 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
-endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY})
+    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)

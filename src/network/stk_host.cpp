@@ -716,6 +716,17 @@ void STKHost::mainLoop()
 
     while (m_exit_timeout.load() > StkTime::getRealTime())
     {
+        if (!is_server)
+        {
+            auto server_peer = getServerPeerForClient();
+            if (server_peer &&
+                StkTime::getRealTime() - server_peer->getConnectedTime() > 3.0)
+            {
+                // Back to default ping interval for client
+                server_peer->setPingInterval(0);
+            }
+        }
+
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
         {

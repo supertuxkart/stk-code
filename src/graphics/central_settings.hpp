@@ -36,6 +36,7 @@ private:
     bool hasExplicitAttribLocation;
     bool hasGS;
     bool hasTextureCompression;
+    bool hasTextureCompressionSRGB;
     bool hasAtomics;
     bool hasSSBO;
     bool hasImageLoadStore;
@@ -45,12 +46,8 @@ private:
     bool hasSamplerObjects;
     bool hasVertexType2101010Rev;
     bool hasInstancedArrays;
-
-#if defined(USE_GLES2)
     bool hasBGRA;
     bool hasColorBufferFloat;
-#endif
-
     bool m_need_vertex_id_workaround;
 public:
     static bool m_supports_sp;
@@ -65,6 +62,7 @@ public:
     // Extension is available and safe to use
     bool isARBUniformBufferObjectUsable() const;
     bool isEXTTextureCompressionS3TCUsable() const;
+    bool isEXTTextureCompressionS3TCSRGBUsable() const;
     bool isARBTextureViewUsable() const;
     bool isARBGeometryShadersUsable() const;
     bool isARBTextureStorageUsable() const;
@@ -81,11 +79,8 @@ public:
     bool isARBSamplerObjectsUsable() const;
     bool isARBVertexType2101010RevUsable() const;
     bool isARBInstancedArraysUsable() const;
-
-#if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
     bool isEXTColorBufferFloatUsable() const;
-#endif
 
     // Are all required extensions available for feature support
     bool supportsComputeShadersFiltering() const;

@@ -164,6 +164,9 @@ public:
         }
     }
     // ------------------------------------------------------------------------
+    void setPingInterval(uint32_t interval)
+                            { enet_peer_ping_interval(m_enet_peer, interval); }
+    // ------------------------------------------------------------------------
     uint32_t getPing() const;
 
 };   // STKPeer

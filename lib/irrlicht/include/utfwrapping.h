@@ -13,7 +13,7 @@ namespace gui
 //You can add more characters if needed
 //For full list please visit http://webapp.docx4java.org/OnlineDemo/ecma376/WordML/kinsoku.html
 
-bool UtfNoStarting (wchar_t c)
+inline bool UtfNoStarting (wchar_t c)
 {
 	switch (c)
 		{
@@ -66,7 +66,7 @@ bool UtfNoStarting (wchar_t c)
 	}
 }
 
-bool UtfNoEnding (wchar_t c)
+inline bool UtfNoEnding (wchar_t c)
 {
 	switch (c)
 		{
@@ -99,7 +99,7 @@ bool UtfNoEnding (wchar_t c)
 
 //Helper function
 
-bool breakable (wchar_t c)
+inline bool breakable (wchar_t c)
 {
 	if ((c > 12287 && c < 40960) || //Common CJK words
 		(c > 44031 && c < 55204)  || //Hangul

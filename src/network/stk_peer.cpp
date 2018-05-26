@@ -18,7 +18,7 @@
 
 #include "network/stk_peer.hpp"
 #include "config/user_config.hpp"
-#include "network/game_setup.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
@@ -37,6 +37,12 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_host_id             = host_id;
     m_connected_time      = (float)StkTime::getRealTime();
     m_token_set.store(false);
+    if (NetworkConfig::get()->isClient())
+    {
+        // This allow client to get the correct ping as fast as possible
+        // reset to default (0) will be done in STKHost::mainloop after 3 sec
+        setPingInterval(10);
+    }
     m_client_server_token.store(0);
 }   // STKPeer
 
@@ -124,12 +130,12 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 }   // isSamePeer
 
 //-----------------------------------------------------------------------------
-/** Returns the ping to this peer from host, it waits for 15 seconds for a
+/** Returns the ping to this peer from host, it waits for 3 seconds for a
  *  stable ping returned by enet measured in ms.
  */
 uint32_t STKPeer::getPing() const
 {
-    if ((float)StkTime::getRealTime() - m_connected_time < 15.0f)
+    if ((float)StkTime::getRealTime() - m_connected_time < 3.0f)
         return 0;
-    return m_enet_peer->lastRoundTripTime;
+    return m_enet_peer->roundTripTime;
 }   // getPing
