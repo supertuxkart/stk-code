@@ -30,7 +30,7 @@ using namespace irr;
 
 class AbstractKart;
 class BareNetworkString;
-class Item;
+class ItemState;
 class SFXBase;
 
 /** This objects is permanently available in a kart and stores information
@@ -115,7 +115,7 @@ public:
           Attachment(AbstractKart* kart);
          ~Attachment();
     void  clear ();
-    void  hitBanana(Item *item);
+    void  hitBanana(ItemState *item);
     void  update(int ticks);
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,

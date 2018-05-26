@@ -317,7 +317,7 @@ void Attachment::rewind(BareNetworkString *buffer)
  *  server, the new item is based on the current world time. 
  *  \param item The item that was collected.
  */
-void Attachment::hitBanana(Item *item)
+void Attachment::hitBanana(ItemState *item_state)
 {
     // Don't keep on getting achievements due to rewind!
     if (m_kart->getController()->canGetAchievements() &&
@@ -369,9 +369,9 @@ void Attachment::hitBanana(Item *item)
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
         int ticks = 
-            std::max(item->getTicksTillReturn(), 
+            std::max(item_state->getTicksTillReturn(), 
                      stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
-        item->setTicksTillReturn(ticks);
+        item_state->setTicksTillReturn(ticks);
         break;
         }
     case ATTACH_ANVIL:

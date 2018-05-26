@@ -445,11 +445,11 @@ void Powerup::use()
  *  or on a client, in which case the item and additional info is used
  *  to make sure server and clients are synched correctly.
  *  \param n
- *  \param item The item (bonux box) that was hit. This is necessary
- *         for servers so that the clients can be informed which item
- *         was collected.
+ *  \param item_state The item_state (bonux box) that was hit. This is
+ *         necessary for servers so that the clients can be informed which
+ *         item was collected.
  */
-void Powerup::hitBonusBox(const Item &item)
+void Powerup::hitBonusBox(const ItemState &item_state)
 {
     // Position can be -1 in case of a battle mode (which doesn't have
     // positions), but this case is properly handled in getRandomPowerup.
@@ -474,9 +474,10 @@ void Powerup::hitBonusBox(const Item &item)
         // non-random selection (e.g. by displaying which item is collecte
         // where), since it's only around 83 ms - but it is bit more
         // relaxed when client prediction should be a frame or so earlier.
-        int random_number = item.getItemId() + world->getTimeTicks() / 10;
+        int random_number = item_state.getItemId() + world->getTimeTicks() / 10;
         new_powerup =
             powerup_manager->getRandomPowerup(position, &n, random_number);
+        new_powerup = PowerupManager::POWERUP_BUBBLEGUM;
         if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
             (world->getTicksSinceStart() - powerup_manager->getBallCollectTicks())
             > RubberBall::getTicksBetweenRubberBalls())

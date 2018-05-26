@@ -27,7 +27,7 @@
 
 class AbstractKart;
 class BareNetworkString;
-class Item;
+class ItemState;
 class SFXBase;
 
 /**
@@ -59,7 +59,7 @@ public:
     Material*       getIcon      () const;
     void            adjustSound  ();
     void            use          ();
-    void            hitBonusBox (const Item &item);
+    void            hitBonusBox (const ItemState &item);
     void            saveState(BareNetworkString *buffer) const;
     void            rewindTo(BareNetworkString *buffer);
 
