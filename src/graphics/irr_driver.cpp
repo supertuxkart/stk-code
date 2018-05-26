@@ -1960,6 +1960,12 @@ void IrrDriver::setRecording(bool val)
     {
         ogrStopCapture();
     }
+#else
+    Log::error("Recorder", "Recording unavailable, STK was compiled without "
+               "recording support.  Please re-compile STK with libopenglrecorder "
+               "to enable recording.  If you got SuperTuxKart from your distribution's "
+               "repositories, please use the official binaries, or contact your "
+               "distributions's package mantainers.");
 #endif
 }   // setRecording
 
