@@ -259,7 +259,7 @@ unsigned int ItemManager::insertItem(Item *item)
  *  \param xyz Can be used to overwrite the item location (used in networking).
  */
 Item* ItemManager::dropNewItem(ItemState::ItemType type,
-                               AbstractKart *kart, const Vec3 *xyz)
+                               const AbstractKart *kart, const Vec3 *xyz)
 {
     Vec3 hit_point;
     Vec3 normal;
@@ -340,8 +340,7 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
 Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
                                 TriggerItemListener* listener)
 {
-    Item* item;
-    item = new Item(xyz, distance, listener);
+    Item* item = new Item(xyz, distance, listener);
     insertItem(item);
 
     return item;

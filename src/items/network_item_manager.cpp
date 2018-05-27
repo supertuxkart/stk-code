@@ -130,11 +130,9 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
  *  \param type Type of the item.
  *  \param kart In case of a dropped item used to avoid that a kart
  *         is affected by its own items.
- *  \param xyz Location of the item. If specified will override the
- *         kart position (used in networking only).
  */
 Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
-                                      AbstractKart *kart, const Vec3 *xyz)
+                                      const AbstractKart *kart, const Vec3 *xyz)
 {
     Item *item = ItemManager::dropNewItem(type, kart, xyz);
     if(!item) return NULL;

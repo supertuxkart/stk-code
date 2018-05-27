@@ -1061,8 +1061,9 @@ void Kart::collectedItem(Item *item)
             break;
         }
     case Item::ITEM_BUBBLEGUM:
-        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL &&
-                                    item->getEmitter()->getIdent() == "nolok");
+        m_has_caught_nolok_bubblegum = 
+            (item->getPreviousOwner()&&
+             item->getPreviousOwner()->getIdent() == "nolok");
 
         // slow down
         m_bubblegum_ticks =

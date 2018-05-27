@@ -68,7 +68,7 @@ public:
     virtual void reset();
     virtual void setItemConfirmationTime(int host_id, int ticks) OVERRIDE;
     virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;
-    virtual Item* dropNewItem(ItemState::ItemType type, AbstractKart *kart, 
+    virtual Item* dropNewItem(ItemState::ItemType type, const AbstractKart *kart,
                               const Vec3 *xyz=NULL) OVERRIDE;
     virtual BareNetworkString* saveState() OVERRIDE;
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;

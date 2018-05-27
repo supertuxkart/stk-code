@@ -73,7 +73,7 @@ void ItemState::update(int ticks)
  */
 void ItemState::collected(const AbstractKart *kart)
 {
-    m_event_handler = kart;
+    m_previous_owner = kart;
     if (m_type == ITEM_EASTER_EGG)
     {
         // They will disappear 'forever'
@@ -190,7 +190,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
 {
     ItemState::initItem(type);
     m_xyz               = xyz;
-    m_emitter           = NULL;
+    m_previous_owner    = NULL;
     m_rotate            = (getType()!=ITEM_BUBBLEGUM) && 
                           (getType()!=ITEM_TRIGGER    );
     // Now determine in which quad this item is, and its distance
@@ -327,10 +327,9 @@ void Item::reset()
  *  affected by its own items.
  *  \param parent Kart that dropped the item.
  */
-void Item::setParent(AbstractKart* parent)
+void Item::setParent(const AbstractKart* parent)
 {
-    m_event_handler  = parent;
-    m_emitter        = parent;
+    m_previous_owner = parent;
     ItemState::setDeactivatedTicks(stk_config->time2Ticks(1.5f));
 }   // setParent
 
