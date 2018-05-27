@@ -20,7 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "states_screens/dialogs/speedrun_mode_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
 
 StoryModeTimer *story_mode_timer = 0;
@@ -71,8 +71,8 @@ void StoryModeTimer::startTimer()
     // and it thus persist if the user disable/reenable it.
 	if (!m_valid_speedrun_started && m_player_can_speedrun)
     {
-		m_speedrun_start = std::chrono::system_clock::now();
-	    m_valid_speedrun_started = true;
+        m_speedrun_start = std::chrono::system_clock::now();
+        m_valid_speedrun_started = true;
     }
 
     // The normal story mode timer runs along the speedrun timer
@@ -80,8 +80,8 @@ void StoryModeTimer::startTimer()
     // and is correct
     if (!m_story_mode_started)
     {
-		m_story_mode_start = std::chrono::system_clock::now();
-	    m_story_mode_started = true;
+        m_story_mode_start = std::chrono::system_clock::now();
+        m_story_mode_started = true;
     }
 }
 
@@ -89,8 +89,8 @@ void StoryModeTimer::stopTimer()
 {
 	if (m_valid_speedrun_started)
     {
-		m_speedrun_end = std::chrono::system_clock::now();
-		m_valid_speedrun_ended = true;
+        m_speedrun_end = std::chrono::system_clock::now();
+        m_valid_speedrun_ended = true;
 	}
 
     if (m_story_mode_started)
@@ -233,7 +233,13 @@ void StoryModeTimer::testPlayerRun()
     if(!m_player_can_speedrun && UserConfigParams::m_speedrun_mode)
     {
         UserConfigParams::m_speedrun_mode = false;
-        new SpeedrunModeDialog();
+        new MessageDialog(_("Speedrun mode disabled. It can only be enabled if the game"
+                            " has not been closed since the launch of the story mode.\n\n"
+                            "Closing the game before the story mode's"
+                            " completion invalidates the timer.\n\n"
+                            "To use the speedrun mode, please use a new profile."),
+                            MessageDialog::MESSAGE_DIALOG_OK,
+                            NULL, false, false, 0.6f, 0.7f);
     }
 
     m_player_tested = true;
