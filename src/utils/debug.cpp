@@ -246,6 +246,9 @@ LightNode* findNearestLight()
 
 bool handleContextMenuAction(s32 cmd_id)
 {
+    if (cmd_id == -1)
+        return false;
+
     Camera* camera = Camera::getActiveCamera();
     unsigned int kart_num = 0;
     if (camera != NULL && camera->getKart() != NULL)
@@ -938,7 +941,7 @@ bool onEvent(const SEvent &event)
                           "libopenglrecorder to enable recording.  If you got\n"
                           "SuperTuxKart from your distribution's repositories,\n"
                           "please use the official binaries, or contact your\n"
-                          "distributions's package mantainer.", DEBUG_STOP_RECORDING);
+                          "distributions's package mantainer.");
 #endif
 
             mnu->addItem(L"Change camera target >",-1,true, true);
