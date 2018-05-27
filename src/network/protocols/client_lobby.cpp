@@ -636,6 +636,7 @@ void ClientLobby::startingRaceNow()
  */
 void ClientLobby::startSelection(Event* event)
 {
+    SFXManager::get()->quickSound("wee");
     const NetworkString& data = event->data();
     uint8_t skip_kart_screen = data.getUInt8();
     const unsigned kart_num = data.getUInt16();

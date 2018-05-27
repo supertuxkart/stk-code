@@ -92,7 +92,6 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
     GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
     GLint type = GL_FLOAT;
 
-#if defined(USE_GLES2)
     if (!CVS->isEXTColorBufferFloatUsable())
     {
         rgba_internal_format = GL_RGBA8;
@@ -104,7 +103,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         diffuse_specular_internal_format = GL_RGBA8;
         type = GL_UNSIGNED_BYTE;
     }
-#endif
+
     if (!CVS->isDeferredEnabled())
     {
         // RTT is used in only deferred shading which need hdr framebuffer

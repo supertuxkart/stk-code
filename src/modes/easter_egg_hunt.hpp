@@ -64,6 +64,7 @@ public:
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
     const int  numberOfEggsFound() { return m_eggs_found; }
+    const int  numberOfEggsToFind() { return m_number_of_eggs; }
 
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);

@@ -44,6 +44,8 @@
 #include "states_screens/dialogs/network_user_dialog.hpp"
 #include "utils/translation.hpp"
 
+#include <utfwrapping.h>
+
 using namespace Online;
 using namespace GUIEngine;
 
@@ -61,7 +63,17 @@ using namespace GUIEngine;
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
+    m_server_info_height = 0;
+
+    m_back_widget = NULL;
+    m_header = NULL;
+    m_text_bubble = NULL;
+    m_exit_widget = NULL;
+    m_start_button = NULL;
     m_player_list = NULL;
+    m_chat_box = NULL;
+    m_send_button = NULL;
+    m_icon_bank = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -155,16 +167,22 @@ void NetworkingLobby::init()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
-    assert(m_text_bubble->getDimension().Width > 10);
-    while ((int)GUIEngine::getFont()->getDimension(info.c_str()).Width >
-        m_text_bubble->getDimension().Width - 10)
+    const unsigned box_width = m_text_bubble->getDimension().Width;
+    while (GUIEngine::getFont()->getDimension(info.c_str()).Width > box_width)
     {
-        int size = (m_text_bubble->getDimension().Width - 10)
-            / m_server_info_height;
-        assert(size > 0);
-        core::stringw new_info = info.subString(0, size);
-        m_server_info.push_back(new_info);
-        info = info.subString(new_info.size(), 80);
+        core::stringw brokentext = info;
+        while (brokentext.size() > 0)
+        {
+            brokentext.erase(brokentext.size() - 1);
+            if (GUIEngine::getFont()->getDimension(brokentext.c_str()).Width <
+                box_width && gui::breakable(brokentext.lastChar()))
+                break;
+        }
+        if (brokentext.size() == 0)
+            break;
+        m_server_info.push_back(brokentext);
+        info =
+            info.subString(brokentext.size(), info.size() - brokentext.size());
     }
     if (info.size() > 0)
     {
@@ -232,15 +250,22 @@ void NetworkingLobby::onUpdate(float delta)
         {
             m_start_button->setVisible(true);
         }
-        if (auto p = m_server_peer.lock())
-        {
-            //I18N: In the networking lobby, display ping when connected
-            const uint32_t ping = p->getPing();
-            if (ping != 0)
-                m_header->setText(_("Lobby (ping: %dms)", ping), false);
-        }
+        //I18N: In the networking lobby, display ping when connected
+        const uint32_t ping = getServerPing();
+        if (ping != 0)
+            m_header->setText(_("Lobby (ping: %dms)", ping), false);
     }
 }   // onUpdate
+
+// ----------------------------------------------------------------------------
+uint32_t NetworkingLobby::getServerPing() const
+{
+    if (auto p = m_server_peer.lock())
+    {
+        return p->getPing();
+    }
+    return 0;
+}   // getServerPing
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::sendChat(irr::core::stringw text)

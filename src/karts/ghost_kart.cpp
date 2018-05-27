@@ -242,7 +242,10 @@ void GhostKart::computeFinishTime()
     // In egg hunts, the finish time is the moment at which all egs are collected
     if (race_manager->isEggHuntMode())
     {
-        m_finish_time = 0; //FIXME : do a real computation
+        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
+        assert(world);
+        int max_eggs = world->numberOfEggsToFind(); 
+        m_finish_time = getTimeForEggs(max_eggs);
     }
     else // linear races
     {
@@ -328,4 +331,64 @@ float GhostKart::getTimeForDistance(float distance)
                     +gc->getTimeAtIndex(upper_frame_index)*(upper_ratio);
 
     return ghost_time;
-}
+} // getTimeForDIstance
+
+// ----------------------------------------------------------------------------
+/** Returns the smallest time at which the kart had the required number of eggs
+  * Returns -1.0f if none */
+float GhostKart::getTimeForEggs(int egg_number)
+{
+    const GhostController* gc =
+        dynamic_cast<const GhostController*>(getController());
+    
+    int current_index = gc->getCurrentReplayIndex();
+
+    // Second, get the current egg number
+    int current_eggs = m_all_bonus_info[current_index].m_special_value;
+
+    // This determines in which direction we will search a matching frame
+    bool search_forward = (current_eggs < egg_number);
+
+    // This used to compute the time
+    int lower_frame_index = current_index-1;
+    unsigned int upper_frame_index = current_index;
+
+    // Third, search frame by frame in the good direction
+    // A modified binary search would be an optimization
+    while (1)
+    {
+        // If we have reached the end of the replay file without finding the
+        // searched distance, break
+        if (upper_frame_index >= m_all_bonus_info.size() ||
+            lower_frame_index < 0 )
+            break;
+
+        // The target distance was reached between those two frames
+        if (m_all_bonus_info[lower_frame_index].m_special_value <  egg_number &&
+            m_all_bonus_info[upper_frame_index].m_special_value == egg_number)
+        {
+            break;
+        }
+
+        if (search_forward)
+        {
+            lower_frame_index++;
+            upper_frame_index++;
+        }
+        else
+        {
+            lower_frame_index--;
+            upper_frame_index--;
+        }
+    }
+
+    float ghost_time;
+
+    if (upper_frame_index >= m_all_bonus_info.size() ||
+        lower_frame_index < 0 )
+        ghost_time = -1.0f;
+    else
+        ghost_time = gc->getTimeAtIndex(upper_frame_index);
+
+    return ghost_time;
+} // getTimeForEggs

@@ -1022,6 +1022,10 @@ void ServerLobby::connectionRequested(Event* event)
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
     peer->sendPacket(server_info);
+    // Make sure it will always ping at least the frequency of state exchange
+    // so enet will not ping when we exchange state but keep ping elsewhere
+    // then in lobby the ping seen will be correct
+    peer->setPingInterval(110);
     delete server_info;
 
     m_peers_ready[peer] = std::make_pair(false, 0.0);

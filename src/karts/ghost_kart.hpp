@@ -95,6 +95,11 @@ public:
       * Returns -1.0f if none */
     float getTimeForDistance(float distance);
 
+    // ----------------------------------------------------------------------------
+    /** Returns the smallest time at which the kart had the required number of eggs
+      * Returns -1.0f if none */
+    float getTimeForEggs(int egg_number);
+
     // ------------------------------------------------------------------------
     virtual void  kartIsInRestNow() OVERRIDE {};
     // ------------------------------------------------------------------------
