@@ -152,6 +152,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     for (int i=0;i<m_xyz_history_size;i++)
     {
         m_previous_xyz.push_back(initial_position);
+        m_previous_xyz_times.push_back(0.0f);
     }
     m_time_previous_counter = 0.0f;
 
@@ -381,6 +382,7 @@ void Kart::reset()
     for (int i=0;i<m_xyz_history_size;i++)
     {
         m_previous_xyz[i] = getXYZ();
+        m_previous_xyz_times[i] = 0.0f;
     }
     m_time_previous_counter = 0.0f;
 
@@ -927,7 +929,9 @@ void Kart::finishedRace(float time, bool from_server)
     }   // !from_server
 
     m_finished_race = true;
+
     m_finish_time   = time;
+
     m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
@@ -1317,9 +1321,11 @@ void Kart::update(int ticks)
     while (m_time_previous_counter > stk_config->ticks2Time(1))
     {
         m_previous_xyz[0] = getXYZ();
+        m_previous_xyz_times[0] = World::getWorld()->getTime();
         for (int i=m_xyz_history_size-1;i>0;i--)
         {
             m_previous_xyz[i] = m_previous_xyz[i-1];
+            m_previous_xyz_times[i] = m_previous_xyz_times[i-1];
         }
         m_time_previous_counter -= stk_config->ticks2Time(1);
     }
@@ -3131,6 +3137,13 @@ const Vec3& Kart::getRecentPreviousXYZ() const
     //irregular on some tracks whose roads are not smooth enough
     return m_previous_xyz[m_xyz_history_size/5];
 }   // getRecentPreviousXYZ
+
+// ------------------------------------------------------------------------
+/** Returns the time at which the recent previoux position occured */
+const float Kart::getRecentPreviousXYZTime() const
+{
+    return m_previous_xyz_times[m_xyz_history_size/5];
+}   // getRecentPreviousXYZTime
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)

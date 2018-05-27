@@ -84,6 +84,10 @@ protected:
     /** The coordinates of the XYZ_HISTORY_SIZE previous positions */
     std::vector<Vec3> m_previous_xyz;
 
+    /** The times at which the previous positions occured.
+        Currently used for finish time computation */
+    std::vector<float> m_previous_xyz_times;
+
     float m_time_previous_counter;
 
     /** Is time flying activated */
@@ -518,6 +522,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a more recent different previous position */
     virtual const Vec3& getRecentPreviousXYZ() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Returns the time at which the recent previous position occured */
+    virtual const float getRecentPreviousXYZTime() const;
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
