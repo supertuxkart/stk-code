@@ -477,7 +477,6 @@ void Powerup::hitBonusBox(const ItemState &item_state)
         int random_number = item_state.getItemId() + world->getTimeTicks() / 10;
         new_powerup =
             powerup_manager->getRandomPowerup(position, &n, random_number);
-        new_powerup = PowerupManager::POWERUP_BUBBLEGUM;
         if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
             (world->getTicksSinceStart() - powerup_manager->getBallCollectTicks())
             > RubberBall::getTicksBetweenRubberBalls())
