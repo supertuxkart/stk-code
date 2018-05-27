@@ -44,7 +44,7 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
-#include "states_screens/dialogs/speedrun_mode_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -150,7 +150,13 @@ void OptionsScreenUI::init()
         if (!story_mode_timer->playerCanRun())
         {
             UserConfigParams::m_speedrun_mode = false;
-            new SpeedrunModeDialog();
+            new MessageDialog(_("Speedrun mode disabled. It can only be enabled if the game"
+                                " has not been closed since the launch of the story mode.\n\n"
+                                "Closing the game before the story mode's"
+                                " completion invalidates the timer.\n\n"
+                                "To use the speedrun mode, please use a new profile."),
+                                MessageDialog::MESSAGE_DIALOG_OK,
+                                NULL, false, false, 0.6f, 0.7f);
         }
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
@@ -330,7 +336,13 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             if (!story_mode_timer->playerCanRun())
             {
                 speedrun_timer->setState(false);
-                new SpeedrunModeDialog();
+                new MessageDialog(_("Speedrun mode can only be enabled if the game has not"
+                                    " been closed since the launch of the story mode.\n\n"
+                                    "Closing the game before the story mode's"
+                                    " completion invalidates the timer.\n\n"
+                                    "To use the speedrun mode, please use a new profile."),
+                                    MessageDialog::MESSAGE_DIALOG_OK,
+                                    NULL, false, false, 0.6f, 0.7f);
             }
         }
         UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
@@ -457,4 +469,3 @@ void OptionsScreenUI::unloaded()
 }   // unloaded
 
 // -----------------------------------------------------------------------------
-
