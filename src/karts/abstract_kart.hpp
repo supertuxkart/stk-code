@@ -489,6 +489,9 @@ public:
     /** Returns the most recent different previous position */
     virtual const Vec3& getRecentPreviousXYZ() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the time at which the recent previous position occured */
+    virtual const float getRecentPreviousXYZTime() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;
     // ------------------------------------------------------------------------
