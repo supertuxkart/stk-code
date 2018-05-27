@@ -1037,17 +1037,17 @@ void Kart::setRaceResult()
 //-----------------------------------------------------------------------------
 /** Called when an item is collected. It will either adjust the collected
  *  energy, or update the attachment or powerup for this kart.
- *  \param item The item that was hit.
+ *  \param item_state The item that was hit.
  */
-void Kart::collectedItem(Item *item)
+void Kart::collectedItem(ItemState *item_state)
 {
     float old_energy          = m_collected_energy;
-    const Item::ItemType type = item->getType();
+    const Item::ItemType type = item_state->getType();
 
     switch (type)
     {
     case Item::ITEM_BANANA:
-        m_attachment->hitBanana(item);
+        m_attachment->hitBanana(item_state);
         break;
     case Item::ITEM_NITRO_SMALL:
         m_collected_energy += m_kart_properties->getNitroSmallContainer();
@@ -1057,13 +1057,13 @@ void Kart::collectedItem(Item *item)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
-            m_powerup->hitBonusBox(*item);
+            m_powerup->hitBonusBox(*item_state);
             break;
         }
     case Item::ITEM_BUBBLEGUM:
         m_has_caught_nolok_bubblegum = 
-            (item->getPreviousOwner()&&
-             item->getPreviousOwner()->getIdent() == "nolok");
+            (item_state->getPreviousOwner()&&
+             item_state->getPreviousOwner()->getIdent() == "nolok");
 
         // slow down
         m_bubblegum_ticks =
@@ -1085,7 +1085,7 @@ void Kart::collectedItem(Item *item)
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
-    m_controller->collectedItem(*item, old_energy);
+    m_controller->collectedItem(*item_state, old_energy);
 
 }   // collectedItem
 

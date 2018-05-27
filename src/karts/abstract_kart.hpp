@@ -40,6 +40,7 @@ class btKart;
 class btQuaternion;
 class Controller;
 class Item;
+class ItemState;
 class KartGFX;
 class KartModel;
 class KartProperties;
@@ -340,7 +341,7 @@ public:
     /** Called when an item is collected. It will either adjust the collected
      *  energy, or update the attachment or powerup for this kart.
      *  \param item The item that was hit. */
-    virtual void  collectedItem(Item *item) = 0;
+    virtual void  collectedItem(ItemState *item_state) = 0;
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     virtual int getPosition() const = 0;

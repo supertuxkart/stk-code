@@ -64,7 +64,7 @@ public:
     bool         action            (PlayerAction action, int value,
                                     bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;
-    void         collectedItem     (const Item &item,
+    void         collectedItem     (const ItemState &item,
                                     float previous_energy=0) OVERRIDE;
     virtual void setPosition       (int p) OVERRIDE;
     virtual void reset             () OVERRIDE;

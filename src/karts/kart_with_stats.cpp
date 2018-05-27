@@ -100,12 +100,12 @@ void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
 // ----------------------------------------------------------------------------
 /** Called when an item is collected. It will increment private variables that
  *  represent counters for each type of item hit.
- *  \param item The item that was hit.
+ *  \param item_state The item that was hit.
  */
-void KartWithStats::collectedItem(Item *item)
+void KartWithStats::collectedItem(ItemState *item_state)
 {
-    Kart::collectedItem(item);
-    const Item::ItemType type = item->getType();
+    Kart::collectedItem(item_state);
+    const Item::ItemType type = item_state->getType();
 
     switch (type)
     {

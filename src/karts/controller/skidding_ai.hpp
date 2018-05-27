@@ -50,6 +50,7 @@
 
 #include <line3d.h>
 
+class Item;
 class LinearWorld;
 class Track;
 

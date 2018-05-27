@@ -331,7 +331,8 @@ void LocalPlayerController::handleZipper(bool play_sound)
  *  \param item Item that was collected.
  *  \param old_energy The previous energy value
  */
-void LocalPlayerController::collectedItem(const Item &item , float old_energy)
+void LocalPlayerController::collectedItem(const ItemState &item_state,
+                                          float old_energy)
 {
     if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
         m_kart->getEnergy() == m_kart->getKartProperties()->getNitroMax())
@@ -346,7 +347,7 @@ void LocalPlayerController::collectedItem(const Item &item , float old_energy)
     }
     else
     {
-        switch(item.getType())
+        switch(item_state.getType())
         {
         case Item::ITEM_BANANA:
             m_kart->playSound(m_ugh_sound);

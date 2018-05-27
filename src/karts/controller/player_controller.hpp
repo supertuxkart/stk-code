@@ -55,7 +55,7 @@ public:
     virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
     virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void  collectedItem(const Item &item,
+    virtual void  collectedItem(const ItemState &item,
                                 float previous_energy=0 ) OVERRIDE { };
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE { return true; }
