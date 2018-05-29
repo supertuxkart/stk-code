@@ -344,6 +344,9 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     uint8_t active_slowdown = 0;
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<=1)
     {
+        // Don't bother saving terrain, this will get updated automatically
+        // each frame.
+        if(i==MS_DECREASE_TERRAIN) continue;
         if (m_speed_decrease[i].isActive()) 
             active_slowdown |= b;
     }
