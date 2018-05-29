@@ -98,36 +98,55 @@ void StandardRace::endRaceEarly()
     std::vector<int> active_players;
     // Required for debugging purposes
     beginSetKartPositions();
+    float worse_finish_time = 0.0f;
+
     for (unsigned int i = 1; i <= kart_amount; i++)
     {
         int kartid = m_position_index[i-1];
         AbstractKart* kart = m_karts[kartid];
+
         if (kart->hasFinishedRace())
         {
+            if (kart->getFinishTime() > worse_finish_time)
+                worse_finish_time = kart->getFinishTime();
+
             // Have to do this to keep endSetKartPosition happy
             setKartPosition(kartid, kart->getPosition());
-            continue;
         }
 
-        if (kart->getController()->isPlayerController())
+        else if (kart->getController()->isPlayerController())
         {
+            if (estimateFinishTimeForKart(kart) > worse_finish_time)
+                worse_finish_time = estimateFinishTimeForKart(kart);
+
             // Keep active players apart for now
             active_players.push_back(kartid);
         }
         else
         {
+            if (estimateFinishTimeForKart(kart) > worse_finish_time)
+                worse_finish_time = estimateFinishTimeForKart(kart);
+
             // AI karts finish
             setKartPosition(kartid, i - (unsigned int) active_players.size());
             kart->finishedRace(estimateFinishTimeForKart(kart));
         }
     } // i <= kart_amount
+
     // Now make the active players finish
     for (unsigned int i = 0; i < active_players.size(); i++)
     {
         int kartid = active_players[i];
         int position = getNumKarts() - (int) active_players.size() + 1 + i;
         setKartPosition(kartid, position);
-        m_karts[kartid]->eliminate();
+        float punished_time = estimateFinishTimeForKart(m_karts[kartid])
+                              + worse_finish_time - WorldStatus::getTime();
+        m_karts[kartid]->finishedRace(punished_time);
+
+        // In networked races, endRaceEarly will be called if a player
+        // takes too much time to finish, so don't mark him as eliminated
+        if (!isNetworkWorld())
+            m_karts[kartid]->eliminate();
     } // Finish the active players
     endSetKartPositions();
     setPhase(RESULT_DISPLAY_PHASE);
