@@ -188,8 +188,7 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
  */
 void Item::initItem(ItemType type, const Vec3 &xyz)
 {
-    ItemState::initItem(type);
-    m_xyz               = xyz;
+    ItemState::initItem(type, xyz);
     m_previous_owner    = NULL;
     m_rotate            = (getType()!=ITEM_BUBBLEGUM) && 
                           (getType()!=ITEM_TRIGGER    );
@@ -210,15 +209,15 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
         // Item is on drive graph. Pre-compute the distance from center
         // of this item, which is used by the AI (mostly for avoiding items)
         Vec3 distances;
-        DriveGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
+        DriveGraph::get()->spatialToTrack(&distances, getXYZ(), m_graph_node);
         m_distance_from_center = distances.getX();
         const DriveNode* dn = DriveGraph::get()->getNode(m_graph_node);
         const Vec3& right = dn->getRightUnitVector();
         // Give it 10% more space, since the kart will not always come
         // parallel to the drive line.
         Vec3 delta = right * sqrt(m_distance_2) * 1.3f;
-        m_avoidance_points[0] = new Vec3(m_xyz + delta);
-        m_avoidance_points[1] = new Vec3(m_xyz - delta);
+        m_avoidance_points[0] = new Vec3(getXYZ() + delta);
+        m_avoidance_points[1] = new Vec3(getXYZ() - delta);
     }
 
 }   // initItem

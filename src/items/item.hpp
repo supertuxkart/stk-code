@@ -118,6 +118,10 @@ private:
      *  will always reappear after a while. */
     int m_used_up_counter;
 
+    /** The original position - saves calls to m_node->getPosition()
+    * and then converting this value to a Vec3. */
+    Vec3 m_xyz;
+
 protected:
     /** The 'owner' of the item, i.e. the kart that dropped this item.
      *  Is NULL if the item is part of the track. */
@@ -165,9 +169,10 @@ public:
     /** Initialises an item.
      *  \param type Type for this item.
      */
-    void initItem(ItemType type)
+    void initItem(ItemType type, const Vec3& xyz)
     {
         setType(type);
+        m_xyz               = xyz;
         m_previous_owner    = NULL;
         m_original_type     = ITEM_NONE;
         m_deactive_ticks    = 0;
@@ -256,6 +261,11 @@ public:
     /** Returns the kart that dropped this item (or NULL if the item was not
      *  dropped by a kart. */
     const AbstractKart *getPreviousOwner() const { return m_previous_owner; }
+    // ------------------------------------------------------------------------
+    void setXYZ(const Vec3& xyz) { m_xyz = xyz; }
+    // ------------------------------------------------------------------------
+    /** Returns the XYZ position of the item. */
+    const Vec3& getXYZ() const { return m_xyz; }
 };   // class ItemState
 
 // ============================================================================
@@ -283,10 +293,6 @@ private:
     /** Stores the original mesh in order to reset it. */
     scene::IMesh *m_original_mesh;
     scene::IMesh *m_original_lowmesh;
-
-    /** The original position - saves calls to m_node->getPosition()
-     * and then converting this value to a Vec3. */
-    Vec3 m_xyz;
 
     /** Set to false if item should not rotate. */
     bool m_rotate;
@@ -347,7 +353,7 @@ public:
     {
         if (m_previous_owner == kart && getDeactivatedTicks() > 0)
             return false;
-        Vec3 lc = quatRotate(m_original_rotation, xyz - m_xyz);
+        Vec3 lc = quatRotate(m_original_rotation, xyz - getXYZ());
         // Don't be too strict if the kart is a bit above the item
         lc.setY(lc.getY() / 2.0f);
         return lc.length2() < m_distance_2;
@@ -368,14 +374,10 @@ protected:
     {
         if (m_previous_owner == kart && getDeactivatedTicks() >0) return false;
 
-        Vec3 closest = line.getClosestPoint(m_xyz.toIrrVector());
+        Vec3 closest = line.getClosestPoint(getXYZ().toIrrVector());
         return hitKart(closest, kart);
     }   // hitLine
-
 public:
-    // ------------------------------------------------------------------------
-    /** Returns the XYZ position of the item. */
-    const Vec3& getXYZ() const { return m_xyz; }
     // ------------------------------------------------------------------------
     /** Sets if this is a predicted item or not. */
     void setPredicted(bool p) { m_is_predicted = p; }
