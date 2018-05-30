@@ -53,7 +53,6 @@ private:
     Synchronised< std::vector<ItemEventInfo> > m_item_events;
 
     void forwardTime(int ticks);
-    virtual unsigned int insertItem(Item *item) OVERRIDE;
 
     NetworkItemManager();
     virtual ~NetworkItemManager();

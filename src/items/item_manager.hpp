@@ -105,9 +105,8 @@ private:
      *  value is <0, it indicates that the items are not switched atm. */
     int m_switch_ticks;
 
-    void  deleteItem(Item *item);
-
 protected:
+    void deleteItem(Item *item);
     virtual unsigned int insertItem(Item *item);
     void setSwitchItems(const std::vector<int> &switch_items);
              ItemManager();

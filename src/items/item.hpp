@@ -171,13 +171,10 @@ public:
      */
     void initItem(ItemType type, const Vec3& xyz)
     {
-        setType(type);
         m_xyz               = xyz;
-        m_previous_owner    = NULL;
         m_original_type     = ITEM_NONE;
         m_deactive_ticks    = 0;
         m_ticks_till_return = 0;
-        m_item_id           = -1;
         setDisappearCounter();
     }   // initItem
 
