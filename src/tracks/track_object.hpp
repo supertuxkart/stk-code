@@ -21,7 +21,6 @@
 
 #include <vector3d.h>
 
-#include "items/item.hpp"
 #include "physics/physical_object.hpp"
 #include "scriptengine/scriptvec3.hpp"
 #include "tracks/track_object_presentation.hpp"
