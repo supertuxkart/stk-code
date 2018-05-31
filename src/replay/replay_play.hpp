@@ -19,13 +19,15 @@
 #ifndef HEADER_REPLAY__PLAY_HPP
 #define HEADER_REPLAY__PLAY_HPP
 
-#include "karts/ghost_kart.hpp"
 #include "replay/replay_base.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include "irrString.h"
 #include <algorithm>
 #include <string>
 #include <vector>
+
+using namespace irr;
 
 class GhostKart;
 
