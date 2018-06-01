@@ -103,6 +103,7 @@ BareNetworkString* KartRewinder::saveState()
     // -------------------------------------
     getControls().saveState(buffer);
     getController()->saveState(buffer);
+    buffer->addTime(m_brake_ticks);
 
     // 3) Attachment, powerup, nitro
     // -----------------------------
@@ -154,6 +155,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // ------------------------------
     getControls().rewindTo(buffer);
     getController()->rewindTo(buffer);
+    m_brake_ticks = buffer->getTime();
 
     // 3) Attachment, powerup, nitro
     // ------------------------------
