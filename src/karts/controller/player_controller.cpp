@@ -379,7 +379,8 @@ void PlayerController::handleZipper(bool play_sound)
 void PlayerController::saveState(BareNetworkString *buffer) const
 {
     buffer->addUInt32(m_steer_val).addUInt32(m_steer_val_l)
-           .addUInt32(m_steer_val_r);
+           .addUInt32(m_steer_val_r).addUInt8(m_prev_brake)
+           .addUInt32(m_prev_accel);
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -388,6 +389,8 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
     m_steer_val   = buffer->getUInt32();
     m_steer_val_l = buffer->getUInt32();
     m_steer_val_r = buffer->getUInt32();
+    m_prev_brake  = buffer->getUInt8();
+    m_prev_accel  = buffer->getUInt32();
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
