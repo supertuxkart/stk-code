@@ -3157,4 +3157,10 @@ const video::SColor& Kart::getColor() const
     return m_kart_properties->getColor();
 }   // getColor
 
+// ------------------------------------------------------------------------
+bool Kart::isVisible()
+{
+    return m_node && m_node->isVisible();
+}   // isVisible
+
 /* EOF */

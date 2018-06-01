@@ -544,6 +544,8 @@ public:
     SFXBase* getNextEmitter();
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool isVisible() OVERRIDE;
 };   // Kart
 
 

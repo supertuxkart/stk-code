@@ -517,6 +517,8 @@ public:
     virtual bool isJumping() const = 0;
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) = 0;
+    // ------------------------------------------------------------------------
+    virtual bool isVisible() = 0;
 };   // AbstractKart
 
 
