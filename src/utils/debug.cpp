@@ -1025,7 +1025,13 @@ bool onEvent(const SEvent &event)
 
 bool handleStaticAction(int key)
 {
-    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
+    Camera* camera = Camera::getActiveCamera();
+    unsigned int kart_num = 0;
+    if (camera != NULL && camera->getKart() != NULL)
+    {
+        kart_num = camera->getKart()->getWorldKartId();
+    }
+
     if (key == IRR_KEY_F1)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_FREE);
