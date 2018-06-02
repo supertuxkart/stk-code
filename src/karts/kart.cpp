@@ -1491,7 +1491,7 @@ void Kart::update(int ticks)
     Log::verbose("physicsafter", "%s t %f %d xyz(9-11) %f %f %f %f %f %f "
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
         "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
-        "maxspeed(35) %f engf(37) %f",
+        "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d",
         getIdent().c_str(),
         World::getWorld()->getTime(), World::getWorld()->getTimeTicks(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1508,7 +1508,9 @@ void Kart::update(int ticks)
         m_skidding->getSkidState(), //31
         m_skidding->getSkidFactor(),    //33
         m_max_speed->getCurrentMaxSpeed(),
-        m_max_speed->getCurrentAdditionalEngineForce()  // 37
+        m_max_speed->getCurrentAdditionalEngineForce(),  // 37
+        m_brake_ticks, //39
+        m_controls.getButtonsCompressed()
     );
 #endif
     // After the physics step was done, the position of the wheels (as stored
@@ -2596,6 +2598,8 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             // we are "parking" the kart, so in battle mode we can ambush people
             if(std::abs(m_speed) < 5.0f)
                 m_vehicle->setAllBrakes(20.0f);
+            else
+                m_vehicle->setAllBrakes(0);
         }   // !m_brake
     }   // not accelerating
 }   // updateEnginePowerAndBrakes
