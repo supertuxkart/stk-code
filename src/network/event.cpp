@@ -18,6 +18,7 @@
 
 #include "network/event.hpp"
 
+#include "network/crypto.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -31,6 +32,7 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
 {
     m_arrival_time = (double)StkTime::getTimeSinceEpoch();
     m_pdi = PDI_TIMEOUT;
+    m_peer = peer;
 
     switch (event->type)
     {
@@ -50,8 +52,15 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
     }
     if (m_type == EVENT_TYPE_MESSAGE)
     {
-        m_data = new NetworkString(event->packet->data, 
-                                   (int)event->packet->dataLength);
+        if (m_peer->getCrypto() && event->channelID == EVENT_CHANNEL_NORMAL)
+        {
+            m_data = m_peer->getCrypto()->decryptRecieve(event->packet);
+        }
+        else
+        {
+            m_data = new NetworkString(event->packet->data, 
+                (int)event->packet->dataLength);
+        }
     }
     else
         m_data = NULL;
@@ -62,7 +71,6 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
         enet_packet_destroy(event->packet);
     }
 
-    m_peer = peer;
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------
@@ -70,9 +78,6 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
  */
 Event::~Event()
 {
-    // Do not delete m_peer, it's a pointer to the enet data structure
-    // which is persistent.
-    m_peer = NULL;
     delete m_data;
 }   // ~Event
 

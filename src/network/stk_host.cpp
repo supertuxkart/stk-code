@@ -275,14 +275,15 @@ STKHost::STKHost(bool server)
         addr.port = NetworkConfig::get()->getServerPort();
         // Reserve 1 peer to deliver full server message
         m_network = new Network(NetworkConfig::get()->getMaxPlayers() + 1,
-            /*channel_limit*/2, /*max_in_bandwidth*/0,
+            /*channel_limit*/EVENT_CHANNEL_COUNT, /*max_in_bandwidth*/0,
             /*max_out_bandwidth*/ 0, &addr, true/*change_port_if_bound*/);
     }
     else
     {
         addr.port = NetworkConfig::get()->getClientPort();
         // Client only has 1 peer
-        m_network = new Network(/*peer_count*/1, /*channel_limit*/2,
+        m_network = new Network(/*peer_count*/1,
+            /*channel_limit*/EVENT_CHANNEL_COUNT,
             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &addr,
             true/*change_port_if_bound*/);
     }
@@ -831,38 +832,16 @@ void STKHost::mainLoop()
             if (!stk_event && m_peers.find(event.peer) != m_peers.end())
             {
                 auto& peer = m_peers.at(event.peer);
-                unsigned token = 0;
-                // Token is after the protocol type (1 byte) in stk network
-                // string (network order)
-                token += event.packet->data[1];
-                token <<= 8;
-                token += event.packet->data[2];
-                token <<= 8;
-                token += event.packet->data[3];
-                token <<= 8;
-                token += event.packet->data[4];
-
-                if (is_server && ((!peer->isClientServerTokenSet() &&
-                    !isConnectionRequestPacket(event.packet->data,
-                    (int)event.packet->dataLength)) ||
-                    (token != peer->getClientServerToken())))
+                try
                 {
-                    // For server discard all events from wrong or unset token
-                    // peers if that is not a connection request
-                    if (token != peer->getClientServerToken())
-                    {
-                        Log::error("STKHost", "Received event with invalid token!");
-                        Log::error("STKHost", "HostID %d Token %d message token %d",
-                            peer->getHostId(), peer->getClientServerToken(), token);
-                        NetworkString wrong_event(event.packet->data,
-                            (int)event.packet->dataLength);
-                        Log::error("STKHost", wrong_event.getLogMessage().c_str());
-                        peer->unsetClientServerToken();
-                    }
+                    stk_event = new Event(&event, peer);
+                }
+                catch (std::exception& e)
+                {
+                    Log::warn("STKHost", "%s", e.what());
                     enet_packet_destroy(event.packet);
                     continue;
                 }
-                stk_event = new Event(&event, peer);
             }
             else if (!stk_event)
             {

@@ -19,11 +19,10 @@
 #include "network/protocols/connect_to_server.hpp"
 
 #include "config/user_config.hpp"
+#include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/get_peer_address.hpp"
-#include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocol_manager.hpp"
@@ -118,19 +117,18 @@ void ConnectToServer::asynchronousUpdate()
                 }
                 servers.clear();
             }
-
-            if (handleDirectConnect())
+            if (m_server->supportsEncryption())
+            {
+                STKHost::get()->setPublicAddress();
+                registerWithSTKServer();
+            }
+            // Assume official server is firewall-less so give it more time
+            // to directly connect
+            if (handleDirectConnect(m_server->isOfficial() ? 5000 : 2000))
                 return;
-            STKHost::get()->setPublicAddress();
             // Set to DONE will stop STKHost is not connected
             m_state = STKHost::get()->getPublicAddress().isUnset() ?
-                DONE : REGISTER_SELF_ADDRESS;
-        }
-        break;
-        case REGISTER_SELF_ADDRESS:
-        {
-            registerWithSTKServer();  // Register us with STK server
-            m_state = GOT_SERVER_ADDRESS;
+                DONE : GOT_SERVER_ADDRESS;
         }
         break;
         case GOT_SERVER_ADDRESS:
@@ -157,13 +155,10 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Connection request made");
             if (m_server_address.isUnset())
             {
-                // server data not correct, hide address and stop
-                m_state = HIDING_ADDRESS;
+                // server data not correct, stop
+                m_state = DONE;
                 Log::error("ConnectToServer", "Server address is %s",
                         m_server_address.toString().c_str());
-                auto hide_address = std::make_shared<HidePublicAddress>();
-                hide_address->requestStart();
-                m_current_protocol = hide_address;
                 return;
             }
             if (m_tried_connection++ > 7)
@@ -221,8 +216,7 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     Log::error("ConnectToServer", "Timeout connect to %s",
                         m_server_address.toString().c_str());
-                    m_state = NetworkConfig::get()->isWAN() ?
-                        HIDING_ADDRESS : DONE;
+                    m_state = DONE;
                 }
             }
             break;
@@ -230,26 +224,9 @@ void ConnectToServer::asynchronousUpdate()
         case CONNECTED:
         {
             Log::info("ConnectToServer", "Connected");
-            // LAN networking does not use the stk server tables.
-            if (NetworkConfig::get()->isWAN() &&
-                !STKHost::get()->isClientServer() &&
-                !STKHost::get()->getPublicAddress().isUnset())
-            {
-                auto hide_address = std::make_shared<HidePublicAddress>();
-                hide_address->requestStart();
-                m_current_protocol = hide_address;
-            }
-            m_state = HIDING_ADDRESS;
-            break;
-        }
-        case HIDING_ADDRESS:
-            // Wait till we have hidden our address
-            if (!m_current_protocol.expired())
-            {
-                return;
-            }
             m_state = DONE;
             break;
+        }
         case DONE:
         case EXITING:
             break;
@@ -278,8 +255,8 @@ void ConnectToServer::update(int ticks)
             {
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
-                auto cl = LobbyProtocol::create<ClientLobby>();
-                cl->setAddress(m_server_address);
+                auto cl = LobbyProtocol::create<ClientLobby>(m_server_address,
+                    m_server);
                 cl->requestStart();
             }
             if (STKHost::get()->getPeerCount() == 0)
@@ -311,7 +288,8 @@ bool ConnectToServer::handleDirectConnect(int timeout)
         ENetAddress ea;
         ea.host = STKHost::HOST_ANY;
         ea.port = STKHost::PORT_ANY;
-        Network* dc = new Network(/*peer_count*/1, /*channel_limit*/2,
+        Network* dc = new Network(/*peer_count*/1,
+            /*channel_limit*/EVENT_CHANNEL_COUNT,
             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
             true/*change_port_if_bound*/);
         assert(dc);
@@ -367,13 +345,17 @@ void ConnectToServer::registerWithSTKServer()
     // STK server.
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest *request  = new Online::XMLRequest();
-    NetworkConfig::get()->setUserDetails(request, "set");
+    NetworkConfig::get()->setServerDetails(request, "join-server-key");
+    request->addParameter("server-id", m_server->getServerId());
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
-    request->addParameter("private_port", STKHost::get()->getPrivatePort());
+
+    Crypto::initClientAES();
+    request->addParameter("aes-key", Crypto::getClientKey());
+    request->addParameter("iv", Crypto::getClientIV());
 
     Log::info("ConnectToServer", "Registering addr %s",
-              addr.toString().c_str());
+        addr.toString().c_str());
 
     // This can be done blocking: till we are registered with the
     // stk server, there is no need to to react to any other 

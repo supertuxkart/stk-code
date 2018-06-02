@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
+#include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -293,6 +294,7 @@ void ServerLobby::asynchronousUpdate()
         // Only poll the STK server if this is a WAN server.
         if (NetworkConfig::get()->isWAN())
             checkIncomingConnectionRequests();
+        handlePendingConnection();
         break;
     }
     case ERROR_LEAVE:
@@ -486,7 +488,7 @@ void ServerLobby::update(int ticks)
 void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
-    NetworkConfig::get()->setUserDetails(request, "create");
+    NetworkConfig::get()->setServerDetails(request, "create");
     request->addParameter("address",      m_server_address.getIP()        );
     request->addParameter("port",         m_server_address.getPort()      );
     request->addParameter("private_port",
@@ -531,7 +533,7 @@ void ServerLobby::registerServer()
 void ServerLobby::unregisterServer()
 {
     Online::XMLRequest* request = new Online::XMLRequest();
-    NetworkConfig::get()->setUserDetails(request, "stop");
+    NetworkConfig::get()->setServerDetails(request, "stop");
 
     request->addParameter("address", m_server_address.getIP());
     request->addParameter("port", m_server_address.getPort());
@@ -671,7 +673,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
     Online::XMLRequest* request = new Online::XMLRequest();
-    NetworkConfig::get()->setUserDetails(request, "poll-connection-requests");
+    NetworkConfig::get()->setServerDetails(request, "poll-connection-requests");
 
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
@@ -692,13 +694,19 @@ void ServerLobby::checkIncomingConnectionRequests()
 
     // Now start a ConnectToPeer protocol for each connection request
     const XMLNode * users_xml = result->getNode("users");
-    uint32_t id = 0;
     for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
     {
+        uint32_t addr, id;
+        uint16_t port;
+        users_xml->getNode(i)->get("ip", &addr);
+        users_xml->getNode(i)->get("port", &port);
         users_xml->getNode(i)->get("id", &id);
-        Log::debug("ServerLobby",
-                   "User with id %d wants to connect.", id);
-        std::make_shared<ConnectToPeer>(id)->requestStart();
+        users_xml->getNode(i)->get("aes-key", &std::get<0>(m_keys[id]));
+        users_xml->getNode(i)->get("iv", &std::get<1>(m_keys[id]));
+        users_xml->getNode(i)->get("username", &std::get<2>(m_keys[id]));
+        std::get<3>(m_keys[id]) = false;
+        std::make_shared<ConnectToPeer>(TransportAddress(addr, port))
+            ->requestStart();
     }
     delete request;
 }   // checkIncomingConnectionRequests
@@ -817,24 +825,12 @@ void ServerLobby::clientDisconnected(Event* event)
 }   // clientDisconnected
 
 //-----------------------------------------------------------------------------
-
-/*! \brief Called when a player asks for a connection.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0   1                
- *       ---------------------
- *  Size | 1 |1|             |
- *  Data | 4 |n| player name |
- *       ---------------------
- */
 void ServerLobby::connectionRequested(Event* event)
 {
     std::lock_guard<std::mutex> lock(m_connection_mutex);
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
+    NetworkString& data = event->data();
     peer->cleanPlayerProfiles();
-
-    const NetworkString &data = event->data();
 
     // can we add the player ?
     if (m_state != ACCEPTING_CLIENTS ||
@@ -843,7 +839,7 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkString *message = getNetworkString(2);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
         // send only to the peer that made the request and disconect it now
-        peer->sendPacket(message);
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
         delete message;
         Log::verbose("ServerLobby", "Player refused: selection started");
@@ -858,91 +854,13 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkString *message = getNetworkString(2);
         message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCOMPATIBLE_DATA);
-        peer->sendPacket(message);
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
         delete message;
         Log::verbose("ServerLobby", "Player refused: wrong server version");
         return;
     }
 
-    // Check for password
-    std::string password;
-    data.decodeString(&password);
-    if (password != NetworkConfig::get()->getPassword())
-    {
-        NetworkString *message = getNetworkString(2);
-        message->addUInt8(LE_CONNECTION_REFUSED)
-                .addUInt8(RR_INCORRECT_PASSWORD);
-        peer->sendPacket(message);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: incorrect password");
-        return;
-    }
-
-    unsigned player_count = data.getUInt8();
-    if (m_game_setup->getPlayerCount() + player_count >
-        NetworkConfig::get()->getMaxPlayers())
-    {
-        NetworkString *message = getNetworkString(2);
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_TOO_MANY_PLAYERS);
-        peer->sendPacket(message);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: too many players");
-        return;
-    }
-
-    for (unsigned i = 0; i < player_count; i++)
-    {
-        std::string name_u8;
-        data.decodeString(&name_u8);
-        core::stringw name = StringUtils::utf8ToWide(name_u8);
-        float default_kart_color = data.getFloat();
-        uint32_t online_id = data.getUInt32();
-        PerPlayerDifficulty per_player_difficulty =
-            (PerPlayerDifficulty)data.getUInt8();
-        peer->addPlayer(std::make_shared<NetworkPlayerProfile>
-            (peer, name, peer->getHostId(), default_kart_color, online_id,
-            per_player_difficulty, (uint8_t)i));
-    }
-
-    bool is_banned = false;
-    auto ret = m_ban_list.find(peer->getAddress().getIP());
-    if (ret != m_ban_list.end())
-    {
-        // Ban all players
-        if (ret->second == 0)
-        {
-            is_banned = true;
-        }
-        else
-        {
-            for (auto& p : peer->getPlayerProfiles())
-            {
-                if (ret->second == p->getOnlineId())
-                {
-                    is_banned = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (is_banned)
-    {
-        NetworkString *message = getNetworkString(2);
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
-        peer->cleanPlayerProfiles();
-        peer->sendPacket(message);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: banned");
-        return;
-    }
-
-    // Connection accepted.
-    // ====================
     std::set<std::string> client_karts, client_tracks;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
@@ -984,7 +902,7 @@ void ServerLobby::connectionRequested(Event* event)
         message->addUInt8(LE_CONNECTION_REFUSED)
             .addUInt8(RR_INCOMPATIBLE_DATA);
         peer->cleanPlayerProfiles();
-        peer->sendPacket(message);
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
         delete message;
         Log::verbose("ServerLobby", "Player has incompatible karts / tracks");
@@ -994,6 +912,95 @@ void ServerLobby::connectionRequested(Event* event)
     // Save available karts and tracks from clients in STKPeer so if this peer
     // disconnects later in lobby it won't affect current players
     peer->setAvailableKartsTracks(client_karts, client_tracks);
+
+    unsigned player_count = data.getUInt8();
+    uint32_t online_id = 0;
+    uint32_t encrypted_size = 0;
+    online_id = data.getUInt32();
+    encrypted_size = data.getUInt32();
+
+    bool is_banned = false;
+    auto ret = m_ban_list.find(peer->getAddress().getIP());
+    if (ret != m_ban_list.end())
+    {
+        // Ban all players if ban list is zero or compare it with online id
+        if (ret->second == 0 || (online_id != 0 && ret->second == online_id))
+        {
+            is_banned = true;
+        }
+    }
+
+    if (is_banned)
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
+        peer->cleanPlayerProfiles();
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: banned");
+        return;
+    }
+
+    if (m_game_setup->getPlayerCount() + player_count >
+        NetworkConfig::get()->getMaxPlayers())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_TOO_MANY_PLAYERS);
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: too many players");
+        return;
+    }
+
+    if (encrypted_size != 0)
+    {
+        m_pending_connection[peer] = std::make_pair(online_id,
+            BareNetworkString(data.getCurrentData(), encrypted_size));
+    }
+    else
+    {
+        core::stringw online_name;
+        if (online_id > 0)
+            data.decodeStringW(&online_name);
+        handleUnencryptedConnection(peer, data, online_id, online_name);
+    }
+}   // connectionRequested
+
+//-----------------------------------------------------------------------------
+void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
+    BareNetworkString& data, uint32_t online_id,
+    const core::stringw& online_name)
+{
+    // Check for password
+    std::string password;
+    data.decodeString(&password);
+    if (password != NetworkConfig::get()->getPassword())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_INCORRECT_PASSWORD);
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: incorrect password");
+        return;
+    }
+
+    unsigned player_count = data.getUInt8();
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        core::stringw name;
+        data.decodeStringW(&name);
+        float default_kart_color = data.getFloat();
+        PerPlayerDifficulty per_player_difficulty =
+            (PerPlayerDifficulty)data.getUInt8();
+        peer->addPlayer(std::make_shared<NetworkPlayerProfile>
+            (peer, i == 0 && !online_name.empty() ? online_name : name,
+            peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
+            per_player_difficulty, (uint8_t)i));
+    }
 
     if (!peer->isClientServerTokenSet())
     {
@@ -1037,7 +1044,7 @@ void ServerLobby::connectionRequested(Event* event)
             npp->getOnlineId(), peer->getAddress().toString().c_str());
     }
     updatePlayerList();
-}   // connectionRequested
+}   // handleUnencryptedConnection
 
 //-----------------------------------------------------------------------------
 void ServerLobby::updatePlayerList()
@@ -1400,3 +1407,56 @@ bool ServerLobby::waitingForPlayers() const
     return m_state.load() == ACCEPTING_CLIENTS &&
         !m_game_setup->isGrandPrixStarted();
 }   // waitingForPlayers
+
+//-----------------------------------------------------------------------------
+void ServerLobby::handlePendingConnection()
+{
+    for (auto it = m_pending_connection.begin();
+         it != m_pending_connection.end();)
+    {
+        auto peer = it->first.lock();
+        if (!peer)
+        {
+            it = m_pending_connection.erase(it);
+        }
+        else
+        {
+            const uint32_t online_id = it->second.first;
+            auto key = m_keys.find(online_id);
+            if (key != m_keys.end() && std::get<3>(key->second) == false)
+            {
+                if (decryptConnectionRequest(peer, it->second.second,
+                        std::get<0>(key->second), std::get<1>(key->second),
+                        online_id, std::get<2>(key->second)))
+                {
+                    it = m_pending_connection.erase(it);
+                    m_keys.erase(online_id);
+                    continue;
+                }
+                else
+                    std::get<3>(key->second) = true;
+            }
+            it++;
+        }
+    }
+}   // handlePendingConnection
+
+//-----------------------------------------------------------------------------
+bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
+    BareNetworkString& data, const std::string& key, const std::string& iv,
+    uint32_t online_id, const core::stringw& online_name)
+{
+    auto crypto = std::unique_ptr<Crypto>(new Crypto(
+        StringUtils::decode64(key), StringUtils::decode64(iv)));
+    if (crypto->decryptConnectionRequest(data))
+    {
+        peer->setCrypto(std::move(crypto));
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
+        Log::info("ServerLobby", "%s validated",
+            StringUtils::wideToUtf8(online_name).c_str());
+        handleUnencryptedConnection(peer, data, online_id,
+            online_name);
+        return true;
+    }
+    return false;
+}   // decryptConnectionRequest

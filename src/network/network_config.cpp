@@ -148,10 +148,20 @@ void NetworkConfig::setUserDetails(Online::XMLRequest* r,
                                    const std::string& name)
 {
     assert(!m_cur_user_token.empty());
-    r->setApiURL(Online::API::SERVER_PATH, name);
+    r->setApiURL(Online::API::USER_PATH, name);
     r->addParameter("userid", m_cur_user_id);
     r->addParameter("token", m_cur_user_token);
 }   // setUserDetails
+
+// ----------------------------------------------------------------------------
+void NetworkConfig::setServerDetails(Online::XMLRequest* r,
+                                   const std::string& name)
+{
+    assert(!m_cur_user_token.empty());
+    r->setApiURL(Online::API::SERVER_PATH, name);
+    r->addParameter("userid", m_cur_user_id);
+    r->addParameter("token", m_cur_user_token);
+}   // setServerDetails
 
 // ----------------------------------------------------------------------------
 core::stringw NetworkConfig::getModeName(unsigned id)

@@ -26,6 +26,7 @@
 #include "input/device_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
+#include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -33,10 +34,9 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
-#include "online/online_player_profile.hpp"
-#include "online/online_profile.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
@@ -66,10 +66,11 @@ engine.
 
 */
 
-ClientLobby::ClientLobby() : LobbyProtocol(NULL)
+ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
+           : LobbyProtocol(NULL)
 {
-
-    m_server_address.clear();
+    m_server_address = a;
+    m_server = s;
     setHandleDisconnections(true);
 }   // ClientLobby
 
@@ -91,14 +92,6 @@ void ClientLobby::clearPlayers()
         input_manager->getDeviceManager()->clearLatestUsedDevice();
     }
 }   // clearPlayers
-
-//-----------------------------------------------------------------------------
-/** Sets the address of the server. 
- */
-void ClientLobby::setAddress(const TransportAddress &address)
-{
-    m_server_address = address;
-}   // setAddress
 
 //-----------------------------------------------------------------------------
 void ClientLobby::setup()
@@ -263,39 +256,10 @@ void ClientLobby::update(int ticks)
         break;
     case LINKED:
     {
-        NetworkString *ns = getNetworkString();
+        NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
-            .addUInt8(NetworkConfig::m_server_version)
-            .encodeString(NetworkConfig::get()->getPassword());
+            .addUInt8(NetworkConfig::m_server_version);
 
-        assert(!NetworkConfig::get()->isAddingNetworkPlayers());
-        ns->addUInt8(
-            (uint8_t)NetworkConfig::get()->getNetworkPlayers().size());
-        // Only first player has online name and profile
-        bool first_player = true;
-        for (auto& p : NetworkConfig::get()->getNetworkPlayers())
-        {
-            core::stringw name;
-            PlayerProfile* player = std::get<1>(p);
-            if (PlayerManager::getCurrentOnlineState() ==
-                PlayerProfile::OS_SIGNED_IN && first_player)
-            {
-                name = PlayerManager::getCurrentOnlineUserName();
-            }
-            else
-            {
-                name = player->getName();
-            }
-            std::string name_u8 = StringUtils::wideToUtf8(name);
-            ns->encodeString(name_u8).addFloat(player->getDefaultKartColor());
-            Online::OnlinePlayerProfile* opp =
-                dynamic_cast<Online::OnlinePlayerProfile*>(player);
-            ns->addUInt32(first_player && opp && opp->getProfile() ?
-                opp->getProfile()->getID() : 0);
-            // Per-player handicap
-            ns->addUInt8(std::get<2>(p));
-            first_player = false;
-        }
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
         if (all_k.size() >= 65536)
@@ -311,9 +275,40 @@ void ClientLobby::update(int ticks)
         {
             ns->encodeString(track);
         }
+        assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+        const uint8_t player_count =
+            (uint8_t)NetworkConfig::get()->getNetworkPlayers().size();
+        ns->addUInt8(player_count);
 
-        sendToServer(ns);
-        delete ns;
+        bool encryption = false;
+        uint32_t id = PlayerManager::getCurrentOnlineId();
+
+        BareNetworkString* rest = new BareNetworkString();
+        if (m_server->supportsEncryption() && id != 0)
+        {
+            ns->addUInt32(id);
+            encryption = true;
+        }
+        else
+        {
+            ns->addUInt32(id).addUInt32(0);
+            if (id != 0)
+                ns->encodeString(PlayerManager::getCurrentOnlineUserName());
+        }
+
+        rest->encodeString(NetworkConfig::get()->getPassword())
+            .addUInt8(player_count);
+        for (auto& p : NetworkConfig::get()->getNetworkPlayers())
+        {
+            core::stringw name;
+            PlayerProfile* player = std::get<1>(p);
+            rest->encodeString(player->getName()).
+                addFloat(player->getDefaultKartColor());
+            // Per-player handicap
+            rest->addUInt8(std::get<2>(p));
+        }
+
+        finalizeConnectionRequest(ns, rest, encryption);
         m_state.store(REQUESTING_CONNECTION);
     }
     break;
@@ -335,6 +330,49 @@ void ClientLobby::update(int ticks)
         break;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+void ClientLobby::finalizeConnectionRequest(NetworkString* header,
+                                            BareNetworkString* rest,
+                                            bool encrypt)
+{
+    if (encrypt)
+    {
+        auto crypto = Crypto::getClientCrypto();
+        Crypto::resetClientAES();
+        BareNetworkString* result = new BareNetworkString();
+        if (!crypto->encryptConnectionRequest(*rest))
+        {
+            // Failed
+            result->addUInt32(0);
+            *result += BareNetworkString(rest->getData(), rest->getTotalSize());
+            encrypt = false;
+        }
+        else
+        {
+            Log::info("ClientLobby", "Server will validate this online player.");
+            result->addUInt32(rest->getTotalSize());
+            *result += BareNetworkString(rest->getData(), rest->getTotalSize());
+        }
+        delete rest;
+        *header += *result;
+        delete result;
+        sendToServer(header);
+        delete header;
+        if (encrypt)
+        {
+            STKHost::get()->getServerPeerForClient()
+                ->setCrypto(std::move(crypto));
+        }
+    }
+    else
+    {
+        *header += *rest;
+        delete rest;
+        sendToServer(header);
+        delete header;
+    }
+}   // finalizeConnectionRequest
 
 //-----------------------------------------------------------------------------
 void ClientLobby::displayPlayerVote(Event* event)
@@ -589,6 +627,10 @@ void ClientLobby::connectionRefused(Event* event)
     case RR_TOO_MANY_PLAYERS:
         STKHost::get()->setErrorMessage(
             _("Connection refused: Server is full."));
+        break;
+    case RR_INVALID_PLAYER:
+        STKHost::get()->setErrorMessage(
+            _("Connection refused: Invalid player connecting."));
         break;
     }
     STKHost::get()->disconnectAllPeers(false/*timeout_waiting*/);

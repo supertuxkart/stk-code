@@ -5,6 +5,9 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
+#include "irrString.h"
+
+#include <array>
 #include <atomic>
 #include <map>
 #include <memory>
@@ -12,6 +15,7 @@
 #include <set>
 #include <tuple>
 
+class BareNetworkString;
 class STKPeer;
 
 class ServerLobby : public LobbyProtocol
@@ -78,6 +82,14 @@ private:
 
     TransportAddress m_server_address;
 
+    std::map<uint32_t,
+        std::tuple</*aes 128 key*/std::string, /*iv*/std::string,
+        /*genuine player name*/irr::core::stringw, /*tried*/bool> > m_keys;
+
+    std::map<std::weak_ptr<STKPeer>,
+        std::pair<uint32_t, BareNetworkString>,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_pending_connection;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -124,6 +136,17 @@ private:
             }
         }
     }
+    void handlePendingConnection();
+    void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
+                                     BareNetworkString& data,
+                                     uint32_t online_id,
+                                     const irr::core::stringw& online_name);
+    bool decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
+                                  BareNetworkString& data,
+                                  const std::string& key,
+                                  const std::string& iv,
+                                  uint32_t online_id,
+                                  const irr::core::stringw& online_name);
     std::tuple<std::string, uint8_t, bool, bool> handleVote();
     void stopCurrentRace();
 

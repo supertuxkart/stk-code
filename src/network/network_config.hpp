@@ -275,6 +275,8 @@ public:
     // ------------------------------------------------------------------------
     void setUserDetails(Online::XMLRequest* r, const std::string& name);
     // ------------------------------------------------------------------------
+    void setServerDetails(Online::XMLRequest* r, const std::string& name);
+    // ------------------------------------------------------------------------
     void setServerIdFile(const std::string& id) { m_server_id_file = id; }
     // ------------------------------------------------------------------------
     const std::string& getServerIdFile() const { return m_server_id_file; }

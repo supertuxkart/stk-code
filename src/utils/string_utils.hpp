@@ -233,6 +233,8 @@ namespace StringUtils
     std::string wideToUtf8(const wchar_t* input);
     std::string wideToUtf8(const irr::core::stringw& input);
     std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
+    std::string base64(const std::vector<uint8_t>& input);
+    std::vector<uint8_t> decode64(std::string input);
 
 } // namespace StringUtils
 

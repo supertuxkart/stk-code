@@ -41,7 +41,7 @@ void HidePublicAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        NetworkConfig::get()->setUserDetails(m_request, "unset");
+        NetworkConfig::get()->setServerDetails(m_request, "unset");
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }

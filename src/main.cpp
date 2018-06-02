@@ -1110,8 +1110,7 @@ int handleCmdLine()
         }
         else
         {
-            auto cl = LobbyProtocol::create<ClientLobby>();
-            cl->setAddress(server_addr);
+            auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
             cl->requestStart();
         }
     }

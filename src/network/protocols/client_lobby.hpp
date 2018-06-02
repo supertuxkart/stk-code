@@ -6,7 +6,11 @@
 #include "utils/cpp2011.hpp"
 
 #include <atomic>
+#include <memory>
 #include <set>
+
+class BareNetworkString;
+class Server;
 
 class ClientLobby : public LobbyProtocol
 {
@@ -28,6 +32,8 @@ private:
     void clearPlayers();
 
     TransportAddress m_server_address;
+
+    std::shared_ptr<Server> m_server;
 
     enum ClientState : unsigned int
     {
@@ -51,11 +57,12 @@ private:
     bool m_received_server_result = false;
 
     void addAllPlayers(Event* event);
+    void finalizeConnectionRequest(NetworkString* header,
+                                   BareNetworkString* rest, bool encrypt);
 
 public:
-             ClientLobby();
+             ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
-    void setAddress(const TransportAddress &address);
     void doneWithResults();
     bool receivedServerResult()            { return m_received_server_result; }
     void startingRaceNow();

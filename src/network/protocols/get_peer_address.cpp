@@ -41,7 +41,7 @@ void GetPeerAddress::setup()
 {
     m_address.clear();
     m_request = new Online::XMLRequest();
-    NetworkConfig::get()->setUserDetails(m_request, "get");
+    NetworkConfig::get()->setServerDetails(m_request, "get");
     m_request->addParameter("peer_id", m_peer_id);
 
     Online::RequestManager::get()->addRequest(m_request);

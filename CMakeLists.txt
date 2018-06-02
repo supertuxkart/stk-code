@@ -460,11 +460,15 @@ endif()
 # CURL
 if(MSVC)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.lib)
 elseif(MINGW)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.dll)
 else()
     find_package(CURL REQUIRED)
+    find_package(OpenSSL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
+    include_directories(${OpenSSL_INCLUDE_DIRS})
 endif()
 
 # Common library dependencies
@@ -481,7 +485,7 @@ target_link_libraries(supertuxkart
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
     ${TURBOJPEG_LIBRARY}
-    #${VPX_LIBRARIES}
+    ${OPENSSL_CRYPTO_LIBRARY}
     )
 
 if(NOT SERVER_ONLY)

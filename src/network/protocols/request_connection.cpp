@@ -37,7 +37,6 @@ RequestConnection::RequestConnection(std::shared_ptr<Server> server)
                  : Protocol(PROTOCOL_SILENT)
 {
     m_server  = server;
-    m_request = NULL;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -132,55 +131,11 @@ void RequestConnection::asynchronousUpdate()
                     }
                 }
 
-                m_state = DONE;
             }
-            else
-            {
-                m_request = new Online::XMLRequest();
-                NetworkConfig::get()->setUserDetails(m_request,
-                    "request-connection");
-                m_request->addParameter("server_id", m_server->getServerId());
-                m_request->queue();
-                m_state = REQUEST_PENDING;
-            }
-            break;
-        }
-        case REQUEST_PENDING:
-        {
-            if (!m_request->isDone())
-                return;
-
-            const XMLNode * result = m_request->getXMLData();
-            std::string rec_success;
-
-            if(result->get("success", &rec_success))
-            {
-                if (rec_success == "yes")
-                {
-                    Log::debug("RequestConnection",
-                               "Connection Request made successfully.");
-                }
-                else
-                {
-                    Log::error("RequestConnection",
-                             "Fail to make a request to connecto to server %d",
-                               m_server->getServerId());
-                }
-            }
-            else
-            {
-                Log::error("RequestConnection", "Fail to make a request.");
-            }
-            m_state = DONE;
-
-            break;
-        }
-        case DONE:
             m_state = EXITING;
-            delete m_request;
-            m_request = NULL;
             requestTerminate();
             break;
+        }
         case EXITING:
             break;
     }
