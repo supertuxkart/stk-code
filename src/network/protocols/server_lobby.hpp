@@ -90,6 +90,17 @@ private:
         std::pair<uint32_t, BareNetworkString>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_pending_connection;
 
+    /* Ranking related variables */
+
+    // If updating the base points, update the base points distribution in DB
+    const float BASE_RANKING_POINTS   = 4000.0f;
+    const float MAX_SCALING_TIME      = 600.0f;
+    const float MAX_POINTS_PER_SECOND = 0.125f;
+
+    std::vector<double>       m_rankings; // TODO : convert from and to int when communicating with the server. Think to round it correctly
+    std::vector<unsigned int> m_num_ranked_races;
+    std::vector<double>       m_max_ranking;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -149,6 +160,11 @@ private:
                                   const irr::core::stringw& online_name);
     std::tuple<std::string, uint8_t, bool, bool> handleVote();
     void stopCurrentRace();
+    void computeNewRankings();
+    float computeRankingFactor(unsigned int player_id);
+    float distributeBasePoints(unsigned int player_id);
+    float getModeFactor();
+    float getModeSpread();
 
 public:
              ServerLobby();

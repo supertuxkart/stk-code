@@ -67,6 +67,9 @@ private:
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
 
+    /** True if this is a ranked server */
+    bool m_is_ranked_server;
+
     /** The password for a server (or to authenticate to a server). */
     std::string m_password;
 
@@ -260,6 +263,11 @@ public:
     /** Returns if an immediate connection to the first server was
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
+
+    // ------------------------------------------------------------------------
+    /** Returns if the server use multi-session rankings. */
+    bool isRankedServer() const { return m_is_ranked_server; }
+
     // ------------------------------------------------------------------------
     /** Returns the minor and majar game mode from server database id. */
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>

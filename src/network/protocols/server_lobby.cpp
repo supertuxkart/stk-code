@@ -759,6 +759,9 @@ void ServerLobby::checkRaceFinished()
             total->addUInt32(last_score).addUInt32(cur_score)
                 .addFloat(overall_time);            
         }
+
+        if (NetworkConfig::get()->isRankedServer())
+            computeNewRankings();
     }
     else if (race_manager->modeHasLaps())
     {
@@ -777,6 +780,192 @@ void ServerLobby::checkRaceFinished()
     Log::info("ServerLobby", "End of game message sent");
 
 }   // checkRaceFinished
+
+//-----------------------------------------------------------------------------
+/** Compute the new player's rankings in ranked servers
+ *  //FIXME : this function assumes that m_rankings,
+ *            m_num_ranked_races and m_max_ranking
+ *            are correctly filled before
+ *            It also assumes that the data stored by them
+ *            is written back to the main list after the GP
+ */
+void ServerLobby::computeNewRankings()
+{
+    auto players = m_game_setup->getConnectedPlayers(true/*same_index_for_disconnected*/);
+
+    assert (m_rankings.size()          == players.size() &&
+            m_num_ranked_races.size()  == players.size() &&
+            m_max_ranking.size()       == players.size() );
+
+    // No ranking yet for battle mode
+    // TODO : separate rankings for time-trial and normal ??
+    if (!race_manager->modeHasLaps())
+        return;
+
+    // Using a vector of vector, it would be possible to fill
+    // all j < i v[i][j] with -v[j][i]
+    // Would this be worth it ?
+    std::vector<double> ranking_change;
+
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        m_rankings[i] += distributeBasePoints(i);
+    }
+
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        ranking_change.push_back(0);
+
+        int player1_ranking = m_rankings[i];
+
+        // If the player has quitted before the race end,
+        // the value will be incorrect, but it will not be used
+        float player1_time  = race_manager->getKartRaceTime(i);
+        float player1_factor = computeRankingFactor(i);
+
+        for (unsigned j = 0; j < players.size(); i++)
+        {
+            // Don't compare a player with itself
+            if (i == j)
+                continue;
+
+            double result = 0.0f;
+            double expected_result = 0.0f;
+            double ranking_importance = 0.0f;
+
+            // No change between two quitting players
+            if (!players[i] && !players[j])
+                continue;
+
+            int player2_ranking = m_rankings[j];
+            float player2_time  = race_manager->getKartRaceTime(j);
+
+            // Compute the expected result using an ELO-like function
+            double diff = (double) player2_ranking - player1_ranking;
+            expected_result = 1.0f/(1.0f+std::pow(10.0f, diff/(BASE_RANKING_POINTS*getModeSpread()/(2.0f))));
+
+            // Compute the result and race ranking importance
+            float player_factors = std::max(player1_factor,
+                                            computeRankingFactor(j) );
+         
+            float mode_factor = getModeFactor();
+
+            if (!players[i])
+            {
+                result = 0.0f;
+                ranking_importance =
+                    mode_factor*MAX_SCALING_TIME*MAX_POINTS_PER_SECOND*player_factors;
+            }
+            else if (!players[j])
+            {
+                result = 1.0f;
+                ranking_importance =
+                    mode_factor*MAX_SCALING_TIME*MAX_POINTS_PER_SECOND*player_factors;
+            }
+            else
+            {
+                // If time difference > 2,5% ; the result is 1 or 0
+                // Otherwise, it is averaged between 0 and 1.
+                if (player1_time <= player2_time)
+                {
+                    result = (player2_time - player1_time)/(player1_time/20);
+                    result = std::min( (double) 1.0f, 0.5f + result);
+                }
+                else
+                {
+                    result = (player1_time - player2_time)/(player2_time/20);
+                    result = std::max( (double) 0.0f, 0.5f - result);
+                }
+                ranking_importance = mode_factor * std::min ( std::max (player1_time, player2_time),
+                                                MAX_SCALING_TIME ) * MAX_POINTS_PER_SECOND * player_factors;
+            }
+            // Compute the ranking change
+            ranking_change[i] += ranking_importance * (result - expected_result);
+        }
+    }
+
+    // Don't merge it in the main loop as m_rankings value are used there
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        m_rankings[i] += ranking_change[i];
+
+        if (m_rankings[i] > m_max_ranking[i])
+            m_max_ranking[i] = m_rankings[i];
+        m_num_ranked_races[i]++;
+    }
+} //computeNewRankings
+
+//-----------------------------------------------------------------------------
+/** Compute the ranking factor, used to make top rankings more stable
+ *  and to allow new players to faster get to an appropriate ranking
+ */
+float ServerLobby::computeRankingFactor(unsigned int player_id)
+{
+    double max_points = m_max_ranking[player_id];
+    int num_races  = m_num_ranked_races[player_id];
+
+    if (     max_points >= (BASE_RANKING_POINTS * 2.0f))
+        return 0.4f;
+    else if (max_points >= (BASE_RANKING_POINTS * 1.75f)  || num_races > 500)
+        return 0.5f;
+    else if (max_points >= (BASE_RANKING_POINTS * 1.5f)   || num_races > 250)
+        return 0.6f;
+    else if (max_points >= (BASE_RANKING_POINTS * 1.25f)  || num_races > 100)
+        return 0.7f;
+    // The base ranking points are not distributed all at once
+    // So it's not guaranteed a player reach them
+    else if (max_points >= (BASE_RANKING_POINTS        )  || num_races > 50)
+        return 0.8f;
+    else
+        return 1.0f; 
+
+} //computeRankingFactor
+
+//-----------------------------------------------------------------------------
+/** Returns the mode race importance factor,
+ *  used to make ranking move slower in more random modes.
+ */
+float ServerLobby::getModeFactor()
+{
+    if (race_manager->isTimeTrialMode())
+        return 1.0f;
+
+    //else
+    return 0.4f;
+}
+
+//-----------------------------------------------------------------------------
+/** Returns the mode spread factor, used so that a similar difference in
+ *  skill will result in a similar ranking difference in more random modes.
+ */
+float ServerLobby::getModeSpread()
+{
+    if (race_manager->isTimeTrialMode())
+        return 1.0f;
+
+    //else
+    //TODO : the value used here for normal races is a wild guess.
+    // When hard data to the spread tendencies of time-trial
+    // and normal mode becomes available, update this to make
+    // the spreads more comparable
+    return 1.4f;
+}
+
+//-----------------------------------------------------------------------------
+/** Manages the distribution of the base points.
+ *  Gives half of the points progressively
+ *  by smaller and smaller chuncks from race 1 to 45.
+ *  The first half is distributed when the player enters
+ *  for the first time in the ranked server.
+ */
+float ServerLobby::distributeBasePoints(unsigned int player_id)
+{
+    int num_races  = m_num_ranked_races[player_id];
+    if (num_races < 45)
+        return (BASE_RANKING_POINTS/2000.0f * std::max((45-num_races),4)*2.0f);
+    else
+        return 0.0f;
+}
 
 //-----------------------------------------------------------------------------
 /** Stop any race currently in server, should only be called in main thread.
