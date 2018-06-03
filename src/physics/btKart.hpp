@@ -166,6 +166,7 @@ public:
     void               updateWheelTransformsWS(btWheelInfo& wheel,
                                                bool interpolatedTransform=true,
                                                float fraction = 1.0f);
+    void               updateAllWheelTransformsWS();
     void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);

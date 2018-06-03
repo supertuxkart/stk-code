@@ -213,6 +213,20 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 }   // updateWheelTransformsWS
 
 // ----------------------------------------------------------------------------
+/** Updates all wheel transform informations. This is used just after a rewind
+ *  to update all m_hardPointWS (which is used by stk to determine the terrain
+ *  under the kart).
+ */
+void btKart::updateAllWheelTransformsWS()
+{
+    for (unsigned int i = 0; i < m_wheelInfo.size(); i++)
+    {
+        btWheelInfo &wheel = m_wheelInfo[i];
+        updateWheelTransformsWS(wheel, false, 1.0f);
+    }
+}   // updateAllWheelTransformsWS
+
+// ----------------------------------------------------------------------------
 /**
  */
 btScalar btKart::rayCast(unsigned int index, float fraction)

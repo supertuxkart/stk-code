@@ -150,6 +150,12 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     float time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
+    // For the raycast to determine the current material under the kart
+    // the m_hardPointWS of the wheels is used. So after a rewind we
+    // must restore the m_hardPointWS to the new values, otherwise they
+    // would still point at the kart position at the previous rewind
+    // (i.e. different terrain --> different slowdown).
+    m_vehicle->updateAllWheelTransformsWS();
 
     // 2) Steering and other controls
     // ------------------------------
