@@ -52,6 +52,7 @@ class RemoteKartInfo
         bool                m_network_player;
         PerPlayerDifficulty m_difficulty;
         float               m_default_kart_color;
+        uint32_t            m_online_id;
 public:
      RemoteKartInfo(int player_id, const std::string& kart_name,
                     const irr::core::stringw& user_name, int host_id,
@@ -61,21 +62,21 @@ public:
                     m_host_id(host_id), m_soccer_team(SOCCER_TEAM_NONE),
                     m_network_player(network),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
-                    m_default_kart_color(0.0f)
+                    m_default_kart_color(0.0f), m_online_id(0)
      {}
      RemoteKartInfo(const std::string& kart_name) : m_kart_name(kart_name),
                     m_user_name(""), m_local_player_id(-1),
                     m_global_player_id(-1), m_host_id(-1),
                     m_soccer_team(SOCCER_TEAM_NONE), m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
-                    m_default_kart_color(0.0f)
+                    m_default_kart_color(0.0f), m_online_id(0)
      {}
      RemoteKartInfo() : m_kart_name(""), m_user_name(""),
                     m_local_player_id(-1), m_global_player_id(-1),
                     m_host_id(-1), m_soccer_team(SOCCER_TEAM_NONE),
                     m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
-                    m_default_kart_color(0.0f)
+                    m_default_kart_color(0.0f), m_online_id(0)
      {}
     void setKartName(const std::string& n)   { m_kart_name = n;           }
     void setPlayerName(const irr::core::stringw& u) { m_user_name = u;    }
@@ -87,6 +88,7 @@ public:
     void setDefaultKartColor(float value) { m_default_kart_color = value; }
     void setPerPlayerDifficulty(PerPlayerDifficulty value) 
                                              { m_difficulty = value;      }
+    void setOnlineId(uint32_t id)            { m_online_id = id;          }
     int  getHostId() const                   { return m_host_id;          }
     int  getLocalPlayerId() const            { return m_local_player_id;  }
     int  getGlobalPlayerId() const           { return m_global_player_id; }
@@ -96,6 +98,7 @@ public:
     SoccerTeam getSoccerTeam() const         { return m_soccer_team;      }
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
     float getDefaultKartColor() const      { return m_default_kart_color; }
+    uint32_t getOnlineId() const           { return m_online_id;          }
 
     bool operator<(const RemoteKartInfo& other) const
     {

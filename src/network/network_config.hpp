@@ -90,6 +90,9 @@ private:
      *  immediately start a race. */
     bool m_auto_connect;
 
+    /** True if only validated players are allowed to join. */
+    bool m_validated_players;
+
     bool m_done_adding_network_players;
 
     /** If this is a server, the server name. */
@@ -267,7 +270,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if the server use multi-session rankings. */
     bool isRankedServer() const { return m_is_ranked_server; }
-
+    // ------------------------------------------------------------------------
+    void setRankedServer(bool val) { m_is_ranked_server = val; }
     // ------------------------------------------------------------------------
     /** Returns the minor and majar game mode from server database id. */
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
@@ -303,6 +307,10 @@ public:
     core::stringw getModeName(unsigned id);
     // ------------------------------------------------------------------------
     std::vector<GUIEngine::Screen*> getResetScreens(bool lobby = false) const;
+    // ------------------------------------------------------------------------
+    void setValidatedPlayers(bool val)           { m_validated_players = val; }
+    // ------------------------------------------------------------------------
+    bool onlyValidatedPlayers() const           { return m_validated_players; }
 
 };   // class NetworkConfig
 

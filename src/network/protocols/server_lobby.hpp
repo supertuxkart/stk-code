@@ -16,6 +16,7 @@
 #include <tuple>
 
 class BareNetworkString;
+class NetworkPlayerProfile;
 class STKPeer;
 
 class ServerLobby : public LobbyProtocol
@@ -91,15 +92,22 @@ private:
         std::owner_less<std::weak_ptr<STKPeer> > > m_pending_connection;
 
     /* Ranking related variables */
-
     // If updating the base points, update the base points distribution in DB
-    const float BASE_RANKING_POINTS   = 4000.0f;
-    const float MAX_SCALING_TIME      = 600.0f;
-    const float MAX_POINTS_PER_SECOND = 0.125f;
+    const double BASE_RANKING_POINTS   = 4000.0;
+    const double MAX_SCALING_TIME      = 600.0;
+    const double MAX_POINTS_PER_SECOND = 0.125;
 
-    std::vector<double>       m_rankings; // TODO : convert from and to int when communicating with the server. Think to round it correctly
-    std::vector<unsigned int> m_num_ranked_races;
-    std::vector<double>       m_max_ranking;
+    /** Online id to profile map, handling disconnection in ranked server */
+    std::map<uint32_t, std::weak_ptr<NetworkPlayerProfile> > m_ranked_players;
+
+    /** Multi-session ranking scores for each current player */
+    std::map<uint32_t, double> m_scores;
+
+    /** The maximum ranking scores achieved for each current player */
+    std::map<uint32_t, double> m_max_scores;
+
+    /** Number of ranked races done for each current players */
+    std::map<uint32_t, unsigned> m_num_ranked_races;
 
     // connection management
     void clientDisconnected(Event* event);
@@ -160,11 +168,15 @@ private:
                                   const irr::core::stringw& online_name);
     std::tuple<std::string, uint8_t, bool, bool> handleVote();
     void stopCurrentRace();
+
+    void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
+    void submitRankingsToAddons();
     void computeNewRankings();
-    float computeRankingFactor(unsigned int player_id);
-    float distributeBasePoints(unsigned int player_id);
-    float getModeFactor();
-    float getModeSpread();
+    void clearDisconnectedRankedPlayer();
+    double computeRankingFactor(uint32_t online_id);
+    double distributeBasePoints(uint32_t online_id);
+    double getModeFactor();
+    double getModeSpread();
 
 public:
              ServerLobby();
