@@ -269,7 +269,7 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
     {
         reset();
     }
-}   // restoreState
+}   // rewindTo
 
 // ----------------------------------------------------------------------------
 /** Returns how much increased speed time is left over in the given category.
@@ -354,7 +354,15 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        if (active_slowdown & b)
+        // Terrain slowodn is not fully stored in the state, since it can
+        // be computed from the raycast. But the current slowdown fraction
+        // must be stored (otherwise on a rewind the current slowdown would
+        // be start from 1.0 again).
+        if (i == MS_DECREASE_TERRAIN)
+        {
+            buffer->addFloat(m_speed_decrease[i].m_current_fraction);
+        }
+        else if (active_slowdown & b)
             m_speed_decrease[i].saveState(buffer);
     }
 
@@ -389,7 +397,14 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        m_speed_decrease[i].rewindTo(buffer, (active_slowdown & b) == b);
+        // Terrain slowodn is not fully stored in the state, since it can
+        // be computed from the raycast. But the current slowdown fraction
+        // must be stored (otherwise on a rewind the current slowdown would
+        // be start from 1.0 again).
+        if (i == MS_DECREASE_TERRAIN)
+            m_speed_decrease[i].m_current_fraction = buffer->getFloat();
+        else
+            m_speed_decrease[i].rewindTo(buffer, (active_slowdown & b) == b);
     }
 
     // Restore the speedup state
