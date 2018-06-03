@@ -34,9 +34,8 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/client_lobby.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/server_lobby.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -198,7 +197,9 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
-    if (m_state == LS_ADD_PLAYERS && NetworkConfig::get()->isClient())
+    if (NetworkConfig::get()->isServer())
+        return;
+    if (m_state == LS_ADD_PLAYERS)
     {
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
                                           "join the game"), true);
@@ -215,7 +216,7 @@ void NetworkingLobby::onUpdate(float delta)
     m_start_button->setVisible(false);
     m_exit_widget->setVisible(true);
     auto lp = LobbyProtocol::get<LobbyProtocol>();
-    if (!lp)
+    if (!lp || !lp->waitingForPlayers())
     {
         core::stringw connect_msg;
         if (m_joined_server)
@@ -223,7 +224,7 @@ void NetworkingLobby::onUpdate(float delta)
             connect_msg = StringUtils::loadingDots(
                 _("Connecting to server %s", m_joined_server->getName()));
         }
-        else if (NetworkConfig::get()->isClient())
+        else
         {
             connect_msg =
                 StringUtils::loadingDots(_("Finding a quick play server"));
@@ -233,8 +234,7 @@ void NetworkingLobby::onUpdate(float delta)
     }
     else
     {
-        if (m_server_peer.expired() && NetworkConfig::get()->isClient()
-            && STKHost::existHost())
+        if (m_server_peer.expired() && STKHost::existHost())
             m_server_peer = STKHost::get()->getServerPeerForClient();
         core::stringw total_msg;
         for (auto& string : m_server_info)
@@ -244,17 +244,16 @@ void NetworkingLobby::onUpdate(float delta)
         }
         m_text_bubble->setText(total_msg, true);
     }
-    if (NetworkConfig::get()->isClient())
+
+    if (STKHost::get()->isAuthorisedToControl())
     {
-        if (STKHost::get()->isAuthorisedToControl())
-        {
-            m_start_button->setVisible(true);
-        }
-        //I18N: In the networking lobby, display ping when connected
-        const uint32_t ping = getServerPing();
-        if (ping != 0)
-            m_header->setText(_("Lobby (ping: %dms)", ping), false);
+        m_start_button->setVisible(true);
     }
+    //I18N: In the networking lobby, display ping when connected
+    const uint32_t ping = getServerPing();
+    if (ping != 0)
+        m_header->setText(_("Lobby (ping: %dms)", ping), false);
+
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
