@@ -21,6 +21,7 @@
 #ifndef HEADER_STRING_UTILS_HPP
 #define HEADER_STRING_UTILS_HPP
 
+#include <limits>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -67,10 +68,20 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
     template <class T>
-    std::string toString (const T& any)
+    std::string toString(const T& any)
     {
         std::ostringstream oss;
-        oss << any ;
+        oss << any;
+        return oss.str();
+    }   // toString template
+
+    // ------------------------------------------------------------------------
+    template <>
+    inline std::string toString(const double& any)
+    {
+        std::ostringstream oss;
+        oss.precision(std::numeric_limits<double>::max_digits10);
+        oss << any;
         return oss.str();
     }   // toString template
 
@@ -115,7 +126,7 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
     /**
-     *  Replaces the first %s or %i/%d in the string with the first value
+     *  Replaces the first %s or %i/%d/%f in the string with the first value
      *  converted to a string), the 2nd %s or %d with the second value etc.
      *  So this is basically a simplified s(n)printf replacement, but doesn't
      *  do any fancy formatting (and no type checks either - so you can print

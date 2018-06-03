@@ -358,7 +358,8 @@ namespace StringUtils
                 }
                 else
                 {
-                    if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
+                    if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i' ||
+                       sv[i][1]=='f')
                     {
                         if (insertValID >= all_vals.size())
                         {
@@ -430,7 +431,8 @@ namespace StringUtils
                 }
                 else
                 {
-                    if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
+                    if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i' ||
+                        sv[i][1]=='f')
                     {
                         if (insertValID >= all_vals.size())
                         {

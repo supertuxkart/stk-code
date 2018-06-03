@@ -58,15 +58,15 @@ protected:
                 if (isSuccess())
                 {
                     int rank = -1;
-                    float score = 0.0;
+                    float score = 0.0f;
                     getXMLData()->get("rank", &rank);
                     getXMLData()->get("scores", &score);
                     if (rank > 0)
                     {
                         // I18N: In the network player dialog show rank and
                         // score of a player
-                        result = _("%s has a rank of %d with score %d.",
-                            m_name, rank, (int)score);
+                        result = _("%s has a rank of %d with score %f.",
+                            m_name, rank, score);
                     }
                 }
                 *done = true;
