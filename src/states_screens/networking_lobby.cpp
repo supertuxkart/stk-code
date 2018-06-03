@@ -302,8 +302,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         auto host_online_ids = StringUtils::splitToUInt
             (m_player_list->getSelectionInternalName(), '_');
-        if (host_online_ids.size() != 2 ||
-            STKHost::get()->getMyHostId() == host_online_ids[0])
+        if (host_online_ids.size() != 2)
         {
             return;
         }
