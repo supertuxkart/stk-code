@@ -457,7 +457,9 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
-# CURL
+# CURL and OpenSSL
+# 1.0.1d for compatible AES GCM handling
+SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 if(MSVC)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.lib)
@@ -467,6 +469,12 @@ elseif(MINGW)
 else()
     find_package(CURL REQUIRED)
     find_package(OpenSSL REQUIRED)
+
+    if(${OPENSSL_VERSION} VERSION_LESS ${OPENSSL_MINIMUM_VERSION} OR
+        (${OPENSSL_VERSION} VERSION_EQUAL ${OPENSSL_MINIMUM_VERSION} AND ${OPENSSL_VERSION} STRLESS ${OPENSSL_MINIMUM_VERSION}))
+        message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
+    endif()
+
     include_directories(${CURL_INCLUDE_DIRS})
     include_directories(${OpenSSL_INCLUDE_DIRS})
 endif()
