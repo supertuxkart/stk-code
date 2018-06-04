@@ -38,14 +38,13 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
     m_connected_time      = (float)StkTime::getRealTime();
-    m_token_set.store(false);
+    m_validated.store(false);
     if (NetworkConfig::get()->isClient())
     {
         // This allow client to get the correct ping as fast as possible
         // reset to default (0) will be done in STKHost::mainloop after 3 sec
         setPingInterval(10);
     }
-    m_client_server_token.store(0);
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
@@ -101,7 +100,6 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
-    data->setToken(m_client_server_token);
 
     ENetPacket* packet = NULL;
     if (m_crypto && encrypted)

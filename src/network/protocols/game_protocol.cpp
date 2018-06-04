@@ -306,7 +306,7 @@ void GameProtocol::sendState()
     Log::info("GameProtocol", "Sending new state at %d.",
         World::getWorld()->getTimeTicks());
     assert(NetworkConfig::get()->isServer());
-    sendMessageToPeersChangingToken(m_data_to_send, /*reliable*/true);
+    sendMessageToPeers(m_data_to_send, /*reliable*/true);
 }   // sendState
 
 // ----------------------------------------------------------------------------

@@ -57,14 +57,11 @@ protected:
     /** Pointer to the corresponding ENet peer data structure. */
     ENetPeer* m_enet_peer;
 
-    /** The token of this client. */
-    std::atomic<uint32_t> m_client_server_token;
-
-    /** True if the token for this peer has been set. */
-    std::atomic_bool m_token_set;
+    /** True if this peer is validated by server. */
+    std::atomic_bool m_validated;
 
     /** Host id of this peer. */
-    int m_host_id;
+    uint32_t m_host_id;
 
     TransportAddress m_peer_address;
 
@@ -108,27 +105,10 @@ public:
     void addPlayer(std::shared_ptr<NetworkPlayerProfile> p)
                                                     { m_players.push_back(p); }
     // ------------------------------------------------------------------------
-    /** Sets the token for this client. */
-    void setClientServerToken(const uint32_t token)
-    {
-        m_client_server_token.store(token);
-        m_token_set.store(true);
-    }   // setClientServerToken
+    void setValidated()                            { m_validated.store(true); }
     // ------------------------------------------------------------------------
-    /** Unsets the token for this client. (used in server to invalidate peer)
-     */
-    void unsetClientServerToken()
-    {
-        m_client_server_token.store(0);
-        m_token_set.store(false);
-    }
-    // ------------------------------------------------------------------------
-    /** Returns the token of this client. */
-    uint32_t getClientServerToken() const
-                                       { return m_client_server_token.load(); }
-    // ------------------------------------------------------------------------
-    /** Returns if the token for this client is known. */
-    bool isClientServerTokenSet() const          { return m_token_set.load(); }
+    /** Returns if the client is validated by server. */
+    bool isValidated() const                     { return m_validated.load(); }
     // ------------------------------------------------------------------------
     /** Returns the host id of this peer. */
     uint32_t getHostId() const                            { return m_host_id; }

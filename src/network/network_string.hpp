@@ -45,8 +45,7 @@ typedef unsigned char uchar;
  *  This class allows you to easily create and parse 8-bit strings, has 
  *  functions to add and read other data types (e.g. int, strings). It does
  *  not enforce any structure on the sequence (NetworkString uses this as
- *  a base class, and enforces a protocol type in the first byte, and a
- *  4-byte authentication token in bytes 2-5)
+ *  a base class, and enforces a protocol type in the first byte)
  */
 
 class BareNetworkString
@@ -62,8 +61,8 @@ protected:
     /** To avoid copying the buffer when bytes are deleted (which only
     *  happens at the front), use an offset index. All positions given
     *  by the user will be relative to this index. Note that the type
-    *  should be left as signed, otherwise certain arithmetic (e.g.
-    *  1-m_current_offset in checkToken() will be done unsigned).
+    *  should be left as signed, otherwise certain arithmetic will be done
+    *  unsigned).
     */
     mutable int m_current_offset;
 
@@ -359,7 +358,6 @@ public:
  *                    manager thread.
  *          bits 6-0: The protocol ID, which identifies the receiving protocol
  *                    for this message.
- *  Byte 1-4: A token to authenticate the sender.
  * 
  *  Otherwise this class offers template functions to add arbitrary variables,
  *  and retrieve them again. It kept the functionality of 'removing' bytes
@@ -373,31 +371,30 @@ public:
     static void unitTesting();
         
     /** Constructor for a message to be sent. It sets the 
-     *  protocol type of this message. It adds 5 bytes to the capacity: 
-     *  1 byte for the protocol type, and 4 bytes for the token. */
+     *  protocol type of this message. It adds 1 byte to the capacity:
+     *  1 byte for the protocol type. */
     NetworkString(ProtocolType type,  int capacity=16)
-        : BareNetworkString(capacity+5)
+        : BareNetworkString(capacity+1)
     {
         m_buffer.push_back(type);
-        addUInt32(0);   // add dummy token for now
     }   // NetworkString
 
     // ------------------------------------------------------------------------
     /** Constructor for a received message. It automatically ignored the first
-     *  5 bytes which contain the type and token. Those will be accessed using
+     *  5 bytes which contain the type. Those will be accessed using
      *  special functions. */
     NetworkString(const uint8_t *data, int len) 
         : BareNetworkString((char*)data, len)
     {
-        m_current_offset = 5;   // ignore type and token
+        m_current_offset = 1;   // ignore type
     }   // NetworkString
 
     // ------------------------------------------------------------------------
     /** Empties the string, but does not reset the pre-allocated size. */
     void clear()
     {
-        m_buffer.erase(m_buffer.begin() + 5, m_buffer.end());
-        m_current_offset = 5;
+        m_buffer.erase(m_buffer.begin() + 1, m_buffer.end());
+        m_current_offset = 1;
     }   // clear
     // ------------------------------------------------------------------------
     /** Returns the protocol type of this message. */
@@ -422,35 +419,6 @@ public:
     {
         return (m_buffer[0] & PROTOCOL_SYNCHRONOUS) == PROTOCOL_SYNCHRONOUS;
     }   // isSynchronous
-    // ------------------------------------------------------------------------
-    /** Sets a token for a message. Note that the token in an already
-    *  assembled message might be updated (e.g. if the same message is sent
-    *  from the server to a set of clients). */
-    void setToken(uint32_t token)
-    {
-        // Make sure there is enough space for the token:
-        if(m_buffer.size()<5)
-            m_buffer.resize(5);
-
-        m_buffer[1] = (token >> 24) & 0xff;
-        m_buffer[2] = (token >> 16) & 0xff;
-        m_buffer[3] = (token >>  8) & 0xff;
-        m_buffer[4] =  token        & 0xff;
-    }   // setToken
-
-    // ------------------------------------------------------------------------
-    /** Returns if the security token of this message is the same as the
-     *  specified token. */
-    uint32_t getToken() const 
-    {
-        // We need to reset the current position to 1 so that we can use the
-        // existing read 4 byte integer function to get the token.
-        int save_pos = m_current_offset;
-        m_current_offset = 1;
-        uint32_t token   = getUInt32();
-        m_current_offset = save_pos;
-        return token;
-    }   // getToken
 
 };   // class NetworkString
 

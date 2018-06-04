@@ -737,17 +737,19 @@ void STKHost::mainLoop()
         if (is_server)
         {
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
-            // Remove any peer which has no token for 7 seconds
-            // The token is set when the first connection request has happened
+            // Remove peer which has not been validated after a specific time
+            // It is validated when the first connection request has finished
+            const float timeout = UserConfigParams::m_validation_timeout;
             for (auto it = m_peers.begin(); it != m_peers.end();)
             {
-                if (!it->second->isClientServerTokenSet() &&
+                if (!it->second->isValidated() &&
                     (float)StkTime::getRealTime() >
-                    it->second->getConnectedTime() + 7.0f)
+                    it->second->getConnectedTime() + timeout)
                 {
-                    Log::info("STKHost", "%s has no token for more than 7"
-                        " seconds, disconnect it by force.",
-                        it->second->getAddress().toString().c_str());
+                    Log::info("STKHost", "%s has not been validated for more"
+                        " than %f seconds, disconnect it by force.",
+                        it->second->getAddress().toString().c_str(),
+                        timeout);
                     enet_host_flush(host);
                     enet_peer_reset(it->first);
                     it = m_peers.erase(it);
@@ -804,6 +806,9 @@ void STKHost::mainLoop()
                 TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just connected. There are "
                     "now %u peers.", addr.toString().c_str(), getPeerCount());
+                // Client always trust the server
+                if (!is_server)
+                    stk_peer->setValidated();
             }   // ENET_EVENT_TYPE_CONNECT
             else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
             {
@@ -1020,7 +1025,7 @@ void STKHost::sendPacketToAllPeers(NetworkString *data, bool reliable)
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto p : m_peers)
     {
-        if (p.second->isClientServerTokenSet())
+        if (p.second->isValidated())
             p.second->sendPacket(data, reliable);
     }
 }   // sendPacketExcept
@@ -1038,7 +1043,7 @@ void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
     for (auto p : m_peers)
     {
         STKPeer* stk_peer = p.second.get();
-        if (!stk_peer->isSamePeer(peer) && p.second->isClientServerTokenSet())
+        if (!stk_peer->isSamePeer(peer) && p.second->isValidated())
         {
             stk_peer->sendPacket(data, reliable);
         }
@@ -1093,6 +1098,7 @@ void STKHost::replaceNetwork(ENetEvent& event, Network* network)
     m_network = network;
     auto stk_peer = std::make_shared<STKPeer>(event.peer, this,
         m_next_unique_host_id++);
+    stk_peer->setValidated();
     m_peers[event.peer] = stk_peer;
     setPrivatePort();
     startListening();
@@ -1100,13 +1106,3 @@ void STKHost::replaceNetwork(ENetEvent& event, Network* network)
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
 }   // replaceNetwork
-
-//-----------------------------------------------------------------------------
-bool STKHost::isConnectionRequestPacket(unsigned char* data, int length)
-{
-    if (length < 6)
-        return false;
-    // Connection request is not synchronous
-    return (uint8_t)data[0] == PROTOCOL_LOBBY_ROOM &&
-        (uint8_t)data[5] == LobbyProtocol::LE_CONNECTION_REQUESTED;
-}   // isConnectionRequestPacket

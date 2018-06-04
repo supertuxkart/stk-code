@@ -444,19 +444,12 @@ void ClientLobby::connectionAccepted(Event* event)
     if (!checkDataSize(event, 4)) return;
 
     NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-
     // Accepted
     // ========
     Log::info("ClientLobby", "The server accepted the connection.");
-
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
-    // connection token
-    uint32_t token = data.getToken();
-    peer->setClientServerToken(token);
     m_state.store(CONNECTED);
-
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------

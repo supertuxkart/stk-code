@@ -170,11 +170,6 @@ bool ServerLobby::notifyEvent(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::handleChat(Event* event)
 {
-    if (!event->getPeer()->hasPlayerProfiles())
-    {
-        Log::warn("ServerLobby", "Unauthorized peer wants to chat.");
-        return;
-    }
     if (!checkDataSize(event, 1)) return;
 
     core::stringw message;
@@ -184,7 +179,7 @@ void ServerLobby::handleChat(Event* event)
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
-        sendMessageToPeersChangingToken(chat, /*reliable*/true);
+        sendMessageToPeers(chat, /*reliable*/true);
         delete chat;
     }
 }   // handleChat
@@ -384,7 +379,7 @@ void ServerLobby::asynchronousUpdate()
             // Reset for next state usage
             resetPeersReady();
             m_state = LOAD_WORLD;
-            sendMessageToPeersChangingToken(load_world);
+            sendMessageToPeers(load_world);
             delete load_world;
         }
         break;
@@ -464,7 +459,7 @@ void ServerLobby::update(int ticks)
             NetworkString *exit_result_screen = getNetworkString(1);
             exit_result_screen->setSynchronous(true);
             exit_result_screen->addUInt8(LE_EXIT_RESULT);
-            sendMessageToPeersChangingToken(exit_result_screen,
+            sendMessageToPeers(exit_result_screen,
                                             /*reliable*/true);
             delete exit_result_screen;
             std::lock_guard<std::mutex> lock(m_connection_mutex);
@@ -475,7 +470,7 @@ void ServerLobby::update(int ticks)
             server_info->setSynchronous(true);
             server_info->addUInt8(LE_SERVER_INFO);
             m_game_setup->addServerInfo(server_info);
-            sendMessageToPeersChangingToken(server_info);
+            sendMessageToPeers(server_info);
             delete server_info;
             setup();
         }
@@ -572,7 +567,7 @@ void ServerLobby::signalRaceStartToClients()
                  StkTime::getRealTime());
     NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
-    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    sendMessageToPeers(ns, /*reliable*/true);
     delete ns;
 }   // startGame
 
@@ -623,6 +618,8 @@ void ServerLobby::startSelection(const Event *event)
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
     {
+        if (!peer->isValidated())
+            continue;
         peer->eraseServerKarts(m_available_kts.first, karts_erase);
         peer->eraseServerTracks(m_available_kts.second, tracks_erase);
     }
@@ -647,7 +644,7 @@ void ServerLobby::startSelection(const Event *event)
         ns->encodeString(track);
     }
 
-    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    sendMessageToPeers(ns, /*reliable*/true);
     delete ns;
 
     m_state = SELECTING;
@@ -802,7 +799,7 @@ void ServerLobby::checkRaceFinished()
     // result screen and go back to the lobby
     m_timeout.store((float)StkTime::getRealTime() + 15.0f);
     m_state = RESULT_DISPLAY;
-    sendMessageToPeersChangingToken(total, /*reliable*/ true);
+    sendMessageToPeers(total, /*reliable*/ true);
     delete total;
     Log::info("ServerLobby", "End of game message sent");
 
@@ -1035,7 +1032,7 @@ void ServerLobby::clientDisconnected(Event* event)
         msg->encodeString(name);
         Log::info("ServerLobby", "%s disconnected", name.c_str());
     }
-    sendMessageToPeersChangingToken(msg, /*reliable*/true);
+    sendMessageToPeers(msg, /*reliable*/true);
     updatePlayerList();
     delete msg;
 }   // clientDisconnected
@@ -1086,7 +1083,7 @@ void ServerLobby::connectionRequested(Event* event)
 
     // Check server version
     int version = data.getUInt8();
-    if (version < stk_config->m_max_server_version ||
+    if (version < stk_config->m_min_server_version ||
         version > stk_config->m_max_server_version)
     {
         NetworkString *message = getNetworkString(2);
@@ -1275,20 +1272,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             per_player_difficulty, (uint8_t)i));
     }
 
-    if (!peer->isClientServerTokenSet())
-    {
-        // Now answer to the peer that just connected
-        // ------------------------------------------
-        RandomGenerator token_generator;
-        // use 4 random numbers because rand_max is probably 2^15-1.
-        uint32_t token = (uint32_t)((token_generator.get(RAND_MAX) & 0xff) << 24 |
-                                    (token_generator.get(RAND_MAX) & 0xff) << 16 |
-                                    (token_generator.get(RAND_MAX) & 0xff) <<  8 |
-                                    (token_generator.get(RAND_MAX) & 0xff));
-
-        peer->setClientServerToken(token);
-    }
-
+    peer->setValidated();
     // send a message to the one that asked to connect
     NetworkString* message_ack = getNetworkString(4);
     message_ack->setSynchronous(true);
@@ -1343,7 +1327,7 @@ void ServerLobby::updatePlayerList(bool force_update)
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
     }
-    sendMessageToPeersChangingToken(pl);
+    sendMessageToPeers(pl);
     delete pl;
 }   // updatePlayerList
 
@@ -1368,7 +1352,7 @@ void ServerLobby::updateServerOwner()
     for (auto peer: peers)
     {
         // Only 127.0.0.1 can be server owner in case of graphics-client-server
-        if (peer->hasPlayerProfiles() &&
+        if (peer->isValidated() &&
             (NetworkConfig::get()->getServerIdFile().empty() ||
             peer->getAddress().getIP() == 0x7f000001))
         {
@@ -1466,7 +1450,7 @@ void ServerLobby::playerVote(Event* event)
     uint8_t reverse = data.getUInt8();
     m_peers_votes[event->getPeerSP()] =
         std::make_tuple(track_name, lap, reverse == 1);
-    sendMessageToPeersChangingToken(&other);
+    sendMessageToPeers(&other);
 
 }   // playerVote
 

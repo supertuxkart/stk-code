@@ -80,6 +80,8 @@ public:
     virtual void asynchronousUpdate() OVERRIDE {}
     virtual bool allPlayersReady() const OVERRIDE
                                           { return m_state.load() >= PLAYING; }
+    bool waitingForServerRespond() const
+                            { return m_state.load() == REQUESTING_CONNECTION; }
 };
 
 #endif // CLIENT_LOBBY_HPP

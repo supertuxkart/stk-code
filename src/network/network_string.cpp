@@ -37,28 +37,6 @@ void NetworkString::unitTesting()
     s.setSynchronous(false);
     assert(!s.isSynchronous());
 
-    uint32_t token = 0x12345678;
-    // Check token setting and reading
-    s.setToken(token);
-    assert(s.getToken()==token);
-    assert(s.getToken()!=0x87654321);
-
-    // Append some values from the message
-    s.addUInt16(12345);
-    s.addFloat(1.2345f);
-
-    // Since this string was not received, we need to skip the type and token explicitly.
-    s.skip(5);
-    assert(s.getUInt16() == 12345);
-    float f = s.getFloat();
-    assert(f==1.2345f);
-
-    // Check modifying a token in an already assembled message
-    uint32_t new_token = 0x87654321;
-    s.setToken(new_token);
-    assert(s.getToken()!=token);
-    assert(s.getToken()==new_token);
-
     // Check log message format
     BareNetworkString slog(28);
     for(unsigned int i=0; i<28; i++)
