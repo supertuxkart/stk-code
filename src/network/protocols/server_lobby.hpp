@@ -45,6 +45,8 @@ private:
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
 
+    std::atomic<uint32_t> m_server_owner_id;
+
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
@@ -82,6 +84,8 @@ private:
     std::map<uint32_t, uint32_t> m_ban_list;
 
     TransportAddress m_server_address;
+
+    std::mutex m_keys_mutex;
 
     std::map<uint32_t,
         std::tuple</*aes 128 key*/std::string, /*iv*/std::string,
@@ -122,9 +126,9 @@ private:
     void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
     void handleChat(Event* event);
-    void unregisterServer();
+    void unregisterServer(bool now);
     void createServerIdFile();
-    void updatePlayerList();
+    void updatePlayerList(bool force_update = false);
     void updateServerOwner();
     bool checkPeersReady() const
     {
@@ -154,6 +158,13 @@ private:
                 it++;
             }
         }
+    }
+    void addAndReplaceKeys(const std::map<uint32_t, std::tuple<std::string,
+        std::string, irr::core::stringw, bool> >& new_keys)
+    {
+        std::lock_guard<std::mutex> lock(m_keys_mutex);
+        for (auto& k : new_keys)
+            m_keys[k.first] = k.second;
     }
     void handlePendingConnection();
     void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,

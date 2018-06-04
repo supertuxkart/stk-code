@@ -87,6 +87,7 @@
  */
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
+    m_server_owner_id.store(-1);
     m_has_created_server_id_file = false;
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
@@ -106,7 +107,7 @@ ServerLobby::~ServerLobby()
 {
     if (m_server_registered)
     {
-        unregisterServer();
+        unregisterServer(true/*now*/);
     }
 }   // ~ServerLobby
 
@@ -158,7 +159,6 @@ bool ServerLobby::notifyEvent(Event* event)
               message_type);
     switch (message_type)
     {
-    case LE_REQUEST_BEGIN: startSelection(event); break;
     case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
@@ -175,6 +175,8 @@ void ServerLobby::handleChat(Event* event)
         Log::warn("ServerLobby", "Unauthorized peer wants to chat.");
         return;
     }
+    if (!checkDataSize(event, 1)) return;
+
     core::stringw message;
     event->data().decodeString16(&message);
     if (message.size() > 0)
@@ -190,10 +192,8 @@ void ServerLobby::handleChat(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::kickHost(Event* event)
 {
-    std::unique_lock<std::mutex> lock(m_connection_mutex);
     if (m_server_owner.lock() != event->getPeerSP())
         return;
-    lock.unlock();
     if (!checkDataSize(event, 4)) return;
     NetworkString& data = event->data();
     uint32_t host_id = data.getUInt32();
@@ -222,6 +222,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
         case LE_VOTE: playerVote(event);                          break;
         case LE_KICK_HOST: kickHost(event);                       break;
+        case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_CHAT: handleChat(event);                          break;
         default:                                                  break;
         }   // switch
@@ -251,6 +252,9 @@ void ServerLobby::createServerIdFile()
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
+    // Check if server owner has left
+    updateServerOwner();
+
     switch (m_state.load())
     {
     case SET_PUBLIC_ADDRESS:
@@ -285,7 +289,7 @@ void ServerLobby::asynchronousUpdate()
             break;
         }
         // Register this server with the STK server. This will block
-        // this thread, but there is no need for the protocol manager
+        // this thread, because there is no need for the protocol manager
         // to react to any requests before the server is registered.
         registerServer();
         if (m_server_registered)
@@ -348,7 +352,6 @@ void ServerLobby::asynchronousUpdate()
         {
             m_game_setup->setRace(std::get<0>(result), std::get<1>(result),
                 std::get<2>(result));
-            std::lock_guard<std::mutex> lock(m_connection_mutex);
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
@@ -417,8 +420,6 @@ void ServerLobby::update(int ticks)
         setup();
     }
 
-    // Check if server owner has left
-    updateServerOwner();
     if (m_game_setup)
     {
         // Remove disconnected players if in these two states
@@ -469,7 +470,7 @@ void ServerLobby::update(int ticks)
             std::lock_guard<std::mutex> lock(m_connection_mutex);
             m_state = NetworkConfig::get()->isLAN() ?
                 ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
-            updatePlayerList();
+            updatePlayerList(true/*force_update*/);
             NetworkString* server_info = getNetworkString();
             server_info->setSynchronous(true);
             server_info->addUInt8(LE_SERVER_INFO);
@@ -535,38 +536,28 @@ void ServerLobby::registerServer()
 
 //-----------------------------------------------------------------------------
 /** Unregister this server (i.e. its public address) with the STK server,
- *  currently when karts enter kart selection screen it will be done.
+ *  currently when karts enter kart selection screen it will be done or quit
+ *  stk.
  */
-void ServerLobby::unregisterServer()
+void ServerLobby::unregisterServer(bool now)
 {
-    Online::XMLRequest* request = new Online::XMLRequest();
+    Online::XMLRequest* request =
+        new Online::XMLRequest(!now/*manage memory*/);
     NetworkConfig::get()->setServerDetails(request, "stop");
 
     request->addParameter("address", m_server_address.getIP());
     request->addParameter("port", m_server_address.getPort());
     Log::info("ServerLobby", "Unregister server address %s",
         m_server_address.toString().c_str());
-    request->executeNow();
-
-    const XMLNode * result = request->getXMLData();
-    std::string rec_success;
-
-    if (result->get("success", &rec_success))
+    // No need to check for result as server will be auto-cleared anyway
+    // when no polling is done
+    if (now)
     {
-        if (rec_success == "yes")
-        {
-            Log::info("ServerLobby", "Server is now unregister.");
-        }
-        else
-        {
-            Log::error("ServerLobby", "Fail to unregister server.");
-        }
+        request->executeNow();
+        delete request;
     }
     else
-    {
-        Log::error("ServerLobby", "Fail to stop server.");
-    }
-    delete request;
+        request->queue();
 
 }   // unregisterServer
 
@@ -591,8 +582,6 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
-    std::lock_guard<std::mutex> lock(m_connection_mutex);
-
     if (m_state != ACCEPTING_CLIENTS)
     {
         Log::warn("ServerLobby",
@@ -608,9 +597,17 @@ void ServerLobby::startSelection(const Event *event)
         return;
     }
 
+    // Drop all pending players
+    for (auto& p : m_pending_connection)
+    {
+        if (auto peer = p.first.lock())
+            peer->disconnect();
+    }
+    m_pending_connection.clear();
+
     if (m_server_registered)
     {
-        unregisterServer();
+        unregisterServer(false/*now*/);
         m_server_registered = false;
     }
 
@@ -679,43 +676,64 @@ void ServerLobby::checkIncomingConnectionRequests()
 
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
-    Online::XMLRequest* request = new Online::XMLRequest();
-    NetworkConfig::get()->setServerDetails(request, "poll-connection-requests");
 
+    // ========================================================================
+    class PollServerRequest : public Online::XMLRequest
+    {
+    private:
+        std::weak_ptr<ServerLobby> m_server_lobby;
+    protected:
+        virtual void afterOperation()
+        {
+            Online::XMLRequest::afterOperation();
+            const XMLNode *result = getXMLData();
+            std::string success;
+
+            if (!result->get("success", &success) || success != "yes")
+            {
+                Log::error("ServerLobby", "Cannot retrieve the list.");
+                return;
+            }
+
+            // Now start a ConnectToPeer protocol for each connection request
+            const XMLNode * users_xml = result->getNode("users");
+            std::map<uint32_t, std::tuple<std::string, std::string,
+                irr::core::stringw, bool> > keys;
+            for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
+            {
+                uint32_t addr, id;
+                uint16_t port;
+                users_xml->getNode(i)->get("ip", &addr);
+                users_xml->getNode(i)->get("port", &port);
+                users_xml->getNode(i)->get("id", &id);
+                users_xml->getNode(i)->get("aes-key", &std::get<0>(keys[id]));
+                users_xml->getNode(i)->get("iv", &std::get<1>(keys[id]));
+                users_xml->getNode(i)->get("username", &std::get<2>(keys[id]));
+                std::get<3>(keys[id]) = false;
+                std::make_shared<ConnectToPeer>(TransportAddress(addr, port))
+                    ->requestStart();
+            }
+            auto sl = m_server_lobby.lock();
+            if (keys.empty() || !sl || sl->m_state.load() != ACCEPTING_CLIENTS)
+                return;
+            sl->addAndReplaceKeys(keys);
+        }
+    public:
+        PollServerRequest(std::shared_ptr<ServerLobby> sl)
+        : XMLRequest(true), m_server_lobby(sl) {}
+    };   // PollServerRequest
+    // ========================================================================
+
+    PollServerRequest* request = new PollServerRequest(
+        std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
+    NetworkConfig::get()->setServerDetails(request,
+        "poll-connection-requests");
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
     request->addParameter("current_players", m_game_setup->getPlayerCount());
+    request->queue();
 
-    request->executeNow();
-    assert(request->isDone());
-
-    const XMLNode *result = request->getXMLData();
-    std::string success;
-
-    if (!result->get("success", &success) || success != "yes")
-    {
-        Log::error("ServerLobby", "Cannot retrieve the list.");
-        return;
-    }
-
-    // Now start a ConnectToPeer protocol for each connection request
-    const XMLNode * users_xml = result->getNode("users");
-    for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
-    {
-        uint32_t addr, id;
-        uint16_t port;
-        users_xml->getNode(i)->get("ip", &addr);
-        users_xml->getNode(i)->get("port", &port);
-        users_xml->getNode(i)->get("id", &id);
-        users_xml->getNode(i)->get("aes-key", &std::get<0>(m_keys[id]));
-        users_xml->getNode(i)->get("iv", &std::get<1>(m_keys[id]));
-        users_xml->getNode(i)->get("username", &std::get<2>(m_keys[id]));
-        std::get<3>(m_keys[id]) = false;
-        std::make_shared<ConnectToPeer>(TransportAddress(addr, port))
-            ->requestStart();
-    }
-    delete request;
 }   // checkIncomingConnectionRequests
 
 //-----------------------------------------------------------------------------
@@ -1004,7 +1022,6 @@ void ServerLobby::stopCurrentRace()
  */
 void ServerLobby::clientDisconnected(Event* event)
 {
-    std::lock_guard<std::mutex> lock(m_connection_mutex);
     auto players_on_peer = event->getPeer()->getPlayerProfiles();
     if (players_on_peer.empty())
         return;
@@ -1049,6 +1066,8 @@ void ServerLobby::connectionRequested(Event* event)
     std::lock_guard<std::mutex> lock(m_connection_mutex);
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     NetworkString& data = event->data();
+    if (!checkDataSize(event, 14)) return;
+
     peer->cleanPlayerProfiles();
 
     // can we add the player ?
@@ -1212,6 +1231,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     BareNetworkString& data, uint32_t online_id,
     const core::stringw& online_name)
 {
+    if (data.size() < 2) return;
+
     // Check for password
     std::string password;
     data.decodeString(&password);
@@ -1304,9 +1325,9 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 }   // handleUnencryptedConnection
 
 //-----------------------------------------------------------------------------
-void ServerLobby::updatePlayerList()
+void ServerLobby::updatePlayerList(bool force_update)
 {
-    if (m_state.load() > ACCEPTING_CLIENTS)
+    if (m_state.load() > ACCEPTING_CLIENTS && !force_update)
         return;
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
     NetworkString* pl = getNetworkString();
@@ -1317,7 +1338,7 @@ void ServerLobby::updatePlayerList()
         pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
             .encodeString(profile->getName());
         uint8_t server_owner = 0;
-        if (m_server_owner.lock() == profile->getPeer())
+        if (m_server_owner_id.load() == profile->getPeer()->getHostId())
             server_owner = 1;
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
@@ -1344,8 +1365,6 @@ void ServerLobby::updateServerOwner()
         });
 
     std::shared_ptr<STKPeer> owner;
-    std::lock_guard<std::mutex> lock(m_connection_mutex);
-    // Make sure no one access the weak pointer or adding player to peers
     for (auto peer: peers)
     {
         // Only 127.0.0.1 can be server owner in case of graphics-client-server
@@ -1364,6 +1383,7 @@ void ServerLobby::updateServerOwner()
         owner->sendPacket(ns);
         delete ns;
         m_server_owner = owner;
+        m_server_owner_id.store(owner->getHostId());
         updatePlayerList();
     }
 }   // updateServerOwner
@@ -1374,7 +1394,6 @@ void ServerLobby::updateServerOwner()
  */
 void ServerLobby::kartSelectionRequested(Event* event)
 {
-    std::lock_guard<std::mutex> lock(m_connection_mutex);
     if (m_state != SELECTING || m_game_setup->isGrandPrixStarted())
     {
         Log::warn("ServerLobby", "Received kart selection while in state %d.",
@@ -1395,18 +1414,12 @@ void ServerLobby::kartSelectionRequested(Event* event)
         data.decodeString(&kart);
         if (m_available_kts.first.find(kart) == m_available_kts.first.end())
         {
-            // Will be reset to a random one later
-            Log::debug("ServerLobby", "Player %d from peer %d chose unknown "
-                "kart %s, use a random one", i, peer->getHostId(),
-                kart.c_str());
             continue;
         }
         else
         {
             peer->getPlayerProfiles()[i]->setKartName(kart);
         }
-        Log::debug("ServerLobby", "Player %d from peer %d chose %s", i,
-            peer->getHostId(), kart.c_str());
     }
 }   // kartSelectionRequested
 
@@ -1668,6 +1681,8 @@ bool ServerLobby::waitingForPlayers() const
 //-----------------------------------------------------------------------------
 void ServerLobby::handlePendingConnection()
 {
+    std::lock_guard<std::mutex> lock(m_keys_mutex);
+
     for (auto it = m_pending_connection.begin();
          it != m_pending_connection.end();)
     {
@@ -1766,7 +1781,7 @@ void ServerLobby::submitRankingsToAddons()
     if (!race_manager->modeHasLaps())
         return;
 
-    // --------------------------------------------------------------------
+    // ========================================================================
     class SumbitRankingRequest : public Online::XMLRequest
     {
     public:
@@ -1779,8 +1794,19 @@ void ServerLobby::submitRankingsToAddons()
             addParameter("max-scores", max_scores);
             addParameter("num-races-done", num_races);
         }
+        virtual void afterOperation()
+        {
+            Online::XMLRequest::afterOperation();
+            const XMLNode* result = getXMLData();
+            std::string rec_success;
+            if (!(result->get("success", &rec_success) &&
+                rec_success == "yes"))
+            {
+                Log::error("ServerLobby", "Failed to submit scores.");
+            }
+        }
     };   // UpdatePlayerRankingRequest
-    // --------------------------------------------------------------------
+    // ========================================================================
 
     for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
     {

@@ -952,8 +952,12 @@ namespace StringUtils
         bmem = BIO_push(b64, bmem);
 
         BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
+#ifdef DEBUG
         size_t read_l = BIO_read(bmem, result.data(), input.size());
         assert(read_l == decode_len);
+#else
+        BIO_read(bmem, result.data(), input.size());
+#endif
         BIO_free_all(bmem);
 
         return result;
