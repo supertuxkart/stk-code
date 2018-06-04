@@ -361,20 +361,20 @@ bool GrandPrixData::writeToFile()
 {
     try
     {
-        UTFWriter file(m_filename.c_str());
+        UTFWriter file(m_filename.c_str(), false);
         if (file.is_open())
         {
-            file << L"\n<supertuxkart_grand_prix name=\"" << m_name
-                 << L"\">\n\n";
+            file << "\n<supertuxkart_grand_prix name=\"" << StringUtils::xmlEncode(m_name)
+                 << "\">\n\n";
             for (unsigned int i = 0; i < m_tracks.size(); i++)
             {
                 file <<
-                    L"\t<track id=\"" << m_tracks[i] <<
-                    L"\" laps=\""     << m_laps[i] <<
-                    L"\" reverse=\""  << (m_reversed[i] ? L"true" : L"false")
-                                      <<  L"\" />\n";
+                    "\t<track id=\"" << m_tracks[i] <<
+                    "\" laps=\""     << m_laps[i] <<
+                    "\" reverse=\""  << (m_reversed[i] ? L"true" : L"false")
+                                      <<  "\" />\n";
             }
-            file << L"\n</supertuxkart_grand_prix>\n";
+            file << "\n</supertuxkart_grand_prix>\n";
 
             file.close();
 
