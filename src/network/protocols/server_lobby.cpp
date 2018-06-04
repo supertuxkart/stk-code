@@ -592,14 +592,6 @@ void ServerLobby::startSelection(const Event *event)
         return;
     }
 
-    // Drop all pending players
-    for (auto& p : m_pending_connection)
-    {
-        if (auto peer = p.first.lock())
-            peer->disconnect();
-    }
-    m_pending_connection.clear();
-
     if (m_server_registered)
     {
         unregisterServer(false/*now*/);
@@ -648,6 +640,16 @@ void ServerLobby::startSelection(const Event *event)
     delete ns;
 
     m_state = SELECTING;
+    // Drop all pending players and keys
+    for (auto& p : m_pending_connection)
+    {
+        if (auto peer = p.first.lock())
+            peer->disconnect();
+    }
+    m_pending_connection.clear();
+    std::unique_lock<std::mutex> ul(m_keys_mutex);
+    m_keys.clear();
+    ul.unlock();
 
     // Will be changed after the first vote received
     m_timeout.store(std::numeric_limits<float>::max());
