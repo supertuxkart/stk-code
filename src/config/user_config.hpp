@@ -723,6 +723,10 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam m_server_max_players
         PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
         &m_network_group, "Maximum number of players on the server."));
+    PARAM_PREFIX BoolUserConfigParam m_firewalled_server
+        PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
+        &m_network_group, "Disable it to turn off all stun related code "
+        "in server, for official server hosting use only."));
 
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",

@@ -667,9 +667,12 @@ void ServerLobby::checkIncomingConnectionRequests()
 
     // Keep the port open, it can be sent to anywhere as we will send to the
     // correct peer later in ConnectToPeer.
-    BareNetworkString data;
-    data.addUInt8(0);
-    STKHost::get()->sendRawPacket(data, STKHost::get()->getStunAddress());
+    if (UserConfigParams::m_firewalled_server)
+    {
+        BareNetworkString data;
+        data.addUInt8(0);
+        STKHost::get()->sendRawPacket(data, STKHost::get()->getStunAddress());
+    }
 
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
@@ -696,6 +699,10 @@ void ServerLobby::checkIncomingConnectionRequests()
             const XMLNode * users_xml = result->getNode("users");
             std::map<uint32_t, std::tuple<std::string, std::string,
                 irr::core::stringw, bool> > keys;
+            auto sl = m_server_lobby.lock();
+            if (!sl || sl->m_state.load() != ACCEPTING_CLIENTS)
+                return;
+
             for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
             {
                 uint32_t addr, id;
@@ -707,11 +714,13 @@ void ServerLobby::checkIncomingConnectionRequests()
                 users_xml->getNode(i)->get("iv", &std::get<1>(keys[id]));
                 users_xml->getNode(i)->get("username", &std::get<2>(keys[id]));
                 std::get<3>(keys[id]) = false;
-                std::make_shared<ConnectToPeer>(TransportAddress(addr, port))
-                    ->requestStart();
+                if (UserConfigParams::m_firewalled_server)
+                {
+                    std::make_shared<ConnectToPeer>
+                        (TransportAddress(addr, port))->requestStart();
+                }
             }
-            auto sl = m_server_lobby.lock();
-            if (keys.empty() || !sl || sl->m_state.load() != ACCEPTING_CLIENTS)
+            if (keys.empty())
                 return;
             sl->addAndReplaceKeys(keys);
         }
