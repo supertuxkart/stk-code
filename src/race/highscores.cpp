@@ -83,7 +83,7 @@ void Highscores::readEntry(const XMLNode &node)
     {
         const XMLNode *entry = node.getNode(i);
         entry->get("time",     &m_time[i]            );
-        entry->get("name",     &m_name[i]            );
+        entry->getAndDecode("name",     &m_name[i]            );
         entry->get("kartname", &m_kart_name[i]       );
 
         // a non-empty entry needs a non-empty kart name.

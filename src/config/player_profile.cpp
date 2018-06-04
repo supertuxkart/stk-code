@@ -87,7 +87,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     node->get("saved-session",      &m_saved_session    );
     node->get("saved-user",         &m_saved_user_id    );
     node->get("saved-token",        &m_saved_token      );
-    node->get("last-online-name",   &m_last_online_name );
+    node->getAndDecode("last-online-name",   &m_last_online_name );
     node->get("last-was-online",    &m_last_was_online  );
     node->get("remember-password",  &m_remember_password);
     node->get("icon-filename",      &m_icon_filename    );

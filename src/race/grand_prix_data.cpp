@@ -270,7 +270,7 @@ void GrandPrixData::reload()
         throw std::runtime_error("Wrong root node name");
     }
 
-    if (!root->get("name", &m_name))
+    if (!root->getAndDecode("name", &m_name))
     {
          Log::error("GrandPrixData",
                     "Error while trying to read grandprix file '%s': "
