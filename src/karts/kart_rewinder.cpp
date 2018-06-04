@@ -173,7 +173,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // 5) Max speed info
     // ------------------
     m_max_speed->rewindTo(buffer);
-    m_max_speed->update(0);
 
     // 6) Skidding
     // -----------
