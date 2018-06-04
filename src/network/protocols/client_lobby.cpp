@@ -69,6 +69,7 @@ engine.
 ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
            : LobbyProtocol(NULL)
 {
+    m_state.store(NONE);
     m_server_address = a;
     m_server = s;
     setHandleDisconnections(true);
