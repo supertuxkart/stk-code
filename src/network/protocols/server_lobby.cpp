@@ -713,7 +713,7 @@ void ServerLobby::checkIncomingConnectionRequests()
                 users_xml->getNode(i)->get("port", &port);
                 users_xml->getNode(i)->get("id", &id);
                 users_xml->getNode(i)->get("aes-key", &std::get<0>(keys[id]));
-                users_xml->getNode(i)->get("iv", &std::get<1>(keys[id]));
+                users_xml->getNode(i)->get("aes-iv", &std::get<1>(keys[id]));
                 users_xml->getNode(i)->get("username", &std::get<2>(keys[id]));
                 std::get<3>(keys[id]) = false;
                 if (UserConfigParams::m_firewalled_server)
