@@ -187,7 +187,7 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
     {
         reset();
     }
-}   // restoreState
+}   // rewindTo
 
 // ----------------------------------------------------------------------------
 /** Defines a slowdown, which is in fraction of top speed.
@@ -361,6 +361,7 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
         if (i == MS_DECREASE_TERRAIN)
         {
             buffer->addFloat(m_speed_decrease[i].m_current_fraction);
+            buffer->addFloat(m_speed_decrease[i].m_max_speed_fraction);
         }
         else if (active_slowdown & b)
             m_speed_decrease[i].saveState(buffer);
@@ -402,7 +403,10 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
         // must be stored (otherwise on a rewind the current slowdown would
         // be start from 1.0 again).
         if (i == MS_DECREASE_TERRAIN)
-            m_speed_decrease[i].m_current_fraction = buffer->getFloat();
+        {
+            m_speed_decrease[i].m_current_fraction   = buffer->getFloat();
+            m_speed_decrease[i].m_max_speed_fraction = buffer->getFloat();
+        }
         else
             m_speed_decrease[i].rewindTo(buffer, (active_slowdown & b) == b);
     }
