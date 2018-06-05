@@ -39,6 +39,14 @@ public:
         EXITING
     };
 private:
+    struct KeyData
+    {
+        std::string m_aes_key;
+        std::string m_aes_iv;
+        irr::core::stringw m_name;
+        bool m_tried = false;
+    };
+
     std::atomic<ServerState> m_state;
 
     /** Hold the next connected peer for server owner if current one expired
@@ -87,9 +95,7 @@ private:
 
     std::mutex m_keys_mutex;
 
-    std::map<uint32_t,
-        std::tuple</*aes 128 key*/std::string, /*iv*/std::string,
-        /*genuine player name*/irr::core::stringw, /*tried*/bool> > m_keys;
+    std::map<uint32_t, KeyData> m_keys;
 
     std::map<std::weak_ptr<STKPeer>,
         std::pair<uint32_t, BareNetworkString>,
@@ -159,8 +165,7 @@ private:
             }
         }
     }
-    void addAndReplaceKeys(const std::map<uint32_t, std::tuple<std::string,
-        std::string, irr::core::stringw, bool> >& new_keys)
+    void addAndReplaceKeys(const std::map<uint32_t, KeyData>& new_keys)
     {
         std::lock_guard<std::mutex> lock(m_keys_mutex);
         for (auto& k : new_keys)

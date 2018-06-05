@@ -699,8 +699,7 @@ void ServerLobby::checkIncomingConnectionRequests()
 
             // Now start a ConnectToPeer protocol for each connection request
             const XMLNode * users_xml = result->getNode("users");
-            std::map<uint32_t, std::tuple<std::string, std::string,
-                irr::core::stringw, bool> > keys;
+            std::map<uint32_t, KeyData> keys;
             auto sl = m_server_lobby.lock();
             if (!sl || sl->m_state.load() != ACCEPTING_CLIENTS)
                 return;
@@ -712,10 +711,10 @@ void ServerLobby::checkIncomingConnectionRequests()
                 users_xml->getNode(i)->get("ip", &addr);
                 users_xml->getNode(i)->get("port", &port);
                 users_xml->getNode(i)->get("id", &id);
-                users_xml->getNode(i)->get("aes-key", &std::get<0>(keys[id]));
-                users_xml->getNode(i)->get("aes-iv", &std::get<1>(keys[id]));
-                users_xml->getNode(i)->get("username", &std::get<2>(keys[id]));
-                std::get<3>(keys[id]) = false;
+                users_xml->getNode(i)->get("aes-key", &keys[id].m_aes_key);
+                users_xml->getNode(i)->get("aes-iv", &keys[id].m_aes_iv);
+                users_xml->getNode(i)->get("username", &keys[id].m_name);
+                keys[id].m_tried = false;
                 if (UserConfigParams::m_firewalled_server)
                 {
                     std::make_shared<ConnectToPeer>
@@ -1690,18 +1689,18 @@ void ServerLobby::handlePendingConnection()
         {
             const uint32_t online_id = it->second.first;
             auto key = m_keys.find(online_id);
-            if (key != m_keys.end() && std::get<3>(key->second) == false)
+            if (key != m_keys.end() && key->second.m_tried == false)
             {
                 if (decryptConnectionRequest(peer, it->second.second,
-                        std::get<0>(key->second), std::get<1>(key->second),
-                        online_id, std::get<2>(key->second)))
+                        key->second.m_aes_key, key->second.m_aes_iv,
+                        online_id, key->second.m_name))
                 {
                     it = m_pending_connection.erase(it);
                     m_keys.erase(online_id);
                     continue;
                 }
                 else
-                    std::get<3>(key->second) = true;
+                    key->second.m_tried = true;
             }
             it++;
         }
