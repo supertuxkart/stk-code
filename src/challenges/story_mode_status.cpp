@@ -355,7 +355,7 @@ void StoryModeStatus::grandPrixFinished()
  */
 void StoryModeStatus::save(UTFWriter &out)
 {
-    out << L"      <story-mode first-time=\"" << m_first_time  << L"\">\n";
+    out << "      <story-mode first-time=\"" << m_first_time  << L"\">\n";
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
@@ -363,5 +363,5 @@ void StoryModeStatus::save(UTFWriter &out)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << L"      </story-mode>\n";
+    out << "      </story-mode>\n";
 }  // save

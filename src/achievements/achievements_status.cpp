@@ -94,14 +94,14 @@ void AchievementsStatus::add(Achievement *achievement)
  */
 void AchievementsStatus::save(UTFWriter &out)
 {
-    out << L"      <achievements online=\"" << m_online << L"\"> \n";
+    out << "      <achievements online=\"" << m_online << "\"> \n";
     std::map<uint32_t, Achievement*>::const_iterator i;
     for(i = m_achievements.begin(); i != m_achievements.end();  i++)
     {
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << L"      </achievements>\n";
+    out << "      </achievements>\n";
 }   // save
 
 // ----------------------------------------------------------------------------
