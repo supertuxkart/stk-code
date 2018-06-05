@@ -26,6 +26,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -592,6 +593,7 @@ void ServerLobby::startSelection(const Event *event)
         return;
     }
 
+    ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
     if (m_server_registered)
     {
         unregisterServer(false/*now*/);
