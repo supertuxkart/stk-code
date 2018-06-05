@@ -741,6 +741,13 @@ void IrrDriver::setMaxTextureSize()
 }   // setMaxTextureSize
 
 // ----------------------------------------------------------------------------
+void IrrDriver::unsetMaxTextureSize()
+{
+    io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
+    att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(2048, 2048));
+}   // unsetMaxTextureSize
+
+// ----------------------------------------------------------------------------
 void IrrDriver::cleanSunInterposer()
 {
     delete m_sun_interposer;
