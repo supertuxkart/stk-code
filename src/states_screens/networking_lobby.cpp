@@ -67,6 +67,7 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_back_widget = NULL;
     m_header = NULL;
     m_text_bubble = NULL;
+    m_timeout_message = NULL;
     m_exit_widget = NULL;
     m_start_button = NULL;
     m_player_list = NULL;
@@ -90,6 +91,9 @@ void NetworkingLobby::loadedFromFile()
 
     m_text_bubble = getWidget<LabelWidget>("text");
     assert(m_text_bubble != NULL);
+
+    m_timeout_message = getWidget<LabelWidget>("timeout-message");
+    assert(m_timeout_message != NULL);
 
     m_chat_box = getWidget<TextBoxWidget>("chat");
     assert(m_chat_box != NULL);
@@ -130,6 +134,10 @@ void NetworkingLobby::beforeAddingWidget()
 void NetworkingLobby::init()
 {
     Screen::init();
+
+    m_cur_starting_timer = m_start_threshold = m_start_timeout =
+        m_server_max_player = std::numeric_limits<float>::max();
+    m_timeout_message->setVisible(false);
 
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
@@ -199,6 +207,33 @@ void NetworkingLobby::onUpdate(float delta)
 {
     if (NetworkConfig::get()->isServer())
         return;
+    if (m_timeout_message->isVisible() && m_player_list)
+    {
+        float cur_player = (float)(m_player_list->getItemCount());
+        if (cur_player > m_server_max_player * m_start_threshold &&
+            m_cur_starting_timer == std::numeric_limits<float>::max())
+        {
+            m_cur_starting_timer = m_start_timeout;
+        }
+        else if (cur_player < m_server_max_player * m_start_threshold)
+        {
+            m_cur_starting_timer = std::numeric_limits<float>::max();
+            m_timeout_message->setText(L"", true);
+        }
+
+        if (m_cur_starting_timer != std::numeric_limits<float>::max())
+        {
+            m_cur_starting_timer -= delta;
+            if (m_cur_starting_timer < 0.0f)
+                m_cur_starting_timer = 0.0f;
+            //I18N: In the networking lobby, display the starting timeout
+            //for owner-less server
+            core::stringw msg = _("Game will start after %d second",
+                (int)m_cur_starting_timer);
+            m_timeout_message->setText(msg, true);
+        }
+    }
+
     if (m_state == LS_ADD_PLAYERS)
     {
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
@@ -419,3 +454,18 @@ void NetworkingLobby::cleanAddedPlayers()
         return;
     m_player_list->clear();
 }   // cleanAddedPlayers
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
+                                         float start_threshold,
+                                         float start_timeout,
+                                         unsigned server_max_player)
+{
+    if (start_threshold == 0.0f || start_timeout == 0.0f)
+        return;
+
+    m_timeout_message->setVisible(true);
+    m_start_threshold = grand_prix_started ? 0.0f : start_threshold;
+    m_start_timeout = start_timeout;
+    m_server_max_player = (float)server_max_player;
+}   // initAutoStartTimer

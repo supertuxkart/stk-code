@@ -602,6 +602,7 @@ void cmdLineHelp()
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
+    "       --owner-less       Race will auto start and no one can kick players in server.\n"
     "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "  -h,  --help             Show this help.\n"
@@ -1071,6 +1072,11 @@ int handleCmdLine()
     {
         NetworkConfig::get()->setValidatedPlayers(true);
         NetworkConfig::get()->setRankedServer(true);
+        NetworkConfig::get()->setOwnerLess(true);
+    }
+    if (CommandLine::has("--owner-less"))
+    {
+        NetworkConfig::get()->setOwnerLess(true);
     }
     if (CommandLine::has("--server-id-file", &s))
     {

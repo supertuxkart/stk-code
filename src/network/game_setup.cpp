@@ -134,6 +134,15 @@ void GameSetup::addServerInfo(NetworkString* ns)
         // No extra server info
         ns->addUInt8((uint8_t)0);
     }
+    if (NetworkConfig::get()->isOwnerLess())
+    {
+        ns->addFloat(UserConfigParams::m_start_game_threshold)
+            .addFloat(UserConfigParams::m_start_game_counter);
+    }
+    else
+        ns->addFloat(0.0f).addFloat(0.0f);
+    ns->addUInt8(NetworkConfig::get()->getMaxPlayers());
+
     ns->encodeString(NetworkConfig::get()->getMOTD());
 }   // addServerInfo
 

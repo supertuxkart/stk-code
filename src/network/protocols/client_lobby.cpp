@@ -494,6 +494,7 @@ void ClientLobby::handleServerInfo(Event* event)
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     uint8_t extra_server_info = data.getUInt8();
+    bool grand_prix_started = false;
     switch (extra_server_info)
     {
         case 0:
@@ -513,6 +514,7 @@ void ClientLobby::handleServerInfo(Event* event)
         case 2:
         {
             unsigned cur_gp_track = data.getUInt8();
+            grand_prix_started = cur_gp_track != 0;
             unsigned total_gp_track = data.getUInt8();
             m_game_setup->setGrandPrixTrack(total_gp_track);
             each_line = _("Grand prix progress: %d / %d", cur_gp_track,
@@ -521,6 +523,12 @@ void ClientLobby::handleServerInfo(Event* event)
             break;
         }
     }
+    // Auto start info
+    float start_threshold = data.getFloat();
+    float start_timeout = data.getFloat();
+    unsigned max_player = data.getUInt8();
+    NetworkingLobby::getInstance()->initAutoStartTimer(grand_prix_started,
+        start_threshold, start_timeout, max_player);
 
     // MOTD
     data.decodeStringW(&str);

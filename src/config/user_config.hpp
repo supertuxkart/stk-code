@@ -727,6 +727,16 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
         &m_network_group, "Disable it to turn off all stun related code "
         "in server, for official server hosting use only."));
+    PARAM_PREFIX FloatUserConfigParam m_start_game_counter
+        PARAM_DEFAULT(FloatUserConfigParam(30.0f, "start-game-counter",
+        &m_network_group, "Time to wait before entering kart selection screen "
+        "if satisfied start-game-threshold below for owner less or ranked "
+        "server."));
+    PARAM_PREFIX FloatUserConfigParam m_start_game_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "start-game-threshold",
+        &m_network_group, "Only auto start kart selection when number of "
+        "connected player is larger than max player * this value, for "
+        "owner less or ranked server, after start-game-counter."));
 
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",

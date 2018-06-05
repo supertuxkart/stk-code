@@ -93,6 +93,8 @@ private:
     /** True if only validated players are allowed to join. */
     bool m_validated_players;
 
+    bool m_owner_less;
+
     bool m_done_adding_network_players;
 
     /** If this is a server, the server name. */
@@ -311,6 +313,10 @@ public:
     void setValidatedPlayers(bool val)           { m_validated_players = val; }
     // ------------------------------------------------------------------------
     bool onlyValidatedPlayers() const           { return m_validated_players; }
+    // ------------------------------------------------------------------------
+    void setOwnerLess(bool val)                         { m_owner_less = val; }
+    // ------------------------------------------------------------------------
+    bool isOwnerLess() const                           { return m_owner_less; }
 
 };   // class NetworkConfig
 

@@ -142,6 +142,7 @@ void ServerLobby::setup()
     resetPeersReady();
     m_peers_votes.clear();
     m_server_delay = 0.0;
+    m_timeout.store(std::numeric_limits<float>::max());
     Log::info("ServerLobby", "Reset server to initial state.");
 }   // setup
 
@@ -297,6 +298,31 @@ void ServerLobby::asynchronousUpdate()
     }
     case ACCEPTING_CLIENTS:
     {
+        if (NetworkConfig::get()->isOwnerLess())
+        {
+            auto players = m_game_setup->getPlayers();
+            if (((float)players.size() >
+                (float)NetworkConfig::get()->getMaxPlayers() *
+                UserConfigParams::m_start_game_threshold ||
+                m_game_setup->isGrandPrixStarted()) &&
+                m_timeout.load() == std::numeric_limits<float>::max())
+            {
+                m_timeout.store((float)StkTime::getRealTime() +
+                    UserConfigParams::m_start_game_counter);
+            }
+            else if ((float)players.size() <
+                (float)NetworkConfig::get()->getMaxPlayers() *
+                UserConfigParams::m_start_game_threshold &&
+                !m_game_setup->isGrandPrixStarted())
+            {
+                m_timeout.store(std::numeric_limits<float>::max());
+            }
+            if (m_timeout.load() < (float)StkTime::getRealTime())
+            {
+                startSelection();
+                return;
+            }
+        }
         clearDisconnectedRankedPlayer();
         // Only poll the STK server if this is a WAN server.
         if (NetworkConfig::get()->isWAN())
@@ -573,24 +599,27 @@ void ServerLobby::signalRaceStartToClients()
 }   // startGame
 
 //-----------------------------------------------------------------------------
-/** Instructs all clients to start the kart selection. If event is not NULL,
- *  the command comes from a client (which needs to be authorised).
+/** Instructs all clients to start the kart selection. If event is NULL,
+ *  the command comes from the owner less server.
  */
 void ServerLobby::startSelection(const Event *event)
 {
-    if (m_state != ACCEPTING_CLIENTS)
+    if (event != NULL)
     {
-        Log::warn("ServerLobby",
-                  "Received startSelection while being in state %d",
-                  m_state.load());
-        return;
-    }
-    if (event->getPeerSP() != m_server_owner.lock())
-    {
-        Log::warn("ServerLobby", 
-                  "Client %lx is not authorised to start selection.",
-                  event->getPeer());
-        return;
+        if (m_state != ACCEPTING_CLIENTS)
+        {
+            Log::warn("ServerLobby",
+                "Received startSelection while being in state %d",
+                m_state.load());
+            return;
+        }
+        if (event->getPeerSP() != m_server_owner.lock())
+        {
+            Log::warn("ServerLobby",
+                "Client %d is not authorised to start selection.",
+                event->getPeer()->getHostId());
+            return;
+        }
     }
 
     ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
@@ -1347,7 +1376,8 @@ void ServerLobby::updatePlayerList(bool force_update)
 void ServerLobby::updateServerOwner()
 {
     if (m_state.load() < ACCEPTING_CLIENTS ||
-        m_state.load() > RESULT_DISPLAY)
+        m_state.load() > RESULT_DISPLAY ||
+        NetworkConfig::get()->isOwnerLess())
         return;
     if (!m_server_owner.expired())
         return;
@@ -1694,8 +1724,8 @@ void ServerLobby::handlePendingConnection()
             if (key != m_keys.end() && key->second.m_tried == false)
             {
                 if (decryptConnectionRequest(peer, it->second.second,
-                        key->second.m_aes_key, key->second.m_aes_iv,
-                        online_id, key->second.m_name))
+                    key->second.m_aes_key, key->second.m_aes_iv, online_id,
+                    key->second.m_name))
                 {
                     it = m_pending_connection.erase(it);
                     m_keys.erase(online_id);

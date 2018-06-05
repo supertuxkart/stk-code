@@ -51,6 +51,7 @@ NetworkConfig::NetworkConfig()
     m_is_public_server      = false;
     m_is_ranked_server      = false;
     m_validated_players     = false;
+    m_owner_less            = false;
     m_done_adding_network_players = false;
     m_max_players           = 4;
     m_cur_user_id           = 0;
