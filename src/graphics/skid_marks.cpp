@@ -105,10 +105,12 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 
     // Get raycast information
     // -----------------------
-    const btKart *vehicle = m_kart.getVehicle();
-    const Vec3& raycast_right = vehicle->getVisualContactPoint(2);
-    const Vec3& raycast_left = vehicle->getVisualContactPoint(3);
+    btKart *vehicle = m_kart.getVehicle();
 
+    Vec3 raycast_right;
+    Vec3 raycast_left;
+    vehicle->getVisualContactPoint(m_kart.getSkidding()->getVisualSkidRotation(),
+                                   &raycast_left, &raycast_right);
     Vec3 delta = raycast_right - raycast_left;
 
     // The kart is making skid marks when it's:

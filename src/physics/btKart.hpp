@@ -105,11 +105,6 @@ private:
      *  properties. */
     Kart               *m_kart;
 
-    /** A visual rotation applied to the kart (for skidding).
-     *  The physics use this to provide proper wheel contact points
-     *  for skid marks. */
-    float m_visual_rotation;
-
     /** Minimum speed for the kart. Used e.g. for zippers. Setting this value
      *  will potentially instantaneously accelerate the kart to the minimum
      *  speed requested (in the next physics step). */
@@ -121,9 +116,6 @@ private:
 
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;
-
-    /** Contact point of the visual wheel position. */
-    btAlignedObjectArray<btVector3> m_visual_contact_point;
 
     btAlignedObjectArray<btWheelInfo> m_wheelInfo;
 
@@ -175,22 +167,14 @@ public:
     void               instantSpeedIncreaseTo(btScalar speed);
     void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
-    // ------------------------------------------------------------------------
+    void               getVisualContactPoint(float visual_rotation,
+                                             btVector3 *left, btVector3 *right);
+        // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
     bool visualWheelsTouchGround() const
     {
         return m_visual_wheels_touch_ground;
     }   // visualWheelsTouchGround
-    // ------------------------------------------------------------------------
-    /** Returns the contact point of a visual wheel.
-     *  \param n Index of the wheel, must be 2 or 3 since only the two rear
-     *           wheels define the visual position
-     */
-    const btVector3&   getVisualContactPoint(int n) const
-    {
-        assert(n>=2 && n<=3);
-        return m_visual_contact_point[n];
-    }   // getVisualContactPoint
     // ------------------------------------------------------------------------
     /** btActionInterface interface. */
     virtual void updateAction(btCollisionWorld* collisionWorld,
@@ -246,14 +230,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
     float getCentralImpulseTime() const { return m_time_additional_impulse; }
-    // ------------------------------------------------------------------------
-    /** Sets a visual rotation to be applied, which the physics use to provide
-     *  the location where the graphical wheels touch the ground (for
-     *  skidmarks). */
-    void setVisualRotation(float angle)
-    {
-        m_visual_rotation = angle;
-    }   // setVisualRotation
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).

@@ -1491,7 +1491,8 @@ void Kart::update(int ticks)
     Log::verbose("physicsafter", "%s t %f %d xyz(9-11) %f %f %f %f %f %f "
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
         "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
-        "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d",
+        "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d heading(43) %f "
+        "noderot(45) %f suslen %f",
         getIdent().c_str(),
         World::getWorld()->getTime(), World::getWorld()->getTimeTicks(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1510,7 +1511,10 @@ void Kart::update(int ticks)
         m_max_speed->getCurrentMaxSpeed(),
         m_max_speed->getCurrentAdditionalEngineForce(),  // 37
         m_brake_ticks, //39
-        m_controls.getButtonsCompressed()
+        m_controls.getButtonsCompressed(),  //41
+        getHeading(),  //43
+        m_node->getAbsoluteTransformation().getRotationDegrees().Y,  //45
+        m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
     );
 #endif
     // After the physics step was done, the position of the wheels (as stored
@@ -1602,7 +1606,8 @@ void Kart::update(int ticks)
 #ifdef DEBUG
             if(UserConfigParams::m_material_debug)
             {
-                Log::info("Kart","%s\tfraction %f\ttime %f.",
+                Log::info("Kart","World %d %s\tfraction %f\ttime %d.",
+                       World::getWorld()->getTimeTicks(),
                        material->getTexFname().c_str(),
                        material->getMaxSpeedFraction(),
                        material->getSlowDownTicks()       );
@@ -2423,7 +2428,6 @@ void Kart::updatePhysics(int ticks)
 
     m_skidding->update(ticks, isOnGround(), m_controls.getSteer(),
                        m_controls.getSkidControl());
-    m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
     if( ( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
           m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
        !m_skidding->isJumping()                                              )

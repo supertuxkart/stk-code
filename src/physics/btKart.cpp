@@ -90,7 +90,6 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
 
     m_wheelInfo.push_back( btWheelInfo(ci));
-    m_visual_contact_point.push_back(btVector3());
 
     btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
 
@@ -124,7 +123,6 @@ void btKart::reset()
     m_time_additional_impulse    = 0;
     m_additional_rotation        = btVector3(0,0,0);
     m_time_additional_rotation   = 0;
-    m_visual_rotation            = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
 
@@ -219,7 +217,7 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
  */
 void btKart::updateAllWheelTransformsWS()
 {
-    for (unsigned int i = 0; i < m_wheelInfo.size(); i++)
+    for (unsigned int i = 0; i < (unsigned int)m_wheelInfo.size(); i++)
     {
         btWheelInfo &wheel = m_wheelInfo[i];
         updateWheelTransformsWS(wheel, false, 1.0f);
@@ -332,43 +330,73 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
         wheel.m_clippedInvContactDotSuspension = btScalar(1.0);
     }
 
-#define USE_VISUAL
-#ifndef USE_VISUAL
-    m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
-#else
-    if(index==2 || index==3)
-    {
-        btTransform chassisTrans = getChassisWorldTransform();
-        if (getRigidBody()->getMotionState())
-        {
-            getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
-        }
-        btQuaternion q(m_visual_rotation, 0, 0);
-        btQuaternion rot_new = chassisTrans.getRotation() * q;
-        chassisTrans.setRotation(rot_new);
-        btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
-        pos.setZ(pos.getZ()*0.9f);
-        btVector3 source = chassisTrans( pos );
-        btVector3 target = source + rayvector;
-        btVehicleRaycaster::btVehicleRaycasterResult rayResults;
-
-        void* object = m_vehicleRaycaster->castRay(source,target,rayResults);
-        m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
-        m_visual_contact_point[index-2] = source;
-        m_visual_wheels_touch_ground &= (object!=NULL);
-    }
-#endif
-
     if(m_chassisBody->getBroadphaseHandle())
     {
         m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup
             = old_group;
     }
 
-
     return depth;
 
 }   // rayCast
+
+// ----------------------------------------------------------------------------
+/** Returns the contact point of a visual wheel.
+*  \param n Index of the wheel, must be 2 or 3 since only the two rear
+*           wheels define the visual position
+*/
+void btKart::getVisualContactPoint(float visual_rotation,
+                                   btVector3 *left, btVector3 *right)
+{
+    btAssert(m_vehicleRaycaster);
+
+    m_visual_wheels_touch_ground = true;
+
+    short int old_group = 0;
+    for (int index = 2; index <= 3; index++)
+    {
+        // Map index 0-1 to wheel 2-3 (which are the rear wheels)
+        btWheelInfo &wheel = m_wheelInfo[index];
+        updateWheelTransformsWS(wheel, false);
+        if (m_chassisBody->getBroadphaseHandle())
+        {
+            old_group = m_chassisBody->getBroadphaseHandle()
+                ->m_collisionFilterGroup;
+            m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+        }
+        btScalar max_susp_len = wheel.getSuspensionRestLength()
+                              + wheel.m_maxSuspensionTravel;
+
+        // Do a slightly longer raycast to see if the kart might soon hit the 
+        // ground and some 'cushioning' is needed to avoid that the chassis
+        // hits the ground.
+        btScalar raylen = max_susp_len + 0.5f;
+        btVector3 rayvector = wheel.m_raycastInfo.m_wheelDirectionWS * (raylen);
+        btTransform chassisTrans = getChassisWorldTransform();
+        if (getRigidBody()->getMotionState())
+        {
+            getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
+        }
+        btQuaternion q(visual_rotation, 0, 0);
+        btQuaternion rot_new = chassisTrans.getRotation() * q;
+        chassisTrans.setRotation(rot_new);
+        btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
+        pos.setZ(pos.getZ()*0.9f);
+        btVector3 source = chassisTrans(pos);
+        btVector3 target = source + rayvector;
+        btVehicleRaycaster::btVehicleRaycasterResult rayResults;
+
+        void* object = m_vehicleRaycaster->castRay(source, target, rayResults);
+        if(index == 2) *left  = rayResults.m_hitPointInWorld;
+        else           *right = rayResults.m_hitPointInWorld;
+        m_visual_wheels_touch_ground &= (object != NULL);
+    }   // for index in [2,3]
+
+    if (m_chassisBody->getBroadphaseHandle())
+    {
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
+    }
+}   // getVisualContactPoint
 
 // ----------------------------------------------------------------------------
 const btTransform& btKart::getChassisWorldTransform() const
@@ -970,9 +998,6 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
         }
 
     }   // for i < getNumWheels
-    btVector3 yellow(1.0f, 1.0f, 0.0f);
-    debugDrawer->drawLine(m_visual_contact_point[0], m_visual_contact_point[2], yellow);
-    debugDrawer->drawLine(m_visual_contact_point[1], m_visual_contact_point[3], yellow);
 }   // debugDraw
 
 
