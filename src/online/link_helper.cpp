@@ -15,6 +15,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "online/link_helper.hpp"
+#include "utils/log.hpp"
 #include <string>
 #ifdef _WIN32
 #include <windows.h>
@@ -27,15 +28,22 @@ namespace Online
 {
     void LinkHelper::OpenURL (std::string url)
     {
-#ifdef _WIN32
+#if defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#else 
-  #ifdef APPLE
-        std::string op = std::string("open ").append(url);
-  #else
-        std::string op = std::string("xdg-open ").append(url);
-  #endif
-        system(op.c_str());
+#elif defined(APPLE)
+        std::string command = std::string("open ").append(url);
+        if (system(command.c_str()))
+        {
+            Log::error("OpenURL", "Command returned non-zero exit status");
+        }
+#elif defined(__linux__) && !defined(__ANDROID__)
+        std::string command = std::string("xdg-open ").append(url);
+        if (system(command.c_str()))
+        {
+            Log::error("OpenURL", "Command returned non-zero exit status");
+        }
+#else
+        Log::error("OpenURL", "Not implemented for this platform!");
 #endif
     }
 }
