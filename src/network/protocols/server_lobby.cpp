@@ -106,7 +106,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
  */
 ServerLobby::~ServerLobby()
 {
-    if (m_server_registered)
+    if (NetworkConfig::get()->isWAN())
     {
         unregisterServer(true/*now*/);
     }
@@ -134,7 +134,6 @@ void ServerLobby::setup()
     m_available_kts.first = { all_k.begin(), all_k.end() };
     m_available_kts.second = { all_t.begin(), all_t.end() };
 
-    m_server_registered = false;
     m_server_has_loaded_world.store(false);
 
     // Initialise the data structures to detect if all clients and 
@@ -288,11 +287,14 @@ void ServerLobby::asynchronousUpdate()
         // Register this server with the STK server. This will block
         // this thread, because there is no need for the protocol manager
         // to react to any requests before the server is registered.
-        registerServer();
-        if (m_server_registered)
+        if (registerServer())
         {
             m_state = ACCEPTING_CLIENTS;
             createServerIdFile();
+        }
+        else
+        {
+            m_state = ERROR_LEAVE;
         }
         break;
     }
@@ -442,6 +444,30 @@ void ServerLobby::update(int ticks)
         setup();
     }
 
+    // Reset for ranked server if in kart / track selection has only 1 player
+    if (NetworkConfig::get()->isRankedServer() &&
+        m_state.load() == SELECTING &&
+        m_game_setup->getPlayerCount() == 1)
+    {
+        NetworkString* exit_result_screen = getNetworkString(1);
+        exit_result_screen->setSynchronous(true);
+        exit_result_screen->addUInt8(LE_EXIT_RESULT);
+        sendMessageToPeers(exit_result_screen, /*reliable*/true);
+        delete exit_result_screen;
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
+        m_game_setup->stopGrandPrix();
+        m_state = NetworkConfig::get()->isLAN() ?
+            ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
+        updatePlayerList(true/*force_update*/);
+        NetworkString* server_info = getNetworkString();
+        server_info->setSynchronous(true);
+        server_info->addUInt8(LE_SERVER_INFO);
+        m_game_setup->addServerInfo(server_info);
+        sendMessageToPeers(server_info);
+        delete server_info;
+        setup();
+    }
+
     if (m_game_setup)
     {
         // Remove disconnected players if in these two states
@@ -486,8 +512,7 @@ void ServerLobby::update(int ticks)
             NetworkString *exit_result_screen = getNetworkString(1);
             exit_result_screen->setSynchronous(true);
             exit_result_screen->addUInt8(LE_EXIT_RESULT);
-            sendMessageToPeers(exit_result_screen,
-                                            /*reliable*/true);
+            sendMessageToPeers(exit_result_screen, /*reliable*/true);
             delete exit_result_screen;
             std::lock_guard<std::mutex> lock(m_connection_mutex);
             m_state = NetworkConfig::get()->isLAN() ?
@@ -515,8 +540,11 @@ void ServerLobby::update(int ticks)
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
-void ServerLobby::registerServer()
+bool ServerLobby::registerServer()
 {
+    while (!m_server_unregistered.expired())
+        StkTime::sleep(1);
+
     Online::XMLRequest *request = new Online::XMLRequest();
     NetworkConfig::get()->setServerDetails(request, "create");
     request->addParameter("address",      m_server_address.getIP()        );
@@ -538,22 +566,20 @@ void ServerLobby::registerServer()
 
     request->executeNow();
 
-    const XMLNode * result = request->getXMLData();
+    const XMLNode* result = request->getXMLData();
     std::string rec_success;
 
     if (result->get("success", &rec_success) && rec_success == "yes")
     {
         Log::info("ServerLobby", "Server is now online.");
-        m_server_registered = true;
+        delete request;
+        return true;
     }
-    else
-    {
-        irr::core::stringc error(request->getInfo().c_str());
-        Log::error("ServerLobby", "%s", error.c_str());
-        m_server_registered = false;
-        m_state = ERROR_LEAVE;
-    }
+
+    irr::core::stringc error(request->getInfo().c_str());
+    Log::error("ServerLobby", "%s", error.c_str());
     delete request;
+    return false;
 }   // registerServer
 
 //-----------------------------------------------------------------------------
@@ -565,6 +591,7 @@ void ServerLobby::unregisterServer(bool now)
 {
     Online::XMLRequest* request =
         new Online::XMLRequest(!now/*manage memory*/);
+    m_server_unregistered = request->observeExistence();
     NetworkConfig::get()->setServerDetails(request, "stop");
 
     request->addParameter("address", m_server_address.getIP());
@@ -623,10 +650,9 @@ void ServerLobby::startSelection(const Event *event)
     }
 
     ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
-    if (m_server_registered)
+    if (NetworkConfig::get()->isWAN())
     {
         unregisterServer(false/*now*/);
-        m_server_registered = false;
     }
 
     NetworkString *ns = getNetworkString(1);

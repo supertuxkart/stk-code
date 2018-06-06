@@ -2006,8 +2006,8 @@ int main(int argc, char *argv[] )
     if (STKHost::existHost())
         STKHost::get()->shutdown();
 
-    NetworkConfig::destroy();
     cleanSuperTuxKart();
+    NetworkConfig::destroy();
 
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();

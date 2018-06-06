@@ -78,8 +78,8 @@ private:
 
     bool m_has_created_server_id_file;
 
-    /** It indicates if this server is registered with the stk server. */
-    std::atomic_bool m_server_registered;
+    /** It indicates if this server is unregistered with the stk server. */
+    std::weak_ptr<bool> m_server_unregistered;
 
     /** Timeout counter for various state. */
     std::atomic<float> m_timeout;
@@ -127,7 +127,7 @@ private:
     // Track(s) votes
     void playerVote(Event *event);
     void playerFinishedResult(Event *event);
-    void registerServer();
+    bool registerServer();
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
