@@ -188,10 +188,7 @@ On OS X 10.9.5, you might need the following workaround:
 sudo ln -s `xcrun --show-sdk-path`/usr/include/ /usr/include
 sudo ln -s `xcrun --show-sdk-path`/System/Library/Frameworks/OpenGL.framework/Headers/ /usr/local/include/OpenGL
 ```
-
 The first link is required in order to find libcurl, the second to find opengl.
-
-Download pre-built dependencies from [here](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/OSX/) and put the frameworks in [hard disk root]/Library/Frameworks
 
 ### CMake
 
@@ -199,9 +196,47 @@ CMake is used to build STK. At this time CMake will not make a binary that is re
 
 You'll have to run these commands inside your stk-code directory.
 
-### Building
 
-With clang:
+### STK 0.9.4 or later (or latest git)
+
+Install homebrew ( https://brew.sh/)
+Install all of the dependencies using homebrew :
+
+```bash
+brew install libogg
+brew install libvorbis
+brew install openal-soft
+brew install freetype
+brew install curl
+brew install openssl@1.1
+brew install fribidi
+brew install glew
+```
+
+Build STK
+```bash
+mkdir cmake_build
+cd cmake_build
+CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/ /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib
+make
+```
+
+#### (Optional) packaging for distribution
+
+By default, the executable that is produced is not ready for distribution. Install https://github.com/auriamg/macdylibbundler
+
+```bash
+dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./bin/SuperTuxKart.app/Contents/libs/ -p @executable_path/../libs/
+```
+
+then copy the datafiles into /SuperTuxKart.app/Contents/Resources/data
+
+
+### STK 0.9.3 or earlier
+
+Download pre-built dependencies from [here](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/OSX/) and put the frameworks in [hard disk root]/Library/Frameworks
+
+Building with clang:
 
 ```bash
 mkdir cmake_build
@@ -210,7 +245,7 @@ cmake ..
 make
 ```
 
-With GCC:
+Building with GCC:
 ```bash
 mkdir cmake_build
 cd cmake_build
@@ -223,7 +258,7 @@ Building on 10.10 with 10.9 compatibility:
 cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
 ```
 
-### Xcode
+#### Xcode
 
 Place an additional copy of the dependencies into `Users/<YOUR_USERNAME>/Library/Frameworks`.
 Then cd to your cloned stk-code directory and execute the following commands:
