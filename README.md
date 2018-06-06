@@ -65,7 +65,10 @@ mesa-common-dev pkg-config zlib1g-dev
 Fedora command:
 
 ```bash
-sudo dnf install @development-tools libjpeg-turbo-devel linXranddr-devel openal-soft-devel bluez-libs-devel libogg-devel libvorbis-devel fribidi-devel openssl-devel zlib-devel libcur-devel cmake freetype-devel libpng-devel mesa-libGL-devel
+sudo dnf install @development-tools libjpeg-turbo-devel libXrandr-devel \
+openal-soft-devel bluez-libs-devel libogg-devel libvorbis-devel fribidi-devel \
+openssl-devel zlib-devel libcurl-devel cmake freetype-devel libpng-devel \
+mesa-libGL-devel subversion git
 ```
 ### In-game recorder
 
