@@ -722,6 +722,7 @@ bool handleContextMenuAction(s32 cmd_id)
     break;
     case DEBUG_ADJUST_LIGHTS:
     {
+        if (!world) return false;
         // Some sliders use multipliers because the spinner widget
         // only supports integers
         DebugSliderDialog *dsd = new DebugSliderDialog();
