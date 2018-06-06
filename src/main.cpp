@@ -598,7 +598,7 @@ void cmdLineHelp()
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
-    "       --motd             Message showing in all lobby of clients.\n"
+    "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
@@ -1065,7 +1065,22 @@ int handleCmdLine()
 
     if (CommandLine::has("--motd", &s))
     {
-        core::stringw motd = StringUtils::xmlDecode(s);
+        core::stringw motd;
+        if (s.find(".txt") != std::string::npos)
+        {
+            std::ifstream message(s);
+            if (message.is_open())
+            {
+                for (std::string line; std::getline(message, line); )
+                {
+                    motd += StringUtils::utf8ToWide(line).trim() + L"\n";
+                }
+                // Remove last newline
+                motd.erase(motd.size() - 1);
+            }
+        }
+        else
+            motd = StringUtils::xmlDecode(s);
         NetworkConfig::get()->setMOTD(motd);
     }
     if (CommandLine::has("--ranked"))

@@ -143,10 +143,10 @@ public:
     // ------------------------------------------------------------------------
     BareNetworkString& encodeString16(const irr::core::stringw& value)
     {
-        uint8_t str_len = (uint8_t)value.size();
-        if (value.size() > 255)
-            str_len = 255;
-        addUInt8(str_len);
+        uint16_t str_len = (uint16_t)value.size();
+        if (value.size() > 65535)
+            str_len = 65535;
+        addUInt16(str_len);
         for (unsigned i = 0; i < str_len; i++)
             addUInt16((uint16_t)value[i]);
         return *this;
@@ -154,13 +154,13 @@ public:
     // ------------------------------------------------------------------------
     int decodeString16(irr::core::stringw* out) const
     {
-        unsigned str_len = getUInt8();
+        uint16_t str_len = getUInt16();
         for (unsigned i = 0; i < str_len; i++)
         {
             uint16_t c = getUInt16();
             out->append((wchar_t)c);
         }
-        return str_len + 1;
+        return str_len + 2;
     }
     // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);

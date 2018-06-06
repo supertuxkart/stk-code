@@ -531,9 +531,10 @@ void ClientLobby::handleServerInfo(Event* event)
         start_threshold, start_timeout, max_player);
 
     // MOTD
-    data.decodeStringW(&str);
-    if (!str.empty())
-        NetworkingLobby::getInstance()->addMoreServerInfo(str);
+    core::stringw motd;
+    data.decodeString16(&motd);
+    if (!motd.empty())
+        NetworkingLobby::getInstance()->addMoreServerInfo(motd);
 
 }   // handleServerInfo
 

@@ -143,7 +143,7 @@ void GameSetup::addServerInfo(NetworkString* ns)
         ns->addFloat(0.0f).addFloat(0.0f);
     ns->addUInt8(NetworkConfig::get()->getMaxPlayers());
 
-    ns->encodeString(NetworkConfig::get()->getMOTD());
+    ns->encodeString16(NetworkConfig::get()->getMOTD());
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------
