@@ -30,7 +30,9 @@
 #endif
 #include <curl/curl.h>
 #include <assert.h>
+#include <memory>
 #include <string>
+
 
 namespace Online
 {
@@ -42,6 +44,7 @@ namespace Online
         /** On a successful download contains the converted XML tree. */
         XMLNode *m_xml_data;
 
+        std::shared_ptr<bool> m_exists;
     protected:
 
 		/** Additional info contained the downloaded data (or an error
@@ -89,6 +92,8 @@ namespace Online
             assert(hasBeenExecuted());
             return m_success;
         }   // isSuccess
+        // --------------------------------------------------------------------
+        std::weak_ptr<bool> observeExistence() const       { return m_exists; }
 
     };   // class XMLRequest
 } //namespace Online
