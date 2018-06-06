@@ -440,8 +440,8 @@ void ClientLobby::disconnectedPlayer(Event* event)
  */
 void ClientLobby::connectionAccepted(Event* event)
 {
-    // At least 4 bytes should remain now
-    if (!checkDataSize(event, 4)) return;
+    // At least 8 bytes should remain now
+    if (!checkDataSize(event, 8)) return;
 
     NetworkString &data = event->data();
     // Accepted
@@ -450,6 +450,9 @@ void ClientLobby::connectionAccepted(Event* event)
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     m_state.store(CONNECTED);
+    float auto_start_timer = data.getFloat();
+    if (auto_start_timer != std::numeric_limits<float>::max())
+        NetworkingLobby::getInstance()->setStartingTimerTo(auto_start_timer);
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------

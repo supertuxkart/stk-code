@@ -1340,19 +1340,24 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     peer->setValidated();
-    // send a message to the one that asked to connect
-    NetworkString* message_ack = getNetworkString(4);
-    message_ack->setSynchronous(true);
-    // connection success -- return the host id of peer
-    message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId());
-    peer->sendPacket(message_ack);
-    delete message_ack;
 
+    // send a message to the one that asked to connect
     NetworkString* server_info = getNetworkString();
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
     peer->sendPacket(server_info);
+
+    NetworkString* message_ack = getNetworkString(4);
+    message_ack->setSynchronous(true);
+    // connection success -- return the host id of peer
+    float auto_start_timer = m_timeout.load();
+    message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
+        .addFloat(auto_start_timer == std::numeric_limits<float>::max() ?
+        auto_start_timer : auto_start_timer - (float)StkTime::getRealTime());
+    peer->sendPacket(message_ack);
+    delete message_ack;
+
     // Make sure it will always ping at least the frequency of state exchange
     // so enet will not ping when we exchange state but keep ping elsewhere
     // then in lobby the ping seen will be correct

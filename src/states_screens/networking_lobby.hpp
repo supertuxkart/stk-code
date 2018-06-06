@@ -132,6 +132,8 @@ public:
     uint32_t getServerPing() const;
     void initAutoStartTimer(bool grand_prix_started, float start_threshold,
                             float start_timeout, unsigned server_max_player);
+    void setStartingTimerTo(float t)             { m_cur_starting_timer = t; }
+
 };   // class NetworkingLobby
 
 #endif
