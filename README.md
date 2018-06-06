@@ -62,6 +62,11 @@ libcurl4-gnutls-dev libfreetype6-dev libfribidi-dev libgl1-mesa-dev \
 libjpeg-dev libogg-dev libopenal-dev libpng-dev libvorbis-dev libxrandr-dev \
 mesa-common-dev pkg-config zlib1g-dev
 ```
+Fedora command:
+
+```bash
+sudo dnf install @development-tools libjpeg-turbo-devel linXranddr-devel openal-soft-devel bluez-libs-devel libogg-devel libvorbis-devel fribidi-devel openssl-devel zlib-devel libcur-devel cmake freetype-devel libpng-devel mesa-libGL-devel
+```
 ### In-game recorder
 
 To build the in-game recorder for STK, you have to install
