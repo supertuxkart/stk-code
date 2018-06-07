@@ -336,7 +336,6 @@ void ServerLobby::asynchronousUpdate()
     {
         requestTerminate();
         m_state = EXITING;
-        STKHost::get()->setErrorMessage(_("Failed to setup server."));
         STKHost::get()->requestShutdown();
         break;
     }
