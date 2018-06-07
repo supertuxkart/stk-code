@@ -456,7 +456,7 @@ void LinearWorld::newLap(unsigned int kart_index)
                 NetworkConfig::get()->isAutoEnd() &&
                 m_finish_timeout == std::numeric_limits<float>::max())
             {
-                m_finish_timeout = finish_time * 1.25f + 15.0f;
+                m_finish_timeout = finish_time * 0.25f + 15.0f;
             }
             kart->finishedRace(finish_time);
         }
