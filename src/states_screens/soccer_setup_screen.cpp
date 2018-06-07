@@ -305,6 +305,12 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 {
     if(m_schedule_continue)
         return EVENT_BLOCK;
+        
+    const bool pressed_down = value > Input::MAX_VALUE*2/3;
+    
+    if (!pressed_down)
+        return EVENT_BLOCK;
+    
 
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
     BubbleWidget* bubble = getWidget<BubbleWidget>("lblLeftRight");
