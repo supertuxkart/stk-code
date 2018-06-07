@@ -373,6 +373,12 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         {
             return EVENT_LET;
         }
+        
+        if ((!m_kart_view_info[playerId].confirmed) && 
+            (playerId == PLAYER_ID_GAME_MASTER))
+        {
+            return EVENT_LET;
+        }
 
         if (m_kart_view_info[playerId].confirmed)
         {
