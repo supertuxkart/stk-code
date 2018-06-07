@@ -2013,13 +2013,19 @@ void SkiddingAI::computeNearestKarts()
         int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
         int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
         // Converts a position among AI to a position among players
-        float ideal_target = ((position_among_ai-1) / ((float) num_ai-1)
+        float ideal_target = 1.0f;
+       
+        // Avoid a division by 0.
+        // If there is only one AI, it will target the first player
+        if (num_ai > 1)
+            ideal_target = ((position_among_ai-1) / ((float) num_ai-1)
                              * ((float) race_manager->getNumPlayers()-1)) + 1.0f;
+        
         // Substract 1 as index start from 0 and add 0.5 to get rounding
         // The cast truncate the decimals, so it won't go over n-1
         // as the highest possible ideal_target is n
         int target_index = (int) (ideal_target - 0.5f);
-        assert (target_index >= 0 && target_index <= n-1);
+        assert(target_index >= 0 && target_index <= n-1);
         target_overall_distance = overall_distance[target_index];
     }
     // Now convert 'maximum overall distance' to distance to player.
