@@ -70,6 +70,9 @@ private:
     /** True if this is a ranked server */
     bool m_is_ranked_server;
 
+    /* True if automatically end after 1st player finished for some time. */
+    bool m_auto_end;
+
     /** The password for a server (or to authenticate to a server). */
     std::string m_password;
 
@@ -317,6 +320,10 @@ public:
     void setOwnerLess(bool val)                         { m_owner_less = val; }
     // ------------------------------------------------------------------------
     bool isOwnerLess() const                           { return m_owner_less; }
+    // ------------------------------------------------------------------------
+    void setAutoEnd(bool val)                             { m_auto_end = val; }
+    // ------------------------------------------------------------------------
+    bool isAutoEnd() const                               { return m_auto_end; }
 
 };   // class NetworkConfig
 

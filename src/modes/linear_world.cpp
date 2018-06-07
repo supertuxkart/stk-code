@@ -30,6 +30,7 @@
 #include "graphics/material.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "physics/physics.hpp"
+#include "network/network_config.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/drive_graph.hpp"
@@ -92,6 +93,7 @@ LinearWorld::~LinearWorld()
 void LinearWorld::reset()
 {
     WorldWithRank::reset();
+    m_finish_timeout = std::numeric_limits<float>::max();
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
     m_fastest_lap_ticks    = INT_MAX;
@@ -157,6 +159,16 @@ void LinearWorld::reset()
  */
 void LinearWorld::update(int ticks)
 {
+    if (getPhase() == RACE_PHASE &&
+        m_finish_timeout != std::numeric_limits<float>::max())
+    {
+        m_finish_timeout -= stk_config->ticks2Time(ticks);
+        if (m_finish_timeout < 0.0f)
+        {
+            endRaceEarly();
+            m_finish_timeout = std::numeric_limits<float>::max();
+        }
+    }
     const unsigned int kart_amount = getNumKarts();
 
     // Do stuff specific to this subtype of race.
@@ -439,6 +451,13 @@ void LinearWorld::newLap(unsigned int kart_index)
         
             float prev_time = kart->getRecentPreviousXYZTime();
             float finish_time = prev_time*finish_proportion + getTime()*(1.0f-finish_proportion);
+
+            if (NetworkConfig::get()->isServer() &&
+                NetworkConfig::get()->isAutoEnd() &&
+                m_finish_timeout == std::numeric_limits<float>::max())
+            {
+                m_finish_timeout = finish_time * 1.25f + 15.0f;
+            }
             kart->finishedRace(finish_time);
         }
     }

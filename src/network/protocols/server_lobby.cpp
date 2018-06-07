@@ -811,6 +811,8 @@ void ServerLobby::checkRaceFinished()
     assert(World::getWorld());
     if (!RaceEventManager::getInstance()->isRaceOver()) return;
 
+    Log::info("ServerLobby", "The game is considered finish.");
+
     // Reset for next state usage
     resetPeersReady();
     NetworkString* total = getNetworkString();

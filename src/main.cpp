@@ -599,6 +599,8 @@ void cmdLineHelp()
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
+    "       --auto-end         Automatically end network game after 1st player finished\n"
+    "                          for some time (currently his finished time * 1.25 + 15.0). \n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
@@ -1088,6 +1090,11 @@ int handleCmdLine()
         NetworkConfig::get()->setValidatedPlayers(true);
         NetworkConfig::get()->setRankedServer(true);
         NetworkConfig::get()->setOwnerLess(true);
+        NetworkConfig::get()->setAutoEnd(true);
+    }
+    if (CommandLine::has("--auto-end"))
+    {
+        NetworkConfig::get()->setAutoEnd(true);
     }
     if (CommandLine::has("--owner-less"))
     {
