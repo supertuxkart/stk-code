@@ -176,9 +176,8 @@ void TracksScreen::beforeAddingWidget()
         getWidget("vote")->setVisible(true);
         calculateLayout();
         //I18N: In track screen for networking, clarify voting phase
-        core::stringw msg = _("Poll will end early, after votes of all entries"
-            " from all players have more than 50% share, when half of the"
-            " remaining time is passed.");
+        core::stringw msg = _("If a majority of players all select the same"
+            " track and race settings, voting will end early.");
         MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     }
     else
