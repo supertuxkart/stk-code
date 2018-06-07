@@ -3518,7 +3518,12 @@ msgid "Username and/or email address invalid."
 msgstr ""
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
-msgid "Please read the terms and conditions "
+msgid ""
+"Please read the terms and conditions for SuperTuxKart at '%s'. You must "
+"agree to these terms in order to register an account for STK. By checking "
+"the box below, you are confirming that you understand these terms. If you "
+"have any questions or comments regarding these terms, one of the members of "
+"the development team would gladly assist you."
 msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:52
