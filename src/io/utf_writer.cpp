@@ -25,27 +25,40 @@ using namespace irr;
 
 // ----------------------------------------------------------------------------
 
-UTFWriter::UTFWriter(const char* dest)
+UTFWriter::UTFWriter(const char* dest, bool wide)
          : m_base(dest, std::ios::out | std::ios::binary)
 {
+    m_wide = wide;
+
     if (!m_base.is_open())
     {
         throw std::runtime_error("Failed to open file for writing : " +
                                   std::string(dest));
     }
 
-    // FIXME: make sure to properly handle endianness
-    // UTF-16 BOM is 0xFEFF; UTF-32 BOM is 0x0000FEFF. So this works in either case
-    wchar_t BOM = 0xFEFF;
+    if (wide)
+    {
+        // FIXME: make sure to properly handle endianness
+        // UTF-16 BOM is 0xFEFF; UTF-32 BOM is 0x0000FEFF. So this works in either case
+        wchar_t BOM = 0xFEFF;
 
-    m_base.write((char *) &BOM, sizeof(wchar_t));
+        m_base.write((char *) &BOM, sizeof(wchar_t));
+    }
 }   // UTFWriter
 
 // ----------------------------------------------------------------------------
 
 UTFWriter& UTFWriter::operator<< (const irr::core::stringw& txt)
 {
-    m_base.write((char *) txt.c_str(), txt.size() * sizeof(wchar_t));
+    if (m_wide)
+    {
+        m_base.write((char *) txt.c_str(), txt.size() * sizeof(wchar_t));
+    }
+    else
+    {
+        std::string utf8 = StringUtils::wideToUtf8(txt);
+        operator<<(utf8);
+    }
     return *this;
 }   // operator<< (stringw)
 
@@ -53,7 +66,15 @@ UTFWriter& UTFWriter::operator<< (const irr::core::stringw& txt)
 
 UTFWriter& UTFWriter::operator<< (const wchar_t*txt)
 {
-    m_base.write((char *) txt, wcslen(txt) * sizeof(wchar_t));
+    if (m_wide)
+    {
+        m_base.write((char *) txt, wcslen(txt) * sizeof(wchar_t));
+    }
+    else
+    {
+        std::string utf8 = StringUtils::wideToUtf8(txt);
+        operator<<(utf8);
+    }
     return *this;
 }   // operator<< (wchar_t)
 

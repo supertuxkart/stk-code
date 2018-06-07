@@ -48,7 +48,7 @@ private:
 
     GUIEngine::RibbonWidget *m_options_widget;
 
-    /** The joinb button. */
+    /** The join button. */
     GUIEngine::IconButtonWidget *m_join_widget;
 
     /** The cancel button. */

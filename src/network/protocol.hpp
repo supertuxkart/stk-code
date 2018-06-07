@@ -125,10 +125,8 @@ public:
     /// functions to check incoming data easily
     NetworkString* getNetworkString(size_t capacity = 16);
     bool checkDataSize(Event* event, unsigned int minimum_size);
-    void sendMessageToPeersChangingToken(NetworkString *message,
-                                         bool reliable = true);
-    void sendToServer(NetworkString *message,
-                      bool reliable = true);
+    void sendMessageToPeers(NetworkString *message, bool reliable = true);
+    void sendToServer(NetworkString *message, bool reliable = true);
     void requestStart();
     void requestPause();
     void requestUnpause();

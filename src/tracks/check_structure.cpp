@@ -108,8 +108,10 @@ void CheckStructure::update(float dt)
         if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
         {
             if(UserConfigParams::m_check_debug)
-                Log::info("CheckStructure", "Check structure %d triggered for kart %s.",
-                          m_index, world->getKart(i)->getIdent().c_str());
+                Log::info("CheckStructure",
+                          "Check structure %d triggered for kart %s at %f.",
+                          m_index, world->getKart(i)->getIdent().c_str(),
+                          World::getWorld()->getTime());
             trigger(i);
         }
         m_previous_position[i] = xyz;
@@ -129,7 +131,7 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
                                   ChangeState change_state)
 {
     bool update_debug_colors =
-        UserConfigParams::m_check_debug &&
+        UserConfigParams::m_check_debug && race_manager->getNumPlayers()>0 &&
         kart_index == (int)World::getWorld()->getPlayerKart(0)->getWorldKartId();
 
     for(unsigned int i=0; i<indices.size(); i++)

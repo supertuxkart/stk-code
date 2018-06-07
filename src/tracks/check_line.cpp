@@ -26,6 +26,7 @@
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
@@ -73,7 +74,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         m_min_height = std::min(m_left_point.getY(), m_right_point.getY());
     }
     m_line.setLine(p1, p2);
-    if(UserConfigParams::m_check_debug)
+    if(UserConfigParams::m_check_debug && !ProfileWorld::isNoGraphics())
     {
 #ifndef SERVER_ONLY
         m_debug_dy_dc = std::make_shared<SP::SPDynamicDrawCall>

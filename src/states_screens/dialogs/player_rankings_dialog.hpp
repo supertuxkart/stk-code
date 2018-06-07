@@ -20,9 +20,11 @@
 #define HEADER_PLAYER_RANKINGS_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "states_screens/dialogs/ranking_callback.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+#include <memory>
 #include <tuple>
 #include <vector>
 
@@ -38,7 +40,8 @@ namespace GUIEngine
  * \brief Dialog that handle user in network lobby
  * \ingroup states_screens
  */
-class PlayerRankingsDialog : public GUIEngine::ModalDialog
+class PlayerRankingsDialog : public GUIEngine::ModalDialog,
+                             public RankingCallback
 {
 private:
     const uint32_t m_online_id;
@@ -46,6 +49,8 @@ private:
     const core::stringw m_name;
 
     bool m_self_destroy;
+
+    std::shared_ptr<bool> m_fetched_ranking;
 
     GUIEngine::RibbonWidget* m_options_widget;
 
@@ -61,11 +66,9 @@ private:
         /*scores*/float> > m_rankings;
 
     // ------------------------------------------------------------------------
-    void updatePlayerRanking();
+    void updateTopTenList();
     // ------------------------------------------------------------------------
-    void updateTopTen();
-    // ------------------------------------------------------------------------
-    void addTopTen();
+    void fillTopTenList();
 
 public:
     PlayerRankingsDialog(uint32_t online_id, const core::stringw& name);
@@ -84,15 +87,7 @@ public:
         return false;
     }
     // ------------------------------------------------------------------------
-    virtual void onUpdate(float dt)
-    {
-        // It's unsafe to delete from inside the event handler so we do it here
-        if (m_self_destroy)
-        {
-            ModalDialog::dismiss();
-            return;
-        }
-    }
+    virtual void onUpdate(float dt);
 };
 
 #endif

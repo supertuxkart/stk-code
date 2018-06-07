@@ -20,9 +20,11 @@
 #define HEADER_NETWORK_USER_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "states_screens/dialogs/ranking_callback.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+#include <memory>
 
 namespace GUIEngine
 {
@@ -35,7 +37,8 @@ namespace GUIEngine
  * \brief Dialog that handle user in network lobby
  * \ingroup states_screens
  */
-class NetworkUserDialog : public GUIEngine::ModalDialog
+class NetworkUserDialog : public GUIEngine::ModalDialog,
+                          public RankingCallback
 {
 private:
     const uint32_t m_host_id;
@@ -46,21 +49,26 @@ private:
 
     bool m_self_destroy;
 
-    GUIEngine::RibbonWidget * m_options_widget;
+    std::shared_ptr<bool> m_fetched_ranking;
 
-    GUIEngine::LabelWidget * m_name_widget;
+    GUIEngine::RibbonWidget* m_options_widget;
 
-    GUIEngine::IconButtonWidget * m_friend_widget;
+    GUIEngine::LabelWidget* m_name_widget;
 
-    GUIEngine::IconButtonWidget * m_kick_widget;
+    GUIEngine::LabelWidget* m_info_widget;
 
-    GUIEngine::IconButtonWidget * m_cancel_widget;
+    GUIEngine::IconButtonWidget* m_friend_widget;
+
+    GUIEngine::IconButtonWidget* m_kick_widget;
+
+    GUIEngine::IconButtonWidget* m_cancel_widget;
 
 public:
     NetworkUserDialog(uint32_t host_id, uint32_t online_id,
                       const core::stringw& name)
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
-          m_name(name), m_self_destroy(false)
+          m_name(name), m_self_destroy(false),
+          m_fetched_ranking(std::make_shared<bool>(false))
     {
         loadFromFile("online/user_info_dialog.stkgui");
     }
@@ -75,15 +83,8 @@ public:
     // ------------------------------------------------------------------------
     virtual bool onEscapePressed();
     // ------------------------------------------------------------------------
-    virtual void onUpdate(float dt)
-    {
-        // It's unsafe to delete from inside the event handler so we do it here
-        if (m_self_destroy)
-        {
-            ModalDialog::dismiss();
-            return;
-        }
-    }
+    virtual void onUpdate(float dt);
+
 };
 
 #endif

@@ -43,9 +43,23 @@ void NetworkUserDialog::beforeAddingWidgets()
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_name, false);
 
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
+    if (m_online_id != 0)
+    {
+        updatePlayerRanking(m_name, m_online_id, m_info_widget,
+            m_fetched_ranking);
+    }
+    else
+    {
+        m_info_widget->setVisible(false);
+    }
+
     m_friend_widget = getWidget<IconButtonWidget>("friend");
     assert(m_friend_widget != NULL);
-    m_friend_widget->setVisible(m_online_id != 0);
+    m_friend_widget->setVisible(m_online_id != 0 &&
+        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN
+        && m_online_id != PlayerManager::getCurrentPlayer()->getOnlineId());
 
     // Hide friend request button if already friend
     Online::OnlineProfile* opp =
@@ -66,7 +80,8 @@ void NetworkUserDialog::beforeAddingWidgets()
 
     //I18N: In the network user dialog
     m_kick_widget->setText(_("Kick"));
-    m_kick_widget->setVisible(STKHost::get()->isAuthorisedToControl());
+    m_kick_widget->setVisible(STKHost::get()->isAuthorisedToControl()
+        && m_host_id != STKHost::get()->getMyHostId());
 
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
@@ -79,8 +94,28 @@ void NetworkUserDialog::beforeAddingWidgets()
     getWidget<IconButtonWidget>("accept")->setVisible(false);
     getWidget<IconButtonWidget>("remove")->setVisible(false);
     getWidget<IconButtonWidget>("enter")->setVisible(false);
-    getWidget<LabelWidget>("info")->setVisible(false);
 }   // beforeAddingWidgets
+
+// -----------------------------------------------------------------------------
+void NetworkUserDialog::onUpdate(float dt)
+{
+    if (*m_fetched_ranking == false)
+    {
+        // I18N: In the network player dialog, showing when waiting for
+        // the result of the ranking info of a player
+        core::stringw fetching =
+            StringUtils::loadingDots(_("Fetching ranking info for %s.",
+            m_name));
+        m_info_widget->setText(fetching, false);
+    }
+
+    // It's unsafe to delete from inside the event handler so we do it here
+    if (m_self_destroy)
+    {
+        ModalDialog::dismiss();
+        return;
+    }
+}   // onUpdate
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation

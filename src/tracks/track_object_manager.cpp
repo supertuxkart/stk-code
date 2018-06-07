@@ -244,7 +244,7 @@ void TrackObjectManager::removeForRewind()
 {
     for (TrackObject* curr : m_all_objects)
     {
-        if (curr->getPhysicalObject() &&
+        if (curr->isEnabled() && curr->getPhysicalObject() &&
             curr->getPhysicalObject()->isDynamic())
             curr->getPhysicalObject()->removeBody();
     }
@@ -255,7 +255,7 @@ void TrackObjectManager::addForRewind()
 {
     for (TrackObject* curr : m_all_objects)
     {
-        if (curr->getPhysicalObject() &&
+        if (curr->isEnabled() && curr->getPhysicalObject() &&
             curr->getPhysicalObject()->isDynamic())
             curr->getPhysicalObject()->addBody();
     }

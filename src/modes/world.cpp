@@ -981,9 +981,11 @@ void World::updateGraphics(float dt)
     const int kart_amount = (int)m_karts.size();
     for (int i = 0; i < kart_amount; ++i)
     {
-        // Update all karts that are not eliminated
-        if (!m_karts[i]->isEliminated() )
+        // Update all karts that are visible
+        if (m_karts[i]->isVisible())
+        {
             m_karts[i]->updateGraphics(dt);
+        }
     }
 
     projectile_manager->updateGraphics(dt);

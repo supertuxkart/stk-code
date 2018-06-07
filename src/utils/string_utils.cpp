@@ -35,6 +35,9 @@
 #include <cwchar>
 #include <exception>
 
+#include <openssl/hmac.h>
+#include <openssl/buffer.h>
+
 namespace StringUtils
 {
     bool hasSuffix(const std::string& lhs, const std::string &rhs)
@@ -355,7 +358,8 @@ namespace StringUtils
                 }
                 else
                 {
-                    if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
+                    if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i' ||
+                       sv[i][1]=='f')
                     {
                         if (insertValID >= all_vals.size())
                         {
@@ -427,7 +431,8 @@ namespace StringUtils
                 }
                 else
                 {
-                    if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
+                    if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i' ||
+                        sv[i][1]=='f')
                     {
                         if (insertValID >= all_vals.size())
                         {
@@ -504,7 +509,7 @@ namespace StringUtils
      *  \param time Time in seconds.
      *  \param precision The number of seconds decimals - 3 to display ms, default 2
      */
-    std::string timeToString(float time, unsigned int precision, bool display_minutes_if_zero)
+    std::string timeToString(float time, unsigned int precision, bool display_minutes_if_zero, bool display_hours)
     {
         //Time more detailed than ms are mostly meaningless
         if (precision > 3)
@@ -546,12 +551,15 @@ namespace StringUtils
             else
                 final_append = "";
             // concatenate the strings with +
-            if (display_minutes_if_zero)
+            if (display_hours)
+                return (std::string("00:00:00") + final_append);
+            else if (display_minutes_if_zero)
                 return (std::string("00:00") + final_append);
             else
                 return (std::string("00") + final_append);
         }
-        else if(int_time >= 100*60*precision_power)  // up to 99:59.999
+        else if((int_time >= 60*60*precision_power && !display_hours) ||
+                int_time >= 100*60*60*precision_power)
         {
             std::string final_append;
             if (precision == 3)
@@ -563,7 +571,10 @@ namespace StringUtils
             else
                 final_append = "";
             // concatenate the strings with +
-            return (std::string("99:59") + final_append);
+            if (display_hours)
+                return (std::string("99:59:59") + final_append);
+            else
+                return (std::string("59:59") + final_append);
         }
 
         // Principle of the computation in pseudo-code
@@ -575,11 +586,15 @@ namespace StringUtils
         int_time       = int_time/precision_power;
         int sec        = int_time % 60;
         int_time       = int_time/60;
-        if (int_time >= 100) int_time = 99;
-        int min        = int_time;
+        int min        = int_time % 60;
+        int_time       = int_time/60;
+        int hours      = int_time;
 
         // Convert the times to string and add the missing zeroes if any
 
+        std::string s_hours = toString(hours);
+        if (hours < 10)
+            s_hours = std::string("0") + s_hours;
         std::string s_min = toString(min);
         if (min < 10)
             s_min = std::string("0") + s_min;
@@ -602,14 +617,15 @@ namespace StringUtils
         if(negative_time)
             s_neg = "-";
 
-        std::string s_min_and_sec = s_sec;
-        if (display_minutes_if_zero || min > 0)
-            s_min_and_sec = s_min + std::string(":") + s_sec;
-
+        std::string s_hours_min_and_sec = s_sec;
+        if (display_minutes_if_zero || min > 0 || display_hours)
+            s_hours_min_and_sec = s_min + std::string(":") + s_sec;
+        if (display_hours)
+            s_hours_min_and_sec = s_hours + std::string(":") + s_hours_min_and_sec;
         if (precision == 0)
-            return (s_neg + s_min_and_sec);
+            return (s_neg + s_hours_min_and_sec);
         else
-            return (s_neg + s_min_and_sec + std::string(".") + s_subsec);
+            return (s_neg + s_hours_min_and_sec + std::string(".") + s_subsec);
     }   // timeToString
 
     // ------------------------------------------------------------------------
@@ -884,6 +900,68 @@ namespace StringUtils
         }
         return destination;
     } //findAndReplace
+
+    // ------------------------------------------------------------------------
+    std::string base64(const std::vector<uint8_t>& input)
+    {
+        BIO *bmem, *b64;
+        BUF_MEM* bptr;
+        std::string result;
+
+        b64 = BIO_new(BIO_f_base64());
+        bmem = BIO_new(BIO_s_mem());
+        b64 = BIO_push(b64, bmem);
+
+        BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
+        BIO_write(b64, input.data(), input.size());
+        BIO_flush(b64);
+        BIO_get_mem_ptr(b64, &bptr);
+        result.resize(bptr->length - 1);
+        memcpy(&result[0], bptr->data, bptr->length - 1);
+        BIO_free_all(b64);
+
+        return result;
+    } //base64
+    // ------------------------------------------------------------------------
+    inline size_t calcDecodeLength(const std::string& input)
+    {
+        // Calculates the length of a decoded string
+        size_t padding = 0;
+        const size_t len = input.size();
+        if (input[len - 1] == '=' && input[len - 2] == '=')
+        {
+            // last two chars are =
+            padding = 2;
+        }
+        else if (input[len - 1] == '=')
+        {
+            // last char is =
+            padding = 1;
+        }
+        return (len * 3) / 4 - padding;
+    }
+    // ------------------------------------------------------------------------
+    std::vector<uint8_t> decode64(std::string input)
+    {
+        BIO *b64, *bmem;
+        size_t decode_len = calcDecodeLength(input);
+        std::vector<uint8_t> result(decode_len, 0);
+        b64 = BIO_new(BIO_f_base64());
+
+        bmem = BIO_new_mem_buf(&input[0], input.size());
+        bmem = BIO_push(b64, bmem);
+
+        BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
+#ifdef DEBUG
+        size_t read_l = BIO_read(bmem, result.data(), input.size());
+        assert(read_l == decode_len);
+#else
+        BIO_read(bmem, result.data(), input.size());
+#endif
+        BIO_free_all(bmem);
+
+        return result;
+    } //decode64
 
 } // namespace StringUtils
 

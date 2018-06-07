@@ -104,15 +104,15 @@ bool ChallengeStatus::isGrandPrix()
 
 void ChallengeStatus::save(UTFWriter& writer)
 {
-    writer << L"        <" << m_data->getChallengeId();
+    writer << "        <" << m_data->getChallengeId();
     if (isSolved(RaceManager::DIFFICULTY_BEST))
-        writer << L" solved=\"best\"/>\n";
+        writer << " solved=\"best\"/>\n";
     else if (isSolved(RaceManager::DIFFICULTY_HARD))
-        writer << L" solved=\"hard\"/>\n";
+        writer << " solved=\"hard\"/>\n";
     else if (isSolved(RaceManager::DIFFICULTY_MEDIUM))
-        writer << L" solved=\"medium\"/>\n";
+        writer << " solved=\"medium\"/>\n";
     else if (isSolved(RaceManager::DIFFICULTY_EASY))
-        writer << L" solved=\"easy\"/>\n";
+        writer << " solved=\"easy\"/>\n";
     else
-        writer << L" solved=\"none\"/>\n";
+        writer << " solved=\"none\"/>\n";
 }   // save

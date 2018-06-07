@@ -45,11 +45,6 @@
 #include "cpusimd.h"
 
 
-#ifndef M_PI
- #define M_PI 3.14159265358979323846
-#endif
-
-
 ////
 
 
@@ -66,7 +61,9 @@ const uint32_t CPU_ALIGN16 simd4uOneInv[4] = { ~1, ~1, ~1, ~1 };
 const uint32_t CPU_ALIGN16 simd4uTwo[4] = { 2, 2, 2, 2 };
 const uint32_t CPU_ALIGN16 simd4uFour[4] = { 4, 4, 4, 4 };
 const float CPU_ALIGN16 simd4fQuarter[4] = { 0.25, 0.25, 0.25, 0.25 };
-const float CPU_ALIGN16 simd4fPi[4] = { M_PI, M_PI, M_PI, M_PI };
+// Avoid double to float conversion warnings when using M_PI --> use our own PI
+#define PI 3.14159265358979323846f
+const float CPU_ALIGN16 simd4fPi[4] = { PI, PI, PI, PI };
 const float CPU_ALIGN16 simd4fZeroOneTwoThree[4] = { 0.0, 1.0, 2.0, 3.0 };
 const uint32_t CPU_ALIGN16 simd4fAlphaMask[4] = { 0x00000000, 0x00000000, 0x00000000, 0xffffffff };
 const float CPU_ALIGN16 simd4f255[4] = { 255.0f, 255.0f, 255.0f, 255.0f };
@@ -102,16 +99,16 @@ const float CPU_ALIGN16 simd4f255Inv[4] = { 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0
   (this is the zlib license)
 */
 
-static const float CPU_ALIGN16 simd4f_cephes_FOPI[4] = { 1.27323954473516, 1.27323954473516, 1.27323954473516, 1.27323954473516 };
+static const float CPU_ALIGN16 simd4f_cephes_FOPI[4] = { 1.27323954473516f, 1.27323954473516f, 1.27323954473516f, 1.27323954473516f };
 static const float CPU_ALIGN16 simd4f_minus_cephes_DP1[4] = { -0.78515625, -0.78515625, -0.78515625, -0.78515625 };
 static const float CPU_ALIGN16 simd4f_minus_cephes_DP2[4] = { -2.4187564849853515625e-4, -2.4187564849853515625e-4, -2.4187564849853515625e-4, -2.4187564849853515625e-4 };
-static const float CPU_ALIGN16 simd4f_minus_cephes_DP3[4] = { -3.77489497744594108e-8, -3.77489497744594108e-8, -3.77489497744594108e-8, -3.77489497744594108e-8 };
-static const float CPU_ALIGN16 simd4f_sincof_p0[4] = { -1.9515295891E-4, -1.9515295891E-4, -1.9515295891E-4, -1.9515295891E-4 };
-static const float CPU_ALIGN16 simd4f_sincof_p1[4] = { 8.3321608736E-3, 8.3321608736E-3, 8.3321608736E-3, 8.3321608736E-3 };
-static const float CPU_ALIGN16 simd4f_sincof_p2[4] = { -1.6666654611E-1, -1.6666654611E-1, -1.6666654611E-1, -1.6666654611E-1 };
-static const float CPU_ALIGN16 simd4f_coscof_p0[4] = { 2.443315711809948E-005, 2.443315711809948E-005, 2.443315711809948E-005, 2.443315711809948E-005 };
-static const float CPU_ALIGN16 simd4f_coscof_p1[4] = { -1.388731625493765E-003, -1.388731625493765E-003, -1.388731625493765E-003, -1.388731625493765E-003 };
-static const float CPU_ALIGN16 simd4f_coscof_p2[4] = { 4.166664568298827E-002, 4.166664568298827E-002, 4.166664568298827E-002, 4.166664568298827E-002 };
+static const float CPU_ALIGN16 simd4f_minus_cephes_DP3[4] = { -3.77489497744594108e-8f, -3.77489497744594108e-8f, -3.77489497744594108e-8f, -3.77489497744594108e-8f };
+static const float CPU_ALIGN16 simd4f_sincof_p0[4] = { -1.9515295891E-4f, -1.9515295891E-4f, -1.9515295891E-4f, -1.9515295891E-4f };
+static const float CPU_ALIGN16 simd4f_sincof_p1[4] = { 8.3321608736E-3f, 8.3321608736E-3f, 8.3321608736E-3f, 8.3321608736E-3f };
+static const float CPU_ALIGN16 simd4f_sincof_p2[4] = { -1.6666654611E-1f, -1.6666654611E-1f, -1.6666654611E-1f, -1.6666654611E-1f };
+static const float CPU_ALIGN16 simd4f_coscof_p0[4] = { 2.443315711809948E-005f, 2.443315711809948E-005f, 2.443315711809948E-005f, 2.443315711809948E-005f };
+static const float CPU_ALIGN16 simd4f_coscof_p1[4] = { -1.388731625493765E-003f, -1.388731625493765E-003f, -1.388731625493765E-003f, -1.388731625493765E-003f };
+static const float CPU_ALIGN16 simd4f_coscof_p2[4] = { 4.166664568298827E-002f, 4.166664568298827E-002f, 4.166664568298827E-002f, 4.166664568298827E-002f };
 
 __m128 simd4f_sin_ps( __m128 x )
 {
@@ -516,8 +513,8 @@ static inline CC_ALWAYSINLINE __m128 simd4f_fastpow_ps( __m128 arg, uint32_t exp
   __m128 ret = arg;
   float corrfactor, powfactor;
   /* Apply a constant pre-correction factor. */
-  corrfactor = exp2( 127.0 * expden / expnum - 127.0 ) * pow( 1.0 * coeffnum / coeffden, 1.0 * expden / expnum );
-  powfactor = 1.0 * expnum / expden;
+  corrfactor = (float)(exp2( 127.0 * expden / expnum - 127.0 ) * pow( 1.0 * coeffnum / coeffden, 1.0 * expden / expnum ));
+  powfactor = 1.0f * expnum / expden;
   ret = _mm_mul_ps( ret, _mm_set1_ps( corrfactor ) );
   /* Reinterpret arg as integer to obtain logarithm. */
   ret = _mm_cvtepi32_ps( _mm_castps_si128( ret ) );

@@ -229,8 +229,8 @@ void CutsceneWorld::update(int ticks)
     }
     else
     {
-        // this way of calculating time and  dt is more in line with what
-        // irrlicht does andprovides better synchronisation
+        // this way of calculating time and dt is more in line with what
+        // irrlicht does and provides better synchronisation
         double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
@@ -297,28 +297,32 @@ void CutsceneWorld::update(int ticks)
     {
         if (curr->getType() == "cutscene_camera")
         {
-            scene::ISceneNode* anchorNode = curr->getPresentation<TrackObjectPresentationEmpty>()->getNode();
-            m_camera->setPosition(anchorNode->getPosition());
-            m_camera->updateAbsolutePosition();
+            Camera *camera = Camera::getActiveCamera();
+            if (camera && camera->getType() == Camera::CM_TYPE_NORMAL)
+            {
+                scene::ISceneNode* anchorNode = curr->getPresentation<TrackObjectPresentationEmpty>()->getNode();
+                m_camera->setPosition(anchorNode->getPosition());
+                m_camera->updateAbsolutePosition();
 
-            core::vector3df rot = anchorNode->getRotation();
-            Vec3 rot2(rot);
-            rot2.setPitch(rot2.getPitch() + 90.0f);
-            m_camera->setRotation(rot2.toIrrVector());
+                core::vector3df rot = anchorNode->getRotation();
+                Vec3 rot2(rot);
+                rot2.setPitch(rot2.getPitch() + 90.0f);
+                m_camera->setRotation(rot2.toIrrVector());
 
-            irr::core::vector3df up(0.0f, 0.0f, 1.0f);
-            irr::core::matrix4 matrix = anchorNode->getAbsoluteTransformation();
-            matrix.rotateVect(up);
-            m_camera->setUpVector(up);
+                irr::core::vector3df up(0.0f, 0.0f, 1.0f);
+                irr::core::matrix4 matrix = anchorNode->getAbsoluteTransformation();
+                matrix.rotateVect(up);
+                m_camera->setUpVector(up);
 
-            SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
-                                          m_camera->getTarget() -
-                                            m_camera->getAbsolutePosition(),
-                                            Vec3(0,1,0));
-
+                SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
+                                              m_camera->getTarget() -
+                                                m_camera->getAbsolutePosition(),
+                                                Vec3(0,1,0));
+            }
             break;
         }
     }
+
     std::map<float, std::vector<TrackObject*> >::iterator it;
     for (it = m_sounds_to_trigger.begin(); it != m_sounds_to_trigger.end(); )
     {

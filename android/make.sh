@@ -237,7 +237,7 @@ if [ -f "$DIRNAME/obj/project_version" ]; then
     PROJECT_VERSION_PREV=$(cat "$DIRNAME/obj/project_version") 
     
     if [ -z "$PROJECT_VERSION" ]; then
-        PROJECT_VERSION="$PROJECT_VERSION_PREV"
+        export PROJECT_VERSION="$PROJECT_VERSION_PREV"
     elif [ "$PROJECT_VERSION" != "$PROJECT_VERSION_PREV" ]; then
         echo "Different project version has been set. Forcing recompilation..."
         touch -c "$DIRNAME/Android.mk"
@@ -246,7 +246,7 @@ fi
 
 if [ -z "$PROJECT_VERSION" ]; then
     if [ $IS_DEBUG_BUILD -ne 0 ]; then
-        PROJECT_VERSION="git"
+        export PROJECT_VERSION="git"
     else
         echo "Error: Variable PROJECT_VERSION is not set. It must have unique" \
              "value for release build."

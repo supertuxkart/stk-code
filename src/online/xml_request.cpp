@@ -43,6 +43,7 @@ namespace Online
         m_info     = "";
         m_success  = false;
         m_xml_data = NULL;
+        m_exists = std::make_shared<bool>(true);
     }   // XMLRequest
 
     // ------------------------------------------------------------------------

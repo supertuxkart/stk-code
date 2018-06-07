@@ -246,6 +246,9 @@ LightNode* findNearestLight()
 
 bool handleContextMenuAction(s32 cmd_id)
 {
+    if (cmd_id == -1)
+        return false;
+
     Camera* camera = Camera::getActiveCamera();
     unsigned int kart_num = 0;
     if (camera != NULL && camera->getKart() != NULL)
@@ -719,6 +722,7 @@ bool handleContextMenuAction(s32 cmd_id)
     break;
     case DEBUG_ADJUST_LIGHTS:
     {
+        if (!world) return false;
         // Some sliders use multipliers because the spinner widget
         // only supports integers
         DebugSliderDialog *dsd = new DebugSliderDialog();
@@ -938,7 +942,7 @@ bool onEvent(const SEvent &event)
                           "libopenglrecorder to enable recording.  If you got\n"
                           "SuperTuxKart from your distribution's repositories,\n"
                           "please use the official binaries, or contact your\n"
-                          "distributions's package mantainer.", DEBUG_STOP_RECORDING);
+                          "distributions's package mantainer.");
 #endif
 
             mnu->addItem(L"Change camera target >",-1,true, true);
@@ -1022,7 +1026,13 @@ bool onEvent(const SEvent &event)
 
 bool handleStaticAction(int key)
 {
-    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
+    Camera* camera = Camera::getActiveCamera();
+    unsigned int kart_num = 0;
+    if (camera != NULL && camera->getKart() != NULL)
+    {
+        kart_num = camera->getKart()->getWorldKartId();
+    }
+
     if (key == IRR_KEY_F1)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_FREE);

@@ -41,7 +41,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     if (event->getType() != EVENT_TYPE_MESSAGE || !World::getWorld())
         return true;
     NetworkString &data = event->data();
-    if (data.size() < 1) // for token and type
+    if (data.size() < 1) // for type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
@@ -134,7 +134,7 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
     ns->setSynchronous(true);
     ns->addUInt8(GE_KART_FINISHED_RACE).addUInt8(kart->getWorldKartId())
        .addFloat(time);
-    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    sendMessageToPeers(ns, /*reliable*/true);
     delete ns;
 }   // kartFinishedRace
 
@@ -145,7 +145,7 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  */
 void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 {
-    if (ns.size() < 5) // for token and type
+    if (ns.size() < 5)
     {
         Log::warn("GameEventsProtocol", "kartFinisheRace: Too short message.");
         return;

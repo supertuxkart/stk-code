@@ -58,11 +58,13 @@ private:
     /** This stores the live time difference between a ghost kart
      *  and a second kart racing against it (normal or ghost). 
      */
-
     float       m_live_time_difference;
 
     /** True if the live_time_difference is invalid */
     bool        m_valid_reference_time;
+
+    /* if set then the game will auto end after this time for networking */
+    float       m_finish_timeout;
 
     /** This calculate the time difference between the second kart in the race
      *  (there must be at least two) and the first kart in the race

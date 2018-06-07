@@ -9,14 +9,7 @@
 # FRIBIDI_LIBRARIES
 #     Fribidi library list
 
-if(APPLE)
-    set(FRIBIDI_INCLUDE_DIR NAMES fribidi/fribidi.h PATHS /Library/Frameworks/fribidi.framework/Headers)
-    find_library(FRIBIDI_LIBRARY NAMES fribidi PATHS /Library/Frameworks/fribidi.framework)
-    set(FRIBIDI_LIBRARIES ${FRIBIDI_LIBRARY})
-    include_directories(/Library/Frameworks/fribidi.framework/Headers)
-    #add_definitions(-framework fribidi)
-    set(FRIBIDI_FOUND 1)
-elseif(UNIX)
+if(UNIX)
     include(FindPkgConfig)
     pkg_check_modules(FRIBIDI fribidi)
 else()
