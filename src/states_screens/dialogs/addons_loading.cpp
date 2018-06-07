@@ -58,7 +58,10 @@ AddonsLoading::AddonsLoading(const std::string &id)
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_install_button   = getWidget<IconButtonWidget> ("install" );
     m_back_button      = getWidget<IconButtonWidget> ("back"  );
-    m_back_button->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
+    
+    RibbonWidget* actions = getWidget<RibbonWidget>("actions");
+    actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    actions->select("back", PLAYER_ID_GAME_MASTER);
 
     if(m_progress)
         m_progress->setVisible(false);
