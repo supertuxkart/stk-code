@@ -62,6 +62,14 @@ libcurl4-gnutls-dev libfreetype6-dev libfribidi-dev libgl1-mesa-dev \
 libjpeg-dev libogg-dev libopenal-dev libpng-dev libvorbis-dev libxrandr-dev \
 mesa-common-dev pkg-config zlib1g-dev
 ```
+Fedora command:
+
+```bash
+sudo dnf install @development-tools cmake bluez-libs-devel \
+openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
+libjpeg-turbo-devel ibogg-devel openal-soft-devel libpng-devel libvorbis-devel \
+libXrandr-devel libGLEW pkgconf zlib-devel
+```
 ### In-game recorder
 
 To build the in-game recorder for STK, you have to install
@@ -93,7 +101,7 @@ make -j4
 
 ##### Build Speed Optimization
 
-"-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
+"-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one. "-j$(nproc)" usually works.
 
 ### Further options
 
