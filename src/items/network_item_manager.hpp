@@ -70,7 +70,7 @@ public:
     void sendItemUpdate();
     void saveInitialState();
 
-    virtual void reset();
+    virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                          int ticks) OVERRIDE;
     virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;

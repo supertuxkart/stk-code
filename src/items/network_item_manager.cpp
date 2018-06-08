@@ -332,7 +332,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }   // while count >0
 
     // Inform the server which events have been received.
-    GameProtocol::lock()->sendItemEventConfirmation(World::getWorld()->getTimeTicks());
+    if (auto gp = GameProtocol::lock())
+        gp->sendItemEventConfirmation(World::getWorld()->getTimeTicks());
 
     // Forward the confirmed item state till the world time:
     int dt = World::getWorld()->getTimeTicks() - current_time;

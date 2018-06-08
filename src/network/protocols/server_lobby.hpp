@@ -16,6 +16,7 @@
 #include <tuple>
 
 class BareNetworkString;
+class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
 
@@ -34,6 +35,7 @@ public:
         WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
         DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
+        WAIT_FOR_RACE_STOPPED,    // Wait server for stopping all race protocols
         RESULT_DISPLAY,           // Show result screen
         ERROR_LEAVE,              // shutting down server
         EXITING
@@ -119,6 +121,10 @@ private:
     /** Number of ranked races done for each current players */
     std::map<uint32_t, unsigned> m_num_ranked_races;
 
+    bool m_waiting_for_reset;
+
+    NetworkString* m_result_ns;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -183,8 +189,6 @@ private:
                                   uint32_t online_id,
                                   const irr::core::stringw& online_name);
     std::tuple<std::string, uint8_t, bool, bool> handleVote();
-    void stopCurrentRace();
-
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
@@ -193,6 +197,7 @@ private:
     double distributeBasePoints(uint32_t online_id);
     double getModeFactor();
     double getModeSpread();
+    void checkRaceFinished();
 
 public:
              ServerLobby();
@@ -207,7 +212,6 @@ public:
     void signalRaceStartToClients();
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
-    void checkRaceFinished();
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();

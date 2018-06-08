@@ -162,17 +162,20 @@ void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
 void RewindManager::saveState(bool local_save)
 {
     PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
-    GameProtocol::lock()->startNewState(local_save);
+    auto gp = GameProtocol::lock();
+    if (!gp)
+        return;
+    gp->startNewState(local_save);
     AllRewinder::const_iterator rewinder;
     for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
     {
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
         BareNetworkString *buffer = (*rewinder)->saveState();
-        if (buffer && buffer->size() >= 0)
+        if (buffer)
         {
             m_overall_state_size += buffer->size();
-            GameProtocol::lock()->addState(buffer);
+            gp->addState(buffer);
         }   // size >= 0
         delete buffer;    // buffer can be freed
     }
@@ -186,10 +189,14 @@ void RewindManager::saveState(bool local_save)
  */
 void RewindManager::saveLocalState()
 {
+    auto gp = GameProtocol::lock();
+    if (!gp)
+        return;
+
     int ticks = World::getWorld()->getTimeTicks();
 
     saveState(/*local_state*/true);
-    NetworkString *state = GameProtocol::lock()->getState();
+    NetworkString *state = gp->getState();
 
     // Copy the data to a new string, making the buffer in
     // GameProtocol availble for again.
@@ -208,7 +215,6 @@ void RewindManager::saveLocalState()
 void RewindManager::restoreState(BareNetworkString *data)
 {
     data->reset();   
-    int index = 0;
     
     for (auto rewinder  = m_all_rewinder.begin(); 
               rewinder != m_all_rewinder.end();   ++rewinder)
@@ -230,7 +236,6 @@ void RewindManager::update(int ticks_not_used)
         m_all_rewinder.size() == 0 ||
         m_is_rewinding)  return;
 
-    float time = World::getWorld()->getTime();
     int ticks = World::getWorld()->getTimeTicks();
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
@@ -245,7 +250,8 @@ void RewindManager::update(int ticks_not_used)
     // Save state
     saveState(/**allow_local_save*/false);
     PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
-    GameProtocol::lock()->sendState();
+    if (auto gp = GameProtocol::lock())
+        gp->sendState();
     PROFILER_POP_CPU_MARKER();
     m_last_saved_state = ticks;
 }   // update
