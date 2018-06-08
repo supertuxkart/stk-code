@@ -888,7 +888,7 @@ void ServerLobby::computeNewRankings()
     std::vector<double> scores_change;
     std::vector<double> new_scores;
 
-    auto players = m_game_setup->getPlayers();
+    auto players = m_game_setup->getConnectedPlayers(true/*same_offset*/);
     for (unsigned i = 0; i < players.size(); i++)
     {
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
@@ -918,7 +918,7 @@ void ServerLobby::computeNewRankings()
             double ranking_importance = 0.0;
 
             // No change between two quitting players
-            if (players[i].expired() && players[j].expired())
+            if (!players[i] && !players[j])
                 continue;
 
             double player2_scores = new_scores[j];
@@ -936,13 +936,13 @@ void ServerLobby::computeNewRankings()
 
             double mode_factor = getModeFactor();
 
-            if (players[i].expired())
+            if (!players[i])
             {
                 result = 0.0;
                 ranking_importance = mode_factor *
                     MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
             }
-            else if (players[j].expired())
+            else if (!players[j])
             {
                 result = 1.0;
                 ranking_importance = mode_factor *
