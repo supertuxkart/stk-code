@@ -228,8 +228,8 @@ void NetworkingLobby::onUpdate(float delta)
                 m_cur_starting_timer = 0.0f;
             //I18N: In the networking lobby, display the starting timeout
             //for owner-less server
-            core::stringw msg = _("Game will start after %d second(s).",
-                (int)m_cur_starting_timer);
+            core::stringw msg = _P("Game will start after %d second.",
+               "Game will start after %d seconds.", (int)m_cur_starting_timer);
             m_timeout_message->setText(msg, true);
         }
     }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-06 20:48-0400\n"
+"POT-Creation-Date: 2018-06-07 18:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,7 +140,7 @@ msgstr ""
 #. I18N: Ghost replay info action
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:285
+#: src/states_screens/dialogs/addons_loading.cpp:288
 msgid "Back"
 msgstr ""
 
@@ -332,7 +332,7 @@ msgstr ""
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/addons_loading.cpp:228
+#: src/states_screens/dialogs/addons_loading.cpp:231
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/user_screen.cpp:110
 msgid "Cancel"
@@ -1116,28 +1116,28 @@ msgstr ""
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:179 src/race/race_manager.hpp:176
+#: src/network/network_config.cpp:180 src/race/race_manager.hpp:176
 msgid "Normal Race"
 msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:181 src/race/race_manager.hpp:178
+#: src/network/network_config.cpp:182 src/race/race_manager.hpp:178
 msgid "Time Trial"
 msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:183 src/race/race_manager.hpp:182
+#: src/network/network_config.cpp:184 src/race/race_manager.hpp:182
 msgid "3 Strikes Battle"
 msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:185 src/race/race_manager.hpp:186
+#: src/network/network_config.cpp:186 src/race/race_manager.hpp:186
 msgid "Soccer"
 msgstr ""
 
@@ -2919,7 +2919,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/main.cpp:1664
+#: src/main.cpp:1671
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2929,16 +2929,16 @@ msgid ""
 "edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:1830
+#: src/main.cpp:1837
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:1859
+#: src/main.cpp:1866
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:1877
+#: src/main.cpp:1884
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
@@ -2958,26 +2958,26 @@ msgstr ""
 msgid "Leader"
 msgstr ""
 
-#: src/modes/linear_world.cpp:358
+#: src/modes/linear_world.cpp:370
 msgid "Final lap!"
 msgstr ""
 
-#: src/modes/linear_world.cpp:386
+#: src/modes/linear_world.cpp:398
 #, c-format
 msgid "Lap %i"
 msgstr ""
 
-#: src/modes/linear_world.cpp:469
+#: src/modes/linear_world.cpp:488
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr ""
 
-#: src/modes/linear_world.cpp:474
+#: src/modes/linear_world.cpp:493
 msgid "New fastest lap"
 msgstr ""
 
-#: src/modes/linear_world.cpp:1001
+#: src/modes/linear_world.cpp:1020
 msgid "WRONG WAY!"
 msgstr ""
 
@@ -2997,11 +2997,11 @@ msgstr ""
 msgid "'%s' has been eliminated."
 msgstr ""
 
-#: src/network/network_config.cpp:175
+#: src/network/network_config.cpp:176
 msgid "Normal Race (Grand Prix)"
 msgstr ""
 
-#: src/network/network_config.cpp:177
+#: src/network/network_config.cpp:178
 msgid "Time Trial (Grand Prix)"
 msgstr ""
 
@@ -3117,10 +3117,6 @@ msgstr ""
 #: src/states_screens/online_screen.cpp:266
 #, c-format
 msgid "Cannot connect to server %s."
-msgstr ""
-
-#: src/network/protocols/server_lobby.cpp:339
-msgid "Failed to setup server."
 msgstr ""
 
 #. I18N: Official means this server is hosted by STK team
@@ -3336,50 +3332,50 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:97
+#: src/states_screens/dialogs/addons_loading.cpp:100
 msgid "Update"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:109
+#: src/states_screens/dialogs/addons_loading.cpp:112
 #, c-format
 msgid "Version: %d"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:140
+#: src/states_screens/dialogs/addons_loading.cpp:143
 msgid "featured"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:166
+#: src/states_screens/dialogs/addons_loading.cpp:169
 #, c-format
 msgid "%s MB"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:173
-#: src/states_screens/dialogs/addons_loading.cpp:177
+#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:180
 #, c-format
 msgid "%s KB"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:178
+#: src/states_screens/dialogs/addons_loading.cpp:181
 #, c-format
 msgid "Size: %s"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:280
+#: src/states_screens/dialogs/addons_loading.cpp:283
 msgid "Sorry, downloading the add-on failed"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:361
+#: src/states_screens/dialogs/addons_loading.cpp:364
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:372
-#: src/states_screens/dialogs/addons_loading.cpp:409
+#: src/states_screens/dialogs/addons_loading.cpp:375
+#: src/states_screens/dialogs/addons_loading.cpp:412
 msgid "Try again"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:398
+#: src/states_screens/dialogs/addons_loading.cpp:401
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr ""
@@ -3522,7 +3518,12 @@ msgid "Username and/or email address invalid."
 msgstr ""
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
-msgid "Please read the terms and conditions "
+msgid ""
+"Please read the terms and conditions for SuperTuxKart at '%s'. You must "
+"agree to these terms in order to register an account for STK. By checking "
+"the box below, you are confirming that you understand these terms. If you "
+"have any questions or comments regarding these terms, one of the members of "
+"the development team would gladly assist you."
 msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:52
@@ -3798,8 +3799,10 @@ msgstr ""
 #. for owner-less server
 #: src/states_screens/networking_lobby.cpp:231
 #, c-format
-msgid "Game will start after %d second(s)."
-msgstr ""
+msgid "Game will start after %d second."
+msgid_plural "Game will start after %d seconds."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/states_screens/networking_lobby.cpp:260
 #, c-format
@@ -4369,7 +4372,7 @@ msgstr ""
 #. I18N: In tracks screen, about voting of tracks in network
 #: src/states_screens/tracks_screen.cpp:398
 #, c-format
-msgid "Remaining time: %d\n"
+msgid "Remaining time: %d"
 msgstr ""
 
 #. I18N: when showing who is the author of track '%s'

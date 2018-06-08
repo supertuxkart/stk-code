@@ -395,7 +395,8 @@ void TracksScreen::onUpdate(float dt)
     if (remaining_time < 0)
         remaining_time = 0;
     //I18N: In tracks screen, about voting of tracks in network
-    core::stringw message = _("Remaining time: %d\n", remaining_time);
+    core::stringw message = _("Remaining time: %d", remaining_time);
+    message += L"\n";
     unsigned height = GUIEngine::getFont()->getDimension(L"X").Height;
     const unsigned total_height = m_votes->getDimension().Height;
     m_vote_messages.lock();
