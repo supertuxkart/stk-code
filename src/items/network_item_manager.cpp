@@ -20,14 +20,11 @@
 
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
-#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
-#include "network/stk_host.hpp"
-#include "network/stk_peer.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
-
+#include "network/stk_peer.hpp"
 
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */
