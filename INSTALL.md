@@ -28,17 +28,17 @@ Ubuntu command:
 
 ```bash
 sudo apt-get install build-essential cmake libbluetooth-dev \
-libcurl4-gnutls-dev libfreetype6-dev libfribidi-dev libgl1-mesa-dev \
-libjpeg-dev libogg-dev libopenal-dev libpng-dev libvorbis-dev libxrandr-dev \
-mesa-common-dev pkg-config zlib1g-dev
+libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
+libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
+libssl-dev libvorbis-dev libxrandr-dev libx11-dev pkg-config zlib1g-dev
 ```
 Fedora command:
 
 ```bash
 sudo dnf install @development-tools cmake bluez-libs-devel \
 openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
-libjpeg-turbo-devel ibogg-devel openal-soft-devel libpng-devel libvorbis-devel \
-libXrandr-devel libGLEW pkgconf zlib-devel
+libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
+libvorbis-devel libXrandr-devel libGLEW pkgconf zlib-devel
 ```
 ### In-game recorder
 
