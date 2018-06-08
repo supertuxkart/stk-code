@@ -151,7 +151,7 @@ public:
         int y = height - int(1.5f * dim.Height);
         m_area = irr::core::recti(x, y, x + dim.Width, y + dim.Height);
         m_text->setRelativePosition(irr::core::recti(x + leftIconSize, y,
-            x + dim.Width - leftIconSize, y + dim.Height));
+            x + dim.Width - 10, y + dim.Height));
         m_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
         m_text->grab();
         m_text->remove();
