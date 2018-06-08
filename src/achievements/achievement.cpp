@@ -68,8 +68,8 @@ void Achievement::load(const XMLNode *node)
  */
 void Achievement::save(UTFWriter &out)
 {
-    out << L"        <achievement id=\"" << m_id << L"\" "
-        << L"achieved=\"" << m_achieved << "\"";
+    out << "        <achievement id=\"" << m_id << "\" "
+        << "achieved=\"" << m_achieved << "\"";
     if (isAchieved())
     {
         out << "/>\n";

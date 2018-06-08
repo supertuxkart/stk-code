@@ -30,12 +30,14 @@
 //-----------------------------------------------------------------------------
 StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
-    m_points            = 0;
-    m_first_time        = true;
-    m_easy_challenges   = 0;
-    m_medium_challenges = 0;
-    m_hard_challenges   = 0;
-    m_current_challenge = NULL;
+    m_points             = 0;
+    m_next_unlock_points = 0;
+    m_first_time         = true;
+    m_easy_challenges    = 0;
+    m_medium_challenges  = 0;
+    m_hard_challenges    = 0;
+    m_best_challenges    = 0;
+    m_current_challenge  = NULL;
 
     // If there is saved data, load it
     if(node)
@@ -62,7 +64,7 @@ StoryModeStatus::~StoryModeStatus()
  */
 void StoryModeStatus::addStatus(ChallengeStatus *cs)
 {
-    m_challenges_state[cs->getData()->getId()] = cs;
+    m_challenges_state[cs->getData()->getChallengeId()] = cs;
 }   // addStatus
 
 //-----------------------------------------------------------------------------
@@ -78,9 +80,11 @@ bool StoryModeStatus::isLocked(const std::string& feature)
 void StoryModeStatus::computeActive()
 {
     m_points = 0;
+    m_next_unlock_points = 0;
     m_easy_challenges = 0;
     m_medium_challenges = 0;
     m_hard_challenges = 0;
+    m_best_challenges = 0;
 
     m_locked_features.clear(); // start afresh
 
@@ -111,20 +115,32 @@ void StoryModeStatus::computeActive()
                 unlockFeature(i->second, RaceManager::DIFFICULTY_HARD,
                               /*save*/ false);
             }
-
-            if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
+            if (i->second->isSolved(RaceManager::DIFFICULTY_BEST))
             {
-                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD];
+                unlockFeature(i->second, RaceManager::DIFFICULTY_BEST,
+                              /*save*/ false);
+            }
+
+            int gp_factor = i->second->isGrandPrix() ? GP_FACTOR : 1;
+
+            if (i->second->isSolved(RaceManager::DIFFICULTY_BEST) && !i->second->isUnlockList())
+            {
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_BEST]*gp_factor;
+                m_best_challenges++;
+            }
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_HARD) && !i->second->isUnlockList())
+            {
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]*gp_factor;
                 m_hard_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM) && !i->second->isUnlockList())
             {
-                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM];
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]*gp_factor;
                 m_medium_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY) && !i->second->isUnlockList())
             {
-                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY];
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor;
                 m_easy_challenges++;
             }
         }
@@ -135,29 +151,40 @@ void StoryModeStatus::computeActive()
             lockFeature(i->second);
         }
 
-        if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
+        if (i->second->isSolved(RaceManager::DIFFICULTY_BEST))
         {
             // challenge beaten at hardest, nothing more to do here
             continue;
         }
+        else if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
+        {
+            i->second->setActive(RaceManager::DIFFICULTY_BEST);
+        }
         else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
         {
+            i->second->setActive(RaceManager::DIFFICULTY_BEST);
             i->second->setActive(RaceManager::DIFFICULTY_HARD);
         }
         else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
         {
+            i->second->setActive(RaceManager::DIFFICULTY_BEST);
             i->second->setActive(RaceManager::DIFFICULTY_HARD);
             i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
         }
         else
         {
+            i->second->setActive(RaceManager::DIFFICULTY_BEST);
             i->second->setActive(RaceManager::DIFFICULTY_HARD);
             i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
             i->second->setActive(RaceManager::DIFFICULTY_EASY);
         }
     }   // for i
 
-    // now we have the number of points. Actually lock the tracks
+    // now we have the number of points.
+
+    unlockFeatureByList();
+
+    //Actually lock the tracks
     for (i = m_challenges_state.begin(); i != m_challenges_state.end();  i++)
     {
         if (m_points < i->second->getData()->getNumTrophies())
@@ -173,11 +200,36 @@ void StoryModeStatus::computeActive()
             }
         }
     }
-
-    clearUnlocked();
-
-
 }   // computeActive
+
+//-----------------------------------------------------------------------------
+
+void StoryModeStatus::unlockFeatureByList()
+{
+    // test if we have unlocked a feature requiring a certain number of points
+    std::map<std::string, ChallengeStatus*>::const_iterator i;
+    for(i = m_challenges_state.begin();
+        i != m_challenges_state.end();  i++)
+    {
+        if (i->second->isUnlockList())
+        {
+            if (i->second->isSolvedAtAnyDifficulty())
+                continue;
+
+            bool newly_solved = unlock_manager->unlockByPoints(m_points,i->second);
+
+            // Add to list of recently unlocked features
+            if(newly_solved)
+                m_unlocked_features.push_back(i->second->getData());
+
+            //Retrieve the smallest number of points for the next unlockable
+            if (i->second->getData()->getNumTrophies() > m_points && (m_next_unlock_points == 0
+                || i->second->getData()->getNumTrophies() < m_next_unlock_points) )
+                m_next_unlock_points = i->second->getData()->getNumTrophies();
+        }
+    }
+} //unlockFeatureByList
+
 
 //-----------------------------------------------------------------------------
 
@@ -216,8 +268,10 @@ void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty 
         m_locked_features.erase(p);
     }
 
-    // Add to list of recently unlocked features
-    m_unlocked_features.push_back(c->getData());
+    // Add to list of recently unlocked features if the challenge is newly completed
+    if (!c->isSolvedAtAnyDifficulty())
+        m_unlocked_features.push_back(c->getData());
+
     c->setSolved(d);  // reset isActive flag
 
     // Save the new unlock information
@@ -250,6 +304,10 @@ void StoryModeStatus::raceFinished()
         unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
                       race_manager->getDifficulty());
     }   // if isActive && challenge solved
+    
+    //This updates the number of points.
+    //It then calls unlockFeatureByList which checks the specially unlocked features (by points, etc)
+    computeActive();
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
@@ -259,11 +317,33 @@ void StoryModeStatus::raceFinished()
 void StoryModeStatus::grandPrixFinished()
 {
     if(m_current_challenge                                           &&
-        m_current_challenge->isActive(race_manager->getDifficulty()) &&
-        m_current_challenge->getData()->isGPFulfilled()                 )
+        m_current_challenge->isActive(race_manager->getDifficulty()) )
     {
-        unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
-                      race_manager->getDifficulty());
+        ChallengeData::GPLevel unlock_level = m_current_challenge->getData()->isGPFulfilled();
+
+        RaceManager::Difficulty difficulty = RaceManager::DIFFICULTY_EASY;
+
+        switch (unlock_level)
+        {
+        case ChallengeData::GP_NONE:
+            race_manager->setCoinTarget(0);
+            return; //No cup unlocked
+        case ChallengeData::GP_EASY:
+            difficulty = RaceManager::DIFFICULTY_EASY;
+            break;
+        case ChallengeData::GP_MEDIUM:
+            difficulty = RaceManager::DIFFICULTY_MEDIUM;
+            break;
+        case ChallengeData::GP_HARD:
+            difficulty = RaceManager::DIFFICULTY_HARD;
+            break;
+        case ChallengeData::GP_BEST:
+            difficulty = RaceManager::DIFFICULTY_BEST;
+            break;
+        }
+
+        race_manager->setDifficulty(difficulty);
+        unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge), difficulty);
     }   // if isActive && challenge solved
 
     race_manager->setCoinTarget(0);
@@ -275,7 +355,7 @@ void StoryModeStatus::grandPrixFinished()
  */
 void StoryModeStatus::save(UTFWriter &out)
 {
-    out << L"      <story-mode first-time=\"" << m_first_time  << L"\">\n";
+    out << "      <story-mode first-time=\"" << m_first_time  << L"\">\n";
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
@@ -283,5 +363,5 @@ void StoryModeStatus::save(UTFWriter &out)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << L"      </story-mode>\n";
+    out << "      </story-mode>\n";
 }  // save

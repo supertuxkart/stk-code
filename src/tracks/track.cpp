@@ -1120,10 +1120,9 @@ void Track::loadMinimap()
 
     //Create the minimap resizing it as necessary.
     m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
-    core::dimension2du size = m_mini_map_size
-                             .getOptimalSize(!nonpower,!nonsquare);
 
-    m_render_target = Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    //Use twice the size of the rendered minimap to reduce significantly aliasing
+    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size*2, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
     if (!m_render_target) return;
 
     core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();

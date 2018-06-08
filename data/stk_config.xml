@@ -113,14 +113,25 @@
 
   <!--  Replay related values, mostly concerned with saving less data
         and using interpolation instead.
-        max-time: Maximum race time that can be saved in a replay/history file.
-        delta-t Minumum time between saving consecutive transform events.
-        delta-pos If the interpolated position is within this delta, a
-                transform event is not generated.
-        delta-angle If the interpolated angle is within this delta,
-                a transform event is not generated. -->
-  <replay max-time="600" delta-t="0.05"  delta-pos="0.1"
-          delta-angle="0.5" />
+        max-frames: Maximum number of transform events that can be saved
+                   in a replay/history file. With normal play, 900 are
+                   enough to store at least one minute, usually more.
+        delta-t Maximum time between saving consecutive transform events.
+            The recording will do more transform events when some kart data
+            changes significantly.
+        delta-speed If the speed difference exceeds this delta, a
+                new transform event is generated before maximum time.
+        delta-steering If the steering angle difference exceeds this delta,
+                new transform event is generated before maximum time. -->
+  <replay max-frames="12000" delta-t="0.200"  delta-speed="0.6"
+          delta-steering="0.35" />
+
+  <!--  Determines the minimap related values. 
+        size: The size of the minimap (scaled afterwards) 480 = full screen height)
+        ai-icon: The size of the icons for the AI karts on the minimap.
+        player-icon: The size of the icons for the player karts. -->
+
+  <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over
@@ -284,10 +295,12 @@
            distance ahead, the value for the largest distance is used,
            and similarly if the kart is more than the minimum value
            behind).
-         speed-cap: Fraction of maximum speed the kart should drive
-           at. Used to slow down karts that are ahead of the player.
-           Note that setting this to a value >1 does NOT increase
-           the speed the kart can drive at!
+         first-speed-cap: Fraction of maximum speed the first AI kart
+           should drive at. Used to slow down karts that are ahead of
+           the player. Note that setting this to a value >1 does NOT
+           increase the speed the kart can drive at!
+         last-speed-cap: same as first-speed-cap, but for last AI kart.
+           AI karts in-between use an average of it with first-speed-cap.
          collect-item-probability: Probability of the AI actually
            trying to collect an item (if an item is selected for
            collection in the first place).
@@ -304,7 +317,8 @@
                 item-skill="1"
                 collect-avoid-items="false"
                 handle-bomb="false"
-                speed-cap="-10:1.0 -5:0.9 5:0.8 20:0.7 50:0.6"
+                first-speed-cap="-100:1.0 -50:0.9 0:0.85 100:0.65"
+                last-speed-cap="-150:0.92 -50:0.75 50:0.6"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="0:0"
@@ -322,7 +336,8 @@
                 item-skill="2"
                 collect-avoid-items="true"
                 handle-bomb="false"
-                speed-cap="10:1.0 50:0.8"
+                first-speed-cap="20:1.0 60:0.9 100:0.85"
+                last-speed-cap="-50:0.94 0:0.85 100:0.75"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="-10:1.0 0:0"
@@ -340,7 +355,8 @@
                 item-skill="3"
                 collect-avoid-items="true"
                 handle-bomb="true"
-                speed-cap="20:1.0 50:0.8"
+                first-speed-cap="50:1.0 150:0.9"
+                last-speed-cap="0:0.96 80:0.8"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="10:1.0 20:0"
@@ -358,7 +374,8 @@
                 item-skill="4"
                 collect-avoid-items="true"
                 handle-bomb="true"
-                speed-cap="0:1.0"
+                first-speed-cap="0:1.0"
+                last-speed-cap="0:1.0"
                 max-item-angle="0.7" max-item-angle-high-speed="0.3"
                 bad-item-closeness="6"
                 collect-item-probability="0:1.0"

@@ -67,9 +67,13 @@ private:
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
 
+    float m_cur_starting_timer, m_start_threshold, m_start_timeout,
+        m_server_max_player;
+
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
     GUIEngine::LabelWidget* m_text_bubble;
+    GUIEngine::LabelWidget* m_timeout_message;
     GUIEngine::IconButtonWidget* m_exit_widget;
     GUIEngine::IconButtonWidget* m_start_button;
     GUIEngine::ListWidget* m_player_list;
@@ -125,6 +129,10 @@ public:
                        int/*icon id*/> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
+    uint32_t getServerPing() const;
+    void initAutoStartTimer(bool grand_prix_started, float start_threshold,
+                            float start_timeout, unsigned server_max_player);
+    void setStartingTimerTo(float t)             { m_cur_starting_timer = t; }
 
 };   // class NetworkingLobby
 

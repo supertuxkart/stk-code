@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<challenge version="3">
+    <unlock_list list="true"/>
+    <!-- This is the  point equivalent of finishing the
+         story mode with all gold except 14 silver challenges -->
+    <requirements trophies="250"/>
+    <unlock difficulty="difficulty_best"/>
+</challenge>

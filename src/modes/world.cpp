@@ -368,7 +368,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
     {
-        controller = new LocalPlayerController(new_kart, local_player_id);
+        controller = new LocalPlayerController(new_kart, local_player_id,
+            difficulty);
         const PlayerProfile* p = StateManager::get()
             ->getActivePlayer(local_player_id)->getConstProfile();
         if (p && p->getDefaultKartColor() > 0.0f)
@@ -981,9 +982,11 @@ void World::updateGraphics(float dt)
     const int kart_amount = (int)m_karts.size();
     for (int i = 0; i < kart_amount; ++i)
     {
-        // Update all karts that are not eliminated
-        if (!m_karts[i]->isEliminated() )
+        // Update all karts that are visible
+        if (m_karts[i]->isVisible())
+        {
             m_karts[i]->updateGraphics(dt);
+        }
     }
 
     projectile_manager->updateGraphics(dt);
@@ -1315,8 +1318,7 @@ void World::unpause()
 //-----------------------------------------------------------------------------
 void World::escapePressed()
 {
-    if (!(NetworkConfig::get()->isNetworking() &&
-        getPhase() < MUSIC_PHASE))
+    if (NetworkConfig::get()->isNetworking() || getPhase() >= MUSIC_PHASE)
         new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
 

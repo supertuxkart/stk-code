@@ -57,6 +57,7 @@ private:
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}                   // challenge was solved
+
     m_state[RaceManager::DIFFICULTY_COUNT];
 
     /** Pointer to the original challenge data. */
@@ -69,6 +70,7 @@ public:
         m_state[RaceManager::DIFFICULTY_EASY]   = CH_INACTIVE;
         m_state[RaceManager::DIFFICULTY_MEDIUM] = CH_INACTIVE;
         m_state[RaceManager::DIFFICULTY_HARD]   = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_BEST]   = CH_INACTIVE;
     }
     virtual ~ChallengeStatus() {};
     void load(const XMLNode* config);
@@ -88,7 +90,7 @@ public:
     bool isSolvedAtAnyDifficulty() const
     {
         return m_state[0]==CH_SOLVED || m_state[1]==CH_SOLVED ||
-                m_state[2]==CH_SOLVED;
+                m_state[2]==CH_SOLVED || m_state[3]==CH_SOLVED;
     }   // isSolvedAtAnyDifficulty
     // ------------------------------------------------------------------------
     /** True if this challenge is active at the given difficulty.
@@ -104,6 +106,13 @@ public:
     {
         m_state[d] = CH_ACTIVE;
     }   // setActive
+    // ------------------------------------------------------------------------
+    /** Returns if this challenge is only an unlock list */
+    bool isUnlockList();
+
+    // ------------------------------------------------------------------------
+    /** Returns if this challenge is a grand prix */
+    bool isGrandPrix();
     // ------------------------------------------------------------------------
     /** Returns a pointer to the actual Challenge data.
      */

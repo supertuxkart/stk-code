@@ -400,12 +400,17 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
 // ----------------------------------------------------------------------------
 core::stringw PlayerController::getName() const
 {
+    core::stringw name = m_kart->getName();
     if (NetworkConfig::get()->isNetworking())
     {
         auto& players = LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
             ->getPlayers();
         if (auto player = players.at(m_kart->getWorldKartId()).lock())
-            return player->getName();
+        {
+            name = player->getName();
+            if (player->getPerPlayerDifficulty() == PLAYER_DIFFICULTY_HANDICAP)
+                name = _("%s (handicapped)", name);
+        }
     }
-    return m_kart->getName();
+    return name;
 }   // getName

@@ -44,6 +44,18 @@ enum EVENT_TYPE
     EVENT_TYPE_DISCONNECTED,//!< A peer is disconnected
     EVENT_TYPE_MESSAGE      //!< A message between server and client protocols
 };
+
+/*!
+ * \enum EVENT_CHANNEL
+ * \brief Represents a list of channels stk used.
+ */
+enum EVENT_CHANNEL : uint8_t
+{
+    EVENT_CHANNEL_NORMAL = 0,   //!< Normal channel (encrypted if supported)
+    EVENT_CHANNEL_UNENCRYPTED = 1,//!< Unencrypted channel
+    EVENT_CHANNEL_COUNT = 2
+};
+
 enum PeerDisconnectInfo : unsigned int;
 
 /*!

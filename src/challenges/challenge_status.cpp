@@ -35,18 +35,19 @@
  */
 void ChallengeStatus::load(const XMLNode* challenges_node)
 {
-    const XMLNode* node = challenges_node->getNode( m_data->getId() );
+    const XMLNode* node = challenges_node->getNode( m_data->getChallengeId() );
     if(node == NULL)
     {
         Log::info("ChallengeStatus", "Couldn't find node <%s> in challenge list."
                 "(If this is the first time you play this is normal)\n",
-                m_data->getId().c_str());
+                m_data->getChallengeId().c_str());
         return;
     }
 
     m_state[0] = CH_INACTIVE;
     m_state[1] = CH_INACTIVE;
     m_state[2] = CH_INACTIVE;
+    m_state[3] = CH_INACTIVE;
 
     std::string solved;
     if (node->get("solved", &solved))
@@ -64,6 +65,13 @@ void ChallengeStatus::load(const XMLNode* challenges_node)
             m_state[1] = CH_SOLVED;
             m_state[2] = CH_SOLVED;
         }
+        else if (solved == "best")
+        {
+            m_state[0] = CH_SOLVED;
+            m_state[1] = CH_SOLVED;
+            m_state[2] = CH_SOLVED;
+            m_state[3] = CH_SOLVED;
+        }
     }   // if has 'solved' attribute
 
 }   // load
@@ -78,19 +86,33 @@ void ChallengeStatus::setSolved(RaceManager::Difficulty d)
     {
         m_state[curr] = CH_SOLVED;
     }
-}
+} // setSolved
+
+// ------------------------------------------------------------------------
+bool ChallengeStatus::isUnlockList()
+{
+    return m_data->isUnlockList();
+} // isUnlockList
+
+// ------------------------------------------------------------------------
+bool ChallengeStatus::isGrandPrix()
+{
+    return m_data->isGrandPrix();
+} // isUnlockList
 
 //-----------------------------------------------------------------------------
 
 void ChallengeStatus::save(UTFWriter& writer)
 {
-    writer << L"        <" << m_data->getId();
-    if (isSolved(RaceManager::DIFFICULTY_HARD))
-        writer << L" solved=\"hard\"/>\n";
+    writer << "        <" << m_data->getChallengeId();
+    if (isSolved(RaceManager::DIFFICULTY_BEST))
+        writer << " solved=\"best\"/>\n";
+    else if (isSolved(RaceManager::DIFFICULTY_HARD))
+        writer << " solved=\"hard\"/>\n";
     else if (isSolved(RaceManager::DIFFICULTY_MEDIUM))
-        writer << L" solved=\"medium\"/>\n";
+        writer << " solved=\"medium\"/>\n";
     else if (isSolved(RaceManager::DIFFICULTY_EASY))
-        writer << L" solved=\"easy\"/>\n";
+        writer << " solved=\"easy\"/>\n";
     else
-        writer << L" solved=\"none\"/>\n";
+        writer << " solved=\"none\"/>\n";
 }   // save

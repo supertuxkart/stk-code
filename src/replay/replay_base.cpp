@@ -29,10 +29,10 @@ ReplayBase::ReplayBase()
  *  \param full_path True if the file is full path.
  *  \return A FILE *, or NULL if the file could not be opened.
  */
-FILE* ReplayBase::openReplayFile(bool writeable, bool full_path)
+FILE* ReplayBase::openReplayFile(bool writeable, bool full_path, int replay_file_number)
 {
-    FILE *fd = fopen(full_path ? getReplayFilename().c_str() :
-        (file_manager->getReplayDir() + getReplayFilename()).c_str(),
+    FILE *fd = fopen(full_path ? getReplayFilename(replay_file_number).c_str() :
+        (file_manager->getReplayDir() + getReplayFilename(replay_file_number)).c_str(),
         writeable ? "w" : "r");
     if (!fd)
     {

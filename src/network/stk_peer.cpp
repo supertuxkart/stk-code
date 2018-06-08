@@ -18,7 +18,9 @@
 
 #include "network/stk_peer.hpp"
 #include "config/user_config.hpp"
-#include "network/game_setup.hpp"
+#include "network/crypto.hpp"
+#include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
@@ -36,9 +38,19 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
     m_connected_time      = (float)StkTime::getRealTime();
-    m_token_set.store(false);
-    m_client_server_token.store(0);
+    m_validated.store(false);
+    if (NetworkConfig::get()->isClient())
+    {
+        // This allow client to get the correct ping as fast as possible
+        // reset to default (0) will be done in STKHost::mainloop after 3 sec
+        setPingInterval(10);
+    }
 }   // STKPeer
+
+//-----------------------------------------------------------------------------
+STKPeer::~STKPeer()
+{
+}   // ~STKPeer
 
 //-----------------------------------------------------------------------------
 void STKPeer::disconnect()
@@ -78,8 +90,9 @@ void STKPeer::reset()
 /** Sends a packet to this host.
  *  \param data The data to send.
  *  \param reliable If the data is sent reliable or not.
+ *  \param encrypted If the data is sent encrypted or not.
  */
-void STKPeer::sendPacket(NetworkString *data, bool reliable)
+void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
 {
     TransportAddress a(m_enet_peer->address);
     // Enet will reuse a disconnected peer so we check here to avoid sending
@@ -87,13 +100,27 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable)
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
-    data->setToken(m_client_server_token);
 
-    ENetPacket* packet = enet_packet_create(data->getData(),
-                                            data->getTotalSize(),
-                                    (reliable ? ENET_PACKET_FLAG_RELIABLE
-                                              : ENET_PACKET_FLAG_UNSEQUENCED));
-    m_host->addEnetCommand(m_enet_peer, packet, 0, ECT_SEND_PACKET);
+    ENetPacket* packet = NULL;
+    if (m_crypto && encrypted)
+    {
+        packet = m_crypto->encryptSend(*data, reliable);
+    }
+    else
+    {
+        packet = enet_packet_create(data->getData(),
+            data->getTotalSize(), (reliable ?
+            ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
+    }
+
+    if (packet)
+    {
+        Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
+            packet->dataLength, a.toString().c_str(), StkTime::getRealTime());
+        m_host->addEnetCommand(m_enet_peer, packet,
+                encrypted ? EVENT_CHANNEL_NORMAL : EVENT_CHANNEL_UNENCRYPTED,
+                ECT_SEND_PACKET);
+    }
 }   // sendPacket
 
 //-----------------------------------------------------------------------------
@@ -122,12 +149,18 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 }   // isSamePeer
 
 //-----------------------------------------------------------------------------
-/** Returns the ping to this peer from host, it waits for 15 seconds for a
+/** Returns the ping to this peer from host, it waits for 3 seconds for a
  *  stable ping returned by enet measured in ms.
  */
 uint32_t STKPeer::getPing() const
 {
-    if ((float)StkTime::getRealTime() - m_connected_time < 15.0f)
+    if ((float)StkTime::getRealTime() - m_connected_time < 3.0f)
         return 0;
-    return m_enet_peer->lastRoundTripTime;
+    return m_enet_peer->roundTripTime;
 }   // getPing
+
+//-----------------------------------------------------------------------------
+void STKPeer::setCrypto(std::unique_ptr<Crypto>&& c)
+{
+    m_crypto = std::move(c);
+}   // setCrypto

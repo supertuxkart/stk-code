@@ -48,17 +48,24 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
+    PerPlayerDifficulty m_difficulty;
+
     SFXBase     *m_wee_sound;
     SFXBuffer   *m_bzzt_sound;
     SFXBuffer   *m_ugh_sound;
     SFXBuffer   *m_grab_sound;
     SFXBuffer   *m_full_sound;
+    SFXBuffer   *m_unfull_sound;
+
+    bool         m_is_above_nitro_target;
 
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
+    void         nitroNotFullSound();
 public:
                  LocalPlayerController(AbstractKart *kart,
-                                       const int local_playerID);
+                                       const int local_player_id,
+                                       PerPlayerDifficulty d);
                 ~LocalPlayerController();
     void         update            (int ticks) OVERRIDE;
     bool         action            (PlayerAction action, int value,

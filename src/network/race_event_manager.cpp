@@ -33,15 +33,6 @@ void RaceEventManager::update(int ticks)
                                          &ticks);
     PROFILER_POP_CPU_MARKER();
     World::getWorld()->updateWorld(ticks);
-
-    // if the race is over
-    if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE &&
-        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
-    {
-        // consider the world finished.
-        stop();
-        Log::info("RaceEventManager", "The game is considered finish.");
-    }
 }   // update
 
 // ----------------------------------------------------------------------------

@@ -62,6 +62,7 @@
 #include "physics/physics.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -615,6 +616,7 @@ void IrrDriver::initDevice()
         (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
         { glReadPixels(x, y, w, h, f, t, d); });
 
+#ifndef USE_GLES2
     ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
         [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
         [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
@@ -622,6 +624,16 @@ void IrrDriver::initDevice()
         [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
         [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
         [](unsigned int t) { return glUnmapBuffer(t); });
+#else
+    ogrRegPBOFunctionsRange([](int n, unsigned int* b) { glGenBuffers(n, b); },
+        [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
+        [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
+        { glBufferData(t, s, d, u); },
+        [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
+        [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a) 
+        { return glMapBufferRange(t, o, l, a); },
+        [](unsigned int t) { return glUnmapBuffer(t); });
+#endif
 
 #endif
 
@@ -727,6 +739,13 @@ void IrrDriver::setMaxTextureSize()
     io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
     att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(max, max));
 }   // setMaxTextureSize
+
+// ----------------------------------------------------------------------------
+void IrrDriver::unsetMaxTextureSize()
+{
+    io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
+    att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(2048, 2048));
+}   // unsetMaxTextureSize
 
 // ----------------------------------------------------------------------------
 void IrrDriver::cleanSunInterposer()
@@ -1715,9 +1734,9 @@ void IrrDriver::displayFPS()
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->draw( L"FPS: ...", core::rect< s32 >(100,0,400,50), fpsColor,
-                    false );
-
+        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms",
+            NetworkingLobby::getInstance()->getServerPing()),
+            core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
 
@@ -1738,22 +1757,26 @@ void IrrDriver::displayFPS()
     {
         fps_string = StringUtils::insertValues
                     (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d, Total skinning joints: %d",
+                      "%d Shadows - LightDist : %d, Total skinning joints: %d, "
+                      "Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
                     SP::sp_shadow_poly_count, m_last_light_bucket_distance,
-                    m_skinning_joint);
+                    m_skinning_joint,
+                    NetworkingLobby::getInstance()->getServerPing());
     }
     else
     {
         if (CVS->isGLSL())
         {
-            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
-                SP::sp_solid_poly_count / 1000);
+            fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
+                max, SP::sp_solid_poly_count / 1000,
+                NetworkingLobby::getInstance()->getServerPing());
         }
         else
         {
-            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
-            (int)roundf(kilotris));
+            fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
+                max, (int)roundf(kilotris),
+                NetworkingLobby::getInstance()->getServerPing());
         }
     }
 
@@ -1944,6 +1967,12 @@ void IrrDriver::setRecording(bool val)
     {
         ogrStopCapture();
     }
+#else
+    Log::error("Recorder", "Recording unavailable, STK was compiled without "
+               "recording support.  Please re-compile STK with libopenglrecorder "
+               "to enable recording.  If you got SuperTuxKart from your distribution's "
+               "repositories, please use the official binaries, or contact your "
+               "distributions's package mantainers.");
 #endif
 }   // setRecording
 

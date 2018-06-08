@@ -34,15 +34,16 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/client_lobby.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/server_lobby.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
 #include "utils/translation.hpp"
+
+#include <utfwrapping.h>
 
 using namespace Online;
 using namespace GUIEngine;
@@ -61,7 +62,18 @@ using namespace GUIEngine;
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
+    m_server_info_height = 0;
+
+    m_back_widget = NULL;
+    m_header = NULL;
+    m_text_bubble = NULL;
+    m_timeout_message = NULL;
+    m_exit_widget = NULL;
+    m_start_button = NULL;
     m_player_list = NULL;
+    m_chat_box = NULL;
+    m_send_button = NULL;
+    m_icon_bank = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -79,6 +91,9 @@ void NetworkingLobby::loadedFromFile()
 
     m_text_bubble = getWidget<LabelWidget>("text");
     assert(m_text_bubble != NULL);
+
+    m_timeout_message = getWidget<LabelWidget>("timeout-message");
+    assert(m_timeout_message != NULL);
 
     m_chat_box = getWidget<TextBoxWidget>("chat");
     assert(m_chat_box != NULL);
@@ -120,6 +135,10 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    m_cur_starting_timer = m_start_threshold = m_start_timeout =
+        m_server_max_player = std::numeric_limits<float>::max();
+    m_timeout_message->setVisible(false);
+
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
@@ -155,16 +174,22 @@ void NetworkingLobby::init()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
-    assert(m_text_bubble->getDimension().Width > 10);
-    while ((int)GUIEngine::getFont()->getDimension(info.c_str()).Width >
-        m_text_bubble->getDimension().Width - 10)
+    const unsigned box_width = m_text_bubble->getDimension().Width;
+    while (GUIEngine::getFont()->getDimension(info.c_str()).Width > box_width)
     {
-        int size = (m_text_bubble->getDimension().Width - 10)
-            / m_server_info_height;
-        assert(size > 0);
-        core::stringw new_info = info.subString(0, size);
-        m_server_info.push_back(new_info);
-        info = info.subString(new_info.size(), 80);
+        core::stringw brokentext = info;
+        while (brokentext.size() > 0)
+        {
+            brokentext.erase(brokentext.size() - 1);
+            if (GUIEngine::getFont()->getDimension(brokentext.c_str()).Width <
+                box_width && gui::breakable(brokentext.lastChar()))
+                break;
+        }
+        if (brokentext.size() == 0)
+            break;
+        m_server_info.push_back(brokentext);
+        info =
+            info.subString(brokentext.size(), info.size() - brokentext.size());
     }
     if (info.size() > 0)
     {
@@ -180,7 +205,36 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
-    if (m_state == LS_ADD_PLAYERS && NetworkConfig::get()->isClient())
+    if (NetworkConfig::get()->isServer())
+        return;
+    if (m_timeout_message->isVisible() && m_player_list)
+    {
+        float cur_player = (float)(m_player_list->getItemCount());
+        if (cur_player > m_server_max_player * m_start_threshold &&
+            m_cur_starting_timer == std::numeric_limits<float>::max())
+        {
+            m_cur_starting_timer = m_start_timeout;
+        }
+        else if (cur_player < m_server_max_player * m_start_threshold)
+        {
+            m_cur_starting_timer = std::numeric_limits<float>::max();
+            m_timeout_message->setText(L"", true);
+        }
+
+        if (m_cur_starting_timer != std::numeric_limits<float>::max())
+        {
+            m_cur_starting_timer -= delta;
+            if (m_cur_starting_timer < 0.0f)
+                m_cur_starting_timer = 0.0f;
+            //I18N: In the networking lobby, display the starting timeout
+            //for owner-less server
+            core::stringw msg = _("Game will start after %d second(s).",
+                (int)m_cur_starting_timer);
+            m_timeout_message->setText(msg, true);
+        }
+    }
+
+    if (m_state == LS_ADD_PLAYERS)
     {
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
                                           "join the game"), true);
@@ -197,7 +251,7 @@ void NetworkingLobby::onUpdate(float delta)
     m_start_button->setVisible(false);
     m_exit_widget->setVisible(true);
     auto lp = LobbyProtocol::get<LobbyProtocol>();
-    if (!lp)
+    if (!lp || !lp->waitingForPlayers())
     {
         core::stringw connect_msg;
         if (m_joined_server)
@@ -205,7 +259,7 @@ void NetworkingLobby::onUpdate(float delta)
             connect_msg = StringUtils::loadingDots(
                 _("Connecting to server %s", m_joined_server->getName()));
         }
-        else if (NetworkConfig::get()->isClient())
+        else
         {
             connect_msg =
                 StringUtils::loadingDots(_("Finding a quick play server"));
@@ -215,8 +269,7 @@ void NetworkingLobby::onUpdate(float delta)
     }
     else
     {
-        if (m_server_peer.expired() && NetworkConfig::get()->isClient()
-            && STKHost::existHost())
+        if (m_server_peer.expired() && STKHost::existHost())
             m_server_peer = STKHost::get()->getServerPeerForClient();
         core::stringw total_msg;
         for (auto& string : m_server_info)
@@ -226,21 +279,27 @@ void NetworkingLobby::onUpdate(float delta)
         }
         m_text_bubble->setText(total_msg, true);
     }
-    if (NetworkConfig::get()->isClient())
+
+    if (STKHost::get()->isAuthorisedToControl())
     {
-        if (STKHost::get()->isAuthorisedToControl())
-        {
-            m_start_button->setVisible(true);
-        }
-        if (auto p = m_server_peer.lock())
-        {
-            //I18N: In the networking lobby, display ping when connected
-            const uint32_t ping = p->getPing();
-            if (ping != 0)
-                m_header->setText(_("Lobby (ping: %dms)", ping), false);
-        }
+        m_start_button->setVisible(true);
     }
+    //I18N: In the networking lobby, display ping when connected
+    const uint32_t ping = getServerPing();
+    if (ping != 0)
+        m_header->setText(_("Lobby (ping: %dms)", ping), false);
+
 }   // onUpdate
+
+// ----------------------------------------------------------------------------
+uint32_t NetworkingLobby::getServerPing() const
+{
+    if (auto p = m_server_peer.lock())
+    {
+        return p->getPing();
+    }
+    return 0;
+}   // getServerPing
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::sendChat(irr::core::stringw text)
@@ -258,8 +317,7 @@ void NetworkingLobby::sendChat(irr::core::stringw text)
             name = PlayerManager::getCurrentOnlineUserName();
         else
             name = player->getName();
-        // Max 80 words
-        chat.encodeString((name + L": " + text).subString(0, 80));
+        chat.encodeString16(name + L": " + text);
 
         STKHost::get()->sendToServer(&chat, true);
     }
@@ -278,8 +336,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         auto host_online_ids = StringUtils::splitToUInt
             (m_player_list->getSelectionInternalName(), '_');
-        if (host_online_ids.size() != 2 ||
-            STKHost::get()->getMyHostId() == host_online_ids[0])
+        if (host_online_ids.size() != 2)
         {
             return;
         }
@@ -305,7 +362,6 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
-        start.setSynchronous(true);
         start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendToServer(&start, true);
     }
@@ -398,3 +454,18 @@ void NetworkingLobby::cleanAddedPlayers()
         return;
     m_player_list->clear();
 }   // cleanAddedPlayers
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
+                                         float start_threshold,
+                                         float start_timeout,
+                                         unsigned server_max_player)
+{
+    if (start_threshold == 0.0f || start_timeout == 0.0f)
+        return;
+
+    m_timeout_message->setVisible(true);
+    m_start_threshold = grand_prix_started ? 0.0f : start_threshold;
+    m_start_timeout = start_timeout;
+    m_server_max_player = (float)server_max_player;
+}   // initAutoStartTimer

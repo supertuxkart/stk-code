@@ -421,8 +421,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
-        controller = new LocalPlayerController(new_kart,
-                                              local_player_id);
+        controller = new LocalPlayerController(new_kart, local_player_id,
+            difficulty);
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:

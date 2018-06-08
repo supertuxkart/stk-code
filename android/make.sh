@@ -237,7 +237,7 @@ if [ -f "$DIRNAME/obj/project_version" ]; then
     PROJECT_VERSION_PREV=$(cat "$DIRNAME/obj/project_version") 
     
     if [ -z "$PROJECT_VERSION" ]; then
-        PROJECT_VERSION="$PROJECT_VERSION_PREV"
+        export PROJECT_VERSION="$PROJECT_VERSION_PREV"
     elif [ "$PROJECT_VERSION" != "$PROJECT_VERSION_PREV" ]; then
         echo "Different project version has been set. Forcing recompilation..."
         touch -c "$DIRNAME/Android.mk"
@@ -246,7 +246,7 @@ fi
 
 if [ -z "$PROJECT_VERSION" ]; then
     if [ $IS_DEBUG_BUILD -ne 0 ]; then
-        PROJECT_VERSION="git"
+        export PROJECT_VERSION="git"
     else
         echo "Error: Variable PROJECT_VERSION is not set. It must have unique" \
              "value for release build."
@@ -479,6 +479,10 @@ convert -scale 48x48 "$APP_ICON" "$DIRNAME/res/drawable-mdpi/icon.png"
 convert -scale 96x96 "$APP_ICON" "$DIRNAME/res/drawable-xhdpi/icon.png"
 convert -scale 144x144 "$APP_ICON" "$DIRNAME/res/drawable-xxhdpi/icon.png"
 
+if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
+    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+    export PATH=$JAVA_HOME/bin:$PATH
+fi
 
 if [ "$BUILD_TOOL" = "gradle" ]; then
     export ANDROID_HOME="$SDK_PATH"

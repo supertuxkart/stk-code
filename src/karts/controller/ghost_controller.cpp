@@ -87,5 +87,7 @@ bool GhostController::action(PlayerAction action, int value, bool dry_run)
     // Watching replay use only
     if (action == PA_LOOK_BACK)
         m_controls->setLookBack(value!=0);
+    else if (action == PA_PAUSE_RACE)
+        if (value != 0) StateManager::get()->escapePressed();
     return true;
 }   // action

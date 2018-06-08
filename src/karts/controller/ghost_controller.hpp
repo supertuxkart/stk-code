@@ -79,6 +79,14 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getCurrentReplayIndex() const
                                                    { return m_current_index; }
+
+    // ------------------------------------------------------------------------
+    float        getTimeAtIndex(unsigned int index) const
+    {
+        assert(index < m_all_times.size());
+        return m_all_times[index];
+    }
+
     // ------------------------------------------------------------------------
     /** Return the display name; if not set, use default display name (kart name) */
     core::stringw getName() const OVERRIDE

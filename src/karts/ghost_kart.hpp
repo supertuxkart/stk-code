@@ -42,23 +42,31 @@ private:
 
     std::vector<ReplayBase::PhysicInfo>      m_all_physic_info;
 
+    std::vector<ReplayBase::BonusInfo>       m_all_bonus_info;
+
     std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
 
+    unsigned int                             m_last_egg_idx = 0;
+
+    // ----------------------------------------------------------------------------
+    /** Compute the time at which the ghost finished the race */
+    void          computeFinishTime();
+
 public:
-                  GhostKart(const std::string& ident,
-                            unsigned int world_kart_id, int position);
+                  GhostKart(const std::string& ident, unsigned int world_kart_id,
+                            int position, float color_hue);
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
-    virtual void  reset();
+    virtual void  reset() OVERRIDE;
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */
-    virtual void  updateWeight() {};
+    virtual void  updateWeight() OVERRIDE  {};
     // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
-    virtual void  applyEngineForce (float force) {};
+    virtual void  applyEngineForce (float force) OVERRIDE {};
     // ------------------------------------------------------------------------
     // Not needed to create any physics for a ghost kart.
-    virtual void  createPhysics() {};
+    virtual void  createPhysics() OVERRIDE {};
     // ------------------------------------------------------------------------
     const float   getSuspensionLength(int index, int wheel) const
                { return m_all_physic_info[index].m_suspension_length[wheel]; }
@@ -66,19 +74,36 @@ public:
     void          addReplayEvent(float time,
                                  const btTransform &trans,
                                  const ReplayBase::PhysicInfo &pi,
+                                 const ReplayBase::BonusInfo &bi,
                                  const ReplayBase::KartReplayEvent &kre);
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
-    virtual bool  isGhostKart() const                         { return true; }
+    virtual bool  isGhostKart() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     /** Ghost can't be hunted. */
-    virtual bool  isInvulnerable() const                      { return true; }
+    virtual bool  isInvulnerable() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
-    virtual float getSpeed() const;
+    virtual float getSpeed() const OVERRIDE;
+
     // ------------------------------------------------------------------------
-    virtual void  kartIsInRestNow() {};
+    /** Returns the finished time for a ghost kart. */
+    float  getGhostFinishTime() { computeFinishTime(); return m_finish_time; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the time at which the kart was at a given distance.
+      * Returns -1.0f if none */
+    float getTimeForDistance(float distance);
+
+    // ----------------------------------------------------------------------------
+    /** Returns the smallest time at which the kart had the required number of eggs
+      * Returns -1.0f if none */
+    float getTimeForEggs(int egg_number);
+
+    // ------------------------------------------------------------------------
+    virtual void  kartIsInRestNow() OVERRIDE {};
     // ------------------------------------------------------------------------
     
 };   // GhostKart
 #endif
+

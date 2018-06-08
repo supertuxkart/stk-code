@@ -31,13 +31,6 @@ class ConnectToPeer : public Protocol
 protected:
 
     TransportAddress m_peer_address;
-    uint32_t m_peer_id;
-
-    /** Pointer to the protocol which is monitored for state changes, this
-     *  need to be shared_ptr because we need to get the result from
-     *  \ref GetPeerAddress, otherwise when it terminated the result will be
-     *  gone. */
-    std::shared_ptr<Protocol> m_current_protocol;
 
     /** Timer use for tracking broadcast. */
     double m_timer = 0.0;
@@ -47,18 +40,14 @@ protected:
 
     enum STATE
     {
-        NONE,
-        RECEIVED_PEER_ADDRESS,
         WAIT_FOR_CONNECTION,
         DONE,
         EXITING
     }  m_state;
 
 public:
-             ConnectToPeer(uint32_t peer_id);
              ConnectToPeer(const TransportAddress &address);
-    virtual ~ConnectToPeer();
-
+    virtual ~ConnectToPeer() {}
     virtual void setup() OVERRIDE {}
     virtual void update(int ticks) OVERRIDE {}
     virtual void asynchronousUpdate() OVERRIDE;

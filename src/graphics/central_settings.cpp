@@ -44,6 +44,7 @@ void CentralVideoSettings::init()
     hasSSBO = false;
     hasImageLoadStore = false;
     hasTextureCompression = false;
+    hasTextureCompressionSRGB = false;
     hasUBO = false;
     hasExplicitAttribLocation = false;
     hasGS = false;
@@ -53,18 +54,11 @@ void CentralVideoSettings::init()
     hasSamplerObjects = false;
     hasVertexType2101010Rev = false;
     hasInstancedArrays = false;
-
-#if defined(USE_GLES2)
     hasBGRA = false;
     hasColorBufferFloat = false;
-#endif
     m_need_vertex_id_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
-    if (!ProfileWorld::isNoGraphics())
-    {
-
-    }
     if (!ProfileWorld::isNoGraphics())
     {
         glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
@@ -193,6 +187,10 @@ void CentralVideoSettings::init()
         m_supports_sp = isARBInstancedArraysUsable() &&
             isARBVertexType2101010RevUsable() && isARBSamplerObjectsUsable() &&
             isARBExplicitAttribLocationUsable();
+            
+        hasTextureCompressionSRGB = true;
+        hasBGRA = true;
+        hasColorBufferFloat = true;
 
 #else
         if (m_glsl == true)
@@ -202,6 +200,7 @@ void CentralVideoSettings::init()
             hasSamplerObjects = true;
             hasVertexType2101010Rev = true;
             hasInstancedArrays = true;
+            hasPixelBufferObject = true;
         }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
@@ -231,6 +230,22 @@ void CentralVideoSettings::init()
         {
             hasColorBufferFloat = true;
             Log::info("GLDriver", "EXT Color Buffer Float Present");
+        }
+        
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
+            (hasGLExtension("GL_EXT_texture_compression_s3tc") || 
+             hasGLExtension("GL_ANGLE_texture_compression_dxt5")))
+        {
+            hasTextureCompression = true;
+            Log::info("GLDriver", "EXT Texture Compression S3TC Present");
+        }
+        
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
+            (hasGLExtension("GL_EXT_texture_compression_s3tc_srgb") || 
+             hasGLExtension("GL_NV_sRGB_formats")))
+        {
+            hasTextureCompressionSRGB = true;
+            Log::info("GLDriver", "EXT Texture Compression S3TC sRGB Present");
         }
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_VERTEX_ID_WORKING))
@@ -315,6 +330,11 @@ bool CentralVideoSettings::isEXTTextureCompressionS3TCUsable() const
     return hasTextureCompression;
 }
 
+bool CentralVideoSettings::isEXTTextureCompressionS3TCSRGBUsable() const
+{
+    return hasTextureCompression && hasTextureCompressionSRGB;
+}
+
 
 bool CentralVideoSettings::isARBBufferStorageUsable() const
 {
@@ -361,7 +381,6 @@ bool CentralVideoSettings::isEXTTextureFilterAnisotropicUsable() const
     return hasTextureFilterAnisotropic;
 }
 
-#if defined(USE_GLES2)
 bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
 {
     return hasBGRA;
@@ -371,7 +390,6 @@ bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
 {
     return hasColorBufferFloat;
 }
-#endif
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {

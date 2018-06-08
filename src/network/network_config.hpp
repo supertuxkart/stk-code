@@ -67,6 +67,12 @@ private:
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
 
+    /** True if this is a ranked server */
+    bool m_is_ranked_server;
+
+    /* True if automatically end after 1st player finished for some time. */
+    bool m_auto_end;
+
     /** The password for a server (or to authenticate to a server). */
     std::string m_password;
 
@@ -87,6 +93,11 @@ private:
      *  immediately start a race. */
     bool m_auto_connect;
 
+    /** True if only validated players are allowed to join. */
+    bool m_validated_players;
+
+    bool m_owner_less;
+
     bool m_done_adding_network_players;
 
     /** If this is a server, the server name. */
@@ -102,7 +113,7 @@ private:
     std::string m_server_id_file;
 
     std::vector<std::tuple<InputDevice*, PlayerProfile*,
-        /*is_handicap*/bool> > m_network_players;
+        PerPlayerDifficulty> > m_network_players;
 
     core::stringw m_motd;
 
@@ -190,7 +201,8 @@ public:
         m_password = "";
     }
     // ------------------------------------------------------------------------
-    const std::vector<std::tuple<InputDevice*, PlayerProfile*, bool> >&
+    const std::vector<std::tuple<InputDevice*, PlayerProfile*,
+                                 PerPlayerDifficulty> >&
                         getNetworkPlayers() const { return m_network_players; }
     // ------------------------------------------------------------------------
     bool isAddingNetworkPlayers() const
@@ -198,7 +210,8 @@ public:
     // ------------------------------------------------------------------------
     void doneAddingNetworkPlayers()   { m_done_adding_network_players = true; }
     // ------------------------------------------------------------------------
-    bool addNetworkPlayer(InputDevice* device, PlayerProfile* profile, bool h)
+    bool addNetworkPlayer(InputDevice* device, PlayerProfile* profile,
+                          PerPlayerDifficulty d)
     {
         for (auto& p : m_network_players)
         {
@@ -207,7 +220,7 @@ public:
             if (std::get<1>(p) == profile)
                 return false;
         }
-        m_network_players.emplace_back(device, profile, h);
+        m_network_players.emplace_back(device, profile, d);
         return true;
     }
     // ------------------------------------------------------------------------
@@ -258,6 +271,12 @@ public:
     /** Returns if an immediate connection to the first server was
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
+
+    // ------------------------------------------------------------------------
+    /** Returns if the server use multi-session rankings. */
+    bool isRankedServer() const { return m_is_ranked_server; }
+    // ------------------------------------------------------------------------
+    void setRankedServer(bool val) { m_is_ranked_server = val; }
     // ------------------------------------------------------------------------
     /** Returns the minor and majar game mode from server database id. */
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
@@ -272,6 +291,8 @@ public:
     const std::string& getCurrentUserToken() const { return m_cur_user_token; }
     // ------------------------------------------------------------------------
     void setUserDetails(Online::XMLRequest* r, const std::string& name);
+    // ------------------------------------------------------------------------
+    void setServerDetails(Online::XMLRequest* r, const std::string& name);
     // ------------------------------------------------------------------------
     void setServerIdFile(const std::string& id) { m_server_id_file = id; }
     // ------------------------------------------------------------------------
@@ -291,6 +312,18 @@ public:
     core::stringw getModeName(unsigned id);
     // ------------------------------------------------------------------------
     std::vector<GUIEngine::Screen*> getResetScreens(bool lobby = false) const;
+    // ------------------------------------------------------------------------
+    void setValidatedPlayers(bool val)           { m_validated_players = val; }
+    // ------------------------------------------------------------------------
+    bool onlyValidatedPlayers() const           { return m_validated_players; }
+    // ------------------------------------------------------------------------
+    void setOwnerLess(bool val)                         { m_owner_less = val; }
+    // ------------------------------------------------------------------------
+    bool isOwnerLess() const                           { return m_owner_less; }
+    // ------------------------------------------------------------------------
+    void setAutoEnd(bool val)                             { m_auto_end = val; }
+    // ------------------------------------------------------------------------
+    bool isAutoEnd() const                               { return m_auto_end; }
 
 };   // class NetworkConfig
 

@@ -421,6 +421,8 @@ void SPMeshBuffer::enableTextureMatrix(unsigned mat_id)
     assert(mat_id < m_stk_material.size());
     // Make the 31 bit in normal to be 1
     uploadGLMesh();
+    if (m_vbo == 0 || m_ibo == 0)
+        return;
     auto& ret = m_stk_material[mat_id];
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     std::set<uint16_t> used_vertices;

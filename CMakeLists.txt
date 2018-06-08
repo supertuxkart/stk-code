@@ -26,11 +26,26 @@ option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when av
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
-    "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
+    "NOT SERVER_ONLY;NOT APPLE" OFF)
+
+if(APPLE)
+    list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
+    include_directories(/usr/local/opt/fribidi/include/)
+    include_directories(/usr/local/opt/openssl@1.1/include/)
+    include_directories(/usr/local/opt/openssl@1.1/include/openssl/)
+    include_directories(/usr/local/opt/freetype/include/freetype2/)
+endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    
+    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
+       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
+        option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
+    else()
+        option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    endif()
+
 endif()
 
 if(UNIX OR MINGW)
@@ -143,7 +158,13 @@ else()
 endif()
 
 # Find system GLEW library or build it if missing
-if(NOT USE_GLES2 AND NOT SERVER_ONLY)
+if (APPLE)
+    find_package(glew)
+
+    if(GLEW_FOUND)
+        include_directories(${GLEW_INCLUDE_DIRS})
+    endif()
+elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
     if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
         find_package(PkgConfig)
@@ -216,12 +237,12 @@ if (BUILD_RECORDER)
     endif()
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     find_library(SQUISH_LIBRARY NAMES squish libsquish)
     find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
     if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
@@ -277,29 +298,12 @@ else()
 endif()
 
 # OpenAL
-if(APPLE)
-    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
-    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
-    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
-    # CMake pick the library it wants essentially means I can't build.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework OpenAL")
-    set(OPENAL_LIBRARY)
-else()
-    find_package(OpenAL REQUIRED)
-    include_directories(${OPENAL_INCLUDE_DIR})
-endif()
+find_package(OpenAL REQUIRED)
+include_directories(${OPENAL_INCLUDE_DIR})
 
 # OggVorbis
-if(APPLE)
-    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
-    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
-    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
-    # CMake pick the library it wants essentially means I can't build.
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -I/Library/Frameworks/Ogg.framework/Versions/A/Headers -I/Library/Frameworks/Vorbis.framework/Versions/A/Headers")
-else()
-    find_package(OggVorbis REQUIRED)
-    include_directories(${OGGVORBIS_INCLUDE_DIRS})
-endif()
+find_package(OggVorbis REQUIRED)
+include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
 # Freetype
 find_package(Freetype)
@@ -450,14 +454,26 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
-# CURL
+# CURL and OpenSSL
+# 1.0.1d for compatible AES GCM handling
+SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 if(MSVC)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.lib)
 elseif(MINGW)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.dll)
 else()
     find_package(CURL REQUIRED)
+    find_package(OpenSSL REQUIRED)
+
+    if(${OPENSSL_VERSION} VERSION_LESS ${OPENSSL_MINIMUM_VERSION} OR
+        (${OPENSSL_VERSION} VERSION_EQUAL ${OPENSSL_MINIMUM_VERSION} AND ${OPENSSL_VERSION} STRLESS ${OPENSSL_MINIMUM_VERSION}))
+        message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
+    endif()
+
     include_directories(${CURL_INCLUDE_DIRS})
+    include_directories(${OpenSSL_INCLUDE_DIRS})
 endif()
 
 # Common library dependencies
@@ -474,19 +490,17 @@ target_link_libraries(supertuxkart
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
     ${TURBOJPEG_LIBRARY}
-    #${VPX_LIBRARIES}
+    ${OPENSSL_CRYPTO_LIBRARY}
     )
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
-endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY})
+    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -506,15 +520,6 @@ endif()
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
 if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
-endif()
-
-if(APPLE)
-    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
-    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
-    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
-    # CMake pick the library it wants essentially means I can't build.
-    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch x86_64 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
 endif()
 
 if(USE_FRIBIDI)

@@ -27,7 +27,6 @@
 
 
 class KartSelectionScreen;
-class NetworkPlayerProfile;
 
 namespace GUIEngine
 {
@@ -44,7 +43,7 @@ namespace GUIEngine
         /** Whether this player confirmed their selection */
         bool m_ready;
         /** If the player is handicapped. */
-        bool m_handicapped;
+        PerPlayerDifficulty m_difficulty;
 
         /** widget coordinates */
         int player_name_x, player_name_y, player_name_w, player_name_h;
@@ -64,9 +63,6 @@ namespace GUIEngine
         /** Local info about the player. */
         StateManager::ActivePlayer* m_associated_player;
         int m_player_id;
-
-        /** Network info about the user. */
-        NetworkPlayerProfile* m_associated_user;
 
         /** Internal name of the spinner; useful to interpret spinner events,
          *  which contain the name of the activated object */
@@ -91,13 +87,12 @@ namespace GUIEngine
         irr::gui::IGUIStaticText* m_ready_text;
 
         core::stringw deviceName;
-        std::string m_kartInternalName;
+        std::string m_kart_internal_name;
 
         bool m_not_updated_yet;
 
         PlayerKartWidget(KartSelectionScreen* parent,
                          StateManager::ActivePlayer* associated_player,
-                         NetworkPlayerProfile* associated_user,
                          core::recti area, const int player_id,
                          std::string kart_group,
                          const int irrlicht_idget_id=-1);
@@ -137,8 +132,8 @@ namespace GUIEngine
         bool isReady();
 
         // ------------------------------------------------------------------------
-        /** \return Whether this player is handicapped or not */
-        bool isHandicapped();
+        /** \return Per player difficulty */
+        PerPlayerDifficulty getDifficulty();
 
         // -------------------------------------------------------------------------
         /** Updates the animation (moving/shrinking/etc.) */
@@ -169,6 +164,8 @@ namespace GUIEngine
 
         /** \brief Event callback from ISpinnerConfirmListener */
         virtual GUIEngine::EventPropagation onSpinnerConfirmed();
+        // -------------------------------------------------------------------------
+        void enableHandicapForNetwork();
     };   // PlayerKartWidget
 }
 

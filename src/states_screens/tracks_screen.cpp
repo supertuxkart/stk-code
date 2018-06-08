@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -174,6 +175,10 @@ void TracksScreen::beforeAddingWidget()
         getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
         getWidget("vote")->setVisible(true);
         calculateLayout();
+        //I18N: In track screen for networking, clarify voting phase
+        core::stringw msg = _("If a majority of players all select the same"
+            " track and race settings, voting will end early.");
+        MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     }
     else
     {

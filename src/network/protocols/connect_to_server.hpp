@@ -43,12 +43,10 @@ private:
     enum ConnectState : unsigned int
     {
         SET_PUBLIC_ADDRESS,
-        REGISTER_SELF_ADDRESS,
         GOT_SERVER_ADDRESS,
         REQUESTING_CONNECTION,
         CONNECTING,
         CONNECTED,
-        HIDING_ADDRESS,
         DONE,
         EXITING
     };
@@ -64,7 +62,7 @@ public:
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-    bool handleDirectConnect(int timeout = 2000);
+    bool handleDirectConnect(int timeout);
 
 };   // class ConnectToServer
 

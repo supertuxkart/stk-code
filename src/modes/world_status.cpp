@@ -63,7 +63,7 @@ WorldStatus::WorldStatus()
 void WorldStatus::reset()
 {
     m_time            = 0.0f;
-    m_adjust_time_by  = 0.0f;
+    m_adjust_time_by.store(0);
     m_time_ticks      = 0;
     m_auxiliary_ticks = 0;
     m_count_up_ticks  = 0;
@@ -481,30 +481,55 @@ void WorldStatus::updateTime(int ticks)
  */
 float WorldStatus::adjustDT(float dt)
 {
+    int adjust_time = m_adjust_time_by.load();
+    if (adjust_time == 0)
+        return dt;
+
     // If request, adjust world time to go ahead (adjust>0) or
     // slow down (<0). This is done in 5% of dt steps so that the
     // user will not notice this.
     const float FRACTION = 0.10f;   // fraction of dt to be adjusted
+    float adjust_time_by = adjust_time / 1000.0f;
     float time_adjust;
-    if (m_adjust_time_by >= 0)   // make it run faster
+    if (adjust_time_by > 0.0f)   // make it run faster
     {
         time_adjust = dt * FRACTION;
-        if (time_adjust > m_adjust_time_by) time_adjust = m_adjust_time_by;
-        if (m_adjust_time_by > 0)
-            Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
-                World::getWorld()->getTime(), StkTime::getRealTime(),
-                time_adjust, dt, dt - time_adjust, m_adjust_time_by);
+
+        if (time_adjust > adjust_time_by)
+        {
+            m_adjust_time_by.fetch_sub(int(adjust_time_by * 1000.f));
+            time_adjust = adjust_time_by;
+        }
+        else
+            m_adjust_time_by.fetch_sub(int(time_adjust * 1000.f));
+
+        Log::verbose("WorldStatus",
+            "At %f %f adjusting time (speed up) by %f dt %f to dt %f for %f",
+            World::getWorld()->getTime(), StkTime::getRealTime(),
+            time_adjust, dt, dt + time_adjust, adjust_time_by);
     }
-    else   // m_adjust_time negative, i.e. will go slower
+    else   // adjust_time_by negative, i.e. will go slower
     {
         time_adjust = -dt * FRACTION;
-        if (time_adjust < m_adjust_time_by) time_adjust = m_adjust_time_by;
-        Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+
+        if (time_adjust < adjust_time_by)
+        {
+            m_adjust_time_by.fetch_sub(int(adjust_time_by * 1000.f));
+            time_adjust = adjust_time_by;
+        }
+        else
+            m_adjust_time_by.fetch_sub(int(time_adjust * 1000.f));
+
+        Log::verbose("WorldStatus",
+            "At %f %f adjusting time (slow down) by %f dt %f to dt %f for %f",
             World::getWorld()->getTime(), StkTime::getRealTime(),
-            time_adjust, dt, dt - time_adjust, m_adjust_time_by);
+            time_adjust, dt, dt + time_adjust, adjust_time_by);
     }
-    m_adjust_time_by -= time_adjust;
-    dt -= time_adjust;
+    dt += time_adjust;
+    // No negative or tends to zero dt
+    const float min_dt = stk_config->ticks2Time(1);
+    if (dt < min_dt)
+        dt = min_dt;
     return dt;
 }  // adjustDT
 

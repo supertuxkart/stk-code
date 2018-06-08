@@ -349,9 +349,27 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     int itemSpacing = (int)(scale * 32.0f);
 
-    int x1 = viewport.UpperLeftCorner.X  + (viewport.getWidth()/2)
+    int x1, y1;
+
+    // When there is not much height, move items on the side
+    if ((float) viewport.getWidth() / (float) viewport.getHeight() > 2.0f)
+    {
+        x1 = viewport.UpperLeftCorner.X  + 3*(viewport.getWidth()/4)
            - ((n * itemSpacing)/2);
-    int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
+    }
+    else
+    {
+        x1 = viewport.UpperLeftCorner.X  + (viewport.getWidth()/2)
+           - ((n * itemSpacing)/2);
+    }
+
+    // When the viewport is smaller in splitscreen, reduce the top margin
+    if ((race_manager->getNumLocalPlayers() == 2    &&
+        viewport.getWidth() > viewport.getHeight()) ||
+        race_manager->getNumLocalPlayers() >= 3       )
+        y1 = viewport.UpperLeftCorner.Y  + (int)(5 * scaling.Y);
+    else
+        y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     int x2 = 0;
 

@@ -715,11 +715,28 @@ namespace UserConfigParams
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
     PARAM_PREFIX FloatUserConfigParam m_voting_timeout
-        PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
+        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "voting-timeout",
         &m_network_group, "Timeout in seconds for voting tracks in server."));
+    PARAM_PREFIX FloatUserConfigParam m_validation_timeout
+        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
+        &m_network_group, "Timeout in seconds for validation of clients."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
         PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
         &m_network_group, "Maximum number of players on the server."));
+    PARAM_PREFIX BoolUserConfigParam m_firewalled_server
+        PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
+        &m_network_group, "Disable it to turn off all stun related code "
+        "in server, for official server hosting use only."));
+    PARAM_PREFIX FloatUserConfigParam m_start_game_counter
+        PARAM_DEFAULT(FloatUserConfigParam(30.0f, "start-game-counter",
+        &m_network_group, "Time to wait before entering kart selection screen "
+        "if satisfied start-game-threshold below for owner less or ranked "
+        "server."));
+    PARAM_PREFIX FloatUserConfigParam m_start_game_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "start-game-threshold",
+        &m_network_group, "Only auto start kart selection when number of "
+        "connected player is larger than max player * this value, for "
+        "owner less or ranked server, after start-game-counter."));
 
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",

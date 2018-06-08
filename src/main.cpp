@@ -600,6 +600,13 @@ void cmdLineHelp()
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
+    "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
+    "       --auto-end         Automatically end network game after 1st player finished\n"
+    "                          for some time (currently his finished time * 1.25 + 15.0). \n"
+    "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
+    "       --ranked           Server will submit ranking to stk addons server.\n"
+    "                          You require permission for that.\n"
+    "       --owner-less       Race will auto start and no one can kick players in server.\n"
     "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "  -h,  --help             Show this help.\n"
@@ -1065,10 +1072,39 @@ int handleCmdLine()
 
     if (CommandLine::has("--motd", &s))
     {
-        core::stringw motd = StringUtils::xmlDecode(s);
+        core::stringw motd;
+        if (s.find(".txt") != std::string::npos)
+        {
+            std::ifstream message(s);
+            if (message.is_open())
+            {
+                for (std::string line; std::getline(message, line); )
+                {
+                    motd += StringUtils::utf8ToWide(line).trim() + L"\n";
+                }
+                // Remove last newline
+                motd.erase(motd.size() - 1);
+            }
+        }
+        else
+            motd = StringUtils::xmlDecode(s);
         NetworkConfig::get()->setMOTD(motd);
     }
-
+    if (CommandLine::has("--ranked"))
+    {
+        NetworkConfig::get()->setValidatedPlayers(true);
+        NetworkConfig::get()->setRankedServer(true);
+        NetworkConfig::get()->setOwnerLess(true);
+        NetworkConfig::get()->setAutoEnd(true);
+    }
+    if (CommandLine::has("--auto-end"))
+    {
+        NetworkConfig::get()->setAutoEnd(true);
+    }
+    if (CommandLine::has("--owner-less"))
+    {
+        NetworkConfig::get()->setOwnerLess(true);
+    }
     if (CommandLine::has("--server-id-file", &s))
     {
         NetworkConfig::get()->setServerIdFile(
@@ -1099,7 +1135,7 @@ int handleCmdLine()
             !server_password.empty());
         NetworkConfig::get()->addNetworkPlayer(
             input_manager->getDeviceManager()->getLatestUsedDevice(),
-            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+            PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         NetworkConfig::get()->doneAddingNetworkPlayers();
         STKHost::create();
         auto cts = std::make_shared<ConnectToServer>(server);
@@ -1115,8 +1151,7 @@ int handleCmdLine()
         }
         else
         {
-            auto cl = LobbyProtocol::create<ClientLobby>();
-            cl->setAddress(server_addr);
+            auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
             cl->requestStart();
         }
     }
@@ -1146,6 +1181,14 @@ int handleCmdLine()
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
             NetworkConfig::get()->setIsPublicServer();
+            if (CommandLine::has("--no-validation"))
+            {
+                NetworkConfig::get()->setValidatedPlayers(false);
+            }
+            else
+            {
+                NetworkConfig::get()->setValidatedPlayers(true);
+            }
             server_lobby = STKHost::create();
             Log::info("main", "Creating a WAN server '%s'.", s.c_str());
         }
@@ -1155,6 +1198,7 @@ int handleCmdLine()
         NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setValidatedPlayers(false);
         server_lobby = STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }
@@ -1168,7 +1212,7 @@ int handleCmdLine()
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
             LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
-                ->setSoccerGoalTarget((bool)n);
+                ->setSoccerGoalTarget(n != 0);
             NetworkConfig::get()->setServerMode(
                 race_manager->getMinorMode(),
                 RaceManager::MAJOR_MODE_SINGLE);
@@ -1989,8 +2033,8 @@ int main(int argc, char *argv[] )
     if (STKHost::existHost())
         STKHost::get()->shutdown();
 
-    NetworkConfig::destroy();
     cleanSuperTuxKart();
+    NetworkConfig::destroy();
 
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();

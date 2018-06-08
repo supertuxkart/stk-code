@@ -29,6 +29,7 @@
 
 namespace Online { class XMLRequest; }
 class Server;
+class TransportAddress;
 class XMLNode;
 
 /**
@@ -40,6 +41,9 @@ class ServersManager
 private:
     /** List of servers */
     std::vector<std::shared_ptr<Server> > m_servers;
+    
+    /** List of broadcast addresses to use. */
+    std::vector<TransportAddress> m_broadcast_address;
 
     std::atomic<float> m_last_load_time;
 
@@ -57,6 +61,10 @@ private:
     // ------------------------------------------------------------------------
     void setLanServers(const std::map<irr::core::stringw, 
                                       std::shared_ptr<Server> >& servers);
+                                      
+    void setDefaultBroadcastAddresses();
+    void addAllBroadcastAddresses(const TransportAddress &a, int len);
+    void updateBroadcastAddresses();
 public:
     // ------------------------------------------------------------------------
     // Singleton
@@ -66,11 +74,13 @@ public:
     // ------------------------------------------------------------------------
     void cleanUpServers()                                { m_servers.clear(); }
     // ------------------------------------------------------------------------
-    bool refresh();
+    bool refresh(bool full_refresh);
     // ------------------------------------------------------------------------
     std::vector<std::shared_ptr<Server> >& getServers()   { return m_servers; }
     // ------------------------------------------------------------------------
     bool listUpdated() const                         { return m_list_updated; }
+    // ------------------------------------------------------------------------
+    const std::vector<TransportAddress>& getBroadcastAddresses();
 
 };   // class ServersManager
 #endif // HEADER_SERVERS_MANAGER_HPP

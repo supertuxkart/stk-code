@@ -123,6 +123,7 @@ void LobbyProtocol::configRemoteKart(
         rki.setGlobalPlayerId(i);
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
+        rki.setOnlineId(profile->getOnlineId());
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players

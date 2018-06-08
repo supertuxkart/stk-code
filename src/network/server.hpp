@@ -76,10 +76,15 @@ protected:
 
     /* WAN server only, show the owner name of server, can only be seen
      * for localhost or if you are friend with the server owner. */
-    std::string m_server_owner_name;
+    core::stringw m_server_owner_name;
 
     /* WAN server only, distance based on IP latitude and longitude. */
     float m_distance;
+
+    /* WAN server only, true if hosted officially by stk team. */
+    bool m_official;
+
+    bool m_supports_encrytion;
 public:
 
          /** Initialises the object from an XML node. */
@@ -119,10 +124,14 @@ public:
     // ------------------------------------------------------------------------
     bool isPasswordProtected() const           { return m_password_protected; }
     // ------------------------------------------------------------------------
-    const std::string& getServerOwnerName() const
+    const core::stringw& getServerOwnerName() const
                                                 { return m_server_owner_name; }
     // ------------------------------------------------------------------------
     float getDistance() const                            { return m_distance; }
+    // ------------------------------------------------------------------------
+    bool supportsEncryption() const            { return m_supports_encrytion; }
+    // ------------------------------------------------------------------------
+    bool isOfficial() const                              { return m_official; }
 
 };   // Server
 #endif // HEADER_SERVER_HPP

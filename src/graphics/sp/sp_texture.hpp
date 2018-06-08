@@ -183,7 +183,8 @@ public:
     // ------------------------------------------------------------------------
     GLuint getOpenGLTextureName() const              { return m_texture_name; }
     // ------------------------------------------------------------------------
-    bool initialized() const;
+    bool initialized() const
+                        { return m_width.load() != 0 && m_height.load() != 0; }
     // ------------------------------------------------------------------------
     unsigned getWidth() const                        { return m_width.load(); }
     // ------------------------------------------------------------------------

@@ -18,5 +18,6 @@
         <box proportion="1" width="100%" layout="vertical-row" padding="6">
             <list id="achievements_list" x="0" y="0" width="100%" height="100%"/>
         </box>
+        <button id="rankings" I18N="In the achievements screen" text="Player rankings"/>
     </div>
 </stkgui>

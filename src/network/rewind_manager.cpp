@@ -27,6 +27,8 @@
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
@@ -74,7 +76,7 @@ RewindManager::~RewindManager()
 void RewindManager::reset()
 {
     m_is_rewinding = false;
-    m_not_rewound_ticks = 0;
+    m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
     m_last_saved_state = -1;  // forces initial state save
     m_state_frequency =
@@ -231,7 +233,7 @@ void RewindManager::update(int ticks_not_used)
     float time = World::getWorld()->getTime();
     int ticks = World::getWorld()->getTimeTicks();
 
-    m_not_rewound_ticks = ticks;
+    m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
     // Clients don't save state, so they just exit.
     if (NetworkConfig::get()->isClient() ||
@@ -300,6 +302,8 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
 void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 {
     assert(!m_is_rewinding);
+    // TODO Do it properly for track objects like soccer ball
+    Track::getCurrentTrack()->getTrackObjectManager()->removeForRewind();
     bool is_history = history->replayHistory();
     history->setReplayHistory(false);
 
@@ -369,5 +373,6 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }
 
     history->setReplayHistory(is_history);
+    Track::getCurrentTrack()->getTrackObjectManager()->addForRewind();
     m_is_rewinding = false;
 }   // rewindTo

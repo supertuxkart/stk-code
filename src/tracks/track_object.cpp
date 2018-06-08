@@ -535,6 +535,7 @@ void TrackObject::updateGraphics(float dt)
     // have been converted to use separate updateGraphics() calls.
 
     if (m_physical_object) m_physical_object->updateGraphics(dt);
+    if (m_animator) m_animator->update(dt);
 
 }   // update
 
@@ -546,10 +547,8 @@ void TrackObject::updateGraphics(float dt)
 void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
-
     if (m_physical_object) m_physical_object->update(dt);
 
-    if (m_animator) m_animator->update(dt);
 }   // update
 
 // ----------------------------------------------------------------------------

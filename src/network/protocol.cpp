@@ -111,16 +111,15 @@ void Protocol::requestTerminate()
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------
-/** Sends a message to all peers, inserting the peer's token into the message.
+/** Sends a message to all peers, encrypt the message if needed.
  *  The message is composed of a 1-byte message (usually the message type)
- *  followed by the token of this client and then actual message).
+ *  followed by the actual message.
  *  \param message The actual message content.
 */
-void Protocol::sendMessageToPeersChangingToken(NetworkString *message,
-                                               bool reliable)
+void Protocol::sendMessageToPeers(NetworkString *message, bool reliable)
 {
     STKHost::get()->sendPacketToAllPeers(message, reliable);
-}   // sendMessageToPeersChangingToken
+}   // sendMessageToPeers
 
 // ----------------------------------------------------------------------------
 /** Sends a message from a client to the server.

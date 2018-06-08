@@ -97,6 +97,8 @@ void ServerInfoDialog::requestJoin()
     if (m_server->isPasswordProtected())
     {
         assert(m_password != NULL);
+        if (m_password->getText().empty())
+            return;
         NetworkConfig::get()->setPassword(
             StringUtils::wideToUtf8(m_password->getText()));
     }
@@ -157,6 +159,11 @@ bool ServerInfoDialog::onEscapePressed()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::onUpdate(float dt)
 {
+    if (m_password && m_password->getText().empty())
+        m_join_widget->setActive(false);
+    else if (!m_join_widget->isActivated())
+        m_join_widget->setActive(true);
+
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {

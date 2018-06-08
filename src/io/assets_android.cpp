@@ -59,18 +59,18 @@ void AssetsAndroid::init()
     if (getenv("SUPERTUXKART_DATADIR"))
         paths.push_back(getenv("SUPERTUXKART_DATADIR"));
         
-    if (getenv("EXTERNAL_STORAGE"))
-        paths.push_back(getenv("EXTERNAL_STORAGE"));
-
-    if (getenv("SECONDARY_STORAGE"))
-        paths.push_back(getenv("SECONDARY_STORAGE"));
-        
     if (global_android_app->activity->externalDataPath)
         paths.push_back(global_android_app->activity->externalDataPath);
 
     if (global_android_app->activity->internalDataPath)
         paths.push_back(global_android_app->activity->internalDataPath);
 
+    if (getenv("EXTERNAL_STORAGE"))
+        paths.push_back(getenv("EXTERNAL_STORAGE"));
+
+    if (getenv("SECONDARY_STORAGE"))
+        paths.push_back(getenv("SECONDARY_STORAGE"));
+        
     paths.push_back("/sdcard/");
     paths.push_back("/storage/sdcard0/");
     paths.push_back("/storage/sdcard1/");

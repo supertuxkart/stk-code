@@ -48,7 +48,7 @@ AbstractKart::AbstractKart(const std::string& ident,
             ident.c_str());
         kp = kart_properties_manager->getKart(std::string("tux"));
     }
-    m_kart_properties->copyForPlayer(kp);
+    m_kart_properties->copyForPlayer(kp, difficulty);
     m_difficulty = difficulty;
     m_kart_animation  = NULL;
     assert(m_kart_properties);
@@ -152,3 +152,11 @@ void AbstractKart::kartIsInRestNow()
     // after all karts are reset
     setTrans(getBody()->getWorldTransform());
 }   // kartIsInRest
+
+// ----------------------------------------------------------------------------
+/** Returns the time at which the kart was at a given distance.
+ * Returns -1.0f if none */
+float AbstractKart::getTimeForDistance(float distance)
+{
+    return -1.0f;
+}   // getTimeForDistance

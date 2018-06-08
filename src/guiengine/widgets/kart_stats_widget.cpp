@@ -80,7 +80,7 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
         m_children.push_back(skill_bar);
     }
 
-	setValues(props);
+	setValues(props, PLAYER_DIFFICULTY_NORMAL);
 
     move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
          area.getWidth(), area.getHeight());
@@ -88,7 +88,8 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 
 // -----------------------------------------------------------------------------
 
-void KartStatsWidget::setValues(const KartProperties* props)
+void KartStatsWidget::setValues(const KartProperties* props,
+                                PerPlayerDifficulty d)
 {
     // Use kart properties computed for "hard" difficulty to show the user, so
     // that properties don't change according to the the last used difficulty
@@ -97,7 +98,7 @@ void KartStatsWidget::setValues(const KartProperties* props)
     RaceManager::Difficulty previous_difficulty = race_manager->getDifficulty();
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
     KartProperties kp_computed;
-    kp_computed.copyForPlayer(props);
+    kp_computed.copyForPlayer(props, d);
     
     // Scale the values so they look better
     // The scaling factor and offset were found by trial and error.

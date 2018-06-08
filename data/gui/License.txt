@@ -38,6 +38,8 @@ power.png by Auria, based on https://openclipart.org/detail/193925/check-engine 
 
 crown.png by glitch, from https://openclipart.org/detail/210257/misc-game-crown, released under public domain
 
+ghost_plus.png by Alayan, based on https://openclipart.org/detail/17847/cartoon-ghost by lemmling, released under CC-O
+
 ====
 
 Glass Skin by Auria, under CC-BY-SA 3+

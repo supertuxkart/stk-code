@@ -55,6 +55,23 @@ private:
      *  get valid finish times estimates. */
     float       m_distance_increase;
 
+    /** This stores the live time difference between a ghost kart
+     *  and a second kart racing against it (normal or ghost). 
+     */
+    float       m_live_time_difference;
+
+    /** True if the live_time_difference is invalid */
+    bool        m_valid_reference_time;
+
+    /* if set then the game will auto end after this time for networking */
+    float       m_finish_timeout;
+
+    /** This calculate the time difference between the second kart in the race
+     *  (there must be at least two) and the first kart in the race
+     *  (who must be a ghost).
+     */
+    void  updateLiveDifference();
+
     // ------------------------------------------------------------------------
     /** Some additional info that needs to be kept for each kart
      * in this kind of race.
@@ -120,13 +137,14 @@ public:
 
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
-    float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceDownTrackForKart(const int kart_id,
                                             bool account_for_checklines) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
     int           getTicksAtLapForKart(const int kart_id) const;
+    float         getLiveTimeDifference() const { return m_live_time_difference; }
+    bool          hasValidTimeDifference() const { return m_valid_reference_time; }
 
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;

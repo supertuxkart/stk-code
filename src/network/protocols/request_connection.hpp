@@ -12,14 +12,9 @@ class RequestConnection : public Protocol
 protected:
     /** Id of the server to join. */
     std::shared_ptr<Server> m_server;
-
-    /** The request to join a server. */
-    Online::XMLRequest *m_request;
     enum STATE
     {
         NONE,
-        REQUEST_PENDING,
-        DONE,
         EXITING
     };
 

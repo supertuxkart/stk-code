@@ -229,8 +229,8 @@ void CutsceneWorld::update(int ticks)
     }
     else
     {
-        // this way of calculating time and  dt is more in line with what
-        // irrlicht does andprovides better synchronisation
+        // this way of calculating time and dt is more in line with what
+        // irrlicht does and provides better synchronisation
         double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
@@ -297,28 +297,32 @@ void CutsceneWorld::update(int ticks)
     {
         if (curr->getType() == "cutscene_camera")
         {
-            scene::ISceneNode* anchorNode = curr->getPresentation<TrackObjectPresentationEmpty>()->getNode();
-            m_camera->setPosition(anchorNode->getPosition());
-            m_camera->updateAbsolutePosition();
+            Camera *camera = Camera::getActiveCamera();
+            if (camera && camera->getType() == Camera::CM_TYPE_NORMAL)
+            {
+                scene::ISceneNode* anchorNode = curr->getPresentation<TrackObjectPresentationEmpty>()->getNode();
+                m_camera->setPosition(anchorNode->getPosition());
+                m_camera->updateAbsolutePosition();
 
-            core::vector3df rot = anchorNode->getRotation();
-            Vec3 rot2(rot);
-            rot2.setPitch(rot2.getPitch() + 90.0f);
-            m_camera->setRotation(rot2.toIrrVector());
+                core::vector3df rot = anchorNode->getRotation();
+                Vec3 rot2(rot);
+                rot2.setPitch(rot2.getPitch() + 90.0f);
+                m_camera->setRotation(rot2.toIrrVector());
 
-            irr::core::vector3df up(0.0f, 0.0f, 1.0f);
-            irr::core::matrix4 matrix = anchorNode->getAbsoluteTransformation();
-            matrix.rotateVect(up);
-            m_camera->setUpVector(up);
+                irr::core::vector3df up(0.0f, 0.0f, 1.0f);
+                irr::core::matrix4 matrix = anchorNode->getAbsoluteTransformation();
+                matrix.rotateVect(up);
+                m_camera->setUpVector(up);
 
-            SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
-                                          m_camera->getTarget() -
-                                            m_camera->getAbsolutePosition(),
-                                            Vec3(0,1,0));
-
+                SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
+                                              m_camera->getTarget() -
+                                                m_camera->getAbsolutePosition(),
+                                                Vec3(0,1,0));
+            }
             break;
         }
     }
+
     std::map<float, std::vector<TrackObject*> >::iterator it;
     for (it = m_sounds_to_trigger.begin(); it != m_sounds_to_trigger.end(); )
     {
@@ -422,11 +426,14 @@ void CutsceneWorld::enterRaceOverState()
             // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
+            //TODO : this code largely duplicate a similar code present in raceResultGUI.
+            //       Try to reduce duplication
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+
             if (unlocked.size() > 0)
             {
-                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -441,8 +448,8 @@ void CutsceneWorld::enterRaceOverState()
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
                 assert(unlocked.size() > 0);
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
@@ -476,9 +483,10 @@ void CutsceneWorld::enterRaceOverState()
 
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+
             if (unlocked.size() > 0)
             {
-                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -492,8 +500,8 @@ void CutsceneWorld::enterRaceOverState()
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
@@ -593,5 +601,4 @@ void CutsceneWorld::createRaceGUI()
 {
     m_race_gui = new CutsceneGUI();
 }   // createRaceGUI
-
 
