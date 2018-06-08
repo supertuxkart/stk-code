@@ -146,6 +146,7 @@ public:
          }   // ItemState(ItemType)
              
     // ------------------------------------------------------------------------
+    virtual ~ItemState() {}
     void setDisappearCounter();
     void update(int ticks);
     virtual void collected(const AbstractKart *kart);
