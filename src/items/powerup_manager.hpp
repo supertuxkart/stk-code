@@ -44,21 +44,22 @@ namespace irr
  *  items depending on position. The latter is done so that as the first player
  *  you get less advantageous items (but no useless ones either, e.g. anchor),
  *  while as the last you get more useful ones.
+ *
  *  The weight distribution works as follow:
- *  The position in a race is mapped to one of five position classes:
- *  first, top, middle, bottom, last - e.g. for a 6 player game the distribution
- *  is:
- *  position  1     2   3      4      5      6
- *  class     first top middle middle bottom last
- *  For each class the weight distribution is read in from powerup.xml:
+ *  Depending on the number of karts, 5 reference points are mapped to positions.
+ *  For each reference point the weight distribution is read in from powerup.xml:
  *   <!--      bubble cake bowl zipper plunger switch para anvil -->
  *   <last  w="0      1    1    2      2       0      2    2"     />
- *  So a (well, in this case 'the') player belonging to the class 'last'
- *  will not get a bubble gum or switch. Cakes and bowling balls have
- *  lower probability.
- *  At the start of each race two mappings are computed in updateWeightsForRace:
- *  m_position_to_class maps each postion to the class using the function
- *                      convertPositionToClass.
+ *  Then, the weights for the real position are calculated as a linear average
+ *  between the weights of the reference positions immediately lower and higher.
+ *  e.g. ; if the reference positions are 1 and 4,5 ; the 3rd will have
+ *  weights equal to (4,5-3)/(4,5-1) times the weight of the reference position
+ *  at 4,5 and (3-1)/(4,5-1) times the weight of the reference position at 1.
+ *
+ *  At the start of each race three mappings are computed in updateWeightsForRace:
+ *  m_position_to_class maps each postion to a list of class using
+ *  the function convertPositionToClass, with a class with a higher weight
+ *  included more times so picking at random gives us the right class distribution
  *  m_powerups_for_position contains a list of items for each class. A item
  *  with higher weight is included more than once, so at runtime we can
  *  just pick a random item from this list to get the right distribution.
@@ -100,6 +101,8 @@ public:
                         POSITION_COUNT};
 
 private:
+    const int     RAND_CLASS_RANGE = 1000;
+
     /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];
 
@@ -112,29 +115,35 @@ private:
 
     /** For each powerup the weight (probability) used depending on the
      *  number of players. */
-    std::vector<int> m_weights[POSITION_COUNT];
+    std::vector<unsigned int> m_weights[POSITION_COUNT];
 
     /** A list of all powerups for a specific class. If a powerup
      *  has weight 5, it will be listed 5 times in this list, so
      *  randomly picking an entry from this for a position class will
      *  result in the right distribution of items. */
-    std::vector<PowerupType> m_powerups_for_position[POSITION_COUNT];
+    std::vector<PowerupType> m_powerups_for_reference_pos[POSITION_COUNT];
 
-    /** The mapping of each position to the corresponding position class.
-     *  There is one map for each different number of players, so it is
-     *  used like  m_position_to_class[number_players][position] */
-    std::vector<PositionClass> m_position_to_class;
+    /** The mapping of each position to the corresponding position class. */
+
+    std::vector<PositionClass> m_position_to_class_inf;
+    std::vector<PositionClass> m_position_to_class_sup;
+    std::vector<int> m_position_to_class_cutoff;
 
     PowerupType   getPowerupType(const std::string &name) const;
     void          loadWeights(const XMLNode &root,
+                              unsigned int num_karts,
                               const std::string &class_name,
                               PositionClass position_class);
+    void          updatePowerupClass(PowerupManager::PositionClass pos_class);
     PositionClass convertPositionToClass(unsigned int num_karts,
+                                         unsigned int position, bool class_sup = false);
+    unsigned int           convertPositionToClassWeight(unsigned int num_karts,
                                          unsigned int position);
 public:
                   PowerupManager  ();
                  ~PowerupManager  ();
-    void          loadAllPowerups ();
+    void          loadPowerupsModels ();
+    void          loadAllPowerups (unsigned int num_karts);
     void          unloadPowerups  ();
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     void          updateWeightsForRace(unsigned int num_karts);
