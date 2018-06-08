@@ -20,6 +20,7 @@
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/ghost_kart.hpp"
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 
