@@ -145,10 +145,13 @@ public:
         core::dimension2du dim(m_text->getTextWidth(),
             m_text->getTextHeight());
         dim.Width += brp.m_left_border + brp.m_right_border;
+
+        int leftIconSize = dim.Height + 10;
         int x = (width - dim.Width) / 2;
         int y = height - int(1.5f * dim.Height);
         m_area = irr::core::recti(x, y, x + dim.Width, y + dim.Height);
-        m_text->setRelativePosition(m_area);
+        m_text->setRelativePosition(irr::core::recti(x + leftIconSize, y,
+            x + dim.Width - leftIconSize, y + dim.Height));
         m_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
         m_text->grab();
         m_text->remove();
