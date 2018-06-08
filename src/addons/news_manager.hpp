@@ -18,6 +18,8 @@
 #ifndef HEADER_NEWS_MANAGER_HPP
 #define HEADER_NEWS_MANAGER_HPP
 
+#ifndef SERVER_ONLY
+
 #include <string>
 #include <vector>
 
@@ -143,4 +145,4 @@ public:
 extern NewsManager *news_manager;
 
 #endif
-
+#endif

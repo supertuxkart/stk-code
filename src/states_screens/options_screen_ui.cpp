@@ -239,6 +239,7 @@ void OptionsScreenUI::init()
 
 void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
+#ifndef SERVER_ONLY
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -387,7 +388,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         OptionsScreenUI::getInstance()->push();
     }
-
+#endif
 }   // eventCallback
 
 // -----------------------------------------------------------------------------

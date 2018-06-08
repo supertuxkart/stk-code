@@ -41,7 +41,9 @@ private:
     GUIEngine::IconButtonWidget  *m_icon;
     
     /** The addon to load. */
+#ifndef SERVER_ONLY
     Addon                         m_addon;
+#endif
     void startDownload();
     void stopDownload();
     void doInstall();

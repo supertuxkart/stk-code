@@ -140,6 +140,7 @@ void MainMenuScreen::init()
     // the key bindings for the first player the default again.
     input_manager->getDeviceManager()->clearLatestUsedDevice();
 
+#ifndef SERVER_ONLY
     if (addons_manager->isLoading())
     {
         IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
@@ -152,6 +153,7 @@ void MainMenuScreen::init()
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
+#endif
 
     RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
     // FIXME: why do I need to do this manually
@@ -174,6 +176,7 @@ void MainMenuScreen::init()
 
 void MainMenuScreen::onUpdate(float delta)
 {
+#ifndef SERVER_ONLY
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
@@ -222,6 +225,7 @@ void MainMenuScreen::onUpdate(float delta)
         const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
         w->setText(news_text, true);
     }
+#endif
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -229,6 +233,7 @@ void MainMenuScreen::onUpdate(float delta)
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
+#ifndef SERVER_ONLY
     if(name=="user-id")
     {
         UserScreen::getInstance()->push();
@@ -534,6 +539,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         OnlineProfileAchievements::getInstance()->push();
     }
+#endif
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -546,6 +552,7 @@ void MainMenuScreen::tearDown()
 
 void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 {
+#ifndef SERVER_ONLY
     if (item == "addons")
     {
         if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
@@ -565,4 +572,5 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
             new MessageDialog( _("Please wait while the add-ons are loading"));
         }
     }
+#endif
 }   // onDisabledItemClicked
