@@ -101,9 +101,6 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
 
     NetworkString &data = event->data();
     uint8_t message_type = data.getUInt8();
-    if (message_type != GP_CONTROLLER_ACTION &&
-        message_type != GP_STATE)
-        printf("");
     switch (message_type)
     {
     case GP_CONTROLLER_ACTION: handleControllerAction(event); break;
@@ -298,10 +295,9 @@ void GameProtocol::sendItemEventConfirmation(int ticks)
 void GameProtocol::handleItemEventConfirmation(Event *event)
 {
     assert(NetworkConfig::get()->isServer());
-    int host_id = event->getPeer()->getHostId();
-    int ticks   = event->data().getTime();
-    NetworkItemManager::get()->setItemConfirmationTime(host_id, ticks);
-
+    int ticks = event->data().getTime();
+    NetworkItemManager::get()->setItemConfirmationTime(event->getPeerSP(),
+        ticks);
 }   // handleItemEventConfirmation
 
 // ----------------------------------------------------------------------------

@@ -25,6 +25,11 @@
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
+#include <map>
+#include <memory>
+
+class STKPeer;
+
 /** \ingroup items
  *  The network item manager is responsible for handling all network related
  *  item manager tasks - synchronisation between clients and servers. It 
@@ -47,7 +52,8 @@ private:
     int m_confirmed_state_time;
 
     /** Stores on the server the latest confirmed tick from each client. */
-    Synchronised< std::vector<int> > m_last_confirmed_item_ticks;
+    std::map<std::weak_ptr<STKPeer>, int32_t,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_last_confirmed_item_ticks;
 
     /** List of all items events. */
     Synchronised< std::vector<ItemEventInfo> > m_item_events;
@@ -65,7 +71,8 @@ public:
     void saveInitialState();
 
     virtual void reset();
-    virtual void setItemConfirmationTime(int host_id, int ticks) OVERRIDE;
+    virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
+                                         int ticks) OVERRIDE;
     virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;
     virtual Item* dropNewItem(ItemState::ItemType type, const AbstractKart *kart,
                               const Vec3 *xyz=NULL) OVERRIDE;

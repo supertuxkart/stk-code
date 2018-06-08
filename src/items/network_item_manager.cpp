@@ -20,8 +20,11 @@
 
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 
@@ -42,16 +45,19 @@ NetworkItemManager::NetworkItemManager()
                   : Rewinder(/*can be deleted*/false),
                     ItemManager()
 {
-    m_last_confirmed_item_ticks.lock();
-    m_last_confirmed_item_ticks.getData().clear();
+    m_last_confirmed_item_ticks.clear();
 
     if (NetworkConfig::get()->isServer())
     {
-        m_last_confirmed_item_ticks.getData()
-                                   .resize(STKHost::get()->getPeerCount(), 0);
+        auto peers = STKHost::get()->getPeers();
+        for (auto& p : peers)
+        {
+            if (!p->isValidated())
+                continue;
+            m_last_confirmed_item_ticks[p] = 0;
+        }
     }
 
-    m_last_confirmed_item_ticks.unlock();
 }   // NetworkItemManager
 
 //-----------------------------------------------------------------------------
@@ -141,23 +147,32 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
 /** Called by the GameProtocol when a confirmation for an item event is
  *  received by a host. Once all hosts have confirmed an event, it can be
  *  deleted and won't be send to any clients again.
- *  \param host_id Host identification of the host confirming the latest
- *         event time received.
+ *  \param peer Peer confirming the latest event time received.
  *  \param ticks Time at which the last event was received.
  */
-void NetworkItemManager::setItemConfirmationTime(int host_id, int ticks)
+void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
+                                                 int ticks)
 {
     assert(NetworkConfig::get()->isServer());
-    m_last_confirmed_item_ticks.lock();
-    if (ticks > m_last_confirmed_item_ticks.getData()[host_id])
-        m_last_confirmed_item_ticks.getData()[host_id] = ticks;
+    if (ticks > m_last_confirmed_item_ticks.at(peer))
+        m_last_confirmed_item_ticks.at(peer) = ticks;
 
-    // Now discard unneeded events, i.e. all events that have
-    // been confirmed by all clients:
-    int min_time = 999999;
-    for (auto i : m_last_confirmed_item_ticks.getData())
-        if (i < min_time) min_time = i;
-    m_last_confirmed_item_ticks.unlock();
+    // Now discard unneeded events and expired (disconnected) peer, i.e. all
+    // events that have been confirmed by all clients:
+    int min_time = std::numeric_limits<int32_t>::max();
+    for (auto it = m_last_confirmed_item_ticks.begin();
+         it != m_last_confirmed_item_ticks.end();)
+    {
+        if (it->first.expired())
+        {
+            it = m_last_confirmed_item_ticks.erase(it);
+        }
+        else
+        {
+            if (it->second < min_time) min_time = it->second;
+            it++;
+        }
+    }
 
     // Find the last entry before the minimal confirmed time.
     // Since the event list is sorted, all events up to this
@@ -169,7 +184,6 @@ void NetworkItemManager::setItemConfirmationTime(int host_id, int ticks)
     m_item_events.getData().erase(m_item_events.getData().begin(), p);
     m_item_events.unlock();
 
-    // TODO: Get informed when a client drops out!!!
 }   // setItemConfirmationTime
 
 //-----------------------------------------------------------------------------
@@ -290,7 +304,6 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         if(iei.isItemCollection())
         {
             int index = iei.getIndex();
-            ItemState *item_state = m_confirmed_state[index];
             // An item on the track was collected:
             AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
             m_confirmed_state[index]->collected(kart);
