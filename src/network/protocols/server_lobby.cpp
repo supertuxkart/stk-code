@@ -1092,9 +1092,7 @@ double ServerLobby::distributeBasePoints(uint32_t online_id)
     unsigned num_races  = m_num_ranked_races.at(online_id);
     if (num_races < 45)
     {
-        return
-            (BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u) *
-            2.0);
+        return BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u);
     }
     else
         return 0.0;
