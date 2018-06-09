@@ -434,7 +434,8 @@ void ServerLobby::update(int ticks)
     // Reset server to initial state if no more connected players
     if (m_waiting_for_reset)
     {
-        if (!RaceEventManager::getInstance()->protocolStopped() ||
+        if ((RaceEventManager::getInstance() &&
+            !RaceEventManager::getInstance()->protocolStopped()) ||
             !GameProtocol::emptyInstance())
             return;
 
