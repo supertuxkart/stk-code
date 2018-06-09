@@ -106,7 +106,7 @@ private:
     /* Ranking related variables */
     // If updating the base points, update the base points distribution in DB
     const double BASE_RANKING_POINTS   = 4000.0;
-    const double MAX_SCALING_TIME      = 600.0;
+    const double MAX_SCALING_TIME      = 500.0;
     const double MAX_POINTS_PER_SECOND = 0.125;
 
     /** Online id to profile map, handling disconnection in ranked server */
