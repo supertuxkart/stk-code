@@ -334,13 +334,14 @@ void AIBaseController::determineTurnRadius(const Vec3 &end, Vec3 *center,
 void AIBaseController::saveState(BareNetworkString *buffer) const
 {
     // Endcontroller needs this for proper offset in kart rewinder
-    buffer->addUInt32(0).addUInt32(0).addUInt32(0);
+    // Must match the number of bytes in Playercontroller.
+    buffer->addUInt32(0).addUInt32(0).addUInt32(0).addUInt8(0).addUInt32(0);
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
 void AIBaseController::rewindTo(BareNetworkString *buffer)
 {
-    // Endcontroller needs this for proper offset in kart rewinder
-    // Skip 3 uint32_t
-    buffer->skip(3 * 4);
+    // Endcontroller needs this for proper offset in kart rewinder.
+    // Skip the same number of bytes as PlayerController.
+    buffer->skip(4 * 4 + 1);
 }   // rewindTo

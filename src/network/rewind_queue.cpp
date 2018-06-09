@@ -245,8 +245,8 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // player might have a network hickup).
         if (NetworkConfig::get()->isServer() && (*i)->getTicks() < world_ticks)
         {
-            Log::warn("RewindQueue", "At %d received message from %d",
-                world_ticks, (*i)->getTicks());
+            Log::warn("RewindQueue", "Server received at %d message from %d",
+                      world_ticks, (*i)->getTicks());
             // Server received an event in the past. Adjust this event
             // to be executed 'now' - at least we get a bit closer to the
             // client state.
@@ -255,13 +255,13 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
 
         insertRewindInfo(*i);
 
-        Log::info("Rewind", "Inserting %s from time %d",
-                  (*i)->isEvent() ? "event" : "state",
-                  (*i)->getTicks()                       );
-
         // Check if a rewind is necessary, i.e. a message is received in the
-        // past of client (server never rewinds).
-        if (NetworkConfig::get()->isClient() && (*i)->getTicks() < world_ticks)
+        // past of client (server never rewinds). Even if
+        // getTicks()==world_ticks (which should not happen in reality, since
+        // any server message should be in the client's past - but it can
+        // happen during debugging) we need to rewind to getTicks (in order
+        // to get the latest state).
+        if (NetworkConfig::get()->isClient() && (*i)->getTicks() <= world_ticks)
         {
             // We need rewind if we receive an event in the past. This will
             // then trigger a rewind later. Note that we only rewind to the
@@ -291,6 +291,22 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     {
         cleanupOldRewindInfo(latest_confirmed_state);
         m_latest_confirmed_state_time = latest_confirmed_state;
+    }
+
+    // If the computed rewind time is before the last confirmed
+    // state, instead rewind from the latest confirmed state.
+    // This should not be necessary anymore, but I'll leave it
+    // in just in case.
+    if (*needs_rewind && 
+        *rewind_ticks < m_latest_confirmed_state_time && 
+        NetworkConfig::get()->isClient())
+    {
+        Log::verbose("rewindqueue",
+                     "world %d rewindticks %d latest_confirmed %d",
+                     World::getWorld()->getTimeTicks(), *rewind_ticks,
+                     m_latest_confirmed_state_time);
+        *rewind_ticks = m_latest_confirmed_state_time;
+        *needs_rewind = m_latest_confirmed_state_time < world_ticks;
     }
 
 }   // mergeNetworkData
@@ -344,6 +360,14 @@ int RewindQueue::undoUntil(int undo_ticks)
     {
         // Undo all events and states from the current time
         (*m_current)->undo();
+        if(m_current == m_all_rewind_info.begin())
+        {
+            // This shouldn't happen, but add some debug info just in case
+            Log::error("undoUntil",
+                       "At %d rewinding to %d current = %d = begin",
+                       World::getWorld()->getTimeTicks(), undo_ticks, 
+                       (*m_current)->getTicks());
+        }
         m_current--;
     }
 
@@ -360,7 +384,7 @@ void RewindQueue::replayAllEvents(int ticks)
     while ( hasMoreRewindInfo() && (*m_current)->getTicks() == ticks )
     {
         if ((*m_current)->isEvent())
-            (*m_current)->rewind();
+            (*m_current)->replay();
         m_current++;
     }   // while current->getTIcks == ticks
 
@@ -384,10 +408,10 @@ void RewindQueue::unitTesting()
     class DummyRewinder : public Rewinder, public EventRewinder
     {
     public:
-        BareNetworkString* saveState() const { return NULL; }
+        BareNetworkString* saveState() { return NULL; }
         virtual void undoEvent(BareNetworkString *s) {}
         virtual void rewindToEvent(BareNetworkString *s) {}
-        virtual void rewindToState(BareNetworkString *s) {}
+        virtual void restoreState(BareNetworkString *s, int count) {}
         virtual void undoState(BareNetworkString *s) {}
         virtual void undo(BareNetworkString *s) {}
         virtual void rewind(BareNetworkString *s) {}

@@ -56,13 +56,15 @@ private:
 public:
     RewindInfo(int ticks, bool is_confirmed);
 
+    void setTicks(int ticks);
+
     /** Called when going back in time to undo any rewind information. */
     virtual void undo() = 0;
-
+    /** This is called to restore a state before replaying the events. */
+    virtual void restore() = 0;
     /** This is called while going forwards in time again to reach current
-     *  time. */
-    virtual void rewind() = 0;
-    void setTicks(int ticks);
+    *  time. */
+    virtual void replay() = 0;
     // ------------------------------------------------------------------------
     virtual ~RewindInfo() { }
     // ------------------------------------------------------------------------
@@ -95,7 +97,7 @@ public:
              RewindInfoState(int ticks,  BareNetworkString *buffer, 
                              bool is_confirmed);
     virtual ~RewindInfoState() { delete m_buffer; };
-    virtual void rewind();
+    virtual void restore();
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the state buffer. */
@@ -109,6 +111,13 @@ public:
     {
         // Nothing being done in case of an undo that goes further back
     }   // undo
+    // ------------------------------------------------------------------------
+    /** Called when rewinding from a past state to 'now'. This should never
+     *  be called for a state (a state calles restore()). */
+    virtual void replay()
+    {
+        assert(false);
+    }   // replay
 };   // class RewindInfoState
 
 // ============================================================================
@@ -129,6 +138,9 @@ public:
     }   // ~RewindInfoEvent
 
     // ------------------------------------------------------------------------
+    /** An event is never 'restored', it is only rewound. */
+    void restore() {}
+    // ------------------------------------------------------------------------
     virtual bool isEvent() const { return true; }
     // ------------------------------------------------------------------------
     /** Called when going back in time to undo any rewind information.
@@ -142,7 +154,7 @@ public:
     /** This is called while going forwards in time again to reach current
      *  time. Calls rewind() in the event rewinder.
      */
-    virtual void rewind()
+    virtual void replay()
     {
         // Make sure to reset the buffer so we read from the beginning
         m_buffer->reset();

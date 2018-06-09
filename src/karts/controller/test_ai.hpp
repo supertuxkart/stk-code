@@ -51,6 +51,8 @@
 
 #include <line3d.h>
 
+class Item;
+
 #ifdef AI_DEBUG
   class ShowCurve;
 

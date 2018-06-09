@@ -41,6 +41,7 @@ class btUprightConstraint;
 class Controller;
 class HitEffect;
 class Item;
+class ItemState;
 class KartGFX;
 class KartRewinder;
 class MaxSpeed;
@@ -297,7 +298,7 @@ public:
     virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const OVERRIDE;
     virtual void  setBoostAI     (bool boosted) OVERRIDE;
     virtual bool  getBoostAI     () const OVERRIDE;
-    virtual void  collectedItem(Item *item, int random_attachment) OVERRIDE;
+    virtual void  collectedItem(ItemState *item) OVERRIDE;
     virtual float getStartupBoost() const;
 
     virtual const Material *getMaterial() const OVERRIDE;

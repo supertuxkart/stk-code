@@ -17,6 +17,8 @@
 
 #include "network/protocols/game_protocol.hpp"
 
+#include "items/item_manager.hpp"
+#include "items/network_item_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/world.hpp"
@@ -53,6 +55,7 @@ GameProtocol::GameProtocol()
             : Protocol( PROTOCOL_CONTROLLER_EVENTS)
 {
     m_data_to_send = getNetworkString();
+
 }   // GameProtocol
 
 //-----------------------------------------------------------------------------
@@ -103,6 +106,8 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
     case GP_CONTROLLER_ACTION: handleControllerAction(event); break;
     case GP_STATE:             handleState(event);            break;
     case GP_ADJUST_TIME:       handleAdjustTime(event);       break;
+    //case GP_ITEM_UPDATE:       handleItemUpdate(event);       break;
+    case GP_ITEM_CONFIRMATION: handleItemEventConfirmation(event); break;
     default: Log::error("GameProtocol",
                         "Received unknown message type %d - ignored.",
                         message_type);                        break;
@@ -266,6 +271,36 @@ void GameProtocol::handleAdjustTime(Event *event)
 }   // handleAdjustTime
 
 // ----------------------------------------------------------------------------
+/** Sends a confirmation to the server that all item events up to 'ticks'
+ *  have been received.
+ *  \param ticks Up to which time in ticks the item events have been received.
+ */
+void GameProtocol::sendItemEventConfirmation(int ticks)
+{
+    assert(NetworkConfig::get()->isClient());
+    NetworkString *ns = getNetworkString(5);
+    ns->addUInt8(GP_ITEM_CONFIRMATION).addUInt32(ticks);
+    // This message can be sent unreliable, it's not critical if it doesn't
+    // get delivered, a future update will come through
+    sendToServer(ns, /*reliable*/false);
+    delete ns;
+}   // sendItemEventConfirmation
+
+// ----------------------------------------------------------------------------
+/** Handles an item even confirmation from a client. Once it has been confirmed
+ *  that all clients have received certain events, those can be deleted and
+ *  do not need to be sent again.
+ *  \param event The data from the client.
+ */
+void GameProtocol::handleItemEventConfirmation(Event *event)
+{
+    assert(NetworkConfig::get()->isServer());
+    int ticks = event->data().getTime();
+    NetworkItemManager::get()->setItemConfirmationTime(event->getPeerSP(),
+        ticks);
+}   // handleItemEventConfirmation
+
+// ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
  *  state of the race to be sent to a client.
  * \param local_save If set it allows a state to be saved on a client.
@@ -303,8 +338,6 @@ void GameProtocol::addState(BareNetworkString *buffer)
  */
 void GameProtocol::sendState()
 {
-    Log::info("GameProtocol", "Sending new state at %d.",
-        World::getWorld()->getTimeTicks());
     assert(NetworkConfig::get()->isServer());
     sendMessageToPeers(m_data_to_send, /*reliable*/true);
 }   // sendState
@@ -329,9 +362,6 @@ void GameProtocol::handleState(Event *event)
 
     // The memory for bns will be handled in the RewindInfoState object
     RewindManager::get()->addNetworkState(bns, ticks);
-
-    Log::info("GameProtocol", "Received at %d state from %d",
-              World::getWorld()->getTimeTicks(), ticks);
 }   // handleState
 
 // ----------------------------------------------------------------------------

@@ -234,7 +234,7 @@ void AddonsScreen::tearDown()
  */
 void AddonsScreen::loadList()
 {
-
+#ifndef SERVER_ONLY
     // Get the filter by words.
     GUIEngine::TextBoxWidget* w_filter_name =
                         getWidget<GUIEngine::TextBoxWidget>("filter_name");
@@ -416,6 +416,7 @@ void AddonsScreen::loadList()
     else
         getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
                                                         PLAYER_ID_GAME_MASTER);
+#endif
 }   // loadList
 
 // ----------------------------------------------------------------------------
@@ -452,6 +453,7 @@ void AddonsScreen::onColumnClicked(int column_id)
 void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
                                  const std::string& name, const int playerID)
 {
+#ifndef SERVER_ONLY
     if (name == "back")
     {
         StateManager::get()->escapePressed();
@@ -509,7 +511,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
     {
         loadList();
     }
-
+#endif
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -534,6 +536,7 @@ void AddonsScreen::setLastSelected()
 
 void AddonsScreen::onUpdate(float dt)
 {
+#ifndef SERVER_ONLY
     if (m_reloading)
     {
         if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
@@ -579,5 +582,5 @@ void AddonsScreen::onUpdate(float dt)
             m_show_tips = false;
         }
     }
-
+#endif
 }   // onUpdate

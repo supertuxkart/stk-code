@@ -80,6 +80,12 @@ public:
     int  undoUntil(int undo_ticks);
 
     // ------------------------------------------------------------------------
+    /** Returns the time of the latest confirmed state. */
+    int getLatestConfirmedState() const
+    {
+        return m_latest_confirmed_state_time;
+    }
+    // ------------------------------------------------------------------------
     /** Sets the current element to be the next one and returns the next
      *  RewindInfo element. */
     void next()

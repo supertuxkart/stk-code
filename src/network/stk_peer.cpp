@@ -115,8 +115,12 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
 
     if (packet)
     {
-        Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
-            packet->dataLength, a.toString().c_str(), StkTime::getRealTime());
+        if (Network::m_connection_debug)
+        {
+            Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
+                packet->dataLength, a.toString().c_str(),
+                StkTime::getRealTime());
+        }
         m_host->addEnetCommand(m_enet_peer, packet,
                 encrypted ? EVENT_CHANNEL_NORMAL : EVENT_CHANNEL_UNENCRYPTED,
                 ECT_SEND_PACKET);

@@ -710,7 +710,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
 
     if (trigger_when_near)
     {
-        ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+        ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
     }
 }   // TrackObjectPresentationSound
 
@@ -1095,7 +1095,11 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     if (m_type == TRIGGER_TYPE_POINT)
     {
         // TODO: rewrite as a sphere check structure?
-        ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+        ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
+        // 0 is the index, and is mostly used for debugging (i.e. to identify which check
+        // structure information is printed about) - not sure how to best use this
+        // with items added outside of the checkline manager. Best option would be to
+        // change CheckManager::add() to create the object?
         // CheckManager::get()->add(new CheckSphere(xml_node, 0 /* TODO what is this? */));
     }
     else if (m_type == TRIGGER_TYPE_CYLINDER)
@@ -1123,7 +1127,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     m_xml_reenable_timeout = 999999.9f;
     m_reenable_timeout     = 0.0f;
     m_type                 = TRIGGER_TYPE_POINT;
-    ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+    ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
 }   // TrackObjectPresentationActionTrigger
 
 // ----------------------------------------------------------------------------

@@ -52,11 +52,13 @@
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
+#include "items/network_item_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/profile_world.hpp"
+#include "network/network_config.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -1532,6 +1534,8 @@ void Track::updateGraphics(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
+    ItemManager::get()->updateGraphics(dt);
+
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
@@ -1802,7 +1806,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         loadArenaGraph(*root);
 
-    ItemManager::create();
+    if (NetworkConfig::get()->isNetworking())
+        NetworkItemManager::create();
+    else
+        ItemManager::create();
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -2440,7 +2447,7 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    ItemManager::get()->newItem(type, drop ? hit_point : loc, normal);
+    ItemManager::get()->placeItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------

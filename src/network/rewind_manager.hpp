@@ -146,7 +146,6 @@ public:
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(BareNetworkString *buffer, int ticks);
-    void addNextTimeStep(int ticks, float dt);
     void saveState(bool local_save);
     void saveLocalState();
     void restoreState(BareNetworkString *buffer);
@@ -160,12 +159,24 @@ public:
         m_all_rewinder.push_back(rewinder);
         return true;
     }   // addRewinder
+
     // ------------------------------------------------------------------------
     /** Returns true if currently a rewind is happening. */
     bool isRewinding() const { return m_is_rewinding; }
+
     // ------------------------------------------------------------------------
     int getNotRewoundWorldTicks() const
-                { return m_not_rewound_ticks.load(std::memory_order_relaxed); }
+    {
+        return m_not_rewound_ticks.load(std::memory_order_relaxed);
+    }   // getNotRewoundWorldTicks
+
+    // ------------------------------------------------------------------------
+    /** Returns the time of the latest confirmed state. */
+    int getLatestConfirmedState() const
+    {
+        return m_rewind_queue.getLatestConfirmedState(); 
+    }   // getLatestConfirmedState
+
 };   // RewindManager
 
 

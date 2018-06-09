@@ -18,7 +18,9 @@
 #include "modes/easter_egg_hunt.hpp"
 
 #include "io/file_manager.hpp"
+#include "items/item.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/ghost_kart.hpp"
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 
@@ -156,11 +158,13 @@ const std::string& EasterEggHunt::getIdent() const
 /** Called when a kart has collected an egg.
  *  \param kart The kart that collected an egg.
  */
-void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
+void EasterEggHunt::collectedItem(const AbstractKart *kart, const Item *item)
 {
+    if(item->getType() != ItemState::ITEM_EASTER_EGG) return;
+
     m_eggs_collected[kart->getWorldKartId()]++;
     m_eggs_found++;
-}   // collectedEasterEgg
+}   // collectedItem
 
 //-----------------------------------------------------------------------------
 /** Called when a ghost kart has collected an egg.

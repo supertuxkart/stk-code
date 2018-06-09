@@ -234,8 +234,6 @@ void Powerup::use()
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
     {
-        //if (m_type == POWERUP_SWITCH) m_sound_use = SFXManager::get()->newSFX(SFXManager::SOUND_SWAP);
-        //else
         m_sound_use = SFXManager::get()->createSoundSource("shoot");
     }
 
@@ -275,26 +273,14 @@ void Powerup::use()
         // use the bubble gum the traditional way, if the kart is looking back
         if (m_kart->getControls().getLookBack())
         {
-            Vec3 hit_point;
-            Vec3 normal;
-            const Material* material_hit;
-            Vec3 pos = m_kart->getXYZ();
-            Vec3 to  = pos+ m_kart->getTrans().getBasis() * Vec3(0, -10000, 0);
-            Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to, 
-                                                                &hit_point,
-                                                                &material_hit,
-                                                                &normal);
-            // This can happen if the kart is 'over nothing' when dropping
-            // the bubble gum
-            if(!material_hit)
-                return;
-            normal.normalize();
+            Item *new_item = 
+                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+
+            // E.g. ground not found in raycast.
+            if(!new_item) return;
 
             Powerup::adjustSound();
             m_sound_use->play();
-
-            pos = hit_point + m_kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
-            ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
         }
         else // if the kart is looking forward, use the bubblegum as a shield
         {
@@ -459,14 +445,11 @@ void Powerup::use()
  *  or on a client, in which case the item and additional info is used
  *  to make sure server and clients are synched correctly.
  *  \param n
- *  \param item The item (bonux box) that was hit. This is necessary
- *         for servers so that the clients can be informed which item
- *         was collected.
- *  \param add_info Additional information. This is used for network games
- *         so that the server can overwrite which item is collectted
- *         (otherwise a random choice is done).
+ *  \param item_state The item_state (bonux box) that was hit. This is
+ *         necessary for servers so that the clients can be informed which
+ *         item was collected.
  */
-void Powerup::hitBonusBox(const Item &item, int add_info)
+void Powerup::hitBonusBox(const ItemState &item_state)
 {
     // Position can be -1 in case of a battle mode (which doesn't have
     // positions), but this case is properly handled in getRandomPowerup.
@@ -480,27 +463,28 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     if(m_type == PowerupManager::POWERUP_RUBBERBALL)
         powerup_manager->setBallCollectTicks(0);
 
+    World *world = World::getWorld();
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
-    if (add_info<0)
+    for (int i = 0; i < 20; i++)
     {
-        for(int i=0; i<20; i++)
-        {
-            new_powerup = powerup_manager->getRandomPowerup(position, &n);
-            if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-                ( World::getWorld()->getTicksSinceStart() - powerup_manager->getBallCollectTicks()) >
-                  RubberBall::getTicksBetweenRubberBalls() )
-                break;
-        }
-    }
-    else // set powerup manually
-    {
-        new_powerup = (PowerupManager::PowerupType)((add_info>>4)&0x0f); // highest 4 bits for the type
-        n = (add_info&0x0f); // last 4 bits for the amount
+        // Determine the item based on index and time - random enough for
+        // the player, and reduces network synchronisation overhead.
+        // Dividing the time by 10 does not really allow exploiting the
+        // non-random selection (e.g. by displaying which item is collecte
+        // where), since it's only around 83 ms - but it is bit more
+        // relaxed when client prediction should be a frame or so earlier.
+        int random_number = item_state.getItemId() + world->getTimeTicks() / 10;
+        new_powerup =
+            powerup_manager->getRandomPowerup(position, &n, random_number);
+        if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
+            (world->getTicksSinceStart() - powerup_manager->getBallCollectTicks())
+            > RubberBall::getTicksBetweenRubberBalls())
+            break;
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(World::getWorld()->getTimeTicks());
+        powerup_manager->setBallCollectTicks(world->getTimeTicks());
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

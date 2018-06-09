@@ -40,6 +40,7 @@
 class AbstractKart;
 class btRigidBody;
 class Controller;
+class Item;
 class PhysicalObject;
 
 namespace Scripting
@@ -242,8 +243,11 @@ public:
     virtual void    unpause() OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type,
                                            int *amount );
-    virtual void    endRaceEarly() { return; }
-
+    // ------------------------------------------------------------------------
+    /** Receives notification if an item is collected. Used for easter eggs. */
+    virtual void collectedItem(const AbstractKart *kart, const Item *item) {}
+    // ------------------------------------------------------------------------
+    virtual void endRaceEarly() { return; }
     // ------------------------------------------------------------------------
     /** Called to determine whether this race mode uses bonus boxes. */
     virtual bool haveBonusBoxes() { return true; }
