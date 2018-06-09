@@ -197,7 +197,7 @@ private:
     double distributeBasePoints(uint32_t online_id);
     double getModeFactor();
     double getModeSpread();
-    double scalingValueForTime(float time);
+    double scalingValueForTime(double time);
     void checkRaceFinished();
 
 public:
