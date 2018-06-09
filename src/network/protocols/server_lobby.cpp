@@ -995,10 +995,10 @@ void ServerLobby::computeNewRankings()
                     result = std::max(0.0, 0.5 - result);
                 }
 
-                float max_time = std::min(std::max(player1_time, player2_time),
-                                          MAX_SCALING_TIME);
+                double max_time = std::min(std::max(player1_time, player2_time),
+                    MAX_SCALING_TIME);
                 ranking_importance = mode_factor *
-                     scalingValueForTime(max_time) * player_factors;
+                    scalingValueForTime(max_time) * player_factors;
             }
             // Compute the ranking change
             scores_change[i] +=
@@ -1075,9 +1075,9 @@ double ServerLobby::getModeSpread()
 /** Compute the scaling value of a given time
  *  Short races are more random, so we don't use strict proportionality
  */
-double ServerLobby::scalingValueForTime(float time)
+double ServerLobby::scalingValueForTime(double time)
 {
-    return time * sqrt(time/120.0) * MAX_POINTS_PER_SECOND;
+    return time * sqrt(time / 120.0) * MAX_POINTS_PER_SECOND;
 }   // scalingValueForTime
 
 //-----------------------------------------------------------------------------
