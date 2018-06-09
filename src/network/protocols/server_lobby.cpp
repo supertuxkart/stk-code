@@ -970,13 +970,13 @@ void ServerLobby::computeNewRankings()
             {
                 result = 0.0;
                 ranking_importance = mode_factor *
-                    MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
             else if (!players[j])
             {
                 result = 1.0;
                 ranking_importance = mode_factor *
-                    MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
             else
             {
@@ -994,10 +994,11 @@ void ServerLobby::computeNewRankings()
                         (player1_time - player2_time) / (player2_time / 20.0);
                     result = std::max(0.0, 0.5 - result);
                 }
+
+                float max_time = std::min(std::max(player1_time, player2_time),
+                                          MAX_SCALING_TIME);
                 ranking_importance = mode_factor *
-                    std::min(
-                    std::max(player1_time, player2_time), MAX_SCALING_TIME) *
-                    MAX_POINTS_PER_SECOND * player_factors;
+                     scalingValueForTime(max_time) * player_factors;
             }
             // Compute the ranking change
             scores_change[i] +=
@@ -1069,6 +1070,15 @@ double ServerLobby::getModeSpread()
     // the spreads more comparable
     return 1.4;
 }   // getModeSpread
+
+//-----------------------------------------------------------------------------
+/** Compute the scaling value of a given time
+ *  Short races are more random, so we don't use strict proportionality
+ */
+double ServerLobby::scalingValueForTime(float time)
+{
+    return time * sqrt(time/120.0) * MAX_POINTS_PER_SECOND;
+}   // scalingValueForTime
 
 //-----------------------------------------------------------------------------
 /** Manages the distribution of the base points.
