@@ -107,6 +107,11 @@ void RegisterScreen::init()
     makeEntryFieldsVisible();
 
     local_username->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    if (PlayerManager::get()->getNumPlayers() == 0)
+    {
+        getWidget<IconButtonWidget>("back")->setVisible(false);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
