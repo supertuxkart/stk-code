@@ -108,10 +108,14 @@ void RegisterScreen::init()
 
     local_username->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     
-    if (PlayerManager::get()->getNumPlayers() == 0)
-    {
-        getWidget<IconButtonWidget>("back")->setVisible(false);
-    }
+    // The behaviour of the screen is slightly different at startup, i.e.
+    // when it is the first screen: cancel will exit the game, and in
+    // this case no 'back' error should be shown.
+    bool has_player_profile = (PlayerManager::get()->getNumPlayers() > 0);
+    getWidget<IconButtonWidget>("back")->setVisible(has_player_profile);
+    getWidget<IconButtonWidget>("cancel")->setLabel(has_player_profile
+        ? _("Cancel")
+        : _("Exit game"));
 }   // init
 
 // -----------------------------------------------------------------------------
