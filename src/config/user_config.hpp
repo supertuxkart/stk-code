@@ -994,6 +994,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
             PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
                                "Enable all karts and tracks") );
+                               
+    PARAM_PREFIX StringUserConfigParam      m_commandline
+            PARAM_DEFAULT( StringUserConfigParam("", "commandline",
+                             "Allows to set commandline args in config file") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

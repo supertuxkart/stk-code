@@ -32,11 +32,27 @@ std::string               CommandLine::m_exec_name="";
 void CommandLine::init(unsigned int argc, char *argv[])
 {
     if (argc > 0)
+    {
         m_exec_name = argv[0];
+    }
 
-    for(unsigned int i=1; i<argc; i++)
+    for (unsigned int i = 1; i < argc; i++)
+    {
         m_argv.push_back(argv[i]);
+    }
 }   // CommandLine
+
+// ----------------------------------------------------------------------------
+void CommandLine::addArgsFromUserConfig()
+{
+    std::vector<std::string> config_args;
+    config_args = StringUtils::split(UserConfigParams::m_commandline, ' ');
+    
+    for (std::string config_arg : config_args)
+    {
+        m_argv.push_back(config_arg);
+    }
+}
 
 // ----------------------------------------------------------------------------
 bool CommandLine::has(const std::string &option)
