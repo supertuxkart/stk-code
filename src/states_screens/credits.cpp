@@ -70,7 +70,7 @@ public:
     {
         m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
     }
-};   // CreditdsSection
+};   // CreditsSection
 
 // ----------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ void CreditsScreen::loadedFromFile()
     int lineCount = 0;
 #undef DEBUG_TRANSLATIONS    // Enable to only see the translator credits
 #ifdef DEBUG_TRANSLATIONS
-        int my_counter = 0;
+    int my_counter = 0;
 #endif
     // Read file into wide strings (converted from utf-8 on the fly)
     while (getLineAsWide( file, &line ))
@@ -186,17 +186,17 @@ void CreditsScreen::loadedFromFile()
 
     if (translators_credits != L"translator-credits")
     {
-        std::vector<irr::core::stringw> translator  =
+        std::vector<irr::core::stringw> translator =
             StringUtils::split(translators_credits, '\n');
 
         m_sections.push_back( new CreditsSection("Translations"));
-        for(unsigned int i = 1; i < translator.size(); i = i + MAX_PER_SCREEN)
+        for (unsigned int i = 1; i < translator.size(); i = i + MAX_PER_SCREEN)
         {
             line = stringw(translations->getCurrentLanguageName().c_str());
             CreditsEntry entry(line);
             getCurrentSection()->addEntry( entry );
 
-            for(unsigned int j = 0; i + j < translator.size() && j < MAX_PER_SCREEN; j ++)
+            for (unsigned int j = 0; i + j < translator.size() && j < MAX_PER_SCREEN; j ++)
             {
                 getCurrentSection()->addSubEntry(translator[i + j]);
             }
@@ -206,7 +206,11 @@ void CreditsScreen::loadedFromFile()
         // translations should be just before the last screen
         m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
     }
-
+#ifdef __ANDROID__
+    // Disable donate button on Android, as the Play store has strict rules
+    // that only allow you to receive donations though their services.
+    getWidget("donate")->setVisible(false);
+#endif
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
