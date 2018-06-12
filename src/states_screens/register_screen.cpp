@@ -245,6 +245,13 @@ void RegisterScreen::doRegister()
 {
     stringw local_name = getWidget<TextBoxWidget>("local_username")
                        ->getText().trim();
+                       
+    if (local_name.empty())
+    {
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("User name cannot be empty."), false);
+        return;
+    }
 
     handleLocalName(local_name);
 
