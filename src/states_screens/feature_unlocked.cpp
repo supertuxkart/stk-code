@@ -165,10 +165,6 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene()
             : CutsceneScreen("feature_unlocked.stkgui")
 {
     m_key_angle = 0;
-
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    m_avoid_irrlicht_bug = NULL;
-#endif
 }  // FeatureUnlockedCutScene
 
 // ----------------------------------------------------------------------------
@@ -181,12 +177,6 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 void FeatureUnlockedCutScene::onCutsceneEnd()
 {
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    if (m_avoid_irrlicht_bug)
-        irr_driver->removeNode(m_avoid_irrlicht_bug);
-    m_avoid_irrlicht_bug = NULL;
-#endif
-
     m_unlocked_stuff.clearAndDeleteAll();
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -362,18 +352,6 @@ void FeatureUnlockedCutScene::init()
 
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");
-#endif
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-            // If a mesh with this material is added, irrlicht will
-            // display the 'continue' text (otherwise the text is
-            // not visible). This is a terrible work around, but allows
-            // stk to be released without waiting for the next
-            // irrlicht version.
-            video::SMaterial m;
-            m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-            scene::IMesh* mesh =
-                irr_driver->createTexturedQuadMesh(&m, 0, 0);
-            m_avoid_irrlicht_bug = irr_driver->addMesh(mesh);
 #endif
         }
 #ifndef SERVER_ONLY
@@ -722,3 +700,4 @@ MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
     MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
     return mi;
 }
+
