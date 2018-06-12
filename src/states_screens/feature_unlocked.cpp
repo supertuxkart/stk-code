@@ -475,6 +475,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
     m_global_time += dt;
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
+    // When the chest has opened but the items are not yet at their final position
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
     {
         float progress_factor = (m_global_time - GIFT_EXIT_FROM) / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
@@ -489,29 +490,20 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
             // when there are more than 1 unlocked items, make sure they each
             // have their own path when they move
-            if (unlockedStuffCount > 1)
-            {
-                if (n == 1) pos.X -= 1.0f*dt*float( int((n + 1)/2) );
-                else if (n > 1) pos.X += 1.0f*dt*(n - 0.3f);
+            // and that they won't end offscreen in usual situations
 
-                //else            pos.X += 6.2f*dt*float( int((n + 1)/2) );
-                //Log::info("FeatureUnlockedCutScene", "Object %d moving by %f", n,
-                //    (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ));
-            }
-            else
-            {
-                //pos.X -= 2.0f*dt;
-            }
-
-            //if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z -= 2.0f*dt;
+            // Put the trophy in center
+            float pos_value = (n == 0) ? unlockedStuffCount/2 :
+                              (n == unlockedStuffCount/2) ? 0 : n;
+            float offset = (float) pos_value - ((float) unlockedStuffCount)/2.0f + 0.5f;
+            offset *= (unlockedStuffCount <= 3) ? 1.4f :
+                      (unlockedStuffCount <= 5) ? 1.2f : 1.0f;
+            pos.X += offset*dt;
 
             pos.Z = smoothed_progress_factor * -4.0f;
 
             m_unlocked_stuff[n].m_root_gift_node->setPosition(pos);
         }
-    }
-    else if (m_global_time < GIFT_EXIT_FROM)
-    {
     }
 
     for (int n=0; n<unlockedStuffCount; n++)
