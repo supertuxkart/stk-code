@@ -195,8 +195,10 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
 void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked)
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    int points_before = player->getPoints();
-    int points_now = points_before + CHALLENGE_POINTS[difficulty];
+
+    // The number of points is updated before this function is called
+    int points_before = player->getPointsBefore();
+    int points_now = player->getPoints();
 
     std::vector<std::string> tracks;
     std::vector<std::string> gps;
@@ -700,4 +702,3 @@ MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
     MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
     return mi;
 }
-
