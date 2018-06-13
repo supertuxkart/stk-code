@@ -348,7 +348,9 @@ void BaseUserScreen::eventCallback(Widget* widget,
                     {
                         UserConfigParams::m_internet_status =
                             Online::RequestManager::IPERM_ALLOWED;
+#ifndef SERVER_ONLY
                         NewsManager::get()->init(false);
+#endif
                         m_parent_screen->makeEntryFieldsVisible();
                         ModalDialog::dismiss();
                     }   // onConfirm
