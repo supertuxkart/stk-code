@@ -49,6 +49,7 @@
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
+using GUIEngine::NavigationDirection;
 
 using namespace irr::gui;
 
@@ -885,4 +886,3 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 }
 
 // -----------------------------------------------------------------------------
-
