@@ -471,8 +471,8 @@ void Powerup::hitBonusBox(const ItemState &item_state)
         // Determine the item based on index and time - random enough for
         // the player, and reduces network synchronisation overhead.
         // Dividing the time by 10 does not really allow exploiting the
-        // non-random selection (e.g. by displaying which item is collecte
-        // where), since it's only around 83 ms - but it is bit more
+        // non-random selection (e.g. by displaying which item is collected
+        // next), since it's only around 83 ms - but it is bit more
         // relaxed when client prediction should be a frame or so earlier.
         int random_number = item_state.getItemId() + world->getTimeTicks() / 10;
         new_powerup =
