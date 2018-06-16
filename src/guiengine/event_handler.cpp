@@ -490,7 +490,7 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
  * experimentally while keeping simple heuristics.
  */
 int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int playerID,
-                                      Widget* w, bool ignore_disabled, int recursion_counter)
+                                      GUIEngine::Widget* w, bool ignore_disabled, int recursion_counter)
 {
     int closest_widget_id = -1;
     int distance = 0;
