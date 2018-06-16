@@ -67,6 +67,12 @@ PowerupManager::~PowerupManager()
                 irr_driver->removeMeshFromCache(mesh);
         }
     }
+    
+    for(auto key: m_all_weights)
+    {
+        for(auto p: key.second )
+            delete p;
+    }
 }   // ~PowerupManager
 
 //-----------------------------------------------------------------------------
@@ -132,34 +138,255 @@ void PowerupManager::loadPowerupsModels()
             exit(-1);
         }
     }
+    
+    loadWeights(root, "race-weight-list"    );
+    loadWeights(root, "ftl-weight-list"     );
+    loadWeights(root, "battle-weight-list"  );
+    loadWeights(root, "soccer-weight-list"  );
+    loadWeights(root, "tutorial-weight-list");
+
     delete root;
+
 }  // loadPowerupsModels
 
 //-----------------------------------------------------------------------------
-/** Loads all powerups weights from the powerup.xml file.
- *  Uses num_karts to get the good weights
+/** Loads the powerups weights for a given category (race, ft, ...). The data
+ *  is stored in m_all_weights.
+ *  \param node The top node of the powerup xml file.
+ *  \param class_name The name of the attribute with the weights for the
+ *         class.
  */
-void PowerupManager::loadAllPowerups(unsigned int num_karts)
+void PowerupManager::loadWeights(const XMLNode *powerup_node,
+                                 const std::string &class_name)
 {
-    const std::string file_name = file_manager->getAsset("powerup.xml");
-    XMLNode *root               = file_manager->createXMLTree(file_name);
+    const XMLNode *node = powerup_node->getNode(class_name);
+    if(!node)
+    {
+        Log::fatal("PowerupManager",
+                   "Cannot find node '%s' in powerup.xml file.",
+                   class_name.c_str());
+    }
 
-    //loadWeights takes care of loading specific weight in follow-the-leader
-    //They also vary depending on rank in race, so they use the usual position classes
-    loadWeights(*root, num_karts, "first",   POSITION_FIRST      );
-    loadWeights(*root, num_karts, "top33",   POSITION_TOP33      );
-    loadWeights(*root, num_karts, "mid33",   POSITION_MID33      );
-    loadWeights(*root, num_karts, "end33",   POSITION_END33      );
-    loadWeights(*root, num_karts, "last" ,   POSITION_LAST       );
-    loadWeights(*root, num_karts, "battle" , POSITION_BATTLE_MODE);
-    loadWeights(*root, num_karts, "soccer" , POSITION_SOCCER_MODE);
-    loadWeights(*root, num_karts, "tuto",    POSITION_TUTORIAL_MODE);
+    for (unsigned int i = 0; i < node->getNumNodes(); i++)
+    {
+        const XMLNode *weights = node->getNode(i);
+        int num_karts;
+        weights->get("num-karts", &num_karts);
+        WeightsData *wd = new WeightsData();
+        wd->readData(num_karts, weights);
+        m_all_weights[class_name].push_back(wd);
+    }    // for i in node->getNumNodes
 
-    delete root;
+}  // loadWeights
 
-}  // loadAllPowerups
+// ============================================================================
+// Implement of WeightsData
+
+/** Deletes all data stored in a WeightsData objects.
+ */
+void PowerupManager::WeightsData::reset()
+{
+    m_weights_for_section.clear();
+    m_summed_weights_for_rank.clear();
+    m_num_karts = 0;
+}   // reset
 
 //-----------------------------------------------------------------------------
+/** Reads in all weights for a given category and number of karts.
+ *  \param num_karts Number of karts for this set of data.
+ *  \param node The XML node with the data to read.
+ */
+void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
+{
+    m_num_karts = num_karts;
+    for (unsigned int i = 0; i < node->getNumNodes(); i++)
+    {
+        m_weights_for_section.emplace_back();
+        const XMLNode *w = node->getNode(i);
+        std::string single_item;
+        w->get("single", &single_item);
+        std::string multi_item;
+        w->get("multi", &multi_item);
+        std::vector<std::string> l_string =
+            StringUtils::split(single_item+" "+multi_item,' ');
+
+        // Keep a reference for shorter access to the list
+        std::vector<int> &l = m_weights_for_section.back();
+        for(unsigned int i=0; i<l_string.size(); i++)
+        {
+            if(l_string[i]=="") continue;
+            int n;
+            StringUtils::fromString(l_string[i], n);
+            l.push_back(n);
+        }
+        // Make sure we have the right number of entries
+        while(l.size()<2*(int)POWERUP_LAST) l.push_back(0);
+        if(l.size()>2*(int)POWERUP_LAST)
+        {
+            Log::error("PowerupManager",
+                       "Too many entries for '%s' in powerup.xml.",
+                       node->getName().c_str());
+        }
+    }   // for i in getNumNodes()
+}   // WeightsData::readData
+
+// ----------------------------------------------------------------------------
+/** Defines the weights for this WeightsData object based on a linear
+ *  interpolation between the previous and next WeightsData class (depending
+ *  on the number of karts in this race and in previous and next).
+ *  \param prev The WeightsData object for less karts.
+ *  \param next The WeightData object for more karts.
+ *  \param num_karts Number of karts to extrapolate for.
+ */
+void PowerupManager::WeightsData::interpolate(WeightsData *prev,
+                                              WeightsData *next, int num_karts)
+{
+    m_num_karts = num_karts;
+    m_weights_for_section.clear();
+    float f = float(num_karts - prev->getNumKarts())
+            / (next->getNumKarts() - prev->getNumKarts());
+
+    // Outer loop over all classes. Note that 'this' is empty atm, but
+    // since all WeightsData have the same number of elements, we use
+    // the previous one for loop boundaries and push_back the interpolated
+    // values to 'this'.
+    for (unsigned int cl = 0; cl < prev->m_weights_for_section.size(); cl++)
+    {
+        std::vector<int> & w_prev = prev->m_weights_for_section[cl];
+        std::vector<int> & w_next = next->m_weights_for_section[cl];
+        m_weights_for_section.emplace_back();
+        std::vector<int> &l = m_weights_for_section.back();
+        for (unsigned int i = 0; i < w_prev.size(); i++)
+        {
+            float interpolated_weight = w_prev[i] * f + w_next[i] * (1 - f);
+            l.push_back(int(interpolated_weight + 0.5f));
+        }
+    }   // for l < prev->m_weights_for_section.size()
+}   // WeightsData::interpolate
+
+// ----------------------------------------------------------------------------
+/** For a given rank in the current race this computed the previous and
+ *  next entry in the weight list, and the weight necessary to interpolate
+ *  between these two values. If the requested rank should exactly match
+ *  one entries, previous and next entry will be identical, and weight set
+ *  to 1.0.
+ *  \param rank Rank that is to be interpolated.
+ *  \param prev On return contains the index of the closest weight field
+ *         smaller than the given rank.
+ *  \param next On return contains the index of the closest weight field
+ *         bigger than the given rank.
+ *  \param weight On return contains the weight to use to interpolate between
+ *         next and previous.
+ */
+int PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
+                                                      int *next, float *weight)
+{
+    // If there is only one section (e.g. in soccer mode etc), use it.
+    // If the rank is first, always use the first entry as well.
+    if (m_weights_for_section.size() == 1 || rank == 1)
+    {
+        *prev = *next = 0;
+        *weight = 1.0f;
+        return 1;
+    }
+
+    // The last kart always uses the data for the last section
+    if (rank == m_num_karts)
+    {
+        *prev = *next = m_weights_for_section.size() - 1;
+        *weight = 1.0f;
+        return 1;
+    }
+
+    // In FTL mode the first section is for the leader, the 
+    // second section is used for the first non-leader kart.
+    if (race_manager->isFollowMode() && rank == 2)
+    {
+        *prev = *next = 1;
+        *weight = 1.0f;
+        return 1;
+    }
+
+    // Now we have a rank that needs to be interpolated between
+    // two sections.
+
+    // Get the first index that is used for a section (FTL is
+    // special since index 2 is for the first non-leader kart):
+    int first_section_index = race_manager->isFollowMode() ? 2 : 1;
+
+    // Get the lowest rank for which the grouping applies:
+    int first_section_rank = race_manager->isFollowMode() ? 3 : 2;
+
+    // If we have three points, we get 4 sections etc. 
+    int num_sections = (m_weights_for_section.size() - first_section_index);
+    float karts_per_fraction = (m_num_karts - first_section_index)
+                             / float(num_sections);
+    int count = 0;
+    while (rank - 1 >  (count + 1) * karts_per_fraction)
+    {
+        count++;
+    }
+
+    *prev = first_section_index + count - 1;
+    *next = *prev + 1;
+    *weight = (rank - first_section_index - count * karts_per_fraction)
+            / karts_per_fraction;
+
+    return 1;
+}   // WeightsData::convertRankToSection
+
+// ----------------------------------------------------------------------------
+/** This function computes the item distribution for each possible rank in the
+ *  race. It creates a list which sums for each item the weights of all
+ *  previous items.  E.g. if the weight list starts with 20, 30, 0, 10,
+ *  the summed array will contains 20, 50, 50, 60. This allows for a quick
+ *  look up based on a single random number.
+ */
+void PowerupManager::WeightsData::precomputeWeights()
+{
+    m_summed_weights_for_rank.clear();
+    for (unsigned int i = 0; i<m_num_karts; i++)
+    {
+        m_summed_weights_for_rank.emplace_back();
+        int prev, next;
+        float weight;
+        convertRankToSection(i + 1, &prev, &next, &weight);
+        int section = i;
+        int sum = 0;
+        for (unsigned int j = 0;
+            j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
+        {
+            float av = (1.0f - weight) * m_weights_for_section[prev][j]
+                + weight * m_weights_for_section[next][j];
+            sum += int(av + 0.5f);
+            m_summed_weights_for_rank[i].push_back(sum);
+        }
+    }
+}   // WeightsData::precomputeWeights
+//-----------------------------------------------------------------------------
+/** Computes a random item dependent on the rank of the kart and a given
+ *  random number.
+ *  \param rank The rank for which an item needs to be picked.
+ *  \param random_number A random number used to 'randomly' select the item
+ *         that was picked.
+ */
+int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
+{
+    // E.g. for battle mode with only one entry
+    if(rank>(int)m_summed_weights_for_rank.size())
+        rank = m_summed_weights_for_rank.size()-1;
+    else if (rank<0) rank = 0;  // E.g. battle mode
+    const std::vector<int> &summed_weights = m_summed_weights_for_rank[rank];
+    // The last entry is the sum of all previous entries, i.e. the maximum
+    // value
+    random_number = random_number % summed_weights.back();
+    int powerup = 0;
+    while ( random_number > summed_weights[powerup] )
+        powerup++;
+    return powerup+POWERUP_FIRST;
+}   // WeightsData::getRandomItem
+
+// ============================================================================
 /** Loads the data for one particular powerup. For bowling ball, plunger, and
  *  cake static members in the appropriate classes are called to store
  *  additional information for those objects.
@@ -222,375 +449,67 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 }   // LoadNode
 
 // ----------------------------------------------------------------------------
-/** Loads a weight list specified in powerup.xml.
- *  Calculates a linear average of the weight specified for the reference points
- *  of num_karts higher and lower (unless it exactly matches one)
- *  \param root The root node of powerup.xml
- *  \param num_karts The number of karts in the race
- *  \param class_name The name of the position class to load.
- *  \param position_class The class for which the weights are read.
+/** Create a (potentially interpolated) WeightsData objects for the current
+ *  race based on the number of karts.
+ *  \param num_karts Number of karts in the current race.
  */
-void PowerupManager::loadWeights(const XMLNode &root,
-                                 unsigned int num_karts,
-                                 const std::string &class_name,
-                                 PositionClass position_class)
+void PowerupManager::computeWeightsForRace(int num_karts)
 {
-    const XMLNode *class_node = root.getNode(class_name), *reference_points_node = root.getNode("reference_points");
-    std::string ref;
-    // Those are the strings which will contain the names of the nodes to load inside the class node
-    std::string w_inf("w"), w_sup("w"), w_inf_multi("w-multi"), w_sup_multi("w-multi");
-    // Those are the strings where the raw weight values will be put when read from the XML nodes
-    std::string values_inf(""), values_inf_multi(""), values_sup(""), values_sup_multi("");
-    int inf_num = 1, sup_num = 1; //The number of karts associated with the reference points
+    if (num_karts == 0) return;
 
-    /** Adds to w_inf and w_sup the suffixe of the closest num_karts reference classes
-     */
-    if(position_class!=POSITION_BATTLE_MODE &&
-       position_class!=POSITION_TUTORIAL_MODE &&
-       position_class!=POSITION_SOCCER_MODE)
+    std::string class_name="";
+    switch (race_manager->getMinorMode())
     {
-        //First step : get the reference points
+    case RaceManager::MINOR_MODE_TIME_TRIAL:     /* fall through */
+    case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";   break;
+    case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";    break;
+    case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle"; break;
+    case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
+    case RaceManager::MINOR_MODE_SOCCER:         class_name="soccer"; break;
+    }
+    class_name +="-weight-list";
 
-        if(!reference_points_node)
+    std::vector<WeightsData*> wd = m_all_weights[class_name];
+
+    // Find the two indices closest to the current number of karts
+    // so that the right number can be interpolated between the
+    // two values.
+    int prev_index=-1, next_index=-1;
+    for (unsigned int i = 0; i < wd.size(); i++)
+    {
+        int n = wd[i]->getNumKarts();
+        if (n <= num_karts && 
+            (prev_index < 0 ||  n > wd[prev_index]->getNumKarts()) )
         {
-            Log::error("[PowerupManager]","No reference points found, "
-                         "probabilities will be incorrect");
+                prev_index = i;
         }
-
-        if (reference_points_node)
+        if (n >= num_karts &&
+            (next_index < 0 || n < wd[next_index]->getNumKarts()))
         {
-            if(race_manager->isFollowMode())
-            {
-                w_inf = w_sup = "wf";
-            }
-            
-            else
-            {
-                int i = 0;
-                while(1)
-                {
-                    i++;
-                    ref = "ref" + StringUtils::toString(i);
-                    std::string ref_pos;
-                    if (!reference_points_node->get(ref, &ref_pos))
-                        break;
-                    unsigned int ref_value;
-                    if (!StringUtils::parseString(ref_pos.c_str(), &ref_value))
-                    {
-                        Log::error("[PowerupManager]","Incorrect reference point values, "
-                                     "probabilities will be incorrect");
-                        continue;
-                    }
-                    if (ref_value <= num_karts)
-                    {
-                        inf_num = ref_value;
-                        //Useful if config is edited so num_kart > highest reference position
-                        sup_num = ref_value;
-                        w_inf = "w" + StringUtils::toString(i);
-                        w_inf_multi = "w-multi" + StringUtils::toString(i);
-                    }
-                    //No else if, it can be equal
-                    if (ref_value >= num_karts)
-                    {
-                        sup_num = ref_value;
-                        w_sup = w_sup + StringUtils::toString(i);
-                        w_sup_multi = w_sup_multi + StringUtils::toString(i);
-                        break;
-                    }
-                }
-            } //else
-        }
-
-        if(w_inf=="w" || w_sup=="w")
-        {
-            w_inf = "w3";            //fallback values
-            w_inf_multi = "w-multi3";//fallback values
-            w_sup = "w3";            //fallback values
-            w_sup_multi = "w-multi3";//fallback values
-            inf_num = sup_num = num_karts;//fallback values
-            Log::error("[PowerupManager]","Uncorrect reference points in powerup.xml."
-                      "%d karts - fallback probabilities will be used.",
-                      num_karts);
-        }
-
-        // Now w_inf and w_sup contain the weight classes to use
-        // for the weights calculations
-
-    }
-    
-    //Second step : load the class_node values
-    if(class_node)
-    {
-        class_node->get(w_inf,       &values_inf       );
-        class_node->get(w_inf_multi, &values_inf_multi );
-        class_node->get(w_sup,       &values_sup       );
-        class_node->get(w_sup_multi, &values_sup_multi );
-    }
-
-    if(!class_node || values_inf=="" || values_inf_multi==""
-                   || values_sup=="" || values_sup_multi=="")
-    {
-        Log::error("[PowerupManager]", "No weights found for class '%s'"
-                    " - probabilities will be incorrect.",
-                    class_name.c_str());
-        return;
-    }
-
-    //Third step : split in discrete values
-    std::vector<std::string> weight_list_inf = StringUtils::split(values_inf+" "+values_inf_multi,' ');
-    std::vector<std::string> weight_list_sup = StringUtils::split(values_sup+" "+values_sup_multi,' ');
-
-    std::vector<std::string>::iterator i=weight_list_inf.begin();
-    while(i!=weight_list_inf.end())
-    {
-        if(*i=="")
-        {
-            std::vector<std::string>::iterator next=weight_list_inf.erase(i);
-            i=next;
-        }
-        else
-            i++;
-    }
-
-    i=weight_list_sup.begin();
-    while(i!=weight_list_sup.end())
-    {
-        if(*i=="")
-        {
-            std::vector<std::string>::iterator next=weight_list_sup.erase(i);
-            i=next;
-        }
-        else
-            i++;
-    }
-
-    // Fill missing entries with 0s
-    while(weight_list_inf.size()<2*(int)POWERUP_LAST)
-        weight_list_inf.push_back(0);
-
-    while(weight_list_sup.size()<2*(int)POWERUP_LAST)
-        weight_list_sup.push_back(0);
-
-    //This also tests that the two lists are of equal size
-    if(weight_list_inf.size()!=2*(int)POWERUP_LAST ||
-       weight_list_sup.size()!=2*(int)POWERUP_LAST)
-    {
-        Log::error("[PowerupManager]", "Incorrect number of weights found in class '%s':",
-               class_name.c_str());
-        Log::error("[PowerupManager]", "%d and %d instead of twice %d - probabilities will be incorrect.",
-               (int)weight_list_inf.size(), (int)weight_list_sup.size(), (int)POWERUP_LAST);
-        return;
-    }
-
-    //Fourth step : finally compute the searched values
-    for(unsigned int i=0; i<2*(int)POWERUP_LAST; i++)
-    {
-        int weight_inf, weight_sup;
-
-        if (!StringUtils::parseString(weight_list_inf[i].c_str(), &weight_inf))
-        {
-            Log::error("[PowerupManager]","Incorrect powerup weight values, "
-                                     "probabilities will be incorrect");
-            weight_inf = 0;//default to zero
-        }
-
-        if (!StringUtils::parseString(weight_list_sup[i].c_str(), &weight_sup))
-        {
-            Log::error("[PowerupManager]","Incorrect powerup weight values, "
-                                     "probabilities will be incorrect");
-            weight_sup = 0;
-        }
-
-        //Do a linear average of the inf and sup values
-        //Use float calculations to reduce the rounding errors
-        float ref_diff = (float) (sup_num - inf_num);
-        float sup_diff = (float) (sup_num - num_karts);
-        float inf_diff = (float) (num_karts - inf_num);
-        float weight;
-        
-        if (ref_diff != 0)
-            weight = (sup_diff/ref_diff)*weight_inf
-                    +(inf_diff/ref_diff)*weight_sup;
-        
-        //the sup and inf weights are the same here, take one of them
-        else
-            weight = weight_inf;
-        int rounded_weight = (int) weight;
-
-        m_weights[position_class].push_back(rounded_weight);
-    }
-}   // loadWeights
-
-
-// ----------------------------------------------------------------------------
-/** This function set up various arrays for faster lookup later. It first
- *  determines which race position correspond to which position class, and
- *  then filters which powerups are available (not all powerups might be
- *  available in all races). It sets up two arrays: m_position_to_class_[inf/sup]
- *  which maps which race position corresponds to which position class
- *  \param num_kart Number of karts.
- */
-void PowerupManager::updateWeightsForRace(unsigned int num_karts)
-{
-    if (num_karts == 0)
-        return;
-
-    //This loads the appropriate weights
-    loadAllPowerups(num_karts);
-
-    // In battle mode no positions exist, so use only position 1
-    unsigned int end_position = (race_manager->isBattleMode() ||
-        race_manager->isSoccerMode()) ? 1 : num_karts;
-
-    m_position_to_class_inf.clear();
-    m_position_to_class_sup.clear();
-    m_position_to_class_cutoff.clear();
-
-    for(unsigned int position =1; position <= end_position; position++)
-    {
-        // Set up the mapping of position to position class,
-        // Using a linear average of the superior and inferor position class
-        // -------------------------------------------------
-        m_position_to_class_inf.push_back(convertPositionToClass(num_karts, position, false));
-        m_position_to_class_sup.push_back(convertPositionToClass(num_karts, position, true));
-        m_position_to_class_cutoff.push_back(convertPositionToClassWeight(num_karts, position));
-    }
-
-    // Then determine which items are available.
-    if (race_manager->isBattleMode())
-         updatePowerupClass(POSITION_BATTLE_MODE);
-    else if(race_manager->isSoccerMode())
-         updatePowerupClass(POSITION_SOCCER_MODE);
-    else if(race_manager->isTutorialMode())
-         updatePowerupClass(POSITION_TUTORIAL_MODE);
-    else
-    {
-        //TODO : replace this by a nice loop   
-        updatePowerupClass(POSITION_FIRST);
-        updatePowerupClass(POSITION_TOP33);
-        updatePowerupClass(POSITION_MID33);
-        updatePowerupClass(POSITION_END33);
-        updatePowerupClass(POSITION_LAST);
-    }
-}   // updateWeightsForRace
-
-// ----------------------------------------------------------------------------
-/** This function update the powerup array of a position class
- *  \param pos_class The position class to update
- */
-void PowerupManager::updatePowerupClass(PowerupManager::PositionClass pos_class)
-{
-
-    m_powerups_for_reference_pos[pos_class].clear();
-
-    // This loop actually goes over the powerups twice: first the single item version,
-    // then the multi-item version. The assignment to type takes care of this
-    for(unsigned int i= POWERUP_FIRST; i<=2*POWERUP_LAST; i++)
-    {
-        PowerupType type =
-            (PowerupType) ((i<=POWERUP_LAST) ? i
-                                             : i+POWERUP_FIRST);
-        unsigned int w =m_weights[pos_class][i-POWERUP_FIRST];
-        for(unsigned int j=0; j<w; j++)
-            m_powerups_for_reference_pos[pos_class].push_back(type);
-    }   // for type in [POWERUP_FIRST, POWERUP_LAST]
-} //updatePowerupClass
-
-// ----------------------------------------------------------------------------
-/** Determines the position class for a given position. If the race is a
- *  battle mode (in which case we don't have a position), always return
- *  'POSITION_BATTLE_MODE' (and in this case only position 1 will be used
- *  for all karts).
- *  \param num_karts  Number of karts in the race.
- *  \param position The position for which to determine the position class.
- *  \param class_sup true if it should send a class matching a >= position
- *                   false if it should match a <= position
- */
-PowerupManager::PositionClass
-               PowerupManager::convertPositionToClass(unsigned int num_karts,
-                                                     unsigned int position, bool class_sup)
-{
-    if(race_manager->isBattleMode()) return POSITION_BATTLE_MODE;
-    if(race_manager->isSoccerMode()) return POSITION_SOCCER_MODE;
-    if(race_manager->isTutorialMode()) return POSITION_TUTORIAL_MODE;
-    if(position==1)         return POSITION_FIRST;
-    if(position==num_karts) return POSITION_LAST;
-
-    // Now num_karts must be >=3, since position <=num_players
-
-    //Special case for Follow the Leader : top33 is mapped to the first non-leader kart
-    if (race_manager->isFollowMode())
-    {
-        float third = (float) (num_karts-2)/3.0f;
-
-        if(position == 2) return POSITION_TOP33;
-
-        if (class_sup)
-        {
-            if(position <= 2 + third) return POSITION_MID33;
-            else if(position <= 2 + 2*third) return POSITION_END33;
-            else return POSITION_LAST;
-        }
-        else
-        {
-            if(position >= 2 + 2*third) return POSITION_END33;
-            else if(position >= 2 + third) return POSITION_MID33;
-            else return POSITION_TOP33;
+            next_index = i;
         }
     }
+    // For battle mode etc where we only have one index
+    if(prev_index < 0) prev_index = 0;
+    if(next_index < 0) next_index = 0;
 
-    //Three points divide a line in 4 sections
-    float quarter = (float) (num_karts-1)/4.0f;
-    if (class_sup)
+    // Check if we have exactly one entry (e.g. either class with only one
+    // set of data specified, or an exact match):
+    m_current_item_weights.reset();
+    if(prev_index == next_index)
     {
-        if(position <= 1 + quarter) return POSITION_TOP33;
-        else if(position <= 1 + 2*quarter) return POSITION_MID33;
-        else if(position <= 1 + 3*quarter) return POSITION_END33;
-        else return POSITION_LAST;
+        // Just create a copy of this entry:
+        m_current_item_weights = *wd[prev_index];
+        m_current_item_weights.setNumKarts(num_karts);
     }
     else
     {
-        if(position >= 1 + 3*quarter) return POSITION_END33;
-        else if(position >= 1 + 2*quarter) return POSITION_MID33;
-        else if(position >= 1 + 1*quarter) return POSITION_TOP33;
-        else return POSITION_FIRST;
+        // We need to interpolate between prev_index and next_index
+        m_current_item_weights.interpolate(wd[prev_index], wd[next_index],
+                                           num_karts                      );
     }
-}   // convertPositionToClass
-
-// ----------------------------------------------------------------------------
-/** Computes the proportion of the inf position class for a given position.
- *  \param num_karts  Number of karts in the race.
- *  \param position The position for which to determine the proportion.
- */
-unsigned int PowerupManager::convertPositionToClassWeight(unsigned int num_karts,
-                                                     unsigned int position)
-{
-    if(race_manager->isBattleMode() || race_manager->isSoccerMode() ||
-       race_manager->isTutorialMode() || position==1 || position==num_karts)
-        return 1;
-
-    // Now num_karts must be >=3, since position <=num_players
-
-    //Special case for Follow the Leader : top33 is mapped to the first non-leader kart
-    if (race_manager->isFollowMode())
-    {
-        float third = (float) (num_karts-2)/3.0f;
-
-        if(position == 2) return 1;
-
-        if(position <= 2 + third) return (int) RAND_CLASS_RANGE-((RAND_CLASS_RANGE*(position - 2))/third);
-        else if(position <= 2 + 2*third) return (int) RAND_CLASS_RANGE-((RAND_CLASS_RANGE*(position - (2+third)))/third);
-        else return (int) RAND_CLASS_RANGE-((RAND_CLASS_RANGE*(position - (2+2*third)))/third);
-    }
-
-    //Three points divide a line in 4 sections
-    float quarter = (float) (num_karts-1)/4.0f;
-
-    if(position <= 1 + quarter) return (int) RAND_CLASS_RANGE-((RAND_CLASS_RANGE*(position - 1))/quarter);
-    else if(position <= 1 + 2*quarter) return (int) RAND_CLASS_RANGE-((RAND_CLASS_RANGE*(position - (1+quarter)))/quarter);
-    else if(position <= 1 + 3*quarter) return (int) RAND_CLASS_RANGE-((RAND_CLASS_RANGE*(position - (1+2*quarter)))/quarter);
-    else return  (int) RAND_CLASS_RANGE-(RAND_CLASS_RANGE*((position - (1+3*quarter)))/quarter);
-}   // convertPositionToClassWeight
+    m_current_item_weights.precomputeWeights();
+}   // computeWeightsForRace
 
 // ----------------------------------------------------------------------------
 /** Returns a random powerup for a kart at a given position. If the race mode
@@ -608,30 +527,17 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n,
                                                              int random_number)
 {
-   int random_class = random_number%RAND_CLASS_RANGE;
-
-    //First step : select at random a class according to the weights of class for this position
-    // Positions start with 1, while the index starts with 0 - so subtract 1
-    PositionClass pos_class =
-        (race_manager->isBattleMode() ? POSITION_BATTLE_MODE :
-         race_manager->isSoccerMode() ? POSITION_SOCCER_MODE :
-         race_manager->isTutorialMode() ? POSITION_TUTORIAL_MODE :
-         random_class > m_position_to_class_cutoff[pos-1] ? m_position_to_class_inf[pos-1] :
-                                                         m_position_to_class_sup[pos-1]);
-
-    //Second step : select an item at random
-    
-    int random = random_number % m_powerups_for_reference_pos[pos_class].size();
-    int i = m_powerups_for_reference_pos[pos_class][random];
-
-    //int random_item = (random / RAND_CLASS_RANGE) % m_powerups_for_reference_pos[pos_class].size();
-    //int i=m_powerups_for_reference_pos[pos_class][random_item];
-    if(i>=POWERUP_MAX)
+    int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
+#ifdef ITEM_DISTRIBUTION_DEBUG
+    Log::verbose("Powerup", "World %d pos %d random %d iten %d",
+                 World::getWorld()->getTimeTicks(), pos, random_number, powerup);
+#endif
+    if(powerup>=POWERUP_MAX)
     {
-        i -= POWERUP_MAX;
+        powerup -= POWERUP_MAX;
         *n = 3;
     }
     else
         *n=1;
-    return (PowerupType)i;
+    return (PowerupType)powerup;
 }   // getRandomPowerup

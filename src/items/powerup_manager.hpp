@@ -20,9 +20,11 @@
 #define HEADER_POWERUPMANAGER_HPP
 
 #include "utils/no_copy.hpp"
+#include "utils/leak_check.hpp"
 
 #include "btBulletDynamicsCommon.h"
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -71,6 +73,50 @@ namespace irr
 class PowerupManager : public NoCopy
 {
 public:
+    LEAK_CHECK();
+private:
+    // ------------------------------------------------------------------------
+    /** This object stores the weights for each 'section' for a certain
+     *  number of karts. */
+    class WeightsData
+    {
+    private:
+        /** The number of karts for which this entry is to be used. */
+        unsigned int m_num_karts;
+
+        /** Stores for each of the sections the weights from the XML file. */
+        std::vector < std::vector<int> > m_weights_for_section;
+
+        /** This field is only populated for the WeightData class that
+         *  is used during a race. It contains for each rank the summed
+         *  weights for easy lookup during a race. */
+        std::vector < std::vector<int> > m_summed_weights_for_rank;
+
+    public:
+        WeightsData() { m_num_karts = 0; }
+        void reset();
+        void readData(int num_karts, const XMLNode *node);
+        void interpolate(WeightsData *prev, WeightsData *next, int num_karts);
+        int convertRankToSection(int rank, int *prev, int *next,
+                                 float *weight);
+        void precomputeWeights();
+        int getRandomItem(int rank, int random_number);
+        // --------------------------------------------------------------------
+        /** Sets the number of karts. */
+        void setNumKarts(int num_karts) { m_num_karts = num_karts; }
+        // --------------------------------------------------------------------
+        /** Returns for how many karts this entry is meant for. */
+        int getNumKarts() const { return m_num_karts; }
+    };   // class WeightsData
+    // ------------------------------------------------------------------------
+
+    /** The first key is the race type: race, battle, soccer etc.
+     *  The key then contains a mapping from the kart numbers to the
+     *  WeightsData object that stores all data for the give kart number.
+     */
+    std::map<std::string, std::vector<WeightsData*> > m_all_weights;
+
+public:
     // The anvil and parachute must be at the end of the enum, and the
     // zipper just before them (see Powerup::hitBonusBox).
     enum PowerupType {POWERUP_NOTHING,
@@ -85,21 +131,6 @@ public:
                       POWERUP_MAX
     };
 
-    /** The different position classes, used to map a kart's position to a
-     *  weight distribution for the different powerups. The battle mode is
-     *  listed as a separate 'position' - this way the same implementation
-     *  as used for normal racing can be used to define which items are
-     *  available in battle mode*/
-    enum PositionClass {POSITION_FIRST,
-                        POSITION_TOP33,
-                        POSITION_MID33,
-                        POSITION_END33,
-                        POSITION_LAST,
-                        POSITION_BATTLE_MODE,
-                        POSITION_SOCCER_MODE,
-                        POSITION_TUTORIAL_MODE,
-                        POSITION_COUNT};
-
 private:
     const int     RAND_CLASS_RANGE = 1000;
 
@@ -113,40 +144,18 @@ private:
         has none. */
     irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
 
-    /** For each powerup the weight (probability) used depending on the
-     *  number of players. */
-    std::vector<unsigned int> m_weights[POSITION_COUNT];
-
-    /** A list of all powerups for a specific class. If a powerup
-     *  has weight 5, it will be listed 5 times in this list, so
-     *  randomly picking an entry from this for a position class will
-     *  result in the right distribution of items. */
-    std::vector<PowerupType> m_powerups_for_reference_pos[POSITION_COUNT];
-
-    /** The mapping of each position to the corresponding position class. */
-
-    std::vector<PositionClass> m_position_to_class_inf;
-    std::vector<PositionClass> m_position_to_class_sup;
-    std::vector<int> m_position_to_class_cutoff;
+    /** The weight distribution to be used for the current race. */
+    WeightsData m_current_item_weights;
 
     PowerupType   getPowerupType(const std::string &name) const;
-    void          loadWeights(const XMLNode &root,
-                              unsigned int num_karts,
-                              const std::string &class_name,
-                              PositionClass position_class);
-    void          updatePowerupClass(PowerupManager::PositionClass pos_class);
-    PositionClass convertPositionToClass(unsigned int num_karts,
-                                         unsigned int position, bool class_sup = false);
-    unsigned int           convertPositionToClassWeight(unsigned int num_karts,
-                                         unsigned int position);
 public:
                   PowerupManager  ();
                  ~PowerupManager  ();
     void          loadPowerupsModels ();
-    void          loadAllPowerups (unsigned int num_karts);
+    void          loadWeights(const XMLNode *node, const std::string &category);
     void          unloadPowerups  ();
+    void          computeWeightsForRace(int num_karts);
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
-    void          updateWeightsForRace(unsigned int num_karts);
     PowerupManager::PowerupType
         getRandomPowerup(unsigned int pos, unsigned int *n, int random_number);
     // ------------------------------------------------------------------------
