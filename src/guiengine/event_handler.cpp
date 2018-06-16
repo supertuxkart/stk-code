@@ -459,7 +459,9 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
  */
 void EventHandler::navigate(const NavigationDirection nav, const int playerID)
 {
-    int next_id = findIDClosestWidget(nav, playerID);
+    Widget* w = GUIEngine::getFocusForPlayer(playerID);
+
+    int next_id = findIDClosestWidget(nav, playerID, w, false);
 
     if (next_id != -1)
     {
@@ -487,14 +489,13 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
  * Several hardcoded values are used, having been found to work well
  * experimentally while keeping simple heuristics.
  */
-int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int playerID)
+int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int playerID,
+                                      Widget* w, bool ignore_disabled, int recursion_counter)
 {
-    Widget* w = GUIEngine::getFocusForPlayer(playerID);
-
     int closest_widget_id = -1;
     int distance = 0;
     // So that the UI behavior don't change when it is upscaled
-    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*10;
+    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*100;
     int smallest_distance = BIG_DISTANCE;
     // Used when there is no suitable widget in the requested direction
     int closest_wrapping_widget_id = -1;
@@ -516,7 +517,8 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         // - it corresponds to an invisible or disabled widget
         // - the player is not allowed to select it
         if (w_test == NULL || !Widget::isFocusableId(i) || w == w_test ||
-            !w_test->isVisible() || !w_test->isActivated() ||
+            (!w_test->isVisible()   && ignore_disabled) ||
+            (!w_test->isActivated() && ignore_disabled) ||
             (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer))
             continue;
 
@@ -546,13 +548,13 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
                 // compare current lowest point with other widget top point
                 distance = w_test->m_y - (w->m_y + w->m_h);
             }
+
             // Better select an item on the side that one much higher,
             // so make the vertical distance matter much more
             // than the horizontal offset.
-            // The multiplicator of 10 is meant so that the offset will mainly
-            // matter if there are two or more widget with a very close
-            // (often equal) vertical height.
-            distance *= 10;
+            // The multiplicator of 100 is meant so that the offset will matter
+            // only if there are two or more widget with a (nearly) equal vertical height.
+            distance *= 100;
 
             wrapping_distance = distance;
             // if the two widgets are not well aligned, consider them farther
@@ -610,10 +612,31 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         }
     } // for i < 1000
 
-    if (smallest_distance >= BIG_DISTANCE)
-        return closest_wrapping_widget_id;
+    int closest_id = (smallest_distance < BIG_DISTANCE) ? closest_widget_id :
+                                                          closest_wrapping_widget_id;
+    Widget* w_test = GUIEngine::getWidget(closest_id);
 
-    return closest_widget_id;
+    // If the newly found focus target is invisible, or not activated,
+    // it is not a good target, search again
+    // This allows to skip over disabled/invisible widgets in a grid
+    if (!w_test->isVisible() || !w_test->isActivated())
+    {
+        // Can skip over at most 3 consecutive disabled/invisible widget
+        if (recursion_counter <=2)
+        {
+            recursion_counter++;
+            return findIDClosestWidget(nav, playerID, w_test, /*ignore disabled*/ false, recursion_counter);
+        }
+        // If nothing has been found, do a search ignoring disabled/invisible widgets,
+        // restarting from the initial focused widget (otherwise, it could lead to weird results) 
+        else if (recursion_counter == 3)
+        {
+            Widget* w_focus = GUIEngine::getFocusForPlayer(playerID);
+            return findIDClosestWidget(nav, playerID, w_focus, /*ignore disabled*/ true, recursion_counter);
+        }
+    }
+
+    return closest_id;
 } // findIDClosestWidget
 
 // -----------------------------------------------------------------------------
@@ -886,3 +909,4 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 }
 
 // -----------------------------------------------------------------------------
+
