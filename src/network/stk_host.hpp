@@ -143,8 +143,6 @@ private:
                                    std::shared_ptr<ServerLobby> sl);
     // ------------------------------------------------------------------------
     void mainLoop();
-    // ------------------------------------------------------------------------
-    bool isConnectionRequestPacket(unsigned char* data, int length);
 
 public:
     /** If a network console should be started. */

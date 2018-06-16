@@ -18,10 +18,6 @@
 
 #include "items/item_manager.hpp"
 
-#include <stdexcept>
-#include <string>
-#include <sstream>
-
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -29,6 +25,7 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -41,9 +38,16 @@
 #include <IMesh.h>
 #include <IAnimatedMesh.h>
 
+#include <assert.h>
+#include <stdexcept>
+#include <sstream>
+#include <string>
+
+
 std::vector<scene::IMesh *> ItemManager::m_item_mesh;
 std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
 std::vector<video::SColorf> ItemManager::m_glow_color;
+bool                        ItemManager::m_disable_item_collection = false;
 ItemManager *               ItemManager::m_item_manager = NULL;
 
 
@@ -69,28 +73,28 @@ void ItemManager::destroy()
  */
 void ItemManager::loadDefaultItemMeshes()
 {
-    m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
-    m_glow_color.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1,
+    m_item_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
+    m_glow_color.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1,
                         video::SColorf(255.0f, 255.0f, 255.0f) );
 
-    m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+    m_item_lowres_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
 
     // A temporary mapping of items to names used in the XML file:
-    std::map<Item::ItemType, std::string> item_names;
-    item_names[Item::ITEM_BANANA     ] = "banana";
-    item_names[Item::ITEM_BONUS_BOX  ] = "bonus-box";
-    item_names[Item::ITEM_BUBBLEGUM  ] = "bubblegum";
-    item_names[Item::ITEM_NITRO_BIG  ] = "nitro-big";
-    item_names[Item::ITEM_NITRO_SMALL] = "nitro-small";
-    item_names[Item::ITEM_TRIGGER    ] = "trigger";
-    item_names[Item::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
-    item_names[Item::ITEM_EASTER_EGG ] = "easter-egg";
+    std::map<ItemState::ItemType, std::string> item_names;
+    item_names[ItemState::ITEM_BANANA     ] = "banana";
+    item_names[ItemState::ITEM_BONUS_BOX  ] = "bonus-box";
+    item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
+    item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
+    item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[ItemState::ITEM_TRIGGER    ] = "trigger";
+    item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
+    item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
 
     const std::string file_name = file_manager->getAsset("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
-    for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
+    for(unsigned int i=ItemState::ITEM_FIRST; i<=ItemState::ITEM_LAST; i++)
     {
-        const std::string &name = item_names[(Item::ItemType)i];
+        const std::string &name = item_names[(ItemState::ItemType)i];
         const XMLNode *node = root->getNode(name);
         if (!node)  continue;
 
@@ -133,7 +137,7 @@ void ItemManager::loadDefaultItemMeshes()
  */
 void ItemManager::removeTextures()
 {
-    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
+    for(unsigned int i=0; i<ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1; i++)
     {
         if(m_item_mesh[i])
         {
@@ -162,9 +166,9 @@ ItemManager::ItemManager()
     // Prepare the switch to array, which stores which item should be
     // switched to what other item. Initialise it with a mapping that
     // each item is switched to itself, so basically a no-op.
-    m_switch_to.reserve(Item::ITEM_COUNT);
-    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
-        m_switch_to.push_back((Item::ItemType)i);
+    m_switch_to.reserve(ItemState::ITEM_COUNT);
+    for(unsigned int i=ItemState::ITEM_FIRST; i<ItemState::ITEM_COUNT; i++)
+        m_switch_to.push_back((ItemState::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
 
     if(Graph::get())
@@ -187,8 +191,8 @@ ItemManager::ItemManager()
  */
 void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
 {
-    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
-        m_switch_to[i]=(Item::ItemType)stk_config->m_switch_items[i];
+    for(unsigned int i=ItemState::ITEM_FIRST; i<ItemState::ITEM_COUNT; i++)
+        m_switch_to[i]=(ItemState::ItemType)stk_config->m_switch_items[i];
 }   // setSwitchItems
 
 
@@ -213,8 +217,10 @@ ItemManager::~ItemManager()
 /** Inserts the new item into the items management data structures, if possible
  *  reusing an existing, unused entry (e.g. due to a removed bubble gum). Then
  *  the item is also added to the quad-wise list of items.
+ *  \param item The item to be added.
+ *  \return Index of the newly added item in the list of all items.
  */
-void ItemManager::insertItem(Item *item)
+unsigned int ItemManager::insertItem(Item *item)
 {
     // Find where the item can be stored in the index list: either in a
     // previously deleted entry, otherwise at the end.
@@ -242,70 +248,126 @@ void ItemManager::insertItem(Item *item)
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
     }   // if m_items_in_quads
+    return index;
 }   // insertItem
 
 //-----------------------------------------------------------------------------
-/** Creates a new item.
+/** Creates a new item at the location of the kart (e.g. kart drops a
+ *  bubblegum).
+ *  \param type Type of the item.
+ *  \param kart The kart that drops the new item.
+ *  \param xyz Can be used to overwrite the item location (used in networking).
+ */
+Item* ItemManager::dropNewItem(ItemState::ItemType type,
+                               const AbstractKart *kart, const Vec3 *xyz)
+{
+    Vec3 hit_point;
+    Vec3 normal;
+    const Material* material_hit;
+    Vec3 pos = xyz ? *xyz : kart->getXYZ();
+    Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
+    Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
+                                                        &hit_point,
+                                                        &material_hit,
+                                                        &normal);
+    // This can happen if the kart is 'over nothing' when dropping
+    // the bubble gum
+    if (!material_hit) return NULL;
+
+    normal.normalize();
+
+    pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
+
+
+    ItemState::ItemType mesh_type = type;
+    if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
+    {
+        mesh_type = ItemState::ITEM_BUBBLEGUM_NOLOK;
+    }
+
+    Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
+                          m_item_lowres_mesh[mesh_type]);
+
+    if(kart != NULL) item->setParent(kart);
+    insertItem(item);
+    if(m_switch_ticks>=0)
+    {
+        ItemState::ItemType new_type = m_switch_to[item->getType()];
+        item->switchTo(new_type, m_item_mesh[(int)new_type],
+                       m_item_lowres_mesh[(int)new_type]);
+    }
+    return item;
+}   // dropNewItem
+
+//-----------------------------------------------------------------------------
+/** Places a new item on the track/arena. It is used for the initial placement
+ *  of the items - either according to the scene.xml file, or random item
+ *  placement.
  *  \param type Type of the item.
  *  \param xyz  Position of the item.
  *  \param normal The normal of the terrain to set roll and pitch.
- *  \param parent In case of a dropped item used to avoid that a kart
- *         is affected by its own items.
  */
-Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
-                           const Vec3 &normal, AbstractKart *parent)
+Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
+                             const Vec3 &normal)
 {
-    Item::ItemType mesh_type = type;
-    if (type == Item::ITEM_BUBBLEGUM && parent->getIdent() == "nolok")
-    {
-        mesh_type = Item::ITEM_BUBBLEGUM_NOLOK;
-    }
+    // Make sure this subroutine is not used otherwise (since networking
+    // needs to be aware of items added to the track, so this would need
+    // to be added).
+    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE);
+    ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type]);
 
     insertItem(item);
-    if(parent != NULL) item->setParent(parent);
-    if(m_switch_ticks>=0)
+    if (m_switch_ticks >= 0)
     {
-        Item::ItemType new_type = m_switch_to[item->getType()];
+        ItemState::ItemType new_type = m_switch_to[item->getType()];
         item->switchTo(new_type, m_item_mesh[(int)new_type],
                        m_item_lowres_mesh[(int)new_type]);
     }
     return item;
-}   // newItem
+}   // placeItem
 
 //-----------------------------------------------------------------------------
-/** Creates a new trigger item.
+/** Creates a new trigger item. This is not synched between client and 
+ *  server, since the triggers are created at startup only and should
+ *  therefore always be in sync.
  *  \param xyz  Position of the item.
+ *  \param listener The listener object that gets called when a kart
+ *         triggers this trigger.
  */
-Item* ItemManager::newItem(const Vec3& xyz, float distance,
-                           TriggerItemListener* listener)
+Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
+                                TriggerItemListener* listener)
 {
-    Item* item;
-    item = new Item(xyz, distance, listener);
+    Item* item = new Item(xyz, distance, listener);
     insertItem(item);
 
     return item;
-}   // newItem
+}   // placeTrigger
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
  *  This function is called on the server when an item is collected, or on
- *  the client upon receiving information about collected items.             */
-void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
+ *  the client upon receiving information about collected items.
+ *  \param item The item that was collected.
+ *  \param kart The kart that collected the item.
+ */
+void ItemManager::collectedItem(Item *item, AbstractKart *kart)
 {
     assert(item);
     // Spare tire karts don't collect items
     if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
-    if( (item->getType() == Item::ITEM_BUBBLEGUM || 
-         item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
+    if( (item->getType() == ItemState::ITEM_BUBBLEGUM ||
+         item->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
     {
         // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
     item->collected(kart);
-    kart->collectedItem(item, add_info);
+    // Inform the world - used for Easter egg hunt
+    World::getWorld()->collectedItem(kart, item);
+    kart->collectedItem(item);
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
@@ -324,25 +386,19 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     // Since at this stace item detection is by far not a bottle neck,
     // the original, simple and stable algorithm is left in place.
 
+    /** Disable item collection detection for debug purposes. */
+    if(m_disable_item_collection) return;
+
     for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+                               i!=m_all_items.end();  i++)
     {
-        if((!*i) || (*i)->wasCollected()) continue;
+        if((!*i) || !(*i)->isAvailable()) continue;
+
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
-            // if we're not playing online, pick the item.
-            if (!NetworkConfig::get()->isNetworking())
-                collectedItem(*i, kart);
-            else if (NetworkConfig::get()->isServer())
-            {
-                // Only the server side detects item being collected
-                // A client does the collection upon receiving the 
-                // event from the server!
-                collectedItem(*i, kart);
-                RaceEventManager::getInstance()->collectedItem(*i, kart);
-            }
+            collectedItem(*i, kart);
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit
@@ -376,7 +432,7 @@ void ItemManager::reset()
             i++;
             continue;
         }
-        if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
+        if((*i)->canBeUsedUp() || (*i)->getType()==ItemState::ITEM_BUBBLEGUM)
         {
             deleteItem( *i );
             i++;
@@ -427,6 +483,20 @@ void ItemManager::update(int ticks)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Updates the graphics, called once per rendered frame.
+ * \param dt Time based on frame rate.
+ */
+void ItemManager::updateGraphics(float dt)
+{
+    for (AllItemTypes::iterator i  = m_all_items.begin();
+                                i != m_all_items.end();  i++)
+    {
+        if (*i) (*i)->updateGraphics(dt);
+    }   // for m_all_items
+
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
 /** Removes an items from the items-in-quad list, from the list of all
  *  items, and then frees the item itself.
  *  \param The item to delete.
@@ -462,7 +532,8 @@ void ItemManager::switchItems()
     {
         if(!*i) continue;
 
-        if ((*i)->getType() == Item::ITEM_BUBBLEGUM || (*i)->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+        if ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM ||
+             (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK)
         {
             if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
             {
@@ -470,8 +541,10 @@ void ItemManager::switchItems()
             }
         }
 
-        Item::ItemType new_type = m_switch_to[(*i)->getType()];
+        ItemState::ItemType new_type = m_switch_to[(*i)->getType()];
 
+        if (new_type == (*i)->getType())
+            continue;
         if(m_switch_ticks<0)
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
         else
@@ -572,9 +645,9 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
     for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
         const int j = random.get(10);
-        Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
-            j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
-            j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
+        ItemState::ItemType type = (j > BONUS_BOX ? ItemState::ITEM_BONUS_BOX :
+            j > NITRO_BIG ? ItemState::ITEM_NITRO_BIG :
+            j > NITRO_SMALL ? ItemState::ITEM_NITRO_SMALL : ItemState::ITEM_BANANA);
 
         ArenaNode* an = ag->getNode(used_location[i]);
         Vec3 loc = an->getCenter();
@@ -587,17 +660,17 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
         Vec3 hit_point;
         const TriangleMesh& tm = Track::getCurrentTrack()->getTriangleMesh();
         bool success = tm.castRay(loc, an->getCenter() + (-10000*quad_normal),
-            &hit_point, &m, &normal);
+                                   &hit_point, &m, &normal);
 
         if (success)
         {
-            newItem(type, hit_point, normal);
+            placeItem(type, hit_point, normal);
         }
         else
         {
             Log::warn("[ItemManager]","Raycast to surface failed"
                       "from node %d", used_location[i]);
-            newItem(type, an->getCenter(), quad_normal);
+            placeItem(type, an->getCenter(), quad_normal);
         }
     }
 

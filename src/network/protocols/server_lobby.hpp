@@ -5,6 +5,9 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
+#include "irrString.h"
+
+#include <array>
 #include <atomic>
 #include <map>
 #include <memory>
@@ -12,6 +15,9 @@
 #include <set>
 #include <tuple>
 
+class BareNetworkString;
+class NetworkString;
+class NetworkPlayerProfile;
 class STKPeer;
 
 class ServerLobby : public LobbyProtocol
@@ -29,16 +35,27 @@ public:
         WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
         DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
+        WAIT_FOR_RACE_STOPPED,    // Wait server for stopping all race protocols
         RESULT_DISPLAY,           // Show result screen
         ERROR_LEAVE,              // shutting down server
         EXITING
     };
 private:
+    struct KeyData
+    {
+        std::string m_aes_key;
+        std::string m_aes_iv;
+        irr::core::stringw m_name;
+        bool m_tried = false;
+    };
+
     std::atomic<ServerState> m_state;
 
     /** Hold the next connected peer for server owner if current one expired
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
+
+    std::atomic<uint32_t> m_server_owner_id;
 
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
@@ -48,7 +65,7 @@ private:
     std::atomic_bool m_server_has_loaded_world;
 
     /** Counts how many peers have finished loading the world. */
-    std::map<std::weak_ptr<STKPeer>, bool,
+    std::map<std::weak_ptr<STKPeer>, std::pair<bool, double>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
     /** Vote from each peer. */
@@ -63,8 +80,8 @@ private:
 
     bool m_has_created_server_id_file;
 
-    /** It indicates if this server is registered with the stk server. */
-    std::atomic_bool m_server_registered;
+    /** It indicates if this server is unregistered with the stk server. */
+    std::weak_ptr<bool> m_server_unregistered;
 
     /** Timeout counter for various state. */
     std::atomic<float> m_timeout;
@@ -78,6 +95,36 @@ private:
 
     TransportAddress m_server_address;
 
+    std::mutex m_keys_mutex;
+
+    std::map<uint32_t, KeyData> m_keys;
+
+    std::map<std::weak_ptr<STKPeer>,
+        std::pair<uint32_t, BareNetworkString>,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_pending_connection;
+
+    /* Ranking related variables */
+    // If updating the base points, update the base points distribution in DB
+    const double BASE_RANKING_POINTS   = 4000.0;
+    const double MAX_SCALING_TIME      = 500.0;
+    const double MAX_POINTS_PER_SECOND = 0.125;
+
+    /** Online id to profile map, handling disconnection in ranked server */
+    std::map<uint32_t, std::weak_ptr<NetworkPlayerProfile> > m_ranked_players;
+
+    /** Multi-session ranking scores for each current player */
+    std::map<uint32_t, double> m_scores;
+
+    /** The maximum ranking scores achieved for each current player */
+    std::map<uint32_t, double> m_max_scores;
+
+    /** Number of ranked races done for each current players */
+    std::map<uint32_t, unsigned> m_num_ranked_races;
+
+    bool m_waiting_for_reset;
+
+    NetworkString* m_result_ns;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -86,14 +133,14 @@ private:
     // Track(s) votes
     void playerVote(Event *event);
     void playerFinishedResult(Event *event);
-    void registerServer();
+    bool registerServer();
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
     void handleChat(Event* event);
-    void unregisterServer();
+    void unregisterServer(bool now);
     void createServerIdFile();
-    void updatePlayerList();
+    void updatePlayerList(bool force_update = false);
     void updateServerOwner();
     bool checkPeersReady() const
     {
@@ -102,7 +149,7 @@ private:
         {
             if (p.first.expired())
                 continue;
-            all_ready = all_ready && p.second;
+            all_ready = all_ready && p.second.first;
             if (!all_ready)
                 return false;
         }
@@ -118,13 +165,40 @@ private:
             }
             else
             {
-                it->second = false;
+                it->second.first = false;
+                it->second.second = 0.0;
                 it++;
             }
         }
     }
-    std::tuple<std::string, uint8_t, bool> handleVote();
-    void stopCurrentRace();
+    void addAndReplaceKeys(const std::map<uint32_t, KeyData>& new_keys)
+    {
+        std::lock_guard<std::mutex> lock(m_keys_mutex);
+        for (auto& k : new_keys)
+            m_keys[k.first] = k.second;
+    }
+    void handlePendingConnection();
+    void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
+                                     BareNetworkString& data,
+                                     uint32_t online_id,
+                                     const irr::core::stringw& online_name);
+    bool decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
+                                  BareNetworkString& data,
+                                  const std::string& key,
+                                  const std::string& iv,
+                                  uint32_t online_id,
+                                  const irr::core::stringw& online_name);
+    std::tuple<std::string, uint8_t, bool, bool> handleVote();
+    void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
+    void submitRankingsToAddons();
+    void computeNewRankings();
+    void clearDisconnectedRankedPlayer();
+    double computeRankingFactor(uint32_t online_id);
+    double distributeBasePoints(uint32_t online_id);
+    double getModeFactor();
+    double getModeSpread();
+    double scalingValueForTime(double time);
+    void checkRaceFinished();
 
 public:
              ServerLobby();
@@ -139,7 +213,6 @@ public:
     void signalRaceStartToClients();
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
-    void checkRaceFinished();
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();

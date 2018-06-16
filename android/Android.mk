@@ -158,6 +158,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Iobj/libogg/include              \
                       -Iobj/libvorbis/include           \
                       -Iobj/openal/include              \
+                      -Iobj/openssl/include             \
                       -I$(call my-dir)/../../sources/android/native_app_glue \
                       -DUSE_GLES2      \
                       -DHAVE_OGGVORBIS \

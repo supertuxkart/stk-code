@@ -18,6 +18,8 @@
   \page addons Addons
   */
 
+#ifndef SERVER_ONLY
+
 #include "addons/addons_manager.hpp"
 
 #include "addons/news_manager.hpp"
@@ -614,3 +616,4 @@ void AddonsManager::saveInstalled()
     xml_installed.close();
 }   // saveInstalled
 
+#endif

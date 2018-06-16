@@ -57,7 +57,7 @@ RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
  *  again to reach current time. It will call rewindToState().
  *  if the state is a confirmed state.
  */
-void RewindInfoState::rewind()
+void RewindInfoState::restore()
 {
     RewindManager::get()->restoreState(m_buffer);
 }   // rewind

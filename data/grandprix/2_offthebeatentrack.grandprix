@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="Off the beaten track">
+<supertuxkart_grand_prix name="Off the Beaten Track">
 
     <track id="cocoa_temple"   laps="3" reverse="false" />
     <track id="hacienda"       laps="3" reverse="false" />

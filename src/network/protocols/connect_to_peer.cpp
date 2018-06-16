@@ -18,45 +18,20 @@
 
 #include "network/protocols/connect_to_peer.hpp"
 
-#include "network/event.hpp"
-#include "network/network_config.hpp"
-#include "network/protocols/get_peer_address.hpp"
-#include "network/protocols/request_connection.hpp"
-#include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
-/** Constructor for a WAN request. In this case we need to get the peer's
- *  ip address first. 
- *  \param peer_id ID of the peer in the stk client table.
- */
-ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
-{
-    m_peer_address.clear();
-    m_peer_id          = peer_id;
-    m_state            = NONE;
-}   // ConnectToPeer(peer_id)
-
-// ----------------------------------------------------------------------------
-/** Constructor for a LAN connection.
+/** Constructor for peer address.
  *  \param address The address to connect to.
  */
 ConnectToPeer::ConnectToPeer(const TransportAddress &address)
              : Protocol(PROTOCOL_CONNECTION)
 {
     m_peer_address = address;
-    // We don't need to find the peer address, so we can start
-    // with the state when we found the peer address.
-    m_state            = WAIT_FOR_CONNECTION;
-}   // ConnectToPeers(TransportAddress)
-
-// ----------------------------------------------------------------------------
-
-ConnectToPeer::~ConnectToPeer()
-{
-}   // ~ConnectToPeer
+    m_state = WAIT_FOR_CONNECTION;
+}   // ConnectToPeer
 
 // ----------------------------------------------------------------------------
 /** Simple finite state machine: Start a GetPeerAddress protocol. Once the
@@ -69,35 +44,6 @@ void ConnectToPeer::asynchronousUpdate()
 {
     switch(m_state)
     {
-        case NONE:
-        {
-            m_current_protocol = std::make_shared<GetPeerAddress>(m_peer_id);
-            m_current_protocol->requestStart();
-            m_state = RECEIVED_PEER_ADDRESS;
-            break;
-        }
-        case RECEIVED_PEER_ADDRESS:
-        {
-            // Wait until we have peer address
-            auto get_peer_address =
-                std::dynamic_pointer_cast<GetPeerAddress>(m_current_protocol);
-            assert(get_peer_address);
-            if (get_peer_address->getAddress().isUnset())
-                return;
-            m_peer_address = get_peer_address->getAddress();
-            m_current_protocol = nullptr;
-            if (m_peer_address.isUnset())
-            {
-                Log::error("ConnectToPeer",
-                    "The peer you want to connect to has hidden his address.");
-                m_state = DONE;
-                break;
-            }
-
-            m_state = WAIT_FOR_CONNECTION;
-            m_timer = 0.0;
-            break;
-        }
         case WAIT_FOR_CONNECTION:
         {
             if (STKHost::get()->peerExists(m_peer_address))

@@ -89,6 +89,8 @@ namespace GUIEngine
 
         bool m_sortable;
 
+        bool m_header_created;
+
     public:
         typedef irr::gui::CGUISTKListBox::ListItem ListItem;
         typedef ListItem::ListCell ListCell;
@@ -135,12 +137,24 @@ namespace GUIEngine
 
         void addItem(   const std::string& internal_name,
                         const std::vector<ListCell>& contents);
+
+        /**
+          * \brief create a header based on m_header
+          * \pre may only be called after the widget has been added to the screen with add()
+          */
+        void createHeader();
         
         /**
-          * \brief erases all items in the list
+          * \brief erases all items in the list, don't clear header
           * \pre may only be called after the widget has been added to the screen with add()
           */
         void clear();
+
+        /**
+          * \brief clear the header
+          * \pre may only be called after the widget has been added to the screen with add()
+          */
+        void clearColumns();
         
         /**
           * \return the number of items in the list
@@ -239,12 +253,10 @@ namespace GUIEngine
             m_listener = listener;
         }
         
-        /** To be called before Widget::add(); columns are persistent across multiple add/remove cycles
+        /** Columns are persistent across multiple "clear" add/remove cycles. clearColumns clear them immediately.
           * \param proportion A column with proportion 2 will be twice as large as a column with proportion 1
           */
         void addColumn(irr::core::stringw col, int proportion=1) { m_header.push_back( Column(col, proportion) ); }
-        
-        void clearColumns() { m_header.clear(); }
 
         void setSortable(bool sortable) { m_sortable = sortable; }
     };

@@ -19,6 +19,8 @@
 #ifndef HEADER_REPLAY_RECORDER_HPP
 #define HEADER_REPLAY_RECORDER_HPP
 
+#include "items/attachment.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "replay/replay_base.hpp"
 
@@ -38,6 +40,9 @@ private:
     /** A separate vector of Replay Events for all physic info. */
     std::vector< std::vector<PhysicInfo> > m_physic_info;
 
+    /** A separate vector of Replay Events for all item/nitro info. */
+    std::vector< std::vector<BonusInfo> > m_bonus_info;
+
     /** A separate vector of Replay Events for all other events. */
     std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
 
@@ -54,6 +59,18 @@ private:
 
     bool  m_incorrect_replay;
 
+    unsigned int m_max_frames;
+
+    // Stores the steering value at the previous transform.
+    // Used to trigger the recording of new transforms.
+    float m_previous_steer = 0.0f;
+
+    const float DISTANCE_FAST_UPDATES = 10.0f;
+
+    const float DISTANCE_MAX_UPDATES = 1.0f;
+
+    uint64_t m_last_uid;
+
 #ifdef DEBUG
     /** Counts overall number of events stored. */
     unsigned int m_count;
@@ -65,6 +82,9 @@ private:
     unsigned int m_count_skipped_interpolation;
 #endif
 
+    /** Compute the replay's UID ; partly based on race data ; partly randomly */
+    uint64_t computeUID(float min_time);
+
 
           ReplayRecorder();
          ~ReplayRecorder();
@@ -73,6 +93,16 @@ public:
     void  reset();
     void  save();
     void  update(int ticks);
+
+    const uint64_t getLastUID() { return m_last_uid; }
+
+    /** Functions to encode and decode attahcments and item types,
+        so that the stored value is independent from internal
+        representation and resilient to such changes. */
+    static int enumToCode (Attachment::AttachmentType type);
+    static int enumToCode (PowerupManager::PowerupType type);
+    static Attachment::AttachmentType codeToEnumAttach (int code);
+    static PowerupManager::PowerupType codeToEnumItem (int code);
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
@@ -89,8 +119,9 @@ public:
     static void destroy() { delete m_replay_recorder; m_replay_recorder=NULL; }
     // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
-    virtual const std::string& getReplayFilename() const { return m_filename; }
+    virtual const std::string& getReplayFilename(int replay_file_number = 1) const { return m_filename; }
     // ------------------------------------------------------------------------
 };   // ReplayRecorder
 
 #endif
+

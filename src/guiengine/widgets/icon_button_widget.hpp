@@ -94,7 +94,7 @@ namespace GUIEngine
         virtual ~IconButtonWidget() {};
 
         /** \brief Implement callback from base class Widget */
-        virtual void add();
+        virtual void add() OVERRIDE;
 
         /**
           * \brief Call this if scale mode is SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO.

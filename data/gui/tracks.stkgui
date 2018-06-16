@@ -41,7 +41,7 @@
     <div id="vote" x="63%" y="1%" width="37%" height="96%" layout="vertical-row">
         <div width="95%" proportion="2" layout="horizontal-row">
             <box proportion="2" height="100%" layout="vertical-row">
-                <label id="vote-text" word_wrap="true" id="text" proportion="3" width="100%" height="100%" text_valign="top"/>
+                <label id="vote-text" word_wrap="true" proportion="3" width="100%" height="100%" text_valign="top"/>
             </box>
         </div>
     </div>

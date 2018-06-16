@@ -334,9 +334,10 @@ void ProtocolManager::findAndTerminate(ProtocolType type)
 {
     OneProtocolType &opt = m_all_protocols[type];
     if (opt.isEmpty())
-        Log::error("ProtocolManager",
-                   "findAndTerminate: No protocol %d registered.", type);
-
+    {
+        Log::debug("ProtocolManager", "findAndTerminate:"
+            " No protocol %d registered, ignore.", type);
+    }
     opt.requestTerminateAll();
 }   // findAndTerminate
 

@@ -30,6 +30,7 @@
 #include "utils/log.hpp"
 
 #include <algorithm>
+#include <random>
 
 //-----------------------------------------------------------------------------
 /** Update and see if any player disconnects.
@@ -133,20 +134,38 @@ void GameSetup::addServerInfo(NetworkString* ns)
         // No extra server info
         ns->addUInt8((uint8_t)0);
     }
-    ns->encodeString(NetworkConfig::get()->getMOTD());
+    if (NetworkConfig::get()->isOwnerLess())
+    {
+        ns->addFloat(UserConfigParams::m_start_game_threshold)
+            .addFloat(UserConfigParams::m_start_game_counter);
+    }
+    else
+        ns->addFloat(0.0f).addFloat(0.0f);
+    ns->addUInt8(NetworkConfig::get()->getMaxPlayers());
+
+    ns->encodeString16(NetworkConfig::get()->getMOTD());
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------
 void GameSetup::sortPlayersForGrandPrix()
 {
-    if (!isGrandPrix() || m_tracks.size() == 1)
+    if (!isGrandPrix())
         return;
     std::lock_guard<std::mutex> lock(m_players_mutex);
+
+    if (m_tracks.size() == 1)
+    {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_players.begin(), m_players.end(), g);
+        return;
+    }
+
     std::sort(m_players.begin(), m_players.end(),
         [](const std::weak_ptr<NetworkPlayerProfile>& a,
         const std::weak_ptr<NetworkPlayerProfile>& b)
         {
-            // They should never expired
+            // They should be never expired
             auto c = a.lock();
             assert(c);
             auto d = b.lock();

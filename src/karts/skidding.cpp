@@ -99,8 +99,7 @@ void Skidding::saveState(BareNetworkString *buffer)
     buffer->addFloat(m_remaining_jump_time);
     buffer->addFloat(m_skid_time);
     buffer->addFloat(m_skid_factor);
-    if(m_skid_state == SKID_NONE)
-        return;
+    buffer->addFloat(m_visual_rotation);
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -113,6 +112,7 @@ void Skidding::rewindTo(BareNetworkString *buffer)
     m_remaining_jump_time = buffer->getFloat();
     m_skid_time = buffer->getFloat();
     m_skid_factor = buffer->getFloat();
+    m_visual_rotation = buffer->getFloat();
 }   // rewindTo
 
 // ----------------------------------------------------------------------------

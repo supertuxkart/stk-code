@@ -160,6 +160,9 @@ void IconButtonWidget::add()
     m_element = btn;
     m_id = m_element->getID();
 
+    if (!m_is_visible)
+        m_element->setVisible(false);
+
     // ---- label if any
     const stringw& message = getText();
     if (message.size() > 0)
@@ -218,6 +221,11 @@ void IconButtonWidget::add()
         m_label->setNotClipped(true);
 
         if (m_properties[PROP_LABELS_LOCATION] == "hover")
+        {
+            m_label->setVisible(false);
+        }
+
+        if (!m_is_visible)
         {
             m_label->setVisible(false);
         }

@@ -26,6 +26,7 @@
 #include "font/bold_face.hpp"
 #include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -190,7 +191,9 @@ void OptionsScreenUI::init()
         Log::warn("OptionsScreenUI",
                   "Couldn't find current skin in the list of skins!");
         skinSelector->setValue(0);
+        irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
+        irr_driver->setMaxTextureSize();
     }
 
     // --- language
@@ -236,6 +239,7 @@ void OptionsScreenUI::init()
 
 void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
+#ifndef SERVER_ONLY
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -265,7 +269,9 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         const core::stringw selectedSkin = skinSelector->getStringValue();
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
+        irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
+        irr_driver->setMaxTextureSize();
     }
     else if (name == "split_screen_horizontally")
     {
@@ -382,7 +388,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         OptionsScreenUI::getInstance()->push();
     }
-
+#endif
 }   // eventCallback
 
 // -----------------------------------------------------------------------------

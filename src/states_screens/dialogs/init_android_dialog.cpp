@@ -56,7 +56,7 @@ InitAndroidDialog::~InitAndroidDialog()
 
 void InitAndroidDialog::load()
 {
-    loadFromFile("init_android.stkgui");
+    loadFromFile("android/init_android.stkgui");
 }
 
 // -----------------------------------------------------------------------------

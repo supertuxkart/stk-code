@@ -18,7 +18,10 @@
 #include "modes/easter_egg_hunt.hpp"
 
 #include "io/file_manager.hpp"
+#include "items/item.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/ghost_kart.hpp"
+#include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
@@ -29,6 +32,7 @@ EasterEggHunt::EasterEggHunt() : LinearWorld()
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = true;
     m_eggs_found     = 0;
+    m_only_ghosts    = false;
 }   // EasterEggHunt
 
 //-----------------------------------------------------------------------------
@@ -39,12 +43,18 @@ void EasterEggHunt::init()
     LinearWorld::init();
     m_display_rank = false;
 
+    unsigned int gk = 0;
+    if (race_manager->hasGhostKarts())
+        gk = ReplayPlay::get()->getNumGhostKart();
     // check for possible problems if AI karts were incorrectly added
-    if(getNumKarts() > race_manager->getNumPlayers())
+    if((getNumKarts() - gk) > race_manager->getNumPlayers())
     {
         Log::error("EasterEggHunt]", "No AI exists for this game mode");
         exit(1);
     }
+
+    if (getNumKarts() == gk)
+        m_only_ghosts = true;
 
     m_eggs_collected.resize(m_karts.size(), 0);
 
@@ -148,10 +158,21 @@ const std::string& EasterEggHunt::getIdent() const
 /** Called when a kart has collected an egg.
  *  \param kart The kart that collected an egg.
  */
-void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
+void EasterEggHunt::collectedItem(const AbstractKart *kart, const Item *item)
 {
+    if(item->getType() != ItemState::ITEM_EASTER_EGG) return;
+
     m_eggs_collected[kart->getWorldKartId()]++;
     m_eggs_found++;
+}   // collectedItem
+
+//-----------------------------------------------------------------------------
+/** Called when a ghost kart has collected an egg.
+ *  \param world_id The world id of the ghost kart that collected an egg.
+ */
+void EasterEggHunt::collectedEasterEggGhost(int world_id)
+{
+    m_eggs_collected[world_id]++;
 }   // collectedEasterEgg
 
 //-----------------------------------------------------------------------------
@@ -169,8 +190,16 @@ void EasterEggHunt::update(int ticks)
  */
 bool EasterEggHunt::isRaceOver()
 {
-    if(m_eggs_found == m_number_of_eggs)
+    if(!m_only_ghosts && m_eggs_found == m_number_of_eggs)
         return true;
+    else if (m_only_ghosts)
+    {
+        for (unsigned int i=0 ; i<m_eggs_collected.size();i++)
+        {
+            if (m_eggs_collected[i] == m_number_of_eggs)
+                return true;
+        }
+    }
     if(m_time<0)
         return true;
     return false;
@@ -223,9 +252,16 @@ void EasterEggHunt::terminateRace()
 }
 //-----------------------------------------------------------------------------
 /** In Easter Egg mode the finish time is just the time the race is over,
- *  since there are no AI karts.
+ *  since there are no AI karts and no other players, except for ghosts.
  */
 float EasterEggHunt::estimateFinishTimeForKart(AbstractKart* kart)
 {
+    // For ghost karts, use the replay data
+    if (kart->isGhostKart())
+    {
+        GhostKart* gk = dynamic_cast<GhostKart*>(kart);
+        return gk->getGhostFinishTime();
+    }
+
     return getTime();
 }   // estimateFinishTimeForKart

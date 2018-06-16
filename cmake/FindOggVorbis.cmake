@@ -17,20 +17,6 @@ find_library(OGGVORBIS_VORBIS_LIBRARY NAMES vorbis Vorbis libvorbis PATHS "${PRO
 find_library(OGGVORBIS_VORBISFILE_LIBRARY NAMES vorbisfile libvorbisfile PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
 find_library(OGGVORBIS_VORBISENC_LIBRARY NAMES vorbisenc libvorbisenc PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
 
-if (APPLE)
-    set(OGGVORBIS_OGG_INCLUDE_DIR "/Library/Frameworks/Ogg.framework/Headers/")
-    set(OGGVORBIS_VORBIS_INCLUDE_DIR "/Library/Frameworks/Vorbis.framework/Headers/")
-endif()
-
-if(APPLE AND NOT OGGVORBIS_VORBISFILE_LIBRARY)
-    # Seems to be the same on Apple systems
-    set(OGGVORBIS_VORBISFILE_LIBRARY ${OGGVORBIS_VORBIS_LIBRARY})
-endif()
-
-if(APPLE AND NOT OGGVORBIS_VORBISENC_LIBRARY)
-    # Seems to be the same on Apple systems
-    set(OGGVORBIS_VORBISENC_LIBRARY ${OGGVORBIS_VORBIS_LIBRARY})
-endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OggVorbis DEFAULT_MSG

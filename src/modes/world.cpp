@@ -36,10 +36,11 @@
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
-#include "karts/controller/soccer_ai.hpp"
+#include "karts/ghost_kart.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/soccer_ai.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
@@ -981,9 +982,11 @@ void World::updateGraphics(float dt)
     const int kart_amount = (int)m_karts.size();
     for (int i = 0; i < kart_amount; ++i)
     {
-        // Update all karts that are not eliminated
-        if (!m_karts[i]->isEliminated() )
+        // Update all karts that are visible
+        if (m_karts[i]->isVisible())
+        {
             m_karts[i]->updateGraphics(dt);
+        }
     }
 
     projectile_manager->updateGraphics(dt);
@@ -1052,6 +1055,16 @@ void World::update(int ticks)
     if (script_engine) script_engine->update(ticks);
 
     Physics::getInstance()->update(ticks);
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        for (int i = 0 ; i < kart_amount; i++)
+        {
+            if (!m_karts[i]->isEliminated())
+                static_cast<Kart*>(m_karts[i])->handleRewoundTransform();
+        }
+    }
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);

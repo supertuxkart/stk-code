@@ -305,6 +305,12 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 {
     if(m_schedule_continue)
         return EVENT_BLOCK;
+        
+    const bool pressed_down = value > Input::MAX_VALUE*2/3;
+    
+    if (!pressed_down)
+        return EVENT_BLOCK;
+    
 
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
     BubbleWidget* bubble = getWidget<BubbleWidget>("lblLeftRight");
@@ -370,6 +376,12 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             !bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             playerId == PLAYER_ID_GAME_MASTER)
+        {
+            return EVENT_LET;
+        }
+        
+        if ((!m_kart_view_info[playerId].confirmed) && 
+            (playerId == PLAYER_ID_GAME_MASTER))
         {
             return EVENT_LET;
         }

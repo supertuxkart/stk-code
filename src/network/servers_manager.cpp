@@ -315,6 +315,8 @@ void ServersManager::setDefaultBroadcastAddresses()
     m_broadcast_address.emplace_back(std::string("255.255.255.255"));
     m_broadcast_address.emplace_back(std::string("127.0.0.255")    );
     m_broadcast_address.emplace_back(std::string("127.0.0.1")      );
+    for (auto& addr : m_broadcast_address)
+        addr.setPort(NetworkConfig::get()->getServerDiscoveryPort());
 }   // setDefaultBroadcastAddresses
 
 // ----------------------------------------------------------------------------
@@ -381,7 +383,7 @@ void ServersManager::updateBroadcastAddresses()
 
     if (return_code == ERROR_BUFFER_OVERFLOW)
     {
-        Log::warn("NetworkConfig", "Can not get broadcast addresses.");
+        Log::warn("ServerManager", "Can not get broadcast addresses.");
         setDefaultBroadcastAddresses();
         return;
     }
@@ -418,7 +420,8 @@ void ServersManager::updateBroadcastAddresses()
             u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
             u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;            
 
-            printf("Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
+            Log::debug("ServerManager",
+                "Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
                 ta.toString().c_str(), u);
             addAllBroadcastAddresses(ta, u);
         }

@@ -30,6 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/skidding.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 
 
@@ -65,7 +66,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         for(unsigned int i=0; i<p.size(); i++)
             m_show_curve->addPoint(p[i]);
     }
-    if (UserConfigParams::m_check_debug)
+    if (UserConfigParams::m_check_debug && !ProfileWorld::isNoGraphics())
     {
         m_debug_target_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
             (scene::EPT_TRIANGLE_STRIP,

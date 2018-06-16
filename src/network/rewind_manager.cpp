@@ -27,6 +27,8 @@
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
@@ -74,7 +76,7 @@ RewindManager::~RewindManager()
 void RewindManager::reset()
 {
     m_is_rewinding = false;
-    m_not_rewound_ticks = 0;
+    m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
     m_last_saved_state = -1;  // forces initial state save
     m_state_frequency =
@@ -97,21 +99,6 @@ void RewindManager::reset()
 
     m_rewind_queue.reset();
 }   // reset
-
-// ----------------------------------------------------------------------------
-/** Adds a new TimeStep entry. Only exception is time=0 (which happens during
- *  all of 'ready, set, go') - for which only one entry is created.
- */
-void RewindManager::addNextTimeStep(int time, float dt)
-{
-    // Add a timestep entry each timestep, except at 'ready, set, go'
-    // at which time is 0 - we add only one entry there
-    if ((time > 0 || m_rewind_queue.isEmpty()) &&
-        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
-    {
-//        m_rewind_queue.addNewTimeStep(time, dt);
-    }
-}   // addNextTimeStep
 
 // ----------------------------------------------------------------------------    
 /** Adds an event to the rewind data. The data to be stored must be allocated
@@ -175,17 +162,20 @@ void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
 void RewindManager::saveState(bool local_save)
 {
     PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
-    GameProtocol::lock()->startNewState(local_save);
+    auto gp = GameProtocol::lock();
+    if (!gp)
+        return;
+    gp->startNewState(local_save);
     AllRewinder::const_iterator rewinder;
     for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
     {
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
         BareNetworkString *buffer = (*rewinder)->saveState();
-        if (buffer && buffer->size() >= 0)
+        if (buffer)
         {
             m_overall_state_size += buffer->size();
-            GameProtocol::lock()->addState(buffer);
+            gp->addState(buffer);
         }   // size >= 0
         delete buffer;    // buffer can be freed
     }
@@ -199,10 +189,14 @@ void RewindManager::saveState(bool local_save)
  */
 void RewindManager::saveLocalState()
 {
+    auto gp = GameProtocol::lock();
+    if (!gp)
+        return;
+
     int ticks = World::getWorld()->getTimeTicks();
 
     saveState(/*local_state*/true);
-    NetworkString *state = GameProtocol::lock()->getState();
+    NetworkString *state = gp->getState();
 
     // Copy the data to a new string, making the buffer in
     // GameProtocol availble for again.
@@ -221,16 +215,12 @@ void RewindManager::saveLocalState()
 void RewindManager::restoreState(BareNetworkString *data)
 {
     data->reset();   
-    int index = 0;
-    //AllRewinder::const_iterator rewinder;
-    for (auto rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end();
-                                          ++rewinder)
+    
+    for (auto rewinder  = m_all_rewinder.begin(); 
+              rewinder != m_all_rewinder.end();   ++rewinder)
     {
         uint16_t count = data->getUInt16();
-        if (count > 0)
-        {
-            (*rewinder)->rewindToState(data);
-        }
+        (*rewinder)->restoreState(data, count);
     }   // for all rewinder
 }   // restoreState
 
@@ -246,10 +236,9 @@ void RewindManager::update(int ticks_not_used)
         m_all_rewinder.size() == 0 ||
         m_is_rewinding)  return;
 
-    float time = World::getWorld()->getTime();
     int ticks = World::getWorld()->getTimeTicks();
 
-    m_not_rewound_ticks = ticks;
+    m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
     // Clients don't save state, so they just exit.
     if (NetworkConfig::get()->isClient() ||
@@ -261,7 +250,8 @@ void RewindManager::update(int ticks_not_used)
     // Save state
     saveState(/**allow_local_save*/false);
     PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
-    GameProtocol::lock()->sendState();
+    if (auto gp = GameProtocol::lock())
+        gp->sendState();
     PROFILER_POP_CPU_MARKER();
     m_last_saved_state = ticks;
 }   // update
@@ -318,6 +308,8 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
 void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 {
     assert(!m_is_rewinding);
+    // TODO Do it properly for track objects like soccer ball
+    Track::getCurrentTrack()->getTrackObjectManager()->removeForRewind();
     bool is_history = history->replayHistory();
     history->setReplayHistory(false);
 
@@ -343,7 +335,10 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // ----------------------------
     World *world = World::getWorld();
 
-    // Now start the rewind with the full state:
+    // Now start the rewind with the full state. It is important that the
+    // world time is set first, since e.g. the NetworkItem manager relies
+    // on having the access to the 'confirmed' state time using 
+    // the world timer.
     world->setTicks(exact_rewind_ticks);
 
     // Get the (first) full state to which we have to rewind
@@ -354,9 +349,9 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // -----------------------------------------
     // A loop in case that we should split states into several smaller ones:
     while (current && current->getTicks() == exact_rewind_ticks && 
-          current->isState()                                        )
+           current->isState()                                        )
     {
-        current->rewind();
+        current->restore();
         m_rewind_queue.next();
         current = m_rewind_queue.getCurrent();
     }
@@ -384,5 +379,6 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }
 
     history->setReplayHistory(is_history);
+    Track::getCurrentTrack()->getTrackObjectManager()->addForRewind();
     m_is_rewinding = false;
 }   // rewindTo

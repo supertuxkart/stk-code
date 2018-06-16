@@ -46,7 +46,6 @@ class AddonsScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 private:
     AddonsScreen();
-    AddonsManager   *m_addons;
     AddonsLoading   *m_load;
     void             loadInformations();
     /** Icon for installed addon, which can be updated. */

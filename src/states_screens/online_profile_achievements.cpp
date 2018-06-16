@@ -26,8 +26,9 @@
 #include "guiengine/widget.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/player_rankings_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIButton.h>
@@ -150,6 +151,11 @@ void BaseOnlineProfileAchievements::eventCallback(Widget* widget,
         if(StringUtils::fromString(achievement, id))
             new MessageDialog(AchievementsManager::get()
                                    ->getAchievementInfo(id)->getDescription());
+    }
+    if (name == "rankings")
+    {
+        new PlayerRankingsDialog(m_visiting_profile->getID(),
+            m_visiting_profile->getUserName());
     }
 }   // eventCallback
 

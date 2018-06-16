@@ -644,7 +644,7 @@ void RubberBall::updateDistanceToTarget()
 
     float target_distance =
         world->getDistanceDownTrackForKart(m_target->getWorldKartId(), true);
-    float ball_distance = getDistanceFromStart(true);
+    float ball_distance = getDistanceFromStart(/* account for checklines */ false);
 
     m_distance_to_target = target_distance - ball_distance;
     if(m_distance_to_target < 0)

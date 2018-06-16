@@ -53,7 +53,7 @@ public:
     virtual void crashed(const AbstractKart *k) OVERRIDE {}
     virtual void handleZipper(bool play_sound) OVERRIDE {}
     virtual void finishedRace(float time) OVERRIDE {}
-    virtual void collectedItem(const Item &item, int add_info=-1,
+    virtual void collectedItem(const ItemState &item,
                                float previous_energy=0) OVERRIDE {}
     virtual void setPosition(int p) OVERRIDE {}
     virtual bool isPlayerController() const OVERRIDE { return false; }
@@ -79,6 +79,14 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getCurrentReplayIndex() const
                                                    { return m_current_index; }
+
+    // ------------------------------------------------------------------------
+    float        getTimeAtIndex(unsigned int index) const
+    {
+        assert(index < m_all_times.size());
+        return m_all_times[index];
+    }
+
     // ------------------------------------------------------------------------
     /** Return the display name; if not set, use default display name (kart name) */
     core::stringw getName() const OVERRIDE

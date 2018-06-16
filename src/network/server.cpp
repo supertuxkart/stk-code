@@ -29,7 +29,7 @@
  *  \param xml The data for one server as received as part of the
  *         get-all stk-server request.
  */
-Server::Server(const XMLNode& xml)
+Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
 {
     assert(xml.getName() == "server");
 
@@ -62,15 +62,25 @@ Server::Server(const XMLNode& xml)
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
     xml.get("distance", &m_distance);
-    m_server_owner_name = "-";
+    m_server_owner_name = L"-";
+
+    // Show owner name as Official right now if official server hoster account
+    m_official = false;
+    xml.get("official", &m_official);
+    if (m_official)
+    {
+        // I18N: Official means this server is hosted by STK team
+        m_server_owner_name = _("Official");
+        return;
+    }
 
     // Display server owner name if he's your friend or localhost
-    Online::OnlineProfile* opp = PlayerManager::getCurrentPlayer()->getProfile();
+    Online::OnlineProfile* opp =
+        PlayerManager::getCurrentPlayer()->getProfile();
     // Check localhost owner
     if (opp && opp->getID() == m_server_owner)
     {
-        m_server_owner_name =
-            StringUtils::wideToUtf8(opp->getUserName());
+        m_server_owner_name = opp->getUserName();
     }
     else if (opp && opp->hasFetchedFriends())
     {
@@ -83,8 +93,7 @@ Server::Server(const XMLNode& xml)
                     Online::ProfileManager::get()->getProfileByID(user_id);
                 if (friend_profile)
                 {
-                    m_server_owner_name =
-                        StringUtils::wideToUtf8(friend_profile->getUserName());
+                    m_server_owner_name = friend_profile->getUserName();
                 }
             }
         }
@@ -108,6 +117,7 @@ Server::Server(const XMLNode& xml)
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                int current_players, unsigned difficulty, unsigned server_mode,
                const TransportAddress &address, bool password_protected)
+      : m_supports_encrytion(false)
 {
     m_name               = name;
     m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
@@ -123,6 +133,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_server_mode        = server_mode;
     m_password_protected = password_protected;
     m_distance = 0.0f;
+    m_official = false;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------

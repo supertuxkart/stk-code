@@ -336,15 +336,9 @@ void LocalPlayerController::handleZipper(bool play_sound)
 /** Called when a kart hits an item. It plays certain sfx (e.g. nitro full,
  *  or item specific sounds).
  *  \param item Item that was collected.
- *  \param add_info Additional info to be used then handling the item. If
- *                  this is -1 (default), the item type is selected
- *                  randomly. Otherwise it contains the powerup or
- *                  attachment for the kart. This is used in network mode to
- *                  let the server determine the powerup/attachment for
- *                  the clients.
  *  \param old_energy The previous energy value
  */
-void LocalPlayerController::collectedItem(const Item &item, int add_info,
+void LocalPlayerController::collectedItem(const ItemState &item_state,
                                           float old_energy)
 {
     if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
@@ -361,7 +355,7 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
     }
     else
     {
-        switch(item.getType())
+        switch(item_state.getType())
         {
         case Item::ITEM_BANANA:
             m_kart->playSound(m_ugh_sound);

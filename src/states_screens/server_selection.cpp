@@ -154,7 +154,7 @@ void ServerSelection::loadList(unsigned sort_case)
                 return c->getServerMode() > d->getServerMode();
                 break;
             case 4:
-                return c->getServerOwnerName() > d->getServerOwnerName();
+                return !(c->getServerOwnerName() < d->getServerOwnerName());
                 break;
             case 5:
                 return c->getDistance() > d->getDistance();
@@ -183,8 +183,8 @@ void ServerSelection::loadList(unsigned sort_case)
 
         if (NetworkConfig::get()->isWAN())
         {
-            row.push_back(GUIEngine::ListWidget::ListCell(StringUtils::
-                utf8ToWide(server->getServerOwnerName()), -1, 1, true));
+            row.push_back(GUIEngine::ListWidget::ListCell(
+                server->getServerOwnerName(), -1, 1, true));
             // I18N: In server selection screen, unknown distance to server
             core::stringw distance = _("Unknown");
             if (!(server->getDistance() < 0.0f))

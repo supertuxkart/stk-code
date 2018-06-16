@@ -2753,26 +2753,26 @@ namespace video
 
 	void COGLES2CallBridge::setBlendFunc(GLenum source, GLenum destination)
 	{
-		if(BlendSource != source || BlendDestination != destination)
-		{
+		//if(BlendSource != source || BlendDestination != destination)
+		//{
 			glBlendFunc(source, destination);
 
 			BlendSource = source;
 			BlendDestination = destination;
-		}
+		//}
 	}
 
 	void COGLES2CallBridge::setBlend(bool enable)
 	{
-		if(Blend != enable)
-		{
+		//if(Blend != enable)
+		//{
 			if (enable)
 				glEnable(GL_BLEND);
 			else
 				glDisable(GL_BLEND);
 
 			Blend = enable;
-		}
+		//}
 	}
 
 	void COGLES2CallBridge::setCullFaceFunc(GLenum mode)

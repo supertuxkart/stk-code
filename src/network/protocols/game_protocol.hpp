@@ -26,6 +26,7 @@
 #include "utils/cpp2011.hpp"
 #include "utils/singleton.hpp"
 
+#include <map>
 #include <vector>
 
 class BareNetworkString;
@@ -40,6 +41,8 @@ private:
     /** The type of game events to be forwarded to the server. */
     enum { GP_CONTROLLER_ACTION,
            GP_STATE,
+           GP_ITEM_UPDATE,
+           GP_ITEM_CONFIRMATION,
            GP_ADJUST_TIME
     };
 
@@ -68,7 +71,10 @@ private:
     void handleControllerAction(Event *event);
     void handleState(Event *event);
     void handleAdjustTime(Event *event);
+    void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
+    std::map<STKPeer*, int> m_initial_ticks;
+
 public:
              GameProtocol();
     virtual ~GameProtocol();
@@ -82,6 +88,7 @@ public:
     void addState(BareNetworkString *buffer);
     void sendState();
     void adjustTimeForClient(STKPeer *peer, int ticks);
+    void sendItemEventConfirmation(int ticks);
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;
@@ -104,6 +111,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the NetworkString in which a state was saved. */
     NetworkString* getState() const { return m_data_to_send;  }
+    // ------------------------------------------------------------------------
+    void addInitialTicks(STKPeer* p, int ticks);
 
 };   // class GameProtocol
 

@@ -49,6 +49,10 @@ NetworkConfig::NetworkConfig()
     m_auto_connect          = false;
     m_is_server             = false;
     m_is_public_server      = false;
+    m_is_ranked_server      = false;
+    m_validated_players     = false;
+    m_auto_end              = false;
+    m_owner_less            = false;
     m_done_adding_network_players = false;
     m_max_players           = 4;
     m_cur_user_id           = 0;
@@ -148,10 +152,20 @@ void NetworkConfig::setUserDetails(Online::XMLRequest* r,
                                    const std::string& name)
 {
     assert(!m_cur_user_token.empty());
-    r->setApiURL(Online::API::SERVER_PATH, name);
+    r->setApiURL(Online::API::USER_PATH, name);
     r->addParameter("userid", m_cur_user_id);
     r->addParameter("token", m_cur_user_token);
 }   // setUserDetails
+
+// ----------------------------------------------------------------------------
+void NetworkConfig::setServerDetails(Online::XMLRequest* r,
+                                   const std::string& name)
+{
+    assert(!m_cur_user_token.empty());
+    r->setApiURL(Online::API::SERVER_PATH, name);
+    r->addParameter("userid", m_cur_user_id);
+    r->addParameter("token", m_cur_user_token);
+}   // setServerDetails
 
 // ----------------------------------------------------------------------------
 core::stringw NetworkConfig::getModeName(unsigned id)

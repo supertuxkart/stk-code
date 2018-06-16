@@ -29,14 +29,14 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
 #include <squish.h>
 static_assert(squish::kColourClusterFit == (1 << 5), "Wrong header");
 static_assert(squish::kColourRangeFit == (1 << 6), "Wrong header");
 static_assert(squish::kColourIterativeClusterFit == (1 << 8), "Wrong header");
 #endif
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
 extern "C"
 {
     #include <mipmap/img.h>
@@ -46,7 +46,7 @@ extern "C"
 
 #include <numeric>
 
-#if !defined(USE_GLES2)
+#if !defined(ANDROID)
 static const uint8_t CACHE_VERSION = 1;
 #endif
 
@@ -68,18 +68,26 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
         return;
     }
 
-    std::string cache_subdir = "hd/";
+    std::string cache_subdir = "hd";
     if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
     {
-        cache_subdir = "hd/";
+        cache_subdir = "hd";
     }
     else
     {
-        cache_subdir = StringUtils::insertValues("resized_%i/",
+        cache_subdir = StringUtils::insertValues("resized_%i",
             (int)UserConfigParams::m_max_texture_size);
     }
+    
+#ifdef USE_GLES2
+    if (m_undo_srgb && !CVS->isEXTTextureCompressionS3TCSRGBUsable())
+    {
+        cache_subdir += "-linear";
+    }
+#endif
+
     m_cache_directory = file_manager->getCachedTexturesDir() +
-        cache_subdir + container_id;
+        cache_subdir + "/" + container_id;
     file_manager->checkAndCreateDirectoryP(m_cache_directory);
 
 #endif
@@ -204,7 +212,11 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
 #ifndef USE_GLES2
         }
 #endif
-        if (m_undo_srgb && !use_tex_compress)
+
+        bool force_undo_srgb = use_tex_compress && 
+                                  !CVS->isEXTTextureCompressionS3TCSRGBUsable();
+
+        if (m_undo_srgb && (!use_tex_compress || force_undo_srgb))
         {
             data[i * 4] = srgb255ToLinear(data[i * 4]);
             data[i * 4 + 1] = srgb255ToLinear(data[i * 4 + 1]);
@@ -221,9 +233,9 @@ bool SPTexture::compressedTexImage2d(std::shared_ptr<video::IImage> texture,
                                      <core::dimension2du, unsigned> >&
                                      mipmap_sizes)
 {
-#if !defined(SERVER_ONLY) && !defined(USE_GLES2)
+#if !defined(SERVER_ONLY) && !defined(ANDROID)
     unsigned format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    if (m_undo_srgb)
+    if (m_undo_srgb && CVS->isEXTTextureCompressionS3TCSRGBUsable())
     {
         format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
     }
@@ -319,7 +331,7 @@ bool SPTexture::saveCompressedTexture(std::shared_ptr<video::IImage> texture,
                                       <core::dimension2du, unsigned> >& sizes,
                                       const std::string& cache_location)
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !defined(SERVER_ONLY) && !defined(ANDROID)
     const unsigned total_size = std::accumulate(sizes.begin(), sizes.end(), 0,
         [] (const unsigned int previous, const std::pair
         <core::dimension2du, unsigned>& cur_sizes)
@@ -384,7 +396,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureCache(const std::string& p,
     std::vector<std::pair<core::dimension2du, unsigned> >* sizes)
 {
     std::shared_ptr<video::IImage> cache;
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
     io::IReadFile* file = irr::io::createReadFile(p.c_str());
     if (file == NULL)
     {
@@ -444,6 +456,8 @@ bool SPTexture::threadedLoad()
     std::shared_ptr<video::IImage> image = getTextureImage();
     if (!image)
     {
+        m_width.store(2);
+        m_height.store(2);
         return true;
     }
     std::shared_ptr<video::IImage> mask = getMask(image->getDimension());
@@ -472,7 +486,7 @@ bool SPTexture::threadedLoad()
     }
     else
     {
-#ifndef USE_GLES2
+#ifndef ANDROID
         if (UserConfigParams::m_hq_mipmap && image->getDimension().Width > 1 &&
             image->getDimension().Height > 1)
         {
@@ -643,12 +657,6 @@ void SPTexture::applyMask(video::IImage* texture, video::IImage* mask)
 }   // applyMask
 
 // ----------------------------------------------------------------------------
-bool SPTexture::initialized() const
-{
-    return m_width.load() != 0 && m_height.load() != 0;
-}   // initialized
-
-// ----------------------------------------------------------------------------
 void SPTexture::generateQuickMipmap(std::shared_ptr<video::IImage> first_image,
                                     const std::vector<std::pair
                                     <core::dimension2du, unsigned> >& mms,
@@ -676,7 +684,7 @@ void SPTexture::generateHQMipmap(void* in,
                                  <core::dimension2du, unsigned> >& mms,
                                  uint8_t* out)
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
     imMipmapCascade cascade;
     imReduceOptions options;
     imReduceSetOptions(&options,
@@ -708,7 +716,7 @@ void SPTexture::generateHQMipmap(void* in,
 void SPTexture::squishCompressImage(uint8_t* rgba, int width, int height,
                                     int pitch, void* blocks, unsigned flags)
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
     // This function is copied from CompressImage in libsquish to avoid omp
     // if enabled by shared libsquish, because we are already using
     // multiple thread
@@ -758,7 +766,7 @@ std::vector<std::pair<core::dimension2du, unsigned> >
 {
     std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes;
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
     unsigned width = image->getDimension().Width;
     unsigned height = image->getDimension().Height;
     mipmap_sizes.emplace_back(core::dimension2du(width, height), 0);

@@ -60,15 +60,39 @@ void KartRewinder::reset()
 void KartRewinder::saveTransform()
 {
     m_saved_transform = getTrans();
+    m_rewound_transforms.clear();
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
 void KartRewinder::computeError()
 {
+    // Local player kart doesn't need showing in the past
+    if (m_rewound_transforms.empty())
+        return;
+
+    std::deque<btTransform> copied = m_rewound_transforms;
+    // Find the closest position that matches previous rewound one
+    Vec3 saved_position = m_saved_transform.getOrigin();
+    while (!copied.empty())
+    {
+        Vec3 cur_position = copied.front().getOrigin();
+        if ((cur_position - saved_position).length() < 0.25f)
+        {
+            setTrans(copied.front());
+            copied.pop_front();
+            std::swap(m_rewound_transforms, copied);
+            return;
+        }
+        copied.pop_front();
+    }
+
+    // Use newly rewound one if no matching transformation
+    setTrans(m_rewound_transforms.front());
+    m_rewound_transforms.pop_front();
     //btTransform error = getTrans() - m_saved_transform;
-    Vec3 pos_error = getTrans().getOrigin() - m_saved_transform.getOrigin();
-    btQuaternion rot_error(0, 0, 0, 1);
-    Kart::addError(pos_error, rot_error);
+    //Vec3 pos_error = getTrans().getOrigin() - m_saved_transform.getOrigin();
+    //btQuaternion rot_error(0, 0, 0, 1);
+    //Kart::addError(pos_error, rot_error);
 }   // computeError
 
 // ----------------------------------------------------------------------------
@@ -79,7 +103,7 @@ void KartRewinder::computeError()
  *  \param[out] buffer  Address of the memory buffer.
  *  \returns    Size of allocated memory, or -1 in case of an error.
  */
-BareNetworkString* KartRewinder::saveState() const
+BareNetworkString* KartRewinder::saveState()
 {
     const int MEMSIZE = 17*sizeof(float) + 9+3;
 
@@ -103,20 +127,19 @@ BareNetworkString* KartRewinder::saveState() const
     // -------------------------------------
     getControls().saveState(buffer);
     getController()->saveState(buffer);
+    buffer->addTime(m_brake_ticks);
 
-    // 3) Attachment
-    // -------------
+    // 3) Attachment, powerup, nitro
+    // -----------------------------
     getAttachment()->saveState(buffer);
-
-    // 4) Powerup
-    // ----------
     getPowerup()->saveState(buffer);
+    buffer->addFloat(getEnergy());
 
-    // 5) Max speed info
+    // 4) Max speed info
     // ------------------
     m_max_speed->saveState(buffer);
 
-    // 6) Skidding
+    // 5) Skidding
     // -----------
     m_skidding->saveState(buffer);
 
@@ -124,8 +147,12 @@ BareNetworkString* KartRewinder::saveState() const
 }   // saveState
 
 // ----------------------------------------------------------------------------
-/** Actually rewind to the specified state. */
-void KartRewinder::rewindToState(BareNetworkString *buffer)
+/** Actually rewind to the specified state. 
+ *  \param buffer The buffer with the state info.
+ *  \param count Number of bytes that must be used up in this function (not
+ *         used).
+ */
+void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 {
     // 1) Physics values: transform and velocities
     // -------------------------------------------
@@ -147,30 +174,35 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     float time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
+    // For the raycast to determine the current material under the kart
+    // the m_hardPointWS of the wheels is used. So after a rewind we
+    // must restore the m_hardPointWS to the new values, otherwise they
+    // would still point at the kart position at the previous rewind
+    // (i.e. different terrain --> different slowdown).
+    m_vehicle->updateAllWheelTransformsWS();
 
     // 2) Steering and other controls
     // ------------------------------
     getControls().rewindTo(buffer);
     getController()->rewindTo(buffer);
+    m_brake_ticks = buffer->getTime();
 
-    // 3) Attachment
-    // -------------
+    // 3) Attachment, powerup, nitro
+    // ------------------------------
     getAttachment()->rewindTo(buffer);
-
-    // 4) Powerup
-    // ----------
     getPowerup()->rewindTo(buffer);
+    float nitro = buffer->getFloat();
+    setEnergy(nitro);
 
     // 5) Max speed info
     // ------------------
     m_max_speed->rewindTo(buffer);
-    m_max_speed->update(0);
 
     // 6) Skidding
     // -----------
     m_skidding->rewindTo(buffer);
     return;
-}   // rewindToState
+}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Called once a frame. It will add a new kart control event to the rewind

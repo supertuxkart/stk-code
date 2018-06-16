@@ -313,10 +313,7 @@ void SkiddingAI::update(int ticks)
 
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
-
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
-                        m_ai_properties->getSpeedCap(m_distance_to_player),
-                        /*fade_in_time*/0);
+   
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
@@ -856,7 +853,7 @@ bool SkiddingAI::handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point)
     // If the item is unavailable keep on testing. It is not necessary
     // to test if an item has turned bad, this was tested before this
     // function is called.
-    if(m_item_to_collect->getDisableTicks()>0)
+    if(!m_item_to_collect->isAvailable())
         return false;
 
     const Vec3 &xyz = m_item_to_collect->getXYZ();
@@ -1046,7 +1043,7 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
     const KartProperties *kp = m_kart->getKartProperties();
 
     // Ignore items that are currently disabled
-    if(item->getDisableTicks()>0) return;
+    if(!item->isAvailable()) return;
 
     // If the item type is not handled here, ignore it
     Item::ItemType type = item->getType();

@@ -584,6 +584,8 @@ void cmdLineHelp()
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
+    // "    --disable-item-collection Disable item collection. Useful for\n"
+    // "                          debugging client/server item management.\n"
     "       --network-console  Enable network console.\n"
     "       --wan-server=name  Start a Wan server (not a playing client).\n"
     "       --public-server    Allow direct connection to the server (without stk server)\n"
@@ -598,6 +600,14 @@ void cmdLineHelp()
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
+    "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
+    "       --auto-end         Automatically end network game after 1st player finished\n"
+    "                          for some time (currently his finished time * 0.25 + 15.0). \n"
+    "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
+    "       --ranked           Server will submit ranking to stk addons server.\n"
+    "                          You require permission for that.\n"
+    "       --owner-less       Race will auto start and no one can kick players in server.\n"
+    "       --connection-debug Print verbose info for sending or receiving packets.\n"
     "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "  -h,  --help             Show this help.\n"
@@ -1051,6 +1061,9 @@ int handleCmdLine()
     if(CommandLine::has("--network-console"))
         STKHost::m_enable_console = true;
 
+    if (CommandLine::has("--disable-item-collection"))
+        ItemManager::disableItemCollection();
+
     std::string server_password;
     if (CommandLine::has("--server-password", &s))
     {
@@ -1060,10 +1073,43 @@ int handleCmdLine()
 
     if (CommandLine::has("--motd", &s))
     {
-        core::stringw motd = StringUtils::xmlDecode(s);
+        core::stringw motd;
+        if (s.find(".txt") != std::string::npos)
+        {
+            std::ifstream message(s);
+            if (message.is_open())
+            {
+                for (std::string line; std::getline(message, line); )
+                {
+                    motd += StringUtils::utf8ToWide(line).trim() + L"\n";
+                }
+                // Remove last newline
+                motd.erase(motd.size() - 1);
+            }
+        }
+        else
+            motd = StringUtils::xmlDecode(s);
         NetworkConfig::get()->setMOTD(motd);
     }
-
+    if (CommandLine::has("--ranked"))
+    {
+        NetworkConfig::get()->setValidatedPlayers(true);
+        NetworkConfig::get()->setRankedServer(true);
+        NetworkConfig::get()->setOwnerLess(true);
+        NetworkConfig::get()->setAutoEnd(true);
+    }
+    if (CommandLine::has("--auto-end"))
+    {
+        NetworkConfig::get()->setAutoEnd(true);
+    }
+    if (CommandLine::has("--owner-less"))
+    {
+        NetworkConfig::get()->setOwnerLess(true);
+    }
+    if (CommandLine::has("--connection-debug"))
+    {
+        Network::m_connection_debug = true;
+    }
     if (CommandLine::has("--server-id-file", &s))
     {
         NetworkConfig::get()->setServerIdFile(
@@ -1110,8 +1156,7 @@ int handleCmdLine()
         }
         else
         {
-            auto cl = LobbyProtocol::create<ClientLobby>();
-            cl->setAddress(server_addr);
+            auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
             cl->requestStart();
         }
     }
@@ -1141,6 +1186,14 @@ int handleCmdLine()
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
             NetworkConfig::get()->setIsPublicServer();
+            if (CommandLine::has("--no-validation"))
+            {
+                NetworkConfig::get()->setValidatedPlayers(false);
+            }
+            else
+            {
+                NetworkConfig::get()->setValidatedPlayers(true);
+            }
             server_lobby = STKHost::create();
             Log::info("main", "Creating a WAN server '%s'.", s.c_str());
         }
@@ -1150,6 +1203,7 @@ int handleCmdLine()
         NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setValidatedPlayers(false);
         server_lobby = STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }
@@ -1163,7 +1217,7 @@ int handleCmdLine()
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
             LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
-                ->setSoccerGoalTarget((bool)n);
+                ->setSoccerGoalTarget(n != 0);
             NetworkConfig::get()->setServerMode(
                 race_manager->getMinorMode(),
                 RaceManager::MAJOR_MODE_SINGLE);
@@ -1520,7 +1574,9 @@ void initRest()
     // This only initialises the non-network part of the add-ons manager. The
     // online section of the add-ons manager will be initialised from a
     // separate thread running in network HTTP.
+#ifndef SERVER_ONLY
     addons_manager          = new AddonsManager();
+#endif
     Online::ProfileManager::create();
 
     // The request manager will start the login process in case of a saved
@@ -1529,7 +1585,9 @@ void initRest()
     // achievement managers to be created, which can only be created later).
     PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
+#ifndef SERVER_ONLY
     NewsManager::get();   // this will create the news manager
+#endif
 
     music_manager = new MusicManager();
     SFXManager::create();
@@ -1610,8 +1668,10 @@ void askForInternetPermission()
                                   Online::RequestManager::IPERM_ALLOWED;
             UserConfigParams::m_internet_status =
                                   Online::RequestManager::IPERM_ALLOWED;
+#ifndef SERVER_ONLY
             if (need_to_start_news_manager)
                 NewsManager::get()->init(false);
+#endif
             GUIEngine::ModalDialog::dismiss();
         }   // onConfirm
         // --------------------------------------------------------
@@ -1677,6 +1737,8 @@ int main(int argc, char *argv[] )
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
         initUserConfig();
+        
+        CommandLine::addArgsFromUserConfig();
 
         handleCmdLinePreliminary();
 
@@ -1752,6 +1814,7 @@ int main(int argc, char *argv[] )
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine()) exit(0);
 
+#ifndef SERVER_ONLY
         addons_manager->checkInstalledAddons();
 
         // Load addons.xml to get info about add-ons even when not
@@ -1773,6 +1836,7 @@ int main(int argc, char *argv[] )
                 }
             }
         }
+#endif
 
         if(UserConfigParams::m_unit_testing)
         {
@@ -1905,6 +1969,7 @@ int main(int argc, char *argv[] )
             StateManager::get()->enterGameState();
         }
 
+#ifndef SERVER_ONLY
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
                                      NewsManager::get()->getImportantMessage();
@@ -1914,7 +1979,7 @@ int main(int argc, char *argv[] )
                               MessageDialog::MESSAGE_DIALOG_OK,
                               NULL, true);
         }   // if important_message
-
+#endif
 
         // Replay a race
         // =============
@@ -1984,8 +2049,8 @@ int main(int argc, char *argv[] )
     if (STKHost::existHost())
         STKHost::get()->shutdown();
 
-    NetworkConfig::destroy();
     cleanSuperTuxKart();
+    NetworkConfig::destroy();
 
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
@@ -2065,11 +2130,13 @@ static void cleanSuperTuxKart()
     // was deleted (in cleanUserConfig below), but before STK finishes and
     // the OS takes all threads down.
 
+#ifndef SERVER_ONLY
     if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
     {
         Log::info("Thread", "News manager not stopping, exiting anyway.");
     }
     NewsManager::deallocate();
+#endif
 
     if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
     {
@@ -2090,7 +2157,9 @@ static void cleanSuperTuxKart()
 
     // The add-ons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
+#ifndef SERVER_ONLY
     if(addons_manager)  delete addons_manager;
+#endif
 
     ServersManager::deallocate();
     cleanUserConfig();
