@@ -543,6 +543,8 @@ void ItemManager::switchItems()
 
         ItemState::ItemType new_type = m_switch_to[(*i)->getType()];
 
+        if (new_type == (*i)->getType())
+            continue;
         if(m_switch_ticks<0)
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
         else

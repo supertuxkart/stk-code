@@ -32,6 +32,7 @@
 #include "karts/abstract_kart.hpp"
 #include "utils/no_copy.hpp"
 
+#include <deque>
 #include <SColor.h>
 
 class AbstractKartAnimation;
@@ -249,6 +250,8 @@ protected:
     SFXBuffer    *m_boing_sound;
     int          m_ticks_last_crash;
     RaceManager::KartType m_type;
+
+    std::deque<btTransform> m_rewound_transforms;
 
     /** To prevent using nitro in too short bursts */
     int           m_min_nitro_ticks;
@@ -547,6 +550,9 @@ public:
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool isVisible() OVERRIDE;
+    // ------------------------------------------------------------------------
+    void handleRewoundTransform();
+
 };   // Kart
 
 

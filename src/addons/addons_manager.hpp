@@ -19,6 +19,8 @@
 #ifndef HEADER_ADDONS_MANAGER_HPP
 #define HEADER_ADDONS_MANAGER_HPP
 
+#ifndef SERVER_ONLY
+
 #include <string>
 #include <map>
 #include <vector>
@@ -89,5 +91,6 @@ public:
 };   // class AddonsManager
 
 extern AddonsManager *addons_manager;
-#endif
 
+#endif
+#endif

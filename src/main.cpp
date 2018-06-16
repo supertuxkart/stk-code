@@ -1574,7 +1574,9 @@ void initRest()
     // This only initialises the non-network part of the add-ons manager. The
     // online section of the add-ons manager will be initialised from a
     // separate thread running in network HTTP.
+#ifndef SERVER_ONLY
     addons_manager          = new AddonsManager();
+#endif
     Online::ProfileManager::create();
 
     // The request manager will start the login process in case of a saved
@@ -1583,7 +1585,9 @@ void initRest()
     // achievement managers to be created, which can only be created later).
     PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
+#ifndef SERVER_ONLY
     NewsManager::get();   // this will create the news manager
+#endif
 
     music_manager = new MusicManager();
     SFXManager::create();
@@ -1664,8 +1668,10 @@ void askForInternetPermission()
                                   Online::RequestManager::IPERM_ALLOWED;
             UserConfigParams::m_internet_status =
                                   Online::RequestManager::IPERM_ALLOWED;
+#ifndef SERVER_ONLY
             if (need_to_start_news_manager)
                 NewsManager::get()->init(false);
+#endif
             GUIEngine::ModalDialog::dismiss();
         }   // onConfirm
         // --------------------------------------------------------
@@ -1731,6 +1737,8 @@ int main(int argc, char *argv[] )
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
         initUserConfig();
+        
+        CommandLine::addArgsFromUserConfig();
 
         handleCmdLinePreliminary();
 
@@ -1806,6 +1814,7 @@ int main(int argc, char *argv[] )
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine()) exit(0);
 
+#ifndef SERVER_ONLY
         addons_manager->checkInstalledAddons();
 
         // Load addons.xml to get info about add-ons even when not
@@ -1827,6 +1836,7 @@ int main(int argc, char *argv[] )
                 }
             }
         }
+#endif
 
         if(UserConfigParams::m_unit_testing)
         {
@@ -1959,6 +1969,7 @@ int main(int argc, char *argv[] )
             StateManager::get()->enterGameState();
         }
 
+#ifndef SERVER_ONLY
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
                                      NewsManager::get()->getImportantMessage();
@@ -1968,7 +1979,7 @@ int main(int argc, char *argv[] )
                               MessageDialog::MESSAGE_DIALOG_OK,
                               NULL, true);
         }   // if important_message
-
+#endif
 
         // Replay a race
         // =============
@@ -2119,11 +2130,13 @@ static void cleanSuperTuxKart()
     // was deleted (in cleanUserConfig below), but before STK finishes and
     // the OS takes all threads down.
 
+#ifndef SERVER_ONLY
     if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
     {
         Log::info("Thread", "News manager not stopping, exiting anyway.");
     }
     NewsManager::deallocate();
+#endif
 
     if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
     {
@@ -2144,7 +2157,9 @@ static void cleanSuperTuxKart()
 
     // The add-ons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
+#ifndef SERVER_ONLY
     if(addons_manager)  delete addons_manager;
+#endif
 
     ServersManager::deallocate();
     cleanUserConfig();

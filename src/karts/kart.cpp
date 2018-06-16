@@ -1688,6 +1688,21 @@ void Kart::update(int ticks)
 }   // update
 
 //-----------------------------------------------------------------------------
+void Kart::handleRewoundTransform()
+{
+    if (!m_controller->isLocalPlayerController())
+    {
+        if (RewindManager::get()->isRewinding())
+            m_rewound_transforms.push_back(getTrans());
+        else if (!m_rewound_transforms.empty())
+        {
+            setTrans(m_rewound_transforms.front());
+            m_rewound_transforms.pop_front();
+        }
+    }
+}   // handleRewoundTransform
+
+//-----------------------------------------------------------------------------
 /** Updates the local speed based on the current physical velocity. The value
  *  is smoothed exponentially to avoid camera stuttering (camera distance
  *  is dependent on speed)
@@ -2765,7 +2780,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
         m_skidmarks = new SkidMarks(*this);
     }
 
-    if (CVS->isGLSL() && !CVS->isShadowEnabled())
+    if (CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
+        ->getShadowMaterial()->getSamplerPath(0) != "unicolor_white")
     {
         m_shadow = new Shadow(m_kart_properties->getShadowMaterial(), *this);
     }

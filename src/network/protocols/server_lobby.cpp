@@ -99,6 +99,9 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
             "STK addons server, don't bother host one if you don't have the "
             "corresponding permission, they will be rejected if so.");
     }
+    m_result_ns = getNetworkString();
+    m_result_ns->setSynchronous(true);
+    m_waiting_for_reset = false;
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -110,6 +113,7 @@ ServerLobby::~ServerLobby()
     {
         unregisterServer(true/*now*/);
     }
+    delete m_result_ns;
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -142,6 +146,8 @@ void ServerLobby::setup()
     m_peers_votes.clear();
     m_server_delay = 0.0;
     m_timeout.store(std::numeric_limits<float>::max());
+    m_waiting_for_reset = false;
+
     Log::info("ServerLobby", "Reset server to initial state.");
 }   // setup
 
@@ -426,6 +432,21 @@ void ServerLobby::asynchronousUpdate()
 void ServerLobby::update(int ticks)
 {
     // Reset server to initial state if no more connected players
+    if (m_waiting_for_reset)
+    {
+        if ((RaceEventManager::getInstance() &&
+            !RaceEventManager::getInstance()->protocolStopped()) ||
+            !GameProtocol::emptyInstance())
+            return;
+
+        RaceResultGUI::getInstance()->backToLobby();
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
+        m_game_setup->stopGrandPrix();
+        m_state = NetworkConfig::get()->isLAN() ?
+            ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
+        setup();
+    }
+
     if ((m_state.load() > ACCEPTING_CLIENTS ||
         m_game_setup->isGrandPrixStarted()) &&
         STKHost::get()->getPeerCount() == 0 &&
@@ -434,13 +455,12 @@ void ServerLobby::update(int ticks)
         if (RaceEventManager::getInstance() &&
             RaceEventManager::getInstance()->isRunning())
         {
-            stopCurrentRace();
+            RaceEventManager::getInstance()->stop();
+            RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+            GameProtocol::lock()->requestTerminate();
         }
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
-        m_game_setup->stopGrandPrix();
-        m_state = NetworkConfig::get()->isLAN() ?
-            ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
-        setup();
+        m_waiting_for_reset = true;
+        return;
     }
 
     // Reset for ranked server if in kart / track selection has only 1 player
@@ -501,6 +521,22 @@ void ServerLobby::update(int ticks)
         {
             checkRaceFinished();
         }
+        break;
+    case WAIT_FOR_RACE_STOPPED:
+        if (!RaceEventManager::getInstance()->protocolStopped() ||
+            !GameProtocol::emptyInstance())
+            return;
+
+        // This will go back to lobby in server (and exit the current race)
+        RaceResultGUI::getInstance()->backToLobby();
+        // Reset for next state usage
+        resetPeersReady();
+        // Set the delay before the server forces all clients to exit the race
+        // result screen and go back to the lobby
+        m_timeout.store((float)StkTime::getRealTime() + 15.0f);
+        m_state = RESULT_DISPLAY;
+        sendMessageToPeers(m_result_ns, /*reliable*/ true);
+        Log::info("ServerLobby", "End of game message sent");
         break;
     case RESULT_DISPLAY:
         if (checkPeersReady() ||
@@ -811,28 +847,32 @@ void ServerLobby::checkRaceFinished()
     if (!RaceEventManager::getInstance()->isRaceOver()) return;
 
     Log::info("ServerLobby", "The game is considered finish.");
+    // notify the network world that it is stopped
+    RaceEventManager::getInstance()->stop();
 
-    // Reset for next state usage
-    resetPeersReady();
-    NetworkString* total = getNetworkString();
-    total->setSynchronous(true);
-    total->addUInt8(LE_RACE_FINISHED);
+    // stop race protocols before going back to lobby (end race)
+    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+    GameProtocol::lock()->requestTerminate();
+
+    // Save race result before delete the world
+    m_result_ns->clear();
+    m_result_ns->addUInt8(LE_RACE_FINISHED);
     if (m_game_setup->isGrandPrix())
     {
         // fastest lap
         int fastest_lap =
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
-        total->addUInt32(fastest_lap);
+        m_result_ns->addUInt32(fastest_lap);
 
         // all gp tracks
-        total->addUInt8((uint8_t)m_game_setup->getTotalGrandPrixTracks())
+        m_result_ns->addUInt8((uint8_t)m_game_setup->getTotalGrandPrixTracks())
             .addUInt8((uint8_t)m_game_setup->getAllTracks().size());
         for (const std::string& gp_track : m_game_setup->getAllTracks())
-            total->encodeString(gp_track);
+            m_result_ns->encodeString(gp_track);
 
         // each kart score and total time
         auto& players = m_game_setup->getPlayers();
-        total->addUInt8((uint8_t)players.size());
+        m_result_ns->addUInt8((uint8_t)players.size());
         for (unsigned i = 0; i < players.size(); i++)
         {
             int last_score = race_manager->getKartScore(i);
@@ -846,7 +886,7 @@ void ServerLobby::checkRaceFinished()
                 player->setScore(cur_score);
                 player->setOverallTime(overall_time);
             }
-            total->addUInt32(last_score).addUInt32(cur_score)
+            m_result_ns->addUInt32(last_score).addUInt32(cur_score)
                 .addFloat(overall_time);            
         }
     }
@@ -854,23 +894,14 @@ void ServerLobby::checkRaceFinished()
     {
         int fastest_lap =
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
-        total->addUInt32(fastest_lap);
+        m_result_ns->addUInt32(fastest_lap);
     }
     if (NetworkConfig::get()->isRankedServer())
     {
         computeNewRankings();
         submitRankingsToAddons();
     }
-
-    stopCurrentRace();
-    // Set the delay before the server forces all clients to exit the race
-    // result screen and go back to the lobby
-    m_timeout.store((float)StkTime::getRealTime() + 15.0f);
-    m_state = RESULT_DISPLAY;
-    sendMessageToPeers(total, /*reliable*/ true);
-    delete total;
-    Log::info("ServerLobby", "End of game message sent");
-
+    m_state.store(WAIT_FOR_RACE_STOPPED);
 }   // checkRaceFinished
 
 //-----------------------------------------------------------------------------
@@ -940,13 +971,13 @@ void ServerLobby::computeNewRankings()
             {
                 result = 0.0;
                 ranking_importance = mode_factor *
-                    MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
             else if (!players[j])
             {
                 result = 1.0;
                 ranking_importance = mode_factor *
-                    MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
             else
             {
@@ -964,10 +995,11 @@ void ServerLobby::computeNewRankings()
                         (player1_time - player2_time) / (player2_time / 20.0);
                     result = std::max(0.0, 0.5 - result);
                 }
+
+                double max_time = std::min(std::max(player1_time, player2_time),
+                    MAX_SCALING_TIME);
                 ranking_importance = mode_factor *
-                    std::min(
-                    std::max(player1_time, player2_time), MAX_SCALING_TIME) *
-                    MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(max_time) * player_factors;
             }
             // Compute the ranking change
             scores_change[i] +=
@@ -1041,6 +1073,15 @@ double ServerLobby::getModeSpread()
 }   // getModeSpread
 
 //-----------------------------------------------------------------------------
+/** Compute the scaling value of a given time
+ *  Short races are more random, so we don't use strict proportionality
+ */
+double ServerLobby::scalingValueForTime(double time)
+{
+    return time * sqrt(time / 120.0) * MAX_POINTS_PER_SECOND;
+}   // scalingValueForTime
+
+//-----------------------------------------------------------------------------
 /** Manages the distribution of the base points.
  *  Gives half of the points progressively
  *  by smaller and smaller chuncks from race 1 to 45.
@@ -1052,34 +1093,11 @@ double ServerLobby::distributeBasePoints(uint32_t online_id)
     unsigned num_races  = m_num_ranked_races.at(online_id);
     if (num_races < 45)
     {
-        return
-            (BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u) *
-            2.0);
+        return BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u);
     }
     else
         return 0.0;
 }   // distributeBasePoints
-
-//-----------------------------------------------------------------------------
-/** Stop any race currently in server, should only be called in main thread.
- */
-void ServerLobby::stopCurrentRace()
-{
-    // notify the network world that it is stopped
-    RaceEventManager::getInstance()->stop();
-
-    // stop race protocols before going back to lobby (end race)
-    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
-    GameProtocol::lock()->requestTerminate();
-
-    while (!RaceEventManager::getInstance()->protocolStopped())
-        StkTime::sleep(1);
-    while (!GameProtocol::emptyInstance())
-        StkTime::sleep(1);
-
-    // This will go back to lobby in server (and exit the current race)
-    RaceResultGUI::getInstance()->backToLobby();
-}   // stopCurrentRace
 
 //-----------------------------------------------------------------------------
 /** Called when a client disconnects.

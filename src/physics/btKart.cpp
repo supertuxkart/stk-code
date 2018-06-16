@@ -353,17 +353,17 @@ void btKart::getVisualContactPoint(float visual_rotation,
     m_visual_wheels_touch_ground = true;
 
     short int old_group = 0;
+    if (m_chassisBody->getBroadphaseHandle())
+    {
+        old_group = m_chassisBody->getBroadphaseHandle()
+                  ->m_collisionFilterGroup;
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    }
     for (int index = 2; index <= 3; index++)
     {
         // Map index 0-1 to wheel 2-3 (which are the rear wheels)
         btWheelInfo &wheel = m_wheelInfo[index];
         updateWheelTransformsWS(wheel, false);
-        if (m_chassisBody->getBroadphaseHandle())
-        {
-            old_group = m_chassisBody->getBroadphaseHandle()
-                ->m_collisionFilterGroup;
-            m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
-        }
         btScalar max_susp_len = wheel.getSuspensionRestLength()
                               + wheel.m_maxSuspensionTravel;
 

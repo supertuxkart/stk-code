@@ -30,10 +30,12 @@
 
 #include <assert.h>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 class Kart;
+class STKPeer;
 
 /**
   * \ingroup items
@@ -129,7 +131,8 @@ public:
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
     // ------------------------------------------------------------------------
     /** Only used in the NetworkItemManager. */
-    virtual void setItemConfirmationTime(int host_id, int ticks)
+    virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
+                                         int ticks)
     {
         assert(false);
     }

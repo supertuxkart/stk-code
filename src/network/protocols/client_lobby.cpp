@@ -322,6 +322,11 @@ void ClientLobby::update(int ticks)
     case PLAYING:
         break;
     case RACE_FINISHED:
+        if (!RaceEventManager::getInstance()->protocolStopped() ||
+            !GameProtocol::emptyInstance())
+            return;
+        if (!m_received_server_result)
+            m_received_server_result = true;
         break;
     case DONE:
         m_state.store(EXITING);
@@ -762,16 +767,9 @@ void ClientLobby::raceFinished(Event* event)
 
     // stop race protocols
     RaceEventManager::getInstance()->stop();
-
     RaceEventManager::getInstance()->getProtocol()->requestTerminate();
     GameProtocol::lock()->requestTerminate();
-
-    while (!RaceEventManager::getInstance()->protocolStopped())
-        StkTime::sleep(1);
-    while (!GameProtocol::emptyInstance())
-        StkTime::sleep(1);
-
-    m_received_server_result = true;
+    m_state.store(RACE_FINISHED);
 }   // raceFinished
 
 //-----------------------------------------------------------------------------

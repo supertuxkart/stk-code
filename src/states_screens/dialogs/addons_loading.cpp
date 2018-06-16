@@ -45,8 +45,10 @@ using namespace irr::gui;
 */
 
 AddonsLoading::AddonsLoading(const std::string &id)
-             : ModalDialog(0.8f, 0.8f),
-               m_addon(*(addons_manager->getAddon(id)) )
+             : ModalDialog(0.8f, 0.8f)
+#ifndef SERVER_ONLY
+             , m_addon(*(addons_manager->getAddon(id)) )
+#endif
 {
     
     m_icon_shown       = false;
@@ -82,6 +84,7 @@ AddonsLoading::~AddonsLoading()
 
 void AddonsLoading::beforeAddingWidgets()
 {
+#ifndef SERVER_ONLY
     /* Init the icon here to be able to load a single image*/
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
@@ -180,6 +183,7 @@ void AddonsLoading::beforeAddingWidgets()
         unit = _LTR("%s KB", 1);
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
+#endif
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------
@@ -205,6 +209,7 @@ bool AddonsLoading::onEscapePressed()
 
 GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event_source)
 {
+#ifndef SERVER_ONLY
     GUIEngine::RibbonWidget* actions_ribbon =
             getWidget<GUIEngine::RibbonWidget>("actions");
 
@@ -252,12 +257,14 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         voteClicked();
         return GUIEngine::EVENT_BLOCK;
     }
+#endif
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::voteClicked()
 {
+#ifndef SERVER_ONLY
     if (PlayerManager::isCurrentLoggedIn())
     {
         // We need to keep a copy of the addon id, since dismiss() will
@@ -266,11 +273,13 @@ void AddonsLoading::voteClicked()
         dismiss();
         new VoteDialog(addon_id);
     }
+#endif
 }   // voteClicked
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
+#ifndef SERVER_ONLY
     if(m_progress->isVisible())
     {
         float progress = m_download_request->getProgress();
@@ -308,6 +317,7 @@ void AddonsLoading::onUpdate(float delta)
         }
         m_icon_shown = true;
     }
+#endif
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -316,13 +326,14 @@ void AddonsLoading::onUpdate(float delta)
  **/
 void AddonsLoading::startDownload()
 {
+#ifndef SERVER_ONLY
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
     m_download_request = new Online::HTTPRequest(save, /*manage mem*/false,
                                                  /*priority*/5);
     m_download_request->setURL(m_addon.getZipFileName());
     m_download_request->queue();
-
+#endif
 }   // startDownload
 
 // ----------------------------------------------------------------------------
@@ -353,6 +364,7 @@ void AddonsLoading::stopDownload()
  */
 void AddonsLoading::doInstall()
 {
+#ifndef SERVER_ONLY
     delete m_download_request;
     m_download_request = NULL;
 
@@ -383,12 +395,14 @@ void AddonsLoading::doInstall()
     }
 
     track_manager->loadTrackList();
+#endif
 }   // doInstall
 
 // ----------------------------------------------------------------------------
 
 void AddonsLoading::doUninstall()
 {
+#ifndef SERVER_ONLY
     delete m_download_request;
     m_download_request = NULL;
     bool error = !addons_manager->uninstall(m_addon);
@@ -418,4 +432,5 @@ void AddonsLoading::doUninstall()
         AddonsScreen::getInstance()->loadList();
         dismiss();
     }
+#endif
 }   // doUninstall
