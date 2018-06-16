@@ -400,7 +400,8 @@ void CreditsScreen::eventCallback(GUIEngine::Widget* widget,
     }
     if (name == "donate")
     {
-        Online::LinkHelper::OpenURL("https://SuperTuxKart.net/Donate"); // Open donation page
+        // Open donation page
+        Online::LinkHelper::OpenURL(stk_config->m_donate_url);
     }
 }
 

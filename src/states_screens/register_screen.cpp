@@ -434,7 +434,8 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "password_reset")
     {
-        Online::LinkHelper::OpenURL("http://addons.SuperTuxKart.net/password-reset.php"); // Open password reset page
+        // Open password reset page
+        Online::LinkHelper::OpenURL(stk_config->m_password_reset_url);
     }
     else if (name == "back")
     {
