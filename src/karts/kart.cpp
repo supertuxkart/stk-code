@@ -1688,21 +1688,6 @@ void Kart::update(int ticks)
 }   // update
 
 //-----------------------------------------------------------------------------
-void Kart::handleRewoundTransform()
-{
-    if (!m_controller->isLocalPlayerController())
-    {
-        if (RewindManager::get()->isRewinding())
-            m_rewound_transforms.push_back(getTrans());
-        else if (!m_rewound_transforms.empty())
-        {
-            setTrans(m_rewound_transforms.front());
-            m_rewound_transforms.pop_front();
-        }
-    }
-}   // handleRewoundTransform
-
-//-----------------------------------------------------------------------------
 /** Updates the local speed based on the current physical velocity. The value
  *  is smoothed exponentially to avoid camera stuttering (camera distance
  *  is dependent on speed)

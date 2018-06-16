@@ -1056,16 +1056,6 @@ void World::update(int ticks)
 
     Physics::getInstance()->update(ticks);
 
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
-    {
-        for (int i = 0 ; i < kart_amount; i++)
-        {
-            if (!m_karts[i]->isEliminated())
-                static_cast<Kart*>(m_karts[i])->handleRewoundTransform();
-        }
-    }
-
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);
     PROFILER_POP_CPU_MARKER();
