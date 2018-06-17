@@ -1,3 +1,7 @@
+## SuperTuxKart 0.9.4
+* Better random item distribution for various numbers of karts
+* Improved powerup handling in AI
+
 ## SuperTuxKart 0.9.3
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau
 * New mesh format optimized for space and hardware skinning
