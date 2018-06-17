@@ -44,30 +44,33 @@ namespace irr
  *  info about cakes, plunger etc which needs to be stored), and maintains
  *  the 'weights' (used in randomly chosing which item was collected) for all
  *  items depending on position. The latter is done so that as the first player
- *  you get less advantageous items (but no useless ones either, e.g. anchor),
- *  while as the last you get more useful ones.
+ *  you get less advantageous items (but no useless ones either), while as the
+ *  last you get more useful ones.
  *
- *  The weight distribution works as follow:
- *  Depending on the number of karts, 5 reference points are mapped to positions.
- *  For each reference point the weight distribution is read in from powerup.xml:
- *   <!--      bubble cake bowl zipper plunger switch para anvil -->
- *   <last  w="0      1    1    2      2       0      2    2"     />
- *  Then, the weights for the real position are calculated as a linear average
- *  between the weights of the reference positions immediately lower and higher.
- *  e.g. ; if the reference positions are 1 and 4,5 ; the 3rd will have
- *  weights equal to (4,5-3)/(4,5-1) times the weight of the reference position
- *  at 4,5 and (3-1)/(4,5-1) times the weight of the reference position at 1.
- *
- *  At the start of each race three mappings are computed in updateWeightsForRace:
- *  m_position_to_class maps each postion to a list of class using
- *  the function convertPositionToClass, with a class with a higher weight
- *  included more times so picking at random gives us the right class distribution
- *  m_powerups_for_position contains a list of items for each class. A item
- *  with higher weight is included more than once, so at runtime we can
- *  just pick a random item from this list to get the right distribution.
- *  In the example above the list for 'last' will be:
- *  [cake, bowling,zipper,zipper,plunger,plunger,parachute,parachute,
- *   anvil,anvil.
+ *  The weights distribution is described in the powerup.xml file in more
+ *  detail. All weights are stored in the m_all_weights data structure,
+ *  which maps the race mode (race, battle, ...) to a list of WeightsData
+ *  instances. Each WeightsData instance stores the data for one specific
+ *  number of karts. E.g. m_all_weights['race'] contains 5 WeightsData
+ *  instances for 1, 5, 9, 14, and 20 karts.
+ *  At race start a new instance of WeightsData is created in
+ *  m_current_item_weights. It contains the interpolated values for the
+ *  number of karts in the current race (e.g. if the race is with 6 karts
+ *  if will use 3/4 the weights for 5 karts, and 1/4 the weights for 9 karts.
+ *  Then m_current_item_weights will create a weight distribution for each
+ *  possible rank in the race (1 to 6 in the example above). This is the
+ *  interpolation of the values within one WeightsData. Atm there are also
+ *  5 entries in that list (though it does not have to be the same number
+ *  as above - i.e. the 1, 5, 9, 14, 20 weights list). Similarly the actual
+ *  distribution used for a kart with a specific rank is based on dividing
+ *  the available ranks (so 6 karts --> 6 ranks). With the 5 specified values
+ *  the first entry is used for rank 1, the last entry for rank 6, and ranks
+ *  2-5 will be interpolated based on an equal distance: in a race with 6
+ *  karts for example, the 2nd weight list is used for rank 2.25, the 3nd
+ *  for rank 3.5, the 4th for rank 4.75 (and the first and last for rank 1
+ *  and 6). It does not matter that the ranks are non integer: the actual
+ *  weights used for say rank 2, will then be interplated between the weights
+ *  of rank 1 and 2.25 (e.g. 0.8*weights_for 2.25 + 0.2*weights_for 1).
  */
 
 class PowerupManager : public NoCopy
@@ -76,8 +79,9 @@ public:
     LEAK_CHECK();
 private:
     // ------------------------------------------------------------------------
-    /** This object stores the weights for each 'section' for a certain
-     *  number of karts. */
+    /** This object stores all the weights for one particular number of
+     *  karts. I.e. it has a list of all the weights within the number of karts.
+     */
     class WeightsData
     {
     private:

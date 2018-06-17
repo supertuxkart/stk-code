@@ -500,6 +500,11 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     {
         // Just create a copy of this entry:
         m_current_item_weights = *wd[prev_index];
+        // The number of karts might need to be increased to make
+        // sure enough weight list for all ranks are created: e.g.
+        // in soccer mode there is only one weight list (for 1 kart)
+        // but we still need to make sure to create rank weight list
+        // for all possible ranks
         m_current_item_weights.setNumKarts(num_karts);
     }
     else
