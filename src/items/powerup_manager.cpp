@@ -366,7 +366,6 @@ void PowerupManager::WeightsData::precomputeWeights()
         int prev, next;
         float weight;
         convertRankToSection(i + 1, &prev, &next, &weight);
-        int section = i;
         int sum = 0;
         for (unsigned int j = 0;
             j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
@@ -480,7 +479,13 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";    break;
     case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle"; break;
     case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
+    case RaceManager::MINOR_MODE_OVERWORLD:
+    case RaceManager::MINOR_MODE_TUTORIAL:
+    case RaceManager::MINOR_MODE_CUTSCENE:
     case RaceManager::MINOR_MODE_SOCCER:         class_name="soccer"; break;
+    default:
+        Log::fatal("PowerupManager", "Invalid minor mode %d - aborting.",
+                    race_manager->getMinorMode());
     }
     class_name +="-weight-list";
 
@@ -489,24 +494,23 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     // Find the two indices closest to the current number of karts
     // so that the right number can be interpolated between the
     // two values.
-    int prev_index=-1, next_index=-1;
-    for (unsigned int i = 0; i < wd.size(); i++)
+    int prev_index=0, next_index=0;
+    for (unsigned int i = 1; i < wd.size(); i++)
     {
         int n = wd[i]->getNumKarts();
-        if (n <= num_karts && 
-            (prev_index < 0 ||  n > wd[prev_index]->getNumKarts()) )
+        if ( ( n < wd[prev_index]->getNumKarts() &&
+                   wd[next_index]->getNumKarts() > num_karts)       ||
+             ( n > wd[prev_index]->getNumKarts() && n <= num_karts )   )
         {
                 prev_index = i;
         }
-        if (n >= num_karts &&
-            (next_index < 0 || n < wd[next_index]->getNumKarts()))
+        if ( ( n > wd[next_index]->getNumKarts()     &&
+                   wd[next_index]->getNumKarts() < num_karts  )     ||
+             ( n < wd[next_index]->getNumKarts() && n >= num_karts)    )
         {
             next_index = i;
         }
     }
-    // For battle mode etc where we only have one index
-    if(prev_index < 0) prev_index = 0;
-    if(next_index < 0) next_index = 0;
 
     // Check if we have exactly one entry (e.g. either class with only one
     // set of data specified, or an exact match):
