@@ -79,9 +79,16 @@
        For each race mode (race, time-trial, soccer etc) there is one
        weight-list entry (e.g. race-weight-list etc). Each of those lists
        contains a list (1 or more entries) of weights for a certain number
-       of karts in the race (which is used to reduce the frequency of
-       'global' items). Each of those weight tagsis stored into a
-       WeightsData object.
+       of karts in the race. This offers two advantages:
+       1) the frequency of global items (like switch) can be reduced for
+          higher number of karts (so that game play does not get dominated
+          by frequent global items)
+       2) to take into account the balance changes when the number of karts
+          is different. Typically, the higher the number of karts, the
+          stronger the difference in "powerup quality" between the first and
+          the last.
+
+       Each of those weight tags is stored into a WeightsData object.
        At race time, a new WeightsData object is created from the list for
        the current race type depending on number of karts in the race.
        If there is a WeightsData object for the same kart number, it is
@@ -111,7 +118,7 @@
        corresponds to the weights of getting one specific item,
        the second line (multi) to the weight at which it will yeld
        a triple item rather than a single one. The probability to get
-       an item is its weight divided by sum of weights of all items
+       an item is its weight divided by the sum of weights of all items
        (single AND multi). It is recommended to keep that sum equal
        to 200 to easily keep track of probabilities.
 
@@ -126,72 +133,72 @@
        there are more karts.                               -->
 
   <race-weight-list>
-    <!-- The entry for '0' karts is special and means 'first kart' -->
+    <!-- The entry for '1' karts is special and means 'first kart' -->
     <weights num-karts="1">
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="28       0    60    20      45       15      32     0     0     0"
-	      multi   =" 0       0     0     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     0     0       0        0       0     0     0     0" />
       <weight single  ="30       0    59    26      40       14      27     0     0     0"
-	      multi   =" 0       0     4     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     4     0       0        0       0     0     0     0" />
       <weight single  ="30       0    62    27      36       13      27     0     0     0"
-	      multi   =" 0       0     5     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     5     0       0        0       0     0     0     0" />
       <weight single  ="31       0    56    36      34       12      25     0     0     0"
-	      multi   =" 0       0     6     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     6     0       0        0       0     0     0     0" />
       <weight single  ="34       0    36    55      30       10      17     0     0     0"
-	      multi   =" 0       0    18     0       0        0       0     0     0     0" />
+	          multi   =" 0       0    18     0       0        0       0     0     0     0" />
     </weights>
 
     <weights num-karts="5">
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="26      16    52    15      46       12      33     0     0     0"
-	      multi   =" 0       0     0     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     0     0       0        0       0     0     0     0" />
       <weight single  ="30      27    48    25      28       10      27     0     0     0"
-	      multi   =" 0       0     5     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     5     0       0        0       0     0     0     0" />
       <weight single  ="30      27    45    27      27        9      27     3     0     0"
-	      multi   =" 0       0     5     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     5     0       0        0       0     0     0     0" />
       <weight single  ="32      24    28    38      22        7      20    16     6     0"
-	      multi   =" 0       0     7     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     7     0       0        0       0     0     0     0" />
       <weight single  ="28      21     9    45       0        6       0    10    18     0"
-	      multi   =" 8       0    16    35       4        0       0     0     0     0" />
+	          multi   =" 8       0    16    35       4        0       0     0     0     0" />
     </weights>
     <weights num-karts="9">
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="24      12    58    10      54        8      34     0     0     0"
-	      multi   =" 0       0     0     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     0     0       0        0       0     0     0     0" />
       <weight single  ="29      30    45    24      32        7      27     0     0     0"
-	      multi   =" 0       0     6     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     6     0       0        0       0     0     0     0" />
       <weight single  ="30      26    41    28      26        6      26    10     0     0"
-	      multi   =" 0       0     7     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     7     0       0        0       0     0     0     0" />
       <weight single  ="33      23    26    45      14        5      16    12     8     0"
-	      multi   =" 0       0    12     0       6        0       0     0     0     0" />
+	          multi   =" 0       0    12     0       6        0       0     0     0     0" />
       <weight single  ="20      16     7    37       0        3       0     4    15     0"
-	      multi   ="18       0    18    58       4        0       0     0     0     0" />
+	          multi   ="18       0    18    58       4        0       0     0     0     0" />
     </weights>
     <weights num-karts="14">
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="22       8    64     5      60        6      35     0     0     0"
-	      multi   =" 0       0     0     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     0     0       0        0       0     0     0     0" />
       <weight single  ="28      31    48    22      34        4      27     0     0     0"
-	      multi   =" 0       0     6     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     6     0       0        0       0     0     0     0" />
       <weight single  ="30      25    42    29      29        3      24    10     0     0"
-	      multi   =" 0       0     8     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     8     0       0        0       0     0     0     0" />
       <weight single  ="27      21    23    44      12        3      14     8     6     0"
-	      multi   =" 8       0    16     8      10        0       0     0     0     0" />
+	          multi   =" 8       0    16     8      10        0       0     0     0     0" />
       <weight single  ="18      14     3    35       0        0       0     0    10     0"
-	      multi   ="24       0    25    65       6        0       0     0     0     0" />
+	          multi   ="24       0    25    65       6        0       0     0     0     0" />
     </weights>
     <weights num-karts="20">
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="20       0    74     0      66        4      36     0     0     0"
-	      multi   =" 0       0     0     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     0     0       0        0       0     0     0     0" />
       <weight single  ="27      32    48    20      37        3      27     0     0     0"
-	      multi   =" 0       0     6     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     6     0       0        0       0     0     0     0" />
       <weight single  ="30      24    40    30      28        2      21    10     0     0"
-	      multi   =" 0       0    10     0       5        0       0     0     0     0" />
+	          multi   =" 0       0    10     0       5        0       0     0     0     0" />
       <weight single  ="25      18    20    50      10        2      10     6     3     0"
-	      multi   ="10       0    20    10      16        0       0     0     0     0" />
+	          multi   ="10       0    20    10      16        0       0     0     0     0" />
       <weight single  ="15      12     0    25       0        0       0     0     7     0"
-	      multi   ="30       0    31    80       0        0       0     0     0     0" />
+	          multi   ="30       0    31    80       0        0       0     0     0     0" />
     </weights>
   </race-weight-list>
 
@@ -200,17 +207,17 @@
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <!-- This is the entry for the leader: -->
       <weight single  ="35       0    25    35      25       15      25     0     0     0"
-	      multi   ="20       0     0    20       0        0       0     0     0     0" />
+	          multi   ="20       0     0    20       0        0       0     0     0     0" />
 	  <!-- This is the entry for the first non-leader karts: -->
       <weight single  ="25       0    60    25      58        2      30     0     0     0"
-	      multi   =" 0       0     0     0       0        0       0     0     0     0" />
+	          multi   =" 0       0     0     0       0        0       0     0     0     0" />
       <weight single  ="35       0    55    35      25        3      25     0     0     0"
-	      multi   =" 0       0    10     0      12        0       0     0     0     0" />
+	          multi   =" 0       0    10     0      12        0       0     0     0     0" />
       <weight single  ="25       0    40    45      15        5      15    10     5     0"
-	      multi   ="10       0    15    15       0        0       0     0     0     0" />
+	          multi   ="10       0    15    15       0        0       0     0     0     0" />
 	  <!-- This is the entry for the last kart: -->
       <weight single  ="20       0    15    25       0        0       0     0    15     0"
-	      multi   ="20       0    25    80       0        0       0     0     0     0" />
+	          multi   ="20       0    25    80       0        0       0     0     0     0" />
     </weights>
   </ftl-weight-list>
   
@@ -218,7 +225,7 @@
     <weights num-karts="1">
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="10      30    60     0       0       10      30     0     0     0"
-	      multi   =" 0       0     5     0       0        0       0     0     0     0"    />
+	          multi   =" 0       0     5     0       0        0       0     0     0     0"    />
     </weights>
   </battle-weight-list>
 
@@ -226,7 +233,7 @@
     <weights num-karts="1">
       <!--               bubble  cake  bowl  zipper  plunger switch swattr rubber para  anvil -->
       <weight single  =" 0      30    60     0       0       10      30     0     0     0"
-	      multi   =" 0       0     5     0       0        0       0     0     0     0"    />
+	          multi   =" 0       0     5     0       0        0       0     0     0     0"    />
     </weights>
   </soccer-weight-list>
 
@@ -234,7 +241,7 @@
     <weights num-karts="0">
       <!--               bubble  cake  bowl  zipper  plunger switch swattr rubber para  anvil -->
       <weight single  =" 0       0     0     0       0        0       0     0     0     0"
-	      multi   =" 0       0   100     0       0        0       0     0     0     0" /> />
+	          multi   =" 0       0   100     0       0        0       0     0     0     0" /> />
     </weights>
   </tutorial-weight-list>
 

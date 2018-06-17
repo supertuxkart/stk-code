@@ -220,7 +220,13 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
             l.push_back(n);
         }
         // Make sure we have the right number of entries
-        while(l.size()<2*(int)POWERUP_LAST) l.push_back(0);
+        if (l.size() < 2 * (int)POWERUP_LAST)
+        {
+            Log::error("PowerupManager",
+                       "Not enough entries for '%s' in powerup.xml",
+                       node->getName().c_str());
+            while (l.size() < 2 * (int)POWERUP_LAST) l.push_back(0);
+        }
         if(l.size()>2*(int)POWERUP_LAST)
         {
             Log::error("PowerupManager",
@@ -265,7 +271,7 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
 }   // WeightsData::interpolate
 
 // ----------------------------------------------------------------------------
-/** For a given rank in the current race this computed the previous and
+/** For a given rank in the current race this computes the previous and
  *  next entry in the weight list, and the weight necessary to interpolate
  *  between these two values. If the requested rank should exactly match
  *  one entries, previous and next entry will be identical, and weight set
@@ -276,10 +282,11 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
  *  \param next On return contains the index of the closest weight field
  *         bigger than the given rank.
  *  \param weight On return contains the weight to use to interpolate between
- *         next and previous.
+ *         next and previous. The weight is for 'next', so (1-weight) is the
+ *         weight that needs to be applied to the previous data.
  */
-int PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
-                                                      int *next, float *weight)
+void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
+                                                       int *next, float *weight)
 {
     // If there is only one section (e.g. in soccer mode etc), use it.
     // If the rank is first, always use the first entry as well.
@@ -287,7 +294,7 @@ int PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     {
         *prev = *next = 0;
         *weight = 1.0f;
-        return 1;
+        return;
     }
 
     // The last kart always uses the data for the last section
@@ -295,7 +302,7 @@ int PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     {
         *prev = *next = m_weights_for_section.size() - 1;
         *weight = 1.0f;
-        return 1;
+        return;
     }
 
     // In FTL mode the first section is for the leader, the 
@@ -304,7 +311,7 @@ int PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     {
         *prev = *next = 1;
         *weight = 1.0f;
-        return 1;
+        return;
     }
 
     // Now we have a rank that needs to be interpolated between
@@ -314,25 +321,33 @@ int PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     // special since index 2 is for the first non-leader kart):
     int first_section_index = race_manager->isFollowMode() ? 2 : 1;
 
-    // Get the lowest rank for which the grouping applies:
-    int first_section_rank = race_manager->isFollowMode() ? 3 : 2;
-
-    // If we have three points, we get 4 sections etc. 
+    // If we have five points, the first and last assigned to the first
+    // and last kart, leaving 3 points 'inside' this interval, which define
+    // 4 'sections'. So the number of sections is number_of_points - 2 + 1.
+    // If the first two points are assigned to rank 1 and 2 in a FTL race
+    // and the last to the last kart, leaving two inner points defining
+    // 3 sections, i.e. number_of_points - 3 + 1
+    // In both cases the number of sections is:
     int num_sections = (m_weights_for_section.size() - first_section_index);
     float karts_per_fraction = (m_num_karts - first_section_index)
                              / float(num_sections);
-    int count = 0;
-    while (rank - 1 >  (count + 1) * karts_per_fraction)
+
+    // Now check in which section the current rank is: Test from the first
+    // section (section 0) and see if the rank is still greater than the
+    // next section. If not, the current section is the section to which
+    // this rank belongs. Otherwise increase section and try again:
+    int section = 0;
+    while (rank - first_section_index >  (section + 1) * karts_per_fraction)
     {
-        count++;
+        section++;
     }
 
-    *prev = first_section_index + count - 1;
+    *prev = first_section_index + section - 1;
     *next = *prev + 1;
-    *weight = (rank - first_section_index - count * karts_per_fraction)
+    *weight = (rank - first_section_index - section * karts_per_fraction)
             / karts_per_fraction;
 
-    return 1;
+    return;
 }   // WeightsData::convertRankToSection
 
 // ----------------------------------------------------------------------------
@@ -357,7 +372,7 @@ void PowerupManager::WeightsData::precomputeWeights()
             j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
         {
             float av = (1.0f - weight) * m_weights_for_section[prev][j]
-                + weight * m_weights_for_section[next][j];
+                     +         weight  * m_weights_for_section[next][j];
             sum += int(av + 0.5f);
             m_summed_weights_for_rank[i].push_back(sum);
         }

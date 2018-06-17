@@ -101,7 +101,7 @@ private:
         void reset();
         void readData(int num_karts, const XMLNode *node);
         void interpolate(WeightsData *prev, WeightsData *next, int num_karts);
-        int convertRankToSection(int rank, int *prev, int *next,
+        void convertRankToSection(int rank, int *prev, int *next,
                                  float *weight);
         void precomputeWeights();
         int getRandomItem(int rank, int random_number);
