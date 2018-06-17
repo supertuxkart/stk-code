@@ -222,14 +222,14 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
         // Make sure we have the right number of entries
         if (l.size() < 2 * (int)POWERUP_LAST)
         {
-            Log::error("PowerupManager",
+            Log::fatal("PowerupManager",
                        "Not enough entries for '%s' in powerup.xml",
                        node->getName().c_str());
             while (l.size() < 2 * (int)POWERUP_LAST) l.push_back(0);
         }
         if(l.size()>2*(int)POWERUP_LAST)
         {
-            Log::error("PowerupManager",
+            Log::fatal("PowerupManager",
                        "Too many entries for '%s' in powerup.xml.",
                        node->getName().c_str());
         }
