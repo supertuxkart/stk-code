@@ -93,8 +93,9 @@ void Shadow::update(bool enabled)
             const btWheelInfo& wi = m_kart.getVehicle()->getWheelInfo(i);
             Vec3 up_vector = kart_trans.getBasis().getColumn(1);
             up_vector = up_vector * (wi.m_raycastInfo.m_suspensionLength - 0.02f);
-            v[i].m_position =
-                Vec3(kart_trans(Vec3(v[i].m_position)) - up_vector).toIrrVector();
+            Vec3 pos = kart_trans(Vec3(v[i].m_position)) - up_vector;
+            m_kart.transformSmoothedPosition(&pos);
+            v[i].m_position = pos.toIrrVector();
             v[i].m_normal = MiniGLM::compressVector3
                 (Vec3(wi.m_raycastInfo.m_contactNormalWS).toIrrVector());
         }

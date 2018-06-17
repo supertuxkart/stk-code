@@ -151,10 +151,17 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         // but it produces good enough results
         float distance = (newPoint - start).length();
 
-        m_left.back()->add(raycast_left-delta, raycast_left+delta,
-                                m_kart.getNormal(), distance);
-        m_right.back()->add(raycast_right-delta, raycast_right+delta,
-                                m_kart.getNormal(), distance);
+        Vec3 p1 = raycast_left - delta;
+        Vec3 p2 = raycast_left + delta;
+        Vec3 p3 = raycast_right - delta;
+        Vec3 p4 = raycast_right + delta;
+        m_kart.transformSmoothedPosition(&p1);
+        m_kart.transformSmoothedPosition(&p2);
+        m_kart.transformSmoothedPosition(&p3);
+        m_kart.transformSmoothedPosition(&p4);
+
+        m_left.back()->add(p1, p2, m_kart.getNormal(), distance);
+        m_right.back()->add(p3, p4, m_kart.getNormal(), distance);
         return;
     }
 
@@ -184,15 +191,22 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         m_right.erase(m_right.begin());
     }
 
+    Vec3 p1 = raycast_left - delta;
+    Vec3 p2 = raycast_left + delta;
+    Vec3 p3 = raycast_right - delta;
+    Vec3 p4 = raycast_right + delta;
+    m_kart.transformSmoothedPosition(&p1);
+    m_kart.transformSmoothedPosition(&p2);
+    m_kart.transformSmoothedPosition(&p3);
+    m_kart.transformSmoothedPosition(&p4);
+
     m_left.emplace_back(
-        new SkidMarkQuads(raycast_left-delta, raycast_left+delta,
-                          m_kart.getNormal(), m_material, m_shader,
-                          m_avoid_z_fighting, custom_color));
+        new SkidMarkQuads(p1, p2, m_kart.getNormal(), m_material, m_shader,
+        m_avoid_z_fighting, custom_color));
 
     m_right.emplace_back(
-        new SkidMarkQuads(raycast_right-delta, raycast_right+delta,
-                          m_kart.getNormal(), m_material, m_shader,
-                          m_avoid_z_fighting, custom_color));
+        new SkidMarkQuads(p3, p4, m_kart.getNormal(), m_material, m_shader,
+        m_avoid_z_fighting, custom_color));
 
     m_skid_marking = true;
 }   // update

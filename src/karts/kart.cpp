@@ -2938,23 +2938,6 @@ SFXBase* Kart::getNextEmitter()
  */
 void Kart::updateGraphics(float dt)
 {
-    static video::SColor pink(255, 255, 133, 253);
-    static video::SColor green(255, 61, 87, 23);
-
-#ifndef SERVER_ONLY
-    // draw skidmarks if relevant (we force pink skidmarks on when hitting 
-    // a bubblegum)
-    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
-    {
-        m_skidmarks->update(dt,
-            m_bubblegum_ticks > 0,
-            (m_bubblegum_ticks > 0
-                ? (m_has_caught_nolok_bubblegum ? &green
-                    : &pink)
-                : NULL));
-    }
-#endif
-
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
@@ -3042,6 +3025,23 @@ void Kart::updateGraphics(float dt)
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, -m_current_lean));
+
+    static video::SColor pink(255, 255, 133, 253);
+    static video::SColor green(255, 61, 87, 23);
+
+#ifndef SERVER_ONLY
+    // draw skidmarks if relevant (we force pink skidmarks on when hitting
+    // a bubblegum)
+    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
+    {
+        m_skidmarks->update(dt,
+            m_bubblegum_ticks > 0,
+            (m_bubblegum_ticks > 0
+                ? (m_has_caught_nolok_bubblegum ? &green
+                    : &pink)
+                : NULL));
+    }
+#endif
 
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
