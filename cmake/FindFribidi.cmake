@@ -9,7 +9,7 @@
 # FRIBIDI_LIBRARIES
 #     Fribidi library list
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
     include(FindPkgConfig)
     pkg_check_modules(FRIBIDI fribidi)
 else()
