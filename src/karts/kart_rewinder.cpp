@@ -59,16 +59,13 @@ void KartRewinder::reset()
  */
 void KartRewinder::saveTransform()
 {
-    m_saved_transform = getTrans();
+    Moveable::prepareSmoothing();
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
 void KartRewinder::computeError()
 {
-    //btTransform error = getTrans() - m_saved_transform;
-    Vec3 pos_error = getTrans().getOrigin() - m_saved_transform.getOrigin();
-    btQuaternion rot_error(0, 0, 0, 1);
-    Kart::addError(pos_error, rot_error);
+    Moveable::checkSmoothing();
 }   // computeError
 
 // ----------------------------------------------------------------------------

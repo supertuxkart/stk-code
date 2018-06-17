@@ -34,8 +34,6 @@ private:
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
 
-    /** The transform of the kart before a rewind starts. */
-    btTransform m_saved_transform;
 public:
 	             KartRewinder(const std::string& ident,
                               unsigned int world_kart_id,

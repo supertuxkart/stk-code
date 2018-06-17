@@ -32,6 +32,8 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <string>
+
 class Material;
 
 /**
@@ -40,6 +42,13 @@ class Material;
 class Moveable: public NoCopy
 {
 private:
+    enum SmoothingState
+    {
+        SS_NONE = 0,
+        SS_TO_ADJUST,
+        SS_TO_REAL
+    };
+
     Vec3                   m_velocityLC;      /**<Velocity in kart coordinates. */
     /** The bullet transform of this rigid body. */
     btTransform            m_transform;
@@ -53,10 +62,18 @@ private:
     /** Client prediction in networked games might cause the visual
      *  and physical position to be different. For visual smoothing
      *  this variable accumulates the error and reduces it over time. */
-    Vec3                   m_positional_error;
+    std::pair<Vec3, btQuaternion> m_start_smoothing_postion,
+        m_adjust_position;
 
-    /** Similar to m_positional_error for rotation. */
-    btQuaternion           m_rotational_error;
+    Vec3 m_adjust_control_point;
+
+    std::pair<btTransform, Vec3> m_prev_position_data;
+
+    float m_adjust_time, m_adjust_time_dt;
+
+    SmoothingState m_smoothing;
+
+    btTransform m_smoothed_transform;
 
 protected:
     UserPointer            m_user_pointer;
@@ -129,14 +146,31 @@ public:
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);
     void          updatePosition();
-    void          addError(const Vec3& pos_error,
-                           const btQuaternion &rot_error);
     // ------------------------------------------------------------------------
     /** Called once per rendered frame. It is used to only update any graphical
      *  effects.
      *  \param dt Time step size (since last call).
      */
     virtual void  updateGraphics(float dt) = 0;
+    // ------------------------------------------------------------------------
+    void prepareSmoothing();
+    // ------------------------------------------------------------------------
+    void checkSmoothing();
+    // ------------------------------------------------------------------------
+    const btTransform &getSmoothedTrans() const
+                                               { return m_smoothed_transform; }
+    // ------------------------------------------------------------------------
+    const Vec3& getSmoothedXYZ() const
+                            { return (Vec3&)m_smoothed_transform.getOrigin(); }
+    // ------------------------------------------------------------------------
+    virtual bool smoothRotation() const                        { return true; }
+    // ------------------------------------------------------------------------
+    virtual const std::string& getIdent() const
+    {
+        static std::string unused("unused");
+        return unused;
+    }
+
 };   // class Moveable
 
 #endif

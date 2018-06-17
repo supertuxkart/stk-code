@@ -210,7 +210,6 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     // Only a client ever rewinds. So the rewind time should be the latest
     // received state before current world time (if any)
     *rewind_ticks = -9999;
-    bool adjust_next = false;
 
     // FIXME: making m_network_events sorted would prevent the need to 
     // go through the whole list of events
@@ -261,7 +260,8 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // any server message should be in the client's past - but it can
         // happen during debugging) we need to rewind to getTicks (in order
         // to get the latest state).
-        if (NetworkConfig::get()->isClient() && (*i)->getTicks() <= world_ticks)
+        if (NetworkConfig::get()->isClient() &&
+            (*i)->getTicks() <= world_ticks && (*i)->isState())
         {
             // We need rewind if we receive an event in the past. This will
             // then trigger a rewind later. Note that we only rewind to the

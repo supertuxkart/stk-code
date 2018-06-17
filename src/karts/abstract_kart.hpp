@@ -140,7 +140,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
      *  kart was loaded from). */
-    const std::string& getIdent() const;
+    virtual const std::string& getIdent() const;
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
