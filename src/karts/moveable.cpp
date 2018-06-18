@@ -112,6 +112,7 @@ void Moveable::checkSmoothing()
     m_start_smoothing_postion.second = m_smoothing == SS_NONE ?
         m_prev_position_data.first.getRotation() :
         m_smoothed_transform.getRotation();
+    m_start_smoothing_postion.second.normalize();
 
     m_adjust_control_point = m_start_smoothing_postion.first +
         m_prev_position_data.second * m_adjust_time;
@@ -120,7 +121,9 @@ void Moveable::checkSmoothing()
 
     m_adjust_position.first.setInterpolate3(m_adjust_control_point, p2, 0.5f);
     m_adjust_position.second = m_transform.getRotation();
+    m_adjust_position.second.normalize();
     m_adjust_position.second.slerp(m_start_smoothing_postion.second, 0.5f);
+    m_adjust_position.second.normalize();
 }   // checkSmoothing
 
 //-----------------------------------------------------------------------------
@@ -184,7 +187,10 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
         cur_xyz.setInterpolate3(m_adjust_position.first, cur_xyz, ratio_sqrt);
         cur_xyz.setInterpolate3(to_control, cur_xyz, ratio);
         if (smoothRotation())
+        {
+            cur_rot.normalize();
             cur_rot.slerp(m_adjust_position.second, 1.0f - ratio);
+        }
     }
 
     m_smoothed_transform.setOrigin(cur_xyz);
