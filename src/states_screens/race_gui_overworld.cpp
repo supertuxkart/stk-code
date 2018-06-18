@@ -363,12 +363,12 @@ void RaceGUIOverworld::drawTrophyPoints()
     else if (points <99) number_width = middle_width;
     else number_width = large_width;
 
-    pos.LowerRightCorner.Y = dest.LowerRightCorner.Y + 1.5f*size;
-    pos.UpperLeftCorner.X -= (0.5f*size + number_width*0.5f);
+    pos.LowerRightCorner.Y = int(dest.LowerRightCorner.Y + 1.5f*size);
+    pos.UpperLeftCorner.X -= int(0.5f*size + number_width*0.5f);
 
     font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
 
-    pos.UpperLeftCorner.X += (0.5f*size + number_width*0.5f);
+    pos.UpperLeftCorner.X += int(0.5f*size + number_width*0.5f);
 
     if (next_unlock_points > points && (points + 80) >= next_unlock_points)
     {
@@ -376,13 +376,15 @@ void RaceGUIOverworld::drawTrophyPoints()
         else if (next_unlock_points <99) number_width = middle_width;
         else number_width = large_width;
 
-        dest = core::rect<s32>(pos.UpperLeftCorner.X - 2.5f*size, pos.UpperLeftCorner.Y,
-                           pos.UpperLeftCorner.X - 1.5f*size, pos.UpperLeftCorner.Y + size);
+        dest = core::rect<s32>(int(pos.UpperLeftCorner.X - 2.5f*size),
+                               pos.UpperLeftCorner.Y,
+                               int(pos.UpperLeftCorner.X - 1.5f*size),
+                               pos.UpperLeftCorner.Y + size);
 
         draw2DImage(m_locked_bonus, dest, source, NULL,
                                                   NULL, true /* alpha */);
 
-        pos.UpperLeftCorner.X -= (2*size + number_width*0.5f);
+        pos.UpperLeftCorner.X -= int(2*size + number_width*0.5f);
 
         font->draw(swg.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
     }
