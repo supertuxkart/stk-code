@@ -69,6 +69,8 @@ when the border that intersect at this corner are enabled.
 <!--  Stateless -->
 <element type="background" image="coal/background.jpg" />
 
+<element type="bottom-bar" image="coal/bottom_bar.png" />
+
 <element type="achievement-message" image="coal/achievement.png"
       left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0.3" vborder_out_portion="0"/>
@@ -93,7 +95,7 @@ when the border that intersect at this corner are enabled.
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
-<element type="button" state="deactivated" image="coal/glassbutton_deactivated.png"
+<element type="button" state="deactivated" image="common/glassbutton_deactivated.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
@@ -111,7 +113,7 @@ when the border that intersect at this corner are enabled.
       left_border="20" right_border="20" top_border="0" bottom_border="0"
       preserve_h_aspect_ratios="true" />
 
-<element type="progress" state="neutral" image="coal/scrollbar_bg.png"
+<element type="progress" state="neutral" image="common/scrollbar_bg.png"
       left_border="31" right_border="31" top_border="15" bottom_border="15"
       preserve_h_aspect_ratios="true" />
       
@@ -128,20 +130,33 @@ when the border that intersect at this corner are enabled.
       left_border="75" right_border="75" top_border="0" bottom_border="15"
       hborder_out_portion="0.2" />
 
+
+<element type="verticalTab" state="neutral" image="coal/glasstab_vert.png"
+      left_border="75" right_border="75" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" />
+      
+<element type="verticalTab" state="focused" image="coal/glasstab_vert_focus.png"
+      left_border="75" right_border="75" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" />
+
+<element type="verticalTab" state="down" image="coal/glasstab_vert_down.png"
+      left_border="75" right_border="75" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" />
+
 <!-- Stateless -->
-<element type="squareFocusHaloBW" image="coal/glass_square_focused_bw.png"
+<element type="squareFocusHaloBW" image="common/glass_square_focused_bw.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo" image="coal/glass_square_focused.png"
+<element type="squareFocusHalo" image="common/glass_square_focused_black.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo2" image="coal/glass_square_focused2.png"
+<element type="squareFocusHalo2" image="common/glass_square_focused_cyan.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo3" image="coal/glass_square_focused3.png"
+<element type="squareFocusHalo3" image="common/glass_square_focused_red.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo4" image="coal/glass_square_focused4.png"
+<element type="squareFocusHalo4" image="common/glass_square_focused_green.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
       
@@ -149,7 +164,7 @@ when the border that intersect at this corner are enabled.
 <element type="selectionHalo" image="coal/bubble.png"  />
 <element type="focusHalo" image="coal/glass_iconhighlight_focus.png"  />
 
-<element type="spinner" state="neutral" image="coal/glassspinner.png"
+<element type="spinner" state="neutral" image="common/glassspinner.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
@@ -157,21 +172,21 @@ when the border that intersect at this corner are enabled.
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
-<element type="spinner" state="deactivated" image="coal/glassspinner_deactivated.png"
+<element type="spinner" state="deactivated" image="common/glassspinner_deactivated.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <!-- player name spinner color in multiplayer-->
-<element type="spinner1" state="neutral" image="coal/glass_square1.png"
+<element type="spinner1" state="neutral" image="common/glass_square_black.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner2" state="neutral" image="coal/glass_square2.png"
+<element type="spinner2" state="neutral" image="common/glass_square_cyan.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner3" state="neutral" image="coal/glass_square3.png"
+<element type="spinner3" state="neutral" image="common/glass_square_red.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner4" state="neutral" image="coal/glass_square4.png"
+<element type="spinner4" state="neutral" image="common/glass_square_green.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
@@ -187,8 +202,8 @@ when the border that intersect at this corner are enabled.
 <element type="checkbox" state="neutral+checked" image="coal/glasscheckbox_checked.png"/>
 <element type="checkbox" state="focused+unchecked" image="coal/glasscheckbox_focus.png"/>
 <element type="checkbox" state="focused+checked" image="coal/glasscheckbox_checked_focus.png"/>
-<element type="checkbox" state="deactivated+unchecked" image="coal/glasscheckbox_deactivated.png"/>
-<element type="checkbox" state="deactivated+checked" image="coal/glasscheckbox_checked_deactivated.png"/>
+<element type="checkbox" state="deactivated+unchecked" image="common/glasscheckbox_deactivated.png"/>
+<element type="checkbox" state="deactivated+checked" image="common/glasscheckbox_checked_deactivated.png"/>
 
 <!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
      Note: the body of a guage is the same as for for spinners. -->
@@ -209,19 +224,19 @@ when the border that intersect at this corner are enabled.
      be mirrorred for bottom. Buttons can be in neutral or down state.
      Advanced stretching is not used here.
       -->
-<element type="scrollbar_background"          image="coal/scrollbar_bg.png" />
+<element type="scrollbar_background"          image="common/scrollbar_bg.png" />
 <element type="scrollbar_thumb"               image="coal/scrollbar_thumb.png" />
-<element type="scrollbar_button"              image="coal/scrollbar_btn.png" />
+<element type="scrollbar_button"              image="common/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="coal/scrollbar_btn_down.png" />
 
-<element type="left_arrow"  state="neutral" image="coal/left_arrow.png" />
-<element type="right_arrow" state="neutral" image="coal/right_arrow.png" />
+<element type="left_arrow"  state="neutral" image="common/left_arrow.png" />
+<element type="right_arrow" state="neutral" image="common/right_arrow.png" />
 <element type="left_arrow"  state="focus"   image="coal/left_arrow_focus.png" />
 <element type="right_arrow" state="focus"   image="coal/right_arrow_focus.png" />
 
 <element type="list_header"  state="neutral" image="coal/table_header.png" />
-<element type="list_sort_up" state="neutral" image="coal/list_sort_up.png" />
-<element type="list_sort_down" state="neutral" image="coal/list_sort_down.png" />
+<element type="list_sort_up" state="neutral" image="common/list_sort_up.png" />
+<element type="list_sort_down" state="neutral" image="common/list_sort_down.png" />
 <element type="list_header"  state="down"    image="coal/table_header_down.png" />
 
 <!-- Stateless -->
@@ -240,12 +255,12 @@ when the border that intersect at this corner are enabled.
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
 
 <!-- Stateless -->
-<element type="tooltip" image="coal/tooltip.png"
+<element type="tooltip" image="common/tooltip.png"
     left_border="10" right_border="10" top_border="10" bottom_border="10"
     hborder_out_portion="1.0" vborder_out_portion="1.0" />
     
 <!--                   Colors                  -->
-<color type="text" state="neutral" r="240" g="240" b="240" />
+<color type="text" state="neutral" r="220" g="220" b="220" />
 <color type="brighttext" state="neutral" r="240" g="240" b="240" />
 
 <!-- For highlighted items, e.g. in list -->
@@ -255,15 +270,15 @@ when the border that intersect at this corner are enabled.
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
 
 <!-- Text field color -->
-<color type="text_field" state="background" a="255" r="45" g="45" b="45" />
-<color type="text_field" state="background_focused" a="255" r="35" g="35" b="35" />
-<color type="text_field" state="background_deactivated" a="255" r="60" g="60" b="60" />
-<color type="text_field" state="neutral" a="255" r="70" g="70" b="70" />
-<color type="text_field" state="focused" a="255" r="25" g="25" b="25" />
-<color type="text_field" state="deactivated" a="255" r="70" g="70" b="70" />
+<color type="text_field" state="background" a="255" r="35" g="35" b="35" />
+<color type="text_field" state="background_focused" a="255" r="15" g="15" b="15" />
+<color type="text_field" state="background_deactivated" a="255" r="90" g="90" b="90" />
+<color type="text_field" state="neutral" a="255" r="35" g="35" b="35" />
+<color type="text_field" state="focused" a="255" r="15" g="15" b="15" />
+<color type="text_field" state="deactivated" a="255" r="90" g="90" b="90" />
 
 <!-- Rating star image -->
-<element type="rating" state="neutral" image="coal/rating_star.png" />
+<element type="rating" state="neutral" image="common/rating_star.png" />
 
 <!-- Font color -->
 <color type="font" state="top" a="255" r="140" g="140" b="140" />
