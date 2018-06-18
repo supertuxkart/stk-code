@@ -267,7 +267,7 @@ namespace GUIEngine
         gui::IGUISkin* m_fallback_skin;
 
 
-        video::ITexture* bg_image;
+        video::ITexture* m_bg_image;
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
 
