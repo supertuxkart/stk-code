@@ -202,6 +202,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
@@ -2232,6 +2233,8 @@ void runUnitTests()
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
 
+    Log::info("UnitTest", "PowerupManager");
+    PowerupManager::unitTesting();
 
     Log::info("UnitTest", "Kart characteristics");
     CombinedCharacteristic::unitTesting();

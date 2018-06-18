@@ -97,6 +97,9 @@ private:
         std::vector < std::vector<int> > m_summed_weights_for_rank;
 
     public:
+        // The friend declaration gives the PowerupManager access to the
+        // internals, which is ONLY used for testing!!
+        friend PowerupManager;
         WeightsData() { m_num_karts = 0; }
         void reset();
         void readData(int num_karts, const XMLNode *node);
@@ -153,6 +156,8 @@ private:
 
     PowerupType   getPowerupType(const std::string &name) const;
 public:
+    static void unitTesting();
+
                   PowerupManager  ();
                  ~PowerupManager  ();
     void          loadPowerupsModels ();

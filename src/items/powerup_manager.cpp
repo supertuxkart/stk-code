@@ -380,6 +380,9 @@ void PowerupManager::WeightsData::precomputeWeights()
 //-----------------------------------------------------------------------------
 /** Computes a random item dependent on the rank of the kart and a given
  *  random number.
+ *  The value returned matches the enum value of the random item if single.
+ *  In case of triple-item, the value will be the enum value plus
+ *  the number of existing powerups (= POWERUP_LAST-POWERUP_FIRST+1)
  *  \param rank The rank for which an item needs to be picked.
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
@@ -394,10 +397,19 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
     random_number = random_number % summed_weights.back();
+    // Put the random number in range [1;max of summed weights],
+    // so for sum = N, there are N possible random numbers <= N.
+    random_number++;
     int powerup = 0;
+    // Stop at the first inferior or equal sum, before incrementing
+    // So stop while powerup is such that
+    // summed_weights[powerup-1] < random_number <= summed_weights[powerup]
     while ( random_number > summed_weights[powerup] )
         powerup++;
-    return powerup+POWERUP_FIRST;
+
+    // We align with the beginning of the enum and return
+    // We don't do more, because it would need to be decoded from enum later
+    return powerup + POWERUP_FIRST;
 }   // WeightsData::getRandomItem
 
 // ============================================================================
@@ -475,14 +487,14 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     switch (race_manager->getMinorMode())
     {
     case RaceManager::MINOR_MODE_TIME_TRIAL:     /* fall through */
-    case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";   break;
-    case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";    break;
-    case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle"; break;
+    case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";     break;
+    case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";      break;
+    case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle";   break;
+    case RaceManager::MINOR_MODE_TUTORIAL:       class_name="tutorial"; break;
     case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:
-    case RaceManager::MINOR_MODE_TUTORIAL:
     case RaceManager::MINOR_MODE_CUTSCENE:
-    case RaceManager::MINOR_MODE_SOCCER:         class_name="soccer"; break;
+    case RaceManager::MINOR_MODE_SOCCER:         class_name="soccer";   break;
     default:
         Log::fatal("PowerupManager", "Invalid minor mode %d - aborting.",
                     race_manager->getMinorMode());
@@ -556,12 +568,67 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     Log::verbose("Powerup", "World %d pos %d random %d iten %d",
                  World::getWorld()->getTimeTicks(), pos, random_number, powerup);
 #endif
-    if(powerup>=POWERUP_MAX)
+    if(powerup > POWERUP_LAST)
     {
-        powerup -= POWERUP_MAX;
+        powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
         *n = 3;
     }
     else
         *n=1;
     return (PowerupType)powerup;
 }   // getRandomPowerup
+
+// ============================================================================
+/** Unit testing is based on deterministic item distributions: if all random
+ *  numbers from 0 till sum_of_all_weights - 1 are used, the original weight
+ *  distribution must be restored.
+ */
+void PowerupManager::unitTesting()
+{
+    // Test 1: Test all possible random numbers for tutorial, and
+    // make sure that always a cake is picked.
+    // ----------------------------------------------------------
+    race_manager->setMinorMode(RaceManager::MINOR_MODE_TUTORIAL);
+    powerup_manager->computeWeightsForRace(1);
+    WeightsData wd = powerup_manager->m_current_item_weights;
+    int num_weights = wd.m_summed_weights_for_rank[0].back();
+    for(int i=0; i<num_weights; i++)
+    {
+        unsigned int n;
+        assert( powerup_manager->getRandomPowerup(1, &n, i)==POWERUP_BOWLING );
+        assert(n==3);
+    }
+
+    // Test 2: Test all possible random numbers for 5 karts and rank 5
+    // ---------------------------------------------------------------
+    race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+    int num_karts = 5;
+    powerup_manager->computeWeightsForRace(num_karts);
+    wd = powerup_manager->m_current_item_weights;
+
+    int position = 5;
+    int section, next;
+    float weight;
+    wd.convertRankToSection(position, &section, &next, &weight);
+    assert(weight == 1.0f);
+    assert(section == next);
+    // Get the sum of all weights, which determine the number
+    // of different random numbers we need to test.
+    num_weights = wd.m_summed_weights_for_rank[section].back();
+    std::vector<int> count(2*POWERUP_LAST);
+    for (int i = 0; i<num_weights; i++)
+    {
+        unsigned int n;
+        int powerup = powerup_manager->getRandomPowerup(position, &n, i);
+        if(n==1)
+            count[powerup-1]++;
+        else
+            count[powerup+POWERUP_LAST-POWERUP_FIRST]++;
+    }
+
+    // Now make sure we reproduce the original weight distribution.
+    for(unsigned int i=0; i<wd.m_weights_for_section[section].size(); i++)
+    {
+        assert(count[i] == wd.m_weights_for_section[section][i]);
+    }
+}   // unitTesting
