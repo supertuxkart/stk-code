@@ -989,6 +989,11 @@ void World::updateGraphics(float dt)
         }
     }
 
+    PROFILER_PUSH_CPU_MARKER("World::updateGraphics (camera)", 0x60, 0x7F, 0);
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+        Camera::getCamera(i)->update(dt);
+    PROFILER_POP_CPU_MARKER();
+
     projectile_manager->updateGraphics(dt);
     Track::getCurrentTrack()->updateGraphics(dt);
 }   // updateGraphics
@@ -1037,18 +1042,6 @@ void World::update(int ticks)
             m_karts[i]->update(ticks);
     }
     PROFILER_POP_CPU_MARKER();
-
-    // Updating during a rewind introduces stuttering in the camera
-    if (!RewindManager::get()->isRewinding())
-    {
-        PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
-
-        for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
-        {
-            Camera::getCamera(i)->update(stk_config->ticks2Time(ticks));
-        }
-        PROFILER_POP_CPU_MARKER();
-    }   // if !rewind
 
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
     Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
