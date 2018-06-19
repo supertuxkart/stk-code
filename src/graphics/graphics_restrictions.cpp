@@ -266,7 +266,7 @@ public:
     {
         return !this->operator==(other);
     }   // operator!=
-        // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** If *this < other. */
     bool operator< (const Version &other) const
     {
@@ -296,6 +296,36 @@ public:
         else
             return true;
     }   // operator<=
+    // ------------------------------------------------------------------------
+    /** If *this > other. */
+    bool operator> (const Version &other) const
+    {
+        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
+        for (unsigned int i = 0; i<min_n; i++)
+        {
+            if (m_version[i] > other.m_version[i]) return true;
+            if (m_version[i] < other.m_version[i]) return false;
+        }
+        if (m_version.size() > other.m_version.size())
+            return true;
+        else
+            return false;
+    }   // operator>
+    // ------------------------------------------------------------------------
+    /** If *this >= other. */
+    bool operator>= (const Version &other) const
+    {
+        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
+        for (unsigned int i = 0; i<min_n; i++)
+        {
+            if (m_version[i] > other.m_version[i]) return true;
+            if (m_version[i] < other.m_version[i]) return false;
+        }
+        if (m_version.size() >= other.m_version.size())
+            return true;
+        else
+            return false;
+    }   // operator>=
 
 };   // class Version
 // ============================================================================
@@ -309,12 +339,21 @@ private:
     std::string m_card_name;
 
     /** Operators to test version numbers with. */
-    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS,
-          VERSION_LESS_EQUAL}  m_version_test;
-
+    enum VersionTest
+    {
+        VERSION_IGNORE, 
+        VERSION_EQUAL, 
+        VERSION_LESS, 
+        VERSION_LESS_EQUAL, 
+        VERSION_MORE, 
+        VERSION_MORE_EQUAL
+    }; 
+    
+    std::vector<VersionTest> m_version_tests;
+    
     /** Driver version for which this rule applies. */
-    Version m_driver_version;
-
+    std::vector<Version> m_driver_versions;
+    
     /** For which OS this rule applies. */
     std::string m_os;
 
@@ -323,17 +362,17 @@ private:
 
     /** Which options to disable. */
     std::vector<std::string> m_disable_options;
+
 public:
     Rule(const XMLNode *rule)
     {
-        m_version_test = VERSION_IGNORE;
         m_card_test = CARD_IGNORE;
 
-        if(rule->get("is", &m_card_name))
+        if (rule->get("is", &m_card_name))
         {
             m_card_test = CARD_IS;
         }
-        else if(rule->get("contains", &m_card_name))
+        else if (rule->get("contains", &m_card_name))
         {
             m_card_test = CARD_CONTAINS;
         }
@@ -342,34 +381,64 @@ public:
         rule->get("vendor", &m_vendor);
 
         std::string s;
-        if(rule->get("version", &s) && s.size()>1)
+        
+        if (rule->get("version", &s) && s.size() > 1)
         {
-            if(s.substr(0, 2)=="<=")
-            {
-                m_version_test = VERSION_LESS_EQUAL;
-                s = s.substr(2, s.size());
-            }
-            else if(s[0]=='<')
-            {
-                m_version_test = VERSION_LESS;
-                s.erase(s.begin());
-            }
-            else if(s[0]=='=')
-            {
-                m_version_test = VERSION_EQUAL;
-                s.erase(s.begin());
-            }
-            else
-            {
-                Log::warn("Graphics", "Invalid verison '%s' found - ignored.",
-                          s.c_str());
-            }
-            m_driver_version = Version(s);
-        }   // has version
+            addVersion(s);
+        }
+        
+        if (rule->get("version2", &s) && s.size() > 1)
+        {
+            addVersion(s);
+        }
 
-        if(rule->get("disable", &s))
+        if (rule->get("disable", &s))
+        {
             m_disable_options = StringUtils::split(s, ' ');
+        }
     }   // Rule
+    
+    // ------------------------------------------------------------------------
+    void addVersion(std::string version)
+    {
+        if (version.substr(0, 2) == "<=")
+        {
+            m_version_tests.push_back(VERSION_LESS_EQUAL);
+            version = version.substr(2, version.size());
+        }
+        else if (version[0] == '<')
+        {
+            m_version_tests.push_back(VERSION_LESS);
+            version.erase(version.begin());
+        }
+        else if (version.substr(0, 2) == ">=")
+        {
+            m_version_tests.push_back(VERSION_MORE_EQUAL);
+            version = version.substr(2, version.size());
+        }
+        else if (version[0] == '>')
+        {
+            m_version_tests.push_back(VERSION_MORE);
+            version.erase(version.begin());
+        }
+        else if (version[0] == '=')
+        {
+            m_version_tests.push_back(VERSION_EQUAL);
+            version.erase(version.begin());
+        }
+        else
+        {
+            m_version_tests.push_back(VERSION_IGNORE);
+            Log::warn("Graphics", "Invalid verison '%s' found - ignored.",
+                      version.c_str());
+        }
+        
+        if (m_version_tests.back() != VERSION_IGNORE)
+        {
+            m_driver_versions.push_back(Version(version));
+        }
+    }
+    
     // ------------------------------------------------------------------------
     bool applies(const std::string &card, const Version &version,
                  const std::string &vendor) const
@@ -417,20 +486,38 @@ public:
 
         // Test for driver version
         // -----------------------
-        switch(m_version_test)
+        assert(m_version_tests.size() == m_driver_versions.size());
+        
+        for (unsigned int i = 0; i < m_version_tests.size(); i++)
         {
-        case VERSION_IGNORE: break;   // always true
-        case VERSION_EQUAL: if(!(version==m_driver_version)) return false;
-            break;
-        case VERSION_LESS_EQUAL:
-            if (!(version <= m_driver_version)) return false;
-            break;
-        case VERSION_LESS:
-            if (!(version < m_driver_version )) return false;
-            break;
-        }   // switch m_version_test
+            switch (m_version_tests[i])
+            {
+            case VERSION_IGNORE:
+                // always true
+                break;
+            case VERSION_EQUAL: 
+                if (version != m_driver_versions[i])
+                    return false;
+                break;
+            case VERSION_LESS_EQUAL:
+                if (version > m_driver_versions[i])
+                    return false;
+                break;
+            case VERSION_LESS:
+                if (version >= m_driver_versions[i])
+                    return false;
+                break;
+            case VERSION_MORE_EQUAL:
+                if (version < m_driver_versions[i]) 
+                    return false;
+                break;
+            case VERSION_MORE:
+                if (version <= m_driver_versions[i])
+                    return false;
+            }   // switch m_version_tests
+        }
+        
         return true;
-        // -----------------------------------------------
     }   // applies
 
     // ------------------------------------------------------------------------
@@ -465,6 +552,11 @@ void unitTesting()
     assert(Version("10.3") <=  Version("10.3.2"));
     assert(!(Version("10.3.2") <  Version("10.3")));
     assert(!(Version("10.3.2") <= Version("10.3")));
+    assert(Version("1.2.4") >  Version("1.2.3"));
+    assert(Version("1.2.3.4") >  Version("1.2.3"));
+    assert(Version("1.2.3") >=  Version("1.2.3"));
+    assert(Version("1.2.4") >=  Version("1.2.3"));
+    assert(Version("1.2.3.4") >=  Version("1.2.3"));
     assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1",
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );

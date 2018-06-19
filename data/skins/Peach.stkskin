@@ -66,7 +66,9 @@ when the border that intersect at this corner are enabled.
 <skin name="Peach" author="Dakal & Marianne Gagnon (Auria)">
 
 <!--  Stateless -->
-<element type="background" image="peach/background.jpg" />
+<element type="background" image="common/background.jpg" />
+
+<element type="bottom-bar" image="common/bottom_bar.png" />
 
 <element type="achievement-message" image="peach/achievement.png"
       left_border="128" right_border="13" top_border="13" bottom_border="13"
@@ -92,7 +94,7 @@ when the border that intersect at this corner are enabled.
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
-<element type="button" state="deactivated" image="peach/glassbutton_deactivated.png"
+<element type="button" state="deactivated" image="common/glassbutton_deactivated.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
@@ -110,7 +112,7 @@ when the border that intersect at this corner are enabled.
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       preserve_h_aspect_ratios="false" />
 
-<element type="progress" state="neutral" image="peach/scrollbar_bg.png"
+<element type="progress" state="neutral" image="common/scrollbar_bg.png"
       left_border="31" right_border="31" top_border="15" bottom_border="15"
       preserve_h_aspect_ratios="true" />
       
@@ -128,20 +130,32 @@ when the border that intersect at this corner are enabled.
       hborder_out_portion="0.2" />
 
 
+<element type="verticalTab" state="neutral" image="peach/glasstab_vert.png"
+      left_border="75" right_border="75" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" />
+      
+<element type="verticalTab" state="focused" image="peach/glasstab_vert_focus.png"
+      left_border="75" right_border="75" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" />
+
+<element type="verticalTab" state="down" image="peach/glasstab_vert_down.png"
+      left_border="75" right_border="75" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" />
+
 <!-- Stateless -->
-<element type="squareFocusHaloBW" image="peach/glass_square_focused_bw.png"
+<element type="squareFocusHaloBW" image="common/glass_square_focused_bw.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo" image="peach/glass_square_focused.png"
+<element type="squareFocusHalo" image="common/glass_square_focused_red.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo2" image="peach/glass_square_focused2.png"
+<element type="squareFocusHalo2" image="common/glass_square_focused_cyan.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo3" image="peach/glass_square_focused3.png"
+<element type="squareFocusHalo3" image="common/glass_square_focused_green.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo4" image="peach/glass_square_focused4.png"
+<element type="squareFocusHalo4" image="common/glass_square_focused_yellow.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
       
@@ -149,7 +163,7 @@ when the border that intersect at this corner are enabled.
 <element type="selectionHalo" image="peach/bubble.png"  />
 <element type="focusHalo" image="peach/glass_iconhighlight_focus.png"  />
 
-<element type="spinner" state="neutral" image="peach/glassspinner.png"
+<element type="spinner" state="neutral" image="common/glassspinner.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
@@ -157,20 +171,21 @@ when the border that intersect at this corner are enabled.
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
-<element type="spinner" state="deactivated" image="peach/glassspinner_deactivated.png"
+<element type="spinner" state="deactivated" image="common/glassspinner_deactivated.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
-<element type="spinner1" state="neutral" image="peach/glass_square1.png"
+<!-- player name spinner color in multiplayer-->
+<element type="spinner1" state="neutral" image="common/glass_square_red.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner2" state="neutral" image="peach/glass_square2.png"
+<element type="spinner2" state="neutral" image="common/glass_square_cyan.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner3" state="neutral" image="peach/glass_square3.png"
+<element type="spinner3" state="neutral" image="common/glass_square_green.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner4" state="neutral" image="peach/glass_square4.png"
+<element type="spinner4" state="neutral" image="common/glass_square_yellow.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
@@ -185,15 +200,15 @@ when the border that intersect at this corner are enabled.
 <element type="checkbox" state="neutral+checked" image="peach/glasscheckbox_checked.png"/>
 <element type="checkbox" state="focused+unchecked" image="peach/glasscheckbox_focus.png"/>
 <element type="checkbox" state="focused+checked" image="peach/glasscheckbox_checked_focus.png"/>
-<element type="checkbox" state="deactivated+unchecked" image="peach/glasscheckbox_deactivated.png"/>
-<element type="checkbox" state="deactivated+checked" image="peach/glasscheckbox_checked_deactivated.png"/>
+<element type="checkbox" state="deactivated+unchecked" image="common/glasscheckbox_deactivated.png"/>
+<element type="checkbox" state="deactivated+checked" image="common/glasscheckbox_checked_deactivated.png"/>
 
 <!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
      Note: the body of a guage is the same as for for spinners. -->
 <element type="gaugefill" image="peach/glasssgauge_fill.png" />
 
 <!-- Lists are always in neutral state for now -->
-<element type="list" image="peach/glass_section.png"
+<element type="list" image="common/glass_section.png"
     left_border="15" right_border="15" top_border="7" bottom_border="7"
     hborder_out_portion="0.0" vborder_out_portion="0.0" />
     
@@ -206,38 +221,38 @@ when the border that intersect at this corner are enabled.
      be mirrorred for bottom. Buttons can be in neutral or down state.
      Advanced stretching is not used here.
       -->
-<element type="scrollbar_background"          image="peach/scrollbar_bg.png" />
+<element type="scrollbar_background"          image="common/scrollbar_bg.png" />
 <element type="scrollbar_thumb"               image="peach/scrollbar_thumb.png" />
-<element type="scrollbar_button"              image="peach/scrollbar_btn.png" />
+<element type="scrollbar_button"              image="common/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="peach/scrollbar_btn_down.png" />
 
-<element type="left_arrow"  state="neutral" image="peach/left_arrow.png" />
-<element type="right_arrow" state="neutral" image="peach/right_arrow.png" />
+<element type="left_arrow"  state="neutral" image="common/left_arrow.png" />
+<element type="right_arrow" state="neutral" image="common/right_arrow.png" />
 <element type="left_arrow"  state="focus"   image="peach/left_arrow_focus.png" />
 <element type="right_arrow" state="focus"   image="peach/right_arrow_focus.png" />
 
-<element type="list_header"  state="neutral" image="peach/table_header.png" />
-<element type="list_sort_up" state="neutral" image="peach/list_sort_up.png" />
-<element type="list_sort_down" state="neutral" image="peach/list_sort_down.png" />
+<element type="list_header"  state="neutral" image="common/table_header.png" />
+<element type="list_sort_up" state="neutral" image="common/list_sort_up.png" />
+<element type="list_sort_down" state="neutral" image="common/list_sort_down.png" />
 <element type="list_header"  state="down"    image="peach/table_header_down.png" />
 
 <!-- Stateless -->
-<element type="section" image="peach/glass_section.png"
+<element type="section" image="common/glass_section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
 <!-- Stateless -->
-<element type="rounded_section" image="peach/glass_rsection.png"
+<element type="rounded_section" image="common/glass_rsection.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
 <!-- Stateless -->
-<element type="window" image="peach/dialog.png"
+<element type="window" image="common/dialog.png"
       left_border="7" right_border="7" top_border="50" bottom_border="50"
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
 
 <!-- Stateless -->
-<element type="tooltip" image="peach/tooltip.png"
+<element type="tooltip" image="common/tooltip.png"
     left_border="10" right_border="10" top_border="10" bottom_border="10"
     hborder_out_portion="1.0" vborder_out_portion="1.0" />
     
@@ -260,7 +275,7 @@ when the border that intersect at this corner are enabled.
 <color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />
 
 <!-- Rating star image -->
-<element type="rating" state="neutral" image="peach/rating_star.png" />
+<element type="rating" state="neutral" image="common/rating_star.png" />
 
 <!-- Font color -->
 <color type="font" state="top" a="255" r="255" g="128" b="0" />

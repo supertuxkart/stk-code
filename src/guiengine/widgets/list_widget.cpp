@@ -488,6 +488,43 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 }
 
 // -----------------------------------------------------------------------------
+
+EventPropagation ListWidget::upPressed(const int playerID)
+{
+    return moveToNextItem(/*reverse*/ true);
+} // upPressed
+
+// -----------------------------------------------------------------------------
+
+EventPropagation ListWidget::downPressed(const int playerID)
+{
+    return moveToNextItem(/*reverse*/ false);
+} // downPressed
+
+EventPropagation ListWidget::moveToNextItem(const bool reverse)
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return EVENT_BLOCK;
+
+    const bool stay_within_list = reverse ? getSelectionID() > 0 :
+                                            getSelectionID() < getItemCount() - 1;
+
+    if (stay_within_list)
+    {
+        if (reverse)
+            setSelectionID(getSelectionID() - 1);
+        else
+            setSelectionID(getSelectionID() + 1);
+        return EVENT_BLOCK_BUT_HANDLED;
+    }
+    else
+    {
+        setSelectionID(-1); // select nothing
+    }
+    return EVENT_BLOCK;
+} // moveToNextItem
+
+// -----------------------------------------------------------------------------
 int ListWidget::getItemID(const std::string &internalName) const
 {
     const CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
