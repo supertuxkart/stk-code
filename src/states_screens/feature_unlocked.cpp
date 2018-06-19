@@ -165,10 +165,6 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene()
             : CutsceneScreen("feature_unlocked.stkgui")
 {
     m_key_angle = 0;
-
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    m_avoid_irrlicht_bug = NULL;
-#endif
 }  // FeatureUnlockedCutScene
 
 // ----------------------------------------------------------------------------
@@ -181,12 +177,6 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 void FeatureUnlockedCutScene::onCutsceneEnd()
 {
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    if (m_avoid_irrlicht_bug)
-        irr_driver->removeNode(m_avoid_irrlicht_bug);
-    m_avoid_irrlicht_bug = NULL;
-#endif
-
     m_unlocked_stuff.clearAndDeleteAll();
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -205,8 +195,10 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
 void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked)
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    int points_before = player->getPoints();
-    int points_now = points_before + CHALLENGE_POINTS[difficulty];
+
+    // The number of points is updated before this function is called
+    int points_before = player->getPointsBefore();
+    int points_now = player->getPoints();
 
     std::vector<std::string> tracks;
     std::vector<std::string> gps;
@@ -363,18 +355,6 @@ void FeatureUnlockedCutScene::init()
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");
 #endif
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-            // If a mesh with this material is added, irrlicht will
-            // display the 'continue' text (otherwise the text is
-            // not visible). This is a terrible work around, but allows
-            // stk to be released without waiting for the next
-            // irrlicht version.
-            video::SMaterial m;
-            m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-            scene::IMesh* mesh =
-                irr_driver->createTexturedQuadMesh(&m, 0, 0);
-            m_avoid_irrlicht_bug = irr_driver->addMesh(mesh);
-#endif
         }
 #ifndef SERVER_ONLY
         else if (!m_unlocked_stuff[n].m_sp_pictures.empty())
@@ -475,6 +455,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
     m_global_time += dt;
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
+    // When the chest has opened but the items are not yet at their final position
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
     {
         float progress_factor = (m_global_time - GIFT_EXIT_FROM) / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
@@ -489,29 +470,20 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
             // when there are more than 1 unlocked items, make sure they each
             // have their own path when they move
-            if (unlockedStuffCount > 1)
-            {
-                if (n == 1) pos.X -= 1.0f*dt*float( int((n + 1)/2) );
-                else if (n > 1) pos.X += 1.0f*dt*(n - 0.3f);
+            // and that they won't end offscreen in usual situations
 
-                //else            pos.X += 6.2f*dt*float( int((n + 1)/2) );
-                //Log::info("FeatureUnlockedCutScene", "Object %d moving by %f", n,
-                //    (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ));
-            }
-            else
-            {
-                //pos.X -= 2.0f*dt;
-            }
-
-            //if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z -= 2.0f*dt;
+            // Put the trophy in center
+            float pos_value = (n == 0) ? unlockedStuffCount/2 :
+                              (n == unlockedStuffCount/2) ? 0 : n;
+            float offset = (float) pos_value - ((float) unlockedStuffCount)/2.0f + 0.5f;
+            offset *= (unlockedStuffCount <= 3) ? 1.4f :
+                      (unlockedStuffCount <= 5) ? 1.2f : 1.0f;
+            pos.X += offset*dt;
 
             pos.Z = smoothed_progress_factor * -4.0f;
 
             m_unlocked_stuff[n].m_root_gift_node->setPosition(pos);
         }
-    }
-    else if (m_global_time < GIFT_EXIT_FROM)
-    {
     }
 
     for (int n=0; n<unlockedStuffCount; n++)

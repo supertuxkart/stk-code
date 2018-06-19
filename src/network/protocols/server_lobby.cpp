@@ -434,7 +434,8 @@ void ServerLobby::update(int ticks)
     // Reset server to initial state if no more connected players
     if (m_waiting_for_reset)
     {
-        if (!RaceEventManager::getInstance()->protocolStopped() ||
+        if ((RaceEventManager::getInstance() &&
+            !RaceEventManager::getInstance()->protocolStopped()) ||
             !GameProtocol::emptyInstance())
             return;
 
@@ -970,13 +971,13 @@ void ServerLobby::computeNewRankings()
             {
                 result = 0.0;
                 ranking_importance = mode_factor *
-                    MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
             else if (!players[j])
             {
                 result = 1.0;
                 ranking_importance = mode_factor *
-                    MAX_SCALING_TIME * MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
             else
             {
@@ -994,10 +995,11 @@ void ServerLobby::computeNewRankings()
                         (player1_time - player2_time) / (player2_time / 20.0);
                     result = std::max(0.0, 0.5 - result);
                 }
+
+                double max_time = std::min(std::max(player1_time, player2_time),
+                    MAX_SCALING_TIME);
                 ranking_importance = mode_factor *
-                    std::min(
-                    std::max(player1_time, player2_time), MAX_SCALING_TIME) *
-                    MAX_POINTS_PER_SECOND * player_factors;
+                    scalingValueForTime(max_time) * player_factors;
             }
             // Compute the ranking change
             scores_change[i] +=
@@ -1071,6 +1073,15 @@ double ServerLobby::getModeSpread()
 }   // getModeSpread
 
 //-----------------------------------------------------------------------------
+/** Compute the scaling value of a given time
+ *  Short races are more random, so we don't use strict proportionality
+ */
+double ServerLobby::scalingValueForTime(double time)
+{
+    return time * sqrt(time / 120.0) * MAX_POINTS_PER_SECOND;
+}   // scalingValueForTime
+
+//-----------------------------------------------------------------------------
 /** Manages the distribution of the base points.
  *  Gives half of the points progressively
  *  by smaller and smaller chuncks from race 1 to 45.
@@ -1082,9 +1093,7 @@ double ServerLobby::distributeBasePoints(uint32_t online_id)
     unsigned num_races  = m_num_ranked_races.at(online_id);
     if (num_races < 45)
     {
-        return
-            (BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u) *
-            2.0);
+        return BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u);
     }
     else
         return 0.0;

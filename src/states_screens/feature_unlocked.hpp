@@ -116,10 +116,6 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
     /** Angle of the key (from 0 to 1, simply traces progression) */
     float m_key_angle;
 
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    scene::IMeshSceneNode *m_avoid_irrlicht_bug;
-#endif
-
     void continueButtonPressed();
 
 public:

@@ -79,6 +79,7 @@ private:
 
 public:
     static void init(unsigned int argc, char *argv[]);
+    static void addArgsFromUserConfig();
     static void reportInvalidParameters();
     static bool has(const std::string &option);
     // ------------------------------------------------------------------------

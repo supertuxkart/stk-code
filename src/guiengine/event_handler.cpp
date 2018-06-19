@@ -49,6 +49,7 @@
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
+using GUIEngine::NavigationDirection;
 
 using namespace irr::gui;
 
@@ -310,68 +311,34 @@ void EventHandler::processGUIAction(const PlayerAction action,
         case PA_STEER_LEFT:
         case PA_MENU_LEFT:
         {
-            Widget* w = GUIEngine::getFocusForPlayer(playerID);
-            if (w == NULL) break;
-
-            Widget* widget_to_call = w;
-
-            /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
-             in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-             notified of clicks onto themselves so they can toggle their state. )
-             On the way, also notify everyone in the chain of the left press. */
-            while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
-            {
-                if (widget_to_call->leftPressed(playerID) == EVENT_LET)
-                {
-                    sendEventToUser(w, w->m_properties[PROP_ID], playerID);
-                }
-                widget_to_call = widget_to_call->m_event_handler;
-            }
-
-
-            if (widget_to_call->leftPressed(playerID) == EVENT_LET)
-            {
-                sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
-            }
+            sendNavigationEvent(NAV_LEFT, playerID);
+            break;
         }
-        break;
 
         case PA_STEER_RIGHT:
         case PA_MENU_RIGHT:
         {
-            Widget* w = GUIEngine::getFocusForPlayer(playerID);
-            if (w == NULL) break;
-
-            Widget* widget_to_call = w;
-            /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
-             in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-             notified of clicks onto themselves so they can toggle their state. )
-             On the way, also notify everyone in the chain of the right press */
-            while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
-            {
-                if (widget_to_call->rightPressed(playerID) == EVENT_LET)
-                {
-                    sendEventToUser(widget_to_call, w->m_properties[PROP_ID], playerID);
-                }
-                widget_to_call = widget_to_call->m_event_handler;
-            }
-
-            if (widget_to_call->rightPressed(playerID) == EVENT_LET)
-            {
-                sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
-            }
+            sendNavigationEvent(NAV_RIGHT, playerID);
+            break;
         }
-        break;
 
         case PA_ACCEL:
         case PA_MENU_UP:
-            navigate(playerID, type, pressedDown, true);
+        {
+            if (type == Input::IT_STICKBUTTON && !pressedDown)
+                break;
+            sendNavigationEvent(NAV_UP, playerID);
             break;
+        }
 
         case PA_BRAKE:
         case PA_MENU_DOWN:
-            navigate(playerID, type, pressedDown, false);
+        {
+            if (type == Input::IT_STICKBUTTON && !pressedDown)
+                break;
+            sendNavigationEvent(NAV_DOWN, playerID);
             break;
+        }
 
         case PA_RESCUE:
         case PA_MENU_CANCEL:
@@ -427,156 +394,250 @@ const bool NAVIGATION_DEBUG = false;
 #pragma mark Private methods
 #endif
 
-/**
- * Focus the next widget either downwards or upwards.
- *
- * \param reverse True means navigating up, false means down.
- */
-void EventHandler::navigate(const int playerID, Input::InputType type, const bool pressedDown, const bool reverse)
+void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int playerID)
 {
-    IGUIElement *el = NULL;
-
-    if (type == Input::IT_STICKBUTTON && !pressedDown)
-        return;
-
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
-    if (w != NULL)
+    if (w == NULL)
     {
-        el = w->getIrrlichtElement();
-    }
+        Widget* defaultWidget = NULL;
+        Screen* screen = GUIEngine::getCurrentScreen();
+        if (screen == NULL) return;
+        defaultWidget = screen->getFirstWidget();
 
-    // list widgets are a bit special, because up/down keys are also used
-    // to navigate between various list items, not only to navigate between
-    // components
-    if (w != NULL && w->m_type == WTYPE_LIST)
-    {
-        ListWidget* list = (ListWidget*) w;
-
-        const bool stay_within_list = reverse ? list->getSelectionID() > 0 :
-            list->getSelectionID() < list->getItemCount() - 1;
-
-        if (stay_within_list)
+        if (defaultWidget != NULL)
         {
-            if (reverse)
-                list->setSelectionID(list->getSelectionID() - 1);
-            else
-                list->setSelectionID(list->getSelectionID() + 1);
-            return;
+            if (playerID != PLAYER_ID_GAME_MASTER && !defaultWidget->m_supports_multiplayer)
+                return;
+            defaultWidget->setFocusForPlayer(playerID);
         }
-        else
+        return;
+    }
+
+    Widget* widget_to_call = w;
+
+    bool handled_by_widget = false;
+    EventPropagation propagation_state = EVENT_BLOCK;
+
+    /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+     in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+     notified of clicks onto themselves so they can toggle their state. )
+     On the way, also notify everyone in the chain of the press. */
+    do
+    {
+        if (nav == NAV_LEFT)
+            propagation_state = widget_to_call->leftPressed(playerID);
+        else if (nav == NAV_RIGHT)
+            propagation_state = widget_to_call->rightPressed(playerID);
+        else if (nav == NAV_UP)
+            propagation_state = widget_to_call->upPressed(playerID);
+        else if (nav == NAV_DOWN)
+            propagation_state = widget_to_call->downPressed(playerID);
+
+        if (propagation_state == EVENT_LET)
+            sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
+
+        if (propagation_state == EVENT_LET || propagation_state == EVENT_BLOCK_BUT_HANDLED)
+            handled_by_widget = true;
+
+        if (widget_to_call->m_event_handler == NULL)
+            break;
+
+        widget_to_call = widget_to_call->m_event_handler;
+    } while (widget_to_call->m_event_handler != widget_to_call);
+
+    if (!handled_by_widget)
+    {
+        navigate(nav, playerID);
+    }
+} // sendNavigationEvent
+
+
+/**
+ * Focus the next widget downards, upwards, leftwards or rightwards.
+ *
+ * \param nav Determine in which direction to navigate
+ */
+void EventHandler::navigate(const NavigationDirection nav, const int playerID)
+{
+    Widget* w = GUIEngine::getFocusForPlayer(playerID);
+
+    int next_id = findIDClosestWidget(nav, playerID, w, false);
+
+    if (next_id != -1)
+    {
+        Widget* closest_widget = GUIEngine::getWidget(next_id);
+        closest_widget->setFocusForPlayer(playerID);
+
+        // A list exception : when entering a list by going down/left/right, select the first item
+        // when focusing a list by going up, select the last item of the list
+        if (closest_widget->m_type == WTYPE_LIST)
         {
-            list->setSelectionID(-1);
+            ListWidget* list = (ListWidget*) closest_widget;
+            assert(list != NULL);
+            list->setSelectionID(nav == NAV_UP ? list->getItemCount() - 1 : 0);
         }
     }
 
-    if (w != NULL && ((reverse && w->m_tab_up_root != -1) || (!reverse && w->m_tab_down_root != -1)))
+    return;
+
+} // navigate
+
+/* This function use simple heuristic to find the closest widget
+ * in the requested direction,
+ * It prioritize widgets close vertically to widget close horizontally,
+ * as it is expected behavior in any direction.
+ * Several hardcoded values are used, having been found to work well
+ * experimentally while keeping simple heuristics.
+ */
+int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int playerID,
+                                      GUIEngine::Widget* w, bool ignore_disabled, int recursion_counter)
+{
+    int closest_widget_id = -1;
+    int distance = 0;
+    // So that the UI behavior don't change when it is upscaled
+    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*100;
+    int smallest_distance = BIG_DISTANCE;
+    // Used when there is no suitable widget in the requested direction
+    int closest_wrapping_widget_id = -1;
+    int wrapping_distance = 0;
+    int smallest_wrapping_distance = BIG_DISTANCE;
+
+    // In theory, it's better to look recursively in m_widgets
+    // In practice, this is much much simpler and work equally well
+    // Usual widget IDs begin at 100 and there is rarely more
+    // than a few dozen of them - but it's very cheap to have some margin,
+    for (int i=0;i<1000;i++)
     {
-        Widget* next = GUIEngine::getWidget(reverse ? w->m_tab_up_root : w->m_tab_down_root);
-        assert(next != NULL);
-        el = next->getIrrlichtElement();
+        Widget* w_test = GUIEngine::getWidget(i);
 
-        if (el == NULL)
-        {
-            Log::warn("EventHandler::navigate", "m_tab_down/up_root is set to an ID for which I can't find the widget");
-            return;
-        }
-    }
+        // The widget id is invalid if :
+        // - it doesn't match a widget
+        // - it doesn't match a focusable widget
+        // - it corresponds to the current widget
+        // - it corresponds to an invisible or disabled widget
+        // - the player is not allowed to select it
+        if (w_test == NULL || !Widget::isFocusableId(i) || w == w_test ||
+            (!w_test->isVisible()   && ignore_disabled) ||
+            (!w_test->isActivated() && ignore_disabled) ||
+            (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer))
+            continue;
 
-    // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
-    if (ScreenKeyboard::isActive())
-    {
-        if (!ScreenKeyboard::getCurrent()->isMyIrrChild(el))
-            el = NULL;
-    }
-    else if (ModalDialog::isADialogActive())
-    {
-        if (!ModalDialog::getCurrent()->isMyIrrChild(el))
-            el = NULL;
-    }
-
-    bool found = false;
-
-    // find closest widget
-    if (el != NULL && el->getTabGroup() != NULL)
-    {
-        // Up: if the current widget is e.g. 15, search for widget 14, 13, 12, ... (up to 10 IDs may be missing)
-        // Down: if the current widget is e.g. 5, search for widget 6, 7, 8, 9, ..., 15 (up to 10 IDs may be missing)
-        for (int n = 1; n < 10 && !found; n++)
-        {
-            IGUIElement *closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() + (reverse ? -n : n), true);
-
-            if (closest != NULL && Widget::isFocusableId(closest->getID()))
-            {
-                Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
-
-                if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
-
-                // if a dialog is shown, restrict to items in the dialog
-                if (ScreenKeyboard::isActive())
-                {
-                    if (!ScreenKeyboard::getCurrent()->isMyChild(closestWidget))
-                        continue;
-                }
-                else if (ModalDialog::isADialogActive())
-                {
-                    if (!ModalDialog::getCurrent()->isMyChild(closestWidget))
-                        continue;
-                }
-
-                if (NAVIGATION_DEBUG)
-                {
-                    Log::info("EventHandler", "Navigating %s to %d", (reverse ? "up" : "down"), closest->getID());
-                }
-
-                assert(closestWidget != NULL);
-
-                if (!closestWidget->isVisible() || !closestWidget->isActivated())
-                    continue;
-
-                closestWidget->setFocusForPlayer(playerID);
-
-                // another list exception : when entering a list by going down, select the first item
-                // when focusing a list by going up, select the last item of the list
-                if (closestWidget->m_type == WTYPE_LIST)
-                {
-                    ListWidget* list = (ListWidget*) closestWidget;
-                    assert(list != NULL);
-                    list->setSelectionID(reverse ? list->getItemCount() - 1 : 0);
-                }
-                found = true;
-            }
-        } // end for
-    }
-
-    if (!found)
-    {
-        if (NAVIGATION_DEBUG)
-            Log::info( "EventHandler::navigate", "Wrap around");
-
-        // select the last/first widget
-        Widget* wrapWidget = NULL;
-
+        // if a dialog is shown, restrict to items in the dialog
         if (ScreenKeyboard::isActive())
         {
-            wrapWidget = reverse ? ScreenKeyboard::getCurrent()->getLastWidget():
-                ScreenKeyboard::getCurrent()->getFirstWidget();
+            if (!ScreenKeyboard::getCurrent()->isMyChild(w_test))
+                continue;
         }
         else if (ModalDialog::isADialogActive())
         {
-            wrapWidget = reverse ? ModalDialog::getCurrent()->getLastWidget() :
-                ModalDialog::getCurrent()->getFirstWidget();
-        }
-        else
-        {
-            Screen* screen = GUIEngine::getCurrentScreen();
-            if (screen == NULL) return;
-            wrapWidget = reverse ? screen->getLastWidget() :
-                screen->getFirstWidget();
+            if (!ModalDialog::getCurrent()->isMyChild(w_test))
+                continue;
         }
 
-        if (wrapWidget != NULL)  wrapWidget->setFocusForPlayer(playerID);
+        int offset = 0;
+
+        if (nav == NAV_UP || nav == NAV_DOWN)
+        {
+            if (nav == NAV_UP)
+            {
+                // Compare current top point with other widget lowest point
+                distance = w->m_y - (w_test->m_y + w_test->m_h);
+            }
+            else
+            {
+                // compare current lowest point with other widget top point
+                distance = w_test->m_y - (w->m_y + w->m_h);
+            }
+
+            // Better select an item on the side that one much higher,
+            // so make the vertical distance matter much more
+            // than the horizontal offset.
+            // The multiplicator of 100 is meant so that the offset will matter
+            // only if there are two or more widget with a (nearly) equal vertical height.
+            distance *= 100;
+
+            wrapping_distance = distance;
+            // if the two widgets are not well aligned, consider them farther
+            // If w's left/right-mosts points are between w_test's,
+            // right_offset and left_offset will be 0.
+            // If w_test's are between w's,
+            // we substract the smaller from the bigger
+            // else, the smaller is 0 and we keep the bigger
+            int right_offset = std::max(0, w_test->m_x - w->m_x);
+            int left_offset  = std::max(0, (w->m_x + w->m_w) - (w_test->m_x + w_test->m_w));
+            offset = std::max (right_offset - left_offset, left_offset - right_offset);
+        }
+        else if (nav == NAV_LEFT || nav == NAV_RIGHT)
+        {
+            if (nav == NAV_LEFT)
+            {
+                // compare current leftmost point with other widget rightmost
+                distance = w->m_x - (w_test->m_x + w_test->m_w);
+            }
+            else
+            {
+                // compare current rightmost point with other widget leftmost
+                distance = w_test->m_x - (w->m_x + w->m_w);
+            }
+            wrapping_distance = distance;
+
+            int down_offset = std::max(0, w_test->m_y - w->m_y);
+            int up_offset  = std::max(0, (w->m_y + w->m_h) - (w_test->m_y + w_test->m_h));
+            offset = std::max (down_offset - up_offset, up_offset - down_offset);
+
+            // No lateral selection if there is not at least partial alignement
+            // >= because we don't want it to trigger if two widgets touch each other
+            if (offset >= w->m_h)
+            {
+                distance = BIG_DISTANCE;
+                wrapping_distance = BIG_DISTANCE;
+            }
+        }
+
+        // This happens if the tested widget is in the opposite direction
+        if (distance < 0)
+            distance = BIG_DISTANCE;
+        distance += offset;
+        wrapping_distance += offset;
+
+        if (distance < smallest_distance)
+        {
+            smallest_distance = distance;
+            closest_widget_id = i;
+        }
+        if (wrapping_distance < smallest_wrapping_distance)
+        {
+            smallest_wrapping_distance = wrapping_distance;
+            closest_wrapping_widget_id = i;
+        }
+    } // for i < 1000
+
+    int closest_id = (smallest_distance < BIG_DISTANCE) ? closest_widget_id :
+                                                          closest_wrapping_widget_id;
+    Widget* w_test = GUIEngine::getWidget(closest_id);
+
+    // If the newly found focus target is invisible, or not activated,
+    // it is not a good target, search again
+    // This allows to skip over disabled/invisible widgets in a grid
+    if (!w_test->isVisible() || !w_test->isActivated())
+    {
+        // Can skip over at most 3 consecutive disabled/invisible widget
+        if (recursion_counter <=2)
+        {
+            recursion_counter++;
+            return findIDClosestWidget(nav, playerID, w_test, /*ignore disabled*/ false, recursion_counter);
+        }
+        // If nothing has been found, do a search ignoring disabled/invisible widgets,
+        // restarting from the initial focused widget (otherwise, it could lead to weird results) 
+        else if (recursion_counter == 3)
+        {
+            Widget* w_focus = GUIEngine::getFocusForPlayer(playerID);
+            return findIDClosestWidget(nav, playerID, w_focus, /*ignore disabled*/ true, recursion_counter);
+        }
     }
-}
+
+    return closest_id;
+} // findIDClosestWidget
 
 // -----------------------------------------------------------------------------
 
@@ -584,7 +645,7 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 {
     if (ScreenKeyboard::isActive())
     {
-        if (ScreenKeyboard::getCurrent()->processEvent(widget->m_properties[PROP_ID]) == EVENT_BLOCK)
+        if (ScreenKeyboard::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
         {
             return;
         }
@@ -592,7 +653,7 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
     
     if (ModalDialog::isADialogActive())
     {
-        if (ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) == EVENT_BLOCK)
+        if (ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
         {
             return;
         }

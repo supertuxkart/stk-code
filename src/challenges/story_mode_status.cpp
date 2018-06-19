@@ -31,6 +31,7 @@
 StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
     m_points             = 0;
+    m_points_before      = 0;
     m_next_unlock_points = 0;
     m_first_time         = true;
     m_easy_challenges    = 0;
@@ -79,6 +80,7 @@ bool StoryModeStatus::isLocked(const std::string& feature)
 //-----------------------------------------------------------------------------
 void StoryModeStatus::computeActive()
 {
+    int old_points = m_points;
     m_points = 0;
     m_next_unlock_points = 0;
     m_easy_challenges = 0;
@@ -181,6 +183,9 @@ void StoryModeStatus::computeActive()
     }   // for i
 
     // now we have the number of points.
+
+    if (old_points != m_points)
+        m_points_before = old_points;
 
     unlockFeatureByList();
 

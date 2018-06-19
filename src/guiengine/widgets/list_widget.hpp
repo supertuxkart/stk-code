@@ -246,6 +246,15 @@ namespace GUIEngine
         virtual EventPropagation transmitEvent(Widget* w,
                                                const std::string& originator,
                                                const int playerID);
+
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation upPressed(const int playerID);
+        
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation downPressed(const int playerID);
+
+        /** \brief implement common core parts of upPressed and downPressed */ 
+        EventPropagation moveToNextItem(const bool down);
         
         void setColumnListener(IListWidgetHeaderListener* listener)
         {

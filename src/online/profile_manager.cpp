@@ -255,16 +255,18 @@ bool ProfileManager::inPersistent(const uint32_t id)
  */
 OnlineProfile* ProfileManager::addPersistent(OnlineProfile * profile)
 {
-    if (inPersistent(profile->getID()))
+    uint32_t profile_id = profile->getID();
+
+    if (inPersistent(profile_id))
     {
-        m_profiles_persistent[profile->getID()]->merge(profile);
+        m_profiles_persistent[profile_id]->merge(profile);
     }
     else
     {
-        m_profiles_persistent[profile->getID()] = profile;
+        m_profiles_persistent[profile_id] = profile;
     }
 
-    return m_profiles_persistent[profile->getID()];
+    return m_profiles_persistent[profile_id];
 }   // addPersistent
 
 // ------------------------------------------------------------------------
