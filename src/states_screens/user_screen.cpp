@@ -294,7 +294,7 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
-        getWidget<ButtonWidget>("password_reset")->setVisible(online);
+        getWidget<ButtonWidget>("password_reset")->setVisible(Online::LinkHelper::isSupported() && online);
         // Is user has no online name, make sure the user can enter one
         if (player->getLastOnlineName().empty())
             m_username_tb->setActive(true);
@@ -382,7 +382,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
     else if (name == "password_reset")
     {
         // Open password reset page
-        Online::LinkHelper::OpenURL(stk_config->m_password_reset_url);
+        Online::LinkHelper::openURL(stk_config->m_password_reset_url);
     }
     else if (name == "options")
     {

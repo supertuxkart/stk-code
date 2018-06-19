@@ -26,7 +26,16 @@ using namespace Online;
 
 namespace Online
 {
-    void LinkHelper::OpenURL (std::string url)
+    bool LinkHelper::isSupported()
+    {
+#if defined(_WIN32) || defined(__APPLE__) || (defined(__linux__) && !defined(__ANDROID__))
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    void LinkHelper::openURL (std::string url)
     {
 #if defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);

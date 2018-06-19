@@ -206,11 +206,11 @@ void CreditsScreen::loadedFromFile()
         // translations should be just before the last screen
         m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
     }
-#ifdef __ANDROID__
-    // Disable donate button on Android, as the Play store has strict rules
-    // that only allow you to receive donations though their services.
-    getWidget("donate")->setVisible(false);
-#endif
+
+    if (!Online::LinkHelper::isSupported())
+    {
+        getWidget("donate")->setVisible(false);
+    }
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -401,7 +401,7 @@ void CreditsScreen::eventCallback(GUIEngine::Widget* widget,
     if (name == "donate")
     {
         // Open donation page
-        Online::LinkHelper::OpenURL(stk_config->m_donate_url);
+        Online::LinkHelper::openURL(stk_config->m_donate_url);
     }
 }
 

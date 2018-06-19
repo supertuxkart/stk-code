@@ -195,7 +195,7 @@ void RegisterScreen::makeEntryFieldsVisible()
         getWidget<LabelWidget  >("label_email_confirm")->setVisible(new_account);
     }
 
-    getWidget<ButtonWidget >("password_reset")->setVisible(online && !new_account);
+    getWidget<ButtonWidget >("password_reset")->setVisible(LinkHelper::isSupported() && (online && !new_account));
 }   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
@@ -451,7 +451,7 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "password_reset")
     {
         // Open password reset page
-        Online::LinkHelper::OpenURL(stk_config->m_password_reset_url);
+        Online::LinkHelper::openURL(stk_config->m_password_reset_url);
     }
     else if (name == "back")
     {
