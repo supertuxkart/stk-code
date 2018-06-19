@@ -46,6 +46,7 @@ StoryModeStatus::StoryModeStatus(const XMLNode *node)
         node->get("first-time", &m_first_time);
     }   // if node
 
+    computeActive( /* first call */ true);
 }   // StoryModeStatus
 
 //-----------------------------------------------------------------------------
@@ -78,7 +79,7 @@ bool StoryModeStatus::isLocked(const std::string& feature)
 }  // featureIsLocked
 
 //-----------------------------------------------------------------------------
-void StoryModeStatus::computeActive()
+void StoryModeStatus::computeActive(bool first_call)
 {
     int old_points = m_points;
     m_points = 0;
@@ -184,8 +185,10 @@ void StoryModeStatus::computeActive()
 
     // now we have the number of points.
 
+    // Update the previous number of points
+    // On game launch, set it to the number of points the player has
     if (old_points != m_points)
-        m_points_before = old_points;
+        m_points_before = (first_call) ? m_points : old_points;
 
     unlockFeatureByList();
 
