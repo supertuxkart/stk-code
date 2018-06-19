@@ -615,6 +615,9 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int closest_id = (smallest_distance < BIG_DISTANCE) ? closest_widget_id :
                                                           closest_wrapping_widget_id;
     Widget* w_test = GUIEngine::getWidget(closest_id);
+    
+    if (w_test == NULL)
+        return -1;
 
     // If the newly found focus target is invisible, or not activated,
     // it is not a good target, search again
