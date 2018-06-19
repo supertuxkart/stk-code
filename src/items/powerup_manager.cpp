@@ -383,7 +383,8 @@ void PowerupManager::WeightsData::precomputeWeights()
  *  The value returned matches the enum value of the random item if single.
  *  In case of triple-item, the value will be the enum value plus
  *  the number of existing powerups (= POWERUP_LAST-POWERUP_FIRST+1)
- *  \param rank The rank for which an item needs to be picked.
+ *  \param rank The rank for which an item needs to be picked (between 0
+ *         and number_of_karts-1).
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
  */
@@ -392,10 +393,14 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
         rank = m_summed_weights_for_rank.size()-1;
-    else if (rank<0) rank = 0;  // E.g. battle mode
+    else if (rank<0) rank = 0;  // E.g. battle mode, which has rank -1
     const std::vector<int> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
+#undef ITEM_DISTRIBUTION_DEBUG
+#ifdef ITEM_DISTRIBUTION_DEBUG
+    int original_random_number = random_number;
+#endif
     random_number = random_number % summed_weights.back();
     // Put the random number in range [1;max of summed weights],
     // so for sum = N, there are N possible random numbers <= N.
@@ -409,6 +414,12 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
 
     // We align with the beginning of the enum and return
     // We don't do more, because it would need to be decoded from enum later
+#ifdef ITEM_DISTRIBUTION_DEBUG
+    Log::verbose("Powerup", "World %d rank %d random %d %d item %d",
+                 World::getWorld()->getTimeTicks(), rank, random_number,
+                 original_random_number, powerup);
+#endif
+
     return powerup + POWERUP_FIRST;
 }   // WeightsData::getRandomItem
 
@@ -553,8 +564,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
  *  item for POSITION_BATTLE_MODE is returned. This function takes the weights
  *  specified for all items into account by using a list which contains all
  *  items depending on the weights defined. See updateWeightsForRace()
- *  \param pos Position of the kart (1<=pos<=number of karts) - ignored in
- *         case of a battle mode.
+ *  \param pos Position of the kart (1<=pos<=number of karts).
  *  \param n Number of times this item is given to the kart.
  *  \param random_number A random number used to select the item. Important
  *         for networking to be able to reproduce item selection.
@@ -564,10 +574,6 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              int random_number)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
-#ifdef ITEM_DISTRIBUTION_DEBUG
-    Log::verbose("Powerup", "World %d pos %d random %d iten %d",
-                 World::getWorld()->getTimeTicks(), pos, random_number, powerup);
-#endif
     if(powerup > POWERUP_LAST)
     {
         powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
