@@ -28,32 +28,49 @@
 
             <box width="80%" height="100%" layout="vertical-row">
                 <spacer height="1%" width="10"/>
-                <label align="center" word_wrap="true" text="Hitting a banana can result in one of the following being attached to the kart:"/>
+                <label align="center" word_wrap="true" text="Not all karts drive the same! They belong to classes with several differences:"/>
                 <spacer height="2%" width="10"/>                
 
-                <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/anchor-icon.png"/>
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/mass.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Anchor - slows down the kart suddenly."/>
+                            text="Mass - there are three classes of karts, depending of their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
                 </div>
                 
-                <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/parachute-icon.png"/>
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/power.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Parachute - slows down the kart, more progressively than the anchor. The faster you go, the stronger it slows you down."/>
+                            text="Acceleration - especially useful at start, after an accident, or in tracks with a lot of sharp curves. The lighter the kart, the faster it accelerates, especially at low speeds."/>
                 </div>
                 
-                <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/bomb_icon.png"/>
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/speed.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Bomb - detonates after some amount of time, throwing the kart up in the air. Bump into another kart to transfer the bomb to it."/>
+                            text="Max speed - the higher it is, the faster the kart can go. Especially useful in tracks with straight lines and gentle curves. Heavier karts have a higher top speed."/>
                 </div>
+
+                <div width="100%" proportion="3" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/nitro.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Nitro consumption - the lower it is, the more speed you can get from a can of nitro. The lighter the kart, the lower its nitro consumption."/>
+                </div>
+
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="128" height="128" icon="gui/slipstream_icon.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%" word_wrap="true"
+                            I18N="In the help menu"
+                            text="If you follow closely another kart for a few seconds, you'll get a slipstream speed bonus when you overtake it. The lighter your kart, the easier it is."/>
+                </div>
+
             </box>
         </div>
     </div>
