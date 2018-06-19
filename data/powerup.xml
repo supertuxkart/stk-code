@@ -94,7 +94,8 @@
        If there is a WeightsData object for the same kart number, it is
        copied, otherwise an interpolated WeightsData object is created
        from the two WeightsData objects that are closest to the current
-       number of karts.
+       number of karts. If there is only one WeightsData for the race
+       mode, it is used for any number of karts.
        Each Weights entry itself can contain one or more weight tags:
        The first entry is for the kart with rank 1, the last weight entry
        for the last kart. The remaining entries are evenly distributed
@@ -133,8 +134,10 @@
        there are more karts.                               -->
 
   <race-weight-list>
-    <!-- The entry for '1' karts is special and means 'first kart' -->
     <weights num-karts="1">
+      <!-- The entry for '1' kart lists more than a single weight
+           because the others are used for interpolation when
+           there are two karts or more. -->
       <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="28       0    60    20      45       15      32     0     0     0"
               multi   =" 0       0     0     0       0        0       0     0     0     0" />

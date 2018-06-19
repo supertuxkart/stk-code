@@ -522,7 +522,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     {
         int n = wd[i]->getNumKarts();
         if ( ( n < wd[prev_index]->getNumKarts() &&
-                   wd[next_index]->getNumKarts() > num_karts)       ||
+                   wd[prev_index]->getNumKarts() > num_karts)       ||
              ( n > wd[prev_index]->getNumKarts() && n <= num_karts )   )
         {
                 prev_index = i;
@@ -592,7 +592,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
 void PowerupManager::unitTesting()
 {
     // Test 1: Test all possible random numbers for tutorial, and
-    // make sure that always a cake is picked.
+    // make sure that always three bowling balls are picked.
     // ----------------------------------------------------------
     race_manager->setMinorMode(RaceManager::MINOR_MODE_TUTORIAL);
     powerup_manager->computeWeightsForRace(1);
