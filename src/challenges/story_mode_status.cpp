@@ -45,8 +45,6 @@ StoryModeStatus::StoryModeStatus(const XMLNode *node)
     {
         node->get("first-time", &m_first_time);
     }   // if node
-
-    computeActive( /* first call */ true);
 }   // StoryModeStatus
 
 //-----------------------------------------------------------------------------
@@ -99,8 +97,8 @@ void StoryModeStatus::computeActive(bool first_call)
         // -----------------
         if((i->second)->isSolvedAtAnyDifficulty())
         {
-            // The constructor calls computeActive, which actually locks
-            // all features, so unlock the solved ones (and don't try to
+            // computeActive is called in createStoryModeStatus, which actually
+            // locks all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
 
             if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))

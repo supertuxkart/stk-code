@@ -222,7 +222,7 @@ StoryModeStatus* UnlockManager::createStoryModeStatus(const XMLNode *node)
         status->addStatus(challenge_status);
     }
 
-    status->computeActive();
+    status->computeActive(/* first call*/ true);
     return status;
 }   // createStoryModeStatus
 
@@ -253,19 +253,31 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& karts,
                                         std::vector<const ChallengeData*>& unlocked)
 {
-    ChallengeData* c = NULL;
+    printf ("points before is %d, points_now is %d\n", points_before, points_now);
 
     for (AllChallengesType::iterator it = m_all_challenges.begin();
          it != m_all_challenges.end(); it++)
-    {
-        c = it->second;
+    {     
+        ChallengeData* c = it->second;
+
         if (c->getNumTrophies() > points_before &&
             c->getNumTrophies() <= points_now      )
         {
+            printf ("Num trophies for a challenge between before and now !)\n");
+            if (c->getMode() != ChallengeData::CM_SINGLE_RACE)
+                printf ("not single race major mode !\n");
+
+            if (c->getTrackId() == "")
+                printf ("empty track ID !\n");
+
             if (c->getMode() == ChallengeData::CM_SINGLE_RACE && c->getTrackId() != "")
             {
+                printf("We've verified the mode status\n");
                 if (!PlayerManager::getCurrentPlayer()->isLocked(c->getTrackId()))
+                {
                     tracks.push_back(c->getTrackId());
+                    printf("track pushed back to list of unlocked feature\n");
+                }
             }
             else if (c->getMode() == ChallengeData::CM_GRAND_PRIX && c->getGPId() != "")
             {
