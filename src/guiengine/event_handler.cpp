@@ -433,11 +433,11 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
         else if (nav == NAV_DOWN)
             propagation_state = widget_to_call->downPressed(playerID);
 
-        if (propagation_state == EVENT_LET)
-            sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
-
         if (propagation_state == EVENT_LET || propagation_state == EVENT_BLOCK_BUT_HANDLED)
             handled_by_widget = true;
+
+        if (propagation_state == EVENT_LET)
+            sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
 
         if (widget_to_call->m_event_handler == NULL)
             break;
@@ -535,6 +535,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         }
 
         int offset = 0;
+        int rightmost = w_test->m_x + w_test->m_w;
 
         if (nav == NAV_UP || nav == NAV_DOWN)
         {
@@ -564,7 +565,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             // we substract the smaller from the bigger
             // else, the smaller is 0 and we keep the bigger
             int right_offset = std::max(0, w_test->m_x - w->m_x);
-            int left_offset  = std::max(0, (w->m_x + w->m_w) - (w_test->m_x + w_test->m_w));
+            int left_offset  = std::max(0, (w->m_x + w->m_w) - rightmost);
             offset = std::max (right_offset - left_offset, left_offset - right_offset);
         }
         else if (nav == NAV_LEFT || nav == NAV_RIGHT)
@@ -572,7 +573,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             if (nav == NAV_LEFT)
             {
                 // compare current leftmost point with other widget rightmost
-                distance = w->m_x - (w_test->m_x + w_test->m_w);
+                distance = w->m_x - rightmost;
             }
             else
             {
@@ -585,9 +586,28 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             int up_offset  = std::max(0, (w->m_y + w->m_h) - (w_test->m_y + w_test->m_h));
             offset = std::max (down_offset - up_offset, up_offset - down_offset);
 
+            // Special case for vertical tabs : select the top element of the body
+            if (w->m_type == GUIEngine::WTYPE_RIBBON)
+            {
+                RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w);
+                if (ribbon->getRibbonType() == GUIEngine::RibbonType::RIBBON_VERTICAL_TABS)
+                {
+                    offset = w_test->m_y;
+                    offset *= 100;
+
+                    // Don't count elements above the tabs or too high as valid
+                    if (!(w_test->m_x > (w->m_x + w->m_w) || rightmost < w->m_x) ||
+                         (w_test->m_y + w_test->m_h) < w->m_y)
+                    {
+                        distance = BIG_DISTANCE;
+                        wrapping_distance = BIG_DISTANCE;
+                    }
+                }
+            }
+
             // No lateral selection if there is not at least partial alignement
             // >= because we don't want it to trigger if two widgets touch each other
-            if (offset >= w->m_h)
+            else if (offset >= w->m_h)
             {
                 distance = BIG_DISTANCE;
                 wrapping_distance = BIG_DISTANCE;

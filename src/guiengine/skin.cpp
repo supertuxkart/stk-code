@@ -1003,6 +1003,56 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             material2D.UseMipMaps = true;
         }
     }
+
+    /* vertical tab-bar ribbons */
+    else if (type == RIBBON_VERTICAL_TABS)
+    {
+        video::SMaterial& material2D =
+            irr_driver->getVideoDriver()->getMaterial2D();
+        for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+        {
+            material2D.UseMipMaps = false;
+        }
+
+        const bool mouseIn = rect.isPointInside(irr_driver->getDevice()
+                                                ->getCursorControl()
+                                                ->getPosition()        );
+
+        BoxRenderParams* params;
+
+        if (mark_selected && (focused || parent_focused))
+            params = &SkinConfig::m_render_params["verticalTab::focused"];
+        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
+            params = &SkinConfig::m_render_params["verticalTab::focused"];
+        else if (mark_selected)
+            params = &SkinConfig::m_render_params["verticalTab::down"];
+        else
+            params = &SkinConfig::m_render_params["verticalTab::neutral"];
+
+
+        // automatically guess from position on-screen if tabs go left or right
+        unsigned int screen_width = irr_driver->getActualScreenSize().Width;
+        const bool horizontal_flip =
+            (unsigned int)rect.UpperLeftCorner.X > screen_width/ 2;
+        params->m_vertical_flip = false;
+
+        core::recti rect2 = rect;
+        if (mark_selected)
+        {
+            // the selected tab should be slighlty bigger than others
+            if (horizontal_flip) rect2.UpperLeftCorner.X -= screen_width/50;
+            else               rect2.LowerRightCorner.X += screen_width/50;
+        }
+
+        drawBoxFromStretchableTexture(widget, rect2, *params,
+                                      parentRibbon->m_deactivated ||
+                                        widget->m_deactivated);
+
+        for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+        {
+            material2D.UseMipMaps = true;
+        }
+    }
     /* icon ribbons */
     else
     {
