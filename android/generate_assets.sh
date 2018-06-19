@@ -275,7 +275,7 @@ optimize_png()
 convert_to_jpg()
 {
     FILE="$1"
-    echo "Convert file: $FILE"
+    echo "Convert file to jpg: $FILE"
 
     if [ ! -f "$FILE" ]; then
         echo "  File doesn't exist."
@@ -360,7 +360,7 @@ convert_to_jpg()
 convert_to_jpg_extract_b3dz()
 {
     FILE="$1"
-    echo "Convert file to jpg: $FILE"
+    echo "Extract b3dz file: $FILE"
 
     if [ ! -f "$FILE" ]; then
         echo "  File doesn't exist."
