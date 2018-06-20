@@ -25,6 +25,8 @@
 * New grand prix win scene
 * Gamepad configuration bugfixes
 * 3 Strikes Battles : added spare tire karts
+* All tracks drivable in reverse, with arrows pointing in the correct direction
+* Visual representation of the start line in all tracks
 * Various improvements (wall driving fixes, parachutes, GP points, cannon fixes, colorization shader)
 
 ## SuperTuxKart 0.9.2
@@ -273,7 +275,7 @@ Too many to list them all. Main points:
   - Fixed keyboard keys unable to work on the first key press bug
   - And others
 
-##SuperTuxKart 0.2 (22. Sep 2006)
+## SuperTuxKart 0.2 (22. Sep 2006)
   * Significant performance improvement by using display lists
   * Improved AI
   * Support for different grand prixs
@@ -291,7 +293,7 @@ Too many to list them all. Main points:
   * Added help and about screens, added credits to track designer
   * Items were added to all tracks
 
-##SuperTuxKart 0.1 (04. May 2006)  (not officially released)
+## SuperTuxKart 0.1 (04. May 2006)  (not officially released)
   * Significant speedup by using a new HOT and collision algorithm --> all tracks are now playable
   * Removed all SDL dependencies, only plib is needed
   * Single and multi-window menu can be used
@@ -299,7 +301,7 @@ Too many to list them all. Main points:
   * Some bug fixes and small improvements
   * Added profile option to support automatic profiling
 
-##SuperTuxKart 0.0.0 (22. Dec 2004)
+## SuperTuxKart 0.0.0 (22. Dec 2004)
   * new tracks
   * new characters and karts
   * new user-interface
