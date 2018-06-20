@@ -158,10 +158,13 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_minimap_ai_icon,           "minimap ai_icon"            );
     CHECK_NEG(m_minimap_player_icon,       "minimap player_icon"        );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
-    CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
-    CHECK_NEG(m_physics_fps,               "physics fps"                );
-    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
+    CHECK_NEG(m_default_track_friction,    "physics default-track-friction"   );
+    CHECK_NEG(m_physics_fps,               "physics fps"                      );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
+    CHECK_NEG(m_solver_iterations,         "physics: solver-iterations"       );
+    CHECK_NEG(m_solver_split_impulse,      "physics: solver-split-impulse"    );
+    CHECK_NEG(m_network_state_frequeny,    "network solver-state-frequency"   );
+    CHECK_NEG(m_solver_split_impulse_thresh,"physics: solver-split-impulse-threshold");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_default_kart_properties->checkAllSet(filename);
@@ -174,11 +177,11 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_bomb_time                  = m_bomb_time_increase        =
-        m_explosion_impulse_objects = m_music_credit_time      =
-        m_delay_finish_time      = m_skid_fadeout_time         =
-        m_near_ground            = 
-        m_smooth_angle_limit     = m_default_track_friction    =
+    m_bomb_time                  = m_bomb_time_increase          =
+        m_explosion_impulse_objects = m_music_credit_time        =
+        m_delay_finish_time      = m_skid_fadeout_time           =
+        m_near_ground            = m_solver_split_impulse_thresh =
+        m_smooth_angle_limit     = m_default_track_friction      =
         m_default_moveable_friction =    UNDEFINED;
     m_item_switch_ticks          = -100;
     m_penalty_ticks              = -100;
@@ -202,7 +205,9 @@ void STKConfig::init_defaults()
     m_minimap_ai_icon            = -100;
     m_minimap_player_icon        = -100;
     m_network_state_frequeny     = -100;
+    m_solver_iterations          = -100;
     m_title_music                = NULL;
+    m_solver_split_impulse       = false;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
     m_ai_acceleration            = 1.0f;
@@ -287,6 +292,11 @@ void STKConfig::getAllData(const XMLNode * root)
         physics_node->get("default-moveable-friction",
                                                  &m_default_moveable_friction);
         physics_node->get("fps",                    &m_physics_fps           );
+        physics_node->get("solver-iterations",      &m_solver_iterations     );
+        physics_node->get("solver-split-impulse",   &m_solver_split_impulse  );
+        physics_node->get("solver-split-impulse-threshold",
+                                               &m_solver_split_impulse_thresh);
+        physics_node->get("solver-mode",            &m_solver_mode           );
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))

@@ -101,12 +101,28 @@
           any track/library pbject.
       default-moveable-friction: Default friction to be used for any moveable,
           e.g. karts, bowling balls, ...
+      solver-iteation: Number of solver iterations. A lower number reduces
+          the quality, but can reduce bouncing effect.
+      solver-split-impulse:: by default bullet solves for velocity and
+          position at the same time, which can introduce bounce. Setting
+          this to 1 can reduce bounce.
+      solver-split-impulse-threshold: Penetration threshold for using split
+          impulse (ignored if solver-split-impulse is false).
+      solver-mode: Bullet's solver mode is a bit mask. This field takes two
+          values: the first value is 'and'ed with bullet's default values 
+          (i.e. it can be used to unset bullet defaults), the second value
+          is 'or'ed (i.e. is used to set a bit). A value of -1 for 'and'
+          means to keep all bits.
       -->
   <physics smooth-normals="true"
            smooth-angle-limit="0.65"
            fps="120"
            default-track-friction="0.5"
-           default-moveable-friction="0.5" />
+           default-moveable-friction="0.5" 
+           solver-iterations="10"
+           solver-split-impulse="false"
+           solver-split-impulse-threshold="-0.02"
+           solver-mode=""/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
@@ -503,7 +519,7 @@
     Use a slow but high quality colour compressor.
     kColourClusterFit = (32),
     Use a fast but low quality colour compressor.
-    kColourRangeFit	= (64),
+    kColourRangeFit = (64),
     Use a very slow but very high quality colour compressor.
     kColourIterativeClusterFit = (256),
     STK default the low quality.

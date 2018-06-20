@@ -74,6 +74,44 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                   0.0f));
     m_debug_drawer = new IrrDebugDrawer();
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
+
+    // Get the solver settings from the config file
+    btContactSolverInfo& info = m_dynamics_world->getSolverInfo();
+    info.m_numIterations = stk_config->m_solver_iterations;
+    info.m_splitImpulse  = stk_config->m_solver_split_impulse;
+    info.m_splitImpulsePenetrationThreshold =
+        stk_config->m_solver_split_impulse_thresh;
+
+    int set_flags=0, reset_flags = 0;
+    int *p;
+    for(auto mode : stk_config->m_solver_mode)
+    {
+        std::string s = mode;
+        p = &set_flags;
+        if (s[0] == '-')
+        {
+            s.erase(s.begin());
+            p = &reset_flags;
+        }
+        s = StringUtils::toLowerCase(s);
+        if      (s=="randmize_order"                               ) *p |=   1;
+        else if (s=="friction_separate"                            ) *p |=   2;
+        else if (s=="use_warmstarting"                             ) *p |=   4;
+        else if (s=="use_friction_warmstarting"                    ) *p |=   8;
+        else if (s=="use_2_friction_directions"                    ) *p |=  16;
+        else if (s=="enable_friction_direction_caching"            ) *p |=  32;
+        else if (s=="disable_velocity_dependent_friction_direction") *p |=  64;
+        else if (s=="cache_friendly"                               ) *p |= 128;
+        else if (s=="simd"                                         ) *p |= 256;
+        else if (s=="cuda"                                         ) *p |= 512;
+        else
+        {
+            Log::error("STK-Config",
+                       "Unknown option '%s' for solver-mode - ignored.",
+                       s.c_str());
+        }
+    }
+    info.m_solverMode = (info.m_solverMode & (~reset_flags)) | set_flags;
 }   // init
 
 //-----------------------------------------------------------------------------
