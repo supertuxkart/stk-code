@@ -32,7 +32,7 @@ after some tweaks, but atm. only linux is supported.
 Dependencies list (may be incomplete):
 
     autoconf, automake, make, python, gradle, ant, imagemagick, cmake, 
-    vorbis-tools
+    vorbis-tools, pngquant
 
 Additionally some dependencies for optimize_data script:
 

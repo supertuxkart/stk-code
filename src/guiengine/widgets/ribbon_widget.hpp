@@ -37,7 +37,8 @@ namespace GUIEngine
     {
         RIBBON_COMBO,   //!< select one item out of many, like in a combo box
         RIBBON_TOOLBAR, //!< a row of individual buttons
-        RIBBON_TABS     //!< a tab bar
+        RIBBON_TABS,    //!< a tab bar
+        RIBBON_VERTICAL_TABS //!< a vertical tab bar
     };
 
     /** \brief A static text/icons/tabs bar widget.
@@ -66,17 +67,21 @@ namespace GUIEngine
         
         int m_selection[MAX_PLAYER_COUNT];
         
-        /** The type of this ribbon (toolbar, combo, tabs) */
+        /** The type of this ribbon (toolbar, combo, tabs, vertical tabs) */
         RibbonType m_ribbon_type;
                 
         /** Each item within the ribbon holds a flag saying whether it is
          *  selected or not. This method updates the flag in all of this
          *  ribbon's children. Called everytime selection changes.*/
         void updateSelection();
-        
+
         /** Callbacks */
         virtual EventPropagation rightPressed(const int playerID=0) OVERRIDE;
         virtual EventPropagation leftPressed(const int playerID=0) OVERRIDE;
+        virtual EventPropagation upPressed(const int playerID=0) OVERRIDE;
+        virtual EventPropagation downPressed(const int playerID=0) OVERRIDE;
+        EventPropagation moveToNextItem(const bool horizontally, const bool reverse, const int playerID);
+        EventPropagation propagationType(const bool horizontally);
         virtual EventPropagation mouseHovered(Widget* child,
                                               const int playerID) OVERRIDE;
         virtual EventPropagation transmitEvent(Widget* w,
@@ -120,6 +125,10 @@ namespace GUIEngine
         /** Returns the type of this ribbon (see the GUI module overview page
          *  for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
+        // --------------------------------------------------------------------
+        /** Returns the number of active items within the ribbon */
+        int getActiveChildrenNumber(const int playerID) const
+                                              { return m_active_children.size(); }
         // --------------------------------------------------------------------
         /** Returns the numerical ID of the selected item within the ribbon */
         int getSelection(const int playerID) const

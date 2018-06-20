@@ -204,6 +204,8 @@ void STKConfig::init_defaults()
     m_minimap_size               = -100;
     m_minimap_ai_icon            = -100;
     m_minimap_player_icon        = -100;
+    m_donate_url                 = "";
+    m_password_reset_url         = "";
     m_network_state_frequeny     = -100;
     m_solver_iterations          = -100;
     m_title_music                = NULL;
@@ -426,6 +428,12 @@ void STKConfig::getAllData(const XMLNode * root)
         replay_node->get("size",        &m_minimap_size         );
         replay_node->get("ai-icon",     &m_minimap_ai_icon      );
         replay_node->get("player-icon", &m_minimap_player_icon  );
+    }
+
+    if(const XMLNode *replay_node = root->getNode("urls"))
+    {
+        replay_node->get("donate",         &m_donate_url         );
+        replay_node->get("password-reset", &m_password_reset_url );
     }
 
     if (const XMLNode *fonts_list = root->getNode("fonts-list"))

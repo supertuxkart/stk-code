@@ -149,6 +149,9 @@
 
   <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
+  <urls donate="https://supertuxkart.net/Donate" 
+        password-reset="http://addons.supertuxkart.net/password-reset.php" />
+
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over
        current number of karts, so the more karts, the less

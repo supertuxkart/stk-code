@@ -196,6 +196,10 @@ public:
     uint16_t m_client_port;
     uint16_t m_server_port;
 
+    /* URLs for donating and reseting the password */
+    std::string m_donate_url;
+    std::string m_password_reset_url;
+
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;
