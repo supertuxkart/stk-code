@@ -59,13 +59,15 @@ void KartRewinder::reset()
  */
 void KartRewinder::saveTransform()
 {
-    Moveable::prepareSmoothing();
+    if (!getKartAnimation())
+        Moveable::prepareSmoothing();
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
 void KartRewinder::computeError()
 {
-    Moveable::checkSmoothing();
+    if (!getKartAnimation())
+        Moveable::checkSmoothing();
 }   // computeError
 
 // ----------------------------------------------------------------------------
@@ -133,15 +135,22 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     t.setOrigin(buffer->getVec3());
     t.setRotation(buffer->getQuat());
     btRigidBody *body = getBody();
-    body->setLinearVelocity(buffer->getVec3());
-    body->setAngularVelocity(buffer->getVec3());
+    Vec3 lv = buffer->getVec3();
+    Vec3 av = buffer->getVec3();
 
-    // This function also reads the velocity, so it must be called
-    // after the velocities are set
-    body->proceedToTransform(t);
-    // Update kart transform in case that there are access to its value
-    // before Moveable::update() is called (which updates the transform)
-    setTrans(t);
+    // Don't restore to phyics position if showing kart animation
+    if (!getKartAnimation())
+    {
+        body->setLinearVelocity(lv);
+        body->setAngularVelocity(av);
+        // This function also reads the velocity, so it must be called
+        // after the velocities are set
+        body->proceedToTransform(t);
+        // Update kart transform in case that there are access to its value
+        // before Moveable::update() is called (which updates the transform)
+        setTrans(t);
+    }
+
     m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
     m_vehicle->setMinSpeed(buffer->getFloat());
     float time_rot = buffer->getFloat();

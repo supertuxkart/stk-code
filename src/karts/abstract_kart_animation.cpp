@@ -22,6 +22,9 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
+#include "modes/world.hpp"
+#include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor. Note that kart can be NULL in case that the animation is
@@ -81,6 +84,49 @@ AbstractKartAnimation::~AbstractKartAnimation()
     {
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         Physics::getInstance()->addKart(m_kart);
+        if (NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isClient() &&
+            !RewindManager::get()->isRewinding())
+        {
+            // ================================================================
+            class AnimationEvent : public RewindInfo
+            {
+            private:
+                AbstractKart* m_kart;
+                Vec3 m_linear_velocity, m_angular_velocity;
+                btTransform m_transform;
+            public:
+                AnimationEvent(AbstractKart* kart)
+                    : RewindInfo(World::getWorld()->getTimeTicks(),
+                                 true/*is_confirmed*/)
+                {
+                    m_kart = kart;
+                    m_linear_velocity = m_kart->getBody()->getLinearVelocity();
+                    m_angular_velocity =
+                        m_kart->getBody()->getAngularVelocity();
+                    m_transform = m_kart->getBody()->getWorldTransform();
+                }
+                // ------------------------------------------------------------
+                virtual void restore()                                       {}
+                // ------------------------------------------------------------
+                virtual bool isEvent() const                   { return true; }
+                // ------------------------------------------------------------
+                virtual void undo()
+                                { Physics::getInstance()->removeKart(m_kart); }
+                // ------------------------------------------------------------
+                virtual void replay()
+                {
+                    Physics::getInstance()->addKart(m_kart);
+                    m_kart->getBody()->setLinearVelocity(m_linear_velocity);
+                    m_kart->getBody()->setAngularVelocity(m_angular_velocity);
+                    m_kart->getBody()->proceedToTransform(m_transform);
+                    m_kart->setTrans(m_transform);
+                }
+            };
+            RewindManager::get()->getRewindQueue().insertRewindInfo
+                (new AnimationEvent(m_kart));
+        }
+
     }
 }   // ~AbstractKartAnimation
 

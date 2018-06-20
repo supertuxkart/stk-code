@@ -57,7 +57,6 @@ private:
     int m_latest_confirmed_state_time;
 
 
-    void insertRewindInfo(RewindInfo *ri);
     void cleanupOldRewindInfo(int ticks);
 
 public:
@@ -78,6 +77,7 @@ public:
     bool isEmpty() const;
     bool hasMoreRewindInfo() const;
     int  undoUntil(int undo_ticks);
+    void insertRewindInfo(RewindInfo *ri);
 
     // ------------------------------------------------------------------------
     /** Returns the time of the latest confirmed state. */

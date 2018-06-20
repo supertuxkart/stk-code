@@ -32,7 +32,7 @@
 #include "karts/skidding.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-
+#include "network/rewind_manager.hpp"
 
 /** Constructor for a check cannon.
  *  \param node XML node containing the parameters for this checkline.
@@ -167,11 +167,13 @@ void CheckCannon::update(float dt)
         if(!triggered) continue;
 
         // Cross the checkline - add the cannon animation
-        CannonAnimation *animation =
-            new CannonAnimation(m_all_flyables[i], m_curve->clone(),
-                                getLeftPoint(), getRightPoint(),
-                                m_target_left, m_target_right);
-        m_all_flyables[i]->setAnimation(animation);
+        if (!RewindManager::get()->isRewinding())
+        {
+            CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
+                m_curve->clone(), getLeftPoint(), getRightPoint(),
+                m_target_left, m_target_right);
+            m_all_flyables[i]->setAnimation(animation);
+        }
     }   // for i in all flyables
 }   // update
 // ----------------------------------------------------------------------------
@@ -191,6 +193,9 @@ void CheckCannon::trigger(unsigned int kart_index)
     // order to smooth rotate the kart, we need to keep the current visual
     // rotation and pass it to the CannonAnimation.
     float skid_rot = kart->getSkidding()->getVisualSkidRotation();
-    new CannonAnimation(kart, m_curve->clone(), getLeftPoint(), getRightPoint(),
-                        m_target_left, m_target_right, skid_rot);
+    if (!RewindManager::get()->isRewinding())
+    {
+        new CannonAnimation(kart, m_curve->clone(), getLeftPoint(),
+            getRightPoint(), m_target_left, m_target_right, skid_rot);
+    }
 }   // CheckCannon
