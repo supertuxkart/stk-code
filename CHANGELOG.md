@@ -1,6 +1,14 @@
 ## SuperTuxKart 0.9.4
-* Better random item distribution for various numbers of karts
-* Improved powerup handling in AI
+* Better random item distribution for various numbers of karts by Alayan and hiker
+* SuperTux challenges in Story Mode by Alayan
+* Race UI improvements (new speedometer, nitro gauge, bigger minimap) by Alayan
+* Improvements to ghost replays (more data saved, live time difference, replay comparison, UI improvements, egg hunt replays) by Alayan
+* Kart color customization by Benau
+* Improved powerup handling in AI by Alayan
+* Local multiplayer improvements by Fantasmos
+* New coal skin by Alayan
+* Various improvements (much better slipstreaming, new skidding particles, better rescue, bubblegum flashing before ending, sound in nitro challenges,	 GP points...)
+* Many bugfixes
 
 ## SuperTuxKart 0.9.3
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau
@@ -27,6 +35,7 @@
 * New subsea track by samuncle
 * New volcano track by Ponzino
 * TTF font rendering by Benau
+* New ruby and forest skins by Benau
 * Kart properties refactor by Flakebi
 * Scripting work under the hood
 * Work on the track editor by mhp
