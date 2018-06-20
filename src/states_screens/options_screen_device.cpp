@@ -33,6 +33,7 @@
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
@@ -78,13 +79,8 @@ void OptionsScreenDevice::init()
     Screen::init();
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
     assert(tabBar != NULL);
+    tabBar->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
-
-    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    tabBar->getRibbonChildren()[3].setTooltip( _("Players") );
-
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
     if (!m_config->isKeyboard())
@@ -506,14 +502,16 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
         Screen *screen = NULL;
         if (selection == "tab_audio")
             screen = OptionsScreenAudio::getInstance();
-        //else if (selection == "tab_video")
-        //    screen = OptionsScreenVideo::getInstance();
+        else if (selection == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
             screen = TabbedUserScreen::getInstance();
         //else if (selection == "tab_controls")
         //    screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }
