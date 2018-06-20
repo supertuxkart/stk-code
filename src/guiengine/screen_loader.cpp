@@ -102,6 +102,10 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 {
                     append_to.push_back(new RibbonWidget(RIBBON_TABS));
                 }
+                else if (wcscmp(L"vertical-tabs", xml->getNodeName()) == 0)
+                {
+                    append_to.push_back(new RibbonWidget(RIBBON_VERTICAL_TABS));
+                }
                 else if (wcscmp(L"spinner", xml->getNodeName()) == 0)
                 {
                     append_to.push_back(new SpinnerWidget());
@@ -270,9 +274,10 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
 
                 // We're done parsing this 'ribbon', return one step back in
                 // the recursive call.
-                if (wcscmp(L"ribbon", xml->getNodeName()) == 0 ||
-                    wcscmp(L"buttonbar", xml->getNodeName()) == 0 ||
-                    wcscmp(L"tabs", xml->getNodeName()) == 0)
+                if (wcscmp(L"ribbon", xml->getNodeName())        == 0 ||
+                    wcscmp(L"buttonbar", xml->getNodeName())     == 0 ||
+                    wcscmp(L"tabs", xml->getNodeName())          == 0 ||
+                    wcscmp(L"vertical-tabs", xml->getNodeName()) == 0)
                     return;
             }
                 break;
