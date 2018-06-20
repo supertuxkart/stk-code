@@ -77,11 +77,13 @@ namespace GUIEngine
 
         /** Callbacks */
         virtual EventPropagation rightPressed(const int playerID=0) OVERRIDE;
-        virtual EventPropagation leftPressed(const int playerID=0) OVERRIDE;
-        virtual EventPropagation upPressed(const int playerID=0) OVERRIDE;
-        virtual EventPropagation downPressed(const int playerID=0) OVERRIDE;
+        virtual EventPropagation leftPressed (const int playerID=0) OVERRIDE;
+        virtual EventPropagation upPressed   (const int playerID=0) OVERRIDE;
+        virtual EventPropagation downPressed (const int playerID=0) OVERRIDE;
         EventPropagation moveToNextItem(const bool horizontally, const bool reverse, const int playerID);
         EventPropagation propagationType(const bool horizontally);
+        void selectNextActiveWidget(const bool horizontally, const bool reverse,
+                                    const int playerID, const int old_selection);
         virtual EventPropagation mouseHovered(Widget* child,
                                               const int playerID) OVERRIDE;
         virtual EventPropagation transmitEvent(Widget* w,
