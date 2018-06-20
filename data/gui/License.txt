@@ -40,6 +40,8 @@ crown.png by glitch, from https://openclipart.org/detail/210257/misc-game-crown,
 
 ghost_plus.png by Alayan, based on https://openclipart.org/detail/17847/cartoon-ghost by lemmling, released under CC-O
 
+options_language.png by Alayan, based on http://www.languageicon.org/, released under CC-BY-SA 3+
+
 ====
 
 Glass Skin by Auria, under CC-BY-SA 3+
