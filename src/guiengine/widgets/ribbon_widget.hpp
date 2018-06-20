@@ -126,6 +126,10 @@ namespace GUIEngine
          *  for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         // --------------------------------------------------------------------
+        /** Returns the number of active items within the ribbon */
+        int getActiveChildrenNumber(const int playerID) const
+                                              { return m_active_children.size(); }
+        // --------------------------------------------------------------------
         /** Returns the numerical ID of the selected item within the ribbon */
         int getSelection(const int playerID) const
                                               { return m_selection[playerID]; }
