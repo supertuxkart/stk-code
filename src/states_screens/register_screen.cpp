@@ -20,10 +20,12 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "audio/sfx_manager.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "online/link_helper.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -192,6 +194,8 @@ void RegisterScreen::makeEntryFieldsVisible()
         getWidget<TextBoxWidget>("email_confirm")->setVisible(new_account);
         getWidget<LabelWidget  >("label_email_confirm")->setVisible(new_account);
     }
+
+    getWidget<ButtonWidget >("password_reset")->setVisible(LinkHelper::isSupported() && (online && !new_account));
 }   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
@@ -443,6 +447,11 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
             StateManager::get()->popMenu();
             onEscapePressed();
         }
+    }
+    else if (name == "password_reset")
+    {
+        // Open password reset page
+        Online::LinkHelper::openURL(stk_config->m_password_reset_url);
     }
     else if (name == "back")
     {

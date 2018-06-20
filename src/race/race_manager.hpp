@@ -703,6 +703,12 @@ public:
     }   // isTutorialMode
 
     // ------------------------------------------------------------------------
+    bool isFollowMode()
+    {
+        return m_minor_mode == MINOR_MODE_FOLLOW_LEADER;
+    }
+ 
+    // ------------------------------------------------------------------------
     bool isEggHuntMode()
     {
         return m_minor_mode == MINOR_MODE_EASTER_EGG;

@@ -476,6 +476,20 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
             assert(list != NULL);
             list->setSelectionID(nav == NAV_UP ? list->getItemCount() - 1 : 0);
         }
+        // Similar exception for vertical tabs, only apply when entering with down/up
+        if (closest_widget->m_type == GUIEngine::WTYPE_RIBBON && (nav == NAV_UP || nav == NAV_DOWN))
+        {
+            RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(closest_widget);
+            assert(ribbon != NULL);
+            if (ribbon->getRibbonType() == GUIEngine::RibbonType::RIBBON_VERTICAL_TABS)
+            {
+                int new_selection = (nav == NAV_UP) ?
+                                   ribbon->getActiveChildrenNumber(playerID) - 1 : 0;
+                ribbon->setSelection(new_selection, playerID);
+                // The tab selection triggers an action
+                sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
+            }
+        }
     }
 
     return;
@@ -635,6 +649,9 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int closest_id = (smallest_distance < BIG_DISTANCE) ? closest_widget_id :
                                                           closest_wrapping_widget_id;
     Widget* w_test = GUIEngine::getWidget(closest_id);
+    
+    if (w_test == NULL)
+        return -1;
 
     // If the newly found focus target is invisible, or not activated,
     // it is not a good target, search again
@@ -929,4 +946,3 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 }
 
 // -----------------------------------------------------------------------------
-
