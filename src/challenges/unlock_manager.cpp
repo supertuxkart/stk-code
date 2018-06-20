@@ -222,7 +222,7 @@ StoryModeStatus* UnlockManager::createStoryModeStatus(const XMLNode *node)
         status->addStatus(challenge_status);
     }
 
-    status->computeActive();
+    status->computeActive(/* first call*/ true);
     return status;
 }   // createStoryModeStatus
 

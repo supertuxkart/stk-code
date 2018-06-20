@@ -78,7 +78,7 @@ public:
      StoryModeStatus(const XMLNode *node=NULL);
     ~StoryModeStatus();
 
-    void computeActive();
+    void       computeActive     (bool first_call=false);
     bool       isLocked          (const std::string& feature);
     void       unlockFeatureByList();
     void       lockFeature       (ChallengeStatus *challenge);
