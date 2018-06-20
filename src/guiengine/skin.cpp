@@ -308,7 +308,7 @@ Skin::Skin(IGUISkin* fallback_skin)
         SkinConfig::loadFromFile( skin_name );
     }
 
-    bg_image = NULL;
+    m_bg_image = NULL;
 
     m_fallback_skin = fallback_skin;
     m_fallback_skin->grab();
@@ -336,14 +336,14 @@ void Skin::drawBgImage()
     static core::recti dest;
     static core::recti source_area;
 
-    if(bg_image == NULL)
+    if(m_bg_image == NULL)
     {
         int texture_w, texture_h;
-        bg_image =
+        m_bg_image =
             SkinConfig::m_render_params["background::neutral"].getImage();
-        assert(bg_image != NULL);
-        texture_w = bg_image->getSize().Width;
-        texture_h = bg_image->getSize().Height;
+        assert(m_bg_image != NULL);
+        texture_w = m_bg_image->getSize().Width;
+        texture_h = m_bg_image->getSize().Height;
 
         source_area = core::recti(0, 0, texture_w, texture_h);
 
@@ -367,7 +367,7 @@ void Skin::drawBgImage()
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
-    draw2DImage(bg_image, dest, source_area,
+    draw2DImage(m_bg_image, dest, source_area,
                                         /* no clipping */0, /*color*/ 0,
                                         /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
@@ -992,6 +992,56 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             // selected tab should be slighlty bigger than others
             if (vertical_flip) rect2.UpperLeftCorner.Y -= 10;
             else               rect2.LowerRightCorner.Y += 10;
+        }
+
+        drawBoxFromStretchableTexture(widget, rect2, *params,
+                                      parentRibbon->m_deactivated ||
+                                        widget->m_deactivated);
+
+        for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+        {
+            material2D.UseMipMaps = true;
+        }
+    }
+
+    /* vertical tab-bar ribbons */
+    else if (type == RIBBON_VERTICAL_TABS)
+    {
+        video::SMaterial& material2D =
+            irr_driver->getVideoDriver()->getMaterial2D();
+        for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+        {
+            material2D.UseMipMaps = false;
+        }
+
+        const bool mouseIn = rect.isPointInside(irr_driver->getDevice()
+                                                ->getCursorControl()
+                                                ->getPosition()        );
+
+        BoxRenderParams* params;
+
+        if (mark_selected && (focused || parent_focused))
+            params = &SkinConfig::m_render_params["verticalTab::focused"];
+        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
+            params = &SkinConfig::m_render_params["verticalTab::focused"];
+        else if (mark_selected)
+            params = &SkinConfig::m_render_params["verticalTab::down"];
+        else
+            params = &SkinConfig::m_render_params["verticalTab::neutral"];
+
+
+        // automatically guess from position on-screen if tabs go left or right
+        unsigned int screen_width = irr_driver->getActualScreenSize().Width;
+        const bool horizontal_flip =
+            (unsigned int)rect.UpperLeftCorner.X > screen_width/ 2;
+        params->m_vertical_flip = false;
+
+        core::recti rect2 = rect;
+        if (mark_selected)
+        {
+            // the selected tab should be slighlty bigger than others
+            if (horizontal_flip) rect2.UpperLeftCorner.X -= screen_width/50;
+            else               rect2.LowerRightCorner.X += screen_width/50;
         }
 
         drawBoxFromStretchableTexture(widget, rect2, *params,
@@ -1705,7 +1755,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
 
                 // there's about 40 empty pixels at the top of bar.png
                 ITexture* tex =
-                    irr_driver->getTexture(FileManager::GUI,"bar.png");
+                    SkinConfig::m_render_params["bottom-bar::neutral"].getImage();
                 if(!tex)
                 {
                     tex = irr_driver->getTexture(FileManager::GUI, "main_help.png");

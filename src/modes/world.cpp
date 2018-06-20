@@ -225,7 +225,7 @@ void World::init()
     // Must be called after all karts are created
     m_race_gui->init();
 
-    powerup_manager->updateWeightsForRace(race_manager->getNumberOfKarts());
+    powerup_manager->computeWeightsForRace(race_manager->getNumberOfKarts());
 
     if (UserConfigParams::m_particles_effects > 1)
     {

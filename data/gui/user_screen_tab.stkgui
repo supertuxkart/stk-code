@@ -46,13 +46,17 @@
                            I18N="In the user screen" text="Username"/>
                     <textbox id="username" proportion="2" height="fit" I18N="In the user screen"/>
                 </div>
-                <spacer height="10%" width="20"/>
+                <spacer height="5%" width="20"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label id="label_password" width="40%" height="100%" text_align="left"
                            I18N="In the user screen" text="Password"/>
                     <textbox id="password" proportion="2" height="fit" I18N="In the user screen"/>
                 </div>
+
+                <spacer height="5%" width="20"/>
+
+                <button id="password_reset" width="fit" text="Reset password"/>
                 
                 <spacer height="5%" width="20"/>
                 

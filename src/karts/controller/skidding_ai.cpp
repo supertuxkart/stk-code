@@ -2025,7 +2025,7 @@ void SkiddingAI::computeNearestKarts()
         // The cast truncate the decimals, so it won't go over n-1
         // as the highest possible ideal_target is n
         int target_index = (int) (ideal_target - 0.5f);
-        assert(target_index >= 0 && target_index <= n-1);
+        assert(target_index >= 0 && target_index <= (int)n-1);
         target_overall_distance = overall_distance[target_index];
     }
     // Now convert 'maximum overall distance' to distance to player.
