@@ -348,17 +348,11 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         sendChat(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
-
-    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if (ribbon == NULL) return;
-    const std::string &selection =
-                     ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-    if (selection == m_exit_widget->m_properties[PROP_ID])
+    else if (name == m_exit_widget->m_properties[PROP_ID])
     {
         StateManager::get()->escapePressed();
     }
-    else if (selection == m_start_button->m_properties[PROP_ID])
+    else if (name == m_start_button->m_properties[PROP_ID])
     {
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
