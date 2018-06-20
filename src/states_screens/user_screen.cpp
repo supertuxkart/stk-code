@@ -17,6 +17,7 @@
 
 #include "states_screens/user_screen.hpp"
 
+#include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -26,6 +27,8 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "online/link_helper.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/kart_color_slider_dialog.hpp"
 #include "states_screens/dialogs/recovery_dialog.hpp"
@@ -250,6 +253,7 @@ void BaseUserScreen::selectUser(int index)
     {
         m_password_tb->setVisible(false);
         getWidget<LabelWidget>("label_password")->setVisible(false);
+        getWidget<ButtonWidget>("password_reset")->setVisible(false);
     }
 
 }   // selectUser
@@ -285,11 +289,13 @@ void BaseUserScreen::makeEntryFieldsVisible()
         // saved session, don't show the password field.
         getWidget<LabelWidget>("label_password")->setVisible(false);
         m_password_tb->setVisible(false);
+        getWidget<ButtonWidget>("password_reset")->setVisible(false);
     }
     else
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
+        getWidget<ButtonWidget>("password_reset")->setVisible(Online::LinkHelper::isSupported() && online);
         // Is user has no online name, make sure the user can enter one
         if (player->getLastOnlineName().empty())
             m_username_tb->setActive(true);
@@ -327,21 +333,57 @@ void BaseUserScreen::eventCallback(Widget* widget,
     }
     else if (name == "online")
     {
-        // If online access is not allowed, do not accept an online account
-        // but advice the user where to enable this option.
+        // If online access is not allowed,
+        // give the player the choice to enable this option.
         if (m_online_cb->getState())
         {
             if (UserConfigParams::m_internet_status ==
                                        Online::RequestManager::IPERM_NOT_ALLOWED)
             {
-                m_info_widget->setText(
-                    _("Internet access is disabled, please enable it in the options"),
-                    true);
+                irr::core::stringw message =
+                    _("Internet access is disabled. Do you want to enable it ?");
+
+                class ConfirmInternet : public MessageDialog::IConfirmDialogListener
+                {
+                    BaseUserScreen *m_parent_screen;
+                private:
+                    GUIEngine::CheckBoxWidget *m_cb;
+                public:
+                    virtual void onConfirm()
+                    {
+                        UserConfigParams::m_internet_status =
+                            Online::RequestManager::IPERM_ALLOWED;
+#ifndef SERVER_ONLY
+                        NewsManager::get()->init(false);
+#endif
+                        m_parent_screen->makeEntryFieldsVisible();
+                        ModalDialog::dismiss();
+                    }   // onConfirm
+                    virtual void onCancel()
+                    {
+                        m_cb->setState(false);
+                        m_parent_screen->makeEntryFieldsVisible();
+                        ModalDialog::dismiss();
+                    }   // onCancel
+                    // ------------------------------------------------------------
+                    ConfirmInternet(BaseUserScreen *parent, GUIEngine::CheckBoxWidget *online_cb)
+                    {
+                        m_parent_screen = parent;
+                        m_cb = online_cb;
+                    }
+                };   // ConfirmInternet
+
                 SFXManager::get()->quickSound( "anvil" );
-                m_online_cb->setState(false);
+                new MessageDialog(message, MessageDialog::MESSAGE_DIALOG_CONFIRM,
+                      new ConfirmInternet(this, m_online_cb), true);
             }
         }
         makeEntryFieldsVisible();
+    }
+    else if (name == "password_reset")
+    {
+        // Open password reset page
+        Online::LinkHelper::openURL(stk_config->m_password_reset_url);
     }
     else if (name == "options")
     {
