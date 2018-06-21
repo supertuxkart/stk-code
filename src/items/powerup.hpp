@@ -51,6 +51,9 @@ private:
     /** The owner (kart) of this powerup. */
     AbstractKart*               m_kart;
 
+    /** Returns an integer in the 0-32767 range.*/
+    int simplePRNG(const int seed, const int item_id, const int position);
+
 public:
                     Powerup      (AbstractKart* kart_);
                    ~Powerup      ();
