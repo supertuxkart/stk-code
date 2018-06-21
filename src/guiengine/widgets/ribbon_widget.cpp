@@ -649,7 +649,7 @@ EventPropagation RibbonWidget::propagationType(const bool horizontally)
 
 /**
  * Move to the next child widget in the requested direction.
- * If it is inactive, move again, until it finds an active child or go over 100 loops
+ * If it is inactive, move again, until it finds an activated child or test all childs
  */
 void RibbonWidget::selectNextActiveWidget(const bool horizontally, const bool reverse,
                                           const int playerID, const int old_selection)
@@ -684,9 +684,10 @@ void RibbonWidget::selectNextActiveWidget(const bool horizontally, const bool re
         }
 
         loop_counter++;
-        if (loop_counter > 100)
+        if (loop_counter > m_active_children.size())
         {
-            Log::warn("RibbonWidget", "Empty ribbon widget focused !");
+            Log::warn("RibbonWidget", "All the buttons of the focused ribbon"
+                                      " are deactivated !");
             break;
         }
     } while (!m_active_children.get(m_selection[playerID])->isActivated());
