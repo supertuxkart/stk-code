@@ -41,6 +41,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -116,12 +117,8 @@ void OptionsScreenUI::init()
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
+    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
-
-    ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
-    ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
-    ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
 
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
@@ -195,44 +192,6 @@ void OptionsScreenUI::init()
         GUIEngine::reloadSkin();
         irr_driver->setMaxTextureSize();
     }
-
-    // --- language
-    ListWidget* list_widget = getWidget<ListWidget>("language");
-
-    // I18N: in the language choice, to select the same language as the OS
-    list_widget->addItem("system", _("System Language"));
-
-    const std::vector<std::string>* lang_list = translations->getLanguageList();
-    const int amount = (int)lang_list->size();
-
-    // The names need to be sorted alphabetically. Store the 2-letter
-    // language names in a mapping, to be able to get them from the
-    // user visible full name.
-    std::vector<core::stringw> nice_lang_list;
-    std::map<core::stringw, std::string> nice_name_2_id;
-    for (int n=0; n<amount; n++)
-    {
-        std::string code_name = (*lang_list)[n];
-        std::string s_name = translations->getLocalizedName(code_name) +
-         " (" + tinygettext::Language::from_name(code_name).get_language() + ")";
-        core::stringw nice_name = translations->fribidize(StringUtils::utf8ToWide(s_name));
-        nice_lang_list.push_back(nice_name);
-        nice_name_2_id[nice_name] = code_name;
-    }
-    std::sort(nice_lang_list.begin(), nice_lang_list.end());
-    for(unsigned int i=0; i<nice_lang_list.size(); i++)
-    {
-        list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
-                              nice_lang_list[i]);
-    }
-
-    list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
-
-    // Forbid changing language while in-game, since this crashes (changing the language involves
-    // tearing down and rebuilding the menu stack. not good when in-game)
-    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
-    
-
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -255,6 +214,8 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             screen = OptionsScreenInput::getInstance();
         //else if (selection == "tab_ui")
         //    screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }
@@ -344,49 +305,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
         assert( difficulty != NULL );
         UserConfigParams::m_per_player_difficulty = difficulty->getState();
-    }
-    else if (name == "language")
-    {
-        ListWidget* list_widget = getWidget<ListWidget>("language");
-        std::string selection = list_widget->getSelectionInternalName();
-
-        delete translations;
-
-        if (selection == "system")
-        {
-#ifdef WIN32
-            _putenv("LANGUAGE=");
-#else
-            unsetenv("LANGUAGE");
-#endif
-        }
-        else
-        {
-#ifdef WIN32
-            std::string s=std::string("LANGUAGE=")+selection.c_str();
-            _putenv(s.c_str());
-#else
-            setenv("LANGUAGE", selection.c_str(), 1);
-#endif
-        }
-
-        translations = new Translations();
-
-        // Reload fonts for new translation
-        GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
-
-        font_manager->getFont<BoldFace>()->reset();
-        font_manager->getFont<RegularFace>()->reset();
-        GUIEngine::getFont()->updateRTL();
-        GUIEngine::getTitleFont()->updateRTL();
-        GUIEngine::getSmallFont()->updateRTL();
-        GUIEngine::getLargeFont()->updateRTL();
-        GUIEngine::getOutlineFont()->updateRTL();
-
-        UserConfigParams::m_language = selection.c_str();
-        user_config->saveConfig();
-
-        OptionsScreenUI::getInstance()->push();
     }
 #endif
 }   // eventCallback

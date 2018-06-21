@@ -30,6 +30,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/options_screen_device.hpp"
 #include "states_screens/options_screen_audio.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/dialogs/add_device_dialog.hpp"
@@ -154,13 +155,8 @@ void OptionsScreenInput::init()
     Screen::init();
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     assert(tabBar != NULL);
+    tabBar->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
-
-    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    tabBar->getRibbonChildren()[3].setTooltip( _("Players") );
-
     /*
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
     assert( devices != NULL );
@@ -222,6 +218,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         //    screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }
