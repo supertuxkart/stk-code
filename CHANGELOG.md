@@ -1,6 +1,13 @@
-## SuperTuxKart 0.9.4
+# Changelog
+This file documents notable changes to SuperTuxKart across versions since its inception.
+
+It should be kept in mind that some versions have a less complete changelog than others, and that this changelog do not list the details of the many small bugfixes and improvements which together make a significant part of the progress between releases.
+
+For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
+
+## Unreleased
 * Better random item distribution for various numbers of karts by Alayan and hiker
-* SuperTux challenges in Story Mode by Alayan
+* Unlockable SuperTux challenges in Story Mode by Alayan
 * Race UI improvements (new speedometer, nitro gauge, bigger minimap) by Alayan
 * Improvements to ghost replays (more data saved, live time difference, replay comparison, UI improvements, egg hunt replays) by Alayan
 * Kart color customization by Benau
@@ -11,8 +18,11 @@
 * Audio improvements (crash sound depending on speed/direction, sound cue in nitro challenges)
 * Gameplay improvements (much better slipstreaming, GP points...)
 * Many bugfixes
+### Tracks and modeling
+#### Tracks
+* Many unwanted shortcuts and exploits fixed by Auria
 
-## SuperTuxKart 0.9.3
+## SuperTuxKart 0.9.3 (28. October 2017)
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau
 * New mesh format optimized for space and hardware skinning
 * Code refactoring of both render pipeline by Benau and Elderme
@@ -27,14 +37,16 @@
 * Visual representation of the start line in all tracks
 * Various improvements (starting boost effect, wall driving fixes, parachutes, GP points, help page for bananas, cannon fixes, colorization shader)
 ### Tracks and modeling
+#### Karts
 * New kart Wilber and Hexley by Jymis
 * New kart Kiki and updated Konqi by Benau
+#### Tracks
 * All tracks drivable in reverse, with arrows pointing in the correct direction
-* New track Candela City by samuncle (replace Shiny Suburbs)
-* New track Cornfield Crossing by samuncle (replace Bovine Barnyard)
+* Candela City by samuncle (replace Shiny Suburbs)
+* Cornfield Crossing by samuncle (replace Bovine Barnyard)
 * New battle track Las Dunas Arena by samuncle
 
-## SuperTuxKart 0.9.2
+## SuperTuxKart 0.9.2 (1. July 2016)
 * Ghost replay races by Benau
 * Battle mode AI by Benau
 * Soccer mode AI by Benau
@@ -47,37 +59,41 @@
 * New farm track song by 0zone0ne and Krobonil
 * Bugfixes
 ### Tracks and modeling
-* New Antediluvian Abysses track by samuncle (replace Subsea)
-* New Volcano Island track by Ponzino
+#### Tracks
+* Antediluvian Abysses by samuncle (replace Subsea)
+* Volcano Island by Ponzino
 * New icy soccer field by samuncle and Benau
 
-## SuperTuxKart 0.9.1
+## SuperTuxKart 0.9.1 (17. October 2015)
 * Many bug fixes
 * Started to use scripting in tracks
 * Significant audio performance improvements
 * Tweak to challenges
 ### Tracks and modeling
+#### Tracks
 * Better support for driving tracks in reverse
 * Smaller tweaks and improvements to several tracks including 
-** Math class
-** XR591
-** Fort Magma
-** Gran Paradiso Island
-** Subsea
+    * Math class
+    * XR591
+    * Fort Magma
+    * Gran Paradiso Island
+    * Subsea
 
-## SupertTuxKart 0.9 (April 2015)
+## SupertTuxKart 0.9 (24. April 2015)
 * Fully shader-based rendering engine
 * Online login which allows to:
-** connect with friends and see when they are playing
-** vote for addons
-** collect online achievements
+    * connect with friends and see when they are playing
+    * vote for addons
+    * collect online achievements
 * Grand Prix editor, including creation of random GPs 
 * Different kart physics
 ### Tracks and modeling
+#### Karts
 * New karts Amanda and Gavroche by XGhost
 * New and improved Tux, Adiumy, Sara the Wizard and the Racer, Xue kart
-* New track Cocoa Temple by samuncle (replace Amazonian Journey)
-* New track Gran Paradiso Island by samuncle (replace The Island)
+#### Tracks
+* Cocoa Temple by samuncle (replace Amazonian Journey)
+* Gran Paradiso Island by samuncle (replace The Island)
 * Graphical improvements to many other tracks
 
 ## SuperTuxKart 0.8.1 (26. November 2013)
@@ -92,12 +108,16 @@
 * Improve skid marks and nitro effects
 * Wiimote support
 ### Tracks and modeling
+#### Karts
 * New karts Xue and Sara
 * Updated Beastie kart
-* New track STK Enterprise by Rubberduck (replace Star Track)
-* Updated track The old mines
-* Updated Lighthouse track
-* Updated Zen Garden track
+#### Tracks
+* STK Enterprise by Rubberduck (replace Star Track)
+* Gameplay and graphical updates to several tracks :
+    * The Old Mine
+    * Lighthouse
+    * Zen Garden
+#### Miscellaneous
 * Updated nitro models
 
 ## SuperTuxKart 0.8 (11. December 2012)
@@ -108,21 +128,19 @@
 * Updated menus
 * New music
 ### Tracks and modeling
-* New Green Valley track by Wolfs (replace Tux Tollway)
-* New Blackhill Mansion track by samuncle (replace Crescent Crossing)
-* Updated XR591 track
-* Updated Fort Magma track
-* Updated Jungle track
-* Updates Sand track
-
+#### Tracks
+* Green Valley by Wolfs (replace Tux Tollway)
+* Blackhill Mansion by samuncle (replace Crescent Crossing)
+* Gameplay and graphical updates to several tracks :
+    * XR591
+    * Fort Magma
+    * Jungle
+    * Sand
+    
 
 ## SuperTuxKart 0.7.3 (2. November 2011)
-* New Zen Garden and Subsea tracks
-* New Island battle arena
-* New Suzanne kart
 * New graphical effects
 * New weapons 'Swatter' and 'Rubber Ball'
-* Added Thunderbird as race referee
 * 3 Strikes Battles now displays lives as spare tires
 * Improved bubble gum
 * See progression during Grand Prix
@@ -131,16 +149,28 @@
 * Improved kart control at high speeds
 * Better placement of rescued karts
 * Transition track-making to blender 2.5/2.6
+### Tracks and modeling
+#### Karts
+* New Suzanne kart
+#### Tracks
+* Zen Garden by samuncle (replace Secret Garden)
+* New Subsea
+* New Island battle arena
+#### Miscellaneous
+* Added Thunderbird as race referee
 
 ## SuperTuxKart 0.7.2 (15. July 2011)
 * Added in-game addon manager
 * Fixed major memory leaks
-* New Snow Peak track by Samuncle
-* Improved star track UFO by Rudy
-* New Beastie kart.
 * Show when you get a highscore
 * Improve gamepad configuration under Windows (add ability to tell gamepads apart)
 * Various other tweaks done and glitches fixed
+### Tracks and modeling
+#### Karts
+* New Beastie kart.
+#### Tracks
+* Snow Peak by samuncle
+* Improved Star Track UFO by Rudy
 
 ## SuperTuxKart 0.7.1b (21. April 2011)
 * Fix circular dependency in challenges
@@ -148,8 +178,6 @@
 
 ## SuperTuxKart 0.7.1 (15. April 2011)
 * Particle  (smoke, splash, fire) and weather effects
-* New Fort Magma by Samuncle, new Shiny Suburbs track by Horace
-* New Beagle kart by wolterh
 * Added internet news
 * Support for live language switch
 * Added optional minimal race UI
@@ -157,6 +185,8 @@
 * Added support for full-screen anti-aliasing
 * Clearer multiplayer setup
 * Renamed many tracks to nicer names
+    * City become Shiny Suburb
+    * ?
 * Basic level-of-detail (LOD) support
 * Debug features for track makers
 * Update to bullet 2.77
@@ -164,6 +194,12 @@
 * Fixed character names that contain non-ASCII characters
 * Full RTL (right to left) support
 * Various other tweaks done and glitches fixed
+### Tracks and modeling
+#### Karts
+* New Beagle kart by wolterh
+#### Tracks
+* New Fort Magma by samuncle
+* New Shiny Suburbs by Horace
 
 ## SuperTuxKart 0.7 (December 2010)
 Too many to list them all. Main points:
@@ -176,8 +212,12 @@ Too many to list them all. Main points:
 * Other improvements
   - Allowed alternative ways/shortcuts in tracks
   - New item 'switch'
-* New art:
-  - New tracks farm, hacienda, scotland, secret garden
+### Tracks and modeling
+#### Tracks
+- Farm
+- Hacienda by samuncle
+- Scotland by Canis Lupus
+- Secret Garden
 
 ## SuperTuxKart 0.6.2a (October 2009)
 * Bugfix: STK would crash while trying to save the config file
