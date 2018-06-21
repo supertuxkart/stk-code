@@ -374,8 +374,6 @@ void MainLoop::run()
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
-                if (World::getWorld() && history->replayHistory())
-                    history->updateReplay(World::getWorld()->getTimeTicks());
                 PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
                 SFXManager::get()->update();
                 PROFILER_POP_CPU_MARKER();
@@ -388,6 +386,8 @@ void MainLoop::run()
 
         for(int i=0; i<num_steps; i++)
         {
+            if (World::getWorld() && history->replayHistory())
+                history->updateReplay(World::getWorld()->getTimeTicks());
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(1);
             PROFILER_POP_CPU_MARKER();
