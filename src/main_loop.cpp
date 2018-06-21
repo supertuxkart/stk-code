@@ -53,7 +53,6 @@ MainLoop::MainLoop(unsigned parent_pid)
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
-    m_is_last_substep = false;
     m_frame_before_loading_world = false;
 #ifdef WIN32
     if (parent_pid != 0)
@@ -322,7 +321,6 @@ void MainLoop::run()
         if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
             m_abort = true;
 #endif
-        m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
@@ -390,9 +388,6 @@ void MainLoop::run()
 
         for(int i=0; i<num_steps; i++)
         {
-            // Enable last substep in last iteration
-            m_is_last_substep = (i == num_steps - 1);
-
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(1);
             PROFILER_POP_CPU_MARKER();
@@ -427,7 +422,6 @@ void MainLoop::run()
             }
         }   // for i < num_steps
 
-        m_is_last_substep = false;
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort

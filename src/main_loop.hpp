@@ -38,7 +38,6 @@ private:
     /** True during the last substep of the inner main loop (where world
      *  is updated). Used to reduce amount of updates (e.g. sfx positions
       * etc). */
-    bool     m_is_last_substep;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
     unsigned m_parent_pid;
