@@ -63,8 +63,7 @@ void OptionsScreenDevice::loadedFromFile()
 
 void OptionsScreenDevice::beforeAddingWidget()
 {
-    GUIEngine::ListWidget* w_list =
-        getWidget<GUIEngine::ListWidget>("actions");
+    ListWidget* w_list = getWidget<GUIEngine::ListWidget>("actions");
     assert(w_list != NULL);
     w_list->clearColumns();
     w_list->addColumn(_("Action"), 1);
@@ -79,7 +78,7 @@ void OptionsScreenDevice::init()
     Screen::init();
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
     assert(tabBar != NULL);
-    tabBar->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    // Focus is set to the actions list later in the init
     tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
@@ -125,12 +124,11 @@ void OptionsScreenDevice::init()
     LabelWidget* label = getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str(), false );
 
-    GUIEngine::ListWidget* actions =
-        getWidget<GUIEngine::ListWidget>("actions");
-    assert( actions != NULL );
-
     // ---- create list skeleton (right number of items, right internal names)
     //      their actualy contents will be adapted as needed after
+
+    ListWidget* actions = getWidget<GUIEngine::ListWidget>("actions");
+    assert( actions != NULL );
 
     //I18N: Key binding section
     addListItemSubheader(actions, "game_keys_section", _("Game Keys"));
@@ -156,6 +154,10 @@ void OptionsScreenDevice::init()
     addListItem(actions, PA_MENU_CANCEL);
 
     updateInputButtons();
+
+    // Focus the list and select its first item
+    actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    actions->setSelectionID(0);
 
     // Disable deletion keyboard configurations
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
