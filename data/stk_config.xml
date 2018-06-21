@@ -126,9 +126,9 @@
            fps="120"
            default-track-friction="0.5"
            default-moveable-friction="0.5" 
-           solver-iterations="10"
-           solver-split-impulse="false"
-           solver-split-impulse-threshold="-0.02"
+           solver-iterations="4"
+           solver-split-impulse="true"
+           solver-split-impulse-threshold="-0.00001"
            solver-mode=""/>
 
   <!-- The title music. -->
