@@ -115,9 +115,10 @@ public:
     
     /** Threshold when to use the split impulse approach. */
     float m_solver_split_impulse_thresh;
-     
-    /** */
-    std::vector<std::string> m_solver_mode;
+
+    /** Bit flags to modify the solver mode. Bits set in set_flags are
+     *  added to the solver mode, bits set in reset_flags are removed. */
+    int m_solver_set_flags, m_solver_reset_flags;
 
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */

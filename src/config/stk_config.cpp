@@ -162,7 +162,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_physics_fps,               "physics fps"                      );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
     CHECK_NEG(m_solver_iterations,         "physics: solver-iterations"       );
-    CHECK_NEG(m_solver_split_impulse,      "physics: solver-split-impulse"    );
     CHECK_NEG(m_network_state_frequeny,    "network solver-state-frequency"   );
     CHECK_NEG(m_solver_split_impulse_thresh,"physics: solver-split-impulse-threshold");
 
@@ -208,6 +207,8 @@ void STKConfig::init_defaults()
     m_password_reset_url         = "";
     m_network_state_frequeny     = -100;
     m_solver_iterations          = -100;
+    m_solver_set_flags           = 0;
+    m_solver_reset_flags         = 0;
     m_title_music                = NULL;
     m_solver_split_impulse       = false;
     m_smooth_normals             = false;
@@ -298,7 +299,38 @@ void STKConfig::getAllData(const XMLNode * root)
         physics_node->get("solver-split-impulse",   &m_solver_split_impulse  );
         physics_node->get("solver-split-impulse-threshold",
                                                &m_solver_split_impulse_thresh);
-        physics_node->get("solver-mode",            &m_solver_mode           );
+        std::vector<std::string> solver_modes;
+        physics_node->get("solver-mode",            &solver_modes            );
+        m_solver_set_flags=0, m_solver_reset_flags = 0;
+        int *p;
+        for (auto mode : solver_modes)
+        {
+            std::string s = mode;
+            p = &m_solver_set_flags;
+            if (s[0] == '-')
+            {
+                s.erase(s.begin());
+                p = &m_solver_reset_flags;
+            }
+            s = StringUtils::toLowerCase(s);
+            if      (s == "randmize_order"                         ) *p |=   1;
+            else if (s == "friction_separate"                      ) *p |=   2;
+            else if (s == "use_warmstarting"                       ) *p |=   4;
+            else if (s == "use_friction_warmstarting"              ) *p |=   8;
+            else if (s == "use_2_friction_directions"              ) *p |=  16;
+            else if (s == "enable_friction_direction_caching"      ) *p |=  32;
+            else if (s == "disable_velocity_dependent_friction_direction") *p |= 64;
+            else if (s == "cache_friendly"                         ) *p |= 128;
+            else if (s == "simd"                                   ) *p |= 256;
+            else if (s == "cuda"                                   ) *p |= 512;
+            else
+            {
+                Log::fatal("STK-Config",
+                           "Unknown option '%s' for solver-mode - ignored.",
+                           s.c_str());
+            }
+        }   // for mode in solver_modes
+
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))

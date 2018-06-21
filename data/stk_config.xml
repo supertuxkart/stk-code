@@ -108,11 +108,18 @@
           this to 1 can reduce bounce.
       solver-split-impulse-threshold: Penetration threshold for using split
           impulse (ignored if solver-split-impulse is false).
-      solver-mode: Bullet's solver mode is a bit mask. This field takes two
+      solver-mode: Bullet's solver mode is a bit mask, which can be modified.
+          This entry contains a space-separated list of mode-names to either
+          set or unset in this bit mask. Any name starting with a '-' indicate
+          that the bit is to be set to 0, otherwise the bit will be set.
+
+       This field takes two
           values: the first value is 'and'ed with bullet's default values 
           (i.e. it can be used to unset bullet defaults), the second value
           is 'or'ed (i.e. is used to set a bit). A value of -1 for 'and'
-          means to keep all bits.
+          means to keep all bits. The valid names are listed in stk_config.cpp
+          and correspond to the definitions in btContactSolverInfo.h, e.g.:
+          'randomized_order' corresponds to the bit SOLVER_RANDMIZE_ORDER.
       -->
   <physics smooth-normals="true"
            smooth-angle-limit="0.65"
