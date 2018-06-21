@@ -19,6 +19,8 @@
 #ifndef HEADER_POWERUPMANAGER_HPP
 #define HEADER_POWERUPMANAGER_HPP
 
+#undef ITEM_DISTRIBUTION_DEBUG
+
 #include "utils/no_copy.hpp"
 #include "utils/leak_check.hpp"
 

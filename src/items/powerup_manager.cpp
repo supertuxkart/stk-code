@@ -249,6 +249,7 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
 {
     m_num_karts = num_karts;
     m_weights_for_section.clear();
+    // f = 1 when num_karts = next->getNumKarts
     float f = float(num_karts - prev->getNumKarts())
             / (next->getNumKarts() - prev->getNumKarts());
 
@@ -260,12 +261,23 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
     {
         std::vector<int> & w_prev = prev->m_weights_for_section[cl];
         std::vector<int> & w_next = next->m_weights_for_section[cl];
+        std::vector<float> summed_weights;
+        float sum_av = 0.0f;
+
         m_weights_for_section.emplace_back();
         std::vector<int> &l = m_weights_for_section.back();
         for (unsigned int i = 0; i < w_prev.size(); i++)
         {
-            float interpolated_weight = w_prev[i] * f + w_next[i] * (1 - f);
-            l.push_back(int(interpolated_weight + 0.5f));
+            float interpolated_weight = w_prev[i] * (1 -f) + w_next[i] * (f);
+            sum_av += interpolated_weight;
+            summed_weights.push_back(sum_av);
+        }
+        l.push_back(int(summed_weights[0] + 0.5f));
+        int sum = l[0];
+        for (unsigned int i = 1; i < w_prev.size(); i++)
+        {
+            l.push_back(int(summed_weights[i] - sum + 0.5f));
+            sum += l[i];
         }
     }   // for l < prev->m_weights_for_section.size()
 }   // WeightsData::interpolate
@@ -366,15 +378,32 @@ void PowerupManager::WeightsData::precomputeWeights()
         int prev, next;
         float weight;
         convertRankToSection(i + 1, &prev, &next, &weight);
-        int sum = 0;
+        float sum_av = 0.0f;
+        std::vector<float> summed_weights;
         for (unsigned int j = 0;
             j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
         {
             float av = (1.0f - weight) * m_weights_for_section[prev][j]
                      +         weight  * m_weights_for_section[next][j];
-            sum += int(av + 0.5f);
-            m_summed_weights_for_rank[i].push_back(sum);
+            sum_av += av;
+            summed_weights.push_back(sum_av);
+
         }
+        for (unsigned int j = 0;
+            j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
+        {
+            // The pseudo-random number when getting an item will be in
+            // the range 1-32768.
+            // We make sure the total sum is 32768 = 2^15
+            // That way max_summed_weights % max_random_number = 0,
+            int normalized_sum = int( (summed_weights[j]/sum_av*32768) + 0.5f);
+            m_summed_weights_for_rank[i].push_back(normalized_sum);
+        }
+
+#ifdef ITEM_DISTRIBUTION_DEBUG
+        Log::verbose("PowerupManager", "Final summed weight for rank %d is %d",
+          i, m_summed_weights_for_rank[i][2*POWERUP_LAST - POWERUP_FIRST]);
+#endif
     }
 }   // WeightsData::precomputeWeights
 //-----------------------------------------------------------------------------
@@ -397,7 +426,6 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
     const std::vector<int> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
-#undef ITEM_DISTRIBUTION_DEBUG
 #ifdef ITEM_DISTRIBUTION_DEBUG
     int original_random_number = random_number;
 #endif
