@@ -41,7 +41,7 @@ addons:
 
 before_script:
   # For unit testing
-  - if "$UNITTEST"; then mkdir stk-assets && cd stk-assets && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/models models && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/sfx sfx && mkdir library music tracks textures && cd ./textures && touch materials.xml && cd ../tracks/ && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/tracks/cave cave && cd ../../; fi
+  - if "$UNITTEST"; then pushd ../ && mkdir stk-assets && cd stk-assets && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/models models && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/sfx sfx && mkdir library music tracks textures && cd ./textures && touch materials.xml && cd ../tracks/ && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/tracks/cave cave && cd ../../ && popd; fi
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
 
