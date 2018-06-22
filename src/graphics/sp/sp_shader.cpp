@@ -43,6 +43,7 @@ SPShader::SPShader(const std::string& name,
                    m_use_alpha_channel(use_alpha_channel),
                    m_use_tangents(use_tangents), m_srgb(srgb)
 {
+#ifndef SERVER_ONLY
     if (CVS->isARBTextureBufferObjectUsable())
     {
 #ifndef USE_GLES2
@@ -55,6 +56,7 @@ SPShader::SPShader(const std::string& name,
         m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 
                                             SamplerType>(0, ST_NEAREST_CLAMPED);        
     }
+#endif
     
     memset(m_program, 0, 12);
     m_init_function(this);
