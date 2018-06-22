@@ -24,6 +24,8 @@
 #include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_4.hpp"
 #include "states_screens/help_screen_5.hpp"
+#include "states_screens/help_screen_6.hpp"
+#include "states_screens/help_screen_7.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
@@ -60,6 +62,10 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
             screen = HelpScreen4::getInstance();
         else if (selection == "page5")
             screen = HelpScreen5::getInstance();
+        else if (selection == "page6")
+            screen = HelpScreen6::getInstance();
+        else if (selection == "page7")
+            screen = HelpScreen7::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }
@@ -76,7 +82,11 @@ void HelpScreen3::init()
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
 
-    if (w != NULL) w->select( "page3", PLAYER_ID_GAME_MASTER );
+    if (w != NULL)
+    {
+        w->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        w->select( "page3", PLAYER_ID_GAME_MASTER );
+    }
 }   // init
 
 // -----------------------------------------------------------------------------

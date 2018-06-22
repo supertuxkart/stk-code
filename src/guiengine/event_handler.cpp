@@ -496,7 +496,8 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
 
 } // navigate
 
-/* This function use simple heuristic to find the closest widget
+/**
+ * This function use simple heuristic to find the closest widget
  * in the requested direction,
  * It prioritize widgets close vertically to widget close horizontally,
  * as it is expected behavior in any direction.
@@ -535,6 +536,22 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             (!w_test->isActivated() && ignore_disabled) ||
             (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer))
             continue;
+
+        // Ignore empty ribbon widgets and lists
+        if (w_test->m_type == GUIEngine::WTYPE_RIBBON)
+        {
+            RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w_test);
+            assert(ribbon != NULL);
+            if (ribbon->getActiveChildrenNumber(playerID) == 0)
+                continue;
+        }
+        else if (w_test->m_type == WTYPE_LIST)
+        {
+            ListWidget* list = (ListWidget*) w_test;
+            assert(list != NULL);
+            if (list->getItemCount() == 0)
+                continue;
+        }
 
         // if a dialog is shown, restrict to items in the dialog
         if (ScreenKeyboard::isActive())

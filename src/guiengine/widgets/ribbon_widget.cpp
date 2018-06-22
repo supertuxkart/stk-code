@@ -593,31 +593,12 @@ EventPropagation RibbonWidget::moveToNextItem(const bool horizontally, const boo
     // Do nothing and do not block navigating out of the widget
     if (result == EVENT_BLOCK) return result;
 
-    if (reverse)
-        m_selection[playerID]--;
-    else
-        m_selection[playerID]++;
+    int old_selection = m_selection[playerID];
+    selectNextActiveWidget(horizontally, reverse, playerID, old_selection);
 
-    if (m_selection[playerID] >= int(m_active_children.size()) || m_selection[playerID] < 0)
-    {
-        // In vertical tabs, don't loop when reaching the top or bottom
-        if (!horizontally)
-        {
-            if (reverse)
-                m_selection[playerID]++;
-            else
-                m_selection[playerID]--;
+    if (m_selection[playerID] == old_selection && !horizontally)
+        return EVENT_BLOCK;
 
-            return EVENT_BLOCK;
-        }
-        bool left = (m_selection[playerID] < 0);
-
-        if (m_listener != NULL) m_listener->onRibbonWidgetScroll(left ? -1 : 1);
-
-        bool select_zero = (m_event_handler && left) || (!m_event_handler && !left);
-
-        m_selection[playerID] = select_zero ? 0 : m_active_children.size()-1;
-    }
     updateSelection();
 
     if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS ||
@@ -664,6 +645,52 @@ EventPropagation RibbonWidget::propagationType(const bool horizontally)
     if (m_active_children.size() < 2) result = EVENT_BLOCK;
 
     return result;
+}
+
+/**
+ * Move to the next child widget in the requested direction.
+ * If it is inactive, move again, until it finds an activated child or test all childs
+ */
+void RibbonWidget::selectNextActiveWidget(const bool horizontally, const bool reverse,
+                                          const int playerID, const int old_selection)
+{
+    int loop_counter = 0;
+    do
+    {
+        if (reverse)
+            m_selection[playerID]--;
+        else
+            m_selection[playerID]++;
+
+        if (m_selection[playerID] >= int(m_active_children.size()) || m_selection[playerID] < 0)
+        {
+            // In vertical tabs, don't loop when reaching the top or bottom
+            if (!horizontally)
+            {
+                if (reverse)
+                    m_selection[playerID] = old_selection;
+                else
+                    m_selection[playerID] = old_selection;
+
+                return;
+            }
+            bool left = (m_selection[playerID] < 0);
+
+            if (m_listener != NULL) m_listener->onRibbonWidgetScroll(left ? -1 : 1);
+
+            bool select_zero = (m_event_handler && left) || (!m_event_handler && !left);
+
+            m_selection[playerID] = select_zero ? 0 : m_active_children.size()-1;
+        }
+
+        loop_counter++;
+        if (loop_counter > m_active_children.size())
+        {
+            Log::warn("RibbonWidget", "All the buttons of the focused ribbon"
+                                      " are deactivated !");
+            break;
+        }
+    } while (!m_active_children.get(m_selection[playerID])->isActivated());
 }
 
 // ----------------------------------------------------------------------------
