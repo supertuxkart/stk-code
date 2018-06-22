@@ -789,7 +789,7 @@ void STKHost::mainLoop()
             }
         }
 
-        while (enet_host_service(host, &event, 0) != 0)
+        while (enet_host_service(host, &event, 10) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
@@ -874,7 +874,6 @@ void STKHost::mainLoop()
             else
                 delete stk_event;
         }   // while enet_host_service
-        StkTime::sleep(10);
     }   // while m_exit_timeout.load() > StkTime::getRealTime()
     delete direct_socket;
     Log::info("STKHost", "Listening has been stopped.");
