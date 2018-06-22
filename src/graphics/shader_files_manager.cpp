@@ -171,6 +171,8 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     code << "//" << full_path << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
+    if (!CVS->isARBTextureBufferObjectUsable())
+        code << "#define TBO_DISABLED\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDeferredEnabled())

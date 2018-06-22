@@ -28,17 +28,37 @@
 
 namespace SP
 {
-const std::map<std::string, std::pair<unsigned, SamplerType> >
-    g_prefilled_names =
-    {
-#ifdef USE_GLES2
-        { "skinning_tex", { 0, ST_NEAREST_CLAMPED } }
-#else
-        { "skinning_tex", { 0, ST_TEXTURE_BUFFER } }
-#endif
-    };
+std::map<std::string, std::pair<unsigned, SamplerType> > 
+                                                    SPShader::m_prefilled_names;
 bool SPShader::m_sp_shader_debug = false;
 
+SPShader::SPShader(const std::string& name,
+                   const std::function<void(SPShader*)>& init_func,
+                   bool transparent_shader, int drawing_priority,
+                   bool use_alpha_channel, bool use_tangents,
+                   const std::array<bool, 6>& srgb)
+                 : m_name(name), m_init_function(init_func),
+                   m_drawing_priority(drawing_priority),
+                   m_transparent_shader(transparent_shader),
+                   m_use_alpha_channel(use_alpha_channel),
+                   m_use_tangents(use_tangents), m_srgb(srgb)
+{
+    if (CVS->isARBTextureBufferObjectUsable())
+    {
+#ifndef USE_GLES2
+        m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 
+                                            SamplerType>(0, ST_TEXTURE_BUFFER);
+#endif
+    }
+    else
+    {
+        m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 
+                                            SamplerType>(0, ST_NEAREST_CLAMPED);        
+    }
+    
+    memset(m_program, 0, 12);
+    m_init_function(this);
+}
 // ----------------------------------------------------------------------------
 void SPShader::addShaderFile(const std::string& name, GLint shader_type,
                              RenderPass rp)
@@ -104,7 +124,7 @@ void SPShader::addAllTextures(RenderPass rp)
 {
 #ifndef SERVER_ONLY
     // Built-in prefilled shaders first
-    for (auto &p : g_prefilled_names)
+    for (auto &p : m_prefilled_names)
     {
         const char* s = p.first.c_str();
         GLuint loc = glGetUniformLocation(m_program[rp], s);
@@ -175,8 +195,8 @@ void SPShader::bindPrefilledTextures(RenderPass rp) const
     for (auto& p : m_prefilled_samplers[rp])
     {
         glActiveTexture(GL_TEXTURE0 + std::get<0>(p));
-        auto it = g_prefilled_names.find(std::get<1>(p));
-        if (it != g_prefilled_names.end())
+        auto it = m_prefilled_names.find(std::get<1>(p));
+        if (it != m_prefilled_names.end())
         {
             glBindTexture(std::get<3>(p), sp_prefilled_tex[it->second.first]);
             glBindSampler(std::get<0>(p), getSampler(std::get<2>(p)));

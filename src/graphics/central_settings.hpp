@@ -48,6 +48,7 @@ private:
     bool hasInstancedArrays;
     bool hasBGRA;
     bool hasColorBufferFloat;
+    bool hasTextureBufferObject;
     bool m_need_vertex_id_workaround;
 public:
     static bool m_supports_sp;
@@ -81,6 +82,7 @@ public:
     bool isARBInstancedArraysUsable() const;
     bool isEXTTextureFormatBGRA8888Usable() const;
     bool isEXTColorBufferFloatUsable() const;
+    bool isARBTextureBufferObjectUsable() const;
 
     // Are all required extensions available for feature support
     bool supportsComputeShadersFiltering() const;

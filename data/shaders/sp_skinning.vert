@@ -1,4 +1,4 @@
-#ifdef GL_ES
+#ifdef TBO_DISABLED
 uniform sampler2D skinning_tex;
 #else
 uniform samplerBuffer skinning_tex;
@@ -56,7 +56,7 @@ void main()
     vec4 skinned_tangent = vec4(0.0);
     int skinning_offset = i_misc_data.x;
 
-#ifdef GL_ES
+#ifdef TBO_DISABLED
     mat4 joint_matrix =
         i_weight[0] * mat4(
         texelFetch(skinning_tex, ivec2(0, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES)), 0),
