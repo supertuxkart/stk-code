@@ -169,7 +169,7 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Karts
 * New Beastie kart.
 #### Tracks
-* Snow Peak by samuncle
+* Improved Snow Peak by samuncle
 * Improved Star Track UFO by Rudy
 
 ## SuperTuxKart 0.7.1b (21. April 2011)
@@ -190,7 +190,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Basic level-of-detail (LOD) support
 * Debug features for track makers
 * Update to bullet 2.77
-* Replace more sounds to be DFSG-compliant
+* Replace more sounds to be DFSG-complianta
 * Fixed character names that contain non-ASCII characters
 * Full RTL (right to left) support
 * Various other tweaks done and glitches fixed
@@ -215,7 +215,7 @@ Too many to list them all. Main points:
 ### Tracks and modeling
 #### Tracks
 - Farm
-- Hacienda by samuncle
+- Hacienda by samuncle (replace Beach)
 - Scotland by Canis Lupus
 - Secret Garden
 
@@ -237,7 +237,7 @@ Too many to list them all. Main points:
 * Bugfix: battle mode would not display track groups.
 
 ## SuperTuxKart 0.6.1 (February 2009)
-* Added new kart ("Puffy"), new battle map ("Cave"), and new music for Snow Mountain.
+* New music for Snow Mountain.
 * Fixed bug in track selection screen that could cause a crash when track groups were used.
 * Fixed crash in character selection that could happen if an old user config file existed.
 * Fixed incorrect rescues in Fort Magma.
@@ -245,15 +245,19 @@ Too many to list them all. Main points:
 * A plunger in the face is now removed when restarting.
 * Added slow-down for karts driving backwards.
 * Somewhat reduced 'shaking' of AI driven karts.
+### Tracks and modeling
+#### Karts
+- New Puffy kart
+#### Tracks
+- New Cave battle map
+
 
 ## SuperTuxKart 0.6 (January 2009)
 * New improved physics and kart handling
 * Added sharp turns and nitro speed boost (replacing wheelies and jump)
 * Totally rewrote powerups (plunger, bowling ball, cake, bubblegum) and new look for bananas
-* New and improved tracks  : skyline, snow mountain, race track, space track, old mine, XR591
 * New game mode : 3-Strikes Battle
 * Major improvements to AI
-* New/improved karts (and removed some old ones) : wilber, eviltux, hexley
 * Improved user interface
 * Karts now have a visible suspension effect
 * Fully positional audio with OpenAL
@@ -268,6 +272,21 @@ Too many to list them all. Main points:
 * Bug fixes and code refactor/cleanup/documentation
   - Fixed 'joystick locks' (kart would turn even if the joystick is in neutral),
     thanks to Samjam for the patch.
+    
+### Tracks and modeling
+#### Karts
+* Improved Wilber
+* Eviltux
+* Hexley
+* Some old karts have been removed
+#### Tracks
+* Skyline
+* Snow Mountain
+* Race track
+* Old Mine
+* XR591
+* Improved track :
+    * Star track
 
 ## SuperTuxKart 0.5 (May 2008)
 * Six new tracks and one improved track: Fort Magma, SnowTux Peak, Amazonian Journey, City, Canyon, Crescent Crossing and StarTrack
