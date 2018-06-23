@@ -66,8 +66,8 @@
                 speed 10 the radius is 7.5 etc.
                 The actual turn radius is piece-wise linearly interpolated. This
                 allows for tighter turning at lower speeds, and also avoids that
-                the kart becomes too hard to control at high speed (speeds of
-                higher than 23 can only be reached with powerups).
+                the kart becomes too hard to control at high speed (speeds
+                higher than 25 can only be reached with powerups).
             time-full-steer: This is the amount of change in steering depending
                 on current steering. So if the steering is between 0 and 0.5,
                 the time-for-steering-change is 0.15. If the current steering is
@@ -84,7 +84,8 @@
               time-reset-steer="0.1" />
 
         <!-- Speed and acceleration
-            power: The power of the kart
+            power: The power of the kart (the engine power needed to accelerate
+                   at a given pace is proportional to mass)
             max-speed: The base maximum speed of the kart in m/s
             brake-factor: Value used when braking.
             brake-time-increase: The brake force is multiplied by
@@ -93,18 +94,19 @@
             max-speed-reverse-ratio is the percentage of max speed for reverse
                 gear.
           -->
-        <engine power="875" max-speed="25" brake-factor="15"
+        <engine power="1000" max-speed="25" brake-factor="15"
                 brake-time-increase="6" max-speed-reverse-ratio="0.65" />
 
         <!-- Simulated gears
             switch-ratio defines at what ratio of the maximum
                 speed what gear is selected, e.g. 0.25 means that if the speed is
-                bigger or equal to 0.25 * maxSpeed then use gear 1, 0.5 means if
-                the speed is bigger or equal to 0.5 x maxSpeed then gear 2.
+                inferior or equal to 0.25 * maxSpeed then use gear 1, 0.5 means if
+                the speed is inferior or equal to 0.5 x maxSpeed then gear 2.
                 gear-power-increase contains the increase in max power (to simulate
                 different gears), e.g. 2.5 as first entry means: 2.5 * maxPower in gear 1
                 | first  | second |  third | . -->
-        <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3" />
+        <gear switch-ratio="0.2 0.45 0.7 1 1.25"
+              power-increase="2.5 2.1 1.7 1.4 1.2" />
 
         <!-- Mass of a kart -->
         <mass value="350" />
@@ -205,9 +207,9 @@
         <anvil duration="2.0" weight="150"  speed-factor="0.2" />
 
         <!-- Parachute
-            friction: The friction increase when a parachute is attached.
+            friction: The friction factor when a parachute is attached.
             duration: The time an attached parachute is active
-            duration-other: The time a parachute attached from other kart works
+            duration-other: Used when the parachute results from item use
             duration-rank-mult: The multiplier applied to the duration of the
             parachute on the 1st kart when affected by the item. Scale for
             intermediary ranks to 1.0 for the last affected.
@@ -220,9 +222,9 @@
                 detach parachute. E.g. at max-speed 50% of speed must be lost.
             max-speed: A factor that decides the impact of rate of speed
                 (distance between bounds) -->
-        <parachute friction="2.0" duration="2.0" duration-other="2.6"
-                   duration-rank-mult="1.35" duration-speed-mult="2.0"
-                   lbound-fraction="0.8" ubound-fraction="0.5" max-speed="23" />
+        <parachute friction="5.0" duration="2" duration-other="2.6"
+                   duration-rank-mult="1.35" duration-speed-mult="1.5"
+                   lbound-fraction="0.5" ubound-fraction="0.3" max-speed="30" />
         <!-- Bubblegum
             duration: How long the bubblegum lasts.
             speed-fraction: To what fraction of top-speed the speed is reduced.
@@ -273,7 +275,7 @@
             fields must have the same size, and must be sorted by
             increasing times. -->
         <startup time="0.3 0.5"
-                 boost="6 3" />
+                 boost="8 4" />
 
         <!-- Rescue
             duration: How long it takes the kart to be raised.
@@ -292,11 +294,12 @@
                 after being hit by an explosion.
             radius: Kart closer to this value will be affected by
                 an explosion as well.  -->
-        <explosion duration="2" radius="5"
-                   invulnerability-time="6" />
+        <explosion duration="2" radius="6"
+                   invulnerability-time="7" />
 
         <!-- Nitro
             engine-force: additional engine power
+            engine-mult: multiply the total engine power by this
             consumption: nitro consumption - heavier characters can be set
                 to need more nitro than lighter character.
             small-container: how much energy a small container gives.
@@ -308,8 +311,9 @@
             fade-out-time: Duration during which the increased maximum
                 speed due to nitro fades out.
             max: How much nitro a kart can store. -->
-        <nitro engine-force="600" consumption="1" small-container="1" big-container="3"
-               max-speed-increase="5" duration="1" fade-out-time="2" max="20" />
+        <nitro engine-force="300" engine-mult="1.2" consumption="1"
+               small-container="1" big-container="3"
+               max-speed-increase="5" duration="1" fade-out-time="2.4" max="20" />
 
         <!-- Slipstream
             base-speed: the speed for which length and width are valid.
@@ -338,15 +342,15 @@
     <!-- The different difficulties (like easy, medium, hard) -->
     <difficulties>
         <characteristic name="easy">
-            <engine power="*0.66" max-speed="*0.6" />
+            <engine power="*0.7" max-speed="*0.6" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="medium">
-            <engine power="*0.77" max-speed="*0.8" />
+            <engine power="*0.83" max-speed="*0.8" />
             <plunger in-face-time="4" />
         </characteristic>
         <characteristic name="hard">
-            <engine power="*0.89" max-speed="*0.92" />
+            <engine power="*0.92" max-speed="*0.92" />
         </characteristic>
         <!-- This doesn't need to be changed because the most fast/heavy/extreme
             values should also be the default ones. -->
@@ -356,45 +360,43 @@
     <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
         <characteristic name="light">
-            <engine power="*0.46" max-speed="*0.92" brake-factor="*1"
+            <turn radius="0:2.0 10:7.5 25:15 45:30" />
+            <engine power="*0.84" max-speed="*0.96" brake-factor="*1"
                  max-speed-reverse-ratio="*0.77" />
-            <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3" />
-            <mass value="*0.56" />
-            <startup time="0.3 0.5"
-                     boost="8.5 4.5" />
-            <explosion time="2.1" radius="5.5"
-                       invulnerability-time="7" />
-            <nitro engine-force="350" max-speed-increase="4.5" duration="1.5"
-                   fade-out-time="2.5" />
-            <slipstream length="*0.9" collect-time="*0.9"
+            <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+                  power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
+            <mass value="*0.6" />
+            <startup boost="*1 *1" />
+            <explosion time="*1" radius="*1" />
+            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1"
+                   fade-out-time="*1" />
+            <slipstream length="*0.9" collect-time="*0.9" add-power="*1"
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium">
-            <engine power="*0.63" max-speed="*1" brake-factor="*0.73"
+            <turn radius="0:2.2 10:8.25 25:16.5 45:33" />
+            <engine power="*0.9" max-speed="*1" brake-factor="*0.8"
                     max-speed-reverse-ratio="*0.62" />
-            <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5" />
-            <mass value="*0.71" />
-            <startup time="0.3 0.5"
-                     boost="4.2 2.6" />
-            <explosion time="1.8" radius="5"
-                       invulnerability-time="6" />
-            <nitro engine-force="425" consumption="1.4" duration="1" />
-            <slipstream duration-factor="*0.8" fade-out-time="*1" />
+            <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+                  power-increase="2.4 2 1.7 1.4 1.2 1" />
+            <mass value="*0.75" />
+            <startup boost="*0.75 *0.75" />
+            <explosion time="*0.8" radius="*0.8" />
+            <nitro engine-force="*0.75" consumption="*1.25" fade-out-time="*0.8" />
+            <slipstream add-power="*0.85" duration-factor="*0.85" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
-            <engine power="*1" max-speed="*1" brake-factor="*0.66"
+            <turn radius="0:2.4 10:9 25:18 45:36" />
+            <engine power="*1" max-speed="*1.04" brake-factor="*0.6"
                     max-speed-reverse-ratio="*1" />
-            <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5" />
+            <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+                  power-increase="2 1.7 1.5 1.3 1.15 1" />
             <mass value="*1" />
-            <swatter duration="10" distance="3" squash-duration="5"
-                     squash-slowdown="0.5" />
-            <startup time="0.3 0.5"
-                     boost="3.8 2" />
-            <explosion time="1.5" radius="4"
-                       invulnerability-time="6" />
-            <nitro engine-force="600" consumption="2" max-speed-increase="8"
-                   duration="0.7" fade-out-time="1.3" />
-            <slipstream length="*1.1" collect-time="*1.1"
+            <startup boost="*0.5 *0.5" />
+            <explosion time="*0.6" radius="*0.6" />
+            <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.1"
+                   fade-out-time="*0.6" />
+            <slipstream length="*1.1" collect-time="*1.1" add-power="*0.6"
                    duration-factor="*0.6" fade-out-time="*1" />
         </characteristic>
     </kart-types>
