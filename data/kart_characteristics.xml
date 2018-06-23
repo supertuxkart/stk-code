@@ -335,8 +335,8 @@
             fade-out-time: How long the slip stream speed increase will
                 gradually be reduced.  -->
         <slipstream base-speed="20" length="8" width="4" inner-factor="0.5"
-                    min-collect-time="3" max-collect-time="8" add-power="300" min-speed="8"
-                    max-speed-increase="5" duration-factor="1" fade-out-time="2" />
+                    min-collect-time="2.5" max-collect-time="8" add-power="300" min-speed="8"
+                    max-speed-increase="3" duration-factor="1" fade-out-time="2" />
     </characteristic>
 
     <!-- The different difficulties (like easy, medium, hard) -->
@@ -361,16 +361,15 @@
     <kart-types>
         <characteristic name="light">
             <turn radius="0:2.0 10:7.5 25:15 45:30" />
-            <engine power="*0.84" max-speed="*0.96" brake-factor="*1"
+            <engine power="*0.84" max-speed="*0.95" brake-factor="*1"
                  max-speed-reverse-ratio="*0.77" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
                   power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
             <mass value="*0.6" />
             <startup boost="*1 *1" />
             <explosion time="*1" radius="*1" />
-            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1"
-                   fade-out-time="*1" />
-            <slipstream length="*0.9" collect-time="*0.9" add-power="*1"
+            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1" />
+            <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium">
@@ -380,23 +379,22 @@
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.4 2 1.7 1.4 1.2 1" />
             <mass value="*0.75" />
-            <startup boost="*0.75 *0.75" />
+            <startup boost="*0.8 *0.8" />
             <explosion time="*0.8" radius="*0.8" />
-            <nitro engine-force="*0.75" consumption="*1.25" fade-out-time="*0.8" />
-            <slipstream add-power="*0.85" duration-factor="*0.85" fade-out-time="*1" />
+            <nitro engine-force="*0.75" consumption="*1.25" />
+            <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
-            <turn radius="0:2.4 10:9 25:18 45:36" />
-            <engine power="*1" max-speed="*1.04" brake-factor="*0.6"
+            <turn radius="0:2.3 10:8.625 25:17.25 45:34.5" />
+            <engine power="*1" max-speed="*1.05" brake-factor="*0.6"
                     max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2 1.7 1.5 1.3 1.15 1" />
             <mass value="*1" />
-            <startup boost="*0.5 *0.5" />
+            <startup boost="*0.6 *0.6" />
             <explosion time="*0.6" radius="*0.6" />
-            <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.1"
-                   fade-out-time="*0.6" />
-            <slipstream length="*1.1" collect-time="*1.1" add-power="*0.6"
+            <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.1" />
+            <slipstream length="*1.1" collect-time="*1.1"
                    duration-factor="*0.6" fade-out-time="*1" />
         </characteristic>
     </kart-types>
