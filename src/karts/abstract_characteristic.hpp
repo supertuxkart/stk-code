@@ -185,6 +185,7 @@ public:
         // Nitro
         NITRO_DURATION,
         NITRO_ENGINE_FORCE,
+        NITRO_ENGINE_MULT,
         NITRO_CONSUMPTION,
         NITRO_SMALL_CONTAINER,
         NITRO_BIG_CONTAINER,
@@ -354,6 +355,7 @@ public:
 
     float getNitroDuration() const;
     float getNitroEngineForce() const;
+    float getNitroEngineMult() const;
     float getNitroConsumption() const;
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;

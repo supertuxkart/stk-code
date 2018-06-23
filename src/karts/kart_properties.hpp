@@ -470,6 +470,7 @@ public:
 
     float getNitroDuration() const;
     float getNitroEngineForce() const;
+    float getNitroEngineMult() const;
     float getNitroConsumption() const;
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;

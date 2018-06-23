@@ -201,6 +201,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case NITRO_ENGINE_FORCE:
         return TYPE_FLOAT;
+    case NITRO_ENGINE_MULT:
+        return TYPE_FLOAT;
     case NITRO_CONSUMPTION:
         return TYPE_FLOAT;
     case NITRO_SMALL_CONTAINER:
@@ -437,6 +439,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_DURATION";
     case NITRO_ENGINE_FORCE:
         return "NITRO_ENGINE_FORCE";
+    case NITRO_ENGINE_MULT:
+        return "NITRO_ENGINE_MULT";
     case NITRO_CONSUMPTION:
         return "NITRO_CONSUMPTION";
     case NITRO_SMALL_CONTAINER:
@@ -1394,6 +1398,18 @@ float AbstractCharacteristic::getNitroEngineForce() const
                     getName(NITRO_ENGINE_FORCE).c_str());
     return result;
 }  // getNitroEngineForce
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitroEngineMult() const
+{
+    float result;
+    bool is_set = false;
+    process(NITRO_ENGINE_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITRO_ENGINE_MULT).c_str());
+    return result;
+}  // getNitroEngineMult
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroConsumption() const

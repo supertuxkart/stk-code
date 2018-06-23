@@ -2545,6 +2545,54 @@ void Kart::updateEngineSFX(float dt)
       }
 }   // updateEngineSFX
 
+
+
+//-----------------------------------------------------------------------------
+/** Reduces the engine power according to speed
+ *  
+ *  TODO : find where the physics already apply a linear force decrease
+ *  TODO : While this work fine, it should ideally be in physics
+ *         However, the function use some kart properties and parachute
+ *         effect needs to be applied, so keep both working if moving
+ *  \param engine_power : the engine power on which to apply the decrease
+ */
+float Kart::applyAirFriction(float engine_power)
+{
+    //The physics already do that a certain amount of engine force is needed to keep going
+    //at a given speed (~39,33 engine force = 1 speed for a mass of 350)
+    //But it's either too slow to accelerate to a target speed or makes it
+    //too easy to accelerate farther.
+    //Instead of making increasing gears have enormous power gaps, apply friction
+
+    float mass_factor = m_kart_properties->getMass()/350.0f;
+    float compense_linear_slowdown = 39.33f*getSpeed()*mass_factor;
+
+    engine_power += compense_linear_slowdown;
+
+    // The result will always be a positive number
+    float friction_intensity = fabsf(getSpeed());
+
+    // Not a pure quadratic evolution as it would be too brutal
+    friction_intensity *= sqrt(friction_intensity)*5;
+
+    // Apply parachute physics
+    // Currently, all karts have the same base friction
+    // If this is changed, a compensation needs to be added here
+    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
+        friction_intensity *= m_kart_properties->getParachuteFriction();
+
+    if (friction_intensity < 0.0f) friction_intensity = 0.0f;
+
+    // We substract the friction from the engine power
+    // 1)This is the logical behavior
+    // 2)That way, engine boosts remain useful at high speed
+    // 3)It helps heavier karts, who have an higher engine power
+
+    engine_power-=friction_intensity;
+
+    return engine_power;
+} //applyAirFriction
+
 //-----------------------------------------------------------------------------
 /** Sets the engine power. It considers the engine specs, items that influence
  *  the available power, and braking/steering.
@@ -2554,9 +2602,14 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     updateNitro(ticks);
     float engine_power = getActualWheelForce();
 
-    // apply parachute physics if relevant
-    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
-        engine_power*=0.2f;
+    // apply nitro boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0)
+    {
+        engine_power*= m_kart_properties->getNitroEngineMult();
+    }
+
+    // This also applies parachute physics if relevant
+    engine_power = applyAirFriction(engine_power);
 
     // apply bubblegum physics if relevant
     if (m_bubblegum_ticks > 0)

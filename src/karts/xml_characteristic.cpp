@@ -545,6 +545,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[NITRO_DURATION]);
         sub_node->get("engine-force",
             &m_values[NITRO_ENGINE_FORCE]);
+        sub_node->get("engine-mult",
+            &m_values[NITRO_ENGINE_MULT]);
         sub_node->get("consumption",
             &m_values[NITRO_CONSUMPTION]);
         sub_node->get("small-container",
