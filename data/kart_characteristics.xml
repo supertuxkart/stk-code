@@ -94,7 +94,7 @@
             max-speed-reverse-ratio is the percentage of max speed for reverse
                 gear.
           -->
-        <engine power="1000" max-speed="25" brake-factor="15"
+        <engine power="950" max-speed="25" brake-factor="15"
                 brake-time-increase="6" max-speed-reverse-ratio="0.65" />
 
         <!-- Simulated gears
@@ -361,8 +361,8 @@
     <kart-types>
         <characteristic name="light">
             <turn radius="0:2.0 10:7.5 25:15 45:30" />
-            <engine power="*0.84" max-speed="*0.95" brake-factor="*1"
-                 max-speed-reverse-ratio="*0.77" />
+            <engine power="*0.8" max-speed="*0.95" brake-factor="*1"
+                 max-speed-reverse-ratio="*0.8" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
                   power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
             <mass value="*0.6" />
@@ -374,8 +374,8 @@
         </characteristic>
         <characteristic name="medium">
             <turn radius="0:2.2 10:8.25 25:16.5 45:33" />
-            <engine power="*0.9" max-speed="*1" brake-factor="*0.8"
-                    max-speed-reverse-ratio="*0.62" />
+            <engine power="*0.875" max-speed="*1" brake-factor="*0.8"
+                    max-speed-reverse-ratio="*0.75" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.4 2 1.7 1.4 1.2 1" />
             <mass value="*0.75" />
@@ -387,7 +387,7 @@
         <characteristic name="heavy">
             <turn radius="0:2.3 10:8.625 25:17.25 45:34.5" />
             <engine power="*1" max-speed="*1.05" brake-factor="*0.6"
-                    max-speed-reverse-ratio="*1" />
+                    max-speed-reverse-ratio="*0.7" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2 1.7 1.5 1.3 1.15 1" />
             <mass value="*1" />
