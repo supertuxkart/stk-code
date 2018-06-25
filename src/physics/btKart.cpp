@@ -217,10 +217,34 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
  */
 void btKart::updateAllWheelTransformsWS()
 {
-    for (unsigned int i = 0; i < (unsigned int)m_wheelInfo.size(); i++)
+    updateAllWheelPositions();
+
+    const btTransform& chassisTrans = getChassisWorldTransform();
+
+    btVector3 forwardW(chassisTrans.getBasis()[0][m_indexForwardAxis],
+                       chassisTrans.getBasis()[1][m_indexForwardAxis],
+                       chassisTrans.getBasis()[2][m_indexForwardAxis]);
+
+    // Simulate suspension
+    // -------------------
+
+    m_num_wheels_on_ground       = 0;
+    m_visual_wheels_touch_ground = true;
+    for (int i=0;i<m_wheelInfo.size();i++)
     {
-        btWheelInfo &wheel = m_wheelInfo[i];
-        updateWheelTransformsWS(wheel, false, 1.0f);
+        rayCast( i);
+        if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
+            m_num_wheels_on_ground++;
+        else
+        {
+            // If the original raycast did not hit the ground,
+            // try a little bit (5%) closer to the centre of the chassis.
+            // Some tracks have very minor gaps that would otherwise
+            // trigger odd physical behaviour.
+            rayCast(i, 0.95f);
+            if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
+                m_num_wheels_on_ground++;
+        }
     }
 }   // updateAllWheelTransformsWS
 
@@ -417,36 +441,7 @@ void btKart::updateAllWheelPositions()
 // ----------------------------------------------------------------------------
 void btKart::updateVehicle( btScalar step )
 {
-    updateAllWheelPositions();
-
-    const btTransform& chassisTrans = getChassisWorldTransform();
-
-    btVector3 forwardW(chassisTrans.getBasis()[0][m_indexForwardAxis],
-                       chassisTrans.getBasis()[1][m_indexForwardAxis],
-                       chassisTrans.getBasis()[2][m_indexForwardAxis]);
-
-    // Simulate suspension
-    // -------------------
-
-    m_num_wheels_on_ground       = 0;
-    m_visual_wheels_touch_ground = true;
-    for (int i=0;i<m_wheelInfo.size();i++)
-    {
-        rayCast( i);
-        if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
-            m_num_wheels_on_ground++;
-        else
-        {
-            // If the original raycast did not hit the ground,
-            // try a little bit (5%) closer to the centre of the chassis.
-            // Some tracks have very minor gaps that would otherwise
-            // trigger odd physical behaviour.
-            rayCast(i, 0.95f);
-            if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
-                m_num_wheels_on_ground++;
-        }
-    }
-
+    updateAllWheelTransformsWS();
     // Test if the kart is falling so fast 
     // that the chassis might hit the track
     // ------------------------------------
