@@ -26,10 +26,13 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "karts/controller/local_player_controller.hpp"
+#include "karts/abstract_kart.hpp"
 #include "input/input_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -427,6 +430,20 @@ void MainLoop::run()
             }
         }   // for i < num_steps
 
+        // Handle buffered player actions
+        if (World::getWorld())
+        {
+            for (unsigned i = 0; i < World::getWorld()->getNumKarts(); i++)
+            {
+                LocalPlayerController* lpc =
+                    dynamic_cast<LocalPlayerController*>
+                    (World::getWorld()->getKart(i)->getController());
+                if (lpc)
+                    lpc->handleBufferedActions();
+            }
+            if (auto gp = GameProtocol::lock())
+                gp->sendAllActions();
+        }
         m_is_last_substep = false;
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();

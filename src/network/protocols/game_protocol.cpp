@@ -65,10 +65,10 @@ GameProtocol::~GameProtocol()
 }   // ~GameProtocol
 
 //-----------------------------------------------------------------------------
-/** Synchronous update - will send all commands collected during the last
+/** Will send all commands collected during the last
  *  frame (and could optional only send messages every N frames).
  */
-void GameProtocol::update(int ticks)
+void GameProtocol::sendAllActions()
 {
     if (m_all_actions.size() == 0) return;   // nothing to do
 
@@ -90,7 +90,7 @@ void GameProtocol::update(int ticks)
     // FIXME: for now send reliable
     sendToServer(m_data_to_send, /*reliable*/ true);
     m_all_actions.clear();
-}   // update
+}   // sendAllActions
 
 //-----------------------------------------------------------------------------
 /** Called when a message from a remote GameProtocol is received.

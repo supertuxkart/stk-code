@@ -247,7 +247,7 @@ void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
 {
     m_steer_val_l = value_l;
     m_steer_val_r = value_r;
-    action(p_action, value);
+    PlayerController::action(p_action, value, /*dry_run*/false);
 }   // actionFromNetwork
 
 //-----------------------------------------------------------------------------

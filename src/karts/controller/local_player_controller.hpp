@@ -23,6 +23,9 @@
 
 #include "karts/controller/player_controller.hpp"
 
+#include <utility>
+#include <vector>
+
 class AbstractKart;
 class ParticleEmitter;
 class SFXBase;
@@ -62,6 +65,9 @@ private:
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
+
+    std::vector<std::pair<PlayerAction, int> > m_actions;
+
 public:
                  LocalPlayerController(AbstractKart *kart,
                                        const int local_player_id,
@@ -86,7 +92,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName() const OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    void handleBufferedActions();
 
 };   // LocalPlayerController
 

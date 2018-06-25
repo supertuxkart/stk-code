@@ -150,28 +150,42 @@ void LocalPlayerController::resetInputState()
 bool LocalPlayerController::action(PlayerAction action, int value,
                                    bool dry_run)
 {
-    // If this event does not change the control state (e.g.
-    // it's a (auto) repeat event), do nothing. This especially
-    // optimises traffic to the server and other clients.
-    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
-
-    // Register event with history
-    if(!history->replayHistory())
-        history->addEvent(m_kart->getWorldKartId(), action, value);
-
-    // If this is a client, send the action to networking layer
-    if (World::getWorld()->isNetworkWorld() && 
-        NetworkConfig::get()->isClient()    &&
-        !RewindManager::get()->isRewinding()   )
-    {
-        if (auto gp = GameProtocol::lock())
-        {
-            gp->controllerAction(m_kart->getWorldKartId(), action, value,
-                m_steer_val_l, m_steer_val_r);
-        }
-    }
-    return PlayerController::action(action, value, /*dry_run*/false);
+    m_actions.emplace_back(action, value);
+    return true;
 }   // action
+
+// ----------------------------------------------------------------------------
+void LocalPlayerController::handleBufferedActions()
+{
+    for (auto& p : m_actions)
+    {
+        PlayerAction action = p.first;
+        int value = p.second;
+
+        // If this event does not change the control state (e.g.
+        // it's a (auto) repeat event), do nothing. This especially
+        // optimises traffic to the server and other clients.
+        if (!PlayerController::action(action, value, /*dry_run*/true))
+            continue;
+
+        // Register event with history
+        if(!history->replayHistory())
+            history->addEvent(m_kart->getWorldKartId(), action, value);
+
+        // If this is a client, send the action to networking layer
+        if (World::getWorld()->isNetworkWorld() &&
+            NetworkConfig::get()->isClient())
+        {
+            if (auto gp = GameProtocol::lock())
+            {
+                gp->controllerAction(m_kart->getWorldKartId(), action, value,
+                    m_steer_val_l, m_steer_val_r);
+            }
+        }
+        PlayerController::action(action, value, /*dry_run*/false);
+    }
+    m_actions.clear();
+}   // handleBufferedActions
 
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
