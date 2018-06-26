@@ -962,6 +962,21 @@ namespace StringUtils
 
         return result;
     } //decode64
+    // ------------------------------------------------------------------------
+    std::string removeWhitespaces(const std::string& input)
+    {
+        std::string out;
+        
+        for (char ch : input)
+        {
+            if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+                continue;
+                
+            out += ch;
+        }
+        
+        return out;
+    }
 
 } // namespace StringUtils
 

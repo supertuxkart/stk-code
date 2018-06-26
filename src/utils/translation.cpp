@@ -206,8 +206,9 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            for (std::string line; std::getline(*in, line); )
+            for (std::string line; std::getline(*in, line, ';'); )
             {
+                line = StringUtils::removeWhitespaces(line);
                 std::size_t pos = line.find("=");
                 std::string name = line.substr(0, pos);
                 std::string localized_name = line.substr(pos + 1);
