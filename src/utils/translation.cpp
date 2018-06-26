@@ -185,13 +185,15 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     {
         std::set<Language> languages = m_dictionary_manager.get_languages();      
 
-        // English is always there but won't be found on file system
+        // English is always there but may be not found on file system
         g_language_list.push_back("en");
 
-        std::set<Language>::iterator it;
-        for (it = languages.begin(); it != languages.end(); it++)
+        for (const Language& language : languages)
         {
-            g_language_list.push_back((*it).str());
+            if (language.str() == "en")
+                continue;
+                
+            g_language_list.push_back(language.str());
         }
     }
 
