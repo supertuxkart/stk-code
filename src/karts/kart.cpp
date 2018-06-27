@@ -1269,9 +1269,6 @@ void Kart::update(int ticks)
     // Reset any instand speed increase in the bullet kart
     m_vehicle->setMinSpeed(0);
 
-    // update star effect (call will do nothing if stars are not activated)
-    m_stars_effect->update(stk_config->ticks2Time(ticks));
-
     if(m_squash_ticks>=0)
     {
         m_squash_ticks-=ticks;
@@ -1421,8 +1418,6 @@ void Kart::update(int ticks)
 
     m_attachment->update(ticks);
 
-    m_kart_gfx->update(dt);
-    if (m_collision_particles) m_collision_particles->update(dt);
 
     PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
     updatePhysics(ticks);
@@ -1442,19 +1437,6 @@ void Kart::update(int ticks)
         World::getWorld()->onFirePressed(getController());
         m_fire_clicked = 1;
     }
-
-    /* (TODO: add back when properly done)
-    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
-    {
-        if (m_custom_sounds[n] != NULL) m_custom_sounds[n]->position   ( getXYZ() );
-    }
-     */
-
-    for (int i = 0; i < EMITTER_COUNT; i++)
-        m_emitters[i]->setPosition(getXYZ());
-
-    m_skid_sound->setPosition   ( getXYZ() );
-    m_nitro_sound->setPosition  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -2061,8 +2043,12 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      stk_config->time2Ticks(duration),
                                      stk_config->time2Ticks(fade_out_time));
     // Play custom character sound (weee!)
-    playCustomSFX(SFXManager::CUSTOM_ZIPPER);
-    m_controller->handleZipper(play_sound);
+    if (!RewindManager::get()->isRewinding())
+    {
+        playCustomSFX(SFXManager::CUSTOM_ZIPPER);
+        m_controller->handleZipper(play_sound);
+    }
+
 }   // handleZipper
 
 // -----------------------------------------------------------------------------
@@ -2348,7 +2334,8 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 void Kart::beep()
 {
     // If the custom horn can't play (isn't defined) then play the default one
-    if (!playCustomSFX(SFXManager::CUSTOM_HORN))
+    if (!playCustomSFX(SFXManager::CUSTOM_HORN) &&
+        !RewindManager::get()->isRewinding())
     {
         getNextEmitter()->play(getXYZ(), m_horn_sound);
     }
@@ -2944,8 +2931,25 @@ SFXBase* Kart::getNextEmitter()
  */
 void Kart::updateGraphics(float dt)
 {
+    /* (TODO: add back when properly done)
+    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    {
+        if (m_custom_sounds[n] != NULL) m_custom_sounds[n]->position(getXYZ());
+    }
+     */
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i]->setPosition(getXYZ());
+    m_skid_sound->setPosition(getXYZ());
+    m_nitro_sound->setPosition(getXYZ());
+
+    // update star effect (call will do nothing if stars are not activated)
+    m_stars_effect->update(dt);
+
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
+    m_kart_gfx->update(dt);
+    if (m_collision_particles) m_collision_particles->update(dt);
+
     // --------------------------------------------------------
     float nitro_frac = 0;
     if ( (m_controls.getNitro() || m_min_nitro_ticks > 0) &&
@@ -2959,7 +2963,7 @@ void Kart::updateGraphics(float dt)
         if(nitro_frac>1.0f) nitro_frac = 1.0f;
     }
     m_kart_gfx->updateNitroGraphics(nitro_frac);
-    
+
     // Handle leaning of karts
     // -----------------------
     // Note that we compare with maximum speed of the kart, not
@@ -3156,7 +3160,8 @@ const float Kart::getRecentPreviousXYZTime() const
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)
 {
-    getNextEmitter()->play(getXYZ(), buffer);
+    if (!RewindManager::get()->isRewinding())
+        getNextEmitter()->play(getXYZ(), buffer);
 }   // playSound
 
 // ------------------------------------------------------------------------
