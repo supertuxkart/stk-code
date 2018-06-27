@@ -1315,17 +1315,20 @@ void Kart::update(int ticks)
         m_kart_animation->update(dt);
     }
 
-    m_time_previous_counter += dt;
-    while (m_time_previous_counter > stk_config->ticks2Time(1))
+    if (!RewindManager::get()->isRewinding())
     {
-        m_previous_xyz[0] = getXYZ();
-        m_previous_xyz_times[0] = World::getWorld()->getTime();
-        for (int i=m_xyz_history_size-1;i>0;i--)
+        m_time_previous_counter += dt;
+        while (m_time_previous_counter > stk_config->ticks2Time(1))
         {
-            m_previous_xyz[i] = m_previous_xyz[i-1];
-            m_previous_xyz_times[i] = m_previous_xyz_times[i-1];
+            m_previous_xyz[0] = getXYZ();
+            m_previous_xyz_times[0] = World::getWorld()->getTime();
+            for (int i=m_xyz_history_size-1;i>0;i--)
+            {
+                m_previous_xyz[i] = m_previous_xyz[i-1];
+                m_previous_xyz_times[i] = m_previous_xyz_times[i-1];
+            }
+            m_time_previous_counter -= stk_config->ticks2Time(1);
         }
-        m_time_previous_counter -= stk_config->ticks2Time(1);
     }
 
     // Update the position and other data taken from the physics (or
@@ -1384,7 +1387,8 @@ void Kart::update(int ticks)
         m_invulnerable_ticks -= ticks;
     }
 
-    m_slipstream->update(ticks);
+    if (!RewindManager::get()->isRewinding())
+        m_slipstream->update(ticks);
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
@@ -1638,6 +1642,8 @@ void Kart::update(int ticks)
         }
     }
 
+    if (RewindManager::get()->isRewinding())
+        return;
     // Remove the shadow if the kart is not on the ground (if a kart
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
