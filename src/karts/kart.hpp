@@ -251,7 +251,7 @@ protected:
     RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
-    int           m_min_nitro_ticks;
+    int8_t        m_min_nitro_ticks;
 
     void          updatePhysics(int ticks);
     void          handleMaterialSFX();

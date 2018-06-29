@@ -108,7 +108,7 @@ BareNetworkString* KartRewinder::saveState()
     // -----------------------------
     getAttachment()->saveState(buffer);
     getPowerup()->saveState(buffer);
-    buffer->addFloat(getEnergy());
+    buffer->addUInt8(m_min_nitro_ticks).addFloat(getEnergy());
 
     // 4) Max speed info
     // ------------------
@@ -173,6 +173,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // ------------------------------
     getAttachment()->rewindTo(buffer);
     getPowerup()->rewindTo(buffer);
+    m_min_nitro_ticks = buffer->getUInt8();
     float nitro = buffer->getFloat();
     setEnergy(nitro);
 

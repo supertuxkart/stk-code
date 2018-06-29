@@ -2073,10 +2073,11 @@ void Kart::updateNitro(int ticks)
             m_min_nitro_ticks = 1;
     }
 
+    bool rewinding = RewindManager::get()->isRewinding();
     bool increase_speed = (m_min_nitro_ticks > 0 && isOnGround());
     if (!increase_speed && m_min_nitro_ticks <= 0)
     {
-        if (m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
+        if (m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->stop();
         return;
     }
@@ -2085,7 +2086,7 @@ void Kart::updateNitro(int ticks)
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
     if (m_collected_energy < 0)
     {
-        if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
+        if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->stop();
         m_collected_energy = 0;
         return;
@@ -2093,7 +2094,7 @@ void Kart::updateNitro(int ticks)
 
     if (increase_speed)
     {
-        if(m_nitro_sound->getStatus() != SFXBase::SFX_PLAYING)
+        if(m_nitro_sound->getStatus() != SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->play();
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
             m_kart_properties->getNitroMaxSpeedIncrease(),
@@ -2103,7 +2104,7 @@ void Kart::updateNitro(int ticks)
     }
     else
     {
-        if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
+        if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->stop();
     }
 }   // updateNitro
