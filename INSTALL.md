@@ -235,7 +235,6 @@ Building on 10.10 with 10.9 compatibility:
 cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
 ```
 
-
 #### Xcode
 
 Place an additional copy of the dependencies into `Users/<YOUR_USERNAME>/Library/Frameworks`.
