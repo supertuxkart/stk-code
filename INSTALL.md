@@ -204,7 +204,7 @@ make
 By default, the executable that is produced is not ready for distribution. Install https://github.com/auriamg/macdylibbundler
 
 ```bash
-dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./bin/SuperTuxKart.app/Contents/libs/ -p /usr/local/opt/
+dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./bin/SuperTuxKart.app/Contents/libs/ -p @executable_path/../libs/
 ```
 
 then copy the contents of `stk-assets` into /SuperTuxKart.app/Contents/Resources/data
@@ -235,29 +235,3 @@ Building on 10.10 with 10.9 compatibility:
 ```bash
 cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
 ```
-
-#### (Optional) packaging for distribution
-
-By default, the executable that is produced is not ready for distribution. Install https://github.com/auriamg/macdylibbundler
-
-```bash
-dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./bin/SuperTuxKart.app/Contents/libs/ -p @executable_path/../libs/
-```
-
-then copy the contents of `stk-assets` into /SuperTuxKart.app/Contents/Resources/data
-
-#### Xcode
-
-Place an additional copy of the dependencies into `Users/<YOUR_USERNAME>/Library/Frameworks`.
-Then cd to your cloned stk-code directory and execute the following commands:
-
-```bash
-mkdir xcode_build && cd xcode_build
-cmake .. -GXcode
-```
-
-Use Finder to navigate to your stk-code/xcode_build folder and open the newly generated Xcode project (`SuperTuxKart.xcodeproj`).
-
-You can then build the project in Xcode using Product -> Build
-
-Note: Xcode is much less well tested than makefiles, so there may be issues when trying to use Xcode.
