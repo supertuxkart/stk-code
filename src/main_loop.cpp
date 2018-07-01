@@ -51,12 +51,11 @@ MainLoop* main_loop = 0;
 
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
-        : m_abort(false), m_parent_pid(parent_pid)
+        : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
-    m_is_last_substep = false;
     m_frame_before_loading_world = false;
 #ifdef WIN32
     if (parent_pid != 0)
@@ -183,16 +182,6 @@ float MainLoop::getLimitedDt()
     }   // while(1)
 
     dt *= 0.001f;
-
-    // If this is a client, the server might request an adjustment of
-    // this client's world clock (to reduce number of rewinds).
-    if (World::getWorld()                   &&
-        NetworkConfig::get()->isClient()    &&
-        !RewindManager::get()->isRewinding()   )
-    {
-        dt = World::getWorld()->adjustDT(dt);
-    }
-
     return dt;
 }   // getLimitedDt
 
@@ -325,11 +314,11 @@ void MainLoop::run()
         if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
             m_abort = true;
 #endif
-        m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
         int num_steps   = stk_config->time2Ticks(left_over_time);
+
         float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
@@ -391,11 +380,33 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
+        m_ticks_adjustment.lock();
+        if (m_ticks_adjustment.getData() != 0)
+        {
+            if (m_ticks_adjustment.getData() > 0)
+            {
+                num_steps += m_ticks_adjustment.getData();
+                m_ticks_adjustment.getData() = 0;
+            }
+            else if (m_ticks_adjustment.getData() < 0)
+            {
+                int new_steps = num_steps + m_ticks_adjustment.getData();
+                if (new_steps < 0)
+                {
+                    num_steps = 0;
+                    m_ticks_adjustment.getData() = new_steps;
+                }
+                else
+                {
+                    num_steps = new_steps;
+                    m_ticks_adjustment.getData() = 0;
+                }
+            }
+        }
+        m_ticks_adjustment.unlock();
+
         for(int i=0; i<num_steps; i++)
         {
-            // Enable last substep in last iteration
-            m_is_last_substep = (i == num_steps - 1);
-
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(1);
             PROFILER_POP_CPU_MARKER();
@@ -444,7 +455,6 @@ void MainLoop::run()
             if (auto gp = GameProtocol::lock())
                 gp->sendAllActions();
         }
-        m_is_last_substep = false;
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort

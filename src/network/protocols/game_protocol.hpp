@@ -74,6 +74,7 @@ private:
     void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
     std::map<STKPeer*, int> m_initial_ticks;
+    std::map<STKPeer*, double> m_last_adjustments;
 
 public:
              GameProtocol();

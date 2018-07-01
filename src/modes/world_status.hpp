@@ -107,15 +107,6 @@ private:
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
 
-    /** In networked game the world clock might be adjusted (without the
-     *  player noticing), e.g. if a client causes rewinds in the server,
-     *  that client needs to speed up to be further ahead of the server
-     *  or slow down if time in client goes too far from server time
-     *  to reduce the number of rollbacks. This is the amount of time
-     *  by which the client's clock needs to be adjusted (positive or 
-     *  negative). */
-    std::atomic<int> m_adjust_time_by;
-
     /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
 protected:
@@ -163,7 +154,6 @@ public:
     virtual void terminateRace();
     void         setTime(const float time);
     void         setTicks(int ticks);
-    float        adjustDT(float dt);
 
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
@@ -219,10 +209,6 @@ public:
     int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
     void setReadyToRace() { m_server_is_ready.store(true); }
-    // ------------------------------------------------------------------------
-    /** Sets a time by which the clock should be adjusted. Used by networking
-     *  if too many rewinds are detected. */
-    void setAdjustTime(int t) { m_adjust_time_by.fetch_add(t); }
 };   // WorldStatus
 
 

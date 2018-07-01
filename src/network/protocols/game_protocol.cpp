@@ -33,6 +33,7 @@
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "main_loop.hpp"
 
 // ============================================================================
 std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol;
@@ -214,8 +215,7 @@ void GameProtocol::handleControllerAction(Event *event)
         const int ticks_difference = m_initial_ticks.at(event->getPeer());
         if (will_trigger_rewind)
         {
-            if (rewind_delta > max_adjustment)
-                rewind_delta = max_adjustment;
+            rewind_delta += max_adjustment;
             Log::info("GameProtocol", "At %d %f %d requesting time adjust"
                 " (speed up) of %d for host %d",
                 World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
@@ -229,8 +229,7 @@ void GameProtocol::handleControllerAction(Event *event)
         if (cur_diff > 0 &&
             cur_diff - ticks_difference > max_adjustment)
         {
-            // 80% slow down
-            const int adjustment = -max_adjustment * 8 / 10;
+            const int adjustment = ticks_difference - cur_diff;
             Log::info("GameProtocol", "At %d %f %d requesting time adjust"
                 " (slow down) of %d for host %d",
                 World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
@@ -251,11 +250,17 @@ void GameProtocol::handleControllerAction(Event *event)
 void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 {
     assert(NetworkConfig::get()->isServer());
+
+    if (m_last_adjustments.find(peer) != m_last_adjustments.end() &&
+        StkTime::getRealTime() - m_last_adjustments.at(peer) < 3.0)
+        return;
+
     NetworkString *ns = getNetworkString(5);
     ns->addUInt8(GP_ADJUST_TIME).addUInt32(ticks);
     // This message can be send unreliable, it's not critical if it doesn't
     // get delivered, the server will request again later anyway.
     peer->sendPacket(ns, /*reliable*/false);
+    m_last_adjustments[peer] = StkTime::getRealTime();
     delete ns;
 }   // adjustTimeForClient
 
@@ -266,8 +271,8 @@ void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 void GameProtocol::handleAdjustTime(Event *event)
 {
     int ticks = event->data().getUInt32();
-    World::getWorld()->setAdjustTime(
-        int(stk_config->ticks2Time(ticks) * 1000.0f));
+    main_loop->setTicksAdjustment(ticks);
+    Log::verbose("GameProtocol", "%d ticks adjustment", ticks);
 }   // handleAdjustTime
 
 // ----------------------------------------------------------------------------
