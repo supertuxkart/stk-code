@@ -39,22 +39,11 @@ addons:
     - pkg-config
     - zlib1g-dev
 
-before_script:
-  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
-  # Use half of the available threads, gcc is memory hungry
-  - 'if [ ${CC} = "gcc" ]; then
-        export THREADS=$((`nproc` / 2));
-    else
-        export THREADS=$((`nproc` + 1));
-    fi'
-  - echo "THREADS = $THREADS"
-  - free -mt
-
 script:
   - mkdir "build"
   - cd "build"
   - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
-  - make VERBOSE=1 -j $THREADS
+  - make VERBOSE=1 -j3
 
 notifications:
   irc:
