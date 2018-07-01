@@ -148,10 +148,6 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
 
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
                                    World::getWorld()->getTimeTicks() );
-
-    Log::info("GameProtocol", "Action at %d: %d value %d",
-              World::getWorld()->getTimeTicks(), action, 
-              action==PlayerAction::PA_STEER_RIGHT ? -value : value);
 }   // controllerAction
 
 // ----------------------------------------------------------------------------
@@ -187,8 +183,6 @@ void GameProtocol::handleControllerAction(Event *event)
         int value   = data.getUInt32();
         int value_l = data.getUInt32();
         int value_r = data.getUInt32();
-        Log::info("GameProtocol", "Action at %d: %d %d %d %d %d",
-                  cur_ticks, kart_id, action, value, value_l, value_r);
         BareNetworkString *s = new BareNetworkString(3);
         s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                             .addUInt32(value_l).addUInt32(value_r);
