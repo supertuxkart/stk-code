@@ -721,7 +721,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
         &m_network_group, "Timeout in seconds for validation of clients."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
+        PARAM_DEFAULT(IntUserConfigParam(8, "server_max_players",
         &m_network_group, "Maximum number of players on the server."));
     PARAM_PREFIX BoolUserConfigParam m_firewalled_server
         PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
