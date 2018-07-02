@@ -93,7 +93,7 @@ public:
     /** Returns the name of the player profile. */
     core::stringw getName() const OVERRIDE;
     // ------------------------------------------------------------------------
-    void handleBufferedActions();
+    void handleBufferedActions(double time_spent);
 
 };   // LocalPlayerController
 

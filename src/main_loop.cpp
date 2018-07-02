@@ -405,7 +405,8 @@ void MainLoop::run()
         }
         m_ticks_adjustment.unlock();
 
-        for(int i=0; i<num_steps; i++)
+        double time_spent = StkTime::getRealTime();
+        for(int i = 0; i < num_steps; i++)
         {
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(1);
@@ -426,6 +427,7 @@ void MainLoop::run()
 
             if (m_frame_before_loading_world)
             {
+                time_spent = StkTime::getRealTime();
                 m_frame_before_loading_world = false;
                 break;
             }
@@ -441,6 +443,7 @@ void MainLoop::run()
             }
         }   // for i < num_steps
 
+        time_spent = StkTime::getRealTime() - time_spent;
         // Handle buffered player actions
         if (World::getWorld())
         {
@@ -450,7 +453,7 @@ void MainLoop::run()
                     dynamic_cast<LocalPlayerController*>
                     (World::getWorld()->getKart(i)->getController());
                 if (lpc)
-                    lpc->handleBufferedActions();
+                    lpc->handleBufferedActions(time_spent);
             }
             if (auto gp = GameProtocol::lock())
                 gp->sendAllActions();

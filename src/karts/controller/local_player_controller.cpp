@@ -155,8 +155,20 @@ bool LocalPlayerController::action(PlayerAction action, int value,
 }   // action
 
 // ----------------------------------------------------------------------------
-void LocalPlayerController::handleBufferedActions()
+void LocalPlayerController::handleBufferedActions(double time_spent)
 {
+    if (m_actions.empty())
+        return;
+
+    // There is 0.1 delay in server, if time_spent is more than ~0.1, than
+    // the timer will be incorrect, in this case ignore all actions
+    if (time_spent > 0.09 && NetworkConfig::get()->isNetworking())
+    {
+        Log::warn("LocalPlayerController", "Update race is too slow to catch"
+            " up: %lf", time_spent);
+        m_actions.clear();
+        return;
+    }
     for (auto& p : m_actions)
     {
         PlayerAction action = p.first;
