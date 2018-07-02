@@ -59,6 +59,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              PerPlayerDifficulty d)
                      : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
+    m_actions.fill(0);
     m_difficulty = d;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
@@ -150,14 +151,19 @@ void LocalPlayerController::resetInputState()
 bool LocalPlayerController::action(PlayerAction action, int value,
                                    bool dry_run)
 {
-    m_actions.emplace_back(action, value);
+    if (action == PA_PAUSE_RACE)
+    {
+        PlayerController::action(action, value);
+        return true;
+    }
+    m_actions[action] = value;
     return true;
 }   // action
 
 // ----------------------------------------------------------------------------
 void LocalPlayerController::handleBufferedActions(double time_spent)
 {
-    if (m_actions.empty())
+    if (!isLocalPlayerController())
         return;
 
     // There is 0.1 delay in server, if time_spent is more than ~0.1, than
@@ -166,13 +172,13 @@ void LocalPlayerController::handleBufferedActions(double time_spent)
     {
         Log::warn("LocalPlayerController", "Update race is too slow to catch"
             " up: %lf", time_spent);
-        m_actions.clear();
         return;
     }
-    for (auto& p : m_actions)
+
+    for (int i = 0; i < PA_PAUSE_RACE; i++)
     {
-        PlayerAction action = p.first;
-        int value = p.second;
+        PlayerAction action = (PlayerAction)i;
+        int value = m_actions[i];
 
         // If this event does not change the control state (e.g.
         // it's a (auto) repeat event), do nothing. This especially
@@ -196,7 +202,6 @@ void LocalPlayerController::handleBufferedActions(double time_spent)
         }
         PlayerController::action(action, value, /*dry_run*/false);
     }
-    m_actions.clear();
 }   // handleBufferedActions
 
 //-----------------------------------------------------------------------------
@@ -331,7 +336,7 @@ void LocalPlayerController::setPosition(int p)
  d*/
 void LocalPlayerController::finishedRace(float time)
 {
-    // This will implicitely trigger setting the first end camera to be active
+    // This will implicitly trigger setting the first end camera to be active
     Camera::changeCamera(m_camera_index, Camera::CM_TYPE_END);
 }   // finishedRace
 

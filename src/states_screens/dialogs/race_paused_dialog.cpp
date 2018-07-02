@@ -25,9 +25,6 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
-#include "karts/controller/controller.hpp"
-#include "karts/kart.hpp"
-#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
@@ -68,18 +65,6 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     {
         music_manager->pauseMusic();
         SFXManager::get()->pauseAll();
-        for (unsigned i = 0; i < World::getWorld()->getNumKarts(); i++)
-        {
-            for (unsigned j = 0; j < PA_PAUSE_RACE; j++)
-            {
-                if (World::getWorld()->getKart(i)->isEliminated() ||
-                    !World::getWorld()->getKart(i)->getController()
-                    ->isLocalPlayerController())
-                    break;
-                World::getWorld()->getKart(i)->getController()
-                    ->action((PlayerAction)j, 0);
-            }
-        }
     }
     else
     {

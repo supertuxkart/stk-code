@@ -23,8 +23,7 @@
 
 #include "karts/controller/player_controller.hpp"
 
-#include <utility>
-#include <vector>
+#include <array>
 
 class AbstractKart;
 class ParticleEmitter;
@@ -66,7 +65,7 @@ private:
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
 
-    std::vector<std::pair<PlayerAction, int> > m_actions;
+    std::array<int, PA_PAUSE_RACE> m_actions;
 
 public:
                  LocalPlayerController(AbstractKart *kart,
