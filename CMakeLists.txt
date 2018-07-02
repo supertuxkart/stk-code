@@ -125,7 +125,7 @@ endif()
 
 if(SERVER_ONLY)
     add_definitions(-DSERVER_ONLY)
-    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_COMPILE_WITH_OSX_DEVICE_)
 endif()
 
 #if(DISABLE_VPX)
