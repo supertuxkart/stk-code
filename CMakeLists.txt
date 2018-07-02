@@ -125,7 +125,7 @@ endif()
 
 if(SERVER_ONLY)
     add_definitions(-DSERVER_ONLY)
-    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_ -DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 #if(DISABLE_VPX)
@@ -403,19 +403,6 @@ if(APPLE)
 
     # build the executable and create an app bundle
     add_executable(supertuxkart MACOSX_BUNDLE ${STK_SOURCES})
-
-    find_library(IOKIT_LIBRARY IOKit)
-    find_library(QUICKTIME_LIBRARY QuickTime)
-    find_library(CARBON_LIBRARY Carbon)
-    find_library(AUDIOUNIT_LIBRARY AudioUnit)
-    find_library(COCOA_LIBRARY Cocoa)
-
-    target_link_libraries(supertuxkart
-         ${IOKIT_LIBRARY}
-         ${QUICKTIME_LIBRARY}
-         ${CARBON_LIBRARY}
-         ${AUDIOUNIT_LIBRARY}
-         ${COCOA_LIBRARY})
 
     # configure CMake to use a custom Info.plist
     set_target_properties(supertuxkart PROPERTIES
