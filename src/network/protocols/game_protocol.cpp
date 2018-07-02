@@ -161,7 +161,7 @@ void GameProtocol::handleControllerAction(Event *event)
     NetworkString &data = event->data();
     uint8_t count = data.getUInt8();
     bool will_trigger_rewind = false;
-    int rewind_delta = 0;
+    //int rewind_delta = 0;
     int cur_ticks = 0;
     const int not_rewound = RewindManager::get()->getNotRewoundWorldTicks();
     for (unsigned int i = 0; i < count; i++)
@@ -174,7 +174,7 @@ void GameProtocol::handleControllerAction(Event *event)
         if (cur_ticks < not_rewound && !will_trigger_rewind)
         {
             will_trigger_rewind = true;
-            rewind_delta = not_rewound - cur_ticks;
+            //rewind_delta = not_rewound - cur_ticks;
         }
         uint8_t kart_id = data.getUInt8();
         assert(kart_id < World::getWorld()->getNumKarts());
@@ -201,7 +201,9 @@ void GameProtocol::handleControllerAction(Event *event)
         if (!will_trigger_rewind)
             STKHost::get()->sendPacketExcept(event->getPeer(), &data, false);
 
-        if (not_rewound == 0 ||
+        // FIXME unless there is a network jitter more than 100ms (more than
+        // server delay), time adjust is not necessary
+        /*if (not_rewound == 0 ||
             m_initial_ticks.find(event->getPeer()) == m_initial_ticks.end())
             return;
         int cur_diff = cur_ticks - not_rewound;
@@ -229,7 +231,7 @@ void GameProtocol::handleControllerAction(Event *event)
                 World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
                 not_rewound, adjustment, event->getPeer()->getHostId());
             adjustTimeForClient(event->getPeer(), adjustment);
-        }
+        }*/
     }   // if server
 
 }   // handleControllerAction
