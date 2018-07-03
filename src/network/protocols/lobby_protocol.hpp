@@ -116,6 +116,7 @@ public:
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;
     virtual bool allPlayersReady() const = 0;
+    virtual bool isRacing() const = 0;
     GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol

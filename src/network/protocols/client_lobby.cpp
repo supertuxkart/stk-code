@@ -57,7 +57,7 @@ digraph interaction {
 "REQUESTING_CONNECTION" -> "?? TO BE DONE ??" [label="Connection refused by server"]
 "CONNECTED" -> "KART_SELECTION" [label="Server tells us to start kart selection"]
 "KART_SELECTION" -> "SELECTING_KARTS" [label="Show kart selection screen"]
-"SELECTING_KARTS" -> "PLAYING" [label="Server sends start race message"]
+"SELECTING_KARTS" -> "RACING" [label="Server sends start race message"]
 }
 \enddot
 Note that some states are actually managed outside of the client lobby. For
@@ -313,14 +313,6 @@ void ClientLobby::update(int ticks)
         m_state.store(REQUESTING_CONNECTION);
     }
     break;
-    case REQUESTING_CONNECTION:
-        break;
-    case CONNECTED:
-        break;
-    case SELECTING_ASSETS:
-        break;
-    case PLAYING:
-        break;
     case RACE_FINISHED:
         if (!RaceEventManager::getInstance()->protocolStopped() ||
             !GameProtocol::emptyInstance())
@@ -332,6 +324,10 @@ void ClientLobby::update(int ticks)
         m_state.store(EXITING);
         requestTerminate();
         break;
+    case REQUESTING_CONNECTION:
+    case CONNECTED:
+    case SELECTING_ASSETS:
+    case RACING:
     case EXITING:
         break;
     }
@@ -656,7 +652,7 @@ void ClientLobby::connectionRefused(Event* event)
  */
 void ClientLobby::startGame(Event* event)
 {
-    m_state.store(PLAYING);
+    m_state.store(RACING);
     // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
     // to READY_PHASE.
     World::getWorld()->setReadyToRace();

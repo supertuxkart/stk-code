@@ -18,6 +18,7 @@
 
 #include "network/stk_host.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
@@ -241,23 +242,19 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  LocalPlayerController for each kart. Each remote player gets a
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
- *  remote players). It will also start the LatencyProtocol, 
- *  RaceEventManager and then load the world.
-
- * TODO:
- *  Once the server has received all
- *  messages in notifyEventAsynchronous(), it will call startCountdown()
- *  in the LatencyProtocol. The LatencyProtocol is 
- *  sending regular (once per second) pings to the clients and measure
- *  the averate latency. Upon starting the countdown this information
- *  is included in the ping request, so the clients can start the countdown
- *  at that stage as well.
- * 
- *  Once the countdown is 0 (or below), the Synchronization Protocol will
- *  start the protocols: KartUpdateProtocol, GameProtocol,
- *  GameEventsProtocol. Then the LatencyProtocol is terminated
- *  which indicates to the main loop to start the actual game.
+ *  remote players). It will also start the RaceEventManager and then load the
+ *  world.
  */
+// ============================================================================
+constexpr std::array<uint8_t, 5> g_ping_packet {{ 255, 'p', 'i', 'n', 'g' }};
+
+// ============================================================================
+constexpr bool isPingPacket(unsigned char* data, size_t length)
+{
+    return length == g_ping_packet.size() && data[0] == g_ping_packet[0] &&
+        data[1] == g_ping_packet[1] && data[2] == g_ping_packet[2] &&
+        data[3] == g_ping_packet[3] && data[4] == g_ping_packet[4];
+}   // isPingPacket
 
 // ============================================================================
 /** The constructor for a server or client.
@@ -715,6 +712,7 @@ void STKHost::mainLoop()
         }
     }
 
+    double last_ping_time = StkTime::getRealTime();
     while (m_exit_timeout.load() > StkTime::getRealTime())
     {
         if (!is_server)
@@ -737,11 +735,28 @@ void STKHost::mainLoop()
         if (is_server)
         {
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
-            // Remove peer which has not been validated after a specific time
-            // It is validated when the first connection request has finished
             const float timeout = UserConfigParams::m_validation_timeout;
+            bool need_ping = false;
+            if (sl && !sl->isRacing() &&
+                last_ping_time < StkTime::getRealTime())
+            {
+                // If not racing, send an reliable packet at the same rate with
+                // state exchange to keep enet ping accurate
+                last_ping_time = StkTime::getRealTime() +
+                    1.0 / double(stk_config->m_network_state_frequeny);
+                need_ping = true;
+            }
             for (auto it = m_peers.begin(); it != m_peers.end();)
             {
+                if (need_ping)
+                {
+                    ENetPacket* packet = enet_packet_create(g_ping_packet.data(),
+                        g_ping_packet.size(), ENET_PACKET_FLAG_RELIABLE);
+                    enet_peer_send(it->first, EVENT_CHANNEL_UNENCRYPTED, packet);
+                }
+
+                // Remove peer which has not been validated after a specific time
+                // It is validated when the first connection request has finished
                 if (!it->second->isValidated() &&
                     (float)StkTime::getRealTime() >
                     it->second->getConnectedTime() + timeout)
@@ -837,6 +852,11 @@ void STKHost::mainLoop()
             if (!stk_event && m_peers.find(event.peer) != m_peers.end())
             {
                 auto& peer = m_peers.at(event.peer);
+                if (isPingPacket(event.packet->data, event.packet->dataLength))
+                {
+                    enet_packet_destroy(event.packet);
+                    continue;
+                }
                 try
                 {
                     stk_event = new Event(&event, peer);
