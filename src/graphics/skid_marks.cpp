@@ -25,9 +25,13 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
+#include "graphics/material.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_per_object_uniform.hpp"
+#include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
+
 #include "graphics/sp/sp_uniform_assigner.hpp"
 #include "physics/btKart.hpp"
 #include "utils/mini_glm.hpp"
@@ -46,6 +50,9 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
         "alphablend");
     m_shader = SP::SPShaderManager::get()->getSPShader("alphablend");
     assert(m_shader);
+    auto texture = SP::SPTextureManager::get()->getTexture(
+        m_material->getSamplerPath(0), m_material,
+        m_shader->isSrgbForTextureLayer(0), m_material->getContainerId());
     m_skid_marking = false;
 }   // SkidMark
 
