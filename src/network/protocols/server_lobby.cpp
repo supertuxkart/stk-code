@@ -1406,6 +1406,7 @@ void ServerLobby::updatePlayerList(bool force_update)
     for (auto profile : all_profiles)
     {
         pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
+            .addUInt8(profile->getLocalPlayerId())
             .encodeString(profile->getName());
         uint8_t server_owner = 0;
         if (m_server_owner_id.load() == profile->getPeer()->getHostId())

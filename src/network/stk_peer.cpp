@@ -20,9 +20,7 @@
 #include "config/user_config.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
-#include "network/network_config.hpp"
 #include "network/network_string.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
 #include "utils/log.hpp"
@@ -39,12 +37,6 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_host_id             = host_id;
     m_connected_time      = (float)StkTime::getRealTime();
     m_validated.store(false);
-    if (NetworkConfig::get()->isClient())
-    {
-        // This allow client to get the correct ping as fast as possible
-        // reset to default (0) will be done in STKHost::mainloop after 3 sec
-        setPingInterval(10);
-    }
 }   // STKPeer
 
 //-----------------------------------------------------------------------------

@@ -169,6 +169,10 @@ public:
     int decodeStringW(irr::core::stringw *out) const;
     std::string getLogMessage(const std::string &indent="") const;
     // ------------------------------------------------------------------------
+    /** Returns the internal buffer of the network string. */
+    std::vector<uint8_t>& getBuffer() { return m_buffer; }
+
+    // ------------------------------------------------------------------------
     /** Returns a byte pointer to the content of the network string. */
     char* getData() { return (char*)(m_buffer.data()); };
 

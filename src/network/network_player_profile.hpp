@@ -57,7 +57,7 @@ private:
     std::string m_kart_name; 
 
     /** The local player id relative to each peer. */
-    int m_local_player_id;
+    uint8_t m_local_player_id;
 
     /** Score if grand prix. */
     int m_score;
@@ -96,7 +96,7 @@ public:
     const std::string &getKartName() const              { return m_kart_name; }
     // ------------------------------------------------------------------------
     /** Retuens the local player id for this player. */
-    int getLocalPlayerId() const                  { return m_local_player_id; }
+    uint8_t getLocalPlayerId() const              { return m_local_player_id; }
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty. */
     PerPlayerDifficulty getPerPlayerDifficulty() const

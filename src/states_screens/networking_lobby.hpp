@@ -20,11 +20,12 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include <map>
 #include <memory>
 #include <tuple>
+#include <utility>
 
 class Server;
-class STKPeer;
 
 namespace GUIEngine
 { 
@@ -62,8 +63,10 @@ private:
 
     NetworkingLobby();
 
+    float m_ping_update_timer;
+    std::map<std::string, std::pair<core::stringw, /*icon*/int> >
+        m_player_names;
     std::shared_ptr<Server> m_joined_server;
-    std::weak_ptr<STKPeer> m_server_peer;
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
 
@@ -93,6 +96,7 @@ private:
     }
 
     void sendChat(irr::core::stringw text);
+    void updatePlayerPings();
 
 public:
 
@@ -125,11 +129,10 @@ public:
         m_server_info.clear();
     }
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
-                       uint32_t/*online id*/, core::stringw/*player name*/,
-                       int/*icon id*/> >& p);
+                       uint32_t/*online id*/, uint32_t/*local player id*/,
+                       core::stringw/*player name*/, int/*icon id*/> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
-    uint32_t getServerPing() const;
     void initAutoStartTimer(bool grand_prix_started, float start_threshold,
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t)             { m_cur_starting_timer = t; }

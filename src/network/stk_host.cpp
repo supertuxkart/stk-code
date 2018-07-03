@@ -251,7 +251,7 @@ constexpr std::array<uint8_t, 5> g_ping_packet {{ 255, 'p', 'i', 'n', 'g' }};
 // ============================================================================
 constexpr bool isPingPacket(unsigned char* data, size_t length)
 {
-    return length == g_ping_packet.size() && data[0] == g_ping_packet[0] &&
+    return length > g_ping_packet.size() && data[0] == g_ping_packet[0] &&
         data[1] == g_ping_packet[1] && data[2] == g_ping_packet[2] &&
         data[3] == g_ping_packet[3] && data[4] == g_ping_packet[4];
 }   // isPingPacket
@@ -305,6 +305,7 @@ void STKHost::init()
     m_authorised       = false;
     m_network          = NULL;
     m_exit_timeout.store(std::numeric_limits<double>::max());
+    m_client_ping.store(0);
 
     // Start with initialising ENet
     // ============================
@@ -713,19 +714,9 @@ void STKHost::mainLoop()
     }
 
     double last_ping_time = StkTime::getRealTime();
+    double last_ping_time_update_for_client = StkTime::getRealTime();
     while (m_exit_timeout.load() > StkTime::getRealTime())
     {
-        if (!is_server)
-        {
-            auto server_peer = getServerPeerForClient();
-            if (server_peer &&
-                StkTime::getRealTime() - server_peer->getConnectedTime() > 3.0)
-            {
-                // Back to default ping interval for client
-                server_peer->setPingInterval(0);
-            }
-        }
-
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
         {
@@ -746,12 +737,29 @@ void STKHost::mainLoop()
                     1.0 / double(stk_config->m_network_state_frequeny);
                 need_ping = true;
             }
+
+            if (need_ping)
+            {
+                m_peer_pings.getData().clear();
+                for (auto& p : m_peers)
+                {
+                    m_peer_pings.getData()[p.second->getHostId()] =
+                        p.second->getPing();
+                }
+            }
             for (auto it = m_peers.begin(); it != m_peers.end();)
             {
                 if (need_ping)
                 {
-                    ENetPacket* packet = enet_packet_create(g_ping_packet.data(),
-                        g_ping_packet.size(), ENET_PACKET_FLAG_RELIABLE);
+                    BareNetworkString ping_packet;
+                    ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
+                    for (auto& p : m_peer_pings.getData())
+                        ping_packet.addUInt32(p.first).addUInt32(p.second);
+                    ping_packet.getBuffer().insert(
+                        ping_packet.getBuffer().begin(), g_ping_packet.begin(),
+                        g_ping_packet.end());
+                    ENetPacket* packet = enet_packet_create(ping_packet.getData(),
+                        ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
                     enet_peer_send(it->first, EVENT_CHANNEL_UNENCRYPTED, packet);
                 }
 
@@ -804,8 +812,28 @@ void STKHost::mainLoop()
             }
         }
 
+        bool need_ping_update = false;
         while (enet_host_service(host, &event, 10) != 0)
         {
+            if (!is_server &&
+                last_ping_time_update_for_client < StkTime::getRealTime())
+            {
+                last_ping_time_update_for_client =
+                    StkTime::getRealTime() + 2.0;
+                auto lp = LobbyProtocol::get<LobbyProtocol>();
+                if (lp && lp->isRacing())
+                {
+                    auto p = getServerPeerForClient();
+                    if (p)
+                    {
+                        m_client_ping.store(p->getPing(),
+                            std::memory_order_relaxed);
+                    }
+                    need_ping_update = false;
+                }
+                else
+                    need_ping_update = true;
+            }
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
 
@@ -854,6 +882,24 @@ void STKHost::mainLoop()
                 auto& peer = m_peers.at(event.peer);
                 if (isPingPacket(event.packet->data, event.packet->dataLength))
                 {
+                    if (!is_server && need_ping_update)
+                    {
+                        m_peer_pings.lock();
+                        m_peer_pings.getData().clear();
+                        BareNetworkString ping_packet((char*)event.packet->data,
+                            event.packet->dataLength);
+                        ping_packet.skip(g_ping_packet.size());
+                        unsigned peer_size = ping_packet.getUInt8();
+                        for (unsigned i = 0; i < peer_size; i++)
+                        {
+                            unsigned host_id = ping_packet.getUInt32();
+                            unsigned ping = ping_packet.getUInt32();
+                            m_peer_pings.getData()[host_id] = ping;
+                        }
+                        m_client_ping.store(m_peer_pings.getData()[m_host_id],
+                            std::memory_order_relaxed);
+                        m_peer_pings.unlock();
+                    }
                     enet_packet_destroy(event.packet);
                     continue;
                 }
