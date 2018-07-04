@@ -262,7 +262,7 @@ constexpr bool isPingPacket(unsigned char* data, size_t length)
 STKHost::STKHost(bool server)
 {
     init();
-    m_host_id = 0;   // indicates a server host.
+    m_host_id = std::numeric_limits<uint32_t>::max();
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
@@ -896,7 +896,10 @@ void STKHost::mainLoop()
                             unsigned ping = ping_packet.getUInt32();
                             m_peer_pings.getData()[host_id] = ping;
                         }
-                        m_client_ping.store(m_peer_pings.getData()[m_host_id],
+                        m_client_ping.store(
+                            m_peer_pings.getData().find(m_host_id) !=
+                            m_peer_pings.getData().end() ?
+                            m_peer_pings.getData().at(m_host_id) : 0,
                             std::memory_order_relaxed);
                         m_peer_pings.unlock();
                     }
