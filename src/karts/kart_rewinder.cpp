@@ -61,6 +61,7 @@ void KartRewinder::saveTransform()
 {
     if (!getKartAnimation())
         Moveable::prepareSmoothing();
+    m_prev_steering = getSteerPercent();
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
@@ -69,6 +70,20 @@ void KartRewinder::computeError()
     if (!getKartAnimation())
         Moveable::checkSmoothing();
 }   // computeError
+
+// ----------------------------------------------------------------------------
+float KartRewinder::getSteerPercent() const
+{
+    if (m_smoothing == SS_TO_ADJUST)
+    {
+        float ratio = m_adjust_time_dt / m_adjust_time;
+        if (ratio > 1.0f)
+            ratio = 1.0f;
+        return ratio * AbstractKart::getSteerPercent() +
+            (1.0f - ratio) * m_prev_steering;
+    }
+    return AbstractKart::getSteerPercent();
+}   // getSteerPercent
 
 // ----------------------------------------------------------------------------
 /** Saves all state information for a kart in a memory buffer. The memory

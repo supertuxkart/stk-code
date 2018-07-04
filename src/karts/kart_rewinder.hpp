@@ -34,34 +34,26 @@ private:
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
 
+    float m_prev_steering;
+
 public:
-	             KartRewinder(const std::string& ident,
-                              unsigned int world_kart_id,
-                              int position, const btTransform& init_transform,
-                              PerPlayerDifficulty difficulty,
-                              std::shared_ptr<RenderInfo> ri);
-   virtual      ~KartRewinder() {};
-   virtual void  saveTransform() OVERRIDE;
-   virtual void  computeError() OVERRIDE;
-   virtual BareNetworkString* saveState();
-   void          reset();
-   virtual void  restoreState(BareNetworkString *p, int count) OVERRIDE;
-   virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
-   virtual void  update(int ticks) OVERRIDE;
-
-   // -------------------------------------------------------------------------
-   virtual void  undoState(BareNetworkString *p) OVERRIDE
-   {
-   };   // undoState
-
-   // -------------------------------------------------------------------------
-   virtual void  undoEvent(BareNetworkString *p) OVERRIDE
-   {
-   };   // undoEvent
-
-   // -------------------------------------------------------------------------
-
-   
+    KartRewinder(const std::string& ident, unsigned int world_kart_id,
+                 int position, const btTransform& init_transform,
+                 PerPlayerDifficulty difficulty,
+                 std::shared_ptr<RenderInfo> ri);
+    ~KartRewinder() {}
+    virtual void saveTransform() OVERRIDE;
+    virtual void computeError() OVERRIDE;
+    virtual BareNetworkString* saveState() OVERRIDE;
+    void reset() OVERRIDE;
+    virtual void restoreState(BareNetworkString *p, int count) OVERRIDE;
+    virtual void rewindToEvent(BareNetworkString *p) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
+    virtual float getSteerPercent() const OVERRIDE;
+    // -------------------------------------------------------------------------
+    virtual void undoState(BareNetworkString *p) OVERRIDE {}
+    // -------------------------------------------------------------------------
+    virtual void undoEvent(BareNetworkString *p) OVERRIDE {}
 
 };   // Rewinder
 #endif

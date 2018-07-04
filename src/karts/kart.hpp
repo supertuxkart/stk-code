@@ -420,7 +420,7 @@ public:
      *  skidding related values) - non-const. */
     virtual Skidding *getSkidding() OVERRIDE { return m_skidding; }
     // ------------------------------------------------------------------------
-    virtual RaceManager::KartType getType() const { return m_type; }
+    virtual RaceManager::KartType getType() const OVERRIDE { return m_type; }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart *getVehicle() const OVERRIDE { return m_vehicle; }
@@ -428,12 +428,9 @@ public:
     /** Returns the speed of the kart in meters/second. */
     virtual float  getSpeed() const OVERRIDE { return m_speed; }
     // ------------------------------------------------------------------------
-    /** Returns the speed of the kart in meters/second. */
-    virtual float getSmoothedSpeed() const OVERRIDE { return m_smoothed_speed; }
-    // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
-     *  from the server information.                                       */
-    virtual void setSpeed(float s)  OVERRIDE { m_speed = s; }
+     *  from the server information. */
+    virtual void setSpeed(float s) OVERRIDE { m_speed = s; }
     // ------------------------------------------------------------------------
     virtual btQuaternion getVisualRotation() const OVERRIDE;
     // ------------------------------------------------------------------------
@@ -453,7 +450,7 @@ public:
     virtual Controller* getController() OVERRIDE { return m_controller; }
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart (const version). */
-    const Controller* getController() const { return m_controller; }
+    const Controller* getController() const OVERRIDE { return m_controller; }
     // ------------------------------------------------------------------------
     /** True if the wheels are touching the ground. */
     virtual bool isOnGround() const OVERRIDE;
@@ -525,7 +522,7 @@ public:
     virtual const Vec3& getRecentPreviousXYZ() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the time at which the recent previous position occured */
-    virtual const float getRecentPreviousXYZTime() const;
+    virtual const float getRecentPreviousXYZTime() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }

@@ -165,7 +165,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     // Set position and heading:
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
-    m_smoothed_speed          = 0.0f;
     m_last_factor_engine_sound = 0.0f;
 
     m_kart_model->setKart(this);
@@ -372,7 +371,6 @@ void Kart::reset()
     m_brake_ticks          = 0;
     m_ticks_last_crash     = 0;
     m_speed                = 0.0f;
-    m_smoothed_speed       = 0.0f;
     m_current_lean         = 0.0f;
     m_falling_time         = 0.0f;
     m_view_blocked_by_plunger = 0;
@@ -1706,9 +1704,6 @@ void Kart::updateSpeed()
         m_speed = -m_speed;
     }
 
-    float f = 0.3f;
-    m_smoothed_speed = f*m_speed + (1.0f - f)*m_smoothed_speed;
-
     // At low velocity, forces on kart push it back and forth so we ignore this
     // - quick'n'dirty workaround for bug 1776883
     if (fabsf(m_speed) < 0.2f                                   ||
@@ -1716,7 +1711,6 @@ void Kart::updateSpeed()
         dynamic_cast<ExplosionAnimation*>( getKartAnimation() )    )
     {
         m_speed          = 0;
-        m_smoothed_speed = 0;
     }
 }   // updateSpeed
 

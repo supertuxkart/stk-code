@@ -41,7 +41,7 @@ class Material;
   */
 class Moveable: public NoCopy
 {
-private:
+protected:
     enum SmoothingState
     {
         SS_NONE = 0,
@@ -49,6 +49,11 @@ private:
         SS_TO_REAL
     };
 
+    float m_adjust_time, m_adjust_time_dt;
+
+    SmoothingState m_smoothing;
+
+private:
     Vec3                   m_velocityLC;      /**<Velocity in kart coordinates. */
     /** The bullet transform of this rigid body. */
     btTransform            m_transform;
@@ -68,10 +73,6 @@ private:
     Vec3 m_adjust_control_point;
 
     std::pair<btTransform, Vec3> m_prev_position_data;
-
-    float m_adjust_time, m_adjust_time_dt;
-
-    SmoothingState m_smoothing;
 
     btTransform m_smoothed_transform;
 

@@ -112,7 +112,7 @@ public:
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
     /** Returns the current steering value for this kart. */
-    float getSteerPercent() const { return m_controls.getSteer();  }
+    virtual float getSteerPercent() const { return m_controls.getSteer(); }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart. */
     KartControl&  getControls() { return m_controls; }
@@ -278,10 +278,6 @@ public:
      *  pure abstract, since this function is not needed for certain classes,
      *  like Ghost. */
     virtual float getSpeed() const = 0;
-    // ------------------------------------------------------------------------
-    /** Returns the exponentially smoothened speed of the kart in 
-     *  which is removes shaking from camera. */
-    virtual float getSmoothedSpeed() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart, this includes all
      *  bonus and maluses that are currently applied. */
