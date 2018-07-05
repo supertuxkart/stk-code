@@ -21,18 +21,17 @@
 
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/material_manager.hpp"
-#include "karts/abstract_kart.hpp"
-#include "karts/skidding.hpp"
-#include "modes/world.hpp"
 #include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_per_object_uniform.hpp"
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
-
 #include "graphics/sp/sp_uniform_assigner.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/skidding.hpp"
+#include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "utils/mini_glm.hpp"
 
@@ -116,8 +115,18 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 
     Vec3 raycast_right;
     Vec3 raycast_left;
-    vehicle->getVisualContactPoint(m_kart.getSkidding()->getVisualSkidRotation(),
-                                   &raycast_left, &raycast_right);
+    vehicle->getVisualContactPoint(m_kart.getSmoothedTrans(), &raycast_left,
+        &raycast_right);
+
+    btTransform smoothed_inv = m_kart.getSmoothedTrans().inverse();
+    Vec3 lc_l = smoothed_inv(raycast_left);
+    Vec3 lc_r = smoothed_inv(raycast_right);
+    btTransform skidding_rotation = m_kart.getSmoothedTrans();
+    skidding_rotation.setRotation(m_kart.getSmoothedTrans().getRotation() *
+        btQuaternion(m_kart.getSkidding()->getVisualSkidRotation(), 0.0f, 0.0f));
+    raycast_left = skidding_rotation(lc_l);
+    raycast_right = skidding_rotation(lc_r);
+
     Vec3 delta = raycast_right - raycast_left;
 
     // The kart is making skid marks when it's:
@@ -158,17 +167,10 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         // but it produces good enough results
         float distance = (newPoint - start).length();
 
-        Vec3 p1 = raycast_left - delta;
-        Vec3 p2 = raycast_left + delta;
-        Vec3 p3 = raycast_right - delta;
-        Vec3 p4 = raycast_right + delta;
-        m_kart.transformSmoothedPosition(&p1);
-        m_kart.transformSmoothedPosition(&p2);
-        m_kart.transformSmoothedPosition(&p3);
-        m_kart.transformSmoothedPosition(&p4);
-
-        m_left.back()->add(p1, p2, m_kart.getNormal(), distance);
-        m_right.back()->add(p3, p4, m_kart.getNormal(), distance);
+        m_left.back()->add(raycast_left-delta, raycast_left+delta,
+             m_kart.getNormal(), distance);
+        m_right.back()->add(raycast_right-delta, raycast_right+delta,
+             m_kart.getNormal(), distance);
         return;
     }
 
@@ -198,22 +200,15 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         m_right.erase(m_right.begin());
     }
 
-    Vec3 p1 = raycast_left - delta;
-    Vec3 p2 = raycast_left + delta;
-    Vec3 p3 = raycast_right - delta;
-    Vec3 p4 = raycast_right + delta;
-    m_kart.transformSmoothedPosition(&p1);
-    m_kart.transformSmoothedPosition(&p2);
-    m_kart.transformSmoothedPosition(&p3);
-    m_kart.transformSmoothedPosition(&p4);
-
     m_left.emplace_back(
-        new SkidMarkQuads(p1, p2, m_kart.getNormal(), m_material, m_shader,
-        m_avoid_z_fighting, custom_color));
+        new SkidMarkQuads(raycast_left - delta, raycast_left + delta,
+        m_kart.getNormal(), m_material, m_shader, m_avoid_z_fighting,
+        custom_color));
 
     m_right.emplace_back(
-        new SkidMarkQuads(p3, p4, m_kart.getNormal(), m_material, m_shader,
-        m_avoid_z_fighting, custom_color));
+        new SkidMarkQuads(raycast_right - delta, raycast_right + delta,
+        m_kart.getNormal(), m_material, m_shader, m_avoid_z_fighting,
+        custom_color));
 
     m_skid_marking = true;
 }   // update

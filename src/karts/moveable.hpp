@@ -171,12 +171,6 @@ public:
         static std::string unused("unused");
         return unused;
     }
-    // ------------------------------------------------------------------------
-    void transformSmoothedPosition(Vec3* position) const
-    {
-        Vec3 p = m_transform.inverse()(*position);
-        *position = m_smoothed_transform(p);
-    }
 
 };   // class Moveable
 

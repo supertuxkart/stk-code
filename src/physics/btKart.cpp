@@ -93,7 +93,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
 
     btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
 
-    updateWheelTransformsWS( wheel , false );
+    updateWheelTransformsWS(wheel, getChassisWorldTransform(), false);
     updateWheelTransform(getNumWheels()-1,false);
 
     m_forwardWS.resize(m_wheelInfo.size());
@@ -145,7 +145,7 @@ void btKart::updateWheelTransform(int wheelIndex, bool interpolatedTransform)
 {
 
     btWheelInfo& wheel = m_wheelInfo[ wheelIndex ];
-    updateWheelTransformsWS(wheel,interpolatedTransform);
+    updateWheelTransformsWS(wheel, getChassisWorldTransform(), interpolatedTransform);
     btVector3 up = -wheel.m_raycastInfo.m_wheelDirectionWS;
     const btVector3& right = wheel.m_raycastInfo.m_wheelAxleWS;
     btVector3 fwd = up.cross(right);
@@ -191,22 +191,22 @@ void btKart::resetSuspension()
 
 // ----------------------------------------------------------------------------
 void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
+                                     btTransform chassis_trans,
                                      bool interpolatedTransform,
                                      float fraction)
 {
     wheel.m_raycastInfo.m_isInContact = false;
 
-    btTransform chassisTrans = getChassisWorldTransform();
     if (interpolatedTransform && (getRigidBody()->getMotionState()))
     {
-        getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
+        getRigidBody()->getMotionState()->getWorldTransform(chassis_trans);
     }
 
     wheel.m_raycastInfo.m_hardPointWS =
-        chassisTrans( wheel.m_chassisConnectionPointCS*fraction );
-    wheel.m_raycastInfo.m_wheelDirectionWS = chassisTrans.getBasis() *
+        chassis_trans( wheel.m_chassisConnectionPointCS*fraction );
+    wheel.m_raycastInfo.m_wheelDirectionWS = chassis_trans.getBasis() *
                                                 wheel.m_wheelDirectionCS ;
-    wheel.m_raycastInfo.m_wheelAxleWS      = chassisTrans.getBasis() *
+    wheel.m_raycastInfo.m_wheelAxleWS      = chassis_trans.getBasis() *
                                                 wheel.m_wheelAxleCS;
 }   // updateWheelTransformsWS
 
@@ -267,7 +267,7 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
         m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
 
-    updateWheelTransformsWS( wheel,false, fraction);
+    updateWheelTransformsWS(wheel, getChassisWorldTransform(), false, fraction);
 
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
@@ -369,7 +369,7 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
 *  \param n Index of the wheel, must be 2 or 3 since only the two rear
 *           wheels define the visual position
 */
-void btKart::getVisualContactPoint(float visual_rotation,
+void btKart::getVisualContactPoint(const btTransform& chassis_trans,
                                    btVector3 *left, btVector3 *right)
 {
     btAssert(m_vehicleRaycaster);
@@ -387,7 +387,7 @@ void btKart::getVisualContactPoint(float visual_rotation,
     {
         // Map index 0-1 to wheel 2-3 (which are the rear wheels)
         btWheelInfo &wheel = m_wheelInfo[index];
-        updateWheelTransformsWS(wheel, false);
+        updateWheelTransformsWS(wheel, chassis_trans, false);
         btScalar max_susp_len = wheel.getSuspensionRestLength()
                               + wheel.m_maxSuspensionTravel;
 
@@ -396,17 +396,9 @@ void btKart::getVisualContactPoint(float visual_rotation,
         // hits the ground.
         btScalar raylen = max_susp_len + 0.5f;
         btVector3 rayvector = wheel.m_raycastInfo.m_wheelDirectionWS * (raylen);
-        btTransform chassisTrans = getChassisWorldTransform();
-        if (getRigidBody()->getMotionState())
-        {
-            getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
-        }
-        btQuaternion q(visual_rotation, 0, 0);
-        btQuaternion rot_new = chassisTrans.getRotation() * q;
-        chassisTrans.setRotation(rot_new);
         btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
         pos.setZ(pos.getZ()*0.9f);
-        btVector3 source = chassisTrans(pos);
+        btVector3 source = chassis_trans(pos);
         btVector3 target = source + rayvector;
         btVehicleRaycaster::btVehicleRaycasterResult rayResults;
 
@@ -1046,7 +1038,7 @@ void btKart::adjustSpeed(btScalar min_speed, btScalar max_speed)
 //vehicles towards the ground at the start of a race
 btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
 {
-    updateWheelTransformsWS( wheel,false);
+    updateWheelTransformsWS(wheel, getChassisWorldTransform(), false);
 
     btScalar depth          = -1;
 
