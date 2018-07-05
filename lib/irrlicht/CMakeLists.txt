@@ -583,7 +583,7 @@ if(ENABLE_WAYLAND_DEVICE)
     set(IRRLICHT_SOURCES 
         ${IRRLICHT_SOURCES}
         source/Irrlicht/server_decoration_client_protocol.c
-        source/Irrlicht/xdg-shell-unstable-v6-protocol.c)
+        source/Irrlicht/xdg_shell_protocol.c)
 endif()
 
 
