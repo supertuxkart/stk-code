@@ -173,6 +173,8 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
         if (smoothRotation())
         {
             cur_rot = m_start_smoothing_postion.second;
+            if (dot(cur_rot, m_adjust_position.second) < 0.0f)
+                cur_rot = -cur_rot;
             cur_rot = cur_rot.slerp(m_adjust_position.second, ratio);
         }
     }
@@ -187,6 +189,8 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
         if (smoothRotation())
         {
             cur_rot.normalize();
+            if (dot(cur_rot, m_adjust_position.second) < 0.0f)
+                cur_rot = -cur_rot;
             cur_rot = cur_rot.slerp(m_adjust_position.second, 1.0f - ratio);
         }
     }
