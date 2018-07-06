@@ -125,7 +125,6 @@ void CameraNormal::moveCamera(float dt, bool smooth)
         else if (delta2 > 1)
             delta2 = 1;
     }
-    m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
 
     btTransform btt = m_kart->getSmoothedTrans();
     m_kart_position = btt.getOrigin();
@@ -141,6 +140,8 @@ void CameraNormal::moveCamera(float dt, bool smooth)
     btt.setRotation(q1);
 
     Vec3 kart_camera_position_with_offset = btt(m_camera_offset);
+    m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
+
     // next target
     Vec3 current_target = btt(Vec3(0, 0.5f, 0));
     // new required position of camera
