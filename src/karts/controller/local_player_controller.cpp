@@ -39,7 +39,6 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
-#include "network/rewind_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"

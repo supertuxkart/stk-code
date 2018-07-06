@@ -30,6 +30,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/lobby_protocol.hpp"
@@ -107,7 +108,12 @@ void PlayerController::resetInputState()
  */
 bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 {
-
+    if (!NetworkConfig::get()->isNetworking() ||
+        !NetworkConfig::get()->isServer())
+    {
+        if (m_penalty_ticks > 0)
+            return false;
+    }
     /** If dry_run (parameter) is true, this macro tests if this action would
      *  trigger a state change in the specified variable (without actually
      *  doing it). If it will trigger a state change, the macro will
@@ -171,7 +177,7 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         break;
     case PA_ACCEL:
         SET_OR_TEST(m_prev_accel, value);
-        if (value && !(m_penalty_ticks > 0))
+        if (value)
         {
             SET_OR_TEST_GETTER(Accel, value/32768.0f);
             SET_OR_TEST_GETTER(Brake, false);
@@ -351,9 +357,11 @@ void PlayerController::update(int ticks)
         return;
     }   // if isStartPhase
 
-    if (m_penalty_ticks>0)
+    if (!RewindManager::get()->isRewinding() && m_penalty_ticks > 0)
     {
-        m_penalty_ticks-=ticks;
+        m_penalty_ticks -= ticks;
+        m_controls->setBrake(false);
+        m_controls->setAccel(0.0f);
         return;
     }
 
