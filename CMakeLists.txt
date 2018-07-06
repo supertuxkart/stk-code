@@ -303,12 +303,14 @@ find_package(OggVorbis REQUIRED)
 include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
 # Freetype
-find_package(Freetype)
-if(FREETYPE_FOUND)
-    include_directories(${FREETYPE_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Freetype not found. "
-        "Freetype is required to display characters in SuperTuxKart. ")
+if (NOT SERVER_ONLY)
+    find_package(Freetype)
+    if(FREETYPE_FOUND)
+        include_directories(${FREETYPE_INCLUDE_DIRS})
+    else()
+        message(FATAL_ERROR "Freetype not found. "
+            "Freetype is required to display characters in SuperTuxKart. ")
+    endif()
 endif()
 
 # Fribidi
@@ -478,9 +480,7 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
-    ${TURBOJPEG_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     )
 
@@ -491,7 +491,7 @@ if(NOT SERVER_ONLY)
         target_link_libraries(supertuxkart GLESv2)
     endif()
 
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} graphics_utils)
+    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} ${FREETYPE_LIBRARIES} graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)

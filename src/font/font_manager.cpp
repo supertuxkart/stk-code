@@ -32,7 +32,9 @@ FontManager *font_manager = NULL;
  */
 FontManager::FontManager()
 {
+#ifndef SERVER_ONLY
     checkFTError(FT_Init_FreeType(&m_ft_library), "loading freetype library");
+#endif
 }   // FontManager
 
 // ----------------------------------------------------------------------------
@@ -49,8 +51,10 @@ FontManager::~FontManager()
     delete m_digit_ttf;
     m_digit_ttf = NULL;
 
+#ifndef SERVER_ONLY
     checkFTError(FT_Done_FreeType(m_ft_library), "removing freetype library");
     m_ft_library = NULL;
+#endif
 }   // ~FontManager
 
 // ----------------------------------------------------------------------------
