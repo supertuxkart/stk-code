@@ -19,7 +19,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
-option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
@@ -27,6 +26,8 @@ option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when av
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
+CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
+    "NOT SERVER_ONLY" OFF)
 
 if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)

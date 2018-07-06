@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_PLURAL_FORMS_HPP
 #define HEADER_TINYGETTEXT_PLURAL_FORMS_HPP
 
+#ifndef SERVER_ONLY
+
 #include <string>
 
 namespace tinygettext {
@@ -59,3 +61,4 @@ public:
 #endif
 
 /* EOF */
+#endif

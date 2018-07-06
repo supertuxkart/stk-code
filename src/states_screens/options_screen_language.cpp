@@ -85,7 +85,7 @@ void OptionsScreenLanguage::init()
 
     // I18N: in the language choice, to select the same language as the OS
     list_widget->addItem("system", _("System Language"));
-
+#ifndef SERVER_ONLY
     const std::vector<std::string>* lang_list = translations->getLanguageList();
     const int amount = (int)lang_list->size();
 
@@ -109,7 +109,7 @@ void OptionsScreenLanguage::init()
         list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
                               nice_lang_list[i]);
     }
-
+#endif
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
 
     // Forbid changing language while in-game, since this crashes (changing the language involves

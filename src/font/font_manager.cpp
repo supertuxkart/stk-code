@@ -87,6 +87,7 @@ void FontManager::loadFonts()
  */
 void FontManager::unitTesting()
 {
+#ifndef SERVER_ONLY
     std::vector<std::string> list = *(translations->getLanguageList());
     const int cur_log_level = Log::getLogLevel();
     for (const std::string& lang : list)
@@ -134,5 +135,5 @@ void FontManager::unitTesting()
             }
         }
     }
-
+#endif
 }   // unitTesting

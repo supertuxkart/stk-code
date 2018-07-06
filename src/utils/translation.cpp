@@ -55,15 +55,15 @@
 // Define TEST_BIDI to force right-to-left style for all languages
 //#define TEST_BIDI
 
-using namespace tinygettext;
-
 Translations* translations = NULL;
-const bool REMOVE_BOM = false;
 
 #ifdef LINUX // m_debug
 #define PACKAGE "supertuxkart"
 #endif
 
+#ifndef SERVER_ONLY
+const bool REMOVE_BOM = false;
+using namespace tinygettext;
 /** The list of available languages; this is global so that it is cached (and remains
     even if the translations object is deleted and re-created) */
 typedef std::vector<std::string> LanguageList;
@@ -75,6 +75,7 @@ const LanguageList* Translations::getLanguageList() const
 {
     return &g_language_list;
 }
+#endif
 
 // ----------------------------------------------------------------------------
 /** Frees the memory allocated for the result of toFribidiChar(). */
@@ -178,6 +179,7 @@ wchar_t* fromFribidiChar(const FriBidiChar* str)
 // ----------------------------------------------------------------------------
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
+#ifndef SERVER_ONLY
     m_dictionary_manager.add_directory(
                         file_manager->getAsset(FileManager::TRANSLATION,""));
 
@@ -416,6 +418,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 #ifdef TEST_BIDI
     m_rtl = true;
 #endif
+
+#endif
 }   // Translations
 
 // ----------------------------------------------------------------------------
@@ -428,6 +432,9 @@ Translations::~Translations()
 
 const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 {
+#ifdef SERVER_ONLY
+    return in_ptr;
+#else
     if (isRTLText(in_ptr))
     {
         // Test if this string was already fribidized
@@ -467,6 +474,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
     }
     else
         return in_ptr;
+#endif
 }
 
 bool Translations::isRTLText(const wchar_t *in_ptr)
@@ -513,6 +521,13 @@ const wchar_t* Translations::w_gettext(const wchar_t* original, const char* cont
  */
 const wchar_t* Translations::w_gettext(const char* original, const char* context)
 {
+
+#ifdef SERVER_ONLY
+    static irr::core::stringw dummy_for_server;
+    dummy_for_server = StringUtils::utf8ToWide(original);
+    return dummy_for_server.c_str();
+#else
+
     if (original[0] == '\0') return L"";
 
 #if TRANSLATE_VERBOSE
@@ -548,6 +563,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
 #endif
 
     return out_ptr;
+#endif
 }
 
 /**
@@ -573,11 +589,18 @@ const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* 
  */
 const wchar_t* Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
 {
+    static core::stringw str_buffer;
+
+#ifdef SERVER_ONLY
+    str_buffer = StringUtils::utf8ToWide(singular);
+    return str_buffer.c_str();
+
+#else
+
     const std::string& res = (context == NULL ?
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    static core::stringw str_buffer;
     str_buffer = StringUtils::utf8ToWide(res);
     const wchar_t* out_ptr = str_buffer.c_str();
     if (REMOVE_BOM) out_ptr++;
@@ -587,28 +610,8 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
 #endif
 
     return out_ptr;
-}
+#endif
 
-
-bool Translations::isRTLLanguage() const
-{
-    return m_rtl;
-}
-
-std::set<wchar_t> Translations::getCurrentAllChar()
-{
-    return m_dictionary.get_all_used_chars();
-}
-
-std::string Translations::getCurrentLanguageName()
-{
-    return m_current_language_name;
-    //return m_dictionary_manager.get_language().get_name();
-}
-
-std::string Translations::getCurrentLanguageNameCode()
-{
-    return m_current_language_name_code;
 }
 
 core::stringw Translations::fribidizeLine(const core::stringw &str)
@@ -662,9 +665,28 @@ core::stringw Translations::fribidizeLine(const core::stringw &str)
 
 }
 
+#ifndef SERVER_ONLY
+std::set<wchar_t> Translations::getCurrentAllChar()
+{
+    return m_dictionary.get_all_used_chars();
+}
+
+std::string Translations::getCurrentLanguageName()
+{
+    return m_current_language_name;
+    //return m_dictionary_manager.get_language().get_name();
+}
+
+std::string Translations::getCurrentLanguageNameCode()
+{
+    return m_current_language_name_code;
+}
+
 const std::string& Translations::getLocalizedName(const std::string& str) const
 {
     std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
     assert (n != m_localized_name.end());
     return n->second;
 }
+
+#endif
