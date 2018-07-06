@@ -378,7 +378,8 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
  */
 void Flyable::updateGraphics(float dt)
 {
-    Moveable::updateGraphics(dt, Vec3(0, 0, 0), btQuaternion(0, 0, 0, 1));
+    updateSmoothedGraphics(dt);
+    Moveable::updateGraphics();
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

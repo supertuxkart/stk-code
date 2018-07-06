@@ -81,9 +81,9 @@ protected:
     scene::ISceneNode     *m_node;
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
-
-    virtual void  updateGraphics(float dt, const Vec3& off_xyz,
-                                 const btQuaternion& off_rotation);
+    virtual void updateSmoothedGraphics(float dt);
+    virtual void updateGraphics(const Vec3& off_xyz = Vec3(0.0f, 0.0f, 0.0f),
+                                const btQuaternion& off_rotation = btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
 public:
                   Moveable();
@@ -163,6 +163,8 @@ public:
     const Vec3& getSmoothedXYZ() const
                             { return (Vec3&)m_smoothed_transform.getOrigin(); }
     // ------------------------------------------------------------------------
+    virtual bool enableSmoothing() const                      { return false; }
+    // ------------------------------------------------------------------------
     virtual bool smoothRotation() const                        { return true; }
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const
@@ -170,7 +172,6 @@ public:
         static std::string unused("unused");
         return unused;
     }
-
 };   // class Moveable
 
 #endif

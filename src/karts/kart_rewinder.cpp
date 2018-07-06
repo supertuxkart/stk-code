@@ -62,7 +62,10 @@ void KartRewinder::reset()
 void KartRewinder::saveTransform()
 {
     if (!getKartAnimation())
+    {
         Moveable::prepareSmoothing();
+        m_skidding->prepareSmoothing();
+    }
 
     m_prev_steering = getSteerPercent();
 }   // saveTransform
@@ -71,7 +74,10 @@ void KartRewinder::saveTransform()
 void KartRewinder::computeError()
 {
     if (!getKartAnimation())
+    {
         Moveable::checkSmoothing();
+        m_skidding->checkSmoothing();
+    }
 
     float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
     if (diff > 0.05f)

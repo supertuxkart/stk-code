@@ -125,18 +125,18 @@ void Moveable::checkSmoothing()
 }   // checkSmoothing
 
 //-----------------------------------------------------------------------------
-/** Updates the graphics model. Mainly set the graphical position to be the
- *  same as the physics position, but uses offsets to position and rotation
- *  for special gfx effects (e.g. skidding will turn the karts more).
- *  \param offset_xyz Offset to be added to the position.
- *  \param rotation Additional rotation.
- */
-void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
-                              const btQuaternion& rotation)
+void Moveable::updateSmoothedGraphics(float dt)
 {
 #ifndef SERVER_ONLY
     Vec3 cur_xyz = getXYZ();
     btQuaternion cur_rot = getRotation();
+
+    if (!enableSmoothing())
+    {
+        m_smoothed_transform.setOrigin(cur_xyz);
+        m_smoothed_transform.setRotation(cur_rot);
+        return;
+    }
 
     float ratio = 0.0f;
     if (m_smoothing != SS_NONE)
@@ -216,9 +216,23 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ());
 #endif
 
-    Vec3 xyz = cur_xyz + offset_xyz;
+#endif
+}   // updateSmoothedGraphics
+
+//-----------------------------------------------------------------------------
+/** Updates the graphics model. Mainly set the graphical position to be the
+ *  same as the physics position, but uses offsets to position and rotation
+ *  for special gfx effects (e.g. skidding will turn the karts more).
+ *  \param offset_xyz Offset to be added to the position.
+ *  \param rotation Additional rotation.
+ */
+void Moveable::updateGraphics(const Vec3& offset_xyz,
+                              const btQuaternion& rotation)
+{
+#ifndef SERVER_ONLY
+    Vec3 xyz = m_smoothed_transform.getOrigin() + offset_xyz;
     m_node->setPosition(xyz.toIrrVector());
-    btQuaternion r_all = cur_rot * rotation;
+    btQuaternion r_all = m_smoothed_transform.getRotation() * rotation;
     if(btFuzzyZero(r_all.getX()) && btFuzzyZero(r_all.getY()-0.70710677f) &&
        btFuzzyZero(r_all.getZ()) && btFuzzyZero(r_all.getW()-0.70710677f)   )
         r_all.setX(0.000001f);

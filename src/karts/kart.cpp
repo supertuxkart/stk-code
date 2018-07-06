@@ -3020,16 +3020,17 @@ void Kart::updateGraphics(float dt)
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
 
-    Vec3 center_shift(0, 0, 0);
+    Moveable::updateSmoothedGraphics(dt);
 
     // Update the skidding jump height:
+    Vec3 center_shift(0, 0, 0);
     float jump_height = m_skidding->updateGraphics(dt);
     center_shift.setY(jump_height + fabsf(lean_height) + m_graphical_y_offset);
-    center_shift = getTrans().getBasis() * center_shift;
+    center_shift = getSmoothedTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
-    Moveable::updateGraphics(dt, center_shift,
-                             btQuaternion(heading, 0, -m_current_lean));
+    Moveable::updateGraphics(center_shift,
+        btQuaternion(heading, 0, -m_current_lean));
 
     static video::SColor pink(255, 255, 133, 253);
     static video::SColor green(255, 61, 87, 23);

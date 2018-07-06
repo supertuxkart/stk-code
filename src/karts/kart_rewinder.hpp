@@ -74,6 +74,8 @@ public:
     virtual void undoState(BareNetworkString *p) OVERRIDE {}
     // -------------------------------------------------------------------------
     virtual void undoEvent(BareNetworkString *p) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual bool enableSmoothing() const OVERRIDE              { return true; }
 
 };   // Rewinder
 #endif
