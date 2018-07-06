@@ -49,6 +49,19 @@
 
 MainLoop* main_loop = 0;
 
+#ifdef WIN32
+LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg, 
+                                     _In_ WPARAM wParam, _In_ LPARAM lParam)
+{
+    if (uMsg == WM_DESTROY)
+    {
+        PostQuitMessage(0);
+        return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+};
+#endif
+
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
         : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
@@ -64,15 +77,7 @@ MainLoop::MainLoop(unsigned parent_pid)
         class_name += StringUtils::toString(GetCurrentProcessId());
         WNDCLASSEX wx = {};
         wx.cbSize = sizeof(WNDCLASSEX);
-        wx.lpfnWndProc = [](HWND h, UINT m, WPARAM w, LPARAM l)->LRESULT
-        {
-            if (m == WM_DESTROY)
-            {
-                PostQuitMessage(0);
-                return 0;
-            }
-            return DefWindowProc(h, m, w, l);
-        };
+        wx.lpfnWndProc = separateProcessProc;
         wx.hInstance = GetModuleHandle(0);
         wx.lpszClassName = &class_name[0];
         if (RegisterClassEx(&wx))

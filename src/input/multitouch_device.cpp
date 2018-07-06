@@ -398,6 +398,10 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
     {
         updateAxisY(button->axis_y);
     }
+    else if (button->type == MultitouchButtonType::BUTTON_ESCAPE)
+    {
+        StateManager::get()->escapePressed();
+    }
     else
     {
         if (button->action != PA_BEFORE_FIRST)
