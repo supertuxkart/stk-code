@@ -40,6 +40,8 @@ KartRewinder::KartRewinder(const std::string& ident,unsigned int world_kart_id,
             , Kart(ident, world_kart_id, position, init_transform, difficulty,
                    ri)
 {
+    m_steering_smoothing_dt = -1.0f;
+    m_prev_steering = m_steering_smoothing_time = 0.0f;
 }   // KartRewinder
 
 // ----------------------------------------------------------------------------
@@ -61,6 +63,7 @@ void KartRewinder::saveTransform()
 {
     if (!getKartAnimation())
         Moveable::prepareSmoothing();
+
     m_prev_steering = getSteerPercent();
 }   // saveTransform
 
@@ -69,21 +72,16 @@ void KartRewinder::computeError()
 {
     if (!getKartAnimation())
         Moveable::checkSmoothing();
-}   // computeError
 
-// ----------------------------------------------------------------------------
-float KartRewinder::getSteerPercent() const
-{
-    if (m_smoothing == SS_TO_ADJUST)
+    float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
+    if (diff > 0.05f)
     {
-        float ratio = m_adjust_time_dt / m_adjust_time;
-        if (ratio > 1.0f)
-            ratio = 1.0f;
-        return ratio * AbstractKart::getSteerPercent() +
-            (1.0f - ratio) * m_prev_steering;
+        m_steering_smoothing_time = getTimeFullSteer(diff) / 2.0f;
+        m_steering_smoothing_dt = 0.0f;
     }
-    return AbstractKart::getSteerPercent();
-}   // getSteerPercent
+    else
+        m_steering_smoothing_dt = -1.0f;
+}   // computeError
 
 // ----------------------------------------------------------------------------
 /** Saves all state information for a kart in a memory buffer. The memory

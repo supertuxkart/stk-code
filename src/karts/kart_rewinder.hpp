@@ -34,7 +34,7 @@ private:
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
 
-    float m_prev_steering;
+    float m_prev_steering, m_steering_smoothing_dt, m_steering_smoothing_time;
 
 public:
     KartRewinder(const std::string& ident, unsigned int world_kart_id,
@@ -49,7 +49,27 @@ public:
     virtual void restoreState(BareNetworkString *p, int count) OVERRIDE;
     virtual void rewindToEvent(BareNetworkString *p) OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-    virtual float getSteerPercent() const OVERRIDE;
+    // -------------------------------------------------------------------------
+    virtual float getSteerPercent() const OVERRIDE
+    {
+        if (m_steering_smoothing_dt >= 0.0f)
+        {
+            return m_steering_smoothing_dt * AbstractKart::getSteerPercent() +
+                (1.0f - m_steering_smoothing_dt) * m_prev_steering;
+        }
+        return AbstractKart::getSteerPercent();
+    }
+    // -------------------------------------------------------------------------
+    virtual void updateGraphics(float dt) OVERRIDE
+    {
+        if (m_steering_smoothing_dt >= 0.0f)
+        {
+            m_steering_smoothing_dt += dt / m_steering_smoothing_time;
+            if (m_steering_smoothing_dt > 1.0f)
+                m_steering_smoothing_dt = -1.0f;
+        }
+        Kart::updateGraphics(dt);
+    }
     // -------------------------------------------------------------------------
     virtual void undoState(BareNetworkString *p) OVERRIDE {}
     // -------------------------------------------------------------------------
