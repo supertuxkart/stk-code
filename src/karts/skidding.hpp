@@ -65,6 +65,8 @@ private:
     /** Set to >0 when a graphical jump is to be done. */
     float m_remaining_jump_time;
 
+    float m_graphical_remaining_jump_time;
+
     float m_prev_visual_rotation;
 
     float m_smoothing_time;
@@ -141,7 +143,7 @@ public:
      *  actually using the skid bonus. */
     bool getSkidBonusReady() const { return m_skid_bonus_ready; }
     // ------------------------------------------------------------------------
-    bool isJumping() const { return m_remaining_jump_time > 0;  }
+    bool isJumping() const { return m_graphical_remaining_jump_time > 0;  }
     // ------------------------------------------------------------------------
     void prepareSmoothing();
     // ------------------------------------------------------------------------

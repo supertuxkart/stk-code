@@ -30,6 +30,7 @@
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
@@ -78,6 +79,7 @@ void Skidding::reset()
     m_kart->getKartGFX()->updateSkidLight(0);
     m_kart->getControls().setSkidControl(KartControl::SC_NONE);
     m_prev_visual_rotation = 0.0f;
+    m_graphical_remaining_jump_time = 0.0f;
     m_smoothing_time = 0.0f;
     m_smoothing_dt = -1.0f;
 
@@ -259,11 +261,12 @@ float Skidding::updateGraphics(float dt)
             m_smoothing_dt = -1.0f;
     }
 
-    if (m_remaining_jump_time <= 0) return 0;
+    if (m_graphical_remaining_jump_time <= 0) return 0;
 
-    if (m_remaining_jump_time < 0)
+    m_graphical_remaining_jump_time -= dt;
+    if (m_graphical_remaining_jump_time < 0)
     {
-        m_remaining_jump_time = 0.0f;
+        m_graphical_remaining_jump_time = 0.0f;
         return 0.0f;
     }
 
@@ -277,7 +280,7 @@ float Skidding::updateGraphics(float dt)
     float gravity   = Track::getCurrentTrack()->getGravity();
     float v0        = 0.5f * gravity * kp->getSkidGraphicalJumpTime();
     float jump_time = kp->getSkidGraphicalJumpTime()
-                    - m_remaining_jump_time;
+                    - m_graphical_remaining_jump_time;
     return v0 * jump_time - 0.5f * gravity * jump_time * jump_time;
 
 }   // updateGraphics
@@ -396,6 +399,15 @@ void Skidding::update(int ticks, bool is_on_ground,
 
             // Some karts might use a graphical-only jump. Set it up:
             m_remaining_jump_time = kp->getSkidGraphicalJumpTime();
+            // Don't re-update for local player controller when rewinding
+            if (m_graphical_remaining_jump_time == 0.0f)
+            {
+                if (RewindManager::get()->isRewinding() &&
+                    !m_kart->getController()->isLocalPlayerController())
+                    m_graphical_remaining_jump_time = m_remaining_jump_time;
+                else if (!RewindManager::get()->isRewinding())
+                    m_graphical_remaining_jump_time = m_remaining_jump_time;
+            }
 
 #ifdef SKID_DEBUG
 #define SPEED 20.0f
