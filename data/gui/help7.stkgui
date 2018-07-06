@@ -27,13 +27,13 @@
             <spacer width="2%" height="100%"/>
 
             <box width="80%" height="100%" layout="vertical-row">
-                <label align="center" text="SuperTuxKart can be played in multiplayer mode online...:"/>
+                <label align="center" I18N="In the help menu" text="SuperTuxKart can be played in multiplayer mode online...:"/>
                 <div width="100%" proportion="2" layout="horizontal-row">
                     <icon align="center" width="64" height="64" icon="gui/networking_icon.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="First, select the 'online' icon in the main menu. Choose either local networking, or global networking (requires internet to be enabled in the options). Then, you can either create your own server with custom options, or search among a list of existing servers to join. Some of them are official servers with ranked races."/>
+                            text="First, select the 'online' icon in the main menu. Choose either local networking, or global networking (requires internet to be enabled in the options). Then, you can either create your own server with custom options, or search among a list of existing servers to join. Some of them are official servers with optionally ranked races."/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
@@ -41,10 +41,10 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Once in a server, a race will begin once its owner (symbolized with the crown) decide so. Official servers auto-start races when there is enough players. Then, you can choose your kart and vote for the next track to race on. An addon kart or track is allowed only if all players connected to the server have it."/>
+                            text="Once in a server, a race will begin once its owner (symbolized with the crown) decides so. Official servers may auto-start races only when there are enough players. Then, you can choose your kart and vote for the next track to race on. An addon kart or track is allowed only if it exists on all joinned players and the server."/>
                 </div>
 
-                <label align="center" text="... or on the same computer:"/>
+                <label align="center" I18N="In the help menu" text="... or on the same computer:"/>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
                     <icon align="center" width="64" height="64" icon="gui/options_input.png"/>
