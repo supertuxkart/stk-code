@@ -28,6 +28,8 @@ CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
 CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
     "NOT SERVER_ONLY" OFF)
+CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
+    "NOT SERVER_ONLY;NOT MINGW;NOT CYGWIN" OFF)
 
 if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
@@ -61,12 +63,6 @@ if(MSVC AND (MSVC_VERSION LESS 1900))
     mark_as_advanced(WIIUSE_BUILD)
 else()
     set(WIIUSE_BUILD ON)
-endif()
-
-if(MINGW OR CYGWIN OR SERVER_ONLY)
-    option(USE_WIIUSE "Support for wiimote input devices" OFF)
-else()
-    option(USE_WIIUSE "Support for wiimote input devices" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
