@@ -167,10 +167,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         // but it produces good enough results
         float distance = (newPoint - start).length();
 
-        m_left.back()->add(raycast_left-delta, raycast_left+delta,
-             m_kart.getNormal(), distance);
-        m_right.back()->add(raycast_right-delta, raycast_right+delta,
-             m_kart.getNormal(), distance);
+        const Vec3 up_offset = (m_kart.getNormal() * 0.05f);
+        m_left.back()->add(raycast_left - delta + up_offset,
+            raycast_left + delta + up_offset, m_kart.getNormal(), distance);
+        m_right.back()->add(raycast_right - delta + up_offset,
+            raycast_right + delta + up_offset, m_kart.getNormal(), distance);
         return;
     }
 
