@@ -637,7 +637,7 @@ void BaseUserScreen::deletePlayer()
     // valid current player, so the last player can not be deleted.
     if(PlayerManager::get()->getNumNonGuestPlayers()==1)
     {
-        m_info_widget->setText("You can't delete the only player.", true);
+        m_info_widget->setText(_("You can't delete the only player."), true);
         m_info_widget->setErrorColor();
         return;
     }
