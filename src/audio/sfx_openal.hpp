@@ -19,7 +19,7 @@
 #ifndef HEADER_SFX_OPENAL_HPP
 #define HEADER_SFX_OPENAL_HPP
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 
 #include <assert.h>
 #ifdef __APPLE__

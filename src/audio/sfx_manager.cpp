@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 #  ifdef __APPLE__
 #    include <OpenAL/al.h>
 #    include <OpenAL/alc.h>
@@ -649,7 +649,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
@@ -875,7 +875,7 @@ void SFXManager::reallyResumeAllNow()
  */
 bool SFXManager::checkError(const std::string &context)
 {
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     // Check (and clear) the error flag
     int error = alGetError();
 
@@ -927,7 +927,7 @@ void SFXManager::setMasterSFXVolume(float gain)
 //-----------------------------------------------------------------------------
 const std::string SFXManager::getErrorString(int err)
 {
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     switch(err)
     {
         case AL_NO_ERROR:          return std::string("AL_NO_ERROR"         );
@@ -967,7 +967,7 @@ void SFXManager::positionListener(const Vec3 &position, const Vec3 &front,
  */
 void SFXManager::reallyPositionListenerNow()
 {
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     if (!sfxAllowed()) return;
 
     m_listener_position.lock();

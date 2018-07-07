@@ -125,10 +125,6 @@ if(SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_COMPILE_WITH_OSX_DEVICE_)
 endif()
 
-#if(DISABLE_VPX)
-#    add_definitions(-DNO_VPX)
-#endif()
-
 if(UNIX OR MINGW)
     if(DEBUG_SYMBOLS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
@@ -296,13 +292,17 @@ else()
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
-# OpenAL
-find_package(OpenAL REQUIRED)
-include_directories(${OPENAL_INCLUDE_DIR})
+if(NOT SERVER_ONLY)
+    # OpenAL
+    find_package(OpenAL REQUIRED)
+    include_directories(${OPENAL_INCLUDE_DIR})
 
-# OggVorbis
-find_package(OggVorbis REQUIRED)
-include_directories(${OGGVORBIS_INCLUDE_DIRS})
+    # OggVorbis
+    find_package(OggVorbis REQUIRED)
+    include_directories(${OGGVORBIS_INCLUDE_DIRS})
+
+    add_definitions(-DENABLE_SOUND)
+endif()
 
 # Freetype
 if (NOT SERVER_ONLY)
@@ -381,8 +381,6 @@ else()
     endif()
 endif()
 
-# TODO: remove this switch
-add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
     configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
@@ -480,8 +478,6 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${OGGVORBIS_LIBRARIES}
-    ${OPENAL_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     )
 
@@ -496,6 +492,8 @@ if(NOT SERVER_ONLY)
         ${SQUISH_LIBRARY}
         ${FREETYPE_LIBRARIES}
         ${JPEG_LIBRARIES}
+        ${OGGVORBIS_LIBRARIES}
+        ${OPENAL_LIBRARY}
         graphics_utils)
 endif()
 

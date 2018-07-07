@@ -169,7 +169,7 @@ void MusicInformation::startMusic()
         return;
     }
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     m_normal_music = new MusicOggStream(m_normal_loop_start);
 #else
     m_normal_music = new MusicDummy();
@@ -200,7 +200,7 @@ void MusicInformation::startMusic()
         return;
     }
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     m_fast_music = new MusicOggStream(m_fast_loop_start);
 #else
     m_fast_music = new MusicDummy();
