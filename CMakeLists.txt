@@ -180,37 +180,39 @@ elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     endif()
 endif()
 
-if(MSVC OR APPLE)
-    if (NOT APPLE)
+if(MSVC)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
 
     set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
     set(ZLIB_LIBRARY zlibstatic)
-    endif()
-
-    # Build png library
-    set(SKIP_INSTALL_ALL TRUE)
-    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
-    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
-    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
-
-    set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png_static)
 endif()
 
-# Add jpeg library
-if (APPLE)
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
-    set(JPEG_LIBRARY jpeglib)
-else()
-    find_package(JPEG REQUIRED)
-    include_directories(${JPEG_INCLUDE_DIR})
+if (NOT SERVER_ONLY)
+    if(MSVC OR APPLE)
+        # Build png library
+        set(SKIP_INSTALL_ALL TRUE)
+        set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+        set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+        set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
+
+        set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
+        set(PNG_LIBRARY png_static)
+    endif()
+
+    # Add jpeg library
+    if (APPLE)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+        set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
+        set(JPEG_LIBRARY jpeglib)
+    else()
+        find_package(JPEG REQUIRED)
+        include_directories(${JPEG_INCLUDE_DIR})
+    endif()
 endif()
 
 if (BUILD_RECORDER)
@@ -480,7 +482,6 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${JPEG_LIBRARIES}
     ${OPENSSL_CRYPTO_LIBRARY}
     )
 
@@ -491,7 +492,11 @@ if(NOT SERVER_ONLY)
         target_link_libraries(supertuxkart GLESv2)
     endif()
 
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} ${FREETYPE_LIBRARIES} graphics_utils)
+    target_link_libraries(supertuxkart
+        ${SQUISH_LIBRARY}
+        ${FREETYPE_LIBRARIES}
+        ${JPEG_LIBRARIES}
+        graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)
