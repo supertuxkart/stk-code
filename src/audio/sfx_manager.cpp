@@ -679,6 +679,8 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
     SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain());
+    if (owns_buffer)
+        delete buffer;
 #endif
 
     sfx->setMasterVolume(m_master_gain);
