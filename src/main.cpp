@@ -598,6 +598,7 @@ void cmdLineHelp()
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --init-user        Save the above login and password (if set) in config.\n"
+    "       --disable-polling  Don't poll for logged in user.\n"
     "       --port=n           Port number to use.\n"
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
@@ -1132,7 +1133,8 @@ int handleCmdLine()
         NetworkConfig::get()->setServerIdFile(
             file_manager->getUserConfigFile(s));
     }
-
+    if(CommandLine::has("--disable-polling"))
+        Online::RequestManager::m_disable_polling = true;
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
     NetworkConfig::get()->
