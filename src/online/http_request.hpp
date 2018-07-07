@@ -71,6 +71,7 @@ namespace Online
         /** String to store the received data in. */
         std::string m_string_buffer;
 
+        static std::string m_cert_location;
     protected:
         virtual void prepareOperation() OVERRIDE;
         virtual void operation() OVERRIDE;
