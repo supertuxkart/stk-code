@@ -33,6 +33,7 @@
 #endif
 
 #include "audio/music_ogg.hpp"
+#include "audio/sfx_manager.hpp"
 #include "audio/sfx_openal.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
@@ -44,6 +45,7 @@ MusicManager* music_manager= NULL;
 MusicManager::MusicManager()
 {
     m_current_music= NULL;
+    m_initialized = false;
     setMasterMusicVolume(UserConfigParams::m_music_volume);
 
     //FIXME: I'm not sure that this code goes here
