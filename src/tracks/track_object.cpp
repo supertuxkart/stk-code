@@ -530,25 +530,18 @@ void TrackObject::resetEnabled()
  */
 void TrackObject::updateGraphics(float dt)
 {
-
-    // FIXME: At this stage neither m_presentation nor m_animator
-    // have been converted to use separate updateGraphics() calls.
-
     if (m_physical_object) m_physical_object->updateGraphics(dt);
-    if (m_animator) m_animator->update(dt);
-
 }   // update
 
 // ----------------------------------------------------------------------------
-/** This updates all only graphical elements. It is only called once per
- *  rendered frame, not once per time step.
+/** This updates once per physics time step.
  *  float dt Time since last rame.
  */
 void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
     if (m_physical_object) m_physical_object->update(dt);
-
+    if (m_animator) m_animator->updateWithWorldTicks();
 }   // update
 
 // ----------------------------------------------------------------------------

@@ -62,7 +62,9 @@ protected:
 
     /** True if the animation is currently playing. */
     bool  m_playing;
-    
+
+    float m_animation_duration;
+
 public:
                  AnimationBase(const XMLNode &node);
                  AnimationBase(Ipo *ipo);
@@ -85,18 +87,7 @@ public:
     void         setPlaying(bool playing) {m_playing = playing; }
 
     // ------------------------------------------------------------------------
-
-    float getAnimationDuration() const
-    {
-        float duration = -1;
-
-        for (const Ipo* currIpo : m_all_ipos)
-        {
-            duration = std::max(duration, currIpo->getEndTime());
-        }
-
-        return duration;
-    }
+    float getAnimationDuration() const         { return m_animation_duration; }
 
 };   // AnimationBase
 

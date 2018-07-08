@@ -69,17 +69,21 @@ ThreeDAnimation::~ThreeDAnimation()
 
 // ----------------------------------------------------------------------------
 /** Updates position and rotation of this model. Called once per time step.
- *  \param dt Time since last call.
  */
-void ThreeDAnimation::update(float dt)
+void ThreeDAnimation::updateWithWorldTicks()
 {
     Vec3 xyz   = m_object->getPosition();
     Vec3 scale = m_object->getScale();
 
-    //make the object think no time has passed to pause it's animation
-    if (m_is_paused)dt = 0;
+    float position = 0.0f;
+    if (!m_is_paused)
+    {
+        int cur_ticks = World::getWorld()->getTicksSinceStart();
+        float cur_time = stk_config->ticks2Time(cur_ticks);
+        position = fmodf(cur_time, m_animation_duration);
+    }
 
-    AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
+    AnimationBase::getAt(position, &xyz, &m_hpr, &scale);     //updates all IPOs
     //m_node->setPosition(xyz.toIrrVector());
     //m_node->setScale(scale.toIrrVector());
 
