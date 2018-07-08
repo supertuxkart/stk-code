@@ -1044,8 +1044,13 @@ void World::update(int ticks)
     PROFILER_POP_CPU_MARKER();
 
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
-    Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
-    if (script_engine) script_engine->update(ticks);
+    if (!RewindManager::get()->isRewinding())
+    {
+        Scripting::ScriptEngine *script_engine =
+            Scripting::ScriptEngine::getInstance();
+        if (script_engine)
+            script_engine->update(ticks);
+    }
 
     Physics::getInstance()->update(ticks);
 
