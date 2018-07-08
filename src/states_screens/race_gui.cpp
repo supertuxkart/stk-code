@@ -540,7 +540,8 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
         // Highlight the player icons with some backgorund image.
-        if (kart->getController()->isLocalPlayerController())
+        if (kart->getController()->isLocalPlayerController() &&
+            m_icons_frame != NULL)
         {
             video::SColor colors[4];
             for (unsigned int i=0;i<4;i++)
