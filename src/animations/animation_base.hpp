@@ -56,6 +56,8 @@ private:
     /** The initial rotation of this object. */
     Vec3 m_initial_hpr;
 
+    void calculateAnimationDuration();
+
 protected:
     /** All IPOs for this animation. */
     PtrVector<Ipo>  m_all_ipos;

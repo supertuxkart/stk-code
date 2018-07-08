@@ -46,14 +46,7 @@ AnimationBase::AnimationBase(const XMLNode &node)
         m_playing = false;
     }
     reset();
-
-    m_animation_duration = -1.0f;
-    for (const Ipo* currIpo : m_all_ipos)
-    {
-        m_animation_duration = std::max(m_animation_duration,
-            currIpo->getEndTime());
-    }
-
+    calculateAnimationDuration();
 }   // AnimationBase
 // ----------------------------------------------------------------------------
 /** Special constructor which takes one IPO (or curve). This is used by the
@@ -64,7 +57,19 @@ AnimationBase::AnimationBase(Ipo *ipo)
     m_playing      = true;
     m_all_ipos.push_back(ipo);
     reset();
+    calculateAnimationDuration();
 }   // AnimationBase(Ipo)
+
+// ----------------------------------------------------------------------------
+void AnimationBase::calculateAnimationDuration()
+{
+    m_animation_duration = -1.0f;
+    for (const Ipo* currIpo : m_all_ipos)
+    {
+        m_animation_duration = std::max(m_animation_duration,
+            currIpo->getEndTime());
+    }
+}   // calculateAnimationDuration
 
 // ----------------------------------------------------------------------------
 /** Stores the initial transform (in the IPOs actually). This is necessary
