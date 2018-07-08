@@ -1558,7 +1558,7 @@ void Kart::update(int ticks)
         Track::getCurrentTrack()->getAABB(&min, &max);
 
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
-           !getKartAnimation())
+           !has_animation_before)
         {
             new RescueAnimation(this);
             m_last_factor_engine_sound = 0.0f;
@@ -1579,7 +1579,7 @@ void Kart::update(int ticks)
             }
             body->setGravity(gravity);
         }   // if !flying
-        if     (material->isDriveReset() && isOnGround())
+        if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
             new RescueAnimation(this);
             m_last_factor_engine_sound = 0.0f;
@@ -1610,7 +1610,7 @@ void Kart::update(int ticks)
 
     ItemManager::get()->checkItemHit(this);
 
-    const bool emergency = getKartAnimation()!=NULL;
+    const bool emergency = has_animation_before;
 
     if (emergency)
     {
@@ -1628,7 +1628,7 @@ void Kart::update(int ticks)
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
-    if (!isOnGround() && !getKartAnimation())
+    if (!isOnGround() && !has_animation_before)
     {
         const Material *m      = getMaterial();
         const Material *last_m = getLastMaterial();
@@ -1663,7 +1663,7 @@ void Kart::update(int ticks)
         m_is_jumping = false;
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
 
-        if (!getKartAnimation())
+        if (!has_animation_before)
         {
             HitEffect *effect =  new Explosion(getXYZ(), "jump",
                                               "jump_explosion.xml");
