@@ -58,7 +58,6 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              PerPlayerDifficulty d)
                      : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
-    m_actions.fill(0);
     m_difficulty = d;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
@@ -115,6 +114,7 @@ LocalPlayerController::~LocalPlayerController()
  */
 void LocalPlayerController::reset()
 {
+    m_actions.fill(0);
     PlayerController::reset();
     m_sound_schedule = false;
 }   // reset
