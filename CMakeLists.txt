@@ -132,22 +132,30 @@ if(UNIX OR MINGW)
     endif()
 endif()
 
+if(UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+
+    if(NOT PKGCONFIG_FOUND)
+        message(FATAL_ERROR "Pkg-config not found.")
+    endif()
+endif()
+
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Find system ENet library or build it if missing
 if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
-    find_package(ENet)
+    pkg_check_modules(ENET libenet>=1.3.4)
 endif()
 
 if(ENET_FOUND)
-    include_directories(${ENet_INCLUDE_DIRS})
+    include_directories(${ENET_INCLUDE_DIRS})
 else()
     # Fallback to built-in version
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
     include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
-    set(ENet_LIBRARIES "enet")
+    set(ENET_LIBRARIES "enet")
 endif()
 
 # Find system GLEW library or build it if missing
@@ -160,10 +168,7 @@ if (APPLE)
 elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
     if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
-        find_package(PkgConfig)
-        if(PKGCONFIG_FOUND)
-            pkg_check_modules(GLEW glew>=2.1)
-        endif()
+        pkg_check_modules(GLEW glew>=2.1)
     endif()
 
     if(GLEW_FOUND)
@@ -474,7 +479,7 @@ target_link_libraries(supertuxkart
     bulletdynamics
     bulletcollision
     bulletmath
-    ${ENet_LIBRARIES}
+    ${ENET_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
