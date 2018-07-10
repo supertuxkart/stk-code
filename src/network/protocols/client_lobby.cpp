@@ -242,6 +242,8 @@ void ClientLobby::addAllPlayers(Event* event)
     }
     configRemoteKart(players);
     loadWorld();
+    // Switch to assign mode in case a player hasn't chosen any karts
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 }   // addAllPlayers
 
 //-----------------------------------------------------------------------------
