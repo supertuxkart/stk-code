@@ -1751,6 +1751,8 @@ int main(int argc, char *argv[] )
             FileManager::addRootDirs(s);
         if (CommandLine::has("--stdout", &s))
             FileManager::setStdoutName(s);
+        if (CommandLine::has("--stdout-dir", &s))
+            FileManager::setStdoutDir(s);
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
