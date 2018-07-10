@@ -287,16 +287,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
 
     int ticks_left = buffer->getUInt32();
 
-    // Attaching an object can be expensive (loading new models, ...)
-    // so avoid doing this if there is no change in attachment type
-    if(new_type == m_type)
-    {
-        setTicksLeft(ticks_left);
-        return;
-    }
-
     // Now it is a new attachment:
-
     if (type == (ATTACH_BOMB | 0x80))   // we have previous owner information
     {
         uint8_t kart_id = buffer->getUInt8();
@@ -306,6 +297,15 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     {
         m_previous_owner = NULL;
     }
+
+    // Attaching an object can be expensive (loading new models, ...)
+    // so avoid doing this if there is no change in attachment type
+    if(new_type == m_type)
+    {
+        setTicksLeft(ticks_left);
+        return;
+    }
+
     set(new_type, ticks_left, m_previous_owner);
 }   // rewindTo
 // -----------------------------------------------------------------------------
@@ -412,7 +412,7 @@ void Attachment::hitBanana(ItemState *item_state)
             // if going very slowly or backwards,
             // braking won't remove parachute
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
-            break ;
+            break;
         case ATTACH_ANVIL:
             set(ATTACH_ANVIL, stk_config->time2Ticks(kp->getAnvilDuration())
                 + leftover_ticks                                      );
@@ -422,12 +422,13 @@ void Attachment::hitBanana(ItemState *item_state)
             // handled in Kart::updatePhysics
             m_kart->adjustSpeed(kp->getAnvilSpeedFactor());
             m_kart->updateWeight();
-            break ;
+            break;
         case ATTACH_BOMB:
             set( ATTACH_BOMB, stk_config->time2Ticks(stk_config->m_bomb_time)
                             + leftover_ticks                                 );
-
-            break ;
+            break;
+        default:
+            break;
         }   // switch
     }
 }   // hitBanana
