@@ -46,7 +46,7 @@ void override_default_params()
     if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
     {
         UserConfigParams::m_multitouch_enabled = true;
-        UserConfigParams::m_screen_keyboard = true;
+        UserConfigParams::m_screen_keyboard = 1;
     }
     
     // Set bigger fonts and buttons
