@@ -40,14 +40,16 @@ void override_default_params()
     // Disable advanced lighting by default to make the game playable
     UserConfigParams::m_dynamic_lights = false;
 
-    // Enable touch steering and screen keyboard when touchscreen is available
+    // Enable multitouch device when touchscreen is available
     int32_t touch = AConfiguration_getTouchscreen(global_android_app->config);
     
     if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
     {
         UserConfigParams::m_multitouch_enabled = true;
-        UserConfigParams::m_screen_keyboard = 1;
     }
+    
+    // Enable screen keyboard
+    UserConfigParams::m_screen_keyboard = 1;
     
     // Set bigger fonts and buttons
     UserConfigParams::m_hidpi_enabled = true;
