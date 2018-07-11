@@ -183,30 +183,6 @@ void RewindManager::saveState(bool local_save)
 }   // saveState
 
 // ----------------------------------------------------------------------------
-/** Saves a state on the client. Used to save an initial state at t=0 for each
- *  client in case that we receive an event from another client (which will
- *  trigger a rewind) before a state from the server.
- */
-void RewindManager::saveLocalState()
-{
-    auto gp = GameProtocol::lock();
-    if (!gp)
-        return;
-
-    int ticks = World::getWorld()->getTimeTicks();
-
-    saveState(/*local_state*/true);
-    NetworkString *state = gp->getState();
-
-    // Copy the data to a new string, making the buffer in
-    // GameProtocol availble for again.
-    BareNetworkString *bns =
-        new BareNetworkString(state->getCurrentData(),
-                              state->size()           );
-    m_rewind_queue.addLocalState(bns, /*confirmed*/true, ticks);
-}   // saveLocalState
-
-// ----------------------------------------------------------------------------
 /** Restores a given state by calling rewindToState for each available rewinder
  *  with its correct data.
  *  \param data The data string used to store the whole game state.

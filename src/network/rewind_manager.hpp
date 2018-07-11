@@ -147,7 +147,6 @@ public:
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(BareNetworkString *buffer, int ticks);
     void saveState(bool local_save);
-    void saveLocalState();
     void restoreState(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.

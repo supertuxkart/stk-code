@@ -68,7 +68,7 @@ public:
 
     void setSwitchItems(const std::vector<int> &switch_items);
     void sendItemUpdate();
-    void saveInitialState();
+    void initClientConfirmState();
 
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,

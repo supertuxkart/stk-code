@@ -62,6 +62,10 @@ NetworkItemManager::NetworkItemManager()
  */
 NetworkItemManager::~NetworkItemManager()
 {
+    for (ItemState* is : m_confirmed_state)
+    {
+        delete is;
+    }
 }   // ~NetworkItemManager
 
 //-----------------------------------------------------------------------------
@@ -71,9 +75,9 @@ void NetworkItemManager::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Copies the initial state at the start of a race as confirmed state.
+/** Initialize state at the start of a race.
  */
-void NetworkItemManager::saveInitialState()
+void NetworkItemManager::initClientConfirmState()
 {
     m_confirmed_state_time = 0;
 
@@ -83,7 +87,7 @@ void NetworkItemManager::saveInitialState()
         ItemState *is = new ItemState(*i);
         m_confirmed_state.push_back(is);
     }
-}   // saveInitialState
+}   // initClientConfirmState
 
 //-----------------------------------------------------------------------------
 /** Called when a kart collects an item. In network games only the server
@@ -195,12 +199,6 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
  */
 BareNetworkString* NetworkItemManager::saveState()
 {
-    if(NetworkConfig::get()->isClient())
-    {
-        saveInitialState();
-        return NULL;
-    }
-
     // On the server:
     // ==============
     m_item_events.lock();

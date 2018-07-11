@@ -324,15 +324,6 @@ void WorldStatus::updateTime(int ticks)
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
-                // Save one initial state on a client, in case that an event
-                // is received from a client (trieggering a rollback) before
-                // a state from the server has been received.
-                if (NetworkConfig::get()->isNetworking() &&  
-                    NetworkConfig::get()->isClient()        )
-                {
-                    RewindManager::get()->saveLocalState();
-                    // FIXME TODO: save state in rewind queue!
-                }
                 if (m_play_ready_set_go_sounds)
                 {
                     m_start_sound->play();
