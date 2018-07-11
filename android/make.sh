@@ -271,9 +271,6 @@ if [ -d "$DIRNAME/assets/data" ]; then
     fi
 fi
 
-echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
-
-
 # Standalone toolchain
 if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     echo "Creating standalone toolchain"
@@ -286,6 +283,8 @@ if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     touch "$DIRNAME/obj/make_standalone_toolchain.stamp"
     echo $COMPILE_ARCH > "$DIRNAME/obj/compile_arch"
 fi
+
+echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
 # Freetype
 if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
