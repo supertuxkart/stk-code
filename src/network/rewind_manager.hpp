@@ -26,7 +26,8 @@
 
 #include <assert.h>
 #include <atomic>
-#include <list>
+#include <functional>
+#include <map>
 #include <vector>
 
 class RewindInfo;
@@ -88,6 +89,8 @@ private:
     static bool           m_enable_rewind_manager;
 
     typedef std::vector<Rewinder *> AllRewinder;
+
+    std::map<int, std::map<Rewinder*, std::function<void()> > > m_local_state;
 
     /** A list of all objects that can be rewound. */
     AllRewinder m_all_rewinder;

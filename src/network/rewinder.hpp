@@ -19,6 +19,8 @@
 #ifndef HEADER_REWINDER_HPP
 #define HEADER_REWINDER_HPP
 
+#include <functional>
+
 class BareNetworkString;
 
 class Rewinder
@@ -80,7 +82,9 @@ public:
    /** True if this rewinder can be destroyed. Karts can not be destroyed,
     *  cakes can. This is used by the RewindManager in reset. */
    bool canBeDestroyed() const { return m_can_be_destroyed; }
-
+    // -------------------------------------------------------------------------
+    virtual std::function<void()> getLocalStateRestoreFunction()
+                                                            { return nullptr; }
 };   // Rewinder
 #endif
 

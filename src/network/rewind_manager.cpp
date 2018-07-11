@@ -217,17 +217,25 @@ void RewindManager::update(int ticks_not_used)
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
     // Clients don't save state, so they just exit.
-    if (NetworkConfig::get()->isClient() ||
-        ticks - m_last_saved_state < m_state_frequency)
+    if (ticks - m_last_saved_state < m_state_frequency)
     {
         return;
     }
 
     // Save state
-    saveState(/**allow_local_save*/false);
-    PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
-    if (auto gp = GameProtocol::lock())
-        gp->sendState();
+    if (NetworkConfig::get()->isClient())
+    {
+        auto& ret = m_local_state[ticks];
+        for (Rewinder* r : m_all_rewinder)
+            ret[r] = r->getLocalStateRestoreFunction();
+    }
+    else
+    {
+        saveState(/**allow_local_save*/false);
+        PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
+        if (auto gp = GameProtocol::lock())
+            gp->sendState();
+    }
     PROFILER_POP_CPU_MARKER();
     m_last_saved_state = ticks;
 }   // update
@@ -323,6 +331,28 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 
     // Restore states from the exact rewind time
     // -----------------------------------------
+    auto it = m_local_state.find(exact_rewind_ticks);
+    if (it != m_local_state.end())
+    {
+        for (auto& local_state : it->second)
+        {
+            if (local_state.second)
+                local_state.second();
+        }
+        for (auto it = m_local_state.begin(); it != m_local_state.end();)
+        {
+            if (it->first <= exact_rewind_ticks)
+                it = m_local_state.erase(it);
+            else
+                break;
+        }
+    }
+    else
+    {
+        Log::warn("RewindManager", "Missing local state at ticks %d",
+            exact_rewind_ticks);
+    }
+
     // A loop in case that we should split states into several smaller ones:
     while (current && current->getTicks() == exact_rewind_ticks && 
            current->isState()                                        )
