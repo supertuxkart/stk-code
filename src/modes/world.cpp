@@ -663,8 +663,6 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
-    // In case someone opened paused race dialog in network game
-    GUIEngine::ModalDialog::dismiss();
     results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
@@ -869,8 +867,9 @@ void World::updateWorld(int ticks)
     }
 
     // Don't update world if a menu is shown or the race is over.
-    if( getPhase() == FINISH_PHASE         ||
-        getPhase() == IN_GAME_MENU_PHASE      )
+    if (getPhase() == FINISH_PHASE ||
+        (!NetworkConfig::get()->isNetworking() &&
+        getPhase() == IN_GAME_MENU_PHASE))
         return;
 
     try

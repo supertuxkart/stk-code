@@ -413,6 +413,14 @@ void MainLoop::run()
         double time_spent = StkTime::getRealTime();
         for(int i = 0; i < num_steps; i++)
         {
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
+                                     0x7F, 0x00, 0x7F);
+            if (auto pm = ProtocolManager::lock())
+            {
+                pm->update(1);
+            }
+            PROFILER_POP_CPU_MARKER();
+
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(1);
             PROFILER_POP_CPU_MARKER();
@@ -421,14 +429,6 @@ void MainLoop::run()
             // the main loop to abort; and it's not a good idea to continue
             // since the GUI engine is no more to be called then.
             if (m_abort) break;
-
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
-                                     0x7F, 0x00, 0x7F);
-            if (auto pm = ProtocolManager::lock())
-            {
-                pm->update(1);
-            }
-            PROFILER_POP_CPU_MARKER();
 
             if (m_frame_before_loading_world)
             {

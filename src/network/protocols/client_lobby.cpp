@@ -321,7 +321,13 @@ void ClientLobby::update(int ticks)
             !GameProtocol::emptyInstance())
             return;
         if (!m_received_server_result)
+        {
             m_received_server_result = true;
+            // In case someone opened paused race dialog or menu in network game
+            GUIEngine::ModalDialog::dismiss();
+            if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+                StateManager::get()->enterGameState();
+        }
         break;
     case DONE:
         m_state.store(EXITING);
