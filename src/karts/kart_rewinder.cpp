@@ -22,6 +22,7 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -191,6 +192,9 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // 3) Attachment, powerup, nitro
     // ------------------------------
     getAttachment()->rewindTo(buffer);
+    // Required for going back to anvil when rewinding
+    updateWeight();
+
     getPowerup()->rewindTo(buffer);
     m_min_nitro_ticks = buffer->getUInt8();
     float nitro = buffer->getFloat();
@@ -203,6 +207,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // 6) Skidding
     // -----------
     m_skidding->rewindTo(buffer);
+
     return;
 }   // restoreState
 
@@ -218,6 +223,33 @@ void KartRewinder::update(int ticks)
 // ----------------------------------------------------------------------------
 void KartRewinder::rewindToEvent(BareNetworkString *buffer)
 {
-};   // rewindToEvent
+}   // rewindToEvent
 
+// ----------------------------------------------------------------------------
+std::function<void()> KartRewinder::getLocalStateRestoreFunction()
+{
+    // In theory all ticks / boolean related stuff can be saved locally
+    int bubblegum_ticks = m_bubblegum_ticks;
+    int bounce_back_ticks = m_bounce_back_ticks;
+    int invulnerable_ticks = m_invulnerable_ticks;
+    int squash_ticks = m_squash_ticks;
+    bool fire_clicked = m_fire_clicked;
+    int view_blocked_by_plunger = m_view_blocked_by_plunger;
 
+    // Attachment local state
+    float initial_speed = getAttachment()->getInitialSpeed();
+    float node_scale = getAttachment()->getNodeScale();
+    return [bubblegum_ticks, bounce_back_ticks, invulnerable_ticks, squash_ticks,
+        fire_clicked, view_blocked_by_plunger, initial_speed,
+        node_scale, this]()
+    {
+        m_bubblegum_ticks = bubblegum_ticks;
+        m_bounce_back_ticks = bounce_back_ticks;
+        m_invulnerable_ticks = invulnerable_ticks;
+        m_squash_ticks = squash_ticks;
+        m_fire_clicked = fire_clicked;
+        m_view_blocked_by_plunger = view_blocked_by_plunger;
+        getAttachment()->setInitialSpeed(initial_speed);
+        getAttachment()->setNodeScale(node_scale);
+    };
+}   // getLocalStateRestoreFunction

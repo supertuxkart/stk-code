@@ -430,10 +430,6 @@ public:
      *  over. */
     virtual void startEngineSFX() = 0;
     // ------------------------------------------------------------------------
-    /** This method is to be called every time the mass of the kart is updated,
-     *  which includes attaching an anvil to the kart (and detaching). */
-    virtual void updateWeight() = 0;
-    // ------------------------------------------------------------------------
     /** Multiplies the velocity of the kart by a factor f (both linear
      *  and angular). This is used by anvils, which suddenly slow down the kart
      *  when they are attached. */

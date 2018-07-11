@@ -351,6 +351,9 @@ void Kart::reset()
     m_kart_gfx->reset();
     m_skidding->reset();
 
+    m_weight = 0.0f;
+    updateWeight();
+
 #ifndef SERVER_ONLY
     if (m_collision_particles)
         m_collision_particles->setCreationRateAbsolute(0.0f);
@@ -856,10 +859,13 @@ void Kart::adjustSpeed(float f)
 void Kart::updateWeight()
 {
     float mass = m_kart_properties->getMass() + m_attachment->weightAdjust();
-
-    btVector3 inertia;
-    m_kart_chassis.calculateLocalInertia(mass, inertia);
-    m_body->setMassProps(mass, inertia);
+    if (m_weight != mass)
+    {
+        m_weight = mass;
+        btVector3 inertia;
+        m_kart_chassis.calculateLocalInertia(mass, inertia);
+        m_body->setMassProps(mass, inertia);
+    }
 }   // updateWeight
 
 // ------------------------------------------------------------------------
@@ -2524,6 +2530,7 @@ void Kart::updateEngineSFX(float dt)
  */
 void Kart::updateEnginePowerAndBrakes(int ticks)
 {
+    updateWeight();
     updateNitro(ticks);
     float engine_power = getActualWheelForce();
 
@@ -2542,7 +2549,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     {
         // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
-        if(m_bounce_back_ticks>0.0f)
+        if (m_bounce_back_ticks > 0)
             engine_power = 0.0f;
         // let a player going backwards accelerate quickly (e.g. if a player
         // hits a wall, he needs to be able to start again quickly after
@@ -2936,6 +2943,8 @@ void Kart::updateGraphics(float dt)
         m_emitters[i]->setPosition(getXYZ());
     m_skid_sound->setPosition(getXYZ());
     m_nitro_sound->setPosition(getXYZ());
+
+    m_attachment->updateGraphics(dt);
 
     // update star effect (call will do nothing if stars are not activated)
     m_stars_effect->update(dt);

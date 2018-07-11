@@ -214,6 +214,8 @@ protected:
 
     float           m_falling_time;
 
+    float           m_weight;
+
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     int           m_view_blocked_by_plunger;
@@ -265,7 +267,7 @@ protected:
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
-
+    void          updateWeight();
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
@@ -276,7 +278,6 @@ public:
     virtual void   kartIsInRestNow() OVERRIDE;
     virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
-    virtual void   updateWeight     () OVERRIDE;
     virtual float  getSpeedForTurnRadius(float radius) const OVERRIDE;
     virtual float  getMaxSteerAngle(float speed) const;
     virtual bool   isInRest         () const OVERRIDE;
