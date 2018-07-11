@@ -994,6 +994,11 @@ void World::updateGraphics(float dt)
         Camera::getCamera(i)->update(dt);
     PROFILER_POP_CPU_MARKER();
 
+    Scripting::ScriptEngine *script_engine =
+        Scripting::ScriptEngine::getInstance();
+    if (script_engine)
+        script_engine->update(dt);
+
     projectile_manager->updateGraphics(dt);
     Track::getCurrentTrack()->updateGraphics(dt);
 }   // updateGraphics
@@ -1044,14 +1049,6 @@ void World::update(int ticks)
     PROFILER_POP_CPU_MARKER();
 
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
-    if (!RewindManager::get()->isRewinding())
-    {
-        Scripting::ScriptEngine *script_engine =
-            Scripting::ScriptEngine::getInstance();
-        if (script_engine)
-            script_engine->update(ticks);
-    }
-
     Physics::getInstance()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
