@@ -427,6 +427,7 @@ void ServersManager::updateBroadcastAddresses()
             addAllBroadcastAddresses(ta, u);
         }
     }
+    freeifaddrs(addresses);
 #endif
 }   // updateBroadcastAddresses
 
