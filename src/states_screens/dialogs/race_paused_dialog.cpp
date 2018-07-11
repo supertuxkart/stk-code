@@ -95,8 +95,12 @@ void RacePausedDialog::loadedFromFile()
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
+#ifdef DEBUG
         const bool success = choice_ribbon->deleteChild("restart");
         assert(success);
+#else
+        choice_ribbon->deleteChild("restart");
+#endif
     }
     // Remove "endrace" button for types not (yet?) implemented
     // Also don't show it unless the race has started. Prevents finishing in
@@ -230,6 +234,20 @@ void RacePausedDialog::beforeAddingWidgets()
     int index = choice_ribbon->findItemNamed("newrace");
     if (index != -1)
         choice_ribbon->setItemVisible(index, !showSetupNewRace);
+
+    // Disable in game menu to avoid timer desync if not racing in network
+    // game
+    if (NetworkConfig::get()->isNetworking() &&
+        World::getWorld()->getPhase() != WorldStatus::RACE_PHASE)
+    {
+        index = choice_ribbon->findItemNamed("help");
+        if (index != -1)
+            choice_ribbon->setItemVisible(index, false);
+        index = choice_ribbon->findItemNamed("options");
+        if (index != -1)
+            choice_ribbon->setItemVisible(index, false);
+    }
+
 }
 
 // ----------------------------------------------------------------------------
