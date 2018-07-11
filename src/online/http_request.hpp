@@ -73,6 +73,8 @@ namespace Online
 
         static std::string m_cert_location;
     protected:
+        bool m_disable_sending_log;
+
         virtual void prepareOperation() OVERRIDE;
         virtual void operation() OVERRIDE;
         virtual void afterOperation() OVERRIDE;

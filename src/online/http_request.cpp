@@ -100,6 +100,7 @@ namespace Online
             m_cert_location =
                 file_manager->getAsset("addons.supertuxkart.net.pem");
         }
+        m_disable_sending_log = false;
     }   // init
 
     // ------------------------------------------------------------------------
@@ -239,11 +240,11 @@ namespace Online
             m_parameters.erase(m_parameters.size()-1);
         }
 
-        if (m_parameters.size() == 0)
+        if (m_parameters.size() == 0 && !m_disable_sending_log)
         {
             Log::info("HTTPRequest", "Downloading %s", m_url.c_str());
         }
-        else if (Log::getLogLevel() <= Log::LL_INFO)
+        else if (Log::getLogLevel() <= Log::LL_INFO && !m_disable_sending_log)
         {
             // Avoid printing the password or token, just replace them with *s
             std::string param = m_parameters;
