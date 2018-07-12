@@ -23,10 +23,11 @@
 /** Constructor. It will add this object to the list of all rewindable
  *  objects in the rewind manager.
  */
-Rewinder::Rewinder(bool can_be_destroyed) 
+Rewinder::Rewinder(bool can_be_destroyed, bool auto_add)
 {
-	m_can_be_destroyed = can_be_destroyed;
-	RewindManager::get()->addRewinder(this);
+    m_can_be_destroyed = can_be_destroyed;
+    if (auto_add)
+        add();
 }   // Rewinder
 
 // ----------------------------------------------------------------------------
@@ -35,3 +36,9 @@ Rewinder::Rewinder(bool can_be_destroyed)
 Rewinder::~Rewinder()
 {
 }   // ~Rewinder
+
+// ----------------------------------------------------------------------------
+void Rewinder::add()
+{
+    RewindManager::get()->addRewinder(this);
+}   // Rewinder

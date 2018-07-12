@@ -28,6 +28,7 @@
 #include "io/xml_node.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "network/network_string.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
@@ -134,6 +135,7 @@ PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
 PhysicalObject::PhysicalObject(bool is_dynamic,
                                const PhysicalObject::Settings& settings,
                                TrackObject* object)
+              : Rewinder(false/*can_be_destroyed*/, false/*auto_add*/)
 {
     m_shape              = NULL;
     m_body               = NULL;
@@ -166,6 +168,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_current_transform.setOrigin(Vec3());
     m_current_transform.setRotation(
         btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+    m_previous_transform = m_current_transform;
 
     m_body_added = false;
 
@@ -773,5 +776,53 @@ void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 }   // hit
 
 // ----------------------------------------------------------------------------
-/* EOF */
+void PhysicalObject::addForRewind()
+{
+    Rewinder::add();
+}   // addForRewind
 
+// ----------------------------------------------------------------------------
+void PhysicalObject::saveTransform()
+{
+}   // saveTransform
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::computeError()
+{
+}   // computeError
+
+// ----------------------------------------------------------------------------
+BareNetworkString* PhysicalObject::saveState()
+{
+    BareNetworkString *buffer = new BareNetworkString();
+    buffer->add(m_current_transform.getOrigin());
+    buffer->add(m_current_transform.getRotation());
+    buffer->add(m_body->getLinearVelocity());
+    buffer->add(m_body->getAngularVelocity());
+    return buffer;
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::restoreState(BareNetworkString *buffer, int count)
+{
+    btTransform t;
+    t.setOrigin(buffer->getVec3());
+    t.setRotation(buffer->getQuat());
+    m_body->setLinearVelocity(buffer->getVec3());
+    m_body->setAngularVelocity(buffer->getVec3());
+    m_body->proceedToTransform(t);
+}   // restoreState
+
+// ----------------------------------------------------------------------------
+std::function<void()> PhysicalObject::getLocalStateRestoreFunction()
+{
+    btTransform t = m_current_transform;
+    Vec3 lv = m_body->getLinearVelocity();
+    Vec3 av = m_body->getAngularVelocity();
+    return [t, lv, av, this]()
+    {
+        m_body->setLinearVelocity(lv);
+        m_body->setAngularVelocity(av);
+        m_body->proceedToTransform(t);
+    };
+}   // getLocalStateRestoreFunction

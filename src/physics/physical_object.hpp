@@ -23,6 +23,7 @@
 
 #include "btBulletDynamicsCommon.h"
 
+#include "network/rewinder.hpp"
 #include "physics/user_pointer.hpp"
 #include "utils/vec3.hpp"
 #include "utils/leak_check.hpp"
@@ -35,7 +36,7 @@ class XMLNode;
 /**
   * \ingroup physics
   */
-class PhysicalObject
+class PhysicalObject : public Rewinder
 {
 public:
     /** The supported collision shapes. */
@@ -140,6 +141,8 @@ private:
     /** Save current transform to avoid frequent lookup from 
      * world transform. */
     btTransform           m_current_transform;
+
+    btTransform           m_previous_transform;
 
     /** The mesh might not have the same center as bullet does. This
      *  offset is used to offset the location of the graphical mesh
@@ -269,6 +272,15 @@ public:
     /** @} */
     /** @} */
 
+    void addForRewind();
+    virtual void saveTransform();
+    virtual void computeError();
+    virtual BareNetworkString* saveState();
+    virtual void undoEvent(BareNetworkString *buffer) {}
+    virtual void rewindToEvent(BareNetworkString *buffer) {}
+    virtual void restoreState(BareNetworkString *buffer, int count);
+    virtual void undoState(BareNetworkString *buffer) {}
+    virtual std::function<void()> getLocalStateRestoreFunction();
     LEAK_CHECK()
 };  // PhysicalObject
 

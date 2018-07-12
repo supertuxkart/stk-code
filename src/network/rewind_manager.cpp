@@ -27,8 +27,6 @@
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
@@ -292,8 +290,6 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
 void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 {
     assert(!m_is_rewinding);
-    // TODO Do it properly for track objects like soccer ball
-    Track::getCurrentTrack()->getTrackObjectManager()->removeForRewind();
     bool is_history = history->replayHistory();
     history->setReplayHistory(false);
 
@@ -385,6 +381,5 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }
 
     history->setReplayHistory(is_history);
-    Track::getCurrentTrack()->getTrackObjectManager()->addForRewind();
     m_is_rewinding = false;
 }   // rewindTo

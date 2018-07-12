@@ -25,6 +25,8 @@ class BareNetworkString;
 
 class Rewinder
 {
+protected:
+    void add();
 private:
     /** True if this object can be destroyed, i.e. if this object is a 'stand
      *  alone' (i.e. not used in inheritance). If the object is used in
@@ -34,7 +36,7 @@ private:
     bool m_can_be_destroyed;
 
 public:
- 	        Rewinder(bool can_be_destroyed);
+             Rewinder(bool can_be_destroyed, bool auto_add = true);
     virtual ~Rewinder();
 
     /** Called before a rewind. Is used to save the previous position of an
@@ -58,30 +60,30 @@ public:
      */
     virtual void undoEvent(BareNetworkString *buffer) = 0;
 
-    /** Called when an event needs to be replayed. This is called during 
+    /** Called when an event needs to be replayed. This is called during
      *  rewind, i.e. when going forward in time again.
      */
     virtual void rewindToEvent(BareNetworkString *buffer) = 0;
 
-    /** Called when a state needs to be replayed. This is called during 
+    /** Called when a state needs to be replayed. This is called during
      *  rewind, i.e. when going forward in time again, and only for confirmed
      *  states.
      */
     virtual void restoreState(BareNetworkString *buffer, int count) = 0;
 
-   /** Undo the effects of the given state, but do not rewind to that 
-    *  state (which is done by rewindTo). This is called while going
-    *  backwards for rewinding - all stored events will get an 'undo' call.
-    */
-   virtual void undoState(BareNetworkString *buffer) = 0;
+    /** Undo the effects of the given state, but do not rewind to that
+     *  state (which is done by rewindTo). This is called while going
+     *  backwards for rewinding - all stored events will get an 'undo' call.
+     */
+    virtual void undoState(BareNetworkString *buffer) = 0;
 
-   // -------------------------------------------------------------------------
-   /** Nothing to do here. */
-   virtual void reset() {};
-   // -------------------------------------------------------------------------
-   /** True if this rewinder can be destroyed. Karts can not be destroyed,
-    *  cakes can. This is used by the RewindManager in reset. */
-   bool canBeDestroyed() const { return m_can_be_destroyed; }
+    // -------------------------------------------------------------------------
+    /** Nothing to do here. */
+    virtual void reset() {}
+    // -------------------------------------------------------------------------
+    /** True if this rewinder can be destroyed. Karts can not be destroyed,
+     *  cakes can. This is used by the RewindManager in reset. */
+    bool canBeDestroyed() const { return m_can_be_destroyed; }
     // -------------------------------------------------------------------------
     virtual std::function<void()> getLocalStateRestoreFunction()
                                                             { return nullptr; }
