@@ -23,7 +23,8 @@
 /** Constructor. It will add this object to the list of all rewindable
  *  objects in the rewind manager.
  */
-Rewinder::Rewinder(bool can_be_destroyed, bool auto_add)
+Rewinder::Rewinder(const std::string& ui, bool can_be_destroyed, bool auto_add)
+        : m_unique_identity(ui)
 {
     m_can_be_destroyed = can_be_destroyed;
     if (auto_add)

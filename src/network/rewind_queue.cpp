@@ -417,7 +417,7 @@ void RewindQueue::unitTesting()
         virtual void rewind(BareNetworkString *s) {}
         virtual void saveTransform() {}
         virtual void computeError() {}
-        DummyRewinder() : Rewinder(true) {}
+        DummyRewinder() : Rewinder("", true) {}
     };
     DummyRewinder *dummy_rewinder = new DummyRewinder();
 

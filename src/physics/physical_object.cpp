@@ -135,7 +135,10 @@ PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
 PhysicalObject::PhysicalObject(bool is_dynamic,
                                const PhysicalObject::Settings& settings,
                                TrackObject* object)
-              : Rewinder(false/*can_be_destroyed*/, false/*auto_add*/)
+              : Rewinder(settings.m_id +
+                (object->getParentLibrary() ?
+                object->getParentLibrary()->getID() : "") ,
+                false/*can_be_destroyed*/, false/*auto_add*/)
 {
     m_shape              = NULL;
     m_body               = NULL;

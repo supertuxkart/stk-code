@@ -214,11 +214,8 @@ void RewindManager::update(int ticks_not_used)
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
-    // Clients don't save state, so they just exit.
     if (ticks - m_last_saved_state < m_state_frequency)
-    {
         return;
-    }
 
     // Save state
     if (NetworkConfig::get()->isClient())

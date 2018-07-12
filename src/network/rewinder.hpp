@@ -19,6 +19,7 @@
 #ifndef HEADER_REWINDER_HPP
 #define HEADER_REWINDER_HPP
 
+#include <string>
 #include <functional>
 
 class BareNetworkString;
@@ -28,6 +29,8 @@ class Rewinder
 protected:
     void add();
 private:
+    const std::string m_unique_identity;
+
     /** True if this object can be destroyed, i.e. if this object is a 'stand
      *  alone' (i.e. not used in inheritance). If the object is used in
      *  inheritance (e.g. KartRewinder, which is a Rewinder and Kart), then
@@ -36,7 +39,8 @@ private:
     bool m_can_be_destroyed;
 
 public:
-             Rewinder(bool can_be_destroyed, bool auto_add = true);
+             Rewinder(const std::string& ui, bool can_be_destroyed,
+                      bool auto_add = true);
     virtual ~Rewinder();
 
     /** Called before a rewind. Is used to save the previous position of an
@@ -86,7 +90,9 @@ public:
     bool canBeDestroyed() const { return m_can_be_destroyed; }
     // -------------------------------------------------------------------------
     virtual std::function<void()> getLocalStateRestoreFunction()
-                                                            { return nullptr; }
+                                                             { return nullptr; }
+    // -------------------------------------------------------------------------
+    const std::string& getUniqueIdentity() const   { return m_unique_identity; }
 };   // Rewinder
 #endif
 
