@@ -1550,7 +1550,6 @@ void Track::update(int ticks)
         m_startup_run = true;
     }
     float dt = stk_config->ticks2Time(ticks);
-    m_track_object_manager->update(dt);
     CheckManager::get()->update(dt);
     ItemManager::get()->update(ticks);
 

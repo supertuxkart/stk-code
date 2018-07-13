@@ -95,13 +95,16 @@ void KartRewinder::computeError()
 // ----------------------------------------------------------------------------
 /** Saves all state information for a kart in a memory buffer. The memory
  *  is allocated here and the address returned. It will then be managed
- *  by the RewindManager. The size is used to keep track of memory usage
- *  for rewinding.
- *  \param[out] buffer  Address of the memory buffer.
- *  \returns    Size of allocated memory, or -1 in case of an error.
+ *  by the RewindManager.
+ *  \param[out] ru The unique identity of rewinder writing to.
+ *  \return The address of the memory buffer with the state.
  */
-BareNetworkString* KartRewinder::saveState()
+BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 {
+    if (m_eliminated)
+        return nullptr;
+
+    ru->push_back(getUniqueIdentity());
     const int MEMSIZE = 17*sizeof(float) + 9+3;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
@@ -230,6 +233,9 @@ void KartRewinder::rewindToEvent(BareNetworkString *buffer)
 // ----------------------------------------------------------------------------
 std::function<void()> KartRewinder::getLocalStateRestoreFunction()
 {
+    if (m_eliminated)
+        return nullptr;
+
     // In theory all ticks / boolean related stuff can be saved locally
     int bubblegum_ticks = m_bubblegum_ticks;
     int bounce_back_ticks = m_bounce_back_ticks;

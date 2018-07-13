@@ -19,8 +19,9 @@
 #ifndef HEADER_REWINDER_HPP
 #define HEADER_REWINDER_HPP
 
-#include <string>
 #include <functional>
+#include <string>
+#include <vector>
 
 class BareNetworkString;
 
@@ -54,10 +55,10 @@ public:
 
     /** Provides a copy of the state of the object in one memory buffer.
      *  The memory is managed by the RewindManager.
-     *  \param[out] buffer The address of the memory buffer with the state.
-     *  \return Size of the buffer, or -1 in case of an error.
+     *  \param[out] ru The unique identity of rewinder writing to.
+     *  \return The address of the memory buffer with the state.
      */
-    virtual BareNetworkString* saveState() = 0;
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru) = 0;
 
     /** Called when an event needs to be undone. This is called while going
      *  backwards for rewinding - all stored events will get an 'undo' call.

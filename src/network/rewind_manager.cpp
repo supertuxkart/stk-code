@@ -82,16 +82,15 @@ void RewindManager::reset()
 
     if (!m_enable_rewind_manager) return;
 
-    AllRewinder::iterator r = m_all_rewinder.begin();
-    while (r != m_all_rewinder.end())
+    for (auto it = m_all_rewinder.begin(); it != m_all_rewinder.end();)
     {
-        if (!(*r)->canBeDestroyed())
+        if (!it->second->canBeDestroyed())
         {
-            r++;
+            it++;
             continue;
         }
-        Rewinder *rewinder = *r;
-        r = m_all_rewinder.erase(r);
+        Rewinder* rewinder = it->second;
+        it = m_all_rewinder.erase(it);
         delete rewinder;
     }
 
@@ -150,53 +149,34 @@ void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
-/** Saves a local state using the GameProtocol function to combine several
- *  independent rewinders to write one state. Typically only the server needs
- *  to save a state (which is then send to the clients), except that each
- *  client needs one initial state (in case that it receives an event from
- *  a client before a state from the serer).
- *  \param allow_local_save Do a local save.
+/** Saves a state using the GameProtocol function to combine several
+ *  independent rewinders to write one state.
  */
-void RewindManager::saveState(bool local_save)
+void RewindManager::saveState()
 {
     PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
     auto gp = GameProtocol::lock();
     if (!gp)
         return;
-    gp->startNewState(local_save);
-    AllRewinder::const_iterator rewinder;
-    for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
+    gp->startNewState();
+
+    m_overall_state_size = 0;
+    std::vector<std::string> rewinder_using;
+    for (auto& p : m_all_rewinder)
     {
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
-        BareNetworkString *buffer = (*rewinder)->saveState();
-        if (buffer)
+        BareNetworkString* buffer = p.second->saveState(&rewinder_using);
+        if (buffer != NULL)
         {
             m_overall_state_size += buffer->size();
             gp->addState(buffer);
-        }   // size >= 0
+        }
         delete buffer;    // buffer can be freed
     }
+    gp->finalizeState(m_current_rewinder_using, rewinder_using);
     PROFILER_POP_CPU_MARKER();
 }   // saveState
-
-// ----------------------------------------------------------------------------
-/** Restores a given state by calling rewindToState for each available rewinder
- *  with its correct data.
- *  \param data The data string used to store the whole game state.
- *
- */
-void RewindManager::restoreState(BareNetworkString *data)
-{
-    data->reset();   
-    
-    for (auto rewinder  = m_all_rewinder.begin(); 
-              rewinder != m_all_rewinder.end();   ++rewinder)
-    {
-        uint16_t count = data->getUInt16();
-        (*rewinder)->restoreState(data, count);
-    }   // for all rewinder
-}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
@@ -221,12 +201,12 @@ void RewindManager::update(int ticks_not_used)
     if (NetworkConfig::get()->isClient())
     {
         auto& ret = m_local_state[ticks];
-        for (Rewinder* r : m_all_rewinder)
-            ret[r] = r->getLocalStateRestoreFunction();
+        for (auto& p : m_all_rewinder)
+            ret.push_back(p.second->getLocalStateRestoreFunction());
     }
     else
     {
-        saveState(/**allow_local_save*/false);
+        saveState();
         PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
         if (auto gp = GameProtocol::lock())
             gp->sendState();
@@ -293,12 +273,8 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // First save all current transforms so that the error
     // can be computed between the transforms before and after
     // the rewind.
-    AllRewinder::iterator rewinder;
-    for (rewinder = m_all_rewinder.begin();
-        rewinder != m_all_rewinder.end(); ++rewinder)
-    {
-        (*rewinder)->saveTransform();
-    }
+    for (auto& p : m_all_rewinder)
+        p.second->saveTransform();
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
@@ -327,10 +303,10 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     auto it = m_local_state.find(exact_rewind_ticks);
     if (it != m_local_state.end())
     {
-        for (auto& local_state : it->second)
+        for (auto& restore_local_state : it->second)
         {
-            if (local_state.second)
-                local_state.second();
+            if (restore_local_state)
+                restore_local_state();
         }
         for (auto it = m_local_state.begin(); it != m_local_state.end();)
         {
@@ -356,7 +332,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }
 
     // Now go forward through the list of rewind infos till we reach 'now':
-    while(world->getTimeTicks() < now_ticks )
+    while (world->getTimeTicks() < now_ticks)
     { 
         m_rewind_queue.replayAllEvents(world->getTimeTicks());
 
@@ -371,11 +347,8 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }   // while (world->getTicks() < current_ticks)
 
     // Now compute the errors which need to be visually smoothed
-    for (rewinder = m_all_rewinder.begin();
-        rewinder != m_all_rewinder.end(); ++rewinder)
-    {
-        (*rewinder)->computeError();
-    }
+    for (auto& p : m_all_rewinder)
+        p.second->computeError();
 
     history->setReplayHistory(is_history);
     m_is_rewinding = false;

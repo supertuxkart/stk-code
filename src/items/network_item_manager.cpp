@@ -197,8 +197,9 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
  *  to save the initial state, which is the first confirmed state by all
  *  clients.
  */
-BareNetworkString* NetworkItemManager::saveState()
+BareNetworkString* NetworkItemManager::saveState(std::vector<std::string>* ru)
 {
+    ru->push_back(getUniqueIdentity());
     // On the server:
     // ==============
     m_item_events.lock();

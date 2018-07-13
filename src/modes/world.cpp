@@ -69,6 +69,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/profiler.hpp"
 #include "utils/translation.hpp"
@@ -1029,6 +1030,10 @@ void World::update(int ticks)
     PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("World::update (RewindManager)", 0x20, 0x7F, 0x40);
     RewindManager::get()->update(ticks);
+    PROFILER_POP_CPU_MARKER();
+
+    PROFILER_PUSH_CPU_MARKER("World::update (Track object manager)", 0x20, 0x7F, 0x40);
+    Track::getCurrentTrack()->getTrackObjectManager()->update(stk_config->ticks2Time(ticks));
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);

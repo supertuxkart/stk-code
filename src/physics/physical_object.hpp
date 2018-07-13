@@ -142,8 +142,6 @@ private:
      * world transform. */
     btTransform           m_current_transform;
 
-    btTransform           m_previous_transform;
-
     /** The mesh might not have the same center as bullet does. This
      *  offset is used to offset the location of the graphical mesh
      *  so that the graphics are aligned with the bullet collision shape. */
@@ -187,6 +185,11 @@ private:
 
     /** Non-null only if the shape is exact */
     TriangleMesh         *m_triangle_mesh;
+
+    btTransform           m_last_transform;
+    Vec3                  m_last_lv;
+    Vec3                  m_last_av;
+    bool                  m_no_server_state;
 
 public:
                     PhysicalObject(bool is_dynamic, const Settings& settings,
@@ -275,7 +278,7 @@ public:
     void addForRewind();
     virtual void saveTransform();
     virtual void computeError();
-    virtual BareNetworkString* saveState();
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru);
     virtual void undoEvent(BareNetworkString *buffer) {}
     virtual void rewindToEvent(BareNetworkString *buffer) {}
     virtual void restoreState(BareNetworkString *buffer, int count);

@@ -82,9 +82,9 @@ void GameSetup::loadWorld()
     if (PlayerManager::getCurrentPlayer())
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
-    race_manager->setReverseTrack(m_reverse);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
+        race_manager->setReverseTrack(false);
         if (isSoccerGoalTarget())
             race_manager->setMaxGoal(m_laps);
         else
@@ -92,6 +92,7 @@ void GameSetup::loadWorld()
     }
     else
     {
+        race_manager->setReverseTrack(m_reverse);
         race_manager->startSingleRace(m_tracks.back(), m_laps,
             false/*from_overworld*/);
     }

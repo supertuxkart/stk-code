@@ -408,7 +408,8 @@ void RewindQueue::unitTesting()
     class DummyRewinder : public Rewinder, public EventRewinder
     {
     public:
-        BareNetworkString* saveState() { return NULL; }
+        BareNetworkString* saveState(std::vector<std::string>* ru)
+            { return NULL; }
         virtual void undoEvent(BareNetworkString *s) {}
         virtual void rewindToEvent(BareNetworkString *s) {}
         virtual void restoreState(BareNetworkString *s, int count) {}
@@ -417,7 +418,7 @@ void RewindQueue::unitTesting()
         virtual void rewind(BareNetworkString *s) {}
         virtual void saveTransform() {}
         virtual void computeError() {}
-        DummyRewinder() : Rewinder("", true) {}
+        DummyRewinder() : Rewinder("dummy_rewinder", true) {}
     };
     DummyRewinder *dummy_rewinder = new DummyRewinder();
 

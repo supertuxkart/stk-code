@@ -29,6 +29,7 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "network/network_string.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
@@ -171,7 +172,9 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_current_transform.setOrigin(Vec3());
     m_current_transform.setRotation(
         btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
-    m_previous_transform = m_current_transform;
+
+    m_last_transform = m_current_transform;
+    m_no_server_state = false;
 
     m_body_added = false;
 
@@ -638,7 +641,7 @@ void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
 
-    m_motion_state->getWorldTransform(m_current_transform);
+    m_current_transform = m_body->getWorldTransform();
 
     const Vec3 &xyz = m_current_transform.getOrigin();
     if(m_reset_when_too_low && xyz.getY()<m_reset_height)
@@ -687,6 +690,9 @@ void PhysicalObject::reset()
     m_body->setAngularVelocity(btVector3(0,0,0));
     m_body->setLinearVelocity(btVector3(0,0,0));
     m_body->activate();
+
+    m_last_transform = m_init_pos;
+    m_last_lv = m_last_av = Vec3(0.0f);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -787,6 +793,7 @@ void PhysicalObject::addForRewind()
 // ----------------------------------------------------------------------------
 void PhysicalObject::saveTransform()
 {
+    m_no_server_state = true;
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
@@ -795,37 +802,72 @@ void PhysicalObject::computeError()
 }   // computeError
 
 // ----------------------------------------------------------------------------
-BareNetworkString* PhysicalObject::saveState()
+BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 {
+    btTransform cur_transform = m_body->getWorldTransform();
+    if ((cur_transform.getOrigin() - m_last_transform.getOrigin())
+        .length() == 0.0f &&
+        m_body->getLinearVelocity() == m_last_lv &&
+        m_body->getLinearVelocity() == m_last_av)
+        return nullptr;
+
+    ru->push_back(getUniqueIdentity());
     BareNetworkString *buffer = new BareNetworkString();
-    buffer->add(m_current_transform.getOrigin());
-    buffer->add(m_current_transform.getRotation());
-    buffer->add(m_body->getLinearVelocity());
-    buffer->add(m_body->getAngularVelocity());
+    m_last_transform = cur_transform;
+    m_last_lv = m_body->getLinearVelocity();
+    m_last_av = m_body->getAngularVelocity();
+    buffer->add(m_last_transform.getOrigin());
+    buffer->add(m_last_transform.getRotation());
+    buffer->add(m_last_lv);
+    buffer->add(m_last_av);
     return buffer;
 }   // saveState
 
 // ----------------------------------------------------------------------------
 void PhysicalObject::restoreState(BareNetworkString *buffer, int count)
 {
-    btTransform t;
-    t.setOrigin(buffer->getVec3());
-    t.setRotation(buffer->getQuat());
-    m_body->setLinearVelocity(buffer->getVec3());
-    m_body->setAngularVelocity(buffer->getVec3());
-    m_body->proceedToTransform(t);
+    m_no_server_state = false;
+    m_last_transform.setOrigin(buffer->getVec3());
+    m_last_transform.setRotation(buffer->getQuat());
+    m_last_lv = buffer->getVec3();
+    m_last_av = buffer->getVec3();
+
+    m_body->setWorldTransform(m_last_transform);
+    m_motion_state->setWorldTransform(m_last_transform);
+    m_body->setInterpolationWorldTransform(m_last_transform);
+    m_body->setLinearVelocity(m_last_lv);
+    m_body->setAngularVelocity(m_last_av);
+    m_body->setInterpolationLinearVelocity(m_last_lv);
+    m_body->setInterpolationAngularVelocity(m_last_av);
 }   // restoreState
 
 // ----------------------------------------------------------------------------
 std::function<void()> PhysicalObject::getLocalStateRestoreFunction()
 {
-    btTransform t = m_current_transform;
+    btTransform t = m_body->getWorldTransform();
     Vec3 lv = m_body->getLinearVelocity();
     Vec3 av = m_body->getAngularVelocity();
     return [t, lv, av, this]()
     {
-        m_body->setLinearVelocity(lv);
-        m_body->setAngularVelocity(av);
-        m_body->proceedToTransform(t);
+        if (m_no_server_state)
+        {
+            m_body->setWorldTransform(m_last_transform);
+            m_motion_state->setWorldTransform(m_last_transform);
+            m_body->setInterpolationWorldTransform(m_last_transform);
+            m_body->setLinearVelocity(m_last_lv);
+            m_body->setAngularVelocity(m_last_av);
+            m_body->setInterpolationLinearVelocity(m_last_lv);
+            m_body->setInterpolationAngularVelocity(m_last_av);
+        }
+        else
+        {
+            m_body->setWorldTransform(t);
+            m_motion_state->setWorldTransform(t);
+            m_body->setInterpolationWorldTransform(t);
+            m_body->setLinearVelocity(lv);
+            m_body->setAngularVelocity(av);
+            m_body->setInterpolationLinearVelocity(lv);
+            m_body->setInterpolationAngularVelocity(av);
+        }
     };
 }   // getLocalStateRestoreFunction

@@ -91,6 +91,8 @@ public:
 class RewindInfoState: public RewindInfo
 {
 private:
+    std::vector<std::string> m_rewinder_using;
+
     /** Pointer to the buffer which stores all states. */
     BareNetworkString *m_buffer;
 public:

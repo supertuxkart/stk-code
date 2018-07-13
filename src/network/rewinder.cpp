@@ -26,6 +26,7 @@
 Rewinder::Rewinder(const std::string& ui, bool can_be_destroyed, bool auto_add)
         : m_unique_identity(ui)
 {
+    assert(!m_unique_identity.empty() && m_unique_identity.size() < 255);
     m_can_be_destroyed = can_be_destroyed;
     if (auto_add)
         add();

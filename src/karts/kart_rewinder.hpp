@@ -44,7 +44,8 @@ public:
     ~KartRewinder() {}
     virtual void saveTransform() OVERRIDE;
     virtual void computeError() OVERRIDE;
-    virtual BareNetworkString* saveState() OVERRIDE;
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
     void reset() OVERRIDE;
     virtual void restoreState(BareNetworkString *p, int count) OVERRIDE;
     virtual void rewindToEvent(BareNetworkString *p) OVERRIDE;

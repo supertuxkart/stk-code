@@ -49,6 +49,7 @@ RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
                                  bool is_confirmed)
     : RewindInfo(ticks, is_confirmed)
 {
+    m_rewinder_using = RewindManager::get()->getRewinderUsing();
     m_buffer = buffer;
 }   // RewindInfoState
 
@@ -59,8 +60,21 @@ RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
  */
 void RewindInfoState::restore()
 {
-    RewindManager::get()->restoreState(m_buffer);
-}   // rewind
+    m_buffer->reset();
+    for (const std::string& name : m_rewinder_using)
+    {
+        uint16_t count = m_buffer->getUInt16();
+        Rewinder* r = RewindManager::get()->getRewinder(name);
+        if (r == NULL)
+        {
+            Log::error("RewindInfoState", "Missing rewinder %s",
+                name.c_str());
+            m_buffer->skip(count);
+            continue;
+        }
+        r->restoreState(m_buffer, count);
+    }   // for all rewinder
+}   // restore
 
 // ============================================================================
 RewindInfoEvent::RewindInfoEvent(int ticks, EventRewinder *event_rewinder,
