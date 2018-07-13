@@ -56,6 +56,7 @@ void KartRewinder::reset()
     Rewinder::reset();
     SmoothNetworkBody::setEnable(true);
     SmoothNetworkBody::setSmoothRotation(true);
+    SmoothNetworkBody::setAdjustVerticalOffset(true);
 }   // reset
 
 // ----------------------------------------------------------------------------

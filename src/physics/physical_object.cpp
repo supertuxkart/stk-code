@@ -790,6 +790,7 @@ void PhysicalObject::addForRewind()
 {
     SmoothNetworkBody::setEnable(true);
     SmoothNetworkBody::setSmoothRotation(false);
+    SmoothNetworkBody::setAdjustVerticalOffset(false);
     Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
         (Track::getCurrentTrack()->getPhysicalObjectUID()));
     Rewinder::add();

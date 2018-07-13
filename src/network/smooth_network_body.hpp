@@ -56,12 +56,15 @@ private:
 
     bool m_smooth_rotation;
 
+    bool m_adjust_vertical_offset;
+
 public:
     SmoothNetworkBody(bool enable = false)
     {
         reset();
         m_enabled = enable;
         m_smooth_rotation = true;
+        m_adjust_vertical_offset = true;
     }
     // ------------------------------------------------------------------------
     void reset()
@@ -78,6 +81,8 @@ public:
     void setEnable(bool val)                               { m_enabled = val; }
     // ------------------------------------------------------------------------
     void setSmoothRotation(bool val)               { m_smooth_rotation = val; }
+    // ------------------------------------------------------------------------
+    void setAdjustVerticalOffset(bool val)  { m_adjust_vertical_offset = val; }
     // ------------------------------------------------------------------------
     void prepareSmoothing(const btTransform& current_transform,
                           const Vec3& current_velocity);

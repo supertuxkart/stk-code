@@ -159,7 +159,7 @@ void SmoothNetworkBody::updateSmoothedGraphics(
     m_smoothed_transform.setOrigin(cur_xyz);
     m_smoothed_transform.setRotation(cur_rot);
 
-    if (m_smoothing != SS_NONE)
+    if (m_adjust_vertical_offset && m_smoothing != SS_NONE)
     {
         Vec3 lc = current_transform.inverse()(cur_xyz);
         // Adjust vertical position for up/down-sloping
