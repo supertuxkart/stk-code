@@ -154,7 +154,7 @@ public:
     virtual void terminateRace();
     void         setTime(const float time);
     void         setTicks(int ticks);
-
+    void         setTicksForRewind(int ticks);
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
     bool     isStartPhase() const  { return m_phase<GO_PHASE;               }

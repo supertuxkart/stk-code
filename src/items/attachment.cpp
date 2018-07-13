@@ -345,7 +345,7 @@ void Attachment::hitBanana(ItemState *item_state)
     // Use this as a basic random number to make sync with server easier.
     // Divide by 16 to increase probablity to have same time as server in
     // case of a few physics frames different between client and server.
-    int ticks = World::getWorld()->getTimeTicks() / 16;
+    int ticks = World::getWorld()->getTicksSinceStart() / 16;
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:

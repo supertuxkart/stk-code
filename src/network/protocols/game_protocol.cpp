@@ -136,7 +136,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     a.m_value   = value;
     a.m_value_l = val_l;
     a.m_value_r = val_r;
-    a.m_ticks   = World::getWorld()->getTimeTicks();
+    a.m_ticks   = World::getWorld()->getTicksSinceStart();
 
     m_all_actions.push_back(a);
 
@@ -147,7 +147,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
                         .addUInt32(val_l).addUInt32(val_r);
 
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
-                                   World::getWorld()->getTimeTicks() );
+                                   World::getWorld()->getTicksSinceStart());
 }   // controllerAction
 
 // ----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ void GameProtocol::handleControllerAction(Event *event)
             rewind_delta += max_adjustment;
             Log::info("GameProtocol", "At %d %f %d requesting time adjust"
                 " (speed up) of %d for host %d",
-                World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
+                World::getWorld()->getTicksSinceStart(), StkTime::getRealTime(),
                 not_rewound, rewind_delta, event->getPeer()->getHostId());
             // This message from a client triggered a rewind in the server.
             // To avoid this, signal to the client that it should speed up.
@@ -228,7 +228,7 @@ void GameProtocol::handleControllerAction(Event *event)
             const int adjustment = ticks_difference - cur_diff;
             Log::info("GameProtocol", "At %d %f %d requesting time adjust"
                 " (slow down) of %d for host %d",
-                World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
+                World::getWorld()->getTicksSinceStart(), StkTime::getRealTime(),
                 not_rewound, adjustment, event->getPeer()->getHostId());
             adjustTimeForClient(event->getPeer(), adjustment);
         }*/
@@ -310,7 +310,7 @@ void GameProtocol::startNewState()
     assert(NetworkConfig::get()->isServer());
     m_data_to_send->clear();
     m_data_to_send->addUInt8(GP_STATE)
-        .addUInt32(World::getWorld()->getTimeTicks());
+        .addUInt32(World::getWorld()->getTicksSinceStart());
 }   // startNewState
 
 // ----------------------------------------------------------------------------

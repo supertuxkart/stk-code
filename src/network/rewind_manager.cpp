@@ -116,7 +116,7 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
     }
 
     if (ticks < 0)
-        ticks = World::getWorld()->getTimeTicks();
+        ticks = World::getWorld()->getTicksSinceStart();
     m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, ticks);
 }   // addEvent
 
@@ -190,7 +190,7 @@ void RewindManager::update(int ticks_not_used)
         m_all_rewinder.size() == 0 ||
         m_is_rewinding)  return;
 
-    int ticks = World::getWorld()->getTimeTicks();
+    int ticks = World::getWorld()->getTicksSinceStart();
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
@@ -237,7 +237,7 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
         PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
         rewindTo(rewind_ticks, world_ticks);
         // This should replay everything up to 'now'
-        assert(World::getWorld()->getTimeTicks() == world_ticks);
+        assert(World::getWorld()->getTicksSinceStart() == world_ticks);
         PROFILER_POP_CPU_MARKER();
         Log::setPrefix("");
     }
@@ -292,7 +292,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // world time is set first, since e.g. the NetworkItem manager relies
     // on having the access to the 'confirmed' state time using 
     // the world timer.
-    world->setTicks(exact_rewind_ticks);
+    world->setTicksForRewind(exact_rewind_ticks);
 
     // Get the (first) full state to which we have to rewind
     RewindInfo *current = m_rewind_queue.getCurrent();
@@ -332,9 +332,9 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }
 
     // Now go forward through the list of rewind infos till we reach 'now':
-    while (world->getTimeTicks() < now_ticks)
+    while (world->getTicksSinceStart() < now_ticks)
     { 
-        m_rewind_queue.replayAllEvents(world->getTimeTicks());
+        m_rewind_queue.replayAllEvents(world->getTicksSinceStart());
 
         // Now simulate the next time step
         world->updateWorld(1);

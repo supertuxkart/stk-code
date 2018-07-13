@@ -1492,7 +1492,7 @@ void Kart::update(int ticks)
         "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d heading(43) %f "
         "noderot(45) %f suslen %f",
         getIdent().c_str(),
-        World::getWorld()->getTime(), World::getWorld()->getTimeTicks(),
+        World::getWorld()->getTime(), World::getWorld()->getTicksSinceStart(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
         m_body->getWorldTransform().getOrigin().getX(),
         m_body->getWorldTransform().getOrigin().getY(),
@@ -1604,7 +1604,7 @@ void Kart::update(int ticks)
             if(UserConfigParams::m_material_debug)
             {
                 Log::info("Kart","World %d %s\tfraction %f\ttime %d.",
-                       World::getWorld()->getTimeTicks(),
+                       World::getWorld()->getTicksSinceStart(),
                        material->getTexFname().c_str(),
                        material->getMaxSpeedFraction(),
                        material->getSlowDownTicks()       );

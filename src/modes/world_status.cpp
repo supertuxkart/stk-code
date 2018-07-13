@@ -500,6 +500,23 @@ void WorldStatus::setTicks(int ticks)
 }   // setTicks
 
 //-----------------------------------------------------------------------------
+/** Sets a new time for the world time (used by rewind), measured in ticks.
+ *  \param ticks New time in ticks to set (always count upwards).
+ */
+void WorldStatus::setTicksForRewind(int ticks)
+{
+    m_count_up_ticks = ticks;
+    if (race_manager->hasTimeTarget())
+    {
+        m_time_ticks = stk_config->time2Ticks(race_manager->getTimeTarget()) -
+            m_count_up_ticks;
+    }
+    else
+        m_time_ticks = ticks;
+    m_time = stk_config->ticks2Time(m_time_ticks);
+}   // setTicksForRewind
+
+//-----------------------------------------------------------------------------
 /** Pauses the game and switches to the specified phase.
  *  \param phase Phase to switch to.
  */

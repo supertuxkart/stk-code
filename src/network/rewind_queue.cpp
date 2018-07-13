@@ -303,7 +303,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     {
         Log::verbose("rewindqueue",
                      "world %d rewindticks %d latest_confirmed %d",
-                     World::getWorld()->getTimeTicks(), *rewind_ticks,
+                     World::getWorld()->getTicksSinceStart(), *rewind_ticks,
                      m_latest_confirmed_state_time);
         *rewind_ticks = m_latest_confirmed_state_time;
         *needs_rewind = m_latest_confirmed_state_time < world_ticks;
@@ -365,7 +365,7 @@ int RewindQueue::undoUntil(int undo_ticks)
             // This shouldn't happen, but add some debug info just in case
             Log::error("undoUntil",
                        "At %d rewinding to %d current = %d = begin",
-                       World::getWorld()->getTimeTicks(), undo_ticks, 
+                       World::getWorld()->getTicksSinceStart(), undo_ticks, 
                        (*m_current)->getTicks());
         }
         m_current--;

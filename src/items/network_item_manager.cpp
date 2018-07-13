@@ -101,7 +101,7 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
     {
         // The server saves the collected item as item event info
         m_item_events.lock();
-        m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(),
+        m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
             item->getItemId(),
             kart->getWorldKartId());
         m_item_events.unlock();
@@ -136,7 +136,7 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
 
     // Server: store the data for this event:
     m_item_events.lock();
-    m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(),
+    m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
         type, item->getItemId(),
         kart->getWorldKartId(),
         kart->getXYZ());
@@ -246,7 +246,7 @@ void NetworkItemManager::forwardTime(int ticks)
 void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 {
     assert(NetworkConfig::get()->isClient());
-    // The state at World::getTimeTicks() needs to be restored. The confirmed
+    // The state at World::getTicksSinceStart() needs to be restored. The confirmed
     // state in this instance was taken at m_confirmed_state_time. First
     // forward this confirmed state to the current time (i.e. world time).
     // This is done in several steps:
@@ -332,10 +332,10 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     // Inform the server which events have been received.
     if (auto gp = GameProtocol::lock())
-        gp->sendItemEventConfirmation(World::getWorld()->getTimeTicks());
+        gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
 
     // Forward the confirmed item state till the world time:
-    int dt = World::getWorld()->getTimeTicks() - current_time;
+    int dt = World::getWorld()->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
 
     // Restore the state to the current world time:
@@ -363,6 +363,6 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }
 
     // Now we save the current local
-    m_confirmed_state_time = World::getWorld()->getTimeTicks();
+    m_confirmed_state_time = World::getWorld()->getTicksSinceStart();
 }   // restoreState
 

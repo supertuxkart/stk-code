@@ -416,7 +416,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
     // We don't do more, because it would need to be decoded from enum later
 #ifdef ITEM_DISTRIBUTION_DEBUG
     Log::verbose("Powerup", "World %d rank %d random %d %d item %d",
-                 World::getWorld()->getTimeTicks(), rank, random_number,
+                 World::getWorld()->getTicksSinceStart(), rank, random_number,
                  original_random_number, powerup);
 #endif
 

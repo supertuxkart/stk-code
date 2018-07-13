@@ -374,7 +374,7 @@ void MainLoop::run()
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
                 if (World::getWorld() && history->replayHistory())
-                    history->updateReplay(World::getWorld()->getTimeTicks());
+                    history->updateReplay(World::getWorld()->getTicksSinceStart());
                 PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
                 SFXManager::get()->update();
                 PROFILER_POP_CPU_MARKER();

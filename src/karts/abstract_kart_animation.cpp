@@ -97,7 +97,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
                 btTransform m_transform;
             public:
                 AnimationEvent(AbstractKart* kart)
-                    : RewindInfo(World::getWorld()->getTimeTicks(),
+                    : RewindInfo(World::getWorld()->getTicksSinceStart(),
                                  true/*is_confirmed*/)
                 {
                     m_kart = kart;
