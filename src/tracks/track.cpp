@@ -143,7 +143,7 @@ Track::Track(const std::string &filename)
     m_clouds                = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
-    m_caustics_speed        = 1.0f;
+    m_physical_object_uid   = 0;
     m_shadows               = true;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
@@ -291,6 +291,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+    m_physical_object_uid = 0;
 #ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
     {
@@ -556,7 +557,6 @@ void Track::loadTrackInfo()
     root->get("shadows",               &m_shadows);
     root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
-    root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
 

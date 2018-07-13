@@ -363,7 +363,7 @@ private:
     bool m_shadows;
 
     float m_displacement_speed;
-    float m_caustics_speed;
+    int m_physical_object_uid;
 
     /** The levels for color correction
      * m_color_inlevel(black, gamma, white)
@@ -662,7 +662,7 @@ public:
     // ------------------------------------------------------------------------
     float getDisplacementSpeed() const { return m_displacement_speed;    }
     // ------------------------------------------------------------------------
-    float getCausticsSpeed() const { return m_caustics_speed;        }
+    int getPhysicalObjectUID()              { return m_physical_object_uid++; }
     // ------------------------------------------------------------------------
     const int getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
     // ------------------------------------------------------------------------

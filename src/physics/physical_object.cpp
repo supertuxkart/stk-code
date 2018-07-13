@@ -136,10 +136,7 @@ PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
 PhysicalObject::PhysicalObject(bool is_dynamic,
                                const PhysicalObject::Settings& settings,
                                TrackObject* object)
-              : Rewinder(settings.m_id +
-                (object->getParentLibrary() ?
-                object->getParentLibrary()->getID() : "") ,
-                false/*can_be_destroyed*/, false/*auto_add*/)
+              : Rewinder("P", false/*can_be_destroyed*/, false/*auto_add*/)
 {
     m_shape              = NULL;
     m_body               = NULL;
@@ -787,6 +784,8 @@ void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 // ----------------------------------------------------------------------------
 void PhysicalObject::addForRewind()
 {
+    Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
+        (Track::getCurrentTrack()->getPhysicalObjectUID()));
     Rewinder::add();
 }   // addForRewind
 

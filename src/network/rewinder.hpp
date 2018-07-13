@@ -29,8 +29,11 @@ class Rewinder
 {
 protected:
     void add();
+    // -------------------------------------------------------------------------
+    void setUniqueIdentity(const std::string& uid)  { m_unique_identity = uid; }
+
 private:
-    const std::string m_unique_identity;
+    std::string m_unique_identity;
 
     /** True if this object can be destroyed, i.e. if this object is a 'stand
      *  alone' (i.e. not used in inheritance). If the object is used in
