@@ -82,13 +82,19 @@ void GameSetup::loadWorld()
     if (PlayerManager::getCurrentPlayer())
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         race_manager->setReverseTrack(false);
-        if (isSoccerGoalTarget())
-            race_manager->setMaxGoal(m_laps);
-        else
-            race_manager->setTimeTarget((float)m_laps * 60.0f);
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            if (isSoccerGoalTarget())
+                race_manager->setMaxGoal(m_laps);
+            else
+                race_manager->setTimeTarget((float)m_laps * 60.0f);
+        }
+        race_manager->startSingleRace(m_tracks.back(), -1,
+            false/*from_overworld*/);
     }
     else
     {

@@ -38,6 +38,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
@@ -716,6 +717,59 @@ void ServerLobby::startSelection(const Event *event)
         m_available_kts.second.erase(track_erase);
     }
 
+    switch (NetworkConfig::get()->getLocalGameMode().first)
+    {
+        case RaceManager::MINOR_MODE_NORMAL_RACE:
+        case RaceManager::MINOR_MODE_TIME_TRIAL:
+        case RaceManager::MINOR_MODE_FOLLOW_LEADER:
+        {
+            auto it = m_available_kts.second.begin();
+            while (it != m_available_kts.second.end())
+            {
+                Track* t =  track_manager->getTrack(*it);
+                if (t->isArena() || t->isSoccer() || t->isInternal())
+                {
+                    it = m_available_kts.second.erase(it);
+                }
+                else
+                    it++;
+            }
+            break;
+        }
+        case RaceManager::MINOR_MODE_3_STRIKES:
+        {
+            auto it = m_available_kts.second.begin();
+            while (it != m_available_kts.second.end())
+            {
+                Track* t =  track_manager->getTrack(*it);
+                if (!t->isArena() ||  t->isInternal())
+                {
+                    it = m_available_kts.second.erase(it);
+                }
+                else
+                    it++;
+            }
+            break;
+        }
+        case RaceManager::MINOR_MODE_SOCCER:
+        {
+            auto it = m_available_kts.second.begin();
+            while (it != m_available_kts.second.end())
+            {
+                Track* t =  track_manager->getTrack(*it);
+                if (!t->isSoccer() || t->isInternal())
+                {
+                    it = m_available_kts.second.erase(it);
+                }
+                else
+                    it++;
+            }
+            break;
+        }
+        default:
+            assert(false);
+            break;
+    }
     const auto& all_k = m_available_kts.first;
     const auto& all_t = m_available_kts.second;
     ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());

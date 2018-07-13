@@ -302,8 +302,9 @@ void TracksScreen::buildTrackList()
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
             continue;
-        if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
-        if (!curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
+        if (!is_network &&
+            (curr->isArena() || curr->isSoccer() || curr->isInternal()))
+            continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
         if (is_network &&

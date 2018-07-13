@@ -25,12 +25,14 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
-#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/network_player_controller.hpp"
+#include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -182,7 +184,8 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(int ticks)
 {
     updateBallPosition(ticks);
-    if (Track::getCurrentTrack()->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh() &&
+        !NetworkConfig::get()->isNetworking())
     {
         updateSectorForKarts();
         updateAIData();
@@ -388,6 +391,11 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
             team = SOCCER_TEAM_BLUE;
         m_kart_team_map[index] = team;
     }
+    else if (NetworkConfig::get()->isNetworking())
+    {
+        m_kart_team_map[index] = race_manager->getKartInfo(index).getSoccerTeam();
+        team = race_manager->getKartInfo(index).getSoccerTeam();
+    }
     else
     {
         int rm_id = index -
@@ -396,6 +404,13 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         assert(rm_id >= 0);
         team = race_manager->getKartInfo(rm_id).getSoccerTeam();
         m_kart_team_map[index] = team;
+    }
+
+    core::stringw online_name;
+    if (global_player_id > -1)
+    {
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
     }
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
@@ -412,9 +427,21 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-        difficulty, team == SOCCER_TEAM_BLUE ?
-        std::make_shared<RenderInfo>(0.66f) : std::make_shared<RenderInfo>(1.0f));
+    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    ri = (team == SOCCER_TEAM_BLUE ? std::make_shared<RenderInfo>(0.66f) :
+        std::make_shared<RenderInfo>(1.0f));
+    AbstractKart* new_kart;
+    if (RewindManager::get()->isEnabled())
+    {
+        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
+            difficulty, ri);
+    }
+    else
+    {
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
+            ri);
+    }
+
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 
@@ -427,6 +454,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         break;
     case RaceManager::KT_NETWORK_PLAYER:
         controller = new NetworkPlayerController(new_kart);
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     case RaceManager::KT_AI:
