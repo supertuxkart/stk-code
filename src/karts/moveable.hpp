@@ -27,6 +27,7 @@ namespace irr
 using namespace irr;
 #include "btBulletDynamicsCommon.h"
 
+#include "network/smooth_network_body.hpp"
 #include "physics/kart_motion_state.hpp"
 #include "physics/user_pointer.hpp"
 #include "utils/no_copy.hpp"
@@ -39,16 +40,10 @@ class Material;
 /**
   * \ingroup karts
   */
-class Moveable: public NoCopy
+class Moveable: public NoCopy,
+                public SmoothNetworkBody
 {
 private:
-    enum SmoothingState
-    {
-        SS_NONE = 0,
-        SS_TO_ADJUST,
-        SS_TO_REAL
-    };
-
     Vec3                   m_velocityLC;      /**<Velocity in kart coordinates. */
     /** The bullet transform of this rigid body. */
     btTransform            m_transform;
@@ -58,32 +53,18 @@ private:
     float                  m_pitch;
     /** The roll between -180 and 180 degrees. */
     float                  m_roll;
-
-    /** Client prediction in networked games might cause the visual
-     *  and physical position to be different. For visual smoothing
-     *  this variable accumulates the error and reduces it over time. */
-    std::pair<Vec3, btQuaternion> m_start_smoothing_postion,
-        m_adjust_position;
-
-    Vec3 m_adjust_control_point;
-
-    std::pair<btTransform, Vec3> m_prev_position_data;
-
-    btTransform m_smoothed_transform;
-
-    float m_adjust_time, m_adjust_time_dt;
-
-    SmoothingState m_smoothing;
-
 protected:
     UserPointer            m_user_pointer;
     scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
-    virtual void updateSmoothedGraphics(float dt);
+    // ------------------------------------------------------------------------
+    void updateSmoothedGraphics(float dt);
+    // ------------------------------------------------------------------------
     virtual void updateGraphics(const Vec3& off_xyz = Vec3(0.0f, 0.0f, 0.0f),
-                                const btQuaternion& off_rotation = btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+                                const btQuaternion& off_rotation =
+                                btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
 public:
                   Moveable();
@@ -153,19 +134,21 @@ public:
      */
     virtual void  updateGraphics(float dt) = 0;
     // ------------------------------------------------------------------------
-    void prepareSmoothing();
+    void prepareSmoothing()
+    {
+        SmoothNetworkBody::prepareSmoothing(m_transform, getVelocity());
+    }
     // ------------------------------------------------------------------------
-    void checkSmoothing();
+    void checkSmoothing()
+    {
+        SmoothNetworkBody::checkSmoothing(m_transform, getVelocity());
+    }
     // ------------------------------------------------------------------------
     const btTransform &getSmoothedTrans() const
-                                               { return m_smoothed_transform; }
+                              { return SmoothNetworkBody::getSmoothedTrans(); }
     // ------------------------------------------------------------------------
     const Vec3& getSmoothedXYZ() const
-                            { return (Vec3&)m_smoothed_transform.getOrigin(); }
-    // ------------------------------------------------------------------------
-    virtual bool enableSmoothing() const                      { return false; }
-    // ------------------------------------------------------------------------
-    virtual bool smoothRotation() const                        { return true; }
+           { return (Vec3&)SmoothNetworkBody::getSmoothedTrans().getOrigin(); }
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const
     {

@@ -615,13 +615,16 @@ void PhysicalObject::updateGraphics(float dt)
 {
     if (!m_is_dynamic)
         return;
-    Vec3 xyz = m_current_transform.getOrigin();
+
+    SmoothNetworkBody::updateSmoothedGraphics(m_body->getWorldTransform(),
+        m_body->getLinearVelocity(), dt);
+    Vec3 xyz = SmoothNetworkBody::getSmoothedTrans().getOrigin();
 
     // Offset the graphical position correctly:
-    xyz += m_current_transform.getBasis()*m_graphical_offset;
+    xyz += SmoothNetworkBody::getSmoothedTrans().getBasis()*m_graphical_offset;
 
     Vec3 hpr;
-    hpr.setHPR(m_current_transform.getRotation());
+    hpr.setHPR(SmoothNetworkBody::getSmoothedTrans().getRotation());
 
     // This will only update the visual position, so it can be
     // called in updateGraphics()
@@ -683,6 +686,7 @@ bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to,
 // ----------------------------------------------------------------------------
 void PhysicalObject::reset()
 {
+    Rewinder::reset();
     m_body->setCenterOfMassTransform(m_init_pos);
     m_body->setAngularVelocity(btVector3(0,0,0));
     m_body->setLinearVelocity(btVector3(0,0,0));
@@ -784,6 +788,8 @@ void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 // ----------------------------------------------------------------------------
 void PhysicalObject::addForRewind()
 {
+    SmoothNetworkBody::setEnable(true);
+    SmoothNetworkBody::setSmoothRotation(false);
     Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
         (Track::getCurrentTrack()->getPhysicalObjectUID()));
     Rewinder::add();
@@ -793,11 +799,15 @@ void PhysicalObject::addForRewind()
 void PhysicalObject::saveTransform()
 {
     m_no_server_state = true;
+    SmoothNetworkBody::prepareSmoothing(m_body->getWorldTransform(),
+        m_body->getLinearVelocity());
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
 void PhysicalObject::computeError()
 {
+    SmoothNetworkBody::checkSmoothing(m_body->getWorldTransform(),
+        m_body->getLinearVelocity());
 }   // computeError
 
 // ----------------------------------------------------------------------------

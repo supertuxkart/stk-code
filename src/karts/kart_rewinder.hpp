@@ -76,8 +76,6 @@ public:
     // -------------------------------------------------------------------------
     virtual void undoEvent(BareNetworkString *p) OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual bool enableSmoothing() const OVERRIDE              { return true; }
-    // ------------------------------------------------------------------------
     virtual std::function<void()> getLocalStateRestoreFunction() OVERRIDE;
 
 
