@@ -77,12 +77,12 @@ check_error()
 
 # Handle clean command
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
-    rm -rf bin
-    rm -rf build
-    rm -rf libs
-    rm -rf obj
-    rm -rf res
-    rm -rf .gradle
+    rm -rf "$DIRNAME/bin"
+    rm -rf "$DIRNAME/build"
+    rm -rf "$DIRNAME/libs"
+    rm -rf "$DIRNAME/obj"
+    rm -rf "$DIRNAME/res"
+    rm -rf "$DIRNAME/.gradle"
     exit
 fi
 
