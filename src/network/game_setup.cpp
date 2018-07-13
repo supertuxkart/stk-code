@@ -77,6 +77,8 @@ void GameSetup::update(bool remove_disconnected_players)
 //-----------------------------------------------------------------------------
 void GameSetup::loadWorld()
 {
+    // Notice: for arena (battle / soccer) lap and reverse will be mapped to
+    // goals / time limit and random item location
     assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
     if (PlayerManager::getCurrentPlayer())

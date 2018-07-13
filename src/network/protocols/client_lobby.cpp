@@ -407,9 +407,36 @@ void ClientLobby::displayPlayerVote(Event* event)
     int rev = data.getUInt8();
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
-    //I18N: Vote message in network game from a player
-    core::stringw vote_msg = _("Track: %s,\nlaps: %d, reversed: %s",
-        track_readable, lap, rev == 1 ? yes : no);
+    core::stringw vote_msg;
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    {
+        //I18N: Vote message in network game from a player
+        vote_msg = _("Track: %s,\nrandom item location: %s",
+            track_readable, rev == 1 ? yes : no);
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        if (m_game_setup->isSoccerGoalTarget())
+        {
+            //I18N: Vote message in network game from a player
+            vote_msg = _("Track: %s,\n"
+                "number of goals to win: %d,\nrandom item location: %s",
+                track_readable, lap, rev == 1 ? yes : no);
+        }
+        else
+        {
+            //I18N: Vote message in network game from a player
+            vote_msg = _("Track: %s,\n"
+                "maximum time: %d,random item location: %s",
+                track_readable, lap, rev == 1 ? yes : no);
+        }
+    }
+    else
+    {
+        //I18N: Vote message in network game from a player
+        vote_msg = _("Track: %s,\nlaps: %d, reversed: %s",
+            track_readable, lap, rev == 1 ? yes : no);
+    }
     vote_msg = StringUtils::utf8ToWide(player_name) + vote_msg;
     TracksScreen::getInstance()->addVoteMessage(player_name +
         StringUtils::toString(host_id), vote_msg);

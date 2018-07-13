@@ -373,6 +373,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
             &m_race_setup_group, "Enable time limit in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam         m_random_arena_item
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "random-arena-item",
+            &m_race_setup_group, "Enable random location of items in an arena.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -637,9 +640,6 @@ namespace UserConfigParams
 
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
-
-    /** If random number of items is used in an arena. */
-    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
 
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );

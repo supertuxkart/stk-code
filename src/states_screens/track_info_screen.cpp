@@ -225,6 +225,10 @@ void TrackInfoScreen::init()
     {
         m_option->setState(race_manager->getReverseTrack());
     }
+    else if (random_item)
+    {
+        m_option->setState(UserConfigParams::m_random_arena_item);
+    }
     else
         m_option->setState(false);
 
