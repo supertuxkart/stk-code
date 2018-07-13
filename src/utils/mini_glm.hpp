@@ -21,6 +21,7 @@
 #include "LinearMath/btQuaternion.h"
 #include "utils/vec3.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -231,7 +232,8 @@ namespace MiniGLM
         }
     }   // toFloat16
     // ------------------------------------------------------------------------
-    inline uint32_t normalizedSignedFloatsTo1010102(std::array<float, 4> src)
+    inline uint32_t normalizedSignedFloatsTo1010102
+        (const std::array<float, 3>& src, int extra_2_bit = -1)
     {
         int part = 0;
         uint32_t packed = 0;
@@ -265,19 +267,17 @@ namespace MiniGLM
             part = (int)((v * 512.0f) - 0.5f);
         }
         packed |= ((uint32_t)part & 1023) << 20;
-        v = fminf(1.0f, fmaxf(-1.0f, src[3]));
-        if (v > 0.0f)
+        if (extra_2_bit >= 0)
         {
-            part = (int)((v * 1.0f) + 0.5f);
+            part = extra_2_bit;
         }
         else
         {
-            part = (int)((v * 2.0f) - 0.5f);
+            part = (int)(-0.5f);
         }
-        part = (int)((v * 2.0f) - 0.5f);
         packed |= ((uint32_t)part & 3) << 30;
         return packed;
-    }   // fourFloatsTo1010102
+    }   // normalizedSignedFloatsTo1010102
     // ------------------------------------------------------------------------
     inline std::array<short, 4> vertexType2101010RevTo4HF(uint32_t packed)
     {
@@ -329,7 +329,7 @@ namespace MiniGLM
     inline std::array<float, 4> extractNormalizedSignedFloats(uint32_t packed,
         bool calculate_w = false)
     {
-        std::array<float, 4> ret;
+        std::array<float, 4> ret = {};
         int part = packed & 1023;
         if (part & 512)
         {
@@ -357,29 +357,56 @@ namespace MiniGLM
         {
             ret[2] = (float)part * (1.0f / 511.0f);
         }
-        part = (packed >> 30) & 3;
-        if (part & 2)
-        {
-            ret[3] = (float)(4 - part) * (-1.0f / 2.0f);
-        }
-        else
-        {
-            ret[3] = (float)part;
-        }
         if (calculate_w)
         {
-            float w = sqrtf(fmaxf(0.0f, 1.0f -
+            float largest_val = sqrtf(fmaxf(0.0f, 1.0f -
                 (ret[0] * ret[0]) - (ret[1] * ret[1]) - (ret[2] * ret[2])));
-            ret[3] = ret[3] > 0.0f ? w : -w;
+            part = (packed >> 30) & 3;
+            switch(part)
+            {
+            case 0:
+            {
+                auto tmp = ret;
+                ret[0] = largest_val;
+                ret[1] = tmp[0];
+                ret[2] = tmp[1];
+                ret[3] = tmp[2];
+                break;
+            }
+            case 1:
+            {
+                auto tmp = ret;
+                ret[0] = tmp[0];
+                ret[1] = largest_val;
+                ret[2] = tmp[1];
+                ret[3] = tmp[2];
+                break;
+            }
+            case 2:
+            {
+                auto tmp = ret;
+                ret[0] = tmp[0];
+                ret[1] = tmp[1];
+                ret[2] = largest_val;
+                ret[3] = tmp[2];
+                break;
+            }
+            case 3:
+                ret[3] = largest_val;
+                break;
+            default:
+                assert(false);
+                break;
+            }
         }
         return ret;
     }   // extractNormalizedSignedFloats
     // ------------------------------------------------------------------------
-    // Please normalize vector and quaternion before compressing
+    // Please normalize vector before compressing
     // ------------------------------------------------------------------------
     inline uint32_t compressVector3(const irr::core::vector3df& vec)
     {
-        return normalizedSignedFloatsTo1010102({{vec.X, vec.Y, vec.Z, 0.0f}});
+        return normalizedSignedFloatsTo1010102({{vec.X, vec.Y, vec.Z}});
     }   // compressVector3
     // ------------------------------------------------------------------------
     inline core::vector3df decompressVector3(uint32_t packed)
@@ -389,11 +416,66 @@ namespace MiniGLM
         return ret.normalize();
     }   // decompressVector3
     // ------------------------------------------------------------------------
-    inline uint32_t compressQuaternion(const core::quaternion& q)
+    inline uint32_t compressQuaternion(const btQuaternion& q)
     {
-        return normalizedSignedFloatsTo1010102({{q.X, q.Y, q.Z,
-            q.W >= 0.0f ? 1.0f : -1.0f}});
+        const float length = q.length();
+        assert(length != 0.0f);
+        std::array<float, 4> tmp_2 =
+            {{
+                q.x() / length,
+                q.y() / length,
+                q.z() / length,
+                q.w() / length
+            }};
+        std::array<float, 3> tmp_3;
+        auto ret = std::max_element(tmp_2.begin(), tmp_2.end(),
+            [](float a, float b) { return std::abs(a) < std::abs(b); });
+        int extra_2_bit = int(std::distance(tmp_2.begin(), ret));
+        switch (extra_2_bit)
+        {
+        case 0:
+        {
+            float neg = tmp_2[0] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = tmp_2[1] * neg;
+            tmp_3[1] = tmp_2[2] * neg;
+            tmp_3[2] = tmp_2[3] * neg;
+            break;
+        }
+        case 1:
+        {
+            float neg = tmp_2[1] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = tmp_2[0] * neg;
+            tmp_3[1] = tmp_2[2] * neg;
+            tmp_3[2] = tmp_2[3] * neg;
+            break;
+        }
+        case 2:
+        {
+            float neg = tmp_2[2] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = tmp_2[0] * neg;
+            tmp_3[1] = tmp_2[1] * neg;
+            tmp_3[2] = tmp_2[3] * neg;
+            break;
+        }
+        case 3:
+        {
+            float neg = tmp_2[3] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = tmp_2[0] * neg;
+            tmp_3[1] = tmp_2[1] * neg;
+            tmp_3[2] = tmp_2[2] * neg;
+            break;
+        }
+        default:
+            assert(false);
+            break;
+        }
+        return normalizedSignedFloatsTo1010102(tmp_3, extra_2_bit);
     }   // compressQuaternion
+    // ------------------------------------------------------------------------
+    inline uint32_t compressIrrQuaternion(const core::quaternion& q)
+    {
+        return compressQuaternion(btQuaternion(q.X, q.Y, q.Z, q.W));
+    }
     // ------------------------------------------------------------------------
     inline core::quaternion decompressQuaternion(uint32_t packed)
     {
@@ -402,12 +484,6 @@ namespace MiniGLM
         core::quaternion ret(out[0], out[1], out[2], out[3]);
         return ret.normalize();
     }   // decompressQuaternion
-    // ------------------------------------------------------------------------
-    inline uint32_t compressbtQuaternion(const btQuaternion& q)
-    {
-        return normalizedSignedFloatsTo1010102({{q.x(), q.y(), q.z(),
-            q.w() >= 0.0f ? 1.0f : -1.0f}});
-    }   // compressbtQuaternion
     // ------------------------------------------------------------------------
     inline btQuaternion decompressbtQuaternion(uint32_t packed)
     {
