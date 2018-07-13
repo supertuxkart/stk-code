@@ -28,7 +28,7 @@
 #include "io/xml_node.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
-#include "network/network_string.hpp"
+#include "network/compress_network_body.hpp"
 #include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -816,10 +816,8 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
     m_last_transform = cur_transform;
     m_last_lv = m_body->getLinearVelocity();
     m_last_av = m_body->getAngularVelocity();
-    buffer->add(m_last_transform.getOrigin());
-    buffer->add(m_last_transform.getRotation());
-    buffer->add(m_last_lv);
-    buffer->add(m_last_av);
+    CompressNetworkBody::compress(m_last_transform, m_last_lv, m_last_av,
+        buffer);
     return buffer;
 }   // saveState
 
@@ -827,10 +825,8 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 void PhysicalObject::restoreState(BareNetworkString *buffer, int count)
 {
     m_no_server_state = false;
-    m_last_transform.setOrigin(buffer->getVec3());
-    m_last_transform.setRotation(buffer->getQuat());
-    m_last_lv = buffer->getVec3();
-    m_last_av = buffer->getVec3();
+    CompressNetworkBody::decompress(buffer, &m_last_transform, &m_last_lv,
+        &m_last_av);
 
     m_body->setWorldTransform(m_last_transform);
     m_motion_state->setWorldTransform(m_last_transform);
