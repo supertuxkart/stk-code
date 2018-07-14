@@ -87,6 +87,8 @@ void GameSetup::loadWorld()
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
+        bool prev_val = UserConfigParams::m_random_arena_item;
+        UserConfigParams::m_random_arena_item = m_reverse;
         race_manager->setReverseTrack(false);
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
@@ -97,6 +99,7 @@ void GameSetup::loadWorld()
         }
         race_manager->startSingleRace(m_tracks.back(), -1,
             false/*from_overworld*/);
+        UserConfigParams::m_random_arena_item = prev_val;
     }
     else
     {

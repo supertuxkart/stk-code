@@ -19,6 +19,7 @@
 #include "network/protocols/server_lobby.hpp"
 
 #include "config/user_config.hpp"
+#include "items/item_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -409,6 +410,9 @@ void ServerLobby::asynchronousUpdate()
                 }
                 load_world->encodeString(player->getKartName());
             }
+            uint32_t random_seed = (uint32_t)StkTime::getTimeSinceEpoch();
+            ItemManager::updateRandomSeed(random_seed);
+            load_world->addUInt32(random_seed);
             configRemoteKart(players);
 
             // Reset for next state usage

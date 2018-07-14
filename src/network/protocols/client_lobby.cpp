@@ -25,6 +25,7 @@
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
+#include "items/item_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -241,6 +242,8 @@ void ClientLobby::addAllPlayers(Event* event)
         m_game_setup->addPlayer(player);
         players.push_back(player);
     }
+    uint32_t random_seed = data.getUInt32();
+    ItemManager::updateRandomSeed(random_seed);
     configRemoteKart(players);
     loadWorld();
     // Switch to assign mode in case a player hasn't chosen any karts
@@ -427,7 +430,7 @@ void ClientLobby::displayPlayerVote(Event* event)
         {
             //I18N: Vote message in network game from a player
             vote_msg = _("Track: %s,\n"
-                "maximum time: %d,random item location: %s",
+                "maximum time: %d,\nrandom item location: %s",
                 track_readable, lap, rev == 1 ? yes : no);
         }
     }

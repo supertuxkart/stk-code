@@ -1111,13 +1111,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
-    //Check whether the hardware can do nonsquare or
-    // non power-of-two textures
-    video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-    bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-    bool nonsquare =
-        video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
     //Create the minimap resizing it as necessary.
     m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 
@@ -1808,7 +1801,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (NetworkConfig::get()->isNetworking())
         NetworkItemManager::create();
     else
+    {
+        // Seed random engine locally
+        ItemManager::updateRandomSeed((uint32_t)StkTime::getTimeSinceEpoch());
         ItemManager::create();
+    }
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
