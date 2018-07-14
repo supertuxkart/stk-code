@@ -92,14 +92,14 @@ void NetworkUserDialog::beforeAddingWidgets()
     m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
 
     m_change_team_widget = NULL;
-    if (m_allow_change_team)
+    if (m_allow_change_team && m_host_id == STKHost::get()->getMyHostId())
     {
         m_change_team_widget = getWidget<IconButtonWidget>("accept");
         m_change_team_widget->setVisible(true);
         //I18N: In the network user dialog
         m_change_team_widget->setText(_("Change team"));
         m_change_team_widget->setImage(file_manager->getAsset(FileManager::GUI,
-            "race_giveup.png"));
+            "race_giveup.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
     else
         getWidget<IconButtonWidget>("accept")->setVisible(false);
