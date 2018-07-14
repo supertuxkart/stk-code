@@ -135,6 +135,7 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    m_allow_change_team = false;
     m_ping_update_timer = 0.0f;
     m_cur_starting_timer = m_start_threshold = m_start_timeout =
         m_server_max_player = std::numeric_limits<float>::max();
@@ -302,7 +303,7 @@ void NetworkingLobby::updatePlayerPings()
     auto peer_pings = STKHost::get()->getPeerPings();
     for (auto& p : m_player_names)
     {
-        core::stringw name_with_ping = p.second.first;
+        core::stringw name_with_ping = std::get<0>(p.second);
         auto host_online_ids = StringUtils::splitToUInt(p.first, '_');
         if (host_online_ids.size() != 3)
             continue;
@@ -317,7 +318,12 @@ void NetworkingLobby::updatePlayerPings()
         }
         else
             continue;
-        m_player_list->renameItem(p.first, name_with_ping, p.second.second);
+        int id = m_player_list->getItemID(p.first);
+        m_player_list->renameItem(id, name_with_ping, std::get<1>(p.second));
+        if (std::get<2>(p.second) == SOCCER_TEAM_RED)
+            m_player_list->markItemRed(id);
+        else if (std::get<2>(p.second) == SOCCER_TEAM_BLUE)
+            m_player_list->markItemBlue(id);
     }
 }   // updatePlayerPings
 
@@ -354,15 +360,17 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == m_player_list->m_properties[GUIEngine::PROP_ID])
     {
-        auto host_online_ids = StringUtils::splitToUInt
+        auto host_online_local_ids = StringUtils::splitToUInt
             (m_player_list->getSelectionInternalName(), '_');
-        if (host_online_ids.size() != 3)
+        if (host_online_local_ids.size() != 3)
         {
             return;
         }
-        new NetworkUserDialog(host_online_ids[0], host_online_ids[1],
-            m_player_names.at(
-            m_player_list->getSelectionInternalName()).first);
+        new NetworkUserDialog(host_online_local_ids[0],
+            host_online_local_ids[1], host_online_local_ids[2],
+            std::get<0>(m_player_names.at(
+            m_player_list->getSelectionInternalName())),
+            m_allow_change_team);
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
@@ -411,7 +419,7 @@ bool NetworkingLobby::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
                                     uint32_t, uint32_t, core::stringw,
-                                    int> >& p)
+                                    int, SoccerTeam> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
@@ -424,19 +432,27 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
         return;
 
     irr::gui::STKModifiedSpriteBank* icon_bank = m_icon_bank;
-    for (auto& q : p)
+    for (unsigned i = 0; i < p.size(); i++)
     {
+        auto& q = p[i];
         if (icon_bank)
         {
             m_player_list->setIcons(icon_bank);
             icon_bank = NULL;
         }
+        SoccerTeam cur_team = std::get<5>(q);
+        m_allow_change_team = cur_team != SOCCER_TEAM_NONE;
         const std::string internal_name =
             StringUtils::toString(std::get<0>(q)) + "_" +
             StringUtils::toString(std::get<1>(q)) + "_" +
             StringUtils::toString(std::get<2>(q));
         m_player_list->addItem(internal_name, std::get<3>(q), std::get<4>(q));
-        m_player_names[internal_name] = { std::get<3>(q), std::get<4>(q) };
+        if (cur_team == SOCCER_TEAM_RED)
+            m_player_list->markItemRed(i);
+        else if (cur_team == SOCCER_TEAM_BLUE)
+            m_player_list->markItemBlue(i);
+        m_player_names[internal_name] =
+            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team);
     }
     updatePlayerPings();
 }   // updatePlayers

@@ -59,7 +59,8 @@ public:
         LE_VOTE,                          // Track vote
         LE_CHAT,
         LE_SERVER_OWNERSHIP,
-        LE_KICK_HOST
+        LE_KICK_HOST,
+        LE_CHANGE_TEAM
     };
 
     enum RejectReason : uint8_t

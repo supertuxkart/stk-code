@@ -606,6 +606,8 @@ void cmdLineHelp()
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --auto-end         Automatically end network game after 1st player finished\n"
     "                          for some time (currently his finished time * 0.25 + 15.0). \n"
+    "       --team-choosing    Allow choosing team in lobby, implicitly allowed in lan or\n"
+    "                          password protected server.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
@@ -1087,6 +1089,7 @@ int handleCmdLine()
     {
         server_password = s;
         NetworkConfig::get()->setPassword(server_password);
+        NetworkConfig::get()->setTeamChoosing(true);
     }
 
     if (CommandLine::has("--motd", &s))
@@ -1149,6 +1152,10 @@ int handleCmdLine()
     if (CommandLine::has("--public-server"))
     {
         NetworkConfig::get()->setIsPublicServer();
+    }
+    if (CommandLine::has("--team-choosing"))
+    {
+        NetworkConfig::get()->setTeamChoosing(true);
     }
     if (CommandLine::has("--connect-now", &s))
     {
@@ -1222,6 +1229,7 @@ int handleCmdLine()
         NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setTeamChoosing(true);
         NetworkConfig::get()->setValidatedPlayers(false);
         server_lobby = STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());

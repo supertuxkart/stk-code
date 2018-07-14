@@ -22,7 +22,6 @@
 #ifndef HEADER_NETWORK_PLAYER_PROFILE
 #define HEADER_NETWORK_PLAYER_PROFILE
 
-#include "network/remote_kart_info.hpp"
 #include "utils/types.hpp"
 
 #include "irrString.h"
@@ -31,6 +30,8 @@
 #include <tuple>
 
 class STKPeer;
+enum SoccerTeam : int8_t;
+enum PerPlayerDifficulty : uint8_t;
 
 /*! \class NetworkPlayerProfile
  *  \brief Contains the profile of a player.
@@ -65,12 +66,14 @@ private:
     /** Overall time if grand prix. */
     float m_overall_time;
 
+    SoccerTeam m_team;
+
 public:
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,
                          PerPlayerDifficulty per_player_difficulty,
-                         uint8_t local_player_id)
+                         uint8_t local_player_id, SoccerTeam team)
     {
         m_peer                  = peer;
         m_player_name           = name;
@@ -79,6 +82,7 @@ public:
         m_online_id             = online_id;
         m_per_player_difficulty = per_player_difficulty;
         m_local_player_id       = local_player_id;
+        m_team                  = team;
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -126,6 +130,10 @@ public:
         m_score = 0;
         m_overall_time = 0.0f;
     }
+    // ------------------------------------------------------------------------
+    void setTeam(SoccerTeam team)                            { m_team = team; }
+    // ------------------------------------------------------------------------
+    SoccerTeam getTeam() const                               { return m_team; }
 
 };   // class NetworkPlayerProfile
 

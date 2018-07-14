@@ -194,6 +194,22 @@ void ServerLobby::handleChat(Event* event)
 }   // handleChat
 
 //-----------------------------------------------------------------------------
+void ServerLobby::changeTeam(Event* event)
+{
+    if (!NetworkConfig::get()->hasTeamChoosing())
+        return;
+    if (!checkDataSize(event, 1)) return;
+    NetworkString& data = event->data();
+    uint8_t local_id = data.getUInt8();
+    auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
+    if (player->getTeam() == SOCCER_TEAM_BLUE)
+        player->setTeam(SOCCER_TEAM_RED);
+    else
+        player->setTeam(SOCCER_TEAM_BLUE);
+    updatePlayerList();
+}   // changeTeam
+
+//-----------------------------------------------------------------------------
 void ServerLobby::kickHost(Event* event)
 {
     if (m_server_owner.lock() != event->getPeerSP())
@@ -226,6 +242,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
         case LE_VOTE: playerVote(event);                          break;
         case LE_KICK_HOST: kickHost(event);                       break;
+        case LE_CHANGE_TEAM: changeTeam(event);                   break;
         case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_CHAT: handleChat(event);                          break;
         default:                                                  break;
@@ -386,6 +403,7 @@ void ServerLobby::asynchronousUpdate()
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
+            m_game_setup->sortPlayersForSoccer();
             auto players = m_game_setup->getConnectedPlayers();
             NetworkString* load_world = getNetworkString();
             load_world->setSynchronous(true);
@@ -399,7 +417,8 @@ void ServerLobby::asynchronousUpdate()
                     .addFloat(player->getDefaultKartColor())
                     .addUInt32(player->getOnlineId())
                     .addUInt8(player->getPerPlayerDifficulty())
-                    .addUInt8(player->getLocalPlayerId());
+                    .addUInt8(player->getLocalPlayerId())
+                    .addUInt8(player->getTeam());
                 if (player->getKartName().empty())
                 {
                     RandomGenerator rg;
@@ -1413,10 +1432,13 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         float default_kart_color = data.getFloat();
         PerPlayerDifficulty per_player_difficulty =
             (PerPlayerDifficulty)data.getUInt8();
-        peer->addPlayer(std::make_shared<NetworkPlayerProfile>
+        auto player = std::make_shared<NetworkPlayerProfile>
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
-            per_player_difficulty, (uint8_t)i));
+            per_player_difficulty, (uint8_t)i, SOCCER_TEAM_NONE);
+        if (NetworkConfig::get()->hasTeamChoosing())
+            player->setTeam((SoccerTeam)(peer->getHostId() % 2));
+        peer->addPlayer(player);
     }
 
     peer->setValidated();
@@ -1474,6 +1496,11 @@ void ServerLobby::updatePlayerList(bool force_update)
             server_owner = 1;
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
+        if (NetworkConfig::get()->hasTeamChoosing() &&
+            race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+            pl->addUInt8(profile->getTeam());
+        else
+            pl->addUInt8(SOCCER_TEAM_NONE);
     }
     sendMessageToPeers(pl);
     delete pl;

@@ -233,8 +233,9 @@ void ClientLobby::addAllPlayers(Event* event)
         uint32_t online_id = data.getUInt32();
         PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
         uint8_t local_id = data.getUInt8();
+        SoccerTeam team = (SoccerTeam)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
-            host_id, kart_color, online_id, ppd, local_id);
+            host_id, kart_color, online_id, ppd, local_id, team);
         std::string kart_name;
         data.decodeString(&kart_name);
         player->setKartName(kart_name);
@@ -588,10 +589,11 @@ void ClientLobby::updatePlayerList(Event* event)
     NetworkString& data = event->data();
     unsigned player_count = data.getUInt8();
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
-        int> > players;
+        int, SoccerTeam> > players;
     for (unsigned i = 0; i < player_count; i++)
     {
-        std::tuple<uint32_t, uint32_t, uint32_t, core::stringw, int> pl;
+        std::tuple<uint32_t, uint32_t, uint32_t, core::stringw, int,
+            SoccerTeam> pl;
         std::get<0>(pl) = data.getUInt32();
         std::get<1>(pl) = data.getUInt32();
         std::get<2>(pl) = data.getUInt8();
@@ -602,6 +604,7 @@ void ClientLobby::updatePlayerList(Event* event)
         PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
         if (d == PLAYER_DIFFICULTY_HANDICAP)
             std::get<3>(pl) = _("%s (handicapped)", std::get<3>(pl));
+        std::get<5>(pl) = (SoccerTeam)data.getUInt8();
         players.push_back(pl);
     }
     NetworkingLobby::getInstance()->updatePlayers(players);

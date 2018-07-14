@@ -26,6 +26,7 @@
 #include <utility>
 
 class Server;
+enum SoccerTeam : int8_t;
 
 namespace GUIEngine
 { 
@@ -64,7 +65,7 @@ private:
     NetworkingLobby();
 
     float m_ping_update_timer;
-    std::map<std::string, std::pair<core::stringw, /*icon*/int> >
+    std::map<std::string, std::tuple<core::stringw, /*icon*/int, SoccerTeam> >
         m_player_names;
     std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
@@ -72,6 +73,8 @@ private:
 
     float m_cur_starting_timer, m_start_threshold, m_start_timeout,
         m_server_max_player;
+
+    bool m_allow_change_team;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
@@ -86,9 +89,9 @@ private:
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    virtual void unloaded();
+    virtual void unloaded() OVERRIDE;
 
-    virtual void onTextUpdated() {}
+    virtual void onTextUpdated() OVERRIDE {}
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
     {
         sendChat(text);
@@ -130,7 +133,8 @@ public:
     }
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, uint32_t/*local player id*/,
-                       core::stringw/*player name*/, int/*icon id*/> >& p);
+                       core::stringw/*player name*/, int/*icon id*/,
+                       SoccerTeam> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
     void initAutoStartTimer(bool grand_prix_started, float start_threshold,

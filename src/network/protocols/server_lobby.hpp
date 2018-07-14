@@ -155,6 +155,7 @@ private:
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
+    void changeTeam(Event* event);
     void handleChat(Event* event);
     void unregisterServer(bool now);
     void createServerIdFile();

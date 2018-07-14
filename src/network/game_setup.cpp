@@ -191,3 +191,18 @@ void GameSetup::sortPlayersForGrandPrix()
         std::reverse(m_players.begin(), m_players.end());
     }
 }   // sortPlayersForGrandPrix
+
+//-----------------------------------------------------------------------------
+void GameSetup::sortPlayersForSoccer()
+{
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER ||
+        NetworkConfig::get()->hasTeamChoosing())
+        return;
+    std::lock_guard<std::mutex> lock(m_players_mutex);
+    for (unsigned i = 0; i < m_players.size(); i++)
+    {
+        auto player = m_players[i].lock();
+        assert(player);
+        player->setTeam((SoccerTeam)(i % 2));
+    }
+}   // sortPlayersForSoccer

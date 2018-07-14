@@ -26,7 +26,7 @@
 #include <vector>
 #include <irrString.h>
 
-enum SoccerTeam
+enum SoccerTeam : int8_t
 {
     SOCCER_TEAM_NONE=-1,
     SOCCER_TEAM_RED=0,

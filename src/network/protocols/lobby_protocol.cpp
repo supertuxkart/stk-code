@@ -125,7 +125,7 @@ void LobbyProtocol::configRemoteKart(
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         rki.setOnlineId(profile->getOnlineId());
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-            rki.setSoccerTeam((SoccerTeam)(i % 2));
+            rki.setSoccerTeam(profile->getTeam());
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
