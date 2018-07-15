@@ -27,6 +27,7 @@
 #include "utils/ptr_vector.hpp"
 
 #include <assert.h>
+#include <functional>
 #include <vector>
 
 /** Used to store rewind information for a given time for all rewind
@@ -166,5 +167,29 @@ public:
     /** Returns the buffer with the event information in it. */
     BareNetworkString *getBuffer() { return m_buffer; }
 };   // class RewindIndoEvent
+
+
+// ============================================================================
+class RewindInfoEventFunction : public RewindInfo
+{
+private:
+    const std::function<void()> m_undo_function, m_replay_function;
+public:
+    RewindInfoEventFunction(int ticks,
+                            std::function<void()> undo_function = [](){},
+                            std::function<void()> replay_function = [](){},
+                            bool is_confirmed = true)
+        : RewindInfo(ticks, is_confirmed),
+        m_undo_function(undo_function), m_replay_function(replay_function)   {}
+    // ------------------------------------------------------------------------
+    /** An event is never 'restored', it is only rewound. */
+    void restore() {}
+    // ------------------------------------------------------------------------
+    virtual bool isEvent() const                               { return true; }
+    // ------------------------------------------------------------------------
+    virtual void undo()                                  { m_undo_function(); }
+    // ------------------------------------------------------------------------
+    virtual void replay()                              { m_replay_function(); }
+};   // class RewindInfoEventFunction
 
 #endif
