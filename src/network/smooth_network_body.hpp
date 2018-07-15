@@ -58,6 +58,9 @@ private:
 
     bool m_adjust_vertical_offset;
 
+    float m_min_adjust_length, m_max_adjust_length, m_min_adjust_speed,
+        m_max_adjust_time;
+
 public:
     SmoothNetworkBody(bool enable = false)
     {
@@ -65,7 +68,13 @@ public:
         m_enabled = enable;
         m_smooth_rotation = true;
         m_adjust_vertical_offset = true;
+        m_min_adjust_length = 0.1f;
+        m_max_adjust_length = 4.0f;
+        m_min_adjust_speed = 0.3f;
+        m_max_adjust_time = 2.0f;
     }
+    // ------------------------------------------------------------------------
+    virtual ~SmoothNetworkBody() {}
     // ------------------------------------------------------------------------
     void reset()
     {
@@ -102,6 +111,14 @@ public:
     // ------------------------------------------------------------------------
     const Vec3& getSmoothedXYZ() const
                             { return (Vec3&)m_smoothed_transform.getOrigin(); }
+    // ------------------------------------------------------------------------
+    void setMinAdjustLength(float val)           { m_min_adjust_length = val; }
+    // ------------------------------------------------------------------------
+    void setMaxAdjustLength(float val)           { m_max_adjust_length = val; }
+    // ------------------------------------------------------------------------
+    void setMinAdjustSpeed(float val)             { m_min_adjust_speed = val; }
+    // ------------------------------------------------------------------------
+    void setMaxAdjustTime(float val)               { m_max_adjust_time = val; }
 
 };
 

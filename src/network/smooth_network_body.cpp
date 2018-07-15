@@ -49,16 +49,17 @@ void SmoothNetworkBody::checkSmoothing(const btTransform& current_transform,
 
     float adjust_length = (current_transform.getOrigin() -
         m_prev_position_data.first.getOrigin()).length();
-    if (adjust_length < 0.1f || adjust_length > 4.0f)
+    if (adjust_length < m_min_adjust_length ||
+        adjust_length > m_max_adjust_length)
         return;
 
     float speed = m_prev_position_data.second.length();
     speed = std::max(speed, current_velocity.length());
-    if (speed < 0.3f)
+    if (speed < m_min_adjust_speed)
         return;
 
     float adjust_time = (adjust_length * 2.0f) / speed;
-    if (adjust_time > 2.0f)
+    if (adjust_time > m_max_adjust_time)
         return;
 
     m_smoothing = SS_TO_ADJUST;
