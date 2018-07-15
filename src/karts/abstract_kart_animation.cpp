@@ -88,45 +88,26 @@ AbstractKartAnimation::~AbstractKartAnimation()
             NetworkConfig::get()->isClient() &&
             !RewindManager::get()->isRewinding())
         {
-            // ================================================================
-            class AnimationEvent : public RewindInfo
-            {
-            private:
-                AbstractKart* m_kart;
-                Vec3 m_linear_velocity, m_angular_velocity;
-                btTransform m_transform;
-            public:
-                AnimationEvent(AbstractKart* kart)
-                    : RewindInfo(World::getWorld()->getTicksSinceStart(),
-                                 true/*is_confirmed*/)
+            AbstractKart* kart = m_kart;
+            Vec3 linear_velocity = kart->getBody()->getLinearVelocity();
+            Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
+            btTransform transform = kart->getBody()->getWorldTransform();
+            RewindManager::get()->getRewindQueue().insertRewindInfo(new
+                RewindInfoEventFunction(
+                World::getWorld()->getTicksSinceStart(),
+                [kart]()
                 {
-                    m_kart = kart;
-                    m_linear_velocity = m_kart->getBody()->getLinearVelocity();
-                    m_angular_velocity =
-                        m_kart->getBody()->getAngularVelocity();
-                    m_transform = m_kart->getBody()->getWorldTransform();
-                }
-                // ------------------------------------------------------------
-                virtual void restore()                                       {}
-                // ------------------------------------------------------------
-                virtual bool isEvent() const                   { return true; }
-                // ------------------------------------------------------------
-                virtual void undo()
-                                { Physics::getInstance()->removeKart(m_kart); }
-                // ------------------------------------------------------------
-                virtual void replay()
+                    Physics::getInstance()->removeKart(kart);
+                },
+                [kart, linear_velocity, angular_velocity, transform]()
                 {
-                    Physics::getInstance()->addKart(m_kart);
-                    m_kart->getBody()->setLinearVelocity(m_linear_velocity);
-                    m_kart->getBody()->setAngularVelocity(m_angular_velocity);
-                    m_kart->getBody()->proceedToTransform(m_transform);
-                    m_kart->setTrans(m_transform);
-                }
-            };
-            RewindManager::get()->getRewindQueue().insertRewindInfo
-                (new AnimationEvent(m_kart));
+                    Physics::getInstance()->addKart(kart);
+                    kart->getBody()->setLinearVelocity(linear_velocity);
+                    kart->getBody()->setAngularVelocity(angular_velocity);
+                    kart->getBody()->proceedToTransform(transform);
+                    kart->setTrans(transform);
+                }));
         }
-
     }
 }   // ~AbstractKartAnimation
 
