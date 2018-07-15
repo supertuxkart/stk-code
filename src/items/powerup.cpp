@@ -440,7 +440,7 @@ void Powerup::use()
 }   // use
 
 //-----------------------------------------------------------------------------
-/** This function is called when a bnous box is it. This function can be
+/** This function is called when a bonus box is it. This function can be
  *  called on a server (in which case item and add_info are not used),
  *  or on a client, in which case the item and additional info is used
  *  to make sure server and clients are synched correctly.
@@ -458,64 +458,48 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     unsigned int n=1;
     PowerupManager::PowerupType new_powerup;
 
-    // Check if rubber ball is the current power up held by the kart. If so,
-    // reset the bBallCollectTime to 0 before giving new powerup.
-    if(m_type == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(0);
-
-    World *world = World::getWorld();
-    // Check if two bouncing balls are collected less than getRubberBallTimer()
-    //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
-    for (int i = 0; i < 20; i++)
-    {
-        // Determine a 'random' number based on time, index of the item,
-        // and position of the kart. The idea is that this process is
-        // randomly enough to get the right distribution of the powerups,
-        // does not involve additional network communication to keep 
-        // client and server in sync, and is not exploitable:
-        // While it is not possible for a client to determine the item
-        // (the server will always finally determine which item a player
-        // receives), we need to make sure that people cannot modify the
-        // sources and display the item that will be collected next
-        // at a box - otherwise the player could chose the 'best' box.
-        // Using synchronised pseudo-random-generators would not prevent
-        // cheating, since the a cheater could determine the next random
-        // number that will be used. If we use the server to always
-        // send the information to the clients, we need to add a delay
-        // before items can be used.
-        // So instead we determine a random number that is based on:
-        // (1) The item id
-        // (2) The time
-        // (3) The position of the kart
-        // Using (1) means that not all boxes at a certain time for a kart
-        // will give the same box. Using (2) means that the item will
-        // change over time - even if the next item is displayed, it 
-        // will mean a cheater has to wait, and because of the frequency
-        // of the time component it will also be difficult to get the
-        // item at the right time. Using (3) adds another cheat-prevention
-        // layer: even if a cheater is waiting for the right sequence
-        // of items, if he is overtaken the sequence will change.
-        //
-        // In order to increase the probability of correct client prediction
-        // in networking (where there might be 1 or 2 frames difference
-        // between client and server when collecting an item), the time
-        // is divided by 10, meaning even if there is one frame difference,
-        // the client will still have a 90% chance to correctly predict the
-        // item. We multiply the item with a 'large' (more or less random)
-        // number to spread the random values across the (typically 200)
-        // weights used in the PowerupManager - same for the position.
-        int random_number = item_state.getItemId()*31 
-                          + world->getTimeTicks() / 10 + position*23;
-        new_powerup =
-            powerup_manager->getRandomPowerup(position, &n, random_number);
-        if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-            (world->getTicksSinceStart() - powerup_manager->getBallCollectTicks())
-            > RubberBall::getTicksBetweenRubberBalls())
-            break;
-    }
-
-    if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(world->getTimeTicks());
+    // Determine a 'random' number based on time, index of the item,
+    // and position of the kart. The idea is that this process is
+    // randomly enough to get the right distribution of the powerups,
+    // does not involve additional network communication to keep 
+    // client and server in sync, and is not exploitable:
+    // While it is not possible for a client to determine the item
+    // (the server will always finally determine which item a player
+    // receives), we need to make sure that people cannot modify the
+    // sources and display the item that will be collected next
+    // at a box - otherwise the player could chose the 'best' box.
+    // Using synchronised pseudo-random-generators would not prevent
+    // cheating, since the a cheater could determine the next random
+    // number that will be used. If we use the server to always
+    // send the information to the clients, we need to add a delay
+    // before items can be used.
+    // So instead we determine a random number that is based on:
+    // (1) The item id
+    // (2) The time
+    // (3) The position of the kart
+    // Using (1) means that not all boxes at a certain time for a kart
+    // will give the same box. Using (2) means that the item will
+    // change over time - even if the next item is displayed, it 
+    // will mean a cheater has to wait, and because of the frequency
+    // of the time component it will also be difficult to get the
+    // item at the right time. Using (3) adds another cheat-prevention
+    // layer: even if a cheater is waiting for the right sequence
+    // of items, if he is overtaken the sequence will change.
+    //
+    // In order to increase the probability of correct client prediction
+    // in networking (where there might be 1 or 2 frames difference
+    // between client and server when collecting an item), the time
+    // is divided by 10, meaning even if there is one frame difference,
+    // the client will still have a 90% chance to correctly predict the
+    // item. We multiply the item with a 'large' (more or less random)
+    // number to spread the random values across the (typically 200)
+    // weights used in the PowerupManager - same for the position.
+    int random_number = simplePRNG(0, item_state.getItemId(), position);
+#ifdef ITEM_DISTRIBUTION_DEBUG
+    Log::verbose("Powerup", "Final PRN is %d", random_number);
+#endif
+    new_powerup =
+        powerup_manager->getRandomPowerup(position, &n, random_number);
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).
@@ -540,3 +524,50 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // POWERUP_MODE_SAME
 
 }   // hitBonusBox
+
+//-----------------------------------------------------------------------------
+/** This function is called when a pseudo-random number for a new item
+ *  is needed.
+ *  Usual PRNG update their state when generating a number. For synchronization
+ *  purposes, this would create a difficulty. If the collection of an item
+ *  box is mispredicted, the PRNG could go out of synch. And if messages had
+ *  to be sent to resynch the PRNG, then it would be more efficient to directly
+ *  send appropriate final pseudo-random number for the items.
+ *  The state of the simplePRNG is defined by the seed it is called with
+ *  (determined at race start and constant),
+ *  and some race parameters :
+ *  - the current time of the race
+ *  - the collected item ID
+ *  - the kart's position
+ *  The simplePRNG takes advantage of the fact that this state will have more
+ *  significant bits that the needed output to extract higher-order bits and
+ *  get enough impredictability - and regularity - for our purpose.
+ *  The simplePRNG is modulo 2^31 : it doesn't need to do modulo calculations,
+ *  the arithmetic of 32-bit ints take care of this automatically.
+ *  \param state The base number.
+ */
+int Powerup::simplePRNG(const int seed, const int item_id, const int position)
+{
+    const int time = World::getWorld()->getTimeTicks() / 10;
+    const int c = 12345*(1+2*time); // This is always an odd number
+
+    const int a = 1103515245;
+    int rand = a*(seed + c);
+    if (rand < 0)
+    {
+        // We substract 2^31, which sends back the number to the positives
+        // while keeping the same value modulo 2^31
+        rand += -2147483648;
+    }
+    if (position > 0 && position > item_id)
+        return simplePRNG(rand, item_id, position-1);
+    else if (item_id > 0)
+        return simplePRNG(-2147483648 - rand, item_id-1, 0);
+
+#ifdef ITEM_DISTRIBUTION_DEBUG
+    Log::verbose("Powerup", "Raw PRN is %d", rand);
+#endif
+
+    // Return the final value and drop the lower order bits
+    return (rand/65536);
+} // simplePRNG
