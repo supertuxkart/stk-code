@@ -23,7 +23,6 @@
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
-#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 
@@ -84,9 +83,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
     {
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         Physics::getInstance()->addKart(m_kart);
-        if (NetworkConfig::get()->isNetworking() &&
-            NetworkConfig::get()->isClient() &&
-            !RewindManager::get()->isRewinding())
+        if (RewindManager::get()->useLocalEvent())
         {
             AbstractKart* kart = m_kart;
             Vec3 linear_velocity = kart->getBody()->getLinearVelocity();

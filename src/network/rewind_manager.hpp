@@ -198,6 +198,8 @@ public:
        in different thread safely. */
     const std::vector<std::string>& getRewinderUsing() const
                                            { return m_current_rewinder_using; }
+    // ------------------------------------------------------------------------
+    bool useLocalEvent() const;
 
 };   // RewindManager
 

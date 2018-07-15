@@ -353,3 +353,10 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     history->setReplayHistory(is_history);
     m_is_rewinding = false;
 }   // rewindTo
+
+// ----------------------------------------------------------------------------
+bool RewindManager::useLocalEvent() const
+{
+    return NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() && !m_is_rewinding;
+}   // useLocalEvent
