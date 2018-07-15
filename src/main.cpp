@@ -950,7 +950,7 @@ int handleCmdLine()
         UserConfigParams::m_arena_ai_stats=true;
         race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
         std::vector<std::string> l;
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 8; i++)
             l.push_back("tux");
         race_manager->setDefaultAIKartList(l);
         race_manager->setNumKarts(9);
