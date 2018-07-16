@@ -129,6 +129,7 @@ void btKart::reset()
     m_time_additional_rotation   = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
+    m_cushioning_disable_time    = 0;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
@@ -525,6 +526,8 @@ void btKart::updateVehicle( btScalar step )
     // not be strong enough to prevent the chassis from hitting the ground.
     // Try to detect this upcoming crash, and apply an upward impulse if
     // necessary that will slow down the falling speed.
+    m_cushioning_disable_time --;
+
     bool needed_cushioning = false;
     btVector3 v =
         m_chassisBody->getVelocityInLocalPoint(m_wheelInfo[wheel_index]
@@ -552,10 +555,16 @@ void btKart::updateVehicle( btScalar step )
     // predict the upcoming collision correcty - so we add an offset
     // to the predicted kart movement, which was found experimentally:
     btScalar gravity = m_chassisBody->getGravity().length();
-    if (v_down.getY()<0 && 
+    if (v_down.getY()<0 && m_cushioning_disable_time <=0 &&
         m_wheelInfo[wheel_index].m_raycastInfo.m_suspensionLength 
                             < step * (-v_down.getY()+gravity*step)+offset)
     {
+        // Disable more cushioning for 1 second. This avoids the problem
+        // of hovering: a kart gets cushioned on a down-sloping area, still
+        // moves forwards, gets cushioned again etc. --> kart is hovering
+        // and not controllable. 
+        m_cushioning_disable_time = 120;
+
         needed_cushioning = true;
         btVector3 impulse = down * (-v_down.getY() + gravity*step)
                           / m_chassisBody->getInvMass();
@@ -702,6 +711,10 @@ void btKart::updateSuspension(btScalar deltaTime)
             // a force pulling the axis down (towards the ground). Note that it
             // is already guaranteed that either both or no wheels on one axis
             // are on the ground, so we have to test only one of the wheels
+            // In hindsight it turns out that this code basically adds
+            // additional gravity when a kart is flying. So if this code would
+            // be removed some jumps (esp. Enterprise) do not work as expected
+            // anymore.
             wheel_info.m_wheelsSuspensionForce =
                  -m_kart->getKartProperties()->getStabilityTrackConnectionAccel()
                 * chassisMass;

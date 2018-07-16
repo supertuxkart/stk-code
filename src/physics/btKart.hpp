@@ -93,6 +93,9 @@ private:
     /** Number of wheels that touch the ground. */
     int                 m_num_wheels_on_ground;
 
+    /** Number of time steps during which cushioning is disabled. */
+    int                 m_cushioning_disable_time;
+
     /** Index of the right axis. */
     int                 m_indexRightAxis;
     /** Index of the up axis. */
