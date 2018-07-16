@@ -360,6 +360,10 @@ namespace MiniGLM
         }
         if (calculate_w)
         {
+            float inv_sqrt_2 = 1.0f / sqrtf(2.0f);
+            ret[0] *= inv_sqrt_2;
+            ret[1] *= inv_sqrt_2;
+            ret[2] *= inv_sqrt_2;
             float largest_val = sqrtf(fmaxf(0.0f, 1.0f -
                 (ret[0] * ret[0]) - (ret[1] * ret[1]) - (ret[2] * ret[2])));
             part = (packed >> 30) & 3;
@@ -432,38 +436,39 @@ namespace MiniGLM
         auto ret = std::max_element(tmp_2.begin(), tmp_2.end(),
             [](float a, float b) { return std::abs(a) < std::abs(b); });
         int extra_2_bit = int(std::distance(tmp_2.begin(), ret));
+        float sqrt_2 = sqrtf(2.0f);
         switch (extra_2_bit)
         {
         case 0:
         {
             float neg = tmp_2[0] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[1] * neg;
-            tmp_3[1] = tmp_2[2] * neg;
-            tmp_3[2] = tmp_2[3] * neg;
+            tmp_3[0] = tmp_2[1] * neg * sqrt_2;
+            tmp_3[1] = tmp_2[2] * neg * sqrt_2;
+            tmp_3[2] = tmp_2[3] * neg * sqrt_2;
             break;
         }
         case 1:
         {
             float neg = tmp_2[1] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[0] * neg;
-            tmp_3[1] = tmp_2[2] * neg;
-            tmp_3[2] = tmp_2[3] * neg;
+            tmp_3[0] = tmp_2[0] * neg * sqrt_2;
+            tmp_3[1] = tmp_2[2] * neg * sqrt_2;
+            tmp_3[2] = tmp_2[3] * neg * sqrt_2;
             break;
         }
         case 2:
         {
             float neg = tmp_2[2] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[0] * neg;
-            tmp_3[1] = tmp_2[1] * neg;
-            tmp_3[2] = tmp_2[3] * neg;
+            tmp_3[0] = tmp_2[0] * neg * sqrt_2;
+            tmp_3[1] = tmp_2[1] * neg * sqrt_2;
+            tmp_3[2] = tmp_2[3] * neg * sqrt_2;
             break;
         }
         case 3:
         {
             float neg = tmp_2[3] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[0] * neg;
-            tmp_3[1] = tmp_2[1] * neg;
-            tmp_3[2] = tmp_2[2] * neg;
+            tmp_3[0] = tmp_2[0] * neg * sqrt_2;
+            tmp_3[1] = tmp_2[1] * neg * sqrt_2;
+            tmp_3[2] = tmp_2[2] * neg * sqrt_2;
             break;
         }
         default:
