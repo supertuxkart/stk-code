@@ -1266,6 +1266,12 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
+    if(m_speed < 5.0f)
+        m_body->setRestitution(1.0f);
+    else if(m_speed<20.0f)
+        m_body->setRestitution(1.0f-(m_speed-5.0f)/15.0f);
+    else
+        m_body->setRestitution(0.0f);
     // Reset any instand speed increase in the bullet kart
     m_vehicle->setMinSpeed(0);
 
