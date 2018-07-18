@@ -543,6 +543,10 @@ void World::onGo()
         if (m_karts[i]->isGhostKart()) continue;
         m_karts[i]->getVehicle()->setAllBrakes(0);
     }
+    // Reset track objects 1 more time to make sure all instances of moveable
+    // fall at the same instant when race start in network
+    if (NetworkConfig::get()->isNetworking())
+        Track::getCurrentTrack()->getTrackObjectManager()->reset();
 }   // onGo
 
 //-----------------------------------------------------------------------------
