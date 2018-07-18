@@ -278,6 +278,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     // 2) Apply all events to current confirmed state:
     int current_time = m_confirmed_state_time;
+    bool has_state = count > 0;
     while(count > 0)
     {
         // 1) Decode the event in the message
@@ -331,8 +332,11 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }   // while count >0
 
     // Inform the server which events have been received.
-    if (auto gp = GameProtocol::lock())
-        gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
+    if (has_state)
+    {
+        if (auto gp = GameProtocol::lock())
+            gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
+    }
 
     // Forward the confirmed item state till the world time:
     int dt = World::getWorld()->getTicksSinceStart() - current_time;
