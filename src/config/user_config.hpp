@@ -469,10 +469,11 @@ namespace UserConfigParams
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
 
-    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
-            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+    PARAM_PREFIX IntUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_mode",
             &m_multitouch_group,
-            "Enable screen keyboard.") );
+            "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
+            "keyboard, 2 = always enabled") );
             
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
