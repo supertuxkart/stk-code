@@ -438,6 +438,11 @@
            period, which results in less abrupt changes. If set to 0,
            the impulse is only applied once.
          resitution: restitution value to be used for the kart rigid bodies.
+           The restitution used depends on the speed to avoid physics issues
+           (a collision with high speed and high restitution will push the
+           kart high up into the air). The values specified are
+           speed:restitution pairs, the actual restitution will be
+           interpolated based on the points specified here.
          bevel-factor: for each point of the chassis collision box one
            additional point is added, resulting in a bevelled box shape.
            The original Z coordinate of the chassis is multiplied by
@@ -457,7 +462,7 @@
            behaviour of the karts. -->
     <collision impulse-type="normal"
                impulse="3000" impulse-time="0.1" terrain-impulse="160"
-               restitution="1.0" bevel-factor="0.5 0.0 0.3"
+               restitution="0:1.0 5:1.0 20:0.2" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 
      <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.

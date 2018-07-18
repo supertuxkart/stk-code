@@ -82,7 +82,7 @@ KartProperties::KartProperties(const std::string &filename)
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
     m_wheel_base = m_friction_slip = m_collision_terrain_impulse =
-        m_collision_impulse = m_restitution = m_collision_impulse_time =
+        m_collision_impulse = m_collision_impulse_time =
         m_max_lean = m_lean_speed = m_physical_wheel_position = UNDEFINED;
 
     m_terrain_impulse_type       = IMPULSE_NONE;
@@ -499,7 +499,7 @@ void KartProperties::getAllData(const XMLNode * root)
 void KartProperties::checkAllSet(const std::string &filename)
 {
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                      \
-        Log::fatal("[KartProperties]",                                \
+        Log::fatal("KartProperties",                                \
                     "Missing default value for '%s' in '%s'.",    \
                     strA,filename.c_str());                \
     }
@@ -508,8 +508,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_collision_terrain_impulse,  "collision terrain-impulse"     );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
-    CHECK_NEG(m_restitution,                "collision restitution"         );
     CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
+
+    if(m_restitution.size()<1)
+        Log::fatal("KartProperties", "Missing restitution value.");
 
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         m_ai_properties[i]->checkAllSet(filename);

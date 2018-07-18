@@ -201,9 +201,8 @@ private:
     /** How long the collision impulse should be applied. */
     float m_collision_impulse_time;
 
-    /** The restitution factor to be used in collsions for this kart. */
-    float m_restitution;
-
+    /** Restitution depending on speed. */
+    InterpolationArray m_restitution;
 
     void  load              (const std::string &filename,
                              const std::string &node);
@@ -340,7 +339,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the restitution factor for this kart. */
-    float getRestitution            () const { return m_restitution; }
+    float getRestitution(float speed) const { return m_restitution.get(speed);}
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the AI properties. */
