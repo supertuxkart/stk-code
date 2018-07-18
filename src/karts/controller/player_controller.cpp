@@ -328,13 +328,6 @@ void PlayerController::update(int ticks)
 {
     steer(ticks, m_steer_val);
 
-    if (World::getWorld()->getPhase() == World::GOAL_PHASE)
-    {
-        m_controls->setBrake(false);
-        m_controls->setAccel(0.0f);
-        return;
-    }
-
     if (World::getWorld()->isStartPhase())
     {
         if (m_controls->getAccel() || m_controls->getBrake()||

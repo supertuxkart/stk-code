@@ -12,7 +12,9 @@ public:
     enum GameEventType : uint8_t
     {
         GE_KART_FINISHED_RACE = 1,
-        GE_PLAYER_DISCONNECT = 2
+        GE_PLAYER_DISCONNECT = 2,
+        GE_RESET_BALL = 3,
+        GE_PLAYER_GOAL = 4
     };   // GameEventType
 private:
     void eliminatePlayer(const NetworkString &ns);
