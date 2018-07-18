@@ -452,7 +452,7 @@ void WorldStatus::updateTime(int ticks)
                 m_count_up_ticks++;
             }
 
-            if(m_time_ticks <= 0.0)
+            if (m_time_ticks <= 0)
             {
                 // event
                 countdownReachedZero();

@@ -472,6 +472,9 @@ bool SoccerWorld::isRaceOver()
  */
 void SoccerWorld::countdownReachedZero()
 {
+    // Prevent negative time in network soccer when finishing
+    m_time_ticks = 0;
+    m_time = 0.0f;
     m_count_down_reached_zero = true;
 }   // countdownReachedZero
 
