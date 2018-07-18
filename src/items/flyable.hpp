@@ -204,7 +204,7 @@ public:
     void         setHasHit   () { m_has_hit_something = true; }
     // ------------------------------------------------------------------------
     /** Resets this flyable. */
-    void         reset       () { Moveable::reset();          }
+    void         reset() OVERRIDE { Moveable::reset();          }
     // ------------------------------------------------------------------------
     /** Returns the type of flyable. */
     PowerupManager::PowerupType getType() const {return m_type;}
