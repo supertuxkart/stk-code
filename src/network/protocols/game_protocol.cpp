@@ -82,6 +82,13 @@ void GameProtocol::update(int ticks)
     // Add all actions
     for (auto a : m_all_actions)
     {
+        if (Network::m_connection_debug)
+        {
+            Log::verbose("GameProtocol",
+                "Controller action: %d %d %d %d %d %d",
+                a.m_ticks, a.m_kart_id, a.m_action, a.m_value, a.m_value_l,
+                a.m_value_r);
+        }
         m_data_to_send->addUInt32(a.m_ticks);
         m_data_to_send->addUInt8(a.m_kart_id);
         m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value)
@@ -183,6 +190,12 @@ void GameProtocol::handleControllerAction(Event *event)
         int value   = data.getUInt32();
         int value_l = data.getUInt32();
         int value_r = data.getUInt32();
+        if (Network::m_connection_debug)
+        {
+            Log::verbose("GameProtocol",
+                "Controller action: %d %d %d %d %d %d",
+                cur_ticks, kart_id, action, value, value_l, value_r);
+        }
         BareNetworkString *s = new BareNetworkString(3);
         s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                             .addUInt32(value_l).addUInt32(value_r);
