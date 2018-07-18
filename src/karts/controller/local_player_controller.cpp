@@ -39,6 +39,7 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
+#include "network/rewind_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -114,7 +115,6 @@ LocalPlayerController::~LocalPlayerController()
  */
 void LocalPlayerController::reset()
 {
-    m_actions.fill(0);
     PlayerController::reset();
     m_sound_schedule = false;
 }   // reset
@@ -150,58 +150,35 @@ void LocalPlayerController::resetInputState()
 bool LocalPlayerController::action(PlayerAction action, int value,
                                    bool dry_run)
 {
+    // Pause race doesn't need to be sent to server
     if (action == PA_PAUSE_RACE)
     {
         PlayerController::action(action, value);
         return true;
     }
-    m_actions[action] = value;
-    return true;
-}   // action
 
-// ----------------------------------------------------------------------------
-void LocalPlayerController::handleBufferedActions(double time_spent)
-{
-    if (!isLocalPlayerController())
-        return;
+    // If this event does not change the control state (e.g.
+    // it's a (auto) repeat event), do nothing. This especially
+    // optimises traffic to the server and other clients.
+    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
 
-    // There is 0.1 delay in server, if time_spent is more than ~0.1, than
-    // the timer will be incorrect, in this case ignore all actions
-    if (time_spent > 0.09 && NetworkConfig::get()->isNetworking())
+    // Register event with history
+    if(!history->replayHistory())
+        history->addEvent(m_kart->getWorldKartId(), action, value);
+
+    // If this is a client, send the action to networking layer
+    if (World::getWorld()->isNetworkWorld() &&
+        NetworkConfig::get()->isClient() &&
+        !RewindManager::get()->isRewinding())
     {
-        Log::warn("LocalPlayerController", "Update race is too slow to catch"
-            " up: %lf", time_spent);
-        return;
-    }
-
-    for (int i = 0; i < PA_PAUSE_RACE; i++)
-    {
-        PlayerAction action = (PlayerAction)i;
-        int value = m_actions[i];
-
-        // If this event does not change the control state (e.g.
-        // it's a (auto) repeat event), do nothing. This especially
-        // optimises traffic to the server and other clients.
-        if (!PlayerController::action(action, value, /*dry_run*/true))
-            continue;
-
-        // Register event with history
-        if(!history->replayHistory())
-            history->addEvent(m_kart->getWorldKartId(), action, value);
-
-        // If this is a client, send the action to networking layer
-        if (World::getWorld()->isNetworkWorld() &&
-            NetworkConfig::get()->isClient())
+        if (auto gp = GameProtocol::lock())
         {
-            if (auto gp = GameProtocol::lock())
-            {
-                gp->controllerAction(m_kart->getWorldKartId(), action, value,
-                    m_steer_val_l, m_steer_val_r);
-            }
+            gp->controllerAction(m_kart->getWorldKartId(), action, value,
+                m_steer_val_l, m_steer_val_r);
         }
-        PlayerController::action(action, value, /*dry_run*/false);
     }
-}   // handleBufferedActions
+    return PlayerController::action(action, value, /*dry_run*/false);
+}   // action
 
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.

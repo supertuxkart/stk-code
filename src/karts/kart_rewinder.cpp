@@ -21,7 +21,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/controller.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
@@ -121,7 +121,6 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->add(q);
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
-    buffer->addUInt8(m_has_started);   // necessary for startup speed boost
     buffer->addFloat(m_vehicle->getMinSpeed());
     buffer->addFloat(m_vehicle->getTimedRotationTime());
     buffer->add(m_vehicle->getTimedRotation());
@@ -130,13 +129,12 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     // -------------------------------------
     getControls().saveState(buffer);
     getController()->saveState(buffer);
-    buffer->addTime(m_brake_ticks);
 
     // 3) Attachment, powerup, nitro
     // -----------------------------
     getAttachment()->saveState(buffer);
     getPowerup()->saveState(buffer);
-    buffer->addUInt8(m_min_nitro_ticks).addFloat(getEnergy());
+    buffer->addFloat(getEnergy());
 
     // 4) Max speed info
     // ------------------
@@ -179,7 +177,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         setTrans(t);
     }
 
-    m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
     m_vehicle->setMinSpeed(buffer->getFloat());
     float time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
@@ -195,7 +192,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // ------------------------------
     getControls().rewindTo(buffer);
     getController()->rewindTo(buffer);
-    m_brake_ticks = buffer->getTime();
 
     // 3) Attachment, powerup, nitro
     // ------------------------------
@@ -204,7 +200,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     updateWeight();
 
     getPowerup()->rewindTo(buffer);
-    m_min_nitro_ticks = buffer->getUInt8();
     float nitro = buffer->getFloat();
     setEnergy(nitro);
 
@@ -240,27 +235,51 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
         return nullptr;
 
     // In theory all ticks / boolean related stuff can be saved locally
+    bool has_started = m_has_started;
     int bubblegum_ticks = m_bubblegum_ticks;
     int bounce_back_ticks = m_bounce_back_ticks;
     int invulnerable_ticks = m_invulnerable_ticks;
     int squash_ticks = m_squash_ticks;
     bool fire_clicked = m_fire_clicked;
     int view_blocked_by_plunger = m_view_blocked_by_plunger;
+    int brake_ticks = m_brake_ticks;
+    int8_t min_nitro_ticks = m_min_nitro_ticks;
 
     // Attachment local state
     float initial_speed = getAttachment()->getInitialSpeed();
     float node_scale = getAttachment()->getNodeScale();
-    return [bubblegum_ticks, bounce_back_ticks, invulnerable_ticks, squash_ticks,
-        fire_clicked, view_blocked_by_plunger, initial_speed,
-        node_scale, this]()
+
+    // Controller local state
+    int steer_val_l = 0;
+    int steer_val_r = 0;
+    PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
+    if (pc)
     {
+        steer_val_l = pc->m_steer_val_l;
+        steer_val_r = pc->m_steer_val_r;
+    }
+
+    return [has_started, bubblegum_ticks, bounce_back_ticks,
+        invulnerable_ticks, squash_ticks, fire_clicked,
+        view_blocked_by_plunger, brake_ticks, min_nitro_ticks, initial_speed,
+        node_scale, steer_val_l, steer_val_r, this]()
+    {
+        m_has_started = has_started;
         m_bubblegum_ticks = bubblegum_ticks;
         m_bounce_back_ticks = bounce_back_ticks;
         m_invulnerable_ticks = invulnerable_ticks;
         m_squash_ticks = squash_ticks;
         m_fire_clicked = fire_clicked;
         m_view_blocked_by_plunger = view_blocked_by_plunger;
+        m_brake_ticks = brake_ticks;
+        m_min_nitro_ticks = min_nitro_ticks;
         getAttachment()->setInitialSpeed(initial_speed);
         getAttachment()->setNodeScale(node_scale);
+        PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
+        if (pc)
+        {
+            pc->m_steer_val_l = steer_val_l;
+            pc->m_steer_val_r = steer_val_r;
+        }
     };
 }   // getLocalStateRestoreFunction

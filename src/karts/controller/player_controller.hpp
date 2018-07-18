@@ -26,6 +26,7 @@ class Player;
 
 class PlayerController : public Controller
 {
+friend class KartRewinder;
 protected:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
     int            m_prev_accel;
