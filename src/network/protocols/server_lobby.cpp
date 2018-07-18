@@ -139,6 +139,59 @@ void ServerLobby::setup()
         all_t.resize(65535);
     m_available_kts.first = { all_k.begin(), all_k.end() };
     m_available_kts.second = { all_t.begin(), all_t.end() };
+    switch (NetworkConfig::get()->getLocalGameMode().first)
+    {
+        case RaceManager::MINOR_MODE_NORMAL_RACE:
+        case RaceManager::MINOR_MODE_TIME_TRIAL:
+        case RaceManager::MINOR_MODE_FOLLOW_LEADER:
+        {
+            auto it = m_available_kts.second.begin();
+            while (it != m_available_kts.second.end())
+            {
+                Track* t =  track_manager->getTrack(*it);
+                if (t->isArena() || t->isSoccer() || t->isInternal())
+                {
+                    it = m_available_kts.second.erase(it);
+                }
+                else
+                    it++;
+            }
+            break;
+        }
+        case RaceManager::MINOR_MODE_3_STRIKES:
+        {
+            auto it = m_available_kts.second.begin();
+            while (it != m_available_kts.second.end())
+            {
+                Track* t =  track_manager->getTrack(*it);
+                if (!t->isArena() ||  t->isInternal())
+                {
+                    it = m_available_kts.second.erase(it);
+                }
+                else
+                    it++;
+            }
+            break;
+        }
+        case RaceManager::MINOR_MODE_SOCCER:
+        {
+            auto it = m_available_kts.second.begin();
+            while (it != m_available_kts.second.end())
+            {
+                Track* t =  track_manager->getTrack(*it);
+                if (!t->isSoccer() || t->isInternal())
+                {
+                    it = m_available_kts.second.erase(it);
+                }
+                else
+                    it++;
+            }
+            break;
+        }
+        default:
+            assert(false);
+            break;
+    }
 
     m_server_has_loaded_world.store(false);
 
@@ -740,59 +793,6 @@ void ServerLobby::startSelection(const Event *event)
         m_available_kts.second.erase(track_erase);
     }
 
-    switch (NetworkConfig::get()->getLocalGameMode().first)
-    {
-        case RaceManager::MINOR_MODE_NORMAL_RACE:
-        case RaceManager::MINOR_MODE_TIME_TRIAL:
-        case RaceManager::MINOR_MODE_FOLLOW_LEADER:
-        {
-            auto it = m_available_kts.second.begin();
-            while (it != m_available_kts.second.end())
-            {
-                Track* t =  track_manager->getTrack(*it);
-                if (t->isArena() || t->isSoccer() || t->isInternal())
-                {
-                    it = m_available_kts.second.erase(it);
-                }
-                else
-                    it++;
-            }
-            break;
-        }
-        case RaceManager::MINOR_MODE_3_STRIKES:
-        {
-            auto it = m_available_kts.second.begin();
-            while (it != m_available_kts.second.end())
-            {
-                Track* t =  track_manager->getTrack(*it);
-                if (!t->isArena() ||  t->isInternal())
-                {
-                    it = m_available_kts.second.erase(it);
-                }
-                else
-                    it++;
-            }
-            break;
-        }
-        case RaceManager::MINOR_MODE_SOCCER:
-        {
-            auto it = m_available_kts.second.begin();
-            while (it != m_available_kts.second.end())
-            {
-                Track* t =  track_manager->getTrack(*it);
-                if (!t->isSoccer() || t->isInternal())
-                {
-                    it = m_available_kts.second.erase(it);
-                }
-                else
-                    it++;
-            }
-            break;
-        }
-        default:
-            assert(false);
-            break;
-    }
     const auto& all_k = m_available_kts.first;
     const auto& all_t = m_available_kts.second;
     ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
