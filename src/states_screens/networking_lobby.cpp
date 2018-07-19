@@ -17,6 +17,7 @@
 
 #include "states_screens/networking_lobby.hpp"
 
+#include <cmath>
 #include <algorithm>
 #include <string>
 
@@ -220,7 +221,13 @@ void NetworkingLobby::onUpdate(float delta)
         else if (cur_player < m_server_max_player * m_start_threshold)
         {
             m_cur_starting_timer = std::numeric_limits<float>::max();
-            m_timeout_message->setText(L"", true);
+            //I18N: In the networking lobby, display the number of players
+            //required to start a game for owner-less server
+            core::stringw msg =
+                _P("Game will start if there is more than %d player.",
+               "Game will start if there are more than %d players.",
+               (int)floor(m_server_max_player * m_start_threshold));
+            m_timeout_message->setText(msg, true);
         }
 
         if (m_cur_starting_timer != std::numeric_limits<float>::max())
