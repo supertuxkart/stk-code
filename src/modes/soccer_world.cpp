@@ -38,6 +38,8 @@
 #include "network/stk_host.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/graph.hpp"
+#include "tracks/quad.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track_sector.hpp"
@@ -211,10 +213,10 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(int ticks)
 {
     updateBallPosition(ticks);
+    updateSectorForKarts();
     if (Track::getCurrentTrack()->hasNavMesh() &&
         !NetworkConfig::get()->isNetworking())
     {
-        updateSectorForKarts();
         updateAIData();
     }
 
@@ -808,12 +810,25 @@ int SoccerWorld::getTeamNum(SoccerTeam team) const
 //-----------------------------------------------------------------------------
 unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
 {
-    std::map<int, unsigned int>::const_iterator n =
-        m_kart_position_map.find(kart->getWorldKartId());
-
-    assert (n != m_kart_position_map.end());
-    return n->second;
+    int last_valid_node =
+        getTrackSector(kart->getWorldKartId())->getLastValidGraphNode();
+    if (last_valid_node >= 0)
+        return last_valid_node;
+    Log::warn("SoccerWorld", "Missing last valid node for rescuing");
+    return 0;
 }   // getRescuePositionIndex
+
+//-----------------------------------------------------------------------------
+btTransform SoccerWorld::getRescueTransform(unsigned int rescue_pos) const
+{
+    const Vec3 &xyz = Graph::get()->getQuad(rescue_pos)->getCenter();
+    const Vec3 &normal = Graph::get()->getQuad(rescue_pos)->getNormal();
+    btTransform pos;
+    pos.setOrigin(xyz);
+    btQuaternion q1 = shortestArcQuat(Vec3(0.0f, 1.0f, 0.0f), normal);
+    pos.setRotation(q1);
+    return pos;
+}   // getRescueTransform
 
 //-----------------------------------------------------------------------------
 void SoccerWorld::enterRaceOverState()

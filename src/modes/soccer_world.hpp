@@ -329,7 +329,8 @@ public:
     virtual void reset() OVERRIDE;
 
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
-
+    virtual btTransform getRescueTransform(unsigned int rescue_pos) const
+        OVERRIDE;
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual void getKartsDisplayInfo(
                std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE {}
