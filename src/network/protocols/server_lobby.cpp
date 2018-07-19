@@ -1857,16 +1857,25 @@ void ServerLobby::handlePendingConnection()
             auto key = m_keys.find(online_id);
             if (key != m_keys.end() && key->second.m_tried == false)
             {
-                if (decryptConnectionRequest(peer, it->second.second,
-                    key->second.m_aes_key, key->second.m_aes_iv, online_id,
-                    key->second.m_name))
+                try
                 {
-                    it = m_pending_connection.erase(it);
-                    m_keys.erase(online_id);
-                    continue;
+                    if (decryptConnectionRequest(peer, it->second.second,
+                        key->second.m_aes_key, key->second.m_aes_iv, online_id,
+                        key->second.m_name))
+                    {
+                        it = m_pending_connection.erase(it);
+                        m_keys.erase(online_id);
+                        continue;
+                    }
+                    else
+                        key->second.m_tried = true;
                 }
-                else
+                catch (std::exception& e)
+                {
+                    Log::error("ServerLobby",
+                        "handlePendingConnection error: %s", e.what());
                     key->second.m_tried = true;
+                }
             }
             it++;
         }
