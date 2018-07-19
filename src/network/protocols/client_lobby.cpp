@@ -166,6 +166,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
             case LE_VOTE: displayPlayerVote(event);                      break;
             case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
+            case LE_BAD_TEAM: handleBadTeam();                           break;
             default:                                                     break;
         }   // switch
 
@@ -611,9 +612,20 @@ void ClientLobby::updatePlayerList(Event* event)
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------
+void ClientLobby::handleBadTeam()
+{
+    SFXManager::get()->quickSound("anvil");
+    //I18N: Display when all players are in red or blue team, which the race
+    //will not be allowed to start
+    core::stringw msg = _("All players joined red or blue team.");
+    MessageQueue::add(MessageQueue::MT_ERROR, msg);
+}   // handleBadTeam
+
+//-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
 {
     SFXManager::get()->quickSound("wee");
+    //I18N: Display when a player is allow to control the server
     core::stringw msg = _("You are now the owner of server.");
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     STKHost::get()->setAuthorisedToControl(true);

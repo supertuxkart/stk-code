@@ -761,6 +761,31 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
+    if (NetworkConfig::get()->hasTeamChoosing())
+    {
+        int red_count = 0;
+        int blue_count = 0;
+        auto players = m_game_setup->getConnectedPlayers();
+        for (auto& player : players)
+        {
+            if (player->getTeam() == SOCCER_TEAM_RED)
+                red_count++;
+            else if (player->getTeam() == SOCCER_TEAM_BLUE)
+                blue_count++;
+            if (red_count != 0 && blue_count != 0)
+                break;
+        }
+        if ((red_count == 0 || blue_count == 0) && players.size() != 1)
+        {
+            Log::warn("ServerLobby", "Bad team choosing.");
+            NetworkString* bt = getNetworkString();
+            bt->addUInt8(LE_BAD_TEAM);
+            sendMessageToPeers(bt, true/*reliable*/);
+            delete bt;
+            return;
+        }
+    }
+
     ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
     if (NetworkConfig::get()->isWAN())
     {
