@@ -54,14 +54,14 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     case GE_RESET_BALL:
     {
         if (!sw)
-            throw("No soccer world");
+            throw std::invalid_argument("No soccer world");
         sw->handleResetBallFromServer(data);
         break;
     }
     case GE_PLAYER_GOAL:
     {
         if (!sw)
-            throw("No soccer world");
+            throw std::invalid_argument("No soccer world");
         sw->handlePlayerGoalFromServer(data);
         break;
     }

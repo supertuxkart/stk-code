@@ -231,7 +231,6 @@ void CutsceneWorld::update(int ticks)
     {
         // this way of calculating time and dt is more in line with what
         // irrlicht does and provides better synchronisation
-        double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
     }
