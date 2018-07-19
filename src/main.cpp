@@ -597,6 +597,8 @@ void cmdLineHelp()
     "                          public port.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
+    "       --init-user        Save the above login and password (if set) in config.\n"
+    "       --disable-polling  Don't poll for logged in user.\n"
     "       --port=n           Port number to use.\n"
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
@@ -604,6 +606,11 @@ void cmdLineHelp()
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --auto-end         Automatically end network game after 1st player finished\n"
     "                          for some time (currently his finished time * 0.25 + 15.0). \n"
+    "       --team-choosing    Allow choosing team in lobby, implicitly allowed in lan or\n"
+    "                          password protected server.\n"
+    "       --soccer-timed     Use time limit mode in network soccer game.\n"
+    "       --soccer-goals     Use goals limit mode in network soccer game.\n"
+    "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
@@ -946,7 +953,7 @@ int handleCmdLine()
         UserConfigParams::m_arena_ai_stats=true;
         race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
         std::vector<std::string> l;
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 8; i++)
             l.push_back("tux");
         race_manager->setDefaultAIKartList(l);
         race_manager->setNumKarts(9);
@@ -1031,6 +1038,13 @@ int handleCmdLine()
         }
     }   // --type
 
+    bool init_user = CommandLine::has("--init-user");
+    if (init_user)
+    {
+        PlayerManager::get()->enforceCurrentPlayer();
+        PlayerManager::getCurrentPlayer()->setRememberPassword(true);
+        UserConfigParams::m_internet_status = Online::RequestManager::IPERM_ALLOWED;
+    }
     if (CommandLine::has("--login", &s))
         login = s.c_str();
     if (CommandLine::has("--password", &s))
@@ -1047,7 +1061,15 @@ int handleCmdLine()
             StkTime::sleep(1);
         }
         Log::info("Main", "Logged in from command-line.");
+        if (init_user)
+            PlayerManager::getCurrentPlayer()->setWasOnlineLastTime(true);
         can_wan = true;
+    }
+    if (init_user)
+    {
+        Log::info("Main", "Done saving user, leaving");
+        cleanSuperTuxKart();
+        return false;
     }
 
     if (!can_wan && CommandLine::has("--login-id", &n) &&
@@ -1070,6 +1092,7 @@ int handleCmdLine()
     {
         server_password = s;
         NetworkConfig::get()->setPassword(server_password);
+        NetworkConfig::get()->setTeamChoosing(true);
     }
 
     if (CommandLine::has("--motd", &s))
@@ -1116,7 +1139,8 @@ int handleCmdLine()
         NetworkConfig::get()->setServerIdFile(
             file_manager->getUserConfigFile(s));
     }
-
+    if(CommandLine::has("--disable-polling"))
+        Online::RequestManager::m_disable_polling = true;
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
     NetworkConfig::get()->
@@ -1131,6 +1155,10 @@ int handleCmdLine()
     if (CommandLine::has("--public-server"))
     {
         NetworkConfig::get()->setIsPublicServer();
+    }
+    if (CommandLine::has("--team-choosing"))
+    {
+        NetworkConfig::get()->setTeamChoosing(true);
     }
     if (CommandLine::has("--connect-now", &s))
     {
@@ -1204,6 +1232,7 @@ int handleCmdLine()
         NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setTeamChoosing(true);
         NetworkConfig::get()->setValidatedPlayers(false);
         server_lobby = STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
@@ -1213,30 +1242,43 @@ int handleCmdLine()
         NetworkConfig::get()->setAutoConnect(true);
     }
 
-    if (CommandLine::has("--extra-server-info", &n))
+    const bool is_soccer =
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    if (CommandLine::has("--soccer-timed") && is_soccer)
     {
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-        {
-            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
-                ->setSoccerGoalTarget(n != 0);
-            NetworkConfig::get()->setServerMode(
-                race_manager->getMinorMode(),
-                RaceManager::MAJOR_MODE_SINGLE);
-        }
-        else
-        {
-            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
-                ->setGrandPrixTrack(n);
-            NetworkConfig::get()->setServerMode(
-                race_manager->getMinorMode(),
-                RaceManager::MAJOR_MODE_GRAND_PRIX);
-        }
+        LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget(false);
+        NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+            RaceManager::MAJOR_MODE_SINGLE);
+    }
+    else if (CommandLine::has("--soccer-goals") && is_soccer)
+    {
+        LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget(true);
+        NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+            RaceManager::MAJOR_MODE_SINGLE);
+    }
+    else if (CommandLine::has("--network-gp", &n))
+    {
+        LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+            ->setGrandPrixTrack(n);
+        NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+            RaceManager::MAJOR_MODE_GRAND_PRIX);
+    }
+    else if (is_soccer)
+    {
+        Log::warn("main", "Set to goal target for soccer server");
+        LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget(true);
+        NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+            RaceManager::MAJOR_MODE_SINGLE);
     }
     else
     {
         NetworkConfig::get()->setServerMode(
             race_manager->getMinorMode(), RaceManager::MAJOR_MODE_SINGLE);
     }
+
     // The extra server info has to be set before server lobby started
     if (server_lobby)
         server_lobby->requestStart();
@@ -1314,21 +1356,6 @@ int handleCmdLine()
         else
             race_manager->setDifficulty(RaceManager::Difficulty(n));
     }   // --mode
-
-    if(CommandLine::has("--type", &n))
-    {
-        switch (n)
-        {
-        case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
-                break;
-        case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-                break;
-        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
-                break;
-        default:
-                Log::warn("main", "Invalid race type '%d' - ignored.", n);
-        }
-    }   // --type
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
@@ -1664,12 +1691,12 @@ void askForInternetPermission()
             // than sorry). If internet should be allowed, the news
             // manager needs to be started (which in turn activates
             // the add-ons manager).
+#ifndef SERVER_ONLY
             bool need_to_start_news_manager =
                 UserConfigParams::m_internet_status !=
                                   Online::RequestManager::IPERM_ALLOWED;
             UserConfigParams::m_internet_status =
                                   Online::RequestManager::IPERM_ALLOWED;
-#ifndef SERVER_ONLY
             if (need_to_start_news_manager)
                 NewsManager::get()->init(false);
 #endif
@@ -1733,6 +1760,8 @@ int main(int argc, char *argv[] )
             FileManager::addRootDirs(s);
         if (CommandLine::has("--stdout", &s))
             FileManager::setStdoutName(s);
+        if (CommandLine::has("--stdout-dir", &s))
+            FileManager::setStdoutDir(s);
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must

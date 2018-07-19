@@ -97,6 +97,8 @@ namespace GUIEngine
 
         void setValues(const KartProperties* props, PerPlayerDifficulty d);
 
+        void hideAll();
+
         /** Change the value of the widget, it must be a percent. */
         void setValue(Stats type, int value);
 

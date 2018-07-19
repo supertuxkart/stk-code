@@ -26,7 +26,8 @@
 
 #include <assert.h>
 #include <atomic>
-#include <list>
+#include <functional>
+#include <map>
 #include <vector>
 
 class RewindInfo;
@@ -87,10 +88,12 @@ private:
      *  rewind data in case of local races only. */
     static bool           m_enable_rewind_manager;
 
-    typedef std::vector<Rewinder *> AllRewinder;
+    std::vector<std::string> m_current_rewinder_using;
+
+    std::map<int, std::vector<std::function<void()> > > m_local_state;
 
     /** A list of all objects that can be rewound. */
-    AllRewinder m_all_rewinder;
+    std::map<std::string, Rewinder*> m_all_rewinder;
 
     /** The queue that stores all rewind infos. */
     RewindQueue m_rewind_queue;
@@ -146,17 +149,26 @@ public:
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(BareNetworkString *buffer, int ticks);
-    void saveState(bool local_save);
-    void saveLocalState();
-    void restoreState(BareNetworkString *buffer);
+    void saveState();
+    // ------------------------------------------------------------------------
+    Rewinder* getRewinder(const std::string& name)
+    {
+        auto it = m_all_rewinder.find(name);
+        if (it == m_all_rewinder.end())
+            return NULL;
+        return it->second;
+    }
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 
      */
     bool addRewinder(Rewinder *rewinder)
     {
-        if(!m_enable_rewind_manager) return false;
-        m_all_rewinder.push_back(rewinder);
+        if (!m_enable_rewind_manager) return false;
+        // Maximum 1 bit to store no of rewinder used
+        if (m_all_rewinder.size() == 255)
+            return false;
+        m_all_rewinder[rewinder->getUniqueIdentity()] = rewinder;
         return true;
     }   // addRewinder
 
@@ -169,13 +181,25 @@ public:
     {
         return m_not_rewound_ticks.load(std::memory_order_relaxed);
     }   // getNotRewoundWorldTicks
-
+    // ------------------------------------------------------------------------
+    RewindQueue& getRewindQueue()                    { return m_rewind_queue; }
     // ------------------------------------------------------------------------
     /** Returns the time of the latest confirmed state. */
     int getLatestConfirmedState() const
     {
         return m_rewind_queue.getLatestConfirmedState(); 
     }   // getLatestConfirmedState
+    // ------------------------------------------------------------------------
+    /* Used by client to update rewinder using. */
+    void setRewinderUsing(std::vector<std::string>& ru)
+                                  { m_current_rewinder_using = std::move(ru); }
+    // ------------------------------------------------------------------------
+    /* Used by client to get a copied list of rewinder using to be used
+       in different thread safely. */
+    const std::vector<std::string>& getRewinderUsing() const
+                                           { return m_current_rewinder_using; }
+    // ------------------------------------------------------------------------
+    bool useLocalEvent() const;
 
 };   // RewindManager
 

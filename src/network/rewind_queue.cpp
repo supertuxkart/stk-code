@@ -260,8 +260,8 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // any server message should be in the client's past - but it can
         // happen during debugging) we need to rewind to getTicks (in order
         // to get the latest state).
-        if (NetworkConfig::get()->isClient() && (*i)->getTicks() <= world_ticks
-            && (*i)->isState())
+        if (NetworkConfig::get()->isClient() &&
+            (*i)->getTicks() <= world_ticks && (*i)->isState())
         {
             // We need rewind if we receive an event in the past. This will
             // then trigger a rewind later. Note that we only rewind to the
@@ -303,7 +303,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     {
         Log::verbose("rewindqueue",
                      "world %d rewindticks %d latest_confirmed %d",
-                     World::getWorld()->getTimeTicks(), *rewind_ticks,
+                     World::getWorld()->getTicksSinceStart(), *rewind_ticks,
                      m_latest_confirmed_state_time);
         *rewind_ticks = m_latest_confirmed_state_time;
         *needs_rewind = m_latest_confirmed_state_time < world_ticks;
@@ -365,7 +365,7 @@ int RewindQueue::undoUntil(int undo_ticks)
             // This shouldn't happen, but add some debug info just in case
             Log::error("undoUntil",
                        "At %d rewinding to %d current = %d = begin",
-                       World::getWorld()->getTimeTicks(), undo_ticks, 
+                       World::getWorld()->getTicksSinceStart(), undo_ticks, 
                        (*m_current)->getTicks());
         }
         m_current--;
@@ -408,7 +408,8 @@ void RewindQueue::unitTesting()
     class DummyRewinder : public Rewinder, public EventRewinder
     {
     public:
-        BareNetworkString* saveState() { return NULL; }
+        BareNetworkString* saveState(std::vector<std::string>* ru)
+            { return NULL; }
         virtual void undoEvent(BareNetworkString *s) {}
         virtual void rewindToEvent(BareNetworkString *s) {}
         virtual void restoreState(BareNetworkString *s, int count) {}
@@ -417,7 +418,7 @@ void RewindQueue::unitTesting()
         virtual void rewind(BareNetworkString *s) {}
         virtual void saveTransform() {}
         virtual void computeError() {}
-        DummyRewinder() : Rewinder(true) {}
+        DummyRewinder() : Rewinder("dummy_rewinder", true) {}
     };
     DummyRewinder *dummy_rewinder = new DummyRewinder();
 

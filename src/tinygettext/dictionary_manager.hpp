@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_DICTIONARY_MANAGER_HPP
 #define HEADER_TINYGETTEXT_DICTIONARY_MANAGER_HPP
 
+#ifndef SERVER_ONLY
+
 #include <map>
 #include <set>
 #include <string>
@@ -103,3 +105,4 @@ private:
 #endif
 
 /* EOF */
+#endif

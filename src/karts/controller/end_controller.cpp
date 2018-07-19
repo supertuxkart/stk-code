@@ -163,12 +163,14 @@ void  EndController::newLap(int lap)
 //-----------------------------------------------------------------------------
 /** The end controller must forward 'fire' presses to the race gui.
  */
-void EndController::action(PlayerAction action, int value)
+bool EndController::action(PlayerAction action, int value, bool dry_run)
 {
-    if(action!=PA_FIRE) return;
-    RaceResultGUI *race_result_gui = dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
-    if(!race_result_gui) return;
+    if(action!=PA_FIRE) return true;
+    RaceResultGUI *race_result_gui =
+        dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
+    if(!race_result_gui) return true;
     race_result_gui->nextPhase();
+    return true;
 }   // action
 
 //-----------------------------------------------------------------------------

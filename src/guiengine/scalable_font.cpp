@@ -87,8 +87,10 @@ void ScalableFont::draw(const core::stringw& text,
                         bool hcenter, bool vcenter,
                         const core::rect<s32>* clip)
 {
+#ifndef SERVER_ONLY
     m_face->render(text, position, color, hcenter, vcenter, clip,
         m_font_settings);
+#endif
 }   // draw
 
 // ----------------------------------------------------------------------------
@@ -98,7 +100,6 @@ void ScalableFont::draw(const core::stringw& text,
                         const core::rect<s32>* clip, bool ignoreRTL)
 {
 #ifndef SERVER_ONLY
-
     bool previousRTL = m_font_settings->isRTL();
     if (ignoreRTL)
         m_font_settings->setRTL(false);

@@ -518,10 +518,10 @@ void RaceGUI::drawGlobalMiniMap()
             dynamic_cast<const SpareTireAI*>(kart->getController());
         // don't draw eliminated kart
         if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
-        const Vec3& xyz = kart->getXYZ();
+        const Vec3& xyz = kart->getSmoothedTrans().getOrigin();
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
-        
+
         video::ITexture* icon = sta ?
             irr_driver->getTexture(FileManager::GUI, "heart.png") :
             kart->getKartProperties()->getMinimapIcon();
@@ -540,7 +540,8 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
         // Highlight the player icons with some backgorund image.
-        if (kart->getController()->isLocalPlayerController())
+        if (kart->getController()->isLocalPlayerController() &&
+            m_icons_frame != NULL)
         {
             video::SColor colors[4];
             for (unsigned int i=0;i<4;i++)

@@ -56,6 +56,7 @@ void CentralVideoSettings::init()
     hasInstancedArrays = false;
     hasBGRA = false;
     hasColorBufferFloat = false;
+    hasTextureBufferObject = false;
     m_need_vertex_id_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
@@ -157,6 +158,12 @@ void CentralVideoSettings::init()
             hasGS = true;
             Log::info("GLDriver", "Geometry Shaders Present");
         }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_BUFFER_OBJECT) &&
+            m_glsl == true) 
+        {
+            hasTextureBufferObject = true;
+            Log::info("GLDriver", "ARB Texture Buffer Object Present");
+        }
         if (hasGLExtension("GL_ARB_texture_swizzle"))
         {
             hasTextureSwizzle = true;
@@ -216,7 +223,7 @@ void CentralVideoSettings::init()
             hasUBO = true;
             Log::info("GLDriver", "ARB Uniform Buffer Object Present");
         }
-
+        
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
             (hasGLExtension("GL_IMG_texture_format_BGRA8888") ||
              hasGLExtension("GL_EXT_texture_format_BGRA8888")))
@@ -447,6 +454,11 @@ bool CentralVideoSettings::isARBInstancedArraysUsable() const
 {
     return hasInstancedArrays ||
         (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2));
+}
+
+bool CentralVideoSettings::isARBTextureBufferObjectUsable() const
+{
+    return hasTextureBufferObject;
 }
 
 #endif   // !SERVER_ONLY

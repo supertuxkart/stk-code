@@ -124,6 +124,10 @@ private:
 
     void     defaultInit();
     btScalar rayCast(btWheelInfo& wheel, const btVector3& ray);
+    void     updateWheelTransformsWS(btWheelInfo& wheel,
+                                     btTransform chassis_trans,
+                                     bool interpolatedTransform=true,
+                                     float fraction = 1.0f);
 
 public:
 
@@ -158,19 +162,15 @@ public:
                                 bool isFrontWheel);
     const btWheelInfo& getWheelInfo(int index) const;
     btWheelInfo&       getWheelInfo(int index);
-    void               updateWheelTransformsWS(btWheelInfo& wheel,
-                                               bool interpolatedTransform=true,
-                                               float fraction = 1.0f);
     void               updateAllWheelTransformsWS();
     void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
-public:
     void               setSliding(bool active);
     void               instantSpeedIncreaseTo(btScalar speed);
     void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
-    void               getVisualContactPoint(float visual_rotation,
+    void               getVisualContactPoint(const btTransform& chassis_trans,
                                              btVector3 *left, btVector3 *right);
         // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */

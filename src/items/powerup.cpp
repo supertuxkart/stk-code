@@ -348,7 +348,6 @@ void Powerup::use()
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
                                            stk_config->
                                            time2Ticks(kp->getAnvilDuration()) );
-                kart->updateWeight();
                 kart->adjustSpeed(kp->getAnvilSpeedFactor() * 0.5f);
 
                 // should we position the sound at the kart that is hit,
@@ -505,7 +504,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
         // number to spread the random values across the (typically 200)
         // weights used in the PowerupManager - same for the position.
         int random_number = item_state.getItemId()*31 
-                          + world->getTimeTicks() / 10 + position*23;
+                          + world->getTicksSinceStart() / 10 + position*23;
         new_powerup =
             powerup_manager->getRandomPowerup(position, &n, random_number);
         if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
@@ -515,7 +514,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(world->getTimeTicks());
+        powerup_manager->setBallCollectTicks(world->getTicksSinceStart());
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

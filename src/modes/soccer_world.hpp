@@ -30,6 +30,7 @@
 
 class AbstractKart;
 class Controller;
+class NetworkString;
 class TrackObject;
 class TrackSector;
 
@@ -248,7 +249,11 @@ private:
             return (reverse ? m_trans(Vec3(-x, 0, -y)) :
                 m_trans(Vec3(x, 0, y)));
         }   // getAimPosition
-
+        void resetCheckGoal(const Track* t)
+        {
+            m_red_check_goal->reset(*t);
+            m_blue_check_goal->reset(*t);
+        }
     };   // BallGoalData
 
     std::vector<KartDistanceMap> m_red_kdm;
@@ -290,6 +295,7 @@ private:
 
     float m_ball_heading;
 
+    std::vector<btTransform> m_goal_transforms;
     /** Set the team for the karts */
     void initKartList();
     /** Function to update the location the ball on the polygon map */
@@ -303,16 +309,21 @@ private:
     int m_frame_count;
     std::vector<int> m_goal_frame;
 
+    int m_reset_ball_ticks;
+    void resetKartsToSelfGoals();
+
 public:
 
     SoccerWorld();
     virtual ~SoccerWorld();
 
     virtual void init() OVERRIDE;
+    virtual void onGo() OVERRIDE;
 
     // clock events
     virtual bool isRaceOver() OVERRIDE;
     virtual void countdownReachedZero() OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
 
     // overriding World methods
     virtual void reset() OVERRIDE;
@@ -394,6 +405,9 @@ public:
     // ------------------------------------------------------------------------
     void setAITeam();
     // ------------------------------------------------------------------------
+    void handlePlayerGoalFromServer(const NetworkString& ns);
+    // ------------------------------------------------------------------------
+    void handleResetBallFromServer(const NetworkString& ns);
 
 };   // SoccerWorld
 

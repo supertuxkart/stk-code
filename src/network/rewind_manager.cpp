@@ -27,8 +27,6 @@
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
@@ -84,16 +82,15 @@ void RewindManager::reset()
 
     if (!m_enable_rewind_manager) return;
 
-    AllRewinder::iterator r = m_all_rewinder.begin();
-    while (r != m_all_rewinder.end())
+    for (auto it = m_all_rewinder.begin(); it != m_all_rewinder.end();)
     {
-        if (!(*r)->canBeDestroyed())
+        if (!it->second->canBeDestroyed())
         {
-            r++;
+            it++;
             continue;
         }
-        Rewinder *rewinder = *r;
-        r = m_all_rewinder.erase(r);
+        Rewinder* rewinder = it->second;
+        it = m_all_rewinder.erase(it);
         delete rewinder;
     }
 
@@ -119,7 +116,7 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
     }
 
     if (ticks < 0)
-        ticks = World::getWorld()->getTimeTicks();
+        ticks = World::getWorld()->getTicksSinceStart();
     m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, ticks);
 }   // addEvent
 
@@ -152,77 +149,34 @@ void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
-/** Saves a local state using the GameProtocol function to combine several
- *  independent rewinders to write one state. Typically only the server needs
- *  to save a state (which is then send to the clients), except that each
- *  client needs one initial state (in case that it receives an event from
- *  a client before a state from the serer).
- *  \param allow_local_save Do a local save.
+/** Saves a state using the GameProtocol function to combine several
+ *  independent rewinders to write one state.
  */
-void RewindManager::saveState(bool local_save)
+void RewindManager::saveState()
 {
     PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
     auto gp = GameProtocol::lock();
     if (!gp)
         return;
-    gp->startNewState(local_save);
-    AllRewinder::const_iterator rewinder;
-    for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
+    gp->startNewState();
+
+    m_overall_state_size = 0;
+    std::vector<std::string> rewinder_using;
+    for (auto& p : m_all_rewinder)
     {
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
-        BareNetworkString *buffer = (*rewinder)->saveState();
-        if (buffer)
+        BareNetworkString* buffer = p.second->saveState(&rewinder_using);
+        if (buffer != NULL)
         {
             m_overall_state_size += buffer->size();
             gp->addState(buffer);
-        }   // size >= 0
+        }
         delete buffer;    // buffer can be freed
     }
+    gp->finalizeState(m_current_rewinder_using, rewinder_using);
     PROFILER_POP_CPU_MARKER();
 }   // saveState
-
-// ----------------------------------------------------------------------------
-/** Saves a state on the client. Used to save an initial state at t=0 for each
- *  client in case that we receive an event from another client (which will
- *  trigger a rewind) before a state from the server.
- */
-void RewindManager::saveLocalState()
-{
-    auto gp = GameProtocol::lock();
-    if (!gp)
-        return;
-
-    int ticks = World::getWorld()->getTimeTicks();
-
-    saveState(/*local_state*/true);
-    NetworkString *state = gp->getState();
-
-    // Copy the data to a new string, making the buffer in
-    // GameProtocol availble for again.
-    BareNetworkString *bns =
-        new BareNetworkString(state->getCurrentData(),
-                              state->size()           );
-    m_rewind_queue.addLocalState(bns, /*confirmed*/true, ticks);
-}   // saveLocalState
-
-// ----------------------------------------------------------------------------
-/** Restores a given state by calling rewindToState for each available rewinder
- *  with its correct data.
- *  \param data The data string used to store the whole game state.
- *
- */
-void RewindManager::restoreState(BareNetworkString *data)
-{
-    data->reset();   
-    
-    for (auto rewinder  = m_all_rewinder.begin(); 
-              rewinder != m_all_rewinder.end();   ++rewinder)
-    {
-        uint16_t count = data->getUInt16();
-        (*rewinder)->restoreState(data, count);
-    }   // for all rewinder
-}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
@@ -236,22 +190,27 @@ void RewindManager::update(int ticks_not_used)
         m_all_rewinder.size() == 0 ||
         m_is_rewinding)  return;
 
-    int ticks = World::getWorld()->getTimeTicks();
+    int ticks = World::getWorld()->getTicksSinceStart();
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
-    // Clients don't save state, so they just exit.
-    if (NetworkConfig::get()->isClient() ||
-        ticks - m_last_saved_state < m_state_frequency)
-    {
+    if (ticks - m_last_saved_state < m_state_frequency)
         return;
-    }
 
     // Save state
-    saveState(/**allow_local_save*/false);
-    PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
-    if (auto gp = GameProtocol::lock())
-        gp->sendState();
+    if (NetworkConfig::get()->isClient())
+    {
+        auto& ret = m_local_state[ticks];
+        for (auto& p : m_all_rewinder)
+            ret.push_back(p.second->getLocalStateRestoreFunction());
+    }
+    else
+    {
+        saveState();
+        PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
+        if (auto gp = GameProtocol::lock())
+            gp->sendState();
+    }
     PROFILER_POP_CPU_MARKER();
     m_last_saved_state = ticks;
 }   // update
@@ -278,7 +237,7 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
         PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
         rewindTo(rewind_ticks, world_ticks);
         // This should replay everything up to 'now'
-        assert(World::getWorld()->getTimeTicks() == world_ticks);
+        assert(World::getWorld()->getTicksSinceStart() == world_ticks);
         PROFILER_POP_CPU_MARKER();
         Log::setPrefix("");
     }
@@ -308,20 +267,14 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
 void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 {
     assert(!m_is_rewinding);
-    // TODO Do it properly for track objects like soccer ball
-    Track::getCurrentTrack()->getTrackObjectManager()->removeForRewind();
     bool is_history = history->replayHistory();
     history->setReplayHistory(false);
 
     // First save all current transforms so that the error
     // can be computed between the transforms before and after
     // the rewind.
-    AllRewinder::iterator rewinder;
-    for (rewinder = m_all_rewinder.begin();
-        rewinder != m_all_rewinder.end(); ++rewinder)
-    {
-        (*rewinder)->saveTransform();
-    }
+    for (auto& p : m_all_rewinder)
+        p.second->saveTransform();
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
@@ -339,7 +292,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // world time is set first, since e.g. the NetworkItem manager relies
     // on having the access to the 'confirmed' state time using 
     // the world timer.
-    world->setTicks(exact_rewind_ticks);
+    world->setTicksForRewind(exact_rewind_ticks);
 
     // Get the (first) full state to which we have to rewind
     RewindInfo *current = m_rewind_queue.getCurrent();
@@ -347,6 +300,28 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 
     // Restore states from the exact rewind time
     // -----------------------------------------
+    auto it = m_local_state.find(exact_rewind_ticks);
+    if (it != m_local_state.end())
+    {
+        for (auto& restore_local_state : it->second)
+        {
+            if (restore_local_state)
+                restore_local_state();
+        }
+        for (auto it = m_local_state.begin(); it != m_local_state.end();)
+        {
+            if (it->first <= exact_rewind_ticks)
+                it = m_local_state.erase(it);
+            else
+                break;
+        }
+    }
+    else
+    {
+        Log::warn("RewindManager", "Missing local state at ticks %d",
+            exact_rewind_ticks);
+    }
+
     // A loop in case that we should split states into several smaller ones:
     while (current && current->getTicks() == exact_rewind_ticks && 
            current->isState()                                        )
@@ -357,9 +332,9 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }
 
     // Now go forward through the list of rewind infos till we reach 'now':
-    while(world->getTimeTicks() < now_ticks )
+    while (world->getTicksSinceStart() < now_ticks)
     { 
-        m_rewind_queue.replayAllEvents(world->getTimeTicks());
+        m_rewind_queue.replayAllEvents(world->getTicksSinceStart());
 
         // Now simulate the next time step
         world->updateWorld(1);
@@ -372,13 +347,16 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     }   // while (world->getTicks() < current_ticks)
 
     // Now compute the errors which need to be visually smoothed
-    for (rewinder = m_all_rewinder.begin();
-        rewinder != m_all_rewinder.end(); ++rewinder)
-    {
-        (*rewinder)->computeError();
-    }
+    for (auto& p : m_all_rewinder)
+        p.second->computeError();
 
     history->setReplayHistory(is_history);
-    Track::getCurrentTrack()->getTrackObjectManager()->addForRewind();
     m_is_rewinding = false;
 }   // rewindTo
+
+// ----------------------------------------------------------------------------
+bool RewindManager::useLocalEvent() const
+{
+    return NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() && !m_is_rewinding;
+}   // useLocalEvent

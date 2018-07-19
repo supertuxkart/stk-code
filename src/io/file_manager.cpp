@@ -70,6 +70,7 @@ namespace irr {
 
 std::vector<std::string> FileManager::m_root_dirs;
 std::string              FileManager::m_stdout_filename = "stdout.log";
+std::string              FileManager::m_stdout_dir;
 
 #ifdef __APPLE__
 // dynamic data path detection onmac
@@ -927,6 +928,12 @@ void FileManager::checkAndCreateConfigDir()
                   "falling back to '.'.", m_user_config_dir.c_str());
         m_user_config_dir = "./";
     }
+    
+    if (m_stdout_dir.empty())
+    {
+        m_stdout_dir = m_user_config_dir;
+    }
+    
     return;
 }   // checkAndCreateConfigDir
 
@@ -1166,6 +1173,20 @@ void FileManager::setStdoutName(const std::string& filename)
 }   // setStdoutName
 
 //-----------------------------------------------------------------------------
+/** Sets the directory for the stdout log file.
+ *  \param dir Directory to use
+ */
+void FileManager::setStdoutDir(const std::string& dir)
+{
+    m_stdout_dir = dir;
+    
+    if (!m_stdout_dir.empty() && m_stdout_dir[m_stdout_dir.size() - 1] != '/')
+    {
+         m_stdout_dir += "/";
+     }
+}   // setStdoutDir
+
+//-----------------------------------------------------------------------------
 /** Redirects output to go into files in the user's config directory
  *  instead of to the console. It keeps backup copies of previous stdout files
  *  (3 atm), which can help to diagnose problems caused by a previous crash.
@@ -1174,7 +1195,7 @@ void FileManager::redirectOutput()
 {
     // Do a simple log rotate: stdout.log.2 becomes stdout.log.3 etc
     const int NUM_BACKUPS=3;
-    std::string logoutfile = getUserConfigFile(m_stdout_filename);
+    std::string logoutfile = m_stdout_dir + m_stdout_filename;
     for(int i=NUM_BACKUPS; i>1; i--)
     {
         std::ostringstream out_old;

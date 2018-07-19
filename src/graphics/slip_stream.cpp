@@ -349,6 +349,7 @@ SP::SPMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
     buffer->setSPMVertices(vertices);
     buffer->setIndices(indices);
     buffer->setSTKMaterial(material);
+    buffer->uploadGLMesh();
 
     spm = new SP::SPMesh();
     spm->addSPMeshBuffer(buffer);

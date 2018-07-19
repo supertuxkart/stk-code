@@ -47,7 +47,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 {
     m_attached_state = RB_TO_PLUNGER;
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (ProfileWorld::isNoGraphics() || !CVS->isGLSL())
     {
         return;
     }

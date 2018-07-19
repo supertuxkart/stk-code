@@ -30,6 +30,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
+#include "network/game_setup.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
@@ -161,17 +162,14 @@ void TracksScreen::beforeAddingWidget()
         rect_box->setVisible(true);
         rect_box->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_bottom_box_height);
         getWidget("lap-text")->setVisible(true);
-        //I18N: In track screen
-        getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
         m_laps = getWidget<SpinnerWidget>("lap-spinner");
         assert(m_laps != NULL);
         m_laps->setVisible(true);
         getWidget("reverse-text")->setVisible(true);
-        //I18N: In track screen
-        getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
         m_reversed = getWidget<CheckBoxWidget>("reverse");
         assert(m_reversed != NULL);
         m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
+        m_reversed->setVisible(true);
         getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
         getWidget("vote")->setVisible(true);
         calculateLayout();
@@ -253,13 +251,59 @@ void TracksScreen::init()
     STKTexManager::getInstance()->unsetTextureErrorMessage();
     if (m_network_tracks)
     {
+        // Notice: for arena (battle / soccer) lap and reverse will be mapped to
+        // goals / time limit and random item location
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
-        m_laps->setValue(UserConfigParams::m_num_laps);
-        m_reversed->setState(m_reverse_checked);
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+        {
+            getWidget("lap-text")->setVisible(false);
+            m_laps->setVisible(false);
+            getWidget("reverse-text")->setVisible(true);
+            //I18N: In track screen
+            getWidget<LabelWidget>("reverse-text")->setText(_("Random item location"), false);
+            m_reversed->setVisible(true);
+            m_reversed->setState(UserConfigParams::m_random_arena_item);
+        }
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            m_laps->setVisible(true);
+            getWidget("lap-text")->setVisible(true);
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            assert(cl);
+            if (cl->getGameSetup()->isSoccerGoalTarget())
+            {
+                //I18N: In track screen
+                getWidget<LabelWidget>("lap-text")->setText(_("Number of goals to win"), false);
+                m_laps->setValue(UserConfigParams::m_num_goals);
+            }
+            else
+            {
+                //I18N: In track screen
+                getWidget<LabelWidget>("lap-text")->setText(_("Maximum time (min.)"), false);
+                m_laps->setValue(UserConfigParams::m_soccer_time_limit);
+            }
+            getWidget("reverse-text")->setVisible(true);
+            //I18N: In track screen
+            getWidget<LabelWidget>("reverse-text")->setText(_("Random item location"), false);
+            m_reversed->setVisible(true);
+            m_reversed->setState(UserConfigParams::m_random_arena_item);
+        }
+        else
+        {
+            getWidget("lap-text")->setVisible(true);
+            //I18N: In track screen
+            getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
+            m_laps->setVisible(true);
+            m_laps->setValue(UserConfigParams::m_num_laps);
+            getWidget("reverse-text")->setVisible(true);
+            //I18N: In track screen
+            getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
+            m_reversed->setVisible(true);
+            m_reversed->setState(m_reverse_checked);
+        }
     }
-
     if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
     {
         assert(!m_random_track_list.empty());
@@ -302,8 +346,9 @@ void TracksScreen::buildTrackList()
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
             continue;
-        if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
-        if (!curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
+        if (!is_network &&
+            (curr->isArena() || curr->isSoccer() || curr->isInternal()))
+            continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
         if (is_network &&
@@ -370,8 +415,12 @@ void TracksScreen::voteForPlayer()
     assert(m_selected_track);
     assert(m_laps);
     assert(m_reversed);
-    // Remember reverse globally for each stk instance
-    m_reverse_checked = m_reversed->getState();
+    // Remember reverse globally for each stk instance if not arena
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+        m_reverse_checked = m_reversed->getState();
+    else
+        UserConfigParams::m_random_arena_item = m_reversed->getState();
     UserConfigParams::m_num_laps = m_laps->getValue();
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);

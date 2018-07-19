@@ -117,15 +117,6 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
     }
 
-    if (m_positional_smoothing.size() == 0)
-    {
-        Log::fatal("StkConfig", "No positional smoothing defined in stk_config.");
-    }
-    if (m_rotational_smoothing.size() == 0)
-    {
-        Log::fatal("StkConfig", "No rotationalsmoothing defined in stk_config.");
-    }
-
     if (m_client_port == 0 || m_server_port == 0 || m_server_discovery_port == 0 ||
         m_client_port == m_server_port || m_client_port == m_server_discovery_port ||
         m_server_port == m_server_discovery_port)
@@ -441,9 +432,7 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *networking_node = root->getNode("networking"))
     {
-        networking_node->get("state-frequency",      &m_network_state_frequeny);
-        networking_node->get("positional-smoothing", &m_positional_smoothing  );
-        networking_node->get("rotational-smoothing", &m_rotational_smoothing  );
+        networking_node->get("state-frequency", &m_network_state_frequeny);
     }
 
     if(const XMLNode *replay_node = root->getNode("replay"))

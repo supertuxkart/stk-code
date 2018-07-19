@@ -30,6 +30,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -46,9 +47,22 @@
 
 MainLoop* main_loop = 0;
 
+#ifdef WIN32
+LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg, 
+                                     _In_ WPARAM wParam, _In_ LPARAM lParam)
+{
+    if (uMsg == WM_DESTROY)
+    {
+        PostQuitMessage(0);
+        return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+};
+#endif
+
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
-        : m_abort(false), m_parent_pid(parent_pid)
+        : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
@@ -61,15 +75,7 @@ MainLoop::MainLoop(unsigned parent_pid)
         class_name += StringUtils::toString(GetCurrentProcessId());
         WNDCLASSEX wx = {};
         wx.cbSize = sizeof(WNDCLASSEX);
-        wx.lpfnWndProc = [](HWND h, UINT m, WPARAM w, LPARAM l)->LRESULT
-        {
-            if (m == WM_DESTROY)
-            {
-                PostQuitMessage(0);
-                return 0;
-            }
-            return DefWindowProc(h, m, w, l);
-        };
+        wx.lpfnWndProc = separateProcessProc;
         wx.hInstance = GetModuleHandle(0);
         wx.lpszClassName = &class_name[0];
         if (RegisterClassEx(&wx))
@@ -179,16 +185,6 @@ float MainLoop::getLimitedDt()
     }   // while(1)
 
     dt *= 0.001f;
-
-    // If this is a client, the server might request an adjustment of
-    // this client's world clock (to reduce number of rewinds).
-    if (World::getWorld()                   &&
-        NetworkConfig::get()->isClient()    &&
-        !RewindManager::get()->isRewinding()   )
-    {
-        dt = World::getWorld()->adjustDT(dt);
-    }
-
     return dt;
 }   // getLimitedDt
 
@@ -384,18 +380,35 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
+        m_ticks_adjustment.lock();
+        if (m_ticks_adjustment.getData() != 0)
+        {
+            if (m_ticks_adjustment.getData() > 0)
+            {
+                num_steps += m_ticks_adjustment.getData();
+                m_ticks_adjustment.getData() = 0;
+            }
+            else if (m_ticks_adjustment.getData() < 0)
+            {
+                int new_steps = num_steps + m_ticks_adjustment.getData();
+                if (new_steps < 0)
+                {
+                    num_steps = 0;
+                    m_ticks_adjustment.getData() = new_steps;
+                }
+                else
+                {
+                    num_steps = new_steps;
+                    m_ticks_adjustment.getData() = 0;
+                }
+            }
+        }
+        m_ticks_adjustment.unlock();
+
         for(int i=0; i<num_steps; i++)
         {
             if (World::getWorld() && history->replayHistory())
-                history->updateReplay(World::getWorld()->getTimeTicks());
-            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            if (World::getWorld()) updateRace(1);
-            PROFILER_POP_CPU_MARKER();
-
-            // We need to check again because update_race may have requested
-            // the main loop to abort; and it's not a good idea to continue
-            // since the GUI engine is no more to be called then.
-            if (m_abort) break;
+                history->updateReplay(World::getWorld()->getTicksSinceStart());
 
             PROFILER_PUSH_CPU_MARKER("Protocol manager update",
                                      0x7F, 0x00, 0x7F);
@@ -404,6 +417,15 @@ void MainLoop::run()
                 pm->update(1);
             }
             PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+            if (World::getWorld()) updateRace(1);
+            PROFILER_POP_CPU_MARKER();
+
+            // We need to check again because update_race may have requested
+            // the main loop to abort; and it's not a good idea to continue
+            // since the GUI engine is no more to be called then.
+            if (m_abort) break;
 
             if (m_frame_before_loading_world)
             {
@@ -421,7 +443,6 @@ void MainLoop::run()
                 World::getWorld()->updateTime(1);
             }
         }   // for i < num_steps
-
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort

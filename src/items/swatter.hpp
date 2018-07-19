@@ -89,7 +89,7 @@ public:
         return m_animation_phase == SWATTER_AIMING;
     }   // isSwatterReady
     // ------------------------------------------------------------------------
-    virtual void onAnimationEnd();
+    virtual void onAnimationEnd() OVERRIDE;
     // ------------------------------------------------------------------------
 
 private:

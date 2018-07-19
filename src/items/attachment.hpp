@@ -116,6 +116,8 @@ public:
          ~Attachment();
     void  clear ();
     void  hitBanana(ItemState *item);
+    void  updateGraphics(float dt);
+
     void  update(int ticks);
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
@@ -154,6 +156,15 @@ public:
     /** Nothing to undo when going back during a rewind, the full state info
      *  will take care of creating the right attachment. */
     virtual void undo(BareNetworkString *buffer) { }
+    // ------------------------------------------------------------------------
+    float getInitialSpeed() const                   { return m_initial_speed; }
+    // ------------------------------------------------------------------------
+    void setInitialSpeed(float speed)              { m_initial_speed = speed; }
+    // ------------------------------------------------------------------------
+    float getNodeScale() const                         { return m_node_scale; }
+    // ------------------------------------------------------------------------
+    void setNodeScale(float scale)                    { m_node_scale = scale; }
+
 };   // Attachment
 
 #endif

@@ -204,8 +204,8 @@ public:
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(int ticks) OVERRIDE;
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    virtual void setAnimation(AbstractKartAnimation *animation);
+    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual void setAnimation(AbstractKartAnimation *animation) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns time (in ticks) between rubberballs, to avoid that in games
      *  with many karts too many rubber balls are in play at the same time. */

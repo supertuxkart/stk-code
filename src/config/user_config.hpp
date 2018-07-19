@@ -373,6 +373,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
             &m_race_setup_group, "Enable time limit in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam         m_random_arena_item
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "random-arena-item",
+            &m_race_setup_group, "Enable random location of items in an arena.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -466,10 +469,11 @@ namespace UserConfigParams
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
 
-    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
-            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+    PARAM_PREFIX IntUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_mode",
             &m_multitouch_group,
-            "Enable screen keyboard.") );
+            "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
+            "keyboard, 2 = always enabled") );
             
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
@@ -638,9 +642,6 @@ namespace UserConfigParams
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
-    /** If random number of items is used in an arena. */
-    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
-
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
@@ -721,7 +722,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
         &m_network_group, "Timeout in seconds for validation of clients."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
+        PARAM_DEFAULT(IntUserConfigParam(8, "server_max_players",
         &m_network_group, "Maximum number of players on the server."));
     PARAM_PREFIX BoolUserConfigParam m_firewalled_server
         PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",

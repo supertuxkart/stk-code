@@ -69,6 +69,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/profiler.hpp"
 #include "utils/translation.hpp"
@@ -542,6 +543,10 @@ void World::onGo()
         if (m_karts[i]->isGhostKart()) continue;
         m_karts[i]->getVehicle()->setAllBrakes(0);
     }
+    // Reset track objects 1 more time to make sure all instances of moveable
+    // fall at the same instant when race start in network
+    if (NetworkConfig::get()->isNetworking())
+        Track::getCurrentTrack()->getTrackObjectManager()->reset();
 }   // onGo
 
 //-----------------------------------------------------------------------------
@@ -663,8 +668,6 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
-    // In case someone opened paused race dialog in network game
-    GUIEngine::ModalDialog::dismiss();
     results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
@@ -869,8 +872,9 @@ void World::updateWorld(int ticks)
     }
 
     // Don't update world if a menu is shown or the race is over.
-    if( getPhase() == FINISH_PHASE         ||
-        getPhase() == IN_GAME_MENU_PHASE      )
+    if (getPhase() == FINISH_PHASE ||
+        (!NetworkConfig::get()->isNetworking() &&
+        getPhase() == IN_GAME_MENU_PHASE))
         return;
 
     try
@@ -989,6 +993,16 @@ void World::updateGraphics(float dt)
         }
     }
 
+    PROFILER_PUSH_CPU_MARKER("World::updateGraphics (camera)", 0x60, 0x7F, 0);
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+        Camera::getCamera(i)->update(dt);
+    PROFILER_POP_CPU_MARKER();
+
+    Scripting::ScriptEngine *script_engine =
+        Scripting::ScriptEngine::getInstance();
+    if (script_engine)
+        script_engine->update(dt);
+
     projectile_manager->updateGraphics(dt);
     Track::getCurrentTrack()->updateGraphics(dt);
 }   // updateGraphics
@@ -1022,6 +1036,10 @@ void World::update(int ticks)
     RewindManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
+    PROFILER_PUSH_CPU_MARKER("World::update (Track object manager)", 0x20, 0x7F, 0x40);
+    Track::getCurrentTrack()->getTrackObjectManager()->update(stk_config->ticks2Time(ticks));
+    PROFILER_POP_CPU_MARKER();
+
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
 
     // Update all the karts. This in turn will also update the controller,
@@ -1038,33 +1056,8 @@ void World::update(int ticks)
     }
     PROFILER_POP_CPU_MARKER();
 
-    // Updating during a rewind introduces stuttering in the camera
-    if (!RewindManager::get()->isRewinding())
-    {
-        PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
-
-        for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
-        {
-            Camera::getCamera(i)->update(stk_config->ticks2Time(ticks));
-        }
-        PROFILER_POP_CPU_MARKER();
-    }   // if !rewind
-
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
-    Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
-    if (script_engine) script_engine->update(ticks);
-
     Physics::getInstance()->update(ticks);
-
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
-    {
-        for (int i = 0 ; i < kart_amount; i++)
-        {
-            if (!m_karts[i]->isEliminated())
-                static_cast<Kart*>(m_karts[i])->handleRewoundTransform();
-        }
-    }
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);
@@ -1328,6 +1321,16 @@ void World::unpause()
 //-----------------------------------------------------------------------------
 void World::escapePressed()
 {
+    for (unsigned i = 0; i < m_karts.size(); i++)
+    {
+        for (unsigned j = 0; j < PA_PAUSE_RACE; j++)
+        {
+            if (m_karts[i]->isEliminated() || !m_karts[i]->getController()
+                ->isLocalPlayerController())
+                continue;
+            m_karts[i]->getController()->action((PlayerAction)j, 0);
+        }
+    }
     if (NetworkConfig::get()->isNetworking() || getPhase() >= MUSIC_PHASE)
         new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed

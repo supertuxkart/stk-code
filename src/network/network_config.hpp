@@ -100,6 +100,8 @@ private:
 
     bool m_done_adding_network_players;
 
+    bool m_team_choosing;
+
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
 
@@ -324,6 +326,10 @@ public:
     void setAutoEnd(bool val)                             { m_auto_end = val; }
     // ------------------------------------------------------------------------
     bool isAutoEnd() const                               { return m_auto_end; }
+    // ------------------------------------------------------------------------
+    void setTeamChoosing(bool val)                   { m_team_choosing = val; }
+    // ------------------------------------------------------------------------
+    bool hasTeamChoosing() const                    { return m_team_choosing; }
 
 };   // class NetworkConfig
 

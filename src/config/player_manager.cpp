@@ -326,8 +326,9 @@ void PlayerManager::enforceCurrentPlayer()
     {
         if (!player->isGuestAccount())
         {
-            Log::info("PlayerManager", "Enforcing current player '%ls'.",
-                      player->getName(true/*ignoreRTL*/).c_str());
+            Log::info("PlayerManager", "Enforcing current player '%s'.",
+                StringUtils::wideToUtf8(player->getName(true/*ignoreRTL*/))
+                .c_str());
             m_current_player = player;
             return;
         }
@@ -341,7 +342,8 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enforcing current player '%s'.",
-                       player->getName(true/*ignoreRTL*/).c_str());
+                StringUtils::wideToUtf8(player->getName(true/*ignoreRTL*/))
+                .c_str());
             m_current_player = player;
             return;
         }

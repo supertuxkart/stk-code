@@ -203,14 +203,8 @@
 
   <!-- Networking 
        state-frequency: how many states the server will send per second.
-       positional-smoothing: smoothing factor used in exponential smoothing
-           depending on error.
-       rotational-smoothing: slerp factor used in exponential smoothing
-           of rotations depending on error.
   -->
-  <networking state-frequency="10"
-              positional-smoothing="0.25:0.95 1.0:0.85"
-              rotational-smoothing="0.25:0.95 1.0:0.85" />
+  <networking state-frequency="10"/>
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the

@@ -22,6 +22,8 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
+#include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor. Note that kart can be NULL in case that the animation is
@@ -81,6 +83,28 @@ AbstractKartAnimation::~AbstractKartAnimation()
     {
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         Physics::getInstance()->addKart(m_kart);
+        if (RewindManager::get()->useLocalEvent())
+        {
+            AbstractKart* kart = m_kart;
+            Vec3 linear_velocity = kart->getBody()->getLinearVelocity();
+            Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
+            btTransform transform = kart->getBody()->getWorldTransform();
+            RewindManager::get()->getRewindQueue().insertRewindInfo(new
+                RewindInfoEventFunction(
+                World::getWorld()->getTicksSinceStart(),
+                [kart]()
+                {
+                    Physics::getInstance()->removeKart(kart);
+                },
+                [kart, linear_velocity, angular_velocity, transform]()
+                {
+                    Physics::getInstance()->addKart(kart);
+                    kart->getBody()->setLinearVelocity(linear_velocity);
+                    kart->getBody()->setAngularVelocity(angular_velocity);
+                    kart->getBody()->proceedToTransform(transform);
+                    kart->setTrans(transform);
+                }));
+        }
     }
 }   // ~AbstractKartAnimation
 

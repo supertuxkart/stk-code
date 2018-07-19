@@ -21,7 +21,8 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/controller.hpp"
+#include "karts/controller/player_controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -32,14 +33,18 @@
 
 #include <string.h>
 
-KartRewinder::KartRewinder(const std::string& ident,unsigned int world_kart_id,
-                           int position, const btTransform& init_transform,
+KartRewinder::KartRewinder(const std::string& ident,
+                           unsigned int world_kart_id, int position,
+                           const btTransform& init_transform,
                            PerPlayerDifficulty difficulty,
                            std::shared_ptr<RenderInfo> ri)
-            : Rewinder(/*can_be_destroyed*/ false)
+            : Rewinder(std::string("K") + StringUtils::toString(world_kart_id),
+                       /*can_be_destroyed*/ false)
             , Kart(ident, world_kart_id, position, init_transform, difficulty,
                    ri)
 {
+    m_steering_smoothing_dt = -1.0f;
+    m_prev_steering = m_steering_smoothing_time = 0.0f;
 }   // KartRewinder
 
 // ----------------------------------------------------------------------------
@@ -49,6 +54,9 @@ void KartRewinder::reset()
 {
     Kart::reset();
     Rewinder::reset();
+    SmoothNetworkBody::setEnable(true);
+    SmoothNetworkBody::setSmoothRotation(true);
+    SmoothNetworkBody::setAdjustVerticalOffset(true);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -59,52 +67,47 @@ void KartRewinder::reset()
  */
 void KartRewinder::saveTransform()
 {
-    m_saved_transform = getTrans();
-    m_rewound_transforms.clear();
+    if (!getKartAnimation())
+    {
+        Moveable::prepareSmoothing();
+        m_skidding->prepareSmoothing();
+    }
+
+    m_prev_steering = getSteerPercent();
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
 void KartRewinder::computeError()
 {
-    // Local player kart doesn't need showing in the past
-    if (m_rewound_transforms.empty())
-        return;
-
-    std::deque<btTransform> copied = m_rewound_transforms;
-    // Find the closest position that matches previous rewound one
-    Vec3 saved_position = m_saved_transform.getOrigin();
-    while (!copied.empty())
+    if (!getKartAnimation())
     {
-        Vec3 cur_position = copied.front().getOrigin();
-        if ((cur_position - saved_position).length() < 0.25f)
-        {
-            setTrans(copied.front());
-            copied.pop_front();
-            std::swap(m_rewound_transforms, copied);
-            return;
-        }
-        copied.pop_front();
+        Moveable::checkSmoothing();
+        m_skidding->checkSmoothing();
     }
 
-    // Use newly rewound one if no matching transformation
-    setTrans(m_rewound_transforms.front());
-    m_rewound_transforms.pop_front();
-    //btTransform error = getTrans() - m_saved_transform;
-    //Vec3 pos_error = getTrans().getOrigin() - m_saved_transform.getOrigin();
-    //btQuaternion rot_error(0, 0, 0, 1);
-    //Kart::addError(pos_error, rot_error);
+    float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
+    if (diff > 0.05f)
+    {
+        m_steering_smoothing_time = getTimeFullSteer(diff) / 2.0f;
+        m_steering_smoothing_dt = 0.0f;
+    }
+    else
+        m_steering_smoothing_dt = -1.0f;
 }   // computeError
 
 // ----------------------------------------------------------------------------
 /** Saves all state information for a kart in a memory buffer. The memory
  *  is allocated here and the address returned. It will then be managed
- *  by the RewindManager. The size is used to keep track of memory usage
- *  for rewinding.
- *  \param[out] buffer  Address of the memory buffer.
- *  \returns    Size of allocated memory, or -1 in case of an error.
+ *  by the RewindManager.
+ *  \param[out] ru The unique identity of rewinder writing to.
+ *  \return The address of the memory buffer with the state.
  */
-BareNetworkString* KartRewinder::saveState()
+BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 {
+    if (m_eliminated)
+        return nullptr;
+
+    ru->push_back(getUniqueIdentity());
     const int MEMSIZE = 17*sizeof(float) + 9+3;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
@@ -118,7 +121,6 @@ BareNetworkString* KartRewinder::saveState()
     buffer->add(q);
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
-    buffer->addUInt8(m_has_started);   // necessary for startup speed boost
     buffer->addFloat(m_vehicle->getMinSpeed());
     buffer->addFloat(m_vehicle->getTimedRotationTime());
     buffer->add(m_vehicle->getTimedRotation());
@@ -127,7 +129,6 @@ BareNetworkString* KartRewinder::saveState()
     // -------------------------------------
     getControls().saveState(buffer);
     getController()->saveState(buffer);
-    buffer->addTime(m_brake_ticks);
 
     // 3) Attachment, powerup, nitro
     // -----------------------------
@@ -160,16 +161,22 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     t.setOrigin(buffer->getVec3());
     t.setRotation(buffer->getQuat());
     btRigidBody *body = getBody();
-    body->setLinearVelocity(buffer->getVec3());
-    body->setAngularVelocity(buffer->getVec3());
+    Vec3 lv = buffer->getVec3();
+    Vec3 av = buffer->getVec3();
 
-    // This function also reads the velocity, so it must be called
-    // after the velocities are set
-    body->proceedToTransform(t);
-    // Update kart transform in case that there are access to its value
-    // before Moveable::update() is called (which updates the transform)
-    setTrans(t);
-    m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
+    // Don't restore to phyics position if showing kart animation
+    if (!getKartAnimation())
+    {
+        body->setLinearVelocity(lv);
+        body->setAngularVelocity(av);
+        // This function also reads the velocity, so it must be called
+        // after the velocities are set
+        body->proceedToTransform(t);
+        // Update kart transform in case that there are access to its value
+        // before Moveable::update() is called (which updates the transform)
+        setTrans(t);
+    }
+
     m_vehicle->setMinSpeed(buffer->getFloat());
     float time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
@@ -185,11 +192,13 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // ------------------------------
     getControls().rewindTo(buffer);
     getController()->rewindTo(buffer);
-    m_brake_ticks = buffer->getTime();
 
     // 3) Attachment, powerup, nitro
     // ------------------------------
     getAttachment()->rewindTo(buffer);
+    // Required for going back to anvil when rewinding
+    updateWeight();
+
     getPowerup()->rewindTo(buffer);
     float nitro = buffer->getFloat();
     setEnergy(nitro);
@@ -201,6 +210,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // 6) Skidding
     // -----------
     m_skidding->rewindTo(buffer);
+
     return;
 }   // restoreState
 
@@ -216,6 +226,60 @@ void KartRewinder::update(int ticks)
 // ----------------------------------------------------------------------------
 void KartRewinder::rewindToEvent(BareNetworkString *buffer)
 {
-};   // rewindToEvent
+}   // rewindToEvent
 
+// ----------------------------------------------------------------------------
+std::function<void()> KartRewinder::getLocalStateRestoreFunction()
+{
+    if (m_eliminated)
+        return nullptr;
 
+    // In theory all ticks / boolean related stuff can be saved locally
+    bool has_started = m_has_started;
+    int bubblegum_ticks = m_bubblegum_ticks;
+    int bounce_back_ticks = m_bounce_back_ticks;
+    int invulnerable_ticks = m_invulnerable_ticks;
+    int squash_ticks = m_squash_ticks;
+    bool fire_clicked = m_fire_clicked;
+    int view_blocked_by_plunger = m_view_blocked_by_plunger;
+    int brake_ticks = m_brake_ticks;
+    int8_t min_nitro_ticks = m_min_nitro_ticks;
+
+    // Attachment local state
+    float initial_speed = getAttachment()->getInitialSpeed();
+    float node_scale = getAttachment()->getNodeScale();
+
+    // Controller local state
+    int steer_val_l = 0;
+    int steer_val_r = 0;
+    PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
+    if (pc)
+    {
+        steer_val_l = pc->m_steer_val_l;
+        steer_val_r = pc->m_steer_val_r;
+    }
+
+    return [has_started, bubblegum_ticks, bounce_back_ticks,
+        invulnerable_ticks, squash_ticks, fire_clicked,
+        view_blocked_by_plunger, brake_ticks, min_nitro_ticks, initial_speed,
+        node_scale, steer_val_l, steer_val_r, this]()
+    {
+        m_has_started = has_started;
+        m_bubblegum_ticks = bubblegum_ticks;
+        m_bounce_back_ticks = bounce_back_ticks;
+        m_invulnerable_ticks = invulnerable_ticks;
+        m_squash_ticks = squash_ticks;
+        m_fire_clicked = fire_clicked;
+        m_view_blocked_by_plunger = view_blocked_by_plunger;
+        m_brake_ticks = brake_ticks;
+        m_min_nitro_ticks = min_nitro_ticks;
+        getAttachment()->setInitialSpeed(initial_speed);
+        getAttachment()->setNodeScale(node_scale);
+        PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
+        if (pc)
+        {
+            pc->m_steer_val_l = steer_val_l;
+            pc->m_steer_val_r = steer_val_r;
+        }
+    };
+}   // getLocalStateRestoreFunction

@@ -23,6 +23,8 @@
 
 #include "btBulletDynamicsCommon.h"
 
+#include "network/rewinder.hpp"
+#include "network/smooth_network_body.hpp"
 #include "physics/user_pointer.hpp"
 #include "utils/vec3.hpp"
 #include "utils/leak_check.hpp"
@@ -35,7 +37,8 @@ class XMLNode;
 /**
   * \ingroup physics
   */
-class PhysicalObject
+class PhysicalObject : public Rewinder,
+                       public SmoothNetworkBody
 {
 public:
     /** The supported collision shapes. */
@@ -185,6 +188,11 @@ private:
     /** Non-null only if the shape is exact */
     TriangleMesh         *m_triangle_mesh;
 
+    btTransform           m_last_transform;
+    Vec3                  m_last_lv;
+    Vec3                  m_last_av;
+    bool                  m_no_server_state;
+
 public:
                     PhysicalObject(bool is_dynamic, const Settings& settings,
                                    TrackObject* object);
@@ -269,6 +277,15 @@ public:
     /** @} */
     /** @} */
 
+    void addForRewind();
+    virtual void saveTransform();
+    virtual void computeError();
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru);
+    virtual void undoEvent(BareNetworkString *buffer) {}
+    virtual void rewindToEvent(BareNetworkString *buffer) {}
+    virtual void restoreState(BareNetworkString *buffer, int count);
+    virtual void undoState(BareNetworkString *buffer) {}
+    virtual std::function<void()> getLocalStateRestoreFunction();
     LEAK_CHECK()
 };  // PhysicalObject
 

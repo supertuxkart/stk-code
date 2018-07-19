@@ -70,6 +70,7 @@ NetworkConfig::NetworkConfig()
         m_client_port = stk_config->m_client_port;
         m_server_port = stk_config->m_server_port;
     }
+    m_team_choosing = false;
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------

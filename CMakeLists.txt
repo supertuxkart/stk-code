@@ -19,7 +19,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
-option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
@@ -27,6 +26,10 @@ option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when av
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
+CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
+    "NOT SERVER_ONLY" OFF)
+CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
+    "NOT SERVER_ONLY;NOT MINGW;NOT CYGWIN" OFF)
 
 if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
@@ -60,12 +63,6 @@ if(MSVC AND (MSVC_VERSION LESS 1900))
     mark_as_advanced(WIIUSE_BUILD)
 else()
     set(WIIUSE_BUILD ON)
-endif()
-
-if(MINGW OR CYGWIN OR SERVER_ONLY)
-    option(USE_WIIUSE "Support for wiimote input devices" OFF)
-else()
-    option(USE_WIIUSE "Support for wiimote input devices" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -125,17 +122,21 @@ endif()
 
 if(SERVER_ONLY)
     add_definitions(-DSERVER_ONLY)
-    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_COMPILE_WITH_OSX_DEVICE_)
 endif()
-
-#if(DISABLE_VPX)
-#    add_definitions(-DNO_VPX)
-#endif()
 
 if(UNIX OR MINGW)
     if(DEBUG_SYMBOLS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    endif()
+endif()
+
+if(UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+
+    if(NOT PKGCONFIG_FOUND)
+        message(FATAL_ERROR "Pkg-config not found.")
     endif()
 endif()
 
@@ -145,16 +146,16 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Find system ENet library or build it if missing
 if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
-    find_package(ENet)
+    pkg_check_modules(ENET libenet>=1.3.4)
 endif()
 
 if(ENET_FOUND)
-    include_directories(${ENet_INCLUDE_DIRS})
+    include_directories(${ENET_INCLUDE_DIRS})
 else()
     # Fallback to built-in version
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
     include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
-    set(ENet_LIBRARIES "enet")
+    set(ENET_LIBRARIES "enet")
 endif()
 
 # Find system GLEW library or build it if missing
@@ -167,10 +168,7 @@ if (APPLE)
 elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
     if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
-        find_package(PkgConfig)
-        if(PKGCONFIG_FOUND)
-            pkg_check_modules(GLEW glew>=2.1)
-        endif()
+        pkg_check_modules(GLEW glew>=2.1)
     endif()
 
     if(GLEW_FOUND)
@@ -183,37 +181,39 @@ elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     endif()
 endif()
 
-if(MSVC OR APPLE)
-    if (NOT APPLE)
+if(MSVC)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
 
     set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
     set(ZLIB_LIBRARY zlibstatic)
-    endif()
-
-    # Build png library
-    set(SKIP_INSTALL_ALL TRUE)
-    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
-    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
-    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
-
-    set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png_static)
 endif()
 
-# Add jpeg library
-if (APPLE)
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
-    set(JPEG_LIBRARY jpeglib)
-else()
-    find_package(JPEG REQUIRED)
-    include_directories(${JPEG_INCLUDE_DIR})
+if (NOT SERVER_ONLY)
+    if(MSVC OR APPLE)
+        # Build png library
+        set(SKIP_INSTALL_ALL TRUE)
+        set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+        set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+        set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
+
+        set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
+        set(PNG_LIBRARY png_static)
+    endif()
+
+    # Add jpeg library
+    if (APPLE)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+        set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
+        set(JPEG_LIBRARY jpeglib)
+    else()
+        find_package(JPEG REQUIRED)
+        include_directories(${JPEG_INCLUDE_DIR})
+    endif()
 endif()
 
 if (BUILD_RECORDER)
@@ -297,21 +297,27 @@ else()
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
-# OpenAL
-find_package(OpenAL REQUIRED)
-include_directories(${OPENAL_INCLUDE_DIR})
+if(NOT SERVER_ONLY)
+    # OpenAL
+    find_package(OpenAL REQUIRED)
+    include_directories(${OPENAL_INCLUDE_DIR})
 
-# OggVorbis
-find_package(OggVorbis REQUIRED)
-include_directories(${OGGVORBIS_INCLUDE_DIRS})
+    # OggVorbis
+    find_package(OggVorbis REQUIRED)
+    include_directories(${OGGVORBIS_INCLUDE_DIRS})
+
+    add_definitions(-DENABLE_SOUND)
+endif()
 
 # Freetype
-find_package(Freetype)
-if(FREETYPE_FOUND)
-    include_directories(${FREETYPE_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Freetype not found. "
-        "Freetype is required to display characters in SuperTuxKart. ")
+if (NOT SERVER_ONLY)
+    find_package(Freetype)
+    if(FREETYPE_FOUND)
+        include_directories(${FREETYPE_INCLUDE_DIRS})
+    else()
+        message(FATAL_ERROR "Freetype not found. "
+            "Freetype is required to display characters in SuperTuxKart. ")
+    endif()
 endif()
 
 # Fribidi
@@ -380,8 +386,6 @@ else()
     endif()
 endif()
 
-# TODO: remove this switch
-add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
     configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
@@ -405,16 +409,10 @@ if(APPLE)
     add_executable(supertuxkart MACOSX_BUNDLE ${STK_SOURCES})
 
     find_library(IOKIT_LIBRARY IOKit)
-    find_library(QUICKTIME_LIBRARY QuickTime)
-    find_library(CARBON_LIBRARY Carbon)
-    find_library(AUDIOUNIT_LIBRARY AudioUnit)
     find_library(COCOA_LIBRARY Cocoa)
 
     target_link_libraries(supertuxkart
          ${IOKIT_LIBRARY}
-         ${QUICKTIME_LIBRARY}
-         ${CARBON_LIBRARY}
-         ${AUDIOUNIT_LIBRARY}
          ${COCOA_LIBRARY})
 
     # configure CMake to use a custom Info.plist
@@ -481,15 +479,10 @@ target_link_libraries(supertuxkart
     bulletdynamics
     bulletcollision
     bulletmath
-    ${ENet_LIBRARIES}
+    ${ENET_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${OGGVORBIS_LIBRARIES}
-    ${OPENAL_LIBRARY}
-    ${FREETYPE_LIBRARIES}
-    ${JPEG_LIBRARIES}
-    ${TURBOJPEG_LIBRARY}
     ${OPENSSL_CRYPTO_LIBRARY}
     )
 
@@ -500,7 +493,13 @@ if(NOT SERVER_ONLY)
         target_link_libraries(supertuxkart GLESv2)
     endif()
 
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY} graphics_utils)
+    target_link_libraries(supertuxkart
+        ${SQUISH_LIBRARY}
+        ${FREETYPE_LIBRARIES}
+        ${JPEG_LIBRARIES}
+        ${OGGVORBIS_LIBRARIES}
+        ${OPENAL_LIBRARY}
+        graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)

@@ -143,7 +143,7 @@ Track::Track(const std::string &filename)
     m_clouds                = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
-    m_caustics_speed        = 1.0f;
+    m_physical_object_uid   = 0;
     m_shadows               = true;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
@@ -291,6 +291,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+    m_physical_object_uid = 0;
 #ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
     {
@@ -556,7 +557,6 @@ void Track::loadTrackInfo()
     root->get("shadows",               &m_shadows);
     root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
-    root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
 
@@ -1111,13 +1111,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
-    //Check whether the hardware can do nonsquare or
-    // non power-of-two textures
-    video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-    bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-    bool nonsquare =
-        video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
     //Create the minimap resizing it as necessary.
     m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 
@@ -1550,7 +1543,6 @@ void Track::update(int ticks)
         m_startup_run = true;
     }
     float dt = stk_config->ticks2Time(ticks);
-    m_track_object_manager->update(dt);
     CheckManager::get()->update(dt);
     ItemManager::get()->update(ticks);
 
@@ -1809,7 +1801,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (NetworkConfig::get()->isNetworking())
         NetworkItemManager::create();
     else
+    {
+        // Seed random engine locally
+        ItemManager::updateRandomSeed((uint32_t)StkTime::getTimeSinceEpoch());
         ItemManager::create();
+    }
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -2050,8 +2046,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             }
         }   // for i<root->getNumNodes()
     }
-
     delete root;
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        static_cast<NetworkItemManager*>(NetworkItemManager::get())
+            ->initClientConfirmState();
+    }
 
     if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
         Graph::get()->createDebugMesh();
@@ -2126,7 +2128,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             int geo_level = 0;
             node->get("geometry-level", &geo_level);
-            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0 &&
+                !NetworkConfig::get()->isNetworking())
                 continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }

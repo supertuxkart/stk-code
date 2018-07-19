@@ -80,7 +80,7 @@ void History::addEvent(int kart_id, PlayerAction pa, int value)
     InputEvent ie;
     // The event is added before m_current is increased. So in order to
     // save the right index for this event, we need to use m_current+1.
-    ie.m_world_ticks = World::getWorld()->getTimeTicks();
+    ie.m_world_ticks = World::getWorld()->getTicksSinceStart();
     ie.m_action      = pa;
     ie.m_value       = value;
     ie.m_kart_index  = kart_id;
@@ -102,7 +102,7 @@ void History::updateReplay(int world_ticks)
         const InputEvent &ie = m_all_input_events[m_event_index];
         AbstractKart *kart = world->getKart(ie.m_kart_index);
         Log::verbose("history", "time %d event-time %d action %d %d",
-            world->getTimeTicks(), ie.m_world_ticks, ie.m_action,
+            world->getTicksSinceStart(), ie.m_world_ticks, ie.m_action,
             ie.m_value);
         kart->getController()->action(ie.m_action, ie.m_value);
         m_event_index++;
@@ -168,7 +168,7 @@ void History::Save()
     {
         fprintf(fd, "model %d: %s\n",k, world->getKart(k)->getIdent().c_str());
     }
-    fprintf(fd, "count:     %d\n", m_all_input_events.size());
+    fprintf(fd, "count:     %zu\n", m_all_input_events.size());
 
     for (unsigned int i = 0; i < m_all_input_events.size(); i++)
     {

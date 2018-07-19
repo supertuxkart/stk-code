@@ -161,7 +161,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Iobj/openssl/include             \
                       -I$(call my-dir)/../../sources/android/native_app_glue \
                       -DUSE_GLES2      \
-                      -DHAVE_OGGVORBIS \
+                      -DENABLE_SOUND   \
                       -DNDEBUG         \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
                       -DANDROID_APP_DIR_NAME=\"$(APP_DIR_NAME)\"    \

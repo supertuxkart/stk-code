@@ -25,12 +25,17 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
-#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/network_player_controller.hpp"
+#include "network/network_config.hpp"
+#include "network/network_string.hpp"
+#include "network/protocols/game_events_protocol.hpp"
+#include "network/rewind_manager.hpp"
+#include "network/stk_host.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -144,7 +149,8 @@ void SoccerWorld::reset()
     m_blue_kdm.clear();
     m_ball_heading = 0.0f;
     m_ball_invalid_timer = 0;
-
+    m_goal_transforms.clear();
+    m_goal_transforms.resize(m_karts.size());
     if (m_goal_sound != NULL &&
         m_goal_sound->getStatus() == SFXBase::SFX_PLAYING)
     {
@@ -156,9 +162,11 @@ void SoccerWorld::reset()
         m_ball_track_sector->reset();
     }
 
+    m_reset_ball_ticks = -1;
     initKartList();
     m_ball->reset();
     m_bgd.reset();
+    m_ball->setEnabled(false);
 
     // Make the player kart in profiling mode up
     // ie make this kart less likely to affect gaming result
@@ -166,6 +174,27 @@ void SoccerWorld::reset()
         getKart(8)->flyUp();
 
 }   // reset
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::onGo()
+{
+    m_ball->setEnabled(true);
+    m_ball->reset();
+    WorldWithRank::onGo();
+}   // onGo
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::terminateRace()
+{
+    const unsigned int kart_amount = getNumKarts();
+    for (unsigned int i = 0; i < kart_amount ; i++)
+    {
+        // Soccer mode use goal for race result, and each goal time is
+        // handled by handlePlayerGoalFromServer already
+        m_karts[i]->finishedRace(0.0f, true/*from_server*/);
+    }   // i<kart_amount
+    WorldWithRank::terminateRace();
+}   // terminateRace
 
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
@@ -182,7 +211,8 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(int ticks)
 {
     updateBallPosition(ticks);
-    if (Track::getCurrentTrack()->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh() &&
+        !NetworkConfig::get()->isNetworking())
     {
         updateSectorForKarts();
         updateAIData();
@@ -193,23 +223,29 @@ void SoccerWorld::update(int ticks)
 
     if (getPhase() == World::GOAL_PHASE)
     {
-        if (m_goal_timer == 0)
+        for (unsigned int i = 0; i < m_karts.size(); i++)
         {
-            // Stop all karts
-            for (unsigned int i = 0; i < m_karts.size(); i++)
-                m_karts[i]->setVelocity(btVector3(0, 0, 0));
+            AbstractKart* kart = m_karts[i];
+            if (kart->isEliminated())
+                continue;
+            kart->getBody()->setLinearVelocity(Vec3(0.0f));
+            kart->getBody()->setAngularVelocity(Vec3(0.0f));
+            kart->getBody()->proceedToTransform(m_goal_transforms[i]);
+            kart->setTrans(m_goal_transforms[i]);
         }
-        m_goal_timer += ticks;
 
+        if (NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isClient())
+            return;
+
+        m_goal_timer += ticks;
         if (m_goal_timer > stk_config->time2Ticks(3.0f))
         {
-            setPhase(WorldStatus::RACE_PHASE);
             m_goal_timer = 0;
             if (!isRaceOver())
             {
-                // Reset all karts
-                for (unsigned int i = 0; i < m_karts.size(); i++)
-                    moveKartAfterRescue(m_karts[i]);
+                // Reset all karts and ball
+                resetKartsToSelfGoals();
                 if (UserConfigParams::m_arena_ai_stats)
                     getKart(8)->flyUp();
             }
@@ -223,11 +259,14 @@ void SoccerWorld::update(int ticks)
 //-----------------------------------------------------------------------------
 void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 {
-    if (isRaceOver() || isStartPhase())
+    if (isRaceOver() || isStartPhase() ||
+        (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient()))
         return;
 
     setPhase(WorldStatus::GOAL_PHASE);
     m_goal_sound->play();
+    m_ball->setEnabled(false);
     if (m_ball_hitter != -1)
     {
         if (UserConfigParams::m_arena_ai_stats)
@@ -253,6 +292,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
 
+        float score_time = 0.0f;
         if (first_goal)
         {
             // Notice: true first_goal means it's blue goal being shoot,
@@ -260,27 +300,145 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             m_red_scorers.push_back(sd);
             if (race_manager->hasTimeTarget())
             {
-                m_red_score_times.push_back(race_manager->getTimeTarget()
-                    - getTime());
+                score_time = race_manager->getTimeTarget() - getTime();
             }
             else
-                m_red_score_times.push_back(getTime());
+                score_time = getTime();
+            m_red_score_times.push_back(score_time);
         }
         else
         {
             m_blue_scorers.push_back(sd);
             if (race_manager->hasTimeTarget())
             {
-                m_blue_score_times.push_back(race_manager->getTimeTarget()
-                    - getTime());
+                score_time = race_manager->getTimeTarget() - getTime();
             }
             else
-                m_blue_score_times.push_back(getTime());
+                score_time = getTime();
+            m_blue_score_times.push_back(score_time);
+        }
+        if (NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isServer())
+        {
+            NetworkString p(PROTOCOL_GAME_EVENTS);
+            p.setSynchronous(true);
+            p.addUInt8(GameEventsProtocol::GE_PLAYER_GOAL)
+                .addUInt8((uint8_t)sd.m_id).addUInt8(sd.m_correct_goal)
+                .addUInt8(first_goal).addFloat(score_time)
+                .addTime(World::getWorld()->getTicksSinceStart() +
+                stk_config->time2Ticks(3.0f));
+            STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
-    m_ball->reset();
+    for (unsigned i = 0; i < m_karts.size(); i++)
+    {
+        AbstractKart* kart = m_karts[i];
+        if (kart->isEliminated())
+            continue;
+        kart->getBody()->setLinearVelocity(Vec3(0.0f));
+        kart->getBody()->setAngularVelocity(Vec3(0.0f));
+        m_goal_transforms[i] = kart->getBody()->getWorldTransform();
+    }
 
 }   // onCheckGoalTriggered
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
+{
+    int ticks_now = World::getWorld()->getTicksSinceStart();
+    int ticks_back_to_own_goal = ns.getTime();
+    if (ticks_now >= ticks_back_to_own_goal)
+    {
+        Log::warn("SoccerWorld", "Server ticks %d is too close to client ticks "
+            "%d when reset player", ticks_back_to_own_goal, ticks_now);
+        return;
+    }
+    RewindManager::get()->getRewindQueue().insertRewindInfo(new
+        RewindInfoEventFunction(ticks_back_to_own_goal,
+        [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
+
+}   // handleResetBallFromServer
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
+{
+    ScorerData sd;
+    sd.m_id = ns.getUInt8();
+    sd.m_correct_goal = ns.getUInt8() == 1;
+    bool first_goal = ns.getUInt8() == 1;
+    float score_time = ns.getFloat();
+    if (sd.m_correct_goal)
+    {
+        m_karts[sd.m_id]->getKartModel()
+            ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
+    }
+    else if (!sd.m_correct_goal)
+    {
+        m_karts[sd.m_id]->getKartModel()
+            ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
+    }
+
+    if (first_goal)
+    {
+        m_red_scorers.push_back(sd);
+        m_red_score_times.push_back(score_time);
+    }
+    else
+    {
+        m_blue_scorers.push_back(sd);
+        m_blue_score_times.push_back(score_time);
+    }
+    int ticks_now = World::getWorld()->getTicksSinceStart();
+    int ticks_back_to_own_goal = ns.getTime();
+
+    if (ticks_now >= ticks_back_to_own_goal)
+    {
+        Log::warn("SoccerWorld", "Server ticks %d is too close to client ticks "
+            "%d when goal", ticks_back_to_own_goal, ticks_now);
+        return;
+    }
+
+    setPhase(WorldStatus::GOAL_PHASE);
+    m_goal_sound->play();
+    m_ball->setEnabled(false);
+    for (unsigned i = 0; i < m_karts.size(); i++)
+    {
+        AbstractKart* kart = m_karts[i];
+        if (kart->isEliminated())
+            continue;
+        btTransform transform_now = kart->getBody()->getWorldTransform();
+        kart->getBody()->setLinearVelocity(Vec3(0.0f));
+        kart->getBody()->setAngularVelocity(Vec3(0.0f));
+        kart->getBody()->proceedToTransform(transform_now);
+        kart->setTrans(transform_now);
+        m_goal_transforms[i] = transform_now;
+    }
+    RewindManager::get()->getRewindQueue().insertRewindInfo(new
+        RewindInfoEventFunction(ticks_back_to_own_goal,
+        [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
+
+}   // handlePlayerGoalFromServer
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::resetKartsToSelfGoals()
+{
+    m_ball->setEnabled(true);
+    m_ball->reset();
+    m_bgd.resetCheckGoal(Track::getCurrentTrack());
+    setPhase(WorldStatus::RACE_PHASE);
+    for (unsigned i = 0; i < m_karts.size(); i++)
+    {
+        AbstractKart* kart = m_karts[i];
+        if (kart->isEliminated())
+            continue;
+
+        kart->getBody()->setLinearVelocity(Vec3(0.0f));
+        kart->getBody()->setAngularVelocity(Vec3(0.0f));
+        unsigned index = m_kart_position_map.at(kart->getWorldKartId());
+        btTransform t = Track::getCurrentTrack()->getStartTransform(index);
+        moveKartTo(kart, t);
+    }
+}   // resetKartsToSelfGoals
 
 //-----------------------------------------------------------------------------
 /** Sets the last kart that hit the ball, to be able to
@@ -296,16 +454,15 @@ void SoccerWorld::setBallHitter(unsigned int kart_id)
  */
 bool SoccerWorld::isRaceOver()
 {
-
-    if(race_manager->hasTimeTarget())
+    if (race_manager->hasTimeTarget())
     {
         return m_count_down_reached_zero;
     }
     // One team scored the target goals ...
     else
     {
-      return (getScore(SOCCER_TEAM_BLUE) >= m_goal_target ||
-          getScore(SOCCER_TEAM_RED) >= m_goal_target);
+        return (getScore(SOCCER_TEAM_BLUE) >= m_goal_target ||
+            getScore(SOCCER_TEAM_RED) >= m_goal_target);
     }
 
 }   // isRaceOver
@@ -315,6 +472,9 @@ bool SoccerWorld::isRaceOver()
  */
 void SoccerWorld::countdownReachedZero()
 {
+    // Prevent negative time in network soccer when finishing
+    m_time_ticks = 0;
+    m_time = 0.0f;
     m_count_down_reached_zero = true;
 }   // countdownReachedZero
 
@@ -388,6 +548,11 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
             team = SOCCER_TEAM_BLUE;
         m_kart_team_map[index] = team;
     }
+    else if (NetworkConfig::get()->isNetworking())
+    {
+        m_kart_team_map[index] = race_manager->getKartInfo(index).getSoccerTeam();
+        team = race_manager->getKartInfo(index).getSoccerTeam();
+    }
     else
     {
         int rm_id = index -
@@ -396,6 +561,13 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         assert(rm_id >= 0);
         team = race_manager->getKartInfo(rm_id).getSoccerTeam();
         m_kart_team_map[index] = team;
+    }
+
+    core::stringw online_name;
+    if (global_player_id > -1)
+    {
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
     }
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
@@ -412,9 +584,21 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-        difficulty, team == SOCCER_TEAM_BLUE ?
-        std::make_shared<RenderInfo>(0.66f) : std::make_shared<RenderInfo>(1.0f));
+    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    ri = (team == SOCCER_TEAM_BLUE ? std::make_shared<RenderInfo>(0.66f) :
+        std::make_shared<RenderInfo>(1.0f));
+    AbstractKart* new_kart;
+    if (RewindManager::get()->isEnabled())
+    {
+        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
+            difficulty, ri);
+    }
+    else
+    {
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
+            ri);
+    }
+
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 
@@ -427,6 +611,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         break;
     case RaceManager::KT_NETWORK_PLAYER:
         controller = new NetworkPlayerController(new_kart);
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     case RaceManager::KT_AI:
@@ -463,22 +649,46 @@ void SoccerWorld::updateBallPosition(int ticks)
     {
         m_ball_track_sector
             ->update(getBallPosition(), true/*ignore_vertical*/);
-        if (!m_ball_track_sector->isOnRoad() && getPhase() == RACE_PHASE)
+        if (!m_ball_track_sector->isOnRoad() && getPhase() == RACE_PHASE &&
+            m_reset_ball_ticks == -1)
         {
             m_ball_invalid_timer += ticks;
             // Reset the ball and karts if out of navmesh after 2 seconds
             if (m_ball_invalid_timer >= stk_config->time2Ticks(2.0f))
             {
-                m_ball_invalid_timer = 0;
-                m_ball->reset();
-                for (unsigned int i = 0; i < m_karts.size(); i++)
-                    moveKartAfterRescue(m_karts[i]);
-                if (UserConfigParams::m_arena_ai_stats)
-                    getKart(8)->flyUp();
+                if (NetworkConfig::get()->isNetworking() &&
+                    NetworkConfig::get()->isServer())
+                {
+                    // Reset the ball 2 seconds in the future to make sure it's
+                    // after all clients time
+                    m_reset_ball_ticks =
+                        World::getWorld()->getTicksSinceStart() +
+                        stk_config->time2Ticks(2.0f);
+
+                    NetworkString p(PROTOCOL_GAME_EVENTS);
+                    p.setSynchronous(true);
+                    p.addUInt8(GameEventsProtocol::GE_RESET_BALL)
+                        .addTime(m_reset_ball_ticks);
+                    STKHost::get()->sendPacketToAllPeers(&p, true);
+                }
+                else if (!NetworkConfig::get()->isNetworking())
+                {
+                    m_ball_invalid_timer = 0;
+                    resetKartsToSelfGoals();
+                    if (UserConfigParams::m_arena_ai_stats)
+                        getKart(8)->flyUp();
+                }
             }
         }
         else
             m_ball_invalid_timer = 0;
+        if (m_reset_ball_ticks == World::getWorld()->getTicksSinceStart())
+        {
+            assert(NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isServer());
+            resetKartsToSelfGoals();
+            m_reset_ball_ticks = -1;
+        }
     }
 
 }   // updateBallPosition

@@ -76,8 +76,6 @@ public:
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }
-    void removeForRewind();
-    void addForRewind();
 
 };   // class TrackObjectManager
 

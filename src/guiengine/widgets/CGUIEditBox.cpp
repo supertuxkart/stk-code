@@ -1262,15 +1262,15 @@ bool CGUIEditBox::processMouse(const SEvent& event)
         }
         else if (!m_rtl)
         {
-            bool use_screen_keyboard = UserConfigParams::m_screen_keyboard;
+            bool use_screen_keyboard = UserConfigParams::m_screen_keyboard > 1;
             
             #ifdef ANDROID
-            int32_t keyboard = AConfiguration_getKeyboard(
-                                                    global_android_app->config);
-            
-            if (keyboard == ACONFIGURATION_KEYBOARD_QWERTY)
+            if (UserConfigParams::m_screen_keyboard == 1)
             {
-                use_screen_keyboard = false;
+                int32_t keyboard = AConfiguration_getKeyboard(
+                                                    global_android_app->config);
+                
+                use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
             }
             #endif
             

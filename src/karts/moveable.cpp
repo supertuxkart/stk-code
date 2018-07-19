@@ -38,8 +38,6 @@ Moveable::Moveable()
     m_mesh            = NULL;
     m_node            = NULL;
     m_heading         = 0;
-    m_positional_error = Vec3(0.0f, 0.0f, 0.0f);
-    m_rotational_error = btQuaternion(0.0f, 0.0f, 0.0f, 1.0f);
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -62,24 +60,21 @@ void Moveable::setNode(scene::ISceneNode *n)
 }   // setNode
 
 //-----------------------------------------------------------------------------
-/** Adds a new error between graphical and physical position/rotation. Called
- *  in case of a rewind to allow to for smoothing the visuals in case of
- *  incorrect client prediction.
- *  \param pos_error Positional error to add.
- *  \param rot_Error Rotational error to add.
- */
-void Moveable::addError(const Vec3& pos_error,
-                        const btQuaternion &rot_error)
+void Moveable::updateSmoothedGraphics(float dt)
 {
-    m_positional_error += pos_error;
-#ifdef DEBUG_VISUAL_ERROR
-    Log::info("VisualError", "time %f addError %f %f %f size %f",
-        World::getWorld()->getTime(),
-        m_positional_error.getX(), m_positional_error.getY(), m_positional_error.getZ(),
-        m_positional_error.length());
+    SmoothNetworkBody::updateSmoothedGraphics(m_transform, getVelocity(), dt);
+#undef DEBUG_SMOOTHING
+#ifdef DEBUG_SMOOTHING
+    // Gnuplot compare command
+    // plot "stdout.log" u 6:8 w lp lw 2, "stdout.log" u 10:12 w lp lw 2
+    Log::verbose("Smoothing", "%s smoothed-xyz(6-8) %f %f %f "
+        "xyz(10-12) %f %f %f", getIdent().c_str(),
+        getSmoothedTrans().getOrigin().getX(),
+        getSmoothedTrans().getOrigin().getY(),
+        getSmoothedTrans().getOrigin().getZ(),
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ());
 #endif
-    m_rotational_error *= rot_error;
-}   // addError
+}   // updateSmoothedGraphics
 
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. Mainly set the graphical position to be the
@@ -88,27 +83,13 @@ void Moveable::addError(const Vec3& pos_error,
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
+void Moveable::updateGraphics(const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
-    // If this is a client, don't smooth error during rewinds
-    if (World::getWorld()->isNetworkWorld() &&
-        NetworkConfig::get()->isClient() &&
-        !RewindManager::get()->isRewinding())
-    {
-        float error = m_positional_error.length();
-        m_positional_error *= stk_config->m_positional_smoothing.get(error);
-#ifdef DEBUG_VISUAL_ERROR
-        Log::info("VisualError", "time %f reduceError %f %f %f size %f",
-            World::getWorld()->getTime(),
-            m_positional_error.getX(), m_positional_error.getY(), m_positional_error.getZ(),
-            m_positional_error.length());
-#endif
-    }
 #ifndef SERVER_ONLY
-    Vec3 xyz=getXYZ()+offset_xyz;
+    Vec3 xyz = getSmoothedTrans().getOrigin() + offset_xyz;
     m_node->setPosition(xyz.toIrrVector());
-    btQuaternion r_all = getRotation()*rotation;
+    btQuaternion r_all = getSmoothedTrans().getRotation() * rotation;
     if(btFuzzyZero(r_all.getX()) && btFuzzyZero(r_all.getY()-0.70710677f) &&
        btFuzzyZero(r_all.getZ()) && btFuzzyZero(r_all.getW()-0.70710677f)   )
         r_all.setX(0.000001f);
@@ -133,6 +114,8 @@ void Moveable::reset()
     m_node->setVisible(true);  // In case that the objects was eliminated
 #endif
 
+    SmoothNetworkBody::reset();
+    SmoothNetworkBody::setSmoothedTransform(m_transform);
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());

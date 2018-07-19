@@ -320,11 +320,14 @@ void CreateServerScreen::createServer()
         {
             // Grand prix track count
             if (esi > 0)
-                server_cfg << " --extra-server-info=" << esi;
+                server_cfg << " --network-gp=" << esi;
         }
         else
         {
-            server_cfg << " --extra-server-info=" << esi;
+            if (esi == 0)
+                server_cfg << " --soccer-timed";
+            else
+                server_cfg << " --soccer-goals";
         }
     }
 

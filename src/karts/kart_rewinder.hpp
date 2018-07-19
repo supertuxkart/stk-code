@@ -34,36 +34,50 @@ private:
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
 
-    /** The transform of the kart before a rewind starts. */
-    btTransform m_saved_transform;
+    float m_prev_steering, m_steering_smoothing_dt, m_steering_smoothing_time;
+
 public:
-	             KartRewinder(const std::string& ident,
-                              unsigned int world_kart_id,
-                              int position, const btTransform& init_transform,
-                              PerPlayerDifficulty difficulty,
-                              std::shared_ptr<RenderInfo> ri);
-   virtual      ~KartRewinder() {};
-   virtual void  saveTransform() OVERRIDE;
-   virtual void  computeError() OVERRIDE;
-   virtual BareNetworkString* saveState();
-   void          reset();
-   virtual void  restoreState(BareNetworkString *p, int count) OVERRIDE;
-   virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
-   virtual void  update(int ticks) OVERRIDE;
+    KartRewinder(const std::string& ident, unsigned int world_kart_id,
+                 int position, const btTransform& init_transform,
+                 PerPlayerDifficulty difficulty,
+                 std::shared_ptr<RenderInfo> ri);
+    ~KartRewinder() {}
+    virtual void saveTransform() OVERRIDE;
+    virtual void computeError() OVERRIDE;
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
+    void reset() OVERRIDE;
+    virtual void restoreState(BareNetworkString *p, int count) OVERRIDE;
+    virtual void rewindToEvent(BareNetworkString *p) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
+    // -------------------------------------------------------------------------
+    virtual float getSteerPercent() const OVERRIDE
+    {
+        if (m_steering_smoothing_dt >= 0.0f)
+        {
+            return m_steering_smoothing_dt * AbstractKart::getSteerPercent() +
+                (1.0f - m_steering_smoothing_dt) * m_prev_steering;
+        }
+        return AbstractKart::getSteerPercent();
+    }
+    // -------------------------------------------------------------------------
+    virtual void updateGraphics(float dt) OVERRIDE
+    {
+        if (m_steering_smoothing_dt >= 0.0f)
+        {
+            m_steering_smoothing_dt += dt / m_steering_smoothing_time;
+            if (m_steering_smoothing_dt > 1.0f)
+                m_steering_smoothing_dt = -1.0f;
+        }
+        Kart::updateGraphics(dt);
+    }
+    // -------------------------------------------------------------------------
+    virtual void undoState(BareNetworkString *p) OVERRIDE {}
+    // -------------------------------------------------------------------------
+    virtual void undoEvent(BareNetworkString *p) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual std::function<void()> getLocalStateRestoreFunction() OVERRIDE;
 
-   // -------------------------------------------------------------------------
-   virtual void  undoState(BareNetworkString *p) OVERRIDE
-   {
-   };   // undoState
-
-   // -------------------------------------------------------------------------
-   virtual void  undoEvent(BareNetworkString *p) OVERRIDE
-   {
-   };   // undoEvent
-
-   // -------------------------------------------------------------------------
-
-   
 
 };   // Rewinder
 #endif

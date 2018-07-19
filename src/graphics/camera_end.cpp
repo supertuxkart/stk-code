@@ -87,7 +87,7 @@ void CameraEnd::update(float dt)
     // First test if the kart is close enough to the next end camera, and
     // if so activate it.
     if( m_end_cameras.size()>0 &&
-        m_end_cameras[m_next_end_camera].isReached(m_kart->getXYZ()))
+        m_end_cameras[m_next_end_camera].isReached(m_kart->getSmoothedXYZ()))
     {
         m_current_end_camera = m_next_end_camera;
         if(m_end_cameras[m_current_end_camera].m_type
@@ -116,7 +116,7 @@ void CameraEnd::update(float dt)
             // after changing the relative position in order to get the right
             // position here).
             const core::vector3df &cp = m_camera->getPosition();
-            const Vec3            &kp = m_kart->getXYZ();
+            const Vec3            &kp = m_kart->getSmoothedXYZ();
             // Estimate the fov, assuming that the vector from the camera to
             // the kart and the kart length are orthogonal to each other
             // --> tan (fov) = kart_length / camera_kart_distance
@@ -125,7 +125,7 @@ void CameraEnd::update(float dt)
             float fov = 6*atan2(m_kart->getKartLength(),
                                 (cp-kp.toIrrVector()).getLength());
             m_camera->setFOV(fov);
-            m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+            m_camera->setTarget(m_kart->getSmoothedXYZ().toIrrVector());
             break;
         }
     case EndCameraInformation::EC_AHEAD_OF_KART:

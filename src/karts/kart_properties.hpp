@@ -147,7 +147,7 @@ private:
     /** Minimum time during which nitro is consumed when pressing
      *  the nitro key (to prevent using in very small bursts)
      */
-    float m_nitro_min_consumption;
+    int8_t m_nitro_min_consumption;
 
     /** Type of the kart (for the properties) */
     std::string m_kart_type;
@@ -475,9 +475,6 @@ public:
     float getNitroMaxSpeedIncrease() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
-    int   getNitroMinConsumptionTicks() const;
-    // ------------------------------------------------------------------------
-
     float getSlipstreamDurationFactor() const;
     float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
@@ -508,6 +505,12 @@ public:
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;
+    // ------------------------------------------------------------------------
+    /** Returns minimum time during which nitro is consumed when pressing nitro
+    *  key, to prevent using nitro in very short bursts
+    */
+    int8_t getNitroMinConsumptionTicks() const
+                                            { return m_nitro_min_consumption; }
 
     /* <characteristics-end kpdefs> */
     

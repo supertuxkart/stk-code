@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_DICTIONARY_HPP
 #define HEADER_TINYGETTEXT_DICTIONARY_HPP
 
+#ifndef SERVER_ONLY
+
 #include <map>
 #include <vector>
 #include <string>
@@ -135,3 +137,4 @@ public:
 #endif
 
 /* EOF */
+#endif

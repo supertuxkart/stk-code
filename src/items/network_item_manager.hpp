@@ -68,7 +68,7 @@ public:
 
     void setSwitchItems(const std::vector<int> &switch_items);
     void sendItemUpdate();
-    void saveInitialState();
+    void initClientConfirmState();
 
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
@@ -76,7 +76,8 @@ public:
     virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;
     virtual Item* dropNewItem(ItemState::ItemType type, const AbstractKart *kart,
                               const Vec3 *xyz=NULL) OVERRIDE;
-    virtual BareNetworkString* saveState() OVERRIDE;
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void rewindToEvent(BareNetworkString *bns) OVERRIDE {};

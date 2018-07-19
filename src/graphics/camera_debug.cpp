@@ -101,7 +101,7 @@ void CameraDebug::update(float dt)
     // high above the kart straight down.
     if (m_default_debug_Type==CM_DEBUG_TOP_OF_KART)
     {
-        core::vector3df xyz = m_kart->getXYZ().toIrrVector();
+        core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
         m_camera->setTarget(xyz);
 #define CLOSE_TO_KART
 #ifdef CLOSE_TO_KART
@@ -118,9 +118,9 @@ void CameraDebug::update(float dt)
     }
     else if (m_default_debug_Type==CM_DEBUG_SIDE_OF_KART)
     {
-        core::vector3df xyz = m_kart->getXYZ().toIrrVector();
+        core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
         Vec3 offset(3, 0, 0);
-        offset = m_kart->getTrans()(offset);
+        offset = m_kart->getSmoothedTrans()(offset);
         m_camera->setTarget(xyz);
         m_camera->setPosition(offset.toIrrVector());
     }
@@ -136,7 +136,7 @@ void CameraDebug::update(float dt)
         // above the kart).
         // Note: this code is replicated from smoothMoveCamera so that
         // the camera keeps on pointing to the same spot.
-        core::vector3df current_target = (m_kart->getXYZ().toIrrVector()
+        core::vector3df current_target = (m_kart->getSmoothedXYZ().toIrrVector()
                                          +core::vector3df(0, above_kart, 0));
         m_camera->setTarget(current_target);
     }
@@ -158,7 +158,7 @@ void CameraDebug::positionCamera(float dt, float above_kart, float cam_angle,
                                  float side_way, float distance              )
 {
     Vec3 wanted_position;
-    Vec3 wanted_target = m_kart->getXYZ();
+    Vec3 wanted_target = m_kart->getSmoothedXYZ();
     if(m_default_debug_Type==CM_DEBUG_GROUND)
     {
         const btWheelInfo &w = m_kart->getVehicle()->getWheelInfo(2);
@@ -170,7 +170,7 @@ void CameraDebug::positionCamera(float dt, float above_kart, float cam_angle,
     Vec3 relative_position(side_way,
                            fabsf(distance)*tan_up+above_kart,
                            distance);
-    btTransform t=m_kart->getTrans();
+    btTransform t=m_kart->getSmoothedTrans();
     if(stk_config->m_camera_follow_skid &&
         m_kart->getSkidding()->getVisualSkidRotation()!=0)
     {
@@ -196,7 +196,7 @@ void CameraDebug::positionCamera(float dt, float above_kart, float cam_angle,
     if (kart && !kart->isFlying())
     {
         // Rotate the up vector (0,1,0) by the rotation ... which is just column 1
-        Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
+        Vec3 up = m_kart->getSmoothedTrans().getBasis().getColumn(1);
         float f = 0.04f;  // weight for new up vector to reduce shaking
         m_camera->setUpVector(        f  * up.toIrrVector() +
                               (1.0f - f) * m_camera->getUpVector());

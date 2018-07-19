@@ -22,6 +22,7 @@
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
+#include "network/network_config.hpp"
 #include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
@@ -154,6 +155,12 @@ namespace Scripting
         {
             Log::error("Script", "%s", log->c_str());
         }
+
+        bool isNetworking()
+        {
+            return NetworkConfig::get()->isNetworking();
+        }
+
         /** @}*/
         /** @}*/
 
@@ -238,6 +245,11 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void logError(const string &in)", 
                                                mp ? WRAP_FN(logError) : asFUNCTION(logError), 
                                                call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("bool isNetworking()",
+                                               mp ? WRAP_FN(isNetworking) : asFUNCTION(isNetworking),
+                                               call_conv); assert(r >= 0);
+
 
         }
     }

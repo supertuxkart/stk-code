@@ -92,7 +92,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
-    m_nitro_min_consumption      = 0.53f;
+    m_nitro_min_consumption      = 64;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -1003,15 +1003,6 @@ float KartProperties::getNitroDuration() const
 }  // getNitroDuration
 
 // ------------------------------------------------------------------------
-/** Returns minimum time during which nitro is consumed when pressing nitro
- *  key, to prevent using nitro in very short bursts
-  */
-int KartProperties::getNitroMinConsumptionTicks() const
-{
-    return stk_config->time2Ticks(m_nitro_min_consumption);
-}
-
-// ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
     return m_cached_characteristic->getNitroEngineForce();
