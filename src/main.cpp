@@ -1265,6 +1265,14 @@ int handleCmdLine()
         NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
             RaceManager::MAJOR_MODE_GRAND_PRIX);
     }
+    else if (is_soccer)
+    {
+        Log::warn("main", "Set to goal target for soccer server");
+        LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget(true);
+        NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+            RaceManager::MAJOR_MODE_SINGLE);
+    }
     else
     {
         NetworkConfig::get()->setServerMode(
