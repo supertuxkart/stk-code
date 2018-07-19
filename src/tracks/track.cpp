@@ -105,6 +105,7 @@ Track::Track(const std::string &filename)
     m_magic_number          = 0x17AC3802;
 #endif
 
+    m_minimap_invert_x_z    = false;
     m_materials_loaded      = false;
     m_filename              = filename;
     m_root                  =
@@ -709,6 +710,21 @@ void Track::startMusic() const
  */
 void Track::loadArenaGraph(const XMLNode &node)
 {
+    // Determine if rotate minimap is needed for soccer mode (for blue team)
+    // Only need to test local player
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        for (unsigned i = 0; i < race_manager->getNumberOfKarts(); i++)
+        {
+            if (race_manager->getKartType(i) != RaceManager::KT_PLAYER)
+                continue;
+            if (race_manager->getKartInfo(i).getSoccerTeam() ==
+                SOCCER_TEAM_BLUE)
+                m_minimap_invert_x_z = true;
+            break;
+        }
+    }
+
     ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
     Graph::setGraph(graph);
 
@@ -786,7 +802,15 @@ void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    Graph::get()->mapPoint2MiniMap(xyz, draw_at);
+    if (m_minimap_invert_x_z)
+    {
+        Vec3 invert = xyz;
+        invert.setX(-xyz.x());
+        invert.setZ(-xyz.z());
+        Graph::get()->mapPoint2MiniMap(invert, draw_at);
+    }
+    else
+        Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -1115,7 +1139,9 @@ void Track::loadMinimap()
     m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 
     //Use twice the size of the rendered minimap to reduce significantly aliasing
-    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size*2, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size * 2,
+        "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+        m_minimap_invert_x_z);
     if (!m_render_target) return;
 
     core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
