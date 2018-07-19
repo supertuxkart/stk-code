@@ -277,12 +277,16 @@ void TracksScreen::init()
                 //I18N: In track screen
                 getWidget<LabelWidget>("lap-text")->setText(_("Number of goals to win"), false);
                 m_laps->setValue(UserConfigParams::m_num_goals);
+                m_laps->setMin(1);
+                m_laps->setMax(10);
             }
             else
             {
                 //I18N: In track screen
                 getWidget<LabelWidget>("lap-text")->setText(_("Maximum time (min.)"), false);
                 m_laps->setValue(UserConfigParams::m_soccer_time_limit);
+                m_laps->setMin(1);
+                m_laps->setMax(15);
             }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
@@ -296,6 +300,8 @@ void TracksScreen::init()
             //I18N: In track screen
             getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
             m_laps->setVisible(true);
+            m_laps->setMin(1);
+            m_laps->setMax(20);
             m_laps->setValue(UserConfigParams::m_num_laps);
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
