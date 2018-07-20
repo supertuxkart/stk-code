@@ -714,11 +714,11 @@ void Track::loadArenaGraph(const XMLNode &node)
     // Only need to test local player
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
-        for (unsigned i = 0; i < race_manager->getNumberOfKarts(); i++)
+        const unsigned pk = race_manager->getNumPlayers();
+        for (unsigned i = 0; i < pk; i++)
         {
-            if (race_manager->getKartType(i) != RaceManager::KT_PLAYER)
-                continue;
-            if (race_manager->getKartInfo(i).getSoccerTeam() ==
+            if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
+                race_manager->getKartInfo(i).getSoccerTeam() ==
                 SOCCER_TEAM_BLUE)
                 m_minimap_invert_x_z = true;
             break;
@@ -1763,6 +1763,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     CameraEnd::clearEndCameras();
+    m_minimap_invert_x_z   = false;
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
