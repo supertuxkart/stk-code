@@ -62,7 +62,10 @@ void Moveable::setNode(scene::ISceneNode *n)
 //-----------------------------------------------------------------------------
 void Moveable::updateSmoothedGraphics(float dt)
 {
-    SmoothNetworkBody::updateSmoothedGraphics(m_transform, getVelocity(), dt);
+    Vec3 velocity;
+    if (m_body)
+        velocity = m_body->getLinearVelocity();
+    SmoothNetworkBody::updateSmoothedGraphics(m_transform, velocity, dt);
 #undef DEBUG_SMOOTHING
 #ifdef DEBUG_SMOOTHING
     // Gnuplot compare command

@@ -858,6 +858,8 @@ void Kart::adjustSpeed(float f)
  */
 void Kart::updateWeight()
 {
+    if (!m_body)
+        return;
     float mass = m_kart_properties->getMass() + m_attachment->weightAdjust();
     if (m_weight != mass)
     {
