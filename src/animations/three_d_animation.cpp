@@ -75,15 +75,13 @@ void ThreeDAnimation::updateWithWorldTicks()
     Vec3 xyz   = m_object->getPosition();
     Vec3 scale = m_object->getScale();
 
-    float position = 0.0f;
     if (!m_is_paused)
     {
         int cur_ticks = World::getWorld()->getTicksSinceStart();
-        float cur_time = stk_config->ticks2Time(cur_ticks);
-        position = fmodf(cur_time, m_animation_duration);
+        m_current_time = stk_config->ticks2Time(cur_ticks);
     }
 
-    AnimationBase::getAt(position, &xyz, &m_hpr, &scale);     //updates all IPOs
+    AnimationBase::getAt(m_current_time, &xyz, &m_hpr, &scale);     //updates all IPOs
     //m_node->setPosition(xyz.toIrrVector());
     //m_node->setScale(scale.toIrrVector());
 

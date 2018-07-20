@@ -47,9 +47,6 @@ private:
     *  one time only (which might get triggered more than once). */
     enum AnimTimeType { ATT_CYCLIC, ATT_CYCLIC_ONCE } m_anim_type;
 
-    /** The current time used in the IPOs. */
-    float m_current_time;
-
     /** The inital position of this object. */
     Vec3 m_initial_xyz;
 
@@ -66,6 +63,9 @@ protected:
     bool  m_playing;
 
     float m_animation_duration;
+
+    /** The current time used in the IPOs. */
+    float m_current_time;
 
 public:
                  AnimationBase(const XMLNode &node);
