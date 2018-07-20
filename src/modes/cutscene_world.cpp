@@ -56,7 +56,8 @@ CutsceneWorld::CutsceneWorld() : World()
 {
     m_time_at_second_reset = 0.0f;
     m_aborted = false;
-    WorldStatus::setClockMode(CLOCK_NONE);
+    WorldStatus::setClockMode(CLOCK_CHRONO);
+    m_phase = RACE_PHASE;
     m_use_highscores = false;
     m_play_track_intro_sound = false;
     m_play_ready_set_go_sounds = false;
