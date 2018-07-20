@@ -61,7 +61,7 @@ namespace Online
         {
             virtual void callback ();
         public:
-            PollRequest() : XMLRequest(true) {}
+            PollRequest();
         };   // PollRequest
 
     private:
