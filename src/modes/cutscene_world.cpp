@@ -171,7 +171,12 @@ void CutsceneWorld::init()
 CutsceneWorld::~CutsceneWorld()
 {
 }   // ~CutsceneWorld
-
+//-----------------------------------------------------------------------------
+void CutsceneWorld::reset()
+{
+    World::reset();
+    m_phase = RACE_PHASE;
+}
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
  */
