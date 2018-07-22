@@ -213,7 +213,7 @@ void NetworkingLobby::onUpdate(float delta)
     if (m_timeout_message->isVisible() && m_player_list)
     {
         float cur_player = (float)(m_player_list->getItemCount());
-        if (cur_player > m_server_max_player * m_start_threshold &&
+        if (cur_player >= m_server_max_player * m_start_threshold &&
             m_cur_starting_timer == std::numeric_limits<float>::max())
         {
             m_cur_starting_timer = m_start_timeout;
@@ -226,7 +226,7 @@ void NetworkingLobby::onUpdate(float delta)
             core::stringw msg =
                 _P("Game will start if there is more than %d player.",
                "Game will start if there are more than %d players.",
-               (int)floor(m_server_max_player * m_start_threshold));
+               (int)ceil(m_server_max_player * m_start_threshold) - 1);
             m_timeout_message->setText(msg, true);
         }
 

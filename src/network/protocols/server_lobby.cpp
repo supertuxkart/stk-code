@@ -381,7 +381,7 @@ void ServerLobby::asynchronousUpdate()
         if (NetworkConfig::get()->isOwnerLess())
         {
             auto players = m_game_setup->getPlayers();
-            if (((float)players.size() >
+            if (((float)players.size() >=
                 (float)NetworkConfig::get()->getMaxPlayers() *
                 UserConfigParams::m_start_game_threshold ||
                 m_game_setup->isGrandPrixStarted()) &&
