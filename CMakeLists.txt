@@ -113,6 +113,7 @@ if(WIN32)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/${DEPENDENCIES})
     add_definitions(-D_IRR_STATIC_LIB_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    include_directories(${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include)
 endif()
 
 if(USE_GLES2)

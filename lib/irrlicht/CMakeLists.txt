@@ -1,10 +1,6 @@
 # CMakeLists.txt for Irrlicht in STK
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
-                    "${JPEG_INCLUDE_DIR}"
-                    "${PNG_INCLUDE_DIRS}"
                     "${ZLIB_INCLUDE_DIR}")
 
 if(MSVC OR APPLE)
@@ -13,6 +9,11 @@ if(MSVC OR APPLE)
 endif()
 
 if(NOT SERVER_ONLY)
+    find_package(PNG REQUIRED)
+    find_package(JPEG REQUIRED)
+    include_directories("${JPEG_INCLUDE_DIR}"
+                        "${PNG_INCLUDE_DIRS}")
+
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})
