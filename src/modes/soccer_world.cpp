@@ -122,6 +122,7 @@ void SoccerWorld::init()
         Log::fatal("SoccerWorld","Ball is missing in soccer field, abort.");
 
     m_bgd.init(m_ball->getPhysicalObject()->getRadius());
+    m_ball_body->setActivationState(DISABLE_DEACTIVATION);
 
 }   // init
 
