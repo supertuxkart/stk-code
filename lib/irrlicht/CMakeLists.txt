@@ -1,18 +1,18 @@
 # CMakeLists.txt for Irrlicht in STK
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
-                    "${JPEG_INCLUDE_DIR}"
-                    "${PNG_INCLUDE_DIRS}"
-                    "${ZLIB_INCLUDE_DIR}")
-
-if(MSVC OR APPLE)
-    include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
-                        "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
-endif()
-
 if(NOT SERVER_ONLY)
+    find_package(PNG REQUIRED)
+    find_package(JPEG REQUIRED)
+
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                        "${JPEG_INCLUDE_DIR}"
+                        "${PNG_INCLUDE_DIRS}"
+                        "${ZLIB_INCLUDE_DIR}")
+
+    if(MSVC OR APPLE)
+        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
+                            "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
+    endif()
+
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})
@@ -58,6 +58,11 @@ if(NOT SERVER_ONLY)
         endif()        
     endif()
 else()
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                        "${ZLIB_INCLUDE_DIR}")
+    if(MSVC OR APPLE)
+        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/")
+    endif()
     add_definitions(-DNO_IRR_COMPILE_WITH_LIBPNG_)
     add_definitions(-DNO_IRR_COMPILE_WITH_LIBJPEG_)
     add_definitions(-DNO_IRR_COMPILE_WITH_BMP_LOADER_)
