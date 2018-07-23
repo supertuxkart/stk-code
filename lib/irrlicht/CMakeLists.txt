@@ -8,9 +8,12 @@ if(NOT SERVER_ONLY)
                         "${PNG_INCLUDE_DIRS}"
                         "${ZLIB_INCLUDE_DIR}")
 
+    if(MSVC)
+        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+    endif()
+
     if(MSVC OR APPLE)
-        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
-                            "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
+        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
     endif()
 
     if(NOT USE_GLES2)
@@ -59,7 +62,7 @@ if(NOT SERVER_ONLY)
     endif()
 else()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
-    if(MSVC OR APPLE)
+    if(MSVC)
         include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/")
     else()
         find_package(ZLIB REQUIRED)
