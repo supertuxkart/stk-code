@@ -720,8 +720,10 @@ void Track::loadArenaGraph(const XMLNode &node)
             if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
                 race_manager->getKartInfo(i).getSoccerTeam() ==
                 SOCCER_TEAM_BLUE)
+            {
                 m_minimap_invert_x_z = true;
-            break;
+                break;
+            }
         }
     }
 
