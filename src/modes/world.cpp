@@ -120,7 +120,7 @@ World* World::m_world = NULL;
  */
 World::World() : WorldStatus()
 {
-
+    RewindManager::setEnable(NetworkConfig::get()->isNetworking());
 #ifdef DEBUG
     m_magic_number = 0xB01D6543;
 #endif
