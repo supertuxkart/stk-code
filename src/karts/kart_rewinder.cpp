@@ -223,11 +223,6 @@ void KartRewinder::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-void KartRewinder::rewindToEvent(BareNetworkString *buffer)
-{
-}   // rewindToEvent
-
-// ----------------------------------------------------------------------------
 std::function<void()> KartRewinder::getLocalStateRestoreFunction()
 {
     if (m_eliminated)

@@ -37,6 +37,7 @@
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/network_string.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -378,7 +379,7 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
  */
 void Flyable::updateGraphics(float dt)
 {
-    updateSmoothedGraphics(dt);
+    Moveable::updateSmoothedGraphics(dt);
     Moveable::updateGraphics();
 }   // updateGraphics
 
@@ -573,5 +574,31 @@ HitEffect* Flyable::getHitEffect() const
 unsigned int Flyable::getOwnerId()
 {
     return m_owner->getWorldKartId();
-}
+}   // getOwnerId
+
+// ----------------------------------------------------------------------------
+BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
+{
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void Flyable::restoreState(BareNetworkString *buffer, int count)
+{
+}   // restoreState
+
+// ----------------------------------------------------------------------------
+std::function<void()> Flyable::getLocalStateRestoreFunction()
+{
+}   // getLocalStateRestoreFunction
+
+// ----------------------------------------------------------------------------
+void Flyable::addForRewind(const std::string& uid)
+{
+    SmoothNetworkBody::setEnable(true);
+    SmoothNetworkBody::setSmoothRotation(false);
+    SmoothNetworkBody::setAdjustVerticalOffset(false);
+    Rewinder::setUniqueIdentity(uid);
+    Rewinder::rewinderAdd();
+}   // addForRewind
+
 /* EOF */

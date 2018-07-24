@@ -212,6 +212,11 @@ void  Powerup::adjustSound()
 }   // adjustSound
 
 //-----------------------------------------------------------------------------
+void Powerup::playSound()
+{
+}   // playSound
+
+//-----------------------------------------------------------------------------
 /** Use (fire) this powerup.
  */
 void Powerup::use()

@@ -1055,12 +1055,12 @@ void World::update(int ticks)
     }
     PROFILER_POP_CPU_MARKER();
 
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
-    Physics::getInstance()->update(ticks);
-
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);
     PROFILER_POP_CPU_MARKER();
+
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
+    Physics::getInstance()->update(ticks);
 
     PROFILER_POP_CPU_MARKER();
 

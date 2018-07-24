@@ -24,6 +24,7 @@
 
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
+#include "network/rewinder.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -43,7 +44,8 @@ class XMLNode;
 /**
   * \ingroup items
   */
-class Flyable : public Moveable, public TerrainInfo
+class Flyable : public Moveable, public TerrainInfo,
+                public Rewinder
 {
 public:
 private:
@@ -128,7 +130,7 @@ protected:
 
     /** Time since thrown. used so a kart can't hit himself when trying
      *  something, and also to put some time limit to some collectibles */
-    int               m_ticks_since_thrown;
+    int16_t            m_ticks_since_thrown;
 
     /** Set to something > -1 if this flyable should auto-destrcut after
      *  that may ticks. */
@@ -217,6 +219,24 @@ public:
     /** Returns the size (extend) of the mesh. */
     const Vec3 &getExtend() const { return m_extend;  }
     // ------------------------------------------------------------------------
+    void addForRewind(const std::string& uid);
+    // ------------------------------------------------------------------------
+    virtual void undoEvent(BareNetworkString *buffer) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual void rewindToEvent(BareNetworkString *buffer) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual void undoState(BareNetworkString *buffer) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual void saveTransform() OVERRIDE     { Moveable::prepareSmoothing(); }
+    // ------------------------------------------------------------------------
+    virtual void computeError() OVERRIDE        { Moveable::checkSmoothing(); }
+    // ------------------------------------------------------------------------
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual std::function<void()> getLocalStateRestoreFunction() OVERRIDE;
 };   // Flyable
 
 #endif

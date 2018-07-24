@@ -31,7 +31,6 @@ class Rewinder : public std::enable_shared_from_this<Rewinder>
 {
 protected:
     void setUniqueIdentity(const std::string& uid)  { m_unique_identity = uid; }
-
 private:
     std::string m_unique_identity;
 
@@ -92,6 +91,9 @@ public:
     }
     // -------------------------------------------------------------------------
     bool rewinderAdd();
+    // -------------------------------------------------------------------------
+    template<typename T> std::shared_ptr<T> getShared()
+                    { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
 };   // Rewinder
 #endif
