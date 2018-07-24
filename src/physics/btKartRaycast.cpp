@@ -71,8 +71,6 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             result.m_hitNormalInWorld.normalize();
             result.m_distFraction = rayCallback.m_closestHitFraction;
             result.m_triangle_index = -1;
-            const TriangleMesh &tm =
-                Track::getCurrentTrack()->getTriangleMesh();
             // FIXME: this code assumes atm that the object the kart is
             // driving on is the main track (and not e.g. a physical object).
             // If this should not be the case (i.e. the object hit by the

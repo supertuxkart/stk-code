@@ -31,9 +31,10 @@
 void NetworkItemManager::create()
 {
     assert(!m_item_manager);
-    m_item_manager = new NetworkItemManager();
+    auto nim = std::shared_ptr<NetworkItemManager>(new NetworkItemManager());
+    nim->rewinderAdd();
+    m_item_manager = nim;
 }   // create
-
 
 // ============================================================================
 /** Creates a new instance of the item manager. This is done at startup

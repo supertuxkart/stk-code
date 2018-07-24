@@ -91,7 +91,7 @@ public:
         return m_unique_identity;
     }
     // -------------------------------------------------------------------------
-    bool add();
+    bool rewinderAdd();
 
 };   // Rewinder
 #endif

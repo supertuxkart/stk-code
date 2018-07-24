@@ -722,18 +722,18 @@ void ThreeStrikesBattle::loadCustomModels()
             // Now add them
             for (unsigned int i = 0; i < pos.size(); i++)
             {
-                AbstractKart* sta = new Kart(sta_list[i], (int)m_karts.size(),
+                auto sta = std::make_shared<Kart>(sta_list[i], (int)m_karts.size(),
                     (int)m_karts.size() + 1, pos[i], PLAYER_DIFFICULTY_NORMAL,
                     std::make_shared<RenderInfo>(1.0f));
                 sta->init(RaceManager::KartType::KT_SPARE_TIRE);
-                sta->setController(new SpareTireAI(sta));
+                sta->setController(new SpareTireAI(sta.get()));
 
                 m_karts.push_back(sta);
                 race_manager->addSpareTireKart(sta_list[i]);
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily
-                m_spare_tire_karts.push_back(sta);
+                m_spare_tire_karts.push_back(sta.get());
             }
             unsigned int sta_num = race_manager->getNumSpareTireKarts();
             assert(m_spare_tire_karts.size() == sta_num);

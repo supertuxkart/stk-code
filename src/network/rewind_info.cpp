@@ -19,8 +19,8 @@
 #include "network/rewind_info.hpp"
 
 #include "network/network_config.hpp"
+#include "network/rewinder.hpp"
 #include "network/rewind_manager.hpp"
-#include "physics/physics.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
  *  for all state info.

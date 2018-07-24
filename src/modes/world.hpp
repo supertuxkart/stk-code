@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <memory>
 #include <vector>
 #include <stdexcept>
 
@@ -80,7 +81,7 @@ public:
 class World : public WorldStatus
 {
 public:
-    typedef std::vector<AbstractKart*> KartList;
+    typedef std::vector<std::shared_ptr<AbstractKart> > KartList;
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
@@ -117,10 +118,10 @@ protected:
     Controller*
           loadAIController  (AbstractKart *kart);
 
-    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
-                             int local_player_id, int global_player_id,
-                             RaceManager::KartType type,
-                             PerPlayerDifficulty difficulty);
+    virtual std::shared_ptr<AbstractKart> createKart
+        (const std::string &kart_ident, int index, int local_player_id,
+        int global_player_id, RaceManager::KartType type,
+        PerPlayerDifficulty difficulty);
 
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
@@ -293,7 +294,7 @@ public:
     /** Returns the kart with a given world id. */
     AbstractKart       *getKart(int kartId) const {
                         assert(kartId >= 0 && kartId < int(m_karts.size()));
-                        return m_karts[kartId];                              }
+                        return m_karts[kartId].get();                              }
     // ------------------------------------------------------------------------
     /** Returns all karts. */
     const KartList & getKarts() const { return m_karts; }

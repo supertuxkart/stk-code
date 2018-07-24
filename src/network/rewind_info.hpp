@@ -21,7 +21,6 @@
 
 #include "network/event_rewinder.hpp"
 #include "network/network_string.hpp"
-#include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"

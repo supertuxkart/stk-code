@@ -212,10 +212,9 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
-        AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
-                                   global_player_id,
-                                   race_manager->getKartType(i),
-                                   race_manager->getPlayerDifficulty(i));
+        auto newkart = createKart(kart_ident, i, local_player_id,
+            global_player_id, race_manager->getKartType(i),
+            race_manager->getPlayerDifficulty(i));
         m_karts.push_back(newkart);
 
     }  // for i
@@ -334,10 +333,10 @@ void World::createRaceGUI()
  *  \param global_player_id If the kart is a player kart this is the index of
  *         this player globally (i.e. including network players).
  */
-AbstractKart *World::createKart(const std::string &kart_ident, int index,
-                                int local_player_id, int global_player_id,
-                                RaceManager::KartType kart_type,
-                                PerPlayerDifficulty difficulty)
+std::shared_ptr<AbstractKart> World::createKart
+    (const std::string &kart_ident, int index, int local_player_id,
+    int global_player_id, RaceManager::KartType kart_type,
+    PerPlayerDifficulty difficulty)
 {
     unsigned int gk = 0;
     if (race_manager->hasGhostKarts())
@@ -355,13 +354,19 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
 
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
-    AbstractKart *new_kart;
+    std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
-        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
-                                    difficulty, ri);
+    {
+        auto kr = std::make_shared<KartRewinder>(kart_ident, index, position,
+            init_pos, difficulty, ri);
+        kr->rewinderAdd();
+        new_kart = kr;
+    }
     else
-        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
-                            ri);
+    {
+        new_kart = std::make_shared<Kart>(kart_ident, index, position,
+            init_pos, difficulty, ri);
+    }
 
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
@@ -369,7 +374,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
     {
-        controller = new LocalPlayerController(new_kart, local_player_id,
+        controller = new LocalPlayerController(new_kart.get(), local_player_id,
             difficulty);
         const PlayerProfile* p = StateManager::get()
             ->getActivePlayer(local_player_id)->getConstProfile();
@@ -383,7 +388,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     }
     case RaceManager::KT_NETWORK_PLAYER:
     {
-        controller = new NetworkPlayerController(new_kart);
+        controller = new NetworkPlayerController(new_kart.get());
         if (!online_name.empty())
             new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
@@ -391,7 +396,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     }
     case RaceManager::KT_AI:
     {
-        controller = loadAIController(new_kart);
+        controller = loadAIController(new_kart.get());
         break;
     }
     case RaceManager::KT_GHOST:
@@ -417,7 +422,7 @@ const btTransform &World::getStartTransform(int index)
 /** Creates an AI controller for the kart.
  *  \param kart The kart to be controlled by an AI.
  */
-Controller* World::loadAIController(AbstractKart *kart)
+Controller* World::loadAIController(AbstractKart* kart)
 {
     Controller *controller;
     int turn=0;
@@ -485,13 +490,7 @@ World::~World()
     
     Weather::kill();
 
-    for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
-    {
-        // Let ReplayPlay destroy the ghost karts
-        if (m_karts[i]->isGhostKart()) continue;
-        delete m_karts[i];
-    }
-
+    m_karts.clear();
     if(race_manager->hasGhostKarts() || race_manager->isRecordingRace())
     {
         // Destroy the old replay object, which also stored the ghost
@@ -502,7 +501,6 @@ World::~World()
         ReplayPlay::destroy();
         ReplayPlay::create();
     }
-    m_karts.clear();
     if(race_manager->isRecordingRace())
         ReplayRecorder::get()->reset();
     race_manager->setRaceGhostKarts(false);
@@ -567,7 +565,8 @@ void World::terminateRace()
     {
         if(!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
         {
-            m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
+            m_karts[i]->finishedRace(
+                estimateFinishTimeForKart(m_karts[i].get()));
 
         }
     }   // i<kart_amount
@@ -699,7 +698,7 @@ void World::resetAllKarts()
                 btTransform t = getRescueTransform(rescue_pos);
                 // This will print out warnings if there is no terrain under
                 // the kart, or the kart is being dropped on a reset texture
-                moveKartTo(m_karts[kart_id], t);
+                moveKartTo(m_karts[kart_id].get(), t);
 
             }   // rescue_pos<getNumberOfRescuePositions
 
@@ -725,7 +724,7 @@ void World::resetAllKarts()
         Vec3 up_offset = (*i)->getNormal() * (0.5f * ((*i)->getKartHeight()));
         (*i)->setXYZ(xyz+up_offset);
 
-        bool kart_over_ground = Track::getCurrentTrack()->findGround(*i);
+        bool kart_over_ground = Track::getCurrentTrack()->findGround(i->get());
 
         if (!kart_over_ground)
         {
@@ -1165,7 +1164,7 @@ void World::updateHighscores(int* best_highscore_rank)
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
         assert(index[pos] < m_karts.size());
-        Kart *k = (Kart*)m_karts[index[pos]];
+        Kart *k = (Kart*)m_karts[index[pos]].get();
 
         Highscores* highscores = getHighscores();
 
@@ -1197,14 +1196,17 @@ void World::updateHighscores(int* best_highscore_rank)
  */
 AbstractKart *World::getPlayerKart(unsigned int n) const
 {
-    unsigned int count=-1;
+    unsigned int count = -1;
 
-    for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getController()->isPlayerController())
+    for(unsigned int i = 0; i < m_karts.size(); i++)
+    {
+        if (m_karts[i]->getController()->isPlayerController())
         {
             count++;
-            if(count==n) return m_karts[i];
+            if (count == n)
+                return m_karts[i].get();
         }
+    }
     return NULL;
 }   // getPlayerKart
 
@@ -1225,7 +1227,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
     assert(kart_id < (int)m_karts.size());
-    AbstractKart *kart = m_karts[kart_id];
+    AbstractKart *kart = m_karts[kart_id].get();
     if (kart->isGhostKart()) return;
 
     // Display a message about the eliminated kart in the race guia

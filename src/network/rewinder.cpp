@@ -24,7 +24,7 @@
 /** Add this object to the list of all rewindable
  *  objects in the rewind manager.
  */
-bool Rewinder::add()
+bool Rewinder::rewinderAdd()
 {
     return RewindManager::get()->addRewinder(shared_from_this());
-}   // add
+}   // rewinderAdd

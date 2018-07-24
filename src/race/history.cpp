@@ -296,11 +296,13 @@ void History::Load()
     {
         fgets(s, 1023, fd);
         InputEvent &ie = m_all_input_events[i];
+        int action = 0;
         if (sscanf(s, "%d %d %d %d\n", &ie.m_world_ticks, &ie.m_kart_index,
-                   &ie.m_action, &ie.m_value) != 4                          )
+            &action, &ie.m_value) != 4)
         {
             Log::warn("History", "Problems reading event: '%s'", s);
         }
+        ie.m_action = (PlayerAction)action;
     }   // for i
     RewindManager::setEnable(rewind_manager_was_enabled);
 
