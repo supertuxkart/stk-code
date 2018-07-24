@@ -82,18 +82,7 @@ void RewindManager::reset()
 
     if (!m_enable_rewind_manager) return;
 
-    for (auto it = m_all_rewinder.begin(); it != m_all_rewinder.end();)
-    {
-        if (!it->second->canBeDestroyed())
-        {
-            it++;
-            continue;
-        }
-        Rewinder* rewinder = it->second;
-        it = m_all_rewinder.erase(it);
-        delete rewinder;
-    }
-
+    clearExpiredRewinder();
     m_rewind_queue.reset();
 }   // reset
 
@@ -166,7 +155,9 @@ void RewindManager::saveState()
     {
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
-        BareNetworkString* buffer = p.second->saveState(&rewinder_using);
+        BareNetworkString* buffer = NULL;
+        if (auto r = p.second.lock())
+            buffer = r->saveState(&rewinder_using);
         if (buffer != NULL)
         {
             m_overall_state_size += buffer->size();
@@ -197,12 +188,16 @@ void RewindManager::update(int ticks_not_used)
     if (ticks - m_last_saved_state < m_state_frequency)
         return;
 
-    // Save state
+    // Save state, remove expired rewinder first
+    clearExpiredRewinder();
     if (NetworkConfig::get()->isClient())
     {
         auto& ret = m_local_state[ticks];
         for (auto& p : m_all_rewinder)
-            ret.push_back(p.second->getLocalStateRestoreFunction());
+        {
+            if (auto r = p.second.lock())
+                ret.push_back(r->getLocalStateRestoreFunction());
+        }
     }
     else
     {
@@ -256,6 +251,20 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
 }   // playEventsTill
 
 // ----------------------------------------------------------------------------
+/** Adds a Rewinder to the list of all rewinders.
+ *  \return true If successfully added, false otherwise.
+ */
+bool RewindManager::addRewinder(std::shared_ptr<Rewinder> rewinder)
+{
+    if (!m_enable_rewind_manager) return false;
+    // Maximum 1 bit to store no of rewinder used
+    if (m_all_rewinder.size() == 255)
+        return false;
+    m_all_rewinder[rewinder->getUniqueIdentity()] = rewinder;
+    return true;
+}   // addRewinder
+
+// ----------------------------------------------------------------------------
 /** Rewinds to the specified time, then goes forward till the current
  *  World::getTime() is reached again: it will replay everything before
  *  World::getTime(), but not the events at World::getTime() (or later)/
@@ -274,7 +283,10 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // can be computed between the transforms before and after
     // the rewind.
     for (auto& p : m_all_rewinder)
-        p.second->saveTransform();
+    {
+        if (auto r = p.second.lock())
+            r->saveTransform();
+    }
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
@@ -348,7 +360,10 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 
     // Now compute the errors which need to be visually smoothed
     for (auto& p : m_all_rewinder)
-        p.second->computeError();
+    {
+        if (auto r = p.second.lock())
+            r->computeError();
+    }
 
     history->setReplayHistory(is_history);
     m_is_rewinding = false;

@@ -21,6 +21,7 @@
 #include "config/stk_config.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 
@@ -418,9 +419,9 @@ void RewindQueue::unitTesting()
         virtual void rewind(BareNetworkString *s) {}
         virtual void saveTransform() {}
         virtual void computeError() {}
-        DummyRewinder() : Rewinder("dummy_rewinder", true) {}
+        DummyRewinder() : Rewinder() {}
     };
-    DummyRewinder *dummy_rewinder = new DummyRewinder();
+    auto dummy_rewinder = std::make_shared<DummyRewinder>();
 
     // First tests: add a state first, then an event, and make
     // sure the state stays first
@@ -434,7 +435,7 @@ void RewindQueue::unitTesting()
     assert(q0.hasMoreRewindInfo());
     assert(q0.undoUntil(0) == 0);
 
-    q0.addNetworkEvent(dummy_rewinder, NULL, 0);
+    q0.addNetworkEvent(dummy_rewinder.get(), NULL, 0);
     // Network events are not immediately merged
     assert(q0.m_all_rewind_info.size() == 1);
 
@@ -462,9 +463,9 @@ void RewindQueue::unitTesting()
     assert((*rii)->isEvent());
 
     // Test time base comparisons: adding an event to the end
-    q0.addLocalEvent(dummy_rewinder, NULL, true, 4);
+    q0.addLocalEvent(dummy_rewinder.get(), NULL, true, 4);
     // Then adding an earlier event
-    q0.addLocalEvent(dummy_rewinder, NULL, false, 1);
+    q0.addLocalEvent(dummy_rewinder.get(), NULL, false, 1);
     // rii points to the 3rd element, the ones added just now
     // should be elements4 and 5:
     rii++;

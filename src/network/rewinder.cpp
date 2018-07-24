@@ -20,27 +20,11 @@
 
 #include "network/rewind_manager.hpp"
 
-/** Constructor. It will add this object to the list of all rewindable
+// ----------------------------------------------------------------------------
+/** Add this object to the list of all rewindable
  *  objects in the rewind manager.
  */
-Rewinder::Rewinder(const std::string& ui, bool can_be_destroyed, bool auto_add)
-        : m_unique_identity(ui)
+bool Rewinder::add()
 {
-    assert(!m_unique_identity.empty() && m_unique_identity.size() < 255);
-    m_can_be_destroyed = can_be_destroyed;
-    if (auto_add)
-        add();
-}   // Rewinder
-
-// ----------------------------------------------------------------------------
-/** Destructor.
- */
-Rewinder::~Rewinder()
-{
-}   // ~Rewinder
-
-// ----------------------------------------------------------------------------
-void Rewinder::add()
-{
-    RewindManager::get()->addRewinder(this);
-}   // Rewinder
+    return RewindManager::get()->addRewinder(shared_from_this());
+}   // add

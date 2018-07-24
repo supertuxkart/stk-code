@@ -19,14 +19,13 @@
 #ifndef HEADER_REWIND_QUEUE_HPP
 #define HEADER_REWIND_QUEUE_HPP
 
-#include "network/rewinder.hpp"
-#include "utils/ptr_vector.hpp"
 #include "utils/synchronised.hpp"
 
 #include <assert.h>
 #include <list>
 #include <vector>
 
+class BareNetworkString;
 class EventRewinder;
 class RewindInfo;
 class TimeStepInfo;

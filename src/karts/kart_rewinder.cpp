@@ -38,8 +38,7 @@ KartRewinder::KartRewinder(const std::string& ident,
                            const btTransform& init_transform,
                            PerPlayerDifficulty difficulty,
                            std::shared_ptr<RenderInfo> ri)
-            : Rewinder(std::string("K") + StringUtils::toString(world_kart_id),
-                       /*can_be_destroyed*/ false)
+            : Rewinder(std::string("K") + StringUtils::toString(world_kart_id))
             , Kart(ident, world_kart_id, position, init_transform, difficulty,
                    ri)
 {

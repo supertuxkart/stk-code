@@ -64,8 +64,9 @@ void RewindInfoState::restore()
     for (const std::string& name : m_rewinder_using)
     {
         uint16_t count = m_buffer->getUInt16();
-        Rewinder* r = RewindManager::get()->getRewinder(name);
-        if (r == NULL)
+        std::shared_ptr<Rewinder> r =
+            RewindManager::get()->getRewinder(name);
+        if (!r)
         {
             Log::error("RewindInfoState", "Missing rewinder %s",
                 name.c_str());
