@@ -354,8 +354,10 @@ int RewindQueue::undoUntil(int undo_ticks)
 {
     // A rewind is done after a state in the past is inserted. This function
     // makes sure that m_current is not end()
-    assert(m_current != m_all_rewind_info.end());
-    
+    //assert(m_current != m_all_rewind_info.end());
+    assert(!m_all_rewind_info.empty());
+    m_current = m_all_rewind_info.end();
+    m_current--;
     while((*m_current)->getTicks() > undo_ticks ||
         (*m_current)->isEvent() || !(*m_current)->isConfirmed())
     {
