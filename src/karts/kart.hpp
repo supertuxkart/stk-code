@@ -164,7 +164,7 @@ protected:
 
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
-    int16_t      m_squash_ticks;
+    float        m_squash_time;
 
     /** Current leaning of the kart. */
     float        m_current_lean;
@@ -496,7 +496,7 @@ public:
     virtual bool isOnMinNitroTime() const OVERRIDE { return m_min_nitro_ticks > 0; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
-    virtual bool isSquashed() const OVERRIDE { return m_squash_ticks >0; }
+    virtual bool isSquashed() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) OVERRIDE;

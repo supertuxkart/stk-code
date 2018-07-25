@@ -146,7 +146,6 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     // 6) Firing and related handling
     // -----------
     buffer->addUInt16(m_bubblegum_ticks);
-    buffer->addUInt16(m_squash_ticks);
     buffer->addUInt16(m_view_blocked_by_plunger);
     // m_invulnerable_ticks will not be negative
     uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
@@ -223,7 +222,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // 6) Firing and related handling
     // -----------
     m_bubblegum_ticks = buffer->getUInt16();
-    m_squash_ticks = buffer->getUInt16();
     m_view_blocked_by_plunger = buffer->getUInt16();
     uint16_t fire_and_invulnerable = buffer->getUInt16();
     m_fire_clicked = (fire_and_invulnerable >> 15) == 1;

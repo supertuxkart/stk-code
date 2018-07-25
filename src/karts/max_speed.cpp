@@ -281,6 +281,15 @@ int MaxSpeed::getSpeedIncreaseTicksLeft(unsigned int category)
 }   // getSpeedIncreaseTimeLeft
 
 // ----------------------------------------------------------------------------
+/** Returns if decreased speed is active in the given category.
+ *  \param category Which category to report on.
+ */
+int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
+{
+    return m_speed_decrease[category].isActive();
+}   // isSpeedDecreaseActive
+
+// ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
  *  current maximum speed. Note that the function can be called with
  *  dt=0, in which case the maxium speed will be updated, but no
