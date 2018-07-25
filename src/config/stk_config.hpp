@@ -89,6 +89,11 @@ public:
     /** How many state updates per second the server will send. */
     int m_network_state_frequeny;
 
+    /** In case of a network race, remote karts will get their steering somewhat
+     *  reduced each frame. This reduces stutter when a kart only does small
+     *  steering adjustments. */
+    float m_network_steering_reduction;
+
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */

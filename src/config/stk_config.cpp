@@ -152,6 +152,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
     CHECK_NEG(m_physics_fps,               "physics fps"                );
     CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
+    CHECK_NEG(m_network_steering_reduction,"network steering-reduction" );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
@@ -195,6 +196,7 @@ void STKConfig::init_defaults()
     m_donate_url                 = "";
     m_password_reset_url         = "";
     m_network_state_frequeny     = -100;
+    m_network_steering_reduction = 1.0f;
     m_title_music                = NULL;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
@@ -391,6 +393,7 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *networking_node = root->getNode("networking"))
     {
         networking_node->get("state-frequency", &m_network_state_frequeny);
+        networking_node->get("steering-reduction", &m_network_steering_reduction);
     }
 
     if(const XMLNode *replay_node = root->getNode("replay"))

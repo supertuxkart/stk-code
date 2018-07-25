@@ -180,8 +180,11 @@
 
   <!-- Networking 
        state-frequency: how many states the server will send per second.
+       steering-reduction: Reduce a remote kart's steering by this factor
+           each frame. This helps reduces oversteering by high latency
+           clients when they only do minor steering adjustments.
   -->
-  <networking state-frequency="10"/>
+  <networking state-frequency="10" steering-reduction="1.0"/>
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the

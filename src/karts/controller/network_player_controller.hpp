@@ -42,6 +42,20 @@ public:
         return false; 
     }   // isLocal
     // ------------------------------------------------------------------------
+    /** Update for network controller. For player with a high ping it is
+     *  useful to reduce shaking by reducing the steering somewhat in each
+     *  frame: If the player does a quick correction only, because of the high
+     *  latency the predicted path will curve way too much. By automatically 
+     *  reducing it, this error is reduced. And even if the player steers more
+     *  the error is hopefully acceptable. */
+    virtual void update(int ticks)
+    {
+        PlayerController::update(ticks);
+        m_controls->setSteer(  m_controls->getSteer()
+                             * stk_config->m_network_steering_reduction);
+    }   // update
+
+    // ------------------------------------------------------------------------
 };   // NetworkPlayerController
 
 #endif // NETWORK_PLAYER_CONTROLLER_HPP
