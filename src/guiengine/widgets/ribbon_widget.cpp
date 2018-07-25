@@ -684,7 +684,7 @@ void RibbonWidget::selectNextActiveWidget(const bool horizontally, const bool re
         }
 
         loop_counter++;
-        if (loop_counter > m_active_children.size())
+        if (loop_counter > (int)m_active_children.size())
         {
             Log::warn("RibbonWidget", "All the buttons of the focused ribbon"
                                       " are deactivated !");
