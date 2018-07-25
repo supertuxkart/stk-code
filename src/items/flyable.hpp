@@ -105,6 +105,11 @@ protected:
     /** Size of this flyable. */
     Vec3              m_extend;
 
+    bool              m_undo_creation;
+    bool              m_has_undone_destruction;
+    bool              m_has_server_state;
+    int               m_check_created_ticks;
+
     // The flyable class stores the values for each flyable type, e.g.
     // speed, min_height, max_height. These variables must be static,
     // so we need arrays of these variables to have different values
@@ -130,11 +135,11 @@ protected:
 
     /** Time since thrown. used so a kart can't hit himself when trying
      *  something, and also to put some time limit to some collectibles */
-    int16_t            m_ticks_since_thrown;
+    int16_t           m_ticks_since_thrown;
 
     /** Set to something > -1 if this flyable should auto-destrcut after
      *  that may ticks. */
-    int                m_max_lifespan;
+    int               m_max_lifespan;
 
     /** If set to true, the kart that throwns this flyable can't collide
      *  with it for a short time. */
@@ -162,6 +167,13 @@ protected:
                                     const bool rotates=false,
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
+
+    /** Used when undoing creation or destruction. */
+    btTransform m_saved_transform;
+    Vec3 m_saved_lv, m_saved_av, m_saved_gravity;
+
+    virtual void additionalPhysicsProperties() {}
+
 public:
 
                  Flyable     (AbstractKart* kart,
@@ -229,14 +241,21 @@ public:
     // ------------------------------------------------------------------------
     virtual void saveTransform() OVERRIDE     { Moveable::prepareSmoothing(); }
     // ------------------------------------------------------------------------
-    virtual void computeError() OVERRIDE        { Moveable::checkSmoothing(); }
+    virtual void computeError() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual BareNetworkString* saveState(std::vector<std::string>* ru)
         OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual std::function<void()> getLocalStateRestoreFunction() OVERRIDE;
+    virtual void addRewindInfoEventFunctionAfterFiring();
+    // ------------------------------------------------------------------------
+    bool isUndoCreation() const                     { return m_undo_creation; }
+    // ------------------------------------------------------------------------
+    bool hasUndoneDestruction() const      { return m_has_undone_destruction; }
+    // ------------------------------------------------------------------------
+    void handleUndoDestruction();
+
 };   // Flyable
 
 #endif

@@ -217,6 +217,10 @@ void RewindManager::update(int ticks_not_used)
  */
 void RewindManager::playEventsTill(int world_ticks, int *ticks)
 {
+    // We add the RewindInfoEventFunction to rewind queue before and after
+    // possible rewind, some RewindInfoEventFunction can be created during
+    // rewind
+    mergeRewindInfoEventFunction();
     bool needs_rewind;
     int rewind_ticks;
 
@@ -367,6 +371,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 
     history->setReplayHistory(is_history);
     m_is_rewinding = false;
+    mergeRewindInfoEventFunction();
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
@@ -375,3 +380,11 @@ bool RewindManager::useLocalEvent() const
     return NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient() && !m_is_rewinding;
 }   // useLocalEvent
+
+// ----------------------------------------------------------------------------
+void RewindManager::mergeRewindInfoEventFunction()
+{
+    for (RewindInfoEventFunction* rief : m_pending_rief)
+        m_rewind_queue.insertRewindInfo(rief);
+    m_pending_rief.clear();
+}   // mergeRewindInfoEventFunction

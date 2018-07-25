@@ -64,7 +64,7 @@ void Moveable::updateSmoothedGraphics(float dt)
 {
     Vec3 velocity;
     if (m_body)
-        velocity = getVelocity();
+        velocity = m_body->getLinearVelocity();
     SmoothNetworkBody::updateSmoothedGraphics(m_transform, velocity, dt);
 #undef DEBUG_SMOOTHING
 #ifdef DEBUG_SMOOTHING

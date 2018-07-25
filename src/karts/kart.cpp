@@ -1297,12 +1297,12 @@ void Kart::update(int ticks)
         }
     }   // if squashed
 
-    if (m_bubblegum_ticks > 0.0f)
+    if (m_bubblegum_ticks > 0)
     {
         m_bubblegum_ticks -= ticks;
-        if (m_bubblegum_ticks <= 0.0f)
+        if (m_bubblegum_ticks <= 0)
         {
-            m_bubblegum_torque = 0.0f;
+            m_bubblegum_torque = 0;
         }
     }
 

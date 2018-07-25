@@ -300,6 +300,7 @@ void World::reset()
     SFXManager::get()->resumeAll();
 
     projectile_manager->cleanup();
+    RewindManager::get()->reset();
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
@@ -1054,13 +1055,15 @@ void World::update(int ticks)
             m_karts[i]->update(ticks);
     }
     PROFILER_POP_CPU_MARKER();
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
+    PROFILER_PUSH_CPU_MARKER("World::update (physics)", 0xa0, 0x7F, 0x00);
     Physics::getInstance()->update(ticks);
+    PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();
 

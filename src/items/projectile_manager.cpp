@@ -74,6 +74,8 @@ void ProjectileManager::update(int ticks)
 {
     updateServer(ticks);
 
+    if (RewindManager::get()->isRewinding())
+        return;
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
     {
@@ -102,12 +104,21 @@ void ProjectileManager::updateServer(int ticks)
     auto p = m_active_projectiles.begin();
     while (p != m_active_projectiles.end())
     {
+        if (p->second->isUndoCreation())
+        {
+            p++;
+            continue;
+        }
         bool can_be_deleted = p->second->updateAndDelete(ticks);
         if (can_be_deleted)
         {
-            HitEffect *he = p->second->getHitEffect();
-            if (he)
-                addHitEffect(he);
+            if (!p->second->hasUndoneDestruction())
+            {
+                HitEffect *he = p->second->getHitEffect();
+                if (he)
+                    addHitEffect(he);
+            }
+            p->second->handleUndoDestruction();
             p = m_active_projectiles.erase(p);
         }
         else
@@ -125,6 +136,12 @@ std::shared_ptr<Flyable>
     ProjectileManager::newProjectile(AbstractKart *kart,
                                      PowerupManager::PowerupType type)
 {
+    const std::string& uid = getUniqueIdentity(kart, type);
+    auto it = m_active_projectiles.find(uid);
+    // Flyable already created during rewind
+    if (it != m_active_projectiles.end())
+        return it->second;
+
     std::shared_ptr<Flyable> f;
     switch(type)
     {
@@ -143,8 +160,12 @@ std::shared_ptr<Flyable>
         default:
             return nullptr;
     }
-    const std::string& uid = getUniqueIdentity(kart, type);
     m_active_projectiles[uid] = f;
+    if (RewindManager::get()->isEnabled())
+    {
+        f->addForRewind(uid);
+        f->addRewindInfoEventFunctionAfterFiring();
+    }
     return f;
 }   // newProjectile
 
@@ -161,6 +182,8 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
     for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end();
         i++)
     {
+        if (i->second->isUndoCreation())
+            continue;
         float dist2 = i->second->getXYZ().distance2(kart->getXYZ());
         if (dist2 < r2)
             return true;
@@ -183,6 +206,8 @@ int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
     for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end();
          i++)
     {
+        if (i->second->isUndoCreation())
+            continue;
         if (i->second->getType() == type)
         {
             float dist2 = i->second->getXYZ().distance2(kart->getXYZ());
@@ -237,8 +262,8 @@ std::shared_ptr<Rewinder>
         return nullptr;
     AbstractKart* kart = World::getWorld()->getKart(world_id);
     char first_id = id[0][0];
-    Log::warn("ProjectileManager",
-        "Missed a firing event, add the flyable %s manually", uid.c_str());
+    Log::debug("ProjectileManager", "Missed a firing event or locally deleted,"
+        " add the flyable %s manually", uid.c_str());
     switch (first_id)
     {
         case 'B':

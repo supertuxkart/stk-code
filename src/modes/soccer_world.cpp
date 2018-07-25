@@ -356,7 +356,7 @@ void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
             "%d when reset player", ticks_back_to_own_goal, ticks_now);
         return;
     }
-    RewindManager::get()->getRewindQueue().insertRewindInfo(new
+    RewindManager::get()->addRewindInfoEventFunction(new
         RewindInfoEventFunction(ticks_back_to_own_goal,
         [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
 
@@ -416,7 +416,7 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         kart->setTrans(transform_now);
         m_goal_transforms[i] = transform_now;
     }
-    RewindManager::get()->getRewindQueue().insertRewindInfo(new
+    RewindManager::get()->addRewindInfoEventFunction(new
         RewindInfoEventFunction(ticks_back_to_own_goal,
         [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
 

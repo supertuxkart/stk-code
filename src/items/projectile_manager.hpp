@@ -81,6 +81,12 @@ public:
     // ------------------------------------------------------------------------
     std::shared_ptr<Flyable> newProjectile(AbstractKart *kart,
                                            PowerupManager::PowerupType type);
+    // ------------------------------------------------------------------------
+    void addByUID(const std::string& uid, std::shared_ptr<Flyable> f)
+                                             { m_active_projectiles[uid] = f; }
+    // ------------------------------------------------------------------------
+    void removeByUID(const std::string& uid)
+                                           { m_active_projectiles.erase(uid); }
 
 };
 

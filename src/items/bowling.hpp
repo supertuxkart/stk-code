@@ -53,9 +53,9 @@ public:
              Bowling(AbstractKart* kart);
     virtual ~Bowling();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
-    virtual bool updateAndDelete(int ticks);
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    virtual HitEffect *getHitEffect() const;
+    virtual bool updateAndDelete(int ticks) OVERRIDE;
+    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual HitEffect *getHitEffect() const OVERRIDE;
 
 
 };   // Bowling

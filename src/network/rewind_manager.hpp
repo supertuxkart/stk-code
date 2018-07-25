@@ -28,10 +28,12 @@
 #include <functional>
 #include <memory>
 #include <map>
+#include <set>
 #include <vector>
 
 class Rewinder;
 class RewindInfo;
+class RewindInfoEventFunction;
 class EventRewinder;
 
 /** \ingroup network
@@ -116,6 +118,8 @@ private:
      *  rewinds. */
     std::atomic<int> m_not_rewound_ticks;
 
+    std::vector<RewindInfoEventFunction*> m_pending_rief;
+
     RewindManager();
    ~RewindManager();
     // ------------------------------------------------------------------------
@@ -131,6 +135,8 @@ private:
             it++;
         }
     }
+    // ------------------------------------------------------------------------
+    void mergeRewindInfoEventFunction();
 
 public:
     // First static functions to manage rewinding.
@@ -187,8 +193,6 @@ public:
         return m_not_rewound_ticks.load(std::memory_order_relaxed);
     }   // getNotRewoundWorldTicks
     // ------------------------------------------------------------------------
-    RewindQueue& getRewindQueue()                    { return m_rewind_queue; }
-    // ------------------------------------------------------------------------
     /** Returns the time of the latest confirmed state. */
     int getLatestConfirmedState() const
     {
@@ -205,6 +209,9 @@ public:
                                            { return m_current_rewinder_using; }
     // ------------------------------------------------------------------------
     bool useLocalEvent() const;
+    // ------------------------------------------------------------------------
+    void addRewindInfoEventFunction(RewindInfoEventFunction* rief)
+                                            { m_pending_rief.push_back(rief); }
 
 };   // RewindManager
 

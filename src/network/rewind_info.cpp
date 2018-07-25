@@ -21,6 +21,7 @@
 #include "network/network_config.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_manager.hpp"
+#include "items/projectile_manager.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
  *  for all state info.
@@ -66,6 +67,12 @@ void RewindInfoState::restore()
         uint16_t count = m_buffer->getUInt16();
         std::shared_ptr<Rewinder> r =
             RewindManager::get()->getRewinder(name);
+        if (!r)
+        {
+            // For now we only need to get missing rewinder from
+            // projectile_manager
+            r = projectile_manager->addRewinderFromNetworkState(name);
+        }
         if (!r)
         {
             Log::error("RewindInfoState", "Missing rewinder %s",
