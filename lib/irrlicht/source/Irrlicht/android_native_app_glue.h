@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2018 Dawid Gan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +122,9 @@ struct android_app {
     // return.  Return 1 if you have handled the event, 0 for any default
     // dispatching.
     int32_t (*onInputEvent)(struct android_app* app, AInputEvent* event);
+    
+    // Function that allows to process (APP_CMD_*) directly in main thread
+    void (*onAppCmdDirect)(ANativeActivity* activity, int32_t cmd);
 
     // The ANativeActivity object instance that this app is running in.
     ANativeActivity* activity;

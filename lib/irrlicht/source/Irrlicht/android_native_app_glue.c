@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2018 Dawid Gan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -335,89 +336,112 @@ static void android_app_free(struct android_app* android_app) {
 
 static void onDestroy(ANativeActivity* activity) {
     LOGV("Destroy: %p\n", activity);
-    android_app_free((struct android_app*)activity->instance);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_DESTROY);
+    android_app_free(app);
 }
 
 static void onStart(ANativeActivity* activity) {
     LOGV("Start: %p\n", activity);
-    android_app_set_activity_state((struct android_app*)activity->instance, APP_CMD_START);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_START);
+    android_app_set_activity_state(app, APP_CMD_START);
 }
 
 static void onResume(ANativeActivity* activity) {
     LOGV("Resume: %p\n", activity);
-    android_app_set_activity_state((struct android_app*)activity->instance, APP_CMD_RESUME);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_RESUME);
+    android_app_set_activity_state(app, APP_CMD_RESUME);
 }
 
 static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
-    struct android_app* android_app = (struct android_app*)activity->instance;
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_SAVE_STATE);
     void* savedState = NULL;
 
     LOGV("SaveInstanceState: %p\n", activity);
-    pthread_mutex_lock(&android_app->mutex);
-    android_app->stateSaved = 0;
-    android_app_write_cmd(android_app, APP_CMD_SAVE_STATE);
-    while (!android_app->stateSaved) {
-        pthread_cond_wait(&android_app->cond, &android_app->mutex);
+    pthread_mutex_lock(&app->mutex);
+    app->stateSaved = 0;
+    android_app_write_cmd(app, APP_CMD_SAVE_STATE);
+    while (!app->stateSaved) {
+        pthread_cond_wait(&app->cond, &app->mutex);
     }
 
-    if (android_app->savedState != NULL) {
-        savedState = android_app->savedState;
-        *outLen = android_app->savedStateSize;
-        android_app->savedState = NULL;
-        android_app->savedStateSize = 0;
+    if (app->savedState != NULL) {
+        savedState = app->savedState;
+        *outLen = app->savedStateSize;
+        app->savedState = NULL;
+        app->savedStateSize = 0;
     }
 
-    pthread_mutex_unlock(&android_app->mutex);
+    pthread_mutex_unlock(&app->mutex);
 
     return savedState;
 }
 
 static void onPause(ANativeActivity* activity) {
     LOGV("Pause: %p\n", activity);
-    android_app_set_activity_state((struct android_app*)activity->instance, APP_CMD_PAUSE);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_PAUSE);
+    android_app_set_activity_state(app, APP_CMD_PAUSE);
 }
 
 static void onStop(ANativeActivity* activity) {
     LOGV("Stop: %p\n", activity);
-    android_app_set_activity_state((struct android_app*)activity->instance, APP_CMD_STOP);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_STOP);
+    android_app_set_activity_state(app, APP_CMD_STOP);
 }
 
 static void onConfigurationChanged(ANativeActivity* activity) {
-    struct android_app* android_app = (struct android_app*)activity->instance;
     LOGV("ConfigurationChanged: %p\n", activity);
-    android_app_write_cmd(android_app, APP_CMD_CONFIG_CHANGED);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_CONFIG_CHANGED);
+    android_app_write_cmd(app, APP_CMD_CONFIG_CHANGED);
 }
 
 static void onLowMemory(ANativeActivity* activity) {
-    struct android_app* android_app = (struct android_app*)activity->instance;
     LOGV("LowMemory: %p\n", activity);
-    android_app_write_cmd(android_app, APP_CMD_LOW_MEMORY);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_LOW_MEMORY);
+    android_app_write_cmd(app, APP_CMD_LOW_MEMORY);
 }
 
 static void onWindowFocusChanged(ANativeActivity* activity, int focused) {
     LOGV("WindowFocusChanged: %p -- %d\n", activity, focused);
-    android_app_write_cmd((struct android_app*)activity->instance,
-            focused ? APP_CMD_GAINED_FOCUS : APP_CMD_LOST_FOCUS);
+    struct android_app* app = (struct android_app*)activity->instance;
+    int cmd = focused ? APP_CMD_GAINED_FOCUS : APP_CMD_LOST_FOCUS;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, cmd);
+    android_app_write_cmd(app, cmd);
 }
 
 static void onNativeWindowCreated(ANativeActivity* activity, ANativeWindow* window) {
     LOGV("NativeWindowCreated: %p -- %p\n", activity, window);
-    android_app_set_window((struct android_app*)activity->instance, window);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_INIT_WINDOW);
+    android_app_set_window(app, window);
 }
 
 static void onNativeWindowDestroyed(ANativeActivity* activity, ANativeWindow* window) {
     LOGV("NativeWindowDestroyed: %p -- %p\n", activity, window);
-    android_app_set_window((struct android_app*)activity->instance, NULL);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_TERM_WINDOW);
+    android_app_set_window(app, NULL);
 }
 
 static void onInputQueueCreated(ANativeActivity* activity, AInputQueue* queue) {
     LOGV("InputQueueCreated: %p -- %p\n", activity, queue);
-    android_app_set_input((struct android_app*)activity->instance, queue);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_INPUT_CHANGED);
+    android_app_set_input(app, queue);
 }
 
 static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue) {
     LOGV("InputQueueDestroyed: %p -- %p\n", activity, queue);
-    android_app_set_input((struct android_app*)activity->instance, NULL);
+    struct android_app* app = (struct android_app*)activity->instance;
+    if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_INPUT_CHANGED);
+    android_app_set_input(app, NULL);
 }
 
 void ANativeActivity_onCreate(ANativeActivity* activity,
