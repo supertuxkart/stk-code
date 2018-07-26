@@ -126,7 +126,7 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)         \
                       $(wildcard ../lib/irrlicht/source/Irrlicht/Android/*.cpp) \
-                      ../lib/irrlicht/source/Irrlicht/android_native_app_glue.c
+                      ../lib/irrlicht/source/Irrlicht/stk_android_native_app_glue.c
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -Iobj/jpeglib/                     \

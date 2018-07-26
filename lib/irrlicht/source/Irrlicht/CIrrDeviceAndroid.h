@@ -12,7 +12,7 @@
 
 #include <android/window.h>
 #include <android/sensor.h>
-#include <android_native_app_glue.h>
+#include "stk_android_native_app_glue.h"
 #include "CIrrDeviceStub.h"
 #include "IrrlichtDevice.h"
 #include "IImagePresenter.h"
