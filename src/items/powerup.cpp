@@ -32,6 +32,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -212,6 +213,13 @@ void  Powerup::adjustSound()
 }   // adjustSound
 
 //-----------------------------------------------------------------------------
+void Powerup::playSound()
+{
+    if (!RewindManager::get()->isRewinding())
+        m_sound_use->play();
+}   // playSound
+
+//-----------------------------------------------------------------------------
 /** Use (fire) this powerup.
  */
 void Powerup::use()
@@ -248,7 +256,7 @@ void Powerup::use()
         {
             ItemManager::get()->switchItems();
             m_sound_use->setPosition(m_kart->getXYZ());
-            m_sound_use->play();
+            playSound();
             break;
         }
     case PowerupManager::POWERUP_CAKE:
@@ -258,7 +266,7 @@ void Powerup::use()
         if(stk_config->m_shield_restrict_weapons)
             m_kart->setShieldTime(0.0f); // make weapon usage destroy the shield
         Powerup::adjustSound();
-        m_sound_use->play();
+        playSound();
 
         projectile_manager->newProjectile(m_kart, m_type);
         break ;
@@ -280,7 +288,7 @@ void Powerup::use()
             if(!new_item) return;
 
             Powerup::adjustSound();
-            m_sound_use->play();
+            playSound();
         }
         else // if the kart is looking forward, use the bubblegum as a shield
         {
@@ -330,7 +338,7 @@ void Powerup::use()
             //In this case this is a workaround, since the bubblegum item has two different sounds.
 
             Powerup::adjustSound();
-            m_sound_use->play();
+            playSound();
 
         }   // end of PowerupManager::POWERUP_BUBBLEGUM
         break;
@@ -359,7 +367,7 @@ void Powerup::use()
                 else
                     m_sound_use->setPosition(m_kart->getXYZ());
 
-                m_sound_use->play();
+                playSound();
                 break;
             }
         }
@@ -418,7 +426,7 @@ void Powerup::use()
                 m_sound_use->setPosition(m_kart->getXYZ());
             else if(player_kart)
                 m_sound_use->setPosition(player_kart->getXYZ());
-            m_sound_use->play();
+            playSound();
         }
         break;
 

@@ -139,7 +139,6 @@ public:
     };
 
 private:
-    const int     RAND_CLASS_RANGE = 1000;
 
     /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];

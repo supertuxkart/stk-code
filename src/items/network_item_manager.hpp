@@ -61,10 +61,10 @@ private:
     void forwardTime(int ticks);
 
     NetworkItemManager();
-    virtual ~NetworkItemManager();
 
 public:
     static void create();
+    virtual ~NetworkItemManager();
 
     void setSwitchItems(const std::vector<int> &switch_items);
     void sendItemUpdate();

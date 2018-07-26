@@ -123,12 +123,11 @@ void PhysicalObject::Settings::init()
 }   // Settings
 
 // ============================================================================
-PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
-                                        const XMLNode &xml_node,
-                                        TrackObject* object)
+std::shared_ptr<PhysicalObject> PhysicalObject::fromXML
+    (bool is_dynamic, const XMLNode &xml_node, TrackObject* object)
 {
     PhysicalObject::Settings settings(xml_node);
-    return new PhysicalObject(is_dynamic, settings, object);
+    return std::make_shared<PhysicalObject>(is_dynamic, settings, object);
 }   // fromXML
 
 // ----------------------------------------------------------------------------
@@ -136,7 +135,6 @@ PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
 PhysicalObject::PhysicalObject(bool is_dynamic,
                                const PhysicalObject::Settings& settings,
                                TrackObject* object)
-              : Rewinder("P", false/*can_be_destroyed*/, false/*auto_add*/)
 {
     m_shape              = NULL;
     m_body               = NULL;
@@ -793,7 +791,7 @@ void PhysicalObject::addForRewind()
     SmoothNetworkBody::setAdjustVerticalOffset(false);
     Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
         (Track::getCurrentTrack()->getPhysicalObjectUID()));
-    Rewinder::add();
+    Rewinder::rewinderAdd();
 }   // addForRewind
 
 // ----------------------------------------------------------------------------

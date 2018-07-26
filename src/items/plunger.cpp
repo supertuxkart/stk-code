@@ -100,7 +100,7 @@ Plunger::Plunger(AbstractKart *kart)
     {
         m_rubber_band = new RubberBand(this, kart);
     }
-    m_keep_alive = -1;
+    additionalPhysicsProperties();
 }   // Plunger
 
 // ----------------------------------------------------------------------------

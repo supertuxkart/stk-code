@@ -197,8 +197,8 @@ public:
                     PhysicalObject(bool is_dynamic, const Settings& settings,
                                    TrackObject* object);
 
-    static PhysicalObject* fromXML(bool is_dynamic, const XMLNode &node,
-                                   TrackObject* object);
+    static std::shared_ptr<PhysicalObject> fromXML
+        (bool is_dynamic, const XMLNode &node, TrackObject* object);
 
     virtual     ~PhysicalObject ();
     virtual void reset          ();

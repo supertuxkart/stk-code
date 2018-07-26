@@ -31,16 +31,16 @@
 void NetworkItemManager::create()
 {
     assert(!m_item_manager);
-    m_item_manager = new NetworkItemManager();
+    auto nim = std::shared_ptr<NetworkItemManager>(new NetworkItemManager());
+    nim->rewinderAdd();
+    m_item_manager = nim;
 }   // create
-
 
 // ============================================================================
 /** Creates a new instance of the item manager. This is done at startup
  *  of each race. */
 NetworkItemManager::NetworkItemManager()
-                  : Rewinder("N", /*can be deleted*/false),
-                    ItemManager()
+                  : Rewinder("N"), ItemManager()
 {
     m_last_confirmed_item_ticks.clear();
 

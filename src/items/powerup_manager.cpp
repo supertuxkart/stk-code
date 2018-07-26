@@ -298,7 +298,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     }
 
     // The last kart always uses the data for the last section
-    if (rank == m_num_karts)
+    if (rank == (int)m_num_karts)
     {
         *prev = *next = m_weights_for_section.size() - 1;
         *weight = 1.0f;
@@ -600,9 +600,11 @@ void PowerupManager::unitTesting()
     int num_weights = wd.m_summed_weights_for_rank[0].back();
     for(int i=0; i<num_weights; i++)
     {
+#ifdef DEBUG
         unsigned int n;
         assert( powerup_manager->getRandomPowerup(1, &n, i)==POWERUP_BOWLING );
         assert(n==3);
+#endif
     }
 
     // Test 2: Test all possible random numbers for 5 karts and rank 5

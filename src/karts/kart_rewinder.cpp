@@ -38,8 +38,7 @@ KartRewinder::KartRewinder(const std::string& ident,
                            const btTransform& init_transform,
                            PerPlayerDifficulty difficulty,
                            std::shared_ptr<RenderInfo> ri)
-            : Rewinder(std::string("K") + StringUtils::toString(world_kart_id),
-                       /*can_be_destroyed*/ false)
+            : Rewinder(std::string("K") + StringUtils::toString(world_kart_id))
             , Kart(ident, world_kart_id, position, init_transform, difficulty,
                    ri)
 {
@@ -144,6 +143,15 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     // -----------
     m_skidding->saveState(buffer);
 
+    // 6) Firing and related handling
+    // -----------
+    buffer->addUInt16(m_bubblegum_ticks);
+    buffer->addUInt16(m_view_blocked_by_plunger);
+    // m_invulnerable_ticks will not be negative
+    uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
+        m_invulnerable_ticks;
+    buffer->addUInt16(fire_and_invulnerable);
+
     return buffer;
 }   // saveState
 
@@ -203,15 +211,21 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     float nitro = buffer->getFloat();
     setEnergy(nitro);
 
-    // 5) Max speed info
+    // 4) Max speed info
     // ------------------
     m_max_speed->rewindTo(buffer);
 
-    // 6) Skidding
+    // 5) Skidding
     // -----------
     m_skidding->rewindTo(buffer);
 
-    return;
+    // 6) Firing and related handling
+    // -----------
+    m_bubblegum_ticks = buffer->getUInt16();
+    m_view_blocked_by_plunger = buffer->getUInt16();
+    uint16_t fire_and_invulnerable = buffer->getUInt16();
+    m_fire_clicked = (fire_and_invulnerable >> 15) == 1;
+    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 15);
 }   // restoreState
 
 // ----------------------------------------------------------------------------
@@ -224,24 +238,15 @@ void KartRewinder::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-void KartRewinder::rewindToEvent(BareNetworkString *buffer)
-{
-}   // rewindToEvent
-
-// ----------------------------------------------------------------------------
 std::function<void()> KartRewinder::getLocalStateRestoreFunction()
 {
     if (m_eliminated)
         return nullptr;
 
-    // In theory all ticks / boolean related stuff can be saved locally
+    // Variable can be saved locally if its adjustment only depends on the kart
+    // itself
     bool has_started = m_has_started;
-    int bubblegum_ticks = m_bubblegum_ticks;
     int bounce_back_ticks = m_bounce_back_ticks;
-    int invulnerable_ticks = m_invulnerable_ticks;
-    int squash_ticks = m_squash_ticks;
-    bool fire_clicked = m_fire_clicked;
-    int view_blocked_by_plunger = m_view_blocked_by_plunger;
     int brake_ticks = m_brake_ticks;
     int8_t min_nitro_ticks = m_min_nitro_ticks;
 
@@ -259,18 +264,11 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
         steer_val_r = pc->m_steer_val_r;
     }
 
-    return [has_started, bubblegum_ticks, bounce_back_ticks,
-        invulnerable_ticks, squash_ticks, fire_clicked,
-        view_blocked_by_plunger, brake_ticks, min_nitro_ticks, initial_speed,
-        node_scale, steer_val_l, steer_val_r, this]()
+    return [has_started, bounce_back_ticks, brake_ticks, min_nitro_ticks,
+        initial_speed, node_scale, steer_val_l, steer_val_r, this]()
     {
         m_has_started = has_started;
-        m_bubblegum_ticks = bubblegum_ticks;
         m_bounce_back_ticks = bounce_back_ticks;
-        m_invulnerable_ticks = invulnerable_ticks;
-        m_squash_ticks = squash_ticks;
-        m_fire_clicked = fire_clicked;
-        m_view_blocked_by_plunger = view_blocked_by_plunger;
         m_brake_ticks = brake_ticks;
         m_min_nitro_ticks = min_nitro_ticks;
         getAttachment()->setInitialSpeed(initial_speed);

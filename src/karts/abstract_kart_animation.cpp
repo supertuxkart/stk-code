@@ -89,7 +89,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
             Vec3 linear_velocity = kart->getBody()->getLinearVelocity();
             Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
             btTransform transform = kart->getBody()->getWorldTransform();
-            RewindManager::get()->getRewindQueue().insertRewindInfo(new
+            RewindManager::get()->addRewindInfoEventFunction(new
                 RewindInfoEventFunction(
                 World::getWorld()->getTicksSinceStart(),
                 [kart]()
