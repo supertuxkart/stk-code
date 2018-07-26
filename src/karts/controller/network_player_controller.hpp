@@ -18,6 +18,7 @@
 #define HEADER_NETWORK_PLAYER_CONTROLLER_HPP
 
 #include "karts/controller/player_controller.hpp"
+#include "network/network_config.hpp"
 
 class AbstractKart;
 class Player;
@@ -51,8 +52,11 @@ public:
     virtual void update(int ticks)
     {
         PlayerController::update(ticks);
-        m_controls->setSteer(  m_controls->getSteer()
-                             * stk_config->m_network_steering_reduction);
+        if (NetworkConfig::get()->isClient())
+        {
+            m_controls->setSteer(  m_controls->getSteer()
+                                 * stk_config->m_network_steering_reduction);
+        }
     }   // update
 
     // ------------------------------------------------------------------------
