@@ -599,7 +599,8 @@ BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
     ru->push_back(getUniqueIdentity());
     BareNetworkString *buffer = new BareNetworkString();
     CompressNetworkBody::compress(m_body->getWorldTransform(),
-        m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer);
+        m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer,
+        m_body, m_motion_state);
     uint16_t hit_and_ticks = (m_has_hit_something ? 1 << 15 : 0) |
         m_ticks_since_thrown;
     buffer->addUInt16(hit_and_ticks);

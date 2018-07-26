@@ -22,19 +22,40 @@
 #include "network/network_string.hpp"
 #include "utils/mini_glm.hpp"
 
+#include "LinearMath/btMotionState.h"
+#include "btBulletDynamicsCommon.h"
+
 namespace CompressNetworkBody
 {
     using namespace MiniGLM;
     // ------------------------------------------------------------------------
-    inline void compress(const btTransform& t, const Vec3& lv, const Vec3& av,
-                         BareNetworkString* bns)
+    inline void compress(btTransform t, const Vec3& lv, const Vec3& av,
+                         BareNetworkString* bns, btRigidBody* body,
+                         btMotionState* ms)
     {
         bns->add(t.getOrigin());
-        bns->addUInt32(compressQuaternion(t.getRotation()));
-        bns->addUInt16(toFloat16(lv.x()))
-            .addUInt16(toFloat16(lv.y())).addUInt16(toFloat16(lv.z()));
-        bns->addUInt16(toFloat16(av.x()))
-            .addUInt16(toFloat16(av.y())).addUInt16(toFloat16(av.z()));
+        uint32_t compressed_q = compressQuaternion(t.getRotation());
+        bns->addUInt32(compressed_q);
+        std::array<short, 3> lvs =
+            {{ toFloat16(lv.x()), toFloat16(lv.y()), toFloat16(lv.z()) }};
+        bns->addUInt16(lvs[0]).addUInt16(lvs[1]).addUInt16(lvs[2]);
+        std::array<short, 3> avs =
+            {{ toFloat16(av.x()), toFloat16(av.y()), toFloat16(av.z()) }};
+        bns->addUInt16(avs[0]).addUInt16(avs[1]).addUInt16(avs[2]);
+
+        btQuaternion uncompressed_q = decompressbtQuaternion(compressed_q);
+        t.setRotation(uncompressed_q);
+        Vec3 uncompressed_lv(toFloat32(lvs[0]), toFloat32(lvs[1]),
+            toFloat32(lvs[2]));
+        Vec3 uncompressed_av(toFloat32(avs[0]), toFloat32(avs[1]),
+            toFloat32(avs[2]));
+        body->setWorldTransform(t);
+        ms->setWorldTransform(t);
+        body->setInterpolationWorldTransform(t);
+        body->setLinearVelocity(uncompressed_lv);
+        body->setAngularVelocity(uncompressed_av);
+        body->setInterpolationLinearVelocity(uncompressed_lv);
+        body->setInterpolationAngularVelocity(uncompressed_av);
     }   // compress
     // ------------------------------------------------------------------------
     inline void decompress(const BareNetworkString* bns, btTransform* t,
@@ -51,7 +72,7 @@ namespace CompressNetworkBody
         vec[1] = bns->getUInt16();
         vec[2] = bns->getUInt16();
         *av = Vec3(toFloat32(vec[0]), toFloat32(vec[1]), toFloat32(vec[2]));
-    }   // compress
+    }   // decompress
 };
 
 #endif // HEADER_COMPRESS_NETWORK_BODY_HPP

@@ -814,9 +814,9 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 {
     btTransform cur_transform = m_body->getWorldTransform();
     if ((cur_transform.getOrigin() - m_last_transform.getOrigin())
-        .length() == 0.0f &&
-        m_body->getLinearVelocity() == m_last_lv &&
-        m_body->getLinearVelocity() == m_last_av)
+        .length() < 0.01f &&
+        (m_body->getLinearVelocity() - m_last_lv).length() < 0.01f &&
+        (m_body->getLinearVelocity() - m_last_av).length() < 0.01f)
         return nullptr;
 
     ru->push_back(getUniqueIdentity());
@@ -825,7 +825,7 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
     m_last_lv = m_body->getLinearVelocity();
     m_last_av = m_body->getAngularVelocity();
     CompressNetworkBody::compress(m_last_transform, m_last_lv, m_last_av,
-        buffer);
+        buffer, m_body, m_motion_state);
     return buffer;
 }   // saveState
 
