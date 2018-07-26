@@ -202,7 +202,7 @@ void STKConfig::init_defaults()
     m_solver_iterations          = -100;
     m_solver_set_flags           = 0;
     m_solver_reset_flags         = 0;
-    m_network_steering_reduction = 1.0f;
+    m_network_steering_reduction = -100;
     m_title_music                = NULL;
     m_solver_split_impulse       = false;
     m_smooth_normals             = false;
