@@ -94,7 +94,7 @@ private:
     int                 m_num_wheels_on_ground;
 
     /** Number of time steps during which cushioning is disabled. */
-    int                 m_cushioning_disable_time;
+    unsigned int        m_cushioning_disable_time;
 
     /** Index of the right axis. */
     int                 m_indexRightAxis;
@@ -247,6 +247,19 @@ public:
     const btVector3& getTimedRotation() const { return m_additional_rotation;  }
     // ------------------------------------------------------------------------
     float getTimedRotationTime() const { return m_time_additional_rotation;  }
+    // ------------------------------------------------------------------------
+    /** Returns the time cushioning is disabled. Used for networking state
+     *  saving. */
+    unsigned int getCushioningDisableTime() const
+    {
+        return m_cushioning_disable_time;
+    }  // getCushioningDisableTime
+    // ------------------------------------------------------------------------
+    /** Sets the cushioning disable time. Used for networking state saving. */
+    void setCushioningDisableTime(unsigned int cdt)
+    {
+        m_cushioning_disable_time = cdt;
+    }   // setCushioningDisableTime
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 

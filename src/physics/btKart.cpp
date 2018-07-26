@@ -514,7 +514,7 @@ void btKart::updateVehicle( btScalar step )
     // not be strong enough to prevent the chassis from hitting the ground.
     // Try to detect this upcoming crash, and apply an upward impulse if
     // necessary that will slow down the falling speed.
-    m_cushioning_disable_time --;
+    if(m_cushioning_disable_time>0) m_cushioning_disable_time --;
 
     bool needed_cushioning = false;
     btVector3 v =
@@ -543,7 +543,7 @@ void btKart::updateVehicle( btScalar step )
     // predict the upcoming collision correcty - so we add an offset
     // to the predicted kart movement, which was found experimentally:
     btScalar gravity = m_chassisBody->getGravity().length();
-    if (v_down.getY()<0 && m_cushioning_disable_time <=0 &&
+    if (v_down.getY()<0 && m_cushioning_disable_time==0 &&
         m_wheelInfo[wheel_index].m_raycastInfo.m_suspensionLength 
                             < step * (-v_down.getY()+gravity*step)+offset)
     {

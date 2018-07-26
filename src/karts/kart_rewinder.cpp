@@ -123,6 +123,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->addFloat(m_vehicle->getMinSpeed());
     buffer->addFloat(m_vehicle->getTimedRotationTime());
     buffer->add(m_vehicle->getTimedRotation());
+    buffer->addUInt8(m_vehicle->getCushioningDisableTime());
 
     // 2) Steering and other player controls
     // -------------------------------------
@@ -189,6 +190,8 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     float time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
+    m_vehicle->setCushioningDisableTime(buffer->getUInt8());
+    
     // For the raycast to determine the current material under the kart
     // the m_hardPointWS of the wheels is used. So after a rewind we
     // must restore the m_hardPointWS to the new values, otherwise they
