@@ -49,7 +49,7 @@ public:
      *  latency the predicted path will curve way too much. By automatically 
      *  reducing it, this error is reduced. And even if the player steers more
      *  the error is hopefully acceptable. */
-    virtual void update(int ticks)
+    virtual void update(int ticks) OVERRIDE
     {
         PlayerController::update(ticks);
         if (NetworkConfig::get()->isClient())

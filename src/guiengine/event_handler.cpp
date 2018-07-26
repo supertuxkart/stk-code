@@ -387,8 +387,6 @@ void EventHandler::deallocate()
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-const bool NAVIGATION_DEBUG = false;
-
 #if 0
 #pragma mark -
 #pragma mark Private methods
