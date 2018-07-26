@@ -124,15 +124,15 @@ include $(CLEAR_VARS)
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)        \
-                      $(wildcard ../lib/irrlicht/source/Irrlicht/Android/*.cpp)
+LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)         \
+                      $(wildcard ../lib/irrlicht/source/Irrlicht/Android/*.cpp) \
+                      ../lib/irrlicht/source/Irrlicht/android_native_app_glue.c
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -Iobj/jpeglib/                     \
                       -Iobj/libpng/                      \
-                      -Iobj/zlib/                        \
-                      -I$(call my-dir)/../../sources/android/native_app_glue
-                      -std=gnu++0x
+                      -Iobj/zlib/                        
+LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := jpeglib png zlib
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
@@ -159,20 +159,17 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Iobj/libvorbis/include           \
                       -Iobj/openal/include              \
                       -Iobj/openssl/include             \
-                      -I$(call my-dir)/../../sources/android/native_app_glue \
                       -DUSE_GLES2      \
                       -DENABLE_SOUND   \
                       -DNDEBUG         \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
                       -DANDROID_APP_DIR_NAME=\"$(APP_DIR_NAME)\"    \
-                      -DSUPERTUXKART_VERSION=\"$(PROJECT_VERSION)\" \
-                      -std=gnu++0x
+                      -DSUPERTUXKART_VERSION=\"$(PROJECT_VERSION)\"
+LOCAL_CPPFLAGS     := -std=gnu++0x
 
 LOCAL_STATIC_LIBRARIES := irrlicht bullet enet freetype ifaddrs angelscript  \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          gnustl_static android_native_app_glue
+                          gnustl_static
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
-
-$(call import-module,android/native_app_glue)
