@@ -47,6 +47,7 @@ void GhostKart::reset()
     Kart::reset();
     // This will set the correct start position
     update(0);
+    updateGraphics(0);
     m_last_egg_idx = 0;
 }   // reset
 

@@ -21,7 +21,6 @@
 
 #include "network/event_rewinder.hpp"
 #include "network/network_string.hpp"
-#include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
@@ -173,14 +172,18 @@ public:
 class RewindInfoEventFunction : public RewindInfo
 {
 private:
-    const std::function<void()> m_undo_function, m_replay_function;
+    const std::function<void()> m_undo_function, m_replay_function,
+        m_destroy_function;
 public:
     RewindInfoEventFunction(int ticks,
                             std::function<void()> undo_function = [](){},
                             std::function<void()> replay_function = [](){},
-                            bool is_confirmed = true)
-        : RewindInfo(ticks, is_confirmed),
-        m_undo_function(undo_function), m_replay_function(replay_function)   {}
+                            std::function<void()> destroy_function = [](){})
+        : RewindInfo(ticks, true/*is_confirmed*/),
+        m_undo_function(undo_function), m_replay_function(replay_function),
+        m_destroy_function(destroy_function) {}
+    // ------------------------------------------------------------------------
+    ~RewindInfoEventFunction()                       {  m_destroy_function(); }
     // ------------------------------------------------------------------------
     /** An event is never 'restored', it is only rewound. */
     void restore() {}

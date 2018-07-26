@@ -58,7 +58,7 @@ void ReplayPlay::reset()
 {
     for(unsigned int i=0; i<(unsigned int)m_ghost_karts.size(); i++)
     {
-        m_ghost_karts[i].reset();
+        m_ghost_karts[i]->reset();
     }
 }   // reset
 
@@ -297,7 +297,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
 //-----------------------------------------------------------------------------
 void ReplayPlay::load()
 {
-    m_ghost_karts.clearAndDeleteAll();
+    m_ghost_karts.clear();
 
     if (m_second_replay_enabled)
         loadFile(/* second replay */ true);
@@ -365,11 +365,11 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
         first_loaded_f_num = m_replay_file_list.at(m_second_replay_file).m_kart_list.size();
 
     ReplayData &rd = m_replay_file_list[replay_index];
-    m_ghost_karts.push_back(new GhostKart(rd.m_kart_list.at(kart_num-first_loaded_f_num),
-                                          kart_num, kart_num + 1,
-                                          rd.m_kart_color.at(kart_num-first_loaded_f_num)));
-    m_ghost_karts[kart_num].init(RaceManager::KT_GHOST);
-    Controller* controller = new GhostController(getGhostKart(kart_num),
+    m_ghost_karts.push_back(std::make_shared<GhostKart>
+        (rd.m_kart_list.at(kart_num-first_loaded_f_num), kart_num, kart_num + 1,
+        rd.m_kart_color.at(kart_num-first_loaded_f_num)));
+    m_ghost_karts[kart_num]->init(RaceManager::KT_GHOST);
+    Controller* controller = new GhostController(getGhostKart(kart_num).get(),
                                                  rd.m_name_list[kart_num-first_loaded_f_num]);
     getGhostKart(kart_num)->setController(controller);
 
@@ -423,7 +423,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 kre.m_skidding_effect     = skidding;
                 kre.m_red_skidding        = red_skidding!=0;
                 kre.m_jumping             = jumping != 0;
-                m_ghost_karts[kart_num].addReplayEvent(time,
+                m_ghost_karts[kart_num]->addReplayEvent(time,
                     btTransform(q, xyz), pi, bi, kre);
             }
             else
@@ -472,7 +472,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 kre.m_skidding_effect     = skidding;
                 kre.m_red_skidding        = red_skidding!=0;
                 kre.m_jumping             = jumping != 0;
-                m_ghost_karts[kart_num].addReplayEvent(time,
+                m_ghost_karts[kart_num]->addReplayEvent(time,
                     btTransform(q, xyz), pi, bi, kre);
             }
             else

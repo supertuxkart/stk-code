@@ -365,6 +365,8 @@ private:
     float m_displacement_speed;
     int m_physical_object_uid;
 
+    bool m_minimap_invert_x_z;
+
     /** The levels for color correction
      * m_color_inlevel(black, gamma, white)
      * m_color_outlevel(black, white)*/

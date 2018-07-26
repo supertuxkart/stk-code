@@ -603,11 +603,13 @@ void cmdLineHelp()
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
+    "       --min-players=n    Minimum number of clients (server only).\n"
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --auto-end         Automatically end network game after 1st player finished\n"
     "                          for some time (currently his finished time * 0.25 + 15.0). \n"
     "       --team-choosing    Allow choosing team in lobby, implicitly allowed in lan or\n"
-    "                          password protected server.\n"
+    "                          password protected server. This function cannot be used in\n"
+    "                          owner-less server.\n"
     "       --soccer-timed     Use time limit mode in network soccer game.\n"
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
     "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
@@ -1139,12 +1141,28 @@ int handleCmdLine()
         NetworkConfig::get()->setServerIdFile(
             file_manager->getUserConfigFile(s));
     }
-    if(CommandLine::has("--disable-polling"))
+    if (CommandLine::has("--disable-polling"))
+    {
         Online::RequestManager::m_disable_polling = true;
-    if(CommandLine::has("--max-players", &n))
-        UserConfigParams::m_server_max_players=n;
-    NetworkConfig::get()->
-        setMaxPlayers(UserConfigParams::m_server_max_players);
+    }
+    if (CommandLine::has("--max-players", &n))
+    {
+        UserConfigParams::m_server_max_players = n;
+    }
+    
+    if (UserConfigParams::m_server_max_players < 1)
+    {
+        UserConfigParams::m_server_max_players = 1;
+    }
+    NetworkConfig::get()->setMaxPlayers(UserConfigParams::m_server_max_players);
+        
+    if (CommandLine::has("--min-players", &n))
+    {
+        float threshold = ((float)(n) - 0.5f) / 
+                                         UserConfigParams::m_server_max_players;
+        threshold = std::max(std::min(threshold, 1.0f), 0.0f);
+        UserConfigParams::m_start_game_threshold = threshold;
+    }
     if (CommandLine::has("--port", &n))
     {
         // We don't know if this instance is going to be a client
@@ -1158,7 +1176,8 @@ int handleCmdLine()
     }
     if (CommandLine::has("--team-choosing"))
     {
-        NetworkConfig::get()->setTeamChoosing(true);
+        if (!NetworkConfig::get()->isOwnerLess())
+            NetworkConfig::get()->setTeamChoosing(true);
     }
     if (CommandLine::has("--connect-now", &s))
     {

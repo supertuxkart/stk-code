@@ -60,7 +60,7 @@ private:
     static std::mt19937 m_random_engine;
 protected:
     /** The instance of ItemManager while a race is on. */
-    static ItemManager *m_item_manager;
+    static std::shared_ptr<ItemManager> m_item_manager;
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
@@ -90,9 +90,10 @@ public:
     // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
      *  create one, call create for that). */
-    static ItemManager *get() {
+    static ItemManager *get()
+    {
         assert(m_item_manager);
-        return m_item_manager;
+        return m_item_manager.get();
     }   // get
 
     // ========================================================================
@@ -119,9 +120,9 @@ protected:
     virtual unsigned int insertItem(Item *item);
     void setSwitchItems(const std::vector<int> &switch_items);
              ItemManager();
+public:
     virtual ~ItemManager();
 
-public:
     virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
                                     const Vec3 &normal);
     virtual Item*  dropNewItem     (ItemState::ItemType type,

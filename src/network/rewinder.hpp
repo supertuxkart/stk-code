@@ -19,33 +19,25 @@
 #ifndef HEADER_REWINDER_HPP
 #define HEADER_REWINDER_HPP
 
+#include <cassert>
 #include <functional>
 #include <string>
+#include <memory>
 #include <vector>
 
 class BareNetworkString;
 
-class Rewinder
+class Rewinder : public std::enable_shared_from_this<Rewinder>
 {
 protected:
-    void add();
-    // -------------------------------------------------------------------------
     void setUniqueIdentity(const std::string& uid)  { m_unique_identity = uid; }
-
 private:
     std::string m_unique_identity;
 
-    /** True if this object can be destroyed, i.e. if this object is a 'stand
-     *  alone' (i.e. not used in inheritance). If the object is used in
-     *  inheritance (e.g. KartRewinder, which is a Rewinder and Kart), then
-     *  freeing the kart will free this rewinder instance as well.
-     */
-    bool m_can_be_destroyed;
-
 public:
-             Rewinder(const std::string& ui, bool can_be_destroyed,
-                      bool auto_add = true);
-    virtual ~Rewinder();
+    Rewinder(const std::string& ui = "")             { m_unique_identity = ui; }
+
+    virtual ~Rewinder() {}
 
     /** Called before a rewind. Is used to save the previous position of an
      *  object before a rewind, so that the error due to a rewind can be
@@ -89,14 +81,20 @@ public:
     /** Nothing to do here. */
     virtual void reset() {}
     // -------------------------------------------------------------------------
-    /** True if this rewinder can be destroyed. Karts can not be destroyed,
-     *  cakes can. This is used by the RewindManager in reset. */
-    bool canBeDestroyed() const { return m_can_be_destroyed; }
-    // -------------------------------------------------------------------------
     virtual std::function<void()> getLocalStateRestoreFunction()
                                                              { return nullptr; }
     // -------------------------------------------------------------------------
-    const std::string& getUniqueIdentity() const   { return m_unique_identity; }
+    const std::string& getUniqueIdentity() const
+    {
+        assert(!m_unique_identity.empty() && m_unique_identity.size() < 255);
+        return m_unique_identity;
+    }
+    // -------------------------------------------------------------------------
+    bool rewinderAdd();
+    // -------------------------------------------------------------------------
+    template<typename T> std::shared_ptr<T> getShared()
+                    { return std::dynamic_pointer_cast<T>(shared_from_this()); }
+
 };   // Rewinder
 #endif
 

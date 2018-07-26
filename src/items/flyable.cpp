@@ -37,6 +37,11 @@
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/compress_network_body.hpp"
+#include "network/network_config.hpp"
+#include "network/network_string.hpp"
+#include "network/rewind_info.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -75,6 +80,10 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_owner_has_temporary_immunity = true;
     m_do_terrain_info              = true;
     m_max_lifespan                 = -1;
+    m_undo_creation                = false;
+    m_has_undone_destruction       = false;
+    m_has_server_state             = false;
+    m_check_created_ticks          = -1;
 
     // Add the graphical model
 #ifndef SERVER_ONLY
@@ -160,6 +169,10 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_body->setCollisionFlags(m_body->getCollisionFlags() |
                               btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
+    m_saved_transform = getTrans();
+    m_saved_lv = m_body->getLinearVelocity();
+    m_saved_av = m_body->getAngularVelocity();
+    m_saved_gravity = gravity;
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
@@ -378,7 +391,7 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
  */
 void Flyable::updateGraphics(float dt)
 {
-    updateSmoothedGraphics(dt);
+    Moveable::updateSmoothedGraphics(dt);
     Moveable::updateGraphics();
 }   // updateGraphics
 
@@ -390,6 +403,9 @@ void Flyable::updateGraphics(float dt)
  */
 bool Flyable::updateAndDelete(int ticks)
 {
+    if (m_undo_creation)
+        return false;
+
     if (hasAnimation())
     {
         m_animation->update(stk_config->ticks2Time(ticks));
@@ -502,6 +518,8 @@ bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
  */
 bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
 {
+    if (m_undo_creation)
+        return false;
     // the owner of this flyable should not be hit by his own flyable
     if(isOwnerImmunity(kart_hit)) return false;
     m_has_hit_something=true;
@@ -573,5 +591,140 @@ HitEffect* Flyable::getHitEffect() const
 unsigned int Flyable::getOwnerId()
 {
     return m_owner->getWorldKartId();
-}
+}   // getOwnerId
+
+// ----------------------------------------------------------------------------
+BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
+{
+    ru->push_back(getUniqueIdentity());
+    BareNetworkString *buffer = new BareNetworkString();
+    CompressNetworkBody::compress(m_body->getWorldTransform(),
+        m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer);
+    uint16_t hit_and_ticks = (m_has_hit_something ? 1 << 15 : 0) |
+        m_ticks_since_thrown;
+    buffer->addUInt16(hit_and_ticks);
+    return buffer;
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void Flyable::restoreState(BareNetworkString *buffer, int count)
+{
+    btTransform t;
+    Vec3 lv, av;
+    CompressNetworkBody::decompress(buffer, &t, &lv, &av);
+
+    m_body->setWorldTransform(t);
+    m_motion_state->setWorldTransform(t);
+    m_body->setInterpolationWorldTransform(t);
+    m_body->setLinearVelocity(lv);
+    m_body->setAngularVelocity(av);
+    m_body->setInterpolationLinearVelocity(lv);
+    m_body->setInterpolationAngularVelocity(av);
+    uint16_t hit_and_ticks = buffer->getUInt16();
+    m_has_hit_something = (hit_and_ticks >> 15) == 1;
+    m_ticks_since_thrown = hit_and_ticks & ~(1 << 15);
+    if (!m_has_server_state)
+        m_has_server_state = true;
+}   // restoreState
+
+// ----------------------------------------------------------------------------
+void Flyable::addForRewind(const std::string& uid)
+{
+    SmoothNetworkBody::setEnable(true);
+    SmoothNetworkBody::setSmoothRotation(false);
+    SmoothNetworkBody::setAdjustVerticalOffset(false);
+    Rewinder::setUniqueIdentity(uid);
+    Rewinder::rewinderAdd();
+}   // addForRewind
+
+// ----------------------------------------------------------------------------
+void Flyable::addRewindInfoEventFunctionAfterFiring()
+{
+    if (!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isServer())
+        return;
+
+    std::shared_ptr<Flyable> f = getShared<Flyable>();
+    RewindManager::get()->addRewindInfoEventFunction(new
+    RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
+        /*undo_function*/[f]()
+        {
+            f->m_undo_creation = true;
+            const Vec3 *min, *max;
+            Track::getCurrentTrack()->getAABB(&min, &max);
+            btTransform t = f->m_body->getWorldTransform();
+            // Move it to (almost infinity), avoiding affecting current
+            // rewinding
+            t.setOrigin(*max * 2.0f);
+            f->m_body->setWorldTransform(t);
+            f->m_motion_state->setWorldTransform(t);
+            f->m_body->setInterpolationWorldTransform(t);
+            f->m_body->setGravity(Vec3(0.0f));
+        },
+        /*replay_function*/[f]()
+        {
+            f->m_undo_creation = false;
+            f->m_body->setWorldTransform(f->m_saved_transform);
+            f->m_motion_state->setWorldTransform(f->m_saved_transform);
+            f->m_body->setInterpolationWorldTransform(f->m_saved_transform);
+            f->m_body->setLinearVelocity(f->m_saved_lv);
+            f->m_body->setAngularVelocity(f->m_saved_av);
+            f->m_body->setInterpolationLinearVelocity(f->m_saved_lv);
+            f->m_body->setInterpolationAngularVelocity(f->m_saved_av);
+            f->m_body->setGravity(f->m_saved_gravity);
+            f->m_ticks_since_thrown = 0;
+            f->m_has_hit_something = false;
+            f->additionalPhysicsProperties();
+        },
+        /*delete_function*/[f]()
+        {
+            f->m_check_created_ticks = World::getWorld()->getTicksSinceStart();
+        }));
+}   // addRewindInfoEventFunctionAfterFiring
+
+// ----------------------------------------------------------------------------
+void Flyable::handleUndoDestruction()
+{
+    if (!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isServer() ||
+        m_has_undone_destruction)
+        return;
+
+    m_has_undone_destruction = true;
+
+    // If destroyed during rewind, than in theroy it should be safe to delete
+    // without undo
+    if (RewindManager::get()->isRewinding())
+        return;
+
+    // We don't bother seeing the mesh during rewinding
+    m_node->setVisible(false);
+    std::shared_ptr<Flyable> f = getShared<Flyable>();
+    std::string uid = f->getUniqueIdentity();
+    RewindManager::get()->addRewindInfoEventFunction(new
+    RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
+        /*undo_function*/[f, uid]()
+        {
+            projectile_manager->addByUID(uid, f);
+        },
+        /*replay_function*/[uid]()
+        {
+            projectile_manager->removeByUID(uid);
+        }));
+}   // handleUndoDestruction
+
+// ----------------------------------------------------------------------------
+void Flyable::computeError()
+{
+    Moveable::checkSmoothing();
+    if (!m_has_server_state && m_check_created_ticks != -1 &&
+        World::getWorld()->getTicksSinceStart() > m_check_created_ticks)
+    {
+        const std::string& uid = getUniqueIdentity();
+        Log::warn("Flyable", "Item %s failed to be created on server, "
+            "remove it locally", uid.c_str());
+        projectile_manager->removeByUID(uid);
+    }
+}   // computeError
+
 /* EOF */

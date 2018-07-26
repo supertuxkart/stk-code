@@ -81,6 +81,8 @@ public:
     bool isOnRoad() const { return m_on_road; }
     // ------------------------------------------------------------------------
     void setLastTriggeredCheckline(int i) { m_last_triggered_checkline = i; }
+    // ------------------------------------------------------------------------
+    int getLastValidGraphNode() const { return m_last_valid_graph_node; }
 
 };   // TrackSector
 

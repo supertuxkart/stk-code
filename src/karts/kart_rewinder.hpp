@@ -48,7 +48,7 @@ public:
         OVERRIDE;
     void reset() OVERRIDE;
     virtual void restoreState(BareNetworkString *p, int count) OVERRIDE;
-    virtual void rewindToEvent(BareNetworkString *p) OVERRIDE;
+    virtual void rewindToEvent(BareNetworkString *p) OVERRIDE {}
     virtual void update(int ticks) OVERRIDE;
     // -------------------------------------------------------------------------
     virtual float getSteerPercent() const OVERRIDE

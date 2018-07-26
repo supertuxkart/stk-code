@@ -74,6 +74,10 @@ protected:
     */
     std::string getString(int len) const
     {
+        if (m_current_offset > (int)m_buffer.size() ||
+            m_current_offset + len > (int)m_buffer.size())
+            throw std::out_of_range("getString out of range.");
+
         std::string a(m_buffer.begin() + (m_current_offset      ),
                       m_buffer.begin() + (m_current_offset + len));
         m_current_offset += len;
@@ -101,7 +105,7 @@ protected:
         {
             result <<= 8; // offset one byte
                           // add the data to result
-            result += m_buffer[offset - a];
+            result += m_buffer.at(offset - a);
         }
         return result;
     }   // get(int pos)
@@ -110,7 +114,7 @@ protected:
     template<typename T>
     T get() const
     {
-        return m_buffer[m_current_offset++];
+        return m_buffer.at(m_current_offset++);
     }   // get
 
 public:
@@ -195,7 +199,8 @@ public:
     {
         return (char*)(m_buffer.data()+m_current_offset); 
     }   // getCurrentData
-
+    // ------------------------------------------------------------------------
+    int getCurrentOffset() const                   { return m_current_offset; }
     // ------------------------------------------------------------------------
     /** Returns the remaining length of the network string. */
     unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
@@ -424,8 +429,7 @@ public:
     /** Returns the protocol type of this message. */
     ProtocolType getProtocolType() const
     {
-        assert(!m_buffer.empty());
-        return (ProtocolType)(m_buffer[0] & ~PROTOCOL_SYNCHRONOUS);
+        return (ProtocolType)(m_buffer.at(0) & ~PROTOCOL_SYNCHRONOUS);
     }   // getProtocolType
 
     // ------------------------------------------------------------------------

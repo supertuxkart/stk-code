@@ -19,8 +19,9 @@
 #include "network/rewind_info.hpp"
 
 #include "network/network_config.hpp"
+#include "network/rewinder.hpp"
 #include "network/rewind_manager.hpp"
-#include "physics/physics.hpp"
+#include "items/projectile_manager.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
  *  for all state info.
@@ -63,16 +64,44 @@ void RewindInfoState::restore()
     m_buffer->reset();
     for (const std::string& name : m_rewinder_using)
     {
-        uint16_t count = m_buffer->getUInt16();
-        Rewinder* r = RewindManager::get()->getRewinder(name);
-        if (r == NULL)
+        const uint16_t data_size = m_buffer->getUInt16();
+        const unsigned current_offset_now = m_buffer->getCurrentOffset();
+        std::shared_ptr<Rewinder> r =
+            RewindManager::get()->getRewinder(name);
+
+        if (!r)
+        {
+            // For now we only need to get missing rewinder from
+            // projectile_manager
+            r = projectile_manager->addRewinderFromNetworkState(name);
+        }
+        if (!r)
         {
             Log::error("RewindInfoState", "Missing rewinder %s",
                 name.c_str());
-            m_buffer->skip(count);
+            m_buffer->skip(data_size);
             continue;
         }
-        r->restoreState(m_buffer, count);
+        try
+        {
+            r->restoreState(m_buffer, data_size);
+        }
+        catch (std::exception& e)
+        {
+            Log::error("RewindInfoState", "Restore state error: %s",
+                e.what());
+            m_buffer->reset();
+            m_buffer->skip(current_offset_now + data_size);
+            continue;
+        }
+
+        if (m_buffer->getCurrentOffset() - current_offset_now != data_size)
+        {
+            Log::error("RewindInfoState", "Wrong size read when restore "
+                "state, incompatible binary?");
+            m_buffer->reset();
+            m_buffer->skip(current_offset_now + data_size);
+        }
     }   // for all rewinder
 }   // restore
 

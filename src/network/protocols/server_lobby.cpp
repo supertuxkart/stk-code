@@ -381,7 +381,7 @@ void ServerLobby::asynchronousUpdate()
         if (NetworkConfig::get()->isOwnerLess())
         {
             auto players = m_game_setup->getPlayers();
-            if (((float)players.size() >
+            if (((float)players.size() >=
                 (float)NetworkConfig::get()->getMaxPlayers() *
                 UserConfigParams::m_start_game_threshold ||
                 m_game_setup->isGrandPrixStarted()) &&
@@ -757,6 +757,31 @@ void ServerLobby::startSelection(const Event *event)
             Log::warn("ServerLobby",
                 "Client %d is not authorised to start selection.",
                 event->getPeer()->getHostId());
+            return;
+        }
+    }
+
+    if (NetworkConfig::get()->hasTeamChoosing())
+    {
+        int red_count = 0;
+        int blue_count = 0;
+        auto players = m_game_setup->getConnectedPlayers();
+        for (auto& player : players)
+        {
+            if (player->getTeam() == SOCCER_TEAM_RED)
+                red_count++;
+            else if (player->getTeam() == SOCCER_TEAM_BLUE)
+                blue_count++;
+            if (red_count != 0 && blue_count != 0)
+                break;
+        }
+        if ((red_count == 0 || blue_count == 0) && players.size() != 1)
+        {
+            Log::warn("ServerLobby", "Bad team choosing.");
+            NetworkString* bt = getNetworkString();
+            bt->addUInt8(LE_BAD_TEAM);
+            sendMessageToPeers(bt, true/*reliable*/);
+            delete bt;
             return;
         }
     }
@@ -1857,16 +1882,25 @@ void ServerLobby::handlePendingConnection()
             auto key = m_keys.find(online_id);
             if (key != m_keys.end() && key->second.m_tried == false)
             {
-                if (decryptConnectionRequest(peer, it->second.second,
-                    key->second.m_aes_key, key->second.m_aes_iv, online_id,
-                    key->second.m_name))
+                try
                 {
-                    it = m_pending_connection.erase(it);
-                    m_keys.erase(online_id);
-                    continue;
+                    if (decryptConnectionRequest(peer, it->second.second,
+                        key->second.m_aes_key, key->second.m_aes_iv, online_id,
+                        key->second.m_name))
+                    {
+                        it = m_pending_connection.erase(it);
+                        m_keys.erase(online_id);
+                        continue;
+                    }
+                    else
+                        key->second.m_tried = true;
                 }
-                else
+                catch (std::exception& e)
+                {
+                    Log::error("ServerLobby",
+                        "handlePendingConnection error: %s", e.what());
                     key->second.m_tried = true;
+                }
             }
             it++;
         }

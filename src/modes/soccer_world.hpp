@@ -51,10 +51,10 @@ public:
     };   // ScorerData
 
 protected:
-    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
-                             int local_player_id, int global_player_id,
-                             RaceManager::KartType type,
-                             PerPlayerDifficulty difficulty) OVERRIDE;
+    virtual std::shared_ptr<AbstractKart> createKart
+        (const std::string &kart_ident, int index, int local_player_id,
+        int global_player_id, RaceManager::KartType type,
+        PerPlayerDifficulty difficulty) OVERRIDE;
 
 private:
     class KartDistanceMap
@@ -329,7 +329,8 @@ public:
     virtual void reset() OVERRIDE;
 
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
-
+    virtual btTransform getRescueTransform(unsigned int rescue_pos) const
+        OVERRIDE;
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual void getKartsDisplayInfo(
                std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE {}

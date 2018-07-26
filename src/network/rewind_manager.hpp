@@ -19,7 +19,6 @@
 #ifndef HEADER_REWIND_MANAGER_HPP
 #define HEADER_REWIND_MANAGER_HPP
 
-#include "network/rewinder.hpp"
 #include "network/rewind_queue.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/synchronised.hpp"
@@ -27,10 +26,15 @@
 #include <assert.h>
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <map>
+#include <set>
+#include <string>
 #include <vector>
 
+class Rewinder;
 class RewindInfo;
+class RewindInfoEventFunction;
 class EventRewinder;
 
 /** \ingroup network
@@ -93,7 +97,7 @@ private:
     std::map<int, std::vector<std::function<void()> > > m_local_state;
 
     /** A list of all objects that can be rewound. */
-    std::map<std::string, Rewinder*> m_all_rewinder;
+    std::map<std::string, std::weak_ptr<Rewinder> > m_all_rewinder;
 
     /** The queue that stores all rewind infos. */
     RewindQueue m_rewind_queue;
@@ -115,8 +119,25 @@ private:
      *  rewinds. */
     std::atomic<int> m_not_rewound_ticks;
 
+    std::vector<RewindInfoEventFunction*> m_pending_rief;
+
     RewindManager();
    ~RewindManager();
+    // ------------------------------------------------------------------------
+    void clearExpiredRewinder()
+    {
+        for (auto it = m_all_rewinder.begin(); it != m_all_rewinder.end();)
+        {
+            if (it->second.expired())
+            {
+                it = m_all_rewinder.erase(it);
+                continue;
+            }
+            it++;
+        }
+    }
+    // ------------------------------------------------------------------------
+    void mergeRewindInfoEventFunction();
 
 public:
     // First static functions to manage rewinding.
@@ -151,27 +172,18 @@ public:
     void addNetworkState(BareNetworkString *buffer, int ticks);
     void saveState();
     // ------------------------------------------------------------------------
-    Rewinder* getRewinder(const std::string& name)
+    std::shared_ptr<Rewinder> getRewinder(const std::string& name)
     {
         auto it = m_all_rewinder.find(name);
-        if (it == m_all_rewinder.end())
-            return NULL;
-        return it->second;
+        if (it != m_all_rewinder.end())
+        {
+            if (auto r = it->second.lock())
+                return r;
+        }
+        return nullptr;
     }
     // ------------------------------------------------------------------------
-    /** Adds a Rewinder to the list of all rewinders.
-     *  \return true If rewinding is enabled, false otherwise. 
-     */
-    bool addRewinder(Rewinder *rewinder)
-    {
-        if (!m_enable_rewind_manager) return false;
-        // Maximum 1 bit to store no of rewinder used
-        if (m_all_rewinder.size() == 255)
-            return false;
-        m_all_rewinder[rewinder->getUniqueIdentity()] = rewinder;
-        return true;
-    }   // addRewinder
-
+    bool addRewinder(std::shared_ptr<Rewinder> rewinder);
     // ------------------------------------------------------------------------
     /** Returns true if currently a rewind is happening. */
     bool isRewinding() const { return m_is_rewinding; }
@@ -181,8 +193,6 @@ public:
     {
         return m_not_rewound_ticks.load(std::memory_order_relaxed);
     }   // getNotRewoundWorldTicks
-    // ------------------------------------------------------------------------
-    RewindQueue& getRewindQueue()                    { return m_rewind_queue; }
     // ------------------------------------------------------------------------
     /** Returns the time of the latest confirmed state. */
     int getLatestConfirmedState() const
@@ -200,6 +210,9 @@ public:
                                            { return m_current_rewinder_using; }
     // ------------------------------------------------------------------------
     bool useLocalEvent() const;
+    // ------------------------------------------------------------------------
+    void addRewindInfoEventFunction(RewindInfoEventFunction* rief)
+                                            { m_pending_rief.push_back(rief); }
 
 };   // RewindManager
 

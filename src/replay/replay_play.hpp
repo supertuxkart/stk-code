@@ -20,10 +20,10 @@
 #define HEADER_REPLAY__PLAY_HPP
 
 #include "replay/replay_base.hpp"
-#include "utils/ptr_vector.hpp"
 
 #include "irrString.h"
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -118,7 +118,7 @@ private:
     std::vector<ReplayData>  m_replay_file_list;
 
     /** All ghost karts. */
-    PtrVector<GhostKart>     m_ghost_karts;
+    std::vector<std::shared_ptr<GhostKart> > m_ghost_karts;
 
           ReplayPlay();
          ~ReplayPlay();
@@ -162,7 +162,7 @@ public:
     const unsigned int getNumReplayFile() const
                            { return (unsigned int)m_replay_file_list.size(); }
     // ------------------------------------------------------------------------
-    GhostKart*         getGhostKart(int n)    { return m_ghost_karts.get(n); }
+    std::shared_ptr<GhostKart> getGhostKart(int n) { return m_ghost_karts[n]; }
     // ------------------------------------------------------------------------
     const unsigned int getNumGhostKart() const
     {

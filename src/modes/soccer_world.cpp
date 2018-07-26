@@ -38,6 +38,8 @@
 #include "network/stk_host.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/graph.hpp"
+#include "tracks/quad.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track_sector.hpp"
@@ -120,6 +122,7 @@ void SoccerWorld::init()
         Log::fatal("SoccerWorld","Ball is missing in soccer field, abort.");
 
     m_bgd.init(m_ball->getPhysicalObject()->getRadius());
+    m_ball_body->setActivationState(DISABLE_DEACTIVATION);
 
 }   // init
 
@@ -211,10 +214,10 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(int ticks)
 {
     updateBallPosition(ticks);
+    updateSectorForKarts();
     if (Track::getCurrentTrack()->hasNavMesh() &&
         !NetworkConfig::get()->isNetworking())
     {
-        updateSectorForKarts();
         updateAIData();
     }
 
@@ -225,7 +228,7 @@ void SoccerWorld::update(int ticks)
     {
         for (unsigned int i = 0; i < m_karts.size(); i++)
         {
-            AbstractKart* kart = m_karts[i];
+            auto& kart = m_karts[i];
             if (kart->isEliminated())
                 continue;
             kart->getBody()->setLinearVelocity(Vec3(0.0f));
@@ -332,7 +335,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     }
     for (unsigned i = 0; i < m_karts.size(); i++)
     {
-        AbstractKart* kart = m_karts[i];
+        auto& kart = m_karts[i];
         if (kart->isEliminated())
             continue;
         kart->getBody()->setLinearVelocity(Vec3(0.0f));
@@ -353,7 +356,7 @@ void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
             "%d when reset player", ticks_back_to_own_goal, ticks_now);
         return;
     }
-    RewindManager::get()->getRewindQueue().insertRewindInfo(new
+    RewindManager::get()->addRewindInfoEventFunction(new
         RewindInfoEventFunction(ticks_back_to_own_goal,
         [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
 
@@ -403,7 +406,7 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     m_ball->setEnabled(false);
     for (unsigned i = 0; i < m_karts.size(); i++)
     {
-        AbstractKart* kart = m_karts[i];
+        auto& kart = m_karts[i];
         if (kart->isEliminated())
             continue;
         btTransform transform_now = kart->getBody()->getWorldTransform();
@@ -413,7 +416,7 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         kart->setTrans(transform_now);
         m_goal_transforms[i] = transform_now;
     }
-    RewindManager::get()->getRewindQueue().insertRewindInfo(new
+    RewindManager::get()->addRewindInfoEventFunction(new
         RewindInfoEventFunction(ticks_back_to_own_goal,
         [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
 
@@ -428,7 +431,7 @@ void SoccerWorld::resetKartsToSelfGoals()
     setPhase(WorldStatus::RACE_PHASE);
     for (unsigned i = 0; i < m_karts.size(); i++)
     {
-        AbstractKart* kart = m_karts[i];
+        auto& kart = m_karts[i];
         if (kart->isEliminated())
             continue;
 
@@ -436,7 +439,7 @@ void SoccerWorld::resetKartsToSelfGoals()
         kart->getBody()->setAngularVelocity(Vec3(0.0f));
         unsigned index = m_kart_position_map.at(kart->getWorldKartId());
         btTransform t = Track::getCurrentTrack()->getStartTransform(index);
-        moveKartTo(kart, t);
+        moveKartTo(kart.get(), t);
     }
 }   // resetKartsToSelfGoals
 
@@ -529,10 +532,10 @@ bool SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
 }   // getKartSoccerResult
 
 //-----------------------------------------------------------------------------
-AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
-                                int local_player_id, int global_player_id,
-                                RaceManager::KartType kart_type,
-                                PerPlayerDifficulty difficulty)
+std::shared_ptr<AbstractKart> SoccerWorld::createKart
+    (const std::string &kart_ident, int index, int local_player_id,
+    int global_player_id, RaceManager::KartType kart_type,
+    PerPlayerDifficulty difficulty)
 {
     int cur_red = getTeamNum(SOCCER_TEAM_RED);
     int cur_blue = getTeamNum(SOCCER_TEAM_BLUE);
@@ -587,16 +590,19 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
     ri = (team == SOCCER_TEAM_BLUE ? std::make_shared<RenderInfo>(0.66f) :
         std::make_shared<RenderInfo>(1.0f));
-    AbstractKart* new_kart;
+
+    std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
     {
-        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
-            difficulty, ri);
+        auto kr = std::make_shared<KartRewinder>(kart_ident, index, position,
+            init_pos, difficulty, ri);
+        kr->rewinderAdd();
+        new_kart = kr;
     }
     else
     {
-        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
-            ri);
+        new_kart = std::make_shared<Kart>(kart_ident, index, position,
+            init_pos, difficulty, ri);
     }
 
     new_kart->init(race_manager->getKartType(index));
@@ -605,18 +611,18 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
-        controller = new LocalPlayerController(new_kart, local_player_id,
+        controller = new LocalPlayerController(new_kart.get(), local_player_id,
             difficulty);
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        controller = new NetworkPlayerController(new_kart);
+        controller = new NetworkPlayerController(new_kart.get());
         if (!online_name.empty())
             new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     case RaceManager::KT_AI:
-        controller = loadAIController(new_kart);
+        controller = loadAIController(new_kart.get());
         break;
     case RaceManager::KT_GHOST:
         break;
@@ -808,12 +814,25 @@ int SoccerWorld::getTeamNum(SoccerTeam team) const
 //-----------------------------------------------------------------------------
 unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
 {
-    std::map<int, unsigned int>::const_iterator n =
-        m_kart_position_map.find(kart->getWorldKartId());
-
-    assert (n != m_kart_position_map.end());
-    return n->second;
+    int last_valid_node =
+        getTrackSector(kart->getWorldKartId())->getLastValidGraphNode();
+    if (last_valid_node >= 0)
+        return last_valid_node;
+    Log::warn("SoccerWorld", "Missing last valid node for rescuing");
+    return 0;
 }   // getRescuePositionIndex
+
+//-----------------------------------------------------------------------------
+btTransform SoccerWorld::getRescueTransform(unsigned int rescue_pos) const
+{
+    const Vec3 &xyz = Graph::get()->getQuad(rescue_pos)->getCenter();
+    const Vec3 &normal = Graph::get()->getQuad(rescue_pos)->getNormal();
+    btTransform pos;
+    pos.setOrigin(xyz);
+    btQuaternion q1 = shortestArcQuat(Vec3(0.0f, 1.0f, 0.0f), normal);
+    pos.setRotation(q1);
+    return pos;
+}   // getRescueTransform
 
 //-----------------------------------------------------------------------------
 void SoccerWorld::enterRaceOverState()

@@ -378,14 +378,15 @@ bool ProtocolManager::sendEvent(Event* event)
     bool can_be_deleted = false;
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        OneProtocolType &opt = m_all_protocols[event->data().getProtocolType()];
+        OneProtocolType &opt =
+            m_all_protocols.at(event->data().getProtocolType());
         can_be_deleted = opt.notifyEvent(event);
     }
     else   // connect or disconnect event --> test all protocols
     {
         for (unsigned int i = 0; i < m_all_protocols.size(); i++)
         {
-            can_be_deleted |= m_all_protocols[i].notifyEvent(event);
+            can_be_deleted |= m_all_protocols.at(i).notifyEvent(event);
         }
     }
     return can_be_deleted || StkTime::getTimeSinceEpoch() - event->getArrivalTime()
@@ -432,7 +433,16 @@ void ProtocolManager::update(int ticks)
     while (i != m_sync_events_to_process.getData().end())
     {
         m_sync_events_to_process.unlock();
-        bool can_be_deleted = sendEvent(*i);
+        bool can_be_deleted = true;
+        try
+        {
+            can_be_deleted = sendEvent(*i);
+        }
+        catch (std::exception& e)
+        {
+            Log::error("ProtocolManager", "Synchronous event error: %s",
+                e.what());
+        }
         m_sync_events_to_process.lock();
         if (can_be_deleted)
         {
@@ -478,7 +488,16 @@ void ProtocolManager::asynchronousUpdate()
         m_async_events_to_process.unlock();
 
         m_all_protocols[(*i)->getType()].lock();
-        bool result = sendEvent(*i);
+        bool result = true;
+        try
+        {
+            result = sendEvent(*i);
+        }
+        catch (std::exception& e)
+        {
+            Log::error("ProtocolManager", "Asynchronous event error: %s",
+                e.what());
+        }
         m_all_protocols[(*i)->getType()].unlock();
 
         m_async_events_to_process.lock();

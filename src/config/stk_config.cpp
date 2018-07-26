@@ -149,8 +149,10 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_minimap_ai_icon,           "minimap ai_icon"            );
     CHECK_NEG(m_minimap_player_icon,       "minimap player_icon"        );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
-    CHECK_NEG(m_default_track_friction,    "physics default-track-friction"   );
-    CHECK_NEG(m_physics_fps,               "physics fps"                      );
+    CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
+    CHECK_NEG(m_physics_fps,               "physics fps"                );
+    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
+    CHECK_NEG(m_network_steering_reduction,"network steering-reduction" );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
     CHECK_NEG(m_solver_iterations,         "physics: solver-iterations"       );
     CHECK_NEG(m_network_state_frequeny,    "network solver-state-frequency"   );
@@ -200,6 +202,7 @@ void STKConfig::init_defaults()
     m_solver_iterations          = -100;
     m_solver_set_flags           = 0;
     m_solver_reset_flags         = 0;
+    m_network_steering_reduction = 1.0f;
     m_title_music                = NULL;
     m_solver_split_impulse       = false;
     m_smooth_normals             = false;
@@ -433,6 +436,7 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *networking_node = root->getNode("networking"))
     {
         networking_node->get("state-frequency", &m_network_state_frequeny);
+        networking_node->get("steering-reduction", &m_network_steering_reduction);
     }
 
     if(const XMLNode *replay_node = root->getNode("replay"))

@@ -103,19 +103,18 @@ void ProfileWorld::setProfileModeLaps(int laps)
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */
-AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
-                                       int local_player_id, int global_player_id,
-                                       RaceManager::KartType type,
-                                       PerPlayerDifficulty difficulty)
+std::shared_ptr<AbstractKart> ProfileWorld::createKart
+    (const std::string &kart_ident, int index, int local_player_id,
+    int global_player_id, RaceManager::KartType kart_type,
+    PerPlayerDifficulty difficulty)
 {
     btTransform init_pos   = getStartTransform(index);
 
-    Kart *new_kart         = new KartWithStats(kart_ident,
-                                               /*world kart id*/ index,
-                                               /*position*/ index+1,
-                                               init_pos, difficulty);
+    std::shared_ptr<KartWithStats> new_kart =
+        std::make_shared<KartWithStats>(kart_ident, /*world kart id*/ index,
+        /*position*/ index + 1, init_pos, difficulty);
     new_kart->init(RaceManager::KT_AI);
-    Controller *controller = loadAIController(new_kart);
+    Controller *controller = loadAIController(new_kart.get());
     new_kart->setController(controller);
 
     // Create a camera for the last kart (since this way more of the
@@ -123,7 +122,7 @@ AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     if (index == (int)race_manager->getNumberOfKarts()-1)
     {
         // The camera keeps track of all cameras and will free them
-        Camera::createCamera(new_kart, local_player_id);
+        Camera::createCamera(new_kart.get(), local_player_id);
     }
     return new_kart;
 }   // createKart
@@ -197,7 +196,7 @@ void ProfileWorld::enterRaceOverState()
         // ---------- update rank ------
         if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated())
             continue;
-        m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
+        m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i].get()));
     }
 
     // Print framerate statistics
@@ -229,9 +228,9 @@ void ProfileWorld::enterRaceOverState()
 
     std::set<std::string> all_groups;
 
-    for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
+    for (KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
-        KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
+        auto kart = std::dynamic_pointer_cast<KartWithStats>(m_karts[i]);
 
         max_t = std::max(max_t, kart->getFinishTime());
         min_t = std::min(min_t, kart->getFinishTime());
@@ -285,7 +284,7 @@ void ProfileWorld::enterRaceOverState()
         float av_time       = 0.0f, energy          = 0;
         for ( unsigned int i = 0; i < (unsigned int)m_karts.size(); ++i)
         {
-            KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
+            auto kart = std::dynamic_pointer_cast<KartWithStats>(m_karts[i]);
             const std::string &name=kart->getController()->getControllerName();
             if(name!=*it)
                 continue;

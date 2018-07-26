@@ -112,9 +112,9 @@ private:
 protected:
     bool            m_play_track_intro_sound;
     bool            m_play_ready_set_go_sounds;
+    Phase           m_phase;
 
 private:
-    Phase           m_phase;
 
     /**
       * Remember previous phase e.g. on pause

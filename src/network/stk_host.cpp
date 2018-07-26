@@ -720,7 +720,15 @@ void STKHost::mainLoop()
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
         {
-            handleDirectSocketRequest(direct_socket, sl);
+            try
+            {
+                handleDirectSocketRequest(direct_socket, sl);
+            }
+            catch (std::exception& e)
+            {
+                Log::warn("STKHost", "Direct socket error: %s",
+                    e.what());
+            }
         }   // if discovery host
 
         if (is_server)
