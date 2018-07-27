@@ -1150,6 +1150,12 @@ void CIrrDeviceAndroid::getKeyChar(SEvent& event)
 
 void CIrrDeviceAndroid::hideNavBar(ANativeActivity* activity)
 {
+    if (activity == NULL)
+        return;
+
+    if (activity->sdkVersion < 19)
+        return;
+
     bool was_detached = false;
     JNIEnv* env = NULL;
     
