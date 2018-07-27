@@ -723,7 +723,7 @@ void Kart::createPhysics()
     btTransform trans;
     trans.setIdentity();
     createBody(mass, trans, &m_kart_chassis,
-               m_kart_properties->getRestitution());
+               m_kart_properties->getRestitution(0.0f));
     std::vector<float> ang_fact = m_kart_properties->getStabilityAngularFactor();
     // The angular factor (with X and Z values <1) helps to keep the kart
     // upright, especially in case of a collision.
@@ -1273,6 +1273,13 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
+    // Make the restitution depend on speed: this avoids collision issues,
+    // otherwise a collision with high speed can see a kart being push
+    // high up in the air (and out of control). So for higher speed we
+    // reduce the restitution, meaning the karts will get less of a push
+    // based on the collision speed.
+    m_body->setRestitution(m_kart_properties->getRestitution(fabsf(m_speed)));
+
     // Reset any instand speed increase in the bullet kart
     m_vehicle->setMinSpeed(0);
 

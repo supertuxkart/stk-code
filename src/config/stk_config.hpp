@@ -105,6 +105,19 @@ public:
     /** Default friction to be used for any moveable, e.g. karts, balls. */
     float m_default_moveable_friction;
 
+    /** Number of solver iterations. */
+    int m_solver_iterations;
+
+    /** If position and velocity constraints are solved separately. */
+    bool m_solver_split_impulse;
+    
+    /** Threshold when to use the split impulse approach. */
+    float m_solver_split_impulse_thresh;
+
+    /** Bit flags to modify the solver mode. Bits set in set_flags are
+     *  added to the solver mode, bits set in reset_flags are removed. */
+    int m_solver_set_flags, m_solver_reset_flags;
+
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near

@@ -321,7 +321,6 @@ void MainLoop::run()
 
         left_over_time += getLimitedDt();
         int num_steps   = stk_config->time2Ticks(left_over_time);
-
         float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
@@ -371,8 +370,6 @@ void MainLoop::run()
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
-                if (World::getWorld() && history->replayHistory())
-                    history->updateReplay(World::getWorld()->getTicksSinceStart());
                 PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
                 SFXManager::get()->update();
                 PROFILER_POP_CPU_MARKER();
@@ -408,8 +405,11 @@ void MainLoop::run()
         }
         m_ticks_adjustment.unlock();
 
-        for (int i = 0; i < num_steps; i++)
+        for(int i=0; i<num_steps; i++)
         {
+            if (World::getWorld() && history->replayHistory())
+                history->updateReplay(World::getWorld()->getTicksSinceStart());
+
             PROFILER_PUSH_CPU_MARKER("Protocol manager update",
                                      0x7F, 0x00, 0x7F);
             if (auto pm = ProtocolManager::lock())
