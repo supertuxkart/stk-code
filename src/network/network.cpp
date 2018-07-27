@@ -181,8 +181,9 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
 void Network::broadcastPacket(NetworkString *data, bool reliable)
 {
     ENetPacket* packet = enet_packet_create(data->getData(), data->size() + 1,
-                                      reliable ? ENET_PACKET_FLAG_RELIABLE
-                                               : ENET_PACKET_FLAG_UNSEQUENCED);
+        (reliable ? ENET_PACKET_FLAG_RELIABLE :
+        (ENET_PACKET_FLAG_UNSEQUENCED | ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT))
+        );
     enet_host_broadcast(m_host, 0, packet);
 }   // broadcastPacket
 
