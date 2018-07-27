@@ -1273,6 +1273,8 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
+    m_powerup->update(ticks);
+
     // Make the restitution depend on speed: this avoids collision issues,
     // otherwise a collision with high speed can see a kart being push
     // high up in the air (and out of control). So for higher speed we

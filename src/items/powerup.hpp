@@ -23,7 +23,8 @@
 
 #include "items/powerup_manager.hpp"  // needed for powerup_type
 #include "utils/no_copy.hpp"
-#include "utils/random_generator.hpp"
+
+#include <set>
 
 class AbstractKart;
 class BareNetworkString;
@@ -48,7 +49,8 @@ private:
     /** The owner (kart) of this powerup. */
     AbstractKart*               m_kart;
 
-    void playSound();
+    std::set<int>               m_played_sound_ticks;
+
 public:
                     Powerup      (AbstractKart* kart_);
                    ~Powerup      ();
@@ -60,7 +62,7 @@ public:
     void            hitBonusBox (const ItemState &item);
     void            saveState(BareNetworkString *buffer) const;
     void            rewindTo(BareNetworkString *buffer);
-
+    void            update(int ticks);
 
     /** Returns the number of powerups. */
     int             getNum       () const {return m_number;}
