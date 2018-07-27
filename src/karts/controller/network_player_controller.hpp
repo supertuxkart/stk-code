@@ -36,6 +36,8 @@ public:
     {
     }   // ~NetworkPlayerController
     // ------------------------------------------------------------------------
+    virtual bool canGetAchievements() const OVERRIDE          { return false; }
+    // ------------------------------------------------------------------------
     /** This player is not a local player. This affect e.g. special sfx and
      *  camera effects to be triggered. */
     virtual bool isLocalPlayerController() const OVERRIDE

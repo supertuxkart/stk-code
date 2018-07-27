@@ -252,7 +252,6 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
 
     // Attachment local state
     float initial_speed = getAttachment()->getInitialSpeed();
-    float node_scale = getAttachment()->getNodeScale();
 
     // Controller local state
     int steer_val_l = 0;
@@ -265,14 +264,13 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     }
 
     return [has_started, bounce_back_ticks, brake_ticks, min_nitro_ticks,
-        initial_speed, node_scale, steer_val_l, steer_val_r, this]()
+        initial_speed, steer_val_l, steer_val_r, this]()
     {
         m_has_started = has_started;
         m_bounce_back_ticks = bounce_back_ticks;
         m_brake_ticks = brake_ticks;
         m_min_nitro_ticks = min_nitro_ticks;
         getAttachment()->setInitialSpeed(initial_speed);
-        getAttachment()->setNodeScale(node_scale);
         PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
         if (pc)
         {

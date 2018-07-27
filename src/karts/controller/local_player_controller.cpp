@@ -400,7 +400,8 @@ void LocalPlayerController::nitroNotFullSound()
  */
 bool LocalPlayerController::canGetAchievements() const 
 {
-    return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
+    return !RewindManager::get()->isRewinding() &&
+        m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
 }   // canGetAchievements
 
 // ----------------------------------------------------------------------------

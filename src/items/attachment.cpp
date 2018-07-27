@@ -56,7 +56,7 @@ Attachment::Attachment(AbstractKart* kart)
     m_previous_owner       = NULL;
     m_bomb_sound           = NULL;
     m_bubble_explode_sound = NULL;
-    m_node_scale           = 1.0f;
+    m_node_scale           = std::numeric_limits<float>::max();
     m_initial_speed        = 0.0f;
 
     // If we attach a NULL mesh, we get a NULL scene node back. So we
@@ -110,9 +110,15 @@ Attachment::~Attachment()
  *         previous owner exists.
  */
 void Attachment::set(AttachmentType type, int ticks,
-                     AbstractKart *current_kart)
+                     AbstractKart *current_kart,
+                     bool disable_swatter_animation)
 {
-    bool was_bomb = (m_type == ATTACH_BOMB);
+    // Don't override currently player swatter removing bomb animation
+    Swatter* s = dynamic_cast<Swatter*>(m_plugin);
+    if (s && s->isRemovingBomb())
+        return;
+
+    bool was_bomb = (m_type == ATTACH_BOMB) && !disable_swatter_animation;
     scene::ISceneNode* bomb_scene_node = NULL;
     if (was_bomb && type == ATTACH_SWATTER)
     {
@@ -132,7 +138,6 @@ void Attachment::set(AttachmentType type, int ticks,
     }
 
     clear();
-    m_node_scale = 0.3f;
 
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
@@ -160,7 +165,12 @@ void Attachment::set(AttachmentType type, int ticks,
         m_node->setCurrentFrame(0);
     }
 
-    m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
+    if (m_node_scale == std::numeric_limits<float>::max())
+    {
+        m_node_scale = 0.3f;
+        m_node->setScale(core::vector3df(m_node_scale, m_node_scale,
+            m_node_scale));
+    }
 
     m_type             = type;
     m_ticks_left       = ticks;
@@ -238,14 +248,22 @@ void Attachment::clear()
  */
 void Attachment::saveState(BareNetworkString *buffer) const
 {
-    // We use bit 7 to indicate if a previous owner is defined for a bomb
-    assert(ATTACH_MAX<=127);
+    // We use bit 6 to indicate if a previous owner is defined for a bomb,
+    // bit 7 to indicate if the attachment is swatter removing animation
+    assert(ATTACH_MAX < 64);
+    uint8_t bit_7 = 0;
+    Swatter* s = dynamic_cast<Swatter*>(m_plugin);
+    if (s)
+    {
+        bit_7 = s->isRemovingBomb() ? 1 : 0;
+        bit_7 <<= 7;
+    }
     uint8_t type = m_type | (( (m_type==ATTACH_BOMB) && (m_previous_owner!=NULL) )
-                             ? 0x80 : 0 );
+                             ? (1 << 6) : 0 ) | bit_7;
     buffer->addUInt8(type);
     if(m_type!=ATTACH_NOTHING)
     {
-        buffer->addUInt32(m_ticks_left);
+        buffer->addUInt16(m_ticks_left);
         if(m_type==ATTACH_BOMB && m_previous_owner)
             buffer->addUInt8(m_previous_owner->getWorldKartId());
         // m_initial_speed is not saved, on restore state it will
@@ -260,19 +278,29 @@ void Attachment::saveState(BareNetworkString *buffer) const
 void Attachment::rewindTo(BareNetworkString *buffer)
 {
     uint8_t type = buffer->getUInt8();
-    AttachmentType new_type = AttachmentType(type & 0x7f);   // mask out bit 7
+    bool is_removing_bomb = (type >> 7 & 1) == 1;
+
+    Swatter* s = dynamic_cast<Swatter*>(m_plugin);
+    // If locally removing a bomb
+    if (s)
+        is_removing_bomb = s->isRemovingBomb();
+
+    // mask out bit 6 and 7
+    AttachmentType new_type = AttachmentType(type & 63);
+    type &= 127;
 
     // If there is no attachment, clear the attachment if necessary and exit
-    if(new_type==ATTACH_NOTHING)
+    if (new_type == ATTACH_NOTHING && !is_removing_bomb)
     {
-        if(m_type!=new_type) clear();
+        if (m_type != new_type)
+            clear();
         return;
     }
 
-    int ticks_left = buffer->getUInt32();
+    int16_t ticks_left = buffer->getUInt16();
 
     // Now it is a new attachment:
-    if (type == (ATTACH_BOMB | 0x80))   // we have previous owner information
+    if (type == (ATTACH_BOMB | 64))   // we have previous owner information
     {
         uint8_t kart_id = buffer->getUInt8();
         m_previous_owner = World::getWorld()->getKart(kart_id);
@@ -281,6 +309,10 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     {
         m_previous_owner = NULL;
     }
+
+    // If playing kart animation, don't rewind to any attacment
+    if (is_removing_bomb)
+        return;
 
     // Attaching an object can be expensive (loading new models, ...)
     // so avoid doing this if there is no change in attachment type
@@ -294,7 +326,9 @@ void Attachment::rewindTo(BareNetworkString *buffer)
         return;
     }
 
-    set(new_type, ticks_left, m_previous_owner);
+    set(new_type, ticks_left, m_previous_owner,
+        new_type == ATTACH_SWATTER && !is_removing_bomb
+        /*disable_swatter_animation*/);
 }   // rewindTo
 
 // -----------------------------------------------------------------------------
@@ -314,9 +348,7 @@ void Attachment::rewind(BareNetworkString *buffer)
  */
 void Attachment::hitBanana(ItemState *item_state)
 {
-    // Don't keep on getting achievements due to rewind!
-    if (m_kart->getController()->canGetAchievements() &&
-        !RewindManager::get()->isRewinding())
+    if (m_kart->getController()->canGetAchievements())
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,
                                            "banana", 1);
@@ -501,8 +533,6 @@ void Attachment::update(int ticks)
 
     bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
                      m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-    float wanted_node_scale = is_shield ?
-        std::max(1.0f, m_kart->getHighestPoint() * 1.1f) : 1.0f;
     int slow_flashes = stk_config->time2Ticks(3.0f);
     if (is_shield && m_ticks_left < slow_flashes)
     {
@@ -516,16 +546,6 @@ void Attachment::update(int ticks)
 
         int division = (m_ticks_left / ticks_per_flash);
         m_node->setVisible((division & 0x1) == 0);
-    }
-
-    float dt = stk_config->ticks2Time(ticks);
-    if (m_node_scale < wanted_node_scale)
-    {
-        m_node_scale += dt*1.5f;
-        if (m_node_scale > wanted_node_scale)
-            m_node_scale = wanted_node_scale;
-        m_node->setScale(core::vector3df(m_node_scale,m_node_scale,
-                                         m_node_scale)             );
     }
 
     if(m_plugin)
@@ -622,6 +642,26 @@ void Attachment::update(int ticks)
 // ----------------------------------------------------------------------------
 void Attachment::updateGraphics(float dt)
 {
+    if (m_plugin)
+        m_plugin->updateGrahpics(dt);
+
+    bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
+                     m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+    float wanted_node_scale = is_shield ?
+        std::max(1.0f, m_kart->getHighestPoint() * 1.1f) : 1.0f;
+    if (m_node_scale < wanted_node_scale)
+    {
+        m_node_scale += dt * 1.5f;
+        float scale = m_node_scale;
+        if (scale > wanted_node_scale)
+            scale = wanted_node_scale;
+        m_node->setScale(core::vector3df(scale, scale, scale));
+    }
+    else
+    {
+        m_node_scale = std::numeric_limits<float>::max();
+    }
+
     switch (m_type)
     {
     case ATTACH_BOMB:
@@ -644,7 +684,6 @@ void Attachment::updateGraphics(float dt)
         m_bomb_sound->deleteSFX();
         m_bomb_sound = NULL;
     }
-
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------

@@ -82,7 +82,7 @@ private:
     AbstractKart   *m_kart;
 
     /** Time left till attachment expires. */
-    int             m_ticks_left;
+    int16_t         m_ticks_left;
 
     /** For parachutes only. */
     float           m_initial_speed;
@@ -121,7 +121,8 @@ public:
     void  update(int ticks);
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
-               AbstractKart *previous_kart=NULL);
+               AbstractKart *previous_kart=NULL,
+               bool disable_swatter_animation = false);
     virtual void rewind(BareNetworkString *buffer);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
@@ -135,10 +136,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns how much time (in ticks) is left before this attachment is 
      *  removed. */
-    int getTicksLeft() const { return m_ticks_left;      }
+    int16_t getTicksLeft() const                       { return m_ticks_left; }
     // ------------------------------------------------------------------------
     /** Sets how long this attachment will remain attached. */
-    void  setTicksLeft(int t){ m_ticks_left = t;         }
+    void setTicksLeft(int16_t t)                          { m_ticks_left = t; }
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */
@@ -160,10 +161,6 @@ public:
     float getInitialSpeed() const                   { return m_initial_speed; }
     // ------------------------------------------------------------------------
     void setInitialSpeed(float speed)              { m_initial_speed = speed; }
-    // ------------------------------------------------------------------------
-    float getNodeScale() const                         { return m_node_scale; }
-    // ------------------------------------------------------------------------
-    void setNodeScale(float scale)                    { m_node_scale = scale; }
 
 };   // Attachment
 

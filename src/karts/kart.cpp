@@ -2939,7 +2939,7 @@ void Kart::updateGraphics(float dt)
         if (m_custom_sounds[n] != NULL) m_custom_sounds[n]->position(getXYZ());
     }
      */
-
+#ifndef SERVER_ONLY
     if (m_squash_time != std::numeric_limits<float>::max())
     {
         m_squash_time -= dt;
@@ -2962,6 +2962,7 @@ void Kart::updateGraphics(float dt)
             }
         }
     }   // if squashed
+#endif
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());

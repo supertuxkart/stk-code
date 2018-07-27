@@ -23,8 +23,9 @@
 #include "items/attachment_plugin.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
-#include "utils/random_generator.hpp"
 
+#include <limits>
+#include <set>
 #include <vector3d.h>
 #include <IAnimatedMeshSceneNode.h>
 
@@ -53,9 +54,6 @@ private:
     /** True if the swatter will be discarded now. */
     bool               m_discard_now;
 
-    /** Require for the sfx to complete. */
-    float              m_discard_timeout;
-
     /** The kart the swatter is aiming at. */
     Moveable          *m_target;
 
@@ -63,8 +61,8 @@ private:
 
     SFXBase           *m_swat_sound;
 
-    /** True if the swatter is removing an attached bomb. */
-    bool               m_removing_bomb;
+    /** Set the end ticks to complete the removing an attached bomb animation. */
+    int                m_removed_bomb_ticks;
 
     /** The scene node of the attachment. */
     scene::IAnimatedMeshSceneNode *m_scene_node;
@@ -76,21 +74,30 @@ private:
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
 
+    std::set<int>      m_swat_sound_ticks;
+
+    int                m_start_swat_ticks;
+
+    int                m_end_swat_ticks;
 public:
              Swatter(AbstractKart *kart, bool was_bomb,
                      scene::ISceneNode* bomb_scene_node);
     virtual ~Swatter();
+    void     updateGrahpics(float dt) OVERRIDE;
     bool     updateAndTestFinished(int ticks) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns if the swatter is currently aiming, i.e. can be used to
      *  swat an incoming projectile. */
-    bool isSwatterReady() const {
+    bool isSwatterReady() const
+    {
         return m_animation_phase == SWATTER_AIMING;
     }   // isSwatterReady
     // ------------------------------------------------------------------------
-    virtual void onAnimationEnd() OVERRIDE;
-    // ------------------------------------------------------------------------
+    bool isRemovingBomb() const
+    {
+        return m_removed_bomb_ticks != std::numeric_limits<int>::max();
+    }
 
 private:
     /** Determine the nearest kart or item and update the current target accordingly */
