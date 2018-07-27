@@ -88,8 +88,7 @@ public:
     void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();
-    void finalizeState(std::vector<std::string>& prev_rewinder,
-                       std::vector<std::string>& cur_rewinder);
+    void finalizeState(std::vector<std::string>& cur_rewinder);
     void adjustTimeForClient(STKPeer *peer, int ticks);
     void sendItemEventConfirmation(int ticks);
 

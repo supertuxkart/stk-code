@@ -102,7 +102,9 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
     {
         packet = enet_packet_create(data->getData(),
             data->getTotalSize(), (reliable ?
-            ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
+            ENET_PACKET_FLAG_RELIABLE :
+            (ENET_PACKET_FLAG_UNSEQUENCED |
+            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT)));
     }
 
     if (packet)

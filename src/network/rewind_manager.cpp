@@ -165,7 +165,7 @@ void RewindManager::saveState()
         }
         delete buffer;    // buffer can be freed
     }
-    gp->finalizeState(m_current_rewinder_using, rewinder_using);
+    gp->finalizeState(rewinder_using);
     PROFILER_POP_CPU_MARKER();
 }   // saveState
 
