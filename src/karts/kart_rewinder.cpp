@@ -176,6 +176,8 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // Don't restore to phyics position if showing kart animation
     if (!getKartAnimation())
     {
+        // Clear any forces applied (like by plunger or bubble gum torque)
+        body->clearForces();
         body->setLinearVelocity(lv);
         body->setAngularVelocity(av);
         // This function also reads the velocity, so it must be called

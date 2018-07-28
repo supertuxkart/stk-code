@@ -168,11 +168,13 @@ protected:
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
 
+    void              moveToInfinity();
     /** Used when undoing creation or destruction. */
     btTransform m_saved_transform;
     Vec3 m_saved_lv, m_saved_av, m_saved_gravity;
 
     virtual void additionalPhysicsProperties() {}
+    virtual void hideNodeWhenUndoDestruction();
 
 public:
 

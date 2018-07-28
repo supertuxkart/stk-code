@@ -594,6 +594,18 @@ unsigned int Flyable::getOwnerId()
 }   // getOwnerId
 
 // ----------------------------------------------------------------------------
+void Flyable::moveToInfinity()
+{
+    const Vec3 *min, *max;
+    Track::getCurrentTrack()->getAABB(&min, &max);
+    btTransform t = m_body->getWorldTransform();
+    t.setOrigin(*max * 2.0f);
+    m_body->setWorldTransform(t);
+    m_motion_state->setWorldTransform(t);
+    m_body->setInterpolationWorldTransform(t);
+}   // moveToInfinity
+
+// ----------------------------------------------------------------------------
 BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
 {
     ru->push_back(getUniqueIdentity());
@@ -651,15 +663,8 @@ void Flyable::addRewindInfoEventFunctionAfterFiring()
         /*undo_function*/[f]()
         {
             f->m_undo_creation = true;
-            const Vec3 *min, *max;
-            Track::getCurrentTrack()->getAABB(&min, &max);
-            btTransform t = f->m_body->getWorldTransform();
-            // Move it to (almost infinity), avoiding affecting current
-            // rewinding
-            t.setOrigin(*max * 2.0f);
-            f->m_body->setWorldTransform(t);
-            f->m_motion_state->setWorldTransform(t);
-            f->m_body->setInterpolationWorldTransform(t);
+            // Move it to infinity, avoiding affecting current rewinding
+            f->moveToInfinity();
             f->m_body->setGravity(Vec3(0.0f));
         },
         /*replay_function*/[f]()
@@ -684,6 +689,14 @@ void Flyable::addRewindInfoEventFunctionAfterFiring()
 }   // addRewindInfoEventFunctionAfterFiring
 
 // ----------------------------------------------------------------------------
+void Flyable::hideNodeWhenUndoDestruction()
+{
+#ifndef SERVER_ONLY
+    m_node->setVisible(false);
+#endif
+}   // hideNodeWhenUndoDestruction
+
+// ----------------------------------------------------------------------------
 void Flyable::handleUndoDestruction()
 {
     if (!NetworkConfig::get()->isNetworking() ||
@@ -699,7 +712,7 @@ void Flyable::handleUndoDestruction()
         return;
 
     // We don't bother seeing the mesh during rewinding
-    m_node->setVisible(false);
+    hideNodeWhenUndoDestruction();
     std::shared_ptr<Flyable> f = getShared<Flyable>();
     std::string uid = f->getUniqueIdentity();
     RewindManager::get()->addRewindInfoEventFunction(new
