@@ -20,6 +20,7 @@
 
 #include "config/stk_config.hpp"
 #include "modes/world.hpp"
+#include "network/dummy_rewinder.hpp"
 #include "network/network_config.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
@@ -405,24 +406,6 @@ void RewindQueue::unitTesting()
 {
     // Some classes need the RewindManager (to register themselves with)
     RewindManager::create();
-
-    // A dummy Rewinder and EventRewinder class since some of the calls being
-    // tested here need an instance.
-    class DummyRewinder : public Rewinder, public EventRewinder
-    {
-    public:
-        BareNetworkString* saveState(std::vector<std::string>* ru)
-            { return NULL; }
-        virtual void undoEvent(BareNetworkString *s) {}
-        virtual void rewindToEvent(BareNetworkString *s) {}
-        virtual void restoreState(BareNetworkString *s, int count) {}
-        virtual void undoState(BareNetworkString *s) {}
-        virtual void undo(BareNetworkString *s) {}
-        virtual void rewind(BareNetworkString *s) {}
-        virtual void saveTransform() {}
-        virtual void computeError() {}
-        DummyRewinder() : Rewinder() {}
-    };
     auto dummy_rewinder = std::make_shared<DummyRewinder>();
 
     // First tests: add a state first, then an event, and make
@@ -494,7 +477,8 @@ void RewindQueue::unitTesting()
     assert(!b1.hasMoreRewindInfo());
     b1.addLocalEvent(NULL, NULL, true, 2);
     RewindInfo *ri = b1.getCurrent();
-    assert(ri->getTicks() == 2);
+    if (ri->getTicks() != 2)
+        Log::fatal("RewindQueue", "ri->getTicks() != 2");
 
     // 2) Make sure when adding an event at the same time as an existing
     //    event, that m_current pooints to the first event, otherwise
@@ -504,7 +488,8 @@ void RewindQueue::unitTesting()
     b1.addLocalEvent(NULL, NULL, true, 2);
     // Make sure that current was not modified, i.e. the new event at time
     // 2 was added at the end of the list:
-    assert(current_old == b1.m_current);
+    if (current_old != b1.m_current)
+        Log::fatal("RewindQueue", "current_old != b1.m_current");
 
     // This should not trigger an exception, now current points to the
     // second event at the same time:

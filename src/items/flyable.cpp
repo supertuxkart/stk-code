@@ -721,6 +721,7 @@ void Flyable::handleUndoDestruction()
     hideNodeWhenUndoDestruction();
     std::shared_ptr<Flyable> f = getShared<Flyable>();
     std::string uid = f->getUniqueIdentity();
+    projectile_manager->addDeletedUID(uid);
     RewindManager::get()->addRewindInfoEventFunction(new
     RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
         /*undo_function*/[f, uid]()

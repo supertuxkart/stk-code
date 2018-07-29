@@ -28,6 +28,7 @@
 #include "items/rubber_ball.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "network/dummy_rewinder.hpp"
 #include "network/rewind_manager.hpp"
 
 ProjectileManager *projectile_manager=0;
@@ -48,6 +49,7 @@ void ProjectileManager::removeTextures()
 void ProjectileManager::cleanup()
 {
     m_active_projectiles.clear();
+    m_deleted_projectiles.clear();
     for(HitEffects::iterator i  = m_active_hit_effects.begin();
         i != m_active_hit_effects.end(); ++i)
     {
@@ -262,8 +264,17 @@ std::shared_ptr<Rewinder>
         return nullptr;
     AbstractKart* kart = World::getWorld()->getKart(world_id);
     char first_id = id[0][0];
-    Log::debug("ProjectileManager", "Missed a firing event or locally deleted,"
-        " add the flyable %s manually", uid.c_str());
+
+    auto it = m_deleted_projectiles.find(uid);
+    if (it != m_deleted_projectiles.end())
+    {
+        Log::debug("ProjectileManager", "Flyable %s locally (early) deleted,"
+            " use a dummy rewinder to skip.", uid.c_str());
+        return std::make_shared<DummyRewinder>();
+    }
+
+    Log::debug("ProjectileManager",
+        "Missed a firing event, add the flyable %s manually.", uid.c_str());
     switch (first_id)
     {
         case 'B':
