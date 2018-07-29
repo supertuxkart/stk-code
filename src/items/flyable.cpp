@@ -408,8 +408,11 @@ bool Flyable::updateAndDelete(int ticks)
 
     if (hasAnimation())
     {
-        m_animation->update(stk_config->ticks2Time(ticks));
-        Moveable::update(ticks);
+        if (!RewindManager::get()->isRewinding())
+        {
+            m_animation->update(stk_config->ticks2Time(ticks));
+            Moveable::update(ticks);
+        }
         return false;
     }   // if animation
 
@@ -626,13 +629,16 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
     Vec3 lv, av;
     CompressNetworkBody::decompress(buffer, &t, &lv, &av);
 
-    m_body->setWorldTransform(t);
-    m_motion_state->setWorldTransform(t);
-    m_body->setInterpolationWorldTransform(t);
-    m_body->setLinearVelocity(lv);
-    m_body->setAngularVelocity(av);
-    m_body->setInterpolationLinearVelocity(lv);
-    m_body->setInterpolationAngularVelocity(av);
+    if (!hasAnimation())
+    {
+        m_body->setWorldTransform(t);
+        m_motion_state->setWorldTransform(t);
+        m_body->setInterpolationWorldTransform(t);
+        m_body->setLinearVelocity(lv);
+        m_body->setAngularVelocity(av);
+        m_body->setInterpolationLinearVelocity(lv);
+        m_body->setInterpolationAngularVelocity(av);
+    }
     uint16_t hit_and_ticks = buffer->getUInt16();
     m_has_hit_something = (hit_and_ticks >> 15) == 1;
     m_ticks_since_thrown = hit_and_ticks & ~(1 << 15);

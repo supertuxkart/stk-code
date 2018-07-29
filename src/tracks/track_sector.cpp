@@ -20,6 +20,7 @@
 
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
 #include "tracks/arena_graph.hpp"
@@ -157,3 +158,25 @@ float TrackSector::getRelativeDistanceToCenter() const
         ratio=-1.0f;
     return ratio;
 }   // getRelativeDistanceToCenter
+
+// ----------------------------------------------------------------------------
+void TrackSector::saveState(BareNetworkString* buffer) const
+{
+    buffer->addUInt32(m_current_graph_node);
+    buffer->addUInt32(m_last_valid_graph_node);
+    buffer->add(m_current_track_coords);
+    buffer->add(m_latest_valid_track_coords);
+    buffer->addUInt8(m_on_road ? 1 : 0);
+    buffer->addUInt32(m_last_triggered_checkline);
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void TrackSector::rewindTo(BareNetworkString* buffer)
+{
+    m_current_graph_node = buffer->getUInt32();
+    m_last_valid_graph_node = buffer->getUInt32();
+    m_current_track_coords = buffer->getVec3();
+    m_latest_valid_track_coords = buffer->getVec3();
+    m_on_road = buffer->getUInt8() == 1;
+    m_last_triggered_checkline = buffer->getUInt32();
+}   // rewindTo

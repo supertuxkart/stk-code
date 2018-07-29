@@ -187,6 +187,9 @@ private:
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;
 
+    /* Used by undo and redo the firing when rewind */
+    Vec3 m_owner_init_pos, m_init_pos;
+
     void         computeTarget();
     void         updateDistanceToTarget();
     unsigned int getSuccessorToHitTarget(unsigned int node_index,
@@ -199,6 +202,8 @@ private:
     float        getTunnelHeight(const Vec3 &next_xyz, 
                                      const float vertical_offset) const;
     bool         checkTunneling();
+    virtual void additionalPhysicsProperties() OVERRIDE;
+
 public:
                  RubberBall  (AbstractKart* kart);
     virtual     ~RubberBall();
@@ -214,6 +219,12 @@ public:
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */
     //virtual HitEffect *getHitEffect() const {return NULL; }
+    // ------------------------------------------------------------------------
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+    // ------------------------------------------------------------------------
 
 };   // RubberBall
 

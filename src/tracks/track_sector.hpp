@@ -21,6 +21,7 @@
 
 #include "utils/vec3.hpp"
 
+class BareNetworkString;
 class Track;
 
 /** This object keeps track of which sector an object is on. A sector is
@@ -83,6 +84,10 @@ public:
     void setLastTriggeredCheckline(int i) { m_last_triggered_checkline = i; }
     // ------------------------------------------------------------------------
     int getLastValidGraphNode() const { return m_last_valid_graph_node; }
+    // ------------------------------------------------------------------------
+    void saveState(BareNetworkString* buffer) const;
+    // ------------------------------------------------------------------------
+    void rewindTo(BareNetworkString* buffer);
 
 };   // TrackSector
 
