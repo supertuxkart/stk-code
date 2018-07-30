@@ -382,7 +382,7 @@ void GameProtocol::handleState(Event *event)
         return;
 
     assert(NetworkConfig::get()->isClient());
-    const NetworkString &data = event->data();
+    NetworkString &data = event->data();
     int ticks          = data.getUInt32();
 
     // Check for updated rewinder using
@@ -394,16 +394,11 @@ void GameProtocol::handleState(Event *event)
         data.decodeString(&name);
         rewinder_using.push_back(name);
     }
-    RewindManager::get()->setRewinderUsing(rewinder_using);
-
-    // Now copy the state data (without ticks etc) to a new
-    // string, so it can be reset to the beginning easily
-    // when restoring the state:
-    BareNetworkString *bns = new BareNetworkString(data.getCurrentData(),
-                                                   data.size());
 
     // The memory for bns will be handled in the RewindInfoState object
-    RewindManager::get()->addNetworkState(bns, ticks);
+    RewindInfoState* ris = new RewindInfoState(ticks, data.getCurrentOffset(),
+        rewinder_using, data.getBuffer());
+    RewindManager::get()->addRewindInfo(ris);
 }   // handleState
 
 // ----------------------------------------------------------------------------

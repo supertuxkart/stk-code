@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <functional>
+#include <string>
 #include <vector>
 
 /** Used to store rewind information for a given time for all rewind
@@ -93,14 +94,22 @@ class RewindInfoState: public RewindInfo
 private:
     std::vector<std::string> m_rewinder_using;
 
+    int m_start_offset;
+
     /** Pointer to the buffer which stores all states. */
     BareNetworkString *m_buffer;
-public:
-             RewindInfoState(int ticks,  BareNetworkString *buffer, 
-                             bool is_confirmed);
-    virtual ~RewindInfoState() { delete m_buffer; };
-    virtual void restore();
 
+public:
+    // ------------------------------------------------------------------------
+    RewindInfoState(int ticks, int start_offset,
+                    std::vector<std::string>& rewinder_using,
+                    std::vector<uint8_t>& buffer);
+    // ------------------------------------------------------------------------
+    RewindInfoState(int ticks, BareNetworkString *buffer, bool is_confirmed);
+    // ------------------------------------------------------------------------
+    virtual ~RewindInfoState()                             { delete m_buffer; }
+    // ------------------------------------------------------------------------
+    virtual void restore();
     // ------------------------------------------------------------------------
     /** Returns a pointer to the state buffer. */
     BareNetworkString *getBuffer() const { return m_buffer; }

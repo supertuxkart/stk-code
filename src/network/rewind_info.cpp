@@ -46,11 +46,25 @@ void RewindInfo::setTicks(int ticks)
 }   // setTicks
 
 // ============================================================================
-RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
-                                 bool is_confirmed)
-    : RewindInfo(ticks, is_confirmed)
+RewindInfoState::RewindInfoState(int ticks, int start_offset,
+                                 std::vector<std::string>& rewinder_using,
+                                 std::vector<uint8_t>& buffer)
+               : RewindInfo(ticks, true/*is_confirmed*/)
 {
-    m_rewinder_using = RewindManager::get()->getRewinderUsing();
+    std::swap(m_rewinder_using, rewinder_using);
+    m_start_offset = start_offset;
+    m_buffer = new BareNetworkString();
+    std::swap(m_buffer->getBuffer(), buffer);
+}   // RewindInfoState
+
+// ------------------------------------------------------------------------
+/** Constructor used only in unit testing (without list of rewinder using).
+ */
+RewindInfoState::RewindInfoState(int ticks, BareNetworkString* buffer,
+                                 bool is_confirmed)
+               : RewindInfo(ticks, is_confirmed)
+{
+    m_start_offset = 0;
     m_buffer = buffer;
 }   // RewindInfoState
 
@@ -62,6 +76,7 @@ RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
 void RewindInfoState::restore()
 {
     m_buffer->reset();
+    m_buffer->skip(m_start_offset);
     for (const std::string& name : m_rewinder_using)
     {
         const uint16_t data_size = m_buffer->getUInt16();

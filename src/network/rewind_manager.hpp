@@ -92,8 +92,6 @@ private:
      *  rewind data in case of local races only. */
     static bool           m_enable_rewind_manager;
 
-    std::vector<std::string> m_current_rewinder_using;
-
     std::map<int, std::vector<std::function<void()> > > m_local_state;
 
     /** A list of all objects that can be rewound. */
@@ -200,19 +198,12 @@ public:
         return m_rewind_queue.getLatestConfirmedState(); 
     }   // getLatestConfirmedState
     // ------------------------------------------------------------------------
-    /* Used by client to update rewinder using. */
-    void setRewinderUsing(std::vector<std::string>& ru)
-                                  { m_current_rewinder_using = std::move(ru); }
-    // ------------------------------------------------------------------------
-    /* Used by client to get a copied list of rewinder using to be used
-       in different thread safely. */
-    const std::vector<std::string>& getRewinderUsing() const
-                                           { return m_current_rewinder_using; }
-    // ------------------------------------------------------------------------
     bool useLocalEvent() const;
     // ------------------------------------------------------------------------
     void addRewindInfoEventFunction(RewindInfoEventFunction* rief)
                                             { m_pending_rief.push_back(rief); }
+    // ------------------------------------------------------------------------
+    void addRewindInfo(RewindInfo* ri) { m_rewind_queue.insertRewindInfo(ri); }
 
 };   // RewindManager
 
