@@ -2440,8 +2440,8 @@ void Kart::updatePhysics(int ticks)
                             /*fade_out_time*/stk_config->time2Ticks(5.0f));
         }
     }
-
-    m_bounce_back_ticks-=ticks;
+    if (m_bounce_back_ticks > std::numeric_limits<int16_t>::min())
+        m_bounce_back_ticks -= ticks;
 
     updateEnginePowerAndBrakes(ticks);
 

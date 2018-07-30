@@ -223,16 +223,20 @@ public:
     /** Sets an impulse that is applied for a certain amount of time.
      *  \param t Time for the impulse to be active.
      *  \param imp The impulse to apply.  */
-    void setTimedCentralImpulse(float t, const btVector3 &imp)
+    void setTimedCentralImpulse(float t, const btVector3 &imp,
+                                bool rewind = false)
     {
         // Only add impulse if no other impulse is active.
-        if(m_time_additional_impulse>0) return;
+        if (m_time_additional_impulse > 0 && !rewind) return;
         m_additional_impulse      = imp;
         m_time_additional_impulse = t;
     }   // setTimedImpulse
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
     float getCentralImpulseTime() const { return m_time_additional_impulse; }
+    // ------------------------------------------------------------------------
+    const btVector3& getAdditionalImpulse() const
+                                             { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).

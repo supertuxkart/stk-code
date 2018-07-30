@@ -125,6 +125,11 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->add(m_vehicle->getTimedRotation());
     buffer->addUInt8(m_vehicle->getCushioningDisableTime());
 
+    // For collision rewind
+    buffer->addUInt16(m_bounce_back_ticks);
+    buffer->addFloat(m_vehicle->getCentralImpulseTime());
+    buffer->add(m_vehicle->getAdditionalImpulse());
+
     // 2) Steering and other player controls
     // -------------------------------------
     getControls().saveState(buffer);
@@ -193,7 +198,14 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
     m_vehicle->setCushioningDisableTime(buffer->getUInt8());
-    
+
+    // Collision rewind
+    m_bounce_back_ticks = buffer->getUInt16();
+    float central_impulse_time = buffer->getFloat();
+    Vec3 additional_impulse = buffer->getVec3();
+    m_vehicle->setTimedCentralImpulse(central_impulse_time,
+        additional_impulse, true/*rewind*/);
+
     // For the raycast to determine the current material under the kart
     // the m_hardPointWS of the wheels is used. So after a rewind we
     // must restore the m_hardPointWS to the new values, otherwise they
@@ -251,7 +263,6 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     // Variable can be saved locally if its adjustment only depends on the kart
     // itself
     bool has_started = m_has_started;
-    int bounce_back_ticks = m_bounce_back_ticks;
     int brake_ticks = m_brake_ticks;
     int8_t min_nitro_ticks = m_min_nitro_ticks;
 
@@ -277,12 +288,11 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     // Skidding local state
     float remaining_jump_time = m_skidding->m_remaining_jump_time;
 
-    return [has_started, bounce_back_ticks, brake_ticks, min_nitro_ticks,
+    return [has_started, brake_ticks, min_nitro_ticks,
         initial_speed, steer_val_l, steer_val_r, current_fraction,
         max_speed_fraction, remaining_jump_time, this]()
     {
         m_has_started = has_started;
-        m_bounce_back_ticks = bounce_back_ticks;
         m_brake_ticks = brake_ticks;
         m_min_nitro_ticks = min_nitro_ticks;
         getAttachment()->setInitialSpeed(initial_speed);

@@ -157,7 +157,7 @@ protected:
 
     /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
-    int          m_bounce_back_ticks;
+    int16_t      m_bounce_back_ticks;
 
     /** Time a kart is invulnerable. */
     int16_t      m_invulnerable_ticks;
