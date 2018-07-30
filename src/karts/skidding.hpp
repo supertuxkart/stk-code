@@ -37,6 +37,7 @@ class ShowCurve;
 
 class Skidding
 {
+friend class KartRewinder;
 public:
     LEAK_CHECK();
 private:
@@ -56,7 +57,7 @@ private:
 
     /** Keeps track on how long a kart has been skidding, in order to
      *  trigger the skidding bonus. */
-    float m_skid_time;
+    uint16_t m_skid_time;
 
     /** True if the kart has skidded long enough to get a skid bonus if it
      *  stopped skidding now. */
@@ -99,7 +100,7 @@ private:
 
     unsigned int getSkidBonus(float *bonus_time, float *bonus_speed,
                               float *bonus_force) const;
-    float updateSteering(float steer, float dt);
+    float updateSteering(float steer, int ticks);
 public:
          Skidding(Kart *kart);
         ~Skidding();
