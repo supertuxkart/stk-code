@@ -398,7 +398,7 @@ void GameProtocol::handleState(Event *event)
     // The memory for bns will be handled in the RewindInfoState object
     RewindInfoState* ris = new RewindInfoState(ticks, data.getCurrentOffset(),
         rewinder_using, data.getBuffer());
-    RewindManager::get()->addRewindInfo(ris);
+    RewindManager::get()->addNetworkRewindInfo(ris);
 }   // handleState
 
 // ----------------------------------------------------------------------------

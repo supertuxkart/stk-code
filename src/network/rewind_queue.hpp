@@ -70,6 +70,12 @@ public:
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(BareNetworkString *buffer, int ticks);
+    void addNetworkRewindInfo(RewindInfo* ri)
+    {
+        m_network_events.lock();
+        m_network_events.getData().push_back(ri);
+        m_network_events.unlock();
+    }
     void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
                           int *rewind_ticks);
     void replayAllEvents(int ticks);

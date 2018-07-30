@@ -203,7 +203,8 @@ public:
     void addRewindInfoEventFunction(RewindInfoEventFunction* rief)
                                             { m_pending_rief.push_back(rief); }
     // ------------------------------------------------------------------------
-    void addRewindInfo(RewindInfo* ri) { m_rewind_queue.insertRewindInfo(ri); }
+    void addNetworkRewindInfo(RewindInfo* ri)
+                                   { m_rewind_queue.addNetworkRewindInfo(ri); }
 
 };   // RewindManager
 
