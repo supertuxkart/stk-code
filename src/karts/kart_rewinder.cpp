@@ -268,11 +268,18 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
         steer_val_r = pc->m_steer_val_r;
     }
 
+    // Max speed local state (terrain)
+    float current_fraction = m_max_speed->m_speed_decrease
+        [MaxSpeed::MS_DECREASE_TERRAIN].m_current_fraction;
+    float max_speed_fraction = m_max_speed->m_speed_decrease
+        [MaxSpeed::MS_DECREASE_TERRAIN].m_max_speed_fraction;
+
     // Skidding local state
     float remaining_jump_time = m_skidding->m_remaining_jump_time;
 
     return [has_started, bounce_back_ticks, brake_ticks, min_nitro_ticks,
-        initial_speed, steer_val_l, steer_val_r, remaining_jump_time, this]()
+        initial_speed, steer_val_l, steer_val_r, current_fraction,
+        max_speed_fraction, remaining_jump_time, this]()
     {
         m_has_started = has_started;
         m_bounce_back_ticks = bounce_back_ticks;
@@ -285,6 +292,10 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
             pc->m_steer_val_l = steer_val_l;
             pc->m_steer_val_r = steer_val_r;
         }
+        m_max_speed->m_speed_decrease[MaxSpeed::MS_DECREASE_TERRAIN]
+            .m_current_fraction = current_fraction;
+        m_max_speed->m_speed_decrease[MaxSpeed::MS_DECREASE_TERRAIN]
+            .m_max_speed_fraction = max_speed_fraction;
         m_skidding->m_remaining_jump_time = remaining_jump_time;
     };
 }   // getLocalStateRestoreFunction

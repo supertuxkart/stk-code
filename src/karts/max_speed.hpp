@@ -26,6 +26,7 @@ class BareNetworkString;
 
 class MaxSpeed
 {
+friend class KartRewinder;
 public:
     /** The categories to use for increasing the speed of a kart:
      *  Increase due to zipper, slipstream, nitro, rubber band,
