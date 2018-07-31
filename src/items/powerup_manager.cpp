@@ -264,7 +264,7 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
         std::vector<int> &l = m_weights_for_section.back();
         for (unsigned int i = 0; i < w_prev.size(); i++)
         {
-            float interpolated_weight = w_prev[i] * f + w_next[i] * (1 - f);
+            float interpolated_weight = w_prev[i] * (1-f) + w_next[i] * f;
             l.push_back(int(interpolated_weight + 0.5f));
         }
     }   // for l < prev->m_weights_for_section.size()
