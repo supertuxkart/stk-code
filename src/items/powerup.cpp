@@ -510,58 +510,63 @@ void Powerup::hitBonusBox(const ItemState &item_state)
         powerup_manager->setBallCollectTicks(0);
 
     World *world = World::getWorld();
-    // Check if two bouncing balls are collected less than getRubberBallTimer()
-    //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
-    for (int i = 0; i < 20; i++)
-    {
-        // Determine a 'random' number based on time, index of the item,
-        // and position of the kart. The idea is that this process is
-        // randomly enough to get the right distribution of the powerups,
-        // does not involve additional network communication to keep 
-        // client and server in sync, and is not exploitable:
-        // While it is not possible for a client to determine the item
-        // (the server will always finally determine which item a player
-        // receives), we need to make sure that people cannot modify the
-        // sources and display the item that will be collected next
-        // at a box - otherwise the player could chose the 'best' box.
-        // Using synchronised pseudo-random-generators would not prevent
-        // cheating, since the a cheater could determine the next random
-        // number that will be used. If we use the server to always
-        // send the information to the clients, we need to add a delay
-        // before items can be used.
-        // So instead we determine a random number that is based on:
-        // (1) The item id
-        // (2) The time
-        // (3) The position of the kart
-        // Using (1) means that not all boxes at a certain time for a kart
-        // will give the same box. Using (2) means that the item will
-        // change over time - even if the next item is displayed, it 
-        // will mean a cheater has to wait, and because of the frequency
-        // of the time component it will also be difficult to get the
-        // item at the right time. Using (3) adds another cheat-prevention
-        // layer: even if a cheater is waiting for the right sequence
-        // of items, if he is overtaken the sequence will change.
-        //
-        // In order to increase the probability of correct client prediction
-        // in networking (where there might be 1 or 2 frames difference
-        // between client and server when collecting an item), the time
-        // is divided by 10, meaning even if there is one frame difference,
-        // the client will still have a 90% chance to correctly predict the
-        // item. We multiply the item with a 'large' (more or less random)
-        // number to spread the random values across the (typically 200)
-        // weights used in the PowerupManager - same for the position.
-        int random_number = item_state.getItemId()*31 
-                          + world->getTicksSinceStart() / 10 + position*23;
-        new_powerup =
-            powerup_manager->getRandomPowerup(position, &n, random_number);
-        if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-            (world->getTicksSinceStart() - powerup_manager->getBallCollectTicks())
-            > RubberBall::getTicksBetweenRubberBalls())
-            break;
-    }
 
-    if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(world->getTicksSinceStart());
+
+    // Determine a 'random' number based on time, index of the item,
+    // and position of the kart. The idea is that this process is
+    // randomly enough to get the right distribution of the powerups,
+    // does not involve additional network communication to keep 
+    // client and server in sync, and is not exploitable:
+    // While it is not possible for a client to determine the item
+    // (the server will always finally determine which item a player
+    // receives), we need to make sure that people cannot modify the
+    // sources and display the item that will be collected next
+    // at a box - otherwise the player could chose the 'best' box.
+    // Using synchronised pseudo-random-generators would not prevent
+    // cheating, since the a cheater could determine the next random
+    // number that will be used. If we use the server to always
+    // send the information to the clients, we need to add a delay
+    // before items can be used.
+    // So instead we determine a random number that is based on:
+    // (1) The item id
+    // (2) The time
+    // (3) The position of the kart
+    // Using (1) means that not all boxes at a certain time for a kart
+    // will give the same box. Using (2) means that the item will
+    // change over time - even if the next item is displayed, it 
+    // will mean a cheater has to wait, and because of the frequency
+    // of the time component it will also be difficult to get the
+    // item at the right time. Using (3) adds another cheat-prevention
+    // layer: even if a cheater is waiting for the right sequence
+    // of items, if he is overtaken the sequence will change.
+    //
+    // In order to increase the probability of correct client prediction
+    // in networking (where there might be 1 or 2 frames difference
+    // between client and server when collecting an item), the time
+    // is divided by 10, meaning even if there is one frame difference,
+    // the client will still have a 90% chance to correctly predict the
+    // item. We multiply the item with a 'large' (more or less random)
+    // number to spread the random values across the (typically 200)
+    // weights used in the PowerupManager - same for the position.
+    unsigned long random_number = item_state.getItemId()*31 
+                                + world->getTicksSinceStart() / 10
+                                + position * 23;
+
+    // Use this random number as a seed of a PRNG (based on the one in 
+    // bullet's btSequentialImpulseConstraintSolver) to avoid getting
+    // consecutive numbers. Without this the same item could be 
+    // produced for a longer period of time, which would make this
+    // exploitable: someone could hack STK to display the item that
+    // can be collected for each box, and the pick the one with the
+    // 'best' item.
+    random_number = (1664525L * random_number + 1013904223L);
+    // Lower bits only have a short period, so mix in higher
+    // bits:
+    random_number ^= (random_number >> 16);
+    random_number ^= (random_number >> 8);
+
+    new_powerup = powerup_manager->getRandomPowerup(position, &n, 
+                                                    random_number);
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).
