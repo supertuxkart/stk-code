@@ -708,9 +708,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_log_packets
         PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
         &m_network_group, "If all network packets should be logged"));
-    PARAM_PREFIX BoolUserConfigParam m_random_ports
-        PARAM_DEFAULT(BoolUserConfigParam(true, "random-ports",
-        &m_network_group, "Use random ports for client and server connection"));
+    PARAM_PREFIX BoolUserConfigParam m_random_client_port
+        PARAM_DEFAULT(BoolUserConfigParam(true, "random-client-port",
+        &m_network_group, "Use random port for client connection "
+        "(check stk_config.xml for default value)"));
+    PARAM_PREFIX BoolUserConfigParam m_random_server_port
+        PARAM_DEFAULT(BoolUserConfigParam(false, "random-server-port",
+        &m_network_group, "Use random port for server connection "
+        "(check stk_config.xml for default value)"));
     PARAM_PREFIX BoolUserConfigParam m_lobby_chat
         PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "

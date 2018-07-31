@@ -60,16 +60,10 @@ NetworkConfig::NetworkConfig()
     m_server_name           = "";
     m_password              = "";
     m_server_discovery_port = stk_config->m_server_discovery_port;
-    if (UserConfigParams::m_random_ports)
-    {
-        m_client_port = 0;
-        m_server_port = 0;
-    }
-    else
-    {
-        m_client_port = stk_config->m_client_port;
-        m_server_port = stk_config->m_server_port;
-    }
+    m_client_port = UserConfigParams::m_random_client_port ?
+        0 : stk_config->m_client_port;
+    m_server_port = UserConfigParams::m_random_server_port ?
+        0 : stk_config->m_server_port;
     m_team_choosing = false;
 }   // NetworkConfig
 

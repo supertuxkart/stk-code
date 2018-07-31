@@ -538,10 +538,8 @@
   -->
   <texture-compression quality="64"/>
 
-  <!-- List of default ports used, by default STK use random ports
-       for client and server, disable it in user config to allow
-       port forward. The server discovery port has to be the same
-       across all clients and servers.
+  <!-- List of default ports used, by default STK use random ports for client.
+       The server discovery port has to be the same across all clients and servers.
   -->
   <network server-discovery-port="2757" client-port="2758" server-port="2759"/>
 
