@@ -124,7 +124,9 @@ float MainLoop::getLimitedDt()
         // with clients (server time is supposed to be behind client time).
         // So we play it safe by adding a loop to make sure at least 1ms
         // (minimum time that can be handled by the integer timer) delay here.
-        while (dt <= 0)
+        // Only exception is profile mode (typically running without graphics),
+        // which we want to run as fast as possible.
+        while (dt <= 0 && !ProfileWorld::isProfileMode())
         {
             StkTime::sleep(1);
             m_curr_time = device->getTimer()->getRealTime();

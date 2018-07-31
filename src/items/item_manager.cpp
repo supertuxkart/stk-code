@@ -26,6 +26,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "modes/easter_egg_hunt.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -312,7 +313,8 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     // Make sure this subroutine is not used otherwise (since networking
     // needs to be aware of items added to the track, so this would need
     // to be added).
-    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE);
+    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE ||
+           ProfileWorld::isProfileMode()                               );
     ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
