@@ -388,7 +388,7 @@ void PowerupManager::WeightsData::precomputeWeights()
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
  */
-int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
+int PowerupManager::WeightsData::getRandomItem(int rank, unsigned int random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
@@ -571,7 +571,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
  */
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n,
-                                                             int random_number)
+                                                             unsigned int random_number)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
     if(powerup > POWERUP_LAST)
