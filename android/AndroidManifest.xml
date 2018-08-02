@@ -3,7 +3,7 @@
           package="org.supertuxkart.stk_dbg"
           android:versionCode="1"
           android:versionName="git"
-          android:installLocation="auto">
+          android:installLocation="preferExternal">
 
     <!-- This .apk has no Java code itself, so set hasCode to false. -->
     <application android:label="@string/app_name"
