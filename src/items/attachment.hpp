@@ -21,9 +21,7 @@
 
 #include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
-#include "network/event_rewinder.hpp"
 #include "utils/no_copy.hpp"
-#include "utils/random_generator.hpp"
 
 #include <IAnimatedMeshSceneNode.h>
 using namespace irr;
@@ -46,8 +44,7 @@ class SFXBase;
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy, public scene::IAnimationEndCallBack,
-                  public EventRewinder
+class Attachment: public NoCopy, public scene::IAnimationEndCallBack
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -102,15 +99,12 @@ private:
      *  for certain attachments. */
     AttachmentPlugin *m_plugin;
 
-    /** Pseudo random number generator. */
-    RandomGenerator   m_random;
-
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
     /** Soung for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
-    
+
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();
@@ -123,7 +117,6 @@ public:
     void  set (AttachmentType type, int ticks,
                AbstractKart *previous_kart=NULL,
                bool disable_swatter_animation = false);
-    virtual void rewind(BareNetworkString *buffer);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
 

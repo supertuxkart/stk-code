@@ -2953,7 +2953,7 @@ void Kart::updateGraphics(float dt)
     {
         m_squash_time -= dt;
         // If squasing time ends, reset the model
-        if (m_squash_time <= 0.0f)
+        if (m_squash_time <= 0.0f || !isSquashed())
         {
             m_squash_time = std::numeric_limits<float>::max();
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
