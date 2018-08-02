@@ -66,6 +66,9 @@ RewindManager::RewindManager()
  */
 RewindManager::~RewindManager()
 {
+    for (RewindInfoEventFunction* rief : m_pending_rief)
+        delete rief;
+    m_pending_rief.clear();
 }   // ~RewindManager
 
 // ----------------------------------------------------------------------------
