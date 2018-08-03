@@ -30,7 +30,9 @@
 #include <enet/enet.h>
 
 #include <atomic>
+#include <deque>
 #include <memory>
+#include <numeric>
 #include <set>
 #include <vector>
 
@@ -45,6 +47,7 @@ enum PeerDisconnectInfo : unsigned int
     PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
     PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
     PDI_KICK = 2, //!< Kick disconnection
+    PDI_BAD_CONNECTION = 3, //!< Bad connection disconnection
 };   // PeerDisconnectInfo
 
 /*! \class STKPeer
@@ -75,6 +78,10 @@ protected:
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
     std::unique_ptr<Crypto> m_crypto;
+
+    std::deque<uint32_t> m_previous_pings;
+
+    uint32_t m_average_ping;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -152,12 +159,15 @@ public:
     void setPingInterval(uint32_t interval)
                             { enet_peer_ping_interval(m_enet_peer, interval); }
     // ------------------------------------------------------------------------
-    uint32_t getPing() const;
+    uint32_t getPing();
     // ------------------------------------------------------------------------
     Crypto* getCrypto() const                        { return m_crypto.get(); }
     // ------------------------------------------------------------------------
     void setCrypto(std::unique_ptr<Crypto>&& c);
-
+    // ------------------------------------------------------------------------
+    uint32_t getAveragePing() const                  { return m_average_ping; }
+    // ------------------------------------------------------------------------
+    ENetPeer* getENetPeer() const                       { return m_enet_peer; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

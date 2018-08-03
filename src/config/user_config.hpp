@@ -727,7 +727,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
         &m_network_group, "Timeout in seconds for validation of clients."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(8, "server_max_players",
+        PARAM_DEFAULT(IntUserConfigParam(8, "server-max-players",
         &m_network_group, "Maximum number of players on the server."));
     PARAM_PREFIX BoolUserConfigParam m_firewalled_server
         PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
@@ -750,6 +750,15 @@ namespace UserConfigParams
             "from this IP will be banned.",
             { { "0.0.0.0", 0u } }
         ));
+    PARAM_PREFIX IntUserConfigParam m_max_ping
+        PARAM_DEFAULT(IntUserConfigParam(300, "max-ping",
+        &m_network_group, "Maximum ping allowed for a player (in ms)."));
+    PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
+        &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
+    PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
+        PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
+        &m_network_group, "Kick players whose ping is above max-ping."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

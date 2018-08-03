@@ -199,7 +199,8 @@ void ServerLobby::setup()
     // the server are ready:
     resetPeersReady();
     m_peers_votes.clear();
-    m_server_delay = 0.0;
+    m_server_delay = std::numeric_limits<double>::max();
+    m_server_max_ping = std::numeric_limits<double>::max();
     m_timeout.store(std::numeric_limits<float>::max());
     m_waiting_for_reset = false;
 
@@ -428,12 +429,34 @@ void ServerLobby::asynchronousUpdate()
         // Reset for next state usage
         resetPeersReady();
         signalRaceStartToClients();
+        m_server_max_ping = StkTime::getRealTime() +
+            ((double)UserConfigParams::m_max_ping / 1000.0);
         break;
     }
     case WAIT_FOR_RACE_STARTED:
-        // The function startedRaceOnClient() will trigger the
-        // next state.
+    {
+        const bool ping_timed_out =
+            m_server_max_ping < StkTime::getRealTime();
+        if (checkPeersReady() || ping_timed_out)
+        {
+            for (auto p : m_peers_ready)
+            {
+                auto cur_peer = p.first.lock();
+                if (!cur_peer)
+                    continue;
+                if (ping_timed_out && p.second.second > m_server_max_ping)
+                    sendBadConnectionMessageToPeer(cur_peer);
+            }
+            m_state = DELAY_SERVER;
+            const double jt =
+                (double)UserConfigParams::m_jitter_tolerance / 1000.0;
+            m_server_delay = StkTime::getRealTime() + jt;
+            Log::verbose("ServerLobby",
+                "Started delay at %lf to %lf with jitter tolerance %lf.",
+                StkTime::getRealTime(), m_server_delay, jt);
+        }
         break;
+    }
     case DELAY_SERVER:
         if (m_server_delay < StkTime::getRealTime())
         {
@@ -500,6 +523,19 @@ void ServerLobby::asynchronousUpdate()
     }
 
 }   // asynchronousUpdate
+
+//-----------------------------------------------------------------------------
+void ServerLobby::sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p)
+{
+    const unsigned max_ping = UserConfigParams::m_max_ping;
+    Log::warn("ServerLobby", "Peer %s cannot catch up with max ping %d, it"
+        " started at %lf.", p->getAddress().toString().c_str(), max_ping,
+        StkTime::getRealTime());
+    NetworkString* msg = getNetworkString();
+    msg->addUInt8(LE_BAD_CONNECTION);
+    p->sendPacket(msg, /*reliable*/true);
+    delete msg;
+}   // sendBadConnectionMessageToPeer
 
 //-----------------------------------------------------------------------------
 /** Simple finite state machine.  Once this
@@ -1783,53 +1819,22 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 /** Called when a notification from a client is received that the client has
  *  started the race. Once all clients have informed the server that they 
  *  have started the race, the server can start. This makes sure that the
- *  server's local time is behind all clients by (at least) their latency,
+ *  server's local time is behind all clients by at most max ping,
  *  which in turn means that when the server simulates local time T all
  *  messages from clients at their local time T should have arrived at
  *  the server, which creates smoother play experience.
  */
 void ServerLobby::startedRaceOnClient(Event *event)
 {
+    if (m_state.load() != WAIT_FOR_RACE_STARTED)
+    {
+        sendBadConnectionMessageToPeer(event->getPeerSP());
+        return;
+    }
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
-    Log::info("ServerLobby", "Peer %d has started race at %lf",
-        peer->getHostId(), StkTime::getRealTime());
-
-    if (checkPeersReady())
-    {
-        std::vector<std::pair<STKPeer*, double> > mapping;
-        for (auto p : m_peers_ready)
-        {
-            auto peer = p.first.lock();
-            if (!peer)
-                continue;
-            mapping.emplace_back(peer.get(), p.second.second);
-        }
-        std::sort(mapping.begin(), mapping.end(),
-            [](const std::pair<STKPeer*, double>& a,
-            const std::pair<STKPeer*, double>& b)->bool
-            {
-                return a.second > b.second;
-            });
-        for (unsigned i = 0; i < mapping.size(); i++)
-        {
-            // Server delay is 0.1, so it's around 12 ticks
-            // (0.1 * 120 (physics fps)) for the highest ping client
-            if (i == 0)
-                GameProtocol::lock()->addInitialTicks(mapping[0].first, 12);
-            else
-            {
-                const double diff = mapping[0].second - mapping[i].second;
-                assert(diff >= 0.0);
-                GameProtocol::lock()->addInitialTicks(mapping[i].first,
-                    12 + stk_config->time2Ticks((float)diff));
-            }
-        }
-        m_state = DELAY_SERVER;
-        m_server_delay = StkTime::getRealTime() + 0.1;
-        Log::verbose("ServerLobby", "Started delay at %lf set delay to %lf",
-            StkTime::getRealTime(), m_server_delay);
-    }
+    Log::info("ServerLobby", "Peer %s has started race at %lf",
+        peer->getAddress().toString().c_str(), StkTime::getRealTime());
 }   // startedRaceOnClient
 
 //-----------------------------------------------------------------------------

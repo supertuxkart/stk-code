@@ -46,6 +46,7 @@ private:
     void handleChat(Event* event);
     void handleServerInfo(Event* event);
     void handleBadTeam();
+    void handleBadConnection();
     void becomingServerOwner();
 
     void clearPlayers();

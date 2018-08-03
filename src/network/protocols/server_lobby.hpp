@@ -90,11 +90,11 @@ private:
     std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
 
-    /** Keeps track of an artificial server delay (which makes sure that the
-     *  data from all clients has arrived when the server computes a certain
-     *  timestep.(. It stores the real time since epoch + delta (atm 0.1
-     *  seconds), which is the real time at which the server should start. */
+    /** Keeps track of an artificial server delay, which is used to compensate
+     *  for network jitter. */
     double m_server_delay;
+
+    double m_server_max_ping;
 
     bool m_has_created_server_id_file;
 
@@ -218,6 +218,7 @@ private:
     double getModeSpread();
     double scalingValueForTime(double time);
     void checkRaceFinished();
+    void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
 
 public:
              ServerLobby();

@@ -61,7 +61,8 @@ public:
         LE_SERVER_OWNERSHIP,
         LE_KICK_HOST,
         LE_CHANGE_TEAM,
-        LE_BAD_TEAM
+        LE_BAD_TEAM,
+        LE_BAD_CONNECTION
     };
 
     enum RejectReason : uint8_t

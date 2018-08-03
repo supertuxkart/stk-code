@@ -167,6 +167,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_VOTE: displayPlayerVote(event);                      break;
             case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
             case LE_BAD_TEAM: handleBadTeam();                           break;
+            case LE_BAD_CONNECTION: handleBadConnection();               break;
             default:                                                     break;
         }   // switch
 
@@ -194,6 +195,10 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case PDI_KICK:
                 STKHost::get()->setErrorMessage(
                     _("You were kicked from the server."));
+                break;
+            case PDI_BAD_CONNECTION:
+                STKHost::get()->setErrorMessage(
+                    _("Bad network connection is detected."));
                 break;
         }   // switch
         STKHost::get()->requestShutdown();
@@ -623,6 +628,14 @@ void ClientLobby::handleBadTeam()
     core::stringw msg = _("All players joined red or blue team.");
     MessageQueue::add(MessageQueue::MT_ERROR, msg);
 }   // handleBadTeam
+
+//-----------------------------------------------------------------------------
+void ClientLobby::handleBadConnection()
+{
+    SFXManager::get()->quickSound("anvil");
+    core::stringw msg = _("Bad network connection is detected.");
+    MessageQueue::add(MessageQueue::MT_ERROR, msg);
+}   // handleBadConnection
 
 //-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
