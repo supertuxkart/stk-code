@@ -20,10 +20,12 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "audio/sfx_manager.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "online/link_helper.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -107,6 +109,15 @@ void RegisterScreen::init()
     makeEntryFieldsVisible();
 
     local_username->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    // The behaviour of the screen is slightly different at startup, i.e.
+    // when it is the first screen: cancel will exit the game, and in
+    // this case no 'back' error should be shown.
+    bool has_player_profile = (PlayerManager::get()->getNumPlayers() > 0);
+    getWidget<IconButtonWidget>("back")->setVisible(has_player_profile);
+    getWidget<IconButtonWidget>("cancel")->setLabel(has_player_profile
+        ? _("Cancel")
+        : _("Exit game"));
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -183,6 +194,8 @@ void RegisterScreen::makeEntryFieldsVisible()
         getWidget<TextBoxWidget>("email_confirm")->setVisible(new_account);
         getWidget<LabelWidget  >("label_email_confirm")->setVisible(new_account);
     }
+
+    getWidget<ButtonWidget >("password_reset")->setVisible(LinkHelper::isSupported() && (online && !new_account));
 }   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
@@ -236,6 +249,13 @@ void RegisterScreen::doRegister()
 {
     stringw local_name = getWidget<TextBoxWidget>("local_username")
                        ->getText().trim();
+                       
+    if (local_name.empty())
+    {
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("User name cannot be empty."), false);
+        return;
+    }
 
     handleLocalName(local_name);
 
@@ -427,6 +447,11 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
             StateManager::get()->popMenu();
             onEscapePressed();
         }
+    }
+    else if (name == "password_reset")
+    {
+        // Open password reset page
+        Online::LinkHelper::openURL(stk_config->m_password_reset_url);
     }
     else if (name == "back")
     {

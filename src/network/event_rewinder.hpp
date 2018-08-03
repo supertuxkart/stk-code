@@ -21,6 +21,10 @@
 
 class BareNetworkString;
 
+/** A simple class that defines an interface to event rewinding: an undo()
+ *  function when going back in time, and a replay() function when going
+ *  forward, replaying the event.
+ */
 class EventRewinder
 {
 public:

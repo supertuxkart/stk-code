@@ -77,12 +77,12 @@ check_error()
 
 # Handle clean command
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
-    rm -rf bin
-    rm -rf build
-    rm -rf libs
-    rm -rf obj
-    rm -rf res
-    rm -rf .gradle
+    rm -rf "$DIRNAME/bin"
+    rm -rf "$DIRNAME/build"
+    rm -rf "$DIRNAME/libs"
+    rm -rf "$DIRNAME/obj"
+    rm -rf "$DIRNAME/res"
+    rm -rf "$DIRNAME/.gradle"
     exit
 fi
 
@@ -237,7 +237,7 @@ if [ -f "$DIRNAME/obj/project_version" ]; then
     PROJECT_VERSION_PREV=$(cat "$DIRNAME/obj/project_version") 
     
     if [ -z "$PROJECT_VERSION" ]; then
-        PROJECT_VERSION="$PROJECT_VERSION_PREV"
+        export PROJECT_VERSION="$PROJECT_VERSION_PREV"
     elif [ "$PROJECT_VERSION" != "$PROJECT_VERSION_PREV" ]; then
         echo "Different project version has been set. Forcing recompilation..."
         touch -c "$DIRNAME/Android.mk"
@@ -246,7 +246,7 @@ fi
 
 if [ -z "$PROJECT_VERSION" ]; then
     if [ $IS_DEBUG_BUILD -ne 0 ]; then
-        PROJECT_VERSION="git"
+        export PROJECT_VERSION="git"
     else
         echo "Error: Variable PROJECT_VERSION is not set. It must have unique" \
              "value for release build."
@@ -271,9 +271,6 @@ if [ -d "$DIRNAME/assets/data" ]; then
     fi
 fi
 
-echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
-
-
 # Standalone toolchain
 if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     echo "Creating standalone toolchain"
@@ -286,6 +283,8 @@ if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     touch "$DIRNAME/obj/make_standalone_toolchain.stamp"
     echo $COMPILE_ARCH > "$DIRNAME/obj/compile_arch"
 fi
+
+echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
 # Freetype
 if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then

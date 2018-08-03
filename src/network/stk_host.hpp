@@ -25,6 +25,7 @@
 #include "network/network.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
+#include "utils/synchronised.hpp"
 
 #include "irrString.h"
 
@@ -132,6 +133,10 @@ private:
     /** The private port enet socket is bound. */
     uint16_t m_private_port;
 
+    Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
+
+    std::atomic<uint32_t> m_client_ping;
+
     // ------------------------------------------------------------------------
     STKHost(bool server);
     // ------------------------------------------------------------------------
@@ -143,8 +148,6 @@ private:
                                    std::shared_ptr<ServerLobby> sl);
     // ------------------------------------------------------------------------
     void mainLoop();
-    // ------------------------------------------------------------------------
-    bool isConnectionRequestPacket(unsigned char* data, int length);
 
 public:
     /** If a network console should be started. */
@@ -303,7 +306,12 @@ public:
     bool isClientServer() const          { return m_separate_process != NULL; }
     // ------------------------------------------------------------------------
     void replaceNetwork(ENetEvent& event, Network* network);
-
+    // ------------------------------------------------------------------------
+    std::map<uint32_t, uint32_t> getPeerPings()
+                                           { return m_peer_pings.getAtomic(); }
+    // ------------------------------------------------------------------------
+    uint32_t getClientPingToServer() const
+                      { return m_client_ping.load(std::memory_order_relaxed); }
 };   // class STKHost
 
 #endif // STK_HOST_HPP

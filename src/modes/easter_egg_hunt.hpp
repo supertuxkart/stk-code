@@ -21,6 +21,7 @@
 
 #include "modes/linear_world.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <string>
 #include <vector>
@@ -61,13 +62,15 @@ public:
     virtual void terminateRace() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
     virtual void getKartsDisplayInfo(
-                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
+    virtual void collectedItem(const AbstractKart *kart,
+                               const Item *item           ) OVERRIDE;
+    void collectedEasterEggGhost(int world_id);
 
     const int  numberOfEggsFound() { return m_eggs_found; }
+    const int  numberOfEggsToFind() { return m_number_of_eggs; }
 
     void updateKartRanks();
-    void collectedEasterEgg(const AbstractKart *kart);
-    void collectedEasterEggGhost(int world_id);
     void readData(const std::string &filename);
 
     virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;

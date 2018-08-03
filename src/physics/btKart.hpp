@@ -93,6 +93,9 @@ private:
     /** Number of wheels that touch the ground. */
     int                 m_num_wheels_on_ground;
 
+    /** Number of time steps during which cushioning is disabled. */
+    unsigned int        m_cushioning_disable_time;
+
     /** Index of the right axis. */
     int                 m_indexRightAxis;
     /** Index of the up axis. */
@@ -104,11 +107,6 @@ private:
      *  get access to the kart properties, which also define physics
      *  properties. */
     Kart               *m_kart;
-
-    /** A visual rotation applied to the kart (for skidding).
-     *  The physics use this to provide proper wheel contact points
-     *  for skid marks. */
-    float m_visual_rotation;
 
     /** Minimum speed for the kart. Used e.g. for zippers. Setting this value
      *  will potentially instantaneously accelerate the kart to the minimum
@@ -122,13 +120,14 @@ private:
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;
 
-    /** Contact point of the visual wheel position. */
-    btAlignedObjectArray<btVector3> m_visual_contact_point;
-
     btAlignedObjectArray<btWheelInfo> m_wheelInfo;
 
     void     defaultInit();
     btScalar rayCast(btWheelInfo& wheel, const btVector3& ray);
+    void     updateWheelTransformsWS(btWheelInfo& wheel,
+                                     btTransform chassis_trans,
+                                     bool interpolatedTransform=true,
+                                     float fraction = 1.0f);
 
 public:
 
@@ -163,33 +162,22 @@ public:
                                 bool isFrontWheel);
     const btWheelInfo& getWheelInfo(int index) const;
     btWheelInfo&       getWheelInfo(int index);
-    void               updateWheelTransformsWS(btWheelInfo& wheel,
-                                               bool interpolatedTransform=true,
-                                               float fraction = 1.0f);
+    void               updateAllWheelTransformsWS();
     void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
-public:
     void               setSliding(bool active);
     void               instantSpeedIncreaseTo(btScalar speed);
     void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
-    // ------------------------------------------------------------------------
+    void               getVisualContactPoint(const btTransform& chassis_trans,
+                                             btVector3 *left, btVector3 *right);
+        // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
     bool visualWheelsTouchGround() const
     {
         return m_visual_wheels_touch_ground;
     }   // visualWheelsTouchGround
-    // ------------------------------------------------------------------------
-    /** Returns the contact point of a visual wheel.
-     *  \param n Index of the wheel, must be 2 or 3 since only the two rear
-     *           wheels define the visual position
-     */
-    const btVector3&   getVisualContactPoint(int n) const
-    {
-        assert(n>=2 && n<=3);
-        return m_visual_contact_point[n];
-    }   // getVisualContactPoint
     // ------------------------------------------------------------------------
     /** btActionInterface interface. */
     virtual void updateAction(btCollisionWorld* collisionWorld,
@@ -235,10 +223,11 @@ public:
     /** Sets an impulse that is applied for a certain amount of time.
      *  \param t Time for the impulse to be active.
      *  \param imp The impulse to apply.  */
-    void setTimedCentralImpulse(float t, const btVector3 &imp)
+    void setTimedCentralImpulse(float t, const btVector3 &imp,
+                                bool rewind = false)
     {
         // Only add impulse if no other impulse is active.
-        if(m_time_additional_impulse>0) return;
+        if (m_time_additional_impulse > 0 && !rewind) return;
         m_additional_impulse      = imp;
         m_time_additional_impulse = t;
     }   // setTimedImpulse
@@ -246,13 +235,8 @@ public:
     /** Returns the time an additional impulse is activated. */
     float getCentralImpulseTime() const { return m_time_additional_impulse; }
     // ------------------------------------------------------------------------
-    /** Sets a visual rotation to be applied, which the physics use to provide
-     *  the location where the graphical wheels touch the ground (for
-     *  skidmarks). */
-    void setVisualRotation(float angle)
-    {
-        m_visual_rotation = angle;
-    }   // setVisualRotation
+    const btVector3& getAdditionalImpulse() const
+                                             { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).
@@ -267,6 +251,19 @@ public:
     const btVector3& getTimedRotation() const { return m_additional_rotation;  }
     // ------------------------------------------------------------------------
     float getTimedRotationTime() const { return m_time_additional_rotation;  }
+    // ------------------------------------------------------------------------
+    /** Returns the time cushioning is disabled. Used for networking state
+     *  saving. */
+    unsigned int getCushioningDisableTime() const
+    {
+        return m_cushioning_disable_time;
+    }  // getCushioningDisableTime
+    // ------------------------------------------------------------------------
+    /** Sets the cushioning disable time. Used for networking state saving. */
+    void setCushioningDisableTime(unsigned int cdt)
+    {
+        m_cushioning_disable_time = cdt;
+    }   // setCushioningDisableTime
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 

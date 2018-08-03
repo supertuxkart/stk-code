@@ -69,9 +69,10 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
 
             if (selection == "random_track")
             {
+#ifdef DEBUG
                 RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
                 assert( tabs != NULL );
-
+#endif
                 if (m_random_track_list.empty()) return;
 
                 std::string track = m_random_track_list.front();

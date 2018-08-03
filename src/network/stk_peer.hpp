@@ -30,10 +30,13 @@
 #include <enet/enet.h>
 
 #include <atomic>
+#include <deque>
 #include <memory>
+#include <numeric>
 #include <set>
 #include <vector>
 
+class Crypto;
 class NetworkPlayerProfile;
 class NetworkString;
 class STKHost;
@@ -44,6 +47,7 @@ enum PeerDisconnectInfo : unsigned int
     PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
     PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
     PDI_KICK = 2, //!< Kick disconnection
+    PDI_BAD_CONNECTION = 3, //!< Bad connection disconnection
 };   // PeerDisconnectInfo
 
 /*! \class STKPeer
@@ -56,14 +60,11 @@ protected:
     /** Pointer to the corresponding ENet peer data structure. */
     ENetPeer* m_enet_peer;
 
-    /** The token of this client. */
-    std::atomic<uint32_t> m_client_server_token;
-
-    /** True if the token for this peer has been set. */
-    std::atomic_bool m_token_set;
+    /** True if this peer is validated by server. */
+    std::atomic_bool m_validated;
 
     /** Host id of this peer. */
-    int m_host_id;
+    uint32_t m_host_id;
 
     TransportAddress m_peer_address;
 
@@ -76,11 +77,19 @@ protected:
     /** Available karts and tracks from this peer */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
+    std::unique_ptr<Crypto> m_crypto;
+
+    std::deque<uint32_t> m_previous_pings;
+
+    uint32_t m_average_ping;
+
 public:
-             STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
-             ~STKPeer() {}
+    STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
     // ------------------------------------------------------------------------
-    void sendPacket(NetworkString *data, bool reliable = true);
+    ~STKPeer();
+    // ------------------------------------------------------------------------
+    void sendPacket(NetworkString *data, bool reliable = true,
+                    bool encrypted = true);
     // ------------------------------------------------------------------------
     void disconnect();
     // ------------------------------------------------------------------------
@@ -103,27 +112,10 @@ public:
     void addPlayer(std::shared_ptr<NetworkPlayerProfile> p)
                                                     { m_players.push_back(p); }
     // ------------------------------------------------------------------------
-    /** Sets the token for this client. */
-    void setClientServerToken(const uint32_t token)
-    {
-        m_client_server_token.store(token);
-        m_token_set.store(true);
-    }   // setClientServerToken
+    void setValidated()                            { m_validated.store(true); }
     // ------------------------------------------------------------------------
-    /** Unsets the token for this client. (used in server to invalidate peer)
-     */
-    void unsetClientServerToken()
-    {
-        m_client_server_token.store(0);
-        m_token_set.store(false);
-    }
-    // ------------------------------------------------------------------------
-    /** Returns the token of this client. */
-    uint32_t getClientServerToken() const
-                                       { return m_client_server_token.load(); }
-    // ------------------------------------------------------------------------
-    /** Returns if the token for this client is known. */
-    bool isClientServerTokenSet() const          { return m_token_set.load(); }
+    /** Returns if the client is validated by server. */
+    bool isValidated() const                     { return m_validated.load(); }
     // ------------------------------------------------------------------------
     /** Returns the host id of this peer. */
     uint32_t getHostId() const                            { return m_host_id; }
@@ -164,8 +156,18 @@ public:
         }
     }
     // ------------------------------------------------------------------------
-    uint32_t getPing() const;
-
+    void setPingInterval(uint32_t interval)
+                            { enet_peer_ping_interval(m_enet_peer, interval); }
+    // ------------------------------------------------------------------------
+    uint32_t getPing();
+    // ------------------------------------------------------------------------
+    Crypto* getCrypto() const                        { return m_crypto.get(); }
+    // ------------------------------------------------------------------------
+    void setCrypto(std::unique_ptr<Crypto>&& c);
+    // ------------------------------------------------------------------------
+    uint32_t getAveragePing() const                  { return m_average_ping; }
+    // ------------------------------------------------------------------------
+    ENetPeer* getENetPeer() const                       { return m_enet_peer; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

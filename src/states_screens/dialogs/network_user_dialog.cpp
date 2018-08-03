@@ -43,9 +43,23 @@ void NetworkUserDialog::beforeAddingWidgets()
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_name, false);
 
+    m_info_widget = getWidget<LabelWidget>("info");
+    assert(m_info_widget != NULL);
+    if (m_online_id != 0)
+    {
+        updatePlayerRanking(m_name, m_online_id, m_info_widget,
+            m_fetched_ranking);
+    }
+    else
+    {
+        m_info_widget->setVisible(false);
+    }
+
     m_friend_widget = getWidget<IconButtonWidget>("friend");
     assert(m_friend_widget != NULL);
-    m_friend_widget->setVisible(m_online_id != 0);
+    m_friend_widget->setVisible(m_online_id != 0 &&
+        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN
+        && m_online_id != PlayerManager::getCurrentPlayer()->getOnlineId());
 
     // Hide friend request button if already friend
     Online::OnlineProfile* opp =
@@ -66,7 +80,8 @@ void NetworkUserDialog::beforeAddingWidgets()
 
     //I18N: In the network user dialog
     m_kick_widget->setText(_("Kick"));
-    m_kick_widget->setVisible(STKHost::get()->isAuthorisedToControl());
+    m_kick_widget->setVisible(STKHost::get()->isAuthorisedToControl()
+        && m_host_id != STKHost::get()->getMyHostId());
 
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
@@ -76,11 +91,42 @@ void NetworkUserDialog::beforeAddingWidgets()
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
 
-    getWidget<IconButtonWidget>("accept")->setVisible(false);
+    m_change_team_widget = NULL;
+    if (m_allow_change_team && m_host_id == STKHost::get()->getMyHostId())
+    {
+        m_change_team_widget = getWidget<IconButtonWidget>("accept");
+        m_change_team_widget->setVisible(true);
+        //I18N: In the network user dialog
+        m_change_team_widget->setText(_("Change team"));
+        m_change_team_widget->setImage(file_manager->getAsset(FileManager::GUI,
+            "race_giveup.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    else
+        getWidget<IconButtonWidget>("accept")->setVisible(false);
     getWidget<IconButtonWidget>("remove")->setVisible(false);
     getWidget<IconButtonWidget>("enter")->setVisible(false);
-    getWidget<LabelWidget>("info")->setVisible(false);
 }   // beforeAddingWidgets
+
+// -----------------------------------------------------------------------------
+void NetworkUserDialog::onUpdate(float dt)
+{
+    if (*m_fetched_ranking == false)
+    {
+        // I18N: In the network player dialog, showing when waiting for
+        // the result of the ranking info of a player
+        core::stringw fetching =
+            StringUtils::loadingDots(_("Fetching ranking info for %s.",
+            m_name));
+        m_info_widget->setText(fetching, false);
+    }
+
+    // It's unsafe to delete from inside the event handler so we do it here
+    if (m_self_destroy)
+    {
+        ModalDialog::dismiss();
+        return;
+    }
+}   // onUpdate
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation
@@ -109,6 +155,15 @@ GUIEngine::EventPropagation
             NetworkString kick(PROTOCOL_LOBBY_ROOM);
             kick.addUInt8(LobbyProtocol::LE_KICK_HOST).addUInt32(m_host_id);
             STKHost::get()->sendToServer(&kick, true/*reliable*/);
+            m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == m_change_team_widget->m_properties[PROP_ID])
+        {
+            NetworkString change_team(PROTOCOL_LOBBY_ROOM);
+            change_team.addUInt8(LobbyProtocol::LE_CHANGE_TEAM)
+                .addUInt8(m_local_id);
+            STKHost::get()->sendToServer(&change_team, true/*reliable*/);
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }

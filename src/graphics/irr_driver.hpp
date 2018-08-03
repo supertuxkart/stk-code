@@ -197,6 +197,7 @@ public:
     void initDevice();
     void reset();
     void setMaxTextureSize();
+    void unsetMaxTextureSize();
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 

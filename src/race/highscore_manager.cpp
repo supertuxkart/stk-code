@@ -150,15 +150,15 @@ void HighscoreManager::saveHighscores()
 
     try
     {
-        UTFWriter highscore_file(m_filename.c_str());
-        highscore_file << L"<?xml version=\"1.0\"?>\n";
-        highscore_file << L"<highscores version=\"" << CURRENT_HSCORE_FILE_VERSION << "\">\n";
+        UTFWriter highscore_file(m_filename.c_str(), false);
+        highscore_file << "<?xml version=\"1.0\"?>\n";
+        highscore_file << "<highscores version=\"" << CURRENT_HSCORE_FILE_VERSION << "\">\n";
 
         for(unsigned int i=0; i<m_all_scores.size(); i++)
         {
             m_all_scores[i]->writeEntry(highscore_file);
         }
-        highscore_file << L"</highscores>\n";
+        highscore_file << "</highscores>\n";
         highscore_file.close();
     }
     catch(std::exception &e)

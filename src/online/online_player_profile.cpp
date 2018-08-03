@@ -345,6 +345,14 @@ namespace Online
     }   // requestPoll()
 
     // ------------------------------------------------------------------------
+    OnlinePlayerProfile::PollRequest::PollRequest()
+                       : XMLRequest(true)
+    {
+        m_disable_sending_log = NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isServer();
+    }   // PollRequest
+
+    // ------------------------------------------------------------------------
     /** Callback for the poll request. Parses the information and spawns
      *  notifications accordingly.
      */

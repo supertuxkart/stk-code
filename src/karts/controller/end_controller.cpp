@@ -104,7 +104,6 @@ EndController::EndController(AbstractKart *kart,
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
 
     // Set the name of the previous controller as this controller name, otherwise
     // we get the incorrect name when printing statistics in profile mode.
@@ -163,12 +162,14 @@ void  EndController::newLap(int lap)
 //-----------------------------------------------------------------------------
 /** The end controller must forward 'fire' presses to the race gui.
  */
-void EndController::action(PlayerAction action, int value)
+bool EndController::action(PlayerAction action, int value, bool dry_run)
 {
-    if(action!=PA_FIRE) return;
-    RaceResultGUI *race_result_gui = dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
-    if(!race_result_gui) return;
+    if(action!=PA_FIRE) return true;
+    RaceResultGUI *race_result_gui =
+        dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
+    if(!race_result_gui) return true;
     race_result_gui->nextPhase();
+    return true;
 }   // action
 
 //-----------------------------------------------------------------------------
@@ -193,6 +194,9 @@ void EndController::update(int ticks)
         m_controls->setBrake(m_kart->getSpeed()>0);
         return;
     }
+    // Keep update slow down in case for network rewind overwrite it
+    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
+
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
     calcSteps();

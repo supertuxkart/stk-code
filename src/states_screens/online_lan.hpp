@@ -42,7 +42,7 @@ public:
     friend class GUIEngine::ScreenSingleton<OnlineLanScreen>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() {}
+    virtual void loadedFromFile() OVERRIDE {}
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;

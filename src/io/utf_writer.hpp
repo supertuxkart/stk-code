@@ -34,9 +34,12 @@
 class UTFWriter
 {
     std::ofstream m_base;
+
+    /** If true, use utf-16/32 (obsolete) */
+    bool m_wide;
 public:
 
-    UTFWriter(const char* dest);
+    UTFWriter(const char* dest, bool wide);
     void close();
 
     UTFWriter& operator<< (const irr::core::stringw& txt);
@@ -44,12 +47,24 @@ public:
     // ------------------------------------------------------------------------
     UTFWriter& operator<< (const char *txt)
     {
-        return operator<<(irr::core::stringw(txt));
+        if (m_wide)
+        {
+            return operator<<(irr::core::stringw(txt));
+        }
+        else
+        {
+            m_base.write((char *)txt, strlen(txt));
+            return *this;
+        }
+            
     }   // operator<<(char*)
     // ------------------------------------------------------------------------
     UTFWriter& operator<< (const std::string &txt)
     {
-        return operator<< (irr::core::stringw(txt.c_str()));
+        if (m_wide)
+            return operator<<(irr::core::stringw(txt.c_str()));
+        else
+            return operator<<(txt.c_str());
     }   // operator<<(std::string)
     // ------------------------------------------------------------------------
     UTFWriter& operator<< (const bool &b)

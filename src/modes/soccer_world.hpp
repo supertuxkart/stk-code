@@ -30,6 +30,7 @@
 
 class AbstractKart;
 class Controller;
+class NetworkString;
 class TrackObject;
 class TrackSector;
 
@@ -50,10 +51,10 @@ public:
     };   // ScorerData
 
 protected:
-    virtual AbstractKart *createKart(const std::string &kart_ident, int index,
-                             int local_player_id, int global_player_id,
-                             RaceManager::KartType type,
-                             PerPlayerDifficulty difficulty) OVERRIDE;
+    virtual std::shared_ptr<AbstractKart> createKart
+        (const std::string &kart_ident, int index, int local_player_id,
+        int global_player_id, RaceManager::KartType type,
+        PerPlayerDifficulty difficulty) OVERRIDE;
 
 private:
     class KartDistanceMap
@@ -248,7 +249,11 @@ private:
             return (reverse ? m_trans(Vec3(-x, 0, -y)) :
                 m_trans(Vec3(x, 0, y)));
         }   // getAimPosition
-
+        void resetCheckGoal(const Track* t)
+        {
+            m_red_check_goal->reset(*t);
+            m_blue_check_goal->reset(*t);
+        }
     };   // BallGoalData
 
     std::vector<KartDistanceMap> m_red_kdm;
@@ -290,6 +295,7 @@ private:
 
     float m_ball_heading;
 
+    std::vector<btTransform> m_goal_transforms;
     /** Set the team for the karts */
     void initKartList();
     /** Function to update the location the ball on the polygon map */
@@ -303,22 +309,28 @@ private:
     int m_frame_count;
     std::vector<int> m_goal_frame;
 
+    int m_reset_ball_ticks;
+    void resetKartsToSelfGoals();
+
 public:
 
     SoccerWorld();
     virtual ~SoccerWorld();
 
     virtual void init() OVERRIDE;
+    virtual void onGo() OVERRIDE;
 
     // clock events
     virtual bool isRaceOver() OVERRIDE;
     virtual void countdownReachedZero() OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
 
     // overriding World methods
     virtual void reset() OVERRIDE;
 
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
-
+    virtual btTransform getRescueTransform(unsigned int rescue_pos) const
+        OVERRIDE;
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual void getKartsDisplayInfo(
                std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE {}
@@ -394,6 +406,9 @@ public:
     // ------------------------------------------------------------------------
     void setAITeam();
     // ------------------------------------------------------------------------
+    void handlePlayerGoalFromServer(const NetworkString& ns);
+    // ------------------------------------------------------------------------
+    void handleResetBallFromServer(const NetworkString& ns);
 
 };   // SoccerWorld
 

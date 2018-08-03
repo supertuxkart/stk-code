@@ -24,15 +24,19 @@
 #include "items/item.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
 #include <SColor.h>
 
 #include <assert.h>
 #include <map>
+#include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
 class Kart;
+class STKPeer;
 
 /**
   * \ingroup items
@@ -50,73 +54,101 @@ private:
     /** Stores all low-resolution item models. */
     static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
+    /** Disable item collection (for debugging purposes). */
+    static bool m_disable_item_collection;
+
+    static std::mt19937 m_random_engine;
+protected:
     /** The instance of ItemManager while a race is on. */
-    static ItemManager *m_item_manager;
+    static std::shared_ptr<ItemManager> m_item_manager;
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
     static void create();
     static void destroy();
+    static void updateRandomSeed(uint32_t seed_number)
+    {
+        m_random_engine.seed(seed_number);
+    }   // updateRandomSeed
+    // ------------------------------------------------------------------------
+
+    /** Disable item collection, useful to test client mispreditions or
+     *  client/server disagreements. */
+    static void disableItemCollection()
+    {
+        m_disable_item_collection = true;
+    }   // disableItemCollection
 
     // ------------------------------------------------------------------------
     /** Returns the mesh for a certain item. */
-    static scene::IMesh* getItemModel(Item::ItemType type)
+    static scene::IMesh* getItemModel(ItemState::ItemType type)
                                       { return m_item_mesh[type]; }
     // ------------------------------------------------------------------------
     /** Returns the glow color for an item. */
-    static video::SColorf& getGlowColor(Item::ItemType type)
+    static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
     // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
      *  create one, call create for that). */
-    static ItemManager *get() {
+    static ItemManager *get()
+    {
         assert(m_item_manager);
-        return m_item_manager;
+        return m_item_manager.get();
     }   // get
 
     // ========================================================================
-private:
+protected:
     /** The vector of all items of the current track. */
     typedef std::vector<Item*> AllItemTypes;
     AllItemTypes m_all_items;
 
+private:
     /** Stores which items are on which quad. m_items_in_quads[#quads]
      *  contains all items that are not on a quad. Note that this
      *  field is undefined if no Graph exist, e.g. arena without navmesh. */
     std::vector< AllItemTypes > *m_items_in_quads;
 
     /** What item this item is switched to. */
-    std::vector<Item::ItemType> m_switch_to;
+    std::vector<ItemState::ItemType> m_switch_to;
 
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
     int m_switch_ticks;
 
-    void  insertItem(Item *item);
-    void  deleteItem(Item *item);
-
-    // Make those private so only create/destroy functions can call them.
-                   ItemManager();
-                  ~ItemManager();
-    void           setSwitchItems(const std::vector<int> &switch_items);
-
+protected:
+    void deleteItem(Item *item);
+    virtual unsigned int insertItem(Item *item);
+    void setSwitchItems(const std::vector<int> &switch_items);
+             ItemManager();
 public:
-    Item*          newItem         (Item::ItemType type, const Vec3& xyz,
-                                    const Vec3 &normal,
-                                    AbstractKart* parent=NULL);
-    Item*          newItem         (const Vec3& xyz, float distance,
+    virtual ~ItemManager();
+
+    virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
+                                    const Vec3 &normal);
+    virtual Item*  dropNewItem     (ItemState::ItemType type,
+                                    const AbstractKart* parent, const Vec3 *xyz=NULL);
+    virtual Item* placeTrigger     (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
     void           update          (int ticks);
+    void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
-    void           collectedItem   (Item *item, AbstractKart *kart,
-                                    int add_info=-1);
+    virtual void   collectedItem   (Item *item, AbstractKart *kart);
     void           switchItems     ();
-    // ------------------------------------------------------------------------
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
     // ------------------------------------------------------------------------
+    /** Only used in the NetworkItemManager. */
+    virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
+                                         int ticks)
+    {
+        assert(false);
+    }
+    // ------------------------------------------------------------------------
     /** Returns the number of items. */
-    unsigned int   getNumberOfItems() const { return (unsigned int) m_all_items.size(); }
+    unsigned int   getNumberOfItems() const
+    {
+        return (unsigned int) m_all_items.size();
+    }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
     const Item*   getItem(unsigned int n) const { return m_all_items[n]; };

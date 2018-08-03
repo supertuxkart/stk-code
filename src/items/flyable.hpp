@@ -24,6 +24,7 @@
 
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
+#include "network/rewinder.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -43,7 +44,8 @@ class XMLNode;
 /**
   * \ingroup items
   */
-class Flyable : public Moveable, public TerrainInfo
+class Flyable : public Moveable, public TerrainInfo,
+                public Rewinder
 {
 public:
 private:
@@ -103,6 +105,11 @@ protected:
     /** Size of this flyable. */
     Vec3              m_extend;
 
+    bool              m_undo_creation;
+    bool              m_has_undone_destruction;
+    bool              m_has_server_state;
+    int               m_check_created_ticks;
+
     // The flyable class stores the values for each flyable type, e.g.
     // speed, min_height, max_height. These variables must be static,
     // so we need arrays of these variables to have different values
@@ -128,11 +135,11 @@ protected:
 
     /** Time since thrown. used so a kart can't hit himself when trying
      *  something, and also to put some time limit to some collectibles */
-    int               m_ticks_since_thrown;
+    int16_t           m_ticks_since_thrown;
 
     /** Set to something > -1 if this flyable should auto-destrcut after
      *  that may ticks. */
-    int                m_max_lifespan;
+    int               m_max_lifespan;
 
     /** If set to true, the kart that throwns this flyable can't collide
      *  with it for a short time. */
@@ -160,6 +167,15 @@ protected:
                                     const bool rotates=false,
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
+
+    void              moveToInfinity();
+    /** Used when undoing creation or destruction. */
+    btTransform m_saved_transform;
+    Vec3 m_saved_lv, m_saved_av, m_saved_gravity;
+
+    virtual void additionalPhysicsProperties() {}
+    virtual void hideNodeWhenUndoDestruction();
+
 public:
 
                  Flyable     (AbstractKart* kart,
@@ -204,7 +220,7 @@ public:
     void         setHasHit   () { m_has_hit_something = true; }
     // ------------------------------------------------------------------------
     /** Resets this flyable. */
-    void         reset       () { Moveable::reset();          }
+    void         reset() OVERRIDE { Moveable::reset();          }
     // ------------------------------------------------------------------------
     /** Returns the type of flyable. */
     PowerupManager::PowerupType getType() const {return m_type;}
@@ -217,6 +233,31 @@ public:
     /** Returns the size (extend) of the mesh. */
     const Vec3 &getExtend() const { return m_extend;  }
     // ------------------------------------------------------------------------
+    void addForRewind(const std::string& uid);
+    // ------------------------------------------------------------------------
+    virtual void undoEvent(BareNetworkString *buffer) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual void rewindToEvent(BareNetworkString *buffer) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual void undoState(BareNetworkString *buffer) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual void saveTransform() OVERRIDE     { Moveable::prepareSmoothing(); }
+    // ------------------------------------------------------------------------
+    virtual void computeError() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void addRewindInfoEventFunctionAfterFiring();
+    // ------------------------------------------------------------------------
+    bool isUndoCreation() const                     { return m_undo_creation; }
+    // ------------------------------------------------------------------------
+    bool hasUndoneDestruction() const      { return m_has_undone_destruction; }
+    // ------------------------------------------------------------------------
+    void handleUndoDestruction();
+
 };   // Flyable
 
 #endif

@@ -73,13 +73,13 @@ RaceGUIBase::RaceGUIBase()
     m_music_icon = irr_driver->getTexture("notes.png");
     if (!m_music_icon)
     {
-        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
+        Log::error("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
     }
 
     m_plunger_face = irr_driver->getTexture("plungerface.png");
     if (!m_plunger_face)
     {
-        Log::fatal("RaceGuiBase",
+        Log::error("RaceGuiBase",
                    "Can't find 'plungerface.png' texture, aborting.");
     }
 
@@ -87,7 +87,7 @@ RaceGUIBase::RaceGUIBase()
     m_icons_frame = irr_driver->getTexture("icons-frame.png");
     if (!m_icons_frame)
     {
-        Log::fatal("RaceGuiBase",
+        Log::error("RaceGuiBase",
                    "Can't find 'icons-frame.png' texture, aborting.");
     }
 
@@ -590,17 +590,20 @@ void RaceGUIBase::drawGlobalMusicDescription()
                true /* vcenter */);
 
     // Draw music icon
-    int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
-    int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
-
-    core::rect<s32> dest(noteX-iconSizeX/2+20,
-                         noteY-iconSizeY/2+ICON_SIZE/2,
-                         noteX+iconSizeX/2+20,
-                         noteY+iconSizeY/2+ICON_SIZE/2);
-    const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 m_music_icon->getSize());
-
-    draw2DImage(m_music_icon, dest, source, NULL, NULL, true);
+    if (m_music_icon != NULL)
+    {
+        int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
+        int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
+    
+        core::rect<s32> dest(noteX-iconSizeX/2+20,
+                             noteY-iconSizeY/2+ICON_SIZE/2,
+                             noteX+iconSizeX/2+20,
+                             noteY+iconSizeY/2+ICON_SIZE/2);
+        const core::rect<s32> source(core::position2d<s32>(0,0),
+                                     m_music_icon->getSize());
+    
+        draw2DImage(m_music_icon, dest, source, NULL, NULL, true);
+    }
 #endif
 }   // drawGlobalMusicDescription
 
@@ -870,7 +873,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         const core::rect<s32> pos(x, y, x+w, y+w);
 
         //to bring to light the player's icon: add a background
-        if (kart->getController()->isLocalPlayerController())
+        if (kart->getController()->isLocalPlayerController() &&
+            m_icons_frame != NULL)
         {
             video::SColor colors[4];
             for (unsigned int i=0;i<4;i++)
@@ -1025,7 +1029,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
         {
             const float fast_time = 0.3f;
-            if(kart->getBlockedByPlungerTicks()<fast_time)
+            if(kart->getBlockedByPlungerTicks()<stk_config->time2Ticks(fast_time))
             {
                 // First time we reach faste state: select random target point
                 // at top of screen and set speed accordingly
@@ -1066,24 +1070,27 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         m_plunger_offset.Y += (int)(m_plunger_speed.Y * dt);
     }
 
-    const int plunger_size = (int)(0.6f * screen_width);
-    int offset_y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2
-                 - plunger_size/2 - m_plunger_offset.Y;
-
-    int plunger_x = viewport.UpperLeftCorner.X + screen_width/2
-                  - plunger_size/2;
-
-    plunger_x += (int)m_plunger_offset.X;
-    core::rect<s32> dest(plunger_x,              offset_y,
-                         plunger_x+plunger_size, offset_y+plunger_size);
-
-    const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 m_plunger_face->getSize());
-
-    draw2DImage(m_plunger_face, dest, source,
-                                              &viewport /* clip */,
-                                              NULL /* color */,
-                                              true /* alpha */     );
+    if (m_plunger_face != NULL)
+    {
+        const int plunger_size = (int)(0.6f * screen_width);
+        int offset_y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2
+                     - plunger_size/2 - m_plunger_offset.Y;
+    
+        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2
+                      - plunger_size/2;
+    
+        plunger_x += (int)m_plunger_offset.X;
+        core::rect<s32> dest(plunger_x,              offset_y,
+                             plunger_x+plunger_size, offset_y+plunger_size);
+    
+        const core::rect<s32> source(core::position2d<s32>(0,0),
+                                     m_plunger_face->getSize());
+    
+        draw2DImage(m_plunger_face, dest, source,
+                                                  &viewport /* clip */,
+                                                  NULL /* color */,
+                                                  true /* alpha */     );
+    }
 #endif   // !SERVER_ONLY
 }   // drawPlungerInFace
 

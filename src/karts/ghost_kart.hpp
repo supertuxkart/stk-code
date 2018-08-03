@@ -48,15 +48,16 @@ private:
 
     unsigned int                             m_last_egg_idx = 0;
 
+    // ----------------------------------------------------------------------------
+    /** Compute the time at which the ghost finished the race */
+    void          computeFinishTime();
+
 public:
                   GhostKart(const std::string& ident, unsigned int world_kart_id,
                             int position, float color_hue);
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset() OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** No physics body for ghost kart, so nothing to adjust. */
-    virtual void  updateWeight() OVERRIDE  {};
     // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
     virtual void  applyEngineForce (float force) OVERRIDE {};
@@ -83,9 +84,18 @@ public:
     virtual float getSpeed() const OVERRIDE;
 
     // ------------------------------------------------------------------------
+    /** Returns the finished time for a ghost kart. */
+    float  getGhostFinishTime() { computeFinishTime(); return m_finish_time; }
+
+    // ------------------------------------------------------------------------
     /** Returns the time at which the kart was at a given distance.
       * Returns -1.0f if none */
-    float getTimeForDistance(float distance);
+    virtual float getTimeForDistance(float distance) OVERRIDE;
+
+    // ----------------------------------------------------------------------------
+    /** Returns the smallest time at which the kart had the required number of eggs
+      * Returns -1.0f if none */
+    float getTimeForEggs(int egg_number);
 
     // ------------------------------------------------------------------------
     virtual void  kartIsInRestNow() OVERRIDE {};
@@ -93,3 +103,4 @@ public:
     
 };   // GhostKart
 #endif
+

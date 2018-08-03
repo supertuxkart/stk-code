@@ -154,11 +154,11 @@ namespace GUIEngine
 
         // --------------------------------------------------------------------
         /** \brief override from base class */
-        virtual EventPropagation focused(const int playerID);
+        virtual EventPropagation focused(const int playerID) OVERRIDE;
 
         // --------------------------------------------------------------------
         /** \brief override from base class */
-        virtual void unfocused(const int playerID, Widget* new_focus);
+        virtual void unfocused(const int playerID, Widget* new_focus) OVERRIDE;
         // --------------------------------------------------------------------
         /** Returns the texture of this button. */
         const video::ITexture* getTexture();

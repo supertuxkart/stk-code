@@ -187,7 +187,7 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
     {
         reset();
     }
-}   // restoreState
+}   // rewindTo
 
 // ----------------------------------------------------------------------------
 /** Defines a slowdown, which is in fraction of top speed.
@@ -269,7 +269,7 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
     {
         reset();
     }
-}   // restoreState
+}   // rewindTo
 
 // ----------------------------------------------------------------------------
 /** Returns how much increased speed time is left over in the given category.
@@ -279,6 +279,15 @@ int MaxSpeed::getSpeedIncreaseTicksLeft(unsigned int category)
 {
     return m_speed_increase[category].getTimeLeft();
 }   // getSpeedIncreaseTimeLeft
+
+// ----------------------------------------------------------------------------
+/** Returns if decreased speed is active in the given category.
+ *  \param category Which category to report on.
+ */
+int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
+{
+    return m_speed_decrease[category].isActive();
+}   // isSpeedDecreaseActive
 
 // ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
@@ -344,6 +353,9 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     uint8_t active_slowdown = 0;
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<=1)
     {
+        // Don't bother saving terrain, this will get updated automatically
+        // each frame.
+        if(i==MS_DECREASE_TERRAIN) continue;
         if (m_speed_decrease[i].isActive()) 
             active_slowdown |= b;
     }
@@ -351,8 +363,13 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        if (active_slowdown & b)
-            m_speed_decrease->saveState(buffer);
+        if (i == MS_DECREASE_TERRAIN)
+        {
+            // Handle in local state
+            continue;
+        }
+        else if (active_slowdown & b)
+            m_speed_decrease[i].saveState(buffer);
     }
 
     // Now save the speedup state
@@ -386,7 +403,13 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        m_speed_decrease->rewindTo(buffer, (active_slowdown & b) == b);
+        if (i == MS_DECREASE_TERRAIN)
+        {
+            // Handle in local state
+            continue;
+        }
+        else
+            m_speed_decrease[i].rewindTo(buffer, (active_slowdown & b) == b);
     }
 
     // Restore the speedup state

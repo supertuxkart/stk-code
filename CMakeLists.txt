@@ -19,18 +19,36 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
-option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
-    "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
+    "NOT SERVER_ONLY;NOT APPLE" OFF)
+CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
+    "NOT SERVER_ONLY" OFF)
+CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
+    "NOT SERVER_ONLY;NOT MINGW;NOT CYGWIN" OFF)
+
+if(APPLE)
+    list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
+    include_directories(/usr/local/opt/fribidi/include/)
+    include_directories(/usr/local/opt/openssl@1.1/include/)
+    include_directories(/usr/local/opt/openssl@1.1/include/openssl/)
+    include_directories(/usr/local/opt/freetype/include/freetype2/)
+endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    
+    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
+       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
+        option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
+    else()
+        option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    endif()
+
 endif()
 
 if(UNIX OR MINGW)
@@ -45,12 +63,6 @@ if(MSVC AND (MSVC_VERSION LESS 1900))
     mark_as_advanced(WIIUSE_BUILD)
 else()
     set(WIIUSE_BUILD ON)
-endif()
-
-if(MINGW OR CYGWIN OR SERVER_ONLY)
-    option(USE_WIIUSE "Support for wiimote input devices" OFF)
-else()
-    option(USE_WIIUSE "Support for wiimote input devices" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -101,6 +113,7 @@ if(WIN32)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/${DEPENDENCIES})
     add_definitions(-D_IRR_STATIC_LIB_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    include_directories(${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include)
 endif()
 
 if(USE_GLES2)
@@ -110,17 +123,21 @@ endif()
 
 if(SERVER_ONLY)
     add_definitions(-DSERVER_ONLY)
-    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_COMPILE_WITH_OSX_DEVICE_)
 endif()
-
-#if(DISABLE_VPX)
-#    add_definitions(-DNO_VPX)
-#endif()
 
 if(UNIX OR MINGW)
     if(DEBUG_SYMBOLS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    endif()
+endif()
+
+if(UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+
+    if(NOT PKGCONFIG_FOUND)
+        message(FATAL_ERROR "Pkg-config not found.")
     endif()
 endif()
 
@@ -130,26 +147,29 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Find system ENet library or build it if missing
 if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
-    find_package(ENet)
+    pkg_check_modules(ENET libenet>=1.3.4)
 endif()
 
 if(ENET_FOUND)
-    include_directories(${ENet_INCLUDE_DIRS})
+    include_directories(${ENET_INCLUDE_DIRS})
 else()
     # Fallback to built-in version
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
     include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
-    set(ENet_LIBRARIES "enet")
+    set(ENET_LIBRARIES "enet")
 endif()
 
 # Find system GLEW library or build it if missing
-if(NOT USE_GLES2 AND NOT SERVER_ONLY)
+if (APPLE)
+    find_package(glew)
+
+    if(GLEW_FOUND)
+        include_directories(${GLEW_INCLUDE_DIRS})
+    endif()
+elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
     if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
-        find_package(PkgConfig)
-        if(PKGCONFIG_FOUND)
-            pkg_check_modules(GLEW glew>=2.1)
-        endif()
+        pkg_check_modules(GLEW glew>=2.1)
     endif()
 
     if(GLEW_FOUND)
@@ -162,37 +182,39 @@ if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     endif()
 endif()
 
-if(MSVC OR APPLE)
-    if (NOT APPLE)
+if(MSVC)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
 
     set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
     set(ZLIB_LIBRARY zlibstatic)
-    endif()
-
-    # Build png library
-    set(SKIP_INSTALL_ALL TRUE)
-    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
-    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
-    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
-
-    set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png_static)
 endif()
 
-# Add jpeg library
-if (APPLE)
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
-    set(JPEG_LIBRARY jpeglib)
-else()
-    find_package(JPEG REQUIRED)
-    include_directories(${JPEG_INCLUDE_DIR})
+if (NOT SERVER_ONLY)
+    if(MSVC OR APPLE)
+        # Build png library
+        set(SKIP_INSTALL_ALL TRUE)
+        set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+        set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+        set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
+
+        set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
+        set(PNG_LIBRARY png_static)
+    endif()
+
+    # Add jpeg library
+    if (APPLE)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+        set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
+        set(JPEG_LIBRARY jpeglib)
+    else()
+        find_package(JPEG REQUIRED)
+        include_directories(${JPEG_INCLUDE_DIR})
+    endif()
 endif()
 
 if (BUILD_RECORDER)
@@ -216,12 +238,12 @@ if (BUILD_RECORDER)
     endif()
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
+if(NOT SERVER_ONLY)
     find_library(SQUISH_LIBRARY NAMES squish libsquish)
     find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
     if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
@@ -276,38 +298,27 @@ else()
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
-# OpenAL
-if(APPLE)
-    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
-    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
-    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
-    # CMake pick the library it wants essentially means I can't build.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework OpenAL")
-    set(OPENAL_LIBRARY)
-else()
+if(NOT SERVER_ONLY)
+    # OpenAL
     find_package(OpenAL REQUIRED)
     include_directories(${OPENAL_INCLUDE_DIR})
-endif()
 
-# OggVorbis
-if(APPLE)
-    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
-    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
-    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
-    # CMake pick the library it wants essentially means I can't build.
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -I/Library/Frameworks/Ogg.framework/Versions/A/Headers -I/Library/Frameworks/Vorbis.framework/Versions/A/Headers")
-else()
+    # OggVorbis
     find_package(OggVorbis REQUIRED)
     include_directories(${OGGVORBIS_INCLUDE_DIRS})
+
+    add_definitions(-DENABLE_SOUND)
 endif()
 
 # Freetype
-find_package(Freetype)
-if(FREETYPE_FOUND)
-    include_directories(${FREETYPE_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Freetype not found. "
-        "Freetype is required to display characters in SuperTuxKart. ")
+if (NOT SERVER_ONLY)
+    find_package(Freetype)
+    if(FREETYPE_FOUND)
+        include_directories(${FREETYPE_INCLUDE_DIRS})
+    else()
+        message(FATAL_ERROR "Freetype not found. "
+            "Freetype is required to display characters in SuperTuxKart. ")
+    endif()
 endif()
 
 # Fribidi
@@ -376,8 +387,6 @@ else()
     endif()
 endif()
 
-# TODO: remove this switch
-add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
     configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
@@ -401,16 +410,10 @@ if(APPLE)
     add_executable(supertuxkart MACOSX_BUNDLE ${STK_SOURCES})
 
     find_library(IOKIT_LIBRARY IOKit)
-    find_library(QUICKTIME_LIBRARY QuickTime)
-    find_library(CARBON_LIBRARY Carbon)
-    find_library(AUDIOUNIT_LIBRARY AudioUnit)
     find_library(COCOA_LIBRARY Cocoa)
 
     target_link_libraries(supertuxkart
          ${IOKIT_LIBRARY}
-         ${QUICKTIME_LIBRARY}
-         ${CARBON_LIBRARY}
-         ${AUDIOUNIT_LIBRARY}
          ${COCOA_LIBRARY})
 
     # configure CMake to use a custom Info.plist
@@ -450,14 +453,26 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
-# CURL
+# CURL and OpenSSL
+# 1.0.1d for compatible AES GCM handling
+SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 if(MSVC)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.lib)
 elseif(MINGW)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.dll)
 else()
     find_package(CURL REQUIRED)
+    find_package(OpenSSL REQUIRED)
+
+    if(${OPENSSL_VERSION} VERSION_LESS ${OPENSSL_MINIMUM_VERSION} OR
+        (${OPENSSL_VERSION} VERSION_EQUAL ${OPENSSL_MINIMUM_VERSION} AND ${OPENSSL_VERSION} STRLESS ${OPENSSL_MINIMUM_VERSION}))
+        message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
+    endif()
+
     include_directories(${CURL_INCLUDE_DIRS})
+    include_directories(${OpenSSL_INCLUDE_DIRS})
 endif()
 
 # Common library dependencies
@@ -465,28 +480,27 @@ target_link_libraries(supertuxkart
     bulletdynamics
     bulletcollision
     bulletmath
-    ${ENet_LIBRARIES}
+    ${ENET_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${OGGVORBIS_LIBRARIES}
-    ${OPENAL_LIBRARY}
-    ${FREETYPE_LIBRARIES}
-    ${JPEG_LIBRARIES}
-    ${TURBOJPEG_LIBRARY}
-    #${VPX_LIBRARIES}
+    ${OPENSSL_CRYPTO_LIBRARY}
     )
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
-endif()
 
-if(NOT SERVER_ONLY AND NOT USE_GLES2)
-    target_link_libraries(supertuxkart ${SQUISH_LIBRARY})
+    target_link_libraries(supertuxkart
+        ${SQUISH_LIBRARY}
+        ${FREETYPE_LIBRARIES}
+        ${JPEG_LIBRARIES}
+        ${OGGVORBIS_LIBRARIES}
+        ${OPENAL_LIBRARY}
+        graphics_utils)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -506,15 +520,6 @@ endif()
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
 if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
-endif()
-
-if(APPLE)
-    # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
-    # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
-    # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
-    # CMake pick the library it wants essentially means I can't build.
-    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch x86_64 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
 endif()
 
 if(USE_FRIBIDI)

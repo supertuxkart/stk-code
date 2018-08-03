@@ -90,6 +90,7 @@ namespace Online
             IPERM_ALLOWED     = 1,
             IPERM_NOT_ALLOWED = 2
         };
+        static bool m_disable_polling;
     private:
             /** Time passed since the last poll request. */
             float                     m_time_since_poll;

@@ -27,6 +27,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/check_manager.hpp"
@@ -47,7 +48,6 @@ float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
-int   RubberBall::m_ticks_between_balls;
 
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
@@ -77,6 +77,17 @@ RubberBall::RubberBall(AbstractKart *kart)
     setAdjustUpVelocity(false);
     m_max_lifespan       = stk_config->time2Ticks(9999);
     m_target             = NULL;
+    m_ping_sfx           = SFXManager::get()->createSoundSource("ball_bounce");
+    m_owner_init_pos     = m_owner->getXYZ();
+    m_init_pos           = getXYZ();
+    additionalPhysicsProperties();
+    CheckManager::get()->addFlyableToCannons(this);
+}   // RubberBall
+
+// ----------------------------------------------------------------------------
+void RubberBall::additionalPhysicsProperties()
+{
+    setXYZ(m_init_pos);
     m_aiming_at_target   = false;
     m_fast_ping          = false;
     // At the start the ball aims at quads till it gets close enough to the
@@ -84,9 +95,8 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_height_timer       = 0.0f;
     m_interval           = m_st_interval;
     m_current_max_height = m_max_height;
-    m_ping_sfx           = SFXManager::get()->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
-    m_previous_xyz       = m_owner->getXYZ();
+    m_previous_xyz       = m_owner_init_pos;
     m_previous_height    = 2.0f;  //
     // A negative value indicates that the timer is not active
     m_delete_ticks       = -1;
@@ -103,9 +113,8 @@ RubberBall::RubberBall(AbstractKart *kart)
     const Vec3& normal =
         DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
     TerrainInfo::update(getXYZ(), -normal);
-    initializeControlPoints(m_owner->getXYZ());
-    CheckManager::get()->addFlyableToCannons(this);
-}   // RubberBall
+    initializeControlPoints(m_owner_init_pos);
+}   // additionalPhysicsProperties
 
 // ----------------------------------------------------------------------------
 /** Destructor, removes any playing sfx.
@@ -154,6 +163,29 @@ void RubberBall::setAnimation(AbstractKartAnimation *animation)
     {
         initializeControlPoints(getXYZ());
         m_height_timer = 0;
+        if (RewindManager::get()->useLocalEvent())
+        {
+            std::shared_ptr<RubberBall> rb = getShared<RubberBall>();
+            btTransform cur_trans = getTrans();
+            Vec3 cur_previous_xyz = m_previous_xyz;
+            RewindManager::get()->addRewindInfoEventFunction(new
+            RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
+                /*undo_function*/[rb]()
+                {
+                    rb->m_undo_creation = true;
+                    rb->moveToInfinity();
+                },
+                /*replay_function*/[rb, cur_trans, cur_previous_xyz]()
+                {
+                    rb->m_undo_creation = false;
+                    rb->m_body->setWorldTransform(cur_trans);
+                    rb->m_motion_state->setWorldTransform(cur_trans);
+                    rb->m_body->setInterpolationWorldTransform(cur_trans);
+                    rb->m_previous_xyz = cur_previous_xyz;
+                    rb->initializeControlPoints(cur_trans.getOrigin());
+                    rb->m_height_timer = 0;
+                }));
+        }
     }
     Flyable::setAnimation(animation);
 }   // setAnimation
@@ -272,7 +304,6 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     m_st_max_height_difference      = 10.0f;
     m_st_fast_ping_distance         = 50.0f;
     m_st_early_target_factor        =  1.0f;
-    m_ticks_between_balls           = stk_config->time2Ticks(15.0f);
 
     if(!node.get("interval", &m_st_interval))
         Log::warn("powerup", "No interval specified for rubber ball.");
@@ -308,10 +339,6 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     if(!node.get("early-target-factor", &m_st_early_target_factor))
         Log::warn("powerup",
                   "No early-target-factor specified for rubber ball.");
-    if(!node.get("time-between-balls", &m_ticks_between_balls))
-        Log::warn("powerup",
-                  "No time-between-balls specified for rubber ball.");
-    m_ticks_between_balls = stk_config->time2Ticks(float(m_ticks_between_balls));
     Flyable::init(node, rubberball, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
@@ -326,7 +353,6 @@ bool RubberBall::updateAndDelete(int ticks)
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return true;
 
-    
     if(m_delete_ticks>0)
     {
         m_delete_ticks -= 1;
@@ -408,16 +434,16 @@ bool RubberBall::updateAndDelete(int ticks)
 
     // Ball squashing:
     // ===============
-#ifndef SERVER_ONLY
-    if (height<1.0f*m_extend.getY())
-        m_node->setScale(core::vector3df(1.0f, height / m_extend.getY(), 1.0f));
-    else
-        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-    next_xyz = getHitPoint() + getNormal()*(height*m_node->getScale().Y);
+    float scale = 1.0f;
+    if (height < 1.0f * m_extend.getY())
+        scale = height / m_extend.getY();
 
-#else
-    next_xyz = getHitPoint() + getNormal()*(height);
+#ifndef SERVER_ONLY
+    if (!RewindManager::get()->isRewinding())
+        m_node->setScale(core::vector3df(1.0f, scale, 1.0f));
 #endif
+
+    next_xyz = getHitPoint() + getNormal() * (height * scale);
     m_previous_xyz = getXYZ();
     m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);
@@ -567,7 +593,8 @@ float RubberBall::updateHeight()
     if(m_height_timer>m_interval)
     {
         m_height_timer -= m_interval;
-        if(m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING)
+        if (m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING &&
+            !RewindManager::get()->isRewinding())
         {
             m_ping_sfx->setPosition(getXYZ());
             m_ping_sfx->play();
@@ -644,7 +671,7 @@ void RubberBall::updateDistanceToTarget()
 
     float target_distance =
         world->getDistanceDownTrackForKart(m_target->getWorldKartId(), true);
-    float ball_distance = getDistanceFromStart(true);
+    float ball_distance = getDistanceFromStart(/* account for checklines */ false);
 
     m_distance_to_target = target_distance - ball_distance;
     if(m_distance_to_target < 0)
@@ -741,3 +768,56 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
     }
     return was_real_hit;
 }   // hit
+
+// ----------------------------------------------------------------------------
+BareNetworkString* RubberBall::saveState(std::vector<std::string>* ru)
+{
+    BareNetworkString* buffer = Flyable::saveState(ru);
+    buffer->addUInt32(m_last_aimed_graph_node);
+    buffer->add(m_control_points[0]);
+    buffer->add(m_control_points[1]);
+    buffer->add(m_control_points[2]);
+    buffer->add(m_control_points[3]);
+    buffer->add(m_previous_xyz);
+    buffer->addFloat(m_previous_height);
+    buffer->addFloat(m_length_cp_1_2);
+    buffer->addFloat(m_length_cp_2_3);
+    buffer->addFloat(m_t);
+    buffer->addFloat(m_t_increase);
+    buffer->addFloat(m_interval);
+    buffer->addUInt8(m_fast_ping ? 1 : 0);
+    buffer->addFloat(m_distance_to_target);
+    buffer->addFloat(m_height_timer);
+    buffer->addUInt32(m_delete_ticks);
+    buffer->addFloat(m_current_max_height);
+    buffer->addUInt8(m_aiming_at_target ? 1 : 0);
+    buffer->addUInt32(m_tunnel_count);
+    TrackSector::saveState(buffer);
+    return buffer;
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void RubberBall::restoreState(BareNetworkString *buffer, int count)
+{
+    Flyable::restoreState(buffer, count);
+    m_last_aimed_graph_node = buffer->getUInt32();
+    m_control_points[0] = buffer->getVec3();
+    m_control_points[1] = buffer->getVec3();
+    m_control_points[2] = buffer->getVec3();
+    m_control_points[3] = buffer->getVec3();
+    m_previous_xyz = buffer->getVec3();
+    m_previous_height = buffer->getFloat();
+    m_length_cp_1_2 = buffer->getFloat();
+    m_length_cp_2_3 = buffer->getFloat();
+    m_t = buffer->getFloat();
+    m_t_increase = buffer->getFloat();
+    m_interval = buffer->getFloat();
+    m_fast_ping = buffer->getUInt8() == 1;
+    m_distance_to_target = buffer->getFloat();
+    m_height_timer = buffer->getFloat();
+    m_delete_ticks = buffer->getUInt32();
+    m_current_max_height = buffer->getFloat();
+    m_aiming_at_target = buffer->getUInt8() == 1;
+    m_tunnel_count = buffer->getUInt32();
+    TrackSector::rewindTo(buffer);
+}   // restoreState

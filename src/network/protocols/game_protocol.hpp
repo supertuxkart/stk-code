@@ -41,6 +41,8 @@ private:
     /** The type of game events to be forwarded to the server. */
     enum { GP_CONTROLLER_ACTION,
            GP_STATE,
+           GP_ITEM_UPDATE,
+           GP_ITEM_CONFIRMATION,
            GP_ADJUST_TIME
     };
 
@@ -69,8 +71,10 @@ private:
     void handleControllerAction(Event *event);
     void handleState(Event *event);
     void handleAdjustTime(Event *event);
+    void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
     std::map<STKPeer*, int> m_initial_ticks;
+    std::map<STKPeer*, double> m_last_adjustments;
 
 public:
              GameProtocol();
@@ -81,10 +85,12 @@ public:
 
     void controllerAction(int kart_id, PlayerAction action,
                           int value, int val_l, int val_r);
-    void startNewState(bool local_save);
+    void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();
+    void finalizeState(std::vector<std::string>& cur_rewinder);
     void adjustTimeForClient(STKPeer *peer, int ticks);
+    void sendItemEventConfirmation(int ticks);
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;

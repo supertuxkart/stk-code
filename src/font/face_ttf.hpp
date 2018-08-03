@@ -22,11 +22,14 @@
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 
+#include <cassert>
 #include <string>
 #include <vector>
 
+#ifndef SERVER_ONLY
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#endif
 
 /** This class will load a list of TTF files from \ref STKConfig, and save
  *  them inside \ref m_faces for \ref FontWithFace to load glyph.
@@ -37,21 +40,31 @@
  */
 class FaceTTF : public NoCopy
 {
+#ifndef SERVER_ONLY
 private:
     /** Contains all TTF files loaded. */
     std::vector<FT_Face> m_faces;
-
+#endif
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
     FaceTTF(const std::vector<std::string>& ttf_list);
     // ------------------------------------------------------------------------
     ~FaceTTF();
+#ifndef SERVER_ONLY
     // ------------------------------------------------------------------------
-    FT_Face getFace(unsigned int i) const;
+    /** Return a TTF in \ref m_faces.
+    *  \param i index of TTF file in \ref m_faces.
+    */
+    FT_Face getFace(unsigned int i) const
+    {
+        assert(i < m_faces.size());
+        return m_faces[i];
+    }
     // ------------------------------------------------------------------------
     /** Return the total TTF files loaded. */
     unsigned int getTotalFaces() const { return (unsigned int)m_faces.size(); }
+#endif
 
 };   // FaceTTF
 

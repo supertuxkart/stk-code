@@ -20,18 +20,11 @@
 
 #include "network/rewind_manager.hpp"
 
-/** Constructor. It will add this object to the list of all rewindable
+// ----------------------------------------------------------------------------
+/** Add this object to the list of all rewindable
  *  objects in the rewind manager.
  */
-Rewinder::Rewinder(bool can_be_destroyed) 
+bool Rewinder::rewinderAdd()
 {
-	m_can_be_destroyed = can_be_destroyed;
-	RewindManager::get()->addRewinder(this);
-}   // Rewinder
-
-// ----------------------------------------------------------------------------
-/** Destructor.
- */
-Rewinder::~Rewinder()
-{
-}   // ~Rewinder
+    return RewindManager::get()->addRewinder(shared_from_this());
+}   // rewinderAdd

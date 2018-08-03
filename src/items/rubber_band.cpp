@@ -46,8 +46,10 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
           : m_plunger(plunger), m_owner(kart)
 {
     m_attached_state = RB_TO_PLUNGER;
+    updatePosition();
+
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (ProfileWorld::isNoGraphics() || !CVS->isGLSL())
     {
         return;
     }
@@ -68,7 +70,6 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     {
         m_dy_dc->getSPMVertex()[i].m_color = color;
     }
-    updatePosition();
     SP::addDynamicDrawCall(m_dy_dc);
 #endif
 }   // RubberBand
@@ -76,12 +77,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 // ----------------------------------------------------------------------------
 RubberBand::~RubberBand()
 {
-#ifndef SERVER_ONLY
-    if (m_dy_dc)
-    {
-        m_dy_dc->removeFromSP();
-    }
-#endif
+    remove();
 }   // RubberBand
 
 // ----------------------------------------------------------------------------
@@ -102,16 +98,22 @@ void RubberBand::updatePosition()
     case RB_TO_PLUNGER: m_end_position = m_plunger->getXYZ();
                         checkForHit(k, m_end_position);        break;
     }   // switch(m_attached_state);
+}   // updatePosition
 
+// ----------------------------------------------------------------------------
+void RubberBand::updateGraphics(float dt)
+{
 #ifndef SERVER_ONLY
     if (!m_dy_dc)
     {
         return;
     }
+
     // Update the rubber band positions
     // --------------------------------
     // Todo: make height dependent on length (i.e. rubber band gets
     // thinner). And call explosion if the band is too long.
+    const Vec3 &k = m_owner->getXYZ();
     const float hh=.1f;  // half height of the band
     const Vec3 &p=m_end_position;  // for shorter typing
     auto& v = m_dy_dc->getVerticesVector();
@@ -137,7 +139,7 @@ void RubberBand::updatePosition()
     m_dy_dc->setUpdateOffset(0);
     m_dy_dc->recalculateBoundingBox();
 #endif
-}   // updatePosition
+}   // updateGraphics
 
 // ----------------------------------------------------------------------------
 /** Updates the rubber band. It takes the new position of the kart and the
@@ -277,3 +279,13 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
 }   // hit
 
 // ----------------------------------------------------------------------------
+void RubberBand::remove()
+{
+#ifndef SERVER_ONLY
+    if (m_dy_dc)
+    {
+        m_dy_dc->removeFromSP();
+        m_dy_dc = nullptr;
+    }
+#endif
+}   // remove

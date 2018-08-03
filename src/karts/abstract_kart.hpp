@@ -40,6 +40,7 @@ class btKart;
 class btQuaternion;
 class Controller;
 class Item;
+class ItemState;
 class KartGFX;
 class KartModel;
 class KartProperties;
@@ -111,7 +112,7 @@ public:
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
     /** Returns the current steering value for this kart. */
-    float getSteerPercent() const { return m_controls.getSteer();  }
+    virtual float getSteerPercent() const { return m_controls.getSteer(); }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart. */
     KartControl&  getControls() { return m_controls; }
@@ -139,7 +140,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
      *  kart was loaded from). */
-    const std::string& getIdent() const;
+    virtual const std::string& getIdent() const;
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
@@ -278,10 +279,6 @@ public:
      *  like Ghost. */
     virtual float getSpeed() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the exponentially smoothened speed of the kart in 
-     *  which is removes shaking from camera. */
-    virtual float getSmoothedSpeed() const = 0;
-    // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart, this includes all
      *  bonus and maluses that are currently applied. */
     virtual float getCurrentMaxSpeed() const = 0;
@@ -344,11 +341,8 @@ public:
     // ------------------------------------------------------------------------
     /** Called when an item is collected. It will either adjust the collected
      *  energy, or update the attachment or powerup for this kart.
-     *  \param item The item that was hit.
-     *  \param add_info Additional info, used in networking games to force
-     *         a specific item to be used (instead of a random item) to keep
-     *         all karts in synch. */
-    virtual void  collectedItem(Item *item, int add_info) = 0;
+     *  \param item The item that was hit. */
+    virtual void  collectedItem(ItemState *item_state) = 0;
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     virtual int getPosition() const = 0;
@@ -436,10 +430,6 @@ public:
      *  over. */
     virtual void startEngineSFX() = 0;
     // ------------------------------------------------------------------------
-    /** This method is to be called every time the mass of the kart is updated,
-     *  which includes attaching an anvil to the kart (and detaching). */
-    virtual void updateWeight() = 0;
-    // ------------------------------------------------------------------------
     /** Multiplies the velocity of the kart by a factor f (both linear
      *  and angular). This is used by anvils, which suddenly slow down the kart
      *  when they are attached. */
@@ -489,6 +479,9 @@ public:
     /** Returns the most recent different previous position */
     virtual const Vec3& getRecentPreviousXYZ() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the time at which the recent previous position occured */
+    virtual const float getRecentPreviousXYZTime() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;
     // ------------------------------------------------------------------------
@@ -514,6 +507,8 @@ public:
     virtual bool isJumping() const = 0;
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) = 0;
+    // ------------------------------------------------------------------------
+    virtual bool isVisible() = 0;
 };   // AbstractKart
 
 

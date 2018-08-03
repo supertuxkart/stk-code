@@ -44,7 +44,8 @@ class ChallengeData;
   * \brief Screen shown when a feature has been unlocked
   * \ingroup states_screens
  */
-class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
+class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen,
+                                public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
 {
     friend class GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>;
 
@@ -78,9 +79,9 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
 
         irr::core::stringw m_unlock_message;
 
-        UnlockedThing(std::string model, irr::core::stringw msg);
+        UnlockedThing(const std::string &model, const irr::core::stringw &msg);
 
-        UnlockedThing(const KartProperties* kart, irr::core::stringw msg);
+        UnlockedThing(const KartProperties* kart, const irr::core::stringw &msg);
 
         /**
           * Creates a 'picture' reward.
@@ -88,7 +89,8 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
           * \param w     width of the picture to display
           * \param y     height of the picture to display
           */
-        UnlockedThing(irr::video::ITexture* pict, float w, float h, irr::core::stringw msg);
+        UnlockedThing(irr::video::ITexture* pict, float w, float h,
+                      const irr::core::stringw &msg);
 
         /**
          * Creates a 'picture slideshow' reward.
@@ -96,7 +98,8 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
          * \param w     width of the pictures to display
          * \param y     height of the pictures to display
          */
-        UnlockedThing(std::vector<irr::video::ITexture*> picts, float w, float h, irr::core::stringw msg);
+        UnlockedThing(std::vector<irr::video::ITexture*> picts, float w, float h,
+                      const irr::core::stringw &msg);
 
         ~UnlockedThing();
     };
@@ -115,10 +118,6 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
 
     /** Angle of the key (from 0 to 1, simply traces progression) */
     float m_key_angle;
-
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    scene::IMeshSceneNode *m_avoid_irrlicht_bug;
-#endif
 
     void continueButtonPressed();
 
@@ -141,18 +140,23 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
 
-    void findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked);
+    void findWhatWasUnlocked(RaceManager::Difficulty difficulty, 
+                             std::vector<const ChallengeData*>& unlocked);
 
     /** Call before showing up the screen to make a kart come out of the chest.
-        'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
+     *  'addUnlockedThings' will invoke this, so you generally don't need to 
+     *  call this directly. */
     void addUnlockedKart(const KartProperties* unlocked_kart);
 
-    /** Call before showing up the screen to make a picture come out of the chest
-        'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
+    /** Call before showing up the screen to make a picture come out of the 
+     *  chest 'addUnlockedThings' will invoke this, so you generally don't 
+     *  need to call this directly. */
+    void addUnlockedPicture(irr::video::ITexture* picture, float w, float h,
+                            const irr::core::stringw &msg);
 
-    /** Call before showing up the screen to make a picture slideshow come out of the chest
-        'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
+    /** Call before showing up the screen to make a picture slideshow come out
+     *  of the chest 'addUnlockedThings' will invoke this, so you generally
+     *  don't need to call this directly. */
     void addUnlockedPictures(std::vector<irr::video::ITexture*> pictures,
                              float w, float h, irr::core::stringw msg);
 

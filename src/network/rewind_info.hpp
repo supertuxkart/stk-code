@@ -21,12 +21,13 @@
 
 #include "network/event_rewinder.hpp"
 #include "network/network_string.hpp"
-#include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <assert.h>
+#include <functional>
+#include <string>
 #include <vector>
 
 /** Used to store rewind information for a given time for all rewind
@@ -56,13 +57,15 @@ private:
 public:
     RewindInfo(int ticks, bool is_confirmed);
 
+    void setTicks(int ticks);
+
     /** Called when going back in time to undo any rewind information. */
     virtual void undo() = 0;
-
+    /** This is called to restore a state before replaying the events. */
+    virtual void restore() = 0;
     /** This is called while going forwards in time again to reach current
-     *  time. */
-    virtual void rewind() = 0;
-    void setTicks(int ticks);
+    *  time. */
+    virtual void replay() = 0;
     // ------------------------------------------------------------------------
     virtual ~RewindInfo() { }
     // ------------------------------------------------------------------------
@@ -89,14 +92,24 @@ public:
 class RewindInfoState: public RewindInfo
 {
 private:
+    std::vector<std::string> m_rewinder_using;
+
+    int m_start_offset;
+
     /** Pointer to the buffer which stores all states. */
     BareNetworkString *m_buffer;
-public:
-             RewindInfoState(int ticks,  BareNetworkString *buffer, 
-                             bool is_confirmed);
-    virtual ~RewindInfoState() { delete m_buffer; };
-    virtual void rewind();
 
+public:
+    // ------------------------------------------------------------------------
+    RewindInfoState(int ticks, int start_offset,
+                    std::vector<std::string>& rewinder_using,
+                    std::vector<uint8_t>& buffer);
+    // ------------------------------------------------------------------------
+    RewindInfoState(int ticks, BareNetworkString *buffer, bool is_confirmed);
+    // ------------------------------------------------------------------------
+    virtual ~RewindInfoState()                             { delete m_buffer; }
+    // ------------------------------------------------------------------------
+    virtual void restore();
     // ------------------------------------------------------------------------
     /** Returns a pointer to the state buffer. */
     BareNetworkString *getBuffer() const { return m_buffer; }
@@ -109,6 +122,13 @@ public:
     {
         // Nothing being done in case of an undo that goes further back
     }   // undo
+    // ------------------------------------------------------------------------
+    /** Called when rewinding from a past state to 'now'. This should never
+     *  be called for a state (a state calles restore()). */
+    virtual void replay()
+    {
+        assert(false);
+    }   // replay
 };   // class RewindInfoState
 
 // ============================================================================
@@ -129,6 +149,9 @@ public:
     }   // ~RewindInfoEvent
 
     // ------------------------------------------------------------------------
+    /** An event is never 'restored', it is only rewound. */
+    void restore() {}
+    // ------------------------------------------------------------------------
     virtual bool isEvent() const { return true; }
     // ------------------------------------------------------------------------
     /** Called when going back in time to undo any rewind information.
@@ -142,7 +165,7 @@ public:
     /** This is called while going forwards in time again to reach current
      *  time. Calls rewind() in the event rewinder.
      */
-    virtual void rewind()
+    virtual void replay()
     {
         // Make sure to reset the buffer so we read from the beginning
         m_buffer->reset();
@@ -152,5 +175,33 @@ public:
     /** Returns the buffer with the event information in it. */
     BareNetworkString *getBuffer() { return m_buffer; }
 };   // class RewindIndoEvent
+
+
+// ============================================================================
+class RewindInfoEventFunction : public RewindInfo
+{
+private:
+    const std::function<void()> m_undo_function, m_replay_function,
+        m_destroy_function;
+public:
+    RewindInfoEventFunction(int ticks,
+                            std::function<void()> undo_function = [](){},
+                            std::function<void()> replay_function = [](){},
+                            std::function<void()> destroy_function = [](){})
+        : RewindInfo(ticks, true/*is_confirmed*/),
+        m_undo_function(undo_function), m_replay_function(replay_function),
+        m_destroy_function(destroy_function) {}
+    // ------------------------------------------------------------------------
+    ~RewindInfoEventFunction()                       {  m_destroy_function(); }
+    // ------------------------------------------------------------------------
+    /** An event is never 'restored', it is only rewound. */
+    void restore() {}
+    // ------------------------------------------------------------------------
+    virtual bool isEvent() const                               { return true; }
+    // ------------------------------------------------------------------------
+    virtual void undo()                                  { m_undo_function(); }
+    // ------------------------------------------------------------------------
+    virtual void replay()                              { m_replay_function(); }
+};   // class RewindInfoEventFunction
 
 #endif

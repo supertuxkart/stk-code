@@ -42,6 +42,7 @@
 #include <signal.h>
 
 Synchronised<FILE*>Network::m_log_file = NULL;
+bool Network::m_connection_debug = false;
 
 // ============================================================================
 /** Constructor that just initialises this object (esp. opening the packet
@@ -111,8 +112,11 @@ void Network::sendRawPacket(const BareNetworkString &buffer,
 
     sendto(m_host->socket, buffer.getData(), buffer.size(), 0,
            (sockaddr*)&to, to_len);
-    Log::verbose("Network", "Raw packet sent to %s",
-                 dst.toString().c_str());
+    if (m_connection_debug)
+    {
+        Log::verbose("Network", "Raw packet sent to %s",
+            dst.toString().c_str());
+    }
     Network::logPacket(buffer, false);
 }   // sendRawPacket
 
@@ -162,10 +166,10 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
     Network::logPacket(BareNetworkString(buffer, len), true);
     sender->setIP(ntohl((uint32_t)(addr.sin_addr.s_addr)) );
     sender->setPort( ntohs(addr.sin_port) );
-    if (addr.sin_family == AF_INET)
+    if (addr.sin_family == AF_INET && m_connection_debug)
     {
-        Log::info("Network", "IPv4 Address of the sender was %s",
-                  sender->toString().c_str());
+        Log::verbose("Network", "IPv4 Address of the sender was %s",
+            sender->toString().c_str());
     }
     return len;
 }   // receiveRawPacket
@@ -177,8 +181,9 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
 void Network::broadcastPacket(NetworkString *data, bool reliable)
 {
     ENetPacket* packet = enet_packet_create(data->getData(), data->size() + 1,
-                                      reliable ? ENET_PACKET_FLAG_RELIABLE
-                                               : ENET_PACKET_FLAG_UNSEQUENCED);
+        (reliable ? ENET_PACKET_FLAG_RELIABLE :
+        (ENET_PACKET_FLAG_UNSEQUENCED | ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT))
+        );
     enet_host_broadcast(m_host, 0, packet);
 }   // broadcastPacket
 

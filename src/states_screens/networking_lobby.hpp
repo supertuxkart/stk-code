@@ -20,11 +20,13 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include <map>
 #include <memory>
 #include <tuple>
+#include <utility>
 
 class Server;
-class STKPeer;
+enum SoccerTeam : int8_t;
 
 namespace GUIEngine
 { 
@@ -62,14 +64,22 @@ private:
 
     NetworkingLobby();
 
+    float m_ping_update_timer;
+    std::map<std::string, std::tuple<core::stringw, /*icon*/int, SoccerTeam> >
+        m_player_names;
     std::shared_ptr<Server> m_joined_server;
-    std::weak_ptr<STKPeer> m_server_peer;
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
+
+    float m_cur_starting_timer, m_start_threshold, m_start_timeout,
+        m_server_max_player;
+
+    bool m_allow_change_team;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
     GUIEngine::LabelWidget* m_text_bubble;
+    GUIEngine::LabelWidget* m_timeout_message;
     GUIEngine::IconButtonWidget* m_exit_widget;
     GUIEngine::IconButtonWidget* m_start_button;
     GUIEngine::ListWidget* m_player_list;
@@ -79,9 +89,9 @@ private:
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    virtual void unloaded();
+    virtual void unloaded() OVERRIDE;
 
-    virtual void onTextUpdated() {}
+    virtual void onTextUpdated() OVERRIDE {}
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
     {
         sendChat(text);
@@ -89,6 +99,7 @@ private:
     }
 
     void sendChat(irr::core::stringw text);
+    void updatePlayerPings();
 
 public:
 
@@ -121,10 +132,14 @@ public:
         m_server_info.clear();
     }
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
-                       uint32_t/*online id*/, core::stringw/*player name*/,
-                       int/*icon id*/> >& p);
+                       uint32_t/*online id*/, uint32_t/*local player id*/,
+                       core::stringw/*player name*/, int/*icon id*/,
+                       SoccerTeam> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
+    void initAutoStartTimer(bool grand_prix_started, float start_threshold,
+                            float start_timeout, unsigned server_max_player);
+    void setStartingTimerTo(float t)             { m_cur_starting_timer = t; }
 
 };   // class NetworkingLobby
 

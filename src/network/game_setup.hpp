@@ -80,7 +80,7 @@ public:
     /** \brief Get the players that are in the game
     *  \return A vector containing pointers on the players profiles. */
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
-        getConnectedPlayers(bool same_index_for_disconnected = false) const
+        getConnectedPlayers(bool same_offset = false) const
     {
         std::lock_guard<std::mutex> lock(m_players_mutex);
         std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
@@ -88,7 +88,7 @@ public:
         {
             if (auto player_connected = player_weak.lock())
                 players.push_back(player_connected);
-            else if (same_index_for_disconnected)
+            else if (same_offset)
                 players.push_back(nullptr);
         }
         return players;
@@ -157,6 +157,9 @@ public:
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
     // ------------------------------------------------------------------------
     void sortPlayersForGrandPrix();
+    // ------------------------------------------------------------------------
+    void sortPlayersForSoccer();
+
 };
 
 #endif // GAME_SETUP_HPP

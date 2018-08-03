@@ -52,6 +52,7 @@ private:
     static Synchronised<FILE*> m_log_file;
 
 public:
+    static bool m_connection_debug;
               Network(int peer_count, int channel_limit,
                       uint32_t max_incoming_bandwidth,
                       uint32_t max_outgoing_bandwidth,

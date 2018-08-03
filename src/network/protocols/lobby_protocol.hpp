@@ -20,11 +20,11 @@
 #define LOBBY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-#include "network/network_string.hpp"
 
 class GameSetup;
 class NetworkPlayerProfile;
 
+#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -59,7 +59,10 @@ public:
         LE_VOTE,                          // Track vote
         LE_CHAT,
         LE_SERVER_OWNERSHIP,
-        LE_KICK_HOST
+        LE_KICK_HOST,
+        LE_CHANGE_TEAM,
+        LE_BAD_TEAM,
+        LE_BAD_CONNECTION
     };
 
     enum RejectReason : uint8_t
@@ -68,7 +71,8 @@ public:
         RR_BANNED = 1,
         RR_INCORRECT_PASSWORD = 2,
         RR_INCOMPATIBLE_DATA = 3,
-        RR_TOO_MANY_PLAYERS = 4
+        RR_TOO_MANY_PLAYERS = 4,
+        RR_INVALID_PLAYER = 5
     };
 
 protected:
@@ -83,12 +87,13 @@ protected:
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */
-    template<typename singleton> static std::shared_ptr<singleton> create()
+    template<typename Singleton, typename... Types>
+        static std::shared_ptr<Singleton> create(Types ...args)
     {
         assert(m_lobby.expired());
-        auto ret = std::make_shared<singleton>();
+        auto ret = std::make_shared<Singleton>(args...);
         m_lobby = ret;
-        return std::dynamic_pointer_cast<singleton>(ret);
+        return std::dynamic_pointer_cast<Singleton>(ret);
     }   // create
 
     // ------------------------------------------------------------------------
@@ -114,6 +119,7 @@ public:
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;
     virtual bool allPlayersReady() const = 0;
+    virtual bool isRacing() const = 0;
     GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol

@@ -105,7 +105,7 @@ public:
         buffer->add(m_steer);
         buffer->add(m_accel);
         buffer->addChar(getButtonsCompressed());
-    }   // copyToBuffer
+    }   // saveState
 
     // ------------------------------------------------------------------------
     /** Restores this object from a previously saved memory  buffer. */

@@ -74,6 +74,17 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                   0.0f));
     m_debug_drawer = new IrrDebugDrawer();
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
+
+    // Get the solver settings from the config file
+    btContactSolverInfo& info = m_dynamics_world->getSolverInfo();
+    info.m_numIterations = stk_config->m_solver_iterations;
+    info.m_splitImpulse  = stk_config->m_solver_split_impulse;
+    info.m_splitImpulsePenetrationThreshold =
+        stk_config->m_solver_split_impulse_thresh;
+
+    // Modify the mode according to the bits of the solver mode:
+    info.m_solverMode = (info.m_solverMode & (~stk_config->m_solver_reset_flags))
+                      | stk_config->m_solver_set_flags;
 }   // init
 
 //-----------------------------------------------------------------------------

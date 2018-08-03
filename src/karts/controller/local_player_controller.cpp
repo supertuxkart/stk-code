@@ -150,6 +150,13 @@ void LocalPlayerController::resetInputState()
 bool LocalPlayerController::action(PlayerAction action, int value,
                                    bool dry_run)
 {
+    // Pause race doesn't need to be sent to server
+    if (action == PA_PAUSE_RACE)
+    {
+        PlayerController::action(action, value);
+        return true;
+    }
+
     // If this event does not change the control state (e.g.
     // it's a (auto) repeat event), do nothing. This especially
     // optimises traffic to the server and other clients.
@@ -160,9 +167,9 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         history->addEvent(m_kart->getWorldKartId(), action, value);
 
     // If this is a client, send the action to networking layer
-    if (World::getWorld()->isNetworkWorld() && 
-        NetworkConfig::get()->isClient()    &&
-        !RewindManager::get()->isRewinding()   )
+    if (World::getWorld()->isNetworkWorld() &&
+        NetworkConfig::get()->isClient() &&
+        !RewindManager::get()->isRewinding())
     {
         if (auto gp = GameProtocol::lock())
         {
@@ -305,7 +312,7 @@ void LocalPlayerController::setPosition(int p)
  d*/
 void LocalPlayerController::finishedRace(float time)
 {
-    // This will implicitely trigger setting the first end camera to be active
+    // This will implicitly trigger setting the first end camera to be active
     Camera::changeCamera(m_camera_index, Camera::CM_TYPE_END);
 }   // finishedRace
 
@@ -336,15 +343,9 @@ void LocalPlayerController::handleZipper(bool play_sound)
 /** Called when a kart hits an item. It plays certain sfx (e.g. nitro full,
  *  or item specific sounds).
  *  \param item Item that was collected.
- *  \param add_info Additional info to be used then handling the item. If
- *                  this is -1 (default), the item type is selected
- *                  randomly. Otherwise it contains the powerup or
- *                  attachment for the kart. This is used in network mode to
- *                  let the server determine the powerup/attachment for
- *                  the clients.
  *  \param old_energy The previous energy value
  */
-void LocalPlayerController::collectedItem(const Item &item, int add_info,
+void LocalPlayerController::collectedItem(const ItemState &item_state,
                                           float old_energy)
 {
     if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
@@ -361,7 +362,7 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
     }
     else
     {
-        switch(item.getType())
+        switch(item_state.getType())
         {
         case Item::ITEM_BANANA:
             m_kart->playSound(m_ugh_sound);
@@ -399,7 +400,8 @@ void LocalPlayerController::nitroNotFullSound()
  */
 bool LocalPlayerController::canGetAchievements() const 
 {
-    return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
+    return !RewindManager::get()->isRewinding() &&
+        m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
 }   // canGetAchievements
 
 // ----------------------------------------------------------------------------

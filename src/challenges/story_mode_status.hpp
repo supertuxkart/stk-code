@@ -62,6 +62,7 @@ private:
     const ChallengeStatus *m_current_challenge;
 
     int m_points;
+    int m_points_before; // used for unlocks
     int m_next_unlock_points;
 
     /** Set to false after the initial stuff (intro, select kart, etc.) */
@@ -89,7 +90,7 @@ public:
      StoryModeStatus(const XMLNode *node=NULL);
     ~StoryModeStatus();
 
-    void computeActive();
+    void       computeActive     (bool first_call=false);
     bool       isLocked          (const std::string& feature);
     void       unlockFeatureByList();
     void       lockFeature       (ChallengeStatus *challenge);
@@ -112,6 +113,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of points accumulated. */
     int        getPoints          () const { return m_points; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of points before the previous point increase */
+    int        getPointsBefore     () const { return m_points_before; }
     // ------------------------------------------------------------------------
     /** Returns the number of points needed by the next unlockable. 0 if none. */
     int        getNextUnlockPoints () const { return m_next_unlock_points; }

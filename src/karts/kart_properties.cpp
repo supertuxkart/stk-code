@@ -82,7 +82,7 @@ KartProperties::KartProperties(const std::string &filename)
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
     m_wheel_base = m_friction_slip = m_collision_terrain_impulse =
-        m_collision_impulse = m_restitution = m_collision_impulse_time =
+        m_collision_impulse = m_collision_impulse_time =
         m_max_lean = m_lean_speed = m_physical_wheel_position = UNDEFINED;
 
     m_terrain_impulse_type       = IMPULSE_NONE;
@@ -92,7 +92,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
-    m_nitro_min_consumption      = 0.53f;
+    m_nitro_min_consumption      = 64;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -499,7 +499,7 @@ void KartProperties::getAllData(const XMLNode * root)
 void KartProperties::checkAllSet(const std::string &filename)
 {
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                      \
-        Log::fatal("[KartProperties]",                                \
+        Log::fatal("KartProperties",                                \
                     "Missing default value for '%s' in '%s'.",    \
                     strA,filename.c_str());                \
     }
@@ -508,8 +508,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_collision_terrain_impulse,  "collision terrain-impulse"     );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
-    CHECK_NEG(m_restitution,                "collision restitution"         );
     CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
+
+    if(m_restitution.size()<1)
+        Log::fatal("KartProperties", "Missing restitution value.");
 
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         m_ai_properties[i]->checkAllSet(filename);
@@ -1001,15 +1003,6 @@ float KartProperties::getNitroDuration() const
 }  // getNitroDuration
 
 // ------------------------------------------------------------------------
-/** Returns minimum time during which nitro is consumed when pressing nitro
- *  key, to prevent using nitro in very short bursts
-  */
-int KartProperties::getNitroMinConsumptionTicks() const
-{
-    return stk_config->time2Ticks(m_nitro_min_consumption);
-}
-
-// ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
     return m_cached_characteristic->getNitroEngineForce();

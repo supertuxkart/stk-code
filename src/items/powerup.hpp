@@ -23,11 +23,12 @@
 
 #include "items/powerup_manager.hpp"  // needed for powerup_type
 #include "utils/no_copy.hpp"
-#include "utils/random_generator.hpp"
+
+#include <set>
 
 class AbstractKart;
 class BareNetworkString;
-class Item;
+class ItemState;
 class SFXBase;
 
 /**
@@ -36,9 +37,6 @@ class SFXBase;
 class Powerup : public NoCopy
 {
 private:
-    /** A synchronised random number generator for network games. */
-    RandomGenerator             m_random;
-
     /** Sound effect that is being played. */
     SFXBase                    *m_sound_use;
 
@@ -51,6 +49,8 @@ private:
     /** The owner (kart) of this powerup. */
     AbstractKart*               m_kart;
 
+    std::set<int>               m_played_sound_ticks;
+
 public:
                     Powerup      (AbstractKart* kart_);
                    ~Powerup      ();
@@ -59,10 +59,10 @@ public:
     Material*       getIcon      () const;
     void            adjustSound  ();
     void            use          ();
-    void            hitBonusBox (const Item &item, int newC=-1);
+    void            hitBonusBox (const ItemState &item);
     void            saveState(BareNetworkString *buffer) const;
     void            rewindTo(BareNetworkString *buffer);
-
+    void            update(int ticks);
 
     /** Returns the number of powerups. */
     int             getNum       () const {return m_number;}

@@ -373,6 +373,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
             &m_race_setup_group, "Enable time limit in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam         m_random_arena_item
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "random-arena-item",
+            &m_race_setup_group, "Enable random location of items in an arena.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -466,10 +469,11 @@ namespace UserConfigParams
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
 
-    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
-            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+    PARAM_PREFIX IntUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_mode",
             &m_multitouch_group,
-            "Enable screen keyboard.") );
+            "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
+            "keyboard, 2 = always enabled") );
             
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
@@ -644,9 +648,6 @@ namespace UserConfigParams
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
-    /** If random number of items is used in an arena. */
-    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
-
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
@@ -713,9 +714,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_log_packets
         PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
         &m_network_group, "If all network packets should be logged"));
-    PARAM_PREFIX BoolUserConfigParam m_random_ports
-        PARAM_DEFAULT(BoolUserConfigParam(true, "random-ports",
-        &m_network_group, "Use random ports for client and server connection"));
+    PARAM_PREFIX BoolUserConfigParam m_random_client_port
+        PARAM_DEFAULT(BoolUserConfigParam(true, "random-client-port",
+        &m_network_group, "Use random port for client connection "
+        "(check stk_config.xml for default value)"));
+    PARAM_PREFIX BoolUserConfigParam m_random_server_port
+        PARAM_DEFAULT(BoolUserConfigParam(false, "random-server-port",
+        &m_network_group, "Use random port for server connection "
+        "(check stk_config.xml for default value)"));
     PARAM_PREFIX BoolUserConfigParam m_lobby_chat
         PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
@@ -723,9 +729,26 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam m_voting_timeout
         PARAM_DEFAULT(FloatUserConfigParam(20.0f, "voting-timeout",
         &m_network_group, "Timeout in seconds for voting tracks in server."));
+    PARAM_PREFIX FloatUserConfigParam m_validation_timeout
+        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
+        &m_network_group, "Timeout in seconds for validation of clients."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
+        PARAM_DEFAULT(IntUserConfigParam(8, "server-max-players",
         &m_network_group, "Maximum number of players on the server."));
+    PARAM_PREFIX BoolUserConfigParam m_firewalled_server
+        PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
+        &m_network_group, "Disable it to turn off all stun related code "
+        "in server, for official server hosting use only."));
+    PARAM_PREFIX FloatUserConfigParam m_start_game_counter
+        PARAM_DEFAULT(FloatUserConfigParam(30.0f, "start-game-counter",
+        &m_network_group, "Time to wait before entering kart selection screen "
+        "if satisfied start-game-threshold below for owner less or ranked "
+        "server."));
+    PARAM_PREFIX FloatUserConfigParam m_start_game_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "start-game-threshold",
+        &m_network_group, "Only auto start kart selection when number of "
+        "connected player is larger than max player * this value, for "
+        "owner less or ranked server, after start-game-counter."));
 
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
@@ -733,6 +756,15 @@ namespace UserConfigParams
             "from this IP will be banned.",
             { { "0.0.0.0", 0u } }
         ));
+    PARAM_PREFIX IntUserConfigParam m_max_ping
+        PARAM_DEFAULT(IntUserConfigParam(300, "max-ping",
+        &m_network_group, "Maximum ping allowed for a player (in ms)."));
+    PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
+        &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
+    PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
+        PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
+        &m_network_group, "Kick players whose ping is above max-ping."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
@@ -983,6 +1015,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
             PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
                                "Enable all karts and tracks") );
+                               
+    PARAM_PREFIX StringUserConfigParam      m_commandline
+            PARAM_DEFAULT( StringUserConfigParam("", "commandline",
+                             "Allows to set commandline args in config file") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

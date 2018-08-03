@@ -49,6 +49,8 @@ public:
 
     virtual ~AttachmentPlugin() {}
 
+    virtual void updateGrahpics(float dt) = 0;
+
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
      *  function returns true, the attachment is discarded. */

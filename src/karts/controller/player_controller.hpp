@@ -26,6 +26,7 @@ class Player;
 
 class PlayerController : public Controller
 {
+friend class KartRewinder;
 protected:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
     int            m_prev_accel;
@@ -55,10 +56,8 @@ public:
     virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
     virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void  collectedItem(const Item &item, int add_info=-1,
-                                float previous_energy=0            ) OVERRIDE
-    {
-    };
+    virtual void  collectedItem(const ItemState &item,
+                                float previous_energy=0 ) OVERRIDE { };
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------

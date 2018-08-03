@@ -93,6 +93,7 @@ bool VoteDialog::onEscapePressed()
  */
 void VoteDialog::sendVote()
 {
+#ifndef SERVER_ONLY
     /** A vote request. The callback will update the addon manager with the
      *  new average. The VoteDialog polls this request till it is finished
      *  to inform the user about the new average.
@@ -125,7 +126,7 @@ void VoteDialog::sendVote()
 
     m_rating_widget->setActive(false);
     m_cancel_widget->setActive(false);
-
+#endif
 }   // sendVote
 
 // -----------------------------------------------------------------------------

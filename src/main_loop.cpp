@@ -21,8 +21,10 @@
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -30,6 +32,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -46,14 +49,26 @@
 
 MainLoop* main_loop = 0;
 
+#ifdef WIN32
+LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg, 
+                                     _In_ WPARAM wParam, _In_ LPARAM lParam)
+{
+    if (uMsg == WM_DESTROY)
+    {
+        PostQuitMessage(0);
+        return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+};
+#endif
+
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
-        : m_abort(false), m_parent_pid(parent_pid)
+        : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
-    m_is_last_substep = false;
     m_frame_before_loading_world = false;
 #ifdef WIN32
     if (parent_pid != 0)
@@ -62,15 +77,7 @@ MainLoop::MainLoop(unsigned parent_pid)
         class_name += StringUtils::toString(GetCurrentProcessId());
         WNDCLASSEX wx = {};
         wx.cbSize = sizeof(WNDCLASSEX);
-        wx.lpfnWndProc = [](HWND h, UINT m, WPARAM w, LPARAM l)->LRESULT
-        {
-            if (m == WM_DESTROY)
-            {
-                PostQuitMessage(0);
-                return 0;
-            }
-            return DefWindowProc(h, m, w, l);
-        };
+        wx.lpfnWndProc = separateProcessProc;
         wx.hInstance = GetModuleHandle(0);
         wx.lpszClassName = &class_name[0];
         if (RegisterClassEx(&wx))
@@ -119,7 +126,9 @@ float MainLoop::getLimitedDt()
         // with clients (server time is supposed to be behind client time).
         // So we play it safe by adding a loop to make sure at least 1ms
         // (minimum time that can be handled by the integer timer) delay here.
-        while (dt <= 0)
+        // Only exception is profile mode (typically running without graphics),
+        // which we want to run as fast as possible.
+        while (dt <= 0 && !ProfileWorld::isProfileMode())
         {
             StkTime::sleep(1);
             m_curr_time = device->getTimer()->getRealTime();
@@ -180,16 +189,6 @@ float MainLoop::getLimitedDt()
     }   // while(1)
 
     dt *= 0.001f;
-
-    // If this is a client, the server might request an adjustment of
-    // this client's world clock (to reduce number of rewinds).
-    if (World::getWorld()                   &&
-        NetworkConfig::get()->isClient()    &&
-        !RewindManager::get()->isRewinding()   )
-    {
-        dt = World::getWorld()->adjustDT(dt);
-    }
-
     return dt;
 }   // getLimitedDt
 
@@ -322,7 +321,6 @@ void MainLoop::run()
         if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
             m_abort = true;
 #endif
-        m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
@@ -343,6 +341,19 @@ void MainLoop::run()
             STKHost::get()->shutdown();
             // In case the user opened a race pause dialog
             GUIEngine::ModalDialog::dismiss();
+
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
+            {
+                // Flush all command before delete world, avoid later access
+                SP::SPTextureManager::get()
+                    ->checkForGLCommand(true/*before_scene*/);
+                // Reset screen in case the minimap was drawn
+                glViewport(0, 0, irr_driver->getActualScreenSize().Width,
+                    irr_driver->getActualScreenSize().Height);
+            }
+#endif
+
             if (World::getWorld())
             {
                 race_manager->clearNetworkGrandPrixResult();
@@ -376,8 +387,6 @@ void MainLoop::run()
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
-                if (World::getWorld() && history->replayHistory())
-                    history->updateReplay(World::getWorld()->getTimeTicks());
                 PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
                 SFXManager::get()->update();
                 PROFILER_POP_CPU_MARKER();
@@ -388,10 +397,43 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
+        m_ticks_adjustment.lock();
+        if (m_ticks_adjustment.getData() != 0)
+        {
+            if (m_ticks_adjustment.getData() > 0)
+            {
+                num_steps += m_ticks_adjustment.getData();
+                m_ticks_adjustment.getData() = 0;
+            }
+            else if (m_ticks_adjustment.getData() < 0)
+            {
+                int new_steps = num_steps + m_ticks_adjustment.getData();
+                if (new_steps < 0)
+                {
+                    num_steps = 0;
+                    m_ticks_adjustment.getData() = new_steps;
+                }
+                else
+                {
+                    num_steps = new_steps;
+                    m_ticks_adjustment.getData() = 0;
+                }
+            }
+        }
+        m_ticks_adjustment.unlock();
+
         for(int i=0; i<num_steps; i++)
         {
-            // Enable last substep in last iteration
-            m_is_last_substep = (i == num_steps - 1);
+            if (World::getWorld() && history->replayHistory())
+                history->updateReplay(World::getWorld()->getTicksSinceStart());
+
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
+                                     0x7F, 0x00, 0x7F);
+            if (auto pm = ProtocolManager::lock())
+            {
+                pm->update(1);
+            }
+            PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(1);
@@ -401,14 +443,6 @@ void MainLoop::run()
             // the main loop to abort; and it's not a good idea to continue
             // since the GUI engine is no more to be called then.
             if (m_abort) break;
-
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
-                                     0x7F, 0x00, 0x7F);
-            if (auto pm = ProtocolManager::lock())
-            {
-                pm->update(1);
-            }
-            PROFILER_POP_CPU_MARKER();
 
             if (m_frame_before_loading_world)
             {
@@ -426,8 +460,6 @@ void MainLoop::run()
                 World::getWorld()->updateTime(1);
             }
         }   // for i < num_steps
-
-        m_is_last_substep = false;
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort

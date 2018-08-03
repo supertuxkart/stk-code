@@ -86,7 +86,8 @@ public:
                 ~EndController();
     virtual void update      (int ticks) ;
     virtual void reset       ();
-    virtual void action      (PlayerAction action, int value);
+    virtual bool action      (PlayerAction action, int value,
+                              bool dry_run = false);
     virtual void newLap      (int lap);
     // ------------------------------------------------------------------------
     virtual bool canGetAchievements() const

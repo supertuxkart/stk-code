@@ -32,6 +32,7 @@
 StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
     m_points                  = 0;
+    m_points_before           = 0;
     m_next_unlock_points      = 0;
     m_first_time              = true;
     m_easy_challenges         = 0;
@@ -85,8 +86,9 @@ bool StoryModeStatus::isLocked(const std::string& feature)
 }  // featureIsLocked
 
 //-----------------------------------------------------------------------------
-void StoryModeStatus::computeActive()
+void StoryModeStatus::computeActive(bool first_call)
 {
+    int old_points = m_points;
     m_points = 0;
     m_next_unlock_points = 0;
     m_easy_challenges = 0;
@@ -104,8 +106,8 @@ void StoryModeStatus::computeActive()
         // -----------------
         if((i->second)->isSolvedAtAnyDifficulty())
         {
-            // The constructor calls computeActive, which actually locks
-            // all features, so unlock the solved ones (and don't try to
+            // computeActive is called in createStoryModeStatus, which actually
+            // locks all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
 
             if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
@@ -189,6 +191,11 @@ void StoryModeStatus::computeActive()
     }   // for i
 
     // now we have the number of points.
+
+    // Update the previous number of points
+    // On game launch, set it to the number of points the player has
+    if (old_points != m_points)
+        m_points_before = (first_call) ? m_points : old_points;
 
     unlockFeatureByList();
 
@@ -276,8 +283,9 @@ void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty 
         m_locked_features.erase(p);
     }
 
-    // Add to list of recently unlocked features if the challenge is newly completed
-    if (!c->isSolvedAtAnyDifficulty())
+    // Add to list of recently unlocked features
+    // if the challenge is newly completed at the current difficulty
+    if (!c->isSolved(d))
         m_unlocked_features.push_back(c->getData());
 
     c->setSolved(d);  // reset isActive flag
@@ -377,11 +385,11 @@ void StoryModeStatus::save(UTFWriter &out, bool current_player)
         m_story_mode_milliseconds = story_mode_timer->getStoryModeTime();
     }
 
-    out << L"      <story-mode first-time=\"" << m_first_time  << L"\"";
-    out << L" finished=\"" << m_story_mode_finished  << L"\"";
-    out << L" speedrun-finished=\"" << m_valid_speedrun_finished  << L"\"\n";
-    out << L"                  story-ms=\"" << m_story_mode_milliseconds  << L"\"";
-    out << L" speedrun-ms=\"" << m_speedrun_milliseconds  << L"\">\n";
+    out << "      <story-mode first-time=\"" << m_first_time  << "\"";
+    out << " finished=\"" << m_story_mode_finished  << "\"";
+    out << " speedrun-finished=\"" << m_valid_speedrun_finished  << "\"\n";
+    out << "                  story-ms=\"" << m_story_mode_milliseconds  << "\"";
+    out << " speedrun-ms=\"" << m_speedrun_milliseconds  << "\">\n";
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
@@ -389,5 +397,5 @@ void StoryModeStatus::save(UTFWriter &out, bool current_player)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << L"      </story-mode>\n";
+    out << "      </story-mode>\n";
 }  // save

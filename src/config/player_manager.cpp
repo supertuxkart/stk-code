@@ -262,14 +262,14 @@ void PlayerManager::save()
     std::string filename = file_manager->getUserConfigFile("players.xml");
     try
     {
-        UTFWriter players_file(filename.c_str());
+        UTFWriter players_file(filename.c_str(), false);
 
-        players_file << L"<?xml version=\"1.0\"?>\n";
-        players_file << L"<players version=\"1\" >\n";
+        players_file << "<?xml version=\"1.0\"?>\n";
+        players_file << "<players version=\"1\" >\n";
 
         if(m_current_player)
         {
-            players_file << L"    <current player=\""
+            players_file << "    <current player=\""
                          << StringUtils::xmlEncode(m_current_player->getName(true/*ignoreRTL*/)) << L"\"/>\n";
         }
 
@@ -279,7 +279,7 @@ void PlayerManager::save()
             if(!player->isGuestAccount())
                 player->save(players_file);
         }
-        players_file << L"</players>\n";
+        players_file << "</players>\n";
         players_file.close();
     }
     catch (std::runtime_error& e)
@@ -327,8 +327,9 @@ void PlayerManager::enforceCurrentPlayer()
     {
         if (!player->isGuestAccount())
         {
-            Log::info("PlayerManager", "Enforcing current player '%ls'.",
-                      player->getName(true/*ignoreRTL*/).c_str());
+            Log::info("PlayerManager", "Enforcing current player '%s'.",
+                StringUtils::wideToUtf8(player->getName(true/*ignoreRTL*/))
+                .c_str());
             m_current_player = player;
             return;
         }
@@ -342,7 +343,8 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enforcing current player '%s'.",
-                       player->getName(true/*ignoreRTL*/).c_str());
+                StringUtils::wideToUtf8(player->getName(true/*ignoreRTL*/))
+                .c_str());
             m_current_player = player;
             return;
         }

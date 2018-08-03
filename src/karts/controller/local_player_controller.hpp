@@ -62,6 +62,7 @@ private:
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
+
 public:
                  LocalPlayerController(AbstractKart *kart,
                                        const int local_player_id,
@@ -71,7 +72,7 @@ public:
     bool         action            (PlayerAction action, int value,
                                     bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;
-    void         collectedItem     (const Item &item, int add_info=-1,
+    void         collectedItem     (const ItemState &item,
                                     float previous_energy=0) OVERRIDE;
     virtual void setPosition       (int p) OVERRIDE;
     virtual void reset             () OVERRIDE;
@@ -86,7 +87,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName() const OVERRIDE;
-
 
 };   // LocalPlayerController
 

@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 #  ifdef __APPLE__
 #    include <OpenAL/al.h>
 #  else
