@@ -19,7 +19,7 @@
             <spacer height="10" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password (optional)"/>
+                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password for private server (optional)"/>
                 <textbox proportion="1" id="password" I18N="In the server creation screen"/>
             </div>
 
