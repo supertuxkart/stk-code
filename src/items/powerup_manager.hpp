@@ -94,7 +94,7 @@ private:
         /** This field is only populated for the WeightData class that
          *  is used during a race. It contains for each rank the summed
          *  weights for easy lookup during a race. */
-        std::vector < std::vector<int> > m_summed_weights_for_rank;
+        std::vector < std::vector<unsigned> > m_summed_weights_for_rank;
 
     public:
         // The friend declaration gives the PowerupManager access to the

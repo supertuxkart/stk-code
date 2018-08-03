@@ -394,7 +394,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, unsigned int random_num
     if(rank>(int)m_summed_weights_for_rank.size())
         rank = m_summed_weights_for_rank.size()-1;
     else if (rank<0) rank = 0;  // E.g. battle mode, which has rank -1
-    const std::vector<int> &summed_weights = m_summed_weights_for_rank[rank];
+    const std::vector<unsigned> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
 #undef ITEM_DISTRIBUTION_DEBUG
