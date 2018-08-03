@@ -1273,7 +1273,7 @@ void ServerLobby::connectionRequested(Event* event)
     }
 
     // Check server version
-    int version = data.getUInt8();
+    int version = data.getUInt32();
     if (version < stk_config->m_min_server_version ||
         version > stk_config->m_max_server_version)
     {
@@ -1481,6 +1481,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     // connection success -- return the host id of peer
     float auto_start_timer = m_timeout.load();
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
+        .addUInt32(NetworkConfig::m_server_version)
         .addFloat(auto_start_timer == std::numeric_limits<float>::max() ?
         auto_start_timer : auto_start_timer - (float)StkTime::getRealTime());
     peer->sendPacket(message_ack);

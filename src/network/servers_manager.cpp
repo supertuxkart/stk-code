@@ -176,7 +176,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                 if (len > 0)
                 {
                     BareNetworkString s(buffer, len);
-                    int version = s.getUInt8();
+                    int version = s.getUInt32();
                     if (version < stk_config->m_max_server_version ||
                         version > stk_config->m_max_server_version)
                     {

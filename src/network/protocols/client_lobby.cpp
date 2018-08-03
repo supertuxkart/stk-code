@@ -267,7 +267,7 @@ void ClientLobby::update(int ticks)
     {
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
-            .addUInt8(NetworkConfig::m_server_version);
+            .addUInt32(NetworkConfig::m_server_version);
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
@@ -491,6 +491,9 @@ void ClientLobby::connectionAccepted(Event* event)
     Log::info("ClientLobby", "The server accepted the connection.");
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+    uint32_t server_version = data.getUInt32();
+    NetworkConfig::get()->setJoinedServerVersion(server_version);
+    assert(server_version != 0);
     m_state.store(CONNECTED);
     float auto_start_timer = data.getFloat();
     if (auto_start_timer != std::numeric_limits<float>::max())

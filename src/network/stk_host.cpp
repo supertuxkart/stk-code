@@ -993,7 +993,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         // Send the answer, consisting of server name, max players, 
         // current players
         BareNetworkString s((int)name.size()+1+11);
-        s.addUInt8(NetworkConfig::m_server_version);
+        s.addUInt32(NetworkConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8((uint8_t)sl->getGameSetup()->getPlayerCount());
