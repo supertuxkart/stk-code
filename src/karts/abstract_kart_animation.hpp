@@ -19,6 +19,8 @@
 #ifndef HEADER_ABSTRACT_KART_ANIMATION_HPP
 #define HEADER_ABSTRACT_KART_ANIMATION_HPP
 
+#include "LinearMath/btTransform.h"
+
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -40,12 +42,19 @@ class AbstractKartAnimation: public NoCopy
 private:
     /** Name of this animation, used for debug prints only. */
     std::string m_name;
+
+    int m_created_ticks;
+
 protected:
    /** A pointer to the kart which is animated by this class. */
     AbstractKart *m_kart;
 
     /** Timer for the explosion. */
     float m_timer;
+
+    btTransform m_end_transform;
+
+    bool m_set_end_transform_by_network;
 
 public:
                  AbstractKartAnimation(AbstractKart *kart,
@@ -59,7 +68,18 @@ public:
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
     virtual const std::string &getName() const { return m_name; }
-
+    // ------------------------------------------------------------------------
+    virtual bool useEarlyEndTransform() const { return true; }
+    // ------------------------------------------------------------------------
+    const btTransform& getEndTransform() const { return m_end_transform; }
+    // ------------------------------------------------------------------------
+    void setEndTransform(const btTransform& t)
+    {
+        if (!useEarlyEndTransform())
+            return;
+        m_set_end_transform_by_network = true;
+        m_end_transform = t;
+    }
 };   // AbstractKartAnimation
 
 #endif

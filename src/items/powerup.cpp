@@ -504,14 +504,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
 
     unsigned int n=1;
     PowerupManager::PowerupType new_powerup;
-
-    // Check if rubber ball is the current power up held by the kart. If so,
-    // reset the bBallCollectTime to 0 before giving new powerup.
-    if(m_type == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(0);
-
     World *world = World::getWorld();
-
 
     // Determine a 'random' number based on time, index of the item,
     // and position of the kart. The idea is that this process is

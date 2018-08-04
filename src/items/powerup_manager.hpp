@@ -143,9 +143,6 @@ private:
     /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];
 
-    /** Last time the bouncing ball was collected */
-    int           m_rubber_ball_collect_ticks;
-
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
     irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
@@ -174,13 +171,6 @@ public:
     /** Returns the mesh for a certain powerup.
      *  \param type Mesh type for which the model is returned. */
     irr::scene::IMesh *getMesh(int type) const {return m_all_meshes[type];}
-    // ------------------------------------------------------------------------
-    /** Returns the last time a rubber ball was collected. */
-    int getBallCollectTicks() const {return m_rubber_ball_collect_ticks;}
-    // ------------------------------------------------------------------------
-    /** Updates the last time at which a rubber ball was collected. */
-    void setBallCollectTicks(int ticks) {m_rubber_ball_collect_ticks=ticks;}
-    // ------------------------------------------------------------------------
 };   // class PowerupManager
 
 extern PowerupManager* powerup_manager;

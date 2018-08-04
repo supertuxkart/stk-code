@@ -45,6 +45,14 @@
 RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
                : AbstractKartAnimation(kart, "RescueAnimation")
 {
+    btTransform prev_trans = kart->getTrans();
+    // Get the required final physicial transform for network, then reset back
+    // to the original transform
+    World::getWorld()->moveKartAfterRescue(kart);
+
+    m_end_transform = kart->getTrans();
+    kart->setTrans(prev_trans);
+
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
     m_timer       = m_kart->getKartProperties()->getRescueDuration();
@@ -56,7 +64,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     // Determine maximum rescue height with up-raycast
     float max_height = m_kart->getKartProperties()->getRescueHeight();
     float hit_dest = maximumHeight();
-   
+
     max_height = std::min(hit_dest, max_height);
     m_velocity = max_height / m_timer;
 
@@ -80,7 +88,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     {
         m_des_rotation = m_orig_rotation;
     }
-    
+
     // Add a hit unless it was auto-rescue
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
         !is_auto_rescue)
@@ -91,8 +99,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
             world->increaseRescueCount();
     }
 
-};   // RescueAnimation
-
+}   // RescueAnimation
 
 //-----------------------------------------------------------------------------
 /** This object is automatically destroyed when the timer expires.
@@ -106,7 +113,9 @@ RescueAnimation::~RescueAnimation()
     m_referee = NULL;
 }   // ~RescueAnimation
 
-// Determine maximum rescue height with up-raycast
+//-----------------------------------------------------------------------------
+/** Determine maximum rescue height with up-raycast
+ */
 float RescueAnimation::maximumHeight() 
 {
     float hit_dest = 9999999.9f;
@@ -125,24 +134,21 @@ float RescueAnimation::maximumHeight()
         }
     }
     return hit_dest;
-}
-// ----------------------------------------------------------------------------
+}   // maximumHeight
 
+// ----------------------------------------------------------------------------
 /** Updates the kart animation.
  *  \param dt Time step size.
  *  \return True if the explosion is still shown, false if it has finished.
  */
 void RescueAnimation::update(float dt)
 {
-
     if (m_timer <= (m_kart->getKartProperties()->getRescueDuration() * rescue_moment))
     {
-        if (kart_on_track == false) 
+        if (m_kart_on_track == false)
         {
-            kart_on_track = true;
-
-            World::getWorld()->moveKartAfterRescue(m_kart);
-
+            m_kart_on_track = true;
+            m_kart->setTrans(m_end_transform);
             for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
             {
                 CameraNormal* camera = dynamic_cast<CameraNormal*>(Camera::getCamera(i));

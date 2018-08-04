@@ -29,7 +29,7 @@
 
 #include "LinearMath/btTransform.h"
 
-/** The constructor for the cannon animation. 
+/** The constructor for the cannon animation.
  *  \param kart The kart to be animated. Can also be NULL if a basket ball
  *         etc is animated (e.g. cannon animation).
  *  \param ipo The IPO (blender interpolation curve) which the kart
@@ -48,6 +48,7 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
                                  float skid_rot)
                : AbstractKartAnimation(kart, "CannonAnimation")
 {
+    m_set_end_transform_by_network = true;
     m_flyable = NULL;
     init(ipo, start_left, start_right, end_left, end_right, skid_rot);
 }   // CannonAnimation

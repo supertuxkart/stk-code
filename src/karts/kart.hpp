@@ -464,7 +464,11 @@ public:
     // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
     virtual void setInvulnerableTicks(int ticks) OVERRIDE
-    { 
+    {
+        // The rest 2 bits are saving fire clicked and animation status for
+        // rewind
+        if (ticks > 16383)
+            ticks = 16383;
         m_invulnerable_ticks = ticks;
     }   // setInvulnerableTicks
     // ------------------------------------------------------------------------

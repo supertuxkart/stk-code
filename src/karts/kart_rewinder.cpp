@@ -21,6 +21,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/abstract_kart_animation.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
@@ -154,10 +155,20 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->addUInt16(m_bubblegum_ticks);
     buffer->addUInt16(m_view_blocked_by_plunger);
     // m_invulnerable_ticks will not be negative
+    AbstractKartAnimation* ka = getKartAnimation();
+    bool has_animation = ka != NULL && ka->useEarlyEndTransform();
     uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
-        m_invulnerable_ticks;
+        (has_animation ? 1 << 14 : 0) | m_invulnerable_ticks;
     buffer->addUInt16(fire_and_invulnerable);
 
+    // 7) Kart animation status (tells the end transformation)
+    if (has_animation)
+    {
+        const btTransform& trans = ka->getEndTransform();
+        buffer->add(trans.getOrigin());
+        btQuaternion quat = trans.getRotation();
+        buffer->add(quat);
+    }
     return buffer;
 }   // saveState
 
@@ -242,7 +253,20 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     m_view_blocked_by_plunger = buffer->getUInt16();
     uint16_t fire_and_invulnerable = buffer->getUInt16();
     m_fire_clicked = (fire_and_invulnerable >> 15) == 1;
-    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 15);
+    bool has_animation = (fire_and_invulnerable >> 14) == 1;
+    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 14);
+
+    // 7) Kart animation status (tells the end transformation)
+    // -----------
+    if (has_animation)
+    {
+        btTransform trans;
+        trans.setOrigin(buffer->getVec3());
+        trans.setRotation(buffer->getQuat());
+        AbstractKartAnimation* ka = getKartAnimation();
+        if (ka)
+            ka->setEndTransform(trans);
+    }
 }   // restoreState
 
 // ----------------------------------------------------------------------------

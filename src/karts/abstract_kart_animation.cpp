@@ -23,8 +23,11 @@
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
+
+#include <limits>
 
 /** Constructor. Note that kart can be NULL in case that the animation is
  *  used for a basket ball in a cannon animation.
@@ -37,7 +40,11 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     m_timer = 0;
     m_kart  = kart;
     m_name  = name;
-
+    m_end_transform = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+    m_end_transform.setOrigin(Vec3(std::numeric_limits<float>::max()));
+    m_set_end_transform_by_network = NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() ? false : true;
+    m_created_ticks = World::getWorld()->getTicksSinceStart();
     // Remove previous animation if there is one
 #ifndef DEBUG
     // Use this code in non-debug mode to avoid a memory leak (and messed
@@ -83,12 +90,15 @@ AbstractKartAnimation::~AbstractKartAnimation()
     {
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         Physics::getInstance()->addKart(m_kart);
-        if (RewindManager::get()->useLocalEvent())
+        if (RewindManager::get()->useLocalEvent() &&
+            m_set_end_transform_by_network)
         {
             AbstractKart* kart = m_kart;
             Vec3 linear_velocity = kart->getBody()->getLinearVelocity();
             Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
-            btTransform transform = kart->getBody()->getWorldTransform();
+            btTransform transform = m_end_transform.getOrigin().x() ==
+                std::numeric_limits<float>::max() ?
+                kart->getBody()->getWorldTransform() : m_end_transform;
             RewindManager::get()->addRewindInfoEventFunction(new
                 RewindInfoEventFunction(
                 World::getWorld()->getTicksSinceStart(),
@@ -123,6 +133,19 @@ void AbstractKartAnimation::update(float dt)
     if(m_timer<0)
     {
         if(m_kart) m_kart->setKartAnimation(NULL);
+        delete this;
+    }
+    // Delete animation in client if after 1 second no end transform
+    // confirmation from network
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() && !m_set_end_transform_by_network &&
+        World::getWorld()->getTicksSinceStart() > m_created_ticks + 120)
+    {
+        Log::warn("AbstractKartAnimation",
+            "No animation has been created on server, remove locally.");
+        m_timer = -1.0f;
+        if (m_kart)
+            m_kart->setKartAnimation(NULL);
         delete this;
     }
 }   // update
