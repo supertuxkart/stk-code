@@ -252,6 +252,8 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         return false;
     }
 
+    rd.m_track = t;
+
     fgets(s, 1023, fd);
     if (sscanf(s, "laps: %u", &rd.m_laps) != 1)
     {
