@@ -162,10 +162,6 @@ void AddonsScreen::init()
 
     m_reloading = false;
 
-    m_sort_desc = false;
-    m_sort_default = true;
-    m_sort_col = 0;
-
     getWidget<GUIEngine::RibbonWidget>("category")->setActive(false);
 
     if(UserConfigParams::logAddons())
@@ -232,7 +228,7 @@ void AddonsScreen::tearDown()
  *  updated.
  *  \param type Must be 'kart' or 'track'.
  */
-void AddonsScreen::loadList()
+void AddonsScreen::loadList(bool sort_desc)
 {
 #ifndef SERVER_ONLY
     // Get the filter by words.
@@ -287,7 +283,7 @@ void AddonsScreen::loadList()
 
         sorted_list.push_back(&addon);
     }
-    sorted_list.insertionSort(/*start=*/0, m_sort_desc);
+    sorted_list.insertionSort(/*start=*/0, sort_desc);
 
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
@@ -420,33 +416,20 @@ void AddonsScreen::loadList()
 }   // loadList
 
 // ----------------------------------------------------------------------------
-void AddonsScreen::onColumnClicked(int column_id)
+void AddonsScreen::onColumnClicked(int column_id, bool sort_desc, bool sort_default)
 {
-    if (m_sort_col != column_id)
-    {
-        m_sort_desc = false;
-        m_sort_default = false;
-    }
-    else
-    {
-        if (!m_sort_default) m_sort_desc = !m_sort_desc;
-        m_sort_default = !m_sort_desc && !m_sort_default;
-    }
-    
-    m_sort_col = column_id;
-
     switch(column_id)
     {
     case 0:
-        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_NAME);
+        Addon::setSortOrder(sort_default ? Addon::SO_DEFAULT : Addon::SO_NAME);
         break;
     case 1:
-        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_DATE);
+        Addon::setSortOrder(sort_default ? Addon::SO_DEFAULT : Addon::SO_DATE);
         break;
     default: assert(0); break;
     }   // switch
     /** \brief Toggle the sort order after column click **/
-    loadList();
+    loadList(sort_desc && !sort_default);
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------

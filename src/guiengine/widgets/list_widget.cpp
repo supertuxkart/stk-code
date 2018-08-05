@@ -479,7 +479,7 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
         */
 
-        if (m_listener) m_listener->onColumnClicked(m_sort_col);
+        if (m_listener) m_listener->onColumnClicked(m_sort_col, m_sort_desc, m_sort_default);
 
         return EVENT_BLOCK;
     }

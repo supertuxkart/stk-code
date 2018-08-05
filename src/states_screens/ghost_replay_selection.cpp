@@ -32,7 +32,6 @@ using namespace GUIEngine;
  */
 GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.stkgui")
 {
-    m_sort_desc = true;
     m_is_comparing = false;
     m_replay_to_compare_uid = 0;
 }   // GhostReplaySelection
@@ -424,11 +423,16 @@ void GhostReplaySelection::onConfirm()
 /** Change the sort order if a column was clicked.
  *  \param column_id ID of the column that was clicked.
  */
-void GhostReplaySelection::onColumnClicked(int column_id)
+void GhostReplaySelection::onColumnClicked(int column_id, bool sort_desc, bool sort_default)
 {
     // Begin by resorting the list to default
     defaultSort();
 
+    if (sort_default)
+    {
+        loadList();
+        return;
+    }
 
     int diff_difficulty = m_same_difficulty ? 1 : 0;
     int diff_linear = m_active_mode_is_linear ? 0 : 1;
@@ -461,10 +465,7 @@ void GhostReplaySelection::onColumnClicked(int column_id)
     else
         assert(0);
 
-    /** \brief Toggle the sort order after column click **/
-    m_sort_desc = !m_sort_desc;
-
-    ReplayPlay::get()->sortReplay(m_sort_desc);
+    ReplayPlay::get()->sortReplay(sort_desc);
 
     loadList();
 }   // onColumnClicked

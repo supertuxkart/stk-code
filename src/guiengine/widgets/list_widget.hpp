@@ -39,7 +39,7 @@ namespace GUIEngine
     public:
         virtual ~IListWidgetHeaderListener(){}
         
-        virtual void onColumnClicked(int columnId) = 0;
+        virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) = 0;
     };
     
     /** \brief A vertical list widget with text entries
