@@ -222,8 +222,8 @@
                 detach parachute. E.g. at max-speed 50% of speed must be lost.
             max-speed: A factor that decides the impact of rate of speed
                 (distance between bounds) -->
-        <parachute friction="5.0" duration="2" duration-other="2.6"
-                   duration-rank-mult="1.35" duration-speed-mult="1.5"
+        <parachute friction="5.0" duration="3" duration-other="2.5"
+                   duration-rank-mult="1.5" duration-speed-mult="1.35"
                    lbound-fraction="0.5" ubound-fraction="0.3" max-speed="30" />
         <!-- Bubblegum
             duration: How long the bubblegum lasts.
