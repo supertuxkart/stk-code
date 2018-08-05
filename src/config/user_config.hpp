@@ -680,10 +680,6 @@ namespace UserConfigParams
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
-    /** How many seconds worth of data the circular profile buffer
-     *  can store. */
-    PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
-
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
