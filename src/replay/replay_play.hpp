@@ -133,8 +133,8 @@ public:
     // ------------------------------------------------------------------------
     void               sortReplay(bool reverse)
     {
-        (reverse ? std::sort(m_replay_file_list.rbegin(),
-            m_replay_file_list.rend()) : std::sort(m_replay_file_list.begin(),
+        (reverse ? std::stable_sort(m_replay_file_list.rbegin(),
+            m_replay_file_list.rend()) : std::stable_sort(m_replay_file_list.begin(),
             m_replay_file_list.end()));
     }
     // ------------------------------------------------------------------------

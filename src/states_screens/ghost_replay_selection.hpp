@@ -62,6 +62,7 @@ private:
     // Using the UID guarantees exact matchess
     uint64_t                   m_replay_to_compare_uid;
 
+    void defaultSort();
 
 public:
 
