@@ -51,6 +51,7 @@ void GhostReplaySelection::refresh(bool forced_update, bool update_columns)
 {
     if (ReplayPlay::get()->getNumReplayFile() == 0 || forced_update)
         ReplayPlay::get()->loadAllReplayFile();
+    defaultSort();
     loadList();
 
     // Allow to disable a comparison, but not to start one
@@ -136,7 +137,6 @@ void GhostReplaySelection::init()
  */
 void GhostReplaySelection::loadList()
 {
-    ReplayPlay::get()->sortReplay(m_sort_desc);
     m_replay_list_widget->clear();
 
     if (ReplayPlay::get()->getNumReplayFile() == 0)
@@ -426,6 +426,10 @@ void GhostReplaySelection::onConfirm()
  */
 void GhostReplaySelection::onColumnClicked(int column_id)
 {
+    // Begin by resorting the list to default
+    defaultSort();
+
+
     int diff_difficulty = m_same_difficulty ? 1 : 0;
     int diff_linear = m_active_mode_is_linear ? 0 : 1;
 
@@ -457,12 +461,28 @@ void GhostReplaySelection::onColumnClicked(int column_id)
     else
         assert(0);
 
-    printf("column_id is %d\n", column_id);
-
     /** \brief Toggle the sort order after column click **/
     m_sort_desc = !m_sort_desc;
+
+    ReplayPlay::get()->sortReplay(m_sort_desc);
+
     loadList();
 }   // onColumnClicked
+
+// ----------------------------------------------------------------------------
+/** Apply the default sorting to the replay list
+ */
+void GhostReplaySelection::defaultSort()
+{
+    ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+    ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+    ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+    ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+}   // defaultSort
 
 // ----------------------------------------------------------------------------
 bool GhostReplaySelection::onEscapePressed()
