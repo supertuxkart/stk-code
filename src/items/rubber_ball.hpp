@@ -177,13 +177,15 @@ private:
     /** This variable counts how often a ball tunneled (in consecutive
      *  frames). If a ball tunnels a certain number of times, it is
      *  considered stuck and will be removed. */
-    unsigned int m_tunnel_count;
+    uint8_t      m_tunnel_count;
 
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;
 
     /* Used by undo and redo the firing when rewind */
     Vec3 m_owner_init_pos, m_init_pos;
+
+    bool m_restoring_state;
 
     void         computeTarget();
     void         updateDistanceToTarget();

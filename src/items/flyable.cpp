@@ -638,6 +638,7 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
         m_body->setAngularVelocity(av);
         m_body->setInterpolationLinearVelocity(lv);
         m_body->setInterpolationAngularVelocity(av);
+        setTrans(t);
     }
     uint16_t hit_and_ticks = buffer->getUInt16();
     m_has_hit_something = (hit_and_ticks >> 15) == 1;

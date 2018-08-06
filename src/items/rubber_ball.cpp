@@ -106,6 +106,7 @@ void RubberBall::additionalPhysicsProperties()
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return;
 
+    m_restoring_state = true;
     computeTarget();
 
     // initialises the current graph node
@@ -196,6 +197,14 @@ void RubberBall::setAnimation(AbstractKartAnimation *animation)
 void RubberBall::computeTarget()
 {
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+
+    if (m_restoring_state)
+    {
+        // Update kart position from rewind data 1st time
+        world->updateTrackSectors();
+        world->updateRacePosition();
+        m_restoring_state = false;
+    }
 
     for(unsigned int p = race_manager->getFinishedKarts()+1;
                      p < world->getNumKarts()+1; p++)
@@ -374,6 +383,11 @@ bool RubberBall::updateAndDelete(int ticks)
         return Flyable::updateAndDelete(ticks);
     }
 
+    // Update normal from rewind first
+    const Vec3& normal =
+        DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
+    TerrainInfo::update(getXYZ(), -normal);
+
     // Update the target in case that the first kart was overtaken (or has
     // finished the race).
     computeTarget();
@@ -397,7 +411,7 @@ bool RubberBall::updateAndDelete(int ticks)
     bool close_to_ground = 2.0*m_previous_height < m_current_max_height;
 
     float vertical_offset = close_to_ground ? 4.0f : 2.0f;
-       
+
     // Update height of terrain (which isn't done as part of
     // Flyable::update for rubber balls.
     TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
@@ -482,7 +496,7 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, int ticks)
     }
 
     // If ball is close to the target, then explode
-    if (diff.length() < m_target->getKartLength()) 
+    if (diff.length() < m_target->getKartLength())
         hit((AbstractKart*)m_target);
 
     assert(!std::isnan((*next_xyz)[0]));
@@ -691,6 +705,10 @@ void RubberBall::updateDistanceToTarget()
     {
         m_fast_ping = true;
     }
+    else
+    {
+        m_fast_ping = false;
+    }
     if(m_distance_to_target < m_st_target_distance &&
         height_diff < m_st_max_height_difference)
     {
@@ -785,13 +803,10 @@ BareNetworkString* RubberBall::saveState(std::vector<std::string>* ru)
     buffer->addFloat(m_t);
     buffer->addFloat(m_t_increase);
     buffer->addFloat(m_interval);
-    buffer->addUInt8(m_fast_ping ? 1 : 0);
-    buffer->addFloat(m_distance_to_target);
     buffer->addFloat(m_height_timer);
     buffer->addUInt32(m_delete_ticks);
     buffer->addFloat(m_current_max_height);
-    buffer->addUInt8(m_aiming_at_target ? 1 : 0);
-    buffer->addUInt32(m_tunnel_count);
+    buffer->addUInt8(m_tunnel_count | (m_aiming_at_target ? (1 << 7) : 0));
     TrackSector::saveState(buffer);
     return buffer;
 }   // saveState
@@ -800,6 +815,7 @@ BareNetworkString* RubberBall::saveState(std::vector<std::string>* ru)
 void RubberBall::restoreState(BareNetworkString *buffer, int count)
 {
     Flyable::restoreState(buffer, count);
+    m_restoring_state = true;
     m_last_aimed_graph_node = buffer->getUInt32();
     m_control_points[0] = buffer->getVec3();
     m_control_points[1] = buffer->getVec3();
@@ -812,12 +828,11 @@ void RubberBall::restoreState(BareNetworkString *buffer, int count)
     m_t = buffer->getFloat();
     m_t_increase = buffer->getFloat();
     m_interval = buffer->getFloat();
-    m_fast_ping = buffer->getUInt8() == 1;
-    m_distance_to_target = buffer->getFloat();
     m_height_timer = buffer->getFloat();
     m_delete_ticks = buffer->getUInt32();
     m_current_max_height = buffer->getFloat();
-    m_aiming_at_target = buffer->getUInt8() == 1;
-    m_tunnel_count = buffer->getUInt32();
+    uint8_t tunnel_and_aiming = buffer->getUInt8();
+    m_tunnel_count = tunnel_and_aiming & 127;
+    m_aiming_at_target = ((tunnel_and_aiming >> 7) & 1) == 1;
     TrackSector::rewindTo(buffer);
 }   // restoreState
