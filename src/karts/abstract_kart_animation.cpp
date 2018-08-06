@@ -89,16 +89,20 @@ AbstractKartAnimation::~AbstractKartAnimation()
     if(m_timer < 0 && m_kart)
     {
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+        Vec3 linear_velocity = m_kart->getBody()->getLinearVelocity();
+        btTransform transform = m_end_transform.getOrigin().x() ==
+            std::numeric_limits<float>::max() ?
+            m_kart->getBody()->getWorldTransform() : m_end_transform;
+        m_kart->getBody()->setLinearVelocity(linear_velocity);
+        m_kart->getBody()->proceedToTransform(transform);
+        m_kart->setTrans(transform);
         Physics::getInstance()->addKart(m_kart);
+
         if (RewindManager::get()->useLocalEvent() &&
             m_set_end_transform_by_network)
         {
             AbstractKart* kart = m_kart;
-            Vec3 linear_velocity = kart->getBody()->getLinearVelocity();
             Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
-            btTransform transform = m_end_transform.getOrigin().x() ==
-                std::numeric_limits<float>::max() ?
-                kart->getBody()->getWorldTransform() : m_end_transform;
             RewindManager::get()->addRewindInfoEventFunction(new
                 RewindInfoEventFunction(
                 World::getWorld()->getTicksSinceStart(),
@@ -108,11 +112,11 @@ AbstractKartAnimation::~AbstractKartAnimation()
                 },
                 [kart, linear_velocity, angular_velocity, transform]()
                 {
-                    Physics::getInstance()->addKart(kart);
-                    kart->getBody()->setLinearVelocity(linear_velocity);
                     kart->getBody()->setAngularVelocity(angular_velocity);
+                    kart->getBody()->setLinearVelocity(linear_velocity);
                     kart->getBody()->proceedToTransform(transform);
                     kart->setTrans(transform);
+                    Physics::getInstance()->addKart(kart);
                 }));
         }
     }
