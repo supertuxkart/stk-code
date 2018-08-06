@@ -99,6 +99,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
             world->increaseRescueCount();
     }
 
+    addNetworkAnimationChecker();
 }   // RescueAnimation
 
 //-----------------------------------------------------------------------------

@@ -79,11 +79,14 @@ void KartRewinder::saveTransform()
 // ----------------------------------------------------------------------------
 void KartRewinder::computeError()
 {
-    if (!getKartAnimation())
+    AbstractKartAnimation* ka = getKartAnimation();
+    if (ka == NULL)
     {
         Moveable::checkSmoothing();
         m_skidding->checkSmoothing();
     }
+    else
+        ka->checkNetworkAnimationCreationSucceed();
 
     float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
     if (diff > 0.05f)

@@ -24,6 +24,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <memory>
 #include <string>
 
 class AbstractKart;
@@ -43,7 +44,11 @@ private:
     /** Name of this animation, used for debug prints only. */
     std::string m_name;
 
+    std::shared_ptr<int> m_check_created_ticks;
+
     int m_created_ticks;
+
+    bool m_confirmed_by_network;
 
 protected:
    /** A pointer to the kart which is animated by this class. */
@@ -54,8 +59,8 @@ protected:
 
     btTransform m_end_transform;
 
-    bool m_set_end_transform_by_network;
-
+    // ------------------------------------------------------------------------
+    void addNetworkAnimationChecker();
 public:
                  AbstractKartAnimation(AbstractKart *kart,
                                        const std::string &name);
@@ -77,9 +82,12 @@ public:
     {
         if (!useEarlyEndTransform())
             return;
-        m_set_end_transform_by_network = true;
+        m_confirmed_by_network = true;
         m_end_transform = t;
     }
+    // ----------------------------------------------------------------------------
+    void checkNetworkAnimationCreationSucceed();
+
 };   // AbstractKartAnimation
 
 #endif

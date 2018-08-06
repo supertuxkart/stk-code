@@ -42,9 +42,9 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     m_name  = name;
     m_end_transform = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     m_end_transform.setOrigin(Vec3(std::numeric_limits<float>::max()));
-    m_set_end_transform_by_network = NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient() ? false : true;
     m_created_ticks = World::getWorld()->getTicksSinceStart();
+    m_check_created_ticks = std::make_shared<int>(-1);
+    m_confirmed_by_network = false;
     // Remove previous animation if there is one
 #ifndef DEBUG
     // Use this code in non-debug mode to avoid a memory leak (and messed
@@ -98,8 +98,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
         m_kart->setTrans(transform);
         Physics::getInstance()->addKart(m_kart);
 
-        if (RewindManager::get()->useLocalEvent() &&
-            m_set_end_transform_by_network)
+        if (RewindManager::get()->useLocalEvent())
         {
             AbstractKart* kart = m_kart;
             Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
@@ -123,6 +122,39 @@ AbstractKartAnimation::~AbstractKartAnimation()
 }   // ~AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
+void AbstractKartAnimation::addNetworkAnimationChecker()
+{
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        std::weak_ptr<int> cct = m_check_created_ticks;
+        RewindManager::get()->addRewindInfoEventFunction(new
+            RewindInfoEventFunction(m_created_ticks,
+            [](){},
+            [](){},
+            /*delete_function*/[cct]()
+            {
+                auto cct_sp = cct.lock();
+                if (!cct_sp)
+                    return;
+                *cct_sp = World::getWorld()->getTicksSinceStart();
+            }));
+    }
+}   // addNetworkAnimationChecker
+
+// ----------------------------------------------------------------------------
+void AbstractKartAnimation::checkNetworkAnimationCreationSucceed()
+{
+    if (!m_confirmed_by_network && *m_check_created_ticks != -1 &&
+        World::getWorld()->getTicksSinceStart() > *m_check_created_ticks)
+    {
+        Log::warn("AbstractKartAnimation",
+            "No animation has been created on server, remove locally.");
+        m_timer = -1.0f;
+    }
+}   // checkNetworkAnimationCreationSucceed
+
+// ----------------------------------------------------------------------------
 /** Updates the timer, and if it expires (<0), the kart animation will be
  *  removed from the kart and this object will be deleted.
  *  NOTE: calling this function must be the last thing done in any kart
@@ -137,19 +169,6 @@ void AbstractKartAnimation::update(float dt)
     if(m_timer<0)
     {
         if(m_kart) m_kart->setKartAnimation(NULL);
-        delete this;
-    }
-    // Delete animation in client if after 1 second no end transform
-    // confirmation from network
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient() && !m_set_end_transform_by_network &&
-        World::getWorld()->getTicksSinceStart() > m_created_ticks + 120)
-    {
-        Log::warn("AbstractKartAnimation",
-            "No animation has been created on server, remove locally.");
-        m_timer = -1.0f;
-        if (m_kart)
-            m_kart->setKartAnimation(NULL);
         delete this;
     }
 }   // update
