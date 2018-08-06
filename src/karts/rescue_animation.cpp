@@ -51,6 +51,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     World::getWorld()->moveKartAfterRescue(kart);
 
     m_end_transform = kart->getTrans();
+    kart->getBody()->setCenterOfMassTransform(prev_trans);
     kart->setTrans(prev_trans);
 
     m_referee     = new Referee(*m_kart);
@@ -149,6 +150,7 @@ void RescueAnimation::update(float dt)
         if (m_kart_on_track == false)
         {
             m_kart_on_track = true;
+            m_kart->getBody()->setCenterOfMassTransform(m_end_transform);
             m_kart->setTrans(m_end_transform);
             for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
             {
