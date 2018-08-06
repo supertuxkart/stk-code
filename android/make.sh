@@ -372,8 +372,8 @@ if [ ! -f "$DIRNAME/obj/curl.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/curl/"* "$DIRNAME/obj/curl"
 
     cd "$DIRNAME/obj/curl"
-    CPPFLAGS="-I$DIRNAME/obj/openssl/include $CPPFLAGS" \
-    LDFLAGS="-L$DIRNAME/obj/openssl/ $LDFLAGS"          \
+    CPPFLAGS="-I$DIRNAME/obj/openssl/include -I$DIRNAME/obj/zlib $CPPFLAGS" \
+    LDFLAGS="-L$DIRNAME/obj/openssl/ -L$DIRNAME/obj/zlib $LDFLAGS"          \
     ./configure --host=$HOST                            \
                 --with-ssl                              \
                 --disable-shared                        \
