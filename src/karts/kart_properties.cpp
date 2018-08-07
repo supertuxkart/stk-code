@@ -1020,15 +1020,6 @@ float KartProperties::getNitroDuration() const
 }  // getNitroDuration
 
 // ------------------------------------------------------------------------
-/** Returns minimum time during which nitro is consumed when pressing nitro
- *  key, to prevent using nitro in very short bursts
-  */
-int KartProperties::getNitroMinConsumptionTicks() const
-{
-    return stk_config->time2Ticks(m_nitro_min_consumption);
-}
-
-// ------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
     return m_cached_characteristic->getNitroEngineForce();
