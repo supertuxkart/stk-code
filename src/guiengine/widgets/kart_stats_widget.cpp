@@ -95,9 +95,10 @@ void KartStatsWidget::setValues(const KartProperties* props,
     race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
     KartProperties kp_computed;
     kp_computed.copyForPlayer(props, d);
+    for (SkillLevelWidget* skills : m_skills)
+        skills->setVisible(true);
 
     // Scale the values so they look better
-
     // A value of 100 takes the whole bar width, including borders.
     // So values should be in the 0-99 range
 
