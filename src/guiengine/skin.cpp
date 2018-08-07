@@ -1410,20 +1410,28 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
                             const bool pressed, bool focused)
 {
-    if (!widget->isVisible()) return;
+    if (!widget->isVisible() || widget->m_deactivated) return;
 
-    if (!widget->m_deactivated && pressed)
+    int areas = 0;
+    bool right;
+
+    if (widget->m_properties[PROP_ID] == "left")
     {
-        Widget* spinner = widget->m_event_handler;
-        int areas = 0;
+        areas = BoxRenderParams::LEFT;
+        right = false;
+    }
+    else if (widget->m_properties[PROP_ID] == "right")
+    {
+        areas = BoxRenderParams::RIGHT;
+        right = true;
+    }
+    else
+        return;
 
-        if (widget->m_properties[PROP_ID] == "left")
-            areas = BoxRenderParams::LEFT;
-        else if (widget->m_properties[PROP_ID] == "right")
-            areas = BoxRenderParams::RIGHT;
-        else
-            return;
+    SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
 
+    if (pressed || (spinner->isRightButtonSelected() == right))
+    {
         core::recti rect2(spinner->m_x, spinner->m_y,
                           spinner->m_x + spinner->m_w,
                           spinner->m_y + spinner->m_h  );
@@ -1434,7 +1442,7 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
                                       widget->m_deactivated);
     }
 
-}
+} // drawSpinnerChild
 
 // ----------------------------------------------------------------------------
 /**
