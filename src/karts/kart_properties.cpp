@@ -559,7 +559,7 @@ float KartProperties::getAccelerationEfficiency() const
 {
     std::vector<float> gear_power_increase = m_combined_characteristic->getGearPowerIncrease();
     std::vector<float> gear_switch_ratio = m_combined_characteristic->getGearSwitchRatio();
-    int current_gear = 0;
+    unsigned current_gear = 0;
     float sum = 0;
     float base_accel = m_combined_characteristic->getEnginePower()
                      / m_combined_characteristic->getMass();

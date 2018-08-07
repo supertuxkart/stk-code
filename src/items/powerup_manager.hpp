@@ -107,7 +107,7 @@ private:
         void convertRankToSection(int rank, int *prev, int *next,
                                  float *weight);
         void precomputeWeights();
-        int getRandomItem(int rank, unsigned int random_number);
+        int getRandomItem(int rank, uint64_t random_number);
         // --------------------------------------------------------------------
         /** Sets the number of karts. */
         void setNumKarts(int num_karts) { m_num_karts = num_karts; }
@@ -163,7 +163,7 @@ public:
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     PowerupManager::PowerupType
         getRandomPowerup(unsigned int pos, unsigned int *n,
-                         unsigned int random_number);
+                         uint64_t random_number);
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a powerup. */
     Material* getIcon(int type) const {return m_all_icons [type];}

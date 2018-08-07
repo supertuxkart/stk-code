@@ -18,6 +18,7 @@
 
 #include "items/powerup_manager.hpp"
 
+#include <cinttypes>
 #include <stdexcept>
 
 #include <irrlicht.h>
@@ -388,7 +389,7 @@ void PowerupManager::WeightsData::precomputeWeights()
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
  */
-int PowerupManager::WeightsData::getRandomItem(int rank, unsigned int random_number)
+int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
@@ -399,7 +400,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, unsigned int random_num
     // value
 #undef ITEM_DISTRIBUTION_DEBUG
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    int original_random_number = random_number;
+    uint64_t original_random_number = random_number;
 #endif
     random_number = random_number % summed_weights.back();
     // Put the random number in range [1;max of summed weights],
@@ -415,7 +416,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, unsigned int random_num
     // We align with the beginning of the enum and return
     // We don't do more, because it would need to be decoded from enum later
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    Log::verbose("Powerup", "World %d rank %d random %d %d item %d",
+    Log::verbose("Powerup", "World %d rank %d random %d %" PRIu64 " item %d",
                  World::getWorld()->getTicksSinceStart(), rank, random_number,
                  original_random_number, powerup);
 #endif
@@ -571,7 +572,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
  */
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n,
-                                                             unsigned int random_number)
+                                                             uint64_t random_number)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
     if(powerup > POWERUP_LAST)

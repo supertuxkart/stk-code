@@ -542,9 +542,8 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // item. We multiply the item with a 'large' (more or less random)
     // number to spread the random values across the (typically 200)
     // weights used in the PowerupManager - same for the position.
-    unsigned long random_number = item_state.getItemId()*31 
-                                + world->getTicksSinceStart() / 10
-                                + position * 23;
+    uint64_t random_number = item_state.getItemId() * 31 +
+        world->getTicksSinceStart() / 10 + position * 23;
 
     // Use this random number as a seed of a PRNG (based on the one in 
     // bullet's btSequentialImpulseConstraintSolver) to avoid getting
