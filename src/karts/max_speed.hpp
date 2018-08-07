@@ -26,6 +26,7 @@ class BareNetworkString;
 
 class MaxSpeed
 {
+friend class KartRewinder;
 public:
     /** The categories to use for increasing the speed of a kart:
      *  Increase due to zipper, slipstream, nitro, rubber band,
@@ -158,11 +159,13 @@ private:
         // --------------------------------------------------------------------
         /** Returns the current slowdown fracftion, taking a 'fade in'
          *  into account. */
-        float getSlowdownFraction() const {return m_current_fraction;}
+        float getSlowdownFraction() const        { return m_current_fraction; }
+        // --------------------------------------------------------------------
+        int getTimeLeft() const                          { return m_duration; }
         // --------------------------------------------------------------------
         /** Returns if this speed decrease is active atm. A duration of
          *  -1 indicates an ongoing effect. */
-        bool isActive() const { return m_duration > 0 || m_duration <= -1.0f; }
+        bool isActive() const    { return m_duration > 0 || m_duration <= -1; }
     };   // SpeedDecrease
 
     // ------------------------------------------------------------------------
@@ -188,6 +191,7 @@ public:
     void  setSlowdown(unsigned int category, float max_speed_fraction,
                       int fade_in_time, int duration=-1);
     int   getSpeedIncreaseTicksLeft(unsigned int category);
+    int   isSpeedDecreaseActive(unsigned int category);
     void  update(int ticks);
     void  reset();
     void  saveState(BareNetworkString *buffer) const;

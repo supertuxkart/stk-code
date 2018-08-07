@@ -27,17 +27,21 @@ namespace irr
 using namespace irr;
 #include "btBulletDynamicsCommon.h"
 
+#include "network/smooth_network_body.hpp"
 #include "physics/kart_motion_state.hpp"
 #include "physics/user_pointer.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+
+#include <string>
 
 class Material;
 
 /**
   * \ingroup karts
   */
-class Moveable: public NoCopy
+class Moveable: public NoCopy,
+                public SmoothNetworkBody
 {
 private:
     Vec3                   m_velocityLC;      /**<Velocity in kart coordinates. */
@@ -49,24 +53,18 @@ private:
     float                  m_pitch;
     /** The roll between -180 and 180 degrees. */
     float                  m_roll;
-
-    /** Client prediction in networked games might cause the visual
-     *  and physical position to be different. For visual smoothing
-     *  this variable accumulates the error and reduces it over time. */
-    Vec3                   m_positional_error;
-
-    /** Similar to m_positional_error for rotation. */
-    btQuaternion           m_rotational_error;
-
 protected:
     UserPointer            m_user_pointer;
     scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
-
-    virtual void  updateGraphics(float dt, const Vec3& off_xyz,
-                                 const btQuaternion& off_rotation);
+    // ------------------------------------------------------------------------
+    void updateSmoothedGraphics(float dt);
+    // ------------------------------------------------------------------------
+    virtual void updateGraphics(const Vec3& off_xyz = Vec3(0.0f, 0.0f, 0.0f),
+                                const btQuaternion& off_rotation =
+                                btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
 public:
                   Moveable();
@@ -129,14 +127,34 @@ public:
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);
     void          updatePosition();
-    void          addError(const Vec3& pos_error,
-                           const btQuaternion &rot_error);
     // ------------------------------------------------------------------------
     /** Called once per rendered frame. It is used to only update any graphical
      *  effects.
      *  \param dt Time step size (since last call).
      */
     virtual void  updateGraphics(float dt) = 0;
+    // ------------------------------------------------------------------------
+    void prepareSmoothing()
+    {
+        SmoothNetworkBody::prepareSmoothing(m_transform, getVelocity());
+    }
+    // ------------------------------------------------------------------------
+    void checkSmoothing()
+    {
+        SmoothNetworkBody::checkSmoothing(m_transform, getVelocity());
+    }
+    // ------------------------------------------------------------------------
+    const btTransform &getSmoothedTrans() const
+                              { return SmoothNetworkBody::getSmoothedTrans(); }
+    // ------------------------------------------------------------------------
+    const Vec3& getSmoothedXYZ() const
+           { return (Vec3&)SmoothNetworkBody::getSmoothedTrans().getOrigin(); }
+    // ------------------------------------------------------------------------
+    virtual const std::string& getIdent() const
+    {
+        static std::string unused("unused");
+        return unused;
+    }
 };   // class Moveable
 
 #endif

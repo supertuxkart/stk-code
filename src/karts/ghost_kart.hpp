@@ -59,9 +59,6 @@ public:
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset() OVERRIDE;
     // ------------------------------------------------------------------------
-    /** No physics body for ghost kart, so nothing to adjust. */
-    virtual void  updateWeight() OVERRIDE  {};
-    // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
     virtual void  applyEngineForce (float force) OVERRIDE {};
     // ------------------------------------------------------------------------
@@ -93,7 +90,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the time at which the kart was at a given distance.
       * Returns -1.0f if none */
-    float getTimeForDistance(float distance);
+    virtual float getTimeForDistance(float distance) OVERRIDE;
 
     // ----------------------------------------------------------------------------
     /** Returns the smallest time at which the kart had the required number of eggs

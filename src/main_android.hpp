@@ -20,7 +20,7 @@
 
 #ifdef ANDROID
 
-#include <android_native_app_glue.h>
+#include "../../../lib/irrlicht/source/Irrlicht/stk_android_native_app_glue.h"
 
 extern struct android_app* global_android_app;
 

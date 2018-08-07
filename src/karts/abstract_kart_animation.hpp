@@ -19,9 +19,12 @@
 #ifndef HEADER_ABSTRACT_KART_ANIMATION_HPP
 #define HEADER_ABSTRACT_KART_ANIMATION_HPP
 
+#include "LinearMath/btTransform.h"
+
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <memory>
 #include <string>
 
 class AbstractKart;
@@ -40,6 +43,13 @@ class AbstractKartAnimation: public NoCopy
 private:
     /** Name of this animation, used for debug prints only. */
     std::string m_name;
+
+    std::shared_ptr<int> m_check_created_ticks;
+
+    int m_created_ticks;
+
+    bool m_confirmed_by_network;
+
 protected:
    /** A pointer to the kart which is animated by this class. */
     AbstractKart *m_kart;
@@ -47,6 +57,10 @@ protected:
     /** Timer for the explosion. */
     float m_timer;
 
+    btTransform m_end_transform;
+
+    // ------------------------------------------------------------------------
+    void addNetworkAnimationChecker();
 public:
                  AbstractKartAnimation(AbstractKart *kart,
                                        const std::string &name);
@@ -59,6 +73,20 @@ public:
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
     virtual const std::string &getName() const { return m_name; }
+    // ------------------------------------------------------------------------
+    virtual bool useEarlyEndTransform() const { return true; }
+    // ------------------------------------------------------------------------
+    const btTransform& getEndTransform() const { return m_end_transform; }
+    // ------------------------------------------------------------------------
+    void setEndTransform(const btTransform& t)
+    {
+        if (!useEarlyEndTransform())
+            return;
+        m_confirmed_by_network = true;
+        m_end_transform = t;
+    }
+    // ----------------------------------------------------------------------------
+    void checkNetworkAnimationCreationSucceed();
 
 };   // AbstractKartAnimation
 

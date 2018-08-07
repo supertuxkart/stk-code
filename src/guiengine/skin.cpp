@@ -912,19 +912,19 @@ void Skin::drawRibbon(const core::recti &rect, Widget* widget,
 {
 }   // drawRibbon
 
-SColorf GetPlayerColor(int player_id)
+// ----------------------------------------------------------------------------
+SColorf Skin::getPlayerColor(int player_id)
 {
-    
     SColorHSL col = { 0,100,50 };
     col.Hue += (360 / 4) * (player_id % 4);
-    int color_id = player_id % 4;
     SColorf color_rgb = { 0,0,0,1 };
-    
-    
-    col.Saturation = col.Saturation * (1.0f / (floorf(float(player_id / 4)) + 1) );
+
+    col.Saturation = col.Saturation *
+        (1.0f / (floorf(float(player_id / 4)) + 1));
     col.toRGB(color_rgb);
     return color_rgb;
-}
+}   // getPlayerColor
+
 // ----------------------------------------------------------------------------
 /**
   * @param focused whether this element is focus by the master player (whether
@@ -1198,7 +1198,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         } // end if mark_focused
 
         //Handle drawing for everyone else
-        for (int i = 1; i < MAX_PLAYER_COUNT; i++) 
+        for (unsigned i = 1; i < MAX_PLAYER_COUNT; i++)
         {
             // ---- Draw selection for other players than player 1
             if (parentRibbon->isFocusedForPlayer(i) &&
@@ -1209,8 +1209,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 short green_previous = parentRibbonWidget->m_skin_g;
                 short blue_previous = parentRibbonWidget->m_skin_b;
 
-                SColorf color_rgb = GetPlayerColor(i);
-                
+                SColorf color_rgb = getPlayerColor(i);
+
                 parentRibbonWidget->m_skin_r = short(color_rgb.r * 255.0f);
                 parentRibbonWidget->m_skin_g = short(color_rgb.g * 255.0f);
                 parentRibbonWidget->m_skin_b = short(color_rgb.b * 255.0f);
@@ -1304,7 +1304,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         params = &SkinConfig::m_render_params[
             "spinner::deactivated"];
 
-        color_rgb = GetPlayerColor(player_id);
+        color_rgb = getPlayerColor(player_id);
 
         texture = "squareFocusHaloBW::neutral";
     }
@@ -1324,23 +1324,20 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     widget->m_skin_g = short(color_rgb.g * 255.0f);
     widget->m_skin_b = short(color_rgb.b * 255.0f);
 
-    for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
+    for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
     {
-        if (widget->isFocusedForPlayer(i - 1)) {
+        if (widget->isFocusedForPlayer(i - 1))
+        {
             core::recti rect2 = rect;
             rect2.UpperLeftCorner.X += 2;
             rect2.UpperLeftCorner.Y -= 3;
             rect2.LowerRightCorner.X -= 2;
             rect2.LowerRightCorner.Y += 5;
-            
-            
             drawBoxFromStretchableTexture(widget, rect2,
                 SkinConfig::m_render_params[texture]);
             //TODO add squarefocushalo0
-
         }
     }
-    
 
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
@@ -1515,6 +1512,18 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
     }
 
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
+
+    if (icon_widget->hasTooltip() > 0)
+    {
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
 
     if (widget->m_type == WTYPE_MODEL_VIEW)
     {

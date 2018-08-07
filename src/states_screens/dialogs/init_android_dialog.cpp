@@ -81,7 +81,7 @@ void InitAndroidDialog::beforeAddingWidgets()
         Widget* accelerometer = &control_type->getChildren()[index];
         accelerometer->setActive(false);
         
-        if (UserConfigParams::m_multitouch_controls = 2)
+        if (UserConfigParams::m_multitouch_controls == 2)
         {
             UserConfigParams::m_multitouch_controls = 1;
         }

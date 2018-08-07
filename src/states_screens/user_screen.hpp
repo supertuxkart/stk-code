@@ -149,6 +149,7 @@ class TabbedUserScreen : public BaseUserScreen,
                          public GUIEngine::ScreenSingleton<TabbedUserScreen>
 {
 private:
+    //FIXME : options_players.stkgui exists but is unused
     TabbedUserScreen() : BaseUserScreen("user_screen_tab.stkgui")
     {}
 

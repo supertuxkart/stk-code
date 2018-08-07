@@ -29,7 +29,7 @@ void RaceEventManager::update(int ticks)
     // This might adjust dt - if a new state is being played, the dt is
     // determined from the last state till 'now'
     PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
-    RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
+    RewindManager::get()->playEventsTill(World::getWorld()->getTicksSinceStart(),
                                          &ticks);
     PROFILER_POP_CPU_MARKER();
     World::getWorld()->updateWorld(ticks);
@@ -41,6 +41,7 @@ bool RaceEventManager::isRaceOver()
     if(!World::getWorld())
         return false;
     return (World::getWorld()->getPhase() > WorldStatus::RACE_PHASE &&
+        World::getWorld()->getPhase() != WorldStatus::GOAL_PHASE &&
         World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE);
 }   // isRaceOver
 

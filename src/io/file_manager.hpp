@@ -83,6 +83,9 @@ private:
 
     /** Name of stdout file. */
     static std::string m_stdout_filename;
+    
+    /** Directory of stdout file. */
+    static std::string m_stdout_dir;
 
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
@@ -133,6 +136,7 @@ public:
     void              init();
     static void       addRootDirs(const std::string &roots);
     static void       setStdoutName(const std::string &name);
+    static void       setStdoutDir(const std::string &dir);
     io::IXMLReader   *createXMLReader(const std::string &filename);
     XMLNode          *createXMLTree(const std::string &filename);
     XMLNode          *createXMLTreeFromString(const std::string & content);

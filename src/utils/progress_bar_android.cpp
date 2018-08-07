@@ -25,12 +25,14 @@
 
 ProgressBarAndroid::ProgressBarAndroid()
 {
+#ifndef SERVER_ONLY
     m_program = 0;
     m_vertex_shader = 0;
     m_fragment_shader = 0;
     m_position = 0;
     m_progress = 0;
     m_vbo = 0;
+#endif
     m_device = NULL;
     m_initialized = false;
     m_close_event_received = false;
@@ -45,6 +47,7 @@ ProgressBarAndroid::~ProgressBarAndroid()
 
 bool ProgressBarAndroid::compileShaders()
 {
+#ifndef SERVER_ONLY
     const GLchar* vsh =
         "precision mediump float;"
         "attribute vec2 position;"
@@ -112,19 +115,23 @@ bool ProgressBarAndroid::compileShaders()
         Log::error("ProgressBarAndroid", "Failed to get uniform location.");
         return false;
     }
+#endif
 
     return true;
 }
 
 void ProgressBarAndroid::deleteShaders()
 {
+#ifndef SERVER_ONLY
     glDeleteShader(m_vertex_shader);
     glDeleteShader(m_fragment_shader);
     glDeleteProgram(m_program);
+#endif
 }
 
 void ProgressBarAndroid::init()
 {
+#ifndef SERVER_ONLY
     SIrrlichtCreationParameters params;
     params.DriverType    = video::EDT_OGLES2;
     params.Bits          = 32;
@@ -162,10 +169,12 @@ void ProgressBarAndroid::init()
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_initialized = true;
+#endif
 }
 
 void ProgressBarAndroid::close()
 {
+#ifndef SERVER_ONLY
     glDisableVertexAttribArray(m_position);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
@@ -182,10 +191,12 @@ void ProgressBarAndroid::close()
     }
 
     m_initialized = false;
+#endif
 }
 
 void ProgressBarAndroid::draw(float value)
 {
+#ifndef SERVER_ONLY
     if (!m_initialized || m_close_event_received)
         return;
 
@@ -203,6 +214,7 @@ void ProgressBarAndroid::draw(float value)
     
         m_device->getVideoDriver()->endScene();
     }
+#endif
 }
 
 #endif

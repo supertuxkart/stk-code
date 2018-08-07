@@ -76,6 +76,7 @@ FontWithFace::~FontWithFace()
 void FontWithFace::init()
 {
     setDPI();
+#ifndef SERVER_ONLY
     // Get the max height for this face
     assert(m_face_ttf->getTotalFaces() > 0);
     FT_Face cur_face = m_face_ttf->getFace(0);
@@ -94,7 +95,7 @@ void FontWithFace::init()
         if (height > m_glyph_max_height)
             m_glyph_max_height = height;
     }
-
+#endif
     reset();
 }   // init
 
@@ -125,6 +126,7 @@ void FontWithFace::reset()
  */
 void FontWithFace::loadGlyphInfo(wchar_t c)
 {
+#ifndef SERVER_ONLY
     unsigned int font_number = 0;
     unsigned int glyph_index = 0;
     while (font_number < m_face_ttf->getTotalFaces())
@@ -134,6 +136,7 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
         font_number++;
     }
     m_character_glyph_info_map[c] = GlyphInfo(font_number, glyph_index);
+#endif
 }   // loadGlyphInfo
 
 // ----------------------------------------------------------------------------
@@ -169,6 +172,7 @@ void FontWithFace::createNewGlyphPage()
  */
 void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 {
+#ifndef SERVER_ONLY
     assert(gi.glyph_index > 0);
     assert(gi.font_number < m_face_ttf->getTotalFaces());
     FT_Face cur_face = m_face_ttf->getFace(gi.font_number);
@@ -209,7 +213,6 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     }
 
     const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
-#ifndef SERVER_ONLY
     if (bits->buffer != NULL && !ProfileWorld::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
@@ -237,7 +240,6 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
             glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-#endif
 
     // Store the rectangle of current glyph
     gui::SGUISpriteFrame f;
@@ -269,6 +271,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     m_used_width += texture_size.Width;
     if (m_current_height < texture_size.Height)
         m_current_height = texture_size.Height;
+#endif
 }   // insertGlyph
 
 // ----------------------------------------------------------------------------
@@ -296,6 +299,7 @@ void FontWithFace::updateCharactersList()
  */
 void FontWithFace::dumpGlyphPage(const std::string& name)
 {
+#ifndef SERVER_ONLY
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
     {
         video::ITexture* tex = m_spritebank->getTexture(i);
@@ -310,6 +314,7 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
             (name + "_" + StringUtils::toString(i) + ".png").c_str());
         image->drop();
     }
+#endif
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------
@@ -393,6 +398,10 @@ const FontWithFace::FontArea&
 core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
                                             FontSettings* font_settings)
 {
+#ifdef SERVER_ONLY
+    return core::dimension2d<u32>(1, 1);
+#else
+
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
     // Test if lazy load char is needed
     insertCharacters(text);
@@ -431,6 +440,7 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
     ret_dim.Height = (u32)(dim.Height + 0.9f);
 
     return ret_dim;
+#endif
 }   // getDimension
                                   
 // ----------------------------------------------------------------------------

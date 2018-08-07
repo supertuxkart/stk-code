@@ -105,6 +105,7 @@ Track::Track(const std::string &filename)
     m_magic_number          = 0x17AC3802;
 #endif
 
+    m_minimap_invert_x_z    = false;
     m_materials_loaded      = false;
     m_filename              = filename;
     m_root                  =
@@ -143,7 +144,7 @@ Track::Track(const std::string &filename)
     m_clouds                = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
-    m_caustics_speed        = 1.0f;
+    m_physical_object_uid   = 0;
     m_shadows               = true;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
@@ -291,6 +292,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+    m_physical_object_uid = 0;
 #ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
     {
@@ -556,7 +558,6 @@ void Track::loadTrackInfo()
     root->get("shadows",               &m_shadows);
     root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
-    root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
 
@@ -709,6 +710,23 @@ void Track::startMusic() const
  */
 void Track::loadArenaGraph(const XMLNode &node)
 {
+    // Determine if rotate minimap is needed for soccer mode (for blue team)
+    // Only need to test local player
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        const unsigned pk = race_manager->getNumPlayers();
+        for (unsigned i = 0; i < pk; i++)
+        {
+            if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
+                race_manager->getKartInfo(i).getSoccerTeam() ==
+                SOCCER_TEAM_BLUE)
+            {
+                m_minimap_invert_x_z = true;
+                break;
+            }
+        }
+    }
+
     ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
     Graph::setGraph(graph);
 
@@ -786,7 +804,15 @@ void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    Graph::get()->mapPoint2MiniMap(xyz, draw_at);
+    if (m_minimap_invert_x_z)
+    {
+        Vec3 invert = xyz;
+        invert.setX(-xyz.x());
+        invert.setZ(-xyz.z());
+        Graph::get()->mapPoint2MiniMap(invert, draw_at);
+    }
+    else
+        Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -1111,18 +1137,13 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
-    //Check whether the hardware can do nonsquare or
-    // non power-of-two textures
-    video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-    bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-    bool nonsquare =
-        video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
     //Create the minimap resizing it as necessary.
     m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 
     //Use twice the size of the rendered minimap to reduce significantly aliasing
-    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size*2, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size * 2,
+        "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+        m_minimap_invert_x_z);
     if (!m_render_target) return;
 
     core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
@@ -1550,7 +1571,6 @@ void Track::update(int ticks)
         m_startup_run = true;
     }
     float dt = stk_config->ticks2Time(ticks);
-    m_track_object_manager->update(dt);
     CheckManager::get()->update(dt);
     ItemManager::get()->update(ticks);
 
@@ -1745,6 +1765,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     CameraEnd::clearEndCameras();
+    m_minimap_invert_x_z   = false;
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
@@ -1809,7 +1830,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (NetworkConfig::get()->isNetworking())
         NetworkItemManager::create();
     else
+    {
+        // Seed random engine locally
+        ItemManager::updateRandomSeed((uint32_t)StkTime::getTimeSinceEpoch());
         ItemManager::create();
+    }
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -2050,8 +2075,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             }
         }   // for i<root->getNumNodes()
     }
-
     delete root;
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        static_cast<NetworkItemManager*>(NetworkItemManager::get())
+            ->initClientConfirmState();
+    }
 
     if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
         Graph::get()->createDebugMesh();
@@ -2126,7 +2157,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             int geo_level = 0;
             node->get("geometry-level", &geo_level);
-            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0 &&
+                !NetworkConfig::get()->isNetworking())
                 continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }

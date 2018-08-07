@@ -196,8 +196,8 @@ void Camera::setMode(Mode mode)
         (m_mode==CM_FALLING && mode==CM_NORMAL)    )
     {
         Vec3 start_offset(0, 1.6f, -3);
-        Vec3 current_position = m_kart->getTrans()(start_offset);
-        Vec3 target_position = m_kart->getTrans()(Vec3(0, 0, 1));
+        Vec3 current_position = m_kart->getSmoothedTrans()(start_offset);
+        Vec3 target_position = m_kart->getSmoothedTrans()(Vec3(0, 0, 1));
         // Don't set position and target the same, otherwise
         // nan values will be calculated in ViewArea of camera
         m_camera->setPosition(current_position.toIrrVector());
@@ -236,7 +236,7 @@ void Camera::setInitialTransform()
 {
     if (m_kart == NULL) return;
     Vec3 start_offset(0, 1.6f, -3);
-    Vec3 current_position = m_kart->getTrans()(start_offset);
+    Vec3 current_position = m_kart->getSmoothedTrans()(start_offset);
     assert(!std::isnan(current_position.getX()));
     assert(!std::isnan(current_position.getY()));
     assert(!std::isnan(current_position.getZ()));
@@ -246,7 +246,7 @@ void Camera::setInitialTransform()
     // direction till smoothMoveCamera has corrected this. Setting target
     // to position doesn't make sense, but smoothMoves will adjust the
     // value before the first frame is rendered
-    Vec3 target_position = m_kart->getTrans()(Vec3(0, 0, 1));
+    Vec3 target_position = m_kart->getSmoothedTrans()(Vec3(0, 0, 1));
     m_camera->setTarget(target_position.toIrrVector());
     m_camera->setRotation(core::vector3df(0, 0, 0));
     m_camera->setFOV(m_fov);
@@ -274,7 +274,7 @@ void Camera::update(float dt)
     if (race_manager->getNumLocalPlayers() < 2)
     {
         Vec3 heading(sin(m_kart->getHeading()), 0.0f, cos(m_kart->getHeading()));
-        SFXManager::get()->positionListener(m_kart->getXYZ(),
+        SFXManager::get()->positionListener(m_kart->getSmoothedXYZ(),
                                             heading,
                                             Vec3(0, 1, 0));
     }

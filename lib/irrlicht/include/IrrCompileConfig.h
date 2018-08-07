@@ -91,6 +91,11 @@
 #endif
 #endif
 
+// Disable macOS/OSX device
+#ifdef NO_IRR_COMPILE_WITH_OSX_DEVICE_
+#undef _IRR_COMPILE_WITH_OSX_DEVICE_
+#endif
+
 #if defined(ANDROID)
 #define _IRR_ANDROID_PLATFORM_
 #define _IRR_POSIX_API_

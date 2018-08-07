@@ -94,7 +94,7 @@ private:
         /** This field is only populated for the WeightData class that
          *  is used during a race. It contains for each rank the summed
          *  weights for easy lookup during a race. */
-        std::vector < std::vector<int> > m_summed_weights_for_rank;
+        std::vector < std::vector<unsigned> > m_summed_weights_for_rank;
 
     public:
         // The friend declaration gives the PowerupManager access to the
@@ -107,7 +107,7 @@ private:
         void convertRankToSection(int rank, int *prev, int *next,
                                  float *weight);
         void precomputeWeights();
-        int getRandomItem(int rank, int random_number);
+        int getRandomItem(int rank, uint64_t random_number);
         // --------------------------------------------------------------------
         /** Sets the number of karts. */
         void setNumKarts(int num_karts) { m_num_karts = num_karts; }
@@ -139,13 +139,9 @@ public:
     };
 
 private:
-    const int     RAND_CLASS_RANGE = 1000;
 
     /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];
-
-    /** Last time the bouncing ball was collected */
-    int           m_rubber_ball_collect_ticks;
 
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
@@ -166,7 +162,8 @@ public:
     void          computeWeightsForRace(int num_karts);
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     PowerupManager::PowerupType
-        getRandomPowerup(unsigned int pos, unsigned int *n, int random_number);
+        getRandomPowerup(unsigned int pos, unsigned int *n,
+                         uint64_t random_number);
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a powerup. */
     Material* getIcon(int type) const {return m_all_icons [type];}
@@ -174,13 +171,6 @@ public:
     /** Returns the mesh for a certain powerup.
      *  \param type Mesh type for which the model is returned. */
     irr::scene::IMesh *getMesh(int type) const {return m_all_meshes[type];}
-    // ------------------------------------------------------------------------
-    /** Returns the last time a rubber ball was collected. */
-    int getBallCollectTicks() const {return m_rubber_ball_collect_ticks;}
-    // ------------------------------------------------------------------------
-    /** Updates the last time at which a rubber ball was collected. */
-    void setBallCollectTicks(int ticks) {m_rubber_ball_collect_ticks=ticks;}
-    // ------------------------------------------------------------------------
 };   // class PowerupManager
 
 extern PowerupManager* powerup_manager;

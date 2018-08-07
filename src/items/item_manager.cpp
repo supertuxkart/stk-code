@@ -26,13 +26,13 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "modes/easter_egg_hunt.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
-#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IMesh.h>
@@ -44,19 +44,20 @@
 #include <string>
 
 
-std::vector<scene::IMesh *> ItemManager::m_item_mesh;
-std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
-std::vector<video::SColorf> ItemManager::m_glow_color;
-bool                        ItemManager::m_disable_item_collection = false;
-ItemManager *               ItemManager::m_item_manager = NULL;
-
+std::vector<scene::IMesh *>  ItemManager::m_item_mesh;
+std::vector<scene::IMesh *>  ItemManager::m_item_lowres_mesh;
+std::vector<video::SColorf>  ItemManager::m_glow_color;
+bool                         ItemManager::m_disable_item_collection = false;
+std::shared_ptr<ItemManager> ItemManager::m_item_manager;
+std::mt19937                 ItemManager::m_random_engine;
 
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */
 void ItemManager::create()
 {
     assert(!m_item_manager);
-    m_item_manager = new ItemManager();
+    // Due to protected constructor use new instead of make_shared
+    m_item_manager = std::shared_ptr<ItemManager>(new ItemManager());
 }   // create
 
 //-----------------------------------------------------------------------------
@@ -64,8 +65,7 @@ void ItemManager::create()
 void ItemManager::destroy()
 {
     assert(m_item_manager);
-    delete m_item_manager;
-    m_item_manager = NULL;
+    m_item_manager = nullptr;
 }   // destroy
 
 //-----------------------------------------------------------------------------
@@ -313,7 +313,8 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     // Make sure this subroutine is not used otherwise (since networking
     // needs to be aware of items added to the track, so this would need
     // to be added).
-    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE);
+    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE ||
+           ProfileWorld::isProfileMode()                               );
     ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
@@ -577,11 +578,11 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
         invalid_location.push_back(node);
     }
 
-    RandomGenerator random;
     const unsigned int ALL_NODES = ag->getNumNodes();
     const unsigned int MIN_DIST = int(sqrt(ALL_NODES));
     const unsigned int TOTAL_ITEM = MIN_DIST / 2;
 
+    std::vector<uint32_t> random_numbers;
     Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
     for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
@@ -595,8 +596,9 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
                     "Use default item location.");
                 return false;
             }
-
-            const int node = random.get(ALL_NODES);
+            uint32_t number = m_random_engine();
+            Log::debug("[ItemManager]", "%u from random engine.", number);
+            const int node = number % ALL_NODES;
 
             // Check if tried
             std::vector<int>::iterator it = std::find(invalid_location.begin(),
@@ -622,6 +624,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             {
                 chosen_node = node;
                 invalid_location.push_back(node);
+                random_numbers.push_back(number);
                 break;
             }
             else
@@ -635,7 +638,8 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
     for (unsigned int i = 0; i < pos.size(); i++)
         used_location.erase(used_location.begin());
 
-    assert (used_location.size() == TOTAL_ITEM);
+    assert(used_location.size() == TOTAL_ITEM);
+    assert(random_numbers.size() == TOTAL_ITEM);
 
     // Hard-coded ratio for now
     const int BONUS_BOX = 4;
@@ -644,7 +648,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
 
     for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
-        const int j = random.get(10);
+        const unsigned j = random_numbers[i] % 10;
         ItemState::ItemType type = (j > BONUS_BOX ? ItemState::ITEM_BONUS_BOX :
             j > NITRO_BIG ? ItemState::ITEM_NITRO_BIG :
             j > NITRO_SMALL ? ItemState::ITEM_NITRO_SMALL : ItemState::ITEM_BANANA);

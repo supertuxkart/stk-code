@@ -189,10 +189,6 @@ void RaceGUIOverworld::renderGlobal(float dt)
     if (race_manager->getIfEmptyScreenSpaceExists() &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
-        const float sqrt_num_players =
-            sqrtf((float)race_manager->getNumLocalPlayers());
-        const int rows = (int)ceil(sqrt_num_players);
-        const int cols = (int)round(sqrt_num_players);
         static video::SColor black = video::SColor(255,0,0,0);
         GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
             race_manager->getNumLocalPlayers()));
@@ -477,7 +473,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      lower_y   -(int)(draw_at.getY()-marker_half_size));
 
             // Highlight the player icons with some backgorund image.
-            if (kart->getController()->isLocalPlayerController())
+            if (kart->getController()->isLocalPlayerController() &&
+                m_icons_frame != NULL)
             {
                 video::SColor colors[4];
                 for (unsigned int i=0;i<4;i++)

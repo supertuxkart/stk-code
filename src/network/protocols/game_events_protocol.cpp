@@ -1,17 +1,18 @@
 #include "network/protocols/game_events_protocol.hpp"
 
 #include "karts/abstract_kart.hpp"
-#include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 
 #include <stdint.h>
 
 /** This class handles all 'major' game events. E.g.
- *  finishing a race etc. The game events manager is notified from the 
+ *  finishing a race or goal etc. The game events manager is notified from the
  *  game code, and it calls the corresponding function in this class.
  *  The server then notifies all clients. Clients receive the message
  *  in the synchronous notifyEvent function here, decode the message
@@ -43,12 +44,27 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         return true;
     }
     uint8_t type = data.getUInt8();
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     switch (type)
     {
     case GE_KART_FINISHED_RACE:
         kartFinishedRace(data);     break;
     case GE_PLAYER_DISCONNECT:
         eliminatePlayer(data);      break;
+    case GE_RESET_BALL:
+    {
+        if (!sw)
+            throw std::invalid_argument("No soccer world");
+        sw->handleResetBallFromServer(data);
+        break;
+    }
+    case GE_PLAYER_GOAL:
+    {
+        if (!sw)
+            throw std::invalid_argument("No soccer world");
+        sw->handlePlayerGoalFromServer(data);
+        break;
+    }
     default:
         Log::warn("GameEventsProtocol", "Unkown message type.");
         break;

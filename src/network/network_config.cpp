@@ -29,7 +29,7 @@
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
 bool           NetworkConfig::m_disable_lan    = false;
-const uint8_t  NetworkConfig::m_server_version = 1;
+const uint32_t NetworkConfig::m_server_version = 1;
 
 /** \class NetworkConfig
  *  This class is the interface between STK and the online code, particularly
@@ -60,16 +60,12 @@ NetworkConfig::NetworkConfig()
     m_server_name           = "";
     m_password              = "";
     m_server_discovery_port = stk_config->m_server_discovery_port;
-    if (UserConfigParams::m_random_ports)
-    {
-        m_client_port = 0;
-        m_server_port = 0;
-    }
-    else
-    {
-        m_client_port = stk_config->m_client_port;
-        m_server_port = stk_config->m_server_port;
-    }
+    m_client_port = UserConfigParams::m_random_client_port ?
+        0 : stk_config->m_client_port;
+    m_server_port = UserConfigParams::m_random_server_port ?
+        0 : stk_config->m_server_port;
+    m_team_choosing = false;
+    m_joined_server_version = 0;
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------

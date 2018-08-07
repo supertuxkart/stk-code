@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <fstream>
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 #  ifdef __APPLE__
 #    include <OpenAL/al.h>
 #    include <OpenAL/alc.h>
@@ -33,6 +33,7 @@
 #endif
 
 #include "audio/music_ogg.hpp"
+#include "audio/sfx_manager.hpp"
 #include "audio/sfx_openal.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
@@ -44,10 +45,11 @@ MusicManager* music_manager= NULL;
 MusicManager::MusicManager()
 {
     m_current_music= NULL;
+    m_initialized = false;
     setMasterMusicVolume(UserConfigParams::m_music_volume);
 
     //FIXME: I'm not sure that this code goes here
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 
 #if defined(__APPLE__) && !defined(NDEBUG)
     // HACK: On OSX, when OpenAL is initialized, breaking in a debugger causes
@@ -100,7 +102,7 @@ MusicManager::~MusicManager()
         i->second = NULL;
     }
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     if(m_initialized)
     {
         ALCcontext* context = alcGetCurrentContext();

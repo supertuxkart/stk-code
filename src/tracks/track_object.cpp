@@ -74,7 +74,6 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_enabled         = true;
     m_presentation    = NULL;
     m_animator        = NULL;
-    m_physical_object = NULL;
     m_parent_library  = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
@@ -86,9 +85,8 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     if (m_interaction != "ghost" && m_interaction != "none" &&
         physics_settings )
     {
-        m_physical_object = new PhysicalObject(is_dynamic,
-                                               *physics_settings,
-                                               this);
+        m_physical_object = std::make_shared<PhysicalObject>
+            (is_dynamic, *physics_settings, this);
     }
 
     reset();
@@ -112,7 +110,6 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_presentation = NULL;
     m_animator = NULL;
     m_parent_library = parent_library;
-    m_physical_object = NULL;
 
     xml_node.get("id",      &m_id        );
     xml_node.get("model",   &m_name      );
@@ -455,7 +452,6 @@ TrackObject::~TrackObject()
 {
     delete m_presentation;
     delete m_animator;
-    delete m_physical_object;
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------
@@ -482,7 +478,7 @@ void TrackObject::setEnabled(bool enabled)
 
     if (getType() == "mesh")
     {
-        if (m_physical_object != NULL)
+        if (m_physical_object)
         {
             if (enabled)
                 m_physical_object->addBody();
@@ -508,7 +504,7 @@ void TrackObject::resetEnabled()
 
     if (getType() == "mesh")
     {
-        if (m_physical_object != NULL)
+        if (m_physical_object)
         {
             if (m_initially_visible)
                 m_physical_object->addBody();
@@ -530,25 +526,18 @@ void TrackObject::resetEnabled()
  */
 void TrackObject::updateGraphics(float dt)
 {
-
-    // FIXME: At this stage neither m_presentation nor m_animator
-    // have been converted to use separate updateGraphics() calls.
-
     if (m_physical_object) m_physical_object->updateGraphics(dt);
-    if (m_animator) m_animator->update(dt);
-
 }   // update
 
 // ----------------------------------------------------------------------------
-/** This updates all only graphical elements. It is only called once per
- *  rendered frame, not once per time step.
+/** This updates once per physics time step.
  *  float dt Time since last rame.
  */
 void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
     if (m_physical_object) m_physical_object->update(dt);
-
+    if (m_animator) m_animator->updateWithWorldTicks();
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -588,7 +577,7 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
     if (m_presentation != NULL)
         m_presentation->move(xyz, hpr, scale, isAbsoluteCoord);
 
-    if (update_rigid_body && m_physical_object != NULL)
+    if (update_rigid_body && m_physical_object)
     {
         movePhysicalBodyToGraphicalNode(xyz, hpr);
     }

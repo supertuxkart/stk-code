@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_STK_FILE_SYSTEM_HPP
 #define HEADER_TINYGETTEXT_STK_FILE_SYSTEM_HPP
 
+#ifndef SERVER_ONLY
+
 #include "file_system.hpp"
 
 namespace tinygettext {
@@ -36,3 +38,5 @@ public:
 #endif
 
 /* EOF */
+
+#endif

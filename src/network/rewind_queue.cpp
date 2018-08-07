@@ -20,7 +20,9 @@
 
 #include "config/stk_config.hpp"
 #include "modes/world.hpp"
+#include "network/dummy_rewinder.hpp"
 #include "network/network_config.hpp"
+#include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 
@@ -260,8 +262,8 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // any server message should be in the client's past - but it can
         // happen during debugging) we need to rewind to getTicks (in order
         // to get the latest state).
-        if (NetworkConfig::get()->isClient() && (*i)->getTicks() <= world_ticks
-            && (*i)->isState())
+        if (NetworkConfig::get()->isClient() &&
+            (*i)->getTicks() <= world_ticks && (*i)->isState())
         {
             // We need rewind if we receive an event in the past. This will
             // then trigger a rewind later. Note that we only rewind to the
@@ -303,7 +305,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     {
         Log::verbose("rewindqueue",
                      "world %d rewindticks %d latest_confirmed %d",
-                     World::getWorld()->getTimeTicks(), *rewind_ticks,
+                     World::getWorld()->getTicksSinceStart(), *rewind_ticks,
                      m_latest_confirmed_state_time);
         *rewind_ticks = m_latest_confirmed_state_time;
         *needs_rewind = m_latest_confirmed_state_time < world_ticks;
@@ -353,8 +355,10 @@ int RewindQueue::undoUntil(int undo_ticks)
 {
     // A rewind is done after a state in the past is inserted. This function
     // makes sure that m_current is not end()
-    assert(m_current != m_all_rewind_info.end());
-    
+    //assert(m_current != m_all_rewind_info.end());
+    assert(!m_all_rewind_info.empty());
+    m_current = m_all_rewind_info.end();
+    m_current--;
     while((*m_current)->getTicks() > undo_ticks ||
         (*m_current)->isEvent() || !(*m_current)->isConfirmed())
     {
@@ -365,7 +369,7 @@ int RewindQueue::undoUntil(int undo_ticks)
             // This shouldn't happen, but add some debug info just in case
             Log::error("undoUntil",
                        "At %d rewinding to %d current = %d = begin",
-                       World::getWorld()->getTimeTicks(), undo_ticks, 
+                       World::getWorld()->getTicksSinceStart(), undo_ticks, 
                        (*m_current)->getTicks());
         }
         m_current--;
@@ -402,24 +406,7 @@ void RewindQueue::unitTesting()
 {
     // Some classes need the RewindManager (to register themselves with)
     RewindManager::create();
-
-    // A dummy Rewinder and EventRewinder class since some of the calls being
-    // tested here need an instance.
-    class DummyRewinder : public Rewinder, public EventRewinder
-    {
-    public:
-        BareNetworkString* saveState() { return NULL; }
-        virtual void undoEvent(BareNetworkString *s) {}
-        virtual void rewindToEvent(BareNetworkString *s) {}
-        virtual void restoreState(BareNetworkString *s, int count) {}
-        virtual void undoState(BareNetworkString *s) {}
-        virtual void undo(BareNetworkString *s) {}
-        virtual void rewind(BareNetworkString *s) {}
-        virtual void saveTransform() {}
-        virtual void computeError() {}
-        DummyRewinder() : Rewinder(true) {}
-    };
-    DummyRewinder *dummy_rewinder = new DummyRewinder();
+    auto dummy_rewinder = std::make_shared<DummyRewinder>();
 
     // First tests: add a state first, then an event, and make
     // sure the state stays first
@@ -433,7 +420,7 @@ void RewindQueue::unitTesting()
     assert(q0.hasMoreRewindInfo());
     assert(q0.undoUntil(0) == 0);
 
-    q0.addNetworkEvent(dummy_rewinder, NULL, 0);
+    q0.addNetworkEvent(dummy_rewinder.get(), NULL, 0);
     // Network events are not immediately merged
     assert(q0.m_all_rewind_info.size() == 1);
 
@@ -461,9 +448,9 @@ void RewindQueue::unitTesting()
     assert((*rii)->isEvent());
 
     // Test time base comparisons: adding an event to the end
-    q0.addLocalEvent(dummy_rewinder, NULL, true, 4);
+    q0.addLocalEvent(dummy_rewinder.get(), NULL, true, 4);
     // Then adding an earlier event
-    q0.addLocalEvent(dummy_rewinder, NULL, false, 1);
+    q0.addLocalEvent(dummy_rewinder.get(), NULL, false, 1);
     // rii points to the 3rd element, the ones added just now
     // should be elements4 and 5:
     rii++;
@@ -490,7 +477,8 @@ void RewindQueue::unitTesting()
     assert(!b1.hasMoreRewindInfo());
     b1.addLocalEvent(NULL, NULL, true, 2);
     RewindInfo *ri = b1.getCurrent();
-    assert(ri->getTicks() == 2);
+    if (ri->getTicks() != 2)
+        Log::fatal("RewindQueue", "ri->getTicks() != 2");
 
     // 2) Make sure when adding an event at the same time as an existing
     //    event, that m_current pooints to the first event, otherwise
@@ -500,7 +488,8 @@ void RewindQueue::unitTesting()
     b1.addLocalEvent(NULL, NULL, true, 2);
     // Make sure that current was not modified, i.e. the new event at time
     // 2 was added at the end of the list:
-    assert(current_old == b1.m_current);
+    if (current_old != b1.m_current)
+        Log::fatal("RewindQueue", "current_old != b1.m_current");
 
     // This should not trigger an exception, now current points to the
     // second event at the same time:

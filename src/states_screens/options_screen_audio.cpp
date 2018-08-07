@@ -28,6 +28,7 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
@@ -58,12 +59,8 @@ void OptionsScreenAudio::init()
     Screen::init();
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
+    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
-
-    ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
-    ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
 
     // ---- sfx volume
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
@@ -115,6 +112,8 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }

@@ -65,7 +65,7 @@ protected:
      *  for AI testing only. */
     static int m_test_ai;
 
-    void         setControllerName(const std::string &name);
+    void         setControllerName(const std::string &name) OVERRIDE;
     float        steerToPoint(const Vec3 &point);
     float        normalizeAngle(float angle);
     // ------------------------------------------------------------------------
@@ -75,7 +75,7 @@ protected:
     // ------------------------------------------------------------------------
     void         determineTurnRadius(const Vec3 &end, Vec3 *center,
                                      float *radius) const;
-    virtual void update(int ticks);
+    virtual void update(int ticks) OVERRIDE;
     virtual void setSteering   (float angle, float dt);
     // ------------------------------------------------------------------------
     /** Return true if AI can skid now. */
@@ -84,7 +84,7 @@ protected:
 public:
              AIBaseController(AbstractKart *kart);
     virtual ~AIBaseController() {};
-    virtual void reset();
+    virtual void reset() OVERRIDE;
     virtual bool disableSlipstreamBonus() const OVERRIDE;
     virtual void crashed(const Material *m) OVERRIDE;
     static  void enableDebug() {m_ai_debug = true; }
@@ -98,11 +98,11 @@ public:
     virtual void setPosition(int p) OVERRIDE {};
     virtual bool isPlayerController() const OVERRIDE { return false; }
     virtual bool isLocalPlayerController() const OVERRIDE { return false; }
-    virtual bool action(PlayerAction action, int value, bool dry_run=false) OVERRIDE 
+    virtual bool action(PlayerAction action, int value, bool dry_run=false) OVERRIDE
     {
         return true;
     };
-    virtual void skidBonusTriggered() {};
+    virtual void skidBonusTriggered() OVERRIDE {}
     // ------------------------------------------------------------------------
     virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
     virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;

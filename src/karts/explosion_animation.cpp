@@ -72,7 +72,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                                        const Vec3 &explosion_position,
                                        bool direct_hit)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
- {
+{
+    m_end_transform = m_kart->getTrans();
     m_xyz = m_kart->getXYZ();
     m_orig_xyz = m_xyz;
     m_normal = m_kart->getNormal();
@@ -109,8 +110,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_kart->showStarEffect(t);
     
     m_kart->getAttachment()->clear();
-
- };   // ExplosionAnimation
+    addNetworkAnimationChecker();
+}   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------
 ExplosionAnimation::~ExplosionAnimation()

@@ -33,6 +33,7 @@
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
@@ -62,8 +63,7 @@ void OptionsScreenDevice::loadedFromFile()
 
 void OptionsScreenDevice::beforeAddingWidget()
 {
-    GUIEngine::ListWidget* w_list =
-        getWidget<GUIEngine::ListWidget>("actions");
+    ListWidget* w_list = getWidget<GUIEngine::ListWidget>("actions");
     assert(w_list != NULL);
     w_list->clearColumns();
     w_list->addColumn(_("Action"), 1);
@@ -78,13 +78,8 @@ void OptionsScreenDevice::init()
     Screen::init();
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
     assert(tabBar != NULL);
+    // Focus is set to the actions list later in the init
     tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
-
-    tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tabBar->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    tabBar->getRibbonChildren()[3].setTooltip( _("Players") );
-
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
     if (!m_config->isKeyboard())
@@ -129,12 +124,11 @@ void OptionsScreenDevice::init()
     LabelWidget* label = getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str(), false );
 
-    GUIEngine::ListWidget* actions =
-        getWidget<GUIEngine::ListWidget>("actions");
-    assert( actions != NULL );
-
     // ---- create list skeleton (right number of items, right internal names)
     //      their actualy contents will be adapted as needed after
+
+    ListWidget* actions = getWidget<GUIEngine::ListWidget>("actions");
+    assert( actions != NULL );
 
     //I18N: Key binding section
     addListItemSubheader(actions, "game_keys_section", _("Game Keys"));
@@ -160,6 +154,10 @@ void OptionsScreenDevice::init()
     addListItem(actions, PA_MENU_CANCEL);
 
     updateInputButtons();
+
+    // Focus the list and select its first item
+    actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    actions->setSelectionID(0);
 
     // Disable deletion keyboard configurations
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
@@ -506,14 +504,16 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
         Screen *screen = NULL;
         if (selection == "tab_audio")
             screen = OptionsScreenAudio::getInstance();
-        //else if (selection == "tab_video")
-        //    screen = OptionsScreenVideo::getInstance();
+        else if (selection == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
             screen = TabbedUserScreen::getInstance();
         //else if (selection == "tab_controls")
         //    screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }

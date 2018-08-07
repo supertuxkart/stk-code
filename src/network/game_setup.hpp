@@ -157,6 +157,9 @@ public:
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
     // ------------------------------------------------------------------------
     void sortPlayersForGrandPrix();
+    // ------------------------------------------------------------------------
+    void sortPlayersForSoccer();
+
 };
 
 #endif // GAME_SETUP_HPP

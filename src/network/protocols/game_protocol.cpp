@@ -33,6 +33,7 @@
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "main_loop.hpp"
 
 // ============================================================================
 std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol;
@@ -81,6 +82,13 @@ void GameProtocol::update(int ticks)
     // Add all actions
     for (auto a : m_all_actions)
     {
+        if (Network::m_connection_debug)
+        {
+            Log::verbose("GameProtocol",
+                "Controller action: %d %d %d %d %d %d",
+                a.m_ticks, a.m_kart_id, a.m_action, a.m_value, a.m_value_l,
+                a.m_value_r);
+        }
         m_data_to_send->addUInt32(a.m_ticks);
         m_data_to_send->addUInt8(a.m_kart_id);
         m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value)
@@ -135,7 +143,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     a.m_value   = value;
     a.m_value_l = val_l;
     a.m_value_r = val_r;
-    a.m_ticks   = World::getWorld()->getTimeTicks();
+    a.m_ticks   = World::getWorld()->getTicksSinceStart();
 
     m_all_actions.push_back(a);
 
@@ -146,11 +154,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
                         .addUInt32(val_l).addUInt32(val_r);
 
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
-                                   World::getWorld()->getTimeTicks() );
-
-    Log::info("GameProtocol", "Action at %d: %d value %d",
-              World::getWorld()->getTimeTicks(), action, 
-              action==PlayerAction::PA_STEER_RIGHT ? -value : value);
+                                   World::getWorld()->getTicksSinceStart());
 }   // controllerAction
 
 // ----------------------------------------------------------------------------
@@ -164,7 +168,7 @@ void GameProtocol::handleControllerAction(Event *event)
     NetworkString &data = event->data();
     uint8_t count = data.getUInt8();
     bool will_trigger_rewind = false;
-    int rewind_delta = 0;
+    //int rewind_delta = 0;
     int cur_ticks = 0;
     const int not_rewound = RewindManager::get()->getNotRewoundWorldTicks();
     for (unsigned int i = 0; i < count; i++)
@@ -177,7 +181,7 @@ void GameProtocol::handleControllerAction(Event *event)
         if (cur_ticks < not_rewound && !will_trigger_rewind)
         {
             will_trigger_rewind = true;
-            rewind_delta = not_rewound - cur_ticks;
+            //rewind_delta = not_rewound - cur_ticks;
         }
         uint8_t kart_id = data.getUInt8();
         assert(kart_id < World::getWorld()->getNumKarts());
@@ -186,8 +190,12 @@ void GameProtocol::handleControllerAction(Event *event)
         int value   = data.getUInt32();
         int value_l = data.getUInt32();
         int value_r = data.getUInt32();
-        Log::info("GameProtocol", "Action at %d: %d %d %d %d %d",
-                  cur_ticks, kart_id, action, value, value_l, value_r);
+        if (Network::m_connection_debug)
+        {
+            Log::verbose("GameProtocol",
+                "Controller action: %d %d %d %d %d %d",
+                cur_ticks, kart_id, action, value, value_l, value_r);
+        }
         BareNetworkString *s = new BareNetworkString(3);
         s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                             .addUInt32(value_l).addUInt32(value_r);
@@ -206,7 +214,9 @@ void GameProtocol::handleControllerAction(Event *event)
         if (!will_trigger_rewind)
             STKHost::get()->sendPacketExcept(event->getPeer(), &data, false);
 
-        if (not_rewound == 0 ||
+        // FIXME unless there is a network jitter more than 100ms (more than
+        // server delay), time adjust is not necessary
+        /*if (not_rewound == 0 ||
             m_initial_ticks.find(event->getPeer()) == m_initial_ticks.end())
             return;
         int cur_diff = cur_ticks - not_rewound;
@@ -214,11 +224,10 @@ void GameProtocol::handleControllerAction(Event *event)
         const int ticks_difference = m_initial_ticks.at(event->getPeer());
         if (will_trigger_rewind)
         {
-            if (rewind_delta > max_adjustment)
-                rewind_delta = max_adjustment;
+            rewind_delta += max_adjustment;
             Log::info("GameProtocol", "At %d %f %d requesting time adjust"
                 " (speed up) of %d for host %d",
-                World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
+                World::getWorld()->getTicksSinceStart(), StkTime::getRealTime(),
                 not_rewound, rewind_delta, event->getPeer()->getHostId());
             // This message from a client triggered a rewind in the server.
             // To avoid this, signal to the client that it should speed up.
@@ -229,14 +238,13 @@ void GameProtocol::handleControllerAction(Event *event)
         if (cur_diff > 0 &&
             cur_diff - ticks_difference > max_adjustment)
         {
-            // 80% slow down
-            const int adjustment = -max_adjustment * 8 / 10;
+            const int adjustment = ticks_difference - cur_diff;
             Log::info("GameProtocol", "At %d %f %d requesting time adjust"
                 " (slow down) of %d for host %d",
-                World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
+                World::getWorld()->getTicksSinceStart(), StkTime::getRealTime(),
                 not_rewound, adjustment, event->getPeer()->getHostId());
             adjustTimeForClient(event->getPeer(), adjustment);
-        }
+        }*/
     }   // if server
 
 }   // handleControllerAction
@@ -251,11 +259,17 @@ void GameProtocol::handleControllerAction(Event *event)
 void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 {
     assert(NetworkConfig::get()->isServer());
+
+    if (m_last_adjustments.find(peer) != m_last_adjustments.end() &&
+        StkTime::getRealTime() - m_last_adjustments.at(peer) < 3.0)
+        return;
+
     NetworkString *ns = getNetworkString(5);
     ns->addUInt8(GP_ADJUST_TIME).addUInt32(ticks);
     // This message can be send unreliable, it's not critical if it doesn't
     // get delivered, the server will request again later anyway.
     peer->sendPacket(ns, /*reliable*/false);
+    m_last_adjustments[peer] = StkTime::getRealTime();
     delete ns;
 }   // adjustTimeForClient
 
@@ -266,8 +280,8 @@ void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 void GameProtocol::handleAdjustTime(Event *event)
 {
     int ticks = event->data().getUInt32();
-    World::getWorld()->setAdjustTime(
-        int(stk_config->ticks2Time(ticks) * 1000.0f));
+    main_loop->setTicksAdjustment(ticks);
+    Log::verbose("GameProtocol", "%d ticks adjustment", ticks);
 }   // handleAdjustTime
 
 // ----------------------------------------------------------------------------
@@ -303,22 +317,13 @@ void GameProtocol::handleItemEventConfirmation(Event *event)
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
  *  state of the race to be sent to a client.
- * \param local_save If set it allows a state to be saved on a client.
- *        This only happens at the very first time step to ensure each client
- *        has a state in case it receives an event before a server state.
  */
-void GameProtocol::startNewState(bool local_save)
+void GameProtocol::startNewState()
 {
-    assert(local_save || NetworkConfig::get()->isServer());
-
+    assert(NetworkConfig::get()->isServer());
     m_data_to_send->clear();
-    // Local saves don't neet this info, they pass time directly to the
-    // RewindInfo in RewindManager::saveLocalState.
-    if (!local_save)
-    {
-        m_data_to_send->addUInt8(GP_STATE)
-                       .addUInt32(World::getWorld()->getTimeTicks());
-    }
+    m_data_to_send->addUInt8(GP_STATE)
+        .addUInt32(World::getWorld()->getTicksSinceStart());
 }   // startNewState
 
 // ----------------------------------------------------------------------------
@@ -328,9 +333,34 @@ void GameProtocol::startNewState(bool local_save)
  */
 void GameProtocol::addState(BareNetworkString *buffer)
 {
+    assert(NetworkConfig::get()->isServer());
     m_data_to_send->addUInt16(buffer->size());
     (*m_data_to_send) += *buffer;
 }   // addState
+
+// ----------------------------------------------------------------------------
+/** Called by a server to finalize the current state, which add updated
+ *  names of rewinder using to the beginning of state buffer
+ *  \param cur_rewinder List of current rewinder using.
+ */
+void GameProtocol::finalizeState(std::vector<std::string>& cur_rewinder)
+{
+    assert(NetworkConfig::get()->isServer());
+    auto& buffer = m_data_to_send->getBuffer();
+    auto pos = buffer.begin() + 1/*protocol type*/ + 1 /*gp event type*/+
+        4/*time*/;
+
+    m_data_to_send->reset();
+    std::vector<uint8_t> names;
+    names.push_back((uint8_t)cur_rewinder.size());
+    for (std::string& name : cur_rewinder)
+    {
+        names.push_back((uint8_t)name.size());
+        std::vector<uint8_t> rewinder(name.begin(), name.end());
+        names.insert(names.end(), rewinder.begin(), rewinder.end());
+    }
+    buffer.insert(pos, names.begin(), names.end());
+}   // finalizeState
 
 // ----------------------------------------------------------------------------
 /** Called when the last state information has been added and the message
@@ -339,7 +369,7 @@ void GameProtocol::addState(BareNetworkString *buffer)
 void GameProtocol::sendState()
 {
     assert(NetworkConfig::get()->isServer());
-    sendMessageToPeers(m_data_to_send, /*reliable*/true);
+    sendMessageToPeers(m_data_to_send, /*reliable*/false);
 }   // sendState
 
 // ----------------------------------------------------------------------------
@@ -352,16 +382,23 @@ void GameProtocol::handleState(Event *event)
         return;
 
     assert(NetworkConfig::get()->isClient());
-    const NetworkString &data = event->data();
+    NetworkString &data = event->data();
     int ticks          = data.getUInt32();
-    // Now copy the state data (without ticks etc) to a new
-    // string, so it can be reset to the beginning easily
-    // when restoring the state:
-    BareNetworkString *bns = new BareNetworkString(data.getCurrentData(),
-                                                   data.size());
+
+    // Check for updated rewinder using
+    unsigned rewinder_size = data.getUInt8();
+    std::vector<std::string> rewinder_using;
+    for (unsigned i = 0; i < rewinder_size; i++)
+    {
+        std::string name;
+        data.decodeString(&name);
+        rewinder_using.push_back(name);
+    }
 
     // The memory for bns will be handled in the RewindInfoState object
-    RewindManager::get()->addNetworkState(bns, ticks);
+    RewindInfoState* ris = new RewindInfoState(ticks, data.getCurrentOffset(),
+        rewinder_using, data.getBuffer());
+    RewindManager::get()->addNetworkRewindInfo(ris);
 }   // handleState
 
 // ----------------------------------------------------------------------------

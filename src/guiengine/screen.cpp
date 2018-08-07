@@ -100,9 +100,7 @@ void Screen::init()
  */
 void Screen::push()
 {
-#ifndef SERVER_ONLY
     StateManager::get()->pushScreen(this);
-#endif
 }   // push
 
 // -----------------------------------------------------------------------------

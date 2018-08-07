@@ -91,7 +91,18 @@ void NetworkUserDialog::beforeAddingWidgets()
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
 
-    getWidget<IconButtonWidget>("accept")->setVisible(false);
+    m_change_team_widget = NULL;
+    if (m_allow_change_team && m_host_id == STKHost::get()->getMyHostId())
+    {
+        m_change_team_widget = getWidget<IconButtonWidget>("accept");
+        m_change_team_widget->setVisible(true);
+        //I18N: In the network user dialog
+        m_change_team_widget->setText(_("Change team"));
+        m_change_team_widget->setImage(file_manager->getAsset(FileManager::GUI,
+            "race_giveup.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    else
+        getWidget<IconButtonWidget>("accept")->setVisible(false);
     getWidget<IconButtonWidget>("remove")->setVisible(false);
     getWidget<IconButtonWidget>("enter")->setVisible(false);
 }   // beforeAddingWidgets
@@ -144,6 +155,15 @@ GUIEngine::EventPropagation
             NetworkString kick(PROTOCOL_LOBBY_ROOM);
             kick.addUInt8(LobbyProtocol::LE_KICK_HOST).addUInt32(m_host_id);
             STKHost::get()->sendToServer(&kick, true/*reliable*/);
+            m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == m_change_team_widget->m_properties[PROP_ID])
+        {
+            NetworkString change_team(PROTOCOL_LOBBY_ROOM);
+            change_team.addUInt8(LobbyProtocol::LE_CHANGE_TEAM)
+                .addUInt8(m_local_id);
+            STKHost::get()->sendToServer(&change_team, true/*reliable*/);
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }

@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_PO_PARSER_HPP
 #define HEADER_TINYGETTEXT_PO_PARSER_HPP
 
+#ifndef SERVER_ONLY
+
 #include <iosfwd>
 #include <string>
 
@@ -76,3 +78,4 @@ private:
 #endif
 
 /* EOF */
+#endif

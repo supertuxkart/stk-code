@@ -59,10 +59,10 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/stk_host.hpp"
 #include "physics/physics.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
-#include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -1729,13 +1729,15 @@ void IrrDriver::displayFPS()
         prev_state = current_state;
     }
 
+    uint32_t ping = 0;
+    if (STKHost::existHost())
+        ping = STKHost::get()->getClientPingToServer();
     if (no_trust)
     {
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms",
-            NetworkingLobby::getInstance()->getServerPing()),
+        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
             core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
@@ -1761,22 +1763,19 @@ void IrrDriver::displayFPS()
                       "Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
                     SP::sp_shadow_poly_count, m_last_light_bucket_distance,
-                    m_skinning_joint,
-                    NetworkingLobby::getInstance()->getServerPing());
+                    m_skinning_joint, ping);
     }
     else
     {
         if (CVS->isGLSL())
         {
             fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
-                max, SP::sp_solid_poly_count / 1000,
-                NetworkingLobby::getInstance()->getServerPing());
+                max, SP::sp_solid_poly_count / 1000, ping);
         }
         else
         {
             fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
-                max, (int)roundf(kilotris),
-                NetworkingLobby::getInstance()->getServerPing());
+                max, (int)roundf(kilotris), ping);
         }
     }
 

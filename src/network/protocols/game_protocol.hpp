@@ -74,6 +74,7 @@ private:
     void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
     std::map<STKPeer*, int> m_initial_ticks;
+    std::map<STKPeer*, double> m_last_adjustments;
 
 public:
              GameProtocol();
@@ -84,9 +85,10 @@ public:
 
     void controllerAction(int kart_id, PlayerAction action,
                           int value, int val_l, int val_r);
-    void startNewState(bool local_save);
+    void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();
+    void finalizeState(std::vector<std::string>& cur_rewinder);
     void adjustTimeForClient(STKPeer *peer, int ticks);
     void sendItemEventConfirmation(int ticks);
 

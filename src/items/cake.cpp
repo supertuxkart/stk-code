@@ -119,11 +119,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
     //do not adjust height according to terrain
     setAdjustUpVelocity(false);
-
-    m_body->setActivationState(DISABLE_DEACTIVATION);
-
-    m_body->applyTorque( btVector3(5,-3,7) );
-
+    additionalPhysicsProperties();
 }   // Cake
 
 // -----------------------------------------------------------------------------

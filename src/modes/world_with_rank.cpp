@@ -82,7 +82,7 @@ AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
     if(p<1 || p>m_position_index.size())
         return NULL;
 
-    return m_karts[m_position_index[p-1]];
+    return m_karts[m_position_index[p-1]].get();
 }   // getKartAtPosition
 
 //-----------------------------------------------------------------------------

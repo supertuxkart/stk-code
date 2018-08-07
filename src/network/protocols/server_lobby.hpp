@@ -1,3 +1,21 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2018 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #ifndef SERVER_LOBBY_HPP
 #define SERVER_LOBBY_HPP
 
@@ -72,11 +90,11 @@ private:
     std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
 
-    /** Keeps track of an artificial server delay (which makes sure that the
-     *  data from all clients has arrived when the server computes a certain
-     *  timestep.(. It stores the real time since epoch + delta (atm 0.1
-     *  seconds), which is the real time at which the server should start. */
+    /** Keeps track of an artificial server delay, which is used to compensate
+     *  for network jitter. */
     double m_server_delay;
+
+    double m_server_max_ping;
 
     bool m_has_created_server_id_file;
 
@@ -137,6 +155,7 @@ private:
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
+    void changeTeam(Event* event);
     void handleChat(Event* event);
     void unregisterServer(bool now);
     void createServerIdFile();
@@ -199,6 +218,7 @@ private:
     double getModeSpread();
     double scalingValueForTime(double time);
     void checkRaceFinished();
+    void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
 
 public:
              ServerLobby();
@@ -219,6 +239,7 @@ public:
     virtual bool waitingForPlayers() const OVERRIDE;
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
+    virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
 
 };   // class ServerLobby
 

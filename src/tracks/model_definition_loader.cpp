@@ -59,7 +59,6 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
 
 LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent, std::shared_ptr<RenderInfo> ri)
 {
-#ifndef SERVER_ONLY
     scene::ISceneManager* sm = irr_driver->getSceneManager();
 
     std::string groupname = "";
@@ -74,6 +73,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         lod_node->updateAbsolutePosition();
         for (unsigned int m=0; m<group.size(); m++)
         {
+#ifndef SERVER_ONLY
             if (group[m].m_skeletal_animation &&
                 (UserConfigParams::m_animated_characters ||
                 World::getWorld()->getIdent() == IDENT_CUTSCENE))
@@ -117,6 +117,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
             else
+#endif
             {
                 scene::IMesh* a_mesh = irr_driver->getMesh(group[m].m_model_file);
                 if (!a_mesh)
@@ -153,9 +154,6 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         Log::warn("ModelDefinitionLoader", "LOD group '%s' is empty", groupname.c_str());
         return NULL;
     }
-#else
-    return NULL;
-#endif
 }   // instanciateAsLOD
 
 // ----------------------------------------------------------------------------

@@ -281,6 +281,15 @@ int MaxSpeed::getSpeedIncreaseTicksLeft(unsigned int category)
 }   // getSpeedIncreaseTimeLeft
 
 // ----------------------------------------------------------------------------
+/** Returns if decreased speed is active in the given category.
+ *  \param category Which category to report on.
+ */
+int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
+{
+    return m_speed_decrease[category].isActive();
+}   // isSpeedDecreaseActive
+
+// ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
  *  current maximum speed. Note that the function can be called with
  *  dt=0, in which case the maxium speed will be updated, but no
@@ -354,14 +363,10 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        // Terrain slowodn is not fully stored in the state, since it can
-        // be computed from the raycast. But the current slowdown fraction
-        // must be stored (otherwise on a rewind the current slowdown would
-        // be start from 1.0 again).
         if (i == MS_DECREASE_TERRAIN)
         {
-            buffer->addFloat(m_speed_decrease[i].m_current_fraction);
-            buffer->addFloat(m_speed_decrease[i].m_max_speed_fraction);
+            // Handle in local state
+            continue;
         }
         else if (active_slowdown & b)
             m_speed_decrease[i].saveState(buffer);
@@ -398,14 +403,10 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
 
     for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
     {
-        // Terrain slowodn is not fully stored in the state, since it can
-        // be computed from the raycast. But the current slowdown fraction
-        // must be stored (otherwise on a rewind the current slowdown would
-        // be start from 1.0 again).
         if (i == MS_DECREASE_TERRAIN)
         {
-            m_speed_decrease[i].m_current_fraction   = buffer->getFloat();
-            m_speed_decrease[i].m_max_speed_fraction = buffer->getFloat();
+            // Handle in local state
+            continue;
         }
         else
             m_speed_decrease[i].rewindTo(buffer, (active_slowdown & b) == b);

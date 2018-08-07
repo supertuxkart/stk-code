@@ -32,7 +32,6 @@
 #include "karts/abstract_kart.hpp"
 #include "utils/no_copy.hpp"
 
-#include <deque>
 #include <SColor.h>
 
 class AbstractKartAnimation;
@@ -158,20 +157,20 @@ protected:
 
     /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
-    int          m_bounce_back_ticks;
+    int16_t      m_bounce_back_ticks;
 
     /** Time a kart is invulnerable. */
-    int          m_invulnerable_ticks;
+    int16_t      m_invulnerable_ticks;
 
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
-    int          m_squash_ticks;
+    float        m_squash_time;
 
     /** Current leaning of the kart. */
     float        m_current_lean;
 
     /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
-    int          m_bubblegum_ticks;
+    int16_t      m_bubblegum_ticks;
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
@@ -215,15 +214,14 @@ protected:
 
     float           m_falling_time;
 
+    float           m_weight;
+
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
-    int           m_view_blocked_by_plunger;
+    int16_t       m_view_blocked_by_plunger;
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
-    /** For camera handling an exponentially smoothened value is used, which
-     *  reduces stuttering of the camera. */
-    float         m_smoothed_speed;
-    
+
     /** For smoothing engine sound**/
     float         m_last_factor_engine_sound;
 
@@ -251,10 +249,8 @@ protected:
     int          m_ticks_last_crash;
     RaceManager::KartType m_type;
 
-    std::deque<btTransform> m_rewound_transforms;
-
     /** To prevent using nitro in too short bursts */
-    int           m_min_nitro_ticks;
+    int8_t        m_min_nitro_ticks;
 
     void          updatePhysics(int ticks);
     void          handleMaterialSFX();
@@ -269,7 +265,7 @@ protected:
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
-
+    void          updateWeight();
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
@@ -280,7 +276,6 @@ public:
     virtual void   kartIsInRestNow() OVERRIDE;
     virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
-    virtual void   updateWeight     () OVERRIDE;
     virtual float  getSpeedForTurnRadius(float radius) const OVERRIDE;
     virtual float  getMaxSteerAngle(float speed) const;
     virtual bool   isInRest         () const OVERRIDE;
@@ -424,7 +419,7 @@ public:
      *  skidding related values) - non-const. */
     virtual Skidding *getSkidding() OVERRIDE { return m_skidding; }
     // ------------------------------------------------------------------------
-    virtual RaceManager::KartType getType() const { return m_type; }
+    virtual RaceManager::KartType getType() const OVERRIDE { return m_type; }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart *getVehicle() const OVERRIDE { return m_vehicle; }
@@ -432,12 +427,9 @@ public:
     /** Returns the speed of the kart in meters/second. */
     virtual float  getSpeed() const OVERRIDE { return m_speed; }
     // ------------------------------------------------------------------------
-    /** Returns the speed of the kart in meters/second. */
-    virtual float getSmoothedSpeed() const OVERRIDE { return m_smoothed_speed; }
-    // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
-     *  from the server information.                                       */
-    virtual void setSpeed(float s)  OVERRIDE { m_speed = s; }
+     *  from the server information. */
+    virtual void setSpeed(float s) OVERRIDE { m_speed = s; }
     // ------------------------------------------------------------------------
     virtual btQuaternion getVisualRotation() const OVERRIDE;
     // ------------------------------------------------------------------------
@@ -457,7 +449,7 @@ public:
     virtual Controller* getController() OVERRIDE { return m_controller; }
     // ------------------------------------------------------------------------
     /** Returns the controller of this kart (const version). */
-    const Controller* getController() const { return m_controller; }
+    const Controller* getController() const OVERRIDE { return m_controller; }
     // ------------------------------------------------------------------------
     /** True if the wheels are touching the ground. */
     virtual bool isOnGround() const OVERRIDE;
@@ -473,7 +465,11 @@ public:
     // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
     virtual void setInvulnerableTicks(int ticks) OVERRIDE
-    { 
+    {
+        // The rest 2 bits are saving fire clicked and animation status for
+        // rewind
+        if (ticks > 16383)
+            ticks = 16383;
         m_invulnerable_ticks = ticks;
     }   // setInvulnerableTicks
     // ------------------------------------------------------------------------
@@ -505,7 +501,7 @@ public:
     virtual bool isOnMinNitroTime() const OVERRIDE { return m_min_nitro_ticks > 0; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
-    virtual bool isSquashed() const OVERRIDE { return m_squash_ticks >0; }
+    virtual bool isSquashed() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) OVERRIDE;
@@ -529,7 +525,7 @@ public:
     virtual const Vec3& getRecentPreviousXYZ() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the time at which the recent previous position occured */
-    virtual const float getRecentPreviousXYZTime() const;
+    virtual const float getRecentPreviousXYZTime() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
@@ -551,9 +547,6 @@ public:
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool isVisible() OVERRIDE;
-    // ------------------------------------------------------------------------
-    void handleRewoundTransform();
-
 };   // Kart
 
 

@@ -30,6 +30,7 @@
 
 namespace Online
 {
+    std::string HTTPRequest::m_cert_location;
     const std::string API::USER_PATH = "user/";
     const std::string API::SERVER_PATH = "server/";
 
@@ -94,6 +95,12 @@ namespace Online
         m_parameters    = "";
         m_curl_code     = CURLE_OK;
         m_progress.setAtomic(0);
+        if (m_cert_location.empty())
+        {
+            m_cert_location =
+                file_manager->getAsset("addons.supertuxkart.net.pem");
+        }
+        m_disable_sending_log = false;
     }   // init
 
     // ------------------------------------------------------------------------
@@ -179,13 +186,13 @@ namespace Online
             chunk = curl_slist_append(chunk, "Host: addons.supertuxkart.net");
             curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
             CURLcode error = curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
-                       file_manager->getAsset("addons.supertuxkart.net.pem").c_str());
+                m_cert_location.c_str());
             if (error != CURLE_OK)
             {
                 Log::error("HTTPRequest", "Error setting CAINFO to '%s'",
-                      file_manager->getAsset("addons.supertuxkart.net.pem").c_str());
-                Log::error("HTTPRequest", "Error %d: '%s'.", error,
-                           curl_easy_strerror(error));
+                    m_cert_location.c_str());
+                Log::error("HTTPRequest", "Error: '%s'.", error,
+                    curl_easy_strerror(error));
             }
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
 #ifdef __APPLE__
@@ -233,11 +240,11 @@ namespace Online
             m_parameters.erase(m_parameters.size()-1);
         }
 
-        if (m_parameters.size() == 0)
+        if (m_parameters.size() == 0 && !m_disable_sending_log)
         {
             Log::info("HTTPRequest", "Downloading %s", m_url.c_str());
         }
-        else if (Log::getLogLevel() <= Log::LL_INFO)
+        else if (Log::getLogLevel() <= Log::LL_INFO && !m_disable_sending_log)
         {
             // Avoid printing the password or token, just replace them with *s
             std::string param = m_parameters;

@@ -23,7 +23,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 #  include <vorbis/codec.h>
 #  include <vorbis/vorbisfile.h>
 #  ifdef __APPLE__
@@ -96,7 +96,7 @@ bool SFXBuffer::load()
 {
     if (UserConfigParams::m_sfx == false) return false;
     
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     if (m_loaded) return false;
 
     alGetError(); // clear errors from previously
@@ -130,7 +130,7 @@ bool SFXBuffer::load()
 
 void SFXBuffer::unload()
 {
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     if (m_loaded)
     {
         alDeleteBuffers(1, &m_buffer);
@@ -147,7 +147,7 @@ void SFXBuffer::unload()
  */
 bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 {
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
     const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
 
 

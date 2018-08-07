@@ -174,7 +174,6 @@ void addAttachment(Attachment::AttachmentType type)
                       stk_config->time2Ticks(kart->getKartProperties()
                                                  ->getAnvilDuration()) );
             kart->adjustSpeed(kart->getKartProperties()->getAnvilSpeedFactor());
-            kart->updateWeight();
         }
         else if (type == Attachment::ATTACH_PARACHUTE)
         {

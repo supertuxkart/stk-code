@@ -18,6 +18,7 @@
 #define HEADER_NETWORK_PLAYER_CONTROLLER_HPP
 
 #include "karts/controller/player_controller.hpp"
+#include "network/network_config.hpp"
 
 class AbstractKart;
 class Player;
@@ -35,12 +36,31 @@ public:
     {
     }   // ~NetworkPlayerController
     // ------------------------------------------------------------------------
+    virtual bool canGetAchievements() const OVERRIDE          { return false; }
+    // ------------------------------------------------------------------------
     /** This player is not a local player. This affect e.g. special sfx and
      *  camera effects to be triggered. */
     virtual bool isLocalPlayerController() const OVERRIDE
     {
         return false; 
     }   // isLocal
+    // ------------------------------------------------------------------------
+    /** Update for network controller. For player with a high ping it is
+     *  useful to reduce shaking by reducing the steering somewhat in each
+     *  frame: If the player does a quick correction only, because of the high
+     *  latency the predicted path will curve way too much. By automatically 
+     *  reducing it, this error is reduced. And even if the player steers more
+     *  the error is hopefully acceptable. */
+    virtual void update(int ticks) OVERRIDE
+    {
+        PlayerController::update(ticks);
+        if (NetworkConfig::get()->isClient())
+        {
+            m_controls->setSteer(  m_controls->getSteer()
+                                 * stk_config->m_network_steering_reduction);
+        }
+    }   // update
+
     // ------------------------------------------------------------------------
 };   // NetworkPlayerController
 

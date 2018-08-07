@@ -47,6 +47,7 @@ void GhostKart::reset()
     Kart::reset();
     // This will set the correct start position
     update(0);
+    updateGraphics(0);
     m_last_egg_idx = 0;
 }   // reset
 
@@ -89,7 +90,8 @@ void GhostKart::updateGraphics(float dt)
 
     // Don't call Kart's updateGraphics, since it assumes physics. Instead
     // immediately call Moveable's updateGraphics.
-    Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
+    Moveable::updateSmoothedGraphics(dt);
+    Moveable::updateGraphics(center_shift, btQuaternion(0, 0, 0, 1));
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
