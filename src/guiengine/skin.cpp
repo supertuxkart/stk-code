@@ -1513,6 +1513,18 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
 
+    if (icon_widget->hasTooltip() > 0)
+    {
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
+
     if (widget->m_type == WTYPE_MODEL_VIEW)
     {
         // Model view widgets don't generate mipmaps so disable material 2D
