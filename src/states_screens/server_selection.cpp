@@ -120,7 +120,7 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
-    m_sort_desc = true;
+    m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
     refresh(true);
 }   // init
@@ -316,5 +316,5 @@ void ServerSelection::copyFromServersManager()
         {
             return a->isPasswordProtected() != m_private_server->getState();
         }), m_servers.end());
-    loadList(0);
+    loadList(/* distance */ 5);
 }   // copyFromServersManager
