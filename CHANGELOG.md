@@ -192,7 +192,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Basic level-of-detail (LOD) support
 * Debug features for track makers
 * Update to bullet 2.77
-* Replace more sounds to be DFSG-complianta
+* Replace more sounds to be DFSG-compliant
 * Fixed character names that contain non-ASCII characters
 * Full RTL (right to left) support
 * Various other tweaks done and glitches fixed
