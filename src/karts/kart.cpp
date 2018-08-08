@@ -1080,9 +1080,10 @@ void Kart::collectedItem(ItemState *item_state)
         // slow down
         m_bubblegum_ticks =
             stk_config->time2Ticks(m_kart_properties->getBubblegumDuration());
-        m_bubblegum_torque = ((rand()%2)
-                           ?  m_kart_properties->getBubblegumTorque()
-                           : -m_kart_properties->getBubblegumTorque());
+        m_bubblegum_torque =
+            ((World::getWorld()->getTicksSinceStart() / 10) % 2 == 0) ?
+            m_kart_properties->getBubblegumTorque() :
+            -m_kart_properties->getBubblegumTorque();
         m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTicks(),
