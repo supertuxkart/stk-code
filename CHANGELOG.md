@@ -17,6 +17,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Visual improvements (new skidding particles, better rescue, bubblegum flashing before ending)
 * Audio improvements (crash sound depending on speed/direction, sound cue in nitro challenges)
 * Gameplay improvements (much better slipstreaming, GP points...)
+* Terrain slowdown works again as intended on several tracks where it was missing
 * Many bugfixes
 ### Tracks and modeling
 #### Tracks
@@ -90,7 +91,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Karts
 * New karts Amanda and Gavroche by XGhost
-* New and improved Tux, Adiumy, Sara the Wizard and the Racer, Xue kart
+* New and improved Tux, Adiumy, Sara the Wizard and the Racer, Xue
 #### Tracks
 * Cocoa Temple by samuncle (replace Amazonian Journey)
 * Gran Paradiso Island by samuncle (replace The Island)
@@ -289,7 +290,6 @@ Too many to list them all. Main points:
     * Star track
 
 ## SuperTuxKart 0.5 (May 2008)
-* Six new tracks and one improved track: Fort Magma, SnowTux Peak, Amazonian Journey, City, Canyon, Crescent Crossing and StarTrack
 * Complete Challenges to unlock game modes, new tracks and a skidding preview
 * New Follow the Leader game mode
 * New Grand Prix
@@ -300,18 +300,29 @@ Too many to list them all. Main points:
 * Many Bugfixes including:
 	- a memory leak fix (Charlie Head)
 	- an AI crash fix (Chris Morris)
-
+	
+### Tracks and modeling	
+#### Tracks
+* SnowTux Peak
+* Amazonian Journey
+* City
+* Canyon
+* BSODs Battlements renamed to Fort Magma
+* Improved Crescent Crossing, Fort Magma, and Star Track
 
 ## SuperTuxKart 0.4 (February 2008)
 * New physics handling using the bullet physics engine
-* New kart: wilber
-* Improved 'Shifting Sands' and 'Lighthouse' tracks
 * Improved AI
 * New GUI handling, including resolution switching GUI
 * Improved input handling	
 * Jump and look-back featue
 * Additional music and main theme
+### Tracks and modeling
+#### Karts
+* New kart: wilber
 	
+#### Tracks
+* Improved 'Shifting Sands' and 'Lighthouse'
 	
 ## SuperTuxKart 0.3 (May 2007)
 * Highscore lists	
