@@ -7,6 +7,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## Unreleased
 * Better random item distribution for various numbers of karts by Alayan and hiker
+* Numerous improvements to input on Android by deveee
 * Unlockable SuperTux challenges in Story Mode by Alayan
 * Race UI improvements (new speedometer, nitro gauge, bigger minimap) by Alayan
 * Improvements to ghost replays (more data saved, live time difference, replay comparison, UI improvements, egg hunt replays) by Alayan
