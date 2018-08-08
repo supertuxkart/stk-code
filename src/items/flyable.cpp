@@ -701,6 +701,7 @@ void Flyable::hideNodeWhenUndoDestruction()
 #ifndef SERVER_ONLY
     m_node->setVisible(false);
 #endif
+    moveToInfinity();
 }   // hideNodeWhenUndoDestruction
 
 // ----------------------------------------------------------------------------
@@ -713,11 +714,6 @@ void Flyable::handleUndoDestruction()
 
     m_has_undone_destruction = true;
 
-    // If destroyed during rewind, than in theroy it should be safe to delete
-    // without undo
-    if (RewindManager::get()->isRewinding())
-        return;
-
     // We don't bother seeing the mesh during rewinding
     hideNodeWhenUndoDestruction();
     std::shared_ptr<Flyable> f = getShared<Flyable>();
@@ -729,9 +725,10 @@ void Flyable::handleUndoDestruction()
         {
             projectile_manager->addByUID(uid, f);
         },
-        /*replay_function*/[uid]()
+        /*replay_function*/[f, uid]()
         {
             projectile_manager->removeByUID(uid);
+            f->moveToInfinity();
         }));
 }   // handleUndoDestruction
 

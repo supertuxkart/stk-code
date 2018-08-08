@@ -48,6 +48,7 @@ private:
 
     /** A sound effect for rolling ball. */
     SFXBase     *m_roll_sfx;
+    virtual void hideNodeWhenUndoDestruction() OVERRIDE;
 
 public:
              Bowling(AbstractKart* kart);
