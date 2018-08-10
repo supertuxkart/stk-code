@@ -60,7 +60,7 @@ private:
 
     float m_vote_timeout = -1.0f;
 
-    Synchronised<std::map<std::string, core::stringw> > m_vote_messages;
+    std::map<std::string, core::stringw> m_vote_messages;
 
     std::deque<std::string> m_random_track_list;
 
@@ -100,9 +100,7 @@ public:
 
     void resetVote()
     {
-        m_vote_messages.lock();
-        m_vote_messages.getData().clear();
-        m_vote_messages.unlock();
+        m_vote_messages.clear();
         m_vote_timeout = -1.0f;
     }
 
@@ -111,9 +109,7 @@ public:
     void addVoteMessage(const std::string& user,
                         const irr::core::stringw& message)
     {
-        m_vote_messages.lock();
-        m_vote_messages.getData()[user] = message;
-        m_vote_messages.unlock();
+        m_vote_messages[user] = message;
     }
 
 };

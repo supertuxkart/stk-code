@@ -454,8 +454,7 @@ void TracksScreen::onUpdate(float dt)
     message += L"\n";
     unsigned height = GUIEngine::getFont()->getDimension(L"X").Height;
     const unsigned total_height = m_votes->getDimension().Height;
-    m_vote_messages.lock();
-    for (auto& p : m_vote_messages.getData())
+    for (auto& p : m_vote_messages)
     {
         height += GUIEngine::getFont()->getDimension(L"X").Height * 2;
         if (height > total_height)
@@ -463,7 +462,6 @@ void TracksScreen::onUpdate(float dt)
         message += p.second;
         message += L"\n";
     }
-    m_vote_messages.unlock();
     m_votes->setText(message, true);
 
 }   // onUpdate

@@ -75,6 +75,11 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_server_address = a;
     m_server = s;
     setHandleDisconnections(true);
+    m_disconnected_msg[PDI_TIMEOUT] = _("Server connection timed out.");
+    m_disconnected_msg[PDI_NORMAL] = _("Server has been shut down.");
+    m_disconnected_msg[PDI_KICK] = _("You were kicked from the server.");
+    m_disconnected_msg[PDI_BAD_CONNECTION] =
+        _("Bad network connection is detected.");
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -140,6 +145,12 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_CHAT:                  handleChat(event);          break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
         case LE_SERVER_INFO:           handleServerInfo(event);    break;
+        case LE_PLAYER_DISCONNECTED :  disconnectedPlayer(event);  break;
+        case LE_CONNECTION_REFUSED:    connectionRefused(event);   break;
+        case LE_VOTE:                  displayPlayerVote(event);   break;
+        case LE_SERVER_OWNERSHIP:      becomingServerOwner();      break;
+        case LE_BAD_TEAM:              handleBadTeam();            break;
+        case LE_BAD_CONNECTION:        handleBadConnection();      break;
         default:
             return false;
             break;
@@ -161,13 +172,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
                   message_type);
         switch(message_type)
         {
-            case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
             case LE_START_RACE: startGame(event);                        break;
-            case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
-            case LE_VOTE: displayPlayerVote(event);                      break;
-            case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
-            case LE_BAD_TEAM: handleBadTeam();                           break;
-            case LE_BAD_CONNECTION: handleBadConnection();               break;
             default:                                                     break;
         }   // switch
 
@@ -182,25 +187,8 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
         // So only signal that STKHost should exit, which will be tested
         // from the main thread.
         STKHost::get()->disconnectAllPeers(false/*timeout_waiting*/);
-        switch(event->getPeerDisconnectInfo())
-        {
-            case PDI_TIMEOUT:
-                STKHost::get()->setErrorMessage(
-                    _("Server connection timed out."));
-                break;
-            case PDI_NORMAL:
-                STKHost::get()->setErrorMessage(
-                    _("Server has been shut down."));
-                break;
-            case PDI_KICK:
-                STKHost::get()->setErrorMessage(
-                    _("You were kicked from the server."));
-                break;
-            case PDI_BAD_CONNECTION:
-                STKHost::get()->setErrorMessage(
-                    _("Bad network connection is detected."));
-                break;
-        }   // switch
+        STKHost::get()->setErrorMessage(
+            m_disconnected_msg.at(event->getPeerDisconnectInfo()));
         STKHost::get()->requestShutdown();
         return true;
     } // disconnection
