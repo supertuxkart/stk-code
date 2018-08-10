@@ -4,13 +4,13 @@
 # 
 # Translators:
 # Marc Coll Carrillo, 2012
-# Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2017
+# Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
+"POT-Creation-Date: 2018-06-07 18:56-0400\n"
+"PO-Revision-Date: 2018-06-09 12:04+0000\n"
 "Last-Translator: Marc Coll Carrillo <marc.coll.carrillo@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/supertuxkart/supertuxkart/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -114,11 +114,11 @@ msgid "Penguin Playground"
 msgstr "Pati del pingüí"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
-msgid "Off the beaten track"
+msgid "Off the Beaten Track"
 msgstr "Fora del circuit habitual"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
-msgid "To the moon and back"
+msgid "To the Moon and Back"
 msgstr "Fins a la lluna i tornar"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
@@ -141,7 +141,7 @@ msgstr "Desinstal·lar"
 #. I18N: Ghost replay info action
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:285
+#: src/states_screens/dialogs/addons_loading.cpp:288
 msgid "Back"
 msgstr "Tornar"
 
@@ -180,11 +180,91 @@ msgstr "Circuits"
 msgid "Arenas"
 msgstr "Arenes"
 
+#. I18N: ./data/gui/android/init_android.stkgui
+msgid "Select a type of control that you prefer"
+msgstr "Selecciona el tipus de controlador que prefereixis"
+
+#. I18N: ./data/gui/android/init_android.stkgui
+#. I18N: Control type
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Accelerometer"
+msgstr "Acceleròmetre"
+
+#. I18N: ./data/gui/android/init_android.stkgui
+#. I18N: Control type
+msgid "Steering wheel"
+msgstr "Volant"
+
+#. I18N: ./data/gui/android/init_android.stkgui
+msgid "You can change it later in touch device settings."
+msgstr "Pots modificar-ho més tard a la configuració del dispositiu tàctil."
+
+#. I18N: ./data/gui/android/init_android.stkgui
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: ./data/gui/kart_color_slider.stkgui
+msgid "Apply"
+msgstr "Aplica-ho"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+msgid "Touch Device Settings"
+msgstr "Configuració del dispositiu tàctil"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: Tab in help menu
+msgid "General"
+msgstr "General"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Device enabled"
+msgstr "Dispositiu habilitat"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Inverted buttons"
+msgstr "Botons invertits"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Buttons scale"
+msgstr "Escala dels botons"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Advanced"
+msgstr "Avançat"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Deadzone"
+msgstr "Zona morta"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Sensitivity"
+msgstr "Sensibilitat"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+msgid "Restore defaults"
+msgstr "Restaura la configuració predeterminada"
+
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
-#: src/states_screens/grand_prix_editor_screen.cpp:337
+#: src/states_screens/grand_prix_editor_screen.cpp:334
 msgid "Standard"
 msgstr "Estàndard"
 
@@ -196,11 +276,11 @@ msgstr "Estàndard"
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:83
-#: src/states_screens/easter_egg_screen.cpp:145
-#: src/states_screens/grand_prix_editor_screen.cpp:339
-#: src/states_screens/kart_selection.cpp:287
-#: src/states_screens/tracks_and_gp_screen.cpp:148
+#: src/states_screens/arenas_screen.cpp:81
+#: src/states_screens/easter_egg_screen.cpp:143
+#: src/states_screens/grand_prix_editor_screen.cpp:336
+#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "Complements"
 
@@ -211,25 +291,24 @@ msgstr "Complements"
 #. I18N: Time filters for add-ons
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
-#. I18N: if all kart animations are enabled
-#. I18N: name of the tab that will show tracks from all groups
-#: src/states_screens/addons_screen.cpp:49
-#: src/states_screens/arenas_screen.cpp:75
-#: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:147
-#: src/states_screens/gp_info_screen.cpp:76
-#: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:279
-#: src/states_screens/options_screen_video.cpp:456
-#: src/states_screens/tracks_and_gp_screen.cpp:138
-#: src/states_screens/tracks_screen.cpp:141
+#: src/states_screens/addons_screen.cpp:47
+#: src/states_screens/arenas_screen.cpp:73
+#: src/states_screens/easter_egg_screen.cpp:135
+#: src/states_screens/edit_track_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/grand_prix_editor_screen.cpp:333
+#: src/states_screens/kart_selection.cpp:282
+#: src/states_screens/tracks_and_gp_screen.cpp:135
+#: src/states_screens/tracks_screen.cpp:209
 msgid "All"
 msgstr "Tots"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/states_screens/edit_gp_screen.cpp:257
-#: src/states_screens/ghost_replay_selection.cpp:117
+#: src/network/protocols/client_lobby.cpp:398
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:169
+#: src/states_screens/edit_gp_screen.cpp:255
+#: src/states_screens/ghost_replay_selection.cpp:312
 msgid "Yes"
 msgstr "Sí"
 
@@ -251,13 +330,15 @@ msgstr "Sí"
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/addons_loading.cpp:228
+#: src/states_screens/dialogs/addons_loading.cpp:231
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
-#: src/states_screens/user_screen.cpp:112
+#: src/states_screens/user_screen.cpp:110
 msgid "Cancel"
 msgstr "Cancel·la"
 
@@ -288,11 +369,6 @@ msgstr "Ombres"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Image-based lighting"
-msgstr "Il'luminació basada en imatges"
-
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
 msgid "Bloom"
 msgstr "Lluïssor"
 
@@ -303,17 +379,17 @@ msgstr "Rajos crepusculars"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Ambient Occlusion"
+msgid "Ambient occlusion"
 msgstr "Oclusió ambiental"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Global illumination"
-msgstr "Il·luminació global"
+msgid "Depth of field"
+msgstr "Profunditat de camp"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Glow (outlines)"
+msgid "Glow (Outlines)"
 msgstr "Resplendor (contorns)"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
@@ -328,13 +404,13 @@ msgstr "Difuminació de moviment"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Depth of field"
-msgstr "Profunditat de camp"
+msgid "Image-based lighting"
+msgstr "Il'luminació basada en imatges"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Weather Effects"
-msgstr "Efectes climàtics"
+msgid "Animated characters"
+msgstr "Personatges animats"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -343,13 +419,8 @@ msgstr "Compressió de textures"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Animated Scenery"
-msgstr "Escenaris animats"
-
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
-msgid "Animated Characters"
-msgstr "Personatges animats"
+msgid "Particle effects"
+msgstr "Efectes de partícules"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -365,11 +436,6 @@ msgstr "Detall geomètric"
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
 msgstr "Cal reiniciar el STK per aplicar la nova configuració"
-
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: ./data/gui/multitouch_settings.stkgui
-msgid "Apply"
-msgstr "Aplica-ho"
 
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -436,6 +502,7 @@ msgstr "A l'inrevés:"
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
+#. I18N: ./data/gui/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/user_screen.stkgui
@@ -454,7 +521,8 @@ msgstr "D'acord"
 #. I18N: In soccer setup screen
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#: src/states_screens/race_result_gui.cpp:205
+#: src/states_screens/race_result_gui.cpp:173
+#: src/states_screens/race_result_gui.cpp:198
 msgid "Continue"
 msgstr "Continua"
 
@@ -471,15 +539,23 @@ msgid "Watch replay only"
 msgstr "Mirar la repetició i prou"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+msgid "Compare to another ghost"
+msgstr "Compara amb un altre fantasma"
+
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the network lobby
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
 msgstr "Comença la cursa"
+
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info screen action
+msgid "Compare ghost"
+msgstr "Compara fantasma"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -488,13 +564,38 @@ msgstr "Selecció de la repetició fantasma"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+msgid "Time trial"
+msgstr "Contra rellotge"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Egg hunt"
+msgstr "A la recerca dels ous perduts"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Only show the best times"
+msgstr "Mostra només els millors temps"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Compare replay"
+msgstr "Compara repetició"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
 msgstr "Mostra només les repeticions del nivell de dificultat actual"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Record ghost replay"
-msgstr "Grava la repetició fantasma"
+msgid "Only show replays matching the current version"
+msgstr "Mostra només les repeticions de la versió actual"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Record a ghost replay"
+msgstr "Grava una repetició fantasma"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -503,7 +604,8 @@ msgstr "Karts controlats per l'ordinador"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/ghost_replay_selection.cpp:79
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:135
+#: src/states_screens/ghost_replay_selection.cpp:112
 msgid "Reverse"
 msgstr "A l'inrevés"
 
@@ -514,7 +616,7 @@ msgstr "Conjunt de circuits"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:147
+#: src/states_screens/gp_info_screen.cpp:145
 msgid "Continue saved GP"
 msgstr "Continua un campionat desat"
 
@@ -554,21 +656,6 @@ msgstr "Desa el campionat"
 #. I18N: ./data/gui/help5.stkgui
 msgid "SuperTuxKart Help"
 msgstr "Ajuda del SuperTuxKart"
-
-#. I18N: ./data/gui/help1.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help3.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help5.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "General"
-msgstr "General"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -817,10 +904,13 @@ msgstr "Bomba - detona al cap de poca estona per llençar el kart pels aires. Xo
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#. I18N: ./data/gui/karts_online.stkgui
-#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Tria un kart"
+
+#. I18N: ./data/gui/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
+msgid "0 to use the original color, otherwise pick one from slider."
+msgstr "0 per fer servir el color original. En cas contrari, selecciona'n un."
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
@@ -839,12 +929,12 @@ msgstr "Multijugador"
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
+#. I18N: ./data/gui/online/online.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/main_menu_screen.cpp:78
-#: src/states_screens/online_profile_friends.cpp:222
+#: src/states_screens/online_profile_friends.cpp:220
 msgid "Online"
 msgstr "En línia"
 
@@ -873,7 +963,7 @@ msgstr "Ajuda"
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:511
+#: src/states_screens/race_gui_overworld.cpp:584
 msgid "Tutorial"
 msgstr "Tutorial"
 
@@ -881,7 +971,7 @@ msgstr "Tutorial"
 #. I18N: In the main screen
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:112
+#: src/states_screens/online_profile_base.cpp:107
 msgid "Achievements"
 msgstr "Assoliments"
 
@@ -899,49 +989,6 @@ msgstr "Quant a"
 #. I18N: In the main screen
 msgid "Quit"
 msgstr "Sortir"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-msgid "Touch Device Settings"
-msgstr "Configuració del dispositiu tàctil"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Device enabled"
-msgstr "Dispositiu habilitat"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Inverted buttons"
-msgstr "Botons invertits"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Buttons scale"
-msgstr "Escala dels botons"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Accelerometer"
-msgstr "Acceleròmetre"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Advanced"
-msgstr "Avançat"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Deadzone"
-msgstr "Zona morta"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Sensitivity"
-msgstr "Sensibilitat"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-msgid "Restore defaults"
-msgstr "Restaura la configuració predeterminada"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -1013,8 +1060,9 @@ msgstr "Contrasenya (opcional)"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/ghost_replay_selection.cpp:80
-#: src/states_screens/server_selection.cpp:104
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:137
+#: src/states_screens/ghost_replay_selection.cpp:114
+#: src/states_screens/server_selection.cpp:105
 msgid "Difficulty"
 msgstr "Dificultat"
 
@@ -1024,8 +1072,9 @@ msgstr "Dificultat"
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:546
-#: src/states_screens/ghost_replay_selection.cpp:121
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:575
 msgid "Novice"
 msgstr "Novell"
 
@@ -1035,8 +1084,9 @@ msgstr "Novell"
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:547
-#: src/states_screens/ghost_replay_selection.cpp:121
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:576
 msgid "Intermediate"
 msgstr "Intermedi"
 
@@ -1046,8 +1096,9 @@ msgstr "Intermedi"
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:548
-#: src/states_screens/ghost_replay_selection.cpp:120
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:577
 msgid "Expert"
 msgstr "Expert"
 
@@ -1055,30 +1106,45 @@ msgstr "Expert"
 #. I18N: Difficulty
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:549
-#: src/states_screens/ghost_replay_selection.cpp:119
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:578
 msgid "SuperTux"
 msgstr "SuperTux"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/server_selection.cpp:105
+#: src/states_screens/server_selection.cpp:106
 msgid "Game mode"
 msgstr "Mode de joc"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/race/race_manager.hpp:175
+#: src/network/network_config.cpp:180 src/race/race_manager.hpp:176
 msgid "Normal Race"
 msgstr "Cursa normal"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/race/race_manager.hpp:177
+#: src/network/network_config.cpp:182 src/race/race_manager.hpp:178
 msgid "Time Trial"
 msgstr "Contra rellotge"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/network_config.cpp:184 src/race/race_manager.hpp:182
+msgid "3 Strikes Battle"
+msgstr "Batalla a 3 cops"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/network_config.cpp:186 src/race/race_manager.hpp:186
+msgid "Soccer"
+msgstr "Futbol"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1087,8 +1153,8 @@ msgstr "Crea"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#. I18N: Used as a verb, appears on the main menu (login button)
-#: src/states_screens/main_menu_screen.cpp:80
+#. I18N: Used as a verb, appears on the main networking menu (login button)
+#: src/states_screens/online_screen.cpp:60
 msgid "Login"
 msgstr "Inicia una sessió"
 
@@ -1125,6 +1191,25 @@ msgstr "Entrar com a convidat et permet participar en curses en línia, però no
 msgid "Log In"
 msgstr "Inici de sessió"
 
+#. I18N: ./data/gui/online/lan.stkgui
+msgid "Local Networking"
+msgstr "Xarxa local"
+
+#. I18N: ./data/gui/online/lan.stkgui
+#. I18N: In the online multiplayer screen
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Find Server"
+msgstr "Troba un servidor"
+
+#. I18N: ./data/gui/online/lan.stkgui
+#. I18N: In the online multiplayer screen
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+#: src/states_screens/create_server_screen.cpp:88
+msgid "Create Server"
+msgstr "Crea un servidor"
+
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Lobby Settings"
@@ -1132,32 +1217,23 @@ msgstr "Paràmetres de la llista de jugadors"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
 #. I18N: In networking lobby
+#. I18N: In the networking lobby
+#: src/states_screens/networking_lobby.cpp:143
 msgid "Lobby"
 msgstr "Llista de jugadors"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the networking lobby
-msgid "Server name:"
-msgstr "Nom del servidor"
+#. I18N: In the network lobby
+msgid "Send"
+msgstr "Enviar"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the networking lobby
-msgid "Difficulty:"
-msgstr "Dificultat:"
+#. I18N: In the network lobby
+msgid "Start race"
+msgstr "Comença la cursa"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the networking lobby
-msgid "Game mode:"
-msgstr "Mode de joc:"
-
-#. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
+#. I18N: In the network lobby
 msgid "Exit"
 msgstr "Sortir"
 
@@ -1168,18 +1244,59 @@ msgstr "Sortir"
 msgid "View"
 msgstr "Vista"
 
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: In the networking menu
+msgid "Enable splitscreen or player handicaps"
+msgstr "Habilita la pantalla dividida o les limitacions dels jugadors"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+msgid "Local networking"
+msgstr "Xarxa local"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+msgid "Global networking"
+msgstr "Xarxa global"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+msgid "Enter server address"
+msgstr "Introdueix l'adreça del servidor"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+#: src/states_screens/online_profile_base.cpp:112
+#: src/states_screens/online_profile_base.cpp:122
+#: src/states_screens/online_screen.cpp:58
+msgid "Your profile"
+msgstr "El teu perfil"
+
+#. I18N: ./data/gui/online/player_rankings_dialog.stkgui
+#. I18N: In player rankings dialog
+msgid "Top 10 players"
+msgstr "Els 10 millors jugadors"
+
+#. I18N: ./data/gui/online/player_rankings_dialog.stkgui
+msgid "Refresh"
+msgstr "Refresca"
+
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/profile_overview.stkgui
-#. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
 msgstr "..."
 
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: In the achievements screen
+msgid "Player rankings"
+msgstr "Classificacions del jugador"
+
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:111
+#: src/states_screens/online_profile_base.cpp:106
 msgid "Friends"
 msgstr "Amics"
 
@@ -1199,27 +1316,6 @@ msgid "Overview"
 msgstr "Vista general"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
-#. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:110
-msgid "Servers"
-msgstr "Servidors"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
-msgid "Local Networking"
-msgstr "Xarxa local"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Find Server"
-msgstr "Troba un servidor"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
-#. I18N: In the online multiplayer screen
-#: src/states_screens/create_server_screen.cpp:83
-msgid "Create Server"
-msgstr "Crea un servidor"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Global Networking"
 msgstr "Xarxa global"
 
@@ -1230,7 +1326,7 @@ msgstr "Partida ràpida"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:113
+#: src/states_screens/online_profile_base.cpp:108
 msgid "Account Settings"
 msgstr "Paràmetres del compte"
 
@@ -1269,8 +1365,8 @@ msgstr "Introdueix el nom d'usuari i l'adreça de correu electrònic que vas pro
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online_profile_friends.cpp:72
-#: src/states_screens/online_user_search.cpp:73
+#: src/states_screens/online_profile_friends.cpp:70
+#: src/states_screens/online_user_search.cpp:71
 msgid "Username"
 msgstr "Nom d'usuari"
 
@@ -1313,10 +1409,11 @@ msgstr "Nom d'usuari en línia"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the registration dialog
+#. I18N: In the user screen
 msgid "Password"
 msgstr "Contrasenya"
 
@@ -1351,6 +1448,21 @@ msgid "Server Info"
 msgstr "Informació del servidor"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the networking lobby
+msgid "Server name:"
+msgstr "Nom del servidor"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the networking lobby
+msgid "Difficulty:"
+msgstr "Dificultat:"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the networking lobby
+msgid "Game mode:"
+msgstr "Mode de joc:"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 msgid "Join"
 msgstr "Unir-se"
@@ -1359,17 +1471,49 @@ msgstr "Unir-se"
 msgid "Server Selection"
 msgstr "Selecció del servidor"
 
+#. I18N: ./data/gui/online/server_selection.stkgui
+#. I18N: In the server selection screen
+msgid "Show only private server(s)"
+msgstr "Mostra només els servidors privats"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Add player"
+msgstr "Afegeix jugador"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#: src/states_screens/online_profile_achievements.cpp:71
+#: src/states_screens/server_selection.cpp:103
+msgid "Name"
+msgstr "Nom"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Handicap"
+msgstr "Limitació"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Press the 'All players ready' button after the player list is ready."
+msgstr "Prem el botó 'Tots llestos' quan la llista de jugadors estigui llesta."
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "All players ready"
+msgstr "Tots llestos"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Clear added player"
+msgstr "Treure el jugador afegit"
+
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog' dialog
 msgid "User Info"
 msgstr "Informació de l'usuari"
-
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#: src/states_screens/online_profile_achievements.cpp:73
-#: src/states_screens/server_selection.cpp:102
-msgid "Name"
-msgstr "Nom"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -1390,11 +1534,6 @@ msgstr "Cerca usuaris"
 msgid "Vote"
 msgstr "Vota"
 
-#. I18N: ./data/gui/online/waiting_for_others.stkgui
-#. I18N: Networking screen
-msgid "Waiting for the others..."
-msgstr "Esperant als altres..."
-
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: ./data/gui/options_input.stkgui
@@ -1407,11 +1546,11 @@ msgstr "Opcions del SuperTuxKart"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_device.cpp:86
-#: src/states_screens/options_screen_input.cpp:151
-#: src/states_screens/options_screen_ui.cpp:123
-#: src/states_screens/options_screen_video.cpp:238
-#: src/states_screens/user_screen.cpp:660
+#: src/states_screens/options_screen_device.cpp:84
+#: src/states_screens/options_screen_input.cpp:160
+#: src/states_screens/options_screen_ui.cpp:122
+#: src/states_screens/options_screen_video.cpp:205
+#: src/states_screens/user_screen.cpp:670
 msgid "Audio"
 msgstr "So"
 
@@ -1424,8 +1563,8 @@ msgstr "Música"
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:68
-#: src/states_screens/options_screen_video.cpp:451
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
+#: src/states_screens/options_screen_video.cpp:415
 msgid "Enabled"
 msgstr "Habilitat"
 
@@ -1443,16 +1582,17 @@ msgstr "Efectes de so"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:68
-#: src/states_screens/options_screen_ui.cpp:125
-#: src/states_screens/options_screen_video.cpp:241
-#: src/states_screens/user_screen.cpp:662
+#: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_ui.cpp:124
+#: src/states_screens/options_screen_video.cpp:208
+#: src/states_screens/user_screen.cpp:672
 msgid "Controls"
 msgstr "Controls"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: src/states_screens/options_screen_device.cpp:111
+#: src/states_screens/options_screen_device.cpp:109
+#: src/states_screens/options_screen_device.cpp:114
 msgid "Delete Configuration"
 msgstr "Esborra la configuració"
 
@@ -1482,13 +1622,13 @@ msgstr "* La configuració a emprar dependrà de quina tecla 'Seleccionar' es pr
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/ghost_replay_selection.cpp:78
-#: src/states_screens/options_screen_audio.cpp:67
-#: src/states_screens/options_screen_device.cpp:88
-#: src/states_screens/options_screen_input.cpp:153
-#: src/states_screens/options_screen_ui.cpp:124
-#: src/states_screens/options_screen_video.cpp:240
-#: src/states_screens/server_selection.cpp:103
+#: src/states_screens/ghost_replay_selection.cpp:110
+#: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_device.cpp:86
+#: src/states_screens/options_screen_input.cpp:162
+#: src/states_screens/options_screen_ui.cpp:123
+#: src/states_screens/options_screen_video.cpp:207
+#: src/states_screens/server_selection.cpp:104
 msgid "Players"
 msgstr "Jugadors"
 
@@ -1508,11 +1648,11 @@ msgstr "Afegeix jugador"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_device.cpp:87
-#: src/states_screens/options_screen_input.cpp:152
-#: src/states_screens/options_screen_video.cpp:239
-#: src/states_screens/user_screen.cpp:661
+#: src/states_screens/options_screen_audio.cpp:64
+#: src/states_screens/options_screen_device.cpp:85
+#: src/states_screens/options_screen_input.cpp:161
+#: src/states_screens/options_screen_video.cpp:206
+#: src/states_screens/user_screen.cpp:671
 msgid "User Interface"
 msgstr "Interfície d'usuari"
 
@@ -1546,13 +1686,23 @@ msgstr "Habilita les limitacions per jugador"
 msgid "Connect to the Internet"
 msgstr "Connectat a Internet"
 
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Multiplayer splits screen horizontally"
+msgstr "Multijugador divideix la pantalla horitzontalment"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable chatting in networking lobby"
+msgstr "Habilita el xat al rebedor de les partides en xarxa"
+
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:65
-#: src/states_screens/options_screen_device.cpp:85
-#: src/states_screens/options_screen_input.cpp:150
-#: src/states_screens/options_screen_ui.cpp:122
-#: src/states_screens/user_screen.cpp:659
+#: src/states_screens/options_screen_audio.cpp:63
+#: src/states_screens/options_screen_device.cpp:83
+#: src/states_screens/options_screen_input.cpp:159
+#: src/states_screens/options_screen_ui.cpp:121
+#: src/states_screens/user_screen.cpp:669
 msgid "Graphics"
 msgstr "Gràfics"
 
@@ -1612,8 +1762,9 @@ msgid "Back to menu"
 msgstr "Tornar al menú"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-msgid "Press a key"
-msgstr "Prem una tecla"
+#. I18N: When changing input configurations
+msgid "Press fully and release..."
+msgstr "Prem a fons i deixa anar..."
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -1637,7 +1788,7 @@ msgstr "Tornar a la cursa"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:228
+#: src/states_screens/race_result_gui.cpp:232
 msgid "Setup New Race"
 msgstr "Configurar una nova cursa"
 
@@ -1658,6 +1809,7 @@ msgstr "Sortir de la cursa"
 
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "Race Setup"
 msgstr "Configuració de la cursa"
@@ -1671,6 +1823,8 @@ msgid "Select a game mode"
 msgstr "Selecciona un mode de joc"
 
 #. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Type of race, in a challenge
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
 #. I18N: Type of race, in a challenge
 msgid "Type:"
 msgstr "Tipus:"
@@ -1707,7 +1861,7 @@ msgstr "Equip blau"
 
 #. I18N: ./data/gui/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:147
+#: src/states_screens/dialogs/select_challenge.cpp:172
 msgid "Grand Prix"
 msgstr "Campionats"
 
@@ -1717,12 +1871,14 @@ msgstr "= Millors temps ="
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:322
+#: src/states_screens/track_info_screen.cpp:326
 msgid "(Empty)"
 msgstr "(Buit)"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
+#. I18N: In track screen
+#: src/states_screens/tracks_screen.cpp:165
 msgid "Number of laps"
 msgstr "Nombre de voltes"
 
@@ -1751,6 +1907,13 @@ msgstr "Afegeix usuari"
 #. I18N: In the user screen
 msgid "Delete"
 msgstr "Esborra"
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Default kart color"
+msgstr "Color per defecte del kart"
 
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
@@ -1978,37 +2141,37 @@ msgid "Error downloading news: '%s'."
 msgstr "Error descarregant notícies: '%s'."
 
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:266
-#: src/states_screens/race_result_gui.cpp:1424
+#: src/challenges/challenge_data.cpp:278
+#: src/states_screens/race_result_gui.cpp:1469
 #, c-format
 msgid "Laps: %i"
 msgstr "Voltes: %i"
 
-#: src/challenges/challenge_data.cpp:272
+#: src/challenges/challenge_data.cpp:284
 msgid "Follow the leader"
 msgstr "Segueix al líder"
 
-#: src/challenges/challenge_data.cpp:518
+#: src/challenges/challenge_data.cpp:545
 #, c-format
 msgid "New track '%s' now available"
 msgstr "Nou circuit '%s' ja disponible"
 
-#: src/challenges/challenge_data.cpp:522
+#: src/challenges/challenge_data.cpp:549
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "Nou mode de joc '%s' ja disponible"
 
-#: src/challenges/challenge_data.cpp:532
+#: src/challenges/challenge_data.cpp:559
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "Nou campionat '%s'  ja disponible"
 
-#: src/challenges/challenge_data.cpp:536
+#: src/challenges/challenge_data.cpp:563
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "Nou nivell de dificultat '%s' ja disponible"
 
-#: src/challenges/challenge_data.cpp:546
+#: src/challenges/challenge_data.cpp:573
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "Nou kart '%s' ja disponible"
@@ -2028,548 +2191,573 @@ msgstr "Convidat/da"
 msgid "Guest %d"
 msgstr "Convidat %d"
 
-#: src/config/user_config.cpp:700
+#: src/config/user_config.cpp:652
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr "El teu fitxer de configuració tenia un format incorrecte, així que s'ha esborrat i s'en crearà un de nou."
 
-#: src/config/user_config.cpp:711
+#: src/config/user_config.cpp:663
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr "El teu fitxer de configuració era massa antic, així que s'ha esborrat i s'en crearà un de nou."
 
-#: src/graphics/irr_driver.cpp:535
+#: src/graphics/irr_driver.cpp:585
 msgid "Video recording started."
 msgstr "S'ha iniciat la gravació de video"
 
-#: src/graphics/irr_driver.cpp:541
+#: src/graphics/irr_driver.cpp:591
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video desat a \"%s\"."
 
-#: src/graphics/irr_driver.cpp:545
+#: src/graphics/irr_driver.cpp:595
 msgid "Encoding progress:"
 msgstr "Codificació en curs:"
 
-#: src/graphics/irr_driver.cpp:1682
+#: src/graphics/irr_driver.cpp:1771 src/graphics/irr_driver.cpp:1777
 #, c-format
-msgid "FPS: %d/%d/%d - %d KTris"
-msgstr "FPS: %d/%d/%d - %d KTris"
+msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
+msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#: src/guiengine/engine.cpp:1296
+#: src/guiengine/engine.cpp:1310
 msgid "Loading"
 msgstr "Carregant"
 
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
-#: src/guiengine/widgets/player_kart_widget.cpp:392
+#: src/guiengine/widgets/player_kart_widget.cpp:384
+#: src/guiengine/widgets/player_kart_widget.cpp:756
+#: src/karts/controller/local_player_controller.cpp:413
+#: src/karts/controller/player_controller.cpp:405
+#: src/network/protocols/client_lobby.cpp:562
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (limitat)"
 
-#: src/guiengine/widgets/player_kart_widget.cpp:451
+#: src/guiengine/widgets/player_kart_widget.cpp:443
 #, c-format
 msgid "%s is ready"
 msgstr "%s està llest"
 
 #. I18N: Unbound key binding
-#: src/input/binding.cpp:90
+#: src/input/binding.cpp:94
 msgid "[none]"
 msgstr "[cap]"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:114
+#: src/input/binding.cpp:118
 msgctxt "input_key"
 msgid "Left Mouse Button"
 msgstr "Botó esquerre del ratolí"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:116
+#: src/input/binding.cpp:120
 msgctxt "input_key"
 msgid "Right Mouse Button"
 msgstr "Botó dret del ratolí"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:118
+#: src/input/binding.cpp:122
 msgctxt "input_key"
 msgid "Cancel"
 msgstr "Cancel·lar"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:120
+#: src/input/binding.cpp:124
 msgctxt "input_key"
 msgid "Middle Mouse Button"
 msgstr "Botó central del ratolí"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:122
+#: src/input/binding.cpp:126
 msgctxt "input_key"
 msgid "X1 Mouse Button"
 msgstr "Botó X1 del ratolí"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:124
+#: src/input/binding.cpp:128
 msgctxt "input_key"
 msgid "X2 Mouse Button"
 msgstr "Botó X2 del ratolí"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:126
+#: src/input/binding.cpp:130
 msgctxt "input_key"
 msgid "Backspace"
 msgstr "Retrocés"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:128
+#: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Tab"
 msgstr "Tabulador"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:130
+#: src/input/binding.cpp:134
 msgctxt "input_key"
 msgid "Clear"
 msgstr "Netejar"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:132
+#: src/input/binding.cpp:136
 msgctxt "input_key"
 msgid "Return"
 msgstr "Retorn"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:134
+#: src/input/binding.cpp:138
 msgctxt "input_key"
 msgid "Shift"
 msgstr "Majúscules"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:136
+#: src/input/binding.cpp:140
 msgctxt "input_key"
 msgid "Control"
 msgstr "Control"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:138
+#: src/input/binding.cpp:142
 msgctxt "input_key"
 msgid "Alt/Menu"
 msgstr "Alt/Menu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:140
+#: src/input/binding.cpp:144
 msgctxt "input_key"
 msgid "Pause"
 msgstr "Pausa"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:142
+#: src/input/binding.cpp:146
 msgctxt "input_key"
 msgid "Caps Lock"
 msgstr "Bloqueig de majúscules"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:144
+#: src/input/binding.cpp:148
 msgctxt "input_key"
 msgid "Kana"
 msgstr "Kana"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:146
+#: src/input/binding.cpp:150
 msgctxt "input_key"
 msgid "Junja"
 msgstr "Junja"
 
 #. I18N: input configuration screen: keyboard key
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:149
+#: src/input/binding.cpp:153
 msgctxt "input_key"
 msgid "Final"
 msgstr "Final"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:151
+#: src/input/binding.cpp:155
 msgctxt "input_key"
 msgid "Escape"
 msgstr "Escapada"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:153
+#: src/input/binding.cpp:157
 msgctxt "input_key"
 msgid "Convert"
 msgstr "Convertir"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:155
+#: src/input/binding.cpp:159
 msgctxt "input_key"
 msgid "Nonconvert"
 msgstr "No convertir"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:157
+#: src/input/binding.cpp:161
 msgctxt "input_key"
 msgid "Accept"
 msgstr "Acceptar"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:159
+#: src/input/binding.cpp:163
 msgctxt "input_key"
 msgid "Modechange"
 msgstr "Canvi de mode"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:161
+#: src/input/binding.cpp:165
 msgctxt "input_key"
 msgid "Space"
 msgstr "Espai"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:163
+#: src/input/binding.cpp:167
 msgctxt "input_key"
 msgid "Page Up"
 msgstr "Retrocedir pàgina"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:165
+#: src/input/binding.cpp:169
 msgctxt "input_key"
 msgid "Page Down"
 msgstr "Avançar pàgina"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:167
+#: src/input/binding.cpp:171
 msgctxt "input_key"
 msgid "End"
 msgstr "Fi"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:169
+#: src/input/binding.cpp:173
 msgctxt "input_key"
 msgid "Home"
 msgstr "Inici"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:171
+#: src/input/binding.cpp:175 src/input/gamepad_android_config.cpp:57
 msgctxt "input_key"
 msgid "Left"
 msgstr "Esquerra"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:173
+#: src/input/binding.cpp:177 src/input/gamepad_android_config.cpp:63
 msgctxt "input_key"
 msgid "Up"
 msgstr "Amunt"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:175
+#: src/input/binding.cpp:179 src/input/gamepad_android_config.cpp:60
 msgctxt "input_key"
 msgid "Right"
 msgstr "Dreta"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:177
+#: src/input/binding.cpp:181 src/input/gamepad_android_config.cpp:66
 msgctxt "input_key"
 msgid "Down"
 msgstr "Avall"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:179
+#: src/input/binding.cpp:183 src/input/gamepad_android_config.cpp:108
 msgctxt "input_key"
 msgid "Select"
 msgstr "Seleccionar"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:181
+#: src/input/binding.cpp:185
 msgctxt "input_key"
 msgid "Print"
 msgstr "Imprimir"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:183
+#: src/input/binding.cpp:187
 msgctxt "input_key"
 msgid "Exec"
 msgstr "Exec"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:185
+#: src/input/binding.cpp:189
 msgctxt "input_key"
 msgid "Print Screen"
 msgstr "Imprimir pantalla"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:187
+#: src/input/binding.cpp:191
 msgctxt "input_key"
 msgid "Insert"
 msgstr "Inserir"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:189
+#: src/input/binding.cpp:193
 msgctxt "input_key"
 msgid "Delete"
 msgstr "Suprimir"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:191
+#: src/input/binding.cpp:195
 msgctxt "input_key"
 msgid "Help"
 msgstr "Ajuda"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:229
+#: src/input/binding.cpp:233
 msgctxt "input_key"
 msgid "Left Logo"
 msgstr "Logo esquerra"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:231
+#: src/input/binding.cpp:235
 msgctxt "input_key"
 msgid "Right Logo"
 msgstr "Logo dreta"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:233
+#: src/input/binding.cpp:237
 msgctxt "input_key"
 msgid "Apps"
 msgstr "Apps"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:235
+#: src/input/binding.cpp:239
 msgctxt "input_key"
 msgid "Sleep"
 msgstr "Dormir"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:237
+#: src/input/binding.cpp:241
 msgctxt "input_key"
 msgid "Numpad 0"
 msgstr "Teclat numèric 0"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:239
+#: src/input/binding.cpp:243
 msgctxt "input_key"
 msgid "Numpad 1"
 msgstr "Teclat numèric 1"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:241
+#: src/input/binding.cpp:245
 msgctxt "input_key"
 msgid "Numpad 2"
 msgstr "Teclat numèric 2"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:243
+#: src/input/binding.cpp:247
 msgctxt "input_key"
 msgid "Numpad 3"
 msgstr "Teclat numèric 3"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:245
+#: src/input/binding.cpp:249
 msgctxt "input_key"
 msgid "Numpad 4"
 msgstr "Teclat numèric 4"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:247
+#: src/input/binding.cpp:251
 msgctxt "input_key"
 msgid "Numpad 5"
 msgstr "Teclat numèric 5"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:249
+#: src/input/binding.cpp:253
 msgctxt "input_key"
 msgid "Numpad 6"
 msgstr "Teclat numèric 6"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:251
+#: src/input/binding.cpp:255
 msgctxt "input_key"
 msgid "Numpad 7"
 msgstr "Teclat numèric 7"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:253
+#: src/input/binding.cpp:257
 msgctxt "input_key"
 msgid "Numpad 8"
 msgstr "Teclat numèric 8"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:255
+#: src/input/binding.cpp:259
 msgctxt "input_key"
 msgid "Numpad 9"
 msgstr "Teclat numèric 9"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:259
+#: src/input/binding.cpp:263
 msgctxt "input_key"
 msgid "Separator"
 msgstr "Separador"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:261
+#: src/input/binding.cpp:265
 msgctxt "input_key"
 msgid "- (Subtract)"
 msgstr "- (Resta)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:263
+#: src/input/binding.cpp:267
 msgctxt "input_key"
 msgid "Decimal"
 msgstr "Decimal"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:265
+#: src/input/binding.cpp:269
 msgctxt "input_key"
 msgid "/ (Divide)"
 msgstr "/ (Divisió)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:291
+#: src/input/binding.cpp:295
 msgctxt "input_key"
 msgid "Num Lock"
 msgstr "Bloqueig del teclat numèric"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:293
+#: src/input/binding.cpp:297
 msgctxt "input_key"
 msgid "Scroll Lock"
 msgstr "Bloqueig de desplaçament"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:295
+#: src/input/binding.cpp:299
 msgctxt "input_key"
 msgid "Left Shift"
 msgstr "Majúscules esquerra"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:297
+#: src/input/binding.cpp:301
 msgctxt "input_key"
 msgid "Right Shift"
 msgstr "Majúscules dreta"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:299
+#: src/input/binding.cpp:303
 msgctxt "input_key"
 msgid "Left Control"
 msgstr "Control esquerra"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:301
+#: src/input/binding.cpp:305
 msgctxt "input_key"
 msgid "Right Control"
 msgstr "Control dreta"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:303
+#: src/input/binding.cpp:307
 msgctxt "input_key"
 msgid "Left Menu"
 msgstr "Menú esquerra"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:305
+#: src/input/binding.cpp:309
 msgctxt "input_key"
 msgid "Right Menu"
 msgstr "Menú dreta"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:311
+#: src/input/binding.cpp:315
 msgctxt "input_key"
 msgid "Attn"
 msgstr "Attn"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:313
+#: src/input/binding.cpp:317
 msgctxt "input_key"
 msgid "Crsel"
 msgstr "Crsel"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:315
+#: src/input/binding.cpp:319
 msgctxt "input_key"
 msgid "Exsel"
 msgstr "Exsel"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:317
+#: src/input/binding.cpp:321
 msgctxt "input_key"
 msgid "Ereof"
 msgstr "Ereof"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:319
+#: src/input/binding.cpp:323
 msgctxt "input_key"
 msgid "Play"
 msgstr "Play"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:321
+#: src/input/binding.cpp:325
 msgctxt "input_key"
 msgid "Zoom"
 msgstr "Zoom"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:323
+#: src/input/binding.cpp:327
 msgctxt "input_key"
 msgid "Pa1"
 msgstr "Pa1"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:325
+#: src/input/binding.cpp:329
 msgctxt "input_key"
 msgid "Oem Clear"
 msgstr "Oem Clear"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
-#: src/input/binding.cpp:334 src/input/binding.cpp:339
+#: src/input/binding.cpp:355 src/input/binding.cpp:360
 #, c-format
 msgid "Gamepad hat %d"
 msgstr "Botó 'punt de vista' del comandament %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:346
+#: src/input/binding.cpp:367
 #, c-format
 msgid "Axis %d %s"
 msgstr "Eix %d %s"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:353
+#: src/input/binding.cpp:374
 #, c-format
 msgid "Axis %d inverted"
 msgstr "Eix %d invertit"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:358
+#: src/input/binding.cpp:379
 #, c-format
 msgid "Axis %d"
 msgstr "Eix %d"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
-#: src/input/binding.cpp:366
+#: src/input/binding.cpp:387
 #, c-format
 msgid "Gamepad button %d"
 msgstr "Botó %d del comandament"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
-#: src/input/binding.cpp:369
+#: src/input/binding.cpp:390
 #, c-format
 msgid "Mouse button %d"
 msgstr "Botó %d del ratolí"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
-#: src/input/binding.cpp:373
+#: src/input/binding.cpp:394
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr "Eix %d %s del ratolí"
 
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:543
+#: src/input/device_manager.cpp:575
 msgid "Please re-configure your key bindings."
 msgstr "Reconfigura les teves tecles."
 
-#: src/input/device_manager.cpp:544
+#: src/input/device_manager.cpp:576
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "El teu fitxer de configuració de dispositius d'entrada no és compatible amb aquesta versió de STK."
+
+#: src/input/gamepad_android_config.cpp:99
+msgctxt "input_key"
+msgid "Thumb Left"
+msgstr "Botó analògic esquerre"
+
+#: src/input/gamepad_android_config.cpp:102
+msgctxt "input_key"
+msgid "Thumb Right"
+msgstr "Botó analògic dret"
+
+#: src/input/gamepad_android_config.cpp:105
+msgctxt "input_key"
+msgid "Start"
+msgstr "Inici"
+
+#: src/input/gamepad_android_config.cpp:111
+msgctxt "input_key"
+msgid "Mode"
+msgstr "Mode"
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
@@ -2682,12 +2870,12 @@ msgstr "Botó analògic esquerre avall"
 msgid "Left thumb up"
 msgstr "Botó analògic esquerre amunt"
 
-#: src/input/input_manager.cpp:807
+#: src/input/input_manager.cpp:845
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "S'ignora a '%s'. Hauries d'haver entrat abans per poder jugar!"
 
-#: src/input/input_manager.cpp:837
+#: src/input/input_manager.cpp:875
 msgid "Only the Game Master may act at this point!"
 msgstr "Només el creador de la partida pot actuar en aquest punt!"
 
@@ -2714,11 +2902,11 @@ msgstr[1] "S'han trobat %d wiimotes"
 msgid "Could not detect any wiimote :/"
 msgstr "No s'ha pogut detectar cap Wiimote"
 
-#: src/karts/controller/local_player_controller.cpp:241
+#: src/karts/controller/local_player_controller.cpp:266
 msgid "Penalty time!!"
 msgstr "Temps de penalització!!"
 
-#: src/karts/controller/local_player_controller.cpp:243
+#: src/karts/controller/local_player_controller.cpp:269
 msgid "Don't accelerate before go"
 msgstr "No acceleris abans de la sortida"
 
@@ -2730,15 +2918,15 @@ msgstr "Pots tenir 3 vides com a molt!"
 msgid "+1 life."
 msgstr "+1 vida."
 
-#: src/karts/kart.cpp:908 src/karts/kart.cpp:913
+#: src/karts/kart.cpp:953 src/karts/kart.cpp:958
 msgid "You won the race!"
 msgstr "Has guanyat la cursa!"
 
-#: src/karts/kart.cpp:913
+#: src/karts/kart.cpp:958
 msgid "You finished the race!"
 msgstr "Has acabat la cursa!"
 
-#: src/main.cpp:1501
+#: src/main.cpp:1671
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2749,120 +2937,242 @@ msgid ""
 "statistics\")."
 msgstr "El SuperTuxKart pot connectar-se a un servidor per descarregar complements i \nnotificar-te actualitzacions. També recollim estadístiques anònimes de \nmaquinari per ajudar en el desenvolupament del STK. Llegeix la nostra política de privacitat a http://privacy.supertuxkart.net. T'agradaria habilitar \naquesta característica? (Per canviar aquest paràmetre més endavant, vés a \nles opcions, selecciona la pestanya \"Interfície d'usuari\", i edita els \nparàmetres \"Connectat a Internet\" i \"Envia estadístiques anònimes del \nmaquinari\")."
 
-#: src/main.cpp:1654
+#: src/main.cpp:1837
 msgid "Your screen resolution is too low to run STK."
 msgstr "La resolució de la teva pantalla és massa baixa per executar el STK."
 
-#: src/main.cpp:1668
+#: src/main.cpp:1866
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "La versió del teu controlador és massa antiga. Si us plau, instal·la la darrera versió."
 
-#: src/main.cpp:1685
+#: src/main.cpp:1884
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "La teva versió d'OpenGL sembla que és massa antiga. Comprova si hi ha disponible una actualització del teu controlador gràfic. SuperTuxKart necessita %s o superior."
 
-#: src/modes/easter_egg_hunt.cpp:202
+#: src/main_loop.cpp:338 src/network/protocols/client_lobby.cpp:185
+msgid "Server connection timed out."
+msgstr "La connexió amb el servidor ha excedit el temps d'espera."
+
+#: src/modes/easter_egg_hunt.cpp:227
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "Ous: %d / %d"
 
-#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:285
+#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:286
 msgid "Leader"
 msgstr "Líder"
 
-#: src/modes/linear_world.cpp:287
+#: src/modes/linear_world.cpp:370
 msgid "Final lap!"
 msgstr "Última volta!"
 
-#: src/modes/linear_world.cpp:314
+#: src/modes/linear_world.cpp:398
 #, c-format
 msgid "Lap %i"
 msgstr "Volta %i"
 
-#: src/modes/linear_world.cpp:369
+#: src/modes/linear_world.cpp:488
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s per %s"
 
-#: src/modes/linear_world.cpp:374
+#: src/modes/linear_world.cpp:493
 msgid "New fastest lap"
 msgstr "Nova volta ràpida"
 
-#: src/modes/linear_world.cpp:891
+#: src/modes/linear_world.cpp:1020
 msgid "WRONG WAY!"
 msgstr "DIRECCIÓ CONTRÀRIA!"
 
-#: src/modes/three_strikes_battle.cpp:664
+#: src/modes/three_strikes_battle.cpp:660
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "S'ha engendrat %i kart de rodes de recanvi!"
 msgstr[1] "S'han engendrat %i karts de rodes de recanvi!"
 
-#: src/modes/world.cpp:1202
+#: src/modes/world.cpp:1234
 msgid "You have been eliminated!"
 msgstr "Estàs eliminat!"
 
-#: src/modes/world.cpp:1205
+#: src/modes/world.cpp:1241
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' ha estat eliminat"
 
-#: src/network/protocols/server_lobby.cpp:318
+#: src/network/network_config.cpp:176
+msgid "Normal Race (Grand Prix)"
+msgstr "Cursa normal (campionat)"
+
+#: src/network/network_config.cpp:178
+msgid "Time Trial (Grand Prix)"
+msgstr "Contra rellotge (campionat)"
+
+#: src/network/protocols/client_lobby.cpp:189
+msgid "Server has been shut down."
+msgstr "El servidor s'ha tancat."
+
+#: src/network/protocols/client_lobby.cpp:193
+msgid "You were kicked from the server."
+msgstr "T'han expulsat del servidor."
+
+#: src/network/protocols/client_lobby.cpp:399
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:169
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:255
+#: src/states_screens/ghost_replay_selection.cpp:312
+msgid "No"
+msgstr "No"
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:401
 #, c-format
-msgid "Failed to register server: %s"
-msgstr "No s'ha pogut registrar el servidor: %s"
+msgid ""
+"Track: %s,\n"
+"laps: %d, reversed: %s"
+msgstr "Circuit: %s,\nvoltes: %d, al revés: %s"
 
-#: src/network/servers_manager.cpp:198
-msgid "No LAN server detected"
-msgstr "No s'ha detectat cap servidor a la xarxa local"
+#: src/network/protocols/client_lobby.cpp:430
+#, c-format
+msgid "%s disconnected."
+msgstr "%s s'ha desconnectat."
 
-#: src/online/online_player_profile.cpp:419
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:471
+#, c-format
+msgid "Server name: %s"
+msgstr "Nom del servidor: %s"
+
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:479
+#: src/states_screens/race_result_gui.cpp:1477
+#, c-format
+msgid "Difficulty: %s"
+msgstr "Dificultat: %s"
+
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:484
+#, c-format
+msgid "Max players: %d"
+msgstr "Màx. jugadors: %d"
+
+#: src/network/protocols/client_lobby.cpp:496
+#, c-format
+msgid "Game mode: %s"
+msgstr "Mode de joc: %s"
+
+#. I18N: In the create server screen for soccer server
+#: src/network/protocols/client_lobby.cpp:508
+#: src/states_screens/create_server_screen.cpp:173
+msgid "Time limit"
+msgstr "Límit de temps"
+
+#. I18N: In the create server screen for soccer server
+#: src/network/protocols/client_lobby.cpp:509
+#: src/states_screens/create_server_screen.cpp:175
+msgid "Goals limit"
+msgstr "Límit de gols"
+
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:513
+#, c-format
+msgid "Soccer game type: %s"
+msgstr "Tipus de partida de futbol: %s"
+
+#: src/network/protocols/client_lobby.cpp:523
+#, c-format
+msgid "Grand prix progress: %d / %d"
+msgstr "Progrés del campionat: %d / %d"
+
+#: src/network/protocols/client_lobby.cpp:572
+msgid "You are now the owner of server."
+msgstr "Ara ets el propietari del servidor."
+
+#: src/network/protocols/client_lobby.cpp:619
+msgid "Connection refused: Server is busy."
+msgstr "Connexió rebutjada. El servidor està ocupat."
+
+#: src/network/protocols/client_lobby.cpp:623
+msgid "Connection refused: You are banned from the server."
+msgstr "Connexió rebutjada. T'han expulsat del servidor."
+
+#: src/network/protocols/client_lobby.cpp:627
+msgid "Connection refused: Server password is incorrect."
+msgstr "Connexió rebutjada. La contrasenya del servidor no és correcta."
+
+#: src/network/protocols/client_lobby.cpp:631
+msgid "Connection refused: Game data is incompatible."
+msgstr "Connexió rebutjada. Les dades del joc són incompatibles."
+
+#: src/network/protocols/client_lobby.cpp:635
+msgid "Connection refused: Server is full."
+msgstr "Connexió rebutjada. El servidor està ple."
+
+#: src/network/protocols/client_lobby.cpp:639
+msgid "Connection refused: Invalid player connecting."
+msgstr "Connexió rebutjada. S'està connectant un jugador invàlid."
+
+#: src/network/protocols/connect_to_server.cpp:113
+msgid "No quick play server available."
+msgstr "No hi ha disponible cap servidor de partides ràpides."
+
+#: src/network/protocols/connect_to_server.cpp:266
+#: src/states_screens/online_screen.cpp:266
+#, c-format
+msgid "Cannot connect to server %s."
+msgstr "No s'ha pogut connectar al servidor %s."
+
+#. I18N: Official means this server is hosted by STK team
+#: src/network/server.cpp:73
+msgid "Official"
+msgstr "Oficial"
+
+#: src/online/online_player_profile.cpp:428
 #, c-format
 msgid "%s is now online."
 msgstr "%s està en línia."
 
-#: src/online/online_player_profile.cpp:423
+#: src/online/online_player_profile.cpp:432
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s i %s estan en línia."
 
-#: src/online/online_player_profile.cpp:428
+#: src/online/online_player_profile.cpp:437
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s i %s estan en línia."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:434
+#: src/online/online_player_profile.cpp:443
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
 msgstr[0] "%d amic en línia."
 msgstr[1] "%d amics en línia."
 
-#: src/online/online_player_profile.cpp:471
+#: src/online/online_player_profile.cpp:480
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
 msgstr[0] "Tens %d petició d'amistat!"
 msgstr[1] "Tens %d peticions d'amistat!"
 
-#: src/online/online_player_profile.cpp:477
+#: src/online/online_player_profile.cpp:486
 msgid "You have a new friend request!"
 msgstr "Tens una nova petició d'amistat!"
 
-#: src/online/xml_request.cpp:83
+#: src/online/xml_request.cpp:84
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
 msgstr "No s'ha pogut connectar al servidor. Comprova la teva connexió a Internet o torna-ho a provar més tard."
 
-#: src/race/grand_prix_data.hpp:171
+#: src/race/grand_prix_data.hpp:174
 msgid "Random Grand Prix"
 msgstr "Campionat aleatori"
 
@@ -2873,93 +3183,83 @@ msgid ""
 msgstr "El fitxer de puntuacions era massa antic,\ntotes les puntuacions han estat esborrades."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:179
+#: src/race/race_manager.hpp:180
 msgid "Follow the Leader"
 msgstr "Segueix al líder"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:181
-msgid "3 Strikes Battle"
-msgstr "Batalla a 3 cops"
-
-#. I18N: Game mode
-#: src/race/race_manager.hpp:183
+#: src/race/race_manager.hpp:184
 msgid "Egg Hunt"
 msgstr "A la recerca dels ous perduts"
 
-#. I18N: Game mode
-#: src/race/race_manager.hpp:185
-msgid "Soccer"
-msgstr "Futbol"
-
-#: src/replay/replay_recorder.cpp:183
+#: src/replay/replay_recorder.cpp:358
 msgid "Incomplete replay file will not be saved."
 msgstr "El fitxer incomplet de repetició no es desarà."
 
-#: src/replay/replay_recorder.cpp:219
+#: src/replay/replay_recorder.cpp:394
 #, c-format
 msgid "Replay saved in \"%s\"."
 msgstr "Repetició desada a \"%s\"."
 
-#: src/states_screens/addons_screen.cpp:50
+#: src/states_screens/addons_screen.cpp:48
 msgid "1 week"
 msgstr "1 setmana"
 
-#: src/states_screens/addons_screen.cpp:51
+#: src/states_screens/addons_screen.cpp:49
 msgid "2 weeks"
 msgstr "2 setmanes"
 
-#: src/states_screens/addons_screen.cpp:52
+#: src/states_screens/addons_screen.cpp:50
 msgid "1 month"
 msgstr "1 mes"
 
-#: src/states_screens/addons_screen.cpp:53
+#: src/states_screens/addons_screen.cpp:51
 msgid "3 months"
 msgstr "3 mesos"
 
-#: src/states_screens/addons_screen.cpp:54
+#: src/states_screens/addons_screen.cpp:52
 msgid "6 months"
 msgstr "6 mesos"
 
-#: src/states_screens/addons_screen.cpp:55
+#: src/states_screens/addons_screen.cpp:53
 msgid "9 months"
 msgstr "9 mesos"
 
-#: src/states_screens/addons_screen.cpp:56
+#: src/states_screens/addons_screen.cpp:54
 msgid "1 year"
 msgstr "1 any"
 
-#: src/states_screens/addons_screen.cpp:57
+#: src/states_screens/addons_screen.cpp:55
 msgid "2 years"
 msgstr "2 anys"
 
-#: src/states_screens/addons_screen.cpp:115
+#: src/states_screens/addons_screen.cpp:113
 msgid "Add-on name"
 msgstr "Nom del complement"
 
-#: src/states_screens/addons_screen.cpp:116
+#: src/states_screens/addons_screen.cpp:114
 msgid "Updated date"
 msgstr "Data d'actualització"
 
-#: src/states_screens/addons_screen.cpp:147
+#: src/states_screens/addons_screen.cpp:145
 msgid ""
 "Access to the Internet is disabled. (To enable it, go to options and select "
 "tab 'User Interface')"
 msgstr "L'accés a Internet es troba deshabilitat. (Per activar-lo, ves a les opcions i selecciona la pestanya 'Interfície d'usuari')"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:343
+#: src/states_screens/addons_screen.cpp:341
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s per %s"
 
-#: src/states_screens/addons_screen.cpp:474
+#: src/states_screens/addons_screen.cpp:472
 msgid "Please wait while addons are updated"
 msgstr "Espera mentre s'actualitzen els complements"
 
-#: src/states_screens/addons_screen.cpp:551
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/addons_screen.cpp:549
+#: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -2970,103 +3270,120 @@ msgstr "S'ha produït un error mentre es contactava amb el servidor de complemen
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:81
-#: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:285
-#: src/states_screens/tracks_and_gp_screen.cpp:146
+#: src/states_screens/arenas_screen.cpp:79
+#: src/states_screens/easter_egg_screen.cpp:141
+#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "Estàndard"
 
-#: src/states_screens/arenas_screen.cpp:275
-#: src/states_screens/arenas_screen.cpp:327
-#: src/states_screens/easter_egg_screen.cpp:225
-#: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:864
-#: src/states_screens/kart_selection.cpp:1481
-#: src/states_screens/race_setup_screen.cpp:99
+#: src/states_screens/arenas_screen.cpp:273
+#: src/states_screens/arenas_screen.cpp:325
+#: src/states_screens/easter_egg_screen.cpp:223
+#: src/states_screens/easter_egg_screen.cpp:254
+#: src/states_screens/kart_selection.cpp:886
+#: src/states_screens/kart_selection.cpp:1501
+#: src/states_screens/race_setup_screen.cpp:98
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Bloquejat: resol els reptes actius per accedir a més!"
 
-#: src/states_screens/arenas_screen.cpp:339
+#: src/states_screens/arenas_screen.cpp:337
 msgid "Random Arena"
 msgstr "Arena aleatòria"
 
-#: src/states_screens/arenas_screen.cpp:343
+#: src/states_screens/arenas_screen.cpp:341
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d arena no disponible amb un sol jugador."
 msgstr[1] "%d arenes no disponibles amb un sol jugador."
 
-#: src/states_screens/create_server_screen.cpp:82
+#: src/states_screens/create_server_screen.cpp:87
 msgid "Create LAN Server"
 msgstr "Crea un servidor local"
 
-#: src/states_screens/create_server_screen.cpp:87
+#: src/states_screens/create_server_screen.cpp:92
 #, c-format
 msgid "%s's server"
 msgstr "Servidor de %s"
 
-#: src/states_screens/create_server_screen.cpp:154
-msgid "Creating server"
-msgstr "S'està creant el servidor"
+#. I18N: In the create server screen
+#: src/states_screens/create_server_screen.cpp:151
+msgid "No. of grand prix track(s)"
+msgstr "Nº de circuits al campionat"
 
-#: src/states_screens/create_server_screen.cpp:181
+#. I18N: Geometry level disabled : lowest level, no details
+#. I18N: in the graphical options tooltip;
+#. indicates a graphical feature is disabled
+#: src/states_screens/create_server_screen.cpp:155
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:69
+#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/options_screen_video.cpp:418
+msgid "Disabled"
+msgstr "Deshabilitat"
+
+#. I18N: In the create server screen
+#: src/states_screens/create_server_screen.cpp:169
+msgid "Soccer game type"
+msgstr "Tipus de partida de futbol"
+
+#: src/states_screens/create_server_screen.cpp:221
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "El nom ha de tenir entre 4 i 30 caràcters!"
 
-#: src/states_screens/create_server_screen.cpp:188
-msgid "The maxinum number of players has to be between 2 and 12."
-msgstr "El nombre màxim de jugadors ha d'estar entre 2 i 12."
+#: src/states_screens/create_server_screen.cpp:238
+msgid "Incorrect characters in password!"
+msgstr "Caràcters invàlids a la contrasenya!"
 
-#: src/states_screens/credits.cpp:180
+#: src/states_screens/credits.cpp:183
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\n  Aljullu https://launchpad.net/~aljullu\n  Dawid Gan https://launchpad.net/~deveee\n  Marc Coll Carrillo https://launchpad.net/~marc-coll-carrillo\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  VPablo https://launchpad.net/~villumar"
 
-#: src/states_screens/dialogs/addons_loading.cpp:97
+#: src/states_screens/dialogs/addons_loading.cpp:100
 msgid "Update"
 msgstr "Actualitza"
 
-#: src/states_screens/dialogs/addons_loading.cpp:109
+#: src/states_screens/dialogs/addons_loading.cpp:112
 #, c-format
 msgid "Version: %d"
 msgstr "Versió: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:140
+#: src/states_screens/dialogs/addons_loading.cpp:143
 msgid "featured"
 msgstr "Destacats"
 
-#: src/states_screens/dialogs/addons_loading.cpp:166
+#: src/states_screens/dialogs/addons_loading.cpp:169
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:173
-#: src/states_screens/dialogs/addons_loading.cpp:177
+#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:180
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:178
+#: src/states_screens/dialogs/addons_loading.cpp:181
 #, c-format
 msgid "Size: %s"
 msgstr "Mida: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:280
+#: src/states_screens/dialogs/addons_loading.cpp:283
 msgid "Sorry, downloading the add-on failed"
 msgstr "No s'ha pogut descarregar el complement"
 
-#: src/states_screens/dialogs/addons_loading.cpp:361
+#: src/states_screens/dialogs/addons_loading.cpp:364
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "Problemes instal·lant el complement '%s'."
 
-#: src/states_screens/dialogs/addons_loading.cpp:372
-#: src/states_screens/dialogs/addons_loading.cpp:409
+#: src/states_screens/dialogs/addons_loading.cpp:375
+#: src/states_screens/dialogs/addons_loading.cpp:412
 msgid "Try again"
 msgstr "Tornar-ho a provar"
 
-#: src/states_screens/dialogs/addons_loading.cpp:398
+#: src/states_screens/dialogs/addons_loading.cpp:401
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "Problemes eliminant el complement '%s'."
@@ -3093,12 +3410,12 @@ msgid "Current password invalid."
 msgstr "La contrasenya actual no és vàlida"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
-#: src/states_screens/register_screen.cpp:289
+#: src/states_screens/register_screen.cpp:290
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "La contrasenya ha de tenir entre 8 i 30 caràcters!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
-#: src/states_screens/register_screen.cpp:273
+#: src/states_screens/register_screen.cpp:274
 msgid "Passwords don't match!"
 msgstr "Les contrasenyes no coïncideixen!"
 
@@ -3108,7 +3425,7 @@ msgstr "La contrasenya s'ha canviat correctament."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
-#: src/states_screens/register_screen.cpp:354
+#: src/states_screens/register_screen.cpp:355
 msgid "Validating info"
 msgstr "S'està validant la informació"
 
@@ -3121,87 +3438,90 @@ msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] "Confirma la resolució abans de %i segon"
 msgstr[1] "Confirma la resolució abans de %i segons"
 
-#. I18N: Geometry level disabled : lowest level, no details
-#. I18N: in the graphical options tooltip;
-#. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/dialogs/custom_video_settings.cpp:72
-#: src/states_screens/dialogs/custom_video_settings.cpp:84
-#: src/states_screens/dialogs/custom_video_settings.cpp:101
-#: src/states_screens/dialogs/multitouch_settings_dialog.cpp:59
-#: src/states_screens/options_screen_video.cpp:454
-msgid "Disabled"
-msgstr "Deshabilitat"
-
-#. I18N: if only important animated scenery is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:67
-#: src/states_screens/options_screen_video.cpp:462
+#. I18N: if only important particles effects is enabled
+#: src/states_screens/dialogs/custom_video_settings.cpp:63
+#: src/states_screens/options_screen_video.cpp:420
 msgid "Important only"
 msgstr "Només lo important"
-
-#. I18N: animations setting (only karts with human players are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:74
-msgid "Human players only"
-msgstr "Només jugadors humans"
-
-#: src/states_screens/dialogs/custom_video_settings.cpp:77
-msgid "Enabled for all"
-msgstr "Habilitat per a tots"
 
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
+#: src/states_screens/dialogs/custom_video_settings.cpp:71
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/dialogs/custom_video_settings.cpp:95
-#: src/states_screens/dialogs/custom_video_settings.cpp:102
-#: src/states_screens/options_screen_video.cpp:469
+#: src/states_screens/options_screen_video.cpp:427
 msgid "Low"
 msgstr "Baix"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/dialogs/custom_video_settings.cpp:96
-#: src/states_screens/dialogs/custom_video_settings.cpp:103
-#: src/states_screens/options_screen_video.cpp:472
+#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/options_screen_video.cpp:430
 msgid "High"
 msgstr "Alt"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:94
-#: src/states_screens/options_screen_video.cpp:466
+#: src/states_screens/dialogs/custom_video_settings.cpp:79
+#: src/states_screens/options_screen_video.cpp:424
 msgid "Very Low"
 msgstr "Molt baix"
 
-#. I18N: in the graphical options tooltip;
-#. indicates the rendered image quality is very high
-#: src/states_screens/dialogs/custom_video_settings.cpp:97
-#: src/states_screens/options_screen_video.cpp:475
-msgid "Very High"
-msgstr "Molt alt"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:140
+#: src/states_screens/edit_gp_screen.cpp:65
+#: src/states_screens/ghost_replay_selection.cpp:116
+msgid "Laps"
+msgstr "Voltes"
 
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:257
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:142
 #: src/states_screens/ghost_replay_selection.cpp:117
-msgid "No"
-msgstr "No"
+msgid "Time"
+msgstr "Temps"
 
-#: src/states_screens/dialogs/multitouch_settings_dialog.cpp:60
-msgid "Tablet"
-msgstr "Tauleta"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:144
+#: src/states_screens/ghost_replay_selection.cpp:118
+msgid "User"
+msgstr "Usuari"
 
-#: src/states_screens/dialogs/multitouch_settings_dialog.cpp:61
-msgid "Phone"
-msgstr "Telèfon"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:146
+#: src/states_screens/ghost_replay_selection.cpp:120
+msgid "Version"
+msgstr "Versió"
+
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:82
+msgid "Kick"
+msgstr "Expulsar"
+
+#: src/states_screens/dialogs/network_user_dialog.cpp:107
+#: src/states_screens/dialogs/player_rankings_dialog.cpp:143
+#, c-format
+msgid "Fetching ranking info for %s."
+msgstr "Obtenint la informació de classificació de %s."
+
+#. I18N: In the network player dialog, indiciating a network
+#. player has no ranking
+#: src/states_screens/dialogs/ranking_callback.hpp:57
+#, c-format
+msgid "%s has no ranking yet."
+msgstr "%s encara no té cap classificació."
+
+#. I18N: In the network player dialog show rank and
+#. score of a player
+#: src/states_screens/dialogs/ranking_callback.hpp:68
+#, c-format
+msgid "%s has a rank of %d with score %f."
+msgstr "%s té una classificació de %d amb una puntuació de %f."
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
 msgstr "El nom d'usuari i/o el correu electrònic no són vàlids."
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
-#, c-format
 msgid ""
 "Please read the terms and conditions for SuperTuxKart at '%s'. You must "
 "agree to these terms in order to register an account for STK. By checking "
@@ -3230,18 +3550,23 @@ msgstr "Punts de nitro requerits: %i"
 msgid "Number of AI Karts: %i"
 msgstr "Karts controlats per l'ordinador: %i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:149
+#: src/states_screens/dialogs/select_challenge.cpp:174
 msgid "Nitro challenge"
 msgstr "Repte de nitro"
 
-#: src/states_screens/dialogs/select_challenge.cpp:151
-#: src/states_screens/race_setup_screen.cpp:136
+#: src/states_screens/dialogs/select_challenge.cpp:176
+#: src/states_screens/race_setup_screen.cpp:135
 msgid "Ghost replay race"
 msgstr "Cursa de repetició fantasma"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:75
-msgid "Server successfully created. You can now join it."
-msgstr "El servidor s'ha creat correctament. Ja t'hi pots unir."
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:129
+msgid "Input device already exists."
+msgstr "El dispositiu d'entrada ja existeix."
+
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
+#: src/states_screens/online_screen.cpp:233
+msgid "No player available for connecting to server."
+msgstr "No hi ha cap jugador disponible per connectar-se al servidor."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 msgid "Cancel Request"
@@ -3298,352 +3623,378 @@ msgstr "El vot s'ha enviat correctament! Ja pots tancar la finestra."
 msgid "Performing vote"
 msgstr "S'està realitzant la votació"
 
-#: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/tracks_and_gp_screen.cpp:292
-#: src/states_screens/tracks_screen.cpp:241
+#: src/states_screens/easter_egg_screen.cpp:268
+#: src/states_screens/tracks_and_gp_screen.cpp:289
+#: src/states_screens/tracks_screen.cpp:340
 msgid "Random Track"
 msgstr "Circuit aleatori"
 
-#: src/states_screens/edit_gp_screen.cpp:66
-#: src/states_screens/ghost_replay_selection.cpp:77
+#: src/states_screens/edit_gp_screen.cpp:64
+#: src/states_screens/ghost_replay_selection.cpp:109
 msgid "Track"
 msgstr "Circuit"
 
-#: src/states_screens/edit_gp_screen.cpp:67
-#: src/states_screens/ghost_replay_selection.cpp:81
-msgid "Laps"
-msgstr "Voltes"
-
-#: src/states_screens/edit_gp_screen.cpp:68
+#: src/states_screens/edit_gp_screen.cpp:66
 msgid "Reversed"
 msgstr "A l'inrevés"
 
-#: src/states_screens/edit_gp_screen.cpp:124
-#: src/states_screens/ghost_replay_selection.cpp:177
-#: src/states_screens/grand_prix_editor_screen.cpp:112
+#: src/states_screens/edit_gp_screen.cpp:122
+#: src/states_screens/ghost_replay_selection.cpp:407
+#: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr "Estàs segur que vols eliminar '%s'?"
 
-#: src/states_screens/edit_gp_screen.cpp:141
+#: src/states_screens/edit_gp_screen.cpp:139
 msgid "Do you want to save your changes?"
 msgstr "Vols desar els canvis?"
 
 #. I18N: Indicate that the grand prix is modified and not saved
-#: src/states_screens/edit_gp_screen.cpp:286
+#: src/states_screens/edit_gp_screen.cpp:284
 #, c-format
 msgid "%s (+)"
 msgstr "%s (+)"
 
-#: src/states_screens/edit_gp_screen.cpp:325
+#: src/states_screens/edit_gp_screen.cpp:323
 msgid "An error occurred while trying to save your grand prix."
 msgstr "S'ha produït un error mentre s'intentava desar el teu campionat."
 
-#: src/states_screens/edit_track_screen.cpp:235
+#: src/states_screens/edit_track_screen.cpp:233
 msgid "Select a track"
 msgstr "Selecciona un circuit"
 
-#: src/states_screens/feature_unlocked.cpp:201
+#: src/states_screens/feature_unlocked.cpp:247
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr "Has completat el repte de nivell fàcil! Punts guanyats en aquest nivell: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:205
+#: src/states_screens/feature_unlocked.cpp:251
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr "Has completat el repte de nivell intermedi! Punts guanyats en aquest nivell: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:209
+#: src/states_screens/feature_unlocked.cpp:255
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr "Has completat el repte de nivell difícil! Punts guanyats en aquest nivell: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:494
+#: src/states_screens/feature_unlocked.cpp:259
+#, c-format
+msgid ""
+"You completed the SuperTux challenge! Points earned on this level: %i/%i"
+msgstr "Has completat el repte del SuperTuxKart! Punts guanyats en aquest nivell: %i/%i"
+
+#: src/states_screens/feature_unlocked.cpp:299
+#, c-format
+msgid "You unlocked %s!"
+msgstr "Has desbloquejat %s!"
+
+#: src/states_screens/feature_unlocked.cpp:607
 msgid "Challenge Completed"
 msgstr "Repte completat"
 
-#: src/states_screens/feature_unlocked.cpp:531
+#: src/states_screens/feature_unlocked.cpp:644
 msgid "You unlocked track %0"
 msgstr "Has desbloquejat el circuit %0"
 
-#: src/states_screens/feature_unlocked.cpp:569
+#: src/states_screens/feature_unlocked.cpp:682
 msgid "You unlocked grand prix %0"
 msgstr "Has desbloquejat el campionat %0"
 
-#: src/states_screens/ghost_replay_selection.cpp:82
-msgid "Finish Time"
-msgstr "Temps final"
-
-#: src/states_screens/ghost_replay_selection.cpp:83
-msgid "User"
-msgstr "Usuari"
-
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:72
 msgid "Default"
 msgstr "Predeterminat"
 
-#. I18N: if no kart animations are enabled
-#: src/states_screens/gp_info_screen.cpp:75
-#: src/states_screens/options_screen_video.cpp:460
+#: src/states_screens/gp_info_screen.cpp:73
 msgid "None"
 msgstr "Cap"
 
-#: src/states_screens/gp_info_screen.cpp:77
+#: src/states_screens/gp_info_screen.cpp:75
 msgid "Random"
 msgstr "Aleatori"
 
-#: src/states_screens/gp_info_screen.cpp:154
-#: src/states_screens/gp_info_screen.cpp:179
+#: src/states_screens/gp_info_screen.cpp:152
+#: src/states_screens/gp_info_screen.cpp:177
 msgid "Reload"
 msgstr "Torna a carregar"
 
 #: src/states_screens/grand_prix_cutscene.cpp:75
-#: src/states_screens/grand_prix_editor_screen.cpp:101
-#: src/states_screens/grand_prix_editor_screen.cpp:118
+#: src/states_screens/grand_prix_editor_screen.cpp:98
+#: src/states_screens/grand_prix_editor_screen.cpp:115
 msgid "Please enter the name of the grand prix"
 msgstr "Introdueix el nom del campionat"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:169
+#: src/states_screens/grand_prix_editor_screen.cpp:166
 msgid "Please select a Grand Prix"
 msgstr "Selecciona un campionat"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:338
+#: src/states_screens/grand_prix_editor_screen.cpp:335
 msgid "User defined"
 msgstr "Definits per l'usuari"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:351
+#: src/states_screens/grand_prix_editor_screen.cpp:348
 msgid "Name is empty."
 msgstr "El nom és buit."
 
-#: src/states_screens/grand_prix_editor_screen.cpp:359
+#: src/states_screens/grand_prix_editor_screen.cpp:356
 msgid "Another grand prix with this name already exists."
 msgstr "Ja existeix un altre campionat amb aquest nom."
 
-#: src/states_screens/grand_prix_editor_screen.cpp:365
+#: src/states_screens/grand_prix_editor_screen.cpp:362
 msgid "Name is too long."
 msgstr "El nom és massa llarg."
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:155
+#: src/states_screens/grand_prix_lose.cpp:153
 msgid "Better luck next time!"
 msgstr "Més sort la propera vegada!"
 
-#: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:194
+#: src/states_screens/grand_prix_win.cpp:164
+#: src/states_screens/race_result_gui.cpp:186
 msgid "You completed a challenge!"
 msgstr "Has completat un repte!"
 
-#: src/states_screens/grand_prix_win.cpp:322
+#: src/states_screens/grand_prix_win.cpp:321
 msgid "You completed the Grand Prix!"
 msgstr "Has completat el campionat!"
 
-#: src/states_screens/kart_selection.cpp:843
-#: src/states_screens/kart_selection.cpp:1499
+#: src/states_screens/kart_selection.cpp:862
+#: src/states_screens/kart_selection.cpp:1519
 msgid "Random Kart"
 msgstr "Kart aleatori"
 
-#: src/states_screens/kart_selection.cpp:859
+#: src/states_screens/kart_selection.cpp:881
 msgid "Locked"
 msgstr "Bloquejat"
 
-#: src/states_screens/kart_selection.cpp:961
+#: src/states_screens/kart_selection.cpp:982
+#: src/states_screens/networking_lobby.cpp:239
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Tothom:\nPremeu el botó 'Seleccionar' per unir-vos a la partida"
 
-#: src/states_screens/main_menu_screen.cpp:510
+#: src/states_screens/main_menu_screen.cpp:489
+#: src/states_screens/online_screen.cpp:211
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia, vés a les opcions, selecciona la pestanya \"Interfície d'usuari\", i edita el paràmetre \"Connectat a Internet\"."
 
-#: src/states_screens/main_menu_screen.cpp:534
+#: src/states_screens/main_menu_screen.cpp:521
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
 msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés a les opcions, selecciona la pestanya \"Interfície d'usuari\", i edita el paràmetre \"Connectat a Internet\"."
 
-#: src/states_screens/main_menu_screen.cpp:566
+#: src/states_screens/main_menu_screen.cpp:553
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "El mòdul de complements actualment es troba deshabilitat a la finestra d'opcions"
 
-#: src/states_screens/main_menu_screen.cpp:578
+#: src/states_screens/main_menu_screen.cpp:565
 msgid "Please wait while the add-ons are loading"
 msgstr "Espera mentre es carreguen els complements"
 
-#: src/states_screens/online_profile_achievements.cpp:79
+#. I18N: In the networking lobby, display the starting timeout
+#. for owner-less server
+#: src/states_screens/networking_lobby.cpp:231
+#, c-format
+msgid "Game will start after %d second."
+msgid_plural "Game will start after %d seconds."
+msgstr[0] "La partida començarà en %d segon."
+msgstr[1] "La partida començarà en %d segons."
+
+#: src/states_screens/networking_lobby.cpp:260
+#, c-format
+msgid "Connecting to server %s"
+msgstr "Connectant al servidor %s"
+
+#: src/states_screens/networking_lobby.cpp:265
+msgid "Finding a quick play server"
+msgstr "Buscant un servidor de partides ràpides"
+
+#: src/states_screens/networking_lobby.cpp:290
+#, c-format
+msgid "Lobby (ping: %dms)"
+msgstr "Rebedor (ping: %dms)"
+
+#: src/states_screens/online_profile_achievements.cpp:77
 msgid "Progress"
 msgstr "Progrés"
 
-#: src/states_screens/online_profile_achievements.cpp:131
-#: src/states_screens/online_profile_achievements.cpp:171
+#: src/states_screens/online_profile_achievements.cpp:129
+#: src/states_screens/online_profile_achievements.cpp:174
 msgid "Fetching achievements"
 msgstr "Obtenint assoliments"
 
-#: src/states_screens/online_profile_base.cpp:117
-#: src/states_screens/online_profile_base.cpp:127
-msgid "Your profile"
-msgstr "El teu perfil"
-
-#: src/states_screens/online_profile_base.cpp:120
+#: src/states_screens/online_profile_base.cpp:115
 #, c-format
 msgid "%s's profile"
 msgstr "Perfil de %s"
 
-#: src/states_screens/online_profile_friends.cpp:75
+#: src/states_screens/online_profile_friends.cpp:73
 msgid "Since"
 msgstr "Des de"
 
-#: src/states_screens/online_profile_friends.cpp:76
+#: src/states_screens/online_profile_friends.cpp:74
 msgid "Status"
 msgstr "Estat"
 
-#: src/states_screens/online_profile_friends.cpp:96
-#: src/states_screens/online_profile_friends.cpp:247
+#: src/states_screens/online_profile_friends.cpp:94
+#: src/states_screens/online_profile_friends.cpp:245
 msgid "Fetching friends"
 msgstr "Obtenint amics"
 
-#: src/states_screens/online_profile_friends.cpp:218
+#: src/states_screens/online_profile_friends.cpp:216
 msgid "New Request"
 msgstr "Nova petició"
 
-#: src/states_screens/online_profile_friends.cpp:219
+#: src/states_screens/online_profile_friends.cpp:217
 msgid "Pending"
 msgstr "Pendent"
 
-#: src/states_screens/online_profile_friends.cpp:223
+#: src/states_screens/online_profile_friends.cpp:221
 msgid "Offline"
 msgstr "Fora de línia"
 
-#: src/states_screens/online_user_search.cpp:207
-#: src/states_screens/online_user_search.cpp:271
+#: src/states_screens/online_screen.cpp:238
+msgid ""
+"Enter the server address with IP (optional) followed by : and then port."
+msgstr "Introdueix l'adreça del servidor amb la IP (opcional) seguida de : i després el port."
+
+#: src/states_screens/online_screen.cpp:249
+#, c-format
+msgid "Invalid server address: %s."
+msgstr "Adreça del servidor invàlida: %s."
+
+#: src/states_screens/online_user_search.cpp:205
+#: src/states_screens/online_user_search.cpp:269
 msgid "Searching"
 msgstr "S'està cercant"
 
-#: src/states_screens/options_screen_device.cpp:71
+#: src/states_screens/options_screen_device.cpp:69
 msgid "Action"
 msgstr "Acció"
 
-#: src/states_screens/options_screen_device.cpp:72
+#: src/states_screens/options_screen_device.cpp:70
 msgid "Key binding"
 msgstr "Tecla assignada"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_device.cpp:96
-#: src/states_screens/options_screen_device.cpp:579
+#: src/states_screens/options_screen_device.cpp:94
+#: src/states_screens/options_screen_device.cpp:586
 msgid "Disable Device"
 msgstr "Deshabilita el dispositiu"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_device.cpp:98
-#: src/states_screens/options_screen_device.cpp:580
+#: src/states_screens/options_screen_device.cpp:96
+#: src/states_screens/options_screen_device.cpp:587
 msgid "Enable Device"
 msgstr "Habilita el dispositiu"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_device.cpp:137
+#: src/states_screens/options_screen_device.cpp:140
 msgid "Game Keys"
 msgstr "Tecles del joc"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_device.cpp:151
+#: src/states_screens/options_screen_device.cpp:154
 msgid "Menu Keys"
 msgstr "Tecles del menú"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:218
+#: src/states_screens/options_screen_device.cpp:225
 msgid "Steer Left"
 msgstr "Gira a l'esquerra"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:221
+#: src/states_screens/options_screen_device.cpp:228
 msgid "Steer Right"
 msgstr "Gira a la dreta"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:224
+#: src/states_screens/options_screen_device.cpp:231
 msgid "Accelerate"
 msgstr "Accelera"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:227
+#: src/states_screens/options_screen_device.cpp:234
 msgid "Brake"
 msgstr "Frena"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:230
+#: src/states_screens/options_screen_device.cpp:237
 msgid "Fire"
 msgstr "Foc"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:233
+#: src/states_screens/options_screen_device.cpp:240
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:236
+#: src/states_screens/options_screen_device.cpp:243
 msgid "Skidding"
 msgstr "Derrapar"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:239
+#: src/states_screens/options_screen_device.cpp:246
 msgid "Look Back"
 msgstr "Mirar enrere"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:242
+#: src/states_screens/options_screen_device.cpp:249
 msgid "Rescue"
 msgstr "Rescat"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:245
+#: src/states_screens/options_screen_device.cpp:252
 msgid "Pause Game"
 msgstr "Pausa"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:250
+#: src/states_screens/options_screen_device.cpp:257
 msgid "Up"
 msgstr "Amunt"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:253
+#: src/states_screens/options_screen_device.cpp:260
 msgid "Down"
 msgstr "Avall"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:256
+#: src/states_screens/options_screen_device.cpp:263
 msgid "Left"
 msgstr "Esquerra"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:259
+#: src/states_screens/options_screen_device.cpp:266
 msgid "Right"
 msgstr "Dreta"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:262
+#: src/states_screens/options_screen_device.cpp:269
 msgid "Select"
 msgstr "Selecciona"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:265
+#: src/states_screens/options_screen_device.cpp:272
 msgid "Cancel/Back"
 msgstr "Cancel·lar/Tornar"
 
-#: src/states_screens/options_screen_device.cpp:360
+#: src/states_screens/options_screen_device.cpp:367
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Un element blau indica un conflicte amb una altra configuració"
 
-#: src/states_screens/options_screen_device.cpp:365
+#: src/states_screens/options_screen_device.cpp:372
 msgid "* A red item means a conflict in the current configuration"
 msgstr "Un element vermell indica un conflicte a la configuració actual"
 
-#: src/states_screens/options_screen_device.cpp:471
+#: src/states_screens/options_screen_device.cpp:478
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -3651,131 +4002,115 @@ msgid ""
 msgstr "Atenció: La tecla 'Majúscules' no és una tecla gaire recomanable. Quan es premi aquesta tecla deixaran de funcionar totes les tecles que continguin un caràcter diferent en majúscules."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options_screen_device.cpp:567
+#: src/states_screens/options_screen_device.cpp:574
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Estàs segur que vols esborrar permanentment aquesta configuració?"
 
-#: src/states_screens/options_screen_input.cpp:100
+#: src/states_screens/options_screen_input.cpp:101
+msgid "Gamepad"
+msgstr "Comandament"
+
+#: src/states_screens/options_screen_input.cpp:108
 #, c-format
 msgid "Keyboard %i"
 msgstr "Teclat %i"
 
-#: src/states_screens/options_screen_input.cpp:138
+#: src/states_screens/options_screen_input.cpp:147
 msgid "Touch Device"
 msgstr "Dispositiu tàctil"
 
-#: src/states_screens/options_screen_ui.cpp:159
+#: src/states_screens/options_screen_ui.cpp:168
 msgid ""
 "In multiplayer mode, players can select handicapped (more difficult) "
 "profiles on the kart selection screen"
 msgstr "En mode multijugador els jugadors poden seleccionar perfils limitats (més difícils) a la pantalla de selecció de karts"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options_screen_ui.cpp:191
+#: src/states_screens/options_screen_ui.cpp:203
 msgid "System Language"
 msgstr "Idioma del sistema"
 
 #. I18N: custom video settings
-#: src/states_screens/options_screen_video.cpp:433
+#: src/states_screens/options_screen_video.cpp:397
 msgid "Custom"
 msgstr "A mida"
 
-#. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:458
-msgid "Me Only"
-msgstr "Només jo"
-
 #. I18N: in graphical options
-#. tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
-#. UserConfigParams::m_pixel_shaders ? enabled : disabled);
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:481
+#: src/states_screens/options_screen_video.cpp:433
 #, c-format
-msgid "Animated Scenery: %s"
-msgstr "Escenaris animats: %s"
+msgid "Particles Effects: %s"
+msgstr "Efectes de partícules: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:487
-#, c-format
-msgid "Weather Effects: %s"
-msgstr "Efectes climàtics: %s"
-
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:490
+#: src/states_screens/options_screen_video.cpp:439
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Personatges animats: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:495
+#: src/states_screens/options_screen_video.cpp:442
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Llums dinàmiques: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:498
+#: src/states_screens/options_screen_video.cpp:445
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Difuminació de moviment: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:501
+#: src/states_screens/options_screen_video.cpp:448
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Antialiàsing: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:504
+#: src/states_screens/options_screen_video.cpp:451
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Oclusió ambiental: %s"
 
-#: src/states_screens/options_screen_video.cpp:508
+#: src/states_screens/options_screen_video.cpp:455
 #, c-format
 msgid "Shadows: %s"
 msgstr "Ombres: %s"
 
-#: src/states_screens/options_screen_video.cpp:510
+#: src/states_screens/options_screen_video.cpp:457
 #, c-format
 msgid "Shadows: %i"
 msgstr "Ombres: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:513
+#: src/states_screens/options_screen_video.cpp:460
 #, c-format
 msgid "Bloom: %s"
 msgstr "Lluïssor: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:517
+#: src/states_screens/options_screen_video.cpp:464
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Resplendor (contorns): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:521
+#: src/states_screens/options_screen_video.cpp:468
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Rajos crepusculars (rajos de Déu): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:525
+#: src/states_screens/options_screen_video.cpp:472
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Profunditat de camp: %s"
 
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:529
-#, c-format
-msgid "Global illumination: %s"
-msgstr "Il·luminació global: %s"
-
-#: src/states_screens/options_screen_video.cpp:534
+#: src/states_screens/options_screen_video.cpp:477
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Qualitat de la imatge renderitzada: %s"
 
-#: src/states_screens/race_gui.cpp:358 src/states_screens/race_gui.cpp:360
+#: src/states_screens/race_gui.cpp:400 src/states_screens/race_gui.cpp:402
 msgid "Challenge Failed"
 msgstr "Repte no superat"
 
@@ -3801,255 +4136,288 @@ msgstr "GOL!"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:517
+#: src/states_screens/race_gui_base.cpp:551
 msgid "by"
 msgstr "per"
 
-#: src/states_screens/race_gui_base.cpp:626
+#: src/states_screens/race_gui_base.cpp:658
 msgid "Collect nitro!"
 msgstr "Recull nitro!"
 
-#: src/states_screens/race_gui_base.cpp:628
+#: src/states_screens/race_gui_base.cpp:660
 msgid "Follow the leader!"
 msgstr "Segueix al líder!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:806
+#: src/states_screens/race_gui_base.cpp:840
 #, c-format
 msgid "Top %i"
 msgstr "Top %i"
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui_overworld.cpp:143
+#: src/states_screens/race_gui_overworld.cpp:146
 msgid "Lap"
 msgstr "Volta"
 
-#: src/states_screens/race_gui_overworld.cpp:144
+#: src/states_screens/race_gui_overworld.cpp:147
 msgid "Rank"
 msgstr "Classificació"
 
-#: src/states_screens/race_gui_overworld.cpp:518
+#: src/states_screens/race_gui_overworld.cpp:591
 msgid "Press fire to start the tutorial"
 msgstr "Prem 'Foc' per començar el tutorial"
 
-#: src/states_screens/race_gui_overworld.cpp:557
+#: src/states_screens/race_gui_overworld.cpp:630
 msgid "Type: Grand Prix"
 msgstr "Tipus: campionat"
 
-#: src/states_screens/race_gui_overworld.cpp:594
+#: src/states_screens/race_gui_overworld.cpp:667
 msgid "Press fire to start the challenge"
 msgstr "Prem 'Foc' per començar el repte"
 
-#: src/states_screens/race_result_gui.cpp:175
-msgid "Continue."
-msgstr "Continua."
-
-#: src/states_screens/race_result_gui.cpp:178
-msgid "Quit the server."
+#: src/states_screens/race_result_gui.cpp:176
+msgid "Quit the server"
 msgstr "Abandonar el servidor"
 
-#: src/states_screens/race_result_gui.cpp:195
+#: src/states_screens/race_result_gui.cpp:187
 msgid "You completed challenges!"
 msgstr "Has completat reptes!"
 
-#: src/states_screens/race_result_gui.cpp:208
+#: src/states_screens/race_result_gui.cpp:203
 msgid "Abort Grand Prix"
 msgstr "Avorta el campionat"
 
-#: src/states_screens/race_result_gui.cpp:218
+#: src/states_screens/race_result_gui.cpp:219
 msgid "Restart"
 msgstr "Reiniciar"
 
-#: src/states_screens/race_result_gui.cpp:224
+#: src/states_screens/race_result_gui.cpp:225
 msgid "Back to challenge selection"
 msgstr "Tornar a la selecció de reptes"
 
 #: src/states_screens/race_result_gui.cpp:230
+msgid "Race against the new ghost replay"
+msgstr "Corre contra la nova repetició fantasma"
+
+#: src/states_screens/race_result_gui.cpp:234
 msgid "Back to the menu"
 msgstr "Tornar al menú"
 
-#: src/states_screens/race_result_gui.cpp:372
+#: src/states_screens/race_result_gui.cpp:268
+msgid "Waiting for others"
+msgstr "Esperant als altres"
+
+#: src/states_screens/race_result_gui.cpp:379
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Realment vols avortar el campionat?"
 
-#: src/states_screens/race_result_gui.cpp:499
-#: src/states_screens/race_result_gui.cpp:865
+#: src/states_screens/race_result_gui.cpp:464
+msgid "Network grand prix has been finished."
+msgstr "El campionat per xarxa s'ha acabat."
+
+#: src/states_screens/race_result_gui.cpp:544
+#: src/states_screens/race_result_gui.cpp:910
 msgid "Eliminated"
 msgstr "Eliminat"
 
-#: src/states_screens/race_result_gui.cpp:1012
+#: src/states_screens/race_result_gui.cpp:1057
 msgid "Red Team Wins"
 msgstr "L'equip vermell guanya"
 
-#: src/states_screens/race_result_gui.cpp:1016
+#: src/states_screens/race_result_gui.cpp:1061
 msgid "Blue Team Wins"
 msgstr "L'equip blau guanya"
 
-#: src/states_screens/race_result_gui.cpp:1021
+#: src/states_screens/race_result_gui.cpp:1066
 msgid "It's a draw"
 msgstr "Empatats"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1098
-#: src/states_screens/race_result_gui.cpp:1154
+#: src/states_screens/race_result_gui.cpp:1143
+#: src/states_screens/race_result_gui.cpp:1199
 msgid "(Own Goal)"
 msgstr "(en pròpia porta)"
 
-#: src/states_screens/race_result_gui.cpp:1220
+#: src/states_screens/race_result_gui.cpp:1265
 #, c-format
 msgid "Track %i/%i"
 msgstr "Circuit %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1304
+#: src/states_screens/race_result_gui.cpp:1349
 msgid "Grand Prix progress:"
 msgstr "Progrés del campionat:"
 
-#: src/states_screens/race_result_gui.cpp:1346
+#: src/states_screens/race_result_gui.cpp:1391
 msgid "Highscores"
 msgstr "Millors temps"
 
-#: src/states_screens/race_result_gui.cpp:1432
-#, c-format
-msgid "Difficulty: %s"
-msgstr "Dificultat: %s"
-
-#: src/states_screens/race_result_gui.cpp:1440
+#: src/states_screens/race_result_gui.cpp:1485
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Millor volta: %s"
 
-#: src/states_screens/race_setup_screen.cpp:87
+#: src/states_screens/race_setup_screen.cpp:86
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "Totes els cops estan permesos, o sigui que agafa armes i fes-ne un bon ús!"
 
-#: src/states_screens/race_setup_screen.cpp:94
+#: src/states_screens/race_setup_screen.cpp:93
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "No conté armes, o sigui que només importa la teva habilitat al volant!"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:107
+#: src/states_screens/race_setup_screen.cpp:106
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Segueix el kart del líder, però no l'avancis!"
 
-#: src/states_screens/race_setup_screen.cpp:114
+#: src/states_screens/race_setup_screen.cpp:113
 msgid "Hit others with weapons until they lose all their lives."
 msgstr "Ataca als altres amb armes fins que perdin totes les seves vides."
 
-#: src/states_screens/race_setup_screen.cpp:119
+#: src/states_screens/race_setup_screen.cpp:118
 msgid "Push the ball into the opposite cage to score goals."
 msgstr "Empeny la pilota cap a la porteria contrària per marcar gols."
 
-#: src/states_screens/race_setup_screen.cpp:129
+#: src/states_screens/race_setup_screen.cpp:128
 msgid "Explore tracks to find all hidden eggs"
 msgstr "Explora circuits per trobar tots els ous amagats"
 
-#: src/states_screens/race_setup_screen.cpp:137
+#: src/states_screens/race_setup_screen.cpp:136
 msgid "Race against ghost karts and try to beat them!"
 msgstr "Corre contra cotxes fantasma i intenta guanyar-los!"
 
-#: src/states_screens/register_screen.cpp:218
-#: src/states_screens/register_screen.cpp:225
+#: src/states_screens/register_screen.cpp:219
+#: src/states_screens/register_screen.cpp:226
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "No s'ha pogut crear el jugador '%s'."
 
-#: src/states_screens/register_screen.cpp:277
+#: src/states_screens/register_screen.cpp:278
 msgid "Emails don't match!"
 msgstr "Els correus electrònics no coincideixen!"
 
-#: src/states_screens/register_screen.cpp:281
+#: src/states_screens/register_screen.cpp:282
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "El nom d'usuari en línia ha de tenir entre 3 i 30 caràcters!"
 
-#: src/states_screens/register_screen.cpp:285
+#: src/states_screens/register_screen.cpp:286
 msgid "Online username must not start with a number!"
 msgstr "El nom d'usuari en línia no pot començar per un número!"
 
-#: src/states_screens/register_screen.cpp:293
+#: src/states_screens/register_screen.cpp:294
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "El correu electrònic ha de tenir entre 4 i 254 caràcters!"
 
-#: src/states_screens/register_screen.cpp:299
+#: src/states_screens/register_screen.cpp:300
 msgid "Email is invalid!"
 msgstr "El correu electrònic no és vàlid!"
 
-#: src/states_screens/register_screen.cpp:362
+#: src/states_screens/register_screen.cpp:363
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Rebràs un correu electrònic amb més instruccions sobre l'activació del compte. Sigues pacient i assegura't de comprovar la teva carpeta de correu brossa."
 
-#: src/states_screens/register_screen.cpp:402
-#: src/states_screens/user_screen.cpp:338
+#: src/states_screens/register_screen.cpp:403
+#: src/states_screens/user_screen.cpp:337
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "L'accés a Internet es troba deshabilitat, activa'l a les opcions"
 
-#: src/states_screens/server_selection.cpp:79
-#: src/states_screens/server_selection.cpp:247
+#. I18N: In server selection screen, owner of server, only displayed
+#. if it's localhost or friends'
+#: src/states_screens/server_selection.cpp:111
+msgid "Owner"
+msgstr "Propietari"
+
+#. I18N: In server selection screen, distance to server
+#: src/states_screens/server_selection.cpp:113
+msgid "Distance (km)"
+msgstr "Distància (km)"
+
+#. I18N: In server selection screen, unknown distance to server
+#: src/states_screens/server_selection.cpp:189
+msgid "Unknown"
+msgstr "Desconegut"
+
+#: src/states_screens/server_selection.cpp:287
+msgid "No server is available."
+msgstr "No hi ha cap servidor disponible."
+
+#: src/states_screens/server_selection.cpp:295
 msgid "Fetching servers"
 msgstr "Obtenint servidors"
 
 #. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:144
+#: src/states_screens/tracks_and_gp_screen.cpp:141
 msgid "all"
 msgstr "Tots"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:195
+#: src/states_screens/tracks_and_gp_screen.cpp:192
 msgid "Locked!"
 msgstr "Bloquejat!"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:278
-#: src/states_screens/tracks_screen.cpp:227
+#: src/states_screens/tracks_and_gp_screen.cpp:275
+#: src/states_screens/tracks_screen.cpp:326
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Bloquejat: resol els reptes actius per accedir-ne a més!"
 
-#: src/states_screens/tracks_screen.cpp:194
-msgid "Only official tracks are supported."
-msgstr "Només es permeten els circuits oficials."
+#. I18N: In track screen
+#. I18N: In the track info screen
+#: src/states_screens/tracks_screen.cpp:171
+#: src/states_screens/track_info_screen.cpp:216
+msgid "Drive in reverse"
+msgstr "Condueix a l'inrevés"
+
+#. I18N: In track screen for networking, clarify voting phase
+#: src/states_screens/tracks_screen.cpp:179
+msgid ""
+"If a majority of players all select the same track and race settings, voting"
+" will end early."
+msgstr "Si una majoria de jugadors selecciona el mateix circuit i la mateixa configuració de cursa, la votació acabarà abans d'hora."
+
+#. I18N: In tracks screen, about voting of tracks in network
+#: src/states_screens/tracks_screen.cpp:398
+#, c-format
+msgid "Remaining time: %d"
+msgstr "Temps restant: %d"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:112
+#: src/states_screens/track_info_screen.cpp:110
 #, c-format
 msgid "Track by %s"
 msgstr "Circuit creat per %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:120
+#: src/states_screens/track_info_screen.cpp:118
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Màx. jugadors permesos: %d"
 
 #. I18N: In the track info screen
-#: src/states_screens/track_info_screen.cpp:213
-msgid "Drive in reverse"
-msgstr "Condueix a l'inrevés"
-
-#. I18N: In the track info screen
-#: src/states_screens/track_info_screen.cpp:218
+#: src/states_screens/track_info_screen.cpp:221
 msgid "Random item location"
 msgstr "Localització aleatòria dels elements"
 
-#: src/states_screens/user_screen.cpp:111
+#: src/states_screens/user_screen.cpp:109
 msgid "Exit game"
 msgstr "Surt del joc"
 
-#: src/states_screens/user_screen.cpp:484
+#: src/states_screens/user_screen.cpp:494
 msgid "You need to enter a password."
 msgstr "Cal que introdueixis una contrasenya."
 
-#: src/states_screens/user_screen.cpp:505
+#: src/states_screens/user_screen.cpp:515
 #, c-format
 msgid "Logging out '%s'"
 msgstr "S'està desconnectant '%s'"
 
-#: src/states_screens/user_screen.cpp:506
+#: src/states_screens/user_screen.cpp:516
 #, c-format
 msgid "Logging in '%s'"
 msgstr "S'està connectant '%s'"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/user_screen.cpp:595
+#: src/states_screens/user_screen.cpp:605
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
 msgstr "Realment vols eliminar el jugador '%s'?"
@@ -4064,7 +4432,7 @@ msgstr "%d/%m/%Y"
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:376
+#: src/utils/translation.cpp:398
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
