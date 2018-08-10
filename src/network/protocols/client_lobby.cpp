@@ -337,6 +337,7 @@ void ClientLobby::update(int ticks)
             GUIEngine::ModalDialog::dismiss();
             if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
                 StateManager::get()->enterGameState();
+            World::getWorld()->enterRaceOverState();
         }
         break;
     case DONE:

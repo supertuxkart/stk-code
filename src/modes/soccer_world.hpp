@@ -409,6 +409,9 @@ public:
     void handlePlayerGoalFromServer(const NetworkString& ns);
     // ------------------------------------------------------------------------
     void handleResetBallFromServer(const NetworkString& ns);
+    // ------------------------------------------------------------------------
+    virtual bool hasTeam() const OVERRIDE                      { return true; }
+    // ------------------------------------------------------------------------
 
 };   // SoccerWorld
 

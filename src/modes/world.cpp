@@ -312,6 +312,7 @@ void World::reset()
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
+    m_unfair_team = false;
 }   // reset
 
 //-----------------------------------------------------------------------------

@@ -54,9 +54,19 @@ void GameSetup::update(bool remove_disconnected_players)
     if (!World::getWorld() ||
         World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
         return;
+    int red_count = 0;
+    int blue_count = 0;
     for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
     {
-        if (!m_players[i].expired())
+        bool disconnected = m_players[i].expired();
+        if (race_manager->getKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED &&
+            !disconnected)
+            red_count++;
+        else if (race_manager->getKartInfo(i).getSoccerTeam() ==
+            SOCCER_TEAM_BLUE && !disconnected)
+            blue_count++;
+
+        if (!disconnected)
             continue;
         AbstractKart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated())
@@ -72,6 +82,9 @@ void GameSetup::update(bool remove_disconnected_players)
             STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
+    if (m_players.size() != 1 && World::getWorld()->hasTeam() &&
+        (red_count == 0 || blue_count == 0))
+        World::getWorld()->setUnfairTeam(true);
 }   // removePlayer
 
 //-----------------------------------------------------------------------------

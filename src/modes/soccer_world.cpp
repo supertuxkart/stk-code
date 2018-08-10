@@ -457,6 +457,9 @@ void SoccerWorld::setBallHitter(unsigned int kart_id)
  */
 bool SoccerWorld::isRaceOver()
 {
+    if (m_unfair_team)
+        return true;
+
     if (race_manager->hasTimeTarget())
     {
         return m_count_down_reached_zero;
