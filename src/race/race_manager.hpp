@@ -89,7 +89,11 @@ public:
     enum MajorRaceModeType
     {
         MAJOR_MODE_GRAND_PRIX,
-        MAJOR_MODE_SINGLE
+        MAJOR_MODE_SINGLE,
+        MAJOR_MODE_FREE_FOR_ALL,
+        MAJOR_MODE_CAPTURE_THE_FLAG,
+        MAJOR_MODE_3_STRIKES
+
     };
 
     // quick method to tell the difference between battle modes and race modes
@@ -112,7 +116,7 @@ public:
         MINOR_MODE_OVERWORLD     = LINEAR_RACE(3, false),
         MINOR_MODE_TUTORIAL      = LINEAR_RACE(4, false),
 
-        MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0),
+        MINOR_MODE_BATTLE        = BATTLE_ARENA(0),
         MINOR_MODE_SOCCER        = BATTLE_ARENA(1),
         MINOR_MODE_CUTSCENE      = BATTLE_ARENA(2),
         MINOR_MODE_EASTER_EGG    = EASTER_EGG(0)
@@ -138,7 +142,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return IDENT_STD;
             case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
             case MINOR_MODE_FOLLOW_LEADER:  return IDENT_FTL;
-            case MINOR_MODE_3_STRIKES:      return IDENT_STRIKES;
+            case MINOR_MODE_BATTLE:      return IDENT_STRIKES;
             case MINOR_MODE_EASTER_EGG:     return IDENT_EASTER;
             case MINOR_MODE_SOCCER:         return IDENT_SOCCER;
             default: assert(false);
@@ -157,7 +161,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return "/gui/mode_normal.png";
             case MINOR_MODE_TIME_TRIAL:     return "/gui/mode_tt.png";
             case MINOR_MODE_FOLLOW_LEADER:  return "/gui/mode_ftl.png";
-            case MINOR_MODE_3_STRIKES:      return "/gui/mode_3strikes.png";
+            case MINOR_MODE_BATTLE:      return "/gui/mode_3strikes.png";
             case MINOR_MODE_EASTER_EGG:     return "/gui/mode_easter.png";
             case MINOR_MODE_SOCCER:         return "/gui/mode_soccer.png";
             default: assert(false); return NULL;
@@ -179,7 +183,7 @@ public:
             //I18N: Game mode
             case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
             //I18N: Game mode
-            case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+            case MINOR_MODE_BATTLE:      return _("3 Strikes Battle");
             //I18N: Game mode
             case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
             //I18N: Game mode
@@ -197,7 +201,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return true;
             case MINOR_MODE_TIME_TRIAL:     return true;
             case MINOR_MODE_FOLLOW_LEADER:  return true;
-            case MINOR_MODE_3_STRIKES:      return true;
+            case MINOR_MODE_BATTLE:      return true;
             case MINOR_MODE_EASTER_EGG:     return false;
             case MINOR_MODE_SOCCER:         return true;
             default: assert(false);         return false;
@@ -216,7 +220,7 @@ public:
         if      (name==IDENT_STD    ) return MINOR_MODE_NORMAL_RACE;
         else if (name==IDENT_TTRIAL ) return MINOR_MODE_TIME_TRIAL;
         else if (name==IDENT_FTL    ) return MINOR_MODE_FOLLOW_LEADER;
-        else if (name==IDENT_STRIKES) return MINOR_MODE_3_STRIKES;
+        else if (name==IDENT_STRIKES) return MINOR_MODE_BATTLE;
         else if (name==IDENT_EASTER ) return MINOR_MODE_EASTER_EGG;
         else if (name==IDENT_SOCCER)  return MINOR_MODE_SOCCER;
 
@@ -336,7 +340,7 @@ private:
     int                              m_coin_target;
     float                            m_time_target;
     int                              m_goal_target;
-
+    int                              m_hit_capture_limit;
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
@@ -518,7 +522,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return "normal";
             case MINOR_MODE_TIME_TRIAL:     return "time-trial";
             case MINOR_MODE_FOLLOW_LEADER:  return "follow-the-leader";
-            case MINOR_MODE_3_STRIKES:      return "battle";
+            case MINOR_MODE_BATTLE:      return "battle";
             case MINOR_MODE_EASTER_EGG:     return "egg-hunt";
             case MINOR_MODE_SOCCER:         return "soccer";
             default: assert(false);         return "";
@@ -538,7 +542,7 @@ public:
      */
     int getNumLaps() const
     {
-        if(m_minor_mode==MINOR_MODE_3_STRIKES      ||
+        if(m_minor_mode==MINOR_MODE_BATTLE      ||
             m_minor_mode==MINOR_MODE_FOLLOW_LEADER ||
             m_minor_mode==MINOR_MODE_SOCCER        ||
             m_minor_mode==MINOR_MODE_EASTER_EGG  )
@@ -737,7 +741,7 @@ public:
         //       and each World may set m_use_highscores to true or false.
         //       The reason for this duplication is that we might want to know
         //       whether to display highscores without creating a World.
-        return m_minor_mode != MINOR_MODE_3_STRIKES &&
+        return m_minor_mode != MINOR_MODE_BATTLE &&
                m_minor_mode != MINOR_MODE_SOCCER &&
                m_minor_mode != MINOR_MODE_FOLLOW_LEADER;
     }   // modeHasHighscore
@@ -837,6 +841,14 @@ public:
     void configGrandPrixResultFromNetwork(NetworkString& ns);
     // ------------------------------------------------------------------------
     void clearNetworkGrandPrixResult();
+    // ------------------------------------------------------------------------
+    void setHitCaptureTime(int hc, float time)
+    {
+        m_hit_capture_limit = hc;
+        m_time_target = time;
+    }
+    // ------------------------------------------------------------------------
+    int getHitCaptureLimit() const              { return m_hit_capture_limit; }
 
 };   // RaceManager
 

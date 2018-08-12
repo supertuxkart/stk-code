@@ -2090,7 +2090,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
     if (CheckManager::get()->getCheckStructureCount()==0  &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
                   m_ident.c_str());

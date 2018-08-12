@@ -76,6 +76,7 @@ RaceManager::RaceManager()
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
     m_num_local_players = 0;
+    m_hit_capture_limit = 0;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -521,7 +522,7 @@ void RaceManager::startNextRace()
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_TUTORIAL)
         World::setWorld(new TutorialWorld());
-    else if(m_minor_mode==MINOR_MODE_3_STRIKES)
+    else if(m_minor_mode==MINOR_MODE_BATTLE)
         World::setWorld(new ThreeStrikesBattle());
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());

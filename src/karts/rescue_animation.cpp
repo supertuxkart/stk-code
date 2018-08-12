@@ -91,7 +91,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     }
 
     // Add a hit unless it was auto-rescue
-    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE &&
         !is_auto_rescue)
     {
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();

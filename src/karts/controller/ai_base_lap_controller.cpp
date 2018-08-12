@@ -87,7 +87,7 @@ AIBaseLapController::AIBaseLapController(AbstractKart *kart)
                    : AIBaseController(kart)
 {
 
-    if (race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+    if (race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         m_world     = dynamic_cast<LinearWorld*>(World::getWorld());

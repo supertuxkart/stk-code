@@ -407,11 +407,19 @@ void ClientLobby::displayPlayerVote(Event* event)
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
     core::stringw vote_msg;
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
     {
         //I18N: Vote message in network game from a player
         vote_msg = _("Track: %s,\nrandom item location: %s",
             track_readable, rev == 1 ? yes : no);
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+        race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        //I18N: Vote message in network game from a player
+        vote_msg = _("Track: %s", track_readable);
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
@@ -527,8 +535,13 @@ void ClientLobby::handleServerInfo(Event* event)
     NetworkConfig::get()->setServerMode(u_data);
     auto game_mode = NetworkConfig::get()->getLocalGameMode();
     race_manager->setMinorMode(game_mode.first);
-    // We use single mode in network even it's grand prix
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    if (game_mode.first == RaceManager::MINOR_MODE_BATTLE)
+        race_manager->setMajorMode(game_mode.second);
+    else
+    {
+        // We use single mode in network even it's grand prix
+        race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    }
 
     //I18N: In the networking lobby
     core::stringw mode_name = NetworkConfig::get()->getModeName(u_data);

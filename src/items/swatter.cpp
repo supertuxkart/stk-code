@@ -238,7 +238,7 @@ bool Swatter::updateAndTestFinished(int ticks)
                     m_animation_phase = SWATTER_FROM_TARGET;
                     const int end_ticks = ticks_start + 60;
                     if (race_manager
-                        ->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+                        ->getMinorMode()==RaceManager::MINOR_MODE_BATTLE ||
                         race_manager
                         ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
                     {

@@ -98,7 +98,7 @@ void GameSetup::loadWorld()
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         bool prev_val = UserConfigParams::m_random_arena_item;
         UserConfigParams::m_random_arena_item = m_reverse;

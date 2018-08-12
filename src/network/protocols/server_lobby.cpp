@@ -158,7 +158,7 @@ void ServerLobby::setup()
             }
             break;
         }
-        case RaceManager::MINOR_MODE_3_STRIKES:
+        case RaceManager::MINOR_MODE_BATTLE:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())

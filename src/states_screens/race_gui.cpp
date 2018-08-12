@@ -85,7 +85,7 @@ RaceGUI::RaceGUI()
     m_negative_timer_additional_width = area.Width;
 
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
+        race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE     ||
         race_manager->getNumLaps() > 9)
         m_lap_width = font->getDimension(L"99/99").Width;
     else

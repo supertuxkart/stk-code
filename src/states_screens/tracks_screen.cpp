@@ -256,7 +256,8 @@ void TracksScreen::init()
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+            race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setVisible(false);
@@ -265,6 +266,14 @@ void TracksScreen::init()
             getWidget<LabelWidget>("reverse-text")->setText(_("Random item location"), false);
             m_reversed->setVisible(true);
             m_reversed->setState(UserConfigParams::m_random_arena_item);
+        }
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+            race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        {
+            getWidget("lap-text")->setVisible(false);
+            m_laps->setVisible(false);
+            getWidget("reverse-text")->setVisible(false);
+            m_reversed->setVisible(false);
         }
         else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
@@ -422,7 +431,7 @@ void TracksScreen::voteForPlayer()
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_BATTLE &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
         m_reverse_checked = m_reversed->getState();
     else

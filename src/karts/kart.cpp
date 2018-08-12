@@ -971,7 +971,7 @@ void Kart::finishedRace(float time, bool from_server)
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE   ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL    ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES     ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE     ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER        ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
     {
@@ -1026,7 +1026,7 @@ void Kart::setRaceResult()
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-             race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+             race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         // the kart wins if it isn't eliminated
         m_race_result = !this->isEliminated();

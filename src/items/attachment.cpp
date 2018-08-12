@@ -35,7 +35,6 @@
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -343,7 +342,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         ExplosionAnimation::create(m_kart);

@@ -56,7 +56,7 @@ EndController::EndController(AbstractKart *kart,
              : AIBaseLapController(kart)
 {
     m_previous_controller = prev_controller;
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         // Overwrite the random selected default path from AIBaseLapController
@@ -131,7 +131,7 @@ void EndController::reset()
 
     m_track_node       = Graph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         DriveGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
@@ -184,7 +184,7 @@ void EndController::update(int ticks)
     AIBaseLapController::update(ticks);
 
     // In case of battle mode: don't do anything
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {

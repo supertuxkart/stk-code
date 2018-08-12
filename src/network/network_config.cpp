@@ -90,7 +90,7 @@ void NetworkConfig::setServerMode(RaceManager::MinorRaceModeType minor,
         else if (minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             m_server_mode = 2;
     }
-    else
+    else if (major == RaceManager::MAJOR_MODE_SINGLE)
     {
         if (minor == RaceManager::MINOR_MODE_NORMAL_RACE)
             m_server_mode = 3;
@@ -98,10 +98,16 @@ void NetworkConfig::setServerMode(RaceManager::MinorRaceModeType minor,
             m_server_mode = 4;
         else if (minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             m_server_mode = 5;
-        else if (minor == RaceManager::MINOR_MODE_3_STRIKES)
-            m_server_mode = 6;
         else if (minor == RaceManager::MINOR_MODE_SOCCER)
-            m_server_mode = 7;
+            m_server_mode = 6;
+    }
+    else if (major == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        m_server_mode = 7;
+    }
+    else
+    {
+        m_server_mode = 8;
     }
 }   // setServerMode
 
@@ -130,11 +136,14 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
             return { RaceManager::MINOR_MODE_FOLLOW_LEADER,
                 RaceManager::MAJOR_MODE_SINGLE };
         case 6:
-            return { RaceManager::MINOR_MODE_3_STRIKES,
-                RaceManager::MAJOR_MODE_SINGLE };
-        case 7:
             return { RaceManager::MINOR_MODE_SOCCER,
                 RaceManager::MAJOR_MODE_SINGLE };
+        case 7:
+            return { RaceManager::MINOR_MODE_BATTLE,
+                RaceManager::MAJOR_MODE_FREE_FOR_ALL };
+        case 8:
+            return { RaceManager::MINOR_MODE_BATTLE,
+                RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG };
         default:
             break;
     }
@@ -177,9 +186,13 @@ core::stringw NetworkConfig::getModeName(unsigned id)
         case 4:
             return _("Time Trial");
         case 6:
-            return _("3 Strikes Battle");
-        case 7:
             return _("Soccer");
+        case 7:
+            // I18n: Free for all means a deathmatch game with battle mode in
+            // networking
+            return _("Free For All");
+        case 8:
+            return _("Capture The Flag");
         default:
             return L"";
     }

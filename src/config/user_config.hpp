@@ -739,7 +739,27 @@ namespace UserConfigParams
         &m_network_group, "Only auto start kart selection when number of "
         "connected player is larger than max player * this value, for "
         "owner less or ranked server, after start-game-counter."));
-
+    PARAM_PREFIX FloatUserConfigParam m_flag_return_timemout
+        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "flag-return-timemout",
+        &m_network_group, "Time in seconds when a flag is dropped a by player in CTF "
+        "returning to its own base."));
+    PARAM_PREFIX FloatUserConfigParam m_hit_limit_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(5.0f, "hit-limit-threshold",
+        &m_network_group, "Value used to calculate hit limit in free for all, which "
+        "is min(number of players * hit-limit-threshold, 40), negative value to disable hit limit."));
+    PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ffa
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "time-limit-threshold-ffa",
+        &m_network_group, "Value used to calculate time limit in free for all, which "
+        "is max(number of players * time-limit-threshold-ffa, 2.0) * 60, negative value to disable time limit."));
+    PARAM_PREFIX FloatUserConfigParam m_capture_limit_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(0.5f, "capture-limit-threshold",
+        &m_network_group, "Value used to calculate capture limit in CTF, which "
+        "is max(2.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
+    PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ctf
+        PARAM_DEFAULT(FloatUserConfigParam(0.9f, "time-limit-threshold-ctf",
+        &m_network_group, "Value used to calculate time limit in CTF, which "
+        "is max(2.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0," 
+        " negative value to disable time limit."));
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
             "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
