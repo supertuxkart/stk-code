@@ -219,7 +219,7 @@ private:
     double scalingValueForTime(double time);
     void checkRaceFinished();
     void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
-
+    std::pair<int, float> getHitCaptureLimit(float num_karts);
 public:
              ServerLobby();
     virtual ~ServerLobby();

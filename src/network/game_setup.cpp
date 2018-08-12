@@ -100,8 +100,14 @@ void GameSetup::loadWorld()
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
+        const bool is_ctf = race_manager->getMajorMode() ==
+            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
         bool prev_val = UserConfigParams::m_random_arena_item;
-        UserConfigParams::m_random_arena_item = m_reverse;
+        if (is_ctf)
+            UserConfigParams::m_random_arena_item = false;
+        else
+            UserConfigParams::m_random_arena_item = m_reverse;
+
         race_manager->setReverseTrack(false);
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
@@ -109,6 +115,11 @@ void GameSetup::loadWorld()
                 race_manager->setMaxGoal(m_laps);
             else
                 race_manager->setTimeTarget((float)m_laps * 60.0f);
+        }
+        else
+        {
+            race_manager->setHitCaptureTime(m_hit_capture_limit,
+                m_battle_time_limit);
         }
         race_manager->startSingleRace(m_tracks.back(), -1,
             false/*from_overworld*/);

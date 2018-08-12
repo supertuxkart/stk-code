@@ -239,6 +239,12 @@ void ClientLobby::addAllPlayers(Event* event)
     }
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+    {
+        int hit_capture_limit = data.getUInt32();
+        float time_limit = data.getFloat();
+        m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
+    }
     configRemoteKart(players);
     loadWorld();
     // Switch to assign mode in case a player hasn't chosen any karts

@@ -574,7 +574,8 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
             if(kart==kart_hit && Track::getCurrentTrack()->isArena())
             {
-                world->kartHit(kart->getWorldKartId());
+                world->kartHit(kart->getWorldKartId(),
+                    m_owner->getWorldKartId());
             }
         }
     }

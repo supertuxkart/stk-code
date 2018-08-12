@@ -32,10 +32,12 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/free_for_all.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/standard_race.hpp"
@@ -523,7 +525,14 @@ void RaceManager::startNextRace()
     else if(m_minor_mode==MINOR_MODE_TUTORIAL)
         World::setWorld(new TutorialWorld());
     else if(m_minor_mode==MINOR_MODE_BATTLE)
-        World::setWorld(new ThreeStrikesBattle());
+    {
+        if (m_major_mode == MAJOR_MODE_3_STRIKES)
+            World::setWorld(new ThreeStrikesBattle());
+        else if (m_major_mode == MAJOR_MODE_FREE_FOR_ALL)
+            World::setWorld(new FreeForAll());
+        else if (m_major_mode == MAJOR_MODE_CAPTURE_THE_FLAG)
+            World::setWorld(new CaptureTheFlag());
+    }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());
     else if(m_minor_mode==MINOR_MODE_OVERWORLD)
@@ -919,7 +928,8 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     if (num_laps != -1) setNumLaps( num_laps );
 
-    setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    if (m_minor_mode != MINOR_MODE_BATTLE)
+        setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
 

@@ -42,9 +42,9 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
+#include "modes/free_for_all.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
-#include "modes/world_with_rank.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -523,6 +523,7 @@ void RaceResultGUI::backToLobby()
         m_width_kart_name = 0;
         float max_finish_time = 0;
 
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         for (unsigned int position = first_position;
         position <= race_manager->getNumberOfKarts() - sta; position++)
         {
@@ -542,6 +543,13 @@ void RaceResultGUI::backToLobby()
                 race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
+            }
+            else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL ||
+                race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+            {
+                assert(ffa);
+                ri->m_finish_time_string =
+                    StringUtils::toWString(ffa->getKartScore(kart->getWorldKartId()));
             }
             else
             {

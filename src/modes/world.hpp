@@ -268,7 +268,7 @@ public:
     virtual void newLap(unsigned int kart_index) {}
     // ------------------------------------------------------------------------
     /** Called when a kart was hit by a projectile. */
-    virtual void kartHit(const unsigned int kart_id) {};
+    virtual void kartHit(int kart_id, int hitter = -1) {};
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) {};
 

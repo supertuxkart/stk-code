@@ -54,6 +54,10 @@ private:
 
     int m_extra_server_info;
 
+    int m_hit_capture_limit;
+
+    float m_battle_time_limit;
+
 public:
     // ------------------------------------------------------------------------
     GameSetup()
@@ -114,6 +118,8 @@ public:
             m_tracks.clear();
         m_laps = 0;
         m_reverse = false;
+        m_hit_capture_limit = 0;
+        m_battle_time_limit = 0.0f;
     }
     // ------------------------------------------------------------------------
     void setGrandPrixTrack(int tracks_no)  { m_extra_server_info = tracks_no; }
@@ -159,6 +165,12 @@ public:
     void sortPlayersForGrandPrix();
     // ------------------------------------------------------------------------
     void sortPlayersForSoccer();
+    // ------------------------------------------------------------------------
+    void setHitCaptureTime(int hc, float time)
+    {
+        m_hit_capture_limit = hc;
+        m_battle_time_limit = time;
+    }
 
 };
 

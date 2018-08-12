@@ -250,7 +250,8 @@ void ServerLobby::handleChat(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::changeTeam(Event* event)
 {
-    if (!NetworkConfig::get()->hasTeamChoosing())
+    if (!NetworkConfig::get()->hasTeamChoosing() ||
+        !race_manager->teamEnabled())
         return;
     if (!checkDataSize(event, 1)) return;
     NetworkString& data = event->data();
@@ -508,6 +509,12 @@ void ServerLobby::asynchronousUpdate()
             uint32_t random_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(random_seed);
             load_world->addUInt32(random_seed);
+            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+            {
+                auto hcl = getHitCaptureLimit((float)players.size());
+                load_world->addUInt32(hcl.first).addFloat(hcl.second);
+                m_game_setup->setHitCaptureTime(hcl.first, hcl.second);
+            }
             configRemoteKart(players);
 
             // Reset for next state usage
@@ -798,11 +805,12 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    if (NetworkConfig::get()->hasTeamChoosing())
+    auto players = m_game_setup->getConnectedPlayers();
+    const unsigned player_count = players.size();
+    if (NetworkConfig::get()->hasTeamChoosing() && race_manager->teamEnabled())
     {
         int red_count = 0;
         int blue_count = 0;
-        auto players = m_game_setup->getConnectedPlayers();
         for (auto& player : players)
         {
             if (player->getTeam() == SOCCER_TEAM_RED)
@@ -812,7 +820,7 @@ void ServerLobby::startSelection(const Event *event)
             if (red_count != 0 && blue_count != 0)
                 break;
         }
-        if ((red_count == 0 || blue_count == 0) && players.size() != 1)
+        if ((red_count == 0 || blue_count == 0) && player_count != 1)
         {
             Log::warn("ServerLobby", "Bad team choosing.");
             NetworkString* bt = getNetworkString();
@@ -854,6 +862,22 @@ void ServerLobby::startSelection(const Event *event)
     for (const std::string& track_erase : tracks_erase)
     {
         m_available_kts.second.erase(track_erase);
+    }
+
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        auto it = m_available_kts.second.begin();
+        while (it != m_available_kts.second.end())
+        {
+            Track* t =  track_manager->getTrack(*it);
+            if (t->getMaxArenaPlayers() < player_count)
+            {
+                it = m_available_kts.second.erase(it);
+            }
+            else
+                it++;
+        }
     }
 
     const auto& all_k = m_available_kts.first;
@@ -1508,7 +1532,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
             per_player_difficulty, (uint8_t)i, SOCCER_TEAM_NONE);
-        if (NetworkConfig::get()->hasTeamChoosing())
+        if (NetworkConfig::get()->hasTeamChoosing() &&
+            race_manager->teamEnabled())
             player->setTeam((SoccerTeam)(peer->getHostId() % 2));
         peer->addPlayer(player);
     }
@@ -1570,7 +1595,7 @@ void ServerLobby::updatePlayerList(bool force_update)
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
         if (NetworkConfig::get()->hasTeamChoosing() &&
-            race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+            race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(SOCCER_TEAM_NONE);
@@ -1806,6 +1831,47 @@ std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
         tracks_rate > 0.5f && laps_rate > 0.5f && reverses_rate > 0.5f ?
         true : false);
 }   // handleVote
+
+// ----------------------------------------------------------------------------
+std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
+{
+    // Read user_config.hpp for formula
+    int hit_capture_limit = std::numeric_limits<int>::max();
+    float time_limit = 0.0f;
+    if (race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        if (UserConfigParams::m_capture_limit_threshold > 0.0f)
+        {
+            float val = fmaxf(2.0f, num_karts *
+                UserConfigParams::m_capture_limit_threshold);
+            hit_capture_limit = (int)val;
+        }
+        if (UserConfigParams::m_time_limit_threshold_ctf > 0.0f)
+        {
+            time_limit = fmaxf(2.0f, num_karts *
+                (UserConfigParams::m_time_limit_threshold_ctf +
+                UserConfigParams::m_flag_return_timemout / 60.f) * 60.0f);
+        }
+    }
+    else
+    {
+        if (UserConfigParams::m_hit_limit_threshold > 0.0f)
+        {
+            float val = fminf(num_karts *
+                UserConfigParams::m_hit_limit_threshold, 40.0f);
+            hit_capture_limit = (int)val;
+            if (hit_capture_limit == 0)
+                hit_capture_limit = 1;
+        }
+        if (UserConfigParams::m_time_limit_threshold_ffa > 0.0f)
+        {
+            time_limit = fmaxf(num_karts *
+                UserConfigParams::m_time_limit_threshold_ffa, 2.0f) * 60.0f;
+        }
+    }
+    return std::make_pair(hit_capture_limit, time_limit);
+}   // getHitCaptureLimit
 
 // ----------------------------------------------------------------------------
 /** Called from the RaceManager of the server when the world is loaded. Marks

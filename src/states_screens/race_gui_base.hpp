@@ -66,6 +66,8 @@ public:
 
         /** Current lap of this kart, or -1 if irrelevant. */
         int lap;
+
+        bool m_outlined_font = false;
     };   // KartIconDisplayInfo
 
 private:

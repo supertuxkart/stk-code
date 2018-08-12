@@ -1,6 +1,8 @@
 ## SuperTuxKart 0.9.4
+* Networking game for normal race, time trial, free for all, capture the flag and soccer
 * Better random item distribution for various numbers of karts
 * Improved powerup handling in AI
+* New tracks Las Dunas Soccer by samuncle
 
 ## SuperTuxKart 0.9.3
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau

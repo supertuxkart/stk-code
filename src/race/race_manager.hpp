@@ -849,6 +849,12 @@ public:
     }
     // ------------------------------------------------------------------------
     int getHitCaptureLimit() const              { return m_hit_capture_limit; }
+    // ------------------------------------------------------------------------
+    bool teamEnabled() const
+    {
+        return m_minor_mode == MINOR_MODE_SOCCER ||
+            m_major_mode == MAJOR_MODE_CAPTURE_THE_FLAG;
+    }
 
 };   // RaceManager
 

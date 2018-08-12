@@ -111,7 +111,7 @@ public:
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void kartHit(const unsigned int kart_id) OVERRIDE;
+    virtual void kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------

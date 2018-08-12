@@ -377,7 +377,8 @@ void Swatter::squashThingsAround()
     if (m_closest_kart->isSquashed())
     {
         // The kart may not be squashed if it was protected by a bubblegum shield
-        World::getWorld()->kartHit(m_closest_kart->getWorldKartId());
+        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
+            m_kart->getWorldKartId());
     }
 
     // TODO: squash items
