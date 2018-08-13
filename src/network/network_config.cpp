@@ -190,7 +190,7 @@ core::stringw NetworkConfig::getModeName(unsigned id)
         case 7:
             // I18n: Free for all means a deathmatch game with battle mode in
             // networking
-            return _("Free For All");
+            return _("Free-For-All");
         case 8:
             return _("Capture The Flag");
         default:

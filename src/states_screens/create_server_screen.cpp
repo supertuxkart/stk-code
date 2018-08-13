@@ -174,7 +174,7 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             m_more_options_spinner->setVisible(true);
             m_more_options_spinner->clearLabels();
             //I18N: In the create server screen for battle server
-            m_more_options_spinner->addLabel(_("Free For All"));
+            m_more_options_spinner->addLabel(_("Free-For-All"));
             //I18N: In the create server screen for battle server
             m_more_options_spinner->addLabel(_("Capture The Flag"));
             m_more_options_spinner->setValue(m_prev_value);
