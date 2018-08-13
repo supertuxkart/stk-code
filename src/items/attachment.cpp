@@ -308,7 +308,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     if (m_type == new_type || m_type == ATTACH_NOTHING)
     {
         setTicksLeft(ticks_left);
-        if (m_type != new_type)
+        if (m_type != new_type && new_type != ATTACH_SWATTER)
             m_type = new_type;
         return;
     }
