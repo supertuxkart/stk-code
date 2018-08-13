@@ -689,6 +689,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_kart_height = size.getY();
     m_kart_length = size.getZ();
 
+    // TODO: Client and server get slightly different sizes, which
+    // affets the physics (size determines inertia, which is used
+    // in steering). So by rounding to three decimals we get
+    // more consistent physics results.
+    m_kart_width  = int(m_kart_width  * 1000) / 1000.0f;
+    m_kart_height = int(m_kart_height * 1000) / 1000.0f;
+    m_kart_length = int(m_kart_length * 1000) / 1000.0f;
+
     // Now set default some default parameters (if not defined) that
     // depend on the size of the kart model (wheel position, center
     // of gravity shift)
