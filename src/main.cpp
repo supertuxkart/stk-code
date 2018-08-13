@@ -1802,6 +1802,22 @@ void askForInternetPermission()
 #endif
 
 // ----------------------------------------------------------------------------
+#ifdef ANDROID
+extern "C"
+{
+#endif
+void main_abort()
+{
+    if (main_loop)
+    {
+        main_loop->abort();
+    }
+}
+#ifdef ANDROID
+}
+#endif
+
+// ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
     CommandLine::init(argc, argv);
@@ -1810,8 +1826,7 @@ int main(int argc, char *argv[] )
 #ifndef WIN32
     signal(SIGTERM, [](int signum)
         {
-            if (main_loop)
-                main_loop->abort();
+            main_abort();
         });
 #endif
     srand(( unsigned ) time( 0 ));

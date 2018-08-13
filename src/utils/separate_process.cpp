@@ -34,6 +34,11 @@
 #  include <errno.h>
 #endif
 
+#ifdef ANDROID
+#include <dlfcn.h>
+#include <fstream>
+#endif
+
 // ----------------------------------------------------------------------------
 std::string SeparateProcess::getCurrentExecutableLocation()
 {
@@ -62,6 +67,11 @@ std::string SeparateProcess::getCurrentExecutableLocation()
 SeparateProcess::SeparateProcess(const std::string& exe,
                                  const std::string& argument, bool create_pipe)
 {
+#ifdef ANDROID
+    m_child_handle = NULL;
+    m_child_abort_proc = NULL;
+#endif
+
     if (!createChildProcess(exe, argument, create_pipe))
     {
         Log::fatal("SeparateProcess", "Failed to run %s %s",
@@ -74,7 +84,7 @@ SeparateProcess::SeparateProcess(const std::string& exe,
 SeparateProcess::~SeparateProcess()
 {
     bool dead = false;
-#ifdef WIN32
+#if defined(WIN32)
     std::string class_name = "separate_process";
     class_name += StringUtils::toString(m_child_pid);
     HWND hwnd = FindWindowEx(HWND_MESSAGE, NULL, &class_name[0], NULL);
@@ -96,6 +106,26 @@ SeparateProcess::~SeparateProcess()
     }
     if (CloseHandle(m_child_handle) == 0)
         Log::warn("SeparateProcess", "Failed to close child process handle.");
+        
+#elif defined(ANDROID)
+
+    if (m_child_handle != NULL)
+    {
+        Log::info("SeparateProcess", "Closing child process");
+        m_child_abort_proc();
+        StkTime::sleep(1000);
+        
+        if (m_child_thread.joinable())
+        {
+            Log::info("SeparateProcess", "Wait for closing");
+            m_child_thread.join();
+        }
+        
+        dlclose(m_child_handle);
+        m_child_handle = NULL;
+        m_child_abort_proc = NULL;
+    }
+
 #else
     if (m_child_stdin_write != -1 && m_child_stdout_read != -1)
     {
@@ -128,7 +158,7 @@ SeparateProcess::~SeparateProcess()
  *  and sets up communication via pipes.
  *  \return True if the child process creation was successful.
  */
-#ifdef WIN32
+#if defined(WIN32)
 bool SeparateProcess::createChildProcess(const std::string& exe,
                                          const std::string& argument,
                                          bool create_pipe)
@@ -222,6 +252,111 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
 
     return true;
 }   // createChildProcess - windows version
+
+#elif defined(ANDROID)
+
+bool SeparateProcess::createChildProcess(const std::string& exe,
+                                         const std::string& argument,
+                                         bool create_pipe)
+{
+    if (create_pipe)
+    {
+        Log::error("SeparateProcess", "Error: create_pipe is not supported.");
+        return false;
+    }
+    
+    if (m_child_handle != NULL)
+    {
+        Log::error("SeparateProcess", "Error: Child process is already started");
+        return false;
+    }
+    
+    const std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+    const std::string main_path = data_path + "/lib/libmain.so";
+    const std::string child_path = data_path + "/files/libchildprocess.so";
+    
+    if (access(main_path.c_str(), R_OK) != 0)
+    {
+        Log::error("SeparateProcess", "Error: Cannot read libmain.so");
+        return false;
+    }
+    
+    if (access(child_path.c_str(), R_OK) != 0)
+    {
+        std::ifstream src(main_path, std::ios::binary);
+        
+        if (!src.good())
+        {
+            Log::error("SeparateProcess", "Error: Cannot open libmain.so");
+            return false;
+        }
+        
+        std::ofstream dst(child_path, std::ios::binary);
+        
+        if (!dst.good())
+        {
+            Log::error("SeparateProcess", "Error: Cannot copy libmain.so");
+            return false;
+        }
+    
+        dst << src.rdbuf();
+    }
+    
+    if (access(child_path.c_str(), R_OK) != 0)
+    {
+        Log::error("SeparateProcess", "Error: Cannot read libchildprocess.so");
+        return false;
+    }
+    
+    m_child_handle = dlopen(child_path.c_str(), RTLD_NOW);
+    
+    if (m_child_handle == NULL)
+    {
+        Log::error("SeparateProcess", "Error: Cannot dlopen libchildprocess.so");
+        return false;
+    }
+
+    typedef void (*main_proc_t)(int, char**);
+    main_proc_t main_proc = (main_proc_t)dlsym(m_child_handle, "main");
+    
+    if (main_proc == NULL)
+    {
+        Log::error("SeparateProcess", "Error: Cannot get handle to main()");
+        dlclose(m_child_handle);
+        m_child_handle = NULL;
+        return false;
+    }
+    
+    m_child_abort_proc = (void(*)())dlsym(m_child_handle, "main_abort");
+    
+    if (m_child_abort_proc == NULL)
+    {
+        Log::error("SeparateProcess", "Error: Cannot get handle to main_abort()");
+        dlclose(m_child_handle);
+        m_child_handle = NULL;
+        return false;
+    }
+    
+    const std::string exe_file = StringUtils::getBasename(exe);
+    auto rest_argv = StringUtils::split(argument, ' ');
+    std::string parent_pid = "--parent-process=";
+    parent_pid += StringUtils::toString(getpid());
+    
+    std::vector<char*> argv;
+    argv.push_back(const_cast<char*>(exe_file.c_str()));
+    
+    for (unsigned i = 0; i < rest_argv.size(); i++)
+    {
+        argv.push_back(const_cast<char*>(rest_argv[i].c_str()));
+    }
+
+    argv.push_back(const_cast<char*>(parent_pid.c_str()));
+    
+    Log::info("SeparateProcess", "Starting main()");
+    std::thread child_process(main_proc, argv.size(), &argv[0]);
+    
+    return true;
+}
 
 #else    // linux and osx
 
@@ -339,7 +474,7 @@ std::string SeparateProcess::getLine()
 #define BUFSIZE 1024
     char buffer[BUFSIZE];
 
-#ifdef WIN32
+#if defined(WIN32)
     DWORD bytes_read;
     // Read from pipe that is the standard output for child process.
     bool success = ReadFile(m_child_stdout_read, buffer, BUFSIZE-1,
@@ -350,6 +485,8 @@ std::string SeparateProcess::getLine()
         std::string s = buffer;
         return s;
     }
+#elif defined(ANDROID)
+    return "";
 #else
     //std::string s;
     //std::getline(std::cin, s);
@@ -372,13 +509,15 @@ std::string SeparateProcess::getLine()
  */
 std::string SeparateProcess::sendCommand(const std::string &command)
 {
-#ifdef WIN32
+#if defined(WIN32)
     // Write to the pipe that is the standard input for a child process.
     // Data is written to the pipe's buffers, so it is not necessary to wait
     // until the child process is running before writing data.
     DWORD bytes_written;
     bool success = WriteFile(m_child_stdin_write, command.c_str(),
         unsigned(command.size()) + 1, &bytes_written, NULL) != 0;
+#elif defined(ANDROID)
+
 #else
     write(m_child_stdin_write, (command+"\n").c_str(), command.size()+1);
 #endif

@@ -24,11 +24,12 @@
 
 #include <assert.h>
 #include <string>
+#include <thread>
 
 class SeparateProcess
 {
 private:
-#ifdef WIN32
+#if defined(WIN32)
     // Various handles for the window pipes
     HANDLE m_child_stdin_read;
     HANDLE m_child_stdin_write;
@@ -36,6 +37,10 @@ private:
     HANDLE m_child_stdout_write;
     HANDLE m_child_handle;
     DWORD m_child_pid;
+#elif defined(ANDROID)
+    void* m_child_handle;
+    void (*m_child_abort_proc)();
+    std::thread m_child_thread;
 #else
     int m_child_stdin_write = -1;
     int m_child_stdout_read = -1;
