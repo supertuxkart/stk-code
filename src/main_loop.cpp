@@ -21,8 +21,10 @@
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -339,6 +341,19 @@ void MainLoop::run()
             STKHost::get()->shutdown();
             // In case the user opened a race pause dialog
             GUIEngine::ModalDialog::dismiss();
+
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
+            {
+                // Flush all command before delete world, avoid later access
+                SP::SPTextureManager::get()
+                    ->checkForGLCommand(true/*before_scene*/);
+                // Reset screen in case the minimap was drawn
+                glViewport(0, 0, irr_driver->getActualScreenSize().Width,
+                    irr_driver->getActualScreenSize().Height);
+            }
+#endif
+
             if (World::getWorld())
             {
                 race_manager->clearNetworkGrandPrixResult();

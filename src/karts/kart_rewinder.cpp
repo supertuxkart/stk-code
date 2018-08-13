@@ -21,6 +21,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/abstract_kart_animation.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
@@ -78,11 +79,14 @@ void KartRewinder::saveTransform()
 // ----------------------------------------------------------------------------
 void KartRewinder::computeError()
 {
-    if (!getKartAnimation())
+    AbstractKartAnimation* ka = getKartAnimation();
+    if (ka == NULL)
     {
         Moveable::checkSmoothing();
         m_skidding->checkSmoothing();
     }
+    else
+        ka->checkNetworkAnimationCreationSucceed();
 
     float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
     if (diff > 0.05f)
@@ -110,14 +114,37 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     const int MEMSIZE = 17*sizeof(float) + 9+3;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
-    const btRigidBody *body = getBody();
 
-    // 1) Physics values: transform and velocities
+    // 1) Firing and related handling
+    // -----------
+    buffer->addUInt16(m_bubblegum_ticks);
+    buffer->addUInt16(m_view_blocked_by_plunger);
+    // m_invulnerable_ticks will not be negative
+    AbstractKartAnimation* ka = getKartAnimation();
+    bool has_animation = ka != NULL && ka->useEarlyEndTransform();
+    uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
+        (has_animation ? 1 << 14 : 0) | m_invulnerable_ticks;
+    buffer->addUInt16(fire_and_invulnerable);
+
+    // 2) Kart animation status (tells the end transformation) or
+    // physics values (transform and velocities)
     // -------------------------------------------
-    const btTransform &t = body->getWorldTransform();
-    buffer->add(t.getOrigin());
-    btQuaternion q = t.getRotation();
-    buffer->add(q);
+    btRigidBody *body = getBody();
+    if (has_animation)
+    {
+        const btTransform& trans = ka->getEndTransform();
+        buffer->add(trans.getOrigin());
+        btQuaternion quat = trans.getRotation();
+        buffer->add(quat);
+    }
+    else
+    {
+        const btTransform &t = body->getWorldTransform();
+        buffer->add(t.getOrigin());
+        btQuaternion q = t.getRotation();
+        buffer->add(q);
+    }
+
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
     buffer->addFloat(m_vehicle->getMinSpeed());
@@ -130,33 +157,24 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->addFloat(m_vehicle->getCentralImpulseTime());
     buffer->add(m_vehicle->getAdditionalImpulse());
 
-    // 2) Steering and other player controls
+    // 3) Steering and other player controls
     // -------------------------------------
     getControls().saveState(buffer);
     getController()->saveState(buffer);
 
-    // 3) Attachment, powerup, nitro
+    // 4) Attachment, powerup, nitro
     // -----------------------------
     getAttachment()->saveState(buffer);
     getPowerup()->saveState(buffer);
     buffer->addFloat(getEnergy());
 
-    // 4) Max speed info
+    // 5) Max speed info
     // ------------------
     m_max_speed->saveState(buffer);
 
-    // 5) Skidding
+    // 6) Skidding
     // -----------
     m_skidding->saveState(buffer);
-
-    // 6) Firing and related handling
-    // -----------
-    buffer->addUInt16(m_bubblegum_ticks);
-    buffer->addUInt16(m_view_blocked_by_plunger);
-    // m_invulnerable_ticks will not be negative
-    uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
-        m_invulnerable_ticks;
-    buffer->addUInt16(fire_and_invulnerable);
 
     return buffer;
 }   // saveState
@@ -169,19 +187,36 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
  */
 void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 {
-    // 1) Physics values: transform and velocities
-    // -------------------------------------------
+
+    // 1) Firing and related handling
+    // -----------
+    m_bubblegum_ticks = buffer->getUInt16();
+    m_view_blocked_by_plunger = buffer->getUInt16();
+    uint16_t fire_and_invulnerable = buffer->getUInt16();
+    m_fire_clicked = ((fire_and_invulnerable >> 15) & 1) == 1;
+    bool has_animation = ((fire_and_invulnerable >> 14) & 1) == 1;
+    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 14);
+
+    // 2) Kart animation status or transform and velocities
+    // -----------
     btTransform t;
     t.setOrigin(buffer->getVec3());
     t.setRotation(buffer->getQuat());
-    btRigidBody *body = getBody();
     Vec3 lv = buffer->getVec3();
     Vec3 av = buffer->getVec3();
+
+    if (has_animation)
+    {
+        AbstractKartAnimation* ka = getKartAnimation();
+        if (ka)
+            ka->setEndTransform(t);
+    }
 
     // Don't restore to phyics position if showing kart animation
     if (!getKartAnimation())
     {
         // Clear any forces applied (like by plunger or bubble gum torque)
+        btRigidBody *body = getBody();
         body->clearForces();
         body->setLinearVelocity(lv);
         body->setAngularVelocity(av);
@@ -213,12 +248,12 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // (i.e. different terrain --> different slowdown).
     m_vehicle->updateAllWheelTransformsWS();
 
-    // 2) Steering and other controls
+    // 3) Steering and other controls
     // ------------------------------
     getControls().rewindTo(buffer);
     getController()->rewindTo(buffer);
 
-    // 3) Attachment, powerup, nitro
+    // 4) Attachment, powerup, nitro
     // ------------------------------
     getAttachment()->rewindTo(buffer);
     // Required for going back to anvil when rewinding
@@ -228,21 +263,14 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     float nitro = buffer->getFloat();
     setEnergy(nitro);
 
-    // 4) Max speed info
+    // 5) Max speed info
     // ------------------
     m_max_speed->rewindTo(buffer);
 
-    // 5) Skidding
+    // 6) Skidding
     // -----------
     m_skidding->rewindTo(buffer);
 
-    // 6) Firing and related handling
-    // -----------
-    m_bubblegum_ticks = buffer->getUInt16();
-    m_view_blocked_by_plunger = buffer->getUInt16();
-    uint16_t fire_and_invulnerable = buffer->getUInt16();
-    m_fire_clicked = (fire_and_invulnerable >> 15) == 1;
-    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 15);
 }   // restoreState
 
 // ----------------------------------------------------------------------------
@@ -265,6 +293,7 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     bool has_started = m_has_started;
     int brake_ticks = m_brake_ticks;
     int8_t min_nitro_ticks = m_min_nitro_ticks;
+    float bubblegum_torque = m_bubblegum_torque;
 
     // Attachment local state
     float initial_speed = getAttachment()->getInitialSpeed();
@@ -288,13 +317,14 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     // Skidding local state
     float remaining_jump_time = m_skidding->m_remaining_jump_time;
 
-    return [has_started, brake_ticks, min_nitro_ticks,
+    return [has_started, brake_ticks, min_nitro_ticks, bubblegum_torque,
         initial_speed, steer_val_l, steer_val_r, current_fraction,
         max_speed_fraction, remaining_jump_time, this]()
     {
         m_has_started = has_started;
         m_brake_ticks = brake_ticks;
         m_min_nitro_ticks = min_nitro_ticks;
+        m_bubblegum_torque = bubblegum_torque;
         getAttachment()->setInitialSpeed(initial_speed);
         PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
         if (pc)

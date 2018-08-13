@@ -50,8 +50,8 @@ protected:
 	/*0.75 means that for 3 quaters of the animation it'll be on track*/
     const float rescue_moment = 0.6F;
     /* Has the kart been moved onto the track */
-    bool kart_on_track = false;
-    
+    bool m_kart_on_track = false;
+
     /** The referee during a rescue operation. */
     Referee      *m_referee;
 

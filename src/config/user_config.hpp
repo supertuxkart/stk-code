@@ -680,10 +680,6 @@ namespace UserConfigParams
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
-    /** How many seconds worth of data the circular profile buffer
-     *  can store. */
-    PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
-
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
@@ -727,7 +723,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
         &m_network_group, "Timeout in seconds for validation of clients."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(8, "server_max_players",
+        PARAM_DEFAULT(IntUserConfigParam(8, "server-max-players",
         &m_network_group, "Maximum number of players on the server."));
     PARAM_PREFIX BoolUserConfigParam m_firewalled_server
         PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
@@ -743,13 +739,42 @@ namespace UserConfigParams
         &m_network_group, "Only auto start kart selection when number of "
         "connected player is larger than max player * this value, for "
         "owner less or ranked server, after start-game-counter."));
-
+    PARAM_PREFIX FloatUserConfigParam m_flag_return_timemout
+        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "flag-return-timemout",
+        &m_network_group, "Time in seconds when a flag is dropped a by player in CTF "
+        "returning to its own base."));
+    PARAM_PREFIX FloatUserConfigParam m_hit_limit_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(5.0f, "hit-limit-threshold",
+        &m_network_group, "Value used to calculate hit limit in free for all, which "
+        "is min(number of players * hit-limit-threshold, 40), negative value to disable hit limit."));
+    PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ffa
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "time-limit-threshold-ffa",
+        &m_network_group, "Value used to calculate time limit in free for all, which "
+        "is max(number of players * time-limit-threshold-ffa, 2.0) * 60, negative value to disable time limit."));
+    PARAM_PREFIX FloatUserConfigParam m_capture_limit_threshold
+        PARAM_DEFAULT(FloatUserConfigParam(0.5f, "capture-limit-threshold",
+        &m_network_group, "Value used to calculate capture limit in CTF, which "
+        "is max(2.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
+    PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ctf
+        PARAM_DEFAULT(FloatUserConfigParam(0.9f, "time-limit-threshold-ctf",
+        &m_network_group, "Value used to calculate time limit in CTF, which "
+        "is max(2.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0," 
+        " negative value to disable time limit."));
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
             "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
             "from this IP will be banned.",
             { { "0.0.0.0", 0u } }
         ));
+    PARAM_PREFIX IntUserConfigParam m_max_ping
+        PARAM_DEFAULT(IntUserConfigParam(300, "max-ping",
+        &m_network_group, "Maximum ping allowed for a player (in ms)."));
+    PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
+        &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
+    PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
+        PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
+        &m_network_group, "Kick players whose ping is above max-ping."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

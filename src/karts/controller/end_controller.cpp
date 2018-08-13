@@ -56,7 +56,7 @@ EndController::EndController(AbstractKart *kart,
              : AIBaseLapController(kart)
 {
     m_previous_controller = prev_controller;
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         // Overwrite the random selected default path from AIBaseLapController
@@ -104,7 +104,6 @@ EndController::EndController(AbstractKart *kart,
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
 
     // Set the name of the previous controller as this controller name, otherwise
     // we get the incorrect name when printing statistics in profile mode.
@@ -132,7 +131,7 @@ void EndController::reset()
 
     m_track_node       = Graph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         DriveGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
@@ -185,7 +184,7 @@ void EndController::update(int ticks)
     AIBaseLapController::update(ticks);
 
     // In case of battle mode: don't do anything
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
@@ -195,6 +194,9 @@ void EndController::update(int ticks)
         m_controls->setBrake(m_kart->getSpeed()>0);
         return;
     }
+    // Keep update slow down in case for network rewind overwrite it
+    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.3f, 2);
+
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
     calcSteps();

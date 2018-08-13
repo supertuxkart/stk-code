@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//  Copyright (C) 2018 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,43 +15,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PROGRESS_BAR_ANDROID_HPP
-#define HEADER_PROGRESS_BAR_ANDROID_HPP
+#ifndef CAPTURE_THE_FLAG_HPP
+#define CAPTURE_THE_FLAG_HPP
 
-#ifdef ANDROID
+#include "modes/free_for_all.hpp"
 
-#include "IrrlichtDevice.h"
-#include "graphics/gl_headers.hpp"
+#include <vector>
+#include <string>
 
-class ProgressBarAndroid
+class CaptureTheFlag : public FreeForAll
 {
 private:
-#ifndef SERVER_ONLY
-    GLuint m_program;
-    GLuint m_vertex_shader;
-    GLuint m_fragment_shader;
-    GLint m_position;
-    GLint m_progress;
-    GLuint m_vbo;
-#endif
-
-    irr::IrrlichtDevice* m_device;
-    bool m_initialized;
-    bool m_close_event_received;
-
-    bool compileShaders();
-    void deleteShaders();
-    void init();
-    void close();
-
 public:
-    ProgressBarAndroid();
-    ~ProgressBarAndroid();
-
-    void draw(float value);
-    bool closeEventReceived() {return m_close_event_received;}
-};
-
-#endif
+    // ------------------------------------------------------------------------
+    CaptureTheFlag();
+    // ------------------------------------------------------------------------
+    virtual ~CaptureTheFlag();
+};   // CaptureTheFlag
 
 #endif

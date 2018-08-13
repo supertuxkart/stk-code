@@ -159,6 +159,9 @@ void CheckCannon::update(float dt)
     for (unsigned int i = 0; i < m_all_flyables.size(); i++)
     {
         setIgnoreHeight(true);
+        if (m_all_flyables[i]->hasUndoneDestruction() ||
+            RewindManager::get()->isRewinding())
+            continue;
         bool triggered = isTriggered(m_flyable_previous_position[i],
                                      m_all_flyables[i]->getXYZ(),
                                      /*kart index - ignore*/ -1     );
@@ -167,13 +170,10 @@ void CheckCannon::update(float dt)
         if(!triggered) continue;
 
         // Cross the checkline - add the cannon animation
-        if (!RewindManager::get()->isRewinding())
-        {
-            CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
-                m_curve->clone(), getLeftPoint(), getRightPoint(),
-                m_target_left, m_target_right);
-            m_all_flyables[i]->setAnimation(animation);
-        }
+        CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
+            m_curve->clone(), getLeftPoint(), getRightPoint(),
+            m_target_left, m_target_right);
+        m_all_flyables[i]->setAnimation(animation);
     }   // for i in all flyables
 }   // update
 // ----------------------------------------------------------------------------

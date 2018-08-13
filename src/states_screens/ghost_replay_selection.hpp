@@ -54,7 +54,6 @@ private:
     bool                       m_same_difficulty;
     bool                       m_same_version;
     bool                       m_best_times;
-    bool                       m_sort_desc;
     bool                       m_is_comparing;
     bool                       m_active_mode_is_linear;
     RaceManager::MinorRaceModeType m_active_mode;
@@ -62,6 +61,7 @@ private:
     // Using the UID guarantees exact matchess
     uint64_t                   m_replay_to_compare_uid;
 
+    void defaultSort();
 
 public:
 
@@ -89,7 +89,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void onColumnClicked(int columnId) OVERRIDE;
+    virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) OVERRIDE;
 
     virtual void init() OVERRIDE;
 

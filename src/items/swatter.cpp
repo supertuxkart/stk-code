@@ -40,6 +40,8 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
 #define SWAT_ANGLE_MIN  45
@@ -56,14 +58,15 @@
  *         attachment scene node).
  */
 Swatter::Swatter(AbstractKart *kart, bool was_bomb,
-                 scene::ISceneNode* bomb_scene_node)
-       : AttachmentPlugin(kart)
+                 scene::ISceneNode* bomb_scene_node, int ticks)
+       : AttachmentPlugin(kart),
+         m_swatter_start_ticks(World::getWorld()->getTicksSinceStart()),
+         m_swatter_end_ticks(World::getWorld()->getTicksSinceStart() + ticks)
 {
     m_animation_phase  = SWATTER_AIMING;
     m_discard_now      = false;
     m_target           = NULL;
     m_closest_kart     = NULL;
-
     m_bomb_scene_node  = bomb_scene_node;
     m_swat_bomb_frame  = 0.0f;
 
@@ -162,12 +165,16 @@ void Swatter::updateGrahpics(float dt)
  */
 bool Swatter::updateAndTestFinished(int ticks)
 {
+    const int ticks_start = World::getWorld()->getTicksSinceStart();
     if (m_removed_bomb_ticks != std::numeric_limits<int>::max())
     {
-        if (World::getWorld()->getTicksSinceStart() >= m_removed_bomb_ticks)
+        if (ticks_start >= m_removed_bomb_ticks)
             return true;
         return false;
     }   // if removing bomb
+
+    if (RewindManager::get()->isRewinding())
+        return false;
 
     if (!m_discard_now)
     {
@@ -175,6 +182,12 @@ bool Swatter::updateAndTestFinished(int ticks)
         {
         case SWATTER_AIMING:
             {
+                // Avoid swatter near the start and the end lifetime of swatter
+                // to make sure all clients know the existence of swatter each other
+                if (ticks_start - m_swatter_start_ticks < 60 ||
+                    m_swatter_end_ticks - ticks_start < 60)
+                    return false;
+
                 chooseTarget();
                 pointToTarget();
                 if(!m_target || !m_closest_kart) break;
@@ -198,8 +211,7 @@ bool Swatter::updateAndTestFinished(int ticks)
                 {
                     // Start squashing
                     m_animation_phase = SWATTER_TO_TARGET;
-                    m_start_swat_ticks =
-                        World::getWorld()->getTicksSinceStart() + 20;
+                    m_start_swat_ticks = ticks_start + 20;
                     // Setup the animation
                     m_scene_node->setCurrentFrame(0.0f);
                     m_scene_node->setLoopMode(false);
@@ -207,14 +219,8 @@ bool Swatter::updateAndTestFinished(int ticks)
 
 #ifndef SERVER_ONLY
                     // Play swat sound
-                    const int wt = World::getWorld()->getTicksSinceStart();
-                    auto it = m_swat_sound_ticks.find(wt);
-                    if (it == m_swat_sound_ticks.end())
-                    {
-                        m_swat_sound->setPosition(swatter_pos);
-                        m_swat_sound->play();
-                        m_swat_sound_ticks.insert(wt);
-                    }
+                    m_swat_sound->setPosition(swatter_pos);
+                    m_swat_sound->play();
 #endif
                 }
             }
@@ -223,17 +229,16 @@ bool Swatter::updateAndTestFinished(int ticks)
             {
                 pointToTarget();
                 // Did we just finish the first part of the movement?
-                if (World::getWorld()->getTicksSinceStart() > m_start_swat_ticks)
+                if (ticks_start > m_start_swat_ticks)
                 {
                     m_start_swat_ticks = std::numeric_limits<int>::max();
                     // Squash the karts and items around and
                     // change the current phase
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
-                    const int end_ticks =
-                        World::getWorld()->getTicksSinceStart() + 60;
+                    const int end_ticks = ticks_start + 60;
                     if (race_manager
-                        ->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+                        ->getMinorMode()==RaceManager::MINOR_MODE_BATTLE ||
                         race_manager
                         ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
                     {
@@ -253,9 +258,9 @@ bool Swatter::updateAndTestFinished(int ticks)
 
     if (m_discard_now)
     {
-        return World::getWorld()->getTicksSinceStart() > m_end_swat_ticks;
+        return ticks_start > m_end_swat_ticks;
     }
-    else if (World::getWorld()->getTicksSinceStart() > m_end_swat_ticks)
+    else if (ticks_start > m_end_swat_ticks)
     {
         m_animation_phase = SWATTER_AIMING;
         m_end_swat_ticks = std::numeric_limits<int>::max();
@@ -335,8 +340,23 @@ void Swatter::squashThingsAround()
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
-    m_closest_kart->setSquash(kp->getSwatterSquashDuration(),
-        kp->getSwatterSquashSlowdown());
+    AbstractKart* closest_kart = m_closest_kart;
+    float duration = kp->getSwatterSquashDuration();
+    float slowdown =  kp->getSwatterSquashSlowdown();
+    closest_kart->setSquash(duration, slowdown);
+
+    // Locally add a event to replay the squash during rewind
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        RewindManager::get()->addRewindInfoEventFunction(new
+            RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
+            /*undo_function*/[](){},
+            /*replay_function*/[closest_kart, duration, slowdown]()
+            {
+                closest_kart->setSquash(duration, slowdown);
+            }));
+    }
 
     // Handle achievement if the swatter is used by the current player
     if (m_kart->getController()->canGetAchievements())
@@ -357,7 +377,8 @@ void Swatter::squashThingsAround()
     if (m_closest_kart->isSquashed())
     {
         // The kart may not be squashed if it was protected by a bubblegum shield
-        World::getWorld()->kartHit(m_closest_kart->getWorldKartId());
+        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
+            m_kart->getWorldKartId());
     }
 
     // TODO: squash items

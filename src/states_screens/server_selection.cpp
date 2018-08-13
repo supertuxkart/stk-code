@@ -120,7 +120,7 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
-    m_sort_desc = true;
+    m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
     refresh(true);
 }   // init
@@ -200,10 +200,18 @@ void ServerSelection::loadList(unsigned sort_case)
 /** Change the sort order if a column was clicked.
  *  \param column_id ID of the column that was clicked.
  */
-void ServerSelection::onColumnClicked(int column_id)
+void ServerSelection::onColumnClicked(int column_id, bool sort_desc, bool sort_default)
 {
-    m_sort_desc = !m_sort_desc;
-    loadList(column_id);
+    if (sort_default)
+    {
+        m_sort_desc = false;
+        loadList(/* distance */ 5);
+    }
+    else
+    {
+        m_sort_desc = sort_desc;
+        loadList(column_id);
+    }
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
@@ -308,5 +316,5 @@ void ServerSelection::copyFromServersManager()
         {
             return a->isPasswordProtected() != m_private_server->getState();
         }), m_servers.end());
-    loadList(0);
+    loadList(/* distance */ 5);
 }   // copyFromServersManager

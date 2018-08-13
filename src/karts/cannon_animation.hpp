@@ -80,6 +80,7 @@ public:
                              const Vec3 &end_left, const Vec3 &end_right);
              virtual ~CannonAnimation();
     virtual void  update(float dt);
-
+    // ------------------------------------------------------------------------
+    virtual bool useEarlyEndTransform() const { return false; }
 };   // CannonAnimation
 #endif

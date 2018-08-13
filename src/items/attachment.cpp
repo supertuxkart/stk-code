@@ -35,7 +35,6 @@
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -47,7 +46,6 @@
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(AbstractKart* kart)
-          : EventRewinder()
 {
     m_type                 = ATTACH_NOTHING;
     m_ticks_left           = 0;
@@ -148,7 +146,7 @@ void Attachment::set(AttachmentType type, int ticks,
             m_node->setMesh(attachment_manager->getMesh(ATTACH_NOLOKS_SWATTER));
         else
             m_node->setMesh(attachment_manager->getMesh(type));
-        m_plugin = new Swatter(m_kart, was_bomb, bomb_scene_node);
+        m_plugin = new Swatter(m_kart, was_bomb, bomb_scene_node, ticks);
         break;
     case ATTACH_BOMB:
         m_node->setMesh(attachment_manager->getMesh(type));
@@ -208,17 +206,6 @@ void Attachment::set(AttachmentType type, int ticks,
         }
     }
     m_node->setVisible(true);
-#ifndef SERVER_ONLY
-    // Save event about the new attachment
-    RewindManager *rwm = RewindManager::get();
-    if(rwm->isEnabled() && !rwm->isRewinding())
-    {
-        // FIXME!!!! For now commented out
-        //BareNetworkString *buffer = new BareNetworkString(2);
-        //saveState(buffer);
-        //rwm->addEvent(this, buffer, /*confirmed*/true);
-    }
-#endif
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -311,7 +298,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     }
 
     // If playing kart animation, don't rewind to any attacment
-    if (is_removing_bomb)
+    if (is_removing_bomb || m_kart->getKartAnimation())
         return;
 
     // Attaching an object can be expensive (loading new models, ...)
@@ -330,16 +317,6 @@ void Attachment::rewindTo(BareNetworkString *buffer)
         new_type == ATTACH_SWATTER && !is_removing_bomb
         /*disable_swatter_animation*/);
 }   // rewindTo
-
-// -----------------------------------------------------------------------------
-/** Called when going forwards in time during a rewind. 
- *  \param buffer Buffer with the rewind information.
- */
-void Attachment::rewind(BareNetworkString *buffer)
-{
-    // Event has same info as a state, so re-use the restore function
-    rewindTo(buffer);
-}   // rewind
 
 // -----------------------------------------------------------------------------
 /** Selects the new attachment. In order to simplify synchronisation with the
@@ -365,7 +342,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         ExplosionAnimation::create(m_kart);

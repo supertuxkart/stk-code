@@ -158,7 +158,7 @@ void ServerLobby::setup()
             }
             break;
         }
-        case RaceManager::MINOR_MODE_3_STRIKES:
+        case RaceManager::MINOR_MODE_BATTLE:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())
@@ -199,7 +199,8 @@ void ServerLobby::setup()
     // the server are ready:
     resetPeersReady();
     m_peers_votes.clear();
-    m_server_delay = 0.0;
+    m_server_delay = std::numeric_limits<double>::max();
+    m_server_max_ping = std::numeric_limits<double>::max();
     m_timeout.store(std::numeric_limits<float>::max());
     m_waiting_for_reset = false;
 
@@ -249,7 +250,8 @@ void ServerLobby::handleChat(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::changeTeam(Event* event)
 {
-    if (!NetworkConfig::get()->hasTeamChoosing())
+    if (!NetworkConfig::get()->hasTeamChoosing() ||
+        !race_manager->teamEnabled())
         return;
     if (!checkDataSize(event, 1)) return;
     NetworkString& data = event->data();
@@ -428,12 +430,34 @@ void ServerLobby::asynchronousUpdate()
         // Reset for next state usage
         resetPeersReady();
         signalRaceStartToClients();
+        m_server_max_ping = StkTime::getRealTime() +
+            ((double)UserConfigParams::m_max_ping / 1000.0);
         break;
     }
     case WAIT_FOR_RACE_STARTED:
-        // The function startedRaceOnClient() will trigger the
-        // next state.
+    {
+        const bool ping_timed_out =
+            m_server_max_ping < StkTime::getRealTime();
+        if (checkPeersReady() || ping_timed_out)
+        {
+            for (auto p : m_peers_ready)
+            {
+                auto cur_peer = p.first.lock();
+                if (!cur_peer)
+                    continue;
+                if (ping_timed_out && p.second.second > m_server_max_ping)
+                    sendBadConnectionMessageToPeer(cur_peer);
+            }
+            m_state = DELAY_SERVER;
+            const double jt =
+                (double)UserConfigParams::m_jitter_tolerance / 1000.0;
+            m_server_delay = StkTime::getRealTime() + jt;
+            Log::verbose("ServerLobby",
+                "Started delay at %lf to %lf with jitter tolerance %lf.",
+                StkTime::getRealTime(), m_server_delay, jt);
+        }
         break;
+    }
     case DELAY_SERVER:
         if (m_server_delay < StkTime::getRealTime())
         {
@@ -485,6 +509,12 @@ void ServerLobby::asynchronousUpdate()
             uint32_t random_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(random_seed);
             load_world->addUInt32(random_seed);
+            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+            {
+                auto hcl = getHitCaptureLimit((float)players.size());
+                load_world->addUInt32(hcl.first).addFloat(hcl.second);
+                m_game_setup->setHitCaptureTime(hcl.first, hcl.second);
+            }
             configRemoteKart(players);
 
             // Reset for next state usage
@@ -500,6 +530,20 @@ void ServerLobby::asynchronousUpdate()
     }
 
 }   // asynchronousUpdate
+
+//-----------------------------------------------------------------------------
+void ServerLobby::sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p)
+{
+    const unsigned max_ping = UserConfigParams::m_max_ping;
+    Log::warn("ServerLobby", "Peer %s cannot catch up with max ping %d, it"
+        " started at %lf.", p->getAddress().toString().c_str(), max_ping,
+        StkTime::getRealTime());
+    NetworkString* msg = getNetworkString();
+    msg->setSynchronous(true);
+    msg->addUInt8(LE_BAD_CONNECTION);
+    p->sendPacket(msg, /*reliable*/true);
+    delete msg;
+}   // sendBadConnectionMessageToPeer
 
 //-----------------------------------------------------------------------------
 /** Simple finite state machine.  Once this
@@ -761,11 +805,12 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    if (NetworkConfig::get()->hasTeamChoosing())
+    auto players = m_game_setup->getConnectedPlayers();
+    const unsigned player_count = players.size();
+    if (NetworkConfig::get()->hasTeamChoosing() && race_manager->teamEnabled())
     {
         int red_count = 0;
         int blue_count = 0;
-        auto players = m_game_setup->getConnectedPlayers();
         for (auto& player : players)
         {
             if (player->getTeam() == SOCCER_TEAM_RED)
@@ -775,10 +820,11 @@ void ServerLobby::startSelection(const Event *event)
             if (red_count != 0 && blue_count != 0)
                 break;
         }
-        if ((red_count == 0 || blue_count == 0) && players.size() != 1)
+        if ((red_count == 0 || blue_count == 0) && player_count != 1)
         {
             Log::warn("ServerLobby", "Bad team choosing.");
             NetworkString* bt = getNetworkString();
+            bt->setSynchronous(true);
             bt->addUInt8(LE_BAD_TEAM);
             sendMessageToPeers(bt, true/*reliable*/);
             delete bt;
@@ -816,6 +862,22 @@ void ServerLobby::startSelection(const Event *event)
     for (const std::string& track_erase : tracks_erase)
     {
         m_available_kts.second.erase(track_erase);
+    }
+
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        auto it = m_available_kts.second.begin();
+        while (it != m_available_kts.second.end())
+        {
+            Track* t =  track_manager->getTrack(*it);
+            if (t->getMaxArenaPlayers() < player_count)
+            {
+                it = m_available_kts.second.erase(it);
+            }
+            else
+                it++;
+        }
     }
 
     const auto& all_k = m_available_kts.first;
@@ -1215,6 +1277,7 @@ void ServerLobby::clientDisconnected(Event* event)
         return;
 
     NetworkString* msg = getNetworkString(2);
+    msg->setSynchronous(true);
     msg->addUInt8(LE_PLAYER_DISCONNECTED);
     msg->addUInt8((uint8_t)players_on_peer.size());
     for (auto p : players_on_peer)
@@ -1263,6 +1326,7 @@ void ServerLobby::connectionRequested(Event* event)
         m_game_setup->isGrandPrixStarted())
     {
         NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
         // send only to the peer that made the request and disconect it now
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
@@ -1273,11 +1337,12 @@ void ServerLobby::connectionRequested(Event* event)
     }
 
     // Check server version
-    int version = data.getUInt8();
+    int version = data.getUInt32();
     if (version < stk_config->m_min_server_version ||
         version > stk_config->m_max_server_version)
     {
         NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCOMPATIBLE_DATA);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
@@ -1325,6 +1390,7 @@ void ServerLobby::connectionRequested(Event* event)
         tracks_erase.size() == m_available_kts.second.size())
     {
         NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED)
             .addUInt8(RR_INCOMPATIBLE_DATA);
         peer->cleanPlayerProfiles();
@@ -1359,6 +1425,7 @@ void ServerLobby::connectionRequested(Event* event)
     if (is_banned)
     {
         NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
         peer->cleanPlayerProfiles();
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
@@ -1372,6 +1439,7 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkConfig::get()->getMaxPlayers())
     {
         NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_TOO_MANY_PLAYERS);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
@@ -1392,6 +1460,7 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkConfig::get()->isRankedServer()))
     {
         NetworkString* message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_INVALID_PLAYER);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
@@ -1427,6 +1496,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     if (password != NetworkConfig::get()->getPassword())
     {
         NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCORRECT_PASSWORD);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
@@ -1441,6 +1511,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         NetworkConfig::get()->isRankedServer())
     {
         NetworkString* message = getNetworkString(2);
+        message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_INVALID_PLAYER);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
@@ -1461,7 +1532,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
             per_player_difficulty, (uint8_t)i, SOCCER_TEAM_NONE);
-        if (NetworkConfig::get()->hasTeamChoosing())
+        if (NetworkConfig::get()->hasTeamChoosing() &&
+            race_manager->teamEnabled())
             player->setTeam((SoccerTeam)(peer->getHostId() % 2));
         peer->addPlayer(player);
     }
@@ -1481,6 +1553,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     // connection success -- return the host id of peer
     float auto_start_timer = m_timeout.load();
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
+        .addUInt32(NetworkConfig::m_server_version)
         .addFloat(auto_start_timer == std::numeric_limits<float>::max() ?
         auto_start_timer : auto_start_timer - (float)StkTime::getRealTime());
     peer->sendPacket(message_ack);
@@ -1522,7 +1595,7 @@ void ServerLobby::updatePlayerList(bool force_update)
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
         if (NetworkConfig::get()->hasTeamChoosing() &&
-            race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+            race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(SOCCER_TEAM_NONE);
@@ -1564,6 +1637,7 @@ void ServerLobby::updateServerOwner()
     if (owner)
     {
         NetworkString* ns = getNetworkString();
+        ns->setSynchronous(true);
         ns->addUInt8(LE_SERVER_OWNERSHIP);
         owner->sendPacket(ns);
         delete ns;
@@ -1641,6 +1715,7 @@ void ServerLobby::playerVote(Event* event)
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
     std::string name = StringUtils::wideToUtf8(event->getPeer()
         ->getPlayerProfiles()[0]->getName());
+    other.setSynchronous(true);
     other.addUInt8(LE_VOTE).addFloat(UserConfigParams::m_voting_timeout)
         .encodeString(name).addUInt32(event->getPeer()->getHostId());
     other += data;
@@ -1758,6 +1833,47 @@ std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
 }   // handleVote
 
 // ----------------------------------------------------------------------------
+std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
+{
+    // Read user_config.hpp for formula
+    int hit_capture_limit = std::numeric_limits<int>::max();
+    float time_limit = 0.0f;
+    if (race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        if (UserConfigParams::m_capture_limit_threshold > 0.0f)
+        {
+            float val = fmaxf(2.0f, num_karts *
+                UserConfigParams::m_capture_limit_threshold);
+            hit_capture_limit = (int)val;
+        }
+        if (UserConfigParams::m_time_limit_threshold_ctf > 0.0f)
+        {
+            time_limit = fmaxf(2.0f, num_karts *
+                (UserConfigParams::m_time_limit_threshold_ctf +
+                UserConfigParams::m_flag_return_timemout / 60.f) * 60.0f);
+        }
+    }
+    else
+    {
+        if (UserConfigParams::m_hit_limit_threshold > 0.0f)
+        {
+            float val = fminf(num_karts *
+                UserConfigParams::m_hit_limit_threshold, 40.0f);
+            hit_capture_limit = (int)val;
+            if (hit_capture_limit == 0)
+                hit_capture_limit = 1;
+        }
+        if (UserConfigParams::m_time_limit_threshold_ffa > 0.0f)
+        {
+            time_limit = fmaxf(num_karts *
+                UserConfigParams::m_time_limit_threshold_ffa, 2.0f) * 60.0f;
+        }
+    }
+    return std::make_pair(hit_capture_limit, time_limit);
+}   // getHitCaptureLimit
+
+// ----------------------------------------------------------------------------
 /** Called from the RaceManager of the server when the world is loaded. Marks
  *  the server to be ready to start the race.
  */
@@ -1782,53 +1898,22 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 /** Called when a notification from a client is received that the client has
  *  started the race. Once all clients have informed the server that they 
  *  have started the race, the server can start. This makes sure that the
- *  server's local time is behind all clients by (at least) their latency,
+ *  server's local time is behind all clients by at most max ping,
  *  which in turn means that when the server simulates local time T all
  *  messages from clients at their local time T should have arrived at
  *  the server, which creates smoother play experience.
  */
 void ServerLobby::startedRaceOnClient(Event *event)
 {
+    if (m_state.load() != WAIT_FOR_RACE_STARTED)
+    {
+        sendBadConnectionMessageToPeer(event->getPeerSP());
+        return;
+    }
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
-    Log::info("ServerLobby", "Peer %d has started race at %lf",
-        peer->getHostId(), StkTime::getRealTime());
-
-    if (checkPeersReady())
-    {
-        std::vector<std::pair<STKPeer*, double> > mapping;
-        for (auto p : m_peers_ready)
-        {
-            auto peer = p.first.lock();
-            if (!peer)
-                continue;
-            mapping.emplace_back(peer.get(), p.second.second);
-        }
-        std::sort(mapping.begin(), mapping.end(),
-            [](const std::pair<STKPeer*, double>& a,
-            const std::pair<STKPeer*, double>& b)->bool
-            {
-                return a.second > b.second;
-            });
-        for (unsigned i = 0; i < mapping.size(); i++)
-        {
-            // Server delay is 0.1, so it's around 12 ticks
-            // (0.1 * 120 (physics fps)) for the highest ping client
-            if (i == 0)
-                GameProtocol::lock()->addInitialTicks(mapping[0].first, 12);
-            else
-            {
-                const double diff = mapping[0].second - mapping[i].second;
-                assert(diff >= 0.0);
-                GameProtocol::lock()->addInitialTicks(mapping[i].first,
-                    12 + stk_config->time2Ticks((float)diff));
-            }
-        }
-        m_state = DELAY_SERVER;
-        m_server_delay = StkTime::getRealTime() + 0.1;
-        Log::verbose("ServerLobby", "Started delay at %lf set delay to %lf",
-            StkTime::getRealTime(), m_server_delay);
-    }
+    Log::info("ServerLobby", "Peer %s has started race at %lf",
+        peer->getAddress().toString().c_str(), StkTime::getRealTime());
 }   // startedRaceOnClient
 
 //-----------------------------------------------------------------------------

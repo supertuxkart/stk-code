@@ -312,9 +312,7 @@ void World::reset()
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
-
-    //Reset the Rubber Ball Collect Time to some negative value.
-    powerup_manager->setBallCollectTicks(-100);
+    m_unfair_team = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -428,7 +426,7 @@ Controller* World::loadAIController(AbstractKart* kart)
     Controller *controller;
     int turn=0;
 
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE)
         turn=1;
     else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;

@@ -24,8 +24,11 @@
 #include "utils/cpp2011.hpp"
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <set>
+
+enum PeerDisconnectInfo : unsigned int;
 
 class BareNetworkString;
 class Server;
@@ -46,6 +49,7 @@ private:
     void handleChat(Event* event);
     void handleServerInfo(Event* event);
     void handleBadTeam();
+    void handleBadConnection();
     void becomingServerOwner();
 
     void clearPlayers();
@@ -78,6 +82,8 @@ private:
     void addAllPlayers(Event* event);
     void finalizeConnectionRequest(NetworkString* header,
                                    BareNetworkString* rest, bool encrypt);
+
+    std::map<PeerDisconnectInfo, irr::core::stringw> m_disconnected_msg;
 
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);

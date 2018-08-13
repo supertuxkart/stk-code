@@ -14,7 +14,8 @@ public:
         GE_KART_FINISHED_RACE = 1,
         GE_PLAYER_DISCONNECT = 2,
         GE_RESET_BALL = 3,
-        GE_PLAYER_GOAL = 4
+        GE_PLAYER_GOAL = 4,
+        GE_BATTLE_KART_SCORE = 5
     };   // GameEventType
 private:
     void eliminatePlayer(const NetworkString &ns);

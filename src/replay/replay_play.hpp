@@ -20,6 +20,7 @@
 #define HEADER_REPLAY__PLAY_HPP
 
 #include "replay/replay_base.hpp"
+#include "tracks/track.hpp"
 
 #include "irrString.h"
 #include <algorithm>
@@ -57,6 +58,7 @@ public:
     public:
         std::string                m_filename;
         std::string                m_track_name;
+        Track*                     m_track;
         std::string                m_minor_mode;
         core::stringw              m_stk_version;
         core::stringw              m_user_name;
@@ -76,7 +78,7 @@ public:
             switch (m_sort_order)
             {
                 case SO_TRACK:
-                    return m_track_name < r.m_track_name;
+                    return m_track->getSortName() < r.m_track->getSortName();
                     break;
                 case SO_KART_NUM:
                     return m_kart_list.size() < r.m_kart_list.size();
@@ -133,8 +135,8 @@ public:
     // ------------------------------------------------------------------------
     void               sortReplay(bool reverse)
     {
-        (reverse ? std::sort(m_replay_file_list.rbegin(),
-            m_replay_file_list.rend()) : std::sort(m_replay_file_list.begin(),
+        (reverse ? std::stable_sort(m_replay_file_list.rbegin(),
+            m_replay_file_list.rend()) : std::stable_sort(m_replay_file_list.begin(),
             m_replay_file_list.end()));
     }
     // ------------------------------------------------------------------------

@@ -386,7 +386,7 @@ void DriveGraph::setDefaultStartPositions(AlignedArray<btTransform>
     // the main driveline.
     int current_node = getNode(getStartNode())->getPredecessor(0);
 
-    float distance_from_start = 0.1f+forwards_distance;
+    float distance_from_start = 0.75f+forwards_distance;
 
     // Maximum distance to left (or right) of centre line
     const float max_x_dist    = 0.5f*(karts_per_row-0.5f)*sidewards_distance;

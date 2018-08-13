@@ -25,6 +25,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widget.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/state_manager.hpp"
 
 #include <irrlicht.h>
@@ -90,7 +91,8 @@ Screen::~Screen()
  */
 void Screen::init()
 {
-    if(m_pause_race && World::getWorld())
+    if (m_pause_race && World::getWorld() &&
+        !NetworkConfig::get()->isNetworking())
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
 }   // init
 
@@ -111,7 +113,8 @@ void Screen::push()
  */
 void Screen::tearDown()
 {
-    if(m_pause_race && World::getWorld())
+    if (m_pause_race && World::getWorld() &&
+        !NetworkConfig::get()->isNetworking())
         World::getWorld()->scheduleUnpause();
 }   // tearDown
 

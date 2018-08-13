@@ -1,6 +1,7 @@
 #include "network/protocols/game_events_protocol.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "modes/free_for_all.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
@@ -44,6 +45,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         return true;
     }
     uint8_t type = data.getUInt8();
+    FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     switch (type)
     {
@@ -63,6 +65,13 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         if (!sw)
             throw std::invalid_argument("No soccer world");
         sw->handlePlayerGoalFromServer(data);
+        break;
+    }
+    case GE_BATTLE_KART_SCORE:
+    {
+        if (!ffa)
+            throw std::invalid_argument("No free for all world");
+        ffa->setKartScoreFromServer(data);
         break;
     }
     default:

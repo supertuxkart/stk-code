@@ -108,6 +108,8 @@ protected:
 
     bool        m_stop_music_when_dialog_open;
 
+    bool        m_unfair_team;
+
     /** Whether highscores should be used for this kind of race.
      *  True by default, change to false in a child class to disable.
     */
@@ -266,7 +268,7 @@ public:
     virtual void newLap(unsigned int kart_index) {}
     // ------------------------------------------------------------------------
     /** Called when a kart was hit by a projectile. */
-    virtual void kartHit(const unsigned int kart_id) {};
+    virtual void kartHit(int kart_id, int hitter = -1) {};
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) {};
 
@@ -327,7 +329,11 @@ public:
     virtual void loadCustomModels() {}
     // ------------------------------------------------------------------------
     void eliminateKart(int kart_number, bool notify_of_elimination = true);
-
+    // ------------------------------------------------------------------------
+    void setUnfairTeam(bool val)                       { m_unfair_team = val; }
+    // ------------------------------------------------------------------------
+    virtual bool hasTeam() const                              { return false; }
+    // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
 

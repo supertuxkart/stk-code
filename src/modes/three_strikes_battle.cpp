@@ -207,8 +207,9 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 //-----------------------------------------------------------------------------
 /** Called when a kart is hit.
  *  \param kart_id The world kart id of the kart that was hit.
+ *  \param hitter The world kart id of the kart who hit(-1 if none).
  */
-void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
+void ThreeStrikesBattle::kartHit(int kart_id, int hitter)
 {
     if (isRaceOver()) return;
 
@@ -221,7 +222,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         return;
     }
 
-    assert(kart_id < m_karts.size());
+    assert(kart_id < (int)m_karts.size());
     // make kart lose a life, ignore if in profiling mode
     if (!UserConfigParams::m_arena_ai_stats)
         m_kart_info[kart_id].m_lives--;
@@ -256,7 +257,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         {
             AbstractKart * const kart = getKart(i);
             if(kart->isEliminated() || kart->hasFinishedRace() ||
-                kart->getWorldKartId()==kart_id) continue;
+                kart->getWorldKartId()==(unsigned)kart_id) continue;
             if(m_kart_info[i].m_lives > max_lives)
             {
                 leader = kart;
@@ -270,7 +271,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
             for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {
                 Camera *camera = Camera::getCamera(i);
-                if(camera->getKart()->getWorldKartId()==kart_id)
+                if(camera->getKart()->getWorldKartId()==(unsigned)kart_id)
                 {
                     camera->setMode(Camera::CM_NORMAL);
                     camera->setKart(leader);

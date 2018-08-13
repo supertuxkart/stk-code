@@ -46,6 +46,8 @@ CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 
 void CreateServerScreen::loadedFromFile()
 {
+    m_prev_mode = 0;
+    m_prev_value = 0;
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
  
@@ -105,8 +107,8 @@ void CreateServerScreen::init()
     // -- Game modes
     RibbonWidget* gamemode = getWidget<RibbonWidget>("gamemode");
     assert(gamemode != NULL);
-    gamemode->setSelection(0, PLAYER_ID_GAME_MASTER);
-    updateMoreOption(0);
+    gamemode->setSelection(m_prev_mode, PLAYER_ID_GAME_MASTER);
+    updateMoreOption(m_prev_mode);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -133,7 +135,9 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
     {
         const int selection =
             m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        m_prev_value = 0;
         updateMoreOption(selection);
+        m_prev_mode = selection;
     }
 
 }   // eventCallback
@@ -157,7 +161,23 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             {
                 m_more_options_spinner->addLabel(StringUtils::toWString(i));
             }
-            m_more_options_spinner->setValue(0);
+            m_more_options_spinner->setValue(m_prev_value);
+            break;
+        }
+        case 2:
+        {
+            m_more_options_text->setVisible(true);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen, show various battle mode available
+            m_more_options_text->setText(_("Battle mode"), false);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen for battle server
+            m_more_options_spinner->addLabel(_("Free-For-All"));
+            //I18N: In the create server screen for battle server
+            m_more_options_spinner->addLabel(_("Capture The Flag"));
+            m_more_options_spinner->setValue(m_prev_value);
             break;
         }
         case 3:
@@ -173,7 +193,7 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             m_more_options_spinner->addLabel(_("Time limit"));
             //I18N: In the create server screen for soccer server
             m_more_options_spinner->addLabel(_("Goals limit"));
-            m_more_options_spinner->setValue(0);
+            m_more_options_spinner->setValue(m_prev_value);
             break;
         }
         default:
@@ -195,9 +215,6 @@ void CreateServerScreen::onUpdate(float delta)
     if(!STKHost::existHost())
         return;
 
-    //FIXME If we really want a gui, we need to decide what else to do here
-    // For now start the (wrong i.e. client) lobby, to prevent to create
-    // a server more than once.
     NetworkingLobby::getInstance()->push();
 }   // onUpdate
 
@@ -315,20 +332,31 @@ void CreateServerScreen::createServer()
     if (m_more_options_spinner->isVisible())
     {
         int esi = m_more_options_spinner->getValue();
-        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER)
-            != 3/*is soccer*/)
-        {
-            // Grand prix track count
-            if (esi > 0)
-                server_cfg << " --network-gp=" << esi;
-        }
-        else
+        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
+            3/*is soccer*/)
         {
             if (esi == 0)
                 server_cfg << " --soccer-timed";
             else
                 server_cfg << " --soccer-goals";
         }
+        else if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
+            2/*is battle*/)
+        {
+            server_cfg << " --battle-mode=" << esi;
+        }
+        else
+        {
+            // Grand prix track count
+            if (esi > 0)
+                server_cfg << " --network-gp=" << esi;
+        }
+        m_prev_mode = gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        m_prev_value = esi;
+    }
+    else
+    {
+        m_prev_mode = m_prev_value = 0;
     }
 
     SeparateProcess* sp =

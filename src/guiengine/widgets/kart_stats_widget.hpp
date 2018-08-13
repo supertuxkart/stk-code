@@ -65,7 +65,8 @@ namespace GUIEngine
         {
             SKILL_MASS,
             SKILL_SPEED,
-            SKILL_POWER,
+            SKILL_ACCELERATION,
+            SKILL_NITRO_EFFICIENCY,
             SKILL_COUNT
         };
 

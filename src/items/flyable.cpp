@@ -574,7 +574,8 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
             if(kart==kart_hit && Track::getCurrentTrack()->isArena())
             {
-                world->kartHit(kart->getWorldKartId());
+                world->kartHit(kart->getWorldKartId(),
+                    m_owner->getWorldKartId());
             }
         }
     }
@@ -638,6 +639,7 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
         m_body->setAngularVelocity(av);
         m_body->setInterpolationLinearVelocity(lv);
         m_body->setInterpolationAngularVelocity(av);
+        setTrans(t);
     }
     uint16_t hit_and_ticks = buffer->getUInt16();
     m_has_hit_something = (hit_and_ticks >> 15) == 1;
@@ -700,6 +702,7 @@ void Flyable::hideNodeWhenUndoDestruction()
 #ifndef SERVER_ONLY
     m_node->setVisible(false);
 #endif
+    moveToInfinity();
 }   // hideNodeWhenUndoDestruction
 
 // ----------------------------------------------------------------------------
@@ -712,11 +715,6 @@ void Flyable::handleUndoDestruction()
 
     m_has_undone_destruction = true;
 
-    // If destroyed during rewind, than in theroy it should be safe to delete
-    // without undo
-    if (RewindManager::get()->isRewinding())
-        return;
-
     // We don't bother seeing the mesh during rewinding
     hideNodeWhenUndoDestruction();
     std::shared_ptr<Flyable> f = getShared<Flyable>();
@@ -728,9 +726,10 @@ void Flyable::handleUndoDestruction()
         {
             projectile_manager->addByUID(uid, f);
         },
-        /*replay_function*/[uid]()
+        /*replay_function*/[f, uid]()
         {
             projectile_manager->removeByUID(uid);
+            f->moveToInfinity();
         }));
 }   // handleUndoDestruction
 

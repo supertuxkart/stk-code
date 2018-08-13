@@ -1410,20 +1410,29 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
                             const bool pressed, bool focused)
 {
-    if (!widget->isVisible()) return;
+    if (!widget->isVisible() || widget->m_deactivated) return;
 
-    if (!widget->m_deactivated && pressed)
+    int areas = 0;
+    bool right;
+
+    if (widget->m_properties[PROP_ID] == "left")
     {
-        Widget* spinner = widget->m_event_handler;
-        int areas = 0;
+        areas = BoxRenderParams::LEFT;
+        right = false;
+    }
+    else if (widget->m_properties[PROP_ID] == "right")
+    {
+        areas = BoxRenderParams::RIGHT;
+        right = true;
+    }
+    else
+        return;
 
-        if (widget->m_properties[PROP_ID] == "left")
-            areas = BoxRenderParams::LEFT;
-        else if (widget->m_properties[PROP_ID] == "right")
-            areas = BoxRenderParams::RIGHT;
-        else
-            return;
+    SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
+    bool spinner_focused = spinner->isFocusedForPlayer(PLAYER_ID_GAME_MASTER);
 
+    if (pressed || (spinner->isRightButtonSelected() == right && spinner_focused))
+    {
         core::recti rect2(spinner->m_x, spinner->m_y,
                           spinner->m_x + spinner->m_w,
                           spinner->m_y + spinner->m_h  );
@@ -1434,7 +1443,7 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
                                       widget->m_deactivated);
     }
 
-}
+} // drawSpinnerChild
 
 // ----------------------------------------------------------------------------
 /**
@@ -1512,6 +1521,18 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
     }
 
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
+
+    if (icon_widget->hasTooltip() > 0)
+    {
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
 
     if (widget->m_type == WTYPE_MODEL_VIEW)
     {

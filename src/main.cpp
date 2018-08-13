@@ -612,6 +612,8 @@ void cmdLineHelp()
     "                          owner-less server.\n"
     "       --soccer-timed     Use time limit mode in network soccer game.\n"
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
+    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free For All and\n"
+    "                          1 is Capture The Flag.\n"
     "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
@@ -973,7 +975,7 @@ int handleCmdLine()
         if (!CommandLine::has("--track", &track))
             track = "temple";
         UserConfigParams::m_arena_ai_stats=true;
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
         std::vector<std::string> l;
         for (int i = 0; i < 8; i++)
             l.push_back("tux");
@@ -1029,7 +1031,7 @@ int handleCmdLine()
                 break;
         case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
                 break;
-        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
                 break;
         case 3: race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
                 break;
@@ -1263,6 +1265,8 @@ int handleCmdLine()
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    const bool is_battle =
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE;
     if (CommandLine::has("--soccer-timed") && is_soccer)
     {
         LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
@@ -1284,6 +1288,31 @@ int handleCmdLine()
         NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
             RaceManager::MAJOR_MODE_GRAND_PRIX);
     }
+    else if (CommandLine::has("--battle-mode", &n) && is_battle)
+    {
+        switch (n)
+        {
+        case 0:
+            NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_FREE_FOR_ALL);
+            race_manager->setMajorMode(RaceManager::MAJOR_MODE_FREE_FOR_ALL);
+            break;
+        case 1:
+            NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+            race_manager->setMajorMode(RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+            break;
+        default:
+            break;
+        }
+    }
+    else if (is_battle)
+    {
+        Log::warn("main", "Set to ffa for battle server");
+        NetworkConfig::get()->setServerMode(race_manager->getMinorMode(),
+            RaceManager::MAJOR_MODE_FREE_FOR_ALL);
+        race_manager->setMajorMode(RaceManager::MAJOR_MODE_FREE_FOR_ALL);
+    }
     else if (is_soccer)
     {
         Log::warn("main", "Set to goal target for soccer server");
@@ -1296,6 +1325,24 @@ int handleCmdLine()
     {
         NetworkConfig::get()->setServerMode(
             race_manager->getMinorMode(), RaceManager::MAJOR_MODE_SINGLE);
+    }
+
+    if (is_battle)
+    {
+        if (UserConfigParams::m_hit_limit_threshold < 0.0f &&
+            UserConfigParams::m_time_limit_threshold_ffa < 0.0f)
+        {
+            Log::warn("main", "Reset invalid hit and time limit settings");
+            UserConfigParams::m_hit_limit_threshold.revertToDefaults();
+            UserConfigParams::m_time_limit_threshold_ffa.revertToDefaults();
+        }
+        if (UserConfigParams::m_capture_limit_threshold < 0.0f &&
+            UserConfigParams::m_time_limit_threshold_ctf < 0.0f)
+        {
+            Log::warn("main", "Reset invalid Capture and time limit settings");
+            UserConfigParams::m_capture_limit_threshold.revertToDefaults();
+            UserConfigParams::m_time_limit_threshold_ctf.revertToDefaults();
+        }
     }
 
     // The extra server info has to be set before server lobby started
@@ -1394,7 +1441,7 @@ int handleCmdLine()
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
             race_manager->setNumKarts(1);
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
         }
         else if (t->isSoccer())
         {

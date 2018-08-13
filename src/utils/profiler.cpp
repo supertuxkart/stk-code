@@ -82,8 +82,10 @@ Profiler::Profiler()
     m_time_between_sync   = 0.0;
     m_freeze_state        = UNFROZEN;
 
-    m_max_frames          = int(  UserConfigParams::m_profiler_buffer_duration
-                                * UserConfigParams::m_max_fps                 );
+    // When initializing profile class during static initialization
+    // UserConfigParams::m_max_fps may not be properly initialized with default
+    // value, so we use hard-coded default value
+    m_max_frames          = 20 * 120;
     m_current_frame       = 0;
     m_has_wrapped_around  = false;
 

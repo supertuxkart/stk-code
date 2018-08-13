@@ -753,6 +753,20 @@ void STKHost::mainLoop()
                 {
                     m_peer_pings.getData()[p.second->getHostId()] =
                         p.second->getPing();
+                    const unsigned ap = p.second->getAveragePing();
+                    const unsigned max_ping = UserConfigParams::m_max_ping;
+                    if (UserConfigParams::m_kick_high_ping_players &&
+                        p.second->isValidated() && ap > max_ping)
+                    {
+                        Log::info("STKHost", "%s with ping %d is higher than"
+                            " %d ms, kick.",
+                            p.second->getAddress().toString().c_str(),
+                            ap, max_ping);
+                        std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
+                        m_enet_cmd.emplace_back(p.second->getENetPeer(),
+                            (ENetPacket*)NULL, PDI_BAD_CONNECTION,
+                            ECT_DISCONNECT);
+                    }
                 }
             }
             for (auto it = m_peers.begin(); it != m_peers.end();)
@@ -993,7 +1007,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         // Send the answer, consisting of server name, max players, 
         // current players
         BareNetworkString s((int)name.size()+1+11);
-        s.addUInt8(NetworkConfig::m_server_version);
+        s.addUInt32(NetworkConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8((uint8_t)sl->getGameSetup()->getPlayerCount());

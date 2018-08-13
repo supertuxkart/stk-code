@@ -48,11 +48,13 @@ private:
     GUIEngine::TextBoxWidget *m_search_box_widget;
 
     bool                        m_waiting_for_friends;
+
     /** Which column to use for sorting. */
     static int m_sort_column;
 
-    /** True is sorting should be increasing. */
-    static bool m_sort_increasing;
+    static bool m_sort_desc;
+
+    static bool m_sort_default;
 
     void displayResults();
     static bool compareFriends(int f1, int f2);
@@ -72,7 +74,7 @@ public:
 
     virtual void onUpdate(float delta) OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
-    virtual void onColumnClicked(int columnId) OVERRIDE;
+    virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Triggers a reload of the friend list next time this menu is shown. */

@@ -32,6 +32,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
@@ -503,14 +504,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
 
     unsigned int n=1;
     PowerupManager::PowerupType new_powerup;
-
-    // Check if rubber ball is the current power up held by the kart. If so,
-    // reset the bBallCollectTime to 0 before giving new powerup.
-    if(m_type == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(0);
-
     World *world = World::getWorld();
-
 
     // Determine a 'random' number based on time, index of the item,
     // and position of the kart. The idea is that this process is
@@ -548,9 +542,8 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // item. We multiply the item with a 'large' (more or less random)
     // number to spread the random values across the (typically 200)
     // weights used in the PowerupManager - same for the position.
-    unsigned long random_number = item_state.getItemId()*31 
-                                + world->getTicksSinceStart() / 10
-                                + position * 23;
+    uint64_t random_number = item_state.getItemId() * 31 +
+        world->getTicksSinceStart() / 10 + position * 23;
 
     // Use this random number as a seed of a PRNG (based on the one in 
     // bullet's btSequentialImpulseConstraintSolver) to avoid getting
@@ -567,6 +560,11 @@ void Powerup::hitBonusBox(const ItemState &item_state)
 
     new_powerup = powerup_manager->getRandomPowerup(position, &n, 
                                                     random_number);
+    // FIXME Disable switch and bubblegum for now in network
+    if (NetworkConfig::get()->isNetworking() &&
+        (new_powerup == PowerupManager::POWERUP_BUBBLEGUM ||
+        new_powerup == PowerupManager::POWERUP_SWITCH))
+        new_powerup = PowerupManager::POWERUP_BOWLING;
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

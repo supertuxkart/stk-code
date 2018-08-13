@@ -769,7 +769,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         if (kart->getPosition() == -1)//if position is not set
         {
             //we use karts ordered by id only
-            //(needed for beginning of MINOR_MODE_3_STRIKES)
+            //(needed for beginning of MINOR_MODE_BATTLE)
             kart= world->getKart(position-1);
         }
 
@@ -781,7 +781,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         int lap = info.lap;
 
         // In battle mode mode there is no distance along track etc.
-        if( minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
+        if( minor_mode==RaceManager::MINOR_MODE_BATTLE ||
             minor_mode==RaceManager::MINOR_MODE_EASTER_EGG)
         {
             x = x_base;
@@ -845,14 +845,21 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             break;
         }
 
-        if (m_kart_display_infos[kart_id].m_text.size() > 0)
+        if (info.m_text.size() > 0)
         {
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5,
                                 x+ICON_PLAYER_WIDTH, y+5);
-            core::stringw s=info.m_text.c_str();
-
-            font->draw(s.c_str(), pos, info.m_color, false, false, NULL,
-                       true /* ignore RTL */);
+            if (info.m_outlined_font)
+            {
+                GUIEngine::getOutlineFont()->draw(info.m_text, pos,
+                    GUIEngine::getSkin()->getColor("font::normal"), false,
+                    false, NULL, true/*ignore RTL*/);
+            }
+            else
+            {
+                font->draw(info.m_text, pos, info.m_color, false, false, NULL,
+                    true/*ignore RTL*/);
+            }
         }
 
         if (info.special_title.size() > 0)

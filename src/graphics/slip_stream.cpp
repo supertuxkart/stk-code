@@ -32,6 +32,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/quad.hpp"
 #include "utils/constants.hpp"
 #include "utils/mini_glm.hpp"
@@ -825,12 +826,28 @@ void SlipStream::update(int ticks)
 
         m_slipstream_time = 0.0f;
         m_bonus_active = true;
+        float speed_increase = kp->getSlipstreamMaxSpeedIncrease();
+        float add_power = kp->getSlipstreamAddPower();
+        int duration = stk_config->time2Ticks(m_bonus_time);
         int fade_out = kp->getSlipstreamFadeOutTicks();
-        m_kart->instantSpeedIncrease(MaxSpeed::MS_INCREASE_SLIPSTREAM,
-                                kp->getSlipstreamMaxSpeedIncrease(),
-                                kp->getSlipstreamMaxSpeedIncrease(),
-                                kp->getSlipstreamAddPower(),
-                                stk_config->time2Ticks(m_bonus_time), fade_out);
+        m_kart->instantSpeedIncrease(
+            MaxSpeed::MS_INCREASE_SLIPSTREAM, speed_increase,
+            speed_increase, add_power, duration, fade_out);
+
+        if (RewindManager::get()->useLocalEvent())
+        {
+            AbstractKart* kart = m_kart;
+            RewindManager::get()->addRewindInfoEventFunction(new
+                RewindInfoEventFunction(
+                World::getWorld()->getTicksSinceStart(),
+                [](){},
+                [kart, speed_increase, add_power, duration, fade_out]()
+                {
+                    kart->instantSpeedIncrease(
+                        MaxSpeed::MS_INCREASE_SLIPSTREAM, speed_increase,
+                        speed_increase, add_power, duration, fade_out);
+                }));
+        }
     }
 
     if(!is_sstreaming)

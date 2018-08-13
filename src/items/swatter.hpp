@@ -74,14 +74,17 @@ private:
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
 
-    std::set<int>      m_swat_sound_ticks;
-
     int                m_start_swat_ticks;
 
     int                m_end_swat_ticks;
+
+    const int          m_swatter_start_ticks;
+
+    const int          m_swatter_end_ticks;
+
 public:
              Swatter(AbstractKart *kart, bool was_bomb,
-                     scene::ISceneNode* bomb_scene_node);
+                     scene::ISceneNode* bomb_scene_node, int ticks);
     virtual ~Swatter();
     void     updateGrahpics(float dt) OVERRIDE;
     bool     updateAndTestFinished(int ticks) OVERRIDE;
