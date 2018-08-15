@@ -74,7 +74,7 @@ SeparateProcess::SeparateProcess(const std::string& exe,
 
     if (!createChildProcess(exe, argument, create_pipe))
     {
-        Log::fatal("SeparateProcess", "Failed to run %s %s",
+        Log::error("SeparateProcess", "Failed to run %s %s",
             exe.c_str(), argument.c_str());
         return;
     }
