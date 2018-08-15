@@ -370,9 +370,9 @@ public:
     void setPlayerKart(unsigned int player_id,
                        const RemoteKartInfo& ki);
 
-    /** Sets additional information for a player to indicate which soccer team it belong to
+    /** Sets additional information for a player to indicate which team it belong to
     */
-    void setKartSoccerTeam(unsigned int player_id, SoccerTeam team);
+    void setKartTeam(unsigned int player_id, KartTeam team);
 
     /** Sets the per-player difficulty for a player.
      */

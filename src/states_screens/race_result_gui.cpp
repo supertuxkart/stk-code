@@ -1054,8 +1054,8 @@ void RaceResultGUI::backToLobby()
         RowInfo *ri = &(m_all_row_infos[0]);
         int current_y = (int)ri->m_y_pos;
         SoccerWorld* sw = (SoccerWorld*)World::getWorld();
-        const int red_score = sw->getScore(SOCCER_TEAM_RED);
-        const int blue_score = sw->getScore(SOCCER_TEAM_BLUE);
+        const int red_score = sw->getScore(KART_TEAM_RED);
+        const int blue_score = sw->getScore(KART_TEAM_BLUE);
 
         GUIEngine::Widget *table_area = getWidget("result-table");
         int height = table_area->m_h + table_area->m_y;
@@ -1117,12 +1117,12 @@ void RaceResultGUI::backToLobby()
         //The red scorers:
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
-        std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(SOCCER_TEAM_RED);
+        std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(KART_TEAM_RED);
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
+        std::vector<float> score_times = sw->getScoreTimes(KART_TEAM_RED);
         while (score_times.size() > 10)
         {
             score_times.erase(score_times.begin());
@@ -1177,12 +1177,12 @@ void RaceResultGUI::backToLobby()
         //The blue scorers:
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
-        scorers = sw->getScorers(SOCCER_TEAM_BLUE);
+        scorers = sw->getScorers(KART_TEAM_BLUE);
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
+        score_times = sw->getScoreTimes(KART_TEAM_BLUE);
         while (score_times.size() > 10)
         {
             score_times.erase(score_times.begin());

@@ -46,10 +46,10 @@ private:
     SoccerWorld *m_world;
 
     /** Save the team this AI belongs to. */
-    SoccerTeam m_cur_team;
+    KartTeam m_cur_team;
 
     /** Save the opposite team of this AI team. */
-    SoccerTeam m_opp_team;
+    KartTeam m_opp_team;
 
     /** Define which way to handle to ball, either steer with it,
      *  or overtake it (Defense). */

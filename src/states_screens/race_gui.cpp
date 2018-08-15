@@ -337,7 +337,7 @@ void RaceGUI::drawScores()
         core::recti position(offset_x, offset_y,
             offset_x + 2*m_minimap_player_size, offset_y + 2*m_minimap_player_size);
 
-        core::stringw score = StringUtils::toWString(sw->getScore((SoccerTeam)i));
+        core::stringw score = StringUtils::toWString(sw->getScore((KartTeam)i));
         int string_height =
             GUIEngine::getFont()->getDimension(score.c_str()).Height;
         core::recti pos(position.UpperLeftCorner.X + 5,

@@ -327,9 +327,9 @@ void NetworkingLobby::updatePlayerPings()
             continue;
         int id = m_player_list->getItemID(p.first);
         m_player_list->renameItem(id, name_with_ping, std::get<1>(p.second));
-        if (std::get<2>(p.second) == SOCCER_TEAM_RED)
+        if (std::get<2>(p.second) == KART_TEAM_RED)
             m_player_list->markItemRed(id);
-        else if (std::get<2>(p.second) == SOCCER_TEAM_BLUE)
+        else if (std::get<2>(p.second) == KART_TEAM_BLUE)
             m_player_list->markItemBlue(id);
     }
 }   // updatePlayerPings
@@ -426,7 +426,7 @@ bool NetworkingLobby::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
                                     uint32_t, uint32_t, core::stringw,
-                                    int, SoccerTeam> >& p)
+                                    int, KartTeam> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
@@ -447,16 +447,16 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
             m_player_list->setIcons(icon_bank);
             icon_bank = NULL;
         }
-        SoccerTeam cur_team = std::get<5>(q);
-        m_allow_change_team = cur_team != SOCCER_TEAM_NONE;
+        KartTeam cur_team = std::get<5>(q);
+        m_allow_change_team = cur_team != KART_TEAM_NONE;
         const std::string internal_name =
             StringUtils::toString(std::get<0>(q)) + "_" +
             StringUtils::toString(std::get<1>(q)) + "_" +
             StringUtils::toString(std::get<2>(q));
         m_player_list->addItem(internal_name, std::get<3>(q), std::get<4>(q));
-        if (cur_team == SOCCER_TEAM_RED)
+        if (cur_team == KART_TEAM_RED)
             m_player_list->markItemRed(i);
-        else if (cur_team == SOCCER_TEAM_BLUE)
+        else if (cur_team == KART_TEAM_BLUE)
             m_player_list->markItemBlue(i);
         m_player_names[internal_name] =
             std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team);

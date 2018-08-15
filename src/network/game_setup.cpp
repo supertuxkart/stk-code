@@ -59,11 +59,11 @@ void GameSetup::update(bool remove_disconnected_players)
     for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
     {
         bool disconnected = m_players[i].expired();
-        if (race_manager->getKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED &&
+        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
             !disconnected)
             red_count++;
-        else if (race_manager->getKartInfo(i).getSoccerTeam() ==
-            SOCCER_TEAM_BLUE && !disconnected)
+        else if (race_manager->getKartInfo(i).getKartTeam() ==
+            KART_TEAM_BLUE && !disconnected)
             blue_count++;
 
         if (!disconnected)
@@ -227,6 +227,6 @@ void GameSetup::sortPlayersForSoccer()
     {
         auto player = m_players[i].lock();
         assert(player);
-        player->setTeam((SoccerTeam)(i % 2));
+        player->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForSoccer

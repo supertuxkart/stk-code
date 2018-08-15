@@ -177,12 +177,12 @@ private:
             m_blue_goal_slope = m_blue_goal_2.z() / m_blue_goal_2.x();
         }   // updateBallAndGoal
 
-        bool isApproachingGoal(SoccerTeam team) const
+        bool isApproachingGoal(KartTeam team) const
         {
             // If the ball lies between the first and last pos, and faces
             // in front of either of them, (inside angular size of goal)
             // than it's likely to goal
-            if (team == SOCCER_TEAM_BLUE)
+            if (team == KART_TEAM_BLUE)
             {
                 if ((m_blue_goal_1.z() > 0.0f || m_blue_goal_3.z() > 0.0f) &&
                     ((m_blue_goal_1.x() < 0.0f && m_blue_goal_3.x() > 0.0f) ||
@@ -199,7 +199,7 @@ private:
             return false;
         }   // isApproachingGoal
 
-        Vec3 getAimPosition(SoccerTeam team, bool reverse) const
+        Vec3 getAimPosition(KartTeam team, bool reverse) const
         {
             // If it's likely to goal already, aim the ball straight behind
             // should do the job
@@ -218,7 +218,7 @@ private:
             // y = sqrt(2*m_radius*m2 / (1+m2))
             float x = 0.0f;
             float y = 0.0f;
-            if (team == SOCCER_TEAM_BLUE)
+            if (team == KART_TEAM_BLUE)
             {
                 y = sqrt((m_blue_goal_slope * m_blue_goal_slope * m_radius*2) /
                     (1 + (m_blue_goal_slope * m_blue_goal_slope)));
@@ -284,7 +284,7 @@ private:
     std::vector<ScorerData> m_blue_scorers;
     std::vector<float> m_blue_score_times;
 
-    std::map<int, SoccerTeam> m_kart_team_map;
+    std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
 
     /** Data generated from navmesh */
@@ -303,7 +303,7 @@ private:
     /** Function to update data for AI usage. */
     void updateAIData();
     /** Get number of teammates in a team, used by starting position assign. */
-    int getTeamNum(SoccerTeam team) const;
+    int getTeamNum(KartTeam team) const;
 
     /** Profiling usage */
     int m_frame_count;
@@ -351,20 +351,20 @@ public:
     bool getKartSoccerResult(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     /** Get the team of kart in soccer world (including AIs) */
-    SoccerTeam getKartTeam(unsigned int kart_id) const;
+    KartTeam getKartTeam(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
-    int getScore(SoccerTeam team) const
+    int getScore(KartTeam team) const
     {
-        return (int)(team == SOCCER_TEAM_BLUE ? m_blue_scorers.size()
+        return (int)(team == KART_TEAM_BLUE ? m_blue_scorers.size()
                                               : m_red_scorers.size());
     }
     // ------------------------------------------------------------------------
-    const std::vector<ScorerData>& getScorers(SoccerTeam team) const
-       { return (team == SOCCER_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
+    const std::vector<ScorerData>& getScorers(KartTeam team) const
+       { return (team == KART_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
     // ------------------------------------------------------------------------
-    const std::vector<float>& getScoreTimes(SoccerTeam team) const
+    const std::vector<float>& getScoreTimes(KartTeam team) const
     {
-        return (team == SOCCER_TEAM_BLUE ?
+        return (team == KART_TEAM_BLUE ?
             m_blue_score_times : m_red_score_times);
     }
     // ------------------------------------------------------------------------
@@ -385,24 +385,24 @@ public:
     float getBallDiameter() const
                                                { return m_bgd.getDiameter(); }
     // ------------------------------------------------------------------------
-    bool ballApproachingGoal(SoccerTeam team) const
+    bool ballApproachingGoal(KartTeam team) const
                                      { return m_bgd.isApproachingGoal(team); }
     // ------------------------------------------------------------------------
-    Vec3 getBallAimPosition(SoccerTeam team, bool reverse = false) const
+    Vec3 getBallAimPosition(KartTeam team, bool reverse = false) const
                                { return m_bgd.getAimPosition(team, reverse); }
     // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
     // ------------------------------------------------------------------------
-    int getBallChaser(SoccerTeam team) const
+    int getBallChaser(KartTeam team) const
     {
         // Only AI call this function, so each team should have at least a kart
         assert(m_blue_kdm.size() > 0 && m_red_kdm.size() > 0);
-        return (team == SOCCER_TEAM_BLUE ? m_blue_kdm[0].m_kart_id :
+        return (team == KART_TEAM_BLUE ? m_blue_kdm[0].m_kart_id :
             m_red_kdm[0].m_kart_id);
     }
     // ------------------------------------------------------------------------
     /** Get the AI who will attack the other team ball chaser. */
-    int getAttacker(SoccerTeam team) const;
+    int getAttacker(KartTeam team) const;
     // ------------------------------------------------------------------------
     void setAITeam();
     // ------------------------------------------------------------------------

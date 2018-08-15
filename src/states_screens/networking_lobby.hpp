@@ -26,7 +26,7 @@
 #include <utility>
 
 class Server;
-enum SoccerTeam : int8_t;
+enum KartTeam : int8_t;
 
 namespace GUIEngine
 { 
@@ -65,7 +65,7 @@ private:
     NetworkingLobby();
 
     float m_ping_update_timer;
-    std::map<std::string, std::tuple<core::stringw, /*icon*/int, SoccerTeam> >
+    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam> >
         m_player_names;
     std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
@@ -134,7 +134,7 @@ public:
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, uint32_t/*local player id*/,
                        core::stringw/*player name*/, int/*icon id*/,
-                       SoccerTeam> >& p);
+                       KartTeam> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
     void initAutoStartTimer(bool grand_prix_started, float start_threshold,

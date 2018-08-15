@@ -26,11 +26,11 @@
 #include <vector>
 #include <irrString.h>
 
-enum SoccerTeam : int8_t
+enum KartTeam : int8_t
 {
-    SOCCER_TEAM_NONE=-1,
-    SOCCER_TEAM_RED=0,
-    SOCCER_TEAM_BLUE=1,
+    KART_TEAM_NONE=-1,
+    KART_TEAM_RED=0,
+    KART_TEAM_BLUE=1,
 };
 
 /** Game difficulty per player. */
@@ -48,7 +48,7 @@ class RemoteKartInfo
         int                 m_local_player_id;
         int                 m_global_player_id;
         int                 m_host_id;
-        SoccerTeam          m_soccer_team;
+        KartTeam          m_kart_team;
         bool                m_network_player;
         PerPlayerDifficulty m_difficulty;
         float               m_default_kart_color;
@@ -59,7 +59,7 @@ public:
                     bool network)
                   : m_kart_name(kart_name), m_user_name(user_name),
                     m_local_player_id(player_id), m_global_player_id(-1),
-                    m_host_id(host_id), m_soccer_team(SOCCER_TEAM_NONE),
+                    m_host_id(host_id), m_kart_team(KART_TEAM_NONE),
                     m_network_player(network),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
                     m_default_kart_color(0.0f), m_online_id(0)
@@ -67,13 +67,13 @@ public:
      RemoteKartInfo(const std::string& kart_name) : m_kart_name(kart_name),
                     m_user_name(""), m_local_player_id(-1),
                     m_global_player_id(-1), m_host_id(-1),
-                    m_soccer_team(SOCCER_TEAM_NONE), m_network_player(false),
+                    m_kart_team(KART_TEAM_NONE), m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
                     m_default_kart_color(0.0f), m_online_id(0)
      {}
      RemoteKartInfo() : m_kart_name(""), m_user_name(""),
                     m_local_player_id(-1), m_global_player_id(-1),
-                    m_host_id(-1), m_soccer_team(SOCCER_TEAM_NONE),
+                    m_host_id(-1), m_kart_team(KART_TEAM_NONE),
                     m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
                     m_default_kart_color(0.0f), m_online_id(0)
@@ -83,7 +83,7 @@ public:
     void setHostId(int id)                   { m_host_id = id;            }
     void setLocalPlayerId(int id)            { m_local_player_id = id;    }
     void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
-    void setSoccerTeam(SoccerTeam team)      { m_soccer_team = team;      }
+    void setKartTeam(KartTeam team)      { m_kart_team = team;      }
     void setNetworkPlayer(bool value)        { m_network_player = value;  }
     void setDefaultKartColor(float value) { m_default_kart_color = value; }
     void setPerPlayerDifficulty(PerPlayerDifficulty value) 
@@ -95,7 +95,7 @@ public:
     bool  isNetworkPlayer() const            { return m_network_player;   }
     const std::string& getKartName() const   { return m_kart_name;        }
     const irr::core::stringw& getPlayerName() const { return m_user_name; }
-    SoccerTeam getSoccerTeam() const         { return m_soccer_team;      }
+    KartTeam getKartTeam() const         { return m_kart_team;      }
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
     float getDefaultKartColor() const      { return m_default_kart_color; }
     uint32_t getOnlineId() const           { return m_online_id;          }

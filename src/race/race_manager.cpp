@@ -162,12 +162,12 @@ void RaceManager::setPlayerKart(unsigned int player_id,
 /** Sets additional information for a player to indicate which soccer team it
  *  belongs to.
 */
-void RaceManager::setKartSoccerTeam(unsigned int player_id, SoccerTeam team)
+void RaceManager::setKartTeam(unsigned int player_id, KartTeam team)
 {
     assert(player_id < m_player_karts.size());
 
-    m_player_karts[player_id].setSoccerTeam(team);
-}   // setKartSoccerTeam
+    m_player_karts[player_id].setKartTeam(team);
+}   // setKartTeam
 
 //-----------------------------------------------------------------------------
 /** Sets the per-player difficulty for a player.

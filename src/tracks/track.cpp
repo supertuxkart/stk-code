@@ -718,8 +718,8 @@ void Track::loadArenaGraph(const XMLNode &node)
         for (unsigned i = 0; i < pk; i++)
         {
             if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
-                race_manager->getKartInfo(i).getSoccerTeam() ==
-                SOCCER_TEAM_BLUE)
+                race_manager->getKartInfo(i).getKartTeam() ==
+                KART_TEAM_BLUE)
             {
                 m_minimap_invert_x_z = true;
                 break;

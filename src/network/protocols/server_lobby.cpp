@@ -257,10 +257,10 @@ void ServerLobby::changeTeam(Event* event)
     NetworkString& data = event->data();
     uint8_t local_id = data.getUInt8();
     auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
-    if (player->getTeam() == SOCCER_TEAM_BLUE)
-        player->setTeam(SOCCER_TEAM_RED);
+    if (player->getTeam() == KART_TEAM_BLUE)
+        player->setTeam(KART_TEAM_RED);
     else
-        player->setTeam(SOCCER_TEAM_BLUE);
+        player->setTeam(KART_TEAM_BLUE);
     updatePlayerList();
 }   // changeTeam
 
@@ -813,9 +813,9 @@ void ServerLobby::startSelection(const Event *event)
         int blue_count = 0;
         for (auto& player : players)
         {
-            if (player->getTeam() == SOCCER_TEAM_RED)
+            if (player->getTeam() == KART_TEAM_RED)
                 red_count++;
-            else if (player->getTeam() == SOCCER_TEAM_BLUE)
+            else if (player->getTeam() == KART_TEAM_BLUE)
                 blue_count++;
             if (red_count != 0 && blue_count != 0)
                 break;
@@ -1531,10 +1531,10 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         auto player = std::make_shared<NetworkPlayerProfile>
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
-            per_player_difficulty, (uint8_t)i, SOCCER_TEAM_NONE);
+            per_player_difficulty, (uint8_t)i, KART_TEAM_NONE);
         if (NetworkConfig::get()->hasTeamChoosing() &&
             race_manager->teamEnabled())
-            player->setTeam((SoccerTeam)(peer->getHostId() % 2));
+            player->setTeam((KartTeam)(peer->getHostId() % 2));
         peer->addPlayer(player);
     }
 
@@ -1598,7 +1598,7 @@ void ServerLobby::updatePlayerList(bool force_update)
             race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
         else
-            pl->addUInt8(SOCCER_TEAM_NONE);
+            pl->addUInt8(KART_TEAM_NONE);
     }
     sendMessageToPeers(pl);
     delete pl;
