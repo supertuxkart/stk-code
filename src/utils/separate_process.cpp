@@ -132,22 +132,26 @@ SeparateProcess::~SeparateProcess()
         close(m_child_stdin_write);
         close(m_child_stdout_read);
     }
-    kill(m_child_pid, SIGTERM);
-    for (int i = 0; i < 5; i++)
+    
+    if (m_child_pid != -1)
     {
-        int status;
-        if (waitpid(m_child_pid, &status, WNOHANG) == m_child_pid)
+        kill(m_child_pid, SIGTERM);
+        for (int i = 0; i < 5; i++)
         {
-            dead = true;
-            break;
+            int status;
+            if (waitpid(m_child_pid, &status, WNOHANG) == m_child_pid)
+            {
+                dead = true;
+                break;
+            }
+            StkTime::sleep(1000);
         }
-        StkTime::sleep(1000);
-    }
-    if (!dead)
-    {
-        Log::info("SeparateProcess", "Timeout waiting for child process to "
-            "self-destroying, killing it anyway");
-        kill(m_child_pid, SIGKILL);
+        if (!dead)
+        {
+            Log::info("SeparateProcess", "Timeout waiting for child process to "
+                "self-destroying, killing it anyway");
+            kill(m_child_pid, SIGKILL);
+        }
     }
 #endif
     Log::info("SeparateProcess", "Destroyed");
