@@ -357,7 +357,7 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     argv.push_back(const_cast<char*>(parent_pid.c_str()));
     
     Log::info("SeparateProcess", "Starting main()");
-    std::thread child_process(main_proc, argv.size(), &argv[0]);
+    m_child_thread = std::thread(main_proc, argv.size(), &argv[0]);
     
     return true;
 }
