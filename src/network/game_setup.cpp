@@ -217,9 +217,9 @@ void GameSetup::sortPlayersForGrandPrix()
 }   // sortPlayersForGrandPrix
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForSoccer()
+void GameSetup::sortPlayersForTeamGame()
 {
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER ||
+    if (!race_manager->teamEnabled() ||
         NetworkConfig::get()->hasTeamChoosing())
         return;
     std::lock_guard<std::mutex> lock(m_players_mutex);
@@ -229,4 +229,4 @@ void GameSetup::sortPlayersForSoccer()
         assert(player);
         player->setTeam((KartTeam)(i % 2));
     }
-}   // sortPlayersForSoccer
+}   // sortPlayersForTeamGame

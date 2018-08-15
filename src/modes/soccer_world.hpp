@@ -50,12 +50,6 @@ public:
         bool            m_correct_goal;
     };   // ScorerData
 
-protected:
-    virtual std::shared_ptr<AbstractKart> createKart
-        (const std::string &kart_ident, int index, int local_player_id,
-        int global_player_id, RaceManager::KartType type,
-        PerPlayerDifficulty difficulty) OVERRIDE;
-
 private:
     class KartDistanceMap
     {
@@ -284,20 +278,12 @@ private:
     std::vector<ScorerData> m_blue_scorers;
     std::vector<float> m_blue_score_times;
 
-    std::map<int, KartTeam> m_kart_team_map;
-    std::map<int, unsigned int> m_kart_position_map;
-
     /** Data generated from navmesh */
     TrackSector* m_ball_track_sector;
-
-    int m_red_ai;
-    int m_blue_ai;
 
     float m_ball_heading;
 
     std::vector<btTransform> m_goal_transforms;
-    /** Set the team for the karts */
-    void initKartList();
     /** Function to update the location the ball on the polygon map */
     void updateBallPosition(int ticks);
     /** Function to update data for AI usage. */
@@ -350,9 +336,6 @@ public:
     /** Get the soccer result of kart in soccer world (including AIs) */
     bool getKartSoccerResult(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
-    /** Get the team of kart in soccer world (including AIs) */
-    KartTeam getKartTeam(unsigned int kart_id) const;
-    // ------------------------------------------------------------------------
     int getScore(KartTeam team) const
     {
         return (int)(team == KART_TEAM_BLUE ? m_blue_scorers.size()
@@ -403,8 +386,6 @@ public:
     // ------------------------------------------------------------------------
     /** Get the AI who will attack the other team ball chaser. */
     int getAttacker(KartTeam team) const;
-    // ------------------------------------------------------------------------
-    void setAITeam();
     // ------------------------------------------------------------------------
     void handlePlayerGoalFromServer(const NetworkString& ns);
     // ------------------------------------------------------------------------

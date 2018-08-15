@@ -164,7 +164,7 @@ public:
     // ------------------------------------------------------------------------
     void sortPlayersForGrandPrix();
     // ------------------------------------------------------------------------
-    void sortPlayersForSoccer();
+    void sortPlayersForTeamGame();
     // ------------------------------------------------------------------------
     void setHitCaptureTime(int hc, float time)
     {

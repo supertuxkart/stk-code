@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <map>
 #include <memory>
 #include <vector>
 #include <stdexcept>
@@ -85,12 +86,25 @@ public:
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
+    // ------------------------------------------------------------------------
+    void setAITeam();
+    // ------------------------------------------------------------------------
+    std::shared_ptr<AbstractKart> createKartWithTeam
+        (const std::string &kart_ident, int index, int local_player_id,
+        int global_player_id, RaceManager::KartType type,
+        PerPlayerDifficulty difficulty);
 
 protected:
 
 #ifdef DEBUG
     unsigned int m_magic_number;
 #endif
+
+    /* Team related variables. */
+    int m_red_ai;
+    int m_blue_ai;
+    std::map<int, KartTeam> m_kart_team_map;
+    std::map<int, unsigned int> m_kart_position_map;
 
     /** The list of all karts. */
     KartList                  m_karts;
@@ -179,7 +193,8 @@ protected:
      */
     virtual float estimateFinishTimeForKart(AbstractKart* kart)
                                         {return getTime(); }
-
+    /** Set the team arrow on karts if necessary*/
+    void initTeamArrows();
 
 public:
                     World();
@@ -333,6 +348,11 @@ public:
     void setUnfairTeam(bool val)                       { m_unfair_team = val; }
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const                              { return false; }
+    // ------------------------------------------------------------------------
+    /** Get the team of kart in world (including AIs) */
+    KartTeam getKartTeam(unsigned int kart_id) const;
+    // ------------------------------------------------------------------------
+    int getTeamNum(KartTeam team) const;
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }

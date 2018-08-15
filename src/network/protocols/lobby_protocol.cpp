@@ -121,7 +121,7 @@ void LobbyProtocol::configRemoteKart(
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         rki.setOnlineId(profile->getOnlineId());
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        if (race_manager->teamEnabled())
             rki.setKartTeam(profile->getTeam());
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);

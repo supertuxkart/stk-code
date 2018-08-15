@@ -130,6 +130,7 @@ Track::Track(const std::string &filename)
     m_enable_push_back      = true;
     m_reverse_available     = false;
     m_is_arena              = false;
+    m_is_ctf                = false;
     m_max_arena_players     = 0;
     m_has_easter_eggs       = false;
     m_has_navmesh           = false;
@@ -160,6 +161,8 @@ Track::Track(const std::string &filename)
     m_minimap_y_scale       = 1.0f;
     m_force_disable_fog     = false;
     m_startup_run           = false;
+    m_red_flag = m_blue_flag =
+        btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     m_default_number_of_laps = 3;
     m_all_nodes.clear();
     m_static_physics_only_nodes.clear();
@@ -545,6 +548,7 @@ void Track::loadTrackInfo()
     root->get("friction",              &m_friction);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
+    root->get("ctf",                   &m_is_ctf);
     root->get("max-arena-players",     &m_max_arena_players);
     root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
@@ -2075,6 +2079,19 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             }
         }   // for i<root->getNumNodes()
     }
+    if (m_is_ctf &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        for (unsigned int i=0; i<root->getNumNodes(); i++)
+        {
+            const XMLNode *node = root->getNode(i);
+            const std::string &name = node->getName();
+            if (name == "red-flag" || name == "blue-flag")
+            {
+                flagCommand(node);
+            }
+        }   // for i<root->getNumNodes()
+    }
     delete root;
 
     if (NetworkConfig::get()->isNetworking() &&
@@ -2146,6 +2163,9 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
     unsigned int start_position_counter = 0;
 
     unsigned int node_count = root->getNumNodes();
+    const bool is_mode_ctf = m_is_ctf && race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+
     for (unsigned int i = 0; i < node_count; i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -2168,12 +2188,16 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "banana"      || name == "item" ||
                  name == "small-nitro" || name == "big-nitro" ||
-                 name == "easter-egg"                           )
+                 name == "easter-egg"  || name == "red-flag" ||
+                 name == "blue-flag")
         {
             // will be handled later
         }
-        else if (name == "start")
+        else if (name == "start" || name == "ctf-start")
         {
+            if ((name == "start" && is_mode_ctf) ||
+                (name == "ctf-start" && !is_mode_ctf))
+                continue;
             unsigned int position = start_position_counter;
             start_position_counter++;
             node->get("position", &position);
@@ -2398,6 +2422,67 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 }   // handleSky
 
 //-----------------------------------------------------------------------------
+void Track::flagCommand(const XMLNode *node)
+{
+    Vec3 xyz;
+    // Set some kind of default in case Y is not defined in the file
+    // (with the new track exporter it always is defined anyway).
+    // Y is the height from which the item is dropped on the track.
+    xyz.setY(1000);
+    node->getXYZ(&xyz);
+
+    Vec3 loc(xyz);
+
+    // Test if the item lies on a 3d node, if so adjust the normal
+    // Also do a raycast if drop item is given
+    Vec3 normal(0, 1, 0);
+    Vec3 quad_normal = normal;
+    Vec3 hit_point = loc;
+    if (Graph::get())
+    {
+        int road_sector = Graph::UNKNOWN_SECTOR;
+        Graph::get()->findRoadSector(xyz, &road_sector);
+        // Only do custom direction of raycast if item is on quad graph
+        if (road_sector != Graph::UNKNOWN_SECTOR)
+        {
+            quad_normal = Graph::get()->getQuad(road_sector)->getNormal();
+        }
+    }
+
+    const Material *m;
+    // If raycast is used, increase the start position slightly
+    // in case that the point is too close to the actual surface
+    // (e.g. floating point errors can cause a problem here).
+    loc += quad_normal * 0.1f;
+
+#ifndef DEBUG
+    m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
+        &m, &normal);
+#else
+    bool drop_success = m_track_mesh->castRay(loc, loc +
+        (-10000 * quad_normal), &hit_point, &m, &normal);
+    if (!drop_success)
+    {
+        Log::warn("track", "flag at position (%f,%f,%f) can not be dropped",
+            loc.getX(), loc.getY(), loc.getZ());
+        Log::warn("track", "onto terrain - position unchanged.");
+    }
+#endif
+
+    const std::string &name = node->getName();
+    if (name == "red-flag")
+    {
+        m_red_flag = btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
+            hit_point);
+    }
+    else
+    {
+        m_blue_flag = btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
+            hit_point);
+    }
+}   // flagCommand
+
+//-----------------------------------------------------------------------------
 /** Handle creation and placement of an item.
  *  \param xyz The position of the item.
  *  \param type The item type.
@@ -2407,6 +2492,13 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 void Track::itemCommand(const XMLNode *node)
 {
     const std::string &name = node->getName();
+
+    const bool is_mode_ctf = m_is_ctf &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+    bool ctf = false;
+    node->get("ctf", &ctf);
+    if ((is_mode_ctf && !ctf) || (!is_mode_ctf && ctf))
+        return;
 
     Item::ItemType type;
     if     (name=="banana"     ) type = Item::ITEM_BANANA;

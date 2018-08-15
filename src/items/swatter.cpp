@@ -39,7 +39,6 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
-#include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 
@@ -290,14 +289,11 @@ void Swatter::chooseTarget()
         if (kart->isInvulnerable() || kart->isSquashed())
             continue;
 
-        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-        if (sw)
-        {
-            // Don't hit teammates in soccer world
-            if (sw->getKartTeam(kart->getWorldKartId()) == sw
-                ->getKartTeam(m_kart->getWorldKartId()))
+        // Don't hit teammates in team world
+        if (world->hasTeam() &&
+            world->getKartTeam(kart->getWorldKartId()) ==
+            world->getKartTeam(m_kart->getWorldKartId()))
             continue;
-        }
 
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
         if(dist2<min_dist2)

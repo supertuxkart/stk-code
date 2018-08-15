@@ -164,12 +164,25 @@ void ServerLobby::setup()
             while (it != m_available_kts.second.end())
             {
                 Track* t =  track_manager->getTrack(*it);
-                if (!t->isArena() ||  t->isInternal())
+                if (race_manager->getMajorMode() ==
+                    RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
                 {
-                    it = m_available_kts.second.erase(it);
+                    if (!t->isCTF() || t->isInternal())
+                    {
+                        it = m_available_kts.second.erase(it);
+                    }
+                    else
+                        it++;
                 }
                 else
-                    it++;
+                {
+                    if (!t->isArena() ||  t->isInternal())
+                    {
+                        it = m_available_kts.second.erase(it);
+                    }
+                    else
+                        it++;
+                }
             }
             break;
         }
@@ -480,7 +493,7 @@ void ServerLobby::asynchronousUpdate()
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
-            m_game_setup->sortPlayersForSoccer();
+            m_game_setup->sortPlayersForTeamGame();
             auto players = m_game_setup->getConnectedPlayers();
             NetworkString* load_world = getNetworkString();
             load_world->setSynchronous(true);

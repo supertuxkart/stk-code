@@ -200,8 +200,11 @@ private:
     Vec3                     m_aabb_min;
     /** Maximum coordinates of this track. */
     Vec3                     m_aabb_max;
+    btTransform              m_red_flag;
+    btTransform              m_blue_flag;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+    bool                     m_is_ctf;
     /** Max players supported by an arena. */
     unsigned int             m_max_arena_players;
     /** True if this track has easter eggs. */
@@ -427,6 +430,7 @@ public:
     void               update(int ticks);
     void               reset();
     void               itemCommand(const XMLNode *node);
+    void               flagCommand(const XMLNode *node);
     core::stringw      getName() const;
     core::stringw      getSortName() const;
     bool               isInGroup(const std::string &group_name);
@@ -446,6 +450,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }
+    // ------------------------------------------------------------------------
+    bool isCTF() const { return m_is_ctf; }
     // ------------------------------------------------------------------------
     /** Returns true if this track is a racing track. This means it is not an
      *  internal track (like cut scenes), arena, or soccer field. */
@@ -681,6 +687,11 @@ public:
     /** Adds the parent of the meta library for correction later */
     void addMetaLibrary(TrackObject* parent, TrackObject* meta_library)
                          { m_meta_library.emplace_back(parent, meta_library); }
+    // ------------------------------------------------------------------------
+    const btTransform& getRedFlag() const                { return m_red_flag; }
+    // ------------------------------------------------------------------------
+    const btTransform& getBlueFlag() const              { return m_blue_flag; }
+
 };   // class Track
 
 #endif

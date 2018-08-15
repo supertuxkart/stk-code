@@ -23,14 +23,36 @@
 #include <vector>
 #include <string>
 
+namespace irr
+{
+    namespace scene
+    {
+        class IAnimatedMeshSceneNode; class IAnimatedMesh;
+    }
+}
+
 class CaptureTheFlag : public FreeForAll
 {
 private:
+    scene::IAnimatedMeshSceneNode* m_red_flag_node;
+
+    scene::IAnimatedMeshSceneNode* m_blue_flag_node;
+
+    irr::scene::IAnimatedMesh* m_red_flag_mesh;
+
+    irr::scene::IAnimatedMesh* m_blue_flag_mesh;
+
 public:
     // ------------------------------------------------------------------------
     CaptureTheFlag();
     // ------------------------------------------------------------------------
     virtual ~CaptureTheFlag();
+    // ------------------------------------------------------------------------
+    virtual void init() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool hasTeam() const OVERRIDE                      { return true; }
+    // ------------------------------------------------------------------------
+
 };   // CaptureTheFlag
 
 #endif
