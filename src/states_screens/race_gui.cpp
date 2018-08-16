@@ -732,6 +732,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
                                             int(offset.Y - 0.49f*meter_height));
 
         font->draw(oss.str().c_str(), pos, color, true, true);
+        font->setScale(1.0f);
         return;
     }
 
