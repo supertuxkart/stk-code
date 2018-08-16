@@ -58,68 +58,82 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
     #endif
-
-    Android = (android_app *)(param.PrivateData);
-    assert(Android != NULL);
-
-    Android->userData = this;
-    Android->onAppCmd = handleAndroidCommand;
-    Android->onAppCmdDirect = handleAndroidCommandDirect;
-    Android->onInputEvent = handleInput;
     
-    printConfig();
     createKeyMap();
 
     CursorControl = new CCursorControl();
+
+    Android = (android_app*)(param.PrivateData);
     
-    Close = Android->destroyRequested;
-
-    // It typically shouldn't happen, but just in case...
-    if (Close)
-        return;
-
-    SensorManager = ASensorManager_getInstance();
-    SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
-                                Android->looper, LOOPER_ID_USER, NULL, NULL);
-
-    ANativeActivity_setWindowFlags(Android->activity,
-                                   AWINDOW_FLAG_KEEP_SCREEN_ON |
-                                   AWINDOW_FLAG_FULLSCREEN, 0);
-
-    os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
-
-    while (!IsStarted || !IsFocused || IsPaused)
+    if (Android == NULL && CreationParams.DriverType != video::EDT_NULL)
     {
-        s32 events = 0;
-        android_poll_source* source = 0;
-
-        s32 id = ALooper_pollAll(-1, NULL, &events, (void**)&source);
-
-        if (id >=0 && source != NULL)
-        {
-            source->process(Android, source);
-        }
+        os::Printer::log("Irrlicht device can run only with NULL driver without android_app.", ELL_DEBUG);
+        return;
     }
-    
-    assert(Android->window);
-    os::Printer::log("Done", ELL_DEBUG);
-    
-    ExposedVideoData.OGLESAndroid.Window = Android->window;
 
-    createVideoModeList();
+    if (Android != NULL)
+    {
+        Android->userData = this;
+        Android->onAppCmd = handleAndroidCommand;
+        Android->onAppCmdDirect = handleAndroidCommandDirect;
+        Android->onInputEvent = handleInput;
+        
+        printConfig();
+        
+        Close = Android->destroyRequested;
+    
+        // It typically shouldn't happen, but just in case...
+        if (Close)
+            return;
+    
+        SensorManager = ASensorManager_getInstance();
+        SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
+                                    Android->looper, LOOPER_ID_USER, NULL, NULL);
+    
+        ANativeActivity_setWindowFlags(Android->activity,
+                                       AWINDOW_FLAG_KEEP_SCREEN_ON |
+                                       AWINDOW_FLAG_FULLSCREEN, 0);
+    
+        os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
+    
+        while (!IsStarted || !IsFocused || IsPaused)
+        {
+            s32 events = 0;
+            android_poll_source* source = 0;
+    
+            s32 id = ALooper_pollAll(-1, NULL, &events, (void**)&source);
+    
+            if (id >=0 && source != NULL)
+            {
+                source->process(Android, source);
+            }
+        }
+        
+        assert(Android->window);
+        os::Printer::log("Done", ELL_DEBUG);
+        
+        ExposedVideoData.OGLESAndroid.Window = Android->window;
+    
+        createVideoModeList();
+    }
 
     createDriver();
 
     if (VideoDriver)
+    {
         createGUIAndScene();
+    }
 }
 
 
 CIrrDeviceAndroid::~CIrrDeviceAndroid()
 {
-    Android->userData = NULL;
-    Android->onAppCmd = NULL;
-    Android->onInputEvent = NULL;
+    if (Android)
+    {
+        Android->userData = NULL;
+        Android->onAppCmd = NULL;
+        Android->onInputEvent = NULL;
+    }
 }
 
 void CIrrDeviceAndroid::printConfig() 
@@ -210,6 +224,9 @@ void CIrrDeviceAndroid::createDriver()
 bool CIrrDeviceAndroid::run()
 {
     os::Timer::tick();
+    
+    if (Android == NULL)
+        return !Close;
     
     while (!Close)
     {
@@ -372,8 +389,8 @@ void CIrrDeviceAndroid::handleAndroidCommandDirect(ANativeActivity* activity,
     switch (cmd)
     {
     case APP_CMD_RESUME:
-        os::Printer::log("Android command direct APP_CMD_RESUME", ELL_DEBUG);	
-        hideNavBar(activity);	
+        os::Printer::log("Android command direct APP_CMD_RESUME", ELL_DEBUG);   
+        hideNavBar(activity);   
         break;
     default:
         break;

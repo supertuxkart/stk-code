@@ -756,11 +756,6 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
-#ifndef SERVER_ONLY
-    if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
-#endif
-        ProfileWorld::disableGraphics();
-
     if (CommandLine::has("--sp-shader-debug"))
         SP::SPShader::m_sp_shader_debug = true;
 
@@ -1843,6 +1838,11 @@ int main(int argc, char *argv[] )
             FileManager::setStdoutName(s);
         if (CommandLine::has("--stdout-dir", &s))
             FileManager::setStdoutDir(s);
+            
+#ifndef SERVER_ONLY
+        if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
+#endif
+            ProfileWorld::disableGraphics();
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
