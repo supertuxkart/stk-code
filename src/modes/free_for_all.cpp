@@ -172,6 +172,7 @@ void FreeForAll::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
+        rank_info.m_color = getColor(i);
         rank_info.m_text = m_karts[i]->getController()->getName() + L" (" +
             StringUtils::toWString(m_scores[i]) + L")";
     }
@@ -187,3 +188,9 @@ void FreeForAll::terminateRace()
     }   // i<kart_amount
     WorldWithRank::terminateRace();
 }   // terminateRace
+
+// ----------------------------------------------------------------------------
+video::SColor FreeForAll::getColor(unsigned int kart_id) const
+{
+    return GUIEngine::getSkin()->getColor("font::normal");
+}   // getColor

@@ -38,14 +38,13 @@ using namespace irr;
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
-#include "items/attachment.hpp"
-#include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
@@ -266,7 +265,8 @@ void RaceGUI::renderGlobal(float dt)
     }
 
     if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
-    if(Track::getCurrentTrack()->isSoccer()) drawScores();
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        drawScores();
 #endif
 }   // renderGlobal
 
@@ -514,6 +514,35 @@ void RaceGUI::drawGlobalMiniMap()
     track->drawMiniMap(dest);
 
     World *world = World::getWorld();
+
+    CaptureTheFlag *ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    if (ctf)
+    {
+        Vec3 draw_at;
+        track->mapPoint2MiniMap(ctf->getRedFlag(), &draw_at);
+
+        video::ITexture* icon =
+            irr_driver->getTexture(FileManager::GUI, "red_flag.png");
+
+        core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
+                                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
+                                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
+                                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
+        draw2DImage(icon, rp, rs, NULL, NULL, true);
+
+        track->mapPoint2MiniMap(ctf->getBlueFlag(), &draw_at);
+
+        icon = irr_driver->getTexture(FileManager::GUI, "blue_flag.png");
+
+        core::rect<s32> bs(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
+                                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
+                                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
+                                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
+        draw2DImage(icon, bp, bs, NULL, NULL, true);
+    }
+
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
@@ -1066,11 +1095,6 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     if (kart->hasFinishedRace()) return;
 
     World *world = World::getWorld();
-    if (!world->raceHasLaps()) return;
-    const int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
-
-    // don't display 'lap 0/..' at the start of a race
-    if (lap < 0 ) return;
 
     core::recti pos;
     
@@ -1089,6 +1113,32 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
                             - m_lap_width - 10;
     pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
+
+    // Draw CTF scores with red score - blue score
+    CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    if (ctf)
+    {
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
+        core::stringw text = StringUtils::toWString(ctf->getRedScore());
+        font->draw(text, pos, video::SColor(255, 255, 0, 0));
+        core::dimension2du d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+        text = StringUtils::toWString(ctf->getBlueScore());
+        font->draw(text, pos, video::SColor(255, 0, 0, 255));
+        font->setScale(1.0f);
+        return;
+    }
+
+    if (!world->raceHasLaps()) return;
+    const int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
+
+    // don't display 'lap 0/..' at the start of a race
+    if (lap < 0 ) return;
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     std::ostringstream out;

@@ -42,6 +42,13 @@ private:
 
     irr::scene::IAnimatedMesh* m_blue_flag_mesh;
 
+    int m_red_scores, m_blue_scores, m_red_holder, m_blue_holder;
+
+    btTransform m_red_trans, m_blue_trans;
+
+    // ------------------------------------------------------------------------
+    virtual video::SColor getColor(unsigned int kart_id) const OVERRIDE;
+
 public:
     // ------------------------------------------------------------------------
     CaptureTheFlag();
@@ -50,8 +57,40 @@ public:
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
+    virtual void reset() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void update(int ticks) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE                      { return true; }
     // ------------------------------------------------------------------------
+    bool getKartCTFResult(unsigned int kart_id) const
+    {
+        if (m_red_scores == m_blue_scores)
+            return true;
+
+        bool red_win = m_red_scores > m_blue_scores;
+        KartTeam team = getKartTeam(kart_id);
+
+        if ((red_win && team == KART_TEAM_RED) ||
+            (!red_win && team == KART_TEAM_BLUE))
+            return true;
+        else
+            return false;
+    }
+    // ------------------------------------------------------------------------
+    int getRedScore() const                            { return m_red_scores; }
+    // ------------------------------------------------------------------------
+    int getBlueScore() const                          { return m_blue_scores; }
+    // ------------------------------------------------------------------------
+    int getRedHolder() const                           { return m_red_holder; }
+    // ------------------------------------------------------------------------
+    int getBlueHolder() const                         { return m_blue_holder; }
+    // ------------------------------------------------------------------------
+    const Vec3& getRedFlag() const   { return (Vec3&)m_red_trans.getOrigin(); }
+    // ------------------------------------------------------------------------
+    const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
+    // ------------------------------------------------------------------------
+    virtual bool isRaceOver() OVERRIDE;
 
 };   // CaptureTheFlag
 

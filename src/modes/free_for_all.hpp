@@ -31,6 +31,10 @@ private:
     bool m_count_down_reached_zero;
 
     std::vector<int> m_scores;
+
+    // ------------------------------------------------------------------------
+    virtual video::SColor getColor(unsigned int kart_id) const;
+
 public:
     // ------------------------------------------------------------------------
     FreeForAll();
@@ -61,7 +65,6 @@ public:
     void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const        { return m_scores.at(kart_id); }
-
 };   // FreeForAll
 
 

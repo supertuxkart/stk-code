@@ -1034,6 +1034,11 @@ void Kart::setRaceResult()
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartAtPosition(1) == this;
     }
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+        m_race_result = ctf->getKartCTFResult(getWorldKartId());
+    }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
         SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());

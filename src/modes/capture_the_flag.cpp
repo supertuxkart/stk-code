@@ -60,8 +60,6 @@ CaptureTheFlag::~CaptureTheFlag()
 void CaptureTheFlag::init()
 {
     FreeForAll::init();
-    const btTransform& red_pos = Track::getCurrentTrack()->getRedFlag();
-    const btTransform& blue_pos = Track::getCurrentTrack()->getBlueFlag();
 
 #ifndef SERVER_ONLY
     m_red_flag_node = irr_driver->addAnimatedMesh(m_red_flag_mesh, "red_flag");
@@ -69,14 +67,51 @@ void CaptureTheFlag::init()
         "blue_flag");
     assert(m_red_flag_node);
     assert(m_blue_flag_node);
-
-    m_red_flag_node->setPosition(Vec3(red_pos.getOrigin()).toIrrVector());
-    Vec3 hpr;
-    hpr.setHPR(red_pos.getRotation());
-    m_red_flag_node->setRotation(hpr.toIrrHPR());
-
-    m_blue_flag_node->setPosition(Vec3(blue_pos.getOrigin()).toIrrVector());
-    hpr.setHPR(blue_pos.getRotation());
-    m_blue_flag_node->setRotation(hpr.toIrrHPR());
 #endif
 }   // init
+
+//-----------------------------------------------------------------------------
+void CaptureTheFlag::reset()
+{
+    FreeForAll::reset();
+    m_red_trans = Track::getCurrentTrack()->getRedFlag();
+    m_blue_trans = Track::getCurrentTrack()->getBlueFlag();
+    m_red_scores = m_blue_scores = 0;
+    m_red_holder = m_blue_holder = -1;
+
+#ifndef SERVER_ONLY
+    m_red_flag_node->setPosition(
+        Vec3(m_red_trans.getOrigin()).toIrrVector());
+    Vec3 hpr;
+    hpr.setHPR(m_red_trans.getRotation());
+    m_red_flag_node->setRotation(hpr.toIrrHPR());
+
+    m_blue_flag_node->setPosition(
+        Vec3(m_blue_trans.getOrigin()).toIrrVector());
+    hpr.setHPR(m_blue_trans.getRotation());
+    m_blue_flag_node->setRotation(hpr.toIrrHPR());
+#endif
+}   // reset
+
+//-----------------------------------------------------------------------------
+void CaptureTheFlag::update(int ticks)
+{
+    FreeForAll::update(ticks);
+}   // update
+
+// ----------------------------------------------------------------------------
+video::SColor CaptureTheFlag::getColor(unsigned int kart_id) const
+{
+    return getKartTeam(kart_id) == KART_TEAM_RED ?
+        video::SColor(255, 255, 0, 0) : video::SColor(255, 0, 0, 255);
+}   // getColor
+
+// ----------------------------------------------------------------------------
+bool CaptureTheFlag::isRaceOver()
+{
+    if (NetworkConfig::get()->isServer() &&
+        (m_red_scores >= race_manager->getHitCaptureLimit() ||
+        m_blue_scores >= race_manager->getHitCaptureLimit()))
+        return true;
+    return FreeForAll::isRaceOver();
+}   // isRaceOver
