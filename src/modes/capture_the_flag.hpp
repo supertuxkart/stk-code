@@ -42,10 +42,17 @@ private:
 
     irr::scene::IAnimatedMesh* m_blue_flag_mesh;
 
+    SFXBase* m_scored_sound;
+
     int m_red_scores, m_blue_scores, m_red_holder, m_blue_holder;
 
-    btTransform m_red_trans, m_blue_trans;
+    btTransform m_red_trans, m_blue_trans, m_orig_red_trans, m_orig_blue_trans;
 
+    // ------------------------------------------------------------------------
+    void updateFlagNodes();
+    // ------------------------------------------------------------------------
+    btTransform getDroppedFlagTrans(const btTransform& kt,
+                                    bool red_flag) const;
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const OVERRIDE;
 
@@ -61,7 +68,17 @@ public:
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
+    virtual void updateGraphics(float dt) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE                      { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool isRaceOver() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
+    // ------------------------------------------------------------------------
+    void attachFlag(NetworkString& ns);
+    // ------------------------------------------------------------------------
+    void resetFlag(NetworkString& ns);
     // ------------------------------------------------------------------------
     bool getKartCTFResult(unsigned int kart_id) const
     {
@@ -89,8 +106,6 @@ public:
     const Vec3& getRedFlag() const   { return (Vec3&)m_red_trans.getOrigin(); }
     // ------------------------------------------------------------------------
     const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
-    // ------------------------------------------------------------------------
-    virtual bool isRaceOver() OVERRIDE;
 
 };   // CaptureTheFlag
 

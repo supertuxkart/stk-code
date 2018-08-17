@@ -283,7 +283,7 @@ public:
     virtual void newLap(unsigned int kart_index) {}
     // ------------------------------------------------------------------------
     /** Called when a kart was hit by a projectile. */
-    virtual void kartHit(int kart_id, int hitter = -1) {};
+    virtual bool kartHit(int kart_id, int hitter = -1) { return false; }
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) {};
 

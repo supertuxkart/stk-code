@@ -209,9 +209,9 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
  *  \param kart_id The world kart id of the kart that was hit.
  *  \param hitter The world kart id of the kart who hit(-1 if none).
  */
-void ThreeStrikesBattle::kartHit(int kart_id, int hitter)
+bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
 {
-    if (isRaceOver()) return;
+    if (isRaceOver()) return false;
 
     SpareTireAI* sta =
         dynamic_cast<SpareTireAI*>(m_karts[kart_id]->getController());
@@ -219,7 +219,7 @@ void ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     {
         // Unspawn the spare tire kart if it get hit
         sta->unspawn();
-        return;
+        return false;
     }
 
     assert(kart_id < (int)m_karts.size());
@@ -338,7 +338,7 @@ void ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     m_tire_dir = m_karts[kart_id]->getKartProperties()->getKartDir();
     if(m_insert_tire == 5 && m_karts[kart_id]->isWheeless())
         m_insert_tire = 0;
-
+    return true;
 }   // kartHit
 
 //-----------------------------------------------------------------------------

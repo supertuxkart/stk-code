@@ -30,9 +30,9 @@ class FreeForAll : public WorldWithRank
 protected:
     bool m_count_down_reached_zero;
 
-private:
     std::vector<int> m_scores;
 
+private:
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const;
 
@@ -55,7 +55,7 @@ public:
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void kartHit(int kart_id, int hitter = -1) OVERRIDE;
+    virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
