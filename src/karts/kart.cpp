@@ -1275,13 +1275,6 @@ void Kart::update(int ticks)
 {
     m_powerup->update(ticks);
 
-    // Make the restitution depend on speed: this avoids collision issues,
-    // otherwise a collision with high speed can see a kart being push
-    // high up in the air (and out of control). So for higher speed we
-    // reduce the restitution, meaning the karts will get less of a push
-    // based on the collision speed.
-    m_body->setRestitution(m_kart_properties->getRestitution(fabsf(m_speed)));
-
     // Reset any instand speed increase in the bullet kart
     m_vehicle->setMinSpeed(0);
 
@@ -1332,6 +1325,12 @@ void Kart::update(int ticks)
     // Update the locally maintained speed of the kart (m_speed), which 
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
+    // Make the restitution depend on speed: this avoids collision issues,
+    // otherwise a collision with high speed can see a kart being push
+    // high up in the air (and out of control). So for higher speed we
+    // reduce the restitution, meaning the karts will get less of a push
+    // based on the collision speed.
+    m_body->setRestitution(m_kart_properties->getRestitution(fabsf(m_speed)));
 
     m_controller->update(ticks);
 
