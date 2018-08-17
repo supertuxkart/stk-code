@@ -114,10 +114,8 @@ void NetworkUserDialog::onUpdate(float dt)
     {
         // I18N: In the network player dialog, showing when waiting for
         // the result of the ranking info of a player
-        core::stringw fetching =
-            StringUtils::loadingDots(_("Fetching ranking info for %s.",
-            m_name));
-        m_info_widget->setText(fetching, false);
+        core::stringw msg = _("Fetching ranking info for %s", m_name);
+        m_info_widget->setText(StringUtils::loadingDots(msg.c_str()), false);
     }
 
     // It's unsafe to delete from inside the event handler so we do it here
