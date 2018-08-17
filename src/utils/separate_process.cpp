@@ -343,8 +343,6 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     
     const std::string exe_file = StringUtils::getBasename(exe);
     auto rest_argv = StringUtils::split(argument, ' ');
-    std::string parent_pid = "--parent-process=";
-    parent_pid += StringUtils::toString(getpid());
     
     std::vector<char*> argv;
     argv.push_back(const_cast<char*>(exe_file.c_str()));
@@ -353,8 +351,6 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     {
         argv.push_back(const_cast<char*>(rest_argv[i].c_str()));
     }
-
-    argv.push_back(const_cast<char*>(parent_pid.c_str()));
     
     Log::info("SeparateProcess", "Starting main()");
     m_child_thread = std::thread(main_proc, argv.size(), &argv[0]);
