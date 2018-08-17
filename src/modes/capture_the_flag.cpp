@@ -109,9 +109,14 @@ video::SColor CaptureTheFlag::getColor(unsigned int kart_id) const
 // ----------------------------------------------------------------------------
 bool CaptureTheFlag::isRaceOver()
 {
-    if (NetworkConfig::get()->isServer() &&
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+        return false;
+
+    if ((m_count_down_reached_zero && race_manager->hasTimeTarget()) ||
         (m_red_scores >= race_manager->getHitCaptureLimit() ||
         m_blue_scores >= race_manager->getHitCaptureLimit()))
         return true;
-    return FreeForAll::isRaceOver();
+
+    return false;
 }   // isRaceOver

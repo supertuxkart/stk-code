@@ -88,7 +88,7 @@ public:
     */
     enum MajorRaceModeType
     {
-        MAJOR_MODE_GRAND_PRIX,
+        MAJOR_MODE_GRAND_PRIX = 0,
         MAJOR_MODE_SINGLE,
         MAJOR_MODE_FREE_FOR_ALL,
         MAJOR_MODE_CAPTURE_THE_FLAG,

@@ -27,9 +27,10 @@ class NetworkString;
 
 class FreeForAll : public WorldWithRank
 {
-private:
+protected:
     bool m_count_down_reached_zero;
 
+private:
     std::vector<int> m_scores;
 
     // ------------------------------------------------------------------------
