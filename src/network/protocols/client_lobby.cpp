@@ -80,6 +80,12 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_KICK] = _("You were kicked from the server.");
     m_disconnected_msg[PDI_BAD_CONNECTION] =
         _("Bad network connection is detected.");
+
+    // I18N: Message shown in network lobby to tell user that
+    // player name is clickable
+    core::stringw msg = _("Press player name in the list for player management"
+        " and ranking information.");
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -648,10 +654,6 @@ void ClientLobby::handleBadConnection()
 //-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
 {
-    SFXManager::get()->quickSound("wee");
-    //I18N: Display when a player is allow to control the server
-    core::stringw msg = _("You are now the owner of server.");
-    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     STKHost::get()->setAuthorisedToControl(true);
     if (m_state.load() == CONNECTED && NetworkConfig::get()->isAutoConnect())
     {
@@ -661,6 +663,14 @@ void ClientLobby::becomingServerOwner()
         start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendToServer(&start, true);
     }
+
+    if (STKHost::get()->isClientServer())
+        return;
+
+    SFXManager::get()->quickSound("wee");
+    //I18N: Display when a player is allow to control the server
+    core::stringw msg = _("You are now the owner of server.");
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 }   // becomingServerOwner
 
 //-----------------------------------------------------------------------------
