@@ -66,6 +66,8 @@ public:
 
         /** Current lap of this kart, or -1 if irrelevant. */
         int lap;
+
+        bool m_outlined_font = false;
     };   // KartIconDisplayInfo
 
 private:
@@ -127,6 +129,9 @@ private:
     /** Musical notes icon (for music description and credits) */
         video::ITexture* m_music_icon;
 
+    /** Texture for the 'plunger in the face' texture. */
+    video::ITexture* m_plunger_face;
+    
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
 
@@ -146,8 +151,6 @@ private:
     
 
 protected:
-    /** Texture for the 'plunger in the face' texture. */
-    video::ITexture* m_plunger_face;
 
     /** State of the plunger: From the 'init' states the plunger switches
      *  between two slow moving states ('shakily moving') till the end of

@@ -17,12 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/stk_peer.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
 #include "utils/log.hpp"
@@ -39,12 +39,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_host_id             = host_id;
     m_connected_time      = (float)StkTime::getRealTime();
     m_validated.store(false);
-    if (NetworkConfig::get()->isClient())
-    {
-        // This allow client to get the correct ping as fast as possible
-        // reset to default (0) will be done in STKHost::mainloop after 3 sec
-        setPingInterval(10);
-    }
+    m_average_ping = 0;
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
@@ -110,7 +105,9 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
     {
         packet = enet_packet_create(data->getData(),
             data->getTotalSize(), (reliable ?
-            ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
+            ENET_PACKET_FLAG_RELIABLE :
+            (ENET_PACKET_FLAG_UNSEQUENCED |
+            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT)));
     }
 
     if (packet)
@@ -156,10 +153,23 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 /** Returns the ping to this peer from host, it waits for 3 seconds for a
  *  stable ping returned by enet measured in ms.
  */
-uint32_t STKPeer::getPing() const
+uint32_t STKPeer::getPing()
 {
     if ((float)StkTime::getRealTime() - m_connected_time < 3.0f)
         return 0;
+    if (NetworkConfig::get()->isServer())
+    {
+        // Average ping in 5 seconds
+        const unsigned ap = stk_config->m_network_state_frequeny * 5;
+        m_previous_pings.push_back(m_enet_peer->roundTripTime);
+        while (m_previous_pings.size() > ap)
+        {
+            m_previous_pings.pop_front();
+            m_average_ping  =
+                (uint32_t)(std::accumulate(m_previous_pings.begin(),
+                m_previous_pings.end(), 0) / m_previous_pings.size());
+        }
+    }
     return m_enet_peer->roundTripTime;
 }   // getPing
 

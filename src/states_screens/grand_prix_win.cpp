@@ -84,8 +84,6 @@ const float KARTS_INITIAL_Z[3] = { 44.9f, 40.9f, 36.9f };
 
 // Locations for karts to go to, should be the locations of the podiums (End Stage 1)
 const float KARTS_PODIUM_X[3] = { 20.5f, 20.75f, 21.0f };
-const float KARTS_PODIUM_Y[3] = {KARTS_INITIAL_Y[0], KARTS_INITIAL_Y[1], KARTS_INITIAL_Y[2]};
-const float KARTS_PODIUM_Z[3] = {KARTS_INITIAL_Z[0], KARTS_INITIAL_Z[1], KARTS_INITIAL_Z[2]};
 
 // Rotations for karts to go to in Stage 2
 const float KARTS_AND_PODIUMS_FINAL_ROTATION[3] = { 270.0f, 270.0f, 270.0f };

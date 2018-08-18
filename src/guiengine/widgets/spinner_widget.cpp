@@ -49,6 +49,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_spinner_widget_player_id=-1;
     m_min = 0;
     m_max = 999;
+    m_right_selected = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -230,45 +231,65 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 
 EventPropagation SpinnerWidget::rightPressed(const int playerID)
 {
+    //Log::info("SpinnerWidget", "Right pressed");
+
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-    //Log::info("SpinnerWidget", "Right pressed");
-    if (m_value+1 <= m_max)
-    {
-        setValue(m_value+1);
-    }
-    else if (m_wrap_around)
-    {
-        setValue(m_min);
-    }
-
-    //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+    // if right arrow is selected, let event handler move to next widget
+    if (m_right_selected)
+        return EVENT_BLOCK;
+    else
+        setSelectedButton(/* right*/ true);
 
     return EVENT_LET;
-}
+} // rightPressed
 
 // -----------------------------------------------------------------------------
 
 EventPropagation SpinnerWidget::leftPressed(const int playerID)
 {
+    //Log::info("SpinnerWidget", "Left pressed");
+
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-    //Log::info("SpinnerWidget", "Left pressed");
-    if (m_value-1 >= m_min)
-    {
-        setValue(m_value-1);
-    }
-    else if (m_wrap_around)
-    {
-        setValue(m_max);
-    }
 
-    //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+    // if right arrow is selected, select left arrow
+    if (m_right_selected)
+        setSelectedButton(/* right*/ false);
+    // if left arrow is selected, let navigation move to next widget
+    else
+        return EVENT_BLOCK;
 
     return EVENT_LET;
-}
+} // leftPressed
+
+void SpinnerWidget::activateSelectedButton()
+{
+    if (m_right_selected)
+    {
+        if (m_value+1 <= m_max)
+        {
+            setValue(m_value+1);
+        }
+        else if (m_wrap_around)
+        {
+            setValue(m_min);
+        }
+    }
+    else // left button active
+    {
+        if (m_value-1 >= m_min)
+        {
+            setValue(m_value-1);
+        }
+        else if (m_wrap_around)
+        {
+            setValue(m_max);
+        }
+    }
+} // activateSelectedButton
 
 // -----------------------------------------------------------------------------
 
@@ -283,11 +304,13 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w,
 
     if (originator == "left")
     {
-        leftPressed(playerID);
+        m_right_selected = false;
+        activateSelectedButton();
     }
     else if (originator == "right")
     {
-        rightPressed(playerID);
+        m_right_selected = true;
+        activateSelectedButton();
     }
     else if (originator == "spinnerbody" || originator == m_properties[PROP_ID])
     {

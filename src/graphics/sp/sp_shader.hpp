@@ -113,22 +113,15 @@ private:
 public:
     // ------------------------------------------------------------------------
     static bool m_sp_shader_debug;
+    static std::map<std::string, std::pair<unsigned, SamplerType> > 
+                                                            m_prefilled_names;
     // ------------------------------------------------------------------------
     SPShader(const std::string& name,
              const std::function<void(SPShader*)>& init_func,
              bool transparent_shader = false, int drawing_priority = 0,
              bool use_alpha_channel = false, bool use_tangents = false,
              const std::array<bool, 6>& srgb =
-             {{ true, true, false, false, false, false }})
-           : m_name(name), m_init_function(init_func),
-             m_drawing_priority(drawing_priority),
-             m_transparent_shader(transparent_shader),
-             m_use_alpha_channel(use_alpha_channel),
-             m_use_tangents(use_tangents), m_srgb(srgb)
-    {
-        memset(m_program, 0, 12);
-        m_init_function(this);
-    }
+             {{ true, true, false, false, false, false }});
     // ------------------------------------------------------------------------
     ~SPShader()
     {

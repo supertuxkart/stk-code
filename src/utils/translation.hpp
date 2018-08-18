@@ -21,13 +21,15 @@
 
 #include <irrString.h>
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "utils/string_utils.hpp"
-
+#ifndef SERVER_ONLY
 #include "tinygettext/tinygettext.hpp"
+#endif
 
 #  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
 #undef _C
@@ -46,6 +48,7 @@
 class Translations
 {
 private:
+#ifndef SERVER_ONLY
     tinygettext::DictionaryManager m_dictionary_manager;
     tinygettext::Dictionary        m_dictionary;
 
@@ -57,6 +60,7 @@ private:
 
     std::string m_current_language_name;
     std::string m_current_language_name_code;
+#endif
 
 public:
                        Translations();
@@ -67,14 +71,22 @@ public:
 
     const wchar_t     *w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context=NULL);
     const wchar_t     *w_ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
+    bool               isRTLLanguage() const
+    {
+#ifdef SERVER_ONLY
+        return false;
+#else
+        return m_rtl;
+#endif
+    }
 
-    bool               isRTLLanguage() const;
     const wchar_t*     fribidize(const wchar_t* in_ptr);
     const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
     bool               isRTLText(const wchar_t* in_ptr);
     bool               isRTLText(const irr::core::stringw &str) { return isRTLText(str.c_str()); }
 
+#ifndef SERVER_ONLY
     const std::vector<std::string>* getLanguageList() const;
 
     std::set<wchar_t>        getCurrentAllChar();
@@ -84,6 +96,7 @@ public:
     std::string              getCurrentLanguageNameCode();
 
     const std::string&       getLocalizedName(const std::string& str) const;
+#endif
 
 private:
     irr::core::stringw fribidizeLine(const irr::core::stringw &str);

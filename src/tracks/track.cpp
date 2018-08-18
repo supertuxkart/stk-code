@@ -105,6 +105,7 @@ Track::Track(const std::string &filename)
     m_magic_number          = 0x17AC3802;
 #endif
 
+    m_minimap_invert_x_z    = false;
     m_materials_loaded      = false;
     m_filename              = filename;
     m_root                  =
@@ -129,6 +130,7 @@ Track::Track(const std::string &filename)
     m_enable_push_back      = true;
     m_reverse_available     = false;
     m_is_arena              = false;
+    m_is_ctf                = false;
     m_max_arena_players     = 0;
     m_has_easter_eggs       = false;
     m_has_navmesh           = false;
@@ -143,7 +145,7 @@ Track::Track(const std::string &filename)
     m_clouds                = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
-    m_caustics_speed        = 1.0f;
+    m_physical_object_uid   = 0;
     m_shadows               = true;
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
@@ -159,6 +161,8 @@ Track::Track(const std::string &filename)
     m_minimap_y_scale       = 1.0f;
     m_force_disable_fog     = false;
     m_startup_run           = false;
+    m_red_flag = m_blue_flag =
+        btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     m_default_number_of_laps = 3;
     m_all_nodes.clear();
     m_static_physics_only_nodes.clear();
@@ -291,6 +295,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+    m_physical_object_uid = 0;
 #ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
     {
@@ -543,6 +548,7 @@ void Track::loadTrackInfo()
     root->get("friction",              &m_friction);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
+    root->get("ctf",                   &m_is_ctf);
     root->get("max-arena-players",     &m_max_arena_players);
     root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
@@ -556,7 +562,6 @@ void Track::loadTrackInfo()
     root->get("shadows",               &m_shadows);
     root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
-    root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
 
@@ -709,6 +714,23 @@ void Track::startMusic() const
  */
 void Track::loadArenaGraph(const XMLNode &node)
 {
+    // Determine if rotate minimap is needed for soccer mode (for blue team)
+    // Only need to test local player
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        const unsigned pk = race_manager->getNumPlayers();
+        for (unsigned i = 0; i < pk; i++)
+        {
+            if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
+                race_manager->getKartInfo(i).getKartTeam() ==
+                KART_TEAM_BLUE)
+            {
+                m_minimap_invert_x_z = true;
+                break;
+            }
+        }
+    }
+
     ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
     Graph::setGraph(graph);
 
@@ -786,7 +808,15 @@ void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    Graph::get()->mapPoint2MiniMap(xyz, draw_at);
+    if (m_minimap_invert_x_z)
+    {
+        Vec3 invert = xyz;
+        invert.setX(-xyz.x());
+        invert.setZ(-xyz.z());
+        Graph::get()->mapPoint2MiniMap(invert, draw_at);
+    }
+    else
+        Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -1111,18 +1141,13 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
-    //Check whether the hardware can do nonsquare or
-    // non power-of-two textures
-    video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-    bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-    bool nonsquare =
-        video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
     //Create the minimap resizing it as necessary.
     m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 
     //Use twice the size of the rendered minimap to reduce significantly aliasing
-    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size*2, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    m_render_target = Graph::get()->makeMiniMap(m_mini_map_size * 2,
+        "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+        m_minimap_invert_x_z);
     if (!m_render_target) return;
 
     core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
@@ -1550,7 +1575,6 @@ void Track::update(int ticks)
         m_startup_run = true;
     }
     float dt = stk_config->ticks2Time(ticks);
-    m_track_object_manager->update(dt);
     CheckManager::get()->update(dt);
     ItemManager::get()->update(ticks);
 
@@ -1745,6 +1769,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     CameraEnd::clearEndCameras();
+    m_minimap_invert_x_z   = false;
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
@@ -1809,7 +1834,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (NetworkConfig::get()->isNetworking())
         NetworkItemManager::create();
     else
+    {
+        // Seed random engine locally
+        ItemManager::updateRandomSeed((uint32_t)StkTime::getTimeSinceEpoch());
         ItemManager::create();
+    }
 
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
@@ -2050,8 +2079,27 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             }
         }   // for i<root->getNumNodes()
     }
-
+    if (m_is_ctf &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        for (unsigned int i=0; i<root->getNumNodes(); i++)
+        {
+            const XMLNode *node = root->getNode(i);
+            const std::string &name = node->getName();
+            if (name == "red-flag" || name == "blue-flag")
+            {
+                flagCommand(node);
+            }
+        }   // for i<root->getNumNodes()
+    }
     delete root;
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        static_cast<NetworkItemManager*>(NetworkItemManager::get())
+            ->initClientConfirmState();
+    }
 
     if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
         Graph::get()->createDebugMesh();
@@ -2059,7 +2107,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
     if (CheckManager::get()->getCheckStructureCount()==0  &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
                   m_ident.c_str());
@@ -2115,6 +2163,9 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
     unsigned int start_position_counter = 0;
 
     unsigned int node_count = root->getNumNodes();
+    const bool is_mode_ctf = m_is_ctf && race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+
     for (unsigned int i = 0; i < node_count; i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -2126,7 +2177,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             int geo_level = 0;
             node->get("geometry-level", &geo_level);
-            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0 &&
+                !NetworkConfig::get()->isNetworking())
                 continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
@@ -2136,12 +2188,16 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "banana"      || name == "item" ||
                  name == "small-nitro" || name == "big-nitro" ||
-                 name == "easter-egg"                           )
+                 name == "easter-egg"  || name == "red-flag" ||
+                 name == "blue-flag")
         {
             // will be handled later
         }
-        else if (name == "start")
+        else if (name == "start" || name == "ctf-start")
         {
+            if ((name == "start" && is_mode_ctf) ||
+                (name == "ctf-start" && !is_mode_ctf))
+                continue;
             unsigned int position = start_position_counter;
             start_position_counter++;
             node->get("position", &position);
@@ -2366,6 +2422,67 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 }   // handleSky
 
 //-----------------------------------------------------------------------------
+void Track::flagCommand(const XMLNode *node)
+{
+    Vec3 xyz;
+    // Set some kind of default in case Y is not defined in the file
+    // (with the new track exporter it always is defined anyway).
+    // Y is the height from which the item is dropped on the track.
+    xyz.setY(1000);
+    node->getXYZ(&xyz);
+
+    Vec3 loc(xyz);
+
+    // Test if the item lies on a 3d node, if so adjust the normal
+    // Also do a raycast if drop item is given
+    Vec3 normal(0, 1, 0);
+    Vec3 quad_normal = normal;
+    Vec3 hit_point = loc;
+    if (Graph::get())
+    {
+        int road_sector = Graph::UNKNOWN_SECTOR;
+        Graph::get()->findRoadSector(xyz, &road_sector);
+        // Only do custom direction of raycast if item is on quad graph
+        if (road_sector != Graph::UNKNOWN_SECTOR)
+        {
+            quad_normal = Graph::get()->getQuad(road_sector)->getNormal();
+        }
+    }
+
+    const Material *m;
+    // If raycast is used, increase the start position slightly
+    // in case that the point is too close to the actual surface
+    // (e.g. floating point errors can cause a problem here).
+    loc += quad_normal * 0.1f;
+
+#ifndef DEBUG
+    m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
+        &m, &normal);
+#else
+    bool drop_success = m_track_mesh->castRay(loc, loc +
+        (-10000 * quad_normal), &hit_point, &m, &normal);
+    if (!drop_success)
+    {
+        Log::warn("track", "flag at position (%f,%f,%f) can not be dropped",
+            loc.getX(), loc.getY(), loc.getZ());
+        Log::warn("track", "onto terrain - position unchanged.");
+    }
+#endif
+
+    const std::string &name = node->getName();
+    if (name == "red-flag")
+    {
+        m_red_flag = btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
+            hit_point);
+    }
+    else
+    {
+        m_blue_flag = btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
+            hit_point);
+    }
+}   // flagCommand
+
+//-----------------------------------------------------------------------------
 /** Handle creation and placement of an item.
  *  \param xyz The position of the item.
  *  \param type The item type.
@@ -2375,6 +2492,13 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 void Track::itemCommand(const XMLNode *node)
 {
     const std::string &name = node->getName();
+
+    const bool is_mode_ctf = m_is_ctf &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+    bool ctf = false;
+    node->get("ctf", &ctf);
+    if ((is_mode_ctf && !ctf) || (!is_mode_ctf && ctf))
+        return;
 
     Item::ItemType type;
     if     (name=="banana"     ) type = Item::ITEM_BANANA;

@@ -45,7 +45,11 @@ private:
 
     const uint32_t m_online_id;
 
+    const uint8_t m_local_id;
+
     const core::stringw m_name;
+
+    const bool m_allow_change_team;
 
     bool m_self_destroy;
 
@@ -61,13 +65,16 @@ private:
 
     GUIEngine::IconButtonWidget* m_kick_widget;
 
+    GUIEngine::IconButtonWidget* m_change_team_widget;
+
     GUIEngine::IconButtonWidget* m_cancel_widget;
 
 public:
-    NetworkUserDialog(uint32_t host_id, uint32_t online_id,
-                      const core::stringw& name)
+    NetworkUserDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
+                      const core::stringw& name, bool allow_change_team)
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
-          m_name(name), m_self_destroy(false),
+          m_local_id(local_id), m_name(name),
+          m_allow_change_team(allow_change_team), m_self_destroy(false),
           m_fetched_ranking(std::make_shared<bool>(false))
     {
         loadFromFile("online/user_info_dialog.stkgui");

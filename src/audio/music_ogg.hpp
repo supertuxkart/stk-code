@@ -19,7 +19,7 @@
 #ifndef HEADER_MUSICOGG_HPP
 #define HEADER_MUSICOGG_HPP
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 
 #include <string>
 

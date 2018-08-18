@@ -32,8 +32,10 @@
 #include <unordered_map>
 #include <vector>
 
+#ifndef SERVER_ONLY
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#endif
 
 class FaceTTF;
 class FontWithFace;
@@ -47,8 +49,10 @@ private:
     /** Stores all \ref FontWithFace used in STK. */
     std::vector<FontWithFace*>               m_fonts;
 
+#ifndef SERVER_ONLY
     /** A FreeType library, it holds the FT_Face internally inside freetype. */
     FT_Library                               m_ft_library;
+#endif
 
     /** TTF files used in \ref BoldFace and \ref RegularFace. */
     FaceTTF*                                 m_normal_ttf;
@@ -81,6 +85,7 @@ public:
         return out;
     }
     // ------------------------------------------------------------------------
+#ifndef SERVER_ONLY
     /** Check for any error discovered in a freetype function that will return
      *  a FT_Error value, and log into the terminal.
      *  \param err The Freetype function.
@@ -94,12 +99,14 @@ public:
         }
     }
     // ------------------------------------------------------------------------
+    /** Return the \ref m_ft_library. */
+    FT_Library getFTLibrary() const                    { return m_ft_library; }
+#endif
+    // ------------------------------------------------------------------------
     void loadFonts();
     // ------------------------------------------------------------------------
     void unitTesting();
-    // ------------------------------------------------------------------------
-    /** Return the \ref m_ft_library. */
-    FT_Library getFTLibrary() const                    { return m_ft_library; }
+
 
 };   // FontManager
 

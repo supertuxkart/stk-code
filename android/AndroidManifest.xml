@@ -11,7 +11,7 @@
                  android:banner="@drawable/banner"
                  android:hasCode="false"
                  android:isGame="true"
-                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                 android:theme="@android:style/Theme.DeviceDefault.NoActionBar.TranslucentDecor"
                  android:hardwareAccelerated="true"
                  android:resizeableActivity="false">
 

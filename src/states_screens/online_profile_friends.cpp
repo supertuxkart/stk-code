@@ -34,7 +34,8 @@ using namespace irr::gui;
 using namespace Online;
 
 int OnlineProfileFriends::m_sort_column      = 0;
-bool OnlineProfileFriends::m_sort_increasing = true;
+bool OnlineProfileFriends::m_sort_desc       = false;
+bool OnlineProfileFriends::m_sort_default    = true;
 
 // -----------------------------------------------------------------------------
 /** Constructor for a display of all friends.
@@ -81,8 +82,6 @@ void OnlineProfileFriends::beforeAddingWidget()
 void OnlineProfileFriends::init()
 {
     OnlineProfileBase::init();
-    m_sort_column     = 0;
-    m_sort_increasing = true;
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID],
                             PLAYER_ID_GAME_MASTER );
     m_profile_tabs->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -120,15 +119,11 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-void OnlineProfileFriends::onColumnClicked(int column_id)
+void OnlineProfileFriends::onColumnClicked(int column_id, bool sort_desc, bool sort_default)
 {
-    if (column_id == m_sort_column)
-        m_sort_increasing = !m_sort_increasing;
-    else
-    {
-        m_sort_increasing = true;       
-    }
     m_sort_column = column_id;
+    m_sort_desc = sort_desc;
+    m_sort_default = sort_default;
     displayResults();
 }   // onColumnClicked
 
@@ -140,20 +135,14 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
     switch (m_sort_column)
     {
     case 0:    // sort by name
-        if (m_sort_increasing)
-            return p1->getUserName().lower_ignore_case(p2->getUserName());
-        else
-            return p2->getUserName().lower_ignore_case(p1->getUserName());
+        return p1->getUserName().lower_ignore_case(p2->getUserName());
     case 1:   // sort by date
     {
         OnlineProfile::RelationInfo *r1 = p1->getRelationInfo();
         OnlineProfile::RelationInfo *r2 = p2->getRelationInfo();
         // While we are comparing dates that are strings, they are normalised
         // i.e. contain leading 0 etc, so a string compare works as expected.
-        if (m_sort_increasing)
-            return r1->getDate().lower_ignore_case(r2->getDate());
-        else
-            return r2->getDate().lower_ignore_case(r1->getDate());
+        return r1->getDate().lower_ignore_case(r2->getDate());
     }
     case 2:   // sort by online status
     {
@@ -162,16 +151,12 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
         // In case of same online status, sort by name
         if (r1->isOnline() == r2->isOnline())
         {
-            if (m_sort_increasing)
-                return p1->getUserName().lower_ignore_case(p2->getUserName());
-            else
-                return p2->getUserName().lower_ignore_case(p1->getUserName());
+            return p1->getUserName().lower_ignore_case(p2->getUserName());
         }
         else
-            if (m_sort_increasing)
-                return r1->isOnline() < r2->isOnline();
-            else
-                return r2->isOnline() < r1->isOnline();
+        {
+            return r1->isOnline() < r2->isOnline();
+        }
     }
     default:
         break;
@@ -187,7 +172,8 @@ void OnlineProfileFriends::displayResults()
 {
     m_friends_list_widget->clear();
     OnlineProfile::IDList friends = m_visiting_profile->getFriends();
-    std::sort(friends.begin(), friends.end(), compareFriends);
+    (m_sort_desc && !m_sort_default) ? std::sort(friends.rbegin(), friends.rend(), compareFriends)
+                                     : std::sort(friends.begin(), friends.end(), compareFriends);
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;

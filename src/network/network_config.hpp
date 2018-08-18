@@ -100,6 +100,8 @@ private:
 
     bool m_done_adding_network_players;
 
+    bool m_team_choosing;
+
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
 
@@ -119,13 +121,15 @@ private:
 
     NetworkConfig();
 
+    uint32_t m_joined_server_version;
+
 public:
     /** Stores the command line flag to disable lan detection (i.e. force
      *  WAN code to be used when connection client and server). */
     static bool m_disable_lan;
 
     /** Server version, will be advanced if there are protocol changes. */
-    static const uint8_t m_server_version;
+    static const uint32_t m_server_version;
 
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -324,7 +328,14 @@ public:
     void setAutoEnd(bool val)                             { m_auto_end = val; }
     // ------------------------------------------------------------------------
     bool isAutoEnd() const                               { return m_auto_end; }
-
+    // ------------------------------------------------------------------------
+    void setTeamChoosing(bool val)                   { m_team_choosing = val; }
+    // ------------------------------------------------------------------------
+    bool hasTeamChoosing() const                    { return m_team_choosing; }
+    // ------------------------------------------------------------------------
+    void setJoinedServerVersion(uint32_t v)    { m_joined_server_version = v; }
+    // ------------------------------------------------------------------------
+    uint32_t getJoinedServerVersion() const { return m_joined_server_version; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

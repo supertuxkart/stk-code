@@ -19,21 +19,25 @@
 #ifndef HEADER_REWINDER_HPP
 #define HEADER_REWINDER_HPP
 
+#include <cassert>
+#include <functional>
+#include <string>
+#include <memory>
+#include <vector>
+
 class BareNetworkString;
 
-class Rewinder
+class Rewinder : public std::enable_shared_from_this<Rewinder>
 {
+protected:
+    void setUniqueIdentity(const std::string& uid)  { m_unique_identity = uid; }
 private:
-    /** True if this object can be destroyed, i.e. if this object is a 'stand
-     *  alone' (i.e. not used in inheritance). If the object is used in
-     *  inheritance (e.g. KartRewinder, which is a Rewinder and Kart), then
-     *  freeing the kart will free this rewinder instance as well.
-     */
-    bool m_can_be_destroyed;
+    std::string m_unique_identity;
 
 public:
- 	        Rewinder(bool can_be_destroyed);
-    virtual ~Rewinder();
+    Rewinder(const std::string& ui = "")             { m_unique_identity = ui; }
+
+    virtual ~Rewinder() {}
 
     /** Called before a rewind. Is used to save the previous position of an
      *  object before a rewind, so that the error due to a rewind can be
@@ -46,40 +50,50 @@ public:
 
     /** Provides a copy of the state of the object in one memory buffer.
      *  The memory is managed by the RewindManager.
-     *  \param[out] buffer The address of the memory buffer with the state.
-     *  \return Size of the buffer, or -1 in case of an error.
+     *  \param[out] ru The unique identity of rewinder writing to.
+     *  \return The address of the memory buffer with the state.
      */
-    virtual BareNetworkString* saveState() = 0;
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru) = 0;
 
     /** Called when an event needs to be undone. This is called while going
      *  backwards for rewinding - all stored events will get an 'undo' call.
      */
     virtual void undoEvent(BareNetworkString *buffer) = 0;
 
-    /** Called when an event needs to be replayed. This is called during 
+    /** Called when an event needs to be replayed. This is called during
      *  rewind, i.e. when going forward in time again.
      */
     virtual void rewindToEvent(BareNetworkString *buffer) = 0;
 
-    /** Called when a state needs to be replayed. This is called during 
+    /** Called when a state needs to be replayed. This is called during
      *  rewind, i.e. when going forward in time again, and only for confirmed
      *  states.
      */
     virtual void restoreState(BareNetworkString *buffer, int count) = 0;
 
-   /** Undo the effects of the given state, but do not rewind to that 
-    *  state (which is done by rewindTo). This is called while going
-    *  backwards for rewinding - all stored events will get an 'undo' call.
-    */
-   virtual void undoState(BareNetworkString *buffer) = 0;
+    /** Undo the effects of the given state, but do not rewind to that
+     *  state (which is done by rewindTo). This is called while going
+     *  backwards for rewinding - all stored events will get an 'undo' call.
+     */
+    virtual void undoState(BareNetworkString *buffer) = 0;
 
-   // -------------------------------------------------------------------------
-   /** Nothing to do here. */
-   virtual void reset() {};
-   // -------------------------------------------------------------------------
-   /** True if this rewinder can be destroyed. Karts can not be destroyed,
-    *  cakes can. This is used by the RewindManager in reset. */
-   bool canBeDestroyed() const { return m_can_be_destroyed; }
+    // -------------------------------------------------------------------------
+    /** Nothing to do here. */
+    virtual void reset() {}
+    // -------------------------------------------------------------------------
+    virtual std::function<void()> getLocalStateRestoreFunction()
+                                                             { return nullptr; }
+    // -------------------------------------------------------------------------
+    const std::string& getUniqueIdentity() const
+    {
+        assert(!m_unique_identity.empty() && m_unique_identity.size() < 255);
+        return m_unique_identity;
+    }
+    // -------------------------------------------------------------------------
+    bool rewinderAdd();
+    // -------------------------------------------------------------------------
+    template<typename T> std::shared_ptr<T> getShared()
+                    { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
 };   // Rewinder
 #endif

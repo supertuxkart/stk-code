@@ -69,8 +69,14 @@ void TrackObjectManager::init()
     for_var_in(TrackObject*, curr, m_all_objects)
     {
         curr->onWorldReady();
+
+        // onWorldReady will hide some track objects using scripting
+        if (curr->isEnabled() && curr->getPhysicalObject() &&
+            curr->getPhysicalObject()->isDynamic())
+            curr->getPhysicalObject()->addForRewind();
     }
-}   // reset
+}   // init
+
 // ----------------------------------------------------------------------------
 /** Initialises all track objects.
  */
@@ -82,6 +88,7 @@ void TrackObjectManager::reset()
         curr->resetEnabled();
     }
 }   // reset
+
 // ----------------------------------------------------------------------------
 /** returns a reference to the track object
  *  with a particular ID
@@ -238,25 +245,3 @@ void TrackObjectManager::removeObject(TrackObject* obj)
     m_all_objects.remove(obj);
     delete obj;
 }   // removeObject
-
-// ----------------------------------------------------------------------------
-void TrackObjectManager::removeForRewind()
-{
-    for (TrackObject* curr : m_all_objects)
-    {
-        if (curr->isEnabled() && curr->getPhysicalObject() &&
-            curr->getPhysicalObject()->isDynamic())
-            curr->getPhysicalObject()->removeBody();
-    }
-}   // removeForRewind
-
-// ----------------------------------------------------------------------------
-void TrackObjectManager::addForRewind()
-{
-    for (TrackObject* curr : m_all_objects)
-    {
-        if (curr->isEnabled() && curr->getPhysicalObject() &&
-            curr->getPhysicalObject()->isDynamic())
-            curr->getPhysicalObject()->addBody();
-    }
-}   // addForRewind

@@ -59,7 +59,10 @@ public:
         LE_VOTE,                          // Track vote
         LE_CHAT,
         LE_SERVER_OWNERSHIP,
-        LE_KICK_HOST
+        LE_KICK_HOST,
+        LE_CHANGE_TEAM,
+        LE_BAD_TEAM,
+        LE_BAD_CONNECTION
     };
 
     enum RejectReason : uint8_t
@@ -116,6 +119,7 @@ public:
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;
     virtual bool allPlayersReady() const = 0;
+    virtual bool isRacing() const = 0;
     GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol

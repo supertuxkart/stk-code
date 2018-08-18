@@ -21,9 +21,7 @@
 
 #include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
-#include "network/event_rewinder.hpp"
 #include "utils/no_copy.hpp"
-#include "utils/random_generator.hpp"
 
 #include <IAnimatedMeshSceneNode.h>
 using namespace irr;
@@ -46,8 +44,7 @@ class SFXBase;
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy, public scene::IAnimationEndCallBack,
-                  public EventRewinder
+class Attachment: public NoCopy, public scene::IAnimationEndCallBack
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -82,7 +79,7 @@ private:
     AbstractKart   *m_kart;
 
     /** Time left till attachment expires. */
-    int             m_ticks_left;
+    int16_t         m_ticks_left;
 
     /** For parachutes only. */
     float           m_initial_speed;
@@ -102,25 +99,24 @@ private:
      *  for certain attachments. */
     AttachmentPlugin *m_plugin;
 
-    /** Pseudo random number generator. */
-    RandomGenerator   m_random;
-
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
     /** Soung for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
-    
+
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();
     void  clear ();
     void  hitBanana(ItemState *item);
+    void  updateGraphics(float dt);
+
     void  update(int ticks);
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
-               AbstractKart *previous_kart=NULL);
-    virtual void rewind(BareNetworkString *buffer);
+               AbstractKart *previous_kart=NULL,
+               bool disable_swatter_animation = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
 
@@ -133,10 +129,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns how much time (in ticks) is left before this attachment is 
      *  removed. */
-    int getTicksLeft() const { return m_ticks_left;      }
+    int16_t getTicksLeft() const                       { return m_ticks_left; }
     // ------------------------------------------------------------------------
     /** Sets how long this attachment will remain attached. */
-    void  setTicksLeft(int t){ m_ticks_left = t;         }
+    void setTicksLeft(int16_t t)                          { m_ticks_left = t; }
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */
@@ -154,6 +150,11 @@ public:
     /** Nothing to undo when going back during a rewind, the full state info
      *  will take care of creating the right attachment. */
     virtual void undo(BareNetworkString *buffer) { }
+    // ------------------------------------------------------------------------
+    float getInitialSpeed() const                   { return m_initial_speed; }
+    // ------------------------------------------------------------------------
+    void setInitialSpeed(float speed)              { m_initial_speed = speed; }
+
 };   // Attachment
 
 #endif

@@ -19,7 +19,7 @@
 #ifndef HEADER_SFX_OPENAL_HPP
 #define HEADER_SFX_OPENAL_HPP
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 
 #include <assert.h>
 #ifdef __APPLE__
@@ -81,43 +81,44 @@ public:
                         bool owns_buffer = false);
     virtual  ~SFXOpenAL();
 
-    virtual void      updatePlayingSFX(float dt);
+    virtual void      updatePlayingSFX(float dt) OVERRIDE;
     virtual bool      init() OVERRIDE;
     virtual void      play() OVERRIDE;
     virtual void      reallyPlayNow(SFXBuffer* buffer = NULL) OVERRIDE;
     virtual void      play(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE;
     virtual void      reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE;
-    virtual void      setLoop(bool status);
-    virtual void      reallySetLoop(bool status);
-    virtual void      stop();
-    virtual void      reallyStopNow();
-    virtual void      pause();
-    virtual void      reallyPauseNow();
-    virtual void      resume();
-    virtual void      reallyResumeNow();
-    virtual void      deleteSFX();
-    virtual void      setSpeed(float factor);
-    virtual void      reallySetSpeed(float factor);
-    virtual void      setPosition(const Vec3 &position);
-    virtual void      reallySetPosition(const Vec3 &p);
-    virtual void      setSpeedPosition(float factor, const Vec3 &p);
-    virtual void      reallySetSpeedPosition(float f,const Vec3 &p);
-    virtual void      setVolume(float volume);
-    virtual void      reallySetVolume(float volume);
-    virtual void      setMasterVolume(float volume);
-    virtual void      reallySetMasterVolumeNow(float volue);
-    virtual void      onSoundEnabledBack();
-    virtual void      setRolloff(float rolloff);
+    virtual void      setLoop(bool status) OVERRIDE;
+    virtual void      reallySetLoop(bool status) OVERRIDE;
+    virtual void      stop() OVERRIDE;
+    virtual void      reallyStopNow() OVERRIDE;
+    virtual void      pause() OVERRIDE;
+    virtual void      reallyPauseNow() OVERRIDE;
+    virtual void      resume() OVERRIDE;
+    virtual void      reallyResumeNow() OVERRIDE;
+    virtual void      deleteSFX() OVERRIDE;
+    virtual void      setSpeed(float factor) OVERRIDE;
+    virtual void      reallySetSpeed(float factor) OVERRIDE;
+    virtual void      setPosition(const Vec3 &position) OVERRIDE;
+    virtual void      reallySetPosition(const Vec3 &p) OVERRIDE;
+    virtual void      setSpeedPosition(float factor, const Vec3 &p) OVERRIDE;
+    virtual void      reallySetSpeedPosition(float f,const Vec3 &p) OVERRIDE;
+    virtual void      setVolume(float volume) OVERRIDE;
+    virtual void      reallySetVolume(float volume) OVERRIDE;
+    virtual void      setMasterVolume(float volume) OVERRIDE;
+    virtual void      reallySetMasterVolumeNow(float volue) OVERRIDE;
+    virtual void      onSoundEnabledBack() OVERRIDE;
+    virtual void      setRolloff(float rolloff) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this sfx is looped or not. */
-    virtual bool      isLooped() { return m_loop; }
+    virtual bool      isLooped()  OVERRIDE { return m_loop; }
     // ------------------------------------------------------------------------
     /** Returns the status of this sfx. */
-    virtual SFXStatus getStatus() { return m_status; }
+    virtual SFXStatus getStatus()  OVERRIDE { return m_status; }
 
     // ------------------------------------------------------------------------
     /** Returns the buffer associated with this sfx. */
-    virtual const SFXBuffer* getBuffer() const { return m_sound_buffer; }
+    virtual const SFXBuffer* getBuffer() const OVERRIDE
+                                                     { return m_sound_buffer; }
 
 };   // SFXOpenAL
 

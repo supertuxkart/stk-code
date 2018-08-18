@@ -1,44 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-        <header align="center" width="80%" text="SuperTuxKart Help" text_align="center"/>
-        <spacer height="15" width="10"/>
-
-        <tabs id="category" height="10%" max_height="110" x="2%" width="98%" align="center">
-            <icon-button id="page1" width="128" height="128" icon="gui/track_random.png"
-                    I18N="Tab in help menu" text="General"/>
-            <icon-button id="page2" width="128" height="128" icon="gui/weapons.png"
-                    I18N="Tab in help menu" text="Weapons"/>
-            <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png"
-                    I18N="Tab in help menu" text="Game Modes"/>
-            <icon-button id="page4" width="128" height="128" icon="gui/options_input.png"
-                    I18N="Tab in help menu" text="Multi-player"/>
-            <icon-button id="page5" width="128" height="128" icon="gui/banana.png"
-                    I18N="Tab in help menu" text="Bananas"/>
-        </tabs>
-
-        <box proportion="1" width="100%" layout="vertical-row">
-            <label align="center" text="SuperTuxKart can be played in multiplayer mode on the same computer"/>
-            <label align="center" text="(network play is not yet available)"/>
-
-            <div width="100%" proportion="2" layout="horizontal-row">
-                <icon align="center" width="64" height="64" icon="gui/options_input.png"/>
-                <spacer width="25" height="25"/>
-                <bubble proportion="1" height="100%"
-                        I18N="In the help menu"
-                        text="First, you will need several input devices (having multiple gamepads or joysticks is the best way to play with several people). Go in the input configuration screen and setup the gamepads. It is also possible to play on keyboard(s), however each player will need a different set of keys, and keep in mind that most keyboards are not appropriate for multiplayer gameplay because they do not support large number of keypresses."/>
-            </div>
-
-            <div width="100%" proportion="2" layout="horizontal-row">
-                <icon align="center" width="64" height="64" icon="gui/random_kart.png"/>
-                <spacer width="25" height="25"/>
-                <bubble proportion="1" height="100%"
-                        I18N="In the help menu"
-                        text="When input devices are configured, you are ready to play. Select the 'multiplayer race' icon in the main menu. When it is time to choose a kart, each player can press on the 'fire' key of their gamepad or keyboard to join the game. Each player can use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>
-            </div>
-            <spacer width="50" height="25" />
-        </box>
-    </div>
-
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Help" text_align="center"/>
+        <spacer height="1%" width="100%"/>
+
+        <div width="100%" height="92%" layout="horizontal-row" >
+
+            <vertical-tabs id="category" height="100%" width="18%">
+                <icon-button id="page1" width="128" height="128" icon="gui/track_random.png"
+                        I18N="Tab in help menu" text="General"/>
+                <icon-button id="page2" width="128" height="128" icon="gui/mode_ftl.png"
+                        I18N="Tab in help menu" text="Game Modes"/>
+                <icon-button id="page3" width="128" height="128" icon="gui/weapons.png"
+                        I18N="Tab in help menu" text="Powerups"/>
+                <icon-button id="page4" width="128" height="128" icon="gui/banana.png"
+                        I18N="Tab in help menu" text="Bananas"/>
+                <icon-button id="page5" width="128" height="128" icon="gui/story_mode_book.png"
+                        I18N="Tab in help menu" text="Story Mode"/>
+                <icon-button id="page6" width="128" height="128" icon="gui/mass.png"
+                        I18N="Tab in help menu" text="Kart classes"/>
+                <icon-button id="page7" width="128" height="128" icon="gui/options_input.png"
+                        I18N="Tab in help menu" text="Multi-player"/>
+            </vertical-tabs>
+
+            <spacer width="2%" height="100%"/>
+
+            <box width="80%" height="100%" layout="vertical-row">
+                <spacer height="1%" width="10"/>
+                <label align="center" word_wrap="true" text="Hitting a banana can result in one of the following being attached to the kart:"/>
+                <spacer height="2%" width="10"/>                
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="models/anchor-icon.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Anchor - slows down the kart suddenly."/>
+                </div>
+                
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="models/parachute-icon.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Parachute - slows down the kart, more progressively than the anchor. The faster you go, the stronger it slows you down."/>
+                </div>
+                
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/bomb_icon.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Bomb - detonates after some amount of time, throwing the kart up in the air. Bump into another kart to transfer the bomb to it."/>
+                </div>
+            </box>
+        </div>
+    </div>
 </stkgui>

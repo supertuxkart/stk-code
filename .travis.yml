@@ -5,6 +5,9 @@
 #
 sudo: false
 language: cpp
+os:
+  - linux
+  - osx
 compiler:
   - gcc
   - clang
@@ -40,21 +43,17 @@ addons:
     - zlib1g-dev
 
 before_script:
-  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
-  # Use half of the available threads, gcc is memory hungry
-  - 'if [ ${CC} = "gcc" ]; then
-        export THREADS=$((`nproc` / 2));
-    else
-        export THREADS=$((`nproc` + 1));
-    fi'
-  - echo "THREADS = $THREADS"
-  - free -mt
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew bundle; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo mkdir -p /usr/local/include/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/; fi
 
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
-  - make VERBOSE=1 -j $THREADS
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
+  - make VERBOSE=1 -j3
 
 notifications:
   irc:

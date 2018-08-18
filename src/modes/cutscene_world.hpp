@@ -65,6 +65,8 @@ public:
 
     virtual void init() OVERRIDE;
 
+    virtual void reset() OVERRIDE;
+
     // clock events
     virtual bool isRaceOver() OVERRIDE;
 

@@ -55,35 +55,35 @@ namespace MiniGLM
         Log::info("MiniGLM::unitTesting", "Quaternion compression");
         core::quaternion quat(11.0f, 44.0f, 55.0f, 77.0f);
         quat.normalize();
-        packed = compressQuaternion(quat);
+        packed = compressIrrQuaternion(quat);
         core::quaternion out_quat = decompressQuaternion(packed);
         Log::info("MiniGLM::unitTesting", "Result before: x:%f y:%f z:%f w:%f,"
             " after: x:%f y:%f z:%f w:%f", quat.X, quat.Y, quat.Z, quat.W,
             out_quat.X, out_quat.Y, out_quat.Z, out_quat.W);
         quat = core::quaternion(-23.0f, -44.0f, -7.0f, 0.0f);
         quat.normalize();
-        packed = compressQuaternion(quat);
+        packed = compressIrrQuaternion(quat);
         out_quat = decompressQuaternion(packed);
         Log::info("MiniGLM::unitTesting", "Result before: x:%f y:%f z:%f w:%f,"
             " after: x:%f y:%f z:%f w:%f", quat.X, quat.Y, quat.Z, quat.W,
             out_quat.X, out_quat.Y, out_quat.Z, out_quat.W);
         quat = core::quaternion(0.0f, 0.0f, 0.0f, 1.0f);
         quat.normalize();
-        packed = compressQuaternion(quat);
+        packed = compressIrrQuaternion(quat);
         out_quat = decompressQuaternion(packed);
         Log::info("MiniGLM::unitTesting", "Result before: x:%f y:%f z:%f w:%f,"
             " after: x:%f y:%f z:%f w:%f", quat.X, quat.Y, quat.Z, quat.W,
             out_quat.X, out_quat.Y, out_quat.Z, out_quat.W);
         quat = core::quaternion(0.0f, 0.0f, 0.0f, -1.0f);
         quat.normalize();
-        packed = compressQuaternion(quat);
+        packed = compressIrrQuaternion(quat);
         out_quat = decompressQuaternion(packed);
         Log::info("MiniGLM::unitTesting", "Result before: x:%f y:%f z:%f w:%f,"
             " after: x:%f y:%f z:%f w:%f", quat.X, quat.Y, quat.Z, quat.W,
             out_quat.X, out_quat.Y, out_quat.Z, out_quat.W);
         quat = core::quaternion(-43.0f, 20.0f, 16.0f, -88.0f);
         quat.normalize();
-        packed = compressQuaternion(quat);
+        packed = compressIrrQuaternion(quat);
         out_quat = decompressQuaternion(packed);
         Log::info("MiniGLM::unitTesting", "Result before: x:%f y:%f z:%f w:%f,"
             " after: x:%f y:%f z:%f w:%f", quat.X, quat.Y, quat.Z, quat.W,

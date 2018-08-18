@@ -77,7 +77,9 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
 {
     // 4 bytes counter and 4 bytes tag
     ENetPacket* p = enet_packet_create(NULL, ns.m_buffer.size() + 8,
-        (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
+        (reliable ? ENET_PACKET_FLAG_RELIABLE :
+        (ENET_PACKET_FLAG_UNSEQUENCED | ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT))
+        );
     if (p == NULL)
         return NULL;
 

@@ -237,43 +237,47 @@ void resizeSkinning(unsigned number)
     const irr::core::matrix4 m;
     g_skinning_size = number;
 
-#ifdef USE_GLES2
 
-    glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, number, 0, GL_RGBA,
-        GL_FLOAT, NULL);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 4, 1, GL_RGBA, GL_FLOAT,
-        m.pointer());
-    glBindTexture(GL_TEXTURE_2D, 0);
-    static std::vector<std::array<float, 16> >
-        tmp_buf(stk_config->m_max_skinning_bones);
-    g_joint_ptr = tmp_buf.data();
 
-#else
-
-    glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
-    if (CVS->isARBBufferStorageUsable())
+    if (!CVS->isARBTextureBufferObjectUsable())
     {
-        glBufferStorage(GL_TEXTURE_BUFFER, number << 6, NULL,
-            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-        g_joint_ptr = (std::array<float, 16>*)glMapBufferRange(
-            GL_TEXTURE_BUFFER, 0, 64,
-            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-        memcpy(g_joint_ptr, m.pointer(), 64);
-        glUnmapBuffer(GL_TEXTURE_BUFFER);
-        g_joint_ptr = (std::array<float, 16>*)glMapBufferRange(
-            GL_TEXTURE_BUFFER, 64, (number - 1) << 6,
-            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+        glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, number, 0, GL_RGBA,
+            GL_FLOAT, NULL);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 4, 1, GL_RGBA, GL_FLOAT,
+            m.pointer());
+        glBindTexture(GL_TEXTURE_2D, 0);
+        static std::vector<std::array<float, 16> >
+            tmp_buf(stk_config->m_max_skinning_bones);
+        g_joint_ptr = tmp_buf.data();
     }
     else
     {
-        glBufferData(GL_TEXTURE_BUFFER, number << 6, NULL, GL_DYNAMIC_DRAW);
-        glBufferSubData(GL_TEXTURE_BUFFER, 0, 64, m.pointer());
-    }
-    glBindTexture(GL_TEXTURE_BUFFER, g_skinning_tex);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, g_skinning_buf);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
+#ifndef USE_GLES2
+        glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
+        if (CVS->isARBBufferStorageUsable())
+        {
+            glBufferStorage(GL_TEXTURE_BUFFER, number << 6, NULL,
+                GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+            g_joint_ptr = (std::array<float, 16>*)glMapBufferRange(
+                GL_TEXTURE_BUFFER, 0, 64,
+                GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+            memcpy(g_joint_ptr, m.pointer(), 64);
+            glUnmapBuffer(GL_TEXTURE_BUFFER);
+            g_joint_ptr = (std::array<float, 16>*)glMapBufferRange(
+                GL_TEXTURE_BUFFER, 64, (number - 1) << 6,
+                GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+        }
+        else
+        {
+            glBufferData(GL_TEXTURE_BUFFER, number << 6, NULL, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_TEXTURE_BUFFER, 0, 64, m.pointer());
+        }
+        glBindTexture(GL_TEXTURE_BUFFER, g_skinning_tex);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, g_skinning_buf);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
 #endif
+    }
 
 }   // resizeSkinning
 
@@ -283,30 +287,35 @@ void initSkinning()
     static_assert(sizeof(std::array<float, 16>) == 64, "No padding");
 
     int max_size = 0;
-#ifdef USE_GLES2
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
 
-    if (stk_config->m_max_skinning_bones > (unsigned)max_size)
+    if (!CVS->isARBTextureBufferObjectUsable())
     {
-        Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
-            max_size);
-        stk_config->m_max_skinning_bones = max_size;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
+    
+        if (stk_config->m_max_skinning_bones > (unsigned)max_size)
+        {
+            Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
+                      max_size);
+            stk_config->m_max_skinning_bones = max_size;
+        }
+        Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: %u"
+                  " (max bones) * 16 RGBA float texture",
+                  stk_config->m_max_skinning_bones);
     }
-    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: %u"
-        " (max bones) * 16 RGBA float texture",
-        stk_config->m_max_skinning_bones);
-#else
-
-    glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
-    if (stk_config->m_max_skinning_bones << 6 > (unsigned)max_size)
+    else
     {
-        Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
-            max_size >> 6);
-        stk_config->m_max_skinning_bones = max_size >> 6;
-    }
-    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
-        "max bones: %u", stk_config->m_max_skinning_bones);
+#ifndef USE_GLES2
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
+        if (stk_config->m_max_skinning_bones << 6 > (unsigned)max_size)
+        {
+            Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
+                      max_size >> 6);
+            stk_config->m_max_skinning_bones = max_size >> 6;
+        }
+        Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
+                  "max bones: %u", stk_config->m_max_skinning_bones);
 #endif
+    }
 
 
     // Reserve 1 identity matrix for non-weighted vertices
@@ -314,7 +323,10 @@ void initSkinning()
     const irr::core::matrix4 m;
     glGenTextures(1, &g_skinning_tex);
 #ifndef USE_GLES2
-    glGenBuffers(1, &g_skinning_buf);
+    if (CVS->isARBTextureBufferObjectUsable())
+    {
+        glGenBuffers(1, &g_skinning_buf);
+    }
 #endif
     resizeSkinning(stk_config->m_max_skinning_bones);
 
@@ -581,7 +593,8 @@ void destroy()
     SPTextureManager::destroy();
 
 #ifndef USE_GLES2
-    if (CVS->isARBBufferStorageUsable())
+    if (CVS->isARBTextureBufferObjectUsable() && 
+        CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
         glUnmapBuffer(GL_TEXTURE_BUFFER);
@@ -1160,7 +1173,8 @@ void uploadSkinningMatrices()
 
     unsigned buffer_offset = 0;
 #ifndef USE_GLES2
-    if (!CVS->isARBBufferStorageUsable())
+    if (CVS->isARBTextureBufferObjectUsable() && 
+        !CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
         g_joint_ptr = (std::array<float, 16>*)
@@ -1178,13 +1192,17 @@ void uploadSkinningMatrices()
         buffer_offset += g_skinning_mesh[i]->getTotalJoints();
     }
 
-#ifdef USE_GLES2
-    glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 1, 4, buffer_offset, GL_RGBA,
-        GL_FLOAT, g_joint_ptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
-#else
-    if (!CVS->isARBBufferStorageUsable())
+    if (!CVS->isARBTextureBufferObjectUsable())
+    {
+        glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 1, 4, buffer_offset, GL_RGBA,
+            GL_FLOAT, g_joint_ptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    
+#ifndef USE_GLES2
+    if (CVS->isARBTextureBufferObjectUsable() && 
+        !CVS->isARBBufferStorageUsable())
     {
         glUnmapBuffer(GL_TEXTURE_BUFFER);
         glBindBuffer(GL_TEXTURE_BUFFER, 0);

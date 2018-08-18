@@ -6,6 +6,7 @@ It should be kept in mind that some versions have a less complete changelog than
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
 
 ## Unreleased
+* Networking game for normal race, time trial, free for all, capture the flag and soccer
 * Better random item distribution for various numbers of karts by Alayan and hiker
 * Numerous improvements to input on Android by deveee
 * Unlockable SuperTux challenges in Story Mode by Alayan
@@ -23,6 +24,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
 * Many unwanted shortcuts and exploits fixed by Auria
+* Las Dunas Soccer by samuncle
 
 ## SuperTuxKart 0.9.3 (28. October 2017)
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau

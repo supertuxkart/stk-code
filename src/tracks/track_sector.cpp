@@ -20,6 +20,7 @@
 
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
 #include "tracks/arena_graph.hpp"
@@ -74,18 +75,21 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
             prev_sector, test_nodes, ignore_vertical);
     }
 
-    // ArenaGraph (battle and soccer mode) doesn't need the code below
-    if (ag) return;
+    // Keep the last valid graph node for arena mode
+    if (ag)
+    {
+        if (prev_sector != Graph::UNKNOWN_SECTOR)
+            m_last_valid_graph_node = prev_sector;
+        return;
+    }
 
     // keep the current quad as the latest valid one IF the player has one
     // of the required checklines
     const DriveNode* dn = DriveGraph::get()->getNode(m_current_graph_node);
     const std::vector<int>& checkline_requirements = dn->getChecklineRequirements();
 
-    bool isValidQuad = false;
     if (checkline_requirements.size() == 0)
     {
-        isValidQuad = true;
         if (m_on_road)
             m_last_valid_graph_node = m_current_graph_node;
     }
@@ -98,7 +102,6 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
                 //has_prerequisite = true;
                 if (m_on_road)
                     m_last_valid_graph_node = m_current_graph_node;
-                isValidQuad = true;
                 break;
             }
         }
@@ -155,3 +158,25 @@ float TrackSector::getRelativeDistanceToCenter() const
         ratio=-1.0f;
     return ratio;
 }   // getRelativeDistanceToCenter
+
+// ----------------------------------------------------------------------------
+void TrackSector::saveState(BareNetworkString* buffer) const
+{
+    buffer->addUInt32(m_current_graph_node);
+    buffer->addUInt32(m_last_valid_graph_node);
+    buffer->add(m_current_track_coords);
+    buffer->add(m_latest_valid_track_coords);
+    buffer->addUInt8(m_on_road ? 1 : 0);
+    buffer->addUInt32(m_last_triggered_checkline);
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void TrackSector::rewindTo(BareNetworkString* buffer)
+{
+    m_current_graph_node = buffer->getUInt32();
+    m_last_valid_graph_node = buffer->getUInt32();
+    m_current_track_coords = buffer->getVec3();
+    m_latest_valid_track_coords = buffer->getVec3();
+    m_on_road = buffer->getUInt8() == 1;
+    m_last_triggered_checkline = buffer->getUInt32();
+}   // rewindTo

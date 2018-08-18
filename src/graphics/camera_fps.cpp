@@ -224,7 +224,7 @@ void CameraFPS::update(float dt)
         m_local_up = up;
 
         // Move the camera with the kart
-        btTransform t = m_kart->getTrans();
+        btTransform t = m_kart->getSmoothedTrans();
         if (stk_config->m_camera_follow_skid &&
             m_kart->getSkidding()->getVisualSkidRotation() != 0)
         {

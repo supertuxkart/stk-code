@@ -82,11 +82,6 @@ private:
      *  ball will be deleted. */
     static int m_st_delete_ticks;
 
-    /** Timer before another rubber ball can be picked up. This is to ensure
-     *  that there are not too many rubber balls on the track in races with many
-     *  karts. */
-    static int m_ticks_between_balls;
-
     /** This factor is used to influence how much the rubber ball should aim
      *  at its target early. It used the 'distance to center of track' of its
      *  target, and adjusts the interpolation control points to be more or
@@ -182,10 +177,15 @@ private:
     /** This variable counts how often a ball tunneled (in consecutive
      *  frames). If a ball tunnels a certain number of times, it is
      *  considered stuck and will be removed. */
-    unsigned int m_tunnel_count;
+    uint8_t      m_tunnel_count;
 
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;
+
+    /* Used by undo and redo the firing when rewind */
+    Vec3 m_owner_init_pos, m_init_pos;
+
+    bool m_restoring_state;
 
     void         computeTarget();
     void         updateDistanceToTarget();
@@ -199,21 +199,25 @@ private:
     float        getTunnelHeight(const Vec3 &next_xyz, 
                                      const float vertical_offset) const;
     bool         checkTunneling();
+    virtual void additionalPhysicsProperties() OVERRIDE;
+
 public:
                  RubberBall  (AbstractKart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(int ticks) OVERRIDE;
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    virtual void setAnimation(AbstractKartAnimation *animation);
-    // ------------------------------------------------------------------------
-    /** Returns time (in ticks) between rubberballs, to avoid that in games
-     *  with many karts too many rubber balls are in play at the same time. */
-    static int   getTicksBetweenRubberBalls() { return m_ticks_between_balls; }
+    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual void setAnimation(AbstractKartAnimation *animation) OVERRIDE;
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */
     //virtual HitEffect *getHitEffect() const {return NULL; }
+    // ------------------------------------------------------------------------
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+    // ------------------------------------------------------------------------
 
 };   // RubberBall
 

@@ -54,9 +54,19 @@ void GameSetup::update(bool remove_disconnected_players)
     if (!World::getWorld() ||
         World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
         return;
+    int red_count = 0;
+    int blue_count = 0;
     for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
     {
-        if (!m_players[i].expired())
+        bool disconnected = m_players[i].expired();
+        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
+            !disconnected)
+            red_count++;
+        else if (race_manager->getKartInfo(i).getKartTeam() ==
+            KART_TEAM_BLUE && !disconnected)
+            blue_count++;
+
+        if (!disconnected)
             continue;
         AbstractKart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated())
@@ -72,26 +82,52 @@ void GameSetup::update(bool remove_disconnected_players)
             STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
+    if (m_players.size() != 1 && World::getWorld()->hasTeam() &&
+        (red_count == 0 || blue_count == 0))
+        World::getWorld()->setUnfairTeam(true);
 }   // removePlayer
 
 //-----------------------------------------------------------------------------
 void GameSetup::loadWorld()
 {
+    // Notice: for arena (battle / soccer) lap and reverse will be mapped to
+    // goals / time limit and random item location
     assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
     if (PlayerManager::getCurrentPlayer())
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
-    race_manager->setReverseTrack(m_reverse);
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
-        if (isSoccerGoalTarget())
-            race_manager->setMaxGoal(m_laps);
+        const bool is_ctf = race_manager->getMajorMode() ==
+            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+        bool prev_val = UserConfigParams::m_random_arena_item;
+        if (is_ctf)
+            UserConfigParams::m_random_arena_item = false;
         else
-            race_manager->setTimeTarget((float)m_laps * 60.0f);
+            UserConfigParams::m_random_arena_item = m_reverse;
+
+        race_manager->setReverseTrack(false);
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            if (isSoccerGoalTarget())
+                race_manager->setMaxGoal(m_laps);
+            else
+                race_manager->setTimeTarget((float)m_laps * 60.0f);
+        }
+        else
+        {
+            race_manager->setHitCaptureTime(m_hit_capture_limit,
+                m_battle_time_limit);
+        }
+        race_manager->startSingleRace(m_tracks.back(), -1,
+            false/*from_overworld*/);
+        UserConfigParams::m_random_arena_item = prev_val;
     }
     else
     {
+        race_manager->setReverseTrack(m_reverse);
         race_manager->startSingleRace(m_tracks.back(), m_laps,
             false/*from_overworld*/);
     }
@@ -179,3 +215,18 @@ void GameSetup::sortPlayersForGrandPrix()
         std::reverse(m_players.begin(), m_players.end());
     }
 }   // sortPlayersForGrandPrix
+
+//-----------------------------------------------------------------------------
+void GameSetup::sortPlayersForTeamGame()
+{
+    if (!race_manager->teamEnabled() ||
+        NetworkConfig::get()->hasTeamChoosing())
+        return;
+    std::lock_guard<std::mutex> lock(m_players_mutex);
+    for (unsigned i = 0; i < m_players.size(); i++)
+    {
+        auto player = m_players[i].lock();
+        assert(player);
+        player->setTeam((KartTeam)(i % 2));
+    }
+}   // sortPlayersForTeamGame

@@ -38,7 +38,9 @@ private:
     // ------------------------------------------------------------------------
     virtual bool isBold() const OVERRIDE                       { return true; }
     // ------------------------------------------------------------------------
+#ifndef SERVER_ONLY
     virtual int shapeOutline(FT_Outline* outline) const OVERRIDE;
+#endif
 
 public:
     LEAK_CHECK()

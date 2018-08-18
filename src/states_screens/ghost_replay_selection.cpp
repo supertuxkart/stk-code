@@ -32,7 +32,6 @@ using namespace GUIEngine;
  */
 GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.stkgui")
 {
-    m_sort_desc = true;
     m_is_comparing = false;
     m_replay_to_compare_uid = 0;
 }   // GhostReplaySelection
@@ -51,6 +50,7 @@ void GhostReplaySelection::refresh(bool forced_update, bool update_columns)
 {
     if (ReplayPlay::get()->getNumReplayFile() == 0 || forced_update)
         ReplayPlay::get()->loadAllReplayFile();
+    defaultSort();
     loadList();
 
     // Allow to disable a comparison, but not to start one
@@ -136,7 +136,6 @@ void GhostReplaySelection::init()
  */
 void GhostReplaySelection::loadList()
 {
-    ReplayPlay::get()->sortReplay(m_sort_desc);
     m_replay_list_widget->clear();
 
     if (ReplayPlay::get()->getNumReplayFile() == 0)
@@ -424,8 +423,17 @@ void GhostReplaySelection::onConfirm()
 /** Change the sort order if a column was clicked.
  *  \param column_id ID of the column that was clicked.
  */
-void GhostReplaySelection::onColumnClicked(int column_id)
+void GhostReplaySelection::onColumnClicked(int column_id, bool sort_desc, bool sort_default)
 {
+    // Begin by resorting the list to default
+    defaultSort();
+
+    if (sort_default)
+    {
+        loadList();
+        return;
+    }
+
     int diff_difficulty = m_same_difficulty ? 1 : 0;
     int diff_linear = m_active_mode_is_linear ? 0 : 1;
 
@@ -457,12 +465,25 @@ void GhostReplaySelection::onColumnClicked(int column_id)
     else
         assert(0);
 
-    printf("column_id is %d\n", column_id);
+    ReplayPlay::get()->sortReplay(sort_desc);
 
-    /** \brief Toggle the sort order after column click **/
-    m_sort_desc = !m_sort_desc;
     loadList();
 }   // onColumnClicked
+
+// ----------------------------------------------------------------------------
+/** Apply the default sorting to the replay list
+ */
+void GhostReplaySelection::defaultSort()
+{
+    ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+    ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+    ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+    ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
+    ReplayPlay::get()->sortReplay(/* decreasing order */ false);
+}   // defaultSort
 
 // ----------------------------------------------------------------------------
 bool GhostReplaySelection::onEscapePressed()

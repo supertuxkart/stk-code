@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_FILE_SYSTEM_HPP
 #define HEADER_TINYGETTEXT_FILE_SYSTEM_HPP
 
+#ifndef SERVER_ONLY
+
 #include <vector>
 #include <memory>
 #include <iosfwd>
@@ -39,4 +41,4 @@ public:
 #endif
 
 /* EOF */
-
+#endif

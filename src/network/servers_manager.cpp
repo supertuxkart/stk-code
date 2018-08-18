@@ -176,7 +176,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                 if (len > 0)
                 {
                     BareNetworkString s(buffer, len);
-                    int version = s.getUInt8();
+                    int version = s.getUInt32();
                     if (version < stk_config->m_max_server_version ||
                         version > stk_config->m_max_server_version)
                     {
@@ -193,9 +193,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t mode        = s.getUInt8();
                     sender.setPort(port);
                     uint8_t password    = s.getUInt8();
-                    servers_now.emplace(name, std::make_shared<Server>
-                        (cur_server_id++, name, max_players, players,
-                        difficulty, mode, sender, password == 1)       );
+                    servers_now.insert(std::make_pair(name, 
+                        std::make_shared<Server>(cur_server_id++, name, 
+                        max_players, players, difficulty, mode, sender, 
+                        password == 1)));
                     //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
@@ -426,6 +427,7 @@ void ServersManager::updateBroadcastAddresses()
             addAllBroadcastAddresses(ta, u);
         }
     }
+    freeifaddrs(addresses);
 #endif
 }   // updateBroadcastAddresses
 

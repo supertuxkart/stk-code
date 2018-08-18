@@ -86,7 +86,7 @@ protected:
     /** True if a kart can drive on this object. This will */
     bool                           m_is_driveable;
 
-    PhysicalObject*                m_physical_object;
+    std::shared_ptr<PhysicalObject> m_physical_object;
 
     ThreeDAnimation*               m_animator;
 
@@ -164,9 +164,10 @@ public:
     // ------------------------------------------------------------------------
     bool isSoccerBall() const { return m_soccer_ball; }
     // ------------------------------------------------------------------------
-    const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
+    const PhysicalObject* getPhysicalObject() const
+                                            { return m_physical_object.get(); }
     // ------------------------------------------------------------------------
-    PhysicalObject* getPhysicalObject() { return m_physical_object; }
+    PhysicalObject* getPhysicalObject()     { return m_physical_object.get(); }
     // ------------------------------------------------------------------------
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     // ------------------------------------------------------------------------
@@ -214,7 +215,7 @@ public:
     /** Get the physics representation of an object.
       * On the script side, the returned object is of type : @ref Scripting_PhysicalObject
       */
-    PhysicalObject* getPhysics() { return m_physical_object; }
+    PhysicalObject* getPhysics() { return m_physical_object.get(); }
     /** Hide or show the object */
     void setEnabled(bool mode);
 

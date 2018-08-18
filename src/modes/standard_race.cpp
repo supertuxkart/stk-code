@@ -103,7 +103,7 @@ void StandardRace::endRaceEarly()
     for (unsigned int i = 1; i <= kart_amount; i++)
     {
         int kartid = m_position_index[i-1];
-        AbstractKart* kart = m_karts[kartid];
+        AbstractKart* kart = m_karts[kartid].get();
 
         if (kart->hasFinishedRace())
         {
@@ -140,7 +140,7 @@ void StandardRace::endRaceEarly()
         int kartid = active_players[i];
         int position = getNumKarts() - (int) active_players.size() + 1 + i;
         setKartPosition(kartid, position);
-        float punished_time = estimateFinishTimeForKart(m_karts[kartid])
+        float punished_time = estimateFinishTimeForKart(m_karts[kartid].get())
                               + worse_finish_time - WorldStatus::getTime();
         m_karts[kartid]->finishedRace(punished_time);
 

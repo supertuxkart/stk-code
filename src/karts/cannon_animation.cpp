@@ -29,7 +29,7 @@
 
 #include "LinearMath/btTransform.h"
 
-/** The constructor for the cannon animation. 
+/** The constructor for the cannon animation.
  *  \param kart The kart to be animated. Can also be NULL if a basket ball
  *         etc is animated (e.g. cannon animation).
  *  \param ipo The IPO (blender interpolation curve) which the kart

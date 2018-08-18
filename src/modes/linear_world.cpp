@@ -169,34 +169,10 @@ void LinearWorld::update(int ticks)
             m_finish_timeout = std::numeric_limits<float>::max();
         }
     }
-    const unsigned int kart_amount = getNumKarts();
 
     // Do stuff specific to this subtype of race.
     // ------------------------------------------
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        KartInfo& kart_info = m_kart_info[n];
-        AbstractKart* kart = m_karts[n];
-
-        // Nothing to do for karts that are currently being
-        // rescued or eliminated
-        if(kart->getKartAnimation()) continue;
-        // If the kart is off road, and 'flying' over a reset plane
-        // don't adjust the distance of the kart, to avoid a jump
-        // in the position of the kart (e.g. while falling the kart
-        // might get too close to another part of the track, shortly
-        // jump to position one, then on reset fall back to last)
-        if ((!getTrackSector(n)->isOnRoad() &&
-            (!kart->getMaterial() ||
-              kart->getMaterial()->isDriveReset()))  &&
-             !kart->isGhostKart())
-            continue;
-        getTrackSector(n)->update(kart->getFrontXYZ());
-        kart_info.m_overall_distance = kart_info.m_finished_laps
-                                     * Track::getCurrentTrack()->getTrackLength()
-                        + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
-    }   // for n
-
+    updateTrackSectors();
     // Run generic parent stuff that applies to all modes.
     // It especially updates the kart positions.
     // It MUST be done after the update of the distances
@@ -209,6 +185,7 @@ void LinearWorld::update(int ticks)
     WorldWithRank::updateTrack(ticks);
     updateRacePosition();
 
+    const unsigned int kart_amount = getNumKarts();
     for (unsigned int i=0; i<kart_amount; i++)
     {
         // ---------- update rank ------
@@ -218,7 +195,7 @@ void LinearWorld::update(int ticks)
         // Update the estimated finish time.
         // This is used by the AI
         m_kart_info[i].m_estimated_finish =
-                estimateFinishTimeForKart(m_karts[i]);
+                estimateFinishTimeForKart(m_karts[i].get());
     }
     // If one player and a ghost, or two compared ghosts,
     // compute the live time difference
@@ -250,6 +227,35 @@ void LinearWorld::update(int ticks)
     }
 #endif
 }   // update
+
+//-----------------------------------------------------------------------------
+void LinearWorld::updateTrackSectors()
+{
+    const unsigned int kart_amount = getNumKarts();
+    for(unsigned int n=0; n<kart_amount; n++)
+    {
+        KartInfo& kart_info = m_kart_info[n];
+        AbstractKart* kart = m_karts[n].get();
+
+        // Nothing to do for karts that are currently being
+        // rescued or eliminated
+        if(kart->getKartAnimation()) continue;
+        // If the kart is off road, and 'flying' over a reset plane
+        // don't adjust the distance of the kart, to avoid a jump
+        // in the position of the kart (e.g. while falling the kart
+        // might get too close to another part of the track, shortly
+        // jump to position one, then on reset fall back to last)
+        if ((!getTrackSector(n)->isOnRoad() &&
+            (!kart->getMaterial() ||
+              kart->getMaterial()->isDriveReset()))  &&
+             !kart->isGhostKart())
+            continue;
+        getTrackSector(n)->update(kart->getFrontXYZ());
+        kart_info.m_overall_distance = kart_info.m_finished_laps
+                                     * Track::getCurrentTrack()->getTrackLength()
+                        + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
+    }   // for n
+}   // updateTrackSectors
 
 //-----------------------------------------------------------------------------
 /** This updates all only graphical elements.It is only called once per
@@ -328,7 +334,7 @@ void LinearWorld::updateLiveDifference()
 void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
-    AbstractKart *kart  = m_karts[kart_index];
+    AbstractKart *kart  = m_karts[kart_index].get();
 
     // Reset reset-after-lap achievements
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
@@ -556,7 +562,7 @@ void LinearWorld::getKartsDisplayInfo(
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
-        AbstractKart* kart = m_karts[i];
+        AbstractKart* kart = m_karts[i].get();
 
         // reset color
         rank_info.m_color = video::SColor(255, 255, 255, 255);
@@ -585,7 +591,7 @@ void LinearWorld::getKartsDisplayInfo(
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         KartInfo& kart_info = m_kart_info[i];
-        AbstractKart* kart = m_karts[i];
+        AbstractKart* kart = m_karts[i].get();
 
         const int position = kart->getPosition();
 
@@ -799,7 +805,7 @@ void LinearWorld::updateRacePosition()
     // so that debug output is still correct!!!!!!!!!!!
     for (unsigned int i=0; i<kart_amount; i++)
     {
-        AbstractKart* kart = m_karts[i];
+        AbstractKart* kart = m_karts[i].get();
         // Karts that are either eliminated or have finished the
         // race already have their (final) position assigned. If
         // these karts would get their rank updated, it could happen
@@ -898,7 +904,7 @@ void LinearWorld::updateRacePosition()
         Log::debug("[LinearWorld]", "Counting laps at %u seconds.", getTime());
         for (unsigned int i=0; i<kart_amount; i++)
         {
-            AbstractKart* kart = m_karts[i];
+            AbstractKart* kart = m_karts[i].get();
             Log::debug("[LinearWorld]", "counting karts ahead of %s (laps %u,"
                         " progress %u, finished %d, eliminated %d, initial position %u.",
                         kart->getIdent().c_str(),
@@ -973,7 +979,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 
     KartInfo &ki = m_kart_info[i];
     
-    const AbstractKart *kart=m_karts[i];
+    const AbstractKart *kart=m_karts[i].get();
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.

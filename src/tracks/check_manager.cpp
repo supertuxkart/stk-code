@@ -23,11 +23,11 @@
 
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
-#include "tracks/ambient_light_sphere.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_goal.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
+#include "tracks/check_sphere.hpp"
 #include "tracks/check_structure.hpp"
 #include "tracks/drive_graph.hpp"
 #include "utils/log.hpp"

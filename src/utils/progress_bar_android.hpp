@@ -26,12 +26,14 @@
 class ProgressBarAndroid
 {
 private:
+#ifndef SERVER_ONLY
     GLuint m_program;
     GLuint m_vertex_shader;
     GLuint m_fragment_shader;
     GLint m_position;
     GLint m_progress;
     GLuint m_vbo;
+#endif
 
     irr::IrrlichtDevice* m_device;
     bool m_initialized;

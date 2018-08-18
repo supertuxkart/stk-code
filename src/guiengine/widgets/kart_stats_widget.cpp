@@ -35,7 +35,6 @@ using namespace irr::core;
 using namespace irr;
 
 // -----------------------------------------------------------------------------
-
 KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                                  std::string kart_group, bool multiplayer,
                                  bool display_icons) : Widget(WTYPE_DIV)
@@ -87,52 +86,81 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 }   // KartStatsWidget
 
 // -----------------------------------------------------------------------------
-
 void KartStatsWidget::setValues(const KartProperties* props,
                                 PerPlayerDifficulty d)
 {
-    // Use kart properties computed for "hard" difficulty to show the user, so
+    // Use kart properties computed for best difficulty to show the user, so
     // that properties don't change according to the the last used difficulty
-    // (And because this code uses arbitrary scaling factors to make them look
-    // nice and the arbitrary factors were optimised for hard difficulty)
     RaceManager::Difficulty previous_difficulty = race_manager->getDifficulty();
-    race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+    race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
     KartProperties kp_computed;
     kp_computed.copyForPlayer(props, d);
-    
+    for (SkillLevelWidget* skills : m_skills)
+        skills->setVisible(true);
+
     // Scale the values so they look better
-    // The scaling factor and offset were found by trial and error.
-    // It should look nice and you should be able to see the difference between
-    // different masses or velocities.
+    // A value of 100 takes the whole bar width, including borders.
+    // So values should be in the 0-99 range
+
+    // The base mass is of 350 ; 350/3.89 ~= 90
     m_skills[SKILL_MASS]->setValue((int)
-    	((kp_computed.getCombinedCharacteristic()->getMass() - 20) / 4));
+    	(kp_computed.getCombinedCharacteristic()->getMass()/3.89f));
     m_skills[SKILL_MASS]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI, "mass.png").c_str()));    
-    m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);    
+    m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
+    m_skills[SKILL_MASS]->m_iconbutton->setTooltip( _("Mass") );
     
+    // The base speed is of 25
+    // Here we are not fully proportional, because small differences matter more
     m_skills[SKILL_SPEED]->setValue((int)
-    	((kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 15) * 6));
+    	((kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20) * 15));
     m_skills[SKILL_SPEED]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI, "speed.png").c_str()));    
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
+    m_skills[SKILL_SPEED]->m_iconbutton->setTooltip( _("Maximum speed") );
     
-    m_skills[SKILL_POWER]->setValue((int)((kp_computed.getAvgPower() - 30) / 20));
-    m_skills[SKILL_POWER]->setIcon(irr::core::stringc(
+    // The acceleration depend on power and mass, and it changes depending on speed
+    // We call a function which gives us a single number to represent it
+    // power/mass gives numbers in the 1-10 range, so we multiply it by 10.
+
+    m_skills[SKILL_ACCELERATION]->setValue((int)(kp_computed.getAccelerationEfficiency()*10));
+    m_skills[SKILL_ACCELERATION]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI, "power.png").c_str()));    
-    m_skills[SKILL_POWER]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_power", m_player_id);
+    m_skills[SKILL_ACCELERATION]->m_properties[PROP_ID] =
+        StringUtils::insertValues("@p%i_acceleration", m_player_id);
+    m_skills[SKILL_ACCELERATION]->m_iconbutton->setTooltip( _("Acceleration") );
+
+    // The base nitro consumption is 1, higher for heavier karts.
+    // Nitro efficiency is hence 90/nitro_consumption
+
+    m_skills[SKILL_NITRO_EFFICIENCY]->setValue((int)
+        (90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption()));
+    m_skills[SKILL_NITRO_EFFICIENCY]->setIcon(irr::core::stringc(
+            file_manager->getAsset(FileManager::GUI, "nitro.png").c_str()));    
+    m_skills[SKILL_NITRO_EFFICIENCY]->m_properties[PROP_ID] =
+        StringUtils::insertValues("@p%i_nitro_efficiency", m_player_id);
+    m_skills[SKILL_NITRO_EFFICIENCY]->m_iconbutton->setTooltip( _("Nitro efficiency") );
     
     race_manager->setDifficulty(previous_difficulty);
-}
+}   // setValues
 
 // -----------------------------------------------------------------------------
+void KartStatsWidget::hideAll()
+{
+    for (SkillLevelWidget* skills : m_skills)
+        skills->setVisible(false);
+}   // hideAll
 
+// -----------------------------------------------------------------------------
 void KartStatsWidget::add()
 {
-    for (int i = 0; i < SKILL_COUNT; ++i) {
+    for (int i = 0; i < SKILL_COUNT; ++i)
+    {
         m_skills[i]->add();
     }
-}
+}   // add
 
+// -----------------------------------------------------------------------------
 void KartStatsWidget::move(int x, int y, int w, int h)
 {
     Widget::move(x,y,w,h);
@@ -148,25 +176,27 @@ void KartStatsWidget::move(int x, int y, int w, int h)
                           m_skill_bar_w,
                           m_skill_bar_h);
     }
-} //move
+}   // move
 
 // -----------------------------------------------------------------------------
-
-// ---- set value for given type
+/** Set value for given type
+ */
 void KartStatsWidget::setValue(Stats type, int value)
 {
     m_skills[type]->setValue(value);
-} //setValue
+}   // setValue
 
 // -----------------------------------------------------------------------------
-
-// ---- get value for given type
+/** Get value for given type
+ */
 int KartStatsWidget::getValue(Stats type)
 {
     return m_skills[type]->getValue();
 }   // getVAlue
 
-// ---- set size for widgets inside KartStatsWidget
+// -----------------------------------------------------------------------------
+/** Set size for widgets inside KartStatsWidget
+ */
 void KartStatsWidget::setSize(const int x, const int y, const int w, const int h)
 {
     m_x = x;
@@ -189,6 +219,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_skill_bar_y = y + h/2 - m_skill_bar_h/2;
 }   // setSize
 
+// -----------------------------------------------------------------------------
 void KartStatsWidget::setDisplayIcons(bool display_icons)
 {
     for (int i = 0; i < SKILL_COUNT; ++i)
@@ -196,6 +227,3 @@ void KartStatsWidget::setDisplayIcons(bool display_icons)
         m_skills[i]->setDisplayIcon(display_icons);
     }
 }   // setDisplayText
-
-// -----------------------------------------------------------------------------
-

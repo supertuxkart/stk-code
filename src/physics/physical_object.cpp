@@ -28,6 +28,8 @@
 #include "io/xml_node.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "network/compress_network_body.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
@@ -121,12 +123,11 @@ void PhysicalObject::Settings::init()
 }   // Settings
 
 // ============================================================================
-PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
-                                        const XMLNode &xml_node,
-                                        TrackObject* object)
+std::shared_ptr<PhysicalObject> PhysicalObject::fromXML
+    (bool is_dynamic, const XMLNode &xml_node, TrackObject* object)
 {
     PhysicalObject::Settings settings(xml_node);
-    return new PhysicalObject(is_dynamic, settings, object);
+    return std::make_shared<PhysicalObject>(is_dynamic, settings, object);
 }   // fromXML
 
 // ----------------------------------------------------------------------------
@@ -166,6 +167,9 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_current_transform.setOrigin(Vec3());
     m_current_transform.setRotation(
         btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+
+    m_last_transform = m_current_transform;
+    m_no_server_state = false;
 
     m_body_added = false;
 
@@ -609,13 +613,16 @@ void PhysicalObject::updateGraphics(float dt)
 {
     if (!m_is_dynamic)
         return;
-    Vec3 xyz = m_current_transform.getOrigin();
+
+    SmoothNetworkBody::updateSmoothedGraphics(m_body->getWorldTransform(),
+        m_body->getLinearVelocity(), dt);
+    Vec3 xyz = SmoothNetworkBody::getSmoothedTrans().getOrigin();
 
     // Offset the graphical position correctly:
-    xyz += m_current_transform.getBasis()*m_graphical_offset;
+    xyz += SmoothNetworkBody::getSmoothedTrans().getBasis()*m_graphical_offset;
 
     Vec3 hpr;
-    hpr.setHPR(m_current_transform.getRotation());
+    hpr.setHPR(SmoothNetworkBody::getSmoothedTrans().getRotation());
 
     // This will only update the visual position, so it can be
     // called in updateGraphics()
@@ -632,7 +639,7 @@ void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
 
-    m_motion_state->getWorldTransform(m_current_transform);
+    m_current_transform = m_body->getWorldTransform();
 
     const Vec3 &xyz = m_current_transform.getOrigin();
     if(m_reset_when_too_low && xyz.getY()<m_reset_height)
@@ -677,10 +684,14 @@ bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to,
 // ----------------------------------------------------------------------------
 void PhysicalObject::reset()
 {
+    Rewinder::reset();
     m_body->setCenterOfMassTransform(m_init_pos);
     m_body->setAngularVelocity(btVector3(0,0,0));
     m_body->setLinearVelocity(btVector3(0,0,0));
     m_body->activate();
+
+    m_last_transform = m_init_pos;
+    m_last_lv = m_last_av = Vec3(0.0f);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -773,5 +784,94 @@ void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 }   // hit
 
 // ----------------------------------------------------------------------------
-/* EOF */
+void PhysicalObject::addForRewind()
+{
+    SmoothNetworkBody::setEnable(true);
+    SmoothNetworkBody::setSmoothRotation(false);
+    SmoothNetworkBody::setAdjustVerticalOffset(false);
+    Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
+        (Track::getCurrentTrack()->getPhysicalObjectUID()));
+    Rewinder::rewinderAdd();
+}   // addForRewind
 
+// ----------------------------------------------------------------------------
+void PhysicalObject::saveTransform()
+{
+    m_no_server_state = true;
+    SmoothNetworkBody::prepareSmoothing(m_body->getWorldTransform(),
+        m_body->getLinearVelocity());
+}   // saveTransform
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::computeError()
+{
+    SmoothNetworkBody::checkSmoothing(m_body->getWorldTransform(),
+        m_body->getLinearVelocity());
+}   // computeError
+
+// ----------------------------------------------------------------------------
+BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
+{
+    btTransform cur_transform = m_body->getWorldTransform();
+    if ((cur_transform.getOrigin() - m_last_transform.getOrigin())
+        .length() < 0.01f &&
+        (m_body->getLinearVelocity() - m_last_lv).length() < 0.01f &&
+        (m_body->getLinearVelocity() - m_last_av).length() < 0.01f)
+        return nullptr;
+
+    ru->push_back(getUniqueIdentity());
+    BareNetworkString *buffer = new BareNetworkString();
+    m_last_transform = cur_transform;
+    m_last_lv = m_body->getLinearVelocity();
+    m_last_av = m_body->getAngularVelocity();
+    CompressNetworkBody::compress(m_last_transform, m_last_lv, m_last_av,
+        buffer, m_body, m_motion_state);
+    return buffer;
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::restoreState(BareNetworkString *buffer, int count)
+{
+    m_no_server_state = false;
+    CompressNetworkBody::decompress(buffer, &m_last_transform, &m_last_lv,
+        &m_last_av);
+
+    m_body->setWorldTransform(m_last_transform);
+    m_motion_state->setWorldTransform(m_last_transform);
+    m_body->setInterpolationWorldTransform(m_last_transform);
+    m_body->setLinearVelocity(m_last_lv);
+    m_body->setAngularVelocity(m_last_av);
+    m_body->setInterpolationLinearVelocity(m_last_lv);
+    m_body->setInterpolationAngularVelocity(m_last_av);
+}   // restoreState
+
+// ----------------------------------------------------------------------------
+std::function<void()> PhysicalObject::getLocalStateRestoreFunction()
+{
+    btTransform t = m_body->getWorldTransform();
+    Vec3 lv = m_body->getLinearVelocity();
+    Vec3 av = m_body->getAngularVelocity();
+    return [t, lv, av, this]()
+    {
+        if (m_no_server_state)
+        {
+            m_body->setWorldTransform(m_last_transform);
+            m_motion_state->setWorldTransform(m_last_transform);
+            m_body->setInterpolationWorldTransform(m_last_transform);
+            m_body->setLinearVelocity(m_last_lv);
+            m_body->setAngularVelocity(m_last_av);
+            m_body->setInterpolationLinearVelocity(m_last_lv);
+            m_body->setInterpolationAngularVelocity(m_last_av);
+        }
+        else
+        {
+            m_body->setWorldTransform(t);
+            m_motion_state->setWorldTransform(t);
+            m_body->setInterpolationWorldTransform(t);
+            m_body->setLinearVelocity(lv);
+            m_body->setAngularVelocity(av);
+            m_body->setInterpolationLinearVelocity(lv);
+            m_body->setInterpolationAngularVelocity(av);
+        }
+    };
+}   // getLocalStateRestoreFunction

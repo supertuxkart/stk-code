@@ -31,16 +31,16 @@
 void NetworkItemManager::create()
 {
     assert(!m_item_manager);
-    m_item_manager = new NetworkItemManager();
+    auto nim = std::shared_ptr<NetworkItemManager>(new NetworkItemManager());
+    nim->rewinderAdd();
+    m_item_manager = nim;
 }   // create
-
 
 // ============================================================================
 /** Creates a new instance of the item manager. This is done at startup
  *  of each race. */
 NetworkItemManager::NetworkItemManager()
-                  : Rewinder(/*can be deleted*/false),
-                    ItemManager()
+                  : Rewinder("N"), ItemManager()
 {
     m_last_confirmed_item_ticks.clear();
 
@@ -62,6 +62,10 @@ NetworkItemManager::NetworkItemManager()
  */
 NetworkItemManager::~NetworkItemManager()
 {
+    for (ItemState* is : m_confirmed_state)
+    {
+        delete is;
+    }
 }   // ~NetworkItemManager
 
 //-----------------------------------------------------------------------------
@@ -71,9 +75,9 @@ void NetworkItemManager::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Copies the initial state at the start of a race as confirmed state.
+/** Initialize state at the start of a race.
  */
-void NetworkItemManager::saveInitialState()
+void NetworkItemManager::initClientConfirmState()
 {
     m_confirmed_state_time = 0;
 
@@ -83,7 +87,7 @@ void NetworkItemManager::saveInitialState()
         ItemState *is = new ItemState(*i);
         m_confirmed_state.push_back(is);
     }
-}   // saveInitialState
+}   // initClientConfirmState
 
 //-----------------------------------------------------------------------------
 /** Called when a kart collects an item. In network games only the server
@@ -97,7 +101,7 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
     {
         // The server saves the collected item as item event info
         m_item_events.lock();
-        m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(),
+        m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
             item->getItemId(),
             kart->getWorldKartId());
         m_item_events.unlock();
@@ -132,7 +136,7 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
 
     // Server: store the data for this event:
     m_item_events.lock();
-    m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(),
+    m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
         type, item->getItemId(),
         kart->getWorldKartId(),
         kart->getXYZ());
@@ -193,14 +197,9 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
  *  to save the initial state, which is the first confirmed state by all
  *  clients.
  */
-BareNetworkString* NetworkItemManager::saveState()
+BareNetworkString* NetworkItemManager::saveState(std::vector<std::string>* ru)
 {
-    if(NetworkConfig::get()->isClient())
-    {
-        saveInitialState();
-        return NULL;
-    }
-
+    ru->push_back(getUniqueIdentity());
     // On the server:
     // ==============
     m_item_events.lock();
@@ -247,7 +246,7 @@ void NetworkItemManager::forwardTime(int ticks)
 void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 {
     assert(NetworkConfig::get()->isClient());
-    // The state at World::getTimeTicks() needs to be restored. The confirmed
+    // The state at World::getTicksSinceStart() needs to be restored. The confirmed
     // state in this instance was taken at m_confirmed_state_time. First
     // forward this confirmed state to the current time (i.e. world time).
     // This is done in several steps:
@@ -279,6 +278,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     // 2) Apply all events to current confirmed state:
     int current_time = m_confirmed_state_time;
+    bool has_state = count > 0;
     while(count > 0)
     {
         // 1) Decode the event in the message
@@ -332,11 +332,14 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }   // while count >0
 
     // Inform the server which events have been received.
-    if (auto gp = GameProtocol::lock())
-        gp->sendItemEventConfirmation(World::getWorld()->getTimeTicks());
+    if (has_state)
+    {
+        if (auto gp = GameProtocol::lock())
+            gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
+    }
 
     // Forward the confirmed item state till the world time:
-    int dt = World::getWorld()->getTimeTicks() - current_time;
+    int dt = World::getWorld()->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
 
     // Restore the state to the current world time:
@@ -364,6 +367,6 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }
 
     // Now we save the current local
-    m_confirmed_state_time = World::getWorld()->getTimeTicks();
+    m_confirmed_state_time = World::getWorld()->getTicksSinceStart();
 }   // restoreState
 

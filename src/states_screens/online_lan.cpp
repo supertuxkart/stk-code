@@ -55,9 +55,6 @@ OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
 
 void OnlineLanScreen::beforeAddingWidget()
 {
-#ifdef ANDROID
-    getWidget("create_lan_server")->setVisible(false);
-#endif
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------

@@ -58,67 +58,82 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
     #endif
-
-    Android = (android_app *)(param.PrivateData);
-    assert(Android != NULL);
-
-    Android->userData = this;
-    Android->onAppCmd = handleAndroidCommand;
-    Android->onInputEvent = handleInput;
     
-    printConfig();
     createKeyMap();
 
     CursorControl = new CCursorControl();
+
+    Android = (android_app*)(param.PrivateData);
     
-    Close = Android->destroyRequested;
-
-    // It typically shouldn't happen, but just in case...
-    if (Close)
-        return;
-
-    SensorManager = ASensorManager_getInstance();
-    SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
-                                Android->looper, LOOPER_ID_USER, NULL, NULL);
-
-    ANativeActivity_setWindowFlags(Android->activity,
-                                   AWINDOW_FLAG_KEEP_SCREEN_ON |
-                                   AWINDOW_FLAG_FULLSCREEN, 0);
-
-    os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
-
-    while (!IsStarted || !IsFocused || IsPaused)
+    if (Android == NULL && CreationParams.DriverType != video::EDT_NULL)
     {
-        s32 events = 0;
-        android_poll_source* source = 0;
-
-        s32 id = ALooper_pollAll(-1, NULL, &events, (void**)&source);
-
-        if (id >=0 && source != NULL)
-        {
-            source->process(Android, source);
-        }
+        os::Printer::log("Irrlicht device can run only with NULL driver without android_app.", ELL_DEBUG);
+        return;
     }
-    
-    assert(Android->window);
-    os::Printer::log("Done", ELL_DEBUG);
-    
-    ExposedVideoData.OGLESAndroid.Window = Android->window;
 
-    createVideoModeList();
+    if (Android != NULL)
+    {
+        Android->userData = this;
+        Android->onAppCmd = handleAndroidCommand;
+        Android->onAppCmdDirect = handleAndroidCommandDirect;
+        Android->onInputEvent = handleInput;
+        
+        printConfig();
+        
+        Close = Android->destroyRequested;
+    
+        // It typically shouldn't happen, but just in case...
+        if (Close)
+            return;
+    
+        SensorManager = ASensorManager_getInstance();
+        SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
+                                    Android->looper, LOOPER_ID_USER, NULL, NULL);
+    
+        ANativeActivity_setWindowFlags(Android->activity,
+                                       AWINDOW_FLAG_KEEP_SCREEN_ON |
+                                       AWINDOW_FLAG_FULLSCREEN, 0);
+    
+        os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
+    
+        while (!IsStarted || !IsFocused || IsPaused)
+        {
+            s32 events = 0;
+            android_poll_source* source = 0;
+    
+            s32 id = ALooper_pollAll(-1, NULL, &events, (void**)&source);
+    
+            if (id >=0 && source != NULL)
+            {
+                source->process(Android, source);
+            }
+        }
+        
+        assert(Android->window);
+        os::Printer::log("Done", ELL_DEBUG);
+        
+        ExposedVideoData.OGLESAndroid.Window = Android->window;
+    
+        createVideoModeList();
+    }
 
     createDriver();
 
     if (VideoDriver)
+    {
         createGUIAndScene();
+    }
 }
 
 
 CIrrDeviceAndroid::~CIrrDeviceAndroid()
 {
-    Android->userData = NULL;
-    Android->onAppCmd = NULL;
-    Android->onInputEvent = NULL;
+    if (Android)
+    {
+        Android->userData = NULL;
+        Android->onAppCmd = NULL;
+        Android->onInputEvent = NULL;
+    }
 }
 
 void CIrrDeviceAndroid::printConfig() 
@@ -209,6 +224,9 @@ void CIrrDeviceAndroid::createDriver()
 bool CIrrDeviceAndroid::run()
 {
     os::Timer::tick();
+    
+    if (Android == NULL)
+        return !Close;
     
     while (!Close)
     {
@@ -363,6 +381,20 @@ bool CIrrDeviceAndroid::getWindowPosition(int* x, int* y)
 E_DEVICE_TYPE CIrrDeviceAndroid::getType() const
 {
     return EIDT_ANDROID;
+}
+
+void CIrrDeviceAndroid::handleAndroidCommandDirect(ANativeActivity* activity, 
+                                                   int32_t cmd)
+{
+    switch (cmd)
+    {
+    case APP_CMD_RESUME:
+        os::Printer::log("Android command direct APP_CMD_RESUME", ELL_DEBUG);   
+        hideNavBar(activity);   
+        break;
+    default:
+        break;
+    }
 }
 
 void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
@@ -1133,15 +1165,107 @@ void CIrrDeviceAndroid::getKeyChar(SEvent& event)
     }
 }
 
+void CIrrDeviceAndroid::hideNavBar(ANativeActivity* activity)
+{
+    if (activity == NULL)
+        return;
+
+    if (activity->sdkVersion < 19)
+        return;
+
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot hide navbar.", ELL_DEBUG);
+        return;
+    }
+    
+    jobject activity_obj = activity->clazz;
+    
+    jclass activity_class = env->GetObjectClass(activity_obj);
+    jclass window_class = env->FindClass("android/view/Window");
+    jclass view_class = env->FindClass("android/view/View");
+
+    jmethodID get_window = env->GetMethodID(activity_class, "getWindow", 
+                                            "()Landroid/view/Window;");
+    jmethodID get_decor_view = env->GetMethodID(window_class, "getDecorView", 
+                                                "()Landroid/view/View;");
+    jmethodID set_system_ui_visibility = env->GetMethodID(view_class, 
+                                               "setSystemUiVisibility", "(I)V");
+
+    jobject window_obj = env->CallObjectMethod(activity_obj, get_window);
+    jobject decor_view_obj = env->CallObjectMethod(window_obj, get_decor_view);
+
+    jfieldID fullscreen_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_FULLSCREEN", "I");
+    jfieldID hide_navigation_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_HIDE_NAVIGATION", "I");
+    jfieldID immersive_sticky_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_IMMERSIVE_STICKY", "I");
+    jfieldID layout_stable_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_LAYOUT_STABLE", "I");
+    jfieldID layout_hide_navigation_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION", "I");
+    jfieldID layout_fullscreen_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN", "I");
+
+    jint fullscreen = env->GetStaticIntField(view_class, fullscreen_field);
+    jint hide_navigation = env->GetStaticIntField(view_class, 
+                                                  hide_navigation_field);
+    jint immersive_sticky = env->GetStaticIntField(view_class, 
+                                                   immersive_sticky_field);
+    jint layout_stable = env->GetStaticIntField(view_class, 
+                                                layout_stable_field);
+    jint layout_hide_navigation = env->GetStaticIntField(view_class, 
+                                                  layout_hide_navigation_field);
+    jint layout_fullscreen = env->GetStaticIntField(view_class, 
+                                                    layout_fullscreen_field);
+    
+    jint flags = fullscreen | hide_navigation | immersive_sticky | 
+                 layout_stable | layout_hide_navigation | layout_fullscreen;
+
+    env->CallVoidMethod(decor_view_obj, set_system_ui_visibility, flags);
+    
+    if (was_detached)
+    {
+        activity->vm->DetachCurrentThread();
+    }
+}
+
 int CIrrDeviceAndroid::getRotation()
 {
-    JavaVMAttachArgs args;
-    args.version = JNI_VERSION_1_6;
-    args.name = "NativeThread";
-    args.group = NULL;
-    JNIEnv* env;
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = Android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
 
-    if (Android->activity->vm->AttachCurrentThread(&env, &args) != JNI_OK) 
+    if (status != JNI_OK)
     {
         os::Printer::log("Cannot find rotation.", ELL_DEBUG);
         return 0;
@@ -1172,13 +1296,11 @@ int CIrrDeviceAndroid::getRotation()
     jobject display_obj = env->CallObjectMethod(window_manager_obj, get_default_display);
     
     int rotation = env->CallIntMethod(display_obj, get_rotation);
-    
-    env->DeleteLocalRef(activity);
-    env->DeleteLocalRef(context);
-    env->DeleteLocalRef(window_manager);
-    env->DeleteLocalRef(display);   
-    
-    Android->activity->vm->DetachCurrentThread();
+
+    if (was_detached)
+    {
+        Android->activity->vm->DetachCurrentThread();
+    }
     
     return rotation;
 }

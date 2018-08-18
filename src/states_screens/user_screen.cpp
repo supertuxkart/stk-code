@@ -35,6 +35,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/register_screen.hpp"
@@ -636,7 +637,7 @@ void BaseUserScreen::deletePlayer()
     // valid current player, so the last player can not be deleted.
     if(PlayerManager::get()->getNumNonGuestPlayers()==1)
     {
-        m_info_widget->setText("You can't delete the only player.", true);
+        m_info_widget->setText(_("You can't delete the only player."), true);
         m_info_widget->setErrorColor();
         return;
     }
@@ -707,11 +708,8 @@ void TabbedUserScreen::init()
 {
     RibbonWidget* tab_bar = getWidget<RibbonWidget>("options_choice");
     assert(tab_bar != NULL);
+    tab_bar->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
-    tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
-    tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tab_bar->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    tab_bar->getRibbonChildren()[4].setTooltip( _("Controls") );
     BaseUserScreen::init();
 }   // init
 
@@ -737,6 +735,8 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }

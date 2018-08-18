@@ -49,6 +49,9 @@ void AssetsAndroid::init()
 #ifdef ANDROID
     if (m_file_manager == NULL)
         return;
+        
+    if (!global_android_app)
+        return;
 
     bool needs_extract_data = false;
     const std::string version = std::string("supertuxkart.") + STK_VERSION;
@@ -339,6 +342,9 @@ void AssetsAndroid::extractData()
 bool AssetsAndroid::extractDir(std::string dir_name)
 {
 #ifdef ANDROID
+    if (!global_android_app)
+        return false;
+        
     AAssetManager* amgr = global_android_app->activity->assetManager;
 
     Log::info("AssetsAndroid", "Extracting %s directory",

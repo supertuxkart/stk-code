@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <map>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -56,14 +57,20 @@ private:
     /** Disable item collection (for debugging purposes). */
     static bool m_disable_item_collection;
 
+    static std::mt19937 m_random_engine;
 protected:
     /** The instance of ItemManager while a race is on. */
-    static ItemManager *m_item_manager;
+    static std::shared_ptr<ItemManager> m_item_manager;
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
     static void create();
     static void destroy();
+    static void updateRandomSeed(uint32_t seed_number)
+    {
+        m_random_engine.seed(seed_number);
+    }   // updateRandomSeed
+    // ------------------------------------------------------------------------
 
     /** Disable item collection, useful to test client mispreditions or
      *  client/server disagreements. */
@@ -83,9 +90,10 @@ public:
     // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
      *  create one, call create for that). */
-    static ItemManager *get() {
+    static ItemManager *get()
+    {
         assert(m_item_manager);
-        return m_item_manager;
+        return m_item_manager.get();
     }   // get
 
     // ========================================================================
@@ -112,9 +120,8 @@ protected:
     virtual unsigned int insertItem(Item *item);
     void setSwitchItems(const std::vector<int> &switch_items);
              ItemManager();
-    virtual ~ItemManager();
-
 public:
+    virtual ~ItemManager();
 
     virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
                                     const Vec3 &normal);

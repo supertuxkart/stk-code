@@ -18,6 +18,8 @@
 #ifndef HEADER_TINYGETTEXT_LANGUAGE_HPP
 #define HEADER_TINYGETTEXT_LANGUAGE_HPP
 
+#ifndef SERVER_ONLY
+
 #include <string>
 
 namespace tinygettext {
@@ -89,3 +91,5 @@ inline bool operator<(const Language& lhs, const Language& rhs) {
 #endif
 
 /* EOF */
+
+#endif

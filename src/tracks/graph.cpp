@@ -120,7 +120,7 @@ void Graph::cleanupDebugMesh()
 /** Creates the actual mesh that is used by createDebugMesh() or makeMiniMap()
  */
 void Graph::createMesh(bool show_invisible, bool enable_transparency,
-                       const video::SColor *track_color)
+                       const video::SColor *track_color, bool invert_x_z)
 {
 #ifndef SERVER_ONLY
     // The debug track will not be lighted or culled.
@@ -172,6 +172,18 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
         differentNodeColor(count, &this_color);
         // Transfer the 4 points of the current quad to the list of vertices
         m_all_nodes[count]->getVertices(new_v+4*i, this_color);
+        if (invert_x_z)
+        {
+            auto* vptr = new_v + 4 * i;
+            vptr[0].Pos.X = -vptr[0].Pos.X;
+            vptr[0].Pos.Z = -vptr[0].Pos.Z;
+            vptr[1].Pos.X = -vptr[1].Pos.X;
+            vptr[1].Pos.Z = -vptr[1].Pos.Z;
+            vptr[2].Pos.X = -vptr[2].Pos.X;
+            vptr[2].Pos.Z = -vptr[2].Pos.Z;
+            vptr[3].Pos.X = -vptr[3].Pos.X;
+            vptr[3].Pos.Z = -vptr[3].Pos.Z;
+        }
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code
@@ -244,7 +256,7 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
 /** Creates the actual mesh that is used by createDebugMesh() or makeMiniMap()
  */
 void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
-                         const video::SColor *track_color)
+                         const video::SColor *track_color, bool invert_x_z)
 {
 #ifndef SERVER_ONLY
 
@@ -294,6 +306,18 @@ void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
         differentNodeColor(count, &this_color);
         // Transfer the 4 points of the current quad to the list of vertices
         m_all_nodes[count]->getSPMVertices(vertices.data() + (4 * i), this_color);
+        if (invert_x_z)
+        {
+            auto* vptr = vertices.data() + (4 * i);
+            vptr[0].m_position.X = -vptr[0].m_position.X;
+            vptr[0].m_position.Z = -vptr[0].m_position.Z;
+            vptr[1].m_position.X = -vptr[1].m_position.X;
+            vptr[1].m_position.Z = -vptr[1].m_position.Z;
+            vptr[2].m_position.X = -vptr[2].m_position.X;
+            vptr[2].m_position.Z = -vptr[2].m_position.Z;
+            vptr[3].m_position.X = -vptr[3].m_position.X;
+            vptr[3].m_position.Z = -vptr[3].m_position.Z;
+        }
 
         // Set up the indices for the triangles
         indices[6 * i] = 4 * i + 2;  // First triangle: vertex 0, 1, 2
@@ -366,7 +390,8 @@ void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
  */
 RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
                                  const std::string &name,
-                                 const video::SColor &fill_color)
+                                 const video::SColor &fill_color,
+                                 bool invert_x_z)
 {
     // Skip minimap when profiling
     if (ProfileWorld::isNoGraphics()) return NULL;
@@ -384,14 +409,14 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     if (CVS->isGLSL())
     {
         createMeshSP(/*show_invisible part of the track*/ false,
-                     /*enable_transparency*/ false,
-                     /*track_color*/    &fill_color);
+            /*enable_transparency*/ false, /*track_color*/&fill_color,
+            invert_x_z);
     }
     else
     {
         createMesh(/*show_invisible part of the track*/ false,
-                   /*enable_transparency*/ false,
-                   /*track_color*/    &fill_color);
+            /*enable_transparency*/ false, /*track_color*/&fill_color,
+            invert_x_z);
     }
 #endif
 
