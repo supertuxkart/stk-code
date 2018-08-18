@@ -712,9 +712,9 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
-#ifdef ENABLE_SOUND
     SFXBase* sfx = NULL;
     
+#ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
         //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
