@@ -189,8 +189,6 @@ For similar reasons, and because some features are vastly more complex than othe
 * Added support for full-screen anti-aliasing
 * Clearer multiplayer setup
 * Renamed many tracks to nicer names
-    * City become Shiny Suburb
-    * ?
 * Basic level-of-detail (LOD) support
 * Debug features for track makers
 * Update to bullet 2.77
