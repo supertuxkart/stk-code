@@ -242,7 +242,7 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     else
         setSelectedButton(/* right*/ true);
 
-    return EVENT_LET;
+    return EVENT_BLOCK_BUT_HANDLED;
 } // rightPressed
 
 // -----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     else
         return EVENT_BLOCK;
 
-    return EVENT_LET;
+    return EVENT_BLOCK_BUT_HANDLED;
 } // leftPressed
 
 void SpinnerWidget::activateSelectedButton()
