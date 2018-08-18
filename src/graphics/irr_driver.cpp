@@ -1850,22 +1850,6 @@ void IrrDriver::doScreenShot()
  */
 void IrrDriver::update(float dt)
 {
-    // User aborted (e.g. closed window)
-    // =================================
-    if (!m_device->run())
-    {
-        // Don't bother cleaning up GUI, has no use and may result in crashes
-        //GUIEngine::cleanUp();
-        //GUIEngine::deallocate();
-        main_loop->abort();
-        return;
-    }
-
-    // If we quit via the menu the m_device->run() does not return true.
-    // To avoid any other calls, we return here.
-    if(main_loop->isAborted())
-        return;
-
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)

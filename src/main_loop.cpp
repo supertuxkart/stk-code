@@ -460,6 +460,20 @@ void MainLoop::run()
                 World::getWorld()->updateTime(1);
             }
         }   // for i < num_steps
+
+        // Handle controller the last to avoid slow PC sending actions too late
+        if (!m_abort)
+        {
+            if (!ProfileWorld::isNoGraphics())
+            {
+                // User aborted (e.g. closed window)
+                bool abort = !irr_driver->getDevice()->run();
+                if (abort)
+                    m_abort = true;
+            }
+            if (auto gp = GameProtocol::lock())
+                gp->sendActions();
+        }
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort
