@@ -321,7 +321,7 @@ void CreateServerScreen::createServer()
     NetworkConfig::get()->setServerIdFile(
         file_manager->getUserConfigFile(server_id_file));
 
-    server_cfg << " --no-graphics --stdout=server.log --type=" <<
+    server_cfg << " --no-graphics --no-sound --stdout=server.log --type=" <<
         gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
         " --difficulty=" <<
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
