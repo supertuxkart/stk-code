@@ -23,6 +23,7 @@
 
 #include "audio/music_dummy.hpp"
 #include "audio/music_ogg.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -170,10 +171,15 @@ void MusicInformation::startMusic()
     }
 
 #ifdef ENABLE_SOUND
-    m_normal_music = new MusicOggStream(m_normal_loop_start);
-#else
-    m_normal_music = new MusicDummy();
+    if (UserConfigParams::m_enable_sound)
+    {
+        m_normal_music = new MusicOggStream(m_normal_loop_start);
+    }
+    else
 #endif
+    {
+        m_normal_music = new MusicDummy();
+    }
 
     if (m_normal_music->load(m_normal_filename) == false)
     {
@@ -201,10 +207,15 @@ void MusicInformation::startMusic()
     }
 
 #ifdef ENABLE_SOUND
-    m_fast_music = new MusicOggStream(m_fast_loop_start);
-#else
-    m_fast_music = new MusicDummy();
+    if (UserConfigParams::m_enable_sound)
+    {
+        m_fast_music = new MusicOggStream(m_fast_loop_start);
+    }
+    else
 #endif
+    {
+        m_fast_music = new MusicDummy();
+    }
 
     if (m_fast_music->load(m_fast_filename) == false)
     {

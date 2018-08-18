@@ -50,43 +50,44 @@ MusicManager::MusicManager()
 
     //FIXME: I'm not sure that this code goes here
 #ifdef ENABLE_SOUND
-
+    if (UserConfigParams::m_enable_sound)
+    {
 #if defined(__APPLE__) && !defined(NDEBUG)
-    // HACK: On OSX, when OpenAL is initialized, breaking in a debugger causes
-    // my iTunes music to stop too, which is highly annoying ;) so in debug
-    // mode, require a restart to enable sound
-    if (UserConfigParams::m_sfx || UserConfigParams::m_music)
-    {
+        // HACK: On OSX, when OpenAL is initialized, breaking in a debugger 
+        // causes my iTunes music to stop too, which is highly annoying ;) so in
+        // debug mode, require a restart to enable sound
+        if (UserConfigParams::m_sfx || UserConfigParams::m_music)
+        {
 #endif
-
-    ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
-    if( device == NULL )
-    {
-        Log::warn("MusicManager", "Could not open the default sound device.");
-        m_initialized = false;
-    }
-    else
-    {
-
-        ALCcontext* context = alcCreateContext( device, NULL );
-
-        if( context == NULL )
-        {
-            Log::warn("MusicManager", "Could not create a sound context.");
-            m_initialized = false;
-        }
-        else
-        {
-            alcMakeContextCurrent( context );
-            m_initialized = true;
-        }
-    }
-
+            ALCdevice* device = alcOpenDevice(NULL); //The default sound device
+            
+            if (device == NULL)
+            {
+                Log::warn("MusicManager", "Could not open the default sound "
+                                          "device.");
+                m_initialized = false;
+            }
+            else
+            {
+                ALCcontext* context = alcCreateContext(device, NULL);
+        
+                if (context == NULL)
+                {
+                    Log::warn("MusicManager", "Could not create a sound "
+                                              "context.");
+                    m_initialized = false;
+                }
+                else
+                {
+                    alcMakeContextCurrent(context);
+                    m_initialized = true;
+                }
+            }
 #if defined(__APPLE__) && !defined(NDEBUG)
-    }
+        }
 #endif
-
-    alGetError(); //Called here to clear any non-important errors found
+        alGetError(); //Called here to clear any non-important errors found
+    }
 #endif
 
     loadMusicInformation();

@@ -901,7 +901,9 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--dont-load-navmesh"))
         Track::m_dont_load_navmesh = true;
 
-
+    if (CommandLine::has("--no-sound"))
+        UserConfigParams::m_enable_sound = false;
+        
     return 0;
 }   // handleCmdLinePreliminary
 
