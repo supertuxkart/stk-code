@@ -419,6 +419,9 @@ video::SColor CaptureTheFlag::getColor(unsigned int kart_id) const
 // ----------------------------------------------------------------------------
 bool CaptureTheFlag::isRaceOver()
 {
+    if (m_unfair_team)
+        return true;
+
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient())
         return false;
