@@ -499,6 +499,14 @@ void AssetsAndroid::removeData()
             m_file_manager->removeFile(file);
         }
     }
+    
+    const std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+    const std::string child_path = data_path + "/files/libchildprocess.so";
+    
+    if (m_file_manager->fileExists(child_path))
+    {
+        m_file_manager->removeFile(child_path);
+    }
 #endif
 }
 
