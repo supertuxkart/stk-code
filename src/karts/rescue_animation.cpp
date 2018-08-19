@@ -26,6 +26,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world_with_rank.hpp"
+#include "network/network_config.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/drive_graph.hpp"
@@ -62,6 +63,13 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_orig_rotation = m_kart->getRotation();
     m_kart->getAttachment()->clear();
 
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer())
+    {
+        m_end_ticks = stk_config->time2Ticks(m_timer) + World::getWorld()
+            ->getTicksSinceStart();
+    }
+
     // Determine maximum rescue height with up-raycast
     float max_height = m_kart->getKartProperties()->getRescueHeight();
     float hit_dest = maximumHeight();
@@ -94,10 +102,14 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE &&
         !is_auto_rescue)
     {
-        ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
-        world->kartHit(m_kart->getWorldKartId());
+        World::getWorld()->kartHit(m_kart->getWorldKartId());
         if (UserConfigParams::m_arena_ai_stats)
-            world->increaseRescueCount();
+        {
+            ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>
+                (World::getWorld());
+            if (tsb)
+                tsb->increaseRescueCount();
+        }
     }
 
     addNetworkAnimationChecker();

@@ -42,9 +42,11 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     m_name  = name;
     m_end_transform = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     m_end_transform.setOrigin(Vec3(std::numeric_limits<float>::max()));
+    m_end_ticks = -1;
     m_created_ticks = World::getWorld()->getTicksSinceStart();
     m_check_created_ticks = std::make_shared<int>(-1);
     m_confirmed_by_network = false;
+    m_ignore_undo = false;
     // Remove previous animation if there is one
 #ifndef DEBUG
     // Use this code in non-debug mode to avoid a memory leak (and messed
@@ -98,7 +100,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
         m_kart->setTrans(transform);
         Physics::getInstance()->addKart(m_kart);
 
-        if (RewindManager::get()->useLocalEvent())
+        if (RewindManager::get()->useLocalEvent() && !m_ignore_undo)
         {
             AbstractKart* kart = m_kart;
             Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
@@ -143,7 +145,8 @@ void AbstractKartAnimation::addNetworkAnimationChecker()
 }   // addNetworkAnimationChecker
 
 // ----------------------------------------------------------------------------
-void AbstractKartAnimation::checkNetworkAnimationCreationSucceed()
+void AbstractKartAnimation::
+    checkNetworkAnimationCreationSucceed(const btTransform& fallback_trans)
 {
     if (!m_confirmed_by_network && *m_check_created_ticks != -1 &&
         World::getWorld()->getTicksSinceStart() > *m_check_created_ticks)
@@ -151,6 +154,8 @@ void AbstractKartAnimation::checkNetworkAnimationCreationSucceed()
         Log::warn("AbstractKartAnimation",
             "No animation has been created on server, remove locally.");
         m_timer = -1.0f;
+        m_end_transform = fallback_trans;
+        m_ignore_undo = true;
     }
 }   // checkNetworkAnimationCreationSucceed
 

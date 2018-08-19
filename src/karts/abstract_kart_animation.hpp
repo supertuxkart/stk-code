@@ -50,6 +50,8 @@ private:
 
     bool m_confirmed_by_network;
 
+    bool m_ignore_undo;
+
 protected:
    /** A pointer to the kart which is animated by this class. */
     AbstractKart *m_kart;
@@ -58,6 +60,8 @@ protected:
     float m_timer;
 
     btTransform m_end_transform;
+
+    int m_end_ticks;
 
     // ------------------------------------------------------------------------
     void addNetworkAnimationChecker();
@@ -78,16 +82,18 @@ public:
     // ------------------------------------------------------------------------
     const btTransform& getEndTransform() const { return m_end_transform; }
     // ------------------------------------------------------------------------
-    void setEndTransform(const btTransform& t)
+    void setEndTransformTicks(const btTransform& t, int ticks)
     {
         if (!useEarlyEndTransform())
             return;
         m_confirmed_by_network = true;
         m_end_transform = t;
+        m_end_ticks = ticks;
     }
     // ----------------------------------------------------------------------------
-    void checkNetworkAnimationCreationSucceed();
-
+    void checkNetworkAnimationCreationSucceed(const btTransform& fallback_trans);
+    // ----------------------------------------------------------------------------
+    int getEndTicks() const { return m_end_ticks; }
 };   // AbstractKartAnimation
 
 #endif

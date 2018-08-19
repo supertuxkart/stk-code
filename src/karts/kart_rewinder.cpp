@@ -52,6 +52,8 @@ KartRewinder::KartRewinder(const std::string& ident,
  */
 void KartRewinder::reset()
 {
+    m_transfrom_from_network =
+        btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     Kart::reset();
     Rewinder::reset();
     SmoothNetworkBody::setEnable(true);
@@ -86,7 +88,7 @@ void KartRewinder::computeError()
         m_skidding->checkSmoothing();
     }
     else
-        ka->checkNetworkAnimationCreationSucceed();
+        ka->checkNetworkAnimationCreationSucceed(m_transfrom_from_network);
 
     float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
     if (diff > 0.05f)
@@ -136,6 +138,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         buffer->add(trans.getOrigin());
         btQuaternion quat = trans.getRotation();
         buffer->add(quat);
+        buffer->addUInt32(ka->getEndTicks());
     }
     else
     {
@@ -199,19 +202,19 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 
     // 2) Kart animation status or transform and velocities
     // -----------
-    btTransform t;
-    t.setOrigin(buffer->getVec3());
-    t.setRotation(buffer->getQuat());
-    Vec3 lv = buffer->getVec3();
-    Vec3 av = buffer->getVec3();
+    m_transfrom_from_network.setOrigin(buffer->getVec3());
+    m_transfrom_from_network.setRotation(buffer->getQuat());
 
     if (has_animation)
     {
+        int end_ticks = buffer->getUInt32();
         AbstractKartAnimation* ka = getKartAnimation();
         if (ka)
-            ka->setEndTransform(t);
+            ka->setEndTransformTicks(m_transfrom_from_network, end_ticks);
     }
 
+    Vec3 lv = buffer->getVec3();
+    Vec3 av = buffer->getVec3();
     // Don't restore to phyics position if showing kart animation
     if (!getKartAnimation())
     {
@@ -222,10 +225,10 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         body->setAngularVelocity(av);
         // This function also reads the velocity, so it must be called
         // after the velocities are set
-        body->proceedToTransform(t);
+        body->proceedToTransform(m_transfrom_from_network);
         // Update kart transform in case that there are access to its value
         // before Moveable::update() is called (which updates the transform)
-        setTrans(t);
+        setTrans(m_transfrom_from_network);
     }
 
     m_vehicle->setMinSpeed(buffer->getFloat());

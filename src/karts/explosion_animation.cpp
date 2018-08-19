@@ -23,6 +23,8 @@
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "tracks/track.hpp"
 
 /** A static create function that does only create an explosion if
@@ -83,6 +85,12 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // Non-direct hits will be only affected half as much.
     if(!direct_hit) m_timer*=0.5f;
 
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer())
+    {
+        m_end_ticks = stk_config->time2Ticks(m_timer) + World::getWorld()
+            ->getTicksSinceStart();
+    }
     // Half of the overall time is spent in raising, so only use
     // half of the explosion time here.
     // Velocity after t seconds is:
@@ -108,7 +116,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
     m_kart->showStarEffect(t);
-    
+
     m_kart->getAttachment()->clear();
     addNetworkAnimationChecker();
 }   // ExplosionAnimation
