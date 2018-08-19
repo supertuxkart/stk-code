@@ -153,7 +153,7 @@ void CaptureTheFlag::update(int ticks)
         m_blue_trans.setOrigin(m_blue_trans(g_kart_flag_offset));
     }
 
-    if (m_red_holder != -1 &&
+    if (m_red_holder != -1 && m_blue_holder == -1 &&
         m_blue_trans.getOrigin() == m_orig_blue_trans.getOrigin() &&
         (m_orig_blue_trans.getOrigin() - m_red_trans.getOrigin()).length() <
         g_capture_length)
@@ -162,7 +162,7 @@ void CaptureTheFlag::update(int ticks)
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
         p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
-            .addUInt8(1) // Reset red flag
+            .addUInt8(1 << 1 | 0) // Reset red flag
             .addUInt8((int8_t)m_red_holder);
         STKHost::get()->sendPacketToAllPeers(&p, true);
         m_scores.at(m_red_holder) += g_captured_score;
@@ -171,7 +171,7 @@ void CaptureTheFlag::update(int ticks)
         m_blue_scores++;
         return;
     }
-    else if (m_blue_holder != -1 &&
+    else if (m_blue_holder != -1 && m_red_holder == -1 &&
         m_red_trans.getOrigin() == m_orig_red_trans.getOrigin() &&
         (m_orig_red_trans.getOrigin() - m_blue_trans.getOrigin()).length() <
         g_capture_length)
@@ -180,7 +180,7 @@ void CaptureTheFlag::update(int ticks)
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
         p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
-            .addUInt8(0)  // Reset blue flag
+            .addUInt8(0 << 1 | 0)  // Reset blue flag
             .addUInt8((int8_t)m_blue_holder);
         STKHost::get()->sendPacketToAllPeers(&p, true);
         m_scores.at(m_blue_holder) += g_captured_score;
@@ -193,9 +193,7 @@ void CaptureTheFlag::update(int ticks)
     // Test if red or blue flag is touched
     for (auto& k : m_karts)
     {
-        if (k->isEliminated() || k->getKartAnimation() || k->isSquashed() ||
-            (int)k->getWorldKartId() == m_blue_holder ||
-            (int)k->getWorldKartId() == m_red_holder)
+        if (k->isEliminated() || k->getKartAnimation() || k->isSquashed())
             continue;
 
         if (m_red_holder == -1 &&
@@ -211,10 +209,8 @@ void CaptureTheFlag::update(int ticks)
                     NetworkString p(PROTOCOL_GAME_EVENTS);
                     p.setSynchronous(true);
                     p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
-                        .addUInt8(1)  // Reset red flag
-                        .addUInt8(((int8_t)-1))
-                        .add(Vec3(m_orig_red_trans.getOrigin()))
-                        .add(m_orig_red_trans.getRotation());
+                        .addUInt8(1 << 1 | 0)  // Reset red flag to original
+                        .addUInt8(((int8_t)-1));
                     STKHost::get()->sendPacketToAllPeers(&p, true);
                     m_red_trans = m_orig_red_trans;
                 }
@@ -244,10 +240,8 @@ void CaptureTheFlag::update(int ticks)
                     NetworkString p(PROTOCOL_GAME_EVENTS);
                     p.setSynchronous(true);
                     p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
-                        .addUInt8(0)  // Reset blue flag
-                        .addUInt8(((int8_t)-1))
-                        .add(Vec3(m_orig_blue_trans.getOrigin()))
-                        .add(m_orig_blue_trans.getRotation());
+                        .addUInt8(0 << 1 | 0)  // Reset blue flag to original
+                        .addUInt8(((int8_t)-1));
                     STKHost::get()->sendPacketToAllPeers(&p, true);
                     m_blue_trans = m_orig_blue_trans;
                 }
@@ -317,6 +311,8 @@ void CaptureTheFlag::attachFlag(NetworkString& ns)
         // I18N: Show when a player gets the flag in CTF
         get_msg = _("%s has the blue flag!", name);
     }
+    if (getKart(kart_id)->getController()->isLocalPlayerController())
+        SFXManager::get()->quickSound("wee");
     m_race_gui->addMessage(get_msg, NULL, 1.5f);
 #endif
 }   // attachFlag
@@ -325,7 +321,9 @@ void CaptureTheFlag::attachFlag(NetworkString& ns)
 void CaptureTheFlag::resetFlag(NetworkString& ns)
 {
 #ifndef SERVER_ONLY
-    bool reset_red_flag = ns.getUInt8() == 1;
+    uint8_t reset_info = ns.getUInt8();
+    bool reset_red_flag = (reset_info >> 1 & 1) == 1;
+    bool with_custom_transform = (reset_info & 1) == 1;
     int8_t kart_id = ns.getUInt8();
     if (kart_id != -1)
     {
@@ -361,11 +359,18 @@ void CaptureTheFlag::resetFlag(NetworkString& ns)
     }
     else
     {
-        btTransform t;
-        t.setOrigin(ns.getVec3());
-        t.setRotation(ns.getQuat());
+        core::stringw returned_msg;
         if (reset_red_flag)
         {
+            btTransform t = m_orig_red_trans;
+            // I18N: Show when the red flag is returned to its base in CTF
+            if (!with_custom_transform)
+                returned_msg = _("The red flag has returned!");
+            else
+            {
+                t.setOrigin(ns.getVec3());
+                t.setRotation(ns.getQuat());
+            }
             m_red_holder = -1;
             m_red_trans = t;
             m_red_flag_node->setParent(
@@ -373,19 +378,31 @@ void CaptureTheFlag::resetFlag(NetworkString& ns)
         }
         else
         {
+            btTransform t = m_orig_blue_trans;
+            // I18N: Show when the red flag is returned to its base in CTF
+            if (!with_custom_transform)
+                returned_msg = _("The blue flag has returned!");
+            else
+            {
+                t.setOrigin(ns.getVec3());
+                t.setRotation(ns.getQuat());
+            }
             m_blue_holder = -1;
             m_blue_trans = t;
             m_blue_flag_node->setParent(
                 irr_driver->getSceneManager()->getRootSceneNode());
         }
+        if (!returned_msg.empty())
+            m_race_gui->addMessage(returned_msg, NULL, 1.5f);
     }
     updateFlagNodes();
 #endif
 }   // resetFlag
 
 // ----------------------------------------------------------------------------
-btTransform CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
-                                                bool red_flag) const
+bool CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
+                                         bool red_flag,
+                                         btTransform* out) const
 {
     Vec3 from = kt.getOrigin() + kt.getBasis().getColumn(1);
     Vec3 to = kt.getOrigin() + kt.getBasis().getColumn(1) * -10000.0f;
@@ -397,16 +414,13 @@ btTransform CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
     bool ret = tm.castRay(from, to, &hit_point, &material, &normal,
         /*interpolate*/false);
     if (!ret || material == NULL)
-    {
-        if (red_flag)
-            return m_orig_red_trans;
-        else
-            return m_orig_blue_trans;
-    }
+        return false;
+
     Track::getCurrentTrack()->getTrackObjectManager()->castRay
         (from, to, &hit_point, &material, &normal, /*interpolate*/false);
-    return btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
+    *out = btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
         hit_point);
+    return true;
 }   // getDroppedFlagTrans
 
 // ----------------------------------------------------------------------------
@@ -442,15 +456,25 @@ bool CaptureTheFlag::kartHit(int kart_id, int hitter)
     if (m_red_holder == kart_id || m_blue_holder == kart_id)
     {
         bool reset_red_flag = m_red_holder == kart_id;
-        btTransform dropped_trans = getDroppedFlagTrans(
-            getKart(kart_id)->getTrans(), reset_red_flag);
+        btTransform dropped_trans = reset_red_flag ?
+            m_orig_red_trans : m_orig_blue_trans;
+        bool succeed = getDroppedFlagTrans(
+            getKart(kart_id)->getTrans(), reset_red_flag, &dropped_trans);
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
-        p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
-            .addUInt8(reset_red_flag ? 1 : 0)  // Reset red flag
-            .addUInt8(((int8_t)-1))
-            .add(Vec3(dropped_trans.getOrigin()))
-            .add(dropped_trans.getRotation());
+        // If reset red flag
+        uint8_t reset_info = reset_red_flag ? 1 : 0;
+        reset_info <<= 1;
+        // With custom transform
+        if (succeed)
+            reset_info |= 1;
+        p.addUInt8(GameEventsProtocol::GE_CTF_RESET).addUInt8(reset_info)
+            .addUInt8(((int8_t)-1));
+        if (succeed)
+        {
+            p.add(Vec3(dropped_trans.getOrigin()))
+                .add(dropped_trans.getRotation());
+        }
         STKHost::get()->sendPacketToAllPeers(&p, true);
         if (reset_red_flag)
         {

@@ -51,8 +51,8 @@ private:
     // ------------------------------------------------------------------------
     void updateFlagNodes();
     // ------------------------------------------------------------------------
-    btTransform getDroppedFlagTrans(const btTransform& kt,
-                                    bool red_flag) const;
+    bool getDroppedFlagTrans(const btTransform& kt, bool red_flag,
+                             btTransform* out) const;
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const OVERRIDE;
 
