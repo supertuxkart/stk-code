@@ -519,11 +519,21 @@ void RaceGUI::drawGlobalMiniMap()
     if (ctf)
     {
         Vec3 draw_at;
-        track->mapPoint2MiniMap(ctf->getRedFlag(), &draw_at);
-
         video::ITexture* icon =
             irr_driver->getTexture(FileManager::GUI, "red_flag.png");
+        if (!ctf->isRedFlagInBase())
+        {
+            track->mapPoint2MiniMap(Track::getCurrentTrack()->getRedFlag().getOrigin(),
+                &draw_at);
+            core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+            core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
+                lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
+                m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
+                lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
+            draw2DImage(icon, rp, rs, NULL, NULL, true, true);
+        }
 
+        track->mapPoint2MiniMap(ctf->getRedFlag(), &draw_at);
         core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
         core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -531,10 +541,20 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(icon, rp, rs, NULL, NULL, true);
 
-        track->mapPoint2MiniMap(ctf->getBlueFlag(), &draw_at);
-
         icon = irr_driver->getTexture(FileManager::GUI, "blue_flag.png");
+        if (!ctf->isBlueFlagInBase())
+        {
+            track->mapPoint2MiniMap(Track::getCurrentTrack()->getBlueFlag().getOrigin(),
+                &draw_at);
+            core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+            core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
+                lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
+                m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
+                lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
+            draw2DImage(icon, rp, rs, NULL, NULL, true, true);
+        }
 
+        track->mapPoint2MiniMap(ctf->getBlueFlag(), &draw_at);
         core::rect<s32> bs(core::position2di(0, 0), icon->getSize());
         core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),

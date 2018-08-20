@@ -1826,6 +1826,25 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
+    // Load the un-raycasted flag position first (for minimap)
+    if (m_is_ctf &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        for (unsigned int i=0; i<root->getNumNodes(); i++)
+        {
+            const XMLNode *node = root->getNode(i);
+            const std::string &name = node->getName();
+            if (name == "red-flag")
+            {
+                m_red_flag.setOrigin(flagCommand(node));
+            }
+            else if (name == "blue-flag")
+            {
+                m_blue_flag.setOrigin(flagCommand(node));
+            }
+        }   // for i<root->getNumNodes()
+    }
+
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) 
         loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
@@ -2422,7 +2441,7 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 }   // handleSky
 
 //-----------------------------------------------------------------------------
-void Track::flagCommand(const XMLNode *node)
+Vec3 Track::flagCommand(const XMLNode *node)
 {
     Vec3 xyz;
     // Set some kind of default in case Y is not defined in the file
@@ -2430,6 +2449,9 @@ void Track::flagCommand(const XMLNode *node)
     // Y is the height from which the item is dropped on the track.
     xyz.setY(1000);
     node->getXYZ(&xyz);
+
+    if (!m_track_mesh)
+        return xyz;
 
     Vec3 loc(xyz);
 
@@ -2480,6 +2502,7 @@ void Track::flagCommand(const XMLNode *node)
         m_blue_flag = btTransform(shortestArcQuat(Vec3(0, 1, 0), normal),
             hit_point);
     }
+    return hit_point;
 }   // flagCommand
 
 //-----------------------------------------------------------------------------

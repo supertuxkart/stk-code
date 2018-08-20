@@ -44,6 +44,7 @@ const int g_captured_score = 10;
 CaptureTheFlag::CaptureTheFlag() : FreeForAll()
 {
     m_red_flag_node = m_blue_flag_node = NULL;
+    m_red_flag_indicator = m_blue_flag_indicator = NULL;
     m_red_flag_mesh = m_blue_flag_mesh = NULL;
     m_scored_sound = NULL;
 #ifndef SERVER_ONLY
@@ -87,6 +88,20 @@ void CaptureTheFlag::init()
         "blue_flag");
     assert(m_red_flag_node);
     assert(m_blue_flag_node);
+
+    std::string red_path =
+        file_manager->getAsset(FileManager::GUI, "red_arrow.png");
+    std::string blue_path =
+        file_manager->getAsset(FileManager::GUI, "blue_arrow.png");
+
+    m_red_flag_indicator = irr_driver->addBillboard(
+            core::dimension2df(1.5f, 1.5f), red_path, NULL);
+    m_red_flag_indicator->setPosition(Vec3(
+        m_orig_red_trans(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
+    m_blue_flag_indicator = irr_driver->addBillboard(
+            core::dimension2df(1.5f, 1.5f), blue_path, NULL);
+    m_blue_flag_indicator->setPosition(Vec3(
+        m_orig_blue_trans(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
 #endif
 }   // init
 
@@ -128,6 +143,8 @@ void CaptureTheFlag::updateGraphics(float dt)
         }
         else
             m_blue_flag_node->setAnimationSpeed(25.0f);
+        m_red_flag_indicator->setVisible(!isRedFlagInBase());
+        m_blue_flag_indicator->setVisible(!isBlueFlagInBase());
     }
 }   // updateGraphics
 
