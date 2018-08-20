@@ -37,12 +37,6 @@ protected:
     /** Column 1 of btTransform of kart. */
     Vec3 m_up_vector;
 
-    /** The kart's original rotation. */
-    btQuaternion m_orig_rotation;
-
-    /** Desired rotation for rescue determined by last valid quad. */
-    btQuaternion m_des_rotation;
-
     /** The velocity with which the kart is moved. */
     float m_velocity;
 

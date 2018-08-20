@@ -25,7 +25,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world_with_rank.hpp"
 #include "network/network_config.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -62,7 +61,6 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_timer       = stk_config->time2Ticks(timer);
     m_up_vector   = m_kart->getTrans().getBasis().getColumn(1);
     m_xyz         = m_kart->getXYZ();
-    m_orig_rotation = m_kart->getRotation();
     m_kart->getAttachment()->clear();
 
     if (NetworkConfig::get()->isNetworking() &&
@@ -77,27 +75,6 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 
     max_height = std::min(hit_dest, max_height);
     m_velocity = max_height / timer;
-
-    // Determine the rotation that will rotate the kart from the current
-    // up direction to the right up direction it should have according to
-    // the last vaild quad of the kart
-    WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
-    if (DriveGraph::get() && wwr &&
-        wwr->getTrackSector(m_kart->getWorldKartId())->getCurrentGraphNode() > -1)
-    {
-        const int sector = wwr->getTrackSector(m_kart->getWorldKartId())
-            ->getCurrentGraphNode();
-        const Vec3& quad_normal = DriveGraph::get()->getQuad(sector)
-            ->getNormal();
-        btQuaternion angle_rot(btVector3(0, 1, 0),
-            Track::getCurrentTrack()->getAngle(sector));
-        m_des_rotation = shortestArcQuat(Vec3(0, 1, 0), quad_normal) * angle_rot;
-        m_des_rotation.normalize();
-    }
-    else
-    {
-        m_des_rotation = m_orig_rotation;
-    }
 
     // Add a hit unless it was auto-rescue
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE &&
@@ -172,7 +149,7 @@ void RescueAnimation::update(int ticks)
                 CameraNormal* camera =
                     dynamic_cast<CameraNormal*>(Camera::getCamera(i));
                 if (camera && camera->getKart() == m_kart &&
-                    dynamic_cast<CameraNormal*>(camera)) 
+                    dynamic_cast<CameraNormal*>(camera))
                 {
                     camera->setMode(Camera::CM_NORMAL);
                     camera->snapToPosition();
