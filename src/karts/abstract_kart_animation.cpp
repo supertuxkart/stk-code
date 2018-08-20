@@ -153,7 +153,7 @@ void AbstractKartAnimation::
     {
         Log::warn("AbstractKartAnimation",
             "No animation has been created on server, remove locally.");
-        m_timer = -1.0f;
+        m_timer = -1;
         m_end_transform = fallback_trans;
         m_ignore_undo = true;
     }
@@ -165,13 +165,40 @@ void AbstractKartAnimation::
  *  NOTE: calling this function must be the last thing done in any kart
  *  animation class, since this object might be deleted, so accessing any
  *  members might be invalid.
- *  \param dt Time step size.
+ *  \param ticks Number of time steps - should be 1.
  */
-void AbstractKartAnimation::update(float dt)
+void AbstractKartAnimation::update(int ticks)
 {
+    // Scale the timer according to m_end_ticks told by server if
+    // necessary
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() &&
+        World::getWorld()->getPhase() == World::RACE_PHASE &&
+        usePredefinedEndTransform() && m_end_ticks != -1)
+    {
+        int cur_end_ticks = World::getWorld()->getTicksSinceStart() +
+            m_timer;
+
+        const int difference = cur_end_ticks - m_end_ticks;
+        if (World::getWorld()->getTicksSinceStart() > m_end_ticks)
+        {
+            // Stop right now
+            m_timer = -1;
+        }
+        else if (difference > 0)
+        {
+            // Speed up
+            m_timer -= ticks;
+        }
+        else if (difference < 0)
+        {
+            // Slow down
+            return;
+        }
+    }
     // See if the timer expires, if so return the kart to normal game play
-    m_timer -= dt;
-    if(m_timer<0)
+    m_timer -= ticks;
+    if (m_timer < 0)
     {
         if(m_kart) m_kart->setKartAnimation(NULL);
         delete this;

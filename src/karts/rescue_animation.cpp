@@ -57,7 +57,9 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
-    m_timer       = m_kart->getKartProperties()->getRescueDuration();
+    float timer = m_kart->getKartProperties()->getRescueDuration();
+    m_rescue_moment = stk_config->time2Ticks(timer * 0.6f);
+    m_timer       = stk_config->time2Ticks(timer);
     m_up_vector   = m_kart->getTrans().getBasis().getColumn(1);
     m_xyz         = m_kart->getXYZ();
     m_orig_rotation = m_kart->getRotation();
@@ -66,8 +68,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
-        m_end_ticks = stk_config->time2Ticks(m_timer) + World::getWorld()
-            ->getTicksSinceStart();
+        m_end_ticks = m_timer + World::getWorld()->getTicksSinceStart() + 1;
     }
 
     // Determine maximum rescue height with up-raycast
@@ -75,7 +76,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     float hit_dest = maximumHeight();
 
     max_height = std::min(hit_dest, max_height);
-    m_velocity = max_height / m_timer;
+    m_velocity = max_height / timer;
 
     // Determine the rotation that will rotate the kart from the current
     // up direction to the right up direction it should have according to
@@ -152,12 +153,12 @@ float RescueAnimation::maximumHeight()
 
 // ----------------------------------------------------------------------------
 /** Updates the kart animation.
- *  \param dt Time step size.
- *  \return True if the explosion is still shown, false if it has finished.
+ *  \param ticks Number of time steps - should be 1.
  */
-void RescueAnimation::update(float dt)
+void RescueAnimation::update(int ticks)
 {
-    if (m_timer <= (m_kart->getKartProperties()->getRescueDuration() * rescue_moment))
+    float dt = stk_config->ticks2Time(ticks);
+    if (m_timer <= m_rescue_moment)
     {
         if (m_kart_on_track == false)
         {
@@ -166,7 +167,8 @@ void RescueAnimation::update(float dt)
             m_kart->setTrans(m_end_transform);
             for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
             {
-                CameraNormal* camera = dynamic_cast<CameraNormal*>(Camera::getCamera(i));
+                CameraNormal* camera =
+                    dynamic_cast<CameraNormal*>(Camera::getCamera(i));
                 if (camera && camera->getKart() == m_kart &&
                     dynamic_cast<CameraNormal*>(camera)) 
                 {
@@ -179,7 +181,8 @@ void RescueAnimation::update(float dt)
             m_xyz = m_kart->getXYZ();
 
             float hit_dest = maximumHeight();
-            float max_height = std::min(hit_dest, m_kart->getKartProperties()->getRescueHeight()) * rescue_moment;
+            float max_height = std::min(hit_dest,
+                m_kart->getKartProperties()->getRescueHeight()) * 0.6f;
             m_xyz += max_height * m_up_vector;
         }
 
@@ -192,6 +195,6 @@ void RescueAnimation::update(float dt)
         m_kart->setXYZ(m_xyz);
     }
 
-    AbstractKartAnimation::update(dt);
+    AbstractKartAnimation::update(ticks);
 
 }   // update

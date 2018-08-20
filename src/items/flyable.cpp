@@ -406,7 +406,7 @@ bool Flyable::updateAndDelete(int ticks)
     {
         if (!RewindManager::get()->isRewinding())
         {
-            m_animation->update(stk_config->ticks2Time(ticks));
+            m_animation->update(ticks);
             Moveable::update(ticks);
         }
         return false;

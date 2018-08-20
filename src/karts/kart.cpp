@@ -1302,12 +1302,12 @@ void Kart::update(int ticks)
     // before updating the graphical position (which is done in
     // Moveable::update() ), otherwise 'stuttering' can happen (caused by
     // graphical and physical position not being the same).
-    float dt = stk_config->ticks2Time(ticks);
     if (has_animation_before && !RewindManager::get()->isRewinding())
     {
-        m_kart_animation->update(dt);
+        m_kart_animation->update(ticks);
     }
 
+    float dt = stk_config->ticks2Time(ticks);
     if (!RewindManager::get()->isRewinding())
     {
         m_time_previous_counter += dt;

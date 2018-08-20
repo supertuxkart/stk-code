@@ -73,6 +73,6 @@ public:
     static ExplosionAnimation *create(AbstractKart *kart);
 
     virtual ~ExplosionAnimation();
-    virtual void update(float dt);
+    virtual void update(int ticks);
 };   // ExplosionAnimation
 #endif

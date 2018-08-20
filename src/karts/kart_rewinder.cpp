@@ -123,7 +123,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->addUInt16(m_view_blocked_by_plunger);
     // m_invulnerable_ticks will not be negative
     AbstractKartAnimation* ka = getKartAnimation();
-    bool has_animation = ka != NULL && ka->useEarlyEndTransform();
+    bool has_animation = ka != NULL && ka->usePredefinedEndTransform();
     uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
         (has_animation ? 1 << 14 : 0) | m_invulnerable_ticks;
     buffer->addUInt16(fire_and_invulnerable);
