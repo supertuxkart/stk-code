@@ -77,6 +77,7 @@ void KartPropertiesManager::unloadAllKarts()
     m_kart_available.clear();
     m_groups_2_indices.clear();
     m_all_groups.clear();
+    m_kart_types.clear();
 }   // unloadAllKarts
 
 //-----------------------------------------------------------------------------
@@ -215,6 +216,7 @@ void KartPropertiesManager::loadCharacteristics(const XMLNode *root)
     for (const XMLNode *type : nodes)
     {
         type->get("name", &name);
+        m_kart_types.push_back(name);
         m_kart_type_characteristics.insert(std::pair<const std::string,
             std::unique_ptr<AbstractCharacteristic> >(name,
             std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(type))));
@@ -303,10 +305,31 @@ const AbstractCharacteristic* KartPropertiesManager::getDifficultyCharacteristic
 }   // getDifficultyCharacteristic
 
 //-----------------------------------------------------------------------------
-const AbstractCharacteristic* KartPropertiesManager::getKartTypeCharacteristic(const std::string &type) const
+const AbstractCharacteristic* KartPropertiesManager::getKartTypeCharacteristic(const std::string &type,
+                                                                               const std::string &name) const
 {
+    bool type_is_valid = false;
+    for (unsigned i=0; i < m_kart_types.size(); i++)
+    {
+        if (type == m_kart_types[i])
+        {
+            type_is_valid = true;
+            break;
+        }
+    }
+
+    if (!type_is_valid)
+    {
+        Log::warn("KartProperties", "Can't find kart type '%s' for kart '%s', defaulting to '%s'.",
+            type.c_str(), name.c_str(), m_kart_types[0].c_str());
+    }
+
+    std::string valid_type = (type_is_valid) ? type : m_kart_types[0];
+
+    printf("Valid type is %s\n.", valid_type.c_str());
+
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> >::const_iterator
-        it = m_kart_type_characteristics.find(type);
+        it = m_kart_type_characteristics.find(valid_type);
     if (it == m_kart_type_characteristics.cend())
         return nullptr;
     return it->second.get();
