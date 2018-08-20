@@ -133,7 +133,7 @@ void AbstractKartAnimation::addNetworkAnimationChecker(bool reset_powerup)
         if (m_kart)
         {
             p = m_kart->getPowerup();
-            p->set(PowerupManager::POWERUP_NOTHING);
+            p->reset();
         }
     }
 
@@ -148,7 +148,7 @@ void AbstractKartAnimation::addNetworkAnimationChecker(bool reset_powerup)
             /*replay_function*/[p]()
             {
                 if (p)
-                    p->set(PowerupManager::POWERUP_NOTHING);
+                    p->reset();
             },
             /*delete_function*/[cct]()
             {
