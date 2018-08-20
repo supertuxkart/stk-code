@@ -433,10 +433,13 @@ void TracksScreen::voteForPlayer()
     // Remember reverse globally for each stk instance if not arena
     if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_BATTLE &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    {
+        UserConfigParams::m_num_laps = m_laps->getValue();
         m_reverse_checked = m_reversed->getState();
+    }
     else
         UserConfigParams::m_random_arena_item = m_reversed->getState();
-    UserConfigParams::m_num_laps = m_laps->getValue();
+
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
     vote.encodeString(m_selected_track->getIdent())
