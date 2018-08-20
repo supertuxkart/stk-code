@@ -65,7 +65,7 @@ protected:
     int m_end_ticks;
 
     // ------------------------------------------------------------------------
-    void addNetworkAnimationChecker();
+    void addNetworkAnimationChecker(bool reset_powerup);
 public:
                  AbstractKartAnimation(AbstractKart *kart,
                                        const std::string &name);

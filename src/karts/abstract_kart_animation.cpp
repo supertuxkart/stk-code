@@ -19,6 +19,7 @@
 #include "karts/abstract_kart_animation.hpp"
 
 #include "graphics/slip_stream.hpp"
+#include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
@@ -124,16 +125,31 @@ AbstractKartAnimation::~AbstractKartAnimation()
 }   // ~AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
-void AbstractKartAnimation::addNetworkAnimationChecker()
+void AbstractKartAnimation::addNetworkAnimationChecker(bool reset_powerup)
 {
+    Powerup* p = NULL;
+    if (reset_powerup)
+    {
+        if (m_kart)
+        {
+            p = m_kart->getPowerup();
+            p->set(PowerupManager::POWERUP_NOTHING);
+        }
+    }
+
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient())
     {
+        // Prevent access to deleted kart animation object
         std::weak_ptr<int> cct = m_check_created_ticks;
         RewindManager::get()->addRewindInfoEventFunction(new
             RewindInfoEventFunction(m_created_ticks,
             [](){},
-            [](){},
+            /*replay_function*/[p]()
+            {
+                if (p)
+                    p->set(PowerupManager::POWERUP_NOTHING);
+            },
             /*delete_function*/[cct]()
             {
                 auto cct_sp = cct.lock();

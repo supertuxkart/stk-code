@@ -64,6 +64,8 @@ protected:
      *  on difficulty (so that on easy you can drive again earlier. */
     float m_duration;
 
+    bool m_direct_hit;
+
     ExplosionAnimation(AbstractKart *kart);
     ExplosionAnimation(AbstractKart *kart, const Vec3 &pos,
                        bool direct_hit);

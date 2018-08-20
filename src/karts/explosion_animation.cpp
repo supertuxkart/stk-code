@@ -82,9 +82,10 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     float timer = m_kart->getKartProperties()->getExplosionDuration();
     m_timer = stk_config->time2Ticks(timer);
+    m_direct_hit = direct_hit;
 
     // Non-direct hits will be only affected half as much.
-    if (!direct_hit)
+    if (!m_direct_hit)
     {
         timer *= 0.5f;
         m_timer /= 2;
@@ -108,7 +109,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_curr_rotation.setPitch(m_kart->getPitch());
     m_curr_rotation.setRoll(m_kart->getRoll());
 
-    const int max_rotation = direct_hit ? 2 : 1;
+    const int max_rotation = m_direct_hit ? 2 : 1;
     // To get rotations in both directions for each axis we determine a random
     // number between -(max_rotation-1) and +(max_rotation-1)
     float f = 2.0f * M_PI / timer;
@@ -122,7 +123,10 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_kart->showStarEffect(t);
 
     m_kart->getAttachment()->clear();
-    addNetworkAnimationChecker();
+    // Clear powerups when direct hit in CTF
+    addNetworkAnimationChecker(m_direct_hit &&
+        race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------

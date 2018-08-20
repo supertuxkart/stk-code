@@ -113,7 +113,9 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
         }
     }
 
-    addNetworkAnimationChecker();
+    // Clear powerups when rescue in CTF
+    addNetworkAnimationChecker(race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
 }   // RescueAnimation
 
 //-----------------------------------------------------------------------------
