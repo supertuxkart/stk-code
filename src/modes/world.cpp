@@ -1064,6 +1064,8 @@ void World::update(int ticks)
         // Update all karts that are not eliminated
         if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
             m_karts[i]->update(ticks);
+        if (isStartPhase())
+            m_karts[i]->makeKartRest();
     }
     PROFILER_POP_CPU_MARKER();
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
