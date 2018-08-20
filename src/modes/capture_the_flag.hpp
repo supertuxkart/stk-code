@@ -48,10 +48,16 @@ private:
 
     btTransform m_red_trans, m_blue_trans, m_orig_red_trans, m_orig_blue_trans;
 
+    int m_red_return_ticks, m_blue_return_ticks;
+
     // ------------------------------------------------------------------------
     void updateFlagNodes();
     // ------------------------------------------------------------------------
     bool getDroppedFlagTrans(const btTransform& kt, btTransform* out) const;
+    // ------------------------------------------------------------------------
+    void resetRedFlagToOrigin();
+    // ------------------------------------------------------------------------
+    void resetBlueFlagToOrigin();
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const OVERRIDE;
 
