@@ -312,21 +312,14 @@ const AbstractCharacteristic* KartPropertiesManager::getKartTypeCharacteristic(c
     for (unsigned i=0; i < m_kart_types.size(); i++)
     {
         if (type == m_kart_types[i])
-        {
             type_is_valid = true;
-            break;
-        }
     }
 
     if (!type_is_valid)
-    {
         Log::warn("KartProperties", "Can't find kart type '%s' for kart '%s', defaulting to '%s'.",
             type.c_str(), name.c_str(), m_kart_types[0].c_str());
-    }
 
     std::string valid_type = (type_is_valid) ? type : m_kart_types[0];
-
-    printf("Valid type is %s\n.", valid_type.c_str());
 
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> >::const_iterator
         it = m_kart_type_characteristics.find(valid_type);
