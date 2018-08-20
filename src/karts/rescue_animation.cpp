@@ -19,7 +19,6 @@
 #include "karts/rescue_animation.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -37,7 +36,6 @@
 
 #include <algorithm>
 
-#include "graphics/camera_normal.hpp"
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
@@ -144,18 +142,6 @@ void RescueAnimation::update(int ticks)
             m_kart_on_track = true;
             m_kart->getBody()->setCenterOfMassTransform(m_end_transform);
             m_kart->setTrans(m_end_transform);
-            for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
-            {
-                CameraNormal* camera =
-                    dynamic_cast<CameraNormal*>(Camera::getCamera(i));
-                if (camera && camera->getKart() == m_kart &&
-                    dynamic_cast<CameraNormal*>(camera))
-                {
-                    camera->setMode(Camera::CM_NORMAL);
-                    camera->snapToPosition();
-                }
-            }
-
             m_up_vector = m_kart->getTrans().getBasis().getColumn(1);
             m_xyz = m_kart->getXYZ();
 

@@ -66,6 +66,13 @@ protected:
 
     bool m_direct_hit;
 
+    /** If not -1, when > m_timer it will use m_reset_xyz below for
+     *  animation. */
+    int m_reset_ticks;
+
+    /** Used for reset kart back to flag base in CTF. */
+    Vec3 m_reset_xyz, m_reset_normal;
+
     ExplosionAnimation(AbstractKart *kart);
     ExplosionAnimation(AbstractKart *kart, const Vec3 &pos,
                        bool direct_hit);
@@ -76,5 +83,7 @@ public:
 
     virtual ~ExplosionAnimation();
     virtual void update(int ticks);
+    bool hasResetAlready() const
+                     { return m_reset_ticks != -1 && m_timer < m_reset_ticks; }
 };   // ExplosionAnimation
 #endif

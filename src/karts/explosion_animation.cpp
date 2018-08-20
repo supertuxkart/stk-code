@@ -75,14 +75,11 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                                        bool direct_hit)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
-    m_end_transform = m_kart->getTrans();
-    m_xyz = m_kart->getXYZ();
-    m_orig_xyz = m_xyz;
-    m_normal = m_kart->getNormal();
-    m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
+    m_direct_hit = direct_hit;
+    m_reset_ticks = -1;
     float timer = m_kart->getKartProperties()->getExplosionDuration();
     m_timer = stk_config->time2Ticks(timer);
-    m_direct_hit = direct_hit;
+    m_normal = m_kart->getNormal();
 
     // Non-direct hits will be only affected half as much.
     if (!m_direct_hit)
@@ -90,6 +87,33 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
         timer *= 0.5f;
         m_timer /= 2;
     }
+
+    // Put the kart back to its own flag base like rescue if direct hit in CTF
+    if (race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
+    {
+        m_reset_ticks = stk_config->time2Ticks(timer * 0.2f);
+    }
+
+    if (m_reset_ticks != -1)
+    {
+        m_xyz = m_kart->getXYZ();
+        m_orig_xyz = m_xyz;
+        btTransform prev_trans = kart->getTrans();
+        World::getWorld()->moveKartAfterRescue(kart);
+        m_end_transform = kart->getTrans();
+        m_reset_xyz = m_end_transform.getOrigin();
+        m_reset_normal = m_end_transform.getBasis().getColumn(1);
+        kart->getBody()->setCenterOfMassTransform(prev_trans);
+        kart->setTrans(prev_trans);
+    }
+    else
+    {
+        m_end_transform = m_kart->getTrans();
+        m_xyz = m_kart->getXYZ();
+        m_orig_xyz = m_xyz;
+    }
+    m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
@@ -124,9 +148,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
 
     m_kart->getAttachment()->clear();
     // Clear powerups when direct hit in CTF
-    addNetworkAnimationChecker(m_direct_hit &&
-        race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+    addNetworkAnimationChecker(m_reset_ticks != -1);
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------
@@ -156,8 +178,8 @@ ExplosionAnimation::~ExplosionAnimation()
 void ExplosionAnimation::update(int ticks)
 {
     float dt = stk_config->ticks2Time(ticks);
-    m_velocity -= dt*Track::getCurrentTrack()->getGravity();
-    m_xyz = m_xyz + dt*m_velocity*m_normal;
+    m_velocity -= dt * Track::getCurrentTrack()->getGravity();
+    m_xyz = m_xyz + dt * m_velocity * m_normal;
 
     // Make sure the kart does not end up under the track
     if ((m_xyz - m_orig_xyz).dot(m_normal)<0)
@@ -167,11 +189,28 @@ void ExplosionAnimation::update(int ticks)
         if (!NetworkConfig::get()->isNetworking())
             m_timer = -1;
     }
-    m_kart->setXYZ(m_xyz);
-    m_curr_rotation += dt*m_add_rotation;
+    m_curr_rotation += dt * m_add_rotation;
     btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),
                    m_curr_rotation.getRoll());
-    m_kart->setRotation(q);
+
+    if (m_reset_ticks != -1)
+    {
+        m_reset_xyz = m_reset_xyz + dt * m_velocity * m_reset_normal;
+        if ((m_reset_xyz - m_end_transform.getOrigin()).dot(m_reset_normal) <
+            0.0f)
+            m_reset_xyz = m_end_transform.getOrigin();
+    }
+    if (m_reset_ticks != -1 && m_timer < m_reset_ticks)
+    {
+        m_kart->setXYZ(m_reset_xyz);
+        m_kart->setRotation(m_end_transform.getRotation());
+        m_kart->getBody()->setCenterOfMassTransform(m_kart->getTrans());
+    }
+    else
+    {
+        m_kart->setXYZ(m_xyz);
+        m_kart->setRotation(q);
+    }
 
     AbstractKartAnimation::update(ticks);
 }   // update

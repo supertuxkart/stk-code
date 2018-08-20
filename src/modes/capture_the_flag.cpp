@@ -379,7 +379,7 @@ void CaptureTheFlag::resetFlag(NetworkString& ns)
         else
         {
             btTransform t = m_orig_blue_trans;
-            // I18N: Show when the red flag is returned to its base in CTF
+            // I18N: Show when the blue flag is returned to its base in CTF
             if (!with_custom_transform)
                 returned_msg = _("The blue flag has returned!");
             else
@@ -401,7 +401,6 @@ void CaptureTheFlag::resetFlag(NetworkString& ns)
 
 // ----------------------------------------------------------------------------
 bool CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
-                                         bool red_flag,
                                          btTransform* out) const
 {
     Vec3 from = kt.getOrigin() + kt.getBasis().getColumn(1);
@@ -459,7 +458,7 @@ bool CaptureTheFlag::kartHit(int kart_id, int hitter)
         btTransform dropped_trans = reset_red_flag ?
             m_orig_red_trans : m_orig_blue_trans;
         bool succeed = getDroppedFlagTrans(
-            getKart(kart_id)->getTrans(), reset_red_flag, &dropped_trans);
+            getKart(kart_id)->getTrans(), &dropped_trans);
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
         // If reset red flag
@@ -489,3 +488,9 @@ bool CaptureTheFlag::kartHit(int kart_id, int hitter)
     }
     return true;
 }   // kartHit
+
+//-----------------------------------------------------------------------------
+unsigned int CaptureTheFlag::getRescuePositionIndex(AbstractKart *kart)
+{
+    return m_kart_position_map.at(kart->getWorldKartId());
+}   // getRescuePositionIndex

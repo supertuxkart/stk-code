@@ -51,8 +51,7 @@ private:
     // ------------------------------------------------------------------------
     void updateFlagNodes();
     // ------------------------------------------------------------------------
-    bool getDroppedFlagTrans(const btTransform& kt, bool red_flag,
-                             btTransform* out) const;
+    bool getDroppedFlagTrans(const btTransform& kt, btTransform* out) const;
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const OVERRIDE;
 
@@ -75,6 +74,8 @@ public:
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     // ------------------------------------------------------------------------
     void attachFlag(NetworkString& ns);
     // ------------------------------------------------------------------------
