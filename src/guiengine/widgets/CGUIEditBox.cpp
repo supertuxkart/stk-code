@@ -120,6 +120,14 @@ CGUIEditBox::~CGUIEditBox()
         dl->setIMEEnable(false);
     }
 #endif
+#ifdef ANDROID
+    if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+    {
+        CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+        dl->setTextInputEnabled(false);
+    }
+#endif
 #endif
 }
 
@@ -269,10 +277,18 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     dl->setIMEEnable(false);
                 }
 #endif
+#ifdef ANDROID
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->setTextInputEnabled(false);
+                }
+#endif
             }
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
                 if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
@@ -280,8 +296,16 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     dl->setIMEEnable(true);
                     dl->setIMELocation(calculateICPos());
                 }
-            }
 #endif
+#ifdef ANDROID
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->setTextInputEnabled(true);
+                }
+#endif
+            }
             break;
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
         case EET_IMPUT_METHOD_EVENT:

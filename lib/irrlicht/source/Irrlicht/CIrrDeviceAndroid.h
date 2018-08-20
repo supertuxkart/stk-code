@@ -64,6 +64,7 @@ namespace irr
         virtual bool deactivateGyroscope();
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
+        virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
         
         class CCursorControl : public gui::ICursorControl
         {
@@ -113,6 +114,7 @@ namespace irr
         const ASensor* Gyroscope;
         bool AccelerometerActive;
         bool GyroscopeActive;
+        bool TextInputEnabled;
 
         static bool IsPaused;
         static bool IsFocused;
@@ -141,7 +143,8 @@ namespace irr
         void createDriver();
         void createKeyMap();
         void createVideoModeList();
-        void getKeyChar(SEvent& event);
+        wchar_t getKeyChar(SEvent& event);
+        wchar_t getUnicodeChar(AInputEvent* event);
         static void hideNavBar(ANativeActivity* activity);
         int getRotation();
         DeviceOrientation getDefaultOrientation();
