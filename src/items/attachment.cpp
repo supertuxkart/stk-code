@@ -345,7 +345,8 @@ void Attachment::hitBanana(ItemState *item_state)
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
-        ExplosionAnimation::create(m_kart);
+        if (m_kart->getKartAnimation() == NULL)
+            ExplosionAnimation::create(m_kart);
         return;
     }
 
