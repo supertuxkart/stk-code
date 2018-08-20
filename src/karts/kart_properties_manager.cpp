@@ -77,7 +77,6 @@ void KartPropertiesManager::unloadAllKarts()
     m_kart_available.clear();
     m_groups_2_indices.clear();
     m_all_groups.clear();
-    m_kart_types.clear();
 }   // unloadAllKarts
 
 //-----------------------------------------------------------------------------
