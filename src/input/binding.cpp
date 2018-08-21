@@ -100,20 +100,6 @@ irr::core::stringw Binding::getAsString() const
 
             switch(m_id)
             {
-#if defined(WIN32) || (defined(__linux__) && !defined(ANDROID))
-            // Windows codes certain special keys, which have atm no defined
-            // value in irr::IRR_KEY_*. So for now hardcode the values.
-            // FIXME: what happens with international keyboards? E.g. A [
-            // might be an Umlaut on a German keyboard. How do we get
-            // the character to display in this case??
-            case 186: s=";";  break;
-            case 191: s="/";  break;
-            case 192: s="`";  break;
-            case 219: s="[";  break;
-            case 220: s="\\"; break;
-            case 221: s="]";  break;
-            case 222: s="'";  break;
-#endif
              //I18N: input configuration screen: mouse button
             case irr::IRR_KEY_LBUTTON    : s = _C("input_key", "Left Mouse Button");  break;
              //I18N: input configuration screen: mouse button
