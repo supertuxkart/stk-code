@@ -1054,6 +1054,10 @@ void RaceResultGUI::displayCTFResults()
 #ifndef SERVER_ONLY
         unsigned int num_karts = race_manager->getNumberOfKarts();
         std::vector<int> old_rank(num_karts, 0);
+        // Update the kart GP ranks
+        // This is useful, e.g., when continuing a saved GP.
+        race_manager->computeGPRanks();
+        
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
         {
             int rank = race_manager->getKartGPRank(kart_id);
