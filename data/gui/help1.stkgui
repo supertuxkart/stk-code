@@ -70,7 +70,7 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="2" height="100%" word_wrap="true"
                             I18N="In the help menu"
-                            text="The 'skidding' key allows you to skid. Short skids help to take sharp turns. If you skid long enough, you will get a boost. You can't stop turning while skidding, so orient your kart carefully before !"/>
+                            text="The 'skidding' key allows you to skid. Short skids help to take sharp turns. If you skid long enough, you will get a boost. You can't stop turning while skidding, so orient your kart carefully before!"/>
                 </div>
 
                 <spacer height="3%" width="10"/>

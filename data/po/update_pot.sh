@@ -6,7 +6,7 @@ CPP_FILE_LIST="`find ./src              \
                      -name '*.cpp' -or  \
                      -name '*.c' -or    \
                      -name '*.hpp' -or  \
-                     -name "*.h"        \
+                     -name "*.h" | sort -n \
               `"
 XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
                      -name 'achievements.xml' -or                \
