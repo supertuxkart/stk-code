@@ -717,7 +717,7 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
     // scan code, because it's better than nothing
     if (event.KeyInput.Key == 0)
     {
-        event.KeyInput.Key = (EKEY_CODE)scanCode;
+        event.KeyInput.Key = (EKEY_CODE)((int)IRR_KEY_CODES_COUNT + scanCode);
     }
 
     // Handle an event when back button in pressed just like an escape key
@@ -868,7 +868,7 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             
             if (event.KeyInput.Key == 0)
             {
-                event.KeyInput.Key = (EKEY_CODE)scanCode;
+                event.KeyInput.Key = (EKEY_CODE)((int)IRR_KEY_CODES_COUNT + scanCode);
             }
             
             postEventFromUser(event);
