@@ -327,6 +327,20 @@ irr::core::stringw Binding::getAsString() const
             case irr::IRR_KEY_PA1        : s = _C("input_key", "Pa1"); break;
              //I18N: input configuration screen: keyboard key
             case irr::IRR_KEY_OEM_CLEAR  : s = _C("input_key", "Oem Clear"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_1      : s = ";"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_2      : s = "/"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_3      : s = "`"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_4      : s = "["; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_5      : s = "\\"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_6      : s = "]"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_7      : s = "'"; break;
             
             // for azerty layout
             case irr::IRR_KEY_AMPERSAND   : s = "&"; break;
