@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # (C) 2016-2017 Dawid Gan, under the GPLv3
 #
