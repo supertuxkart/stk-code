@@ -68,8 +68,6 @@
 using namespace GUIEngine;
 using namespace Online;
 
-bool MainMenuScreen::m_enable_online = false;
-
 // ----------------------------------------------------------------------------
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
@@ -497,24 +495,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        // Define this to require a login to the stk server (default behaviour)
-        // Undefine for testing LAN only.
-        if (MainMenuScreen::m_enable_online)
-        {
-            OnlineScreen::getInstance()->push();
-        }
-        else
-        {
-            if (PlayerManager::getCurrentOnlineId())
-            {
-                ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-                TabOnlineProfileAchievements::getInstance()->push();
-            }
-            else
-            {
-                UserScreen::getInstance()->push();
-            }
-        }
+        OnlineScreen::getInstance()->push();
     }
     else if (selection == "addons")
     {

@@ -559,7 +559,14 @@ void cmdLineHelp()
     "       --aiNP=a,b,...     Use the karts a, b, ... for the AI, no additional player kart.\n"
     "       --laps=N           Define number of laps to N.\n"
     "       --mode=N           N=1 Beginner, N=2 Intermediate, N=3 Expert, N=4 SuperTux.\n"
-    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Follow The Leader\n"
+    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Battle, N=3 Soccer,\n"
+    "                          N=4 Follow The Leader. In configure server use --battle-mode=n\n"
+    "                          for battle server and --soccer-timed / goals for soccer server\n"
+    "                          to control verbosely, see below:\n"
+    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free-For-All and\n"
+    "                          1 is Capture The Flag.\n"
+    "       --soccer-timed     Use time limit mode in network soccer game.\n"
+    "       --soccer-goals     Use goals limit mode in network soccer game.\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     "  -f,  --fullscreen       Use fullscreen display.\n"
     "  -w,  --windowed         Use windowed display (default).\n"
@@ -610,10 +617,6 @@ void cmdLineHelp()
     "       --team-choosing    Allow choosing team in lobby, implicitly allowed in lan or\n"
     "                          password protected server. This function cannot be used in\n"
     "                          owner-less server.\n"
-    "       --soccer-timed     Use time limit mode in network soccer game.\n"
-    "       --soccer-goals     Use goals limit mode in network soccer game.\n"
-    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free For All and\n"
-    "                          1 is Capture The Flag.\n"
     "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
@@ -737,7 +740,7 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--online"))
-        MainMenuScreen::m_enable_online=true;
+        History::m_online_history_replay = true;
 #if !(defined(SERVER_ONLY) || defined(ANDROID))
     if(CommandLine::has("--apitrace"))
     {
@@ -1553,7 +1556,7 @@ int handleCmdLine()
         history->setReplayHistory(true);
         // Force the no-start screen flag, since this initialises
         // the player structures correctly.
-        if(!MainMenuScreen::m_enable_online)
+        if (!History::m_online_history_replay)
             UserConfigParams::m_no_start_screen = true;
     }   // --history
 
@@ -2100,7 +2103,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            if (!MainMenuScreen::m_enable_online)
+            if (!History::m_online_history_replay)
             {
                 race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);

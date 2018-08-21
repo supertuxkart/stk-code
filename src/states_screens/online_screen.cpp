@@ -73,6 +73,23 @@ void OnlineScreen::loadedFromFile()
 
 void OnlineScreen::beforeAddingWidget()
 {
+} // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
+//
+void OnlineScreen::init()
+{
+    Screen::init();
+
+    m_online = getWidget<IconButtonWidget>("online");
+    assert(m_online);
+
+    m_user_id = getWidget<ButtonWidget>("user-id");
+    assert(m_user_id);
+
+    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
+    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
     bool is_logged_in = false;
     if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
         PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
@@ -84,26 +101,15 @@ void OnlineScreen::beforeAddingWidget()
     if (wan)
     {
         wan->setActive(is_logged_in);
-        wan->setVisible(is_logged_in);
+        if (!is_logged_in)
+        {
+            //I18N: Shown to players when he is not is not logged in
+            wan->setTooltip(_("You must be logged in to play Global "
+                "networking. Click your username above."));
+        }
+        else
+            wan->setTooltip("");
     }
-} // beforeAddingWidget
-
-// ----------------------------------------------------------------------------
-//
-void OnlineScreen::init()
-{
-    Screen::init();
-
-    m_online = getWidget<IconButtonWidget>("online");
-
-    if (!MainMenuScreen::m_enable_online)
-        m_online->setActive(false);
-
-    m_user_id = getWidget<ButtonWidget>("user-id");
-    assert(m_user_id);
-
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
-    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // Pre-add a default single player profile in network
     if (!m_enable_splitscreen->getState() &&
