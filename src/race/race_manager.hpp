@@ -724,13 +724,14 @@ public:
         return m_minor_mode == MINOR_MODE_TIME_TRIAL;
     }   //  isTimeTrialMode
     // ------------------------------------------------------------------------
+     /** \brief Returns the number of second's decimals to display */
     int currentModeTimePrecision()
     {
         if (isEggHuntMode() || isTimeTrialMode())
             return 3;//display milliseconds
 
         return 2;//display centiseconds
-    }   //  modeTimePrecision
+    }   // currentModeTimePrecision
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */
     bool modeHasLaps()
