@@ -302,6 +302,8 @@ void TrackInfoScreen::updateHighScores()
     core::stringw name;
     float time;
 
+    int time_precision = race_manager->currentModeTimePrecision();
+
     // fill highscore entries
     for (int n=0; n<HIGHSCORE_COUNT; n++)
     {
@@ -312,7 +314,7 @@ void TrackInfoScreen::updateHighScores()
         {
             highscores->getEntry(n, kart_name, name, &time);
 
-            std::string time_string = StringUtils::timeToString(time);
+            std::string time_string = StringUtils::timeToString(time, time_precision);
 
             const KartProperties* prop = kart_properties_manager->getKart(kart_name);
             if (prop != NULL)

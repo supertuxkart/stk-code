@@ -676,6 +676,9 @@ void RaceResultGUI::displayCTFResults()
         float max_finish_time = 0;
 
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+
+        int time_precision = race_manager->currentModeTimePrecision();
+
         for (unsigned int position = first_position;
         position <= race_manager->getNumberOfKarts() - sta; position++)
         {
@@ -707,7 +710,7 @@ void RaceResultGUI::displayCTFResults()
             {
                 const float time = kart->getFinishTime();
                 if (time > max_finish_time) max_finish_time = time;
-                std::string time_string = StringUtils::timeToString(time);
+                std::string time_string = StringUtils::timeToString(time, time_precision);
                 ri->m_finish_time_string = time_string.c_str();
             }
 
@@ -717,7 +720,7 @@ void RaceResultGUI::displayCTFResults()
                 m_width_kart_name = rect.Width;
         }   // for position
 
-        std::string max_time = StringUtils::timeToString(max_finish_time);
+        std::string max_time = StringUtils::timeToString(max_finish_time, time_precision);
         core::stringw string_max_time(max_time.c_str());
         core::dimension2du r = m_font->getDimension(string_max_time.c_str());
         m_width_finish_time = r.Width;
@@ -1057,7 +1060,9 @@ void RaceResultGUI::displayCTFResults()
         // Update the kart GP ranks
         // This is useful, e.g., when continuing a saved GP.
         race_manager->computeGPRanks();
-        
+
+        int time_precision = race_manager->currentModeTimePrecision();
+
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
         {
             int rank = race_manager->getKartGPRank(kart_id);
@@ -1082,7 +1087,7 @@ void RaceResultGUI::displayCTFResults()
             {
                 float time = race_manager->getOverallTime(kart_id);
                 ri->m_finish_time_string
-                    = StringUtils::timeToString(time).c_str();
+                    = StringUtils::timeToString(time, time_precision).c_str();
             }
             ri->m_start_at = m_time_between_rows * rank;
             ri->m_x_pos = (float)UserConfigParams::m_width;
@@ -1291,6 +1296,7 @@ void RaceResultGUI::displayCTFResults()
         irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
+
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
@@ -1539,6 +1545,8 @@ void RaceResultGUI::displayCTFResults()
 
         int current_y = y;
 
+        int time_precision = race_manager->currentModeTimePrecision();
+
         // In some case for exemple FTL they will be no highscores
         if (scores != NULL)
         {
@@ -1608,7 +1616,7 @@ void RaceResultGUI::displayCTFResults()
                 current_x = (int)(UserConfigParams::m_width * 0.85f);
 
                 // Finally draw the time
-                std::string time_string = StringUtils::timeToString(time);
+                std::string time_string = StringUtils::timeToString(time, time_precision);
                 GUIEngine::getSmallFont()->draw(time_string.c_str(),
                     core::recti(current_x, current_y, current_x + 100, current_y + 10),
                     text_color,
@@ -1638,7 +1646,7 @@ void RaceResultGUI::displayCTFResults()
             {
                 float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
                 core::stringw best_lap_string = _("Best lap time: %s",
-                    StringUtils::timeToString(best_lap_time).c_str());
+                    StringUtils::timeToString(best_lap_time, time_precision).c_str());
                 current_y += int(m_distance_between_rows * 0.8f);
                 GUIEngine::getFont()->draw(best_lap_string,
                     core::recti(x, current_y, 0, 0), white_color, false, false,
