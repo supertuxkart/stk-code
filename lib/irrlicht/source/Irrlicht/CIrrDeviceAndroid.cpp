@@ -33,6 +33,8 @@ bool CIrrDeviceAndroid::IsPaused = true;
 bool CIrrDeviceAndroid::IsFocused = false;
 bool CIrrDeviceAndroid::IsStarted = false;
 
+AndroidApplicationInfo CIrrDeviceAndroid::ApplicationInfo;
+
 // Execution of android_main() function is a kind of "onCreate" event, so this
 // function should be used there to make sure that global window state variables
 // have their default values on startup.
@@ -1371,6 +1373,119 @@ int CIrrDeviceAndroid::getRotation()
     }
     
     return rotation;
+}
+
+void CIrrDeviceAndroid::readApplicationInfo(ANativeActivity* activity)
+{
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot get application info.", ELL_DEBUG);
+        return;
+    }
+    
+    jobject activity_obj = activity->clazz;
+    jclass activity_class = env->GetObjectClass(activity_obj);
+
+    jmethodID get_package_manager = env->GetMethodID(activity_class, 
+                                       "getPackageManager", 
+                                       "()Landroid/content/pm/PackageManager;");
+    jobject package_manager_obj = env->CallObjectMethod(activity_obj, 
+                                                        get_package_manager);
+
+    jmethodID get_intent = env->GetMethodID(activity_class, "getIntent", 
+                                            "()Landroid/content/Intent;");
+                                            
+    jobject intent_obj = env->CallObjectMethod(activity_obj, get_intent);
+    jclass intent = env->FindClass("android/content/Intent");
+    
+    jmethodID get_component = env->GetMethodID(intent, "getComponent", 
+                                           "()Landroid/content/ComponentName;");
+
+    jobject component_name = env->CallObjectMethod(intent_obj, get_component);
+
+    jclass package_manager = env->FindClass("android/content/pm/PackageManager");
+
+    jfieldID get_meta_data_field = env->GetStaticFieldID(package_manager, 
+                                                         "GET_META_DATA", "I");
+    jint get_meta_data = env->GetStaticIntField(package_manager, 
+                                                get_meta_data_field);
+
+    jmethodID get_activity_info = env->GetMethodID(package_manager, 
+                                           "getActivityInfo", 
+                                           "(Landroid/content/ComponentName;I)"
+                                           "Landroid/content/pm/ActivityInfo;");
+         
+    jobject activity_info_obj = env->CallObjectMethod(package_manager_obj, 
+                                                      get_activity_info, 
+                                                      component_name, 
+                                                      get_meta_data);
+    jclass activity_info = env->FindClass("android/content/pm/ActivityInfo");
+    
+    jfieldID application_info_field = env->GetFieldID(activity_info, 
+                                        "applicationInfo", 
+                                        "Landroid/content/pm/ApplicationInfo;");
+    jobject application_info_obj = env->GetObjectField(activity_info_obj, 
+                                                       application_info_field);
+    jclass application_info = env->FindClass("android/content/pm/ApplicationInfo");
+    
+    jfieldID native_library_dir_field = env->GetFieldID(application_info, 
+                                                        "nativeLibraryDir", 
+                                                        "Ljava/lang/String;");
+    jstring native_library_dir_str = (jstring)env->GetObjectField(
+                                                      application_info_obj, 
+                                                      native_library_dir_field);
+    const char* native_library_dir = env->GetStringUTFChars(
+                                                         native_library_dir_str, 
+                                                         NULL);
+    
+    jfieldID data_dir_field = env->GetFieldID(application_info, "dataDir", 
+                                             "Ljava/lang/String;");
+    jstring data_dir_str = (jstring)env->GetObjectField(application_info_obj, 
+                                                        data_dir_field);
+    const char* data_dir = env->GetStringUTFChars(data_dir_str, NULL);
+
+    if (native_library_dir != NULL)
+    {
+        ApplicationInfo.native_lib_dir = native_library_dir;
+    }
+        
+    if (data_dir != NULL)
+    {
+        ApplicationInfo.data_dir = data_dir;
+    }
+    
+    ApplicationInfo.initialized = true;
+    
+    if (was_detached)
+    {
+        activity->vm->DetachCurrentThread();
+    }
+}
+
+const AndroidApplicationInfo& CIrrDeviceAndroid::getApplicationInfo()
+{
+    if (Android != NULL && ApplicationInfo.initialized == false)
+    {
+        readApplicationInfo(Android->activity);
+    }
+    
+    return ApplicationInfo;
 }
 
 DeviceOrientation CIrrDeviceAndroid::getDefaultOrientation()

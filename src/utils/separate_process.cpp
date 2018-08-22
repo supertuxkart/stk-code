@@ -37,6 +37,9 @@
 #ifdef ANDROID
 #include <dlfcn.h>
 #include <fstream>
+
+#include "graphics/irr_driver.hpp"
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -280,15 +283,30 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         return false;
     }
     
-    const std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
-    const std::string main_path = data_path + "/lib/libmain.so";
-    const std::string child_path = data_path + "/files/libchildprocess.so";
+    CIrrDeviceAndroid* device = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                                                       
+    AndroidApplicationInfo application_info = device->getApplicationInfo();
+    
+    std::string data_path = application_info.data_dir;
+    std::string main_path = data_path + "/lib/libmain.so";
+    
+    if (data_path.empty() || access(main_path.c_str(), R_OK) != 0)
+    {
+        Log::warn("SeparateProcess", "Cannot read data dir from app info");
+        data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+        main_path = data_path + "/lib/libmain.so";
+    }
     
     if (access(main_path.c_str(), R_OK) != 0)
     {
         Log::error("SeparateProcess", "Error: Cannot read libmain.so");
         return false;
     }
+    
+    Log::info("SeparateProcess", "Data dir found in: %s", data_path.c_str());
+    
+    std::string child_path = data_path + "/files/libchildprocess.so";
     
     if (access(child_path.c_str(), R_OK) != 0)
     {
