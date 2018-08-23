@@ -75,14 +75,6 @@ void GhostReplaySelection::refresh(bool forced_update, bool update_columns)
  */
 void GhostReplaySelection::loadedFromFile()
 {
-    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
-
-    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
-    {
-        const KartProperties* prop = kart_properties_manager->getKartById(i);
-        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
-    }
-
     m_replay_list_widget = getWidget<GUIEngine::ListWidget>("replay_list");
     assert(m_replay_list_widget != NULL);
     m_replay_list_widget->setColumnListener(this);
@@ -147,6 +139,19 @@ void GhostReplaySelection::init()
 {
     Screen::init();
     m_cur_difficulty = race_manager->getDifficulty();
+
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
+
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+    }
+
+    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                              "main_help.png"         ));
+
+    m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
 
     int icon_height = getHeight()/24.0f;
     // 128 is the height of the image file
@@ -348,7 +353,7 @@ void GhostReplaySelection::loadList()
 
         if (icon == -1)
         {
-            icon = 0;
+            icon = m_icon_unknown_kart;
             Log::warn("GhostReplaySelection", "Kart not found, using default icon.");
         }
 

@@ -65,6 +65,9 @@ private:
 
     irr::gui::STKModifiedSpriteBank *m_icon_bank;
 
+    /** Icon for unknown karts */
+    int                        m_icon_unknown_kart;
+
     void defaultSort();
 
 public:
