@@ -38,8 +38,7 @@
 #include <dlfcn.h>
 #include <fstream>
 
-#include "graphics/irr_driver.hpp"
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#include "io/assets_android.hpp"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -283,21 +282,8 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         return false;
     }
     
-    std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+    std::string data_path = AssetsAndroid::getDataPath();
     std::string main_path = data_path + "/lib/libmain.so";
-
-    if (access(main_path.c_str(), R_OK) != 0)
-    {
-        Log::warn("SeparateProcess", "Cannot use standard data dir");
-        
-        CIrrDeviceAndroid* device = dynamic_cast<CIrrDeviceAndroid*>(
-                                                       irr_driver->getDevice());
-                                                           
-        AndroidApplicationInfo application_info = device->getApplicationInfo();
-        
-        data_path = application_info.data_dir;
-        main_path = data_path + "/lib/libmain.so";
-    }
     
     if (data_path.empty() || access(main_path.c_str(), R_OK) != 0)
     {
@@ -311,6 +297,8 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     
     if (access(child_path.c_str(), R_OK) != 0)
     {
+        Log::info("SeparateProcess", "Creating libchildprocess.so");
+
         std::ifstream src(main_path, std::ios::binary);
         
         if (!src.good())

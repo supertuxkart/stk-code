@@ -74,7 +74,6 @@ namespace irr
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
         virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
-        virtual const AndroidApplicationInfo& getApplicationInfo();
         
         class CCursorControl : public gui::ICursorControl
         {
@@ -115,6 +114,8 @@ namespace irr
         };
         
         static void onCreate();
+        static const AndroidApplicationInfo& getApplicationInfo(
+                                                    ANativeActivity* activity);
 
     private:
         android_app* Android;

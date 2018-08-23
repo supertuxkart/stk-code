@@ -28,6 +28,8 @@
 #ifdef ANDROID
 #include <android/asset_manager.h>
 #include <sys/statfs.h> 
+
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -488,7 +490,7 @@ void AssetsAndroid::removeData()
         if (file == m_stk_dir + "/.nomedia")
             continue;
 
-        Log::info("AssetsAndroid", "Deleting file: %s\n", file.c_str());
+        Log::info("AssetsAndroid", "Deleting file: %s", file.c_str());
 
         if (m_file_manager->isDirectory(file))
         {
@@ -499,13 +501,19 @@ void AssetsAndroid::removeData()
             m_file_manager->removeFile(file);
         }
     }
+
+    std::string data_path = getDataPath();
     
-    const std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
-    const std::string child_path = data_path + "/files/libchildprocess.so";
-    
-    if (m_file_manager->fileExists(child_path))
+    if (!data_path.empty())
     {
-        m_file_manager->removeFile(child_path);
+        const std::string child_path = data_path + "/files/libchildprocess.so";
+    
+        if (m_file_manager->fileExists(child_path))
+        {
+            Log::info("AssetsAndroid", "Deleting old libchildprocess: %s", 
+                      child_path.c_str());
+            m_file_manager->removeFile(child_path);
+        }
     }
 #endif
 }
@@ -595,3 +603,27 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
 }
 
 //-----------------------------------------------------------------------------
+/** Get a path for internal data directory
+ *  \return Path for internal data directory or empty string when failed
+ */
+std::string AssetsAndroid::getDataPath()
+{
+    std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+    
+    if (access(data_path.c_str(), R_OK) != 0)
+    {
+        Log::warn("AssetsAndroid", "Cannot use standard data dir");
+        
+        AndroidApplicationInfo application_info = 
+            CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+        
+        data_path = application_info.data_dir;
+    }
+    
+    if (access(data_path.c_str(), R_OK) != 0)
+    {
+        data_path = "";
+    }
+    
+    return data_path;
+}

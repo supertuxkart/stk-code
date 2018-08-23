@@ -1478,11 +1478,12 @@ void CIrrDeviceAndroid::readApplicationInfo(ANativeActivity* activity)
     }
 }
 
-const AndroidApplicationInfo& CIrrDeviceAndroid::getApplicationInfo()
+const AndroidApplicationInfo& CIrrDeviceAndroid::getApplicationInfo(
+                                                      ANativeActivity* activity)
 {
-    if (Android != NULL && ApplicationInfo.initialized == false)
+    if (activity != NULL && ApplicationInfo.initialized == false)
     {
-        readApplicationInfo(Android->activity);
+        readApplicationInfo(activity);
     }
     
     return ApplicationInfo;
