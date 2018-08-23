@@ -752,15 +752,15 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ffa
         PARAM_DEFAULT(FloatUserConfigParam(0.7f, "time-limit-threshold-ffa",
         &m_network_group, "Value used to calculate time limit in free for all, which "
-        "is max(number of players * time-limit-threshold-ffa, 2.0) * 60, negative value to disable time limit."));
+        "is max(number of players * time-limit-threshold-ffa, 3.0) * 60, negative value to disable time limit."));
     PARAM_PREFIX FloatUserConfigParam m_capture_limit_threshold
-        PARAM_DEFAULT(FloatUserConfigParam(0.5f, "capture-limit-threshold",
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "capture-limit-threshold",
         &m_network_group, "Value used to calculate capture limit in CTF, which "
-        "is max(2.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
+        "is max(3.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
     PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ctf
         PARAM_DEFAULT(FloatUserConfigParam(0.9f, "time-limit-threshold-ctf",
         &m_network_group, "Value used to calculate time limit in CTF, which "
-        "is max(2.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0," 
+        "is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
         " negative value to disable time limit."));
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
@@ -774,6 +774,9 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
         PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
         &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
+     PARAM_PREFIX IntUserConfigParam m_timer_sync_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(50, "timer-sync-tolerance",
+        &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
     PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
         PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
         &m_network_group, "Kick players whose ping is above max-ping."));
