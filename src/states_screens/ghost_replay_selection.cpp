@@ -45,8 +45,14 @@ GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.st
  */
 GhostReplaySelection::~GhostReplaySelection()
 {
-    delete m_icon_bank;
 }   // GhostReplaySelection
+
+// ----------------------------------------------------------------------------
+void GhostReplaySelection::tearDown()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}
 
 // ----------------------------------------------------------------------------
 /** Triggers a refresh of the replay file list.
