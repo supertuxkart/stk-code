@@ -154,7 +154,8 @@ void ServerSelection::loadList(unsigned sort_case)
                 return c->getServerMode() > d->getServerMode();
                 break;
             case 4:
-                return !(c->getServerOwnerName() < d->getServerOwnerName());
+                return c->getServerOwnerLowerCaseName() >
+                    d->getServerOwnerLowerCaseName();
                 break;
             case 5:
                 return c->getDistance() > d->getDistance();

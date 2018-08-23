@@ -48,6 +48,8 @@ protected:
     /** Name in lower case for comparisons. */
     std::string m_lower_case_name;
 
+    std::string m_server_owner_lower_case_name;
+
     uint32_t m_server_id;
     uint32_t m_server_owner;
 
@@ -56,9 +58,6 @@ protected:
 
     /** The number of players currently on the server */
     int m_current_players;
-
-    /** The score/rating given */
-    float m_satisfaction_score;
 
     /** The public ip address and port of this server. */
     TransportAddress m_address;
@@ -126,6 +125,9 @@ public:
     // ------------------------------------------------------------------------
     const core::stringw& getServerOwnerName() const
                                                 { return m_server_owner_name; }
+    // ------------------------------------------------------------------------
+    const std::string& getServerOwnerLowerCaseName() const
+                                     { return m_server_owner_lower_case_name; }
     // ------------------------------------------------------------------------
     float getDistance() const                            { return m_distance; }
     // ------------------------------------------------------------------------
