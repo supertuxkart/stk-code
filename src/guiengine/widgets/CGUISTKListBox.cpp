@@ -572,7 +572,8 @@ void CGUISTKListBox::draw()
                             Items[i].m_contents[x].m_center, true, &clientClip);
                     }
                     //Position back to inital pos
-                    textRect.UpperLeftCorner.X -= ItemsIconWidth+6;
+                    if (IconBank && (Items[i].m_contents[x].m_icon > -1))
+                        textRect.UpperLeftCorner.X -= ItemsIconWidth+6;
                     //Calculate new beginning
                     textRect.UpperLeftCorner.X += Items[i].m_contents[x].m_proportion * part_size;
                 }
@@ -779,5 +780,4 @@ void CGUISTKListBox::setDrawBackground(bool draw)
 
 } // end namespace gui
 } // end namespace irr
-
 
