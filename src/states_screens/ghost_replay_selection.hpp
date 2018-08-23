@@ -71,6 +71,9 @@ private:
     void defaultSort();
 
 public:
+    irr::gui::STKModifiedSpriteBank* getIconBank() { return m_icon_bank; }
+
+    int  getUnknownKartIcon() { return m_icon_unknown_kart; }
 
     void setCompareReplayUid(uint64_t uid) { m_replay_to_compare_uid = uid; }
     void setCompare(bool compare) { m_is_comparing = compare; }

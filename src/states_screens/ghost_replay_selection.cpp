@@ -375,7 +375,7 @@ void GhostReplaySelection::loadList()
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (" ", icon, 1, true));
+            ("", icon, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 5, true));
         if (m_multiplayer)
