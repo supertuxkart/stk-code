@@ -283,22 +283,23 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         return false;
     }
     
-    CIrrDeviceAndroid* device = dynamic_cast<CIrrDeviceAndroid*>(
-                                                       irr_driver->getDevice());
-                                                       
-    AndroidApplicationInfo application_info = device->getApplicationInfo();
-    
-    std::string data_path = application_info.data_dir;
+    std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
     std::string main_path = data_path + "/lib/libmain.so";
-    
-    if (data_path.empty() || access(main_path.c_str(), R_OK) != 0)
+
+    if (access(main_path.c_str(), R_OK) != 0)
     {
-        Log::warn("SeparateProcess", "Cannot read data dir from app info");
-        data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+        Log::warn("SeparateProcess", "Cannot use standard data dir");
+        
+        CIrrDeviceAndroid* device = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                                                           
+        AndroidApplicationInfo application_info = device->getApplicationInfo();
+        
+        data_path = application_info.data_dir;
         main_path = data_path + "/lib/libmain.so";
     }
     
-    if (access(main_path.c_str(), R_OK) != 0)
+    if (data_path.empty() || access(main_path.c_str(), R_OK) != 0)
     {
         Log::error("SeparateProcess", "Error: Cannot read libmain.so");
         return false;
