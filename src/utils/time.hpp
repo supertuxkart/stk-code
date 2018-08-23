@@ -21,7 +21,10 @@
 
 #include "ITimer.h"
 
+#include <chrono>
 #include <stdexcept>
+
+#include "utils/types.hpp"
 
 #ifdef WIN32
 #  define WIN32_LEAN_AND_MEAN
@@ -90,7 +93,20 @@ public:
      *  The value is a double precision floating point value in seconds.
      */
     static double getRealTime(long startAt=0);
-
+    // ------------------------------------------------------------------------
+    /** Returns a time based since epoch.
+     *  The value is a 64bit unsigned integer in milliseconds.
+     */
+    static uint64_t getRealTimeMs()
+    {
+        auto now = std::chrono::system_clock::now();
+        auto now_ms =
+            std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+        auto epoch = now_ms.time_since_epoch();
+        auto value =
+            std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+        return value.count();
+    }
     // ------------------------------------------------------------------------
     /**
      * \brief Compare two different times.
@@ -135,7 +151,7 @@ public:
     // ------------------------------------------------------------------------
     class ScopeProfiler
     {
-        float m_time;
+        uint64_t m_time;
         std::string m_name;
     public:
         ScopeProfiler(const char* name);
