@@ -256,6 +256,21 @@ public:
     }   // addUInt32
 
     // ------------------------------------------------------------------------
+    /** Adds unsigned 64 bit integer. */
+    BareNetworkString& addUInt64(const uint64_t& value)
+    {
+        m_buffer.push_back((value >> 56) & 0xff);
+        m_buffer.push_back((value >> 48) & 0xff);
+        m_buffer.push_back((value >> 40) & 0xff);
+        m_buffer.push_back((value >> 32) & 0xff);
+        m_buffer.push_back((value >> 24) & 0xff);
+        m_buffer.push_back((value >> 16) & 0xff);
+        m_buffer.push_back((value >>  8) & 0xff);
+        m_buffer.push_back( value        & 0xff);
+        return *this;
+    }   // addUInt64
+
+    // ------------------------------------------------------------------------
     /** Adds a 4 byte floating point value. */
     BareNetworkString& addFloat(const float value)
     {
@@ -305,6 +320,9 @@ public:
     }   // addTime
 
     // Functions related to getting data from a network string
+    // ------------------------------------------------------------------------
+    /** Returns a unsigned 64 bit integer. */
+    inline uint64_t getUInt64() const { return get<uint64_t, 8>(); }
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getUInt32() const { return get<uint32_t, 4>(); }
