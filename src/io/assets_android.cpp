@@ -608,6 +608,7 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
  */
 std::string AssetsAndroid::getDataPath()
 {
+#ifdef ANDROID
     std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
     
     if (access(data_path.c_str(), R_OK) != 0)
@@ -626,4 +627,7 @@ std::string AssetsAndroid::getDataPath()
     }
     
     return data_path;
+#endif
+
+    return "";
 }
