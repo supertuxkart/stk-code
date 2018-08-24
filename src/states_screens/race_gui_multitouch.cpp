@@ -154,7 +154,7 @@ void RaceGUIMultitouch::init()
     if (m_device->isAccelerometerActive())
     {
         m_device->addButton(BUTTON_UP_DOWN,
-                    int(steering_btn_x + btn2_size / 4), int(steering_btn_y),
+                    int(margin), int(steering_btn_y),
                     int(btn2_size / 2), int(btn2_size));
     }
     else
