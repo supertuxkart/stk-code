@@ -464,7 +464,7 @@ namespace UserConfigParams
             "A parameter that determines general accelerometer sensitivity."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
-            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
+            PARAM_DEFAULT( FloatUserConfigParam(1.2f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
