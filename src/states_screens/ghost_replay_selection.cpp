@@ -18,6 +18,10 @@
 
 #include "states_screens/ghost_replay_selection.hpp"
 
+#include "graphics/material.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "states_screens/dialogs/ghost_replay_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -42,6 +46,13 @@ GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.st
 GhostReplaySelection::~GhostReplaySelection()
 {
 }   // GhostReplaySelection
+
+// ----------------------------------------------------------------------------
+void GhostReplaySelection::tearDown()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}
 
 // ----------------------------------------------------------------------------
 /** Triggers a refresh of the replay file list.
@@ -79,6 +90,11 @@ void GhostReplaySelection::loadedFromFile()
     m_replay_difficulty_toggle_widget->setState(/* default value */ true);
     m_same_difficulty = m_replay_difficulty_toggle_widget->getState();
 
+    m_replay_multiplayer_toggle_widget =
+        getWidget<GUIEngine::CheckBoxWidget>("replay_multiplayer_toggle");
+    m_replay_multiplayer_toggle_widget->setState(/* default value */ true /* hide */);
+    m_multiplayer = !m_replay_multiplayer_toggle_widget->getState();
+
     m_replay_version_toggle_widget =
         getWidget<GUIEngine::CheckBoxWidget>("replay_version_toggle");
     m_replay_version_toggle_widget->setState(/* default value */ true);
@@ -107,7 +123,6 @@ void GhostReplaySelection::loadedFromFile()
 void GhostReplaySelection::beforeAddingWidget()
 {
     m_replay_list_widget->addColumn( _("Track"), 9 );
-    m_replay_list_widget->addColumn( _("Players"), 3);
     if (m_active_mode_is_linear)
         m_replay_list_widget->addColumn( _("Reverse"), 3);
     if (!m_same_difficulty)
@@ -115,7 +130,10 @@ void GhostReplaySelection::beforeAddingWidget()
     if (m_active_mode_is_linear)
         m_replay_list_widget->addColumn( _("Laps"), 3);
     m_replay_list_widget->addColumn( _("Time"), 4);
+    m_replay_list_widget->addColumn( _("Kart"), 1);
     m_replay_list_widget->addColumn( _("User"), 5);
+    if (m_multiplayer)
+        m_replay_list_widget->addColumn( _("Players"), 3);
     if (!m_same_version)
         m_replay_list_widget->addColumn( _("Version"), 3);
 
@@ -127,6 +145,27 @@ void GhostReplaySelection::init()
 {
     Screen::init();
     m_cur_difficulty = race_manager->getDifficulty();
+
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
+
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+    }
+
+    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+                                                              "main_help.png"         ));
+
+    m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
+
+    int icon_height = getHeight()/24.0f;
+    // 128 is the height of the image file
+    //FIXME : this isn't guaranteed
+    // Amanda's icon is 300x300
+    m_icon_bank->setScale(icon_height/128.0f);
+    m_replay_list_widget->setIcons(m_icon_bank, (int)icon_height);
+
     refresh(/*reload replay files*/ false, /* update columns */ true);
 }   // init
 
@@ -162,6 +201,9 @@ void GhostReplaySelection::loadList()
 
             core::stringw current_version = STK_VERSION;
             if (m_same_version && current_version != rd.m_stk_version)
+                continue;
+
+            if (!m_multiplayer && (rd.m_kart_list.size() > 1))
                 continue;
 
             Track* track = track_manager->getTrack(rd.m_track_name);
@@ -268,6 +310,9 @@ void GhostReplaySelection::loadList()
         if (m_same_version && current_version != rd.m_stk_version)
             continue;
 
+        if (!m_multiplayer && (rd.m_kart_list.size() > 1))
+            continue;
+
         // Only display replays comparable with the replay selected for comparison
         if (m_is_comparing)
         {
@@ -300,12 +345,28 @@ void GhostReplaySelection::loadList()
         if (track == NULL)
             continue;
 
+        int icon = -1;
+
+        for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+        {
+            const KartProperties* prop = kart_properties_manager->getKartById(i);
+            if (rd.m_kart_list[0] == prop->getIdent())
+            {
+                icon = i;
+                break;
+            }
+        }
+
+        if (icon == -1)
+        {
+            icon = m_icon_unknown_kart;
+            Log::warn("GhostReplaySelection", "Kart not found, using default icon.");
+        }
+
         std::vector<GUIEngine::ListWidget::ListCell> row;
         //The third argument should match the numbers used in beforeAddingWidget
         row.push_back(GUIEngine::ListWidget::ListCell
             (translations->fribidize(track->getName()) , -1, 9));
-        row.push_back(GUIEngine::ListWidget::ListCell
-            (StringUtils::toWString(rd.m_kart_list.size()), -1, 3, true));
         if (m_active_mode_is_linear)
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
@@ -320,7 +381,12 @@ void GhostReplaySelection::loadList()
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
         row.push_back(GUIEngine::ListWidget::ListCell
+            ("", icon, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
             (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 5, true));
+        if (m_multiplayer)
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (StringUtils::toWString(rd.m_kart_list.size()), -1, 3, true));
         if (!m_same_version)
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_stk_version.empty() ? " " : rd.m_stk_version, -1, 3, true));
@@ -381,6 +447,11 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
         m_same_difficulty = m_replay_difficulty_toggle_widget->getState();
         refresh(/*reload replay files*/ false, /* update columns */ true);
     }
+    else if (name == "replay_multiplayer_toggle")
+    {
+        m_multiplayer = !m_replay_multiplayer_toggle_widget->getState();
+        refresh(/*reload replay files*/ false, /* update columns */ true);
+    }
     else if (name == "replay_version_toggle")
     {
         m_same_version = m_replay_version_toggle_widget->getState();
@@ -436,31 +507,37 @@ void GhostReplaySelection::onColumnClicked(int column_id, bool sort_desc, bool s
 
     int diff_difficulty = m_same_difficulty ? 1 : 0;
     int diff_linear = m_active_mode_is_linear ? 0 : 1;
+    int diff_multiplayer = m_multiplayer ? 0 : 1;
+
+    if (column_id >= 1)
+        column_id += diff_linear;
 
     if (column_id >= 2)
-        column_id += diff_linear;
-
-    if (column_id >= 3)
         column_id += diff_difficulty;
 
-    if (column_id >= 4)
+    if (column_id >= 3)
         column_id += diff_linear;
+
+    if (column_id >= 7)
+        column_id += diff_multiplayer;
 
     if (column_id == 0)
         ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
     else if (column_id == 1)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
-    else if (column_id == 2)
         ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
-    else if (column_id == 3)
+    else if (column_id == 2)
         ReplayPlay::setSortOrder(ReplayPlay::SO_DIFF);
-    else if (column_id == 4)
+    else if (column_id == 3)
         ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
-    else if (column_id == 5)
+    else if (column_id == 4)
         ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
+    else if (column_id == 5)
+        return; // no sorting by kart icon (yet ?)
     else if (column_id == 6)
         ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
-    else if (column_id == 7)    
+    else if (column_id == 7)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
+    else if (column_id == 8)    
         ReplayPlay::setSortOrder(ReplayPlay::SO_VERSION);
     else
         assert(0);
