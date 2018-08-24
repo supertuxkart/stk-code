@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <stdexcept>
 #include <string>
 #include <string.h>
 #include <vector>
