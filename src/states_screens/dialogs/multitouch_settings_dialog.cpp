@@ -125,12 +125,35 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
     }
     else if (eventSource == "restore")
     {
-        UserConfigParams::m_multitouch_scale.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone_edge.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone_center.revertToDefaults();
         UserConfigParams::m_multitouch_mode.revertToDefaults();
         UserConfigParams::m_multitouch_inverted.revertToDefaults();
         UserConfigParams::m_multitouch_controls.revertToDefaults();
+        
+#ifdef ANDROID
+        int32_t screen_size = AConfiguration_getScreenSize(
+                                                    global_android_app->config);
+        
+        switch (screen_size)
+        {
+        case ACONFIGURATION_SCREENSIZE_SMALL:
+        case ACONFIGURATION_SCREENSIZE_NORMAL:
+            UserConfigParams::m_multitouch_scale = 1.3f;
+            break;
+        case ACONFIGURATION_SCREENSIZE_LARGE:
+            UserConfigParams::m_multitouch_scale = 1.2f;
+            break;
+        case ACONFIGURATION_SCREENSIZE_XLARGE:
+            UserConfigParams::m_multitouch_scale = 1.1f;
+            break;
+        default:
+            UserConfigParams::m_multitouch_scale.revertToDefaults();
+            break;
+        }
+#else
+        UserConfigParams::m_multitouch_scale.revertToDefaults();
+#endif
 
         updateValues();
 
