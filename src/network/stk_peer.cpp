@@ -156,7 +156,10 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 uint32_t STKPeer::getPing()
 {
     if (getConnectedTime() < 3.0f)
+    {
+        m_average_ping.store(m_enet_peer->roundTripTime);
         return 0;
+    }
     if (NetworkConfig::get()->isServer())
     {
         // Average ping in 5 seconds

@@ -759,7 +759,8 @@ void STKHost::mainLoop()
                     const unsigned ap = p.second->getAveragePing();
                     const unsigned max_ping = UserConfigParams::m_max_ping;
                     if (UserConfigParams::m_kick_high_ping_players &&
-                        p.second->isValidated() && ap > max_ping)
+                        p.second->isValidated() &&
+                        p.second->getConnectedTime() > 5.0f && ap > max_ping)
                     {
                         Log::info("STKHost", "%s with ping %d is higher than"
                             " %d ms, kick.",

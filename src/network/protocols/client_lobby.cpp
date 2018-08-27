@@ -216,11 +216,14 @@ void ClientLobby::addAllPlayers(Event* event)
     // time
     if (!STKHost::get()->getNetworkTimerSynchronizer()->isSynchronised())
     {
-        core::stringw msg = _("Bad network connection is detected.");
-        MessageQueue::add(MessageQueue::MT_ERROR, msg);
-        Log::warn("ClientLobby", "Failed to synchronize timer before game "
-            "start, maybe you enter the game too quick? (at least 5 seconds "
-            "are required for synchronization.");
+        if (UserConfigParams::m_voting_timeout >= 10.0f)
+        {
+            core::stringw msg = _("Bad network connection is detected.");
+            MessageQueue::add(MessageQueue::MT_ERROR, msg);
+            Log::warn("ClientLobby", "Failed to synchronize timer before game "
+                "start, maybe you enter the game too quick? (at least 5 "
+                "seconds are required for synchronization.");
+        }
         STKHost::get()->getNetworkTimerSynchronizer()->enableForceSetTimer();
     }
 
