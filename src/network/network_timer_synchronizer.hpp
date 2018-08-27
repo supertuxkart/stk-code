@@ -20,11 +20,12 @@
 #define HEADER_NETWORK_TIMER_SYNCHRONIZER_HPP
 
 #include "config/user_config.hpp"
+#include "network/stk_host.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
-#include "main_loop.hpp"
 
+#include <atomic>
 #include <cstdlib>
 #include <deque>
 #include <numeric>
@@ -35,15 +36,36 @@ class NetworkTimerSynchronizer
 private:
     std::deque<std::tuple<uint32_t, uint64_t, uint64_t> > m_times;
 
-    bool m_synchronised = false;
+    std::atomic_bool m_synchronised, m_force_set_timer;
+
 public:
+    NetworkTimerSynchronizer()
+    {
+        m_synchronised.store(false);
+        m_force_set_timer.store(false);
+    }
     // ------------------------------------------------------------------------
-    bool isSynchronised() const                      { return m_synchronised; }
+    bool isSynchronised() const               { return m_synchronised.load(); }
+    // ------------------------------------------------------------------------
+    void enableForceSetTimer()
+    {
+        if (m_synchronised.load() == true)
+            return;
+        m_force_set_timer.store(true);
+    }
     // ------------------------------------------------------------------------
     void addAndSetTime(uint32_t ping, uint64_t server_time)
     {
-        if (m_synchronised)
+        if (m_synchronised.load() == true)
             return;
+
+        if (m_force_set_timer.load() == true)
+        {
+            m_force_set_timer.store(false);
+            m_synchronised.store(true);
+            STKHost::get()->setNetworkTimer(server_time + (uint64_t)(ping / 2));
+            return;
+        }
 
         const uint64_t cur_time = StkTime::getRealTimeMs();
         // Take max 20 averaged samples from m_times, the next addAndGetTime
@@ -64,8 +86,9 @@ public:
             if (std::abs(averaged_time - server_time_now) <
                 UserConfigParams::m_timer_sync_tolerance)
             {
-                main_loop->setNetworkTimer(averaged_time);
-                m_synchronised = true;
+                STKHost::get()->setNetworkTimer(averaged_time);
+                m_force_set_timer.store(false);
+                m_synchronised.store(true);
                 Log::info("NetworkTimerSynchronizer", "Network "
                     "timer synchronized, difference: %dms", difference);
                 return;

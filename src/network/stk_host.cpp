@@ -35,7 +35,6 @@
 #include "utils/separate_process.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
-#include "main_loop.hpp"
 
 #include <string.h>
 #if defined(WIN32)
@@ -304,12 +303,12 @@ STKHost::STKHost(bool server)
  */
 void STKHost::init()
 {
+    m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
     m_network          = NULL;
     m_exit_timeout.store(std::numeric_limits<double>::max());
     m_client_ping.store(0);
-    main_loop->resetStartNetworkGameTimer();
 
     // Start with initialising ENet
     // ============================
@@ -337,7 +336,6 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
-    main_loop->resetStartNetworkGameTimer();
     requestShutdown();
     if (m_network_console.joinable())
         m_network_console.join();
@@ -779,7 +777,7 @@ void STKHost::mainLoop()
                 if (need_ping)
                 {
                     BareNetworkString ping_packet;
-                    uint64_t network_timer = main_loop->getNetworkTimer();
+                    uint64_t network_timer = getNetworkTimer();
                     ping_packet.addUInt64(network_timer);
                     ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
                     for (auto& p : m_peer_pings.getData())

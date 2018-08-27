@@ -212,8 +212,6 @@ void ServerLobby::setup()
     // the server are ready:
     resetPeersReady();
     m_peers_votes.clear();
-    m_server_delay = std::numeric_limits<double>::max();
-    m_server_max_ping = std::numeric_limits<double>::max();
     m_timeout.store(std::numeric_limits<float>::max());
     m_waiting_for_reset = false;
 
@@ -307,7 +305,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
-        case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
         case LE_VOTE: playerVote(event);                          break;
         case LE_KICK_HOST: kickHost(event);                       break;
         case LE_CHANGE_TEAM: changeTeam(event);                   break;
@@ -439,47 +436,11 @@ void ServerLobby::asynchronousUpdate()
             return;
         if (!checkPeersReady())
             return;
-        m_state = WAIT_FOR_RACE_STARTED;
         // Reset for next state usage
         resetPeersReady();
-        signalRaceStartToClients();
-        m_server_max_ping = StkTime::getRealTime() +
-            ((double)UserConfigParams::m_max_ping / 1000.0);
+        configPeersStartTime();
         break;
     }
-    case WAIT_FOR_RACE_STARTED:
-    {
-        const bool ping_timed_out =
-            m_server_max_ping < StkTime::getRealTime();
-        if (checkPeersReady() || ping_timed_out)
-        {
-            for (auto p : m_peers_ready)
-            {
-                auto cur_peer = p.first.lock();
-                if (!cur_peer)
-                    continue;
-                if (ping_timed_out && p.second.second > m_server_max_ping)
-                    sendBadConnectionMessageToPeer(cur_peer);
-            }
-            m_state = DELAY_SERVER;
-            const double jt =
-                (double)UserConfigParams::m_jitter_tolerance / 1000.0;
-            m_server_delay = StkTime::getRealTime() + jt;
-            Log::verbose("ServerLobby",
-                "Started delay at %lf to %lf with jitter tolerance %lf.",
-                StkTime::getRealTime(), m_server_delay, jt);
-        }
-        break;
-    }
-    case DELAY_SERVER:
-        if (m_server_delay < StkTime::getRealTime())
-        {
-            Log::verbose("ServerLobby", "End delay at %lf",
-                         StkTime::getRealTime());
-            m_state = RACING;
-            World::getWorld()->setReadyToRace();
-        }
-        break;
     case SELECTING:
     {
         auto result = handleVote();
@@ -634,7 +595,6 @@ void ServerLobby::update(int ticks)
     case ACCEPTING_CLIENTS:
     case WAIT_FOR_WORLD_LOADED:
     case WAIT_FOR_RACE_STARTED:
-    case DELAY_SERVER:
     {
         // Waiting for asynchronousUpdate
         break;
@@ -778,21 +738,6 @@ void ServerLobby::unregisterServer(bool now)
         request->queue();
 
 }   // unregisterServer
-
-//-----------------------------------------------------------------------------
-/** This function is called when all clients have loaded the world and
- *  are therefore ready to start the race. It signals to all clients
- *  to start the race and then switches state to DELAY_SERVER.
- */
-void ServerLobby::signalRaceStartToClients()
-{
-    Log::verbose("Server", "Signaling race start to clients at %lf",
-                 StkTime::getRealTime());
-    NetworkString *ns = getNetworkString(1);
-    ns->addUInt8(LE_START_RACE);
-    sendMessageToPeers(ns, /*reliable*/true);
-    delete ns;
-}   // startGame
 
 //-----------------------------------------------------------------------------
 /** Instructs all clients to start the kart selection. If event is NULL,
@@ -1908,28 +1853,6 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 }   // finishedLoadingWorldClient
 
 //-----------------------------------------------------------------------------
-/** Called when a notification from a client is received that the client has
- *  started the race. Once all clients have informed the server that they 
- *  have started the race, the server can start. This makes sure that the
- *  server's local time is behind all clients by at most max ping,
- *  which in turn means that when the server simulates local time T all
- *  messages from clients at their local time T should have arrived at
- *  the server, which creates smoother play experience.
- */
-void ServerLobby::startedRaceOnClient(Event *event)
-{
-    if (m_state.load() != WAIT_FOR_RACE_STARTED)
-    {
-        sendBadConnectionMessageToPeer(event->getPeerSP());
-        return;
-    }
-    std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
-    Log::info("ServerLobby", "Peer %s has started race at %lf",
-        peer->getAddress().toString().c_str(), StkTime::getRealTime());
-}   // startedRaceOnClient
-
-//-----------------------------------------------------------------------------
 /** Called when a client clicks on 'ok' on the race result screen.
  *  If all players have clicked on 'ok', go back to the lobby.
  */
@@ -2114,3 +2037,52 @@ void ServerLobby::submitRankingsToAddons()
         request->queue();
     }
 }   // submitRankingsToAddons
+
+//-----------------------------------------------------------------------------
+/** This function is called when all clients have loaded the world and
+ *  are therefore ready to start the race. It determine the start time in
+ *  network timer for client and server based on pings and then switches state
+ *  to WAIT_FOR_RACE_STARTED.
+ */
+void ServerLobby::configPeersStartTime()
+{
+    uint32_t max_ping = 0;
+    const unsigned max_ping_from_peers = UserConfigParams::m_max_ping;
+    for (auto p : m_peers_ready)
+    {
+        auto peer = p.first.lock();
+        if (!peer)
+            continue;
+        if (peer->getAveragePing() > max_ping_from_peers)
+        {
+            sendBadConnectionMessageToPeer(peer);
+            continue;
+        }
+        max_ping = std::max(peer->getAveragePing(), max_ping);
+    }
+    // Start up time will be after 2000ms, so even if this packet is sent late
+    // (due to packet loss), the start time will still ahead of current time
+    uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2000;
+    NetworkString* ns = getNetworkString(10);
+    ns->addUInt8(LE_START_RACE).addUInt64(start_time);
+    sendMessageToPeers(ns, /*reliable*/true);
+
+    const unsigned jitter_tolerance = UserConfigParams::m_jitter_tolerance;
+    Log::info("ServerLobby", "Max ping from peers: %d, jitter tolerance: %d",
+        max_ping, jitter_tolerance);
+    // Delay server for max ping / 2 from peers and jitter tolerance.
+    start_time += (uint64_t)(max_ping / 2) + (uint64_t)jitter_tolerance;
+    delete ns;
+    m_state = WAIT_FOR_RACE_STARTED;
+
+    joinStartGameThread();
+    m_start_game_thread = std::thread([start_time, this]()
+        {
+            const uint64_t cur_time = STKHost::get()->getNetworkTimer();
+            assert(start_time > cur_time);
+            int sleep_time = (int)(start_time - cur_time);
+            Log::info("ServerLobby", "Start game after %dms", sleep_time);
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+            m_state.store(RACING);
+        });
+}   // configPeersStartTime

@@ -21,7 +21,6 @@
 #define HEADER_MAIN_LOOP_HPP
 
 #include "utils/synchronised.hpp"
-#include "utils/time.hpp"
 #include "utils/types.hpp"
 #include <atomic>
 
@@ -39,8 +38,6 @@ private:
     bool m_frame_before_loading_world;
 
     Synchronised<int> m_ticks_adjustment;
-
-    std::atomic<uint64_t> m_network_timer, m_start_game_ticks;
 
     uint32_t m_curr_time;
     uint32_t m_prev_time;
@@ -65,17 +62,6 @@ public:
         m_ticks_adjustment.getData() += ticks;
         m_ticks_adjustment.unlock();
     }
-    // ------------------------------------------------------------------------
-    uint64_t getNetworkTimer() const
-                  { return StkTime::getRealTimeMs() - m_network_timer.load(); }
-    // ------------------------------------------------------------------------
-    void setNetworkTimer(uint64_t ticks)
-                   { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
-    // ------------------------------------------------------------------------
-    void resetStartNetworkGameTimer()          { m_start_game_ticks.store(0); }
-    // ------------------------------------------------------------------------
-    void setStartNetworkGameTimer(uint64_t ticks);
-
 };   // MainLoop
 
 extern MainLoop* main_loop;

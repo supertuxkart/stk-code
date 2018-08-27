@@ -51,7 +51,6 @@ public:
         LOAD_WORLD,               // Server starts loading world
         WAIT_FOR_WORLD_LOADED,    // Wait for clients and server to load world
         WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
-        DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
         WAIT_FOR_RACE_STOPPED,    // Wait server for stopping all race protocols
         RESULT_DISPLAY,           // Show result screen
@@ -89,12 +88,6 @@ private:
     /** Vote from each peer. */
     std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
-
-    /** Keeps track of an artificial server delay, which is used to compensate
-     *  for network jitter. */
-    double m_server_delay;
-
-    double m_server_max_ping;
 
     bool m_has_created_server_id_file;
 
@@ -153,7 +146,6 @@ private:
     void playerFinishedResult(Event *event);
     bool registerServer();
     void finishedLoadingWorldClient(Event *event);
-    void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
@@ -220,6 +212,7 @@ private:
     void checkRaceFinished();
     void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
     std::pair<int, float> getHitCaptureLimit(float num_karts);
+    void configPeersStartTime();
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -230,7 +223,6 @@ public:
     virtual void update(int ticks) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
 
-    void signalRaceStartToClients();
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void finishedLoadingWorld() OVERRIDE;

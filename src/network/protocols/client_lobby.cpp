@@ -33,6 +33,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
@@ -211,6 +212,18 @@ void ClientLobby::addAllPlayers(Event* event)
         STKHost::get()->requestShutdown();
         return;
     }
+    // Timeout is too slow to synchronize, force it to stop and set current
+    // time
+    if (!STKHost::get()->getNetworkTimerSynchronizer()->isSynchronised())
+    {
+        core::stringw msg = _("Bad network connection is detected.");
+        MessageQueue::add(MessageQueue::MT_ERROR, msg);
+        Log::warn("ClientLobby", "Failed to synchronize timer before game "
+            "start, maybe you enter the game too quick? (at least 5 seconds "
+            "are required for synchronization.");
+        STKHost::get()->getNetworkTimerSynchronizer()->enableForceSetTimer();
+    }
+
     NetworkString& data = event->data();
     std::string track_name;
     data.decodeString(&track_name);
@@ -737,36 +750,30 @@ void ClientLobby::connectionRefused(Event* event)
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when the server broadcasts to start the race to all clients.
- *  \param event : Event providing the information (no additional informati
- *                 in this case).
+ *  \param event : Event providing the time the client should start game.
  */
 void ClientLobby::startGame(Event* event)
 {
-    m_state.store(RACING);
-    // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
-    // to READY_PHASE.
-    World::getWorld()->setReadyToRace();
-    Log::info("ClientLobby", "Starting new game at %lf",
-              StkTime::getRealTime());
+    uint64_t start_time = event->data().getUInt64();
+    joinStartGameThread();
+    m_start_game_thread = std::thread([start_time, this]()
+        {
+            const uint64_t cur_time = STKHost::get()->getNetworkTimer();
+            if (!(start_time > cur_time))
+            {
+                Log::warn("ClientLobby", "Network timer is too slow to catch "
+                    "up, you must have a poor network.");
+                STKHost::get()->setErrorMessage(
+                    m_disconnected_msg.at(PDI_BAD_CONNECTION));
+                STKHost::get()->requestShutdown();
+                return;
+            }
+            int sleep_time = (int)(start_time - cur_time);
+            Log::info("ClientLobby", "Start game after %dms", sleep_time);
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+            m_state.store(RACING);
+        });
 }   // startGame
-
-//-----------------------------------------------------------------------------
-/** Called from WorldStatus when reaching the READY phase, i.e. when the race
- *  was started. It is going to inform the server of the race start. This
- *  allows the server to wait for all clients to start, so the server will
- *  be running behind the client with the biggest latency, which should
- *  make it likely that at local time T on the server all messages from
- *  all clients at their local time T have arrived.
- */
-void ClientLobby::startingRaceNow()
-{
-    NetworkString* ns = getNetworkString(2);
-    ns->addUInt8(LE_STARTED_RACE);
-    sendToServer(ns, /*reliable*/true);
-    delete ns;
-    Log::verbose("ClientLobby", "StartingRaceNow at %lf",
-                 StkTime::getRealTime());
-}   // startingRaceNow
 
 //-----------------------------------------------------------------------------
 /*! \brief Called when the kart selection starts.

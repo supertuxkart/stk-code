@@ -81,7 +81,7 @@ protected:
 
     std::deque<uint32_t> m_previous_pings;
 
-    uint32_t m_average_ping;
+    std::atomic<uint32_t> m_average_ping;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -165,7 +165,7 @@ public:
     // ------------------------------------------------------------------------
     void setCrypto(std::unique_ptr<Crypto>&& c);
     // ------------------------------------------------------------------------
-    uint32_t getAveragePing() const                  { return m_average_ping; }
+    uint32_t getAveragePing() const           { return m_average_ping.load(); }
     // ------------------------------------------------------------------------
     ENetPeer* getENetPeer() const                       { return m_enet_peer; }
 };   // STKPeer

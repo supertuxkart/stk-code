@@ -230,13 +230,13 @@ void RaceGUI::renderGlobal(float dt)
 
     World *world = World::getWorld();
     assert(world != NULL);
-    if(world->getPhase() >= WorldStatus::READY_PHASE &&
+    if(world->getPhase() >= WorldStatus::WAIT_FOR_SERVER_PHASE &&
        world->getPhase() <= WorldStatus::GO_PHASE      )
     {
         drawGlobalReadySetGo();
     }
     if(world->getPhase() == World::GOAL_PHASE)
-            drawGlobalGoal();
+        drawGlobalGoal();
 
     // MiniMap is drawn when the players wait for the start countdown to end
     drawGlobalMiniMap();

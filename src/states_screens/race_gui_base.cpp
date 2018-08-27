@@ -70,6 +70,9 @@ RaceGUIBase::RaceGUIBase()
     m_string_go             = _("Go!");
     //I18N: Shown when a goal is scored
     m_string_goal           = _("GOAL!");
+    // I18N: Shown waiting for other players in network to finish loading or
+    // waiting
+    m_string_waiting_for_others = _("Waiting for others");
 
     m_music_icon = irr_driver->getTexture("notes.png");
     if (!m_music_icon)
@@ -626,6 +629,18 @@ void RaceGUIBase::drawGlobalReadySetGo()
 {
     switch (World::getWorld()->getPhase())
     {
+    case WorldStatus::WAIT_FOR_SERVER_PHASE:
+        {
+            static video::SColor color = video::SColor(255, 255, 255, 255);
+            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1,
+                                irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1);
+            gui::IGUIFont* font = GUIEngine::getTitleFont();
+            font->draw(StringUtils::loadingDots(
+                m_string_waiting_for_others.c_str()), pos, color, true, true);
+        }
+        break;
     case WorldStatus::READY_PHASE:
         {
             static video::SColor color = video::SColor(255, 255, 255, 255);

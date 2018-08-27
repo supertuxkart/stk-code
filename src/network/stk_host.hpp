@@ -26,6 +26,7 @@
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/time.hpp"
 
 #include "irrString.h"
 
@@ -137,6 +138,8 @@ private:
     Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
 
     std::atomic<uint32_t> m_client_ping;
+
+    std::atomic<uint64_t> m_network_timer;
 
     std::unique_ptr<NetworkTimerSynchronizer> m_nts;
 
@@ -318,7 +321,12 @@ public:
     // ------------------------------------------------------------------------
     NetworkTimerSynchronizer* getNetworkTimerSynchronizer() const
                                                         { return m_nts.get(); }
-
+    // ------------------------------------------------------------------------
+    uint64_t getNetworkTimer() const
+                  { return StkTime::getRealTimeMs() - m_network_timer.load(); }
+    // ------------------------------------------------------------------------
+    void setNetworkTimer(uint64_t ticks)
+                   { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
 };   // class STKHost
 
 #endif // STK_HOST_HPP
