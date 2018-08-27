@@ -765,7 +765,7 @@ void ServerLobby::startSelection(const Event *event)
     }
 
     auto players = m_game_setup->getConnectedPlayers();
-    const unsigned player_count = players.size();
+    const unsigned player_count = (unsigned)players.size();
     if (NetworkConfig::get()->hasTeamChoosing() && race_manager->teamEnabled())
     {
         int red_count = 0;

@@ -677,7 +677,7 @@ void STKHost::startListening()
 void STKHost::stopListening()
 {
     if (m_exit_timeout.load() == std::numeric_limits<uint64_t>::max())
-        m_exit_timeout.store(0.0);
+        m_exit_timeout.store(0);
     if (m_listening_thread.joinable())
         m_listening_thread.join();
 }   // stopListening
@@ -912,9 +912,9 @@ void STKHost::mainLoop()
                     if (!is_server)
                     {
                         BareNetworkString ping_packet((char*)event.packet->data,
-                            event.packet->dataLength);
+                            (int)event.packet->dataLength);
                         std::map<uint32_t, uint32_t> peer_pings;
-                        ping_packet.skip(g_ping_packet.size());
+                        ping_packet.skip((int)g_ping_packet.size());
                         uint64_t server_time = ping_packet.getUInt64();
                         unsigned peer_size = ping_packet.getUInt8();
                         for (unsigned i = 0; i < peer_size; i++)
