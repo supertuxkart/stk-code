@@ -54,11 +54,11 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
     m_use_icons = (icons != NULL);
     m_icons = icons;
 
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+
     if (m_use_icons)
     {
-        CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
-        assert(list != NULL);
-
         list->setSpriteBank(m_icons);
 
         // determine needed height
@@ -82,6 +82,10 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
         {
             list->setItemHeight( item_height );
         }
+    }
+    else
+    {
+        list->setSpriteBank(NULL);
     }
 
 }
