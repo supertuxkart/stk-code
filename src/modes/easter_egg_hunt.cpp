@@ -33,6 +33,7 @@ EasterEggHunt::EasterEggHunt() : LinearWorld()
     m_use_highscores = true;
     m_eggs_found     = 0;
     m_only_ghosts    = false;
+    m_finish_time    = 0;
 }   // EasterEggHunt
 
 //-----------------------------------------------------------------------------
@@ -192,7 +193,8 @@ bool EasterEggHunt::isRaceOver()
 {
     if(!m_only_ghosts && m_eggs_found == m_number_of_eggs)
     {
-        m_finish_time = getTime();
+        if (m_finish_time == 0)
+            m_finish_time = getTime();
         return true;
     }
     else if (m_only_ghosts)
