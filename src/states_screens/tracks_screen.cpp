@@ -442,8 +442,23 @@ void TracksScreen::voteForPlayer()
 
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
-    vote.encodeString(m_selected_track->getIdent())
-        .addUInt8(m_laps->getValue()).addUInt8(m_reversed->getState());
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(0).addUInt8(m_reversed->getState() ? 1 : 0);
+    }
+    else if (race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(0).addUInt8(0);
+    }
+    else
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(m_laps->getValue())
+            .addUInt8(m_reversed->getState() ? 1 : 0);
+    }
     STKHost::get()->sendToServer(&vote, true);
 }   // voteForPlayer
 
