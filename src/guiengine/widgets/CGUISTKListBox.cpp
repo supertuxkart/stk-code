@@ -573,7 +573,10 @@ void CGUISTKListBox::draw()
                     }
                     //Position back to inital pos
                     if (IconBank && (Items[i].m_contents[x].m_icon > -1))
-                        textRect.UpperLeftCorner.X -= ItemsIconWidth+6;
+                        textRect.UpperLeftCorner.X -= ItemsIconWidth;
+
+                    textRect.UpperLeftCorner.X -= 6;
+
                     //Calculate new beginning
                     textRect.UpperLeftCorner.X += Items[i].m_contents[x].m_proportion * part_size;
                 }
