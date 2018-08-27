@@ -212,7 +212,7 @@ void ServerLobby::setup()
     // the server are ready:
     resetPeersReady();
     m_peers_votes.clear();
-    m_timeout.store(std::numeric_limits<float>::max());
+    m_timeout.store(std::numeric_limits<int64_t>::max());
     m_waiting_for_reset = false;
 
     Log::info("ServerLobby", "Reset server to initial state.");
@@ -397,19 +397,20 @@ void ServerLobby::asynchronousUpdate()
                 (float)NetworkConfig::get()->getMaxPlayers() *
                 UserConfigParams::m_start_game_threshold ||
                 m_game_setup->isGrandPrixStarted()) &&
-                m_timeout.load() == std::numeric_limits<float>::max())
+                m_timeout.load() == std::numeric_limits<int64_t>::max())
             {
-                m_timeout.store((float)StkTime::getRealTime() +
-                    UserConfigParams::m_start_game_counter);
+                m_timeout.store((int64_t)StkTime::getRealTimeMs() +
+                    (int64_t)
+                    (UserConfigParams::m_start_game_counter * 1000.0f));
             }
             else if ((float)players.size() <
                 (float)NetworkConfig::get()->getMaxPlayers() *
                 UserConfigParams::m_start_game_threshold &&
                 !m_game_setup->isGrandPrixStarted())
             {
-                m_timeout.store(std::numeric_limits<float>::max());
+                m_timeout.store(std::numeric_limits<int64_t>::max());
             }
-            if (m_timeout.load() < (float)StkTime::getRealTime())
+            if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs())
             {
                 startSelection();
                 return;
@@ -444,10 +445,11 @@ void ServerLobby::asynchronousUpdate()
     case SELECTING:
     {
         auto result = handleVote();
-        if (m_timeout.load() < (float)StkTime::getRealTime() ||
+        if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs() ||
             (std::get<3>(result) &&
-            m_timeout.load() - (UserConfigParams::m_voting_timeout / 2.0f) <
-            (float)StkTime::getRealTime()))
+            m_timeout.load() -
+            (int64_t)(UserConfigParams::m_voting_timeout / 2.0f * 1000.0f) <
+            (int64_t)StkTime::getRealTimeMs()))
         {
             m_game_setup->setRace(std::get<0>(result), std::get<1>(result),
                 std::get<2>(result));
@@ -509,9 +511,8 @@ void ServerLobby::asynchronousUpdate()
 void ServerLobby::sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p)
 {
     const unsigned max_ping = UserConfigParams::m_max_ping;
-    Log::warn("ServerLobby", "Peer %s cannot catch up with max ping %d, it"
-        " started at %lf.", p->getAddress().toString().c_str(), max_ping,
-        StkTime::getRealTime());
+    Log::warn("ServerLobby", "Peer %s cannot catch up with max ping %d.",
+        p->getAddress().toString().c_str(), max_ping);
     NetworkString* msg = getNetworkString();
     msg->setSynchronous(true);
     msg->addUInt8(LE_BAD_CONNECTION);
@@ -627,14 +628,14 @@ void ServerLobby::update(int ticks)
         resetPeersReady();
         // Set the delay before the server forces all clients to exit the race
         // result screen and go back to the lobby
-        m_timeout.store((float)StkTime::getRealTime() + 15.0f);
+        m_timeout.store((int64_t)StkTime::getRealTimeMs() + 15000);
         m_state = RESULT_DISPLAY;
         sendMessageToPeers(m_result_ns, /*reliable*/ true);
         Log::info("ServerLobby", "End of game message sent");
         break;
     case RESULT_DISPLAY:
         if (checkPeersReady() ||
-            StkTime::getRealTime() > m_timeout.load())
+            (int64_t)StkTime::getRealTimeMs() > m_timeout.load())
         {
             // Send a notification to all clients to exit
             // the race result screen
@@ -866,7 +867,7 @@ void ServerLobby::startSelection(const Event *event)
     ul.unlock();
 
     // Will be changed after the first vote received
-    m_timeout.store(std::numeric_limits<float>::max());
+    m_timeout.store(std::numeric_limits<int64_t>::max());
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -876,9 +877,9 @@ void ServerLobby::startSelection(const Event *event)
 void ServerLobby::checkIncomingConnectionRequests()
 {
     // First poll every 5 seconds. Return if no polling needs to be done.
-    const float POLL_INTERVAL = 5.0f;
-    static double last_poll_time = 0;
-    if (StkTime::getRealTime() < last_poll_time + POLL_INTERVAL)
+    const uint64_t POLL_INTERVAL = 5000;
+    static uint64_t last_poll_time = 0;
+    if (StkTime::getRealTimeMs() < last_poll_time + POLL_INTERVAL)
         return;
 
     // Keep the port open, it can be sent to anywhere as we will send to the
@@ -891,7 +892,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     }
 
     // Now poll the stk server
-    last_poll_time = StkTime::getRealTime();
+    last_poll_time = StkTime::getRealTimeMs();
 
     // ========================================================================
     class PollServerRequest : public Online::XMLRequest
@@ -1509,15 +1510,20 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     NetworkString* message_ack = getNetworkString(4);
     message_ack->setSynchronous(true);
     // connection success -- return the host id of peer
-    float auto_start_timer = m_timeout.load();
+    float auto_start_timer = 0.0f;
+    if (m_timeout.load() == std::numeric_limits<int64_t>::max())
+        auto_start_timer = std::numeric_limits<float>::max();
+    else
+    {
+        auto_start_timer =
+            (m_timeout.load() - (int64_t)StkTime::getRealTimeMs()) / 1000.0f;
+    }
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
-        .addUInt32(NetworkConfig::m_server_version)
-        .addFloat(auto_start_timer == std::numeric_limits<float>::max() ?
-        auto_start_timer : auto_start_timer - (float)StkTime::getRealTime());
+        .addUInt32(NetworkConfig::m_server_version).addFloat(auto_start_timer);
     peer->sendPacket(message_ack);
     delete message_ack;
 
-    m_peers_ready[peer] = std::make_pair(false, 0.0);
+    m_peers_ready[peer] = false;
     for (std::shared_ptr<NetworkPlayerProfile> npp : peer->getPlayerProfiles())
     {
         m_game_setup->addPlayer(npp);
@@ -1658,13 +1664,14 @@ void ServerLobby::playerVote(Event* event)
         return;
 
     // Check if first vote, if so start counter
-    if (m_timeout.load() == std::numeric_limits<float>::max())
+    if (m_timeout.load() == std::numeric_limits<int64_t>::max())
     {
-        m_timeout.store((float)StkTime::getRealTime() +
-            UserConfigParams::m_voting_timeout);
+        m_timeout.store((int64_t)StkTime::getRealTimeMs() +
+            (int64_t)(UserConfigParams::m_voting_timeout * 1000.0f));
     }
-    float remaining_time = m_timeout.load() - (float)StkTime::getRealTime();
-    if (remaining_time < 0.0f)
+    int64_t remaining_time =
+        m_timeout.load() - (int64_t)StkTime::getRealTimeMs();
+    if (remaining_time < 0)
     {
         return;
     }
@@ -1847,7 +1854,7 @@ void ServerLobby::finishedLoadingWorld()
 void ServerLobby::finishedLoadingWorldClient(Event *event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
+    m_peers_ready.at(peer) = true;
     Log::info("ServerLobby", "Peer %d has finished loading world at %lf",
         peer->getHostId(), StkTime::getRealTime());
 }   // finishedLoadingWorldClient
@@ -1861,7 +1868,7 @@ void ServerLobby::playerFinishedResult(Event *event)
     if (m_state.load() != RESULT_DISPLAY)
         return;
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
+    m_peers_ready.at(peer) = true;
 }   // playerFinishedResult
 
 //-----------------------------------------------------------------------------
@@ -2083,6 +2090,7 @@ void ServerLobby::configPeersStartTime()
             int sleep_time = (int)(start_time - cur_time);
             Log::info("ServerLobby", "Start game after %dms", sleep_time);
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+            Log::info("ServerLobby", "Started at %lf", StkTime::getRealTime());
             m_state.store(RACING);
         });
 }   // configPeersStartTime

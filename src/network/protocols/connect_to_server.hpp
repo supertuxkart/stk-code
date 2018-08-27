@@ -31,7 +31,7 @@ class Server;
 class ConnectToServer : public Protocol
 {
 private:
-    double m_timer = 0.0;
+    uint64_t m_timer = 0;
     TransportAddress m_server_address;
     std::shared_ptr<Server> m_server;
     unsigned m_tried_connection = 0;

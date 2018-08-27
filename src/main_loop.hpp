@@ -39,8 +39,8 @@ private:
 
     Synchronised<int> m_ticks_adjustment;
 
-    uint32_t m_curr_time;
-    uint32_t m_prev_time;
+    uint64_t m_curr_time;
+    uint64_t m_prev_time;
     unsigned m_parent_pid;
     float    getLimitedDt();
     void     updateRace(int ticks);

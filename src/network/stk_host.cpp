@@ -307,7 +307,7 @@ void STKHost::init()
     m_shutdown         = false;
     m_authorised       = false;
     m_network          = NULL;
-    m_exit_timeout.store(std::numeric_limits<double>::max());
+    m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
     m_client_ping.store(0);
 
     // Start with initialising ENet
@@ -440,7 +440,7 @@ void STKHost::setPublicAddress()
         }
 
         m_network->sendRawPacket(s, m_stun_address);
-        double ping = StkTime::getRealTime();
+        uint64_t ping = StkTime::getRealTimeMs();
         freeaddrinfo(res);
 
         // Recieve now
@@ -448,7 +448,7 @@ void STKHost::setPublicAddress()
         const int LEN = 2048;
         char buffer[LEN];
         int len = m_network->receiveRawPacket(buffer, LEN, &sender, 2000);
-        ping = StkTime::getRealTime() - ping;
+        ping = StkTime::getRealTimeMs() - ping;
 
         if (sender.getIP() != m_stun_address.getIP())
         {
@@ -587,8 +587,7 @@ void STKHost::setPublicAddress()
                 m_public_address = non_xor_addr;
             }
             // Succeed, save ping
-            UserConfigParams::m_stun_list[server_name] =
-                (uint32_t)(ping * 1000.0);
+            UserConfigParams::m_stun_list[server_name] = (uint32_t)(ping);
             untried_server.clear();
         }
     }
@@ -620,7 +619,7 @@ void STKHost::disconnectAllPeers(bool timeout_waiting)
         for (auto peer : m_peers)
             peer.second->disconnect();
         // Wait for at most 2 seconds for disconnect event to be generated
-        m_exit_timeout.store(StkTime::getRealTime() + 2.0);
+        m_exit_timeout.store(StkTime::getRealTimeMs() + 2000);
     }
     m_peers.clear();
 }   // disconnectAllPeers
@@ -667,7 +666,7 @@ bool STKHost::connect(const TransportAddress& address)
  */
 void STKHost::startListening()
 {
-    m_exit_timeout.store(std::numeric_limits<double>::max());
+    m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
     m_listening_thread = std::thread(std::bind(&STKHost::mainLoop, this));
 }   // startListening
 
@@ -677,7 +676,7 @@ void STKHost::startListening()
  */
 void STKHost::stopListening()
 {
-    if (m_exit_timeout.load() == std::numeric_limits<double>::max())
+    if (m_exit_timeout.load() == std::numeric_limits<uint64_t>::max())
         m_exit_timeout.store(0.0);
     if (m_listening_thread.joinable())
         m_listening_thread.join();
@@ -716,9 +715,9 @@ void STKHost::mainLoop()
         }
     }
 
-    double last_ping_time = StkTime::getRealTime();
-    double last_ping_time_update_for_client = StkTime::getRealTime();
-    while (m_exit_timeout.load() > StkTime::getRealTime())
+    uint64_t last_ping_time = StkTime::getRealTimeMs();
+    uint64_t last_ping_time_update_for_client = StkTime::getRealTimeMs();
+    while (m_exit_timeout.load() > StkTime::getRealTimeMs())
     {
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
@@ -740,12 +739,13 @@ void STKHost::mainLoop()
             const float timeout = UserConfigParams::m_validation_timeout;
             bool need_ping = false;
             if (sl && !sl->isRacing() &&
-                last_ping_time < StkTime::getRealTime())
+                last_ping_time < StkTime::getRealTimeMs())
             {
                 // If not racing, send an reliable packet at the same rate with
                 // state exchange to keep enet ping accurate
-                last_ping_time = StkTime::getRealTime() +
-                    1.0 / double(stk_config->m_network_state_frequeny);
+                last_ping_time = StkTime::getRealTimeMs() +
+                    (uint64_t)((1.0f /
+                    (float)(stk_config->m_network_state_frequeny)) * 1000.0f);
                 need_ping = true;
             }
 
@@ -793,8 +793,7 @@ void STKHost::mainLoop()
                 // Remove peer which has not been validated after a specific time
                 // It is validated when the first connection request has finished
                 if (!it->second->isValidated() &&
-                    (float)StkTime::getRealTime() >
-                    it->second->getConnectedTime() + timeout)
+                    it->second->getConnectedTime() > timeout)
                 {
                     Log::info("STKHost", "%s has not been validated for more"
                         " than %f seconds, disconnect it by force.",
@@ -843,10 +842,10 @@ void STKHost::mainLoop()
         while (enet_host_service(host, &event, 10) != 0)
         {
             if (!is_server &&
-                last_ping_time_update_for_client < StkTime::getRealTime())
+                last_ping_time_update_for_client < StkTime::getRealTimeMs())
             {
                 last_ping_time_update_for_client =
-                    StkTime::getRealTime() + 2.0;
+                    StkTime::getRealTimeMs() + 2000;
                 auto lp = LobbyProtocol::get<LobbyProtocol>();
                 if (lp && lp->isRacing())
                 {
@@ -886,9 +885,9 @@ void STKHost::mainLoop()
 
                 // If used a timeout waiting disconnect, exit now
                 if (m_exit_timeout.load() !=
-                    std::numeric_limits<double>::max())
+                    std::numeric_limits<uint64_t>::max())
                 {
-                    m_exit_timeout.store(0.0);
+                    m_exit_timeout.store(0);
                     break;
                 }
                 // Use the previous stk peer so protocol can see the network
@@ -981,7 +980,7 @@ void STKHost::mainLoop()
             else
                 delete stk_event;
         }   // while enet_host_service
-    }   // while m_exit_timeout.load() > StkTime::getRealTime()
+    }   // while m_exit_timeout.load() > StkTime::getRealTimeMs()
     delete direct_socket;
     Log::info("STKHost", "Listening has been stopped.");
 }   // mainLoop

@@ -82,7 +82,7 @@ private:
     std::atomic_bool m_server_has_loaded_world;
 
     /** Counts how many peers have finished loading the world. */
-    std::map<std::weak_ptr<STKPeer>, std::pair<bool, double>,
+    std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
     /** Vote from each peer. */
@@ -95,7 +95,7 @@ private:
     std::weak_ptr<bool> m_server_unregistered;
 
     /** Timeout counter for various state. */
-    std::atomic<float> m_timeout;
+    std::atomic<int64_t> m_timeout;
 
     /** Lock this mutex whenever a client is connect / disconnect or
      *  starting race. */
@@ -160,7 +160,7 @@ private:
         {
             if (p.first.expired())
                 continue;
-            all_ready = all_ready && p.second.first;
+            all_ready = all_ready && p.second;
             if (!all_ready)
                 return false;
         }
@@ -176,8 +176,7 @@ private:
             }
             else
             {
-                it->second.first = false;
-                it->second.second = 0.0;
+                it->second = false;
                 it++;
             }
         }

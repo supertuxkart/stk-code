@@ -41,7 +41,7 @@
 #  include <ifaddrs.h>
 #endif
 
-#define SERVER_REFRESH_INTERVAL 5.0f
+const uint64_t SERVER_REFRESH_INTERVAL = 5000;
 
 static ServersManager* g_manager_singleton(NULL);
 
@@ -64,7 +64,7 @@ void ServersManager::deallocate()
 // ----------------------------------------------------------------------------
 ServersManager::ServersManager()
 {
-    m_last_load_time.store(0.0f);
+    m_last_load_time.store(0);
     m_list_updated = false;
 }   // ServersManager
 
@@ -158,8 +158,8 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             char buffer[LEN];
             // Wait for up to 0.5 seconds to receive an answer from 
             // any local servers.
-            double start_time = StkTime::getRealTime();
-            const double DURATION = 1.0;
+            uint64_t start_time = StkTime::getRealTimeMs();
+            const uint64_t DURATION = 1000;
             const auto& servers = ServersManager::get()->getServers();
             int cur_server_id = (int)servers.size();
             assert(cur_server_id == 0);
@@ -169,7 +169,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             // because e.g. a local client would answer as 127.0.0.1 and
             // 192.168.**.
             std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
-            while (StkTime::getRealTime() - start_time < DURATION)
+            while (StkTime::getRealTimeMs() - start_time < DURATION)
             {
                 TransportAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
@@ -236,7 +236,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
  */
 bool ServersManager::refresh(bool full_refresh)
 {
-    if (StkTime::getRealTime() - m_last_load_time.load()
+    if (StkTime::getRealTimeMs() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
@@ -292,7 +292,7 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
         m_servers.emplace_back(
             std::make_shared<Server>(*servers_xml->getNode(i)));
     }
-    m_last_load_time.store((float)StkTime::getRealTime());
+    m_last_load_time.store(StkTime::getRealTimeMs());
     m_list_updated = true;
 }   // refresh
 

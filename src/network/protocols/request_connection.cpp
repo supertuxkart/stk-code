@@ -77,8 +77,8 @@ void RequestConnection::asynchronousUpdate()
                 {
                     // Allow up to 10 seconds for the separate process to
                     // fully start-up
-                    double timeout = StkTime::getRealTime() + 10.;
-                    while (StkTime::getRealTime() < timeout)
+                    uint64_t timeout = StkTime::getRealTimeMs() + 10000;
+                    while (StkTime::getRealTimeMs() < timeout)
                     {
                         const std::string& sid = NetworkConfig::get()
                             ->getServerIdFile();

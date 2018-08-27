@@ -25,6 +25,7 @@
 
 #include "network/transport_address.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/time.hpp"
 #include "utils/types.hpp"
 
 #include <enet/enet.h>
@@ -72,7 +73,7 @@ protected:
 
     std::vector<std::shared_ptr<NetworkPlayerProfile> > m_players;
 
-    float m_connected_time;
+    uint64_t m_connected_time;
 
     /** Available karts and tracks from this peer */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
@@ -120,7 +121,8 @@ public:
     /** Returns the host id of this peer. */
     uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
-    float getConnectedTime() const                 { return m_connected_time; }
+    float getConnectedTime() const
+       { return float(StkTime::getRealTimeMs() - m_connected_time) / 1000.0f; }
     // ------------------------------------------------------------------------
     void setAvailableKartsTracks(std::set<std::string>& k,
                                  std::set<std::string>& t)

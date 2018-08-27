@@ -120,7 +120,7 @@ private:
     std::atomic_bool m_authorised;
 
     /** Use as a timeout to waiting a disconnect event when exiting. */
-    std::atomic<double> m_exit_timeout;
+    std::atomic<uint64_t> m_exit_timeout;
 
     /** An error message, which is set by a protocol to be displayed
      *  in the GUI. */

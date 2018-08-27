@@ -55,9 +55,9 @@ void ConnectToPeer::asynchronousUpdate()
                 break;
             }
             // Each 2 second for a ping or broadcast
-            if (StkTime::getRealTime() > m_timer + 2.0)
+            if (StkTime::getRealTimeMs() > m_timer + 2000)
             {
-                m_timer = StkTime::getRealTime();
+                m_timer = StkTime::getRealTimeMs();
                 // Send a broadcast packet with the string aloha_stk inside,
                 // the client will know our ip address and will connect
                 // The wan remote should already start its ping message to us now

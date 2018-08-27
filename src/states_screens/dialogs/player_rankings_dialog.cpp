@@ -165,12 +165,12 @@ GUIEngine::EventPropagation
         }
         else if (selection == m_refresh_widget->m_properties[PROP_ID])
         {
-            static double timer = StkTime::getRealTime();
+            static uint64_t timer = StkTime::getRealTimeMs();
             // 1 minute per refresh
-            if (StkTime::getRealTime() < timer + 60.0)
+            if (StkTime::getRealTimeMs() < timer + 60000)
                 return GUIEngine::EVENT_BLOCK;
 
-            timer = StkTime::getRealTime();
+            timer = StkTime::getRealTimeMs();
             *m_fetched_ranking = false;
             updatePlayerRanking(m_name, m_online_id, m_ranking_info,
                 m_fetched_ranking);

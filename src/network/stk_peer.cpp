@@ -37,7 +37,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
 {
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
-    m_connected_time      = (float)StkTime::getRealTime();
+    m_connected_time      = StkTime::getRealTimeMs();
     m_validated.store(false);
     m_average_ping.store(0);
 }   // STKPeer
@@ -114,7 +114,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
     {
         if (Network::m_connection_debug)
         {
-            Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
+            Log::verbose("STKPeer", "sending packet of size %d to %s at %lf",
                 packet->dataLength, a.toString().c_str(),
                 StkTime::getRealTime());
         }
@@ -155,7 +155,7 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
  */
 uint32_t STKPeer::getPing()
 {
-    if ((float)StkTime::getRealTime() - m_connected_time < 3.0f)
+    if (getConnectedTime() < 3.0f)
         return 0;
     if (NetworkConfig::get()->isServer())
     {
