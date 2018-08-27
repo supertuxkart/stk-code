@@ -68,6 +68,14 @@ public:
         }
 
         const uint64_t cur_time = StkTime::getRealTimeMs();
+        // Discard too close time compared to last ping
+        // (due to resend when packet loss)
+        const uint64_t frequency = (uint64_t)((1.0f /
+            (float)(stk_config->m_network_state_frequeny)) * 1000.0f) / 2;
+        if (!m_times.empty() &&
+            cur_time - std::get<2>(m_times.back()) < frequency)
+            return;
+
         // Take max 20 averaged samples from m_times, the next addAndGetTime
         // is used to determine that server_time if it's correct, if not
         // clear half in m_times until it's correct
@@ -84,7 +92,7 @@ public:
             const int64_t server_time_now = server_time + (uint64_t)(ping / 2);
             int difference = (int)std::abs(averaged_time - server_time_now);
             if (std::abs(averaged_time - server_time_now) <
-                UserConfigParams::m_timer_sync_tolerance)
+                UserConfigParams::m_timer_sync_difference_tolerance)
             {
                 STKHost::get()->setNetworkTimer(averaged_time);
                 m_force_set_timer.store(false);

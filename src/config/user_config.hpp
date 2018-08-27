@@ -774,8 +774,8 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
         PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
         &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
-     PARAM_PREFIX IntUserConfigParam m_timer_sync_tolerance
-        PARAM_DEFAULT(IntUserConfigParam(50, "timer-sync-tolerance",
+     PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
         &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
     PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
         PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
