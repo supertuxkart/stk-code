@@ -46,6 +46,7 @@
 class GameSetup;
 class LobbyProtocol;
 class NetworkPlayerProfile;
+class NetworkTimerSynchronizer;
 class Server;
 class ServerLobby;
 class SeparateProcess;
@@ -136,6 +137,8 @@ private:
     Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
 
     std::atomic<uint32_t> m_client_ping;
+
+    std::unique_ptr<NetworkTimerSynchronizer> m_nts;
 
     // ------------------------------------------------------------------------
     STKHost(bool server);
@@ -312,6 +315,10 @@ public:
     // ------------------------------------------------------------------------
     uint32_t getClientPingToServer() const
                       { return m_client_ping.load(std::memory_order_relaxed); }
+    // ------------------------------------------------------------------------
+    NetworkTimerSynchronizer* getNetworkTimerSynchronizer() const
+                                                        { return m_nts.get(); }
+
 };   // class STKHost
 
 #endif // STK_HOST_HPP

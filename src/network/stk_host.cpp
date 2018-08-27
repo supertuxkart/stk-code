@@ -26,6 +26,7 @@
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_string.hpp"
+#include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
@@ -34,6 +35,7 @@
 #include "utils/separate_process.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
+#include "main_loop.hpp"
 
 #include <string.h>
 #if defined(WIN32)
@@ -283,6 +285,7 @@ STKHost::STKHost(bool server)
             /*channel_limit*/EVENT_CHANNEL_COUNT,
             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &addr,
             true/*change_port_if_bound*/);
+        m_nts.reset(new NetworkTimerSynchronizer());
     }
 
     if (!m_network)
@@ -306,6 +309,7 @@ void STKHost::init()
     m_network          = NULL;
     m_exit_timeout.store(std::numeric_limits<double>::max());
     m_client_ping.store(0);
+    main_loop->resetStartNetworkGameTimer();
 
     // Start with initialising ENet
     // ============================
@@ -333,6 +337,7 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
+    main_loop->resetStartNetworkGameTimer();
     requestShutdown();
     if (m_network_console.joinable())
         m_network_console.join();
@@ -774,6 +779,8 @@ void STKHost::mainLoop()
                 if (need_ping)
                 {
                     BareNetworkString ping_packet;
+                    uint64_t network_timer = main_loop->getNetworkTimer();
+                    ping_packet.addUInt64(network_timer);
                     ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
                     for (auto& p : m_peer_pings.getData())
                         ping_packet.addUInt32(p.first).addUInt32(p.second);
@@ -904,26 +911,37 @@ void STKHost::mainLoop()
                 auto& peer = m_peers.at(event.peer);
                 if (isPingPacket(event.packet->data, event.packet->dataLength))
                 {
-                    if (!is_server && need_ping_update)
+                    if (!is_server)
                     {
-                        m_peer_pings.lock();
-                        m_peer_pings.getData().clear();
                         BareNetworkString ping_packet((char*)event.packet->data,
                             event.packet->dataLength);
+                        std::map<uint32_t, uint32_t> peer_pings;
                         ping_packet.skip(g_ping_packet.size());
+                        uint64_t server_time = ping_packet.getUInt64();
                         unsigned peer_size = ping_packet.getUInt8();
                         for (unsigned i = 0; i < peer_size; i++)
                         {
                             unsigned host_id = ping_packet.getUInt32();
                             unsigned ping = ping_packet.getUInt32();
-                            m_peer_pings.getData()[host_id] = ping;
+                            peer_pings[host_id] = ping;
                         }
-                        m_client_ping.store(
-                            m_peer_pings.getData().find(m_host_id) !=
-                            m_peer_pings.getData().end() ?
-                            m_peer_pings.getData().at(m_host_id) : 0,
-                            std::memory_order_relaxed);
-                        m_peer_pings.unlock();
+                        const uint32_t client_ping =
+                            peer_pings.find(m_host_id) != peer_pings.end() ?
+                            peer_pings.at(m_host_id) : 0;
+
+                        if (client_ping > 0)
+                        {
+                            assert(m_nts);
+                            m_nts->addAndSetTime(client_ping, server_time);
+                        }
+                        if (need_ping_update)
+                        {
+                            m_peer_pings.lock();
+                            std::swap(m_peer_pings.getData(), peer_pings);
+                            m_peer_pings.unlock();
+                            m_client_ping.store(client_ping,
+                                std::memory_order_relaxed);
+                        }
                     }
                     enet_packet_destroy(event.packet);
                     continue;

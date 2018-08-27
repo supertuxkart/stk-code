@@ -138,15 +138,19 @@ void RaceGUIMultitouch::init()
 
     float first_column_x = w - 2 * col_size;
     float second_column_x = w - 1 * col_size;
-    float steering_btn_margin = 0.6f * margin;
-    float steering_btn_x = steering_btn_margin;
-    float steering_btn_y = h - steering_btn_margin - btn2_size;
+    float steering_wheel_margin = 0.6f * margin;
+    float steering_wheel_x = steering_wheel_margin;
+    float steering_wheel_y = h - steering_wheel_margin - btn2_size;
+    float steering_accel_margin = margin;
+    float steering_accel_x = steering_accel_margin;
+    float steering_accel_y = h - steering_accel_margin - btn2_size;
     
     if (UserConfigParams::m_multitouch_inverted)
     {
         first_column_x = margin + 1 * col_size;
         second_column_x = margin;
-        steering_btn_x = w - btn2_size - steering_btn_margin;
+        steering_wheel_x = w - btn2_size - steering_wheel_margin;
+        steering_accel_x = w - btn2_size / 2 - steering_accel_margin;
     }
 
     m_minimap_bottom = (unsigned int)(h - 2 * col_size);
@@ -154,13 +158,13 @@ void RaceGUIMultitouch::init()
     if (m_device->isAccelerometerActive())
     {
         m_device->addButton(BUTTON_UP_DOWN,
-                    int(steering_btn_x + btn2_size / 4), int(steering_btn_y),
+                    int(steering_accel_x), int(steering_accel_y),
                     int(btn2_size / 2), int(btn2_size));
     }
     else
     {
         m_device->addButton(BUTTON_STEERING,
-                            int(steering_btn_x), int(steering_btn_y),
+                            int(steering_wheel_x), int(steering_wheel_y),
                             int(btn2_size), int(btn2_size));
     }
 

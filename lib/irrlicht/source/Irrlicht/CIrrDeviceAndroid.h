@@ -30,6 +30,15 @@ namespace irr
         ORIENTATION_LANDSCAPE
     };
     
+    struct AndroidApplicationInfo
+    {
+        std::string native_lib_dir;
+        std::string data_dir;
+        bool initialized;
+        
+        AndroidApplicationInfo() : initialized(false) {};
+    };
+    
     class CIrrDeviceAndroid : public CIrrDeviceStub, video::IImagePresenter
     {
     public:
@@ -105,6 +114,8 @@ namespace irr
         };
         
         static void onCreate();
+        static const AndroidApplicationInfo& getApplicationInfo(
+                                                    ANativeActivity* activity);
 
     private:
         android_app* Android;
@@ -115,6 +126,7 @@ namespace irr
         bool AccelerometerActive;
         bool GyroscopeActive;
         bool TextInputEnabled;
+        static AndroidApplicationInfo ApplicationInfo;
 
         static bool IsPaused;
         static bool IsFocused;
@@ -146,6 +158,7 @@ namespace irr
         wchar_t getKeyChar(SEvent& event);
         wchar_t getUnicodeChar(AInputEvent* event);
         static void hideNavBar(ANativeActivity* activity);
+        static void readApplicationInfo(ANativeActivity* activity);
         int getRotation();
         DeviceOrientation getDefaultOrientation();
         video::SExposedVideoData& getExposedVideoData();

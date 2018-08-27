@@ -37,6 +37,8 @@
 #ifdef ANDROID
 #include <dlfcn.h>
 #include <fstream>
+
+#include "io/assets_android.hpp"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -280,18 +282,23 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         return false;
     }
     
-    const std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
-    const std::string main_path = data_path + "/lib/libmain.so";
-    const std::string child_path = data_path + "/files/libchildprocess.so";
+    std::string data_path = AssetsAndroid::getDataPath();
+    std::string main_path = data_path + "/lib/libmain.so";
     
-    if (access(main_path.c_str(), R_OK) != 0)
+    if (data_path.empty() || access(main_path.c_str(), R_OK) != 0)
     {
         Log::error("SeparateProcess", "Error: Cannot read libmain.so");
         return false;
     }
     
+    Log::info("SeparateProcess", "Data dir found in: %s", data_path.c_str());
+    
+    std::string child_path = data_path + "/files/libchildprocess.so";
+    
     if (access(child_path.c_str(), R_OK) != 0)
     {
+        Log::info("SeparateProcess", "Creating libchildprocess.so");
+
         std::ifstream src(main_path, std::ios::binary);
         
         if (!src.good())

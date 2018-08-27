@@ -82,15 +82,18 @@ void StkTime::getDate(int *day, int *month, int *year)
     if(year)  *year  = now->tm_year + 1900;
 }   // getDate
 
+// ----------------------------------------------------------------------------
 StkTime::ScopeProfiler::ScopeProfiler(const char* name)
 {
     Log::info("ScopeProfiler", "%s {\n", name);
-    m_time = (float)getRealTime();
+    m_time = getRealTimeMs();
     m_name = name;
-}
+}   // StkTime::ScopeProfiler::ScopeProfiler
 
+// ----------------------------------------------------------------------------
 StkTime::ScopeProfiler::~ScopeProfiler()
 {
-    float f2 = (float)getRealTime();
-    Log::info("ScopeProfiler", "} // took %f s (%s)\n", (f2 - m_time), m_name.c_str());
-}
+    uint64_t difference = getRealTimeMs() - m_time;
+    Log::info("ScopeProfiler", "} // took %d ms (%s)\n",
+        (int)difference, m_name.c_str());
+}   // StkTime::ScopeProfiler::ScopeProfiler

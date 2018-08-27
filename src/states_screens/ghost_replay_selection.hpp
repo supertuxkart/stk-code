@@ -44,6 +44,7 @@ private:
 
     GUIEngine::ListWidget*     m_replay_list_widget;
     GUIEngine::CheckBoxWidget* m_replay_difficulty_toggle_widget;
+    GUIEngine::CheckBoxWidget* m_replay_multiplayer_toggle_widget;
     GUIEngine::CheckBoxWidget* m_replay_version_toggle_widget;
     GUIEngine::CheckBoxWidget* m_best_times_toggle_widget;
     GUIEngine::CheckBoxWidget* m_compare_toggle_widget;
@@ -53,6 +54,7 @@ private:
     std::vector<unsigned int>  m_best_times_index;
     bool                       m_same_difficulty;
     bool                       m_same_version;
+    bool                       m_multiplayer;
     bool                       m_best_times;
     bool                       m_is_comparing;
     bool                       m_active_mode_is_linear;
@@ -61,9 +63,17 @@ private:
     // Using the UID guarantees exact matchess
     uint64_t                   m_replay_to_compare_uid;
 
+    irr::gui::STKModifiedSpriteBank *m_icon_bank;
+
+    /** Icon for unknown karts */
+    int                        m_icon_unknown_kart;
+
     void defaultSort();
 
 public:
+    irr::gui::STKModifiedSpriteBank* getIconBank() { return m_icon_bank; }
+
+    int  getUnknownKartIcon() { return m_icon_unknown_kart; }
 
     void setCompareReplayUid(uint64_t uid) { m_replay_to_compare_uid = uid; }
     void setCompare(bool compare) { m_is_comparing = compare; }
@@ -92,6 +102,8 @@ public:
     virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) OVERRIDE;
 
     virtual void init() OVERRIDE;
+
+    virtual void tearDown() OVERRIDE;
 
     virtual bool onEscapePressed() OVERRIDE;
 

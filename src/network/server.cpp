@@ -34,7 +34,6 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
     assert(xml.getName() == "server");
 
     m_name = "";
-    m_satisfaction_score = 0;
     m_server_id = 0;
     m_current_players = 0;
     m_max_players = 0;
@@ -63,6 +62,7 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
     xml.get("password", &m_password_protected);
     xml.get("distance", &m_distance);
     m_server_owner_name = L"-";
+    m_server_owner_lower_case_name = "-";
 
     // Show owner name as Official right now if official server hoster account
     m_official = false;
@@ -71,6 +71,7 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
     {
         // I18N: Official means this server is hosted by STK team
         m_server_owner_name = _("Official");
+        m_server_owner_lower_case_name = "Official";
         return;
     }
 
@@ -81,6 +82,8 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
     if (opp && opp->getID() == m_server_owner)
     {
         m_server_owner_name = opp->getUserName();
+        m_server_owner_lower_case_name = StringUtils::toLowerCase
+            (StringUtils::wideToUtf8(m_server_owner_name));
     }
     else if (opp && opp->hasFetchedFriends())
     {
@@ -94,6 +97,8 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
                 if (friend_profile)
                 {
                     m_server_owner_name = friend_profile->getUserName();
+                    m_server_owner_lower_case_name = StringUtils::toLowerCase
+                        (StringUtils::wideToUtf8(m_server_owner_name));
                 }
             }
         }
@@ -121,7 +126,6 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
 {
     m_name               = name;
     m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
-    m_satisfaction_score = 0;
     m_server_id          = server_id;
     m_server_owner       = 0;
     m_current_players    = current_players;

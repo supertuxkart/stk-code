@@ -1856,7 +1856,7 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
     {
         if (UserConfigParams::m_capture_limit_threshold > 0.0f)
         {
-            float val = fmaxf(2.0f, num_karts *
+            float val = fmaxf(3.0f, num_karts *
                 UserConfigParams::m_capture_limit_threshold);
             hit_capture_limit = (int)val;
         }
@@ -1880,7 +1880,7 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
         if (UserConfigParams::m_time_limit_threshold_ffa > 0.0f)
         {
             time_limit = fmaxf(num_karts *
-                UserConfigParams::m_time_limit_threshold_ffa, 2.0f) * 60.0f;
+                UserConfigParams::m_time_limit_threshold_ffa, 3.0f) * 60.0f;
         }
     }
     return std::make_pair(hit_capture_limit, time_limit);
