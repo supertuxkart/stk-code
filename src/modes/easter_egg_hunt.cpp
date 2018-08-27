@@ -191,7 +191,10 @@ void EasterEggHunt::update(int ticks)
 bool EasterEggHunt::isRaceOver()
 {
     if(!m_only_ghosts && m_eggs_found == m_number_of_eggs)
+    {
+        m_finish_time = getTime();
         return true;
+    }
     else if (m_only_ghosts)
     {
         for (unsigned int i=0 ; i<m_eggs_collected.size();i++)
@@ -263,5 +266,5 @@ float EasterEggHunt::estimateFinishTimeForKart(AbstractKart* kart)
         return gk->getGhostFinishTime();
     }
 
-    return getTime();
+    return m_finish_time;
 }   // estimateFinishTimeForKart
