@@ -3071,10 +3071,28 @@ void SkiddingAI::setSteering(float angle, float dt)
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
     // Restrict steering when a plunger is in the face
+    // The degree of restriction depends on item_skill
+
+    //FIXME : the AI speed estimate in curves don't account for this restriction
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
-        if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
-        else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
+        int item_skill = computeSkill(ITEM_SKILL);
+        float steering_limit = 0.5f;
+        if (item_skill == 0)
+            steering_limit = 0.35f;
+        else if (item_skill == 1)
+            steering_limit = 0.45f;
+        else if (item_skill == 2)
+            steering_limit = 0.55f;
+        else if (item_skill == 3)
+            steering_limit = 0.65f;
+        else if (item_skill == 4)
+            steering_limit = 0.75f;
+        else if (item_skill == 5)
+            steering_limit = 0.9f;
+
+        if     (steer_fraction >  steering_limit) steer_fraction =  steering_limit;
+        else if(steer_fraction < -steering_limit) steer_fraction = -steering_limit;
     }
 
     const Skidding *skidding = m_kart->getSkidding();
