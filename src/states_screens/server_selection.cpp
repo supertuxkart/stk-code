@@ -18,10 +18,13 @@
 #include "states_screens/server_selection.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "io/file_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/servers_manager.hpp"
@@ -92,6 +95,16 @@ void ServerSelection::loadedFromFile()
     m_private_server = getWidget<GUIEngine::CheckBoxWidget>("private_server");
     assert(m_private_server != NULL);
     m_private_server->setState(false);
+    m_game_started = getWidget<GUIEngine::CheckBoxWidget>("game_started");
+    assert(m_game_started != NULL);
+    m_game_started->setState(false);
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
+    video::ITexture* icon1 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI, "green_check.png"));
+    video::ITexture* icon2 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI, "hourglass.png"));
+    m_icon_bank->addTextureAsSprite(icon1);
+    m_icon_bank->addTextureAsSprite(icon2);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -120,6 +133,8 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
+    m_icon_bank->setScale((float)getHeight() / 20.0f / 128.0f);
+    m_server_list_widget->setIcons(m_icon_bank);
     m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
     refresh(true);
@@ -164,19 +179,23 @@ void ServerSelection::loadList(unsigned sort_case)
             assert(false);
             return false;
         });
-    for (auto server : m_servers)
+    for (auto& server : m_servers)
     {
+        const int icon = server->isGameStarted() ? 1 : 0;
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), -1, 3));
-        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), icon,
+            3));
+        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1,
+            true));
 
         core::stringw difficulty =
             race_manager->getDifficultyName(server->getDifficulty());
-        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1,
+            true));
 
         core::stringw mode =
             NetworkConfig::get()->getModeName(server->getServerMode());
@@ -228,7 +247,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     {
         refresh(true);
     }
-    else if (name == "private_server")
+    else if (name == "private_server" || name == "game_started")
     {
         copyFromServersManager();
     }
@@ -313,9 +332,23 @@ void ServerSelection::copyFromServersManager()
     if (m_servers.empty())
         return;
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
-        [this](const std::shared_ptr<Server> a)->bool
+        [this](const std::shared_ptr<Server>& a)->bool
         {
             return a->isPasswordProtected() != m_private_server->getState();
         }), m_servers.end());
+    m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
+        [this](const std::shared_ptr<Server>& a)->bool
+        {
+            if (m_game_started->getState() && a->isGameStarted())
+                return true;
+            return false;
+        }), m_servers.end());
     loadList(/* distance */ 5);
 }   // copyFromServersManager
+
+// ----------------------------------------------------------------------------
+void ServerSelection::unloaded()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}   // unloaded

@@ -17,6 +17,10 @@
                 <spacer width="10"/>
                 <label proportion="1" height="100%" text_align="left"
                        I18N="In the server selection screen" text="Show only private server(s)"/>
+                <checkbox width="fit" id="game_started" text_align="left"/>
+                <spacer width="10"/>
+                <label proportion="1" height="100%" text_align="left"
+                       I18N="In the server selection screen" text="Hide server(s) which has already begun a game"/>
             </div>
         </div>
     </div>

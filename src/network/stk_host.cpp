@@ -1031,6 +1031,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt8((uint8_t)race_manager->getDifficulty());
         s.addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
         s.addUInt8(!NetworkConfig::get()->getPassword().empty());
+        s.addUInt8(0);
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == connection_cmd)

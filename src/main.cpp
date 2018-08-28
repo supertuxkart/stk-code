@@ -1187,7 +1187,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
         auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
-            !server_password.empty());
+            !server_password.empty(), false);
         NetworkConfig::get()->addNetworkPlayer(
             input_manager->getDeviceManager()->getLatestUsedDevice(),
             PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);

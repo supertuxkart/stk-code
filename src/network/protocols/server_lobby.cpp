@@ -956,7 +956,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
-    request->addParameter("current_players", m_game_setup->getPlayerCount());
+    request->addParameter("current-players", m_game_setup->getPlayerCount());
     request->queue();
 
 }   // checkIncomingConnectionRequests

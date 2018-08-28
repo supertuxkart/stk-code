@@ -261,7 +261,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                 NetworkConfig::get()->setIsServer(false);
                 NetworkConfig::get()->setPassword("");
                 auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0,
-                    server_addr, false);
+                    server_addr, false, false);
                 STKHost::create();
                 auto cts = std::make_shared<ConnectToServer>(server);
                 cts->setup();
