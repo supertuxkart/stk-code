@@ -2054,9 +2054,24 @@ void SkiddingAI::handleAcceleration(int ticks)
 
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
-        if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
-            m_controls->setAccel(0.05f);
-        else
+        int item_skill = computeSkill(ITEM_SKILL);
+        float accel_threshold = 0.5f;
+
+        if (item_skill == 0)
+            accel_threshold = 0.3f;
+        else if (item_skill == 1)
+            accel_threshold = 0.5f;
+        else if (item_skill == 2)
+            accel_threshold = 0.6f;
+        else if (item_skill == 3)
+            accel_threshold = 0.7f;
+        else if (item_skill == 4)
+            accel_threshold = 0.8f;
+        // The best players, knowing the track, don't slow down with a plunger
+        else if (item_skill == 5)
+            accel_threshold = 1.0f;
+
+        if(m_kart->getSpeed() > m_kart->getCurrentMaxSpeed() * accel_threshold)
             m_controls->setAccel(0.0f);
         return;
     }
