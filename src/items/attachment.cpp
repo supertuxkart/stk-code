@@ -607,7 +607,8 @@ void Attachment::update(int ticks)
                 m_bubble_explode_sound->play();
             }
 
-            ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            if (!m_kart->isGhostKart())
+                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
         break;
     }   // switch
