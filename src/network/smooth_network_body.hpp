@@ -16,6 +16,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/*! \file smooth_network_body.hpp
+ *  \brief This class help to smooth the graphicial transformation of network
+ *  controlled object. In case there is any difference between server and
+ *  client predicted values, instead of showing the server one immediately,
+ *  it will interpolate between them with an extrapolated value from the old
+ *  predicted values stored in m_adjust_control_point estimated by current
+ *  speed of object.
+ */
+
 #ifndef HEADER_SMOOTH_NETWORK_BODY_HPP
 #define HEADER_SMOOTH_NETWORK_BODY_HPP
 
