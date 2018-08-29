@@ -184,7 +184,7 @@ int Highscores::addData(const std::string& kart_name,
     if(position>=0)
     {
         m_track               = race_manager->getTrackName();
-        m_number_of_karts     = race_manager->getNumberOfKarts();
+        m_number_of_karts     = race_manager->getNumNonGhostKarts();
         m_difficulty          = race_manager->getDifficulty();
         m_number_of_laps      = race_manager->getNumLaps();
         m_reverse             = race_manager->getReverseTrack();
