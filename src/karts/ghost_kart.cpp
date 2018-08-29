@@ -92,6 +92,8 @@ void GhostKart::updateGraphics(float dt)
     // immediately call Moveable's updateGraphics.
     Moveable::updateSmoothedGraphics(dt);
     Moveable::updateGraphics(center_shift, btQuaternion(0, 0, 0, 1));
+    // Also update attachment's graphics
+    m_attachment->updateGraphics(dt);
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
