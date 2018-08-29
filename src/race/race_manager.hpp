@@ -334,6 +334,7 @@ private:
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
+    unsigned int                     m_num_ghost_karts;
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
@@ -510,6 +511,8 @@ public:
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
     unsigned int getNumberOfKarts() const {return m_num_karts; }
+    // ------------------------------------------------------------------------
+    unsigned int getNumNonGhostKarts() const { return m_num_karts - m_num_ghost_karts; }
     // ------------------------------------------------------------------------
     MajorRaceModeType getMajorMode() const { return m_major_mode; }
     // ------------------------------------------------------------------------

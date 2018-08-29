@@ -1116,7 +1116,7 @@ Highscores* World::getHighscores() const
 
     Highscores * highscores =
         highscore_manager->getHighscores(type,
-                                         getNumKarts(),
+                                         race_manager->getNumNonGhostKarts(),
                                          race_manager->getDifficulty(),
                                          race_manager->getTrackName(),
                                          race_manager->getNumLaps(),
