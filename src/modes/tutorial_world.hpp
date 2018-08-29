@@ -45,6 +45,7 @@ public:
         return WorldWithRank::getRescueTransform(index);
     }
 
+    bool shouldDrawTimer() const OVERRIDE { return false; }
 
 
 };   // class TutorialWorld
