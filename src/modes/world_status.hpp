@@ -156,6 +156,9 @@ public:
     bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
                                             m_phase<FINISH_PHASE;           }
     // ------------------------------------------------------------------------
+    bool     isActiveRacePhase() const { return m_phase>=GO_PHASE &&
+                                                m_phase<DELAY_FINISH_PHASE; }
+    // ------------------------------------------------------------------------
     /** While the race menu is being displayed, m_phase is limbo, and
      *  m_previous_phase is finish. So we have to test this case, too.  */
     bool     isFinishPhase() const { return m_phase==FINISH_PHASE ||
