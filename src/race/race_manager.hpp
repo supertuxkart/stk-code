@@ -512,7 +512,7 @@ public:
      *  AI karts. */
     unsigned int getNumberOfKarts() const {return m_num_karts; }
     // ------------------------------------------------------------------------
-    unsigned int getNumNonGhostKarts() const {printf("There are %u ghost karts\n", m_num_ghost_karts); return m_num_karts - m_num_ghost_karts; }
+    unsigned int getNumNonGhostKarts() const { return m_num_karts - m_num_ghost_karts; }
     // ------------------------------------------------------------------------
     MajorRaceModeType getMajorMode() const { return m_major_mode; }
     // ------------------------------------------------------------------------
