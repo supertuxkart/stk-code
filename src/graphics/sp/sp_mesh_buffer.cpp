@@ -484,11 +484,7 @@ void SPMeshBuffer::setSTKMaterial(Material* m)
 
     m_shaders[1] = SPShaderManager::get()->getSPShader(skinned_shader_name);
     if (!m_shaders[1])
-    {
-        Log::warn("SPMeshBuffer", "%s shader is missing, "
-             "fallback to solid_skinned", skinned_shader_name.c_str());
         m_shaders[1] = SPShaderManager::get()->getSPShader("solid_skinned");
-    }
 }   // setSTKMaterial
 
 }
