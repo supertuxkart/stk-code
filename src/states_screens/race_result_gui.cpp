@@ -1582,7 +1582,7 @@ void RaceResultGUI::displayCTFResults()
                 }
 
                 int current_x = x;
-                current_y = y + (int)((i + 1) * m_distance_between_rows * 1.5f);
+                current_y = y + (int)((i + 1) * m_distance_between_rows);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
