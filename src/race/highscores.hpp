@@ -40,7 +40,7 @@ public:
     typedef std::string HighscoreType;
 
 private:
-    enum {HIGHSCORE_LEN = 3};       // It's a top 3 list
+    enum {HIGHSCORE_LEN = 5};       // It's a top 5 list
     std::string         m_track;
     HighscoreType       m_highscore_type;
     int                 m_number_of_karts;
