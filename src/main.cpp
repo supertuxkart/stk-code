@@ -574,6 +574,7 @@ void cmdLineHelp()
     "  -v,  --version          Print version of SuperTuxKart.\n"
     "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
+    "       --seed=n           Seed for random number generation to provide reproducible behavior.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
@@ -906,6 +907,12 @@ int handleCmdLinePreliminary()
 
     if (CommandLine::has("--no-sound"))
         UserConfigParams::m_enable_sound = false;
+
+    if (CommandLine::has("--seed", &n))
+    {
+        srand(n);
+        Log::info("main", "STK using random seed (%d)", n);
+    }
         
     return 0;
 }   // handleCmdLinePreliminary
