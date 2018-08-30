@@ -112,10 +112,12 @@ void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_posit
     }
 }
 
-void RatingBarWidget::onClick()
+EventPropagation RatingBarWidget::onClick()
 {
     if(m_allow_voting)
         m_rating = m_hover_rating;
+        
+    return EVENT_LET;
 }
 
 

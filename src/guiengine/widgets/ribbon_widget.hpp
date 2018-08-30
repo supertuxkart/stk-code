@@ -92,6 +92,8 @@ namespace GUIEngine
         virtual EventPropagation focused(const int playerID) OVERRIDE;
         virtual void unfocused(const int playerID, Widget* new_focus) OVERRIDE;
         
+        virtual EventPropagation onClick() OVERRIDE;
+        
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         
         IRibbonListener* m_listener;

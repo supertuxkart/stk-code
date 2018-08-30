@@ -457,13 +457,13 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 // -----------------------------------------------------------------------------
 
-void SpinnerWidget::onClick()
+EventPropagation SpinnerWidget::onClick()
 {
     if (m_children[1].m_deactivated || 
         m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
         !isGauge()) 
     { 
-        return; 
+        return EVENT_LET; 
     }
 
     const core::position2di mouse_position
@@ -487,6 +487,8 @@ void SpinnerWidget::onClick()
 
         setValue(new_value);
     }
+    
+    return EVENT_LET;
 }
 
 // -----------------------------------------------------------------------------
