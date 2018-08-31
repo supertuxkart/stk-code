@@ -638,8 +638,11 @@ void IrrDriver::initDevice()
 #endif
 
 #ifndef SERVER_ONLY
-    if(CVS->isGLSL())
+    if (CVS->isGLSL())
+    {
         m_renderer = new ShaderBasedRenderer();
+        preloadShaders();
+    }
     else
         m_renderer = new FixedPipelineRenderer();
 #endif

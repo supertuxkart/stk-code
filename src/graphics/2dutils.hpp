@@ -28,6 +28,8 @@
 #include <SColor.h>
 #include <SVertexIndex.h>
 
+void preloadShaders();
+
 void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
                         const irr::core::rect<irr::s32>& destRect,
                         const irr::core::rect<irr::s32>& sourceRect,
