@@ -148,9 +148,13 @@ CPUParticleManager::CPUParticleManager()
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
     // For preloading shaders
-    ParticleRenderer::getInstance();
-    AlphaTestParticleRenderer::getInstance();
+    if (CVS->isGLSL())
+    {
+        ParticleRenderer::getInstance();
+        AlphaTestParticleRenderer::getInstance();
+    }
 }   // CPUParticleManager
 
 // ----------------------------------------------------------------------------
