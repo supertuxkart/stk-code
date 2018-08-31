@@ -21,6 +21,53 @@
 #include "network/network_string.hpp"
 
 #include <openssl/aes.h>
+#include <openssl/buffer.h>
+#include <openssl/hmac.h>
+
+// ============================================================================
+std::string Crypto::base64(const std::vector<uint8_t>& input)
+{
+    BIO *bmem, *b64;
+    BUF_MEM* bptr;
+    std::string result;
+
+    b64 = BIO_new(BIO_f_base64());
+    bmem = BIO_new(BIO_s_mem());
+    b64 = BIO_push(b64, bmem);
+
+    BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
+    BIO_write(b64, input.data(), input.size());
+    BIO_flush(b64);
+    BIO_get_mem_ptr(b64, &bptr);
+    result.resize(bptr->length - 1);
+    memcpy(&result[0], bptr->data, bptr->length - 1);
+    BIO_free_all(b64);
+
+    return result;
+}   // base64
+
+// ============================================================================
+std::vector<uint8_t> Crypto::decode64(std::string input)
+{
+    BIO *b64, *bmem;
+    size_t decode_len = calcDecodeLength(input);
+    std::vector<uint8_t> result(decode_len, 0);
+    b64 = BIO_new(BIO_f_base64());
+
+    bmem = BIO_new_mem_buf(&input[0], input.size());
+    bmem = BIO_push(b64, bmem);
+
+    BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
+#ifdef DEBUG
+    size_t read_l = BIO_read(bmem, result.data(), input.size());
+    assert(read_l == decode_len);
+#else
+    BIO_read(bmem, result.data(), input.size());
+#endif
+    BIO_free_all(bmem);
+
+    return result;
+}   // decode64
 
 // ============================================================================
 std::string Crypto::m_client_key;

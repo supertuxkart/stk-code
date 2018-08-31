@@ -19,7 +19,7 @@
 #ifndef HEADER_CRYPTO_HPP
 #define HEADER_CRYPTO_HPP
 
-#include "utils/string_utils.hpp"
+#include "utils/log.hpp"
 
 #include <enet/enet.h>
 
@@ -55,14 +55,36 @@ private:
 
     std::mutex m_crypto_mutex;
 
+    // ------------------------------------------------------------------------
+    static size_t calcDecodeLength(const std::string& input)
+    {
+        // Calculates the length of a decoded string
+        size_t padding = 0;
+        const size_t len = input.size();
+        if (input[len - 1] == '=' && input[len - 2] == '=')
+        {
+            // last two chars are =
+            padding = 2;
+        }
+        else if (input[len - 1] == '=')
+        {
+            // last char is =
+            padding = 1;
+        }
+        return (len * 3) / 4 - padding;
+    }   // calcDecodeLength
 public:
+    // ------------------------------------------------------------------------
+    static std::string base64(const std::vector<uint8_t>& input);
+    // ------------------------------------------------------------------------
+    static std::vector<uint8_t> decode64(std::string input);
+    // ------------------------------------------------------------------------
     static std::unique_ptr<Crypto> getClientCrypto()
     {
         assert(!m_client_key.empty());
         assert(!m_client_iv.empty());
-        auto c = std::unique_ptr<Crypto>(new Crypto(
-            StringUtils::decode64(m_client_key),
-            StringUtils::decode64(m_client_iv)));
+        auto c = std::unique_ptr<Crypto>(new Crypto(decode64(m_client_key),
+            decode64(m_client_iv)));
         c->m_packet_counter = 1;
         return c;
     }
@@ -84,8 +106,8 @@ public:
             Log::warn("Crypto",
                 "Failed to generate cryptographically strong key");
         }
-        m_client_key = StringUtils::base64(key);
-        m_client_iv = StringUtils::base64(iv);
+        m_client_key = base64(key);
+        m_client_iv = base64(iv);
     }
     // ------------------------------------------------------------------------
     static void resetClientAES()

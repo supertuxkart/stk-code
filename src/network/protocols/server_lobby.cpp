@@ -2015,7 +2015,7 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
     uint32_t online_id, const core::stringw& online_name)
 {
     auto crypto = std::unique_ptr<Crypto>(new Crypto(
-        StringUtils::decode64(key), StringUtils::decode64(iv)));
+        Crypto::decode64(key), Crypto::decode64(iv)));
     if (crypto->decryptConnectionRequest(data))
     {
         peer->setCrypto(std::move(crypto));
