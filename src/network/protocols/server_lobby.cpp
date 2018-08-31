@@ -766,22 +766,11 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    auto players = m_game_setup->getConnectedPlayers();
-    const unsigned player_count = (unsigned)players.size();
     if (NetworkConfig::get()->hasTeamChoosing() && race_manager->teamEnabled())
     {
-        int red_count = 0;
-        int blue_count = 0;
-        for (auto& player : players)
-        {
-            if (player->getTeam() == KART_TEAM_RED)
-                red_count++;
-            else if (player->getTeam() == KART_TEAM_BLUE)
-                blue_count++;
-            if (red_count != 0 && blue_count != 0)
-                break;
-        }
-        if ((red_count == 0 || blue_count == 0) && player_count != 1)
+        auto red_blue = m_game_setup->getPlayerTeamInfo();
+        if ((red_blue.first == 0 || red_blue.second == 0) &&
+            red_blue.first + red_blue.second != 1)
         {
             Log::warn("ServerLobby", "Bad team choosing.");
             NetworkString* bt = getNetworkString();
@@ -835,7 +824,7 @@ void ServerLobby::startSelection(const Event *event)
         while (it != m_available_kts.second.end())
         {
             Track* t =  track_manager->getTrack(*it);
-            if (t->getMaxArenaPlayers() < player_count)
+            if (t->getMaxArenaPlayers() < m_game_setup->getPlayerCount())
             {
                 it = m_available_kts.second.erase(it);
             }
@@ -1507,6 +1496,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     unsigned player_count = data.getUInt8();
+    auto red_blue = m_game_setup->getPlayerTeamInfo();
     for (unsigned i = 0; i < player_count; i++)
     {
         core::stringw name;
@@ -1520,7 +1510,20 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             per_player_difficulty, (uint8_t)i, KART_TEAM_NONE);
         if (NetworkConfig::get()->hasTeamChoosing() &&
             race_manager->teamEnabled())
-            player->setTeam((KartTeam)(peer->getHostId() % 2));
+        {
+            KartTeam cur_team = KART_TEAM_NONE;
+            if (red_blue.first > red_blue.second)
+            {
+                cur_team = KART_TEAM_BLUE;
+                red_blue.second++;
+            }
+            else
+            {
+                cur_team = KART_TEAM_RED;
+                red_blue.first++;
+            }
+            player->setTeam(cur_team);
+        }
         peer->addPlayer(player);
     }
 

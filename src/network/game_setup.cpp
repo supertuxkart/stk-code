@@ -241,3 +241,22 @@ void GameSetup::sortPlayersForTeamGame()
         player->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForTeamGame
+
+// ----------------------------------------------------------------------------
+std::pair<int, int> GameSetup::getPlayerTeamInfo() const
+{
+    std::lock_guard<std::mutex> lock(m_players_mutex);
+    int red_count = 0;
+    int blue_count = 0;
+    for (auto& p : m_players)
+    {
+        auto player = p.lock();
+        if (!player)
+            continue;
+        if (player->getTeam() == KART_TEAM_RED)
+            red_count++;
+        else if (player->getTeam() == KART_TEAM_BLUE)
+            blue_count++;
+    }
+    return std::make_pair(red_count, blue_count);
+}   // getPlayerTeamInfo

@@ -29,6 +29,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 class NetworkPlayerProfile;
@@ -171,7 +172,8 @@ public:
         m_hit_capture_limit = hc;
         m_battle_time_limit = time;
     }
-
+    // ------------------------------------------------------------------------
+    std::pair<int, int> getPlayerTeamInfo() const;
 };
 
 #endif // GAME_SETUP_HPP
