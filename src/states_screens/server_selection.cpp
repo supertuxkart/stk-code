@@ -133,8 +133,8 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
-    m_icon_bank->setScale((float)getHeight() / 20.0f / 128.0f);
-    m_server_list_widget->setIcons(m_icon_bank);
+    m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
+    m_server_list_widget->setIcons(m_icon_bank, (float)getHeight() / 12.0f);
     m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
     refresh(true);
