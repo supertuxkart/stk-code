@@ -72,6 +72,7 @@ engine.
 ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
            : LobbyProtocol(NULL)
 {
+    m_waiting_for_game.store(false);
     m_state.store(NONE);
     m_server_address = a;
     m_server = s;
@@ -626,6 +627,16 @@ void ClientLobby::updatePlayerList(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString& data = event->data();
+    bool waiting = data.getUInt8() == 1;
+    if (m_waiting_for_game.load() && !waiting)
+    {
+        // The waiting game finished
+        NetworkingLobby::getInstance()
+            ->addMoreServerInfo(L"--------------------");
+        SFXManager::get()->quickSound("wee");
+    }
+
+    m_waiting_for_game.store(waiting);
     unsigned player_count = data.getUInt8();
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
         int, KartTeam> > players;
@@ -637,9 +648,13 @@ void ClientLobby::updatePlayerList(Event* event)
         std::get<1>(pl) = data.getUInt32();
         std::get<2>(pl) = data.getUInt8();
         data.decodeStringW(&std::get<3>(pl));
+        bool is_peer_waiting_for_game = data.getUInt8() == 1;
+        bool is_peer_server_owner = data.getUInt8() == 1;
         // icon to be used, see NetworkingLobby::loadedFromFile
-        std::get<4>(pl) = data.getUInt8() == 1 /*if server owner*/ ? 0 :
+        std::get<4>(pl) = is_peer_server_owner ? 0 :
             std::get<1>(pl) != 0 /*if online account*/ ? 1 : 2;
+        if (waiting && !is_peer_waiting_for_game)
+            std::get<4>(pl) = 3;
         PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
         if (d == PLAYER_DIFFICULTY_HANDICAP)
             std::get<3>(pl) = _("%s (handicapped)", std::get<3>(pl));

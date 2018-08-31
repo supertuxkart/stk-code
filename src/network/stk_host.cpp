@@ -738,7 +738,7 @@ void STKHost::mainLoop()
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
             const float timeout = UserConfigParams::m_validation_timeout;
             bool need_ping = false;
-            if (sl && !sl->isRacing() &&
+            if (sl && (!sl->isRacing() || sl->allowJoinedPlayersWaiting()) &&
                 last_ping_time < StkTime::getRealTimeMs())
             {
                 // If not racing, send an reliable packet at the same rate with
@@ -749,6 +749,7 @@ void STKHost::mainLoop()
                 need_ping = true;
             }
 
+            ENetPacket* packet = NULL;
             if (need_ping)
             {
                 m_peer_pings.getData().clear();
@@ -772,22 +773,25 @@ void STKHost::mainLoop()
                             ECT_DISCONNECT);
                     }
                 }
+                BareNetworkString ping_packet;
+                uint64_t network_timer = getNetworkTimer();
+                ping_packet.addUInt64(network_timer);
+                ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
+                for (auto& p : m_peer_pings.getData())
+                    ping_packet.addUInt32(p.first).addUInt32(p.second);
+                ping_packet.getBuffer().insert(
+                    ping_packet.getBuffer().begin(), g_ping_packet.begin(),
+                    g_ping_packet.end());
+                packet = enet_packet_create(ping_packet.getData(),
+                    ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
             }
+
             for (auto it = m_peers.begin(); it != m_peers.end();)
             {
-                if (need_ping)
+                if (need_ping &&
+                    (!sl->allowJoinedPlayersWaiting() ||
+                    !sl->isRacing() || it->second->isWaitingForGame()))
                 {
-                    BareNetworkString ping_packet;
-                    uint64_t network_timer = getNetworkTimer();
-                    ping_packet.addUInt64(network_timer);
-                    ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
-                    for (auto& p : m_peer_pings.getData())
-                        ping_packet.addUInt32(p.first).addUInt32(p.second);
-                    ping_packet.getBuffer().insert(
-                        ping_packet.getBuffer().begin(), g_ping_packet.begin(),
-                        g_ping_packet.end());
-                    ENetPacket* packet = enet_packet_create(ping_packet.getData(),
-                        ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
                     enet_peer_send(it->first, EVENT_CHANNEL_UNENCRYPTED, packet);
                 }
 
@@ -1026,12 +1030,15 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt32(NetworkConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
-        s.addUInt8((uint8_t)sl->getGameSetup()->getPlayerCount());
+        s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
+            sl->getWaitingPlayersCount()));
         s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)race_manager->getDifficulty());
         s.addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
         s.addUInt8(!NetworkConfig::get()->getPassword().empty());
-        s.addUInt8(0);
+        s.addUInt8((uint8_t)
+            (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?
+            0 : 1));
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == connection_cmd)
@@ -1123,7 +1130,22 @@ bool STKHost::isConnectedTo(const TransportAddress& peer)
 }   // isConnectedTo
 
 //-----------------------------------------------------------------------------
-/** Sends data to all peers
+/** Sends data to all validated peers currently in server
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketToAllPeersInServer(NetworkString *data, bool reliable)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
+    {
+        if (p.second->isValidated())
+            p.second->sendPacket(data, reliable);
+    }
+}   // sendPacketToAllPeersInServer
+
+//-----------------------------------------------------------------------------
+/** Sends data to all validated peers currently in game
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
  */
@@ -1132,13 +1154,13 @@ void STKHost::sendPacketToAllPeers(NetworkString *data, bool reliable)
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto p : m_peers)
     {
-        if (p.second->isValidated())
+        if (p.second->isValidated() && !p.second->isWaitingForGame())
             p.second->sendPacket(data, reliable);
     }
-}   // sendPacketExcept
+}   // sendPacketToAllPeers
 
 //-----------------------------------------------------------------------------
-/** Sends data to all peers except the specified one.
+/** Sends data to all validated peers except the specified currently in game
  *  \param peer Peer which will not receive the message.
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
@@ -1150,12 +1172,31 @@ void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
     for (auto p : m_peers)
     {
         STKPeer* stk_peer = p.second.get();
-        if (!stk_peer->isSamePeer(peer) && p.second->isValidated())
+        if (!stk_peer->isSamePeer(peer) && p.second->isValidated() &&
+            !p.second->isWaitingForGame())
         {
             stk_peer->sendPacket(data, reliable);
         }
     }
 }   // sendPacketExcept
+
+//-----------------------------------------------------------------------------
+/** Sends data to peers with custom rule
+ *  \param predicate boolean function for peer to predicate whether to send
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketToAllPeersWith(std::function<bool(STKPeer*)> predicate,
+                                       NetworkString* data, bool reliable)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
+    {
+        STKPeer* stk_peer = p.second.get();
+        if (predicate(stk_peer))
+            stk_peer->sendPacket(data, reliable);
+    }
+}   // sendPacketToAllPeersWith
 
 //-----------------------------------------------------------------------------
 /** Sends a message from a client to the server. */

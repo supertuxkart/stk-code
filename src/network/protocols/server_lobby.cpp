@@ -61,12 +61,12 @@
  node [shape=ellipse,style=filled,color=lightgrey];
 
  "Server Constructor" -> "INIT_WAN" [label="If WAN game"]
- "Server Constructor" -> "ACCEPTING_CLIENTS" [label="If LAN game"]
+ "Server Constructor" -> "WAITING_FOR_START_GAME" [label="If LAN game"]
  "INIT_WAN" -> "GETTING_PUBLIC_ADDRESS" [label="GetPublicAddress protocol callback"]
- "GETTING_PUBLIC_ADDRESS" -> "ACCEPTING_CLIENTS" [label="Register server"]
- "ACCEPTING_CLIENTS" -> "connectionRequested" [label="Client connection request"]
- "connectionRequested" -> "ACCEPTING_CLIENTS" 
- "ACCEPTING_CLIENTS" -> "SELECTING" [label="Start race from authorised client"]
+ "GETTING_PUBLIC_ADDRESS" -> "WAITING_FOR_START_GAME" [label="Register server"]
+ "WAITING_FOR_START_GAME" -> "connectionRequested" [label="Client connection request"]
+ "connectionRequested" -> "WAITING_FOR_START_GAME"
+ "WAITING_FOR_START_GAME" -> "SELECTING" [label="Start race from authorised client"]
  "SELECTING" -> "SELECTING" [label="Client selects kart, #laps, ..."]
  "SELECTING" -> "playerTrackVote" [label="Client selected track"]
  "playerTrackVote" -> "SELECTING" [label="Not all clients have selected"]
@@ -90,7 +90,9 @@
  */
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
+    m_waiting_players_counts.store(0);
     m_server_owner_id.store(-1);
+    m_registered_for_once_only = false;
     m_has_created_server_id_file = false;
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
@@ -253,7 +255,19 @@ void ServerLobby::handleChat(Event* event)
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
-        sendMessageToPeers(chat, /*reliable*/true);
+        // After game is started, only send to waiting player
+        const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
+        STKHost::get()->sendPacketToAllPeersWith([game_started]
+            (STKPeer* p)
+            {
+                if (!p->isValidated())
+                    return false;
+                if (!game_started)
+                    return true;
+                if (!p->isWaitingForGame() && game_started)
+                    return false;
+                return true;
+            }, chat);
         delete chat;
     }
 }   // handleChat
@@ -341,6 +355,17 @@ void ServerLobby::asynchronousUpdate()
     // Check if server owner has left
     updateServerOwner();
 
+    if (allowJoinedPlayersWaiting() || (m_game_setup->isGrandPrix() &&
+        m_state.load() == WAITING_FOR_START_GAME))
+    {
+        updateWaitingPlayers();
+        clearDisconnectedRankedPlayer();
+        // Only poll the STK server if this is a WAN server.
+        if (NetworkConfig::get()->isWAN())
+            checkIncomingConnectionRequests();
+        handlePendingConnection();
+    }
+
     switch (m_state.load())
     {
     case SET_PUBLIC_ADDRESS:
@@ -349,7 +374,7 @@ void ServerLobby::asynchronousUpdate()
         // STK server, so we can directly go to the accepting clients state.
         if (NetworkConfig::get()->isLAN())
         {
-            m_state = ACCEPTING_CLIENTS;
+            m_state = WAITING_FOR_START_GAME;
             STKHost::get()->startListening();
             createServerIdFile();
             return;
@@ -369,9 +394,9 @@ void ServerLobby::asynchronousUpdate()
     }
     case REGISTER_SELF_ADDRESS:
     {
-        if (m_game_setup->isGrandPrixStarted())
+        if (m_game_setup->isGrandPrixStarted() || m_registered_for_once_only)
         {
-            m_state = ACCEPTING_CLIENTS;
+            m_state = WAITING_FOR_START_GAME;
             break;
         }
         // Register this server with the STK server. This will block
@@ -379,7 +404,9 @@ void ServerLobby::asynchronousUpdate()
         // to react to any requests before the server is registered.
         if (registerServer())
         {
-            m_state = ACCEPTING_CLIENTS;
+            if (allowJoinedPlayersWaiting())
+                m_registered_for_once_only = true;
+            m_state = WAITING_FOR_START_GAME;
             createServerIdFile();
         }
         else
@@ -388,12 +415,12 @@ void ServerLobby::asynchronousUpdate()
         }
         break;
     }
-    case ACCEPTING_CLIENTS:
+    case WAITING_FOR_START_GAME:
     {
         if (NetworkConfig::get()->isOwnerLess())
         {
-            auto players = m_game_setup->getPlayers();
-            if (((float)players.size() >=
+            float player_size = (float)m_game_setup->getPlayerCount();
+            if ((player_size >=
                 (float)NetworkConfig::get()->getMaxPlayers() *
                 UserConfigParams::m_start_game_threshold ||
                 m_game_setup->isGrandPrixStarted()) &&
@@ -403,7 +430,7 @@ void ServerLobby::asynchronousUpdate()
                     (int64_t)
                     (UserConfigParams::m_start_game_counter * 1000.0f));
             }
-            else if ((float)players.size() <
+            else if (player_size <
                 (float)NetworkConfig::get()->getMaxPlayers() *
                 UserConfigParams::m_start_game_threshold &&
                 !m_game_setup->isGrandPrixStarted())
@@ -416,11 +443,6 @@ void ServerLobby::asynchronousUpdate()
                 return;
             }
         }
-        clearDisconnectedRankedPlayer();
-        // Only poll the STK server if this is a WAN server.
-        if (NetworkConfig::get()->isWAN())
-            checkIncomingConnectionRequests();
-        handlePendingConnection();
         break;
     }
     case ERROR_LEAVE:
@@ -538,14 +560,12 @@ void ServerLobby::update(int ticks)
         RaceResultGUI::getInstance()->backToLobby();
         std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_game_setup->stopGrandPrix();
-        m_state = NetworkConfig::get()->isLAN() ?
-            ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
-        setup();
+        resetServer();
     }
 
-    if ((m_state.load() > ACCEPTING_CLIENTS ||
+    if ((m_state.load() > WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()) &&
-        STKHost::get()->getPeerCount() == 0 &&
+        m_game_setup->getPlayerCount() == 0 &&
         NetworkConfig::get()->getServerIdFile().empty())
     {
         if (RaceEventManager::getInstance() &&
@@ -571,29 +591,20 @@ void ServerLobby::update(int ticks)
         delete exit_result_screen;
         std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_game_setup->stopGrandPrix();
-        m_state = NetworkConfig::get()->isLAN() ?
-            ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
-        updatePlayerList(true/*force_update*/);
-        NetworkString* server_info = getNetworkString();
-        server_info->setSynchronous(true);
-        server_info->addUInt8(LE_SERVER_INFO);
-        m_game_setup->addServerInfo(server_info);
-        sendMessageToPeers(server_info);
-        delete server_info;
-        setup();
+        resetServer();
     }
 
     if (m_game_setup)
     {
         // Remove disconnected players if in these two states
-        m_game_setup->update(m_state.load() == ACCEPTING_CLIENTS ||
+        m_game_setup->update(m_state.load() == WAITING_FOR_START_GAME ||
             m_state.load() == SELECTING);
     }
     switch (m_state.load())
     {
     case SET_PUBLIC_ADDRESS:
     case REGISTER_SELF_ADDRESS:
-    case ACCEPTING_CLIENTS:
+    case WAITING_FOR_START_GAME:
     case WAIT_FOR_WORLD_LOADED:
     case WAIT_FOR_RACE_STARTED:
     {
@@ -645,16 +656,7 @@ void ServerLobby::update(int ticks)
             sendMessageToPeers(exit_result_screen, /*reliable*/true);
             delete exit_result_screen;
             std::lock_guard<std::mutex> lock(m_connection_mutex);
-            m_state = NetworkConfig::get()->isLAN() ?
-                ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
-            updatePlayerList(true/*force_update*/);
-            NetworkString* server_info = getNetworkString();
-            server_info->setSynchronous(true);
-            server_info->addUInt8(LE_SERVER_INFO);
-            m_game_setup->addServerInfo(server_info);
-            sendMessageToPeers(server_info);
-            delete server_info;
-            setup();
+            resetServer();
         }
         break;
     case ERROR_LEAVE:
@@ -748,7 +750,7 @@ void ServerLobby::startSelection(const Event *event)
 {
     if (event != NULL)
     {
-        if (m_state != ACCEPTING_CLIENTS)
+        if (m_state != WAITING_FOR_START_GAME)
         {
             Log::warn("ServerLobby",
                 "Received startSelection while being in state %d",
@@ -791,10 +793,13 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
-    if (NetworkConfig::get()->isWAN())
+    if (!allowJoinedPlayersWaiting())
     {
-        unregisterServer(false/*now*/);
+        ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
+        if (NetworkConfig::get()->isWAN() )
+        {
+            unregisterServer(false/*now*/);
+        }
     }
 
     NetworkString *ns = getNetworkString(1);
@@ -809,7 +814,7 @@ void ServerLobby::startSelection(const Event *event)
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
     {
-        if (!peer->isValidated())
+        if (!peer->isValidated() || peer->isWaitingForGame())
             continue;
         peer->eraseServerKarts(m_available_kts.first, karts_erase);
         peer->eraseServerTracks(m_available_kts.second, tracks_erase);
@@ -855,16 +860,19 @@ void ServerLobby::startSelection(const Event *event)
     delete ns;
 
     m_state = SELECTING;
-    // Drop all pending players and keys
-    for (auto& p : m_pending_connection)
+    if (!allowJoinedPlayersWaiting())
     {
-        if (auto peer = p.first.lock())
-            peer->disconnect();
+        // Drop all pending players and keys if doesn't allow joinning-waiting
+        for (auto& p : m_pending_connection)
+        {
+            if (auto peer = p.first.lock())
+                peer->disconnect();
+        }
+        m_pending_connection.clear();
+        std::unique_lock<std::mutex> ul(m_keys_mutex);
+        m_keys.clear();
+        ul.unlock();
     }
-    m_pending_connection.clear();
-    std::unique_lock<std::mutex> ul(m_keys_mutex);
-    m_keys.clear();
-    ul.unlock();
 
     // Will be changed after the first vote received
     m_timeout.store(std::numeric_limits<int64_t>::max());
@@ -916,7 +924,8 @@ void ServerLobby::checkIncomingConnectionRequests()
             const XMLNode * users_xml = result->getNode("users");
             std::map<uint32_t, KeyData> keys;
             auto sl = m_server_lobby.lock();
-            if (!sl || sl->m_state.load() != ACCEPTING_CLIENTS)
+            if (!sl || (sl->m_state.load() != WAITING_FOR_START_GAME &&
+                !sl->allowJoinedPlayersWaiting()))
                 return;
 
             for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
@@ -956,7 +965,10 @@ void ServerLobby::checkIncomingConnectionRequests()
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
-    request->addParameter("current-players", m_game_setup->getPlayerCount());
+    request->addParameter("current-players",
+        m_game_setup->getPlayerCount() + m_waiting_players_counts.load());
+    request->addParameter("game-started",
+        m_state.load() == WAITING_FOR_START_GAME ? 0 : 1);
     request->queue();
 
 }   // checkIncomingConnectionRequests
@@ -1236,6 +1248,8 @@ void ServerLobby::clientDisconnected(Event* event)
         return;
 
     NetworkString* msg = getNetworkString(2);
+    const bool waiting_peer_disconnected =
+        event->getPeer()->isWaitingForGame();
     msg->setSynchronous(true);
     msg->addUInt8(LE_PLAYER_DISCONNECTED);
     msg->addUInt8((uint8_t)players_on_peer.size());
@@ -1245,7 +1259,17 @@ void ServerLobby::clientDisconnected(Event* event)
         msg->encodeString(name);
         Log::info("ServerLobby", "%s disconnected", name.c_str());
     }
-    sendMessageToPeers(msg, /*reliable*/true);
+
+    // Don't show waiting peer disconnect message to in game player
+    STKHost::get()->sendPacketToAllPeersWith([waiting_peer_disconnected]
+        (STKPeer* p)
+        {
+            if (!p->isValidated())
+                return false;
+            if (!p->isWaitingForGame() && waiting_peer_disconnected)
+                return false;
+            return true;
+        }, msg);
     updatePlayerList();
     delete msg;
 }   // clientDisconnected
@@ -1281,8 +1305,9 @@ void ServerLobby::connectionRequested(Event* event)
     peer->cleanPlayerProfiles();
 
     // can we add the player ?
-    if (m_state != ACCEPTING_CLIENTS ||
-        m_game_setup->isGrandPrixStarted())
+    if (!allowJoinedPlayersWaiting() &&
+        (m_state.load() != WAITING_FOR_START_GAME ||
+        m_game_setup->isGrandPrixStarted()))
     {
         NetworkString *message = getNetworkString(2);
         message->setSynchronous(true);
@@ -1394,7 +1419,8 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
-    if (m_game_setup->getPlayerCount() + player_count >
+    if (m_game_setup->getPlayerCount() + player_count +
+        m_waiting_players_counts.load() >
         NetworkConfig::get()->getMaxPlayers())
     {
         NetworkString *message = getNetworkString(2);
@@ -1415,7 +1441,8 @@ void ServerLobby::connectionRequested(Event* event)
         peer->getAddress().isLAN()) &&
         NetworkConfig::get()->isWAN() &&
         NetworkConfig::get()->onlyValidatedPlayers()) ||
-        ((player_count != 1 || m_scores.find(online_id) != m_scores.end()) &&
+        ((player_count != 1 || online_id == 0 ||
+        m_scores.find(online_id) != m_scores.end()) &&
         NetworkConfig::get()->isRankedServer()))
     {
         NetworkString* message = getNetworkString(2);
@@ -1507,6 +1534,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     peer->sendPacket(server_info);
     delete server_info;
 
+    const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
     NetworkString* message_ack = getNetworkString(4);
     message_ack->setSynchronous(true);
     // connection success -- return the host id of peer
@@ -1520,39 +1548,70 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
         .addUInt32(NetworkConfig::m_server_version).addFloat(auto_start_timer);
-    peer->sendPacket(message_ack);
-    delete message_ack;
 
-    m_peers_ready[peer] = false;
-    for (std::shared_ptr<NetworkPlayerProfile> npp : peer->getPlayerProfiles())
+    if (game_started)
     {
-        m_game_setup->addPlayer(npp);
-        Log::info("ServerLobby", "New player %s with online id %u from %s.",
-            StringUtils::wideToUtf8(npp->getName()).c_str(),
-            npp->getOnlineId(), peer->getAddress().toString().c_str());
+        peer->setWaitingForGame(true);
+        for (auto& p : peer->getPlayerProfiles())
+            m_waiting_players.push_back(p);
+        updatePlayerList();
+        peer->sendPacket(message_ack);
+        delete message_ack;
     }
-    updatePlayerList();
-
-    if (NetworkConfig::get()->isRankedServer())
+    else
     {
-        getRankingForPlayer(peer->getPlayerProfiles()[0]);
+        peer->setWaitingForGame(false);
+        m_peers_ready[peer] = false;
+        for (std::shared_ptr<NetworkPlayerProfile>& npp :
+            peer->getPlayerProfiles())
+        {
+            m_game_setup->addPlayer(npp);
+            Log::info("ServerLobby",
+                "New player %s with online id %u from %s.",
+                StringUtils::wideToUtf8(npp->getName()).c_str(),
+                npp->getOnlineId(), peer->getAddress().toString().c_str());
+        }
+        updatePlayerList();
+        peer->sendPacket(message_ack);
+        delete message_ack;
+
+        if (NetworkConfig::get()->isRankedServer())
+        {
+            getRankingForPlayer(peer->getPlayerProfiles()[0]);
+        }
     }
 }   // handleUnencryptedConnection
 
 //-----------------------------------------------------------------------------
-void ServerLobby::updatePlayerList(bool force_update)
+/** Called when any players change their setting (team for example), or
+ *  connection / disconnection, it will use the game_started parameter to
+ *  determine if this should be send to all peers in server or just in game.
+ *  \param update_when_reset_server If true, this message will be sent to
+ *  all peers.
+ */
+void ServerLobby::updatePlayerList(bool update_when_reset_server)
 {
-    if (m_state.load() > ACCEPTING_CLIENTS && !force_update)
+    const bool game_started = m_state.load() != WAITING_FOR_START_GAME &&
+        !update_when_reset_server;
+
+    // No need to update player list (for started grand prix currently)
+    if (!allowJoinedPlayersWaiting() &&
+        m_state.load() > WAITING_FOR_START_GAME && !update_when_reset_server)
         return;
+
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
     NetworkString* pl = getNetworkString();
     pl->setSynchronous(true);
-    pl->addUInt8(LE_UPDATE_PLAYER_LIST).addUInt8((uint8_t)all_profiles.size());
+    pl->addUInt8(LE_UPDATE_PLAYER_LIST)
+        .addUInt8((uint8_t)(game_started ? 1 : 0))
+        .addUInt8((uint8_t)all_profiles.size());
     for (auto profile : all_profiles)
     {
         pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
             .addUInt8(profile->getLocalPlayerId())
             .encodeString(profile->getName());
+        pl->addUInt8((uint8_t)
+            (profile->getPeer()->isWaitingForGame() ? 1 : 0));
         uint8_t server_owner = 0;
         if (m_server_owner_id.load() == profile->getPeer()->getHostId())
             server_owner = 1;
@@ -1564,14 +1623,24 @@ void ServerLobby::updatePlayerList(bool force_update)
         else
             pl->addUInt8(KART_TEAM_NONE);
     }
-    sendMessageToPeers(pl);
+
+    // Don't send this message to in-game players
+    STKHost::get()->sendPacketToAllPeersWith([game_started]
+        (STKPeer* p)
+        {
+            if (!p->isValidated())
+                return false;
+            if (!p->isWaitingForGame() && game_started)
+                return false;
+            return true;
+        }, pl);
     delete pl;
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------
 void ServerLobby::updateServerOwner()
 {
-    if (m_state.load() < ACCEPTING_CLIENTS ||
+    if (m_state.load() < WAITING_FOR_START_GAME ||
         m_state.load() > RESULT_DISPLAY ||
         NetworkConfig::get()->isOwnerLess())
         return;
@@ -1660,7 +1729,8 @@ void ServerLobby::playerVote(Event* event)
     }
 
     if (!checkDataSize(event, 4) ||
-        event->getPeer()->getPlayerProfiles().empty())
+        event->getPeer()->getPlayerProfiles().empty() ||
+        event->getPeer()->isWaitingForGame())
         return;
 
     // Check if first vote, if so start counter
@@ -1714,7 +1784,7 @@ std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
     {
-        if (peer->hasPlayerProfiles())
+        if (peer->hasPlayerProfiles() && !peer->isWaitingForGame())
             cur_players += 1.0f;
     }
     if (cur_players == 0.0f)
@@ -1887,8 +1957,9 @@ void ServerLobby::updateBanList()
 //-----------------------------------------------------------------------------
 bool ServerLobby::waitingForPlayers() const
 {
-    return m_state.load() == ACCEPTING_CLIENTS &&
-        !m_game_setup->isGrandPrixStarted();
+    if (m_game_setup->isGrandPrix() && m_game_setup->isGrandPrixStarted())
+        return false;
+    return m_state.load() >= WAITING_FOR_START_GAME;
 }   // waitingForPlayers
 
 //-----------------------------------------------------------------------------
@@ -2094,3 +2165,86 @@ void ServerLobby::configPeersStartTime()
             m_state.store(RACING);
         });
 }   // configPeersStartTime
+
+//-----------------------------------------------------------------------------
+bool ServerLobby::allowJoinedPlayersWaiting() const
+{
+    return !m_game_setup->isGrandPrix();
+}   // allowJoinedPlayersWaiting
+
+//-----------------------------------------------------------------------------
+void ServerLobby::updateWaitingPlayers()
+{
+    // addWaitingPlayersToGame below will be called by main thread in case
+    // resetServer
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
+
+    m_waiting_players.erase(std::remove_if(
+        m_waiting_players.begin(), m_waiting_players.end(), []
+        (const std::weak_ptr<NetworkPlayerProfile>& npp)->bool
+        {
+            return npp.expired();
+        }), m_waiting_players.end());
+    m_waiting_players_counts.store((uint32_t)m_waiting_players.size());
+}   // updateWaitingPlayers
+
+//-----------------------------------------------------------------------------
+void ServerLobby::addWaitingPlayersToGame()
+{
+    if (m_waiting_players.empty())
+        return;
+    for (auto& p : m_waiting_players)
+    {
+        auto npp = p.lock();
+        if (!npp)
+            continue;
+        auto peer = npp->getPeer();
+        assert(peer);
+        uint32_t online_id = npp->getOnlineId();
+        if (NetworkConfig::get()->isRankedServer())
+        {
+            if (m_scores.find(online_id) != m_scores.end())
+            {
+                NetworkString* message = getNetworkString(2);
+                message->setSynchronous(true);
+                message->addUInt8(LE_CONNECTION_REFUSED)
+                    .addUInt8(RR_INVALID_PLAYER);
+                peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+                peer->reset();
+                delete message;
+                Log::verbose("ServerLobby", "Player refused: invalid player");
+                continue;
+            }
+        }
+
+        peer->setWaitingForGame(false);
+        m_peers_ready[peer] = false;
+        m_game_setup->addPlayer(npp);
+        Log::info("ServerLobby", "New player %s with online id %u from %s.",
+            StringUtils::wideToUtf8(npp->getName()).c_str(),
+            npp->getOnlineId(), peer->getAddress().toString().c_str());
+
+        if (NetworkConfig::get()->isRankedServer())
+        {
+            getRankingForPlayer(peer->getPlayerProfiles()[0]);
+        }
+    }
+    m_waiting_players.clear();
+    m_waiting_players_counts.store(0);
+}   // addWaitingPlayersToGame
+
+//-----------------------------------------------------------------------------
+void ServerLobby::resetServer()
+{
+    addWaitingPlayersToGame();
+    m_state = NetworkConfig::get()->isLAN() ?
+        WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
+    updatePlayerList(true/*update_when_reset_server*/);
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    sendMessageToPeersInServer(server_info);
+    delete server_info;
+    setup();
+}   // resetServer

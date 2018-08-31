@@ -46,7 +46,7 @@ public:
     {
         SET_PUBLIC_ADDRESS,       // Waiting to receive its public ip address
         REGISTER_SELF_ADDRESS,    // Register with STK online server
-        ACCEPTING_CLIENTS,        // In lobby, accepting clients
+        WAITING_FOR_START_GAME,   // In lobby, waiting for (auto) start game
         SELECTING,                // kart, track, ... selection started
         LOAD_WORLD,               // Server starts loading world
         WAIT_FOR_WORLD_LOADED,    // Wait for clients and server to load world
@@ -136,6 +136,12 @@ private:
 
     NetworkString* m_result_ns;
 
+    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_waiting_players;
+
+    std::atomic<uint32_t> m_waiting_players_counts;
+
+    bool m_registered_for_once_only;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -151,7 +157,7 @@ private:
     void handleChat(Event* event);
     void unregisterServer(bool now);
     void createServerIdFile();
-    void updatePlayerList(bool force_update = false);
+    void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
     bool checkPeersReady() const
     {
@@ -212,6 +218,9 @@ private:
     void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
     std::pair<int, float> getHitCaptureLimit(float num_karts);
     void configPeersStartTime();
+    void updateWaitingPlayers();
+    void resetServer();
+    void addWaitingPlayersToGame();
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -227,10 +236,13 @@ public:
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();
-    virtual bool waitingForPlayers() const OVERRIDE;
+    bool waitingForPlayers() const;
+    uint32_t getWaitingPlayersCount() const
+                                    { return m_waiting_players_counts.load(); }
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
+    bool allowJoinedPlayersWaiting() const;
 
 };   // class ServerLobby
 

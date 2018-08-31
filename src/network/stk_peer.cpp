@@ -40,6 +40,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_connected_time      = StkTime::getRealTimeMs();
     m_validated.store(false);
     m_average_ping.store(0);
+    m_waiting_for_game.store(true);
 }   // STKPeer
 
 //-----------------------------------------------------------------------------

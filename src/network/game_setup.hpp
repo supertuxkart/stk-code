@@ -24,6 +24,7 @@
 
 #include "network/remote_kart_info.hpp"
 
+#include <atomic>
 #include <cassert>
 #include <memory>
 #include <mutex>
@@ -58,10 +59,13 @@ private:
 
     float m_battle_time_limit;
 
+    std::atomic<uint32_t> m_connected_players_count;
+
 public:
     // ------------------------------------------------------------------------
     GameSetup()
     {
+        m_connected_players_count.store(0);
         m_extra_server_info = -1;
         reset();
     }
@@ -99,11 +103,7 @@ public:
     }   // getConnectedPlayers
     // ------------------------------------------------------------------------
     /** Returns the number of connected players. */
-    unsigned getPlayerCount()
-    {
-        std::lock_guard<std::mutex> lock(m_players_mutex);
-        return (unsigned)m_players.size();
-    }
+    unsigned getPlayerCount()      { return m_connected_players_count.load(); }
     // ------------------------------------------------------------------------
     void setRace(const std::string& track, unsigned laps, bool reverse)
     {

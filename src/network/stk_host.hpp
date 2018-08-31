@@ -38,6 +38,7 @@
 
 #include <atomic>
 #include <list>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -210,7 +211,13 @@ public:
     //-------------------------------------------------------------------------
     void shutdown();
     //-------------------------------------------------------------------------
+    void sendPacketToAllPeersInServer(NetworkString *data,
+                                      bool reliable = true);
+    // ------------------------------------------------------------------------
     void sendPacketToAllPeers(NetworkString *data, bool reliable = true);
+    // ------------------------------------------------------------------------
+    void sendPacketToAllPeersWith(std::function<bool(STKPeer*)> predicate,
+                                  NetworkString* data, bool reliable = true);
     // ------------------------------------------------------------------------
     /** Returns true if this client instance is allowed to control the server.
      *  It will auto transfer ownership if previous server owner disconnected.

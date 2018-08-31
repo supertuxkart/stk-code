@@ -71,6 +71,8 @@ private:
         EXITING
     };
 
+    std::atomic_bool m_waiting_for_game;
+
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
 
@@ -100,13 +102,13 @@ public:
     virtual void finishedLoadingWorld() OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-    virtual bool waitingForPlayers() const OVERRIDE
-                                        { return m_state.load() == CONNECTED; }
     virtual void asynchronousUpdate() OVERRIDE {}
     virtual bool allPlayersReady() const OVERRIDE
                                            { return m_state.load() >= RACING; }
     bool waitingForServerRespond() const
                             { return m_state.load() == REQUESTING_CONNECTION; }
+    bool isLobbyReady() const           { return m_state.load() == CONNECTED; }
+    bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
 
 };

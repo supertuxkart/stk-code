@@ -64,6 +64,9 @@ protected:
     /** True if this peer is validated by server. */
     std::atomic_bool m_validated;
 
+    /** True if this peer is waiting for game. */
+    std::atomic_bool m_waiting_for_game;
+
     /** Host id of this peer. */
     uint32_t m_host_id;
 
@@ -170,6 +173,11 @@ public:
     uint32_t getAveragePing() const           { return m_average_ping.load(); }
     // ------------------------------------------------------------------------
     ENetPeer* getENetPeer() const                       { return m_enet_peer; }
+    // ------------------------------------------------------------------------
+    void setWaitingForGame(bool val)         { m_waiting_for_game.store(val); }
+    // ------------------------------------------------------------------------
+    bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
+
 };   // STKPeer
 
 #endif // STK_PEER_HPP
