@@ -586,7 +586,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
-                        
+
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",
@@ -780,6 +780,11 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
         PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
         &m_network_group, "Kick players whose ping is above max-ping."));
+    PARAM_PREFIX FloatUserConfigParam m_auto_lap_ratio
+        PARAM_DEFAULT(FloatUserConfigParam(-1.0f, "auto-lap-ratio",
+        &m_network_group, "Value used by server to automatically calculate lap of each race in network game, "
+        "if more than 0.0f, the number of lap of each track vote in linear race will be determined "
+        "by max(1.0f, auto-lap-ratio * default lap of that track)."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

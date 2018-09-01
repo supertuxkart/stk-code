@@ -305,13 +305,24 @@ void TracksScreen::init()
         }
         else
         {
-            getWidget("lap-text")->setVisible(true);
-            //I18N: In track screen
-            getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
-            m_laps->setVisible(true);
-            m_laps->setMin(1);
-            m_laps->setMax(20);
-            m_laps->setValue(UserConfigParams::m_num_laps);
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            assert(cl);
+            if (cl->isServerAutoLap())
+            {
+                getWidget("lap-text")->setVisible(false);
+                m_laps->setVisible(false);
+                m_laps->setValue(0);
+            }
+            else
+            {
+                getWidget("lap-text")->setVisible(true);
+                //I18N: In track screen
+                getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
+                m_laps->setVisible(true);
+                m_laps->setMin(1);
+                m_laps->setMax(20);
+                m_laps->setValue(UserConfigParams::m_num_laps);
+            }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
             getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);

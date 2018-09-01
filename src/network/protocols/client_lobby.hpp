@@ -71,15 +71,17 @@ private:
         EXITING
     };
 
-    std::atomic_bool m_waiting_for_game;
+    bool m_waiting_for_game;
+
+    bool m_server_auto_lap;
+
+    bool m_received_server_result;
 
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
 
     std::set<std::string> m_available_karts;
     std::set<std::string> m_available_tracks;
-
-    bool m_received_server_result = false;
 
     void addAllPlayers(Event* event);
     void finalizeConnectionRequest(NetworkString* header,
@@ -108,7 +110,8 @@ public:
     bool waitingForServerRespond() const
                             { return m_state.load() == REQUESTING_CONNECTION; }
     bool isLobbyReady() const           { return m_state.load() == CONNECTED; }
-    bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
+    bool isWaitingForGame() const                { return m_waiting_for_game; }
+    bool isServerAutoLap() const                  { return m_server_auto_lap; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
 
 };

@@ -72,7 +72,9 @@ engine.
 ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
            : LobbyProtocol(NULL)
 {
-    m_waiting_for_game.store(false);
+    m_waiting_for_game = false;
+    m_server_auto_lap = false;
+    m_received_server_result = false;
     m_state.store(NONE);
     m_server_address = a;
     m_server = s;
@@ -628,7 +630,7 @@ void ClientLobby::updatePlayerList(Event* event)
     if (!checkDataSize(event, 1)) return;
     NetworkString& data = event->data();
     bool waiting = data.getUInt8() == 1;
-    if (m_waiting_for_game.load() && !waiting)
+    if (m_waiting_for_game && !waiting)
     {
         // The waiting game finished
         NetworkingLobby::getInstance()
@@ -636,7 +638,7 @@ void ClientLobby::updatePlayerList(Event* event)
         SFXManager::get()->quickSound("wee");
     }
 
-    m_waiting_for_game.store(waiting);
+    m_waiting_for_game = waiting;
     unsigned player_count = data.getUInt8();
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
         int, KartTeam> > players;
@@ -803,7 +805,8 @@ void ClientLobby::startSelection(Event* event)
 {
     SFXManager::get()->quickSound("wee");
     const NetworkString& data = event->data();
-    uint8_t skip_kart_screen = data.getUInt8();
+    bool skip_kart_screen = data.getUInt8() == 1;
+    m_server_auto_lap = data.getUInt8() == 1;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
     m_available_karts.clear();
@@ -829,7 +832,7 @@ void ClientLobby::startSelection(Event* event)
     screen->setAvailableKartsFromServer(m_available_karts);
     // In case of auto-connect or continue a grand prix, use random karts
     // (or previous kart) from server and go to track selection
-    if (NetworkConfig::get()->isAutoConnect() || skip_kart_screen == 1)
+    if (NetworkConfig::get()->isAutoConnect() || skip_kart_screen)
     {
         input_manager->setMasterPlayerOnly(true);
         for (auto& p : NetworkConfig::get()->getNetworkPlayers())
