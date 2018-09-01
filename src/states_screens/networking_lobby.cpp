@@ -236,7 +236,7 @@ void NetworkingLobby::onUpdate(float delta)
         m_timeout_message->setVisible(true);
         //I18N: In the networking lobby, show when player is required to wait
         //before the current game finish
-        core::stringw msg = _("Please wait for current game to be finished.");
+        core::stringw msg = _("Please wait for current game to end.");
         m_timeout_message->setText(msg, true);
         core::stringw total_msg;
         for (auto& string : m_server_info)
