@@ -38,7 +38,7 @@ std::string Crypto::base64(const std::vector<uint8_t>& input)
     b64 = BIO_push(b64, bmem);
 
     BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
-    BIO_write(b64, input.data(), input.size());
+    BIO_write(b64, input.data(), (int)input.size());
     BIO_flush(b64);
     BIO_get_mem_ptr(b64, &bptr);
     result.resize(bptr->length - 1);
@@ -56,15 +56,15 @@ std::vector<uint8_t> Crypto::decode64(std::string input)
     std::vector<uint8_t> result(decode_len, 0);
     b64 = BIO_new(BIO_f_base64());
 
-    bmem = BIO_new_mem_buf(&input[0], input.size());
+    bmem = BIO_new_mem_buf(&input[0], (int)input.size());
     bmem = BIO_push(b64, bmem);
 
     BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
 #ifdef DEBUG
-    size_t read_l = BIO_read(bmem, result.data(), input.size());
+    size_t read_l = BIO_read(bmem, result.data(), (int)input.size());
     assert(read_l == decode_len);
 #else
-    BIO_read(bmem, result.data(), input.size());
+    BIO_read(bmem, result.data(), (int)input.size());
 #endif
     BIO_free_all(bmem);
 
@@ -83,7 +83,7 @@ bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
     if (EVP_EncryptInit_ex(m_encrypt, NULL, NULL, NULL, NULL) != 1)
         return false;
     if (EVP_EncryptUpdate(m_encrypt, cipher.data() + 4, &elen,
-        ns.m_buffer.data(), ns.m_buffer.size()) != 1)
+        ns.m_buffer.data(), (int)ns.m_buffer.size()) != 1)
         return false;
     if (EVP_EncryptFinal_ex(m_encrypt, cipher.data() + 4 + elen, &elen) != 1)
         return false;
@@ -105,7 +105,7 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
 
     int dlen;
     if (EVP_DecryptUpdate(m_decrypt, pt.data(), &dlen, ns.m_buffer.data() + 4,
-        ns.m_buffer.size() - 4) != 1)
+        (int)(ns.m_buffer.size() - 4)) != 1)
         return false;
     if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, 4,
         ns.m_buffer.data()))
@@ -147,7 +147,7 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
 
     int elen;
     if (EVP_EncryptUpdate(m_encrypt, packet_start, &elen, ns.m_buffer.data(),
-        ns.m_buffer.size()) != 1)
+        (int)ns.m_buffer.size()) != 1)
     {
         enet_packet_destroy(p);
         return NULL;
