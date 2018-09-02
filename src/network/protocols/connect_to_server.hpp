@@ -55,6 +55,7 @@ private:
     void registerWithSTKServer();
     void waitingAloha(bool is_wan);
 public:
+    static std::weak_ptr<bool> m_previous_unjoin;
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
 

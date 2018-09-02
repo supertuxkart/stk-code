@@ -916,8 +916,12 @@ void ServerLobby::checkIncomingConnectionRequests()
             auto sl = m_server_lobby.lock();
             if (!sl || (sl->m_state.load() != WAITING_FOR_START_GAME &&
                 !sl->allowJoinedPlayersWaiting()))
+            {
+                sl->replaceKeys(keys);
                 return;
+            }
 
+            sl->removeExpiredPeerConnection();
             for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
             {
                 uint32_t addr, id;
@@ -931,13 +935,18 @@ void ServerLobby::checkIncomingConnectionRequests()
                 keys[id].m_tried = false;
                 if (UserConfigParams::m_firewalled_server)
                 {
-                    std::make_shared<ConnectToPeer>
-                        (TransportAddress(addr, port))->requestStart();
+                    TransportAddress peer_addr(addr, port);
+                    std::string peer_addr_str = peer_addr.toString();
+                    if (sl->m_pending_peer_connection.find(peer_addr_str) !=
+                        sl->m_pending_peer_connection.end())
+                    {
+                        continue;
+                    }
+                    std::make_shared<ConnectToPeer>(peer_addr)->requestStart();
+                    sl->addPeerConnection(peer_addr_str);
                 }
             }
-            if (keys.empty())
-                return;
-            sl->addAndReplaceKeys(keys);
+            sl->replaceKeys(keys);
         }
     public:
         PollServerRequest(std::shared_ptr<ServerLobby> sl)

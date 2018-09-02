@@ -35,7 +35,8 @@
 #include "utils/log.hpp"
 
 #include <algorithm>
-
+// ============================================================================
+std::weak_ptr<bool> ConnectToServer::m_previous_unjoin;
 // ----------------------------------------------------------------------------
 /** Specify server to connect to.
  *  \param server Server to connect to (if nullptr than we use quick play).
@@ -56,6 +57,16 @@ ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
  */
 ConnectToServer::~ConnectToServer()
 {
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (!cl && m_server->supportsEncryption())
+    {
+        Online::XMLRequest* request =
+            new Online::XMLRequest(true/*manager_memory*/);
+        NetworkConfig::get()->setServerDetails(request,
+            "clear-user-joined-server");
+        request->queue();
+        m_previous_unjoin = request->observeExistence();
+    }
 }   // ~ConnectToServer
 
 // ----------------------------------------------------------------------------
@@ -82,9 +93,17 @@ void ConnectToServer::asynchronousUpdate()
             if (!m_server)
             {
                 while (!ServersManager::get()->refresh(false))
+                {
+                    if (ProtocolManager::lock()->isExiting())
+                        return;
                     StkTime::sleep(1);
+                }
                 while (!ServersManager::get()->listUpdated())
+                {
+                    if (ProtocolManager::lock()->isExiting())
+                        return;
                     StkTime::sleep(1);
+                }
                 auto servers = std::move(ServersManager::get()->getServers());
 
                 // Remove password protected servers
@@ -342,7 +361,14 @@ bool ConnectToServer::handleDirectConnect(int timeout)
 void ConnectToServer::registerWithSTKServer()
 {
     // Our public address is now known, register details with
-    // STK server.
+    // STK server. If previous unjoin request is not finished, wait
+    if (!m_previous_unjoin.expired())
+    {
+        if (ProtocolManager::lock()->isExiting())
+            return;
+        StkTime::sleep(1);
+    }
+
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest *request  = new Online::XMLRequest();
     NetworkConfig::get()->setServerDetails(request, "join-server-key");

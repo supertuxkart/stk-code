@@ -22,6 +22,7 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+#include "utils/time.hpp"
 
 #include "irrString.h"
 
@@ -114,6 +115,8 @@ private:
         std::pair<uint32_t, BareNetworkString>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_pending_connection;
 
+    std::map<std::string, uint64_t> m_pending_peer_connection;
+
     /* Ranking related variables */
     // If updating the base points, update the base points distribution in DB
     const double BASE_RANKING_POINTS   = 4000.0;
@@ -187,11 +190,27 @@ private:
             }
         }
     }
-    void addAndReplaceKeys(const std::map<uint32_t, KeyData>& new_keys)
+    void addPeerConnection(const std::string& addr_str)
+    {
+        m_pending_peer_connection[addr_str] = StkTime::getRealTimeMs();
+    }
+    void removeExpiredPeerConnection()
+    {
+        // Remove connect to peer protocol running more than a 45 seconds
+        // (from stk addons poll server request),
+        for (auto it = m_pending_peer_connection.begin();
+             it != m_pending_peer_connection.end();)
+        {
+            if (StkTime::getRealTimeMs() - it->second > 45000)
+                it = m_pending_peer_connection.erase(it);
+            else
+                it++;
+        }
+    }
+    void replaceKeys(std::map<uint32_t, KeyData>& new_keys)
     {
         std::lock_guard<std::mutex> lock(m_keys_mutex);
-        for (auto& k : new_keys)
-            m_keys[k.first] = k.second;
+        std::swap(m_keys, new_keys);
     }
     void handlePendingConnection();
     void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,

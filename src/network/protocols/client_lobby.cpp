@@ -34,6 +34,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/network_timer_synchronizer.hpp"
+#include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
@@ -96,6 +97,15 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
 ClientLobby::~ClientLobby()
 {
     clearPlayers();
+    if (m_server->supportsEncryption())
+    {
+        Online::XMLRequest* request =
+            new Online::XMLRequest(true/*manager_memory*/);
+        NetworkConfig::get()->setServerDetails(request,
+            "clear-user-joined-server");
+        request->queue();
+        ConnectToServer::m_previous_unjoin = request->observeExistence();
+    }
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
