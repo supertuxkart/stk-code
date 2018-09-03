@@ -120,11 +120,11 @@ void SoccerSetupScreen::beforeAddingWidget()
     // Add red/blue team icon above the karts
     IconButtonWidget*    red = getWidget<IconButtonWidget>("red_team");
     IconButtonWidget*    blue = getWidget<IconButtonWidget>("blue_team");
-    red->m_x = central_div->m_x + central_div->m_w/4;
-    red->m_y = central_div->m_y + red->m_h;
+    red->m_x = central_div->m_x + central_div->m_w/4 - red->m_w/2;
+    red->m_y = central_div->m_y + (int)(red->m_h * 0.5f);
 
-    blue->m_x = central_div->m_x + (central_div->m_w/4)*3;
-    blue->m_y = central_div->m_y + blue->m_h;
+    blue->m_x = central_div->m_x + (central_div->m_w/4)*3 - blue->m_w/2;
+    blue->m_y = central_div->m_y + (int)(blue->m_h * 0.5f);
 
     // Add the 3D views for the karts
     int nb_players = race_manager->getNumPlayers();
@@ -463,7 +463,7 @@ void SoccerSetupScreen::updateKartViewsLayout()
 
     // Compute/get some dimensions
     const int nb_columns = 2;   // two karts maximum per column
-    const int kart_area_width = (central_div->m_w) / 2; // size of one half of the screen
+    const int kart_area_width = (int)((central_div->m_w) / 2 * 0.8f); // size of one half of the screen with some margin
     const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
     const int center_x = central_div->m_x + central_div->m_w/2;
     const int center_y = central_div->m_y + central_div->m_h/2;
