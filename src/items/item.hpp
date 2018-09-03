@@ -138,7 +138,7 @@ public:
           *  \param id Index of this item in the array of all items.
           *  \param kart_id If !=-1 the kart that dropped this item; -1
           *         indicates an item that's part of the track. */
-         ItemState(ItemType type, int id=-1, AbstractKart *kart=NULL)
+         ItemState(ItemType type, int id=-1, const AbstractKart *kart=NULL)
          { 
              setType(type); 
              m_item_id        = id;
@@ -150,7 +150,6 @@ public:
     void setDisappearCounter();
     void update(int ticks);
     virtual void collected(const AbstractKart *kart);
-
          
     // -----------------------------------------------------------------------
     void reset()
@@ -326,13 +325,13 @@ private:
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                        scene::IMesh* mesh, scene::IMesh* lowres_mesh,
+                       const AbstractKart *owner,
                        bool is_predicted=false);
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();
     void          updateGraphics(float dt);
     virtual void  collected(const AbstractKart *kart) OVERRIDE;
-    void          setParent(const AbstractKart* parent);
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
     void          switchBack();

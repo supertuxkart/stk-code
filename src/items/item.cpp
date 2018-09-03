@@ -107,11 +107,16 @@ void ItemState::collected(const AbstractKart *kart)
  *  \param normal The normal upon which the item is placed (so that it can
  *         be aligned properly with the ground).
  *  \param mesh The mesh to be used for this item.
+ *  \param owner 'Owner' of this item, i.e. the kart that drops it. This is
+ *         used to deactivate this item for the owner, i.e. avoid that a kart
+ *         'collects' its own bubble gum. NULL means no owner, and the item
+ *         can be collected immediatley by any kart.
  *  \param is_predicted True if the creation of the item is predicted by
  *         a client. Only used in networking.
  */
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           scene::IMesh* mesh, scene::IMesh* lowres_mesh, bool is_predicted)
+           scene::IMesh* mesh, scene::IMesh* lowres_mesh,
+           const AbstractKart *owner, bool is_predicted)
     : ItemState(type)
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
@@ -158,6 +163,11 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
+    if (owner)
+    {
+        m_previous_owner = owner;
+        ItemState::setDeactivatedTicks(stk_config->time2Ticks(1.5f));
+    }
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
@@ -319,17 +329,6 @@ void Item::reset()
         m_node->setVisible(true);
     }
 }   // reset
-
-//-----------------------------------------------------------------------------
-/** Sets which karts dropped an item. This is used to avoid that a kart is
- *  affected by its own items.
- *  \param parent Kart that dropped the item.
- */
-void Item::setParent(const AbstractKart* parent)
-{
-    m_previous_owner = parent;
-    ItemState::setDeactivatedTicks(stk_config->time2Ticks(1.5f));
-}   // setParent
 
 // ----------------------------------------------------------------------------
 /** Updated the item - rotates it, takes care of items coming back into

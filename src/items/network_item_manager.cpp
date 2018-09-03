@@ -267,6 +267,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // From here the replay can happen.
 
     // 1) Remove predicted items:
+    // --------------------------
     for (unsigned int i=0; i<m_all_items.size(); i++)
     {
         Item *item = m_all_items[i];
@@ -274,20 +275,21 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         {
             deleteItem(item);
         }
-    }
+    }   // for i in m_all_items
 
     // 2) Apply all events to current confirmed state:
+    // -----------------------------------------------
     int current_time = m_confirmed_state_time;
     bool has_state = count > 0;
     while(count > 0)
     {
-        // 1) Decode the event in the message
-        // ----------------------------------
+        // 2.1) Decode the event in the message
+        // ------------------------------------
         ItemEventInfo iei(buffer, &count);
 
-        // 2) If the event needs to be applied, forward
-        //    the time to the time of this event:
-        // --------------------------------------------
+        // 2.2) If the event needs to be applied, forward
+        //      the time to the time of this event:
+        // ----------------------------------------------
         int dt = iei.getTicks() - current_time;
         // Skip an event that are 'in the past' (i.e. have been sent again by
         // the server because it has not yet received confirmation from all
@@ -331,7 +333,9 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         current_time = iei.getTicks();
     }   // while count >0
 
-    // Inform the server which events have been received.
+    // Inform the server which events have been received (if there has
+    // been any updates - no need to send messages if nothing has changed)
+
     if (has_state)
     {
         if (auto gp = GameProtocol::lock())
@@ -342,8 +346,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     int dt = World::getWorld()->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
 
-    // Restore the state to the current world time:
-    // ============================================
+    // 3. Restore the state to the current world time:
+    // ===============================================
 
     for(unsigned int i=0; i<m_confirmed_state.size(); i++)
     {
@@ -358,6 +362,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                                          &xyz);
             item_new->setPredicted(false);
             item_new->setItemId(i);
+            item_new->setDeactivatedTicks(is->getDeactivatedTicks());
             m_all_items[i] = item_new;
             *((ItemState*)m_all_items[i]) = *is;
         }

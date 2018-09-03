@@ -286,9 +286,7 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
     }
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type]);
-
-    if(kart != NULL) item->setParent(kart);
+                          m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
     insertItem(item);
     if(m_switch_ticks>=0)
     {
@@ -318,7 +316,7 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type]);
+                          m_item_lowres_mesh[mesh_type], /*prev_owner*/NULL);
 
     insertItem(item);
     if (m_switch_ticks >= 0)
