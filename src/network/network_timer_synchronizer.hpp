@@ -20,11 +20,12 @@
 #define HEADER_NETWORK_TIMER_SYNCHRONIZER_HPP
 
 #include "config/user_config.hpp"
+#include "network/stk_host.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
-#include "main_loop.hpp"
 
+#include <atomic>
 #include <cstdlib>
 #include <deque>
 #include <numeric>
@@ -35,17 +36,46 @@ class NetworkTimerSynchronizer
 private:
     std::deque<std::tuple<uint32_t, uint64_t, uint64_t> > m_times;
 
-    bool m_synchronised = false;
+    std::atomic_bool m_synchronised, m_force_set_timer;
+
 public:
+    NetworkTimerSynchronizer()
+    {
+        m_synchronised.store(false);
+        m_force_set_timer.store(false);
+    }
     // ------------------------------------------------------------------------
-    bool isSynchronised() const                      { return m_synchronised; }
+    bool isSynchronised() const               { return m_synchronised.load(); }
+    // ------------------------------------------------------------------------
+    void enableForceSetTimer()
+    {
+        if (m_synchronised.load() == true)
+            return;
+        m_force_set_timer.store(true);
+    }
     // ------------------------------------------------------------------------
     void addAndSetTime(uint32_t ping, uint64_t server_time)
     {
-        if (m_synchronised)
+        if (m_synchronised.load() == true)
             return;
 
+        if (m_force_set_timer.load() == true)
+        {
+            m_force_set_timer.store(false);
+            m_synchronised.store(true);
+            STKHost::get()->setNetworkTimer(server_time + (uint64_t)(ping / 2));
+            return;
+        }
+
         const uint64_t cur_time = StkTime::getRealTimeMs();
+        // Discard too close time compared to last ping
+        // (due to resend when packet loss)
+        const uint64_t frequency = (uint64_t)((1.0f /
+            (float)(stk_config->m_network_state_frequeny)) * 1000.0f) / 2;
+        if (!m_times.empty() &&
+            cur_time - std::get<2>(m_times.back()) < frequency)
+            return;
+
         // Take max 20 averaged samples from m_times, the next addAndGetTime
         // is used to determine that server_time if it's correct, if not
         // clear half in m_times until it's correct
@@ -62,10 +92,11 @@ public:
             const int64_t server_time_now = server_time + (uint64_t)(ping / 2);
             int difference = (int)std::abs(averaged_time - server_time_now);
             if (std::abs(averaged_time - server_time_now) <
-                UserConfigParams::m_timer_sync_tolerance)
+                UserConfigParams::m_timer_sync_difference_tolerance)
             {
-                main_loop->setNetworkTimer(averaged_time);
-                m_synchronised = true;
+                STKHost::get()->setNetworkTimer(averaged_time);
+                m_force_set_timer.store(false);
+                m_synchronised.store(true);
                 Log::info("NetworkTimerSynchronizer", "Network "
                     "timer synchronized, difference: %dms", difference);
                 return;

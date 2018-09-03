@@ -127,7 +127,7 @@ void SPMeshBuffer::uploadGLMesh()
         {
             m_textures[i][j] = SPTextureManager::get()->getTexture
                 (m_shaders[0]->hasTextureLayer(j) ?
-                    std::get<2>(m_stk_material[i])->getSamplerPath(j) : "",
+                std::get<2>(m_stk_material[i])->getSamplerPath(j) : "",
                 j == 0 ? std::get<2>(m_stk_material[i]) : NULL,
                 m_shaders[0]->isSrgbForTextureLayer(j),
                 std::get<2>(m_stk_material[i])->getContainerId());
@@ -469,10 +469,22 @@ void SPMeshBuffer::reloadTextureCompare()
 void SPMeshBuffer::setSTKMaterial(Material* m)
 {
     m_stk_material[0] = std::make_tuple(0u, getIndexCount(), m);
-    m_shaders[0] = SPShaderManager::get()->getSPShader(
-        std::get<2>(m_stk_material[0])->getShaderName());
-    m_shaders[1] = SPShaderManager::get()->getSPShader(
-        std::get<2>(m_stk_material[0])->getShaderName() + "_skinned");
+    const std::string shader_name =
+        std::get<2>(m_stk_material[0])->getShaderName();
+    const std::string skinned_shader_name =
+        std::get<2>(m_stk_material[0])->getShaderName() + "_skinned";
+
+    m_shaders[0] = SPShaderManager::get()->getSPShader(shader_name);
+    if (!m_shaders[0])
+    {
+        Log::warn("SPMeshBuffer", "%s shader is missing, fallback to solid",
+            shader_name.c_str());
+        m_shaders[0] = SPShaderManager::get()->getSPShader("solid");
+    }
+
+    m_shaders[1] = SPShaderManager::get()->getSPShader(skinned_shader_name);
+    if (!m_shaders[1])
+        m_shaders[1] = SPShaderManager::get()->getSPShader("solid_skinned");
 }   // setSTKMaterial
 
 }

@@ -84,6 +84,8 @@ protected:
     bool m_official;
 
     bool m_supports_encrytion;
+
+    bool m_game_started;
 public:
 
          /** Initialises the object from an XML node. */
@@ -91,7 +93,7 @@ public:
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
                 unsigned server_mode, const TransportAddress &address,
-                bool password_protected);
+                bool password_protected, bool game_started);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
@@ -134,6 +136,7 @@ public:
     bool supportsEncryption() const            { return m_supports_encrytion; }
     // ------------------------------------------------------------------------
     bool isOfficial() const                              { return m_official; }
-
+    // ------------------------------------------------------------------------
+    bool isGameStarted() const                       { return m_game_started; }
 };   // Server
 #endif // HEADER_SERVER_HPP

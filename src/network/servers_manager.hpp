@@ -45,7 +45,7 @@ private:
     /** List of broadcast addresses to use. */
     std::vector<TransportAddress> m_broadcast_address;
 
-    std::atomic<float> m_last_load_time;
+    std::atomic<uint64_t> m_last_load_time;
 
     std::atomic_bool m_list_updated;
     // ------------------------------------------------------------------------

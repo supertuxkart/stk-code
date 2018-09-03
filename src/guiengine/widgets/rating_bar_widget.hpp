@@ -73,7 +73,7 @@ namespace GUIEngine
 
         void setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect);
 
-        virtual void onClick();
+        virtual EventPropagation onClick();
 
         void allowVoting() { m_allow_voting = true; }
     };

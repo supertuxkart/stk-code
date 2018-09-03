@@ -135,7 +135,7 @@ bool TracksScreen::onEscapePressed()
 void TracksScreen::tearDown()
 {
     m_network_tracks = false;
-    m_vote_timeout = -1.0f;
+    m_vote_timeout = std::numeric_limits<uint64_t>::max();
     m_selected_track = NULL;
 }   // tearDown
 
@@ -418,9 +418,9 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 // -----------------------------------------------------------------------------
 void TracksScreen::setVoteTimeout(float timeout)
 {
-    if (m_vote_timeout != -1.0f)
+    if (m_vote_timeout != std::numeric_limits<uint64_t>::max())
         return;
-    m_vote_timeout = (float)StkTime::getRealTime() + timeout;
+    m_vote_timeout = StkTime::getRealTimeMs() + (uint64_t)(timeout * 1000.0f);
 }   // setVoteTimeout
 
 // -----------------------------------------------------------------------------
@@ -442,8 +442,23 @@ void TracksScreen::voteForPlayer()
 
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
-    vote.encodeString(m_selected_track->getIdent())
-        .addUInt8(m_laps->getValue()).addUInt8(m_reversed->getState());
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(0).addUInt8(m_reversed->getState() ? 1 : 0);
+    }
+    else if (race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(0).addUInt8(0);
+    }
+    else
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(m_laps->getValue())
+            .addUInt8(m_reversed->getState() ? 1 : 0);
+    }
     STKHost::get()->sendToServer(&vote, true);
 }   // voteForPlayer
 
@@ -451,14 +466,14 @@ void TracksScreen::voteForPlayer()
 void TracksScreen::onUpdate(float dt)
 {
     assert(m_votes);
-    if (m_vote_timeout == -1.0f)
+    if (m_vote_timeout == std::numeric_limits<uint64_t>::max())
     {
         m_votes->setText(L"", false);
         return;
     }
 
     m_votes->setVisible(true);
-    int remaining_time = (int)(m_vote_timeout - StkTime::getRealTime());
+    int remaining_time = (m_vote_timeout - StkTime::getRealTimeMs()) / 1000;
     if (remaining_time < 0)
         remaining_time = 0;
     //I18N: In tracks screen, about voting of tracks in network

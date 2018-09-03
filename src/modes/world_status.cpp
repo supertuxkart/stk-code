@@ -49,7 +49,6 @@ WorldStatus::WorldStatus()
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
-    m_server_is_ready.store(false);
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
@@ -96,10 +95,6 @@ void WorldStatus::reset()
 
     // Set the right music
     Track::getCurrentTrack()->startMusic();
-    // In case of a networked race the race can only start once
-    // all protocols are up. This flag is used to wait for
-    // a confirmation before starting the actual race.
-    m_server_is_ready.store(false);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -271,25 +266,13 @@ void WorldStatus::updateTime(int ticks)
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
         {
-            // Wait for all players to finish loading world
             auto lobby = LobbyProtocol::get<LobbyProtocol>();
-            assert(lobby);
-            if (!lobby->allPlayersReady())
-                return;
-            // This stage is only reached in case of a networked game.
-            // The server waits for a confirmation from
-            // each client that they have started (to guarantee that the
-            // server is running with a local time behind all clients).
-            if (m_play_ready_set_go_sounds)
-                m_prestart_sound->play();
-
-            if (NetworkConfig::get()->isServer() &&
-                m_server_is_ready.load() == false) return;
-
-            m_phase = READY_PHASE;
-            auto cl = LobbyProtocol::get<ClientLobby>();
-            if (cl)
-                cl->startingRaceNow();
+            if (lobby && lobby->isRacing())
+            {
+                if (m_play_ready_set_go_sounds)
+                    m_prestart_sound->play();
+                m_phase = READY_PHASE;
+            }
             return;   // Don't increase time
         }
         case READY_PHASE:
@@ -462,19 +445,6 @@ void WorldStatus::updateTime(int ticks)
         default: break;
     }   // switch m_phase
 }   // update
-
-//-----------------------------------------------------------------------------
-/** Called on the client when it receives a notification from the server that
- *  all clients (and server) are ready to start the race. The server will
- *  then additionally wait for all clients to report back that they are
- *  starting, which guarantees that the server is running far enough behind
- *  clients time that at server time T all events from the clients at time
- *  T have arrived, minimising rollback impact.
- */
-void WorldStatus::startReadySetGo()
-{
-    m_server_is_ready.store(true);
-}   // startReadySetGo
 
 //-----------------------------------------------------------------------------
 /** Sets the time for the clock.

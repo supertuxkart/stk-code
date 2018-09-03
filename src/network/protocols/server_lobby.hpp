@@ -46,12 +46,11 @@ public:
     {
         SET_PUBLIC_ADDRESS,       // Waiting to receive its public ip address
         REGISTER_SELF_ADDRESS,    // Register with STK online server
-        ACCEPTING_CLIENTS,        // In lobby, accepting clients
+        WAITING_FOR_START_GAME,   // In lobby, waiting for (auto) start game
         SELECTING,                // kart, track, ... selection started
         LOAD_WORLD,               // Server starts loading world
         WAIT_FOR_WORLD_LOADED,    // Wait for clients and server to load world
         WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
-        DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
         WAIT_FOR_RACE_STOPPED,    // Wait server for stopping all race protocols
         RESULT_DISPLAY,           // Show result screen
@@ -83,18 +82,12 @@ private:
     std::atomic_bool m_server_has_loaded_world;
 
     /** Counts how many peers have finished loading the world. */
-    std::map<std::weak_ptr<STKPeer>, std::pair<bool, double>,
+    std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
     /** Vote from each peer. */
     std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
-
-    /** Keeps track of an artificial server delay, which is used to compensate
-     *  for network jitter. */
-    double m_server_delay;
-
-    double m_server_max_ping;
 
     bool m_has_created_server_id_file;
 
@@ -102,7 +95,7 @@ private:
     std::weak_ptr<bool> m_server_unregistered;
 
     /** Timeout counter for various state. */
-    std::atomic<float> m_timeout;
+    std::atomic<int64_t> m_timeout;
 
     /** Lock this mutex whenever a client is connect / disconnect or
      *  starting race. */
@@ -143,6 +136,12 @@ private:
 
     NetworkString* m_result_ns;
 
+    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_waiting_players;
+
+    std::atomic<uint32_t> m_waiting_players_counts;
+
+    bool m_registered_for_once_only;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -153,13 +152,12 @@ private:
     void playerFinishedResult(Event *event);
     bool registerServer();
     void finishedLoadingWorldClient(Event *event);
-    void startedRaceOnClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
     void unregisterServer(bool now);
     void createServerIdFile();
-    void updatePlayerList(bool force_update = false);
+    void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
     bool checkPeersReady() const
     {
@@ -168,7 +166,7 @@ private:
         {
             if (p.first.expired())
                 continue;
-            all_ready = all_ready && p.second.first;
+            all_ready = all_ready && p.second;
             if (!all_ready)
                 return false;
         }
@@ -184,8 +182,7 @@ private:
             }
             else
             {
-                it->second.first = false;
-                it->second.second = 0.0;
+                it->second = false;
                 it++;
             }
         }
@@ -220,6 +217,10 @@ private:
     void checkRaceFinished();
     void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
     std::pair<int, float> getHitCaptureLimit(float num_karts);
+    void configPeersStartTime();
+    void updateWaitingPlayers();
+    void resetServer();
+    void addWaitingPlayersToGame();
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -230,16 +231,18 @@ public:
     virtual void update(int ticks) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
 
-    void signalRaceStartToClients();
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();
-    virtual bool waitingForPlayers() const OVERRIDE;
+    bool waitingForPlayers() const;
+    uint32_t getWaitingPlayersCount() const
+                                    { return m_waiting_players_counts.load(); }
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
+    bool allowJoinedPlayersWaiting() const;
 
 };   // class ServerLobby
 

@@ -267,7 +267,7 @@ void CreateServerScreen::createServer()
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        0, server_address, !password.empty());
+        0, server_address, !password.empty(), false);
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER

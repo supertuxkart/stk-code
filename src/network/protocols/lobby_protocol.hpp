@@ -26,6 +26,7 @@ class NetworkPlayerProfile;
 
 #include <cassert>
 #include <memory>
+#include <thread>
 #include <vector>
 
 /*!
@@ -51,7 +52,6 @@ public:
         LE_CLIENT_LOADED_WORLD,           // Client finished loading world
         LE_LOAD_WORLD,                    // Clients should load world
         LE_START_RACE,                    // Server to client to start race
-        LE_STARTED_RACE,                  // Client to server that it has started race
         LE_START_SELECTION,               // inform client to start selection
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
@@ -76,14 +76,22 @@ public:
     };
 
 protected:
+    std::thread m_start_game_thread;
+
     static std::weak_ptr<LobbyProtocol> m_lobby;
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
+    // ------------------------------------------------------------------------
     void configRemoteKart(
      const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
-
+    // ------------------------------------------------------------------------
+    void joinStartGameThread()
+    {
+        if (m_start_game_thread.joinable())
+            m_start_game_thread.join();
+    }
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */
@@ -117,7 +125,6 @@ public:
     virtual void update(int ticks)      = 0;
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
-    virtual bool waitingForPlayers() const = 0;
     virtual bool allPlayersReady() const = 0;
     virtual bool isRacing() const = 0;
     GameSetup* getGameSetup() const { return m_game_setup; }

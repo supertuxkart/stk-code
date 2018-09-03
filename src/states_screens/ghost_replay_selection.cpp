@@ -50,6 +50,7 @@ GhostReplaySelection::~GhostReplaySelection()
 // ----------------------------------------------------------------------------
 void GhostReplaySelection::tearDown()
 {
+    m_replay_list_widget->setIcons(NULL);
     delete m_icon_bank;
     m_icon_bank = NULL;
 }

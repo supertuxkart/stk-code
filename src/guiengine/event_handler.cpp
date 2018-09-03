@@ -821,7 +821,10 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     return EVENT_BLOCK;
                 }
 
-                w->onClick();
+                EventPropagation result = w->onClick();
+                
+                if (result == EVENT_BLOCK)
+                    return result;
 
                 // These events are only triggered by mouse (or so I hope)
                 // The player that owns the mouser receives "game master" priviledges

@@ -42,6 +42,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
+#include "utils/time.hpp"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -66,8 +67,6 @@ LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
 MainLoop::MainLoop(unsigned parent_pid)
         : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
 {
-    m_network_timer.store(StkTime::getRealTimeMs());
-    m_start_game_ticks.store(0);
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
@@ -113,11 +112,9 @@ float MainLoop::getLimitedDt()
         return 1.0f/60.0f;
     }
 
-    IrrlichtDevice* device = irr_driver->getDevice();
-
     while( 1 )
     {
-        m_curr_time = device->getTimer()->getRealTime();
+        m_curr_time = StkTime::getRealTimeMs();
         dt = (float)(m_curr_time - m_prev_time);
         // On a server (i.e. without graphics) the frame rate can be under
         // 1 ms, i.e. dt = 0. Additionally, the resolution of a sleep
@@ -133,7 +130,7 @@ float MainLoop::getLimitedDt()
         while (dt <= 0 && !ProfileWorld::isProfileMode())
         {
             StkTime::sleep(1);
-            m_curr_time = device->getTimer()->getRealTime();
+            m_curr_time = StkTime::getRealTimeMs();
             dt = (float)(m_curr_time - m_prev_time);
         }
 
@@ -281,9 +278,7 @@ void MainLoop::updateRace(int ticks)
  */
 void MainLoop::run()
 {
-    IrrlichtDevice* device = irr_driver->getDevice();
-
-    m_curr_time = device->getTimer()->getRealTime();
+    m_curr_time = StkTime::getRealTimeMs();
     // DT keeps track of the leftover time, since the race update
     // happens in fixed timesteps
     float left_over_time = 0;
@@ -494,19 +489,5 @@ void MainLoop::abort()
 {
     m_abort = true;
 }   // abort
-
-//-----------------------------------------------------------------------------
-/** Set game start ticks told by server somewhere in the future.
- */
-void MainLoop::setStartNetworkGameTimer(uint64_t ticks)
-{
-    uint64_t ticks_now = getNetworkTimer();
-    if (ticks < ticks_now)
-    {
-        Log::warn("MainLoop", "Network timer is too slow to catch up");
-        ticks = ticks_now;
-    }
-    m_start_game_ticks.store(ticks);
-}   // setStartNetworkGameTimer
 
 /* EOF */

@@ -60,6 +60,7 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
     m_address.setPort(port);
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
+    xml.get("game_started", &m_game_started);
     xml.get("distance", &m_distance);
     m_server_owner_name = L"-";
     m_server_owner_lower_case_name = "-";
@@ -118,10 +119,12 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
  *  \param server_mode The game modes of server (including minor and major).
  *  \param address IP and port of the server.
  *  \param password_protected True if can only be joined with a password.
+ *  \param game_started True if there is already game begun in server.
  */
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                int current_players, unsigned difficulty, unsigned server_mode,
-               const TransportAddress &address, bool password_protected)
+               const TransportAddress &address, bool password_protected,
+               bool game_started)
       : m_supports_encrytion(false)
 {
     m_name               = name;
@@ -138,6 +141,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_password_protected = password_protected;
     m_distance = 0.0f;
     m_official = false;
+    m_game_started = game_started;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------

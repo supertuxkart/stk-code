@@ -32,6 +32,15 @@ namespace GUIEngine
     class LabelWidget;
     class ListWidget;
 }
+
+namespace irr
+{
+    namespace gui
+    {
+        class STKModifiedSpriteBank;
+    }
+}
+
 class Server;
 
 /**
@@ -51,9 +60,11 @@ private:
     std::vector<std::shared_ptr<Server> > m_servers;
 
     GUIEngine::CheckBoxWidget* m_private_server;
+    GUIEngine::CheckBoxWidget* m_game_started;
     GUIEngine::IconButtonWidget* m_reload_widget;
     GUIEngine::LabelWidget* m_update_status;
     GUIEngine::ListWidget* m_server_list_widget;
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
 
     /** \brief To check (and set) if sort order is descending **/
     bool m_sort_desc;
@@ -85,6 +96,8 @@ public:
     virtual void init() OVERRIDE;
 
     virtual void tearDown() OVERRIDE;
+
+    virtual void unloaded() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;

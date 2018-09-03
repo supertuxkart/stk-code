@@ -328,6 +328,8 @@ public:
     virtual const std::string& getIdent() const OVERRIDE;
 
     virtual void update(int ticks) OVERRIDE;
+
+    bool shouldDrawTimer() const OVERRIDE { return !isStartPhase(); }
     // ------------------------------------------------------------------------
     void onCheckGoalTriggered(bool first_goal);
     // ------------------------------------------------------------------------

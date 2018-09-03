@@ -230,13 +230,13 @@ void RaceGUI::renderGlobal(float dt)
 
     World *world = World::getWorld();
     assert(world != NULL);
-    if(world->getPhase() >= WorldStatus::READY_PHASE &&
+    if(world->getPhase() >= WorldStatus::WAIT_FOR_SERVER_PHASE &&
        world->getPhase() <= WorldStatus::GO_PHASE      )
     {
         drawGlobalReadySetGo();
     }
     if(world->getPhase() == World::GOAL_PHASE)
-            drawGlobalGoal();
+        drawGlobalGoal();
 
     // MiniMap is drawn when the players wait for the start countdown to end
     drawGlobalMiniMap();
@@ -245,13 +245,11 @@ void RaceGUI::renderGlobal(float dt)
     if(!world->isRacePhase()) return;
     if (!m_enabled) return;
 
+    //drawGlobalTimer checks if it should display in the current phase/mode
+    drawGlobalTimer();
 
     if (!m_is_tutorial)
     {
-        //stop displaying timer as soon as race is over
-        if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
-           drawGlobalTimer();
-
         if (race_manager->isLinearRaceMode() &&
             race_manager->hasGhostKarts() &&
             race_manager->getNumberOfKarts() >= 2 )

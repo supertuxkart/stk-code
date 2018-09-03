@@ -2,12 +2,12 @@
 <stkgui>
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
-    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
+    <div x="2%" y="2%" width="96%" height="98%" layout="vertical-row">
         <header id="name" height="7%" width="80%" align="center" text_align="center"/>
 
         <spacer width="1" height="1%"/>
 
-        <box width="100%" height="40%" padding="10" layout="horizontal-row">
+        <box width="100%" height="42%" padding="10" layout="horizontal-row">
             <!-- Left pane -->
             <div proportion="1" height="100%" layout="vertical-row">
                 <icon-button proportion="1" width="100%" height="100%" id="screenshot" custom_ratio="1.33333"/>
@@ -24,7 +24,7 @@
                     <label id="highscore1" proportion="1" text="(Empty)"/>
                 </div>
 
-                <spacer width="1" height="2%"/>
+                <spacer width="1" height="1%"/>
 
                 <div width="95%" height="fit" layout="horizontal-row">
                     <icon id="iconscore2" icon="gui/random_kart.png" width="font" height="font"/>
@@ -32,12 +32,28 @@
                     <label id="highscore2" proportion="1" text="(Empty)"/>
                 </div>
 
-                <spacer width="1" height="2%"/>
+                <spacer width="1" height="1%"/>
 
                 <div width="95%" height="fit" layout="horizontal-row">
                     <icon id="iconscore3" icon="gui/random_kart.png" width="font" height="font"/>
                     <spacer width="2%" height="1"/>
                     <label id="highscore3" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="1%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore4" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore4" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="1%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore5" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore5" proportion="1" text="(Empty)"/>
                 </div>
 
                 <spacer width="1" height="2%"/>
@@ -50,7 +66,7 @@
 
         </box>
         <spacer width="1" height="1%"/>
-        <box width="100%" height="33%" padding="15" layout="vertical-row">
+        <box width="100%" height="32%" padding="15" layout="vertical-row">
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label id="lap-text" proportion="1" I18N="In the track info screen" text="Number of laps" text_align="right"/>
                 <spacer width="40"/>
@@ -90,7 +106,7 @@
             <spacer width="1" height="1%"/>
         </box>
         <spacer width="1" height="1%"/>
-        <buttonbar id="buttons" height="15%" width="100%" align="center">
+        <buttonbar id="buttons" height="14%" width="100%" align="center">
             <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
                     I18N="In the track info screen" text="Start Race"/>
 

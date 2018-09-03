@@ -74,7 +74,7 @@ private:
     float m_cur_starting_timer, m_start_threshold, m_start_timeout,
         m_server_max_player;
 
-    bool m_allow_change_team;
+    bool m_allow_change_team, m_has_auto_start_in_server;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;

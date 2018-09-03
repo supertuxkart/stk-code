@@ -574,6 +574,7 @@ void cmdLineHelp()
     "  -v,  --version          Print version of SuperTuxKart.\n"
     "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
+    "       --seed=n           Seed for random number generation to provide reproducible behavior.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
@@ -906,6 +907,12 @@ int handleCmdLinePreliminary()
 
     if (CommandLine::has("--no-sound"))
         UserConfigParams::m_enable_sound = false;
+
+    if (CommandLine::has("--seed", &n))
+    {
+        srand(n);
+        Log::info("main", "STK using random seed (%d)", n);
+    }
         
     return 0;
 }   // handleCmdLinePreliminary
@@ -1187,7 +1194,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
         auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
-            !server_password.empty());
+            !server_password.empty(), false);
         NetworkConfig::get()->addNetworkPlayer(
             input_manager->getDeviceManager()->getLatestUsedDevice(),
             PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);

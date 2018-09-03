@@ -26,6 +26,7 @@
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/time.hpp"
 
 #include "irrString.h"
 
@@ -37,6 +38,7 @@
 
 #include <atomic>
 #include <list>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -119,7 +121,7 @@ private:
     std::atomic_bool m_authorised;
 
     /** Use as a timeout to waiting a disconnect event when exiting. */
-    std::atomic<double> m_exit_timeout;
+    std::atomic<uint64_t> m_exit_timeout;
 
     /** An error message, which is set by a protocol to be displayed
      *  in the GUI. */
@@ -137,6 +139,8 @@ private:
     Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
 
     std::atomic<uint32_t> m_client_ping;
+
+    std::atomic<uint64_t> m_network_timer;
 
     std::unique_ptr<NetworkTimerSynchronizer> m_nts;
 
@@ -207,7 +211,13 @@ public:
     //-------------------------------------------------------------------------
     void shutdown();
     //-------------------------------------------------------------------------
+    void sendPacketToAllPeersInServer(NetworkString *data,
+                                      bool reliable = true);
+    // ------------------------------------------------------------------------
     void sendPacketToAllPeers(NetworkString *data, bool reliable = true);
+    // ------------------------------------------------------------------------
+    void sendPacketToAllPeersWith(std::function<bool(STKPeer*)> predicate,
+                                  NetworkString* data, bool reliable = true);
     // ------------------------------------------------------------------------
     /** Returns true if this client instance is allowed to control the server.
      *  It will auto transfer ownership if previous server owner disconnected.
@@ -318,7 +328,12 @@ public:
     // ------------------------------------------------------------------------
     NetworkTimerSynchronizer* getNetworkTimerSynchronizer() const
                                                         { return m_nts.get(); }
-
+    // ------------------------------------------------------------------------
+    uint64_t getNetworkTimer() const
+                  { return StkTime::getRealTimeMs() - m_network_timer.load(); }
+    // ------------------------------------------------------------------------
+    void setNetworkTimer(uint64_t ticks)
+                   { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
 };   // class STKHost
 
 #endif // STK_HOST_HPP
