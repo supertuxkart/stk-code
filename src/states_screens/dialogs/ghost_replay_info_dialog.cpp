@@ -75,7 +75,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     /* Used to display kart icons for the selected replay(s) */
     irr::gui::STKModifiedSpriteBank *icon_bank = GhostReplaySelection::getInstance()->getIconBank();
-    int icon_height = getHeight()/18.0f;
+    int icon_height = getHeight()/18;
     m_replay_info_widget->setIcons(icon_bank, (int)icon_height);
 
     updateReplayDisplayedInfo();

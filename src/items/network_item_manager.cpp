@@ -137,17 +137,17 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
     // Server: store the data for this event:
     m_item_events.lock();
     m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
-        type, item->getItemId(),
-        kart->getWorldKartId(),
-        kart->getXYZ());
+                                         type, item->getItemId(),
+                                         kart->getWorldKartId(),
+                                         kart->getXYZ() );
     m_item_events.unlock();
     return item;
 }   // newItem
 
 // ----------------------------------------------------------------------------
 /** Called by the GameProtocol when a confirmation for an item event is
- *  received by a host. Once all hosts have confirmed an event, it can be
- *  deleted and won't be send to any clients again.
+ *  received by the server. Once all hosts have confirmed an event, it can be
+ *  deleted and won't be sent to any clients again.
  *  \param peer Peer confirming the latest event time received.
  *  \param ticks Time at which the last event was received.
  */
@@ -251,8 +251,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // forward this confirmed state to the current time (i.e. world time).
     // This is done in several steps:
     // 1) First remove all client-side predicted items from the list of all
-    //    items, and store them for now in a predictem_item cache. Predicted
-    //    item only happen between m_confirmed_state_time and 'now'.
+    //    items. Predicted item only happen between m_confirmed_state_time
+    //    and 'now'.
     // 2) Apply all events included in this state to the confirmed state.
     //    a) When a collection event is found, adjust the confirmed item state
     //       only (this state will later be copied to the current item state).
@@ -338,7 +338,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
     }
 
-    // Forward the confirmed item state till the world time:
+    // Forward the confirmed item state to the world time:
     int dt = World::getWorld()->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
 
@@ -359,6 +359,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             item_new->setPredicted(false);
             item_new->setItemId(i);
             m_all_items[i] = item_new;
+            *((ItemState*)m_all_items[i]) = *is;
         }
         else if (!is && item)
         {

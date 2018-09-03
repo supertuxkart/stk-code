@@ -160,7 +160,7 @@ void GhostReplaySelection::init()
 
     m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
 
-    int icon_height = getHeight()/24.0f;
+    int icon_height = getHeight()/24;
     // 128 is the height of the image file
     //FIXME : this isn't guaranteed
     // Amanda's icon is 300x300

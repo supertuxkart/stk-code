@@ -308,12 +308,13 @@ void Track::cleanup()
     Graph::destroy();
     ItemManager::destroy();
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics())
-    {
-        CPUParticleManager::getInstance()->cleanMaterialMap();
-    }
     if (CVS->isGLSL())
     {
+        if (!ProfileWorld::isNoGraphics())
+        {
+            CPUParticleManager::getInstance()->cleanMaterialMap();
+        }
+        
         SP::resetEmptyFogColor();
     }
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();

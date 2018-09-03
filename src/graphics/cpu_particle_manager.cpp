@@ -137,6 +137,8 @@ CPUParticleManager::GLParticle::GLParticle(bool flips)
 // ----------------------------------------------------------------------------
 CPUParticleManager::CPUParticleManager()
 {
+    assert(CVS->isGLSL());
+    
     const float vertices[] =
     {
         -0.5f, 0.5f, 0.0f, 0.0f,
@@ -150,11 +152,8 @@ CPUParticleManager::CPUParticleManager()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     // For preloading shaders
-    if (CVS->isGLSL())
-    {
-        ParticleRenderer::getInstance();
-        AlphaTestParticleRenderer::getInstance();
-    }
+    ParticleRenderer::getInstance();
+    AlphaTestParticleRenderer::getInstance();
 }   // CPUParticleManager
 
 // ----------------------------------------------------------------------------
