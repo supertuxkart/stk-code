@@ -89,7 +89,7 @@ protected:
 public:
 
          /** Initialises the object from an XML node. */
-         Server(const XMLNode &xml);
+         Server(const XMLNode& server_info);
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
                 unsigned server_mode, const TransportAddress &address,

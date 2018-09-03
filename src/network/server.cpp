@@ -29,9 +29,9 @@
  *  \param xml The data for one server as received as part of the
  *         get-all stk-server request.
  */
-Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
+Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
 {
-    assert(xml.getName() == "server");
+    const XMLNode& xml = *server_info.getNode("server-info");
 
     m_name = "";
     m_server_id = 0;
