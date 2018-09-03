@@ -750,6 +750,7 @@ void STKHost::mainLoop()
             }
 
             ENetPacket* packet = NULL;
+            bool need_destroy_packet = true;
             if (need_ping)
             {
                 m_peer_pings.getData().clear();
@@ -792,6 +793,7 @@ void STKHost::mainLoop()
                     (!sl->allowJoinedPlayersWaiting() ||
                     !sl->isRacing() || it->second->isWaitingForGame()))
                 {
+                    need_destroy_packet = false;
                     enet_peer_send(it->first, EVENT_CHANNEL_UNENCRYPTED, packet);
                 }
 
@@ -814,6 +816,8 @@ void STKHost::mainLoop()
                 }
             }
             peer_lock.unlock();
+            if (need_destroy_packet && packet != NULL)
+                enet_packet_destroy(packet);
         }
 
         std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
