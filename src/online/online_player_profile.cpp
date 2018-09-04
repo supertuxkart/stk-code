@@ -459,6 +459,48 @@ namespace Online
                     OnlineProfileFriends::getInstance()->refreshFriendsList();
                 }
             }
+
+            std::map<uint32_t, core::stringw> friend_server_map;
+            for (unsigned int i = 0; i < getXMLData()->getNumNodes(); i++)
+            {
+                const XMLNode * node = getXMLData()->getNode(i);
+                if (node->getName() == "friend-in-server")
+                {
+                    uint32_t id = 0;
+                    core::stringw server_name;
+                    node->get("id", &id);
+                    node->get("name", &server_name);
+                    friend_server_map[id] = server_name;
+                }
+            }
+            std::vector<std::pair<core::stringw, core::stringw> >
+                friend_server_notify;
+            std::map<uint32_t, core::stringw>& cur_friend_server_map =
+                PlayerManager::getCurrentPlayer()->getProfile()
+                ->getFriendServerMap();
+            for (auto& p : friend_server_map)
+            {
+                if (friend_server_notify.size() > 3)
+                    break;
+                uint32_t uid = p.first;
+                const core::stringw& server_name = p.second;
+                if (cur_friend_server_map.find(uid) ==
+                    cur_friend_server_map.end() ||
+                    cur_friend_server_map.at(uid) != server_name)
+                {
+                    friend_server_notify.emplace_back(ProfileManager::get()
+                        ->getProfileByID(uid)->getUserName(), server_name);
+                }
+            }
+            for (auto& p : friend_server_notify)
+            {
+                // I18N: Show in game to tell your friend if your friend is on
+                // any server
+                core::stringw message = _("%s is now on server \"%s\"",
+                    p.first, p.second);
+                MessageQueue::add(MessageQueue::MT_FRIEND, message);
+            }
+            std::swap(cur_friend_server_map, friend_server_map);
         }
         else
         {
