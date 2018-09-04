@@ -122,10 +122,11 @@ private:
     * and then converting this value to a Vec3. */
     Vec3 m_xyz;
 
-protected:
     /** The 'owner' of the item, i.e. the kart that dropped this item.
-     *  Is NULL if the item is part of the track. */
+    *  Is NULL if the item is part of the track. */
     const AbstractKart *m_previous_owner;
+
+protected:
 
     friend class ItemManager;
     friend class NetworkItemManager;
@@ -133,23 +134,13 @@ protected:
     void setType(ItemType type) { m_type = type; }
 
 public:
-         /** Constructor. 
-          *  \param type Type of the item.
-          *  \param id Index of this item in the array of all items.
-          *  \param kart_id If !=-1 the kart that dropped this item; -1
-          *         indicates an item that's part of the track. */
-         ItemState(ItemType type, int id=-1, const AbstractKart *kart=NULL)
-         { 
-             setType(type); 
-             m_item_id        = id;
-             m_previous_owner = kart;
-         }   // ItemState(ItemType)
-             
+         ItemState(ItemType type, const AbstractKart *owner=NULL, int id = -1);
+    void initItem(ItemType type, const Vec3& xyz);
+    void update(int ticks);
+    void setDisappearCounter();
+    virtual void collected(const AbstractKart *kart);
     // ------------------------------------------------------------------------
     virtual ~ItemState() {}
-    void setDisappearCounter();
-    void update(int ticks);
-    virtual void collected(const AbstractKart *kart);
          
     // -----------------------------------------------------------------------
     void reset()
@@ -164,19 +155,6 @@ public:
             m_original_type = ITEM_NONE;
         }
     }   // reset
-
-    // -----------------------------------------------------------------------
-    /** Initialises an item.
-     *  \param type Type for this item.
-     */
-    void initItem(ItemType type, const Vec3& xyz)
-    {
-        m_xyz               = xyz;
-        m_original_type     = ITEM_NONE;
-        m_deactive_ticks    = 0;
-        m_ticks_till_return = 0;
-        setDisappearCounter();
-    }   // initItem
 
     // ------------------------------------------------------------------------
     /** Switches an item to be of a different type. Used for the switch
@@ -333,12 +311,11 @@ public:
     void          updateGraphics(float dt);
     virtual void  collected(const AbstractKart *kart) OVERRIDE;
     void          reset();
-    void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);
+    void          switchTo(ItemType type, scene::IMesh *mesh,
+                           scene::IMesh *lowmesh);
     void          switchBack();
 
-
-
-        // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is
      *  not deactivated anymore, and it wasn't placed by this kart (this is
      *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
@@ -348,7 +325,7 @@ public:
      */
     bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
-        if (m_previous_owner == kart && getDeactivatedTicks() > 0)
+        if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
             return false;
         Vec3 lc = quatRotate(m_original_rotation, xyz - getXYZ());
         // Don't be too strict if the kart is a bit above the item
@@ -369,7 +346,8 @@ protected:
     bool hitLine(const core::line3df &line,
                   const AbstractKart *kart=NULL) const
     {
-        if (m_previous_owner == kart && getDeactivatedTicks() >0) return false;
+        if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
+            return false;
 
         Vec3 closest = line.getClosestPoint(getXYZ().toIrrVector());
         return hitKart(closest, kart);

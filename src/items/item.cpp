@@ -37,6 +37,22 @@
 #include <ISceneManager.h>
 
 
+// ----------------------------------------------------------------------------
+/** Constructor.
+ *  \param type Type of the item.
+ *  \param owner If not NULL it is the kart that dropped this item; NULL
+ *         indicates an item that's part of the track.
+ *  \param id Index of this item in the array of all items.
+ */
+ItemState::ItemState(ItemType type, const AbstractKart *owner, int id)
+{
+    setType(type);
+    m_item_id = id;
+    m_previous_owner = owner;
+    if (owner)
+        setDeactivatedTicks(stk_config->time2Ticks(1.5f));
+}   // ItemState(ItemType)
+
 // ------------------------------------------------------------------------
 /** Sets the disappear counter depending on type.  */
 void ItemState::setDisappearCounter()
@@ -52,9 +68,23 @@ void ItemState::setDisappearCounter()
     }   // switch
 }   // setDisappearCounter
     
+// -----------------------------------------------------------------------
+/** Initialises an item.
+ *  \param type Type for this item.
+ */
+void ItemState::initItem(ItemType type, const Vec3& xyz)
+{
+    m_xyz               = xyz;
+    m_original_type     = ITEM_NONE;
+    m_ticks_till_return = 0;
+    setDisappearCounter();
+}   // initItem
+
 // ----------------------------------------------------------------------------
 /** Update the state of the item, called once per physics frame.
- *  \param ticks Number of ticks to simulate (typically 1).
+ *  \param ticks Number of ticks to simulate. While this value is 1 when
+ *         called during the normal game loop, during a rewind this value
+ *         can be (much) larger than 1.
  */
 void ItemState::update(int ticks)
 {
@@ -117,7 +147,7 @@ void ItemState::collected(const AbstractKart *kart)
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh,
            const AbstractKart *owner, bool is_predicted)
-    : ItemState(type)
+    : ItemState(type, owner)
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
@@ -163,11 +193,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
-    if (owner)
-    {
-        m_previous_owner = owner;
-        ItemState::setDeactivatedTicks(stk_config->time2Ticks(1.5f));
-    }
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
@@ -198,7 +223,6 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 void Item::initItem(ItemType type, const Vec3 &xyz)
 {
     ItemState::initItem(type, xyz);
-    m_previous_owner    = NULL;
     m_rotate            = (getType()!=ITEM_BUBBLEGUM) && 
                           (getType()!=ITEM_TRIGGER    );
     // Now determine in which quad this item is, and its distance

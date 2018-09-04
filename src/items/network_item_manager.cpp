@@ -102,8 +102,8 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
         // The server saves the collected item as item event info
         m_item_events.lock();
         m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
-            item->getItemId(),
-            kart->getWorldKartId());
+                                             item->getItemId(),
+                                             kart->getWorldKartId()                   );
         m_item_events.unlock();
         ItemManager::collectedItem(item, kart);
     }
@@ -315,8 +315,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         else if(iei.isNewItem())
         {
             AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
-            ItemState *is = new ItemState(iei.getNewItemType(), iei.getIndex(),
-                                          kart);
+            ItemState *is = new ItemState(iei.getNewItemType(), kart,
+                                          iei.getIndex()             );
             is->initItem(iei.getNewItemType(), iei.getXYZ());
             if (m_confirmed_state.size() <= is->getItemId())
             {
