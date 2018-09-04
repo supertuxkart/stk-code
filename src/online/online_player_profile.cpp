@@ -467,10 +467,11 @@ namespace Online
                 if (node->getName() == "friend-in-server")
                 {
                     uint32_t id = 0;
-                    core::stringw server_name;
+                    std::string server_name;
                     node->get("id", &id);
                     node->get("name", &server_name);
-                    friend_server_map[id] = server_name;
+                    friend_server_map[id] =
+                        StringUtils::xmlDecode(server_name);
                 }
             }
             std::vector<std::pair<core::stringw, core::stringw> >
@@ -494,9 +495,8 @@ namespace Online
             }
             for (auto& p : friend_server_notify)
             {
-                // I18N: Show in game to tell your friend if your friend is on
-                // any server
-                core::stringw message = _("%s is now on server \"%s\"",
+                // I18N: Tell your friend if he is on any server in game
+                core::stringw message = _("%s is now on server \"%s\".",
                     p.first, p.second);
                 MessageQueue::add(MessageQueue::MT_FRIEND, message);
             }
