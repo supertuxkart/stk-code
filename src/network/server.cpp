@@ -25,6 +25,8 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+#include <algorithm>
+
 /** Constructor based on XML data received from the stk server.
  *  \param xml The data for one server as received as part of the
  *         get-all stk-server request.
@@ -64,6 +66,40 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("distance", &m_distance);
     m_server_owner_name = L"-";
     m_server_owner_lower_case_name = "-";
+
+    const XMLNode* players = server_info.getNode("players");
+    assert(players);
+    for (unsigned int i = 0; i < players->getNumNodes(); i++)
+    {
+        const XMLNode* player_info = players->getNode(i);
+        assert(player_info->getName() == "player-info");
+        std::string username;
+        std::pair<std::string, std::tuple<int, core::stringw, double, float> >
+            p;
+        auto& t = p.second;
+        // Default rank and scores if none
+        std::get<0>(t) = -1;
+        std::get<2>(t) = 2000.0;
+        player_info->get("rank", &std::get<0>(t));
+        player_info->get("username", &username);
+        std::get<1>(t) = StringUtils::utf8ToWide(username);
+        p.first = StringUtils::toLowerCase(username);
+        player_info->get("scores", &std::get<2>(t));
+        int cur_time = StkTime::getTimeSinceEpoch();
+        player_info->get("connected-since", &cur_time);
+        std::get<3>(t) = (float)(StkTime::getTimeSinceEpoch() - cur_time)
+            / 60.0f;
+        m_players.emplace_back(std::move(p));
+    }
+    // Sort by rank
+    std::sort(m_players.begin(), m_players.end(),
+        [](const std::pair<std::string,
+        std::tuple<int, core::stringw, double, float> >& a,
+        const std::pair<std::string,
+        std::tuple<int, core::stringw, double, float> >& b)->bool
+        {
+            return std::get<0>(a.second) < std::get<0>(b.second);
+        });
 
     // Show owner name as Official right now if official server hoster account
     m_official = false;
