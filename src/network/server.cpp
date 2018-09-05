@@ -48,7 +48,8 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
 
     xml.get("name", &m_lower_case_name);
     m_name = StringUtils::xmlDecode(m_lower_case_name);
-    m_lower_case_name = StringUtils::toLowerCase(m_lower_case_name);
+    m_lower_case_name = StringUtils::toLowerCase(
+        StringUtils::wideToUtf8(m_name));
 
     xml.get("id", &m_server_id);
     xml.get("host_id", &m_server_owner);
@@ -179,28 +180,3 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_official = false;
     m_game_started = game_started;
 }   // server(server_id, ...)
-
-// ----------------------------------------------------------------------------
-/** \brief Filter the add-on with a list of words.
- *  \param words A list of words separated by ' '.
- *  \return true if the add-on contains one of the words, otherwise false.
- */
-bool Server::filterByWords(const core::stringw words) const
-{
-    if (words == NULL || words.empty())
-        return true;
-
-    std::vector<core::stringw> list = StringUtils::split(words, ' ', false);
-
-    for (unsigned int i = 0; i < list.size(); i++)
-    {
-        list[i].make_lower();
-
-        if ((core::stringw(m_name).make_lower()).find(list[i].c_str()) != -1)
-        {
-            return true;
-        }
-    }
-
-    return false;
-} // filterByWords

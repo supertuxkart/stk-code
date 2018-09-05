@@ -101,7 +101,6 @@ public:
                 int max_players, int current_players, unsigned difficulty,
                 unsigned server_mode, const TransportAddress &address,
                 bool password_protected, bool game_started);
-    bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
     const TransportAddress& getAddress() const { return m_address; }
@@ -152,13 +151,17 @@ public:
     // ------------------------------------------------------------------------
     bool searchByName(const std::string& lower_case_word)
     {
-        bool server_name_found =
-            m_lower_case_name.find(lower_case_word) != std::string::npos;
-        if (!server_name_found)
+        auto list = StringUtils::split(lower_case_word, ' ', false);
+        bool server_name_found = false;
+        for (auto& word : list)
         {
+            server_name_found =
+                m_lower_case_name.find(word) != std::string::npos;
+            if (server_name_found)
+                break;
             for (auto& p : m_players)
             {
-                if (p.first.find(lower_case_word) != std::string::npos)
+                if (p.first.find(word) != std::string::npos)
                     return true;
             }
         }
