@@ -9,7 +9,8 @@
         </div>
 
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
-            <list id="server_list" x="0" y="0" width="100%" height="100%"/>
+            <list id="server_list" x="0" y="0" width="100%" height="93%"/>
+            <textbox id="searcher" width="100%" height="7%"/>
         </box>
         <div width="99%" align="center" layout="vertical-row" height="fit">
             <div width="100%" height="fit" layout="horizontal-row" >

@@ -97,6 +97,8 @@ void ServerSelection::loadedFromFile()
     m_private_server->setState(false);
     m_game_started = getWidget<GUIEngine::CheckBoxWidget>("game_started");
     assert(m_game_started != NULL);
+    m_searcher = getWidget<GUIEngine::TextBoxWidget>("searcher");
+    assert(m_searcher != NULL);
     m_game_started->setState(false);
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon1 = irr_driver->getTexture(
@@ -133,6 +135,9 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
+    m_current_column = 5/*distance*/;
+    m_searcher->clearListeners();
+    m_searcher->addListener(this);
     m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
     m_server_list_widget->setIcons(m_icon_bank, (float)getHeight() / 12.0f);
     m_sort_desc = false;
@@ -143,18 +148,17 @@ void ServerSelection::init()
 // ----------------------------------------------------------------------------
 /** Loads the list of all servers. The gui element will be
  *  updated.
- *  \param sort_case what sorting method will be used.
  */
-void ServerSelection::loadList(unsigned sort_case)
+void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    std::sort(m_servers.begin(), m_servers.end(), [sort_case, this]
+    std::sort(m_servers.begin(), m_servers.end(), [this]
         (const std::shared_ptr<Server> a,
          const std::shared_ptr<Server> b)->bool
         {
             std::shared_ptr<Server> c = m_sort_desc ? a : b;
             std::shared_ptr<Server> d = m_sort_desc ? b : a;
-            switch (sort_case)
+            switch (m_current_column)
             {
             case 0:
                 return c->getLowerCaseName() > d->getLowerCaseName();
@@ -225,12 +229,14 @@ void ServerSelection::onColumnClicked(int column_id, bool sort_desc, bool sort_d
     if (sort_default)
     {
         m_sort_desc = false;
-        loadList(/* distance */ 5);
+        m_current_column = 5/*distance*/;
+        loadList();
     }
     else
     {
         m_sort_desc = sort_desc;
-        loadList(column_id);
+        m_current_column = column_id;
+        loadList();
     }
 }   // onColumnClicked
 
@@ -343,7 +349,20 @@ void ServerSelection::copyFromServersManager()
                 return true;
             return false;
         }), m_servers.end());
-    loadList(/* distance */ 5);
+    const core::stringw& search = m_searcher->getText();
+    const std::string search_word_lc = StringUtils::toLowerCase(
+        StringUtils::wideToUtf8(search));
+    if (!search_word_lc.empty())
+    {
+        m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
+            [search_word_lc](const std::shared_ptr<Server>& a)->bool
+            {
+                if (!a->searchByName(search_word_lc))
+                    return true;
+                return false;
+            }), m_servers.end());
+    }
+    loadList();
 }   // copyFromServersManager
 
 // ----------------------------------------------------------------------------
