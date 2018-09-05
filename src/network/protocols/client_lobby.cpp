@@ -218,6 +218,10 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::addAllPlayers(Event* event)
 {
+    // In case the user opened a user info dialog
+    GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ScreenKeyboard::dismiss();
+
     if (!checkDataSize(event, 1))
     {
         // If recieved invalid message for players leave now
@@ -364,6 +368,7 @@ void ClientLobby::update(int ticks)
             m_received_server_result = true;
             // In case someone opened paused race dialog or menu in network game
             GUIEngine::ModalDialog::dismiss();
+            GUIEngine::ScreenKeyboard::dismiss();
             if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
                 StateManager::get()->enterGameState();
             World::getWorld()->enterRaceOverState();
@@ -904,6 +909,10 @@ void ClientLobby::raceFinished(Event* event)
  */
 void ClientLobby::exitResultScreen(Event *event)
 {
+    // In case the user opened a user info dialog
+    GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ScreenKeyboard::dismiss();
+    
     setup();
     m_state.store(CONNECTED);
     RaceResultGUI::getInstance()->backToLobby();
