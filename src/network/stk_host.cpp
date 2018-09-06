@@ -1217,13 +1217,16 @@ std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const
 }   // findPeerByHostId
 
 //-----------------------------------------------------------------------------
-void STKHost::replaceNetwork(ENetEvent& event, Network* network)
+void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
 {
     assert(NetworkConfig::get()->isClient());
     assert(!m_listening_thread.joinable());
-    assert(network->getENetHost()->peerCount == 1);
-    delete m_network;
-    m_network = network;
+    assert(new_network->getENetHost()->peerCount == 1);
+    if (m_network != new_network)
+    {
+        delete m_network;
+        m_network = new_network;
+    }
     auto stk_peer = std::make_shared<STKPeer>(event.peer, this,
         m_next_unique_host_id++);
     stk_peer->setValidated();

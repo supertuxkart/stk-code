@@ -608,7 +608,6 @@ void cmdLineHelp()
     "       --init-user        Save the above login and password (if set) in config.\n"
     "       --disable-polling  Don't poll for logged in user.\n"
     "       --port=n           Port number to use.\n"
-    "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --min-players=n    Minimum number of clients (server only).\n"
@@ -1204,7 +1203,7 @@ int handleCmdLine()
         cts->setup();
         Log::info("main", "Trying to connect to server '%s'.",
             server_addr.toString().c_str());
-        if (!cts->handleDirectConnect(10000))
+        if (!cts->tryConnect(2000, 15))
         {
             Log::error("main", "Timeout trying to connect to server '%s'.",
                 server_addr.toString().c_str());
@@ -1355,11 +1354,6 @@ int handleCmdLine()
     // The extra server info has to be set before server lobby started
     if (server_lobby)
         server_lobby->requestStart();
-
-    /** Disable detection of LAN connection when connecting via WAN. This is
-     *  mostly a debugging feature to force using WAN connection. */
-    if (CommandLine::has("--disable-lan"))
-        NetworkConfig::m_disable_lan = true;
 
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))

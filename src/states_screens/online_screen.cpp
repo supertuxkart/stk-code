@@ -267,7 +267,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                 cts->setup();
                 Log::info("OnlineScreen", "Trying to connect to server '%s'.",
                     server_addr.toString().c_str());
-                if (!cts->handleDirectConnect(10000))
+                if (!cts->tryConnect(2000, 15))
                 {
                     core::stringw err = _("Cannot connect to server %s.",
                         server_addr.toString().c_str());

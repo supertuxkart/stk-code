@@ -28,7 +28,6 @@
 #include "states_screens/online_screen.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
-bool           NetworkConfig::m_disable_lan    = false;
 const uint32_t NetworkConfig::m_server_version = 1;
 
 /** \class NetworkConfig

@@ -280,6 +280,8 @@ public:
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
     // ------------------------------------------------------------------------
+    Network* getNetwork() const                           { return m_network; }
+    // ------------------------------------------------------------------------
     /** Returns a copied list of peers. */
     std::vector<std::shared_ptr<STKPeer> > getPeers() const
     {
@@ -318,7 +320,7 @@ public:
      *  creation screen. */
     bool isClientServer() const          { return m_separate_process != NULL; }
     // ------------------------------------------------------------------------
-    void replaceNetwork(ENetEvent& event, Network* network);
+    void initClientNetwork(ENetEvent& event, Network* new_network);
     // ------------------------------------------------------------------------
     std::map<uint32_t, uint32_t> getPeerPings()
                                            { return m_peer_pings.getAtomic(); }
