@@ -73,29 +73,10 @@ void RequestConnection::asynchronousUpdate()
                     Log::info("RequestConnection",
                         "LAN connection to WAN server will be used.");
                 }
-                if (STKHost::get()->isClientServer())
-                {
-                    // Allow up to 10 seconds for the separate process to
-                    // fully start-up
-                    uint64_t timeout = StkTime::getRealTimeMs() + 10000;
-                    while (StkTime::getRealTimeMs() < timeout)
-                    {
-                        const std::string& sid = NetworkConfig::get()
-                            ->getServerIdFile();
-                        assert(!sid.empty());
-                        if (file_manager->fileExists(sid))
-                        {
-                            file_manager->removeFile(sid);
-                            break;
-                        }
-                        StkTime::sleep(10);
-                    }
-                    NetworkConfig::get()->setServerIdFile("");
-                }
+
                 std::string str_msg("connection-request");
                 BareNetworkString message(str_msg +
-                    (STKHost::get()->isClientServer() ? "-localhost" :
-                    StringUtils::toString(m_server->getPrivatePort())));
+                    StringUtils::toString(m_server->getPrivatePort()));
 
                 if (!NetworkConfig::m_disable_lan &&
                     m_server->getAddress().getIP() ==

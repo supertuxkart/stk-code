@@ -143,6 +143,8 @@ private:
 
     std::atomic<uint32_t> m_waiting_players_counts;
 
+    unsigned m_server_id_online;
+
     bool m_registered_for_once_only;
 
     // connection management

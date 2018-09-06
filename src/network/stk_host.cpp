@@ -347,16 +347,6 @@ STKHost::~STKHost()
     delete m_network;
     enet_deinitialize();
     delete m_separate_process;
-    // Always clean up server id file in case client failed to connect
-    const std::string& sid = NetworkConfig::get()->getServerIdFile();
-    if (!sid.empty())
-    {
-        if (file_manager->fileExists(sid))
-        {
-            file_manager->removeFile(sid);
-        }
-        NetworkConfig::get()->setServerIdFile("");
-    }
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
@@ -1017,7 +1007,6 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     message.decodeString(&command);
     const std::string connection_cmd = std::string("connection-request") +
         StringUtils::toString(m_private_port);
-    const std::string connection_cmd_localhost("connection-request-localhost");
 
     if (command == "stk-server")
     {
@@ -1058,19 +1047,6 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
             return;
         }
         std::make_shared<ConnectToPeer>(sender)->requestStart();
-    }
-    else if (command == connection_cmd_localhost)
-    {
-        if (sender.getIP() == 0x7f000001)
-        {
-            std::make_shared<ConnectToPeer>(sender)->requestStart();
-        }
-        else
-        {
-            Log::error("STKHost", "Client trying to connect from '%s'",
-                       sender.toString().c_str());
-            Log::error("STKHost", "which is not localhost - rejected.");
-        }
     }
     else if (command == "stk-server-port")
     {

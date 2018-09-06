@@ -198,7 +198,8 @@ public:
     void       redirectOutput();
 
     bool       fileIsNewer(const std::string& f1, const std::string& f2) const;
-
+    // ------------------------------------------------------------------------
+    const std::string& getUserConfigDir() const   { return m_user_config_dir; }
     // ------------------------------------------------------------------------
     /** Returns the irrlicht file system. */
     irr::io::IFileSystem* getFileSystem() { return m_file_system; }

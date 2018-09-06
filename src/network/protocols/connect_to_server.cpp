@@ -78,14 +78,77 @@ void ConnectToServer::setup()
     m_current_protocol.reset();
     // In case of LAN or client-server we already have the server's
     // and our ip address, so we can immediately start requesting a connection.
-    m_state = (NetworkConfig::get()->isLAN() ||
-        STKHost::get()->isClientServer()) ?
+    m_state = NetworkConfig::get()->isLAN() ?
         GOT_SERVER_ADDRESS : SET_PUBLIC_ADDRESS;
 }   // setup
 
 // ----------------------------------------------------------------------------
 void ConnectToServer::asynchronousUpdate()
 {
+    if (STKHost::get()->isClientServer() &&
+        !NetworkConfig::get()->getServerIdFile().empty())
+    {
+        assert(m_server);
+        // Allow up to 10 seconds for the separate process to fully start-up
+        bool started = false;
+        uint64_t timeout = StkTime::getRealTimeMs() + 10000;
+        const std::string& sid = NetworkConfig::get()->getServerIdFile();
+        assert(!sid.empty());
+        const std::string dir = StringUtils::getPath(sid);
+        const std::string server_id_file = StringUtils::getBasename(sid);
+        uint16_t port = 0;
+        unsigned server_id = 0;
+        while (StkTime::getRealTimeMs() < timeout)
+        {
+            std::set<std::string> files;
+            file_manager->listFiles(files, dir);
+            for (auto& f : files)
+            {
+                if (f.find(server_id_file) != std::string::npos)
+                {
+                    auto split = StringUtils::split(f, '_');
+                    if (split.size() != 3)
+                        continue;
+                    if (!StringUtils::fromString(split[1], server_id))
+                        continue;
+                    if (!StringUtils::fromString(split[2], port))
+                        continue;
+                    file_manager->removeFile(dir + "/" + f);
+                    started = true;
+                    break;
+                }
+            }
+            if (started)
+                break;
+            StkTime::sleep(10);
+        }
+        NetworkConfig::get()->setServerIdFile("");
+        if (!started)
+        {
+            Log::error("ConnectToServer",
+                "Separate server process failed to started");
+            m_state = DONE;
+            return;
+        }
+        else
+        {
+            assert(port != 0);
+            m_server_address.setPort(port);
+            m_server->setPrivatePort(port);
+            if (server_id != 0)
+            {
+                m_server->setSupportsEncryption(true);
+                m_server->setServerId(server_id);
+            }
+            if (NetworkConfig::get()->isLAN() &&
+                handleDirectConnect(5000))
+            {
+                m_state = DONE;
+                return;
+            }
+        }
+    }
+
     switch(m_state.load())
     {
         case SET_PUBLIC_ADDRESS:
@@ -143,7 +206,8 @@ void ConnectToServer::asynchronousUpdate()
             }
             // Assume official server is firewall-less so give it more time
             // to directly connect
-            if (handleDirectConnect(m_server->isOfficial() ? 5000 : 2000))
+            if (handleDirectConnect((m_server->isOfficial() ||
+                STKHost::get()->isClientServer()) ? 5000 : 2000))
                 return;
             // Set to DONE will stop STKHost is not connected
             m_state = STKHost::get()->getPublicAddress().isUnset() ?
@@ -299,9 +363,9 @@ bool ConnectToServer::handleDirectConnect(int timeout)
 {
     // Direct connection to server should only possbile if public and private
     // ports of server are the same
-    if (NetworkConfig::get()->isWAN() &&
-        m_server->getPrivatePort() == m_server->getAddress().getPort() &&
-        !STKHost::get()->isClientServer())
+    if ((NetworkConfig::get()->isWAN() &&
+        m_server->getPrivatePort() == m_server->getAddress().getPort()) ||
+        STKHost::get()->isClientServer())
     {
         ENetEvent event;
         ENetAddress ea;

@@ -106,6 +106,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_result_ns = getNetworkString();
     m_result_ns->setSynchronous(true);
     m_waiting_for_reset = false;
+    m_server_id_online = 0;
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -338,10 +339,12 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 /** Create the server id file to let the graphics server client connect. */
 void ServerLobby::createServerIdFile()
 {
-    const std::string& sid = NetworkConfig::get()->getServerIdFile();
+    std::string sid = NetworkConfig::get()->getServerIdFile();
     if (!sid.empty() && !m_has_created_server_id_file)
     {
         std::fstream fs;
+        sid += StringUtils::toString(m_server_id_online) + "_" +
+            StringUtils::toString(STKHost::get()->getPrivatePort());
         fs.open(sid, std::ios::out);
         fs.close();
         m_has_created_server_id_file = true;
@@ -703,7 +706,14 @@ bool ServerLobby::registerServer()
 
     if (result->get("success", &rec_success) && rec_success == "yes")
     {
-        Log::info("ServerLobby", "Server is now online.");
+        const XMLNode* server = result->getNode("server");
+        assert(server);
+        const XMLNode* server_info = server->getNode("server-info");
+        assert(server_info);
+        server_info->get("id", &m_server_id_online);
+        assert(m_server_id_online != 0);
+        Log::info("ServerLobby",
+            "Server %d is now online.", m_server_id_online);
         delete request;
         return true;
     }

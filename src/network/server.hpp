@@ -149,6 +149,12 @@ public:
         std::tuple<int, core::stringw, double, float> > >& getPlayers() const
                                                           { return m_players; }
     // ------------------------------------------------------------------------
+    void setServerId(unsigned id)                         { m_server_id = id; }
+    // ------------------------------------------------------------------------
+    void setPrivatePort(uint16_t port)               { m_private_port = port; }
+    // ------------------------------------------------------------------------
+    void setSupportsEncryption(bool val)        { m_supports_encrytion = val; }
+    // ------------------------------------------------------------------------
     bool searchByName(const std::string& lower_case_word)
     {
         auto list = StringUtils::split(lower_case_word, ' ', false);

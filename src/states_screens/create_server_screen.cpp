@@ -316,8 +316,18 @@ void CreateServerScreen::createServer()
         server_cfg << "--lan-server=" << server_name;
     }
 
-    std::string server_id_file = "server_id_file_";
-    server_id_file += StringUtils::toString(StkTime::getTimeSinceEpoch());
+    // Clear previous stk-server-id-file_*
+    std::set<std::string> files;
+    const std::string server_id_file = "stk-server-id-file_";
+    file_manager->listFiles(files, file_manager->getUserConfigDir());
+    for (auto& f : files)
+    {
+        if (f.find(server_id_file) != std::string::npos)
+        {
+            file_manager->removeFile(file_manager->getUserConfigDir() + "/" +
+                f);
+        }
+    }
     NetworkConfig::get()->setServerIdFile(
         file_manager->getUserConfigFile(server_id_file));
 
