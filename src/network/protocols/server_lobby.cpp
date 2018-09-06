@@ -924,8 +924,10 @@ void ServerLobby::checkIncomingConnectionRequests()
             const XMLNode * users_xml = result->getNode("users");
             std::map<uint32_t, KeyData> keys;
             auto sl = m_server_lobby.lock();
-            if (!sl || (sl->m_state.load() != WAITING_FOR_START_GAME &&
-                !sl->allowJoinedPlayersWaiting()))
+            if (!sl)
+                return;
+            if (sl->m_state.load() != WAITING_FOR_START_GAME &&
+                !sl->allowJoinedPlayersWaiting())
             {
                 sl->replaceKeys(keys);
                 return;
