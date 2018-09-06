@@ -470,7 +470,7 @@ else()
     find_package(CURL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
 
-    find_path(NETTLE_INCLUDE_DIRS nettle/gcm.h nettle/sha.h nettle/base64.h nettle/yarrow.h)
+    find_path(NETTLE_INCLUDE_DIRS nettle/gcm.h nettle/sha.h nettle/base64.h nettle/version.h nettle/yarrow.h)
     find_library(NETTLE_LIBRARY NAMES nettle libnettle)
 
     if (NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL)

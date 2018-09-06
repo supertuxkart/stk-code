@@ -23,6 +23,16 @@
 #include "network/network_string.hpp"
 
 #include <nettle/base64.h>
+#include <nettle/version.h>
+
+#if NETTLE_VERSION_MAJOR > 3 || 
+    (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR > 3)
+typedef const char* NETTLE_CONST_CHAR;
+typedef char* NETTLE_CHAR;
+#else
+typedef const uint8_t* NETTLE_CONST_CHAR;
+typedef uint8_t* NETTLE_CHAR;
+#endif
 
 // ============================================================================
 std::string Crypto::base64(const std::vector<uint8_t>& input)
@@ -30,7 +40,7 @@ std::string Crypto::base64(const std::vector<uint8_t>& input)
     std::string result;
     const size_t char_size = ((input.size() + 3 - 1) / 3) * 4;
     result.resize(char_size, (char)0);
-    base64_encode_raw(&result[0], input.size(), input.data());
+    base64_encode_raw((NETTLE_CHAR)&result[0], input.size(), input.data());
     return result;
 }   // base64
 
@@ -44,14 +54,14 @@ std::vector<uint8_t> Crypto::decode64(std::string input)
     size_t decode_len_by_nettle;
 #ifdef DEBUG
     int ret = base64_decode_update(&ctx, &decode_len_by_nettle, result.data(),
-        input.size(), input.c_str());
+        input.size(), (NETTLE_CONST_CHAR)input.c_str());
     assert(ret == 1);
     ret = base64_decode_final(&ctx);
     assert(ret == 1);
     assert(decode_len_by_nettle == decode_len);
 #else
     base64_decode_update(&ctx, &decode_len_by_nettle, result.data(),
-        input.size(), input.c_str());
+        input.size(), (NETTLE_CONST_CHAR)input.c_str());
     base64_decode_final(&ctx);
 #endif
     return result;
