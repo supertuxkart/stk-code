@@ -683,21 +683,24 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
     // ---- Networking
-    PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
-        "The stun servers that will be used to know the public address,"
-        " LHS: server address, RHS: ping time.",
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_servers",
+        "The stun servers that will be used to know the public address with"
+        " port, LHS: server address, RHS: ping time.",
             {
-                { "numb.viagenie.ca", 0u },
-                { "stun.12connect.com", 0u },
-                { "stun.callwithus.com", 0u },
-                { "stun.cope.es", 0u },
-                { "stun.counterpath.net", 0u },
-                { "stun.ekiga.net", 0u },
-                { "stun.ivao.aero", 0u },
-                { "stun.schlund.de", 0u },
-                { "stun.stunprotocol.org", 0u },
-                { "stun.voip.aebc.com", 0u }
+                { "stun.12connect.com:3478", 0u },
+                { "stun.callwithus.com:3478", 0u },
+                { "stun.cope.es:3478", 0u },
+                { "stun.counterpath.net:3478", 0u },
+                { "stun.ekiga.net:3478", 0u },
+                { "stun.ivao.aero:3478", 0u },
+                { "stun.schlund.de:3478", 0u },
+                { "stun.stunprotocol.org:3478", 0u },
+                { "stun.l.google.com:19302", 0u },
+                { "stun1.l.google.com:19302", 0u },
+                { "stun2.l.google.com:19302", 0u },
+                { "stun3.l.google.com:19302", 0u },
+                { "stun4.l.google.com:19302", 0u }
             }
         ));
 

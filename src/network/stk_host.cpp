@@ -365,7 +365,7 @@ void STKHost::shutdown()
 void STKHost::setPublicAddress()
 {
     std::vector<std::pair<std::string, uint32_t> > untried_server;
-    for (auto& p : UserConfigParams::m_stun_list)
+    for (auto& p : UserConfigParams::m_stun_servers)
         untried_server.push_back(p);
 
     assert(untried_server.size() > 2);
@@ -385,9 +385,19 @@ void STKHost::setPublicAddress()
     {
         // Pick last element in untried servers
         std::string server_name = untried_server.back().first.c_str();
-        UserConfigParams::m_stun_list[server_name] = (uint32_t)-1;
+        UserConfigParams::m_stun_servers[server_name] = (uint32_t)-1;
         Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
 
+        std::vector<std::string> addr_and_port =
+            StringUtils::split(server_name, ':');
+        uint16_t port = 0;
+        if (addr_and_port.size() != 2 ||
+            !StringUtils::fromString(addr_and_port[1], port))
+        {
+            Log::error("STKHost", "Wrong server address and port");
+            untried_server.pop_back();
+            continue;
+        }
         struct addrinfo hints, *res;
 
         memset(&hints, 0, sizeof hints);
@@ -395,11 +405,11 @@ void STKHost::setPublicAddress()
         hints.ai_socktype = SOCK_STREAM;
 
         // Resolve the stun server name so we can send it a STUN request
-        int status = getaddrinfo(server_name.c_str(), NULL, &hints, &res);
+        int status = getaddrinfo(addr_and_port[0].c_str(), NULL, &hints, &res);
         if (status != 0)
         {
             Log::error("STKHost", "Error in getaddrinfo for stun server"
-                " %s: %s", server_name.c_str(), gai_strerror(status));
+                " %s: %s", addr_and_port[0].c_str(), gai_strerror(status));
             untried_server.pop_back();
             continue;
         }
@@ -408,7 +418,7 @@ void STKHost::setPublicAddress()
         assert(res != NULL);
         struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
         m_stun_address.setIP(ntohl(current_interface->sin_addr.s_addr));
-        m_stun_address.setPort(3478);
+        m_stun_address.setPort(port);
 
         // Assemble the message for the stun server
         BareNetworkString s(20);
@@ -577,7 +587,7 @@ void STKHost::setPublicAddress()
                 m_public_address = non_xor_addr;
             }
             // Succeed, save ping
-            UserConfigParams::m_stun_list[server_name] = (uint32_t)(ping);
+            UserConfigParams::m_stun_servers[server_name] = (uint32_t)(ping);
             untried_server.clear();
         }
     }
