@@ -166,6 +166,7 @@
 #include <cstring>
 #include <sstream>
 #include <algorithm>
+#include <limits>
 
 #include <IEventReceiver.h>
 
@@ -214,6 +215,7 @@
 #include "modes/profile_world.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -2369,6 +2371,70 @@ void runUnitTests()
 
     Log::info("UnitTest", "RewindQueue");
     RewindQueue::unitTesting();
+
+    Log::info("UnitTest", "IP ban");
+    NetworkConfig::get()->unsetNetworking();
+    ServerLobby sl;
+
+    UserConfigParams::m_server_ip_ban_list =
+        {
+            { "1.2.3.4/32", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.4")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.3.5")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.3.3")));
+
+    UserConfigParams::m_server_ip_ban_list =
+        {
+            { "1.2.3.4/23", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(!sl.isBannedForIP(TransportAddress("1.2.1.255")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.0")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.3")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.4")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.5")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.3")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.4")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.5")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.255")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.4.0")));
+
+    UserConfigParams::m_server_ip_ban_list =
+        {
+            { "11.12.13.14/22", std::numeric_limits<uint32_t>::max() },
+            { "12.13.14.15/24", std::numeric_limits<uint32_t>::max() },
+            { "123.234.56.78/26", std::numeric_limits<uint32_t>::max() },
+            { "234.123.56.78/25", std::numeric_limits<uint32_t>::max() },
+            // Test for overlap handling
+            { "12.13.14.23/32", std::numeric_limits<uint32_t>::max() },
+            { "12.13.14.255/32", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(!sl.isBannedForIP(TransportAddress("11.12.11.255")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.12.0")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.13.14")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.15.255")));
+    assert(!sl.isBannedForIP(TransportAddress("11.12.16.0")));
+
+    assert(!sl.isBannedForIP(TransportAddress("12.13.13.255")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.0")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.15")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.255")));
+    assert(!sl.isBannedForIP(TransportAddress("12.13.15.0")));
+
+    assert(!sl.isBannedForIP(TransportAddress("123.234.56.63")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.64")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.78")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.127")));
+    assert(!sl.isBannedForIP(TransportAddress("123.234.56.128")));
+
+    assert(!sl.isBannedForIP(TransportAddress("234.123.55.255")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.0")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.78")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.127")));
+    assert(!sl.isBannedForIP(TransportAddress("234.123.56.128")));
 
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");

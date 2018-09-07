@@ -152,6 +152,10 @@ public:
     {
         return m_elements[key];
     }
+    U& at(const T key)
+    {
+        return m_elements.at(key);
+    }
 };   // MapUserConfigParam
 typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
 typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
@@ -765,12 +769,15 @@ namespace UserConfigParams
         &m_network_group, "Value used to calculate time limit in CTF, which "
         "is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
         " negative value to disable time limit."));
-    PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
-            "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
-            "from this IP will be banned.",
-            { { "0.0.0.0", 0u } }
-        ));
+    PARAM_PREFIX StringToUIntUserConfigParam m_server_ip_ban_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ip_ban_list",
+        "LHS: IP in X.X.X.X/Y (CIDR) format, use Y of 32 for a specific ip, "
+        "RHS: time epoch to expire, if -1 (uint32_t max) than a permanent ban.",
+        { { "0.0.0.0/0", 0u } }));
+    PARAM_PREFIX UIntToUIntUserConfigParam m_server_online_id_ban_list
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("server_online_id_ban_list",
+        "LHS: online id, RHS: time epoch to expire, if -1 (uint32_t max) than a permanent ban.",
+        { { 0u, 0u } }));
     PARAM_PREFIX IntUserConfigParam m_max_ping
         PARAM_DEFAULT(IntUserConfigParam(300, "max-ping",
         &m_network_group, "Maximum ping allowed for a player (in ms)."));

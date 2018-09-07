@@ -25,7 +25,7 @@
 #include <nettle/base64.h>
 #include <nettle/version.h>
 
-#if NETTLE_VERSION_MAJOR > 3 || 
+#if NETTLE_VERSION_MAJOR > 3 || \
     (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR > 3)
 typedef const char* NETTLE_CONST_CHAR;
 typedef char* NETTLE_CHAR;
