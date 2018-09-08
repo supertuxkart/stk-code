@@ -32,8 +32,6 @@
 
 #include <algorithm>
 
-class AbstractKart;
-
 namespace SP
 {
 SPShaderManager* SPShaderManager::m_spsm = NULL;
@@ -66,8 +64,13 @@ SPShaderManager::SPShaderManager()
         },
         { "dirtFactorUniformAssigner", [](SPUniformAssigner* ua)
             {
-                Camera *camera = Camera::getCamera(0);
-                if (camera && camera->getKart()->isOnGround())
+                AbstractKart* k = NULL;
+                if (Camera::getNumCameras() > 1)
+                {
+                    Camera* camera = Camera::getCamera(0);
+                    k = camera->getKart();
+                }
+                if (k && k->isOnGround())
                 {
                     ua->setValue(2.0f);
                 }
