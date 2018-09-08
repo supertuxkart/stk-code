@@ -19,7 +19,7 @@ void main()
 {
     // Triplanar detail map
     vec2 xyuv = vec2(world_position.x, world_position.y);
-    float detail = texture(g_detail_map, uv * 32).r;
+    float detail = texture(g_detail_map, uv * 32.0).r;
     detail *= 2.5;
 
     vec4 col = sampleTextureLayer0(uv);
