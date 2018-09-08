@@ -48,26 +48,35 @@ void GameSetup::update(bool remove_disconnected_players)
             {
                 return npp.expired();
             }), m_players.end());
+        m_connected_players_count.store((uint32_t)m_players.size());
+        return;
+    }
+    if (!World::getWorld() ||
+        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
+    {
+        m_connected_players_count.store((uint32_t)m_players.size());
         return;
     }
     lock.unlock();
-    if (!World::getWorld() ||
-        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
-        return;
+
     int red_count = 0;
     int blue_count = 0;
+    unsigned total = 0;
     for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
     {
         bool disconnected = m_players[i].expired();
-        if (race_manager->getKartInfo(i).getSoccerTeam() == SOCCER_TEAM_RED &&
+        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
             !disconnected)
             red_count++;
-        else if (race_manager->getKartInfo(i).getSoccerTeam() ==
-            SOCCER_TEAM_BLUE && !disconnected)
+        else if (race_manager->getKartInfo(i).getKartTeam() ==
+            KART_TEAM_BLUE && !disconnected)
             blue_count++;
 
         if (!disconnected)
+        {
+            total++;
             continue;
+        }
         AbstractKart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated())
         {
@@ -82,6 +91,8 @@ void GameSetup::update(bool remove_disconnected_players)
             STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
+    m_connected_players_count.store(total);
+
     if (m_players.size() != 1 && World::getWorld()->hasTeam() &&
         (red_count == 0 || blue_count == 0))
         World::getWorld()->setUnfairTeam(true);
@@ -217,9 +228,9 @@ void GameSetup::sortPlayersForGrandPrix()
 }   // sortPlayersForGrandPrix
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForSoccer()
+void GameSetup::sortPlayersForTeamGame()
 {
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER ||
+    if (!race_manager->teamEnabled() ||
         NetworkConfig::get()->hasTeamChoosing())
         return;
     std::lock_guard<std::mutex> lock(m_players_mutex);
@@ -227,6 +238,25 @@ void GameSetup::sortPlayersForSoccer()
     {
         auto player = m_players[i].lock();
         assert(player);
-        player->setTeam((SoccerTeam)(i % 2));
+        player->setTeam((KartTeam)(i % 2));
     }
-}   // sortPlayersForSoccer
+}   // sortPlayersForTeamGame
+
+// ----------------------------------------------------------------------------
+std::pair<int, int> GameSetup::getPlayerTeamInfo() const
+{
+    std::lock_guard<std::mutex> lock(m_players_mutex);
+    int red_count = 0;
+    int blue_count = 0;
+    for (auto& p : m_players)
+    {
+        auto player = p.lock();
+        if (!player)
+            continue;
+        if (player->getTeam() == KART_TEAM_RED)
+            red_count++;
+        else if (player->getTeam() == KART_TEAM_BLUE)
+            blue_count++;
+    }
+    return std::make_pair(red_count, blue_count);
+}   // getPlayerTeamInfo

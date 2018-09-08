@@ -40,6 +40,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
@@ -69,6 +70,9 @@ RaceGUIBase::RaceGUIBase()
     m_string_go             = _("Go!");
     //I18N: Shown when a goal is scored
     m_string_goal           = _("GOAL!");
+    // I18N: Shown waiting for other players in network to finish loading or
+    // waiting
+    m_string_waiting_for_others = _("Waiting for others");
 
     m_music_icon = irr_driver->getTexture("notes.png");
     if (!m_music_icon)
@@ -625,6 +629,18 @@ void RaceGUIBase::drawGlobalReadySetGo()
 {
     switch (World::getWorld()->getPhase())
     {
+    case WorldStatus::WAIT_FOR_SERVER_PHASE:
+        {
+            static video::SColor color = video::SColor(255, 255, 255, 255);
+            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1,
+                                irr_driver->getActualScreenSize().Width>>1,
+                                irr_driver->getActualScreenSize().Height>>1);
+            gui::IGUIFont* font = GUIEngine::getTitleFont();
+            font->draw(StringUtils::loadingDots(
+                m_string_waiting_for_others.c_str()), pos, color, true, true);
+        }
+        break;
     case WorldStatus::READY_PHASE:
         {
             static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -722,7 +738,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     // Icon width for the AI karts
     int ICON_WIDTH = ICON_PLAYER_WIDTH * 4 / 5;
 
-    WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
+    WorldWithRank* world = dynamic_cast<WorldWithRank*>(World::getWorld());
+    CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
 
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
@@ -852,8 +869,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             if (info.m_outlined_font)
             {
                 GUIEngine::getOutlineFont()->draw(info.m_text, pos,
-                    GUIEngine::getSkin()->getColor("font::normal"), false,
-                    false, NULL, true/*ignore RTL*/);
+                    info.m_color, false, false, NULL, true/*ignore RTL*/);
             }
             else
             {
@@ -877,6 +893,32 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         int w = kart->getController()
                     ->isLocalPlayerController() ? ICON_PLAYER_WIDTH
                                                 : ICON_WIDTH;
+
+        // CTF
+        if (ctf)
+        {
+            if (ctf->getRedHolder() == (int)kart_id)
+            {
+                video::ITexture* red =
+                    irr_driver->getTexture(FileManager::GUI, "red_flag.png");
+                const core::rect<s32> rect(core::position2d<s32>(0, 0),
+                    red->getSize());
+                const core::rect<s32> pos1
+                    (x - 20, y - 10, x + w - 20, y + w - 30);
+                draw2DImage(red, pos1, rect, NULL, NULL, true);
+            }
+            else if (ctf->getBlueHolder() == (int)kart_id)
+            {
+                video::ITexture* blue =
+                    irr_driver->getTexture(FileManager::GUI, "blue_flag.png");
+                const core::rect<s32> rect(core::position2d<s32>(0, 0),
+                    blue->getSize());
+                const core::rect<s32> pos1
+                    (x - 20, y - 10, x + w - 20, y + w - 30);
+                draw2DImage(blue, pos1, rect, NULL, NULL, true);
+            }
+        }
+
         const core::rect<s32> pos(x, y, x+w, y+w);
 
         //to bring to light the player's icon: add a background

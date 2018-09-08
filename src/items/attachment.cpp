@@ -345,7 +345,8 @@ void Attachment::hitBanana(ItemState *item_state)
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
-        ExplosionAnimation::create(m_kart);
+        if (m_kart->getKartAnimation() == NULL)
+            ExplosionAnimation::create(m_kart);
         return;
     }
 
@@ -606,7 +607,8 @@ void Attachment::update(int ticks)
                 m_bubble_explode_sound->play();
             }
 
-            ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            if (!m_kart->isGhostKart())
+                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
         break;
     }   // switch

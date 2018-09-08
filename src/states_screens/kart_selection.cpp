@@ -738,11 +738,6 @@ void KartSelectionScreen::playerConfirm(const int player_id)
         return;
     }
 
-    if (player_id == PLAYER_ID_GAME_MASTER)
-    {
-        UserConfigParams::m_default_kart = selection;
-    }
-
     if (m_kart_widgets[player_id].getKartInternalName().size() == 0 ||
         m_kart_widgets[player_id].getKartInternalName() == RibbonWidget::NO_ITEM_ID)
     {
@@ -1249,6 +1244,11 @@ void KartSelectionScreen::allPlayersDone()
                     break;
                 }
             }
+        }
+        
+        if (n == PLAYER_ID_GAME_MASTER)
+        {
+            UserConfigParams::m_default_kart = selected_kart;
         }
 
         race_manager->setPlayerKart(n, selected_kart);

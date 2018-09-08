@@ -638,8 +638,11 @@ void IrrDriver::initDevice()
 #endif
 
 #ifndef SERVER_ONLY
-    if(CVS->isGLSL())
+    if (CVS->isGLSL())
+    {
         m_renderer = new ShaderBasedRenderer();
+        preloadShaders();
+    }
     else
         m_renderer = new FixedPipelineRenderer();
 #endif
@@ -795,6 +798,9 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
                               std::string *version)
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+        
     *vendor   = (char*)glGetString(GL_VENDOR  );
     *renderer = (char*)glGetString(GL_RENDERER);
     *version  = (char*)glGetString(GL_VERSION );
@@ -1847,22 +1853,6 @@ void IrrDriver::doScreenShot()
  */
 void IrrDriver::update(float dt)
 {
-    // User aborted (e.g. closed window)
-    // =================================
-    if (!m_device->run())
-    {
-        // Don't bother cleaning up GUI, has no use and may result in crashes
-        //GUIEngine::cleanUp();
-        //GUIEngine::deallocate();
-        main_loop->abort();
-        return;
-    }
-
-    // If we quit via the menu the m_device->run() does not return true.
-    // To avoid any other calls, we return here.
-    if(main_loop->isAborted())
-        return;
-
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)

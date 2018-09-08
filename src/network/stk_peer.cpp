@@ -37,9 +37,10 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
 {
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
-    m_connected_time      = (float)StkTime::getRealTime();
+    m_connected_time      = StkTime::getRealTimeMs();
     m_validated.store(false);
-    m_average_ping = 0;
+    m_average_ping.store(0);
+    m_waiting_for_game.store(true);
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
@@ -114,7 +115,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
     {
         if (Network::m_connection_debug)
         {
-            Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
+            Log::verbose("STKPeer", "sending packet of size %d to %s at %lf",
                 packet->dataLength, a.toString().c_str(),
                 StkTime::getRealTime());
         }
@@ -155,8 +156,11 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
  */
 uint32_t STKPeer::getPing()
 {
-    if ((float)StkTime::getRealTime() - m_connected_time < 3.0f)
+    if (getConnectedTime() < 3.0f)
+    {
+        m_average_ping.store(m_enet_peer->roundTripTime);
         return 0;
+    }
     if (NetworkConfig::get()->isServer())
     {
         // Average ping in 5 seconds
@@ -165,9 +169,9 @@ uint32_t STKPeer::getPing()
         while (m_previous_pings.size() > ap)
         {
             m_previous_pings.pop_front();
-            m_average_ping  =
+            m_average_ping.store(
                 (uint32_t)(std::accumulate(m_previous_pings.begin(),
-                m_previous_pings.end(), 0) / m_previous_pings.size());
+                m_previous_pings.end(), 0) / m_previous_pings.size()));
         }
     }
     return m_enet_peer->roundTripTime;

@@ -28,12 +28,11 @@
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
 History* history = 0;
-
+bool History::m_online_history_replay = false;
 //-----------------------------------------------------------------------------
 /** Initialises the history object and sets the mode to none.
  */
@@ -272,7 +271,7 @@ void History::Load()
         if(sscanf(s, "model %d: %1023s",&n, s1) != 2)
             Log::fatal("History", "No model information for kart %d found.", i);
         m_kart_ident.push_back(s1);
-        if(i<race_manager->getNumPlayers() && !MainMenuScreen::m_enable_online)
+        if(i<race_manager->getNumPlayers() && !m_online_history_replay)
         {
             race_manager->setPlayerKart(i, s1);
         }

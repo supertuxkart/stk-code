@@ -21,6 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "utils/synchronised.hpp"
 #include <deque>
+#include <limits>
 #include <map>
 #include <string>
 
@@ -58,7 +59,7 @@ private:
 
     int m_bottom_box_height = -1;
 
-    float m_vote_timeout = -1.0f;
+    uint64_t m_vote_timeout = std::numeric_limits<uint64_t>::max();
 
     std::map<std::string, core::stringw> m_vote_messages;
 
@@ -101,7 +102,7 @@ public:
     void resetVote()
     {
         m_vote_messages.clear();
-        m_vote_timeout = -1.0f;
+        m_vote_timeout = std::numeric_limits<uint64_t>::max();
     }
 
     void setVoteTimeout(float timeout);

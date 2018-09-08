@@ -39,7 +39,6 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
-#include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 
@@ -207,7 +206,7 @@ bool Swatter::updateAndTestFinished(int ticks)
                 float min_dist2
                      = m_kart->getKartProperties()->getSwatterDistance();
 
-                if (dist2 < min_dist2)
+                if (dist2 < min_dist2 && !m_kart->isGhostKart())
                 {
                     // Start squashing
                     m_animation_phase = SWATTER_TO_TARGET;
@@ -290,14 +289,11 @@ void Swatter::chooseTarget()
         if (kart->isInvulnerable() || kart->isSquashed())
             continue;
 
-        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-        if (sw)
-        {
-            // Don't hit teammates in soccer world
-            if (sw->getKartTeam(kart->getWorldKartId()) == sw
-                ->getKartTeam(m_kart->getWorldKartId()))
+        // Don't hit teammates in team world
+        if (world->hasTeam() &&
+            world->getKartTeam(kart->getWorldKartId()) ==
+            world->getKartTeam(m_kart->getWorldKartId()))
             continue;
-        }
 
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
         if(dist2<min_dist2)
@@ -316,6 +312,8 @@ void Swatter::chooseTarget()
 void Swatter::pointToTarget()
 {
 #ifndef SERVER_ONLY
+    if (m_kart->isGhostKart()) return;
+
     if(!m_target)
     {
         m_scene_node->setRotation(core::vector3df());
@@ -338,6 +336,8 @@ void Swatter::pointToTarget()
  */
 void Swatter::squashThingsAround()
 {
+    if (m_kart->isGhostKart()) return;
+
     const KartProperties *kp = m_kart->getKartProperties();
 
     AbstractKart* closest_kart = m_closest_kart;

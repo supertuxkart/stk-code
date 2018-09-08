@@ -27,10 +27,15 @@ class NetworkString;
 
 class FreeForAll : public WorldWithRank
 {
-private:
+protected:
     bool m_count_down_reached_zero;
 
     std::vector<int> m_scores;
+
+private:
+    // ------------------------------------------------------------------------
+    virtual video::SColor getColor(unsigned int kart_id) const;
+
 public:
     // ------------------------------------------------------------------------
     FreeForAll();
@@ -50,7 +55,7 @@ public:
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void kartHit(int kart_id, int hitter = -1) OVERRIDE;
+    virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
@@ -61,7 +66,6 @@ public:
     void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const        { return m_scores.at(kart_id); }
-
 };   // FreeForAll
 
 

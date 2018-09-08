@@ -19,7 +19,6 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
-#include <atomic>
 
 class SFXBase;
 
@@ -132,11 +131,6 @@ private:
     int             m_count_up_ticks;
 
     bool            m_engines_started;
-    /** In networked game a client must wait for the server to start 'ready
-    *  set go' to make sure all client are actually ready to start the game.
-    *  A server on the other hand will run behind all clients, so it will
-    *  wait for all clients to indicate that they have started the race. */
-    std::atomic_bool m_server_is_ready;
 
     void startEngines();
 
@@ -161,6 +155,9 @@ public:
     // ------------------------------------------------------------------------
     bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
                                             m_phase<FINISH_PHASE;           }
+    // ------------------------------------------------------------------------
+    bool     isActiveRacePhase() const { return m_phase>=GO_PHASE &&
+                                                m_phase<DELAY_FINISH_PHASE; }
     // ------------------------------------------------------------------------
     /** While the race menu is being displayed, m_phase is limbo, and
      *  m_previous_phase is finish. So we have to test this case, too.  */
@@ -207,8 +204,6 @@ public:
     // ------------------------------------------------------------------------
     /** Get the ticks since start regardless of which way the clock counts */
     int getTicksSinceStart() const { return m_count_up_ticks; }
-    // ------------------------------------------------------------------------
-    void setReadyToRace() { m_server_is_ready.store(true); }
 };   // WorldStatus
 
 

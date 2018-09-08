@@ -166,6 +166,7 @@
 #include <cstring>
 #include <sstream>
 #include <algorithm>
+#include <limits>
 
 #include <IEventReceiver.h>
 
@@ -214,6 +215,7 @@
 #include "modes/profile_world.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -559,7 +561,14 @@ void cmdLineHelp()
     "       --aiNP=a,b,...     Use the karts a, b, ... for the AI, no additional player kart.\n"
     "       --laps=N           Define number of laps to N.\n"
     "       --mode=N           N=1 Beginner, N=2 Intermediate, N=3 Expert, N=4 SuperTux.\n"
-    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Follow The Leader\n"
+    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Battle, N=3 Soccer,\n"
+    "                          N=4 Follow The Leader. In configure server use --battle-mode=n\n"
+    "                          for battle server and --soccer-timed / goals for soccer server\n"
+    "                          to control verbosely, see below:\n"
+    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free-For-All and\n"
+    "                          1 is Capture The Flag.\n"
+    "       --soccer-timed     Use time limit mode in network soccer game.\n"
+    "       --soccer-goals     Use goals limit mode in network soccer game.\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     "  -f,  --fullscreen       Use fullscreen display.\n"
     "  -w,  --windowed         Use windowed display (default).\n"
@@ -567,6 +576,7 @@ void cmdLineHelp()
     "  -v,  --version          Print version of SuperTuxKart.\n"
     "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
+    "       --seed=n           Seed for random number generation to provide reproducible behavior.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
@@ -600,7 +610,6 @@ void cmdLineHelp()
     "       --init-user        Save the above login and password (if set) in config.\n"
     "       --disable-polling  Don't poll for logged in user.\n"
     "       --port=n           Port number to use.\n"
-    "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --min-players=n    Minimum number of clients (server only).\n"
@@ -610,10 +619,6 @@ void cmdLineHelp()
     "       --team-choosing    Allow choosing team in lobby, implicitly allowed in lan or\n"
     "                          password protected server. This function cannot be used in\n"
     "                          owner-less server.\n"
-    "       --soccer-timed     Use time limit mode in network soccer game.\n"
-    "       --soccer-goals     Use goals limit mode in network soccer game.\n"
-    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free For All and\n"
-    "                          1 is Capture The Flag.\n"
     "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
@@ -737,7 +742,7 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--online"))
-        MainMenuScreen::m_enable_online=true;
+        History::m_online_history_replay = true;
 #if !(defined(SERVER_ONLY) || defined(ANDROID))
     if(CommandLine::has("--apitrace"))
     {
@@ -755,11 +760,6 @@ int handleCmdLinePreliminary()
         TrackManager::addTrackSearchDir(s);
     if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
-
-#ifndef SERVER_ONLY
-    if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
-#endif
-        ProfileWorld::disableGraphics();
 
     if (CommandLine::has("--sp-shader-debug"))
         SP::SPShader::m_sp_shader_debug = true;
@@ -906,7 +906,15 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--dont-load-navmesh"))
         Track::m_dont_load_navmesh = true;
 
+    if (CommandLine::has("--no-sound"))
+        UserConfigParams::m_enable_sound = false;
 
+    if (CommandLine::has("--seed", &n))
+    {
+        srand(n);
+        Log::info("main", "STK using random seed (%d)", n);
+    }
+        
     return 0;
 }   // handleCmdLinePreliminary
 
@@ -1187,7 +1195,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
         auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
-            !server_password.empty());
+            !server_password.empty(), false);
         NetworkConfig::get()->addNetworkPlayer(
             input_manager->getDeviceManager()->getLatestUsedDevice(),
             PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
@@ -1197,7 +1205,7 @@ int handleCmdLine()
         cts->setup();
         Log::info("main", "Trying to connect to server '%s'.",
             server_addr.toString().c_str());
-        if (!cts->handleDirectConnect(10000))
+        if (!cts->tryConnect(2000, 15))
         {
             Log::error("main", "Timeout trying to connect to server '%s'.",
                 server_addr.toString().c_str());
@@ -1348,11 +1356,6 @@ int handleCmdLine()
     // The extra server info has to be set before server lobby started
     if (server_lobby)
         server_lobby->requestStart();
-
-    /** Disable detection of LAN connection when connecting via WAN. This is
-     *  mostly a debugging feature to force using WAN connection. */
-    if (CommandLine::has("--disable-lan"))
-        NetworkConfig::m_disable_lan = true;
 
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
@@ -1556,7 +1559,7 @@ int handleCmdLine()
         history->setReplayHistory(true);
         // Force the no-start screen flag, since this initialises
         // the player structures correctly.
-        if(!MainMenuScreen::m_enable_online)
+        if (!History::m_online_history_replay)
             UserConfigParams::m_no_start_screen = true;
     }   // --history
 
@@ -1646,6 +1649,12 @@ void initRest()
     stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     irr_driver = new IrrDriver();
+    
+    if (irr_driver->getDevice() == NULL)
+    {
+        Log::fatal("main", "Couldn't initialise irrlicht device. Quitting.\n");
+    }
+    
     StkTime::init();   // grabs the timer object from the irrlicht device
 
     // Now create the actual non-null device in the irrlicht driver
@@ -1802,6 +1811,22 @@ void askForInternetPermission()
 #endif
 
 // ----------------------------------------------------------------------------
+#ifdef ANDROID
+extern "C"
+{
+#endif
+void main_abort()
+{
+    if (main_loop)
+    {
+        main_loop->abort();
+    }
+}
+#ifdef ANDROID
+}
+#endif
+
+// ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
     CommandLine::init(argc, argv);
@@ -1810,8 +1835,7 @@ int main(int argc, char *argv[] )
 #ifndef WIN32
     signal(SIGTERM, [](int signum)
         {
-            if (main_loop)
-                main_loop->abort();
+            main_abort();
         });
 #endif
     srand(( unsigned ) time( 0 ));
@@ -1828,6 +1852,11 @@ int main(int argc, char *argv[] )
             FileManager::setStdoutName(s);
         if (CommandLine::has("--stdout-dir", &s))
             FileManager::setStdoutDir(s);
+            
+#ifndef SERVER_ONLY
+        if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
+#endif
+            ProfileWorld::disableGraphics();
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
@@ -2083,7 +2112,7 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            if (!MainMenuScreen::m_enable_online)
+            if (!History::m_online_history_replay)
             {
                 race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
@@ -2342,6 +2371,70 @@ void runUnitTests()
 
     Log::info("UnitTest", "RewindQueue");
     RewindQueue::unitTesting();
+
+    Log::info("UnitTest", "IP ban");
+    NetworkConfig::get()->unsetNetworking();
+    ServerLobby sl;
+
+    UserConfigParams::m_server_ip_ban_list =
+        {
+            { "1.2.3.4/32", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.4")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.3.5")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.3.3")));
+
+    UserConfigParams::m_server_ip_ban_list =
+        {
+            { "1.2.3.4/23", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(!sl.isBannedForIP(TransportAddress("1.2.1.255")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.0")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.3")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.4")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.5")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.3")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.4")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.5")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.255")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.4.0")));
+
+    UserConfigParams::m_server_ip_ban_list =
+        {
+            { "11.12.13.14/22", std::numeric_limits<uint32_t>::max() },
+            { "12.13.14.15/24", std::numeric_limits<uint32_t>::max() },
+            { "123.234.56.78/26", std::numeric_limits<uint32_t>::max() },
+            { "234.123.56.78/25", std::numeric_limits<uint32_t>::max() },
+            // Test for overlap handling
+            { "12.13.14.23/32", std::numeric_limits<uint32_t>::max() },
+            { "12.13.14.255/32", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(!sl.isBannedForIP(TransportAddress("11.12.11.255")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.12.0")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.13.14")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.15.255")));
+    assert(!sl.isBannedForIP(TransportAddress("11.12.16.0")));
+
+    assert(!sl.isBannedForIP(TransportAddress("12.13.13.255")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.0")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.15")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.255")));
+    assert(!sl.isBannedForIP(TransportAddress("12.13.15.0")));
+
+    assert(!sl.isBannedForIP(TransportAddress("123.234.56.63")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.64")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.78")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.127")));
+    assert(!sl.isBannedForIP(TransportAddress("123.234.56.128")));
+
+    assert(!sl.isBannedForIP(TransportAddress("234.123.55.255")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.0")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.78")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.127")));
+    assert(!sl.isBannedForIP(TransportAddress("234.123.56.128")));
 
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");

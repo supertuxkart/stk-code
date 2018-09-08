@@ -75,7 +75,7 @@
                 
                 <spacer width="20" height="2%"/>
 
-                <div width="90%" align="center" layout="vertical-row" height="18%">
+                <div width="100%" align="center" layout="vertical-row" height="18%">
                     <buttonbar id="options" width="100%" height="100%" align="center">
                         <icon-button id="ok" width="fit" height="fit" icon="gui/green_check.png"
                                      I18N="In the user screen" text="OK" label_location="bottom"/>

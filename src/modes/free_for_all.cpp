@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/free_for_all.hpp"
-#include "karts/kart.hpp"
+#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <utility>
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
  */
 FreeForAll::FreeForAll() : WorldWithRank()
@@ -42,12 +42,12 @@ FreeForAll::FreeForAll() : WorldWithRank()
     }
 }   // FreeForAll
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 FreeForAll::~FreeForAll()
 {
 }   // ~FreeForAll
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void FreeForAll::init()
 {
     WorldWithRank::init();
@@ -55,7 +55,7 @@ void FreeForAll::init()
     m_count_down_reached_zero = false;
 }   // init
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Called when a battle is restarted.
  */
 void FreeForAll::reset()
@@ -74,7 +74,7 @@ void FreeForAll::reset()
     m_scores.resize(m_karts.size(), 0);
 }   // reset
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Called when the match time ends.
  */
 void FreeForAll::countdownReachedZero()
@@ -85,18 +85,19 @@ void FreeForAll::countdownReachedZero()
     m_count_down_reached_zero = true;
 }   // countdownReachedZero
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Called when a kart is hit.
  *  \param kart_id The world kart id of the kart that was hit.
  *  \param hitter The world kart id of the kart who hit(-1 if none).
  */
-void FreeForAll::kartHit(int kart_id, int hitter)
+bool FreeForAll::kartHit(int kart_id, int hitter)
 {
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient())
-        return;
+        return false;
 
-    if (isRaceOver()) return;
+    if (isRaceOver())
+        return false;
 
     NetworkString p(PROTOCOL_GAME_EVENTS);
     p.setSynchronous(true);
@@ -106,9 +107,10 @@ void FreeForAll::kartHit(int kart_id, int hitter)
     else
         p.addUInt8((uint8_t)hitter).addUInt32(++m_scores[hitter]);
     STKHost::get()->sendPacketToAllPeers(&p, true);
+    return true;
 }   // kartHit
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void FreeForAll::setKartScoreFromServer(NetworkString& ns)
 {
     int kart_id = ns.getUInt8();
@@ -116,7 +118,7 @@ void FreeForAll::setKartScoreFromServer(NetworkString& ns)
     m_scores.at(kart_id) = score;
 }   // setKartScoreFromServer
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
  */
 const std::string& FreeForAll::getIdent() const
@@ -144,7 +146,7 @@ void FreeForAll::update(int ticks)
     endSetKartPositions();
 }   // update
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.
  */
 bool FreeForAll::isRaceOver()
@@ -160,7 +162,7 @@ bool FreeForAll::isRaceOver()
         m_scores[top_id] >= race_manager->getHitCaptureLimit();
 }   // isRaceOver
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.
  */
 void FreeForAll::getKartsDisplayInfo(
@@ -172,18 +174,25 @@ void FreeForAll::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
-        rank_info.m_text = m_karts[i]->getController()->getName() + L" (" +
+        rank_info.m_color = getColor(i);
+        rank_info.m_text = getKart(i)->getController()->getName() + L" (" +
             StringUtils::toWString(m_scores[i]) + L")";
     }
 }   // getKartsDisplayInfo
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void FreeForAll::terminateRace()
 {
     const unsigned int kart_amount = getNumKarts();
     for (unsigned int i = 0; i < kart_amount ; i++)
     {
-        m_karts[i]->finishedRace(0.0f, true/*from_server*/);
+        getKart(i)->finishedRace(0.0f, true/*from_server*/);
     }   // i<kart_amount
     WorldWithRank::terminateRace();
 }   // terminateRace
+
+// ----------------------------------------------------------------------------
+video::SColor FreeForAll::getColor(unsigned int kart_id) const
+{
+    return GUIEngine::getSkin()->getColor("font::normal");
+}   // getColor

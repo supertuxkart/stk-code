@@ -161,6 +161,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Iobj/openssl/include             \
                       -DUSE_GLES2      \
                       -DENABLE_SOUND   \
+                      -DENABLE_CRYPTO_OPENSSL           \
                       -DNDEBUG         \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
                       -DANDROID_APP_DIR_NAME=\"$(APP_DIR_NAME)\"    \

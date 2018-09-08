@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 
 #include <memory>
 
@@ -30,8 +31,16 @@ namespace GUIEngine
     class CheckBoxWidget;
     class IconButtonWidget;
     class LabelWidget;
-    class ListWidget;
 }
+
+namespace irr
+{
+    namespace gui
+    {
+        class STKModifiedSpriteBank;
+    }
+}
+
 class Server;
 
 /**
@@ -40,7 +49,8 @@ class Server;
   */
 class ServerSelection :  public GUIEngine::Screen,
                          public GUIEngine::ScreenSingleton<ServerSelection>,
-                         public GUIEngine::IListWidgetHeaderListener
+                         public GUIEngine::IListWidgetHeaderListener,
+                         public GUIEngine::ITextBoxWidgetListener
 {
     friend class GUIEngine::ScreenSingleton<ServerSelection>;
 
@@ -51,19 +61,24 @@ private:
     std::vector<std::shared_ptr<Server> > m_servers;
 
     GUIEngine::CheckBoxWidget* m_private_server;
+    GUIEngine::CheckBoxWidget* m_game_started;
     GUIEngine::IconButtonWidget* m_reload_widget;
     GUIEngine::LabelWidget* m_update_status;
     GUIEngine::ListWidget* m_server_list_widget;
+    GUIEngine::TextBoxWidget* m_searcher;
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
 
     /** \brief To check (and set) if sort order is descending **/
     bool m_sort_desc;
+
+    int m_current_column;
 
     bool m_refreshing_server;
     
     float m_refresh_timer;
 
     /** Load the servers into the main list.*/
-    void loadList(unsigned sort_case);
+    void loadList();
 
     void copyFromServersManager();
 
@@ -74,20 +89,29 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name,
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) OVERRIDE;
+    virtual void onColumnClicked(int column_id, bool sort_desc,
+                                 bool sort_default) OVERRIDE;
 
     virtual void init() OVERRIDE;
 
     virtual void tearDown() OVERRIDE;
 
+    virtual void unloaded() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
+
+    virtual void onTextUpdated() OVERRIDE         { copyFromServersManager(); }
+
+    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
+                                                              { return false; }
 
 };   // ServerSelection
 

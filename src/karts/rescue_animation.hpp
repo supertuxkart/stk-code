@@ -37,18 +37,11 @@ protected:
     /** Column 1 of btTransform of kart. */
     Vec3 m_up_vector;
 
-    /** The kart's original rotation. */
-    btQuaternion m_orig_rotation;
-
-    /** Desired rotation for rescue determined by last valid quad. */
-    btQuaternion m_des_rotation;
-
     /** The velocity with which the kart is moved. */
     float m_velocity;
 
-    /* At what percent of the animation should the kart be on the track*/
-	/*0.75 means that for 3 quaters of the animation it'll be on track*/
-    const float rescue_moment = 0.6F;
+    int m_rescue_moment;
+
     /* Has the kart been moved onto the track */
     bool m_kart_on_track = false;
 
@@ -59,6 +52,6 @@ public:
                  RescueAnimation(AbstractKart *kart, bool is_auto_rescue=false);
     float maximumHeight();
     virtual     ~RescueAnimation();
-    virtual void update(float dt);
+    virtual void update(int ticks);
 };   // RescueAnimation
 #endif

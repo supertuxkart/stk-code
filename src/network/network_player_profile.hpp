@@ -30,7 +30,7 @@
 #include <tuple>
 
 class STKPeer;
-enum SoccerTeam : int8_t;
+enum KartTeam : int8_t;
 enum PerPlayerDifficulty : uint8_t;
 
 /*! \class NetworkPlayerProfile
@@ -66,14 +66,14 @@ private:
     /** Overall time if grand prix. */
     float m_overall_time;
 
-    SoccerTeam m_team;
+    KartTeam m_team;
 
 public:
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,
                          PerPlayerDifficulty per_player_difficulty,
-                         uint8_t local_player_id, SoccerTeam team)
+                         uint8_t local_player_id, KartTeam team)
     {
         m_peer                  = peer;
         m_player_name           = name;
@@ -131,9 +131,9 @@ public:
         m_overall_time = 0.0f;
     }
     // ------------------------------------------------------------------------
-    void setTeam(SoccerTeam team)                            { m_team = team; }
+    void setTeam(KartTeam team)                            { m_team = team; }
     // ------------------------------------------------------------------------
-    SoccerTeam getTeam() const                               { return m_team; }
+    KartTeam getTeam() const                               { return m_team; }
 
 };   // class NetworkPlayerProfile
 

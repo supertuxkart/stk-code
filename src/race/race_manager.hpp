@@ -88,7 +88,7 @@ public:
     */
     enum MajorRaceModeType
     {
-        MAJOR_MODE_GRAND_PRIX,
+        MAJOR_MODE_GRAND_PRIX = 0,
         MAJOR_MODE_SINGLE,
         MAJOR_MODE_FREE_FOR_ALL,
         MAJOR_MODE_CAPTURE_THE_FLAG,
@@ -334,6 +334,7 @@ private:
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
+    unsigned int                     m_num_ghost_karts;
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
@@ -370,9 +371,9 @@ public:
     void setPlayerKart(unsigned int player_id,
                        const RemoteKartInfo& ki);
 
-    /** Sets additional information for a player to indicate which soccer team it belong to
+    /** Sets additional information for a player to indicate which team it belong to
     */
-    void setKartSoccerTeam(unsigned int player_id, SoccerTeam team);
+    void setKartTeam(unsigned int player_id, KartTeam team);
 
     /** Sets the per-player difficulty for a player.
      */
@@ -510,6 +511,8 @@ public:
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
     unsigned int getNumberOfKarts() const {return m_num_karts; }
+    // ------------------------------------------------------------------------
+    unsigned int getNumNonGhostKarts() const { return m_num_karts - m_num_ghost_karts; }
     // ------------------------------------------------------------------------
     MajorRaceModeType getMajorMode() const { return m_major_mode; }
     // ------------------------------------------------------------------------
@@ -723,6 +726,15 @@ public:
     {
         return m_minor_mode == MINOR_MODE_TIME_TRIAL;
     }   //  isTimeTrialMode
+    // ------------------------------------------------------------------------
+     /** \brief Returns the number of second's decimals to display */
+    int currentModeTimePrecision()
+    {
+        if (isEggHuntMode() || isTimeTrialMode())
+            return 3;//display milliseconds
+
+        return 2;//display centiseconds
+    }   // currentModeTimePrecision
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */
     bool modeHasLaps()

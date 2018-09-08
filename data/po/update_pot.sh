@@ -6,7 +6,7 @@ CPP_FILE_LIST="`find ./src              \
                      -name '*.cpp' -or  \
                      -name '*.c' -or    \
                      -name '*.hpp' -or  \
-                     -name "*.h"        \
+                     -name "*.h" | sort -n \
               `"
 XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
                      -name 'achievements.xml' -or                \
@@ -15,7 +15,7 @@ XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
                      -name 'scene.xml' -or                       \
                      -name '*.challenge' -or                     \
                      -name '*.grandprix' -or                     \
-                     -name '*.stkgui'                            \
+                     -name '*.stkgui' | sort -n                  \
               `"
 ANGELSCRIPT_FILE_LIST="`find ./data ../stk-assets/tracks -name '*.as'`"
 

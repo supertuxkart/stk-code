@@ -200,7 +200,7 @@ void AIBaseLapController::computePath()
 void AIBaseLapController::update(int ticks)
 {
     AIBaseController::update(ticks);
-    if(DriveGraph::get())
+    if(DriveGraph::get() && m_world)
     {
         // Update the current node:
         int old_node = m_track_node;

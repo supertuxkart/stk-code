@@ -37,7 +37,7 @@
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/lobby_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
@@ -115,9 +115,12 @@ void NetworkingLobby::loadedFromFile()
         (file_manager->getAsset(FileManager::GUI, "difficulty_medium.png"));
     video::ITexture* icon_3 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI, "main_help.png"));
+    video::ITexture* icon_4 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI, "hourglass.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
+    m_icon_bank->addTextureAsSprite(icon_4);
     const int screen_width = irr_driver->getFrameSize().Width;
     m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
 }   // loadedFromFile
@@ -136,7 +139,9 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    m_player_names.clear();
     m_allow_change_team = false;
+    m_has_auto_start_in_server = false;
     m_ping_update_timer = 0.0f;
     m_cur_starting_timer = m_start_threshold = m_start_timeout =
         m_server_max_player = std::numeric_limits<float>::max();
@@ -210,8 +215,43 @@ void NetworkingLobby::onUpdate(float delta)
 {
     if (NetworkConfig::get()->isServer())
         return;
-    if (m_timeout_message->isVisible() && m_player_list)
+
+    m_ping_update_timer += delta;
+    if (m_player_list && m_ping_update_timer > 2.0f)
     {
+        m_ping_update_timer = 0.0f;
+        updatePlayerPings();
+    }
+
+    //I18N: In the networking lobby, display ping when connected
+    const uint32_t ping = STKHost::get()->getClientPingToServer();
+    if (ping != 0)
+        m_header->setText(_("Lobby (ping: %dms)", ping), false);
+
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl && cl->isWaitingForGame())
+    {
+        m_start_button->setVisible(false);
+        m_exit_widget->setVisible(true);
+        m_timeout_message->setVisible(true);
+        //I18N: In the networking lobby, show when player is required to wait
+        //before the current game finish
+        core::stringw msg = _("Please wait for current game to end.");
+        m_timeout_message->setText(msg, true);
+        core::stringw total_msg;
+        for (auto& string : m_server_info)
+        {
+            total_msg += string;
+            total_msg += L"\n";
+        }
+        m_text_bubble->setText(total_msg, true);
+        m_cur_starting_timer = std::numeric_limits<float>::max();
+        return;
+    }
+
+    if (m_has_auto_start_in_server && m_player_list)
+    {
+        m_timeout_message->setVisible(true);
         float cur_player = (float)(m_player_list->getItemCount());
         if (cur_player >= m_server_max_player * m_start_threshold &&
             m_cur_starting_timer == std::numeric_limits<float>::max())
@@ -242,6 +282,10 @@ void NetworkingLobby::onUpdate(float delta)
             m_timeout_message->setText(msg, true);
         }
     }
+    else
+    {
+        m_timeout_message->setVisible(false);
+    }
 
     if (m_state == LS_ADD_PLAYERS)
     {
@@ -259,8 +303,7 @@ void NetworkingLobby::onUpdate(float delta)
 
     m_start_button->setVisible(false);
     m_exit_widget->setVisible(true);
-    auto lp = LobbyProtocol::get<LobbyProtocol>();
-    if (!lp || !lp->waitingForPlayers())
+    if (!cl || !cl->isLobbyReady())
     {
         core::stringw connect_msg;
         if (m_joined_server)
@@ -287,20 +330,10 @@ void NetworkingLobby::onUpdate(float delta)
         m_text_bubble->setText(total_msg, true);
     }
 
-    m_ping_update_timer += delta;
-    if (m_player_list && m_ping_update_timer > 2.0f)
-    {
-        m_ping_update_timer = 0.0f;
-        updatePlayerPings();
-    }
     if (STKHost::get()->isAuthorisedToControl())
     {
         m_start_button->setVisible(true);
     }
-    //I18N: In the networking lobby, display ping when connected
-    const uint32_t ping = STKHost::get()->getClientPingToServer();
-    if (ping != 0)
-        m_header->setText(_("Lobby (ping: %dms)", ping), false);
 
 }   // onUpdate
 
@@ -327,9 +360,9 @@ void NetworkingLobby::updatePlayerPings()
             continue;
         int id = m_player_list->getItemID(p.first);
         m_player_list->renameItem(id, name_with_ping, std::get<1>(p.second));
-        if (std::get<2>(p.second) == SOCCER_TEAM_RED)
+        if (std::get<2>(p.second) == KART_TEAM_RED)
             m_player_list->markItemRed(id);
-        else if (std::get<2>(p.second) == SOCCER_TEAM_BLUE)
+        else if (std::get<2>(p.second) == KART_TEAM_BLUE)
             m_player_list->markItemBlue(id);
     }
 }   // updatePlayerPings
@@ -426,7 +459,7 @@ bool NetworkingLobby::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
                                     uint32_t, uint32_t, core::stringw,
-                                    int, SoccerTeam> >& p)
+                                    int, KartTeam> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
@@ -447,16 +480,16 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
             m_player_list->setIcons(icon_bank);
             icon_bank = NULL;
         }
-        SoccerTeam cur_team = std::get<5>(q);
-        m_allow_change_team = cur_team != SOCCER_TEAM_NONE;
+        KartTeam cur_team = std::get<5>(q);
+        m_allow_change_team = cur_team != KART_TEAM_NONE;
         const std::string internal_name =
             StringUtils::toString(std::get<0>(q)) + "_" +
             StringUtils::toString(std::get<1>(q)) + "_" +
             StringUtils::toString(std::get<2>(q));
         m_player_list->addItem(internal_name, std::get<3>(q), std::get<4>(q));
-        if (cur_team == SOCCER_TEAM_RED)
+        if (cur_team == KART_TEAM_RED)
             m_player_list->markItemRed(i);
-        else if (cur_team == SOCCER_TEAM_BLUE)
+        else if (cur_team == KART_TEAM_BLUE)
             m_player_list->markItemBlue(i);
         m_player_names[internal_name] =
             std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team);
@@ -508,7 +541,7 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
     if (start_threshold == 0.0f || start_timeout == 0.0f)
         return;
 
-    m_timeout_message->setVisible(true);
+    m_has_auto_start_in_server = true;
     m_start_threshold = grand_prix_started ? 0.0f : start_threshold;
     m_start_timeout = start_timeout;
     m_server_max_player = (float)server_max_player;

@@ -2,25 +2,26 @@
 <stkgui>
     <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" padding="10">
 
-        <header id="selected_track" width="80%" height="30"
+        <header id="selected_track" width="80%"
             I18N="No neeed to translate this, it will be overwritten by the track name"
             text="" align="center" text_align="center" />
 
         <spacer height="20" />
 
         <!-- Track selection -->
-        <box width="100%" height="60%" layout="vertical-row">
-            <ribbon_grid id="tracks" proportion="1" width="100%" height="100%" square_items="true"
-                label_location="each" align="center" child_width="240" child_height="160" />
+        <box proportion="3" width="100%" layout="vertical-row">
+            <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
+                label_location="each" align="center" max_rows="2" child_width="160"
+                child_height="120"/>
         </box>
 
         <!-- Populated dynamically at runtime -->
         <tabs width="100%" height="5%" id="trackgroups"> </tabs>
 
-        <spacer height="50" />
+        <spacer height="10%" />
 
         <!-- Laps and reverse -->
-        <div width="100%" height="100" layout="horizontal-row" align="center">
+        <div width="100%" height="fit" layout="horizontal-row" align="center">
 
             <spacer proportion="1" />
 
@@ -40,14 +41,18 @@
             <spacer proportion="1" />
         </div>
 
+        <spacer height="5%" />
+
         <!-- Dialog buttons -->
-        <div width="100%" height="60" layout="horizontal-row">
+        <div width="100%" height="fit" layout="horizontal-row">
             <spacer proportion="2" />
             <button id="ok" text="OK" proportion="1" />
             <spacer proportion="1" />
             <button id="cancel" text="Cancel" proportion="1" />
             <spacer proportion="2" />
         </div>
+
+        <spacer height="2%" />
 
     </div>
 </stkgui>

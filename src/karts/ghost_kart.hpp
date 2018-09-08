@@ -98,9 +98,9 @@ public:
     float getTimeForEggs(int egg_number);
 
     // ------------------------------------------------------------------------
-    virtual void  kartIsInRestNow() OVERRIDE {};
+    virtual void kartIsInRestNow() OVERRIDE {}
     // ------------------------------------------------------------------------
-    
+    virtual void makeKartRest() OVERRIDE {}
 };   // GhostKart
 #endif
 

@@ -39,7 +39,7 @@ class Plunger;
 class RubberBand : public NoCopy
 {
 public:
-enum RubberBandTo : uint8_t
+enum RubberBandTo
 {
     RB_TO_PLUNGER = 0, /**< Rubber band is attached to plunger.    */
     RB_TO_KART,        /**< Rubber band is attached to a kart hit. */

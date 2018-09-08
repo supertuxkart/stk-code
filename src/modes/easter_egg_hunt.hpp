@@ -45,6 +45,8 @@ private:
     int   m_eggs_found;
 
     bool  m_only_ghosts;
+
+    float m_finish_time;
 public:
              EasterEggHunt();
     virtual ~EasterEggHunt();

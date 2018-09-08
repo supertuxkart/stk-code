@@ -779,6 +779,14 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child,
     return EVENT_BLOCK;
 }   // mouseHovered
 
+EventPropagation RibbonWidget::onClick()
+{
+    if (m_ribbon_type == RIBBON_TOOLBAR)
+        return EVENT_BLOCK;
+        
+    return EVENT_LET;
+}
+
 // ----------------------------------------------------------------------------
 const std::string& RibbonWidget::getSelectionIDString(const int playerID)
 {

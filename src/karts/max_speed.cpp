@@ -323,6 +323,14 @@ void MaxSpeed::update(int ticks)
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
     }
+    if (getSpeedIncreaseTicksLeft(MS_INCREASE_SKIDDING) > 0 &&
+        getSpeedIncreaseTicksLeft(MS_INCREASE_RED_SKIDDING) > 0)
+    {
+        SpeedIncrease &speedup = m_speed_increase[MS_INCREASE_SKIDDING];
+        m_current_max_speed -= speedup.getSpeedIncrease();
+        m_add_engine_force  -= speedup.getEngineForce();
+    }
+
     m_current_max_speed *= slowdown_factor;
 
     // Then cap the current speed of the kart

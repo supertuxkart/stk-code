@@ -22,6 +22,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_manager.hpp"
@@ -724,3 +725,13 @@ DriveNode* DriveGraph::getNode(unsigned int j) const
     assert(n != NULL);
     return n;
 }   // getNode
+
+// -----------------------------------------------------------------------------
+bool DriveGraph::hasLapLine() const
+{
+    if (Track::getCurrentTrack()->isCTF() &&
+        race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        return false;
+    return true;
+}   // hasLapLine

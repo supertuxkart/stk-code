@@ -341,7 +341,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
                                        Online::RequestManager::IPERM_NOT_ALLOWED)
             {
                 irr::core::stringw message =
-                    _("Internet access is disabled. Do you want to enable it ?");
+                    _("Internet access is disabled. Do you want to enable it?");
 
                 class ConfirmInternet : public MessageDialog::IConfirmDialogListener
                 {
@@ -645,7 +645,7 @@ void BaseUserScreen::deletePlayer()
     PlayerProfile *player = getSelectedPlayer();
     irr::core::stringw message =
         //I18N: In the player info dialog (when deleting)
-        _("Do you really want to delete player '%s' ?", player->getName(true/*ignoreRTL*/));
+        _("Do you really want to delete player '%s'?", player->getName(true/*ignoreRTL*/));
 
     class ConfirmServer : public MessageDialog::IConfirmDialogListener
     {

@@ -62,8 +62,8 @@ SoccerAI::SoccerAI(AbstractKart *kart)
     m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
     m_track = Track::getCurrentTrack();
     m_cur_team = m_world->getKartTeam(m_kart->getWorldKartId());
-    m_opp_team = (m_cur_team == SOCCER_TEAM_BLUE ?
-        SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
+    m_opp_team = (m_cur_team == KART_TEAM_BLUE ?
+        KART_TEAM_RED : KART_TEAM_BLUE);
 
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.
@@ -110,8 +110,8 @@ void SoccerAI::reset()
 void SoccerAI::update(int ticks)
 {
 #ifdef BALL_AIM_DEBUG
-    Vec3 red = m_world->getBallAimPosition(SOCCER_TEAM_RED);
-    Vec3 blue = m_world->getBallAimPosition(SOCCER_TEAM_BLUE);
+    Vec3 red = m_world->getBallAimPosition(KART_TEAM_RED);
+    Vec3 blue = m_world->getBallAimPosition(KART_TEAM_BLUE);
     m_red_sphere->setPosition(red.toIrrVector());
     m_blue_sphere->setPosition(blue.toIrrVector());
 #endif
@@ -226,7 +226,7 @@ Vec3 SoccerAI::determineBallAimingPosition()
 {
 #ifdef BALL_AIM_DEBUG
     // Choose your favourite team to watch
-    if (m_world->getKartTeam(m_kart->getWorldKartId()) == SOCCER_TEAM_BLUE)
+    if (m_world->getKartTeam(m_kart->getWorldKartId()) == KART_TEAM_BLUE)
     {
         Camera *cam = Camera::getActiveCamera();
         cam->setMode(Camera::CM_NORMAL);

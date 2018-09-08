@@ -81,7 +81,7 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
     const Vec3 &end_right, float skid_rot)
 {
     m_curve = new AnimationBase(ipo);
-    m_timer = ipo->getEndTime();
+    m_timer = stk_config->time2Ticks(ipo->getEndTime());
 
     // First make sure that left and right points are indeed correct
     // -------------------------------------------------------------
@@ -214,25 +214,25 @@ CannonAnimation::~CannonAnimation()
 
 // ----------------------------------------------------------------------------
 /** Updates the kart animation.
- *  \param dt Time step size.
- *  \return True if the explosion is still shown, false if it has finished.
+ *  \param ticks Number of time steps - should be 1.
  */
-void CannonAnimation::update(float dt)
+void CannonAnimation::update(int ticks)
 {
-    if(m_timer < dt)
+    float dt = stk_config->ticks2Time(ticks);
+    if (m_timer < ticks)
     {
-        AbstractKartAnimation::update(dt);
+        AbstractKartAnimation::update(ticks);
         return;
     }
-    AbstractKartAnimation::update(dt);
+    AbstractKartAnimation::update(ticks);
 
     // First compute the current rotation
     // ==================================
     // Get the tangent = derivative at the current point to compute the
     // new orientation of the kart
     Vec3 tangent;
-    m_curve->getDerivativeAt(m_curve->getAnimationDuration() - m_timer,
-                             &tangent);
+    m_curve->getDerivativeAt(m_curve->getAnimationDuration() -
+        getAnimationTimer(), &tangent);
     // Get the current kart orientation
     const btTransform &trans = m_kart ? m_kart->getTrans()
                                       : m_flyable->getBody()->getWorldTransform();
@@ -275,7 +275,7 @@ void CannonAnimation::update(float dt)
     // forward direction.
 
     // The timer counts backwards, so the fraction goes from 1 to 0
-    float f = m_timer / m_curve->getAnimationDuration();
+    float f = getAnimationTimer() / m_curve->getAnimationDuration();
     float f_current_width = m_start_line_length * f
                           + m_end_line_length   * (1.0f - f);
 

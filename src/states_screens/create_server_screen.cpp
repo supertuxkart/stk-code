@@ -267,7 +267,7 @@ void CreateServerScreen::createServer()
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        0, server_address, !password.empty());
+        0, server_address, !password.empty(), false);
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
@@ -316,12 +316,22 @@ void CreateServerScreen::createServer()
         server_cfg << "--lan-server=" << server_name;
     }
 
-    std::string server_id_file = "server_id_file_";
-    server_id_file += StringUtils::toString(StkTime::getTimeSinceEpoch());
+    // Clear previous stk-server-id-file_*
+    std::set<std::string> files;
+    const std::string server_id_file = "stk-server-id-file_";
+    file_manager->listFiles(files, file_manager->getUserConfigDir());
+    for (auto& f : files)
+    {
+        if (f.find(server_id_file) != std::string::npos)
+        {
+            file_manager->removeFile(file_manager->getUserConfigDir() + "/" +
+                f);
+        }
+    }
     NetworkConfig::get()->setServerIdFile(
         file_manager->getUserConfigFile(server_id_file));
 
-    server_cfg << " --no-graphics --stdout=server.log --type=" <<
+    server_cfg << " --no-graphics --no-sound --stdout=server.log --type=" <<
         gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
         " --difficulty=" <<
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<

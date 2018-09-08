@@ -41,7 +41,7 @@
 #  include <ifaddrs.h>
 #endif
 
-#define SERVER_REFRESH_INTERVAL 5.0f
+const uint64_t SERVER_REFRESH_INTERVAL = 5000;
 
 static ServersManager* g_manager_singleton(NULL);
 
@@ -64,7 +64,7 @@ void ServersManager::deallocate()
 // ----------------------------------------------------------------------------
 ServersManager::ServersManager()
 {
-    m_last_load_time.store(0.0f);
+    m_last_load_time.store(0);
     m_list_updated = false;
 }   // ServersManager
 
@@ -158,8 +158,8 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             char buffer[LEN];
             // Wait for up to 0.5 seconds to receive an answer from 
             // any local servers.
-            double start_time = StkTime::getRealTime();
-            const double DURATION = 1.0;
+            uint64_t start_time = StkTime::getRealTimeMs();
+            const uint64_t DURATION = 1000;
             const auto& servers = ServersManager::get()->getServers();
             int cur_server_id = (int)servers.size();
             assert(cur_server_id == 0);
@@ -169,7 +169,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             // because e.g. a local client would answer as 127.0.0.1 and
             // 192.168.**.
             std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
-            while (StkTime::getRealTime() - start_time < DURATION)
+            while (StkTime::getRealTimeMs() - start_time < DURATION)
             {
                 TransportAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
@@ -193,10 +193,11 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t mode        = s.getUInt8();
                     sender.setPort(port);
                     uint8_t password    = s.getUInt8();
+                    uint8_t game_started = s.getUInt8();
                     servers_now.insert(std::make_pair(name, 
                         std::make_shared<Server>(cur_server_id++, name, 
                         max_players, players, difficulty, mode, sender, 
-                        password == 1)));
+                        password == 1, game_started == 1)));
                     //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
@@ -236,7 +237,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
  */
 bool ServersManager::refresh(bool full_refresh)
 {
-    if (StkTime::getRealTime() - m_last_load_time.load()
+    if (StkTime::getRealTimeMs() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
@@ -280,8 +281,12 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
     const XMLNode *servers_xml = input->getNode("servers");
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
+        const XMLNode* s = servers_xml->getNode(i);
+        assert(s);
+        const XMLNode* si = s->getNode("server-info");
+        assert(si);
         int version = 0;
-        servers_xml->getNode(i)->get("version", &version);
+        si->get("version", &version);
         assert(version != 0);
         if (version < stk_config->m_max_server_version ||
             version > stk_config->m_max_server_version)
@@ -289,10 +294,9 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
             Log::verbose("ServersManager", "Skipping a server");
             continue;
         }
-        m_servers.emplace_back(
-            std::make_shared<Server>(*servers_xml->getNode(i)));
+        m_servers.emplace_back(std::make_shared<Server>(*s));
     }
-    m_last_load_time.store((float)StkTime::getRealTime());
+    m_last_load_time.store(StkTime::getRealTimeMs());
     m_list_updated = true;
 }   // refresh
 

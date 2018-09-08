@@ -346,9 +346,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -395,9 +392,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -474,9 +468,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -524,9 +515,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -603,9 +591,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -653,9 +638,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -741,9 +723,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -795,9 +774,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -879,9 +855,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -930,9 +903,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -1016,9 +986,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -1070,9 +1037,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -1144,9 +1108,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -1191,9 +1152,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -1281,9 +1239,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -1337,9 +1292,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
@@ -1434,9 +1386,6 @@ endcopy:
 		// and the epilogue below, the stack unwind works as it should. 
 		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
 		"pushl %%ebp               \n"
-#ifndef __ANDROID__
-		".cfi_startproc            \n"
-#endif
 		".cfi_adjust_cfa_offset 4  \n"
 		".cfi_rel_offset ebp, 0    \n"
 		"movl %%esp, %%ebp         \n"
@@ -1503,9 +1452,6 @@ endcopy:
 		"popl %%ebp                \n"
 		".cfi_adjust_cfa_offset -4 \n"
 		".cfi_restore ebp          \n"
-#ifndef __ANDROID__
-		".cfi_endproc              \n"
-#endif
 #endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable

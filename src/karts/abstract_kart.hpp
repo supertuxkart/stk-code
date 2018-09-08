@@ -74,7 +74,7 @@ private:
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 
-
+    btTransform m_starting_transform;
 protected:
     /** The kart properties. */
     std::unique_ptr<KartProperties> m_kart_properties;
@@ -509,6 +509,9 @@ public:
     virtual void playSound(SFXBuffer* buffer) = 0;
     // ------------------------------------------------------------------------
     virtual bool isVisible() = 0;
+    // ------------------------------------------------------------------------
+    virtual void makeKartRest();
+
 };   // AbstractKart
 
 

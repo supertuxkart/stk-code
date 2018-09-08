@@ -152,6 +152,10 @@ public:
     {
         return m_elements[key];
     }
+    U& at(const T key)
+    {
+        return m_elements.at(key);
+    }
 };   // MapUserConfigParam
 typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
 typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
@@ -464,7 +468,7 @@ namespace UserConfigParams
             "A parameter that determines general accelerometer sensitivity."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
-            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
+            PARAM_DEFAULT( FloatUserConfigParam(1.2f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
@@ -586,7 +590,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
-                        
+
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",
@@ -672,6 +676,8 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
+    
+    PARAM_PREFIX bool m_enable_sound PARAM_DEFAULT( true );
 
     /** True to test funky ambient/diffuse/specularity in RGB &
      *  all anisotropic */
@@ -681,21 +687,24 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
     // ---- Networking
-    PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
-        "The stun servers that will be used to know the public address,"
-        " LHS: server address, RHS: ping time.",
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_servers",
+        "The stun servers that will be used to know the public address with"
+        " port, LHS: server address, RHS: ping time.",
             {
-                { "numb.viagenie.ca", 0u },
-                { "stun.12connect.com", 0u },
-                { "stun.callwithus.com", 0u },
-                { "stun.cope.es", 0u },
-                { "stun.counterpath.net", 0u },
-                { "stun.ekiga.net", 0u },
-                { "stun.ivao.aero", 0u },
-                { "stun.schlund.de", 0u },
-                { "stun.stunprotocol.org", 0u },
-                { "stun.voip.aebc.com", 0u }
+                { "stun.12connect.com:3478", 0u },
+                { "stun.callwithus.com:3478", 0u },
+                { "stun.cope.es:3478", 0u },
+                { "stun.counterpath.net:3478", 0u },
+                { "stun.ekiga.net:3478", 0u },
+                { "stun.ivao.aero:3478", 0u },
+                { "stun.schlund.de:3478", 0u },
+                { "stun.stunprotocol.org:3478", 0u },
+                { "stun.l.google.com:19302", 0u },
+                { "stun1.l.google.com:19302", 0u },
+                { "stun2.l.google.com:19302", 0u },
+                { "stun3.l.google.com:19302", 0u },
+                { "stun4.l.google.com:19302", 0u }
             }
         ));
 
@@ -750,31 +759,42 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ffa
         PARAM_DEFAULT(FloatUserConfigParam(0.7f, "time-limit-threshold-ffa",
         &m_network_group, "Value used to calculate time limit in free for all, which "
-        "is max(number of players * time-limit-threshold-ffa, 2.0) * 60, negative value to disable time limit."));
+        "is max(number of players * time-limit-threshold-ffa, 3.0) * 60, negative value to disable time limit."));
     PARAM_PREFIX FloatUserConfigParam m_capture_limit_threshold
-        PARAM_DEFAULT(FloatUserConfigParam(0.5f, "capture-limit-threshold",
+        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "capture-limit-threshold",
         &m_network_group, "Value used to calculate capture limit in CTF, which "
-        "is max(2.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
+        "is max(3.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
     PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ctf
         PARAM_DEFAULT(FloatUserConfigParam(0.9f, "time-limit-threshold-ctf",
         &m_network_group, "Value used to calculate time limit in CTF, which "
-        "is max(2.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0," 
+        "is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
         " negative value to disable time limit."));
-    PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
-            "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
-            "from this IP will be banned.",
-            { { "0.0.0.0", 0u } }
-        ));
+    PARAM_PREFIX StringToUIntUserConfigParam m_server_ip_ban_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ip_ban_list",
+        "LHS: IP in X.X.X.X/Y (CIDR) format, use Y of 32 for a specific ip, "
+        "RHS: time epoch to expire, if -1 (uint32_t max) than a permanent ban.",
+        { { "0.0.0.0/0", 0u } }));
+    PARAM_PREFIX UIntToUIntUserConfigParam m_server_online_id_ban_list
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("server_online_id_ban_list",
+        "LHS: online id, RHS: time epoch to expire, if -1 (uint32_t max) than a permanent ban.",
+        { { 0u, 0u } }));
     PARAM_PREFIX IntUserConfigParam m_max_ping
         PARAM_DEFAULT(IntUserConfigParam(300, "max-ping",
         &m_network_group, "Maximum ping allowed for a player (in ms)."));
     PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
         PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
         &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
+     PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
+        &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
     PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
         PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
         &m_network_group, "Kick players whose ping is above max-ping."));
+    PARAM_PREFIX FloatUserConfigParam m_auto_lap_ratio
+        PARAM_DEFAULT(FloatUserConfigParam(-1.0f, "auto-lap-ratio",
+        &m_network_group, "Value used by server to automatically calculate lap of each race in network game, "
+        "if more than 0.0f, the number of lap of each track vote in linear race will be determined "
+        "by max(1.0f, auto-lap-ratio * default lap of that track)."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

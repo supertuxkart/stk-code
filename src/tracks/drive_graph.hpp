@@ -69,7 +69,7 @@ private:
     // ------------------------------------------------------------------------
     unsigned int getStartNode() const;
     // ------------------------------------------------------------------------
-    virtual bool hasLapLine() const OVERRIDE                   { return true; }
+    virtual bool hasLapLine() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void differentNodeColor(int n, video::SColor* c) const OVERRIDE;
 

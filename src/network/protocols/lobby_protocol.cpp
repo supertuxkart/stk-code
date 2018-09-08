@@ -45,6 +45,7 @@ LobbyProtocol::~LobbyProtocol()
     if (RaceEventManager::getInstance())
         RaceEventManager::getInstance()->stop();
     delete m_game_setup;
+    joinStartGameThread();
 }   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
@@ -121,8 +122,8 @@ void LobbyProtocol::configRemoteKart(
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         rki.setOnlineId(profile->getOnlineId());
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-            rki.setSoccerTeam(profile->getTeam());
+        if (race_manager->teamEnabled())
+            rki.setKartTeam(profile->getTeam());
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
