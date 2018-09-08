@@ -18,6 +18,7 @@
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader.hpp"
@@ -25,10 +26,13 @@
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
 #include "tracks/track.hpp"
+#include "karts/abstract_kart.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
+
+class AbstractKart;
 
 namespace SP
 {
@@ -62,7 +66,15 @@ SPShaderManager::SPShaderManager()
         },
         { "dirtFactorUniformAssigner", [](SPUniformAssigner* ua)
             {
-                ua->setValue(2.0f);
+                Camera *camera = Camera::getCamera(0);
+                if (camera && camera->getKart()->isOnGround())
+                {
+                    ua->setValue(2.0f);
+                }
+                else
+                {
+                    ua->setValue(0.0f);
+                }
             }
         },
         { "isDuringDayUniformAssigner", [](SPUniformAssigner* ua)
