@@ -1,0 +1,21 @@
+<spshader>
+    <shader-info name="kartDirt" fallback-shader="solid" use-tangents="Y"/>
+    <first-pass vertex-shader="sp_pass.vert"
+        fragment-shader="sp_kart_dirt.frag"
+        skinned-mesh-shader="sp_skinning.vert">
+    <prefilled-textures>
+            <prefilled-texture name="g_kart_dirt" file="dirt.jpg"
+                 srgb="Y" sampler="trilinear"/>
+    </prefilled-textures>
+    </first-pass>
+    <shadow-pass vertex-shader="sp_shadow.vert"
+        fragment-shader="white.frag"
+        skinned-mesh-shader="sp_skinning_shadow.vert">
+    </shadow-pass>
+    <uniform-assigners>
+        <uniform-assigner name="layer"
+        function="shadowCascadeUniformAssigner"/>
+        <uniform-assigner name="dirt_factor"
+            function="dirtFactorUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

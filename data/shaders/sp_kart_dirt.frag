@@ -13,17 +13,16 @@ layout(location = 1) out vec4 o_normal_color;
 #stk_include "utils/rgb_conversion.frag"
 #stk_include "utils/sp_texture_sampling.frag"
 
-uniform sampler2D g_detail_map;
+uniform sampler2D g_kart_dirt;
+uniform float dirt_factor;
 
 void main()
 {
     // Triplanar detail map
     vec2 xyuv = vec2(world_position.x, world_position.y);
-    float detail = texture(g_detail_map, uv * 32).r;
-    detail *= 2.5;
+    vec3 dirt = texture(g_kart_dirt, uv * 32).rgb;
 
     vec4 col = sampleTextureLayer0(uv);
-    //col = (col - detail) + 0.5;
     if (hue_change > 0.0)
     {
         float mask = col.a;
@@ -41,12 +40,20 @@ void main()
         col = vec4(new_color.r, new_color.g, new_color.b, 1.0);
     }
 
+    float dirtMask = sampleTextureLayer4(uv).r;
+    dirtMask *= dirtMask;
+    // Dirt factor
+    dirtMask = 1.0 - dirtMask;
+    dirtMask *= dirt_factor;
     vec3 final_color = col.xyz * color.xyz;
+    final_color = mix(final_color, dirt, dirtMask);
 
 #if defined(Advanced_Lighting_Enabled)
     vec4 layer_2 = sampleTextureLayer2(uv);
     vec4 layer_3 = sampleTextureLayer3(uv);
     o_diffuse_color = vec4(final_color, layer_2.z);
+    // Dirt part should not be glossy
+    layer_2.r = mix(layer_2.r, 0.0, dirtMask);
 
     vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
     vec3 frag_tangent = normalize(tangent);

@@ -60,6 +60,11 @@ SPShaderManager::SPShaderManager()
                 ua->setValue(sp_wind_dir);
             }
         },
+        { "dirtFactorUniformAssigner", [](SPUniformAssigner* ua)
+            {
+                ua->setValue(2.0f);
+            }
+        },
         { "isDuringDayUniformAssigner", [](SPUniformAssigner* ua)
             {
                 int is_during_day = Track::getCurrentTrack() ?
