@@ -4,8 +4,10 @@
         fragment-shader="sp_kart_dirt.frag"
         skinned-mesh-shader="sp_skinning.vert">
     <prefilled-textures>
-            <prefilled-texture name="g_kart_dirt" file="dirt.jpg"
+            <prefilled-texture name="g_dirt_albedo" file="gfx_kartDirt_a_Albedo.png"
                  srgb="Y" sampler="trilinear"/>
+            <prefilled-texture name="g_dirt_normal" file="gfx_kartDirt_a_Normal.png"
+                 sampler="trilinear"/>
     </prefilled-textures>
     </first-pass>
     <shadow-pass vertex-shader="sp_shadow.vert"

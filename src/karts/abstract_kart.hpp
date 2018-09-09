@@ -356,6 +356,9 @@ public:
     /** True if the wheels are touching the ground. */
     virtual bool isOnGround() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the dirt factor (how dirty the kart is). */
+    virtual float getDirtFactor() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
     virtual const SlipStream* getSlipstream() const = 0;
     // ------------------------------------------------------------------------

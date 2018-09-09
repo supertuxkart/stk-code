@@ -65,14 +65,16 @@ SPShaderManager::SPShaderManager()
         { "dirtFactorUniformAssigner", [](SPUniformAssigner* ua)
             {
                 AbstractKart* k = NULL;
-                if (Camera::getNumCameras() > 1)
+                if (Camera::getNumCameras() > 0)
                 {
-                    Camera* camera = Camera::getCamera(0);
-                    k = camera->getKart();
+                    if (Camera::getActiveCamera() != NULL)
+                    {
+                        k = Camera::getActiveCamera()->getKart();
+                    }
                 }
-                if (k && k->isOnGround())
+                if (k)
                 {
-                    ua->setValue(2.0f);
+                    ua->setValue(k->getDirtFactor());
                 }
                 else
                 {

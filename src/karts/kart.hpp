@@ -166,6 +166,12 @@ protected:
      *  the kart is squashed. */
     float        m_squash_time;
 
+    /** How dirty the kart is, 0 = clean */
+    float        m_dirt_factor;
+
+    /** Counter to reset the dirt */
+    float        m_dirt_reset_counter;
+
     /** Current leaning of the kart. */
     float        m_current_lean;
 
@@ -452,6 +458,9 @@ public:
     // ------------------------------------------------------------------------
     /** True if the wheels are touching the ground. */
     virtual bool isOnGround() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Returns the dirt factor (how dirty the kart is). */
+    virtual float getDirtFactor() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */

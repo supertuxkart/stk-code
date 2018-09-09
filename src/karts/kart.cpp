@@ -377,6 +377,8 @@ void Kart::reset()
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
+    m_dirt_factor          = 0.0f;
+    m_dirt_reset_counter   = 0.0f;
 
     for (int i=0;i<m_xyz_history_size;i++)
     {
@@ -1165,6 +1167,14 @@ bool Kart::isOnGround() const
 }   // isOnGround
 
 //-----------------------------------------------------------------------------
+/** The kart as a dirt factor (if the player skids and go in dirty places)
+ */
+ float Kart::getDirtFactor() const
+ {
+     return m_dirt_factor;
+ }   // getDirtFactor
+
+//-----------------------------------------------------------------------------
 /** The kart is near the ground, but not necessarily on it (small jumps). This
  *  is used to determine when to stop flying.
 */
@@ -1889,6 +1899,29 @@ void Kart::handleMaterialSFX()
 void Kart::handleMaterialGFX(float dt)
 {
     const Material *material = getMaterial();
+
+    if (m_skidding->isSkidding())
+    {
+        m_dirt_factor += 0.001f;
+        if (m_dirt_factor > 1.0f)
+        {
+            m_dirt_factor = 1.0f;
+        }
+        m_dirt_reset_counter = 2.0f;
+    }
+    else
+    {
+        m_dirt_reset_counter -= 0.01f;
+        if (m_dirt_reset_counter < 0.0f)
+        {
+            m_dirt_reset_counter = 0.0f;
+            m_dirt_factor -= 0.002f;
+            if (m_dirt_factor < 0.0f)
+            {
+                m_dirt_factor = 0.0f;
+            }
+        }
+    }
 
     // First test: give the terrain effect, if the kart is
     // on top of a surface (i.e. not falling), actually touching
