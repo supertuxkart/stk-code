@@ -2037,14 +2037,15 @@ int main(int argc, char *argv[] )
                 #endif
                 Log::warn("OpenGL", "OpenGL version is too old!");
             }
+
+            // Note that on the very first run of STK internet status is set to
+            // "not asked", so the report will only be sent in the next run.
+            if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
+            {
+                HardwareStats::reportHardwareStats();
+            }
         }
 #endif
-        // Note that on the very first run of STK internet status is set to
-        // "not asked", so the report will only be sent in the next run.
-        if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
-        {
-            HardwareStats::reportHardwareStats();
-        }
 
         if (STKHost::existHost())
         {
