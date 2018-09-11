@@ -31,6 +31,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "physics/physics.hpp"
 #include "network/network_config.hpp"
+#include "network/server_config.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/drive_graph.hpp"
@@ -459,7 +460,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             float finish_time = prev_time*finish_proportion + getTime()*(1.0f-finish_proportion);
 
             if (NetworkConfig::get()->isServer() &&
-                NetworkConfig::get()->isAutoEnd() &&
+                ServerConfig::m_auto_end &&
                 m_finish_timeout == std::numeric_limits<float>::max())
             {
                 m_finish_timeout = finish_time * 0.25f + 15.0f;

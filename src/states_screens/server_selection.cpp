@@ -27,6 +27,7 @@
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
@@ -202,7 +203,7 @@ void ServerSelection::loadList()
             true));
 
         core::stringw mode =
-            NetworkConfig::get()->getModeName(server->getServerMode());
+            ServerConfig::getModeName(server->getServerMode());
         row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 2, true));
 
         if (NetworkConfig::get()->isWAN())

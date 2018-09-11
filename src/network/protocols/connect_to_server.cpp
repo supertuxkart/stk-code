@@ -343,7 +343,7 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port)
         Log::info("ConnectToServer", "Detect port for server address.");
         BareNetworkString s(std::string("stk-server-port"));
         TransportAddress address(m_server_address.getIP(),
-            NetworkConfig::get()->getServerDiscoveryPort());
+            stk_config->m_server_discovery_port);
         nw->sendRawPacket(s, address);
         TransportAddress sender;
         const int LEN = 2048;
@@ -352,6 +352,8 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port)
         if (len != 2)
         {
             Log::error("ConnectToServer", "Invalid port number");
+            if (another_port)
+                delete nw;
             return false;
         }
         BareNetworkString server_port(buffer, len);

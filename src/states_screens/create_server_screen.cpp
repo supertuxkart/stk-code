@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -257,12 +258,12 @@ void CreateServerScreen::createServer()
         return;
     }
 
-    NetworkConfig::get()->setPassword(password);
+    ServerConfig::m_private_server_password = password;
     if (!password.empty())
         password = std::string(" --server-password=") + password;
 
     TransportAddress server_address(0x7f000001,
-        NetworkConfig::get()->getServerDiscoveryPort());
+        stk_config->m_server_discovery_port);
 
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
@@ -275,8 +276,8 @@ void CreateServerScreen::createServer()
     // In case of a WAN game, we register this server with the
     // stk server, and will get the server's id when this 
     // request is finished.
-    NetworkConfig::get()->setMaxPlayers(max_players);
-    NetworkConfig::get()->setServerName(name);
+    ServerConfig::m_server_max_players = max_players;
+    ServerConfig::m_server_name = StringUtils::xmlEncode(name);
 
     // FIXME: Add the following fields to the create server screen
     // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
@@ -331,7 +332,7 @@ void CreateServerScreen::createServer()
     NetworkConfig::get()->setServerIdFile(
         file_manager->getUserConfigFile(server_id_file));
 
-    server_cfg << " --no-graphics --no-sound --stdout=server.log --type=" <<
+    server_cfg << " --stdout=server.log --mode=" <<
         gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
         " --difficulty=" <<
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<

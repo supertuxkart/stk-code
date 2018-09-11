@@ -98,7 +98,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
     updateBanList();
-    if (NetworkConfig::get()->isRankedServer())
+    if (ServerConfig::m_ranked)
     {
         Log::info("ServerLobby", "This server will submit ranking scores to "
             "STK addons server, don't bother host one if you don't have the "
@@ -144,7 +144,8 @@ void ServerLobby::setup()
         all_t.resize(65535);
     m_available_kts.first = { all_k.begin(), all_k.end() };
     m_available_kts.second = { all_t.begin(), all_t.end() };
-    switch (NetworkConfig::get()->getLocalGameMode().first)
+    RaceManager::MinorRaceModeType m = ServerConfig::getLocalGameMode().first;
+    switch (m)
     {
         case RaceManager::MINOR_MODE_NORMAL_RACE:
         case RaceManager::MINOR_MODE_TIME_TRIAL:
@@ -278,7 +279,7 @@ void ServerLobby::handleChat(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::changeTeam(Event* event)
 {
-    if (!NetworkConfig::get()->hasTeamChoosing() ||
+    if (!ServerConfig::m_team_choosing ||
         !race_manager->teamEnabled())
         return;
     if (!checkDataSize(event, 1)) return;
@@ -422,11 +423,11 @@ void ServerLobby::asynchronousUpdate()
     }
     case WAITING_FOR_START_GAME:
     {
-        if (NetworkConfig::get()->isOwnerLess())
+        if (ServerConfig::m_owner_less)
         {
             float player_size = (float)m_game_setup->getPlayerCount();
             if ((player_size >=
-                (float)NetworkConfig::get()->getMaxPlayers() *
+                (float)ServerConfig::m_server_max_players *
                 ServerConfig::m_start_game_threshold ||
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
@@ -436,7 +437,7 @@ void ServerLobby::asynchronousUpdate()
                     (ServerConfig::m_start_game_counter * 1000.0f));
             }
             else if (player_size <
-                (float)NetworkConfig::get()->getMaxPlayers() *
+                (float)ServerConfig::m_server_max_players*
                 ServerConfig::m_start_game_threshold &&
                 !m_game_setup->isGrandPrixStarted())
             {
@@ -585,7 +586,7 @@ void ServerLobby::update(int ticks)
     }
 
     // Reset for ranked server if in kart / track selection has only 1 player
-    if (NetworkConfig::get()->isRankedServer() &&
+    if (ServerConfig::m_ranked &&
         m_state.load() == SELECTING &&
         m_game_setup->getPlayerCount() == 1)
     {
@@ -688,15 +689,16 @@ bool ServerLobby::registerServer()
     request->addParameter("port",         m_server_address.getPort()      );
     request->addParameter("private_port",
                                     STKHost::get()->getPrivatePort()      );
-    request->addParameter("name",   NetworkConfig::get()->getServerName() );
-    request->addParameter("max_players",
-        NetworkConfig::get()->getMaxPlayers());
-    request->addParameter("difficulty", race_manager->getDifficulty());
-    request->addParameter("game_mode", NetworkConfig::get()->getServerMode());
-    request->addParameter("password",
-        (unsigned)(!NetworkConfig::get()->getPassword().empty()));
-    request->addParameter("version",
-        (unsigned)NetworkConfig::m_server_version);
+    // The ServerConfig::m_server_name has xml encoded name so we send this
+    // insteaf of from game_setup
+    const std::string& server_name = ServerConfig::m_server_name;
+    request->addParameter("name", server_name);
+    request->addParameter("max_players", ServerConfig::m_server_max_players);
+    request->addParameter("difficulty", ServerConfig::m_server_difficulty);
+    request->addParameter("game_mode", ServerConfig::m_server_mode);
+    const std::string& pw = ServerConfig::m_private_server_password;
+    request->addParameter("password", (unsigned)(!pw.empty()));
+    request->addParameter("version", (unsigned)ServerConfig::m_server_version);
 
     Log::info("ServerLobby", "Public server address %s",
         m_server_address.toString().c_str());
@@ -778,7 +780,7 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    if (NetworkConfig::get()->hasTeamChoosing() && race_manager->teamEnabled())
+    if (ServerConfig::m_team_choosing && race_manager->teamEnabled())
     {
         auto red_blue = m_game_setup->getPlayerTeamInfo();
         if ((red_blue.first == 0 || red_blue.second == 0) &&
@@ -1047,7 +1049,7 @@ void ServerLobby::checkRaceFinished()
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
         m_result_ns->addUInt32(fastest_lap);
     }
-    if (NetworkConfig::get()->isRankedServer())
+    if (ServerConfig::m_ranked)
     {
         computeNewRankings();
         submitRankingsToAddons();
@@ -1435,7 +1437,7 @@ void ServerLobby::connectionRequested(Event* event)
 
     if (m_game_setup->getPlayerCount() + player_count +
         m_waiting_players_counts.load() >
-        NetworkConfig::get()->getMaxPlayers())
+        (unsigned)ServerConfig::m_server_max_players)
     {
         NetworkString *message = getNetworkString(2);
         message->setSynchronous(true);
@@ -1454,10 +1456,9 @@ void ServerLobby::connectionRequested(Event* event)
         !(peer->getAddress().isPublicAddressLocalhost() ||
         peer->getAddress().isLAN()) &&
         NetworkConfig::get()->isWAN() &&
-        NetworkConfig::get()->onlyValidatedPlayers()) ||
+        ServerConfig::m_validating_player) ||
         ((player_count != 1 || online_id == 0 ||
-        m_scores.find(online_id) != m_scores.end()) &&
-        NetworkConfig::get()->isRankedServer()))
+        m_scores.find(online_id) != m_scores.end()) && ServerConfig::m_ranked))
     {
         NetworkString* message = getNetworkString(2);
         message->setSynchronous(true);
@@ -1493,7 +1494,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     // Check for password
     std::string password;
     data.decodeString(&password);
-    if (password != NetworkConfig::get()->getPassword())
+    const std::string& server_pw = ServerConfig::m_private_server_password;
+    if (password != server_pw)
     {
         NetworkString *message = getNetworkString(2);
         message->setSynchronous(true);
@@ -1508,7 +1510,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 
     // Check again for duplicated online id in ranked server
     if (m_scores.find(online_id) != m_scores.end() &&
-        NetworkConfig::get()->isRankedServer())
+        ServerConfig::m_ranked)
     {
         NetworkString* message = getNetworkString(2);
         message->setSynchronous(true);
@@ -1533,7 +1535,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
             per_player_difficulty, (uint8_t)i, KART_TEAM_NONE);
-        if (NetworkConfig::get()->hasTeamChoosing() &&
+        if (ServerConfig::m_team_choosing &&
             race_manager->teamEnabled())
         {
             KartTeam cur_team = KART_TEAM_NONE;
@@ -1575,7 +1577,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (m_timeout.load() - (int64_t)StkTime::getRealTimeMs()) / 1000.0f;
     }
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
-        .addUInt32(NetworkConfig::m_server_version).addFloat(auto_start_timer);
+        .addUInt32(ServerConfig::m_server_version).addFloat(auto_start_timer);
 
     if (game_started)
     {
@@ -1603,7 +1605,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         peer->sendPacket(message_ack);
         delete message_ack;
 
-        if (NetworkConfig::get()->isRankedServer())
+        if (ServerConfig::m_ranked)
         {
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }
@@ -1645,7 +1647,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             server_owner = 1;
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
-        if (NetworkConfig::get()->hasTeamChoosing() &&
+        if (ServerConfig::m_team_choosing &&
             race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
         else
@@ -1670,7 +1672,7 @@ void ServerLobby::updateServerOwner()
 {
     if (m_state.load() < WAITING_FOR_START_GAME ||
         m_state.load() > RESULT_DISPLAY ||
-        NetworkConfig::get()->isOwnerLess())
+        ServerConfig::m_owner_less)
         return;
     if (!m_server_owner.expired())
         return;
@@ -2306,7 +2308,7 @@ void ServerLobby::addWaitingPlayersToGame()
         auto peer = npp->getPeer();
         assert(peer);
         uint32_t online_id = npp->getOnlineId();
-        if (NetworkConfig::get()->isRankedServer())
+        if (ServerConfig::m_ranked)
         {
             if (m_scores.find(online_id) != m_scores.end())
             {
@@ -2329,7 +2331,7 @@ void ServerLobby::addWaitingPlayersToGame()
             StringUtils::wideToUtf8(npp->getName()).c_str(),
             npp->getOnlineId(), peer->getAddress().toString().c_str());
 
-        if (NetworkConfig::get()->isRankedServer())
+        if (ServerConfig::m_ranked)
         {
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }

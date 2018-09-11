@@ -31,6 +31,7 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"
@@ -259,7 +260,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                 }
                 NetworkConfig::get()->setIsWAN();
                 NetworkConfig::get()->setIsServer(false);
-                NetworkConfig::get()->setPassword("");
+                ServerConfig::m_private_server_password = "";
                 auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0,
                     server_addr, false, false);
                 STKHost::create();

@@ -41,7 +41,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <fstream>
+#include <sstream>
 
 #include <irrString.h>
 using irr::core::stringc;
@@ -69,8 +69,8 @@ protected:
     std::string m_comment;
 public:
     virtual     ~UserConfigParam();
-    virtual void write(std::ofstream & stream) const = 0;
-    virtual void writeInner(std::ofstream & stream, int level = 0) const;
+    virtual void write(std::stringstream & stream) const = 0;
+    virtual void writeInner(std::stringstream & stream, int level = 0) const;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
     virtual irr::core::stringc toString() const = 0;
@@ -86,8 +86,8 @@ public:
     GroupUserConfigParam(const char* param_name,
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
-    void write(std::ofstream& stream) const;
-    void writeInner(std::ofstream& stream, int level = 0) const;
+    void write(std::stringstream& stream) const;
+    void writeInner(std::stringstream& stream, int level = 0) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -124,7 +124,7 @@ public:
         const char* comment,
         std::map<T, U> default_value);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -186,7 +186,7 @@ public:
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -213,7 +213,7 @@ public:
     TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         GroupUserConfigParam* group, const char* comment=NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -242,12 +242,12 @@ protected:
 public:
 
     StringUserConfigParam(const char* default_value, const char* param_name,
-                          const char* comment = NULL);
+                          const char* comment);
     StringUserConfigParam(const char* default_value, const char* param_name,
                           GroupUserConfigParam* group,
                           const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -285,7 +285,7 @@ public:
     BoolUserConfigParam(bool default_value, const char* param_name,
                         GroupUserConfigParam* group,
                         const char* comment = NULL);
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -318,7 +318,7 @@ public:
                          GroupUserConfigParam* group,
                          const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 

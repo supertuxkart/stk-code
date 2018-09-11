@@ -321,7 +321,7 @@ void ServersManager::setDefaultBroadcastAddresses()
     m_broadcast_address.emplace_back(std::string("127.0.0.255")    );
     m_broadcast_address.emplace_back(std::string("127.0.0.1")      );
     for (auto& addr : m_broadcast_address)
-        addr.setPort(NetworkConfig::get()->getServerDiscoveryPort());
+        addr.setPort(stk_config->m_server_discovery_port);
 }   // setDefaultBroadcastAddresses
 
 // ----------------------------------------------------------------------------
@@ -344,8 +344,8 @@ void ServersManager::addAllBroadcastAddresses(const TransportAddress &a, int len
     while (len > 0)
     {
         unsigned int mask = (1 << len) - 1;
-        TransportAddress bcast(a.getIP() | mask, 
-                               NetworkConfig::get()->getServerDiscoveryPort());
+        TransportAddress bcast(a.getIP() | mask,
+            stk_config->m_server_discovery_port);
         Log::info("Broadcast", "address %s length %d mask %x --> %s",
             a.toString().c_str(),
             len, mask,

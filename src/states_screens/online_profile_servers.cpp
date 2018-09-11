@@ -24,6 +24,7 @@
 #include "guiengine/widget.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
+#include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/create_server_screen.hpp"
@@ -112,7 +113,7 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 // ----------------------------------------------------------------------------
 void OnlineProfileServers::doQuickPlay()
 {
-    NetworkConfig::get()->setPassword("");
+    ServerConfig::m_private_server_password = "";
     STKHost::create();
     NetworkingLobby::getInstance()->setJoinedServer(nullptr);
     NetworkingLobby::getInstance()->push();

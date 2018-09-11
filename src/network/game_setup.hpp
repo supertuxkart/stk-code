@@ -62,14 +62,14 @@ private:
 
     std::atomic<uint32_t> m_connected_players_count;
 
+    irr::core::stringw m_message_of_today;
+
+    /** Utf8 server name (with xml decoded) */
+    std::string m_server_name_utf8;
+
 public:
     // ------------------------------------------------------------------------
-    GameSetup()
-    {
-        m_connected_players_count.store(0);
-        m_extra_server_info = -1;
-        reset();
-    }
+    GameSetup();
     // ------------------------------------------------------------------------
     ~GameSetup() {}
     // ------------------------------------------------------------------------
@@ -174,6 +174,8 @@ public:
     }
     // ------------------------------------------------------------------------
     std::pair<int, int> getPlayerTeamInfo() const;
+    // ------------------------------------------------------------------------
+    const std::string& getServerNameUtf8() const { return m_server_name_utf8; }
 };
 
 #endif // GAME_SETUP_HPP

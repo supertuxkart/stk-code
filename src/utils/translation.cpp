@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <fstream>
 #include <iostream>
 #include <vector>
 

@@ -306,7 +306,7 @@ void ClientLobby::update(int ticks)
     {
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
-            .addUInt32(NetworkConfig::m_server_version);
+            .addUInt32(ServerConfig::m_server_version);
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
@@ -344,7 +344,7 @@ void ClientLobby::update(int ticks)
                 ns->encodeString(PlayerManager::getCurrentOnlineUserName());
         }
 
-        rest->encodeString(NetworkConfig::get()->getPassword())
+        rest->encodeString(ServerConfig::m_private_server_password)
             .addUInt8(player_count);
         for (auto& p : NetworkConfig::get()->getNetworkPlayers())
         {
@@ -579,8 +579,8 @@ void ClientLobby::handleServerInfo(Event* event)
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     u_data = data.getUInt8();
-    NetworkConfig::get()->setServerMode(u_data);
-    auto game_mode = NetworkConfig::get()->getLocalGameMode();
+    ServerConfig::m_server_mode = u_data;
+    auto game_mode = ServerConfig::getLocalGameMode();
     race_manager->setMinorMode(game_mode.first);
     if (game_mode.first == RaceManager::MINOR_MODE_BATTLE)
         race_manager->setMajorMode(game_mode.second);
@@ -591,7 +591,7 @@ void ClientLobby::handleServerInfo(Event* event)
     }
 
     //I18N: In the networking lobby
-    core::stringw mode_name = NetworkConfig::get()->getModeName(u_data);
+    core::stringw mode_name = ServerConfig::getModeName(u_data);
     each_line = _("Game mode: %s", mode_name);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 

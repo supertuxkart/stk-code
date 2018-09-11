@@ -271,9 +271,11 @@ STKHost::STKHost(bool server)
 
     if (server)
     {
-        addr.port = NetworkConfig::get()->getServerPort();
+        addr.port = ServerConfig::m_server_port;
+        if (addr.port == 0 && !UserConfigParams::m_random_server_port)
+            addr.port = stk_config->m_server_port;
         // Reserve 1 peer to deliver full server message
-        m_network = new Network(NetworkConfig::get()->getMaxPlayers() + 1,
+        m_network = new Network(ServerConfig::m_server_max_players + 1,
             /*channel_limit*/EVENT_CHANNEL_COUNT, /*max_in_bandwidth*/0,
             /*max_out_bandwidth*/ 0, &addr, true/*change_port_if_bound*/);
     }
@@ -703,8 +705,7 @@ void STKHost::mainLoop()
     if ((NetworkConfig::get()->isLAN() && is_server) ||
         NetworkConfig::get()->isPublicServer())
     {
-        TransportAddress address(0,
-            NetworkConfig::get()->getServerDiscoveryPort());
+        TransportAddress address(0, stk_config->m_server_discovery_port);
         ENetAddress eaddr = address.toEnetAddress();
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
         if (direct_socket->getENetHost() == NULL)
@@ -1022,24 +1023,20 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
-        std::string name = 
-            StringUtils::wideToUtf8(NetworkConfig::get()->getServerName());
-        // Avoid buffer overflows
-        if (name.size() > 255)
-            name = name.substr(0, 255);
-
+        const std::string& name = sl->getGameSetup()->getServerNameUtf8();
         // Send the answer, consisting of server name, max players, 
         // current players
+        const std::string& pw = ServerConfig::m_private_server_password;
         BareNetworkString s((int)name.size()+1+11);
-        s.addUInt32(NetworkConfig::m_server_version);
+        s.addUInt32(ServerConfig::m_server_version);
         s.encodeString(name);
-        s.addUInt8(NetworkConfig::get()->getMaxPlayers());
+        s.addUInt8((uint8_t)ServerConfig::m_server_max_players);
         s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
             sl->getWaitingPlayersCount()));
         s.addUInt16(m_private_port);
-        s.addUInt8((uint8_t)race_manager->getDifficulty());
-        s.addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
-        s.addUInt8(!NetworkConfig::get()->getPassword().empty());
+        s.addUInt8((uint8_t)ServerConfig::m_server_difficulty);
+        s.addUInt8((uint8_t)ServerConfig::m_server_mode);
+        s.addUInt8(!pw.empty());
         s.addUInt8((uint8_t)
             (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?
             0 : 1));
