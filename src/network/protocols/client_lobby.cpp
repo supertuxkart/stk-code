@@ -39,6 +39,7 @@
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -233,7 +234,7 @@ void ClientLobby::addAllPlayers(Event* event)
     // time
     if (!STKHost::get()->getNetworkTimerSynchronizer()->isSynchronised())
     {
-        if (UserConfigParams::m_voting_timeout >= 10.0f)
+        if (ServerConfig::m_voting_timeout >= 10.0f)
         {
             core::stringw msg = _("Bad network connection is detected.");
             MessageQueue::add(MessageQueue::MT_ERROR, msg);

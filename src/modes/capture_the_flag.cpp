@@ -17,7 +17,6 @@
 
 #include "modes/capture_the_flag.hpp"
 #include "audio/sfx_base.hpp"
-#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
@@ -26,6 +25,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "states_screens/race_gui.hpp"
@@ -190,7 +190,7 @@ void CaptureTheFlag::update(int ticks)
         m_blue_return_ticks++;
 
     const int max_flag_return_timeout = stk_config->time2Ticks(
-        UserConfigParams::m_flag_return_timemout);
+        ServerConfig::m_flag_return_timemout);
     if (m_red_holder == -1 && m_red_return_ticks > max_flag_return_timeout)
     {
         resetRedFlagToOrigin();

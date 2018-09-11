@@ -222,6 +222,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/rewind_queue.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
@@ -1157,21 +1158,21 @@ int handleCmdLine()
     }
     if (CommandLine::has("--max-players", &n))
     {
-        UserConfigParams::m_server_max_players = n;
+        ServerConfig::m_server_max_players = n;
     }
     
-    if (UserConfigParams::m_server_max_players < 1)
+    if (ServerConfig::m_server_max_players < 1)
     {
-        UserConfigParams::m_server_max_players = 1;
+        ServerConfig::m_server_max_players = 1;
     }
-    NetworkConfig::get()->setMaxPlayers(UserConfigParams::m_server_max_players);
+    NetworkConfig::get()->setMaxPlayers(ServerConfig::m_server_max_players);
         
     if (CommandLine::has("--min-players", &n))
     {
         float threshold = ((float)(n) - 0.5f) / 
-                                         UserConfigParams::m_server_max_players;
+                                         ServerConfig::m_server_max_players;
         threshold = std::max(std::min(threshold, 1.0f), 0.0f);
-        UserConfigParams::m_start_game_threshold = threshold;
+        ServerConfig::m_start_game_threshold = threshold;
     }
     if (CommandLine::has("--port", &n))
     {
@@ -1337,19 +1338,19 @@ int handleCmdLine()
 
     if (is_battle)
     {
-        if (UserConfigParams::m_hit_limit_threshold < 0.0f &&
-            UserConfigParams::m_time_limit_threshold_ffa < 0.0f)
+        if (ServerConfig::m_hit_limit_threshold < 0.0f &&
+            ServerConfig::m_time_limit_threshold_ffa < 0.0f)
         {
             Log::warn("main", "Reset invalid hit and time limit settings");
-            UserConfigParams::m_hit_limit_threshold.revertToDefaults();
-            UserConfigParams::m_time_limit_threshold_ffa.revertToDefaults();
+            ServerConfig::m_hit_limit_threshold.revertToDefaults();
+            ServerConfig::m_time_limit_threshold_ffa.revertToDefaults();
         }
-        if (UserConfigParams::m_capture_limit_threshold < 0.0f &&
-            UserConfigParams::m_time_limit_threshold_ctf < 0.0f)
+        if (ServerConfig::m_capture_limit_threshold < 0.0f &&
+            ServerConfig::m_time_limit_threshold_ctf < 0.0f)
         {
             Log::warn("main", "Reset invalid Capture and time limit settings");
-            UserConfigParams::m_capture_limit_threshold.revertToDefaults();
-            UserConfigParams::m_time_limit_threshold_ctf.revertToDefaults();
+            ServerConfig::m_capture_limit_threshold.revertToDefaults();
+            ServerConfig::m_time_limit_threshold_ctf.revertToDefaults();
         }
     }
 
@@ -2377,7 +2378,7 @@ void runUnitTests()
     NetworkConfig::get()->unsetNetworking();
     ServerLobby sl;
 
-    UserConfigParams::m_server_ip_ban_list =
+    ServerConfig::m_server_ip_ban_list =
         {
             { "1.2.3.4/32", std::numeric_limits<uint32_t>::max() }
         };
@@ -2386,7 +2387,7 @@ void runUnitTests()
     assert(!sl.isBannedForIP(TransportAddress("1.2.3.5")));
     assert(!sl.isBannedForIP(TransportAddress("1.2.3.3")));
 
-    UserConfigParams::m_server_ip_ban_list =
+    ServerConfig::m_server_ip_ban_list =
         {
             { "1.2.3.4/23", std::numeric_limits<uint32_t>::max() }
         };
@@ -2402,7 +2403,7 @@ void runUnitTests()
     assert(sl.isBannedForIP(TransportAddress("1.2.3.255")));
     assert(!sl.isBannedForIP(TransportAddress("1.2.4.0")));
 
-    UserConfigParams::m_server_ip_ban_list =
+    ServerConfig::m_server_ip_ban_list =
         {
             { "11.12.13.14/22", std::numeric_limits<uint32_t>::max() },
             { "12.13.14.15/24", std::numeric_limits<uint32_t>::max() },

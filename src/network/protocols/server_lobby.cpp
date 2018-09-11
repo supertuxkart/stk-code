@@ -32,6 +32,7 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
@@ -426,17 +427,17 @@ void ServerLobby::asynchronousUpdate()
             float player_size = (float)m_game_setup->getPlayerCount();
             if ((player_size >=
                 (float)NetworkConfig::get()->getMaxPlayers() *
-                UserConfigParams::m_start_game_threshold ||
+                ServerConfig::m_start_game_threshold ||
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
             {
                 m_timeout.store((int64_t)StkTime::getRealTimeMs() +
                     (int64_t)
-                    (UserConfigParams::m_start_game_counter * 1000.0f));
+                    (ServerConfig::m_start_game_counter * 1000.0f));
             }
             else if (player_size <
                 (float)NetworkConfig::get()->getMaxPlayers() *
-                UserConfigParams::m_start_game_threshold &&
+                ServerConfig::m_start_game_threshold &&
                 !m_game_setup->isGrandPrixStarted())
             {
                 m_timeout.store(std::numeric_limits<int64_t>::max());
@@ -474,7 +475,7 @@ void ServerLobby::asynchronousUpdate()
         if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs() ||
             (std::get<3>(result) &&
             m_timeout.load() -
-            (int64_t)(UserConfigParams::m_voting_timeout / 2.0f * 1000.0f) <
+            (int64_t)(ServerConfig::m_voting_timeout / 2.0f * 1000.0f) <
             (int64_t)StkTime::getRealTimeMs()))
         {
             m_game_setup->setRace(std::get<0>(result), std::get<1>(result),
@@ -536,7 +537,7 @@ void ServerLobby::asynchronousUpdate()
 //-----------------------------------------------------------------------------
 void ServerLobby::sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p)
 {
-    const unsigned max_ping = UserConfigParams::m_max_ping;
+    const unsigned max_ping = ServerConfig::m_max_ping;
     Log::warn("ServerLobby", "Peer %s cannot catch up with max ping %d.",
         p->getAddress().toString().c_str(), max_ping);
     NetworkString* msg = getNetworkString();
@@ -808,7 +809,7 @@ void ServerLobby::startSelection(const Event *event)
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION).addUInt8(
         m_game_setup->isGrandPrixStarted() ? 1 : 0)
-        .addUInt8(UserConfigParams::m_auto_lap_ratio > 0.0f ? 1 : 0);
+        .addUInt8(ServerConfig::m_auto_lap_ratio > 0.0f ? 1 : 0);
 
     // Remove karts / tracks from server that are not supported on all clients
     std::set<std::string> karts_erase, tracks_erase;
@@ -893,7 +894,7 @@ void ServerLobby::checkIncomingConnectionRequests()
 
     // Keep the port open, it can be sent to anywhere as we will send to the
     // correct peer later in ConnectToPeer.
-    if (UserConfigParams::m_firewalled_server)
+    if (ServerConfig::m_firewalled_server)
     {
         BareNetworkString data;
         data.addUInt8(0);
@@ -946,7 +947,7 @@ void ServerLobby::checkIncomingConnectionRequests()
                 users_xml->getNode(i)->get("aes-iv", &keys[id].m_aes_iv);
                 users_xml->getNode(i)->get("username", &keys[id].m_name);
                 keys[id].m_tried = false;
-                if (UserConfigParams::m_firewalled_server)
+                if (ServerConfig::m_firewalled_server)
                 {
                     TransportAddress peer_addr(addr, port);
                     std::string peer_addr_str = peer_addr.toString();
@@ -1764,7 +1765,7 @@ void ServerLobby::playerVote(Event* event)
     if (m_timeout.load() == std::numeric_limits<int64_t>::max())
     {
         m_timeout.store((int64_t)StkTime::getRealTimeMs() +
-            (int64_t)(UserConfigParams::m_voting_timeout * 1000.0f));
+            (int64_t)(ServerConfig::m_voting_timeout * 1000.0f));
     }
     int64_t remaining_time =
         m_timeout.load() - (int64_t)StkTime::getRealTimeMs();
@@ -1781,14 +1782,14 @@ void ServerLobby::playerVote(Event* event)
 
     if (race_manager->modeHasLaps())
     {
-        if (UserConfigParams::m_auto_lap_ratio > 0.0f)
+        if (ServerConfig::m_auto_lap_ratio > 0.0f)
         {
             Track* t = track_manager->getTrack(track_name);
             if (t)
             {
                 lap = (uint8_t)(fmaxf(1.0f,
                     (float)t->getDefaultNumberOfLaps() *
-                    UserConfigParams::m_auto_lap_ratio));
+                    ServerConfig::m_auto_lap_ratio));
             }
             else
             {
@@ -1805,7 +1806,7 @@ void ServerLobby::playerVote(Event* event)
     std::string name = StringUtils::wideToUtf8(event->getPeer()
         ->getPlayerProfiles()[0]->getName());
     other.setSynchronous(true);
-    other.addUInt8(LE_VOTE).addFloat(UserConfigParams::m_voting_timeout)
+    other.addUInt8(LE_VOTE).addFloat(ServerConfig::m_voting_timeout)
         .encodeString(name).addUInt32(event->getPeer()->getHostId())
         .encodeString(track_name).addUInt8(lap).addUInt8(reverse);
 
@@ -1926,33 +1927,33 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
     if (race_manager->getMajorMode() ==
         RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
     {
-        if (UserConfigParams::m_capture_limit_threshold > 0.0f)
+        if (ServerConfig::m_capture_limit_threshold > 0.0f)
         {
             float val = fmaxf(3.0f, num_karts *
-                UserConfigParams::m_capture_limit_threshold);
+                ServerConfig::m_capture_limit_threshold);
             hit_capture_limit = (int)val;
         }
-        if (UserConfigParams::m_time_limit_threshold_ctf > 0.0f)
+        if (ServerConfig::m_time_limit_threshold_ctf > 0.0f)
         {
             time_limit = fmaxf(2.0f, num_karts *
-                (UserConfigParams::m_time_limit_threshold_ctf +
-                UserConfigParams::m_flag_return_timemout / 60.f) * 60.0f);
+                (ServerConfig::m_time_limit_threshold_ctf +
+                ServerConfig::m_flag_return_timemout / 60.f) * 60.0f);
         }
     }
     else
     {
-        if (UserConfigParams::m_hit_limit_threshold > 0.0f)
+        if (ServerConfig::m_hit_limit_threshold > 0.0f)
         {
             float val = fminf(num_karts *
-                UserConfigParams::m_hit_limit_threshold, 40.0f);
+                ServerConfig::m_hit_limit_threshold, 40.0f);
             hit_capture_limit = (int)val;
             if (hit_capture_limit == 0)
                 hit_capture_limit = 1;
         }
-        if (UserConfigParams::m_time_limit_threshold_ffa > 0.0f)
+        if (ServerConfig::m_time_limit_threshold_ffa > 0.0f)
         {
             time_limit = fmaxf(num_karts *
-                UserConfigParams::m_time_limit_threshold_ffa, 3.0f) * 60.0f;
+                ServerConfig::m_time_limit_threshold_ffa, 3.0f) * 60.0f;
         }
     }
     return std::make_pair(hit_capture_limit, time_limit);
@@ -1997,7 +1998,7 @@ void ServerLobby::updateBanList()
     m_ip_ban_list.clear();
     m_online_id_ban_list.clear();
 
-    for (auto& ban : UserConfigParams::m_server_ip_ban_list)
+    for (auto& ban : ServerConfig::m_server_ip_ban_list)
     {
         if (ban.first == "0.0.0.0/0" ||
             (uint32_t)StkTime::getTimeSinceEpoch() > ban.second)
@@ -2040,22 +2041,22 @@ void ServerLobby::updateBanList()
             continue;
         }
         final_ip_ban_list[std::get<1>(it->second)] =
-            UserConfigParams::m_server_ip_ban_list.at(std::get<1>(it->second));
+            ServerConfig::m_server_ip_ban_list.at(std::get<1>(it->second));
         it++;
     }
-    UserConfigParams::m_server_ip_ban_list = final_ip_ban_list;
+    ServerConfig::m_server_ip_ban_list = final_ip_ban_list;
 
     std::map<uint32_t, uint32_t> final_online_id_ban_list;
-    for (auto& ban : UserConfigParams::m_server_online_id_ban_list)
+    for (auto& ban : ServerConfig::m_server_online_id_ban_list)
     {
         if (ban.first == 0 ||
             (uint32_t)StkTime::getTimeSinceEpoch() > ban.second)
             continue;
         m_online_id_ban_list[ban.first] = ban.second;
         final_online_id_ban_list[ban.first] =
-            UserConfigParams::m_server_online_id_ban_list.at(ban.first);
+            ServerConfig::m_server_online_id_ban_list.at(ban.first);
     }
-    UserConfigParams::m_server_online_id_ban_list = final_online_id_ban_list;
+    ServerConfig::m_server_online_id_ban_list = final_online_id_ban_list;
 }   // updateBanList
 
 //-----------------------------------------------------------------------------
@@ -2229,7 +2230,7 @@ void ServerLobby::submitRankingsToAddons()
 void ServerLobby::configPeersStartTime()
 {
     uint32_t max_ping = 0;
-    const unsigned max_ping_from_peers = UserConfigParams::m_max_ping;
+    const unsigned max_ping_from_peers = ServerConfig::m_max_ping;
     for (auto p : m_peers_ready)
     {
         auto peer = p.first.lock();
@@ -2249,7 +2250,7 @@ void ServerLobby::configPeersStartTime()
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
     sendMessageToPeers(ns, /*reliable*/true);
 
-    const unsigned jitter_tolerance = UserConfigParams::m_jitter_tolerance;
+    const unsigned jitter_tolerance = ServerConfig::m_jitter_tolerance;
     Log::info("ServerLobby", "Max ping from peers: %d, jitter tolerance: %d",
         max_ping, jitter_tolerance);
     // Delay server for max ping / 2 from peers and jitter tolerance.

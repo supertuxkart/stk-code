@@ -18,13 +18,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "utils/ptr_vector.hpp"
+#include <vector>
 
 // The order here is important. If all_params is declared later (e.g. after
 // the #includes), all elements will be added to all_params, and then
 // all_params will be initialised, i.e. cleared!
 class UserConfigParam;
-static PtrVector<UserConfigParam, REF> all_params;
+static std::vector<UserConfigParam*> all_params;
 
 // X-macros
 #define PARAM_PREFIX
@@ -53,7 +53,9 @@ const int UserConfig::m_current_config_version = 8;
 // ----------------------------------------------------------------------------
 UserConfigParam::~UserConfigParam()
 {
-    all_params.remove(this);
+    // Now we have server config param so we cannot do this anymore,
+    // esp all params are kept until the closing of stk anyway
+    //all_params.remove(this);
 }   // ~UserConfigParam
 
 // ----------------------------------------------------------------------------
@@ -180,16 +182,6 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 {
     m_attributes.push_back(child);
 }   // addChild
-
-// ----------------------------------------------------------------------------
-template<typename T, typename U>
-MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    const char* comment)
-{
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if (comment != NULL) m_comment = comment;
-}   // MapUserConfigParam
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
@@ -672,7 +664,7 @@ bool UserConfig::loadConfig()
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
     {
-        all_params[i].findYourDataInAChildOf(root);
+        all_params[i]->findYourDataInAChildOf(root);
     }
 
 
@@ -709,7 +701,7 @@ void UserConfig::saveConfig()
         for(int i=0; i<paramAmount; i++)
         {
             //Log::info("UserConfig", "Saving parameter %d to file", i);
-            all_params[i].write(configfile);
+            all_params[i]->write(configfile);
         }
 
         configfile << "</stkconfig>\n";

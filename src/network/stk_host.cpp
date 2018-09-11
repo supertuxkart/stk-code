@@ -30,6 +30,7 @@
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
@@ -736,7 +737,7 @@ void STKHost::mainLoop()
         if (is_server)
         {
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
-            const float timeout = UserConfigParams::m_validation_timeout;
+            const float timeout = ServerConfig::m_validation_timeout;
             bool need_ping = false;
             if (sl && (!sl->isRacing() || sl->allowJoinedPlayersWaiting()) &&
                 last_ping_time < StkTime::getRealTimeMs())
@@ -759,8 +760,8 @@ void STKHost::mainLoop()
                     m_peer_pings.getData()[p.second->getHostId()] =
                         p.second->getPing();
                     const unsigned ap = p.second->getAveragePing();
-                    const unsigned max_ping = UserConfigParams::m_max_ping;
-                    if (UserConfigParams::m_kick_high_ping_players &&
+                    const unsigned max_ping = ServerConfig::m_max_ping;
+                    if (ServerConfig::m_kick_high_ping_players &&
                         p.second->isValidated() &&
                         p.second->getConnectedTime() > 5.0f && ap > max_ping)
                     {

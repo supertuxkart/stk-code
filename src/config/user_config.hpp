@@ -102,11 +102,17 @@ public:
 template<typename T, typename U>
 class MapUserConfigParam : public UserConfigParam
 {
+protected:
     std::map<T, U> m_elements;
+    MapUserConfigParam(const char* param_name,
+                       const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
-    MapUserConfigParam(const char* param_name,
-        const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         const char* comment,
         std::map<T, U> default_value);
@@ -162,8 +168,15 @@ typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
+protected:
     int m_value;
     int m_default_value;
+    IntUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
 
@@ -216,8 +229,15 @@ public:
 // ============================================================================
 class StringUserConfigParam : public UserConfigParam
 {
+protected:
     std::string m_value;
     std::string m_default_value;
+    StringUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
 
@@ -249,8 +269,15 @@ public:
 // ============================================================================
 class BoolUserConfigParam : public UserConfigParam
 {
+protected:
     bool m_value;
     bool m_default_value;
+    BoolUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
     BoolUserConfigParam(bool default_value, const char* param_name,
@@ -274,8 +301,15 @@ public:
 // ============================================================================
 class FloatUserConfigParam : public UserConfigParam
 {
+protected:
     float m_value;
     float m_default_value;
+    FloatUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
     FloatUserConfigParam(float default_value, const char* param_name,
@@ -725,80 +759,17 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
-    PARAM_PREFIX FloatUserConfigParam m_voting_timeout
-        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "voting-timeout",
-        &m_network_group, "Timeout in seconds for voting tracks in server."));
-    PARAM_PREFIX FloatUserConfigParam m_validation_timeout
-        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
-        &m_network_group, "Timeout in seconds for validation of clients."));
-    PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(8, "server-max-players",
-        &m_network_group, "Maximum number of players on the server."));
-    PARAM_PREFIX BoolUserConfigParam m_firewalled_server
-        PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
-        &m_network_group, "Disable it to turn off all stun related code "
-        "in server, for official server hosting use only."));
-    PARAM_PREFIX FloatUserConfigParam m_start_game_counter
-        PARAM_DEFAULT(FloatUserConfigParam(30.0f, "start-game-counter",
-        &m_network_group, "Time to wait before entering kart selection screen "
-        "if satisfied start-game-threshold below for owner less or ranked "
-        "server."));
-    PARAM_PREFIX FloatUserConfigParam m_start_game_threshold
-        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "start-game-threshold",
-        &m_network_group, "Only auto start kart selection when number of "
-        "connected player is larger than max player * this value, for "
-        "owner less or ranked server, after start-game-counter."));
-    PARAM_PREFIX FloatUserConfigParam m_flag_return_timemout
-        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "flag-return-timemout",
-        &m_network_group, "Time in seconds when a flag is dropped a by player in CTF "
-        "returning to its own base."));
-    PARAM_PREFIX FloatUserConfigParam m_hit_limit_threshold
-        PARAM_DEFAULT(FloatUserConfigParam(5.0f, "hit-limit-threshold",
-        &m_network_group, "Value used to calculate hit limit in free for all, which "
-        "is min(number of players * hit-limit-threshold, 40), negative value to disable hit limit."));
-    PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ffa
-        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "time-limit-threshold-ffa",
-        &m_network_group, "Value used to calculate time limit in free for all, which "
-        "is max(number of players * time-limit-threshold-ffa, 3.0) * 60, negative value to disable time limit."));
-    PARAM_PREFIX FloatUserConfigParam m_capture_limit_threshold
-        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "capture-limit-threshold",
-        &m_network_group, "Value used to calculate capture limit in CTF, which "
-        "is max(3.0, number of players * capture-limit-threshold), negative value to disable capture limit."));
-    PARAM_PREFIX FloatUserConfigParam m_time_limit_threshold_ctf
-        PARAM_DEFAULT(FloatUserConfigParam(0.9f, "time-limit-threshold-ctf",
-        &m_network_group, "Value used to calculate time limit in CTF, which "
-        "is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
-        " negative value to disable time limit."));
-    PARAM_PREFIX StringToUIntUserConfigParam m_server_ip_ban_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ip_ban_list",
-        "LHS: IP in X.X.X.X/Y (CIDR) format, use Y of 32 for a specific ip, "
-        "RHS: time epoch to expire, if -1 (uint32_t max) than a permanent ban.",
-        { { "0.0.0.0/0", 0u } }));
-    PARAM_PREFIX UIntToUIntUserConfigParam m_server_online_id_ban_list
-        PARAM_DEFAULT(UIntToUIntUserConfigParam("server_online_id_ban_list",
-        "LHS: online id, RHS: time epoch to expire, if -1 (uint32_t max) than a permanent ban.",
-        { { 0u, 0u } }));
-    PARAM_PREFIX IntUserConfigParam m_max_ping
-        PARAM_DEFAULT(IntUserConfigParam(300, "max-ping",
-        &m_network_group, "Maximum ping allowed for a player (in ms)."));
-    PARAM_PREFIX IntUserConfigParam m_jitter_tolerance
-        PARAM_DEFAULT(IntUserConfigParam(100, "jitter-tolerance",
-        &m_network_group, "Tolerance of jitter in network allowed (in ms)."));
+    PARAM_PREFIX IntUserConfigParam m_max_players
+        PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
+        &m_network_group, "Maximum number of players on the server "
+        "(for gui server creation."));
      PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
         PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
         &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
-    PARAM_PREFIX BoolUserConfigParam m_kick_high_ping_players
-        PARAM_DEFAULT(BoolUserConfigParam(false, "kick-high-ping-players",
-        &m_network_group, "Kick players whose ping is above max-ping."));
-    PARAM_PREFIX FloatUserConfigParam m_auto_lap_ratio
-        PARAM_DEFAULT(FloatUserConfigParam(-1.0f, "auto-lap-ratio",
-        &m_network_group, "Value used by server to automatically calculate lap of each race in network game, "
-        "if more than 0.0f, the number of lap of each track vote in linear race will be determined "
-        "by max(1.0f, auto-lap-ratio * default lap of that track)."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
-        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("num-karts-per-gamemode",
             "The Number of karts per gamemode.",
             {
                 { 0u, 4u },

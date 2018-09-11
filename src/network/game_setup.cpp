@@ -25,6 +25,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
@@ -183,8 +184,8 @@ void GameSetup::addServerInfo(NetworkString* ns)
     }
     if (NetworkConfig::get()->isOwnerLess())
     {
-        ns->addFloat(UserConfigParams::m_start_game_threshold)
-            .addFloat(UserConfigParams::m_start_game_counter);
+        ns->addFloat(ServerConfig::m_start_game_threshold)
+            .addFloat(ServerConfig::m_start_game_counter);
     }
     else
         ns->addFloat(0.0f).addFloat(0.0f);
