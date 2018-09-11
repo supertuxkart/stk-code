@@ -152,7 +152,8 @@ private:
     void init();
     // ------------------------------------------------------------------------
     void handleDirectSocketRequest(Network* direct_socket,
-                                   std::shared_ptr<ServerLobby> sl);
+                                   std::shared_ptr<ServerLobby> sl,
+                                   std::map<std::string, uint64_t>& ctp);
     // ------------------------------------------------------------------------
     void mainLoop();
 

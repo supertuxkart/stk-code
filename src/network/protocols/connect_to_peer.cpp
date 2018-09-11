@@ -69,17 +69,7 @@ void ConnectToPeer::asynchronousUpdate()
                 BareNetworkString aloha("aloha-stk");
                 aloha.getBuffer().insert(aloha.getBuffer().begin(), 2, 0xFF);
                 STKHost::get()->sendRawPacket(aloha, broadcast_address);
-                Log::verbose("ConnectToPeer", "Broadcast aloha sent.");
-                StkTime::sleep(1);
-
-                if (m_peer_address.isPublicAddressLocalhost())
-                {
-                    broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
-                    broadcast_address.setPort(m_peer_address.getPort());
-                    STKHost::get()->sendRawPacket(aloha, broadcast_address);
-                    Log::verbose("ConnectToPeer", "Broadcast aloha to self.");
-                }
-
+                Log::debug("ConnectToPeer", "Broadcast aloha sent.");
                 // 20 seconds timeout
                 if (m_tried_connection++ > 10)
                 {

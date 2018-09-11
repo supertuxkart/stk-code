@@ -719,14 +719,24 @@ void STKHost::mainLoop()
 
     uint64_t last_ping_time = StkTime::getRealTimeMs();
     uint64_t last_ping_time_update_for_client = StkTime::getRealTimeMs();
+    std::map<std::string, uint64_t> ctp;
     while (m_exit_timeout.load() > StkTime::getRealTimeMs())
     {
+        // Clear outdated connect to peer list every 15 seconds
+        for (auto it = ctp.begin(); it != ctp.end();)
+        {
+            if (it->second + 15000 < StkTime::getRealTimeMs())
+                it = ctp.erase(it);
+            else
+                it++;
+        }
+
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
         {
             try
             {
-                handleDirectSocketRequest(direct_socket, sl);
+                handleDirectSocketRequest(direct_socket, sl, ctp);
             }
             catch (std::exception& e)
             {
@@ -1006,7 +1016,8 @@ void STKHost::mainLoop()
  *  (and sender IP address and port).
  */
 void STKHost::handleDirectSocketRequest(Network* direct_socket,
-                                        std::shared_ptr<ServerLobby> sl)
+                                        std::shared_ptr<ServerLobby> sl,
+                                        std::map<std::string, uint64_t>& ctp)
 {
     const int LEN=2048;
     char buffer[LEN];
@@ -1044,17 +1055,22 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     }   // if message is server-requested
     else if (command == connection_cmd)
     {
+        const std::string& peer_addr = sender.toString();
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
         if (!sender.isLAN() && !sender.isPublicAddressLocalhost() &&
             !NetworkConfig::get()->isPublicServer())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
-                       sender.toString().c_str());
+                peer_addr.c_str());
             Log::error("STKHost", "which is outside of LAN - rejected.");
             return;
         }
-        std::make_shared<ConnectToPeer>(sender)->requestStart();
+        if (ctp.find(peer_addr) == ctp.end())
+        {
+            ctp[peer_addr] = StkTime::getRealTimeMs();
+            std::make_shared<ConnectToPeer>(sender)->requestStart();
+        }
     }
     else if (command == "stk-server-port")
     {
