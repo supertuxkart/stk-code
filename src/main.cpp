@@ -1796,9 +1796,20 @@ int main(int argc, char *argv[] )
 
     try
     {
-        std::string s;
+        std::string s, server_config;
 
         handleCmdLineOutputModifier();
+
+        if (CommandLine::has("--server-config", &s))
+        {
+            const std::string& base_name = StringUtils::getBasename(s);
+            if (base_name.find(".xml") != std::string::npos)
+            {
+                server_config = s;
+                FileManager::setStdoutName(
+                    StringUtils::removeExtension(base_name) + ".log");
+            }
+        }
 
         if(CommandLine::has("--root", &s))
             FileManager::addRootDirs(s);
@@ -1823,20 +1834,18 @@ int main(int argc, char *argv[] )
 
         // ServerConfig will use stk_config for server version testing
         stk_config->load(file_manager->getAsset("stk_config.xml"));
-        bool has_server_config = false;
         bool no_graphics = !CommandLine::has("--graphical-server");
         // Load current server config first, if any option is specified than
         // override it later
         // Disable sound if found server-config or wan/lan server name
-        if (CommandLine::has("--server-config", &s))
+        if (!server_config.empty())
         {
             if (no_graphics)
             {
                 ProfileWorld::disableGraphics();
                 UserConfigParams::m_enable_sound = false;
             }
-            has_server_config = true;
-            ServerConfig::loadServerConfig(s);
+            ServerConfig::loadServerConfig(server_config);
             NetworkConfig::get()->setIsServer(true);
         }
         else
@@ -1936,7 +1945,8 @@ int main(int argc, char *argv[] )
                                                           "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
-        if(!handleCmdLine(has_server_config)) exit(0);
+        if (!handleCmdLine(!server_config.empty()))
+            exit(0);
 
 #ifndef SERVER_ONLY
         addons_manager->checkInstalledAddons();
