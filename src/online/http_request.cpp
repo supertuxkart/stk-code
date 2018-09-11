@@ -31,6 +31,7 @@
 namespace Online
 {
     std::string HTTPRequest::m_cert_location;
+    struct curl_slist* HTTPRequest::m_http_header = NULL;
     const std::string API::USER_PATH = "user/";
     const std::string API::SERVER_PATH = "server/";
 
@@ -99,6 +100,11 @@ namespace Online
         {
             m_cert_location =
                 file_manager->getAsset("addons.supertuxkart.net.pem");
+        }
+        if (m_http_header == NULL)
+        {
+            m_http_header = curl_slist_append(m_http_header,
+                "Host: addons.supertuxkart.net");
         }
         m_disable_sending_log = false;
     }   // init
@@ -182,9 +188,9 @@ namespace Online
         if (m_url.substr(0, 8) == "https://")
         {
             // https, load certificate info
-            struct curl_slist *chunk = NULL;
-            chunk = curl_slist_append(chunk, "Host: addons.supertuxkart.net");
-            curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
+            assert(m_http_header != NULL);
+            curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER,
+                m_http_header);
             CURLcode error = curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
                 m_cert_location.c_str());
             if (error != CURLE_OK)

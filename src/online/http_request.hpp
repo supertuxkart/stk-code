@@ -72,6 +72,8 @@ namespace Online
         std::string m_string_buffer;
 
         static std::string m_cert_location;
+
+        static struct curl_slist* m_http_header;
     protected:
         bool m_disable_sending_log;
 
