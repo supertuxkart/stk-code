@@ -74,9 +74,11 @@ namespace ServerConfig
     class MapServerConfigParam : public MapUserConfigParam<T, U>
     {
     private:
+        using MapUserConfigParam<T, U>::m_key_names;
         using MapUserConfigParam<T, U>::m_elements;
     public:
         MapServerConfigParam(const char* param_name, const char* comment,
+                             std::array<std::string, 3> key_names,
                              std::map<T, U> default_value);
         using MapUserConfigParam<T, U>::operator=;
     };
@@ -251,16 +253,18 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
-        "LHS: IP in X.X.X.X/Y (CIDR) format, use Y of 32 for a specific ip, "
-        "RHS: time epoch to expire, "
+        "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "
+        "specific ip, expired-time: unix timestamp to expire, "
         "if -1 (uint32_t max) than a permanent ban.",
+        {{ "ban", "ip", "expired-time" }},
         { { "0.0.0.0/0", 0u } }));
 
     SERVER_CFG_PREFIX UIntToUIntServerConfigParam m_server_online_id_ban_list
         SERVER_CFG_DEFAULT(UIntToUIntServerConfigParam(
         "server-online-id-ban-list",
-        "LHS: online id, RHS: time epoch to expire, "
-        "if -1 (uint32_t max) than a permanent ban.",
+        "online-id: online id for banning, expired-time: unix timestamp to "
+        "expire, if -1 (uint32_t max) than a permanent ban.",
+        {{ "ban", "online-id", "expired-time" }},
         { { 0u, 0u } }));
 
     // ========================================================================

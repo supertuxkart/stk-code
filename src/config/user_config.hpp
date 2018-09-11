@@ -37,6 +37,7 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
+#include <array>
 #include <iterator>
 #include <string>
 #include <map>
@@ -99,10 +100,13 @@ public:
 };   // GroupUserConfigParam
 
 // ============================================================================
+/** ATM only map with 1 key and 1 value is supported
+ */
 template<typename T, typename U>
 class MapUserConfigParam : public UserConfigParam
 {
 protected:
+    std::array<std::string, 3> m_key_names;
     std::map<T, U> m_elements;
     MapUserConfigParam(const char* param_name,
                        const char* comment)
@@ -115,13 +119,14 @@ protected:
 public:
     MapUserConfigParam(const char* param_name,
         const char* comment,
+        std::array<std::string, 3> key_names,
         std::map<T, U> default_value);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
         const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
-        const char* comment,
+        const char* comment, std::array<std::string, 3> key_names,
         std::map<T, U> default_value);
 
     void write(std::stringstream& stream) const;
@@ -722,9 +727,9 @@ namespace UserConfigParams
 
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_servers",
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers",
         "The stun servers that will be used to know the public address with"
-        " port, LHS: server address, RHS: ping time.",
+        " port", {{ "stun-server", "address", "ping" }},
             {
                 { "stun.12connect.com:3478", 0u },
                 { "stun.callwithus.com:3478", 0u },
@@ -771,6 +776,7 @@ namespace UserConfigParams
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
         PARAM_DEFAULT(UIntToUIntUserConfigParam("num-karts-per-gamemode",
             "The Number of karts per gamemode.",
+            {{ "gamemode-list", "gamemode", "num-karts" }},
             {
                 { 0u, 4u },
                 { 1002u, 5u },

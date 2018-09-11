@@ -92,10 +92,11 @@ StringServerConfigParam::StringServerConfigParam(std::string default_value,
 // ============================================================================
 template<typename T, typename U>
 MapServerConfigParam<T, U>::MapServerConfigParam(const char* param_name,
-                                                 const char* comment,
-                                                 std::map<T, U> default_value)
+    const char* comment, std::array<std::string, 3> key_names,
+    std::map<T, U> default_value)
                           : MapUserConfigParam<T, U>(param_name, comment)
 {
+    m_key_names = key_names;
     m_elements = default_value;
     g_server_params.push_back(this);
 }   // MapServerConfigParam

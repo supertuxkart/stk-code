@@ -186,11 +186,14 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    const char* comment, std::map<T, U> default_value)
+    const char* comment, std::array<std::string, 3> key_names,
+    std::map<T, U> default_value)
 {
     m_param_name = param_name;
     all_params.push_back(this);
     if (comment != NULL) m_comment = comment;
+
+    m_key_names = key_names;
     m_elements = default_value;
 }   // MapUserConfigParam
 
@@ -209,12 +212,13 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     GroupUserConfigParam* group, const char* comment,
-    std::map<T, U> default_value)
+    std::array<std::string, 3> key_names, std::map<T, U> default_value)
 {
     m_param_name = param_name;
     group->addChild(this);
     if (comment != NULL) m_comment = comment;
 
+    m_key_names = key_names;
     m_elements = default_value;
 }   // MapUserConfigParam
 
@@ -224,13 +228,14 @@ void MapUserConfigParam<T, U>::write(std::stringstream& stream) const
 {
     // comment
     if (m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
-    stream << " -->\n    <" << m_param_name.c_str() << "\n";
+    stream << " -->\n    <" << m_param_name.c_str() << ">\n";
 
     for (const auto& kv : m_elements)
     {
-        stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
+        stream << "        <" << m_key_names[0] << " " << m_key_names[1] <<
+            "=\"" << kv.first << "\" " <<  m_key_names[2] << "=\"" <<
+            kv.second << "\"/>\n";
     }
-    stream << "    >\n";
     stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
@@ -241,10 +246,44 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode(m_param_name);
     if (child == NULL)
     {
-        //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
+        Log::error("User Config", "Couldn't find parameter group %s",
+          m_param_name.c_str());
         return;
     }
-    child->get(&m_elements);
+    for (unsigned i = 0; i < child->getNumNodes(); i++)
+    {
+        const std::string& map_name = m_key_names[0];
+        const std::string& key_name = m_key_names[1];
+        const std::string& value_name = m_key_names[2];
+        const XMLNode* map = child->getNode(i);
+        if (map->getName() != map_name)
+        {
+            Log::error("User Config", "Invalid name %s",
+                map->getName().c_str());
+            continue;
+        }
+
+        T key;
+        std::string key_string;
+        if (!map->get(key_name, &key_string) ||
+            !StringUtils::fromString(key_string, key))
+        {
+            Log::error("User Config", "Invalid key name %s",
+                key_name.c_str());
+            continue;
+        }
+
+        U value;
+        std::string value_string;
+        if (!map->get(value_name, &value_string) ||
+            !StringUtils::fromString(value_string, value))
+        {
+            Log::error("User Config", "Invalid value name %s",
+                value_name.c_str());
+            continue;
+        }
+        m_elements[key] = value;
+    }
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
