@@ -152,6 +152,8 @@ private:
 
     bool m_registered_for_once_only;
 
+    bool m_save_server_config;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -272,7 +274,7 @@ public:
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
     bool isBannedForIP(const TransportAddress& addr) const;
     bool allowJoinedPlayersWaiting() const;
-
+    void setSaveServerConfig(bool val)          { m_save_server_config = val; }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

@@ -97,6 +97,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_has_created_server_id_file = false;
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
+    m_save_server_config = true;
     updateBanList();
     if (ServerConfig::m_ranked)
     {
@@ -121,6 +122,8 @@ ServerLobby::~ServerLobby()
         unregisterServer(true/*now*/);
     }
     delete m_result_ns;
+    if (m_save_server_config)
+        ServerConfig::writeServerConfigToDisk();
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -2047,6 +2050,8 @@ void ServerLobby::updateBanList()
         it++;
     }
     ServerConfig::m_server_ip_ban_list = final_ip_ban_list;
+    // Default guided entry
+    ServerConfig::m_server_ip_ban_list["0.0.0.0/0"] = 0;
 
     std::map<uint32_t, uint32_t> final_online_id_ban_list;
     for (auto& ban : ServerConfig::m_server_online_id_ban_list)
@@ -2059,6 +2064,7 @@ void ServerLobby::updateBanList()
             ServerConfig::m_server_online_id_ban_list.at(ban.first);
     }
     ServerConfig::m_server_online_id_ban_list = final_online_id_ban_list;
+    ServerConfig::m_server_online_id_ban_list[0] = 0;
 }   // updateBanList
 
 //-----------------------------------------------------------------------------

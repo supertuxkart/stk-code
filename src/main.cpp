@@ -2375,6 +2375,7 @@ void runUnitTests()
     Log::info("UnitTest", "IP ban");
     NetworkConfig::get()->unsetNetworking();
     ServerLobby sl;
+    sl.setSaveServerConfig(false);
 
     ServerConfig::m_server_ip_ban_list =
         {
