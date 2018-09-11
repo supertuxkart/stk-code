@@ -2098,7 +2098,7 @@ int main(int argc, char *argv[] )
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
                                      NewsManager::get()->getImportantMessage();
-        if(important_message!="")
+        if(important_message!="" && !NetworkConfig::get()->isServer())
         {
             new MessageDialog(important_message,
                               MessageDialog::MESSAGE_DIALOG_OK,
