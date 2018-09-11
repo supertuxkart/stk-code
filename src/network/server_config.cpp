@@ -256,8 +256,8 @@ void loadServerLobbyFromConfig()
     if (unsupportedGameMode())
         Log::fatal("ServerConfig", "Unsupported game mode");
 
-    if (m_server_difficulty > (unsigned)RaceManager::DIFFICULTY_LAST)
-        m_server_difficulty = (unsigned)RaceManager::DIFFICULTY_LAST;
+    if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
+        m_server_difficulty = RaceManager::DIFFICULTY_LAST;
     if (m_server_mode > 8)
         m_server_mode = 3;
 

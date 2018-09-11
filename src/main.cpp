@@ -1601,7 +1601,6 @@ void initUserConfig()
 //=============================================================================
 void initRest()
 {
-    stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     irr_driver = new IrrDriver();
     
@@ -1822,6 +1821,8 @@ int main(int argc, char *argv[] )
 
         handleCmdLinePreliminary();
 
+        // ServerConfig will use stk_config for server version testing
+        stk_config->load(file_manager->getAsset("stk_config.xml"));
         bool has_server_config = false;
         bool no_graphics = !CommandLine::has("--graphical-server");
         // Load current server config first, if any option is specified than
