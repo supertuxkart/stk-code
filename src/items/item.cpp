@@ -255,9 +255,10 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
  */
 void Item::switchBack()
 {
-    if (ItemState::switchBack()) return;
-
     setMesh(m_original_mesh, m_original_lowmesh);
+    
+    if (ItemState::switchBack()) 
+        return;
 
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);

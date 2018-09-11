@@ -130,7 +130,7 @@ protected:
     friend class ItemManager;
     friend class NetworkItemManager;
     // ------------------------------------------------------------------------
-    void setType(ItemType type) { m_type = type; }
+    virtual void setType(ItemType type) { m_type = type; }
 
 public:
          /** Constructor. 
@@ -319,7 +319,7 @@ private:
     /** True if this item is predicted to exists. Used in networking only. */
     bool m_is_predicted;
 
-    void          setType(ItemType type);
+    void          setType(ItemType type) OVERRIDE;
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
 
