@@ -343,7 +343,8 @@ void Item::updateGraphics(float dt)
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     bool is_visible = isAvailable() || time_till_return <= 1.0f || 
-                      (getType() == ITEM_BUBBLEGUM && !isUsedUp() );
+                      (getType() == ITEM_BUBBLEGUM && 
+                       getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
 

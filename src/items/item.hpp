@@ -235,6 +235,9 @@ public:
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
     // ------------------------------------------------------------------------
+    /** Returns the original type of this item. */
+    ItemType getOriginalType() const { return m_original_type; }
+    // ------------------------------------------------------------------------
     /** Sets the index of this item in the item manager list. */
     void setItemId(unsigned int n) { m_item_id = n; }
     // ------------------------------------------------------------------------
