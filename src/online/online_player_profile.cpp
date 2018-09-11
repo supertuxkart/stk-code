@@ -348,8 +348,6 @@ namespace Online
     OnlinePlayerProfile::PollRequest::PollRequest()
                        : XMLRequest(true)
     {
-        m_disable_sending_log = NetworkConfig::get()->isNetworking() &&
-            NetworkConfig::get()->isServer();
     }   // PollRequest
 
     // ------------------------------------------------------------------------

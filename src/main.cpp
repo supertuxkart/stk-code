@@ -1298,6 +1298,9 @@ int handleCmdLine(bool has_server_config)
             }
             if (can_wan)
             {
+                // Server owner online account will keep online as long as
+                // server is live
+                Online::RequestManager::m_disable_polling = true;
                 NetworkConfig::get()->setIsWAN();
                 NetworkConfig::get()->setIsPublicServer();
                 ServerConfig::loadServerLobbyFromConfig();
