@@ -279,7 +279,7 @@ private:
 public:
              Profiler();
     virtual ~Profiler();
-
+    void     init();
     void     pushCPUMarker(const char* name="N/A",
                            const video::SColor& color=video::SColor());
     void     popCPUMarker();

@@ -248,6 +248,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
 #include "utils/mini_glm.hpp"
+#include "utils/profiler.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -1879,6 +1880,9 @@ int main(int argc, char *argv[] )
             ServerConfig::m_wan_server = false;
             ServerConfig::m_validating_player = false;
         }
+
+        if (!ProfileWorld::isNoGraphics())
+            profiler.init();
         initRest();
 
         input_manager = new InputManager ();
