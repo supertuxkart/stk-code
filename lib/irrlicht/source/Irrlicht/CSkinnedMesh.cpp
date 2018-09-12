@@ -23,7 +23,7 @@ CSkinnedMesh::CSkinnedMesh()
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
 	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
-	AnimateNormals(true), HardwareSkinning(false)
+	AnimateNormals(true), m_deleted_vertex_buffer(false)
 {
 	#ifdef _DEBUG
 	setDebugName("CSkinnedMesh");
@@ -74,21 +74,14 @@ void CSkinnedMesh::setAnimationSpeed(f32 fps)
 //! returns the animated mesh based on a detail level. 0 is the lowest, 255 the highest detail. Note, that some Meshes will ignore the detail level.
 IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32 endFrameLoop)
 {
-	const bool is_hw_skinning_before = HardwareSkinning;
-	if (is_hw_skinning_before)
-	{
-		HardwareSkinning = false;
-		LastAnimatedFrame = -1;
-	}
+	if (m_deleted_vertex_buffer)
+		return this;
 	//animate(frame,startFrameLoop, endFrameLoop);
 	if (frame==-1)
 		return this;
 
 	animateMesh((f32)frame, 1.0f);
 	skinMesh();
-
-	if (is_hw_skinning_before)
-		HardwareSkinning = true;
 
 	return this;
 }
@@ -103,7 +96,7 @@ IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32
 //! blend: {0-old position, 1-New position}
 void CSkinnedMesh::animateMesh(f32 frame, f32 blend)
 {
-	if (HardwareSkinning && LastAnimatedFrame==frame)
+	if (LastAnimatedFrame==frame)
 	{
 		SkinnedLastFrame=false;
 		return;
@@ -732,20 +725,6 @@ const core::array<CSkinnedMesh::SJoint*> &CSkinnedMesh::getAllJoints() const
 	return AllJoints;
 }
 
-
-//! (This feature is not implementated in irrlicht yet)
-bool CSkinnedMesh::setHardwareSkinning(bool on)
-{
-	if (HardwareSkinning!=on)
-	{
-		if (on)
-			toStaticPose();
-
-		HardwareSkinning=on;
-	}
-	return HardwareSkinning;
-}
-
 void CSkinnedMesh::toStaticPose()
 {
 	for (u32 i=0; i<AllJoints.size(); ++i)
@@ -1154,7 +1133,7 @@ void CSkinnedMesh::finalize()
 
 void CSkinnedMesh::updateBoundingBox(void)
 {
-	if(HardwareSkinning || !SkinningBuffers)
+	if (!SkinningBuffers)
 		return;
 
 	core::array<SSkinMeshBuffer*> & buffer = *SkinningBuffers;
@@ -1395,6 +1374,27 @@ void CSkinnedMesh::addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 		bone->drop();
 	}
 	SkinnedLastFrame=false;
+}
+
+void CSkinnedMesh::freeMeshVertexBuffer()
+{
+	if (m_deleted_vertex_buffer)
+		return;
+	for (u32 i=0; i<AllJoints.size(); ++i)
+		delete AllJoints[i];
+
+	for (u32 j=0; j<LocalBuffers.size(); ++j)
+	{
+		if (LocalBuffers[j])
+		{
+			LocalBuffers[j]->Vertices_Tangents.clear();
+			LocalBuffers[j]->Vertices_2TCoords.clear();
+			LocalBuffers[j]->Vertices_Standard.clear();
+			LocalBuffers[j]->Indices.clear();
+		}
+	}
+	AllJoints.clear();
+	m_deleted_vertex_buffer = true;
 }
 
 } // end namespace scene
