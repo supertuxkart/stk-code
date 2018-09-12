@@ -86,12 +86,6 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_KICK] = _("You were kicked from the server.");
     m_disconnected_msg[PDI_BAD_CONNECTION] =
         _("Bad network connection is detected.");
-
-    // I18N: Message shown in network lobby to tell user that
-    // player name is clickable
-    core::stringw msg = _("Press player name in the list for player management"
-        " and ranking information.");
-    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -538,6 +532,13 @@ void ClientLobby::connectionAccepted(Event* event)
     // Accepted
     // ========
     Log::info("ClientLobby", "The server accepted the connection.");
+
+    // I18N: Message shown in network lobby to tell user that
+    // player name is clickable
+    core::stringw msg = _("Press player name in the list for player management"
+        " and ranking information.");
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     uint32_t server_version = data.getUInt32();
