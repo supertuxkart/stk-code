@@ -923,7 +923,7 @@ int handleCmdLinePreliminary()
 /** Handles command line options.
  *  \param argc Number of command line options
  */
-int handleCmdLine(bool has_server_config)
+int handleCmdLine(bool has_server_config, bool has_parent_process)
 {
     // Some generic variables used in scanning:
     int n;
@@ -1170,7 +1170,7 @@ int handleCmdLine(bool has_server_config)
         STKHost::m_enable_console = true;
     }
     else if (ServerConfig::m_enable_console &&
-        NetworkConfig::get()->isServer())
+        NetworkConfig::get()->isServer() && !has_parent_process)
     {
         STKHost::m_enable_console = true;
     }
@@ -1886,8 +1886,12 @@ int main(int argc, char *argv[] )
         // Get into menu mode initially.
         input_manager->setMode(InputManager::MENU);
         int parent_pid;
+        bool has_parent_process = false;
         if (CommandLine::has("--parent-process", &parent_pid))
+        {
             main_loop = new MainLoop(parent_pid);
+            has_parent_process = true;
+        }
         else
             main_loop = new MainLoop(0/*parent_pid*/);
         material_manager->loadMaterial();
@@ -1945,7 +1949,7 @@ int main(int argc, char *argv[] )
                                                           "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
-        if (!handleCmdLine(!server_config.empty()))
+        if (!handleCmdLine(!server_config.empty(), has_parent_process))
             exit(0);
 
 #ifndef SERVER_ONLY
