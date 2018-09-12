@@ -1632,7 +1632,9 @@ void initRest()
     // online section of the add-ons manager will be initialised from a
     // separate thread running in network HTTP.
 #ifndef SERVER_ONLY
-    addons_manager          = new AddonsManager();
+    addons_manager = NULL;
+    if (!ProfileWorld::isNoGraphics())
+        addons_manager = new AddonsManager();
 #endif
     Online::ProfileManager::create();
 
@@ -1643,7 +1645,8 @@ void initRest()
     PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
 #ifndef SERVER_ONLY
-    NewsManager::get();   // this will create the news manager
+    if (!ProfileWorld::isNoGraphics())
+        NewsManager::get();   // this will create the news manager
 #endif
 
     music_manager = new MusicManager();
@@ -1723,7 +1726,8 @@ void askForInternetPermission()
 #ifndef SERVER_ONLY
             bool need_to_start_news_manager =
                 UserConfigParams::m_internet_status !=
-                                  Online::RequestManager::IPERM_ALLOWED;
+                Online::RequestManager::IPERM_ALLOWED &&
+                !ProfileWorld::isNoGraphics();
             UserConfigParams::m_internet_status =
                                   Online::RequestManager::IPERM_ALLOWED;
             if (need_to_start_news_manager)
@@ -1953,24 +1957,27 @@ int main(int argc, char *argv[] )
             exit(0);
 
 #ifndef SERVER_ONLY
-        addons_manager->checkInstalledAddons();
-
-        // Load addons.xml to get info about add-ons even when not
-        // allowed to access the Internet
-        if (UserConfigParams::m_internet_status !=
-            Online::RequestManager::IPERM_ALLOWED)
+        if (!ProfileWorld::isNoGraphics())
         {
-            std::string xml_file = file_manager->getAddonsFile("addonsX.xml");
-            if (file_manager->fileExists(xml_file))
+            addons_manager->checkInstalledAddons();
+
+            // Load addons.xml to get info about add-ons even when not
+            // allowed to access the Internet
+            if (UserConfigParams::m_internet_status !=
+                Online::RequestManager::IPERM_ALLOWED)
             {
-                try
+                std::string xml_file = file_manager->getAddonsFile("addonsX.xml");
+                if (file_manager->fileExists(xml_file))
                 {
-                    const XMLNode *xml = new XMLNode(xml_file);
-                    addons_manager->initAddons(xml);
-                }
-                catch (std::runtime_error& e)
-                {
-                    Log::warn("Addons", "Exception thrown when initializing add-ons manager : %s", e.what());
+                    try
+                    {
+                        const XMLNode *xml = new XMLNode(xml_file);
+                        addons_manager->initAddons(xml);
+                    }
+                    catch (std::runtime_error& e)
+                    {
+                        Log::warn("Addons", "Exception thrown when initializing add-ons manager : %s", e.what());
+                    }
                 }
             }
         }
@@ -2110,14 +2117,17 @@ int main(int argc, char *argv[] )
 
 #ifndef SERVER_ONLY
         // If an important news message exists it is shown in a popup dialog.
-        const core::stringw important_message =
-                                     NewsManager::get()->getImportantMessage();
-        if(important_message!="" && !NetworkConfig::get()->isServer())
+        if (!ProfileWorld::isNoGraphics())
         {
-            new MessageDialog(important_message,
-                              MessageDialog::MESSAGE_DIALOG_OK,
-                              NULL, true);
-        }   // if important_message
+            const core::stringw important_message =
+                                        NewsManager::get()->getImportantMessage();
+            if (important_message!="")
+            {
+                new MessageDialog(important_message,
+                                MessageDialog::MESSAGE_DIALOG_OK,
+                                NULL, true);
+            }   // if important_message
+        }
 #endif
 
         // Replay a race
@@ -2270,11 +2280,14 @@ static void cleanSuperTuxKart()
     // the OS takes all threads down.
 
 #ifndef SERVER_ONLY
-    if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+    if (!ProfileWorld::isNoGraphics())
     {
-        Log::info("Thread", "News manager not stopping, exiting anyway.");
+        if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+        {
+            Log::info("Thread", "News manager not stopping, exiting anyway.");
+        }
+        NewsManager::deallocate();
     }
-    NewsManager::deallocate();
 #endif
 
     if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
