@@ -24,6 +24,7 @@
 #include <irrlicht.h>
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
@@ -479,6 +480,9 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
               << "', aborting.";
             throw std::runtime_error(o.str());
         }
+#ifndef SERVER_ONLY
+        SP::uploadSPM(m_all_meshes[type]);
+#endif
         m_all_meshes[type]->grab();
     }
     else
