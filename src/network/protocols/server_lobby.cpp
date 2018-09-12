@@ -130,11 +130,16 @@ ServerLobby::~ServerLobby()
 void ServerLobby::setup()
 {
     LobbyProtocol::setup();
+    auto players = m_game_setup->getConnectedPlayers();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
-        auto players = m_game_setup->getConnectedPlayers();
         for (auto player : players)
             player->resetGrandPrixData();
+    }
+    if (!m_game_setup->isGrandPrix() || !m_game_setup->isGrandPrixStarted())
+    {
+        for (auto player : players)
+            player->setKartName("");
     }
 
     StateManager::get()->resetActivePlayers();
