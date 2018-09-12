@@ -118,7 +118,7 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_soccer_goal_target
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "soccer-goal-target",
-        "Use goal torget in soccer."));
+        "Use goal target in soccer."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_wan_server
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "wan-server",
