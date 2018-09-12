@@ -160,7 +160,7 @@ public:
     void          loadWeights(const XMLNode *node, const std::string &category);
     void          unloadPowerups  ();
     void          computeWeightsForRace(int num_karts);
-    void          LoadPowerup     (PowerupType type, const XMLNode &node);
+    void          loadPowerup     (PowerupType type, const XMLNode &node);
     PowerupManager::PowerupType
         getRandomPowerup(unsigned int pos, unsigned int *n,
                          uint64_t random_number);
