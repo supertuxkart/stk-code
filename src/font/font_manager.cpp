@@ -23,6 +23,7 @@
 #include "font/digit_face.hpp"
 #include "font/face_ttf.hpp"
 #include "font/regular_face.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -33,6 +34,10 @@ FontManager *font_manager = NULL;
 FontManager::FontManager()
 {
 #ifndef SERVER_ONLY
+    m_ft_library = NULL;
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     checkFTError(FT_Init_FreeType(&m_ft_library), "loading freetype library");
 #endif
 }   // FontManager
@@ -52,8 +57,10 @@ FontManager::~FontManager()
     m_digit_ttf = NULL;
 
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     checkFTError(FT_Done_FreeType(m_ft_library), "removing freetype library");
-    m_ft_library = NULL;
 #endif
 }   // ~FontManager
 

@@ -77,6 +77,12 @@ void FontWithFace::init()
 {
     setDPI();
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+    {
+        reset();
+        return;
+    }
+
     // Get the max height for this face
     assert(m_face_ttf->getTotalFaces() > 0);
     FT_Face cur_face = m_face_ttf->getFace(0);
@@ -127,6 +133,9 @@ void FontWithFace::reset()
 void FontWithFace::loadGlyphInfo(wchar_t c)
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     unsigned int font_number = 0;
     unsigned int glyph_index = 0;
     while (font_number < m_face_ttf->getTotalFaces())
@@ -145,6 +154,9 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
 void FontWithFace::createNewGlyphPage()
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
     (CVS->isARBTextureSwizzleUsable() ? 1 : 4)]();
 #else
@@ -173,6 +185,9 @@ void FontWithFace::createNewGlyphPage()
 void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     assert(gi.glyph_index > 0);
     assert(gi.font_number < m_face_ttf->getTotalFaces());
     FT_Face cur_face = m_face_ttf->getFace(gi.font_number);
@@ -401,6 +416,8 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
 #ifdef SERVER_ONLY
     return core::dimension2d<u32>(1, 1);
 #else
+    if (ProfileWorld::isNoGraphics())
+        return core::dimension2d<u32>(1, 1);
 
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
     // Test if lazy load char is needed
@@ -494,6 +511,9 @@ void FontWithFace::render(const core::stringw& text,
                           FontCharCollector* char_collector)
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     const bool black_border = font_settings ?
         font_settings->useBlackBorder() : false;
     const bool rtl = font_settings ? font_settings->isRTL() : false;
