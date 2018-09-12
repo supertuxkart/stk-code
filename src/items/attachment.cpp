@@ -35,7 +35,6 @@
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -309,7 +308,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     if (m_type == new_type || m_type == ATTACH_NOTHING)
     {
         setTicksLeft(ticks_left);
-        if (m_type != new_type)
+        if (m_type != new_type && new_type != ATTACH_SWATTER)
             m_type = new_type;
         return;
     }
@@ -343,10 +342,11 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
-        ExplosionAnimation::create(m_kart);
+        if (m_kart->getKartAnimation() == NULL)
+            ExplosionAnimation::create(m_kart);
         return;
     }
 
@@ -607,7 +607,8 @@ void Attachment::update(int ticks)
                 m_bubble_explode_sound->play();
             }
 
-            ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            if (!m_kart->isGhostKart())
+                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
         break;
     }   // switch

@@ -37,6 +37,7 @@ public:
            MS_INCREASE_NITRO,
            MS_INCREASE_RUBBER,
            MS_INCREASE_SKIDDING,
+           MS_INCREASE_RED_SKIDDING,
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:

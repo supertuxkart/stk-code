@@ -22,7 +22,6 @@
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
 #include "karts/kart_model.hpp"
@@ -166,7 +165,6 @@ void SoccerWorld::reset()
     }
 
     m_reset_ball_ticks = -1;
-    initKartList();
     m_ball->reset();
     m_bgd.reset();
     m_ball->setEnabled(false);
@@ -457,6 +455,9 @@ void SoccerWorld::setBallHitter(unsigned int kart_id)
  */
 bool SoccerWorld::isRaceOver()
 {
+    if (m_unfair_team)
+        return true;
+
     if (race_manager->hasTimeTarget())
     {
         return m_count_down_reached_zero;
@@ -464,8 +465,8 @@ bool SoccerWorld::isRaceOver()
     // One team scored the target goals ...
     else
     {
-        return (getScore(SOCCER_TEAM_BLUE) >= m_goal_target ||
-            getScore(SOCCER_TEAM_RED) >= m_goal_target);
+        return (getScore(KART_TEAM_BLUE) >= m_goal_target ||
+            getScore(KART_TEAM_RED) >= m_goal_target);
     }
 
 }   // isRaceOver
@@ -482,160 +483,20 @@ void SoccerWorld::countdownReachedZero()
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------
-void SoccerWorld::initKartList()
-{
-#ifndef SERVER_ONLY
-    const unsigned int kart_amount = (unsigned int)m_karts.size();
-
-    //Loading the indicator textures
-    std::string red_path =
-            file_manager->getAsset(FileManager::GUI, "soccer_player_red.png");
-    std::string blue_path =
-            file_manager->getAsset(FileManager::GUI, "soccer_player_blue.png");
-
-    //Assigning indicators
-    for(unsigned int i = 0; i < kart_amount; i++)
-    {
-        scene::ISceneNode *arrow_node = NULL;
-
-        KartModel* km = m_karts[i]->getKartModel();
-        // Color of karts can be changed using shaders if the model supports
-        if (km->supportColorization() && CVS->isGLSL()) continue;
-
-        float arrow_pos_height = km->getHeight() + 0.5f;
-        SoccerTeam team = getKartTeam(i);
-
-        arrow_node = irr_driver->addBillboard(
-            core::dimension2d<irr::f32>(0.3f,0.3f),
-            team == SOCCER_TEAM_BLUE ? blue_path : red_path,
-            m_karts[i]->getNode());
-
-        arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
-    }
-#endif
-}   // initKartList
-
-//-----------------------------------------------------------------------------
 bool SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
 {
     if (m_red_scorers.size() == m_blue_scorers.size()) return true;
 
     bool red_win = m_red_scorers.size() > m_blue_scorers.size();
-    SoccerTeam team = getKartTeam(kart_id);
+    KartTeam team = getKartTeam(kart_id);
 
-    if ((red_win && team == SOCCER_TEAM_RED) ||
-        (!red_win && team == SOCCER_TEAM_BLUE))
+    if ((red_win && team == KART_TEAM_RED) ||
+        (!red_win && team == KART_TEAM_BLUE))
         return true;
     else
         return false;
 
 }   // getKartSoccerResult
-
-//-----------------------------------------------------------------------------
-std::shared_ptr<AbstractKart> SoccerWorld::createKart
-    (const std::string &kart_ident, int index, int local_player_id,
-    int global_player_id, RaceManager::KartType kart_type,
-    PerPlayerDifficulty difficulty)
-{
-    int cur_red = getTeamNum(SOCCER_TEAM_RED);
-    int cur_blue = getTeamNum(SOCCER_TEAM_BLUE);
-    int pos_index = 0;
-    int position  = index + 1;
-    SoccerTeam team = SOCCER_TEAM_BLUE;
-
-    if (kart_type == RaceManager::KT_AI)
-    {
-        if (index < m_red_ai)
-            team = SOCCER_TEAM_RED;
-        else
-            team = SOCCER_TEAM_BLUE;
-        m_kart_team_map[index] = team;
-    }
-    else if (NetworkConfig::get()->isNetworking())
-    {
-        m_kart_team_map[index] = race_manager->getKartInfo(index).getSoccerTeam();
-        team = race_manager->getKartInfo(index).getSoccerTeam();
-    }
-    else
-    {
-        int rm_id = index -
-            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-        assert(rm_id >= 0);
-        team = race_manager->getKartInfo(rm_id).getSoccerTeam();
-        m_kart_team_map[index] = team;
-    }
-
-    core::stringw online_name;
-    if (global_player_id > -1)
-    {
-        online_name = race_manager->getKartInfo(global_player_id)
-            .getPlayerName();
-    }
-
-    // Notice: In blender, please set 1,3,5,7... for blue starting position;
-    // 2,4,6,8... for red.
-    if (team == SOCCER_TEAM_BLUE)
-    {
-        pos_index = 1 + 2 * cur_blue;
-    }
-    else
-    {
-        pos_index = 2 + 2 * cur_red;
-    }
-
-    btTransform init_pos = getStartTransform(pos_index - 1);
-    m_kart_position_map[index] = (unsigned)(pos_index - 1);
-
-    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
-    ri = (team == SOCCER_TEAM_BLUE ? std::make_shared<RenderInfo>(0.66f) :
-        std::make_shared<RenderInfo>(1.0f));
-
-    std::shared_ptr<AbstractKart> new_kart;
-    if (RewindManager::get()->isEnabled())
-    {
-        auto kr = std::make_shared<KartRewinder>(kart_ident, index, position,
-            init_pos, difficulty, ri);
-        kr->rewinderAdd();
-        new_kart = kr;
-    }
-    else
-    {
-        new_kart = std::make_shared<Kart>(kart_ident, index, position,
-            init_pos, difficulty, ri);
-    }
-
-    new_kart->init(race_manager->getKartType(index));
-    Controller *controller = NULL;
-
-    switch(kart_type)
-    {
-    case RaceManager::KT_PLAYER:
-        controller = new LocalPlayerController(new_kart.get(), local_player_id,
-            difficulty);
-        m_num_players ++;
-        break;
-    case RaceManager::KT_NETWORK_PLAYER:
-        controller = new NetworkPlayerController(new_kart.get());
-        if (!online_name.empty())
-            new_kart->setOnScreenText(online_name.c_str());
-        m_num_players++;
-        break;
-    case RaceManager::KT_AI:
-        controller = loadAIController(new_kart.get());
-        break;
-    case RaceManager::KT_GHOST:
-        break;
-    case RaceManager::KT_LEADER:
-        break;
-    case RaceManager::KT_SPARE_TIRE:
-        break;
-    }
-
-    new_kart->setController(controller);
-
-    return new_kart;
-}   // createKart
 
 //-----------------------------------------------------------------------------
 /** Localize the ball on the navigation mesh.
@@ -707,27 +568,17 @@ int SoccerWorld::getBallNode() const
 }   // getBallNode
 
 //-----------------------------------------------------------------------------
-SoccerTeam SoccerWorld::getKartTeam(unsigned int kart_id) const
-{
-    std::map<int, SoccerTeam>::const_iterator n =
-        m_kart_team_map.find(kart_id);
-
-    assert(n != m_kart_team_map.end());
-    return n->second;
-}   // getKartTeam
-
-//-----------------------------------------------------------------------------
 bool SoccerWorld::isCorrectGoal(unsigned int kart_id, bool first_goal) const
 {
-    SoccerTeam team = getKartTeam(kart_id);
+    KartTeam team = getKartTeam(kart_id);
     if (first_goal)
     {
-        if (team == SOCCER_TEAM_RED)
+        if (team == KART_TEAM_RED)
             return true;
     }
     else if (!first_goal)
     {
-        if (team == SOCCER_TEAM_BLUE)
+        if (team == KART_TEAM_BLUE)
             return true;
     }
     return false;
@@ -748,7 +599,7 @@ void SoccerWorld::updateAIData()
             m_karts[i]->getController()->isPlayerController())
             continue;
 
-        if (getKartTeam(m_karts[i]->getWorldKartId()) == SOCCER_TEAM_RED)
+        if (getKartTeam(m_karts[i]->getWorldKartId()) == KART_TEAM_RED)
         {
             Vec3 rd = m_karts[i]->getXYZ() - getBallPosition();
             m_red_kdm.push_back(KartDistanceMap(i, rd.length_2d()));
@@ -769,9 +620,9 @@ void SoccerWorld::updateAIData()
 }   // updateAIData
 
 //-----------------------------------------------------------------------------
-int SoccerWorld::getAttacker(SoccerTeam team) const
+int SoccerWorld::getAttacker(KartTeam team) const
 {
-    if (team == SOCCER_TEAM_BLUE && m_blue_kdm.size() > 1)
+    if (team == KART_TEAM_BLUE && m_blue_kdm.size() > 1)
     {
         for (unsigned int i = 1; i < m_blue_kdm.size(); i++)
         {
@@ -782,7 +633,7 @@ int SoccerWorld::getAttacker(SoccerTeam team) const
             return m_blue_kdm[i].m_kart_id;
         }
     }
-    else if (team == SOCCER_TEAM_RED && m_red_kdm.size() > 1)
+    else if (team == KART_TEAM_RED && m_red_kdm.size() > 1)
     {
         for (unsigned int i = 1; i < m_red_kdm.size(); i++)
         {
@@ -796,20 +647,6 @@ int SoccerWorld::getAttacker(SoccerTeam team) const
     // No attacker
     return -1;
 }   // getAttacker
-
-//-----------------------------------------------------------------------------
-int SoccerWorld::getTeamNum(SoccerTeam team) const
-{
-    int total = 0;
-    if (m_kart_team_map.empty()) return total;
-
-    for (unsigned int i = 0; i < (unsigned)m_karts.size(); ++i)
-    {
-        if (team == getKartTeam(m_karts[i]->getWorldKartId())) total++;
-    }
-
-    return total;
-}   // getTeamNum
 
 //-----------------------------------------------------------------------------
 unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
@@ -898,7 +735,7 @@ void SoccerWorld::enterRaceOverState()
             "Blue goal: %d, Blue own goal: %d", red_goal, red_own_goal,
             blue_goal, blue_own_goal);
 
-        if (getScore(SOCCER_TEAM_BLUE) >= m_goal_target)
+        if (getScore(KART_TEAM_BLUE) >= m_goal_target)
             Log::verbose("Soccer AI profiling", "Blue team wins");
         else
             Log::verbose("Soccer AI profiling", "Red team wins");
@@ -908,52 +745,3 @@ void SoccerWorld::enterRaceOverState()
     }
 
 }   // enterRaceOverState
-
-//-----------------------------------------------------------------------------
-void SoccerWorld::setAITeam()
-{
-    const int total_player = race_manager->getNumPlayers();
-    const int total_karts = race_manager->getNumberOfKarts();
-
-    // No AI
-    if ((total_karts - total_player) == 0) return;
-
-    int red_player = 0;
-    int blue_player = 0;
-    for (int i = 0; i < total_player; i++)
-    {
-        SoccerTeam team = race_manager->getKartInfo(i).getSoccerTeam();
-
-        // Happen in profiling mode
-        if (team == SOCCER_TEAM_NONE)
-        {
-            race_manager->setKartSoccerTeam(i, SOCCER_TEAM_BLUE);
-            team = SOCCER_TEAM_BLUE;
-            continue;
-        }
-
-        team == SOCCER_TEAM_BLUE ? blue_player++ : red_player++;
-    }
-
-    int available_ai = total_karts - red_player - blue_player;
-    while (available_ai > 0)
-    {
-        if ((m_red_ai + red_player) > (m_blue_ai + blue_player))
-        {
-            m_blue_ai++;
-            available_ai--;
-        }
-        else if ((m_blue_ai + blue_player) > (m_red_ai + red_player))
-        {
-            m_red_ai++;
-            available_ai--;
-        }
-        else if ((m_blue_ai + blue_player) == (m_red_ai + red_player))
-        {
-            blue_player > red_player ? m_red_ai++ : m_blue_ai++;
-            available_ai--;
-        }
-    }
-    Log::debug("SoccerWorld","blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
-
-}   // setAITeam

@@ -26,9 +26,11 @@
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_string.hpp"
+#include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
@@ -269,9 +271,11 @@ STKHost::STKHost(bool server)
 
     if (server)
     {
-        addr.port = NetworkConfig::get()->getServerPort();
+        addr.port = ServerConfig::m_server_port;
+        if (addr.port == 0 && !UserConfigParams::m_random_server_port)
+            addr.port = stk_config->m_server_port;
         // Reserve 1 peer to deliver full server message
-        m_network = new Network(NetworkConfig::get()->getMaxPlayers() + 1,
+        m_network = new Network(ServerConfig::m_server_max_players + 1,
             /*channel_limit*/EVENT_CHANNEL_COUNT, /*max_in_bandwidth*/0,
             /*max_out_bandwidth*/ 0, &addr, true/*change_port_if_bound*/);
     }
@@ -283,6 +287,7 @@ STKHost::STKHost(bool server)
             /*channel_limit*/EVENT_CHANNEL_COUNT,
             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &addr,
             true/*change_port_if_bound*/);
+        m_nts.reset(new NetworkTimerSynchronizer());
     }
 
     if (!m_network)
@@ -301,10 +306,11 @@ STKHost::STKHost(bool server)
  */
 void STKHost::init()
 {
+    m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
     m_network          = NULL;
-    m_exit_timeout.store(std::numeric_limits<double>::max());
+    m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
     m_client_ping.store(0);
 
     // Start with initialising ENet
@@ -344,16 +350,6 @@ STKHost::~STKHost()
     delete m_network;
     enet_deinitialize();
     delete m_separate_process;
-    // Always clean up server id file in case client failed to connect
-    const std::string& sid = NetworkConfig::get()->getServerIdFile();
-    if (!sid.empty())
-    {
-        if (file_manager->fileExists(sid))
-        {
-            file_manager->removeFile(sid);
-        }
-        NetworkConfig::get()->setServerIdFile("");
-    }
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
@@ -372,7 +368,7 @@ void STKHost::shutdown()
 void STKHost::setPublicAddress()
 {
     std::vector<std::pair<std::string, uint32_t> > untried_server;
-    for (auto& p : UserConfigParams::m_stun_list)
+    for (auto& p : UserConfigParams::m_stun_servers)
         untried_server.push_back(p);
 
     assert(untried_server.size() > 2);
@@ -392,9 +388,19 @@ void STKHost::setPublicAddress()
     {
         // Pick last element in untried servers
         std::string server_name = untried_server.back().first.c_str();
-        UserConfigParams::m_stun_list[server_name] = (uint32_t)-1;
+        UserConfigParams::m_stun_servers[server_name] = (uint32_t)-1;
         Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
 
+        std::vector<std::string> addr_and_port =
+            StringUtils::split(server_name, ':');
+        uint16_t port = 0;
+        if (addr_and_port.size() != 2 ||
+            !StringUtils::fromString(addr_and_port[1], port))
+        {
+            Log::error("STKHost", "Wrong server address and port");
+            untried_server.pop_back();
+            continue;
+        }
         struct addrinfo hints, *res;
 
         memset(&hints, 0, sizeof hints);
@@ -402,11 +408,11 @@ void STKHost::setPublicAddress()
         hints.ai_socktype = SOCK_STREAM;
 
         // Resolve the stun server name so we can send it a STUN request
-        int status = getaddrinfo(server_name.c_str(), NULL, &hints, &res);
+        int status = getaddrinfo(addr_and_port[0].c_str(), NULL, &hints, &res);
         if (status != 0)
         {
             Log::error("STKHost", "Error in getaddrinfo for stun server"
-                " %s: %s", server_name.c_str(), gai_strerror(status));
+                " %s: %s", addr_and_port[0].c_str(), gai_strerror(status));
             untried_server.pop_back();
             continue;
         }
@@ -415,7 +421,7 @@ void STKHost::setPublicAddress()
         assert(res != NULL);
         struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
         m_stun_address.setIP(ntohl(current_interface->sin_addr.s_addr));
-        m_stun_address.setPort(3478);
+        m_stun_address.setPort(port);
 
         // Assemble the message for the stun server
         BareNetworkString s(20);
@@ -437,7 +443,7 @@ void STKHost::setPublicAddress()
         }
 
         m_network->sendRawPacket(s, m_stun_address);
-        double ping = StkTime::getRealTime();
+        uint64_t ping = StkTime::getRealTimeMs();
         freeaddrinfo(res);
 
         // Recieve now
@@ -445,7 +451,7 @@ void STKHost::setPublicAddress()
         const int LEN = 2048;
         char buffer[LEN];
         int len = m_network->receiveRawPacket(buffer, LEN, &sender, 2000);
-        ping = StkTime::getRealTime() - ping;
+        ping = StkTime::getRealTimeMs() - ping;
 
         if (sender.getIP() != m_stun_address.getIP())
         {
@@ -584,8 +590,7 @@ void STKHost::setPublicAddress()
                 m_public_address = non_xor_addr;
             }
             // Succeed, save ping
-            UserConfigParams::m_stun_list[server_name] =
-                (uint32_t)(ping * 1000.0);
+            UserConfigParams::m_stun_servers[server_name] = (uint32_t)(ping);
             untried_server.clear();
         }
     }
@@ -617,7 +622,7 @@ void STKHost::disconnectAllPeers(bool timeout_waiting)
         for (auto peer : m_peers)
             peer.second->disconnect();
         // Wait for at most 2 seconds for disconnect event to be generated
-        m_exit_timeout.store(StkTime::getRealTime() + 2.0);
+        m_exit_timeout.store(StkTime::getRealTimeMs() + 2000);
     }
     m_peers.clear();
 }   // disconnectAllPeers
@@ -664,7 +669,7 @@ bool STKHost::connect(const TransportAddress& address)
  */
 void STKHost::startListening()
 {
-    m_exit_timeout.store(std::numeric_limits<double>::max());
+    m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
     m_listening_thread = std::thread(std::bind(&STKHost::mainLoop, this));
 }   // startListening
 
@@ -674,8 +679,8 @@ void STKHost::startListening()
  */
 void STKHost::stopListening()
 {
-    if (m_exit_timeout.load() == std::numeric_limits<double>::max())
-        m_exit_timeout.store(0.0);
+    if (m_exit_timeout.load() == std::numeric_limits<uint64_t>::max())
+        m_exit_timeout.store(0);
     if (m_listening_thread.joinable())
         m_listening_thread.join();
 }   // stopListening
@@ -700,8 +705,7 @@ void STKHost::mainLoop()
     if ((NetworkConfig::get()->isLAN() && is_server) ||
         NetworkConfig::get()->isPublicServer())
     {
-        TransportAddress address(0,
-            NetworkConfig::get()->getServerDiscoveryPort());
+        TransportAddress address(0, stk_config->m_server_discovery_port);
         ENetAddress eaddr = address.toEnetAddress();
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
         if (direct_socket->getENetHost() == NULL)
@@ -713,16 +717,26 @@ void STKHost::mainLoop()
         }
     }
 
-    double last_ping_time = StkTime::getRealTime();
-    double last_ping_time_update_for_client = StkTime::getRealTime();
-    while (m_exit_timeout.load() > StkTime::getRealTime())
+    uint64_t last_ping_time = StkTime::getRealTimeMs();
+    uint64_t last_ping_time_update_for_client = StkTime::getRealTimeMs();
+    std::map<std::string, uint64_t> ctp;
+    while (m_exit_timeout.load() > StkTime::getRealTimeMs())
     {
+        // Clear outdated connect to peer list every 15 seconds
+        for (auto it = ctp.begin(); it != ctp.end();)
+        {
+            if (it->second + 15000 < StkTime::getRealTimeMs())
+                it = ctp.erase(it);
+            else
+                it++;
+        }
+
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
         {
             try
             {
-                handleDirectSocketRequest(direct_socket, sl);
+                handleDirectSocketRequest(direct_socket, sl, ctp);
             }
             catch (std::exception& e)
             {
@@ -734,18 +748,21 @@ void STKHost::mainLoop()
         if (is_server)
         {
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
-            const float timeout = UserConfigParams::m_validation_timeout;
+            const float timeout = ServerConfig::m_validation_timeout;
             bool need_ping = false;
-            if (sl && !sl->isRacing() &&
-                last_ping_time < StkTime::getRealTime())
+            if (sl && (!sl->isRacing() || sl->allowJoinedPlayersWaiting()) &&
+                last_ping_time < StkTime::getRealTimeMs())
             {
                 // If not racing, send an reliable packet at the same rate with
                 // state exchange to keep enet ping accurate
-                last_ping_time = StkTime::getRealTime() +
-                    1.0 / double(stk_config->m_network_state_frequeny);
+                last_ping_time = StkTime::getRealTimeMs() +
+                    (uint64_t)((1.0f /
+                    (float)(stk_config->m_network_state_frequeny)) * 1000.0f);
                 need_ping = true;
             }
 
+            ENetPacket* packet = NULL;
+            bool need_destroy_packet = true;
             if (need_ping)
             {
                 m_peer_pings.getData().clear();
@@ -754,9 +771,10 @@ void STKHost::mainLoop()
                     m_peer_pings.getData()[p.second->getHostId()] =
                         p.second->getPing();
                     const unsigned ap = p.second->getAveragePing();
-                    const unsigned max_ping = UserConfigParams::m_max_ping;
-                    if (UserConfigParams::m_kick_high_ping_players &&
-                        p.second->isValidated() && ap > max_ping)
+                    const unsigned max_ping = ServerConfig::m_max_ping;
+                    if (ServerConfig::m_kick_high_ping_players &&
+                        p.second->isValidated() &&
+                        p.second->getConnectedTime() > 5.0f && ap > max_ping)
                     {
                         Log::info("STKHost", "%s with ping %d is higher than"
                             " %d ms, kick.",
@@ -768,28 +786,33 @@ void STKHost::mainLoop()
                             ECT_DISCONNECT);
                     }
                 }
+                BareNetworkString ping_packet;
+                uint64_t network_timer = getNetworkTimer();
+                ping_packet.addUInt64(network_timer);
+                ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
+                for (auto& p : m_peer_pings.getData())
+                    ping_packet.addUInt32(p.first).addUInt32(p.second);
+                ping_packet.getBuffer().insert(
+                    ping_packet.getBuffer().begin(), g_ping_packet.begin(),
+                    g_ping_packet.end());
+                packet = enet_packet_create(ping_packet.getData(),
+                    ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
             }
+
             for (auto it = m_peers.begin(); it != m_peers.end();)
             {
-                if (need_ping)
+                if (need_ping &&
+                    (!sl->allowJoinedPlayersWaiting() ||
+                    !sl->isRacing() || it->second->isWaitingForGame()))
                 {
-                    BareNetworkString ping_packet;
-                    ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
-                    for (auto& p : m_peer_pings.getData())
-                        ping_packet.addUInt32(p.first).addUInt32(p.second);
-                    ping_packet.getBuffer().insert(
-                        ping_packet.getBuffer().begin(), g_ping_packet.begin(),
-                        g_ping_packet.end());
-                    ENetPacket* packet = enet_packet_create(ping_packet.getData(),
-                        ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
+                    need_destroy_packet = false;
                     enet_peer_send(it->first, EVENT_CHANNEL_UNENCRYPTED, packet);
                 }
 
                 // Remove peer which has not been validated after a specific time
                 // It is validated when the first connection request has finished
                 if (!it->second->isValidated() &&
-                    (float)StkTime::getRealTime() >
-                    it->second->getConnectedTime() + timeout)
+                    it->second->getConnectedTime() > timeout)
                 {
                     Log::info("STKHost", "%s has not been validated for more"
                         " than %f seconds, disconnect it by force.",
@@ -805,6 +828,8 @@ void STKHost::mainLoop()
                 }
             }
             peer_lock.unlock();
+            if (need_destroy_packet && packet != NULL)
+                enet_packet_destroy(packet);
         }
 
         std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
@@ -838,10 +863,10 @@ void STKHost::mainLoop()
         while (enet_host_service(host, &event, 10) != 0)
         {
             if (!is_server &&
-                last_ping_time_update_for_client < StkTime::getRealTime())
+                last_ping_time_update_for_client < StkTime::getRealTimeMs())
             {
                 last_ping_time_update_for_client =
-                    StkTime::getRealTime() + 2.0;
+                    StkTime::getRealTimeMs() + 2000;
                 auto lp = LobbyProtocol::get<LobbyProtocol>();
                 if (lp && lp->isRacing())
                 {
@@ -881,9 +906,9 @@ void STKHost::mainLoop()
 
                 // If used a timeout waiting disconnect, exit now
                 if (m_exit_timeout.load() !=
-                    std::numeric_limits<double>::max())
+                    std::numeric_limits<uint64_t>::max())
                 {
-                    m_exit_timeout.store(0.0);
+                    m_exit_timeout.store(0);
                     break;
                 }
                 // Use the previous stk peer so protocol can see the network
@@ -904,26 +929,37 @@ void STKHost::mainLoop()
                 auto& peer = m_peers.at(event.peer);
                 if (isPingPacket(event.packet->data, event.packet->dataLength))
                 {
-                    if (!is_server && need_ping_update)
+                    if (!is_server)
                     {
-                        m_peer_pings.lock();
-                        m_peer_pings.getData().clear();
                         BareNetworkString ping_packet((char*)event.packet->data,
-                            event.packet->dataLength);
-                        ping_packet.skip(g_ping_packet.size());
+                            (int)event.packet->dataLength);
+                        std::map<uint32_t, uint32_t> peer_pings;
+                        ping_packet.skip((int)g_ping_packet.size());
+                        uint64_t server_time = ping_packet.getUInt64();
                         unsigned peer_size = ping_packet.getUInt8();
                         for (unsigned i = 0; i < peer_size; i++)
                         {
                             unsigned host_id = ping_packet.getUInt32();
                             unsigned ping = ping_packet.getUInt32();
-                            m_peer_pings.getData()[host_id] = ping;
+                            peer_pings[host_id] = ping;
                         }
-                        m_client_ping.store(
-                            m_peer_pings.getData().find(m_host_id) !=
-                            m_peer_pings.getData().end() ?
-                            m_peer_pings.getData().at(m_host_id) : 0,
-                            std::memory_order_relaxed);
-                        m_peer_pings.unlock();
+                        const uint32_t client_ping =
+                            peer_pings.find(m_host_id) != peer_pings.end() ?
+                            peer_pings.at(m_host_id) : 0;
+
+                        if (client_ping > 0)
+                        {
+                            assert(m_nts);
+                            m_nts->addAndSetTime(client_ping, server_time);
+                        }
+                        if (need_ping_update)
+                        {
+                            m_peer_pings.lock();
+                            std::swap(m_peer_pings.getData(), peer_pings);
+                            m_peer_pings.unlock();
+                            m_client_ping.store(client_ping,
+                                std::memory_order_relaxed);
+                        }
                     }
                     enet_packet_destroy(event.packet);
                     continue;
@@ -965,7 +1001,7 @@ void STKHost::mainLoop()
             else
                 delete stk_event;
         }   // while enet_host_service
-    }   // while m_exit_timeout.load() > StkTime::getRealTime()
+    }   // while m_exit_timeout.load() > StkTime::getRealTimeMs()
     delete direct_socket;
     Log::info("STKHost", "Listening has been stopped.");
 }   // mainLoop
@@ -980,7 +1016,8 @@ void STKHost::mainLoop()
  *  (and sender IP address and port).
  */
 void STKHost::handleDirectSocketRequest(Network* direct_socket,
-                                        std::shared_ptr<ServerLobby> sl)
+                                        std::shared_ptr<ServerLobby> sl,
+                                        std::map<std::string, uint64_t>& ctp)
 {
     const int LEN=2048;
     char buffer[LEN];
@@ -993,55 +1030,46 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     message.decodeString(&command);
     const std::string connection_cmd = std::string("connection-request") +
         StringUtils::toString(m_private_port);
-    const std::string connection_cmd_localhost("connection-request-localhost");
 
     if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
-        std::string name = 
-            StringUtils::wideToUtf8(NetworkConfig::get()->getServerName());
-        // Avoid buffer overflows
-        if (name.size() > 255)
-            name = name.substr(0, 255);
-
+        const std::string& name = sl->getGameSetup()->getServerNameUtf8();
         // Send the answer, consisting of server name, max players, 
         // current players
+        const std::string& pw = ServerConfig::m_private_server_password;
         BareNetworkString s((int)name.size()+1+11);
-        s.addUInt32(NetworkConfig::m_server_version);
+        s.addUInt32(ServerConfig::m_server_version);
         s.encodeString(name);
-        s.addUInt8(NetworkConfig::get()->getMaxPlayers());
-        s.addUInt8((uint8_t)sl->getGameSetup()->getPlayerCount());
+        s.addUInt8((uint8_t)ServerConfig::m_server_max_players);
+        s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
+            sl->getWaitingPlayersCount()));
         s.addUInt16(m_private_port);
-        s.addUInt8((uint8_t)race_manager->getDifficulty());
-        s.addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
-        s.addUInt8(!NetworkConfig::get()->getPassword().empty());
+        s.addUInt8((uint8_t)ServerConfig::m_server_difficulty);
+        s.addUInt8((uint8_t)ServerConfig::m_server_mode);
+        s.addUInt8(!pw.empty());
+        s.addUInt8((uint8_t)
+            (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?
+            0 : 1));
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == connection_cmd)
     {
+        const std::string& peer_addr = sender.toString();
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
         if (!sender.isLAN() && !sender.isPublicAddressLocalhost() &&
             !NetworkConfig::get()->isPublicServer())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
-                       sender.toString().c_str());
+                peer_addr.c_str());
             Log::error("STKHost", "which is outside of LAN - rejected.");
             return;
         }
-        std::make_shared<ConnectToPeer>(sender)->requestStart();
-    }
-    else if (command == connection_cmd_localhost)
-    {
-        if (sender.getIP() == 0x7f000001)
+        if (ctp.find(peer_addr) == ctp.end())
         {
+            ctp[peer_addr] = StkTime::getRealTimeMs();
             std::make_shared<ConnectToPeer>(sender)->requestStart();
-        }
-        else
-        {
-            Log::error("STKHost", "Client trying to connect from '%s'",
-                       sender.toString().c_str());
-            Log::error("STKHost", "which is not localhost - rejected.");
         }
     }
     else if (command == "stk-server-port")
@@ -1106,7 +1134,22 @@ bool STKHost::isConnectedTo(const TransportAddress& peer)
 }   // isConnectedTo
 
 //-----------------------------------------------------------------------------
-/** Sends data to all peers
+/** Sends data to all validated peers currently in server
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketToAllPeersInServer(NetworkString *data, bool reliable)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
+    {
+        if (p.second->isValidated())
+            p.second->sendPacket(data, reliable);
+    }
+}   // sendPacketToAllPeersInServer
+
+//-----------------------------------------------------------------------------
+/** Sends data to all validated peers currently in game
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
  */
@@ -1115,13 +1158,13 @@ void STKHost::sendPacketToAllPeers(NetworkString *data, bool reliable)
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto p : m_peers)
     {
-        if (p.second->isValidated())
+        if (p.second->isValidated() && !p.second->isWaitingForGame())
             p.second->sendPacket(data, reliable);
     }
-}   // sendPacketExcept
+}   // sendPacketToAllPeers
 
 //-----------------------------------------------------------------------------
-/** Sends data to all peers except the specified one.
+/** Sends data to all validated peers except the specified currently in game
  *  \param peer Peer which will not receive the message.
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
@@ -1133,12 +1176,31 @@ void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
     for (auto p : m_peers)
     {
         STKPeer* stk_peer = p.second.get();
-        if (!stk_peer->isSamePeer(peer) && p.second->isValidated())
+        if (!stk_peer->isSamePeer(peer) && p.second->isValidated() &&
+            !p.second->isWaitingForGame())
         {
             stk_peer->sendPacket(data, reliable);
         }
     }
 }   // sendPacketExcept
+
+//-----------------------------------------------------------------------------
+/** Sends data to peers with custom rule
+ *  \param predicate boolean function for peer to predicate whether to send
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketToAllPeersWith(std::function<bool(STKPeer*)> predicate,
+                                       NetworkString* data, bool reliable)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
+    {
+        STKPeer* stk_peer = p.second.get();
+        if (predicate(stk_peer))
+            stk_peer->sendPacket(data, reliable);
+    }
+}   // sendPacketToAllPeersWith
 
 //-----------------------------------------------------------------------------
 /** Sends a message from a client to the server. */
@@ -1179,13 +1241,16 @@ std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const
 }   // findPeerByHostId
 
 //-----------------------------------------------------------------------------
-void STKHost::replaceNetwork(ENetEvent& event, Network* network)
+void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
 {
     assert(NetworkConfig::get()->isClient());
     assert(!m_listening_thread.joinable());
-    assert(network->getENetHost()->peerCount == 1);
-    delete m_network;
-    m_network = network;
+    assert(new_network->getENetHost()->peerCount == 1);
+    if (m_network != new_network)
+    {
+        delete m_network;
+        m_network = new_network;
+    }
     auto stk_peer = std::make_shared<STKPeer>(event.peer, this,
         m_next_unique_host_id++);
     stk_peer->setValidated();

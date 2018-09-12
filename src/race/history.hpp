@@ -62,6 +62,7 @@ private:
 
     void  allocateMemory(int size=-1);
 public:
+    static bool m_online_history_replay;
           History        ();
     void  initRecording  ();
     void  Save           ();

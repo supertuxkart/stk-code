@@ -100,20 +100,6 @@ irr::core::stringw Binding::getAsString() const
 
             switch(m_id)
             {
-#if defined(WIN32) || (defined(__linux__) && !defined(ANDROID))
-            // Windows codes certain special keys, which have atm no defined
-            // value in irr::IRR_KEY_*. So for now hardcode the values.
-            // FIXME: what happens with international keyboards? E.g. A [
-            // might be an Umlaut on a German keyboard. How do we get
-            // the character to display in this case??
-            case 186: s=";";  break;
-            case 191: s="/";  break;
-            case 192: s="`";  break;
-            case 219: s="[";  break;
-            case 220: s="\\"; break;
-            case 221: s="]";  break;
-            case 222: s="'";  break;
-#endif
              //I18N: input configuration screen: mouse button
             case irr::IRR_KEY_LBUTTON    : s = _C("input_key", "Left Mouse Button");  break;
              //I18N: input configuration screen: mouse button
@@ -327,6 +313,20 @@ irr::core::stringw Binding::getAsString() const
             case irr::IRR_KEY_PA1        : s = _C("input_key", "Pa1"); break;
              //I18N: input configuration screen: keyboard key
             case irr::IRR_KEY_OEM_CLEAR  : s = _C("input_key", "Oem Clear"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_1      : s = ";"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_2      : s = "/"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_3      : s = "`"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_4      : s = "["; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_5      : s = "\\"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_6      : s = "]"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::IRR_KEY_OEM_7      : s = "'"; break;
             
             // for azerty layout
             case irr::IRR_KEY_AMPERSAND   : s = "&"; break;

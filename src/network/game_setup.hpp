@@ -24,10 +24,12 @@
 
 #include "network/remote_kart_info.hpp"
 
+#include <atomic>
 #include <cassert>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 class NetworkPlayerProfile;
@@ -54,13 +56,20 @@ private:
 
     int m_extra_server_info;
 
+    int m_hit_capture_limit;
+
+    float m_battle_time_limit;
+
+    std::atomic<uint32_t> m_connected_players_count;
+
+    irr::core::stringw m_message_of_today;
+
+    /** Utf8 server name (with xml decoded) */
+    std::string m_server_name_utf8;
+
 public:
     // ------------------------------------------------------------------------
-    GameSetup()
-    {
-        m_extra_server_info = -1;
-        reset();
-    }
+    GameSetup();
     // ------------------------------------------------------------------------
     ~GameSetup() {}
     // ------------------------------------------------------------------------
@@ -95,11 +104,7 @@ public:
     }   // getConnectedPlayers
     // ------------------------------------------------------------------------
     /** Returns the number of connected players. */
-    unsigned getPlayerCount()
-    {
-        std::lock_guard<std::mutex> lock(m_players_mutex);
-        return (unsigned)m_players.size();
-    }
+    unsigned getPlayerCount()      { return m_connected_players_count.load(); }
     // ------------------------------------------------------------------------
     void setRace(const std::string& track, unsigned laps, bool reverse)
     {
@@ -114,6 +119,8 @@ public:
             m_tracks.clear();
         m_laps = 0;
         m_reverse = false;
+        m_hit_capture_limit = 0;
+        m_battle_time_limit = 0.0f;
     }
     // ------------------------------------------------------------------------
     void setGrandPrixTrack(int tracks_no)  { m_extra_server_info = tracks_no; }
@@ -158,8 +165,17 @@ public:
     // ------------------------------------------------------------------------
     void sortPlayersForGrandPrix();
     // ------------------------------------------------------------------------
-    void sortPlayersForSoccer();
-
+    void sortPlayersForTeamGame();
+    // ------------------------------------------------------------------------
+    void setHitCaptureTime(int hc, float time)
+    {
+        m_hit_capture_limit = hc;
+        m_battle_time_limit = time;
+    }
+    // ------------------------------------------------------------------------
+    std::pair<int, int> getPlayerTeamInfo() const;
+    // ------------------------------------------------------------------------
+    const std::string& getServerNameUtf8() const { return m_server_name_utf8; }
 };
 
 #endif // GAME_SETUP_HPP

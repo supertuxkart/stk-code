@@ -248,7 +248,9 @@ void CameraNormal::update(float dt)
 
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
-    if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
+    ExplosionAnimation* ea =
+        dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation());
+    if (ea && !ea->hasResetAlready())
     {
         float above_kart, cam_angle, side_way, distance;
         bool  smoothing;

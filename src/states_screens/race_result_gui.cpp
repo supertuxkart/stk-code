@@ -42,9 +42,9 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
-#include "modes/world_with_rank.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -475,6 +475,158 @@ void RaceResultGUI::backToLobby()
 }   // backToLobby
 
 //-----------------------------------------------------------------------------
+void RaceResultGUI::displayCTFResults()
+{
+#ifndef SERVER_ONLY
+    //Draw win text
+    core::stringw result_text;
+    video::SColor color = video::SColor(255, 255, 255, 255);
+    video::SColor red_color = video::SColor(255, 255, 0, 0);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    int current_x = UserConfigParams::m_width / 2;
+    RowInfo *ri = &(m_all_row_infos[0]);
+    int current_y = (int)ri->m_y_pos;
+    CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    const int red_score = ctf->getRedScore();
+    const int blue_score = ctf->getBlueScore();
+
+    GUIEngine::Widget *table_area = getWidget("result-table");
+    int height = table_area->m_h + table_area->m_y;
+
+    if (red_score > blue_score)
+        result_text = _("Red Team Wins");
+    else if (blue_score > red_score)
+        result_text = _("Blue Team Wins");
+    else
+        result_text = _("It's a draw");
+
+    core::rect<s32> pos(current_x, current_y, current_x, current_y);
+    font->draw(result_text.c_str(), pos, color, true, true);
+
+    core::dimension2du rect = font->getDimension(result_text.c_str());
+
+    //Draw team scores:
+    current_y += rect.Height;
+    current_x /= 2;
+    irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI,
+        "red_flag.png");
+    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI,
+        "blue_flag.png");
+
+    core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
+    core::recti dest_rect(current_x, current_y,
+        current_x + red_icon->getSize().Width / 2,
+        current_y + red_icon->getSize().Height / 2);
+    draw2DImage(red_icon, dest_rect, source_rect,
+        NULL, NULL, true);
+    current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+    dest_rect = core::recti(current_x, current_y,
+        current_x + red_icon->getSize().Width / 2,
+        current_y + red_icon->getSize().Height / 2);
+    draw2DImage(blue_icon, dest_rect, source_rect,
+        NULL, NULL, true);
+
+    result_text = StringUtils::toWString(blue_score);
+    rect = font->getDimension(result_text.c_str());
+    current_x += red_icon->getSize().Width / 4;
+    current_y += red_icon->getSize().Height / 2 + rect.Height / 4;
+    pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+    font->draw(result_text.c_str(), pos, color, true, false);
+
+    current_x -= UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+    result_text = StringUtils::toWString(red_score);
+    pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+    font->draw(result_text.c_str(), pos, color, true, false);
+
+    int center_x = UserConfigParams::m_width / 2;
+    pos = core::rect<s32>(center_x, current_y, center_x, current_y);
+    font->draw("-", pos, color, true, false);
+
+    // The red team player scores:
+    current_y += rect.Height / 2 + rect.Height / 4;
+    font = GUIEngine::getSmallFont();
+    irr::video::ITexture* kart_icon;
+
+    int prev_y = current_y;
+    const unsigned num_karts = ctf->getNumKarts();
+    for (unsigned int i = 0; i < num_karts; i++)
+    {
+        AbstractKart* kart = ctf->getKartAtPosition(i + 1);
+        unsigned kart_id = kart->getWorldKartId();
+        if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
+            continue;
+        result_text = kart->getController()->getName();
+
+        result_text.append("  ");
+        if (kart->isEliminated())
+        {
+            result_text.append(_("Eliminated"));
+        }
+        else
+        {
+            result_text.append(
+                StringUtils::toWString(ctf->getKartScore(kart_id)));
+        }
+        rect = font->getDimension(result_text.c_str());
+        current_y += rect.Height;
+
+        if (current_y > height) break;
+
+        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+        font->draw(result_text, pos,
+            kart->getController()->isLocalPlayerController() ?
+            red_color : color, true, false);
+        kart_icon = kart->getKartProperties()->getIconMaterial()->getTexture();
+        source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
+        irr::u32 offset_x =
+            (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
+        dest_rect = core::recti(current_x - offset_x - 30, current_y,
+            current_x - offset_x, current_y + 30);
+        draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
+    }
+
+    // The blue team player scores:
+    current_y = prev_y;
+    current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+    for (unsigned int i = 0; i < num_karts; i++)
+    {
+        AbstractKart* kart = ctf->getKartAtPosition(i + 1);
+        unsigned kart_id = kart->getWorldKartId();
+        if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
+            continue;
+        result_text = kart->getController()->getName();
+
+        result_text.append("  ");
+        if (kart->isEliminated())
+        {
+            result_text.append(_("Eliminated"));
+        }
+        else
+        {
+            result_text.append(
+                StringUtils::toWString(ctf->getKartScore(kart_id)));
+        }
+        rect = font->getDimension(result_text.c_str());
+        current_y += rect.Height;
+
+        if (current_y > height) break;
+
+        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+        font->draw(result_text, pos,
+            kart->getController()->isLocalPlayerController() ?
+            red_color : color, true, false);
+        kart_icon = kart->getKartProperties()->getIconMaterial()->getTexture();
+        source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
+        irr::u32 offset_x = (irr::u32)
+            (font->getDimension(result_text.c_str()).Width / 1.5f);
+        dest_rect = core::recti(current_x - offset_x - 30, current_y,
+            current_x - offset_x, current_y + 30);
+        draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
+    }
+#endif
+}
+
+//-----------------------------------------------------------------------------
     void RaceResultGUI::onConfirm()
     {
         //race_manager->saveGP(); // Save the aborted GP
@@ -523,6 +675,10 @@ void RaceResultGUI::backToLobby()
         m_width_kart_name = 0;
         float max_finish_time = 0;
 
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+
+        int time_precision = race_manager->currentModeTimePrecision();
+
         for (unsigned int position = first_position;
         position <= race_manager->getNumberOfKarts() - sta; position++)
         {
@@ -543,11 +699,18 @@ void RaceResultGUI::backToLobby()
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
+            else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL ||
+                race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+            {
+                assert(ffa);
+                ri->m_finish_time_string =
+                    StringUtils::toWString(ffa->getKartScore(kart->getWorldKartId()));
+            }
             else
             {
                 const float time = kart->getFinishTime();
                 if (time > max_finish_time) max_finish_time = time;
-                std::string time_string = StringUtils::timeToString(time);
+                std::string time_string = StringUtils::timeToString(time, time_precision);
                 ri->m_finish_time_string = time_string.c_str();
             }
 
@@ -557,7 +720,7 @@ void RaceResultGUI::backToLobby()
                 m_width_kart_name = rect.Width;
         }   // for position
 
-        std::string max_time = StringUtils::timeToString(max_finish_time);
+        std::string max_time = StringUtils::timeToString(max_finish_time, time_precision);
         core::stringw string_max_time(max_time.c_str());
         core::dimension2du r = m_font->getDimension(string_max_time.c_str());
         m_width_finish_time = r.Width;
@@ -706,8 +869,6 @@ void RaceResultGUI::backToLobby()
     void RaceResultGUI::renderGlobal(float dt)
     {
 #ifndef SERVER_ONLY
-        bool isSoccerWorld = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-
         m_timer += dt;
         assert(World::getWorld()->getPhase() == WorldStatus::RESULT_DISPLAY_PHASE);
         unsigned int num_karts = (unsigned int)m_all_row_infos.size();
@@ -813,7 +974,16 @@ void RaceResultGUI::backToLobby()
         // Second phase: update X and Y positions for the various animations
         // =================================================================
         float v = 0.9f*UserConfigParams::m_width / m_time_single_scroll;
-        if (!isSoccerWorld)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            displaySoccerResults();
+        }
+        else if (race_manager->getMajorMode() ==
+            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        {
+            displayCTFResults();
+        }
+        else
         {
             for (unsigned int i = 0; i < m_all_row_infos.size(); i++)
             {
@@ -868,8 +1038,6 @@ void RaceResultGUI::backToLobby()
                 displayOneEntry((unsigned int)x, (unsigned int)y, i, true);
             }   // for i
         }
-        else
-            displaySoccerResults();
 
         // Display highscores
         if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
@@ -889,6 +1057,12 @@ void RaceResultGUI::backToLobby()
 #ifndef SERVER_ONLY
         unsigned int num_karts = race_manager->getNumberOfKarts();
         std::vector<int> old_rank(num_karts, 0);
+        // Update the kart GP ranks
+        // This is useful, e.g., when continuing a saved GP.
+        race_manager->computeGPRanks();
+
+        int time_precision = race_manager->currentModeTimePrecision();
+
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
         {
             int rank = race_manager->getKartGPRank(kart_id);
@@ -913,7 +1087,7 @@ void RaceResultGUI::backToLobby()
             {
                 float time = race_manager->getOverallTime(kart_id);
                 ri->m_finish_time_string
-                    = StringUtils::timeToString(time).c_str();
+                    = StringUtils::timeToString(time, time_precision).c_str();
             }
             ri->m_start_at = m_time_between_rows * rank;
             ri->m_x_pos = (float)UserConfigParams::m_width;
@@ -1046,8 +1220,8 @@ void RaceResultGUI::backToLobby()
         RowInfo *ri = &(m_all_row_infos[0]);
         int current_y = (int)ri->m_y_pos;
         SoccerWorld* sw = (SoccerWorld*)World::getWorld();
-        const int red_score = sw->getScore(SOCCER_TEAM_RED);
-        const int blue_score = sw->getScore(SOCCER_TEAM_BLUE);
+        const int red_score = sw->getScore(KART_TEAM_RED);
+        const int blue_score = sw->getScore(KART_TEAM_BLUE);
 
         GUIEngine::Widget *table_area = getWidget("result-table");
         int height = table_area->m_h + table_area->m_y;
@@ -1109,12 +1283,12 @@ void RaceResultGUI::backToLobby()
         //The red scorers:
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
-        std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(SOCCER_TEAM_RED);
+        std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(KART_TEAM_RED);
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
+        std::vector<float> score_times = sw->getScoreTimes(KART_TEAM_RED);
         while (score_times.size() > 10)
         {
             score_times.erase(score_times.begin());
@@ -1122,19 +1296,13 @@ void RaceResultGUI::backToLobby()
         irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
+
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
             const int kart_id = scorers.at(i).m_id;
-            const int rm_id = kart_id -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-            if (rm_id >= 0)
-                result_text = race_manager->getKartInfo(rm_id).getPlayerName();
-            else
-                result_text = sw->getKart(kart_id)->
-                getKartProperties()->getName();
+            result_text = sw->getKart(kart_id)->getController()->getName();
 
             if (own_goal)
             {
@@ -1169,12 +1337,12 @@ void RaceResultGUI::backToLobby()
         //The blue scorers:
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
-        scorers = sw->getScorers(SOCCER_TEAM_BLUE);
+        scorers = sw->getScorers(KART_TEAM_BLUE);
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
+        score_times = sw->getScoreTimes(KART_TEAM_BLUE);
         while (score_times.size() > 10)
         {
             score_times.erase(score_times.begin());
@@ -1184,14 +1352,7 @@ void RaceResultGUI::backToLobby()
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
             const int kart_id = scorers.at(i).m_id;
-            const int rm_id = kart_id -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-            if (rm_id >= 0)
-                result_text = race_manager->getKartInfo(rm_id).getPlayerName();
-            else
-                result_text = sw->getKart(kart_id)->
-                getKartProperties()->getName();
+            result_text = sw->getKart(kart_id)->getController()->getName();
 
             if (own_goal)
             {
@@ -1384,6 +1545,8 @@ void RaceResultGUI::backToLobby()
 
         int current_y = y;
 
+        int time_precision = race_manager->currentModeTimePrecision();
+
         // In some case for exemple FTL they will be no highscores
         if (scores != NULL)
         {
@@ -1453,7 +1616,7 @@ void RaceResultGUI::backToLobby()
                 current_x = (int)(UserConfigParams::m_width * 0.85f);
 
                 // Finally draw the time
-                std::string time_string = StringUtils::timeToString(time);
+                std::string time_string = StringUtils::timeToString(time, time_precision);
                 GUIEngine::getSmallFont()->draw(time_string.c_str(),
                     core::recti(current_x, current_y, current_x + 100, current_y + 10),
                     text_color,
@@ -1483,7 +1646,7 @@ void RaceResultGUI::backToLobby()
             {
                 float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
                 core::stringw best_lap_string = _("Best lap time: %s",
-                    StringUtils::timeToString(best_lap_time).c_str());
+                    StringUtils::timeToString(best_lap_time, time_precision).c_str());
                 current_y += int(m_distance_between_rows * 0.8f);
                 GUIEngine::getFont()->draw(best_lap_string,
                     core::recti(x, current_y, 0, 0), white_color, false, false,

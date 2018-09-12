@@ -66,6 +66,8 @@ public:
 
         /** Current lap of this kart, or -1 if irrelevant. */
         int lap;
+
+        bool m_outlined_font = false;
     };   // KartIconDisplayInfo
 
 private:
@@ -131,7 +133,8 @@ private:
     video::ITexture* m_plunger_face;
     
     /** Translated strings 'ready', 'set', 'go'. */
-    core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
+    core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal,
+        m_string_waiting_for_others;
 
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;

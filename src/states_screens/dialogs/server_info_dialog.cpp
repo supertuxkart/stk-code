@@ -20,11 +20,12 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
-#include "network/network_config.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -51,18 +52,7 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     m_self_destroy = false;
 
     loadFromFile("online/server_info_dialog.stkgui");
-
-    GUIEngine::LabelWidget *name = getWidget<LabelWidget>("server_name");
-    assert(name);
-    name->setText(server->getName(),false);
-
-    core::stringw difficulty = race_manager->getDifficultyName(server->getDifficulty());
-    GUIEngine::LabelWidget *lbldifficulty = getWidget<LabelWidget>("server_difficulty");
-    lbldifficulty->setText(difficulty, false);
-
-    core::stringw mode = NetworkConfig::get()->getModeName(server->getServerMode());
-    GUIEngine::LabelWidget *gamemode = getWidget<LabelWidget>("server_game_mode");
-    gamemode->setText(mode, false);
+    getWidget<LabelWidget>("title")->setText(server->getName(), true);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
@@ -84,6 +74,64 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         getWidget("password")->setVisible(false);
     }
 
+    auto& players = m_server->getPlayers();
+    core::stringw server_info;
+    core::stringw difficulty = race_manager->getDifficultyName(
+        server->getDifficulty());
+
+    //I18N: In server info dialog
+    core::stringw each_line = _("Difficulty: %s", difficulty);
+    server_info += each_line;
+    server_info += L"\n";
+
+    //I18N: In server info dialog
+    core::stringw mode = ServerConfig::getModeName(server->getServerMode());
+    each_line = _("Game mode: %s", mode);
+    server_info += each_line;
+    server_info += L"\n";
+
+    if (!players.empty())
+    {
+        // I18N: Show above the player list in server info dialog to
+        // indicate the row meanings
+        ListWidget* player_list = getWidget<ListWidget>("player-list");
+        std::vector<ListWidget::ListCell> row;
+        row.push_back(ListWidget::ListCell(_("Rank"), -1, 1, true));
+        // I18N: Show above the player list in server info dialog, tell
+        // the user name on server
+        row.push_back(ListWidget::ListCell(_("Player"), -1, 2, true));
+        // I18N: Show above the player list in server info dialog, tell
+        // the scores of user calculated by player rankings
+        row.push_back(ListWidget::ListCell(_("Scores"), -1, 1, true));
+        // I18N: Show above the player list in server info dialog, tell
+        // the user time played on server
+        row.push_back(ListWidget::ListCell(_("Time played"),
+            -1, 1, true));
+        player_list->addItem("player", row);
+        for (auto& p : players)
+        {
+            auto& r = p.second;
+            row.clear();
+            row.push_back(ListWidget::ListCell(
+                std::get<0>(r) == -1 ? L"-" :
+                StringUtils::toWString(std::get<0>(r)), -1, 1, true));
+            row.push_back(ListWidget::ListCell(std::get<1>(r), -1,
+                2, true));
+            row.push_back(ListWidget::ListCell(
+                std::get<0>(r) == -1 ? L"-" :
+                StringUtils::toWString(std::get<2>(r)), -1, 1, true));
+            row.push_back(ListWidget::ListCell(
+                StringUtils::toWString(std::get<3>(r)), -1, 1, true));
+            player_list->addItem("player", row);
+        }
+    }
+    else
+    {
+        getWidget("player-list")->setVisible(false);
+    }
+    getWidget("server-info")->setVisible(true);
+    getWidget<LabelWidget>("server-info")->setText(server_info, true);
+
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
@@ -99,12 +147,12 @@ void ServerInfoDialog::requestJoin()
         assert(m_password != NULL);
         if (m_password->getText().empty())
             return;
-        NetworkConfig::get()->setPassword(
-            StringUtils::wideToUtf8(m_password->getText()));
+        ServerConfig::m_private_server_password =
+            StringUtils::wideToUtf8(m_password->getText());
     }
     else
     {
-        NetworkConfig::get()->setPassword("");
+        ServerConfig::m_private_server_password = "";
     }
     STKHost::create();
     NetworkingLobby::getInstance()->setJoinedServer(m_server);

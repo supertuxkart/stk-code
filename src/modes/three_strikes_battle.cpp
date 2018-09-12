@@ -207,10 +207,11 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 //-----------------------------------------------------------------------------
 /** Called when a kart is hit.
  *  \param kart_id The world kart id of the kart that was hit.
+ *  \param hitter The world kart id of the kart who hit(-1 if none).
  */
-void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
+bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
 {
-    if (isRaceOver()) return;
+    if (isRaceOver()) return false;
 
     SpareTireAI* sta =
         dynamic_cast<SpareTireAI*>(m_karts[kart_id]->getController());
@@ -218,10 +219,10 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
     {
         // Unspawn the spare tire kart if it get hit
         sta->unspawn();
-        return;
+        return false;
     }
 
-    assert(kart_id < m_karts.size());
+    assert(kart_id < (int)m_karts.size());
     // make kart lose a life, ignore if in profiling mode
     if (!UserConfigParams::m_arena_ai_stats)
         m_kart_info[kart_id].m_lives--;
@@ -256,7 +257,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         {
             AbstractKart * const kart = getKart(i);
             if(kart->isEliminated() || kart->hasFinishedRace() ||
-                kart->getWorldKartId()==kart_id) continue;
+                kart->getWorldKartId()==(unsigned)kart_id) continue;
             if(m_kart_info[i].m_lives > max_lives)
             {
                 leader = kart;
@@ -270,7 +271,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
             for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {
                 Camera *camera = Camera::getCamera(i);
-                if(camera->getKart()->getWorldKartId()==kart_id)
+                if(camera->getKart()->getWorldKartId()==(unsigned)kart_id)
                 {
                     camera->setMode(Camera::CM_NORMAL);
                     camera->setKart(leader);
@@ -337,7 +338,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
     m_tire_dir = m_karts[kart_id]->getKartProperties()->getKartDir();
     if(m_insert_tire == 5 && m_karts[kart_id]->isWheeless())
         m_insert_tire = 0;
-
+    return true;
 }   // kartHit
 
 //-----------------------------------------------------------------------------

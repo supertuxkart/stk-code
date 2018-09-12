@@ -111,15 +111,27 @@ void Protocol::requestTerminate()
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------
-/** Sends a message to all peers, encrypt the message if needed.
- *  The message is composed of a 1-byte message (usually the message type)
- *  followed by the actual message.
+/** Sends a message to all validated peers in game, encrypt the message if
+ *  needed. The message is composed of a 1-byte message (usually the message
+ *  type) followed by the actual message.
  *  \param message The actual message content.
 */
 void Protocol::sendMessageToPeers(NetworkString *message, bool reliable)
 {
     STKHost::get()->sendPacketToAllPeers(message, reliable);
 }   // sendMessageToPeers
+
+// ----------------------------------------------------------------------------
+/** Sends a message to all validated peers in server, encrypt the message if
+ *  needed. The message is composed of a 1-byte message (usually the message
+ *  type) followed by the actual message.
+ *  \param message The actual message content.
+*/
+void Protocol::sendMessageToPeersInServer(NetworkString* message,
+                                          bool reliable)
+{
+    STKHost::get()->sendPacketToAllPeersInServer(message, reliable);
+}   // sendMessageToPeersInServer
 
 // ----------------------------------------------------------------------------
 /** Sends a message from a client to the server.

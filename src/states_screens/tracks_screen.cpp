@@ -135,7 +135,7 @@ bool TracksScreen::onEscapePressed()
 void TracksScreen::tearDown()
 {
     m_network_tracks = false;
-    m_vote_timeout = -1.0f;
+    m_vote_timeout = std::numeric_limits<uint64_t>::max();
     m_selected_track = NULL;
 }   // tearDown
 
@@ -256,7 +256,8 @@ void TracksScreen::init()
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+            race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setVisible(false);
@@ -265,6 +266,14 @@ void TracksScreen::init()
             getWidget<LabelWidget>("reverse-text")->setText(_("Random item location"), false);
             m_reversed->setVisible(true);
             m_reversed->setState(UserConfigParams::m_random_arena_item);
+        }
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
+            race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        {
+            getWidget("lap-text")->setVisible(false);
+            m_laps->setVisible(false);
+            getWidget("reverse-text")->setVisible(false);
+            m_reversed->setVisible(false);
         }
         else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
@@ -296,13 +305,24 @@ void TracksScreen::init()
         }
         else
         {
-            getWidget("lap-text")->setVisible(true);
-            //I18N: In track screen
-            getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
-            m_laps->setVisible(true);
-            m_laps->setMin(1);
-            m_laps->setMax(20);
-            m_laps->setValue(UserConfigParams::m_num_laps);
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            assert(cl);
+            if (cl->isServerAutoLap())
+            {
+                getWidget("lap-text")->setVisible(false);
+                m_laps->setVisible(false);
+                m_laps->setValue(0);
+            }
+            else
+            {
+                getWidget("lap-text")->setVisible(true);
+                //I18N: In track screen
+                getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
+                m_laps->setVisible(true);
+                m_laps->setMin(1);
+                m_laps->setMax(20);
+                m_laps->setValue(UserConfigParams::m_num_laps);
+            }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
             getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
@@ -409,9 +429,9 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 // -----------------------------------------------------------------------------
 void TracksScreen::setVoteTimeout(float timeout)
 {
-    if (m_vote_timeout != -1.0f)
+    if (m_vote_timeout != std::numeric_limits<uint64_t>::max())
         return;
-    m_vote_timeout = (float)StkTime::getRealTime() + timeout;
+    m_vote_timeout = StkTime::getRealTimeMs() + (uint64_t)(timeout * 1000.0f);
 }   // setVoteTimeout
 
 // -----------------------------------------------------------------------------
@@ -422,16 +442,34 @@ void TracksScreen::voteForPlayer()
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_BATTLE &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    {
+        UserConfigParams::m_num_laps = m_laps->getValue();
         m_reverse_checked = m_reversed->getState();
+    }
     else
         UserConfigParams::m_random_arena_item = m_reversed->getState();
-    UserConfigParams::m_num_laps = m_laps->getValue();
+
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
-    vote.encodeString(m_selected_track->getIdent())
-        .addUInt8(m_laps->getValue()).addUInt8(m_reversed->getState());
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(0).addUInt8(m_reversed->getState() ? 1 : 0);
+    }
+    else if (race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(0).addUInt8(0);
+    }
+    else
+    {
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(m_laps->getValue())
+            .addUInt8(m_reversed->getState() ? 1 : 0);
+    }
     STKHost::get()->sendToServer(&vote, true);
 }   // voteForPlayer
 
@@ -439,14 +477,14 @@ void TracksScreen::voteForPlayer()
 void TracksScreen::onUpdate(float dt)
 {
     assert(m_votes);
-    if (m_vote_timeout == -1.0f)
+    if (m_vote_timeout == std::numeric_limits<uint64_t>::max())
     {
         m_votes->setText(L"", false);
         return;
     }
 
     m_votes->setVisible(true);
-    int remaining_time = (int)(m_vote_timeout - StkTime::getRealTime());
+    int remaining_time = (m_vote_timeout - StkTime::getRealTimeMs()) / 1000;
     if (remaining_time < 0)
         remaining_time = 0;
     //I18N: In tracks screen, about voting of tracks in network
@@ -454,8 +492,7 @@ void TracksScreen::onUpdate(float dt)
     message += L"\n";
     unsigned height = GUIEngine::getFont()->getDimension(L"X").Height;
     const unsigned total_height = m_votes->getDimension().Height;
-    m_vote_messages.lock();
-    for (auto& p : m_vote_messages.getData())
+    for (auto& p : m_vote_messages)
     {
         height += GUIEngine::getFont()->getDimension(L"X").Height * 2;
         if (height > total_height)
@@ -463,7 +500,6 @@ void TracksScreen::onUpdate(float dt)
         message += p.second;
         message += L"\n";
     }
-    m_vote_messages.unlock();
     m_votes->setText(message, true);
 
 }   // onUpdate

@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <map>
 #include <memory>
 #include <vector>
 #include <stdexcept>
@@ -85,12 +86,25 @@ public:
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
+    // ------------------------------------------------------------------------
+    void setAITeam();
+    // ------------------------------------------------------------------------
+    std::shared_ptr<AbstractKart> createKartWithTeam
+        (const std::string &kart_ident, int index, int local_player_id,
+        int global_player_id, RaceManager::KartType type,
+        PerPlayerDifficulty difficulty);
 
 protected:
 
 #ifdef DEBUG
     unsigned int m_magic_number;
 #endif
+
+    /* Team related variables. */
+    int m_red_ai;
+    int m_blue_ai;
+    std::map<int, KartTeam> m_kart_team_map;
+    std::map<int, unsigned int> m_kart_position_map;
 
     /** The list of all karts. */
     KartList                  m_karts;
@@ -107,6 +121,8 @@ protected:
     bool        m_faster_music_active; // true if faster music was activated
 
     bool        m_stop_music_when_dialog_open;
+
+    bool        m_unfair_team;
 
     /** Whether highscores should be used for this kind of race.
      *  True by default, change to false in a child class to disable.
@@ -177,7 +193,8 @@ protected:
      */
     virtual float estimateFinishTimeForKart(AbstractKart* kart)
                                         {return getTime(); }
-
+    /** Set the team arrow on karts if necessary*/
+    void initTeamArrows();
 
 public:
                     World();
@@ -266,7 +283,7 @@ public:
     virtual void newLap(unsigned int kart_index) {}
     // ------------------------------------------------------------------------
     /** Called when a kart was hit by a projectile. */
-    virtual void kartHit(const unsigned int kart_id) {};
+    virtual bool kartHit(int kart_id, int hitter = -1) { return false; }
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) {};
 
@@ -310,7 +327,7 @@ public:
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const
-                    { return isRacePhase() && getClockMode() != CLOCK_NONE; }
+                    { return isActiveRacePhase() && getClockMode() != CLOCK_NONE; }
     // ------------------------------------------------------------------------
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }
@@ -327,7 +344,16 @@ public:
     virtual void loadCustomModels() {}
     // ------------------------------------------------------------------------
     void eliminateKart(int kart_number, bool notify_of_elimination = true);
-
+    // ------------------------------------------------------------------------
+    void setUnfairTeam(bool val)                       { m_unfair_team = val; }
+    // ------------------------------------------------------------------------
+    virtual bool hasTeam() const                              { return false; }
+    // ------------------------------------------------------------------------
+    /** Get the team of kart in world (including AIs) */
+    KartTeam getKartTeam(unsigned int kart_id) const;
+    // ------------------------------------------------------------------------
+    int getTeamNum(KartTeam team) const;
+    // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
 

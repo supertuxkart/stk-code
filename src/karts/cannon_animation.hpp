@@ -79,8 +79,8 @@ public:
                              const Vec3 &start_left, const Vec3 &start_right,
                              const Vec3 &end_left, const Vec3 &end_right);
              virtual ~CannonAnimation();
-    virtual void  update(float dt);
+    virtual void  update(int ticks);
     // ------------------------------------------------------------------------
-    virtual bool useEarlyEndTransform() const { return false; }
+    virtual bool usePredefinedEndTransform() const { return false; }
 };   // CannonAnimation
 #endif

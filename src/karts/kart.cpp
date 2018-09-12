@@ -61,13 +61,10 @@
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "main_loop.hpp"
-#include "modes/overworld.hpp"
-#include "modes/soccer_world.hpp"
-#include "modes/world.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
-#include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -971,7 +968,7 @@ void Kart::finishedRace(float time, bool from_server)
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE   ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL    ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES     ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE     ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER        ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
     {
@@ -1026,10 +1023,21 @@ void Kart::setRaceResult()
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-             race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+             race_manager->getMajorMode() == RaceManager::MAJOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
         m_race_result = !this->isEliminated();
+    }
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    {
+        // the top kart wins
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartAtPosition(1) == this;
+    }
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+        m_race_result = ctf->getKartCTFResult(getWorldKartId());
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
@@ -1080,9 +1088,10 @@ void Kart::collectedItem(ItemState *item_state)
         // slow down
         m_bubblegum_ticks =
             stk_config->time2Ticks(m_kart_properties->getBubblegumDuration());
-        m_bubblegum_torque = ((rand()%2)
-                           ?  m_kart_properties->getBubblegumTorque()
-                           : -m_kart_properties->getBubblegumTorque());
+        m_bubblegum_torque =
+            ((World::getWorld()->getTicksSinceStart() / 10) % 2 == 0) ?
+            m_kart_properties->getBubblegumTorque() :
+            -m_kart_properties->getBubblegumTorque();
         m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTicks(),
@@ -1275,13 +1284,6 @@ void Kart::update(int ticks)
 {
     m_powerup->update(ticks);
 
-    // Make the restitution depend on speed: this avoids collision issues,
-    // otherwise a collision with high speed can see a kart being push
-    // high up in the air (and out of control). So for higher speed we
-    // reduce the restitution, meaning the karts will get less of a push
-    // based on the collision speed.
-    m_body->setRestitution(m_kart_properties->getRestitution(fabsf(m_speed)));
-
     // Reset any instand speed increase in the bullet kart
     m_vehicle->setMinSpeed(0);
 
@@ -1300,12 +1302,12 @@ void Kart::update(int ticks)
     // before updating the graphical position (which is done in
     // Moveable::update() ), otherwise 'stuttering' can happen (caused by
     // graphical and physical position not being the same).
-    float dt = stk_config->ticks2Time(ticks);
     if (has_animation_before && !RewindManager::get()->isRewinding())
     {
-        m_kart_animation->update(dt);
+        m_kart_animation->update(ticks);
     }
 
+    float dt = stk_config->ticks2Time(ticks);
     if (!RewindManager::get()->isRewinding())
     {
         m_time_previous_counter += dt;
@@ -1332,6 +1334,12 @@ void Kart::update(int ticks)
     // Update the locally maintained speed of the kart (m_speed), which 
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
+    // Make the restitution depend on speed: this avoids collision issues,
+    // otherwise a collision with high speed can see a kart being push
+    // high up in the air (and out of control). So for higher speed we
+    // reduce the restitution, meaning the karts will get less of a push
+    // based on the collision speed.
+    m_body->setRestitution(m_kart_properties->getRestitution(fabsf(m_speed)));
 
     m_controller->update(ticks);
 

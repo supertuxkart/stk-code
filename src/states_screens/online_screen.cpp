@@ -31,6 +31,7 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"
@@ -73,6 +74,23 @@ void OnlineScreen::loadedFromFile()
 
 void OnlineScreen::beforeAddingWidget()
 {
+} // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
+//
+void OnlineScreen::init()
+{
+    Screen::init();
+
+    m_online = getWidget<IconButtonWidget>("online");
+    assert(m_online);
+
+    m_user_id = getWidget<ButtonWidget>("user-id");
+    assert(m_user_id);
+
+    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
+    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
     bool is_logged_in = false;
     if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
         PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
@@ -84,26 +102,15 @@ void OnlineScreen::beforeAddingWidget()
     if (wan)
     {
         wan->setActive(is_logged_in);
-        wan->setVisible(is_logged_in);
+        if (!is_logged_in)
+        {
+            //I18N: Shown to players when he is not is not logged in
+            wan->setTooltip(_("You must be logged in to play Global "
+                "networking. Click your username above."));
+        }
+        else
+            wan->setTooltip("");
     }
-} // beforeAddingWidget
-
-// ----------------------------------------------------------------------------
-//
-void OnlineScreen::init()
-{
-    Screen::init();
-
-    m_online = getWidget<IconButtonWidget>("online");
-
-    if (!MainMenuScreen::m_enable_online)
-        m_online->setActive(false);
-
-    m_user_id = getWidget<ButtonWidget>("user-id");
-    assert(m_user_id);
-
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
-    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // Pre-add a default single player profile in network
     if (!m_enable_splitscreen->getState() &&
@@ -253,15 +260,15 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                 }
                 NetworkConfig::get()->setIsWAN();
                 NetworkConfig::get()->setIsServer(false);
-                NetworkConfig::get()->setPassword("");
+                ServerConfig::m_private_server_password = "";
                 auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0,
-                    server_addr, false);
+                    server_addr, false, false);
                 STKHost::create();
                 auto cts = std::make_shared<ConnectToServer>(server);
                 cts->setup();
                 Log::info("OnlineScreen", "Trying to connect to server '%s'.",
                     server_addr.toString().c_str());
-                if (!cts->handleDirectConnect(10000))
+                if (!cts->tryConnect(2000, 15))
                 {
                     core::stringw err = _("Cannot connect to server %s.",
                         server_addr.toString().c_str());

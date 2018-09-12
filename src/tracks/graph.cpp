@@ -26,6 +26,7 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "modes/profile_world.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
 #include "tracks/drive_node_3d.hpp"
@@ -419,6 +420,21 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
             invert_x_z);
     }
 #endif
+
+    // Adjust bounding boxes for flags in CTF
+    if (Track::getCurrentTrack()->isCTF() &&
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    {
+        Vec3 red_flag = Track::getCurrentTrack()->getRedFlag().getOrigin();
+        Vec3 blue_flag = Track::getCurrentTrack()->getBlueFlag().getOrigin();
+        // In case the flag is placed outside of the graph, we scale it a bit
+        red_flag *= 1.1f;
+        blue_flag *= 1.1f;
+        m_bb_max.max(red_flag);
+        m_bb_max.max(blue_flag);
+        m_bb_min.min(red_flag);
+        m_bb_min.min(blue_flag);
+    }
 
     m_node = irr_driver->addMesh(m_mesh, "mini_map");
 #ifdef DEBUG

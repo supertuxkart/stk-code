@@ -16,9 +16,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "network/protocols/server_lobby.hpp"
@@ -27,6 +27,7 @@
 #include "main_loop.hpp"
 
 #include <iostream>
+#include <limits>
 
 namespace NetworkConsole
 {
@@ -87,9 +88,13 @@ void mainLoop(STKHost* host)
             if (peer)
             {
                 peer->kick();
-                UserConfigParams::m_server_ban_list
-                    [peer->getAddress().toString(false/*show_port*/)] = 0;
-                LobbyProtocol::get<ServerLobby>()->updateBanList();
+                // ATM use permanently ban
+                auto sl = LobbyProtocol::get<ServerLobby>();
+                auto lock = sl->acquireConnectionMutex();
+                ServerConfig::m_server_ip_ban_list
+                    [peer->getAddress().toString(false/*show_port*/) + "/32"]
+                    = std::numeric_limits<uint32_t>::max();
+                sl->updateBanList();
             }
             else
                 std::cout << "Unknown host id: " << number << std::endl;
@@ -107,11 +112,18 @@ void mainLoop(STKHost* host)
         }
         else if (str == "listban")
         {
-            for (auto& ban : UserConfigParams::m_server_ban_list)
+            for (auto& ban : ServerConfig::m_server_ip_ban_list)
             {
-                if (ban.first == "0.0.0.0")
+                if (ban.first == "0.0.0.0/0")
                     continue;
-                std::cout << "IP: " << ban.first << " online id: " <<
+                std::cout << "IP: " << ban.first << ", expire at: " <<
+                    ban.second << std::endl;
+            }
+            for (auto& ban : ServerConfig::m_server_online_id_ban_list)
+            {
+                if (ban.first == 0)
+                    continue;
+                std::cout << "Online id: " << ban.first << ", expire at: " <<
                     ban.second << std::endl;
             }
         }

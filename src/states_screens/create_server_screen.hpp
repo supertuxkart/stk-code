@@ -33,6 +33,8 @@ class CreateServerScreen :      public GUIEngine::Screen,
                                 public GUIEngine::ScreenSingleton<CreateServerScreen>
 {
 private:
+    int m_prev_mode, m_prev_value;
+
     friend class GUIEngine::ScreenSingleton<CreateServerScreen>;
 
     CreateServerScreen();

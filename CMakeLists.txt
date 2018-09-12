@@ -24,6 +24,8 @@ option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angels
 option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
+CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF
+    "NOT APPLE" ON)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
 CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
@@ -453,26 +455,45 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
-# CURL and OpenSSL
+# CURL and OpenSSL or Nettle
 # 1.0.1d for compatible AES GCM handling
 SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 if(MSVC)
+    set(USE_CRYPTO_OPENSSL ON)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.lib)
 elseif(MINGW)
+    set(USE_CRYPTO_OPENSSL ON)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.dll)
 else()
     find_package(CURL REQUIRED)
-    find_package(OpenSSL REQUIRED)
-
-    if(${OPENSSL_VERSION} VERSION_LESS ${OPENSSL_MINIMUM_VERSION} OR
-        (${OPENSSL_VERSION} VERSION_EQUAL ${OPENSSL_MINIMUM_VERSION} AND ${OPENSSL_VERSION} STRLESS ${OPENSSL_MINIMUM_VERSION}))
-        message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
-    endif()
-
     include_directories(${CURL_INCLUDE_DIRS})
-    include_directories(${OpenSSL_INCLUDE_DIRS})
+
+    find_path(NETTLE_INCLUDE_DIRS nettle/gcm.h nettle/sha.h nettle/base64.h nettle/version.h nettle/yarrow.h)
+    find_library(NETTLE_LIBRARY NAMES nettle libnettle)
+
+    if (NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL)
+        set(USE_CRYPTO_OPENSSL ON)
+        find_package(OpenSSL REQUIRED)
+
+        if(${OPENSSL_VERSION} VERSION_LESS ${OPENSSL_MINIMUM_VERSION} OR
+            (${OPENSSL_VERSION} VERSION_EQUAL ${OPENSSL_MINIMUM_VERSION} AND ${OPENSSL_VERSION} STRLESS ${OPENSSL_MINIMUM_VERSION}))
+            message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
+        endif()
+        include_directories(${OpenSSL_INCLUDE_DIRS})
+    else()
+        set(USE_CRYPTO_OPENSSL OFF)
+        include_directories(${NETTLE_INCLUDE_DIRS})
+    endif()
+endif()
+
+if (USE_CRYPTO_OPENSSL)
+    message(STATUS "OpenSSL will be used for cryptography in STK.")
+    add_definitions(-DENABLE_CRYPTO_OPENSSL)
+else()
+    message(STATUS "Nettle will be used for cryptography in STK.")
+    add_definitions(-DENABLE_CRYPTO_NETTLE)
 endif()
 
 # Common library dependencies
@@ -484,8 +505,13 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${OPENSSL_CRYPTO_LIBRARY}
     )
+
+if (USE_CRYPTO_OPENSSL)
+    target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})
+else()
+    target_link_libraries(supertuxkart ${NETTLE_LIBRARY})
+endif()
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)

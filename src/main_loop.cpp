@@ -42,6 +42,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
+#include "utils/time.hpp"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -111,11 +112,9 @@ float MainLoop::getLimitedDt()
         return 1.0f/60.0f;
     }
 
-    IrrlichtDevice* device = irr_driver->getDevice();
-
     while( 1 )
     {
-        m_curr_time = device->getTimer()->getRealTime();
+        m_curr_time = StkTime::getRealTimeMs();
         dt = (float)(m_curr_time - m_prev_time);
         // On a server (i.e. without graphics) the frame rate can be under
         // 1 ms, i.e. dt = 0. Additionally, the resolution of a sleep
@@ -131,7 +130,7 @@ float MainLoop::getLimitedDt()
         while (dt <= 0 && !ProfileWorld::isProfileMode())
         {
             StkTime::sleep(1);
-            m_curr_time = device->getTimer()->getRealTime();
+            m_curr_time = StkTime::getRealTimeMs();
             dt = (float)(m_curr_time - m_prev_time);
         }
 
@@ -279,9 +278,7 @@ void MainLoop::updateRace(int ticks)
  */
 void MainLoop::run()
 {
-    IrrlichtDevice* device = irr_driver->getDevice();
-
-    m_curr_time = device->getTimer()->getRealTime();
+    m_curr_time = StkTime::getRealTimeMs();
     // DT keeps track of the leftover time, since the race update
     // happens in fixed timesteps
     float left_over_time = 0;
@@ -460,6 +457,20 @@ void MainLoop::run()
                 World::getWorld()->updateTime(1);
             }
         }   // for i < num_steps
+
+        // Handle controller the last to avoid slow PC sending actions too late
+        if (!m_abort)
+        {
+            if (!ProfileWorld::isNoGraphics())
+            {
+                // User aborted (e.g. closed window)
+                bool abort = !irr_driver->getDevice()->run();
+                if (abort)
+                    m_abort = true;
+            }
+            if (auto gp = GameProtocol::lock())
+                gp->sendActions();
+        }
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort

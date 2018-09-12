@@ -30,6 +30,15 @@ namespace irr
         ORIENTATION_LANDSCAPE
     };
     
+    struct AndroidApplicationInfo
+    {
+        std::string native_lib_dir;
+        std::string data_dir;
+        bool initialized;
+        
+        AndroidApplicationInfo() : initialized(false) {};
+    };
+    
     class CIrrDeviceAndroid : public CIrrDeviceStub, video::IImagePresenter
     {
     public:
@@ -64,6 +73,7 @@ namespace irr
         virtual bool deactivateGyroscope();
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
+        virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
         
         class CCursorControl : public gui::ICursorControl
         {
@@ -104,6 +114,8 @@ namespace irr
         };
         
         static void onCreate();
+        static const AndroidApplicationInfo& getApplicationInfo(
+                                                    ANativeActivity* activity);
 
     private:
         android_app* Android;
@@ -113,6 +125,8 @@ namespace irr
         const ASensor* Gyroscope;
         bool AccelerometerActive;
         bool GyroscopeActive;
+        bool TextInputEnabled;
+        static AndroidApplicationInfo ApplicationInfo;
 
         static bool IsPaused;
         static bool IsFocused;
@@ -141,8 +155,10 @@ namespace irr
         void createDriver();
         void createKeyMap();
         void createVideoModeList();
-        void getKeyChar(SEvent& event);
+        wchar_t getKeyChar(SEvent& event);
+        wchar_t getUnicodeChar(AInputEvent* event);
         static void hideNavBar(ANativeActivity* activity);
+        static void readApplicationInfo(ANativeActivity* activity);
         int getRotation();
         DeviceOrientation getDefaultOrientation();
         video::SExposedVideoData& getExposedVideoData();

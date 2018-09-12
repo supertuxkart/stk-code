@@ -54,11 +54,11 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
     m_use_icons = (icons != NULL);
     m_icons = icons;
 
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+
     if (m_use_icons)
     {
-        CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
-        assert(list != NULL);
-
         list->setSpriteBank(m_icons);
 
         // determine needed height
@@ -82,6 +82,10 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
         {
             list->setItemHeight( item_height );
         }
+    }
+    else
+    {
+        list->setSpriteBank(NULL);
     }
 
 }
@@ -145,7 +149,8 @@ void ListWidget::createHeader()
         }
 
         int x = m_x;
-        for (unsigned int n=0; n<m_header.size(); n++)
+        int scrollbar_width = GUIEngine::getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
+        for (unsigned int n=0; n<m_header.size()+1; n++)
         {
             std::ostringstream name;
             name << m_properties[PROP_ID];
@@ -160,12 +165,22 @@ void ListWidget::createHeader()
             header->m_h = header_height;
 
             header->m_x = x;
-            header->m_w = (int)(m_w * float(m_header[n].m_proportion)
-                                /float(proportion_total));
+            if (n == m_header.size())
+            {
+                header->m_w = scrollbar_width;
+                header->setActive(false);
+            }
+            else
+            {
+                int header_width = m_w - scrollbar_width;
+                header->m_w = (int)(header_width * float(m_header[n].m_proportion)
+                                    /float(proportion_total));
+            }
 
             x += header->m_w;
 
-            header->setText( m_header[n].m_text );
+            if (n < m_header.size())
+                header->setText( m_header[n].m_text );
             header->m_properties[PROP_ID] = name.str();
 
             header->add();

@@ -26,6 +26,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -45,11 +46,11 @@
 #include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_rewinder.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
-#include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
@@ -67,6 +68,7 @@
 #include "states_screens/race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -154,6 +156,7 @@ void World::init()
     m_eliminated_players  = 0;
     m_num_players         = 0;
     unsigned int gk       = 0;
+    m_red_ai = m_blue_ai = 0;
     if (race_manager->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
@@ -199,10 +202,9 @@ void World::init()
             m_karts.push_back(ReplayPlay::get()->getGhostKart(k));
     }
 
-    // Assign team of AIs for soccer mode before createKart
-    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(this);
-    if (sw)
-        sw->setAITeam();
+    // Assign team of AIs for team mode before createKart
+    if (hasTeam())
+        setAITeam();
 
     for(unsigned int i=0; i<num_karts; i++)
     {
@@ -212,10 +214,20 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
-        auto newkart = createKart(kart_ident, i, local_player_id,
-            global_player_id, race_manager->getKartType(i),
-            race_manager->getPlayerDifficulty(i));
-        m_karts.push_back(newkart);
+        std::shared_ptr<AbstractKart> new_kart;
+        if (hasTeam())
+        {
+            new_kart = createKartWithTeam(kart_ident, i, local_player_id,
+                global_player_id, race_manager->getKartType(i),
+                race_manager->getPlayerDifficulty(i));
+        }
+        else
+        {
+            new_kart = createKart(kart_ident, i, local_player_id,
+                global_player_id, race_manager->getKartType(i),
+                race_manager->getPlayerDifficulty(i));
+        }
+        m_karts.push_back(new_kart);
 
     }  // for i
 
@@ -244,6 +256,7 @@ void World::init()
 
         }   // if server with graphics of is watching replay
     } // if getNumCameras()==0
+    initTeamArrows();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -312,6 +325,7 @@ void World::reset()
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
+    m_unfair_team = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -425,7 +439,7 @@ Controller* World::loadAIController(AbstractKart* kart)
     Controller *controller;
     int turn=0;
 
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE)
         turn=1;
     else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;
@@ -1050,6 +1064,8 @@ void World::update(int ticks)
         // Update all karts that are not eliminated
         if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
             m_karts[i]->update(ticks);
+        if (isStartPhase())
+            m_karts[i]->makeKartRest();
     }
     PROFILER_POP_CPU_MARKER();
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
@@ -1100,7 +1116,7 @@ Highscores* World::getHighscores() const
 
     Highscores * highscores =
         highscore_manager->getHighscores(type,
-                                         getNumKarts(),
+                                         race_manager->getNumNonGhostKarts(),
                                          race_manager->getDifficulty(),
                                          race_manager->getTrackName(),
                                          race_manager->getNumLaps(),
@@ -1355,4 +1371,219 @@ unsigned int World::getNumberOfRescuePositions() const
     return Track::getCurrentTrack()->getNumberOfStartPositions();
 }   // getNumberOfRescuePositions
 
-/* EOF */
+//-----------------------------------------------------------------------------
+std::shared_ptr<AbstractKart> World::createKartWithTeam
+    (const std::string &kart_ident, int index, int local_player_id,
+    int global_player_id, RaceManager::KartType kart_type,
+    PerPlayerDifficulty difficulty)
+{
+    int cur_red = getTeamNum(KART_TEAM_RED);
+    int cur_blue = getTeamNum(KART_TEAM_BLUE);
+    int pos_index = 0;
+    int position  = index + 1;
+    KartTeam team = KART_TEAM_BLUE;
+
+    if (kart_type == RaceManager::KT_AI)
+    {
+        if (index < m_red_ai)
+            team = KART_TEAM_RED;
+        else
+            team = KART_TEAM_BLUE;
+        m_kart_team_map[index] = team;
+    }
+    else if (NetworkConfig::get()->isNetworking())
+    {
+        m_kart_team_map[index] = race_manager->getKartInfo(index).getKartTeam();
+        team = race_manager->getKartInfo(index).getKartTeam();
+    }
+    else
+    {
+        int rm_id = index -
+            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+
+        assert(rm_id >= 0);
+        team = race_manager->getKartInfo(rm_id).getKartTeam();
+        m_kart_team_map[index] = team;
+    }
+
+    core::stringw online_name;
+    if (global_player_id > -1)
+    {
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
+    }
+
+    // Notice: In blender, please set 1,3,5,7... for blue starting position;
+    // 2,4,6,8... for red.
+    if (team == KART_TEAM_BLUE)
+    {
+        pos_index = 1 + 2 * cur_blue;
+    }
+    else
+    {
+        pos_index = 2 + 2 * cur_red;
+    }
+
+    btTransform init_pos = getStartTransform(pos_index - 1);
+    m_kart_position_map[index] = (unsigned)(pos_index - 1);
+
+    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    ri = (team == KART_TEAM_BLUE ? std::make_shared<RenderInfo>(0.66f) :
+        std::make_shared<RenderInfo>(1.0f));
+
+    std::shared_ptr<AbstractKart> new_kart;
+    if (RewindManager::get()->isEnabled())
+    {
+        auto kr = std::make_shared<KartRewinder>(kart_ident, index, position,
+            init_pos, difficulty, ri);
+        kr->rewinderAdd();
+        new_kart = kr;
+    }
+    else
+    {
+        new_kart = std::make_shared<Kart>(kart_ident, index, position,
+            init_pos, difficulty, ri);
+    }
+
+    new_kart->init(race_manager->getKartType(index));
+    Controller *controller = NULL;
+
+    switch(kart_type)
+    {
+    case RaceManager::KT_PLAYER:
+        controller = new LocalPlayerController(new_kart.get(), local_player_id,
+            difficulty);
+        m_num_players ++;
+        break;
+    case RaceManager::KT_NETWORK_PLAYER:
+        controller = new NetworkPlayerController(new_kart.get());
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
+        m_num_players++;
+        break;
+    case RaceManager::KT_AI:
+        controller = loadAIController(new_kart.get());
+        break;
+    case RaceManager::KT_GHOST:
+        break;
+    case RaceManager::KT_LEADER:
+        break;
+    case RaceManager::KT_SPARE_TIRE:
+        break;
+    }
+
+    new_kart->setController(controller);
+
+    return new_kart;
+}   // createKartWithTeam
+
+//-----------------------------------------------------------------------------
+int World::getTeamNum(KartTeam team) const
+{
+    int total = 0;
+    if (m_kart_team_map.empty()) return total;
+
+    for (unsigned int i = 0; i < (unsigned)m_karts.size(); ++i)
+    {
+        if (team == getKartTeam(m_karts[i]->getWorldKartId())) total++;
+    }
+
+    return total;
+}   // getTeamNum
+
+//-----------------------------------------------------------------------------
+KartTeam World::getKartTeam(unsigned int kart_id) const
+{
+    std::map<int, KartTeam>::const_iterator n =
+        m_kart_team_map.find(kart_id);
+
+    assert(n != m_kart_team_map.end());
+    return n->second;
+}   // getKartTeam
+
+
+//-----------------------------------------------------------------------------
+void World::initTeamArrows()
+{
+    if (!hasTeam())
+        return;
+#ifndef SERVER_ONLY
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
+
+    //Loading the indicator textures
+    std::string red_path =
+            file_manager->getAsset(FileManager::GUI, "red_arrow.png");
+    std::string blue_path =
+            file_manager->getAsset(FileManager::GUI, "blue_arrow.png");
+
+    //Assigning indicators
+    for(unsigned int i = 0; i < kart_amount; i++)
+    {
+        scene::ISceneNode *arrow_node = NULL;
+
+        KartModel* km = m_karts[i]->getKartModel();
+        // Color of karts can be changed using shaders if the model supports
+        if (km->supportColorization() && CVS->isGLSL()) continue;
+
+        float arrow_pos_height = km->getHeight() + 0.5f;
+        KartTeam team = getKartTeam(i);
+
+        arrow_node = irr_driver->addBillboard(
+            core::dimension2d<irr::f32>(0.3f,0.3f),
+            team == KART_TEAM_BLUE ? blue_path : red_path,
+            m_karts[i]->getNode());
+
+        arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
+    }
+#endif
+}   // initTeamArrows
+
+
+//-----------------------------------------------------------------------------
+void World::setAITeam()
+{
+    const int total_player = race_manager->getNumPlayers();
+    const int total_karts = race_manager->getNumberOfKarts();
+
+    // No AI
+    if ((total_karts - total_player) == 0) return;
+
+    int red_player = 0;
+    int blue_player = 0;
+    for (int i = 0; i < total_player; i++)
+    {
+        KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+
+        // Happen in profiling mode
+        if (team == KART_TEAM_NONE)
+        {
+            race_manager->setKartTeam(i, KART_TEAM_BLUE);
+            team = KART_TEAM_BLUE;
+            continue;
+        }
+
+        team == KART_TEAM_BLUE ? blue_player++ : red_player++;
+    }
+
+    int available_ai = total_karts - red_player - blue_player;
+    while (available_ai > 0)
+    {
+        if ((m_red_ai + red_player) > (m_blue_ai + blue_player))
+        {
+            m_blue_ai++;
+            available_ai--;
+        }
+        else if ((m_blue_ai + blue_player) > (m_red_ai + red_player))
+        {
+            m_red_ai++;
+            available_ai--;
+        }
+        else if ((m_blue_ai + blue_player) == (m_red_ai + red_player))
+        {
+            blue_player > red_player ? m_red_ai++ : m_blue_ai++;
+            available_ai--;
+        }
+    }
+    Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
+
+}   // setAITeam

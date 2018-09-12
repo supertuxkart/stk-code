@@ -30,10 +30,7 @@ class KartRewinder : public Rewinder, public Kart
 {
 private:
     
-    // Flags to indicate the different event types
-    enum { EVENT_CONTROL = 0x01,
-           EVENT_ATTACH  = 0x02 };
-
+    btTransform m_transfrom_from_network;
     float m_prev_steering, m_steering_smoothing_dt, m_steering_smoothing_time;
 
 public:

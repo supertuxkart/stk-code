@@ -49,6 +49,9 @@ private:
     /** List of all kart groups. */
     std::vector<std::string>                 m_all_groups;
 
+    /** List of all kart types. */
+    std::vector<std::string>                 m_kart_types;
+
     /** Mapping of group names to list of kart indices in each group. */
     std::map<std::string, std::vector<int> > m_groups_2_indices;
 
@@ -105,7 +108,7 @@ public:
     const AbstractCharacteristic* getDifficultyCharacteristic(const std::string &type) const;
     // ------------------------------------------------------------------------
     /** Get a characteristic that holds the values for a kart type. */
-    const AbstractCharacteristic* getKartTypeCharacteristic(const std::string &type) const;
+    const AbstractCharacteristic* getKartTypeCharacteristic(const std::string &type, const std::string &name) const;
     // ------------------------------------------------------------------------
     /** Get a characteristic that holds the values for a player difficulty. */
     const AbstractCharacteristic* getPlayerCharacteristic(const std::string &type) const;

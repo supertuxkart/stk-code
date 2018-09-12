@@ -18,12 +18,16 @@
 #include "states_screens/server_selection.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "io/file_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
@@ -92,6 +96,18 @@ void ServerSelection::loadedFromFile()
     m_private_server = getWidget<GUIEngine::CheckBoxWidget>("private_server");
     assert(m_private_server != NULL);
     m_private_server->setState(false);
+    m_game_started = getWidget<GUIEngine::CheckBoxWidget>("game_started");
+    assert(m_game_started != NULL);
+    m_searcher = getWidget<GUIEngine::TextBoxWidget>("searcher");
+    assert(m_searcher != NULL);
+    m_game_started->setState(false);
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
+    video::ITexture* icon1 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI, "green_check.png"));
+    video::ITexture* icon2 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI, "hourglass.png"));
+    m_icon_bank->addTextureAsSprite(icon1);
+    m_icon_bank->addTextureAsSprite(icon2);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -120,7 +136,12 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
-    m_sort_desc = true;
+    m_current_column = 5/*distance*/;
+    m_searcher->clearListeners();
+    m_searcher->addListener(this);
+    m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
+    m_server_list_widget->setIcons(m_icon_bank, (float)getHeight() / 12.0f);
+    m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
     refresh(true);
 }   // init
@@ -128,18 +149,17 @@ void ServerSelection::init()
 // ----------------------------------------------------------------------------
 /** Loads the list of all servers. The gui element will be
  *  updated.
- *  \param sort_case what sorting method will be used.
  */
-void ServerSelection::loadList(unsigned sort_case)
+void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    std::sort(m_servers.begin(), m_servers.end(), [sort_case, this]
+    std::sort(m_servers.begin(), m_servers.end(), [this]
         (const std::shared_ptr<Server> a,
          const std::shared_ptr<Server> b)->bool
         {
             std::shared_ptr<Server> c = m_sort_desc ? a : b;
             std::shared_ptr<Server> d = m_sort_desc ? b : a;
-            switch (sort_case)
+            switch (m_current_column)
             {
             case 0:
                 return c->getLowerCaseName() > d->getLowerCaseName();
@@ -154,7 +174,8 @@ void ServerSelection::loadList(unsigned sort_case)
                 return c->getServerMode() > d->getServerMode();
                 break;
             case 4:
-                return !(c->getServerOwnerName() < d->getServerOwnerName());
+                return c->getServerOwnerLowerCaseName() >
+                    d->getServerOwnerLowerCaseName();
                 break;
             case 5:
                 return c->getDistance() > d->getDistance();
@@ -163,22 +184,26 @@ void ServerSelection::loadList(unsigned sort_case)
             assert(false);
             return false;
         });
-    for (auto server : m_servers)
+    for (auto& server : m_servers)
     {
+        const int icon = server->isGameStarted() ? 1 : 0;
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), -1, 3));
-        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), icon,
+            3));
+        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1,
+            true));
 
         core::stringw difficulty =
             race_manager->getDifficultyName(server->getDifficulty());
-        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1,
+            true));
 
         core::stringw mode =
-            NetworkConfig::get()->getModeName(server->getServerMode());
+            ServerConfig::getModeName(server->getServerMode());
         row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 2, true));
 
         if (NetworkConfig::get()->isWAN())
@@ -205,12 +230,14 @@ void ServerSelection::onColumnClicked(int column_id, bool sort_desc, bool sort_d
     if (sort_default)
     {
         m_sort_desc = false;
-        loadList(/* distance */ 5);
+        m_current_column = 5/*distance*/;
+        loadList();
     }
     else
     {
         m_sort_desc = sort_desc;
-        loadList(column_id);
+        m_current_column = column_id;
+        loadList();
     }
 }   // onColumnClicked
 
@@ -227,7 +254,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     {
         refresh(true);
     }
-    else if (name == "private_server")
+    else if (name == "private_server" || name == "game_started")
     {
         copyFromServersManager();
     }
@@ -312,9 +339,36 @@ void ServerSelection::copyFromServersManager()
     if (m_servers.empty())
         return;
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
-        [this](const std::shared_ptr<Server> a)->bool
+        [this](const std::shared_ptr<Server>& a)->bool
         {
             return a->isPasswordProtected() != m_private_server->getState();
         }), m_servers.end());
-    loadList(0);
+    m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
+        [this](const std::shared_ptr<Server>& a)->bool
+        {
+            if (m_game_started->getState() && a->isGameStarted())
+                return true;
+            return false;
+        }), m_servers.end());
+    const core::stringw& search = m_searcher->getText();
+    const std::string search_word_lc = StringUtils::toLowerCase(
+        StringUtils::wideToUtf8(search));
+    if (!search_word_lc.empty())
+    {
+        m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
+            [search_word_lc](const std::shared_ptr<Server>& a)->bool
+            {
+                if (!a->searchByName(search_word_lc))
+                    return true;
+                return false;
+            }), m_servers.end());
+    }
+    loadList();
 }   // copyFromServersManager
+
+// ----------------------------------------------------------------------------
+void ServerSelection::unloaded()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}   // unloaded

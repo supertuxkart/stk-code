@@ -24,6 +24,7 @@
 #include <irrlicht.h>
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
@@ -32,7 +33,7 @@
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/rubber_ball.hpp"
-#include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
@@ -130,7 +131,7 @@ void PowerupManager::loadPowerupsModels()
         PowerupType type = getPowerupType(name);
         // The weight nodes will be also included in this list, so ignore those
         if(type!=POWERUP_NOTHING)
-            LoadPowerup(type, *node);
+            loadPowerup(type, *node);
         else
         {
             Log::fatal("PowerupManager",
@@ -148,6 +149,19 @@ void PowerupManager::loadPowerupsModels()
 
     delete root;
 
+    if (ProfileWorld::isNoGraphics())
+    {
+        for (unsigned i = POWERUP_FIRST; i <= POWERUP_LAST; i++)
+        {
+            scene::IMesh *mesh = m_all_meshes[(PowerupType)i];
+            if (mesh)
+            {
+                // After minMax3D from loadPowerup mesh can free its vertex
+                // buffer
+                mesh->freeMeshVertexBuffer();
+            }
+        }
+    }
 }  // loadPowerupsModels
 
 //-----------------------------------------------------------------------------
@@ -431,7 +445,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
  *  \param type The type of the powerup.
  *  \param node The XML node with the data for this powerup.
  */
-void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
+void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
 {
     std::string icon_file("");
     node.get("icon", &icon_file);
@@ -466,6 +480,9 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
               << "', aborting.";
             throw std::runtime_error(o.str());
         }
+#ifndef SERVER_ONLY
+        SP::uploadSPM(m_all_meshes[type]);
+#endif
         m_all_meshes[type]->grab();
     }
     else
@@ -482,9 +499,9 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
              Cake::init(node, m_all_meshes[type]);       break;
         case POWERUP_RUBBERBALL:
              RubberBall::init(node, m_all_meshes[type]); break;
-        default:;
+        default: break;
     }   // switch
-}   // LoadNode
+}   // loadPowerup
 
 // ----------------------------------------------------------------------------
 /** Create a (potentially interpolated) WeightsData objects for the current
@@ -501,7 +518,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_TIME_TRIAL:     /* fall through */
     case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";     break;
     case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";      break;
-    case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle";   break;
+    case RaceManager::MINOR_MODE_BATTLE:      class_name="battle";   break;
     case RaceManager::MINOR_MODE_TUTORIAL:       class_name="tutorial"; break;
     case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:

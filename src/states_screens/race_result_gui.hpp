@@ -192,6 +192,7 @@ private:
     void displayGPProgress();
     void cleanupGPProgress();
     void displayPostRaceInfo();
+    void displayCTFResults();
     void displaySoccerResults();
     void displayScreenShots();
 

@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -46,18 +47,20 @@ CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 
 void CreateServerScreen::loadedFromFile()
 {
+    m_prev_mode = 0;
+    m_prev_value = 0;
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
  
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
-    int max = UserConfigParams::m_server_max_players.getDefaultValue();
+    int max = UserConfigParams::m_max_players.getDefaultValue();
     m_max_players_widget->setMax(max);
 
-    if (UserConfigParams::m_server_max_players > max)
-        UserConfigParams::m_server_max_players = max;
+    if (UserConfigParams::m_max_players > max)
+        UserConfigParams::m_max_players = max;
 
-    m_max_players_widget->setValue(UserConfigParams::m_server_max_players);
+    m_max_players_widget->setValue(UserConfigParams::m_max_players);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
@@ -105,8 +108,8 @@ void CreateServerScreen::init()
     // -- Game modes
     RibbonWidget* gamemode = getWidget<RibbonWidget>("gamemode");
     assert(gamemode != NULL);
-    gamemode->setSelection(0, PLAYER_ID_GAME_MASTER);
-    updateMoreOption(0);
+    gamemode->setSelection(m_prev_mode, PLAYER_ID_GAME_MASTER);
+    updateMoreOption(m_prev_mode);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -133,7 +136,9 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
     {
         const int selection =
             m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        m_prev_value = 0;
         updateMoreOption(selection);
+        m_prev_mode = selection;
     }
 
 }   // eventCallback
@@ -157,7 +162,23 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             {
                 m_more_options_spinner->addLabel(StringUtils::toWString(i));
             }
-            m_more_options_spinner->setValue(0);
+            m_more_options_spinner->setValue(m_prev_value);
+            break;
+        }
+        case 2:
+        {
+            m_more_options_text->setVisible(true);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen, show various battle mode available
+            m_more_options_text->setText(_("Battle mode"), false);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen for battle server
+            m_more_options_spinner->addLabel(_("Free-For-All"));
+            //I18N: In the create server screen for battle server
+            m_more_options_spinner->addLabel(_("Capture The Flag"));
+            m_more_options_spinner->setValue(m_prev_value);
             break;
         }
         case 3:
@@ -173,7 +194,7 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             m_more_options_spinner->addLabel(_("Time limit"));
             //I18N: In the create server screen for soccer server
             m_more_options_spinner->addLabel(_("Goals limit"));
-            m_more_options_spinner->setValue(0);
+            m_more_options_spinner->setValue(m_prev_value);
             break;
         }
         default:
@@ -195,9 +216,6 @@ void CreateServerScreen::onUpdate(float delta)
     if(!STKHost::existHost())
         return;
 
-    //FIXME If we really want a gui, we need to decide what else to do here
-    // For now start the (wrong i.e. client) lobby, to prevent to create
-    // a server more than once.
     NetworkingLobby::getInstance()->push();
 }   // onUpdate
 
@@ -223,9 +241,9 @@ void CreateServerScreen::createServer()
         return;
     }
     assert(max_players > 1 && max_players <=
-        UserConfigParams::m_server_max_players.getDefaultValue());
+        UserConfigParams::m_max_players.getDefaultValue());
 
-    UserConfigParams::m_server_max_players = max_players;
+    UserConfigParams::m_max_players = max_players;
     std::string password = StringUtils::wideToUtf8(getWidget<TextBoxWidget>
         ("password")->getText());
     if ((!password.empty() != 0 &&
@@ -240,17 +258,17 @@ void CreateServerScreen::createServer()
         return;
     }
 
-    NetworkConfig::get()->setPassword(password);
+    ServerConfig::m_private_server_password = password;
     if (!password.empty())
         password = std::string(" --server-password=") + password;
 
     TransportAddress server_address(0x7f000001,
-        NetworkConfig::get()->getServerDiscoveryPort());
+        stk_config->m_server_discovery_port);
 
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        0, server_address, !password.empty());
+        0, server_address, !password.empty(), false);
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
@@ -258,8 +276,8 @@ void CreateServerScreen::createServer()
     // In case of a WAN game, we register this server with the
     // stk server, and will get the server's id when this 
     // request is finished.
-    NetworkConfig::get()->setMaxPlayers(max_players);
-    NetworkConfig::get()->setServerName(name);
+    ServerConfig::m_server_max_players = max_players;
+    ServerConfig::m_server_name = StringUtils::xmlEncode(name);
 
     // FIXME: Add the following fields to the create server screen
     // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
@@ -299,12 +317,22 @@ void CreateServerScreen::createServer()
         server_cfg << "--lan-server=" << server_name;
     }
 
-    std::string server_id_file = "server_id_file_";
-    server_id_file += StringUtils::toString(StkTime::getTimeSinceEpoch());
+    // Clear previous stk-server-id-file_*
+    std::set<std::string> files;
+    const std::string server_id_file = "stk-server-id-file_";
+    file_manager->listFiles(files, file_manager->getUserConfigDir());
+    for (auto& f : files)
+    {
+        if (f.find(server_id_file) != std::string::npos)
+        {
+            file_manager->removeFile(file_manager->getUserConfigDir() + "/" +
+                f);
+        }
+    }
     NetworkConfig::get()->setServerIdFile(
         file_manager->getUserConfigFile(server_id_file));
 
-    server_cfg << " --no-graphics --stdout=server.log --type=" <<
+    server_cfg << " --stdout=server.log --mode=" <<
         gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
         " --difficulty=" <<
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
@@ -315,20 +343,31 @@ void CreateServerScreen::createServer()
     if (m_more_options_spinner->isVisible())
     {
         int esi = m_more_options_spinner->getValue();
-        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER)
-            != 3/*is soccer*/)
-        {
-            // Grand prix track count
-            if (esi > 0)
-                server_cfg << " --network-gp=" << esi;
-        }
-        else
+        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
+            3/*is soccer*/)
         {
             if (esi == 0)
                 server_cfg << " --soccer-timed";
             else
                 server_cfg << " --soccer-goals";
         }
+        else if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
+            2/*is battle*/)
+        {
+            server_cfg << " --battle-mode=" << esi;
+        }
+        else
+        {
+            // Grand prix track count
+            if (esi > 0)
+                server_cfg << " --network-gp=" << esi;
+        }
+        m_prev_mode = gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        m_prev_value = esi;
+    }
+    else
+    {
+        m_prev_mode = m_prev_value = 0;
     }
 
     SeparateProcess* sp =

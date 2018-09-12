@@ -98,32 +98,35 @@ SFXManager::SFXManager()
     loadSfx();
 
 #ifdef ENABLE_SOUND
-    pthread_cond_init(&m_cond_request, NULL);
-
-    pthread_attr_t  attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    m_thread_id.setAtomic(new pthread_t());
-    // The thread is created even if there atm sfx are disabled
-    // (since the user might enable it later).
-    int error = pthread_create(m_thread_id.getData(), &attr,
-                               &SFXManager::mainLoop, this);
-    if (error)
+    if (UserConfigParams::m_enable_sound)
     {
-        m_thread_id.lock();
-        delete m_thread_id.getData();
-        m_thread_id.unlock();
-        m_thread_id.setAtomic(0);
-        Log::error("SFXManager", "Could not create thread, error=%d.",
-                   errno);
+        pthread_cond_init(&m_cond_request, NULL);
+    
+        pthread_attr_t  attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    
+        m_thread_id.setAtomic(new pthread_t());
+        // The thread is created even if there atm sfx are disabled
+        // (since the user might enable it later).
+        int error = pthread_create(m_thread_id.getData(), &attr,
+                                   &SFXManager::mainLoop, this);
+        if (error)
+        {
+            m_thread_id.lock();
+            delete m_thread_id.getData();
+            m_thread_id.unlock();
+            m_thread_id.setAtomic(0);
+            Log::error("SFXManager", "Could not create thread, error=%d.",
+                       errno);
+        }
+        pthread_attr_destroy(&attr);
+    
+        setMasterSFXVolume( UserConfigParams::m_sfx_volume );
+        m_sfx_commands.lock();
+        m_sfx_commands.getData().clear();
+        m_sfx_commands.unlock();
     }
-    pthread_attr_destroy(&attr);
-
-    setMasterSFXVolume( UserConfigParams::m_sfx_volume );
-    m_sfx_commands.lock();
-    m_sfx_commands.getData().clear();
-    m_sfx_commands.unlock();
 #endif
 }  // SoundManager
 
@@ -133,11 +136,14 @@ SFXManager::SFXManager()
 SFXManager::~SFXManager()
 {
 #ifdef ENABLE_SOUND
-    m_thread_id.lock();
-    pthread_join(*m_thread_id.getData(), NULL);
-    delete m_thread_id.getData();
-    m_thread_id.unlock();
-    pthread_cond_destroy(&m_cond_request);
+    if (UserConfigParams::m_enable_sound)
+    {
+        m_thread_id.lock();
+        pthread_join(*m_thread_id.getData(), NULL);
+        delete m_thread_id.getData();
+        m_thread_id.unlock();
+        pthread_cond_destroy(&m_cond_request);
+    }
 #endif
 
     // ---- clear m_all_sfx
@@ -189,6 +195,9 @@ SFXManager::~SFXManager()
 void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     SFXCommand *sfx_command = new SFXCommand(command, sfx);
     queueCommand(sfx_command);
 #endif
@@ -205,6 +214,9 @@ void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     SFXCommand *sfx_command = new SFXCommand(command, sfx, f);
     queueCommand(sfx_command);
 #endif
@@ -221,8 +233,11 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f)
 void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 {
 #ifdef ENABLE_SOUND
-   SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
-   queueCommand(sfx_command);
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
+    queueCommand(sfx_command);
 #endif
 }   // queue (Vec3)
 
@@ -231,6 +246,9 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p, SFXBuffer* buffer)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
     sfx_command->m_buffer = buffer;
     queueCommand(sfx_command);
@@ -250,6 +268,9 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f,
                        const Vec3 &p)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     SFXCommand *sfx_command = new SFXCommand(command, sfx, f, p);
     queueCommand(sfx_command);
 #endif
@@ -262,6 +283,9 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f,
 void SFXManager::queue(SFXCommands command, MusicInformation *mi)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     SFXCommand *sfx_command = new SFXCommand(command, mi);
     queueCommand(sfx_command);
 #endif
@@ -275,6 +299,9 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi)
 void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     SFXCommand *sfx_command = new SFXCommand(command, mi, f);
     queueCommand(sfx_command);
 #endif
@@ -288,6 +315,9 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
 void SFXManager::queueCommand(SFXCommand *command)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+        
     m_sfx_commands.lock();
     if(World::getWorld() && 
         m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
@@ -321,12 +351,17 @@ void SFXManager::queueCommand(SFXCommand *command)
 void SFXManager::stopThread()
 {
 #ifdef ENABLE_SOUND
-    queue(SFX_EXIT);
-    // Make sure the thread wakes up.
-    pthread_cond_signal(&m_cond_request);
-#else
-    setCanBeDeleted();
+    if (UserConfigParams::m_enable_sound)
+    {
+        queue(SFX_EXIT);
+        // Make sure the thread wakes up.
+        pthread_cond_signal(&m_cond_request);
+    }
+    else
 #endif
+    {
+        setCanBeDeleted();
+    }
 }   // stopThread
 
 //----------------------------------------------------------------------------
@@ -338,6 +373,9 @@ void SFXManager::stopThread()
 void* SFXManager::mainLoop(void *obj)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return NULL;
+        
     VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
@@ -674,14 +712,24 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
         positional = buffer->isPositional();
     }
 
+    SFXBase* sfx = NULL;
+    
 #ifdef ENABLE_SOUND
-    //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
-    SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
-#else
-    SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain());
-    if (owns_buffer)
-        delete buffer;
+    if (UserConfigParams::m_enable_sound)
+    {
+        //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
+        sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
+    }
+    else
 #endif
+    {
+        sfx = new DummySFX(buffer, positional, buffer->getGain());
+        
+        if (owns_buffer)
+        {
+            delete buffer;
+        }
+    }
 
     sfx->setMasterVolume(m_master_gain);
 
@@ -766,6 +814,9 @@ void SFXManager::deleteSFXMapping(const std::string &name)
 void SFXManager::update()
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+
     queue(SFX_UPDATE, (SFXBase*)NULL);
     // Wake up the sfx thread to handle all queued up audio commands.
     pthread_cond_signal(&m_cond_request);
@@ -780,6 +831,9 @@ void SFXManager::update()
 void SFXManager::reallyUpdateNow(SFXCommand *current)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return;
+        
     if (m_last_update_time < 0.0)
     {
         // first time
@@ -906,10 +960,13 @@ void SFXManager::reallyResumeAllNow()
 bool SFXManager::checkError(const std::string &context)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return true;
+
     // Check (and clear) the error flag
     int error = alGetError();
 
-    if(error != AL_NO_ERROR)
+    if (error != AL_NO_ERROR)
     {
         Log::error("SFXManager", "SFXOpenAL OpenAL error while %s: %s",
                    context.c_str(), SFXManager::getErrorString(error).c_str());
@@ -958,6 +1015,9 @@ void SFXManager::setMasterSFXVolume(float gain)
 const std::string SFXManager::getErrorString(int err)
 {
 #ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return std::string("sound disabled");
+
     switch(err)
     {
         case AL_NO_ERROR:          return std::string("AL_NO_ERROR"         );
@@ -968,9 +1028,9 @@ const std::string SFXManager::getErrorString(int err)
         case AL_OUT_OF_MEMORY:     return std::string("AL_OUT_OF_MEMORY"    );
         default:                   return std::string("UNKNOWN");
     };
-#else
-    return std::string("sound disabled");
 #endif
+
+    return std::string("sound disabled");
 }   // getErrorString
 
 //-----------------------------------------------------------------------------

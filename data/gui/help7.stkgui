@@ -41,7 +41,7 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Once in a server, a race will begin once its owner (symbolized with the crown) decides so. Official servers may auto-start races only when there are enough players. Then, you can choose your kart and vote for the next track to race on. An addon kart or track is allowed only if it exists on all joinned players and the server."/>
+                            text="Once in a server, a race will begin once its owner (symbolized with the crown) decides so. Official servers may auto-start races only when there are enough players. Then, you can choose your kart and vote for the next track to race on. An addon kart or track is allowed only if it exists on all joined players and the server."/>
                 </div>
 
                 <label align="center" I18N="In the help menu" text="... or on the same computer:"/>
@@ -59,7 +59,7 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="When input devices are configured, select the 'multiplayer race' icon in the main menu. Each player can press the 'fire' key of their gamepad or keyboard to join the game, and use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>
+                            text="When input devices are configured, select the 'multiplayer' icon in the main menu. Each player can press the 'fire' key of their gamepad or keyboard to join the game, and use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>
                 </div>
                 <spacer width="50" height="25" />
             </box>

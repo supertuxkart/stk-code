@@ -36,7 +36,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
-#include "modes/soccer_world.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -193,13 +192,6 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
     node.get("min-height",      &(m_st_min_height[type])  );
     node.get("max-height",      &(m_st_max_height[type])  );
     node.get("force-updown",    &(m_st_force_updown[type]));
-    core::vector3df scale(1.0f, 1.0f, 1.0f);
-    if(node.get("scale",        &scale))
-    {
-        irr::scene::IMeshManipulator *mani =
-            irr_driver->getVideoDriver()->getMeshManipulator();
-        mani->scale(model, scale);
-    }
 
     // Store the size of the model
     Vec3 min, max;
@@ -243,14 +235,11 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
             kart->isInvulnerable()                 ||
             kart->getKartAnimation()                   ) continue;
 
-        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-        if (sw)
-        {
-            // Don't hit teammates in soccer world
-            if (sw->getKartTeam(kart->getWorldKartId()) == sw
-                ->getKartTeam(m_owner->getWorldKartId()))
+        // Don't hit teammates in team world
+        if (world->hasTeam() &&
+            world->getKartTeam(kart->getWorldKartId()) ==
+            world->getKartTeam(m_owner->getWorldKartId()))
             continue;
-        }
 
         btTransform t=kart->getTrans();
 
@@ -410,7 +399,7 @@ bool Flyable::updateAndDelete(int ticks)
     {
         if (!RewindManager::get()->isRewinding())
         {
-            m_animation->update(stk_config->ticks2Time(ticks));
+            m_animation->update(ticks);
             Moveable::update(ticks);
         }
         return false;
@@ -548,15 +537,12 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
         AbstractKart *kart = world->getKart(i);
-
-        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-        if (sw)
-        {
-            // Don't explode teammates in soccer world
-            if (sw->getKartTeam(kart->getWorldKartId()) == sw
-                ->getKartTeam(m_owner->getWorldKartId()))
+        // Don't explode teammates in team world
+        if (world->hasTeam() &&
+            world->getKartTeam(kart->getWorldKartId()) ==
+            world->getKartTeam(m_owner->getWorldKartId()))
             continue;
-        }
+
         if (kart->isGhostKart()) continue;
 
         // If no secondary hits should be done, only hit the
@@ -572,9 +558,10 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             // The explosion animation will register itself with the kart
             // and will free it later.
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
-            if(kart==kart_hit && Track::getCurrentTrack()->isArena())
+            if (kart == kart_hit)
             {
-                world->kartHit(kart->getWorldKartId());
+                world->kartHit(kart->getWorldKartId(),
+                    m_owner->getWorldKartId());
             }
         }
     }
@@ -701,6 +688,7 @@ void Flyable::hideNodeWhenUndoDestruction()
 #ifndef SERVER_ONLY
     m_node->setVisible(false);
 #endif
+    moveToInfinity();
 }   // hideNodeWhenUndoDestruction
 
 // ----------------------------------------------------------------------------
@@ -713,11 +701,6 @@ void Flyable::handleUndoDestruction()
 
     m_has_undone_destruction = true;
 
-    // If destroyed during rewind, than in theroy it should be safe to delete
-    // without undo
-    if (RewindManager::get()->isRewinding())
-        return;
-
     // We don't bother seeing the mesh during rewinding
     hideNodeWhenUndoDestruction();
     std::shared_ptr<Flyable> f = getShared<Flyable>();
@@ -729,9 +712,10 @@ void Flyable::handleUndoDestruction()
         {
             projectile_manager->addByUID(uid, f);
         },
-        /*replay_function*/[uid]()
+        /*replay_function*/[f, uid]()
         {
             projectile_manager->removeByUID(uid);
+            f->moveToInfinity();
         }));
 }   // handleUndoDestruction
 

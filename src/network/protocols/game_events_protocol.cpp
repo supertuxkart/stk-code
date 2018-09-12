@@ -1,6 +1,7 @@
 #include "network/protocols/game_events_protocol.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
@@ -44,6 +45,8 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         return true;
     }
     uint8_t type = data.getUInt8();
+    CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     switch (type)
     {
@@ -63,6 +66,27 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         if (!sw)
             throw std::invalid_argument("No soccer world");
         sw->handlePlayerGoalFromServer(data);
+        break;
+    }
+    case GE_BATTLE_KART_SCORE:
+    {
+        if (!ffa)
+            throw std::invalid_argument("No free-for-all world");
+        ffa->setKartScoreFromServer(data);
+        break;
+    }
+    case GE_CTF_ATTACH:
+    {
+        if (!ctf)
+            throw std::invalid_argument("No CTF world");
+        ctf->attachFlag(data);
+        break;
+    }
+    case GE_CTF_RESET:
+    {
+        if (!ctf)
+            throw std::invalid_argument("No CTF world");
+        ctf->resetFlag(data);
         break;
     }
     default:

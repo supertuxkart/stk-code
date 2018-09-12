@@ -25,7 +25,6 @@
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
-#include "utils/random_generator.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
 
@@ -90,7 +89,8 @@ Bowling::Bowling(AbstractKart *kart)
 Bowling::~Bowling()
 {
     // This will stop the sfx and delete the object.
-    m_roll_sfx->deleteSFX();
+    if (m_roll_sfx)
+        m_roll_sfx->deleteSFX();
 
 }   // ~RubberBall
 
@@ -175,7 +175,7 @@ bool Bowling::updateAndDelete(int ticks)
         return true;
     }
 
-    if (m_roll_sfx->getStatus()==SFXBase::SFX_PLAYING)
+    if (m_roll_sfx && m_roll_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_roll_sfx->setPosition(getXYZ());
 
     return false;
@@ -206,6 +206,17 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
     }
     return was_real_hit;
 }   // hit
+
+// ----------------------------------------------------------------------------
+void Bowling::hideNodeWhenUndoDestruction()
+{
+    Flyable::hideNodeWhenUndoDestruction();
+    if (m_roll_sfx)
+    {
+        m_roll_sfx->deleteSFX();
+        m_roll_sfx = NULL;
+    }
+}   // hideNodeWhenUndoDestruction
 
 // ----------------------------------------------------------------------------
 /** Returns the hit effect object to use when this objects hits something.

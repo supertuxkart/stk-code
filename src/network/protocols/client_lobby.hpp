@@ -24,8 +24,11 @@
 #include "utils/cpp2011.hpp"
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <set>
+
+enum PeerDisconnectInfo : unsigned int;
 
 class BareNetworkString;
 class Server;
@@ -68,17 +71,23 @@ private:
         EXITING
     };
 
+    bool m_waiting_for_game;
+
+    bool m_server_auto_lap;
+
+    bool m_received_server_result;
+
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
 
     std::set<std::string> m_available_karts;
     std::set<std::string> m_available_tracks;
 
-    bool m_received_server_result = false;
-
     void addAllPlayers(Event* event);
     void finalizeConnectionRequest(NetworkString* header,
                                    BareNetworkString* rest, bool encrypt);
+
+    std::map<PeerDisconnectInfo, irr::core::stringw> m_disconnected_msg;
 
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
@@ -95,13 +104,14 @@ public:
     virtual void finishedLoadingWorld() OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-    virtual bool waitingForPlayers() const OVERRIDE
-                                        { return m_state.load() == CONNECTED; }
     virtual void asynchronousUpdate() OVERRIDE {}
     virtual bool allPlayersReady() const OVERRIDE
                                            { return m_state.load() >= RACING; }
     bool waitingForServerRespond() const
                             { return m_state.load() == REQUESTING_CONNECTION; }
+    bool isLobbyReady() const           { return m_state.load() == CONNECTED; }
+    bool isWaitingForGame() const                { return m_waiting_for_game; }
+    bool isServerAutoLap() const                  { return m_server_auto_lap; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
 
 };

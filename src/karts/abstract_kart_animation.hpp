@@ -21,6 +21,7 @@
 
 #include "LinearMath/btTransform.h"
 
+#include "config/stk_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -50,44 +51,53 @@ private:
 
     bool m_confirmed_by_network;
 
+    bool m_ignore_undo;
+
 protected:
    /** A pointer to the kart which is animated by this class. */
     AbstractKart *m_kart;
 
-    /** Timer for the explosion. */
-    float m_timer;
+    /** Timer for the animation. */
+    int m_timer;
 
     btTransform m_end_transform;
 
+    int m_end_ticks;
+
     // ------------------------------------------------------------------------
-    void addNetworkAnimationChecker();
+    void addNetworkAnimationChecker(bool reset_powerup);
 public:
                  AbstractKartAnimation(AbstractKart *kart,
                                        const std::string &name);
     virtual     ~AbstractKartAnimation();
-    virtual void update(float dt);
+    virtual void update(int ticks);
     // ------------------------------------------------------------------------
     /** Returns the current animation timer. */
-    virtual float getAnimationTimer() const { return m_timer; }
+    virtual float getAnimationTimer() const
+                                    { return stk_config->ticks2Time(m_timer); }
     // ------------------------------------------------------------------------
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
     virtual const std::string &getName() const { return m_name; }
     // ------------------------------------------------------------------------
-    virtual bool useEarlyEndTransform() const { return true; }
+    /** If true, the end transform can be determined early, used in network for
+     *  for client to synchronize with server. */
+    virtual bool usePredefinedEndTransform() const { return true; }
     // ------------------------------------------------------------------------
     const btTransform& getEndTransform() const { return m_end_transform; }
     // ------------------------------------------------------------------------
-    void setEndTransform(const btTransform& t)
+    void setEndTransformTicks(const btTransform& t, int ticks)
     {
-        if (!useEarlyEndTransform())
+        if (!usePredefinedEndTransform() || m_confirmed_by_network)
             return;
         m_confirmed_by_network = true;
         m_end_transform = t;
+        m_end_ticks = ticks;
     }
     // ----------------------------------------------------------------------------
-    void checkNetworkAnimationCreationSucceed();
-
+    void checkNetworkAnimationCreationSucceed(const btTransform& fallback_trans);
+    // ----------------------------------------------------------------------------
+    int getEndTicks() const { return m_end_ticks; }
 };   // AbstractKartAnimation
 
 #endif

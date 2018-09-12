@@ -40,7 +40,7 @@
                 <div width="100%" proportion="1" layout="horizontal-row">
                      <icon align="center" width="64" height="64" icon="models/zipper_collect.png"/>
                      <spacer width="25" height="25"/>
-                     <bubble proportion="1" height="100%" text="Zipper - will give you a strong speed boost. But beware of not losing control of your kart !"/>
+                     <bubble proportion="1" height="100%" text="Zipper - will give you a strong speed boost. But beware of not losing control of your kart!"/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">

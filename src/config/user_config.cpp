@@ -18,13 +18,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "utils/ptr_vector.hpp"
+#include <vector>
 
 // The order here is important. If all_params is declared later (e.g. after
 // the #includes), all elements will be added to all_params, and then
 // all_params will be initialised, i.e. cleared!
 class UserConfigParam;
-static PtrVector<UserConfigParam, REF> all_params;
+static std::vector<UserConfigParam*> all_params;
 
 // X-macros
 #define PARAM_PREFIX
@@ -53,7 +53,9 @@ const int UserConfig::m_current_config_version = 8;
 // ----------------------------------------------------------------------------
 UserConfigParam::~UserConfigParam()
 {
-    all_params.remove(this);
+    // Now we have server config param so we cannot do this anymore,
+    // esp all params are kept until the closing of stk anyway
+    //all_params.remove(this);
 }   // ~UserConfigParam
 
 // ----------------------------------------------------------------------------
@@ -61,7 +63,7 @@ UserConfigParam::~UserConfigParam()
  *  \param stream the xml writer.
  *  \param level determines indentation level.
  */
-void UserConfigParam::writeInner(std::ofstream& stream, int level) const
+void UserConfigParam::writeInner(std::stringstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
     stream << "    " << tab.c_str() << m_param_name.c_str() << "=\""
@@ -88,7 +90,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
 }   // GroupUserConfigParam
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::write(std::ofstream& stream) const
+void GroupUserConfigParam::write(std::stringstream& stream) const
 {
     const int attr_amount = (int)m_attributes.size();
 
@@ -118,7 +120,7 @@ void GroupUserConfigParam::write(std::ofstream& stream) const
 }   // write
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::writeInner(std::ofstream& stream, int level) const
+void GroupUserConfigParam::writeInner(std::stringstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
@@ -184,21 +186,14 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    const char* comment)
+    const char* comment, std::array<std::string, 3> key_names,
+    std::map<T, U> default_value)
 {
     m_param_name = param_name;
     all_params.push_back(this);
     if (comment != NULL) m_comment = comment;
-}   // MapUserConfigParam
 
-// ----------------------------------------------------------------------------
-template<typename T, typename U>
-MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    const char* comment, std::map<T, U> default_value)
-{
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if (comment != NULL) m_comment = comment;
+    m_key_names = key_names;
     m_elements = default_value;
 }   // MapUserConfigParam
 
@@ -217,28 +212,30 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     GroupUserConfigParam* group, const char* comment,
-    std::map<T, U> default_value)
+    std::array<std::string, 3> key_names, std::map<T, U> default_value)
 {
     m_param_name = param_name;
     group->addChild(this);
     if (comment != NULL) m_comment = comment;
 
+    m_key_names = key_names;
     m_elements = default_value;
 }   // MapUserConfigParam
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
+void MapUserConfigParam<T, U>::write(std::stringstream& stream) const
 {
     // comment
     if (m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
-    stream << " -->\n    <" << m_param_name.c_str() << "\n";
+    stream << " -->\n    <" << m_param_name.c_str() << ">\n";
 
     for (const auto& kv : m_elements)
     {
-        stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
+        stream << "        <" << m_key_names[0] << " " << m_key_names[1] <<
+            "=\"" << kv.first << "\" " <<  m_key_names[2] << "=\"" <<
+            kv.second << "\"/>\n";
     }
-    stream << "    >\n";
     stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
@@ -249,10 +246,44 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
     const XMLNode* child = node->getNode(m_param_name);
     if (child == NULL)
     {
-        //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
+        Log::error("User Config", "Couldn't find parameter group %s",
+          m_param_name.c_str());
         return;
     }
-    child->get(&m_elements);
+    for (unsigned i = 0; i < child->getNumNodes(); i++)
+    {
+        const std::string& map_name = m_key_names[0];
+        const std::string& key_name = m_key_names[1];
+        const std::string& value_name = m_key_names[2];
+        const XMLNode* map = child->getNode(i);
+        if (map->getName() != map_name)
+        {
+            Log::error("User Config", "Invalid name %s",
+                map->getName().c_str());
+            continue;
+        }
+
+        T key;
+        std::string key_string;
+        if (!map->get(key_name, &key_string) ||
+            !StringUtils::fromString(key_string, key))
+        {
+            Log::error("User Config", "Invalid key name %s",
+                key_name.c_str());
+            continue;
+        }
+
+        U value;
+        std::string value_string;
+        if (!map->get(value_name, &value_string) ||
+            !StringUtils::fromString(value_string, value))
+        {
+            Log::error("User Config", "Invalid value name %s",
+                value_name.c_str());
+            continue;
+        }
+        m_elements[key] = value;
+    }
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
@@ -301,7 +332,7 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 }   // IntUserConfigParam
 
 // ----------------------------------------------------------------------------
-void IntUserConfigParam::write(std::ofstream& stream) const
+void IntUserConfigParam::write(std::stringstream& stream) const
 {
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
                                     << " -->\n";
@@ -364,11 +395,11 @@ TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-void TimeUserConfigParam::write(std::ofstream& stream) const
+void TimeUserConfigParam::write(std::stringstream& stream) const
 {
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
                                     << " -->\n";
-    std::ostringstream o;
+    std::stringstream o;
     o<<m_value;
     stream << "    <" << m_param_name.c_str() << " value=\""
            << o.str().c_str() << "\" />\n\n";
@@ -381,7 +412,7 @@ irr::core::stringc TimeUserConfigParam::toString() const
     // we can't use an irrlicht's stringw directly. Since it's only a
     // number, we can use std::string, and convert to stringw
 
-    std::ostringstream o;
+    std::stringstream o;
     o<<m_value;
     return o.str().c_str();
 }   // toString
@@ -435,7 +466,7 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 }   // StringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void StringUserConfigParam::write(std::ofstream& stream) const
+void StringUserConfigParam::write(std::stringstream& stream) const
 {
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
                                     << " -->\n";
@@ -487,7 +518,7 @@ BoolUserConfigParam::BoolUserConfigParam(bool default_value,
 
 
 // ----------------------------------------------------------------------------
-void BoolUserConfigParam::write(std::ofstream& stream) const
+void BoolUserConfigParam::write(std::stringstream& stream) const
 {
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
                                     << " -->\n";
@@ -572,7 +603,7 @@ FloatUserConfigParam::FloatUserConfigParam(float default_value,
 }   // FloatUserConfigParam
 
 // ----------------------------------------------------------------------------
-void FloatUserConfigParam::write(std::ofstream& stream) const
+void FloatUserConfigParam::write(std::stringstream& stream) const
 {
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
                                     << " -->\n";
@@ -669,10 +700,9 @@ bool UserConfig::loadConfig()
 
     // ---- Read parameters values (all parameter objects must have been created before this point if
     //      you want them automatically read from the config file)
-    const int paramAmount = all_params.size();
-    for(int i=0; i<paramAmount; i++)
+    for (unsigned i = 0; i < all_params.size(); i++)
     {
-        all_params[i].findYourDataInAChildOf(root);
+        all_params[i]->findYourDataInAChildOf(root);
     }
 
 
@@ -696,29 +726,27 @@ bool UserConfig::loadConfig()
 void UserConfig::saveConfig()
 {
     const std::string filename = file_manager->getUserConfigFile(m_filename);
+    std::stringstream ss;
+    ss << "<?xml version=\"1.0\"?>\n";
+    ss << "<stkconfig version=\"" << m_current_config_version
+        << "\" >\n\n";
+    for (unsigned i = 0; i < all_params.size(); i++)
+    {
+        all_params[i]->write(ss);
+    }
+    ss << "</stkconfig>\n";
 
     try
     {
-        std::ofstream configfile (filename.c_str(), std::ofstream::out);
-
-        configfile << "<?xml version=\"1.0\"?>\n";
-        configfile << "<stkconfig version=\"" << m_current_config_version
-                   << "\" >\n\n";
-
-        const int paramAmount = all_params.size();
-        for(int i=0; i<paramAmount; i++)
-        {
-            //Log::info("UserConfig", "Saving parameter %d to file", i);
-            all_params[i].write(configfile);
-        }
-
-        configfile << "</stkconfig>\n";
+        std::string s = ss.str();
+        std::ofstream configfile(filename.c_str(), std::ofstream::out);
+        configfile << ss.rdbuf();
         configfile.close();
     }
     catch (std::runtime_error& e)
     {
-        Log::error("UserConfig::saveConfig", "Failed to write config to %s, because %s",
-            filename.c_str(), e.what());
+        Log::error("UserConfig::saveConfig", "Failed to write config to %s, "
+            "because %s", filename.c_str(), e.what());
     }
 
 }   // saveConfig

@@ -503,8 +503,10 @@ void Skidding::update(int ticks, bool is_on_ground,
                           ->setCreationRateRelative(KartGFX::KGFX_SKIDL, 1.0f);
                     m_kart->getKartGFX()
                           ->setCreationRateRelative(KartGFX::KGFX_SKIDR, 1.0f);
+                    unsigned int bonus_cat = (level == 1) ? MaxSpeed::MS_INCREASE_SKIDDING :
+                                                            MaxSpeed::MS_INCREASE_RED_SKIDDING;
                     m_kart->m_max_speed->
-                        instantSpeedIncrease(MaxSpeed::MS_INCREASE_SKIDDING,
+                        instantSpeedIncrease(bonus_cat,
                                bonus_speed, bonus_speed/2,
                                bonus_force,
                                stk_config->time2Ticks(bonus_time),

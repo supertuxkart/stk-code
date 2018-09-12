@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -312,20 +313,25 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             }   // if c[0]
             
 #elif defined(ANDROID)
-            char p_language[3] = {};
-            AConfiguration_getLanguage(global_android_app->config, p_language);
-            
-            if (p_language != NULL)
+            if (global_android_app)
             {
-                language += p_language;
+                char p_language[3] = {};
+                AConfiguration_getLanguage(global_android_app->config, 
+                                           p_language);
                 
-                char p_country[3] = {};
-                AConfiguration_getCountry(global_android_app->config, p_country);
-                
-                if (p_country)
+                if (p_language != NULL)
                 {
-                    language += "_";
-                    language += p_country;
+                    language += p_language;
+                    
+                    char p_country[3] = {};
+                    AConfiguration_getCountry(global_android_app->config, 
+                                              p_country);
+                    
+                    if (p_country)
+                    {
+                        language += "_";
+                        language += p_country;
+                    }
                 }
             }
 #endif

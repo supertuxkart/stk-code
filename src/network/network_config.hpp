@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-/*! \file stk_host.hpp
- *  \brief Defines an interface to use network low-level functions easily.
+/*! \file network_config.hpp
+ *  \brief Defines network configuration for server and client.
  */
 #ifndef HEADER_NETWORK_CONFIG
 #define HEADER_NETWORK_CONFIG
@@ -59,53 +59,19 @@ private:
 
     /** If set it allows clients to connect directly to this server without
      *  using the stk server in between. It requires obviously that this
-     *  server is accessible (through the firewall) from the outside,
-     *  then you can use the \ref m_server_discovery_port and ip address for
-     *  direct connection. */
+     *  server is accessible (through the firewall) from the outside. */
     bool m_is_public_server;
 
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
 
-    /** True if this is a ranked server */
-    bool m_is_ranked_server;
-
-    /* True if automatically end after 1st player finished for some time. */
-    bool m_auto_end;
-
-    /** The password for a server (or to authenticate to a server). */
-    std::string m_password;
-
-    /** The port number to which the server listens to detect direct socket
-     *  requests. */
-    uint16_t m_server_discovery_port;
-
-    /** The port on which the server listens for connection requests from LAN. */
-    uint16_t m_server_port;
-
     /** The LAN port on which a client is waiting for a server connection. */
     uint16_t m_client_port;
-
-    /** Maximum number of players on the server. */
-    unsigned m_max_players;
-
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
 
-    /** True if only validated players are allowed to join. */
-    bool m_validated_players;
-
-    bool m_owner_less;
-
     bool m_done_adding_network_players;
-
-    bool m_team_choosing;
-
-    /** If this is a server, the server name. */
-    irr::core::stringw m_server_name;
-
-    unsigned m_server_mode;
 
     /** Used by wan server. */
     uint32_t m_cur_user_id;
@@ -117,20 +83,11 @@ private:
     std::vector<std::tuple<InputDevice*, PlayerProfile*,
         PerPlayerDifficulty> > m_network_players;
 
-    core::stringw m_motd;
-
     NetworkConfig();
 
     uint32_t m_joined_server_version;
 
 public:
-    /** Stores the command line flag to disable lan detection (i.e. force
-     *  WAN code to be used when connection client and server). */
-    static bool m_disable_lan;
-
-    /** Server version, will be advanced if there are protocol changes. */
-    static const uint32_t m_server_version;
-
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {
@@ -147,34 +104,17 @@ public:
     }   // destroy
 
     // ------------------------------------------------------------------------
-    void setIsServer(bool b);
-    // ------------------------------------------------------------------------
-    /** Sets the port for server discovery. */
-    void setServerDiscoveryPort(uint16_t port)
+    /** Sets if this instance is a server or client. */
+    void setIsServer(bool b)
     {
-        m_server_discovery_port = port;
-    }   // setServerDiscoveryPort
-    // ------------------------------------------------------------------------
-    /** Sets the port on which this server listens. */
-    void setServerPort(uint16_t port) { m_server_port = port; }
+        m_is_server = b;
+    }   // setIsServer
     // ------------------------------------------------------------------------
     /** Sets the port on which a client listens for server connection. */
     void setClientPort(uint16_t port) { m_client_port = port; }
     // ------------------------------------------------------------------------
-    /** Returns the port on which this server listenes. */
-    uint16_t getServerPort() const { return m_server_port; }
-    // ------------------------------------------------------------------------
-    /** Returns the port for LAN server discovery. */
-    uint16_t getServerDiscoveryPort() const { return m_server_discovery_port; }
-    // ------------------------------------------------------------------------
     /** Returns the port on which a client listens for server connections. */
     uint16_t getClientPort() const { return m_client_port; }
-    // ------------------------------------------------------------------------
-    /** Sets the password for a server. */
-    void setPassword(const std::string &password) { m_password = password; }
-    // ------------------------------------------------------------------------
-    /** Returns the password. */
-    const std::string& getPassword() const { return m_password; }
     // ------------------------------------------------------------------------
     /** Sets that this server can be contacted directly. */
     void setIsPublicServer() { m_is_public_server = true; }
@@ -198,12 +138,7 @@ public:
     /** Set that this is a WAN networked game. */
     void setIsWAN() { m_network_type = NETWORK_WAN; }
     // ------------------------------------------------------------------------
-    /** Set that this is not a networked game. */
-    void unsetNetworking()
-    {
-        m_network_type = NETWORK_NONE;
-        m_password = "";
-    }
+    void unsetNetworking();
     // ------------------------------------------------------------------------
     const std::vector<std::tuple<InputDevice*, PlayerProfile*,
                                  PerPlayerDifficulty> >&
@@ -244,30 +179,11 @@ public:
         m_done_adding_network_players = false;
     }
     // ------------------------------------------------------------------------
-    /** Sets the maximum number of players for this server. */
-    void setMaxPlayers(unsigned n) { m_max_players = n; }
-    // ------------------------------------------------------------------------
-    /** Returns the maximum number of players for this server. */
-    unsigned getMaxPlayers() const { return m_max_players; }
-    // ------------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }
     // ------------------------------------------------------------------------
     /** Returns if this instance is a client. */
     bool isClient() const { return !m_is_server; }
-    // ------------------------------------------------------------------------
-    /** Sets the name of this server. */
-    void setServerName(const irr::core::stringw &name)
-    {
-        m_server_name = name;
-    }   // setServerName
-    // ------------------------------------------------------------------------
-    /** Returns the server name. */
-    const irr::core::stringw& getServerName() const
-    {
-        assert(isServer());
-        return m_server_name;
-    }   // getServerName
     // ------------------------------------------------------------------------
     /** Sets if a client should immediately connect to the first server. */
     void setAutoConnect(bool b) { m_auto_connect = b; }
@@ -275,16 +191,6 @@ public:
     /** Returns if an immediate connection to the first server was
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
-
-    // ------------------------------------------------------------------------
-    /** Returns if the server use multi-session rankings. */
-    bool isRankedServer() const { return m_is_ranked_server; }
-    // ------------------------------------------------------------------------
-    void setRankedServer(bool val) { m_is_ranked_server = val; }
-    // ------------------------------------------------------------------------
-    /** Returns the minor and majar game mode from server database id. */
-    std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-        getLocalGameMode();
     // ------------------------------------------------------------------------
     void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
     // ------------------------------------------------------------------------
@@ -302,36 +208,7 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getServerIdFile() const { return m_server_id_file; }
     // ------------------------------------------------------------------------
-    void setMOTD(const core::stringw& motd) { m_motd = motd; }
-    // ------------------------------------------------------------------------
-    const core::stringw& getMOTD() const { return m_motd; }
-    // ------------------------------------------------------------------------
-    void setServerMode(RaceManager::MinorRaceModeType mode,
-                       RaceManager::MajorRaceModeType);
-    // ------------------------------------------------------------------------
-    void setServerMode(unsigned mode) { m_server_mode = mode; }
-    // ------------------------------------------------------------------------
-    unsigned getServerMode() const { return m_server_mode; }
-    // ------------------------------------------------------------------------
-    core::stringw getModeName(unsigned id);
-    // ------------------------------------------------------------------------
     std::vector<GUIEngine::Screen*> getResetScreens(bool lobby = false) const;
-    // ------------------------------------------------------------------------
-    void setValidatedPlayers(bool val)           { m_validated_players = val; }
-    // ------------------------------------------------------------------------
-    bool onlyValidatedPlayers() const           { return m_validated_players; }
-    // ------------------------------------------------------------------------
-    void setOwnerLess(bool val)                         { m_owner_less = val; }
-    // ------------------------------------------------------------------------
-    bool isOwnerLess() const                           { return m_owner_less; }
-    // ------------------------------------------------------------------------
-    void setAutoEnd(bool val)                             { m_auto_end = val; }
-    // ------------------------------------------------------------------------
-    bool isAutoEnd() const                               { return m_auto_end; }
-    // ------------------------------------------------------------------------
-    void setTeamChoosing(bool val)                   { m_team_choosing = val; }
-    // ------------------------------------------------------------------------
-    bool hasTeamChoosing() const                    { return m_team_choosing; }
     // ------------------------------------------------------------------------
     void setJoinedServerVersion(uint32_t v)    { m_joined_server_version = v; }
     // ------------------------------------------------------------------------

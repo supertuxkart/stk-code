@@ -25,7 +25,6 @@
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "tracks/arena_graph.hpp"
@@ -95,7 +94,7 @@ void ItemState::collected(const AbstractKart *kart)
         m_ticks_till_return = stk_config->time2Ticks(2.0f);
     }
 
-    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
     {
         m_ticks_till_return *= 3;
     }
@@ -256,9 +255,10 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
  */
 void Item::switchBack()
 {
-    if (ItemState::switchBack()) return;
-
     setMesh(m_original_mesh, m_original_lowmesh);
+    
+    if (ItemState::switchBack()) 
+        return;
 
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
@@ -343,7 +343,8 @@ void Item::updateGraphics(float dt)
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     bool is_visible = isAvailable() || time_till_return <= 1.0f || 
-                      (getType() == ITEM_BUBBLEGUM && !isUsedUp() );
+                      (getType() == ITEM_BUBBLEGUM && 
+                       getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
 

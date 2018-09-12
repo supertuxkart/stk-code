@@ -33,6 +33,8 @@ bool CIrrDeviceAndroid::IsPaused = true;
 bool CIrrDeviceAndroid::IsFocused = false;
 bool CIrrDeviceAndroid::IsStarted = false;
 
+AndroidApplicationInfo CIrrDeviceAndroid::ApplicationInfo;
+
 // Execution of android_main() function is a kind of "onCreate" event, so this
 // function should be used there to make sure that global window state variables
 // have their default values on startup.
@@ -50,6 +52,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Gyroscope(0),
     AccelerometerActive(false),
     GyroscopeActive(false),
+    TextInputEnabled(false),
     IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
@@ -58,68 +61,82 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
     #endif
-
-    Android = (android_app *)(param.PrivateData);
-    assert(Android != NULL);
-
-    Android->userData = this;
-    Android->onAppCmd = handleAndroidCommand;
-    Android->onAppCmdDirect = handleAndroidCommandDirect;
-    Android->onInputEvent = handleInput;
     
-    printConfig();
     createKeyMap();
 
     CursorControl = new CCursorControl();
+
+    Android = (android_app*)(param.PrivateData);
     
-    Close = Android->destroyRequested;
-
-    // It typically shouldn't happen, but just in case...
-    if (Close)
-        return;
-
-    SensorManager = ASensorManager_getInstance();
-    SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
-                                Android->looper, LOOPER_ID_USER, NULL, NULL);
-
-    ANativeActivity_setWindowFlags(Android->activity,
-                                   AWINDOW_FLAG_KEEP_SCREEN_ON |
-                                   AWINDOW_FLAG_FULLSCREEN, 0);
-
-    os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
-
-    while (!IsStarted || !IsFocused || IsPaused)
+    if (Android == NULL && CreationParams.DriverType != video::EDT_NULL)
     {
-        s32 events = 0;
-        android_poll_source* source = 0;
-
-        s32 id = ALooper_pollAll(-1, NULL, &events, (void**)&source);
-
-        if (id >=0 && source != NULL)
-        {
-            source->process(Android, source);
-        }
+        os::Printer::log("Irrlicht device can run only with NULL driver without android_app.", ELL_DEBUG);
+        return;
     }
-    
-    assert(Android->window);
-    os::Printer::log("Done", ELL_DEBUG);
-    
-    ExposedVideoData.OGLESAndroid.Window = Android->window;
 
-    createVideoModeList();
+    if (Android != NULL)
+    {
+        Android->userData = this;
+        Android->onAppCmd = handleAndroidCommand;
+        Android->onAppCmdDirect = handleAndroidCommandDirect;
+        Android->onInputEvent = handleInput;
+        
+        printConfig();
+        
+        Close = Android->destroyRequested;
+    
+        // It typically shouldn't happen, but just in case...
+        if (Close)
+            return;
+    
+        SensorManager = ASensorManager_getInstance();
+        SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
+                                    Android->looper, LOOPER_ID_USER, NULL, NULL);
+    
+        ANativeActivity_setWindowFlags(Android->activity,
+                                       AWINDOW_FLAG_KEEP_SCREEN_ON |
+                                       AWINDOW_FLAG_FULLSCREEN, 0);
+    
+        os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
+    
+        while (!IsStarted || !IsFocused || IsPaused)
+        {
+            s32 events = 0;
+            android_poll_source* source = 0;
+    
+            s32 id = ALooper_pollAll(-1, NULL, &events, (void**)&source);
+    
+            if (id >=0 && source != NULL)
+            {
+                source->process(Android, source);
+            }
+        }
+        
+        assert(Android->window);
+        os::Printer::log("Done", ELL_DEBUG);
+        
+        ExposedVideoData.OGLESAndroid.Window = Android->window;
+    
+        createVideoModeList();
+    }
 
     createDriver();
 
     if (VideoDriver)
+    {
         createGUIAndScene();
+    }
 }
 
 
 CIrrDeviceAndroid::~CIrrDeviceAndroid()
 {
-    Android->userData = NULL;
-    Android->onAppCmd = NULL;
-    Android->onInputEvent = NULL;
+    if (Android)
+    {
+        Android->userData = NULL;
+        Android->onAppCmd = NULL;
+        Android->onInputEvent = NULL;
+    }
 }
 
 void CIrrDeviceAndroid::printConfig() 
@@ -210,6 +227,9 @@ void CIrrDeviceAndroid::createDriver()
 bool CIrrDeviceAndroid::run()
 {
     os::Timer::tick();
+    
+    if (Android == NULL)
+        return !Close;
     
     while (!Close)
     {
@@ -372,8 +392,8 @@ void CIrrDeviceAndroid::handleAndroidCommandDirect(ANativeActivity* activity,
     switch (cmd)
     {
     case APP_CMD_RESUME:
-        os::Printer::log("Android command direct APP_CMD_RESUME", ELL_DEBUG);	
-        hideNavBar(activity);	
+        os::Printer::log("Android command direct APP_CMD_RESUME", ELL_DEBUG);   
+        hideNavBar(activity);   
         break;
     default:
         break;
@@ -684,14 +704,22 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
 
     if (event.KeyInput.Key > 0)
     {
-        getKeyChar(event);
+        if (TextInputEnabled == true)
+        {
+            event.KeyInput.Char = getUnicodeChar(androidEvent);
+        }
+        
+        if (event.KeyInput.Char == 0)
+        {
+            event.KeyInput.Char = getKeyChar(event);
+        }
     }
     
     // If button doesn't return key code, then at least use device-specific
     // scan code, because it's better than nothing
     if (event.KeyInput.Key == 0)
     {
-        event.KeyInput.Key = (EKEY_CODE)scanCode;
+        event.KeyInput.Key = (EKEY_CODE)((int)IRR_KEY_CODES_COUNT + scanCode);
     }
 
     // Handle an event when back button in pressed just like an escape key
@@ -842,7 +870,7 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             
             if (event.KeyInput.Key == 0)
             {
-                event.KeyInput.Key = (EKEY_CODE)scanCode;
+                event.KeyInput.Key = (EKEY_CODE)((int)IRR_KEY_CODES_COUNT + scanCode);
             }
             
             postEventFromUser(event);
@@ -935,14 +963,14 @@ void CIrrDeviceAndroid::createKeyMap()
     KeyMap[AKEYCODE_DEL] = IRR_KEY_BACK; 
     KeyMap[AKEYCODE_GRAVE] = IRR_KEY_OEM_3; 
     KeyMap[AKEYCODE_MINUS] = IRR_KEY_MINUS; 
-    KeyMap[AKEYCODE_EQUALS] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_LEFT_BRACKET] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_RIGHT_BRACKET] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_BACKSLASH] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_SEMICOLON] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_APOSTROPHE] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_SLASH] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_AT] = IRR_KEY_UNKNOWN; 
+    KeyMap[AKEYCODE_EQUALS] = IRR_KEY_PLUS; 
+    KeyMap[AKEYCODE_LEFT_BRACKET] = IRR_KEY_OEM_4; 
+    KeyMap[AKEYCODE_RIGHT_BRACKET] = IRR_KEY_OEM_6; 
+    KeyMap[AKEYCODE_BACKSLASH] = IRR_KEY_OEM_5; 
+    KeyMap[AKEYCODE_SEMICOLON] = IRR_KEY_OEM_1; 
+    KeyMap[AKEYCODE_APOSTROPHE] = IRR_KEY_OEM_7; 
+    KeyMap[AKEYCODE_SLASH] = IRR_KEY_OEM_2; 
+    KeyMap[AKEYCODE_AT] = IRR_KEY_2; 
     KeyMap[AKEYCODE_NUM] = IRR_KEY_UNKNOWN; 
     KeyMap[AKEYCODE_HEADSETHOOK] = IRR_KEY_UNKNOWN; 
     KeyMap[AKEYCODE_FOCUS] = IRR_KEY_UNKNOWN;
@@ -985,8 +1013,8 @@ void CIrrDeviceAndroid::createKeyMap()
     KeyMap[AKEYCODE_CTRL_RIGHT] = IRR_KEY_CONTROL; 
     KeyMap[AKEYCODE_CAPS_LOCK] = IRR_KEY_CAPITAL; 
     KeyMap[AKEYCODE_SCROLL_LOCK] = IRR_KEY_SCROLL; 
-    KeyMap[AKEYCODE_META_LEFT] = IRR_KEY_UNKNOWN; 
-    KeyMap[AKEYCODE_META_RIGHT] = IRR_KEY_UNKNOWN; 
+    KeyMap[AKEYCODE_META_LEFT] = IRR_KEY_LWIN; 
+    KeyMap[AKEYCODE_META_RIGHT] = IRR_KEY_RWIN; 
     KeyMap[AKEYCODE_FUNCTION] = IRR_KEY_UNKNOWN; 
     KeyMap[AKEYCODE_SYSRQ] = IRR_KEY_SNAPSHOT; 
     KeyMap[AKEYCODE_BREAK] = IRR_KEY_PAUSE; 
@@ -1093,59 +1121,118 @@ void CIrrDeviceAndroid::createKeyMap()
     KeyMap[AKEYCODE_MEDIA_AUDIO_TRACK] = IRR_KEY_UNKNOWN; 
 }
 
-void CIrrDeviceAndroid::getKeyChar(SEvent& event)
+wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
 {
     // Handle ASCII chars
 
-    event.KeyInput.Char = 0;
+    wchar_t key_char = 0;
 
     // A-Z
     if (event.KeyInput.SystemKeyCode > 28 && event.KeyInput.SystemKeyCode < 55)
     {
         if (event.KeyInput.Shift)
         {
-            event.KeyInput.Char = event.KeyInput.SystemKeyCode + 36;
+            key_char = event.KeyInput.SystemKeyCode + 36;
         }
         else
         {
-            event.KeyInput.Char = event.KeyInput.SystemKeyCode + 68;
+            key_char = event.KeyInput.SystemKeyCode + 68;
         }
     }
 
     // 0-9
     else if (event.KeyInput.SystemKeyCode > 6 && event.KeyInput.SystemKeyCode < 17)
     {
-        event.KeyInput.Char = event.KeyInput.SystemKeyCode + 41;
+        key_char = event.KeyInput.SystemKeyCode + 41;
     }
 
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_BACK)
     {
-        event.KeyInput.Char =  8;
+        key_char =  8;
     }
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_DEL)
     {
-        event.KeyInput.Char =  8;
+        key_char =  8;
     }
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_TAB)
     {
-        event.KeyInput.Char =  9;
+        key_char =  9;
     }
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_ENTER)
     {
-        event.KeyInput.Char =  13;
+        key_char =  13;
     }
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_SPACE)
     {
-        event.KeyInput.Char =  32;
+        key_char =  32;
     }
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_COMMA)
     {
-        event.KeyInput.Char =  44;
+        key_char =  44;
     }
     else if (event.KeyInput.SystemKeyCode == AKEYCODE_PERIOD)
     {
-        event.KeyInput.Char =  46;
+        key_char =  46;
     }
+    
+    return key_char;
+}
+
+wchar_t CIrrDeviceAndroid::getUnicodeChar(AInputEvent* event)
+{
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = Android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot get unicode character.", ELL_DEBUG);
+        return 0;
+    }
+
+    jlong down_time = AKeyEvent_getDownTime(event);
+    jlong event_time = AKeyEvent_getEventTime(event);
+    jint action = AKeyEvent_getAction(event);
+    jint code = AKeyEvent_getKeyCode(event);
+    jint repeat = AKeyEvent_getRepeatCount(event);
+    jint meta_state = AKeyEvent_getMetaState(event);
+    jint device_id = AInputEvent_getDeviceId(event);
+    jint scan_code = AKeyEvent_getScanCode(event);
+    jint flags = AKeyEvent_getFlags(event);
+    jint source = AInputEvent_getSource(event);
+
+    jclass key_event = env->FindClass("android/view/KeyEvent");
+    jmethodID key_event_constructor = env->GetMethodID(key_event, "<init>", 
+                                                       "(JJIIIIIIII)V");
+                                                       
+    jobject key_event_obj = env->NewObject(key_event, key_event_constructor, 
+                                           down_time, event_time, action, code, 
+                                           repeat, meta_state, device_id, 
+                                           scan_code, flags, source);
+
+    jmethodID get_unicode = env->GetMethodID(key_event, "getUnicodeChar", "(I)I");
+    
+    wchar_t unicode_char = env->CallIntMethod(key_event_obj, get_unicode, 
+                                              meta_state);
+
+    if (was_detached)
+    {
+        Android->activity->vm->DetachCurrentThread();
+    }
+
+    return unicode_char;
 }
 
 void CIrrDeviceAndroid::hideNavBar(ANativeActivity* activity)
@@ -1286,6 +1373,120 @@ int CIrrDeviceAndroid::getRotation()
     }
     
     return rotation;
+}
+
+void CIrrDeviceAndroid::readApplicationInfo(ANativeActivity* activity)
+{
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot get application info.", ELL_DEBUG);
+        return;
+    }
+    
+    jobject activity_obj = activity->clazz;
+    jclass activity_class = env->GetObjectClass(activity_obj);
+
+    jmethodID get_package_manager = env->GetMethodID(activity_class, 
+                                       "getPackageManager", 
+                                       "()Landroid/content/pm/PackageManager;");
+    jobject package_manager_obj = env->CallObjectMethod(activity_obj, 
+                                                        get_package_manager);
+
+    jmethodID get_intent = env->GetMethodID(activity_class, "getIntent", 
+                                            "()Landroid/content/Intent;");
+                                            
+    jobject intent_obj = env->CallObjectMethod(activity_obj, get_intent);
+    jclass intent = env->FindClass("android/content/Intent");
+    
+    jmethodID get_component = env->GetMethodID(intent, "getComponent", 
+                                           "()Landroid/content/ComponentName;");
+
+    jobject component_name = env->CallObjectMethod(intent_obj, get_component);
+
+    jclass package_manager = env->FindClass("android/content/pm/PackageManager");
+
+    jfieldID get_meta_data_field = env->GetStaticFieldID(package_manager, 
+                                                         "GET_META_DATA", "I");
+    jint get_meta_data = env->GetStaticIntField(package_manager, 
+                                                get_meta_data_field);
+
+    jmethodID get_activity_info = env->GetMethodID(package_manager, 
+                                           "getActivityInfo", 
+                                           "(Landroid/content/ComponentName;I)"
+                                           "Landroid/content/pm/ActivityInfo;");
+         
+    jobject activity_info_obj = env->CallObjectMethod(package_manager_obj, 
+                                                      get_activity_info, 
+                                                      component_name, 
+                                                      get_meta_data);
+    jclass activity_info = env->FindClass("android/content/pm/ActivityInfo");
+    
+    jfieldID application_info_field = env->GetFieldID(activity_info, 
+                                        "applicationInfo", 
+                                        "Landroid/content/pm/ApplicationInfo;");
+    jobject application_info_obj = env->GetObjectField(activity_info_obj, 
+                                                       application_info_field);
+    jclass application_info = env->FindClass("android/content/pm/ApplicationInfo");
+    
+    jfieldID native_library_dir_field = env->GetFieldID(application_info, 
+                                                        "nativeLibraryDir", 
+                                                        "Ljava/lang/String;");
+    jstring native_library_dir_str = (jstring)env->GetObjectField(
+                                                      application_info_obj, 
+                                                      native_library_dir_field);
+    const char* native_library_dir = env->GetStringUTFChars(
+                                                         native_library_dir_str, 
+                                                         NULL);
+    
+    jfieldID data_dir_field = env->GetFieldID(application_info, "dataDir", 
+                                             "Ljava/lang/String;");
+    jstring data_dir_str = (jstring)env->GetObjectField(application_info_obj, 
+                                                        data_dir_field);
+    const char* data_dir = env->GetStringUTFChars(data_dir_str, NULL);
+
+    if (native_library_dir != NULL)
+    {
+        ApplicationInfo.native_lib_dir = native_library_dir;
+    }
+        
+    if (data_dir != NULL)
+    {
+        ApplicationInfo.data_dir = data_dir;
+    }
+    
+    ApplicationInfo.initialized = true;
+    
+    if (was_detached)
+    {
+        activity->vm->DetachCurrentThread();
+    }
+}
+
+const AndroidApplicationInfo& CIrrDeviceAndroid::getApplicationInfo(
+                                                      ANativeActivity* activity)
+{
+    if (activity != NULL && ApplicationInfo.initialized == false)
+    {
+        readApplicationInfo(activity);
+    }
+    
+    return ApplicationInfo;
 }
 
 DeviceOrientation CIrrDeviceAndroid::getDefaultOrientation()

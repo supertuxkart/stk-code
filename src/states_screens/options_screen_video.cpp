@@ -250,6 +250,7 @@ void OptionsScreenVideo::init()
         // old standard resolutions
         // those are always useful for windowed mode
         bool found_1024_768 = false;
+        bool found_1280_720 = false;
 
         for (int n=0; n<amount; n++)
         {
@@ -267,6 +268,10 @@ void OptionsScreenVideo::init()
             {
                 found_1024_768 = true;
             }
+            if (r.width == 1280 && r.height == 720)
+            {
+                found_1280_720 = true;
+            }
         }
 
 #ifndef ANDROID
@@ -280,6 +285,10 @@ void OptionsScreenVideo::init()
             {
                 found_1024_768 = true;
             }
+            if (r.width == 1280 && r.height == 720)
+            {
+                found_1280_720 = true;
+            }
         } // next found resolution
 
         // Add default resolutions that were not found by irrlicht
@@ -287,6 +296,13 @@ void OptionsScreenVideo::init()
         {
             r.width  = 1024;
             r.height = 768;
+            resolutions.push_back(r);
+        }
+
+        if (!found_1280_720)
+        {
+            r.width  = 1280;
+            r.height = 720;
             resolutions.push_back(r);
         }
 #endif
@@ -601,4 +617,3 @@ void OptionsScreenVideo::unloaded()
 }   // unloaded
 
 // ----------------------------------------------------------------------------
-
