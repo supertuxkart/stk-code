@@ -66,7 +66,7 @@ public:
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void collectedItem(const AbstractKart *kart,
-                               const Item *item           ) OVERRIDE;
+                               const ItemState *item     ) OVERRIDE;
     void collectedEasterEggGhost(int world_id);
 
     const int  numberOfEggsFound() { return m_eggs_found; }

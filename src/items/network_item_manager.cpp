@@ -95,7 +95,7 @@ void NetworkItemManager::initClientConfirmState()
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
+void NetworkItemManager::collectedItem(ItemState *item, AbstractKart *kart)
 {
     if(NetworkConfig::get()->isServer())
     {
@@ -142,7 +142,7 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
                                          kart->getXYZ() );
     m_item_events.unlock();
     return item;
-}   // newItem
+}   // dropNewItem
 
 // ----------------------------------------------------------------------------
 /** Called by the GameProtocol when a confirmation for an item event is
@@ -237,9 +237,9 @@ void NetworkItemManager::forwardTime(int ticks)
 
 //-----------------------------------------------------------------------------
 /** Restores the state of the items to the current world time. It takes the
- *  last saved
-
- *  using exactly 'count' bytes of the message.
+ *  last saved confirmed state, applies any updates from the server, and
+ *  then syncs up the confirmed state to the in-race items.
+ *  It uses exactly 'count' bytes of the message.
  *  \param buffer the state content.
  *  \param count Number of bytes used for this state.
  */
@@ -299,13 +299,14 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         // Forward the saved state:
         if (dt>0) forwardTime(dt);
 
-        // TODO: apply the various events types, atm only collection is supported:
+        // TODO: apply the various events types, atm only collection
+        // and new items are supported.
         if(iei.isItemCollection())
         {
             int index = iei.getIndex();
             // An item on the track was collected:
             AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
-            m_confirmed_state[index]->collected(kart);
+            collectedItem(m_confirmed_state[index], kart);
             if (m_confirmed_state[index]->isUsedUp())
             {
                 delete m_confirmed_state[index];
@@ -327,7 +328,10 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                 if (m_confirmed_state[is->getItemId()] == NULL)
                     m_confirmed_state[is->getItemId()] = is;
                 else
+                {
                     *m_confirmed_state[is->getItemId()] = *is;
+                    delete is;
+                }
             }
         }
         current_time = iei.getTicks();
@@ -351,7 +355,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     for(unsigned int i=0; i<m_confirmed_state.size(); i++)
     {
-        Item *item = m_all_items[i];
+        Item *item = i < m_all_items.size() ?  m_all_items[i] : NULL;
         const ItemState *is = m_confirmed_state[i];
         if (is && item)
             *(ItemState*)item = *is;
@@ -360,10 +364,21 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             Vec3 xyz = is->getXYZ();
             Item *item_new = dropNewItem(is->getType(), is->getPreviousOwner(),
                                          &xyz);
+            if (i != item_new->getItemId())
+            {
+                // The server has this item at a different index in the list
+                // of all items, which means the client has an incorrect
+                // item at the index given by the server - delete that item
+                Log::info("nim", "about to delete item with not matching index i %d item %d",
+                    i, item_new->getItemId());
+                if(m_all_items[i])
+                    deleteItem(m_all_items[i]);
+                m_all_items[item_new->getItemId()] = NULL;
+                m_all_items[i] = item_new;
+                item_new->setItemId(i);
+            }
             item_new->setPredicted(false);
-            item_new->setItemId(i);
             item_new->setDeactivatedTicks(is->getDeactivatedTicks());
-            m_all_items[i] = item_new;
             *((ItemState*)m_all_items[i]) = *is;
         }
         else if (!is && item)

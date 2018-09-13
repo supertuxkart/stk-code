@@ -159,7 +159,8 @@ const std::string& EasterEggHunt::getIdent() const
 /** Called when a kart has collected an egg.
  *  \param kart The kart that collected an egg.
  */
-void EasterEggHunt::collectedItem(const AbstractKart *kart, const Item *item)
+void EasterEggHunt::collectedItem(const AbstractKart *kart,
+                                  const ItemState *item    )
 {
     if(item->getType() != ItemState::ITEM_EASTER_EGG) return;
 
