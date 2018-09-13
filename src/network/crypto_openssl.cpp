@@ -104,21 +104,22 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
         return false;
 
     int dlen;
-    if (EVP_DecryptUpdate(m_decrypt, pt.data(), &dlen, ns.m_buffer.data() + 4,
-        (int)(ns.m_buffer.size() - 4)) != 1)
-        return false;
     if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, 4,
         ns.m_buffer.data()))
         return false;
 
-    if (!(EVP_DecryptFinal_ex(m_decrypt, pt.data() + dlen, &dlen) > 0))
+    if (EVP_DecryptUpdate(m_decrypt, pt.data(), &dlen, ns.m_buffer.data() + 4,
+        (int)(ns.m_buffer.size() - 4)) != 1)
+        return false;
+
+    if (EVP_DecryptFinal_ex(m_decrypt, pt.data() + dlen, &dlen) > 0)
     {
         assert(dlen == 0);
-        return false;
+        std::swap(ns.m_buffer, pt);
+        return true;
     }
 
-    std::swap(ns.m_buffer, pt);
-    return true;
+    return false;
 }   // decryptConnectionRequest
 
 // ----------------------------------------------------------------------------
@@ -183,6 +184,10 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     {
         throw std::runtime_error("Failed to set IV.");
     }
+    if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, 4, tag))
+    {
+        throw std::runtime_error("Failed to set tag.");
+    }
 
     int dlen;
     if (EVP_DecryptUpdate(m_decrypt, ns->m_buffer.data(), &dlen,
@@ -190,11 +195,7 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     {
         throw std::runtime_error("Failed to decrypt.");
     }
-    if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, 4, tag))
-    {
-        throw std::runtime_error("Failed to set tag.");
-    }
-    if (EVP_DecryptFinal_ex(m_decrypt, ns->m_buffer.data(), &dlen) > 0)
+    if (EVP_DecryptFinal_ex(m_decrypt, ns->m_buffer.data() + dlen, &dlen) > 0)
     {
         assert(dlen == 0);
         NetworkString* result = ns.get();
