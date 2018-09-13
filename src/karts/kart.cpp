@@ -64,6 +64,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/overworld.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
@@ -3136,6 +3137,9 @@ btQuaternion Kart::getVisualRotation() const
 void Kart::setOnScreenText(const wchar_t *text)
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+        
     BoldFace* bold_face = font_manager->getFont<BoldFace>();
     core::dimension2d<u32> textsize = bold_face->getDimension(text);
 
