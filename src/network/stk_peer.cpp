@@ -41,6 +41,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_validated.store(false);
     m_average_ping.store(0);
     m_waiting_for_game.store(true);
+    m_disconnected.store(false);
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
@@ -55,6 +56,7 @@ void STKPeer::disconnect()
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
+    m_disconnected.store(true);
     m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT);
 }   // disconnect
 
@@ -67,6 +69,7 @@ void STKPeer::kick()
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
+    m_disconnected.store(true);
     m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT);
 }   // kick
 
@@ -79,6 +82,7 @@ void STKPeer::reset()
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
+    m_disconnected.store(true);
     m_host->addEnetCommand(m_enet_peer, NULL, 0, ECT_RESET);
 }   // reset
 

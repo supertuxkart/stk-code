@@ -67,6 +67,8 @@ protected:
     /** True if this peer is waiting for game. */
     std::atomic_bool m_waiting_for_game;
 
+    std::atomic_bool m_disconnected;
+
     /** Host id of this peer. */
     uint32_t m_host_id;
 
@@ -177,7 +179,8 @@ public:
     void setWaitingForGame(bool val)         { m_waiting_for_game.store(val); }
     // ------------------------------------------------------------------------
     bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
-
+    // ------------------------------------------------------------------------
+    bool isDisconnected() const               { return m_disconnected.load(); }
 };   // STKPeer
 
 #endif // STK_PEER_HPP
