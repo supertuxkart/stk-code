@@ -99,6 +99,8 @@ private:
     /** Directory where user-defined grand prix are stored. */
     std::string       m_gp_dir;
 
+    std::string       m_cert_location;
+
     std::vector<TextureSearchPath> m_texture_search_path;
 
     std::vector<std::string>
@@ -225,6 +227,7 @@ public:
     {
         return m_subdir_name[SHADER];
     }
+    const std::string& getCertLocation() const { return m_cert_location; }
 };   // FileManager
 
 extern FileManager* file_manager;
