@@ -442,6 +442,7 @@ void ProtocolManager::update(int ticks)
         {
             Log::error("ProtocolManager", "Synchronous event error: %s",
                 e.what());
+            Log::error("ProtocolManager", (*i)->data().getLogMessage().c_str());
         }
         m_sync_events_to_process.lock();
         if (can_be_deleted)
@@ -497,6 +498,8 @@ void ProtocolManager::asynchronousUpdate()
         {
             Log::error("ProtocolManager", "Asynchronous event error: %s",
                 e.what());
+            Log::error("ProtocolManager",
+                (*i)->data().getLogMessage().c_str());
         }
         m_all_protocols[(*i)->getType()].unlock();
 
