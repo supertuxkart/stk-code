@@ -39,10 +39,10 @@ class SoccerSetupScreen : public GUIEngine::Screen,
         GUIEngine::ModelViewWidget* view;
         bool                        confirmed;
         bool                        support_colorization;
-        SoccerTeam                  team;
+        KartTeam                  team;
 
         KartViewInfo() : view(), confirmed(false), support_colorization(false),
-                         team(SOCCER_TEAM_NONE) {}
+                         team(KART_TEAM_NONE) {}
     };
 
     AlignedArray<KartViewInfo>  m_kart_view_info;
@@ -82,7 +82,7 @@ private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();
     void updateKartViewsLayout();
-    void changeTeam(int player_id, SoccerTeam team);
+    void changeTeam(int player_id, KartTeam team);
     void prepareGame();
 };
 

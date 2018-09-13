@@ -37,11 +37,12 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
+#include <array>
 #include <iterator>
 #include <string>
 #include <map>
 #include <vector>
-#include <fstream>
+#include <sstream>
 
 #include <irrString.h>
 using irr::core::stringc;
@@ -69,8 +70,8 @@ protected:
     std::string m_comment;
 public:
     virtual     ~UserConfigParam();
-    virtual void write(std::ofstream & stream) const = 0;
-    virtual void writeInner(std::ofstream & stream, int level = 0) const;
+    virtual void write(std::stringstream & stream) const = 0;
+    virtual void writeInner(std::stringstream & stream, int level = 0) const;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
     virtual irr::core::stringc toString() const = 0;
@@ -86,8 +87,8 @@ public:
     GroupUserConfigParam(const char* param_name,
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
-    void write(std::ofstream& stream) const;
-    void writeInner(std::ofstream& stream, int level = 0) const;
+    void write(std::stringstream& stream) const;
+    void writeInner(std::stringstream& stream, int level = 0) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -99,26 +100,36 @@ public:
 };   // GroupUserConfigParam
 
 // ============================================================================
+/** ATM only map with 1 key and 1 value is supported
+ */
 template<typename T, typename U>
 class MapUserConfigParam : public UserConfigParam
 {
+protected:
+    std::array<std::string, 3> m_key_names;
     std::map<T, U> m_elements;
+    MapUserConfigParam(const char* param_name,
+                       const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
     MapUserConfigParam(const char* param_name,
-        const char* comment = NULL);
-    MapUserConfigParam(const char* param_name,
         const char* comment,
+        std::array<std::string, 3> key_names,
         std::map<T, U> default_value);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
         const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
-        const char* comment,
+        const char* comment, std::array<std::string, 3> key_names,
         std::map<T, U> default_value);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -152,14 +163,25 @@ public:
     {
         return m_elements[key];
     }
+    U& at(const T key)
+    {
+        return m_elements.at(key);
+    }
 };   // MapUserConfigParam
 typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
 typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
+protected:
     int m_value;
     int m_default_value;
+    IntUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
 
@@ -169,7 +191,7 @@ public:
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -196,7 +218,7 @@ public:
     TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         GroupUserConfigParam* group, const char* comment=NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -212,18 +234,25 @@ public:
 // ============================================================================
 class StringUserConfigParam : public UserConfigParam
 {
+protected:
     std::string m_value;
     std::string m_default_value;
+    StringUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
 
     StringUserConfigParam(const char* default_value, const char* param_name,
-                          const char* comment = NULL);
+                          const char* comment);
     StringUserConfigParam(const char* default_value, const char* param_name,
                           GroupUserConfigParam* group,
                           const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -245,8 +274,15 @@ public:
 // ============================================================================
 class BoolUserConfigParam : public UserConfigParam
 {
+protected:
     bool m_value;
     bool m_default_value;
+    BoolUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
     BoolUserConfigParam(bool default_value, const char* param_name,
@@ -254,7 +290,7 @@ public:
     BoolUserConfigParam(bool default_value, const char* param_name,
                         GroupUserConfigParam* group,
                         const char* comment = NULL);
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -270,8 +306,15 @@ public:
 // ============================================================================
 class FloatUserConfigParam : public UserConfigParam
 {
+protected:
     float m_value;
     float m_default_value;
+    FloatUserConfigParam(const char* param_name, const char* comment)
+    {
+        m_param_name = param_name;
+        if (comment != NULL)
+            m_comment = comment;
+    }
 
 public:
     FloatUserConfigParam(float default_value, const char* param_name,
@@ -280,7 +323,7 @@ public:
                          GroupUserConfigParam* group,
                          const char* comment = NULL);
 
-    void write(std::ofstream& stream) const;
+    void write(std::stringstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -373,6 +416,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
             &m_race_setup_group, "Enable time limit in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam         m_random_arena_item
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "random-arena-item",
+            &m_race_setup_group, "Enable random location of items in an arena.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -461,15 +507,16 @@ namespace UserConfigParams
             "A parameter that determines general accelerometer sensitivity."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
-            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
+            PARAM_DEFAULT( FloatUserConfigParam(1.2f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
 
-    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
-            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+    PARAM_PREFIX IntUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_mode",
             &m_multitouch_group,
-            "Enable screen keyboard.") );
+            "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
+            "keyboard, 2 = always enabled") );
             
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
@@ -582,7 +629,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
-                        
+
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",
@@ -638,9 +685,6 @@ namespace UserConfigParams
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
-    /** If random number of items is used in an arena. */
-    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
-
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
@@ -671,6 +715,8 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
+    
+    PARAM_PREFIX bool m_enable_sound PARAM_DEFAULT( true );
 
     /** True to test funky ambient/diffuse/specularity in RGB &
      *  all anisotropic */
@@ -679,26 +725,25 @@ namespace UserConfigParams
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
-    /** How many seconds worth of data the circular profile buffer
-     *  can store. */
-    PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
-
     // ---- Networking
-    PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
-        "The stun servers that will be used to know the public address,"
-        " LHS: server address, RHS: ping time.",
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers",
+        "The stun servers that will be used to know the public address with"
+        " port", {{ "stun-server", "address", "ping" }},
             {
-                { "numb.viagenie.ca", 0u },
-                { "stun.12connect.com", 0u },
-                { "stun.callwithus.com", 0u },
-                { "stun.cope.es", 0u },
-                { "stun.counterpath.net", 0u },
-                { "stun.ekiga.net", 0u },
-                { "stun.ivao.aero", 0u },
-                { "stun.schlund.de", 0u },
-                { "stun.stunprotocol.org", 0u },
-                { "stun.voip.aebc.com", 0u }
+                { "stun.12connect.com:3478", 0u },
+                { "stun.callwithus.com:3478", 0u },
+                { "stun.cope.es:3478", 0u },
+                { "stun.counterpath.net:3478", 0u },
+                { "stun.ekiga.net:3478", 0u },
+                { "stun.ivao.aero:3478", 0u },
+                { "stun.schlund.de:3478", 0u },
+                { "stun.stunprotocol.org:3478", 0u },
+                { "stun.l.google.com:19302", 0u },
+                { "stun1.l.google.com:19302", 0u },
+                { "stun2.l.google.com:19302", 0u },
+                { "stun3.l.google.com:19302", 0u },
+                { "stun4.l.google.com:19302", 0u }
             }
         ));
 
@@ -707,48 +752,31 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_log_packets
         PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
         &m_network_group, "If all network packets should be logged"));
-    PARAM_PREFIX BoolUserConfigParam m_random_ports
-        PARAM_DEFAULT(BoolUserConfigParam(true, "random-ports",
-        &m_network_group, "Use random ports for client and server connection"));
+    PARAM_PREFIX BoolUserConfigParam m_random_client_port
+        PARAM_DEFAULT(BoolUserConfigParam(true, "random-client-port",
+        &m_network_group, "Use random port for client connection "
+        "(check stk_config.xml for default value)"));
+    PARAM_PREFIX BoolUserConfigParam m_random_server_port
+        PARAM_DEFAULT(BoolUserConfigParam(false, "random-server-port",
+        &m_network_group, "Use random port for server connection "
+        "(check stk_config.xml for default value)"));
     PARAM_PREFIX BoolUserConfigParam m_lobby_chat
         PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
-    PARAM_PREFIX FloatUserConfigParam m_voting_timeout
-        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "voting-timeout",
-        &m_network_group, "Timeout in seconds for voting tracks in server."));
-    PARAM_PREFIX FloatUserConfigParam m_validation_timeout
-        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "validation-timeout",
-        &m_network_group, "Timeout in seconds for validation of clients."));
-    PARAM_PREFIX IntUserConfigParam m_server_max_players
-        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
-        &m_network_group, "Maximum number of players on the server."));
-    PARAM_PREFIX BoolUserConfigParam m_firewalled_server
-        PARAM_DEFAULT(BoolUserConfigParam(true, "firewalled-server",
-        &m_network_group, "Disable it to turn off all stun related code "
-        "in server, for official server hosting use only."));
-    PARAM_PREFIX FloatUserConfigParam m_start_game_counter
-        PARAM_DEFAULT(FloatUserConfigParam(30.0f, "start-game-counter",
-        &m_network_group, "Time to wait before entering kart selection screen "
-        "if satisfied start-game-threshold below for owner less or ranked "
-        "server."));
-    PARAM_PREFIX FloatUserConfigParam m_start_game_threshold
-        PARAM_DEFAULT(FloatUserConfigParam(0.7f, "start-game-threshold",
-        &m_network_group, "Only auto start kart selection when number of "
-        "connected player is larger than max player * this value, for "
-        "owner less or ranked server, after start-game-counter."));
-
-    PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
-        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
-            "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
-            "from this IP will be banned.",
-            { { "0.0.0.0", 0u } }
-        ));
+    PARAM_PREFIX IntUserConfigParam m_max_players
+        PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
+        &m_network_group, "Maximum number of players on the server "
+        "(for gui server creation."));
+     PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
+        PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
+        &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
-        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("num-karts-per-gamemode",
             "The Number of karts per gamemode.",
+            {{ "gamemode-list", "gamemode", "num-karts" }},
             {
                 { 0u, 4u },
                 { 1002u, 5u },

@@ -19,7 +19,6 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
-#include <atomic>
 
 class SFXBase;
 
@@ -107,23 +106,14 @@ private:
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
 
-    /** In networked game the world clock might be adjusted (without the
-     *  player noticing), e.g. if a client causes rewinds in the server,
-     *  that client needs to speed up to be further ahead of the server
-     *  or slow down if time in client goes too far from server time
-     *  to reduce the number of rollbacks. This is the amount of time
-     *  by which the client's clock needs to be adjusted (positive or 
-     *  negative). */
-    std::atomic<int> m_adjust_time_by;
-
     /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
 protected:
     bool            m_play_track_intro_sound;
     bool            m_play_ready_set_go_sounds;
+    Phase           m_phase;
 
 private:
-    Phase           m_phase;
 
     /**
       * Remember previous phase e.g. on pause
@@ -141,11 +131,6 @@ private:
     int             m_count_up_ticks;
 
     bool            m_engines_started;
-    /** In networked game a client must wait for the server to start 'ready
-    *  set go' to make sure all client are actually ready to start the game.
-    *  A server on the other hand will run behind all clients, so it will
-    *  wait for all clients to indicate that they have started the race. */
-    std::atomic_bool m_server_is_ready;
 
     void startEngines();
 
@@ -163,14 +148,16 @@ public:
     virtual void terminateRace();
     void         setTime(const float time);
     void         setTicks(int ticks);
-    float        adjustDT(float dt);
-
+    void         setTicksForRewind(int ticks);
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
     bool     isStartPhase() const  { return m_phase<GO_PHASE;               }
     // ------------------------------------------------------------------------
     bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
                                             m_phase<FINISH_PHASE;           }
+    // ------------------------------------------------------------------------
+    bool     isActiveRacePhase() const { return m_phase>=GO_PHASE &&
+                                                m_phase<DELAY_FINISH_PHASE; }
     // ------------------------------------------------------------------------
     /** While the race menu is being displayed, m_phase is limbo, and
      *  m_previous_phase is finish. So we have to test this case, too.  */
@@ -217,12 +204,6 @@ public:
     // ------------------------------------------------------------------------
     /** Get the ticks since start regardless of which way the clock counts */
     int getTicksSinceStart() const { return m_count_up_ticks; }
-    // ------------------------------------------------------------------------
-    void setReadyToRace() { m_server_is_ready.store(true); }
-    // ------------------------------------------------------------------------
-    /** Sets a time by which the clock should be adjusted. Used by networking
-     *  if too many rewinds are detected. */
-    void setAdjustTime(int t) { m_adjust_time_by.fetch_add(t); }
 };   // WorldStatus
 
 

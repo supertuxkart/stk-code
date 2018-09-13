@@ -216,9 +216,10 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         //StateManager::get()->resetActivePlayers();
 
         // Use latest used device
+#ifdef DEBUG
         InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         assert(device != NULL);
-
+#endif
         // Set up race manager appropriately
         race_manager->setNumPlayers(1);
         race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);

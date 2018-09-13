@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 
 #include "audio/sfx_openal.hpp"
 
@@ -544,4 +544,4 @@ void SFXOpenAL::setRolloff(float rolloff)
 
 //-----------------------------------------------------------------------------
 
-#endif //if HAVE_OGGVORBIS
+#endif //ifdef ENABLE_SOUND

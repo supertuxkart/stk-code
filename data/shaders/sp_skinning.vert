@@ -1,4 +1,4 @@
-#ifdef GL_ES
+#ifdef TBO_DISABLED
 uniform sampler2D skinning_tex;
 #else
 uniform samplerBuffer skinning_tex;
@@ -37,6 +37,8 @@ out vec3 normal;
 out vec2 uv;
 out vec2 uv_two;
 out vec4 color;
+out vec4 world_position;
+
 out float camdist;
 out float hue_change;
 
@@ -56,7 +58,7 @@ void main()
     vec4 skinned_tangent = vec4(0.0);
     int skinning_offset = i_misc_data.x;
 
-#ifdef GL_ES
+#ifdef TBO_DISABLED
     mat4 joint_matrix =
         i_weight[0] * mat4(
         texelFetch(skinning_tex, ivec2(0, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES)), 0),
@@ -106,7 +108,7 @@ void main()
     skinned_normal = joint_matrix * idle_normal;
     skinned_tangent = joint_matrix * idle_tangent;
 
-    vec4 world_position = getWorldPosition(i_origin, i_rotation, i_scale.xyz,
+    vec4 v_world_position = getWorldPosition(i_origin, i_rotation, i_scale.xyz,
         skinned_position.xyz);
     vec3 world_normal = rotateVector(i_rotation, skinned_normal.xyz);
     vec3 world_tangent = rotateVector(i_rotation, skinned_tangent.xyz);
@@ -123,7 +125,8 @@ void main()
     uv_two = i_uv_two;
 
     color = i_color.zyxw;
-    camdist = length(u_view_matrix * world_position);
+    camdist = length(u_view_matrix * v_world_position);
     hue_change = float(i_misc_data.y) * 0.01;
-    gl_Position = u_projection_view_matrix * world_position;
+    gl_Position = u_projection_view_matrix * v_world_position;
+    world_position = v_world_position;
 }

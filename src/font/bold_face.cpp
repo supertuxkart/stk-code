@@ -59,7 +59,9 @@ void BoldFace::reset()
 /** Embolden the glyph to make bold font using FT_Outline_Embolden.
  *  \return A FT_Error value.
  */
+#ifndef SERVER_ONLY
 int BoldFace::shapeOutline(FT_Outline* outline) const
 {
     return FT_Outline_Embolden(outline, getDPI() * 2);
 }   // shapeOutline
+#endif

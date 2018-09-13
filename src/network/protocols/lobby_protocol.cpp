@@ -28,7 +28,6 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
-#include "network/rewind_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -46,6 +45,7 @@ LobbyProtocol::~LobbyProtocol()
     if (RaceEventManager::getInstance())
         RaceEventManager::getInstance()->stop();
     delete m_game_setup;
+    joinStartGameThread();
 }   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
@@ -59,8 +59,6 @@ LobbyProtocol::~LobbyProtocol()
 void LobbyProtocol::loadWorld()
 {
     Log::info("LobbyProtocol", "Ready !");
-    RewindManager::setEnable(true);
-
     // Race startup sequence
     // ---------------------
     // This creates the network world.
@@ -124,6 +122,8 @@ void LobbyProtocol::configRemoteKart(
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         rki.setOnlineId(profile->getOnlineId());
+        if (race_manager->teamEnabled())
+            rki.setKartTeam(profile->getTeam());
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players

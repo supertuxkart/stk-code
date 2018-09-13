@@ -26,6 +26,7 @@
 
 #include <atomic>
 #include <irrString.h>
+#include <map>
 #include <string>
 
 namespace Online
@@ -101,7 +102,7 @@ private:
 
     bool                            m_has_fetched_achievements;
     std::vector<uint32_t>           m_achievements;
-
+    std::map<uint32_t, core::stringw> m_friend_server_map;
     bool                            m_cache_bit;
 
     void storeFriends(const XMLNode * input);
@@ -121,7 +122,9 @@ public:
     void deleteRelationalInfo();
     const IDList&   getAchievements();
     void merge(OnlineProfile * profile);
-
+    // ------------------------------------------------------------------------
+    std::map<uint32_t, core::stringw>& getFriendServerMap()
+                                                { return m_friend_server_map; }
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */
     bool hasFetchedAchievements() const  { return m_has_fetched_achievements; }

@@ -23,6 +23,7 @@
 #include "font/digit_face.hpp"
 #include "font/face_ttf.hpp"
 #include "font/regular_face.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -32,7 +33,13 @@ FontManager *font_manager = NULL;
  */
 FontManager::FontManager()
 {
+#ifndef SERVER_ONLY
+    m_ft_library = NULL;
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     checkFTError(FT_Init_FreeType(&m_ft_library), "loading freetype library");
+#endif
 }   // FontManager
 
 // ----------------------------------------------------------------------------
@@ -49,8 +56,12 @@ FontManager::~FontManager()
     delete m_digit_ttf;
     m_digit_ttf = NULL;
 
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     checkFTError(FT_Done_FreeType(m_ft_library), "removing freetype library");
-    m_ft_library = NULL;
+#endif
 }   // ~FontManager
 
 // ----------------------------------------------------------------------------
@@ -87,6 +98,7 @@ void FontManager::loadFonts()
  */
 void FontManager::unitTesting()
 {
+#ifndef SERVER_ONLY
     std::vector<std::string> list = *(translations->getLanguageList());
     const int cur_log_level = Log::getLogLevel();
     for (const std::string& lang : list)
@@ -134,5 +146,5 @@ void FontManager::unitTesting()
             }
         }
     }
-
+#endif
 }   // unitTesting

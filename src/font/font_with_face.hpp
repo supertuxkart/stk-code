@@ -29,9 +29,11 @@
 #include <set>
 #include <string>
 
+#ifndef SERVER_ONLY
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
+#endif
 
 #include <irrlicht.h>
 
@@ -261,10 +263,12 @@ private:
     /** Override it if sub-class has bold outline. */
     virtual bool isBold() const                               { return false; }
     // ------------------------------------------------------------------------
+#ifndef SERVER_ONLY
     /** Override it if any outline shaping is needed to be done before
      *  rendering the glyph into bitmap.
      *  \return A FT_Error value if needed. */
     virtual int shapeOutline(FT_Outline* outline) const           { return 0; }
+#endif
 
 public:
     LEAK_CHECK()

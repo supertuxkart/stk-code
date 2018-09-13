@@ -1,0 +1,8 @@
+brew "libogg"
+brew "libvorbis"
+brew "openal-soft"
+brew "freetype"
+brew "curl"
+brew "openssl@1.1"
+brew "fribidi"
+brew "glew"

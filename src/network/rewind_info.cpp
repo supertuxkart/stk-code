@@ -19,8 +19,9 @@
 #include "network/rewind_info.hpp"
 
 #include "network/network_config.hpp"
+#include "network/rewinder.hpp"
 #include "network/rewind_manager.hpp"
-#include "physics/physics.hpp"
+#include "items/projectile_manager.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
  *  for all state info.
@@ -45,10 +46,25 @@ void RewindInfo::setTicks(int ticks)
 }   // setTicks
 
 // ============================================================================
-RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
-                                 bool is_confirmed)
-    : RewindInfo(ticks, is_confirmed)
+RewindInfoState::RewindInfoState(int ticks, int start_offset,
+                                 std::vector<std::string>& rewinder_using,
+                                 std::vector<uint8_t>& buffer)
+               : RewindInfo(ticks, true/*is_confirmed*/)
 {
+    std::swap(m_rewinder_using, rewinder_using);
+    m_start_offset = start_offset;
+    m_buffer = new BareNetworkString();
+    std::swap(m_buffer->getBuffer(), buffer);
+}   // RewindInfoState
+
+// ------------------------------------------------------------------------
+/** Constructor used only in unit testing (without list of rewinder using).
+ */
+RewindInfoState::RewindInfoState(int ticks, BareNetworkString* buffer,
+                                 bool is_confirmed)
+               : RewindInfo(ticks, is_confirmed)
+{
+    m_start_offset = 0;
     m_buffer = buffer;
 }   // RewindInfoState
 
@@ -59,8 +75,50 @@ RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
  */
 void RewindInfoState::restore()
 {
-    RewindManager::get()->restoreState(m_buffer);
-}   // rewind
+    m_buffer->reset();
+    m_buffer->skip(m_start_offset);
+    for (const std::string& name : m_rewinder_using)
+    {
+        const uint16_t data_size = m_buffer->getUInt16();
+        const unsigned current_offset_now = m_buffer->getCurrentOffset();
+        std::shared_ptr<Rewinder> r =
+            RewindManager::get()->getRewinder(name);
+
+        if (!r)
+        {
+            // For now we only need to get missing rewinder from
+            // projectile_manager
+            r = projectile_manager->addRewinderFromNetworkState(name);
+        }
+        if (!r)
+        {
+            Log::error("RewindInfoState", "Missing rewinder %s",
+                name.c_str());
+            m_buffer->skip(data_size);
+            continue;
+        }
+        try
+        {
+            r->restoreState(m_buffer, data_size);
+        }
+        catch (std::exception& e)
+        {
+            Log::error("RewindInfoState", "Restore state error: %s",
+                e.what());
+            m_buffer->reset();
+            m_buffer->skip(current_offset_now + data_size);
+            continue;
+        }
+
+        if (m_buffer->getCurrentOffset() - current_offset_now != data_size)
+        {
+            Log::error("RewindInfoState", "Wrong size read when restore "
+                "state, incompatible binary?");
+            m_buffer->reset();
+            m_buffer->skip(current_offset_now + data_size);
+        }
+    }   // for all rewinder
+}   // restore
 
 // ============================================================================
 RewindInfoEvent::RewindInfoEvent(int ticks, EventRewinder *event_rewinder,

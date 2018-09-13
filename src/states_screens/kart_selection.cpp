@@ -738,11 +738,6 @@ void KartSelectionScreen::playerConfirm(const int player_id)
         return;
     }
 
-    if (player_id == PLAYER_ID_GAME_MASTER)
-    {
-        UserConfigParams::m_default_kart = selection;
-    }
-
     if (m_kart_widgets[player_id].getKartInternalName().size() == 0 ||
         m_kart_widgets[player_id].getKartInternalName() == RibbonWidget::NO_ITEM_ID)
     {
@@ -835,6 +830,11 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
         w->setValues(kp, m_kart_widgets[widget_id].getDifficulty());
         w->update(0);
     }
+    else
+    {
+        w->hideAll();
+        w->update(0);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -859,7 +859,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
         w3->addModel(model, model_location);
         w3->update(0);
         m_kart_widgets[widget_id].m_kart_name
-        ->setText( _("Random Kart"), false );
+            ->setText( _("Random Kart"), false );
     }
     // selection contains the name of the kart, so check only for substr
     else if (StringUtils::startsWith(selection, ID_LOCKED) && !m_multiplayer)
@@ -1244,6 +1244,11 @@ void KartSelectionScreen::allPlayersDone()
                     break;
                 }
             }
+        }
+        
+        if (n == PLAYER_ID_GAME_MASTER)
+        {
+            UserConfigParams::m_default_kart = selected_kart;
         }
 
         race_manager->setPlayerKart(n, selected_kart);

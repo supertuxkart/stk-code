@@ -28,12 +28,11 @@
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
 History* history = 0;
-
+bool History::m_online_history_replay = false;
 //-----------------------------------------------------------------------------
 /** Initialises the history object and sets the mode to none.
  */
@@ -80,7 +79,7 @@ void History::addEvent(int kart_id, PlayerAction pa, int value)
     InputEvent ie;
     // The event is added before m_current is increased. So in order to
     // save the right index for this event, we need to use m_current+1.
-    ie.m_world_ticks = World::getWorld()->getTimeTicks();
+    ie.m_world_ticks = World::getWorld()->getTicksSinceStart();
     ie.m_action      = pa;
     ie.m_value       = value;
     ie.m_kart_index  = kart_id;
@@ -102,7 +101,7 @@ void History::updateReplay(int world_ticks)
         const InputEvent &ie = m_all_input_events[m_event_index];
         AbstractKart *kart = world->getKart(ie.m_kart_index);
         Log::verbose("history", "time %d event-time %d action %d %d",
-            world->getTimeTicks(), ie.m_world_ticks, ie.m_action,
+            world->getTicksSinceStart(), ie.m_world_ticks, ie.m_action,
             ie.m_value);
         kart->getController()->action(ie.m_action, ie.m_value);
         m_event_index++;
@@ -168,7 +167,7 @@ void History::Save()
     {
         fprintf(fd, "model %d: %s\n",k, world->getKart(k)->getIdent().c_str());
     }
-    fprintf(fd, "count:     %d\n", m_all_input_events.size());
+    fprintf(fd, "count:     %zu\n", m_all_input_events.size());
 
     for (unsigned int i = 0; i < m_all_input_events.size(); i++)
     {
@@ -272,7 +271,7 @@ void History::Load()
         if(sscanf(s, "model %d: %1023s",&n, s1) != 2)
             Log::fatal("History", "No model information for kart %d found.", i);
         m_kart_ident.push_back(s1);
-        if(i<race_manager->getNumPlayers() && !MainMenuScreen::m_enable_online)
+        if(i<race_manager->getNumPlayers() && !m_online_history_replay)
         {
             race_manager->setPlayerKart(i, s1);
         }
@@ -296,11 +295,13 @@ void History::Load()
     {
         fgets(s, 1023, fd);
         InputEvent &ie = m_all_input_events[i];
+        int action = 0;
         if (sscanf(s, "%d %d %d %d\n", &ie.m_world_ticks, &ie.m_kart_index,
-                   &ie.m_action, &ie.m_value) != 4                          )
+            &action, &ie.m_value) != 4)
         {
             Log::warn("History", "Problems reading event: '%s'", s);
         }
+        ie.m_action = (PlayerAction)action;
     }   // for i
     RewindManager::setEnable(rewind_manager_was_enabled);
 

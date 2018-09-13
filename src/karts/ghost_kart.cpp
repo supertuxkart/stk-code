@@ -47,6 +47,7 @@ void GhostKart::reset()
     Kart::reset();
     // This will set the correct start position
     update(0);
+    updateGraphics(0);
     m_last_egg_idx = 0;
 }   // reset
 
@@ -89,7 +90,10 @@ void GhostKart::updateGraphics(float dt)
 
     // Don't call Kart's updateGraphics, since it assumes physics. Instead
     // immediately call Moveable's updateGraphics.
-    Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
+    Moveable::updateSmoothedGraphics(dt);
+    Moveable::updateGraphics(center_shift, btQuaternion(0, 0, 0, 1));
+    // Also update attachment's graphics
+    m_attachment->updateGraphics(dt);
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
@@ -148,15 +152,15 @@ void GhostKart::update(int ticks)
 
     Attachment::AttachmentType attach_type =
         ReplayRecorder::codeToEnumAttach(m_all_bonus_info[idx].m_attachment);
-    int attach_ticks = 0;
+    int16_t attach_ticks = 0;
     if (attach_type == Attachment::ATTACH_BUBBLEGUM_SHIELD)
-        attach_ticks = stk_config->time2Ticks(10);
+        attach_ticks = (int16_t)stk_config->time2Ticks(10);
     else if (attach_type == Attachment::ATTACH_BOMB)
-        attach_ticks = stk_config->time2Ticks(30);
+        attach_ticks = (int16_t)stk_config->time2Ticks(30);
     // The replay history will take care of clearing,
     // just make sure it won't expire by itself
     else
-        attach_ticks = stk_config->time2Ticks(300);
+        attach_ticks = 32767;
 
     if ( attach_type == Attachment::ATTACH_NOTHING )
         m_attachment->clear();

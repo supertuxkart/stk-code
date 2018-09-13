@@ -62,6 +62,7 @@ private:
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
+
 public:
                  LocalPlayerController(AbstractKart *kart,
                                        const int local_player_id,
@@ -86,7 +87,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName() const OVERRIDE;
-
 
 };   // LocalPlayerController
 

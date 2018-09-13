@@ -137,12 +137,8 @@ void PlayerRankingsDialog::onUpdate(float dt)
 {
     if (*m_fetched_ranking == false)
     {
-        // I18N: In the network player dialog, showing when waiting for
-        // the result of the ranking info of a player
-        core::stringw fetching =
-            StringUtils::loadingDots(_("Fetching ranking info for %s.",
-            m_name));
-        m_ranking_info->setText(fetching, false);
+        core::stringw msg = _("Fetching ranking info for %s", m_name);
+        m_ranking_info->setText(StringUtils::loadingDots(msg.c_str()), false);
     }
 
     // It's unsafe to delete from inside the event handler so we do it here
@@ -169,12 +165,12 @@ GUIEngine::EventPropagation
         }
         else if (selection == m_refresh_widget->m_properties[PROP_ID])
         {
-            static double timer = StkTime::getRealTime();
+            static uint64_t timer = StkTime::getRealTimeMs();
             // 1 minute per refresh
-            if (StkTime::getRealTime() < timer + 60.0)
+            if (StkTime::getRealTimeMs() < timer + 60000)
                 return GUIEngine::EVENT_BLOCK;
 
-            timer = StkTime::getRealTime();
+            timer = StkTime::getRealTimeMs();
             *m_fetched_ranking = false;
             updatePlayerRanking(m_name, m_online_id, m_ranking_info,
                 m_fetched_ranking);

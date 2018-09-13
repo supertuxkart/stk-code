@@ -65,7 +65,8 @@ namespace GUIEngine
         {
             SKILL_MASS,
             SKILL_SPEED,
-            SKILL_POWER,
+            SKILL_ACCELERATION,
+            SKILL_NITRO_EFFICIENCY,
             SKILL_COUNT
         };
 
@@ -96,6 +97,8 @@ namespace GUIEngine
         void setSize(const int x, const int y, const int w, const int h);
 
         void setValues(const KartProperties* props, PerPlayerDifficulty d);
+
+        void hideAll();
 
         /** Change the value of the widget, it must be a percent. */
         void setValue(Stats type, int value);

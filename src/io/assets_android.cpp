@@ -28,6 +28,8 @@
 #ifdef ANDROID
 #include <android/asset_manager.h>
 #include <sys/statfs.h> 
+
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -48,6 +50,9 @@ void AssetsAndroid::init()
 {
 #ifdef ANDROID
     if (m_file_manager == NULL)
+        return;
+        
+    if (!global_android_app)
         return;
 
     bool needs_extract_data = false;
@@ -339,6 +344,9 @@ void AssetsAndroid::extractData()
 bool AssetsAndroid::extractDir(std::string dir_name)
 {
 #ifdef ANDROID
+    if (!global_android_app)
+        return false;
+        
     AAssetManager* amgr = global_android_app->activity->assetManager;
 
     Log::info("AssetsAndroid", "Extracting %s directory",
@@ -482,7 +490,7 @@ void AssetsAndroid::removeData()
         if (file == m_stk_dir + "/.nomedia")
             continue;
 
-        Log::info("AssetsAndroid", "Deleting file: %s\n", file.c_str());
+        Log::info("AssetsAndroid", "Deleting file: %s", file.c_str());
 
         if (m_file_manager->isDirectory(file))
         {
@@ -491,6 +499,20 @@ void AssetsAndroid::removeData()
         else
         {
             m_file_manager->removeFile(file);
+        }
+    }
+
+    std::string data_path = getDataPath();
+    
+    if (!data_path.empty())
+    {
+        const std::string child_path = data_path + "/files/libchildprocess.so";
+    
+        if (m_file_manager->fileExists(child_path))
+        {
+            Log::info("AssetsAndroid", "Deleting old libchildprocess: %s", 
+                      child_path.c_str());
+            m_file_manager->removeFile(child_path);
         }
     }
 #endif
@@ -581,3 +603,31 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
 }
 
 //-----------------------------------------------------------------------------
+/** Get a path for internal data directory
+ *  \return Path for internal data directory or empty string when failed
+ */
+std::string AssetsAndroid::getDataPath()
+{
+#ifdef ANDROID
+    std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
+    
+    if (access(data_path.c_str(), R_OK) != 0)
+    {
+        Log::warn("AssetsAndroid", "Cannot use standard data dir");
+        
+        AndroidApplicationInfo application_info = 
+            CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+        
+        data_path = application_info.data_dir;
+    }
+    
+    if (access(data_path.c_str(), R_OK) != 0)
+    {
+        data_path = "";
+    }
+    
+    return data_path;
+#endif
+
+    return "";
+}

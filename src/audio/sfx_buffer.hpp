@@ -19,7 +19,7 @@
 #ifndef HEADER_SFX_BUFFER_HPP
 #define HEADER_SFX_BUFFER_HPP
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 #  ifdef __APPLE__
 #    include <OpenAL/al.h>
 #  else

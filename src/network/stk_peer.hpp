@@ -25,12 +25,15 @@
 
 #include "network/transport_address.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/time.hpp"
 #include "utils/types.hpp"
 
 #include <enet/enet.h>
 
 #include <atomic>
+#include <deque>
 #include <memory>
+#include <numeric>
 #include <set>
 #include <vector>
 
@@ -45,6 +48,7 @@ enum PeerDisconnectInfo : unsigned int
     PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
     PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
     PDI_KICK = 2, //!< Kick disconnection
+    PDI_BAD_CONNECTION = 3, //!< Bad connection disconnection
 };   // PeerDisconnectInfo
 
 /*! \class STKPeer
@@ -60,6 +64,9 @@ protected:
     /** True if this peer is validated by server. */
     std::atomic_bool m_validated;
 
+    /** True if this peer is waiting for game. */
+    std::atomic_bool m_waiting_for_game;
+
     /** Host id of this peer. */
     uint32_t m_host_id;
 
@@ -69,12 +76,16 @@ protected:
 
     std::vector<std::shared_ptr<NetworkPlayerProfile> > m_players;
 
-    float m_connected_time;
+    uint64_t m_connected_time;
 
     /** Available karts and tracks from this peer */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
     std::unique_ptr<Crypto> m_crypto;
+
+    std::deque<uint32_t> m_previous_pings;
+
+    std::atomic<uint32_t> m_average_ping;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -113,7 +124,8 @@ public:
     /** Returns the host id of this peer. */
     uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
-    float getConnectedTime() const                 { return m_connected_time; }
+    float getConnectedTime() const
+       { return float(StkTime::getRealTimeMs() - m_connected_time) / 1000.0f; }
     // ------------------------------------------------------------------------
     void setAvailableKartsTracks(std::set<std::string>& k,
                                  std::set<std::string>& t)
@@ -152,11 +164,19 @@ public:
     void setPingInterval(uint32_t interval)
                             { enet_peer_ping_interval(m_enet_peer, interval); }
     // ------------------------------------------------------------------------
-    uint32_t getPing() const;
+    uint32_t getPing();
     // ------------------------------------------------------------------------
     Crypto* getCrypto() const                        { return m_crypto.get(); }
     // ------------------------------------------------------------------------
     void setCrypto(std::unique_ptr<Crypto>&& c);
+    // ------------------------------------------------------------------------
+    uint32_t getAveragePing() const           { return m_average_ping.load(); }
+    // ------------------------------------------------------------------------
+    ENetPeer* getENetPeer() const                       { return m_enet_peer; }
+    // ------------------------------------------------------------------------
+    void setWaitingForGame(bool val)         { m_waiting_for_game.store(val); }
+    // ------------------------------------------------------------------------
+    bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
 
 };   // STKPeer
 

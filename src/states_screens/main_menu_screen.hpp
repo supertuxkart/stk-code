@@ -38,9 +38,6 @@ private:
     MainMenuScreen();
 
 public:
-    /** Temporary disable the online menu while it is being worked at. */
-    static bool m_enable_online;
-
     virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

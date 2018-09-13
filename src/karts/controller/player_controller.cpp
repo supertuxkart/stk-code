@@ -30,6 +30,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/lobby_protocol.hpp"
@@ -107,7 +108,12 @@ void PlayerController::resetInputState()
  */
 bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 {
-
+    if (!NetworkConfig::get()->isNetworking() ||
+        !NetworkConfig::get()->isServer())
+    {
+        if (m_penalty_ticks > 0)
+            return false;
+    }
     /** If dry_run (parameter) is true, this macro tests if this action would
      *  trigger a state change in the specified variable (without actually
      *  doing it). If it will trigger a state change, the macro will
@@ -171,7 +177,7 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         break;
     case PA_ACCEL:
         SET_OR_TEST(m_prev_accel, value);
-        if (value && !(m_penalty_ticks > 0))
+        if (value)
         {
             SET_OR_TEST_GETTER(Accel, value/32768.0f);
             SET_OR_TEST_GETTER(Brake, false);
@@ -247,7 +253,7 @@ void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
 {
     m_steer_val_l = value_l;
     m_steer_val_r = value_r;
-    action(p_action, value);
+    PlayerController::action(p_action, value, /*dry_run*/false);
 }   // actionFromNetwork
 
 //-----------------------------------------------------------------------------
@@ -322,13 +328,6 @@ void PlayerController::update(int ticks)
 {
     steer(ticks, m_steer_val);
 
-    if (World::getWorld()->getPhase() == World::GOAL_PHASE)
-    {
-        m_controls->setBrake(false);
-        m_controls->setAccel(0.0f);
-        return;
-    }
-
     if (World::getWorld()->isStartPhase())
     {
         if (m_controls->getAccel() || m_controls->getBrake()||
@@ -351,9 +350,11 @@ void PlayerController::update(int ticks)
         return;
     }   // if isStartPhase
 
-    if (m_penalty_ticks>0)
+    if (!RewindManager::get()->isRewinding() && m_penalty_ticks > 0)
     {
-        m_penalty_ticks-=ticks;
+        m_penalty_ticks -= ticks;
+        m_controls->setBrake(false);
+        m_controls->setAccel(0.0f);
         return;
     }
 
@@ -380,9 +381,8 @@ void PlayerController::saveState(BareNetworkString *buffer) const
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    buffer->addUInt32(m_steer_val).addUInt32(m_steer_val_l)
-           .addUInt32(m_steer_val_r).addUInt8(m_prev_brake)
-           .addUInt32(m_prev_accel);
+    buffer->addUInt32(m_steer_val).addUInt32(m_prev_accel)
+        .addUInt8(m_prev_brake);
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -390,11 +390,9 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    m_steer_val   = buffer->getUInt32();
-    m_steer_val_l = buffer->getUInt32();
-    m_steer_val_r = buffer->getUInt32();
-    m_prev_brake  = buffer->getUInt8();
-    m_prev_accel  = buffer->getUInt32();
+    m_steer_val  = buffer->getUInt32();
+    m_prev_accel = buffer->getUInt32();
+    m_prev_brake = buffer->getUInt8();
 }   // rewindTo
 
 // ----------------------------------------------------------------------------

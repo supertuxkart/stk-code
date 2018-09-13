@@ -56,7 +56,8 @@ CutsceneWorld::CutsceneWorld() : World()
 {
     m_time_at_second_reset = 0.0f;
     m_aborted = false;
-    WorldStatus::setClockMode(CLOCK_NONE);
+    WorldStatus::setClockMode(CLOCK_CHRONO);
+    m_phase = RACE_PHASE;
     m_use_highscores = false;
     m_play_track_intro_sound = false;
     m_play_ready_set_go_sounds = false;
@@ -170,7 +171,12 @@ void CutsceneWorld::init()
 CutsceneWorld::~CutsceneWorld()
 {
 }   // ~CutsceneWorld
-
+//-----------------------------------------------------------------------------
+void CutsceneWorld::reset()
+{
+    World::reset();
+    m_phase = RACE_PHASE;
+}
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this race.
  */
@@ -231,7 +237,6 @@ void CutsceneWorld::update(int ticks)
     {
         // this way of calculating time and dt is more in line with what
         // irrlicht does and provides better synchronisation
-        double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
     }

@@ -22,6 +22,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_manager.hpp"
@@ -386,7 +387,7 @@ void DriveGraph::setDefaultStartPositions(AlignedArray<btTransform>
     // the main driveline.
     int current_node = getNode(getStartNode())->getPredecessor(0);
 
-    float distance_from_start = 0.1f+forwards_distance;
+    float distance_from_start = 0.75f+forwards_distance;
 
     // Maximum distance to left (or right) of centre line
     const float max_x_dist    = 0.5f*(karts_per_row-0.5f)*sidewards_distance;
@@ -724,3 +725,13 @@ DriveNode* DriveGraph::getNode(unsigned int j) const
     assert(n != NULL);
     return n;
 }   // getNode
+
+// -----------------------------------------------------------------------------
+bool DriveGraph::hasLapLine() const
+{
+    if (Track::getCurrentTrack()->isCTF() &&
+        race_manager->getMajorMode() ==
+        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        return false;
+    return true;
+}   // hasLapLine

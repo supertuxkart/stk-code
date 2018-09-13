@@ -76,6 +76,9 @@ namespace GUIEngine
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
 
+        /** \brief Whether the right or left arrow is the currently selected one  */
+        bool m_right_selected;
+
         /** \brief Keeps track of the custom text in spinner (a text which isn't related to a value)
         *   to remember it and set it back (example : when we deactivate the widget)
         */
@@ -93,7 +96,7 @@ namespace GUIEngine
         virtual EventPropagation leftPressed(const int playerID);
 
         /** \brief implementing method from base class Widget */
-        virtual void onClick();
+        virtual EventPropagation onClick();
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -123,6 +126,11 @@ namespace GUIEngine
         void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
         int getSpinnerWidgetPlayerID()              {return m_spinner_widget_player_id;  }
         void unsetUseBackgroundColor()              {m_use_background_color=false;       }
+
+        void activateSelectedButton();
+        void setSelectedButton(bool right)          {m_right_selected = right;           }
+        bool isRightButtonSelected()                {return m_right_selected;            }
+
 
 
 

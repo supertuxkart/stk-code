@@ -700,5 +700,14 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     glGetError();
 }   // GL32_draw2DRectangle
 
+void preloadShaders()
+{
+    Primitive2DList::getInstance();
+    UniformColoredTextureRectShader::getInstance();
+    TextureRectShader::getInstance();
+    ColoredRectShader::getInstance();
+    ColoredTextureRectShader::getInstance();
+}   // preloadShaders
+
 #endif   // !SERVER_ONLY
 

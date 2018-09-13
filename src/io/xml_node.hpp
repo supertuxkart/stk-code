@@ -98,27 +98,6 @@ public:
     int getHPR(core::vector3df *value) const;
     int getHPR(Vec3 *value) const;
 
-    template<typename T, typename U>
-    int get(std::map<T, U>* out_map) const
-    {
-        using namespace StringUtils;
-        for (auto& p : m_attributes)
-        {
-            T val_1;
-            if (!fromString(p.first, val_1))
-            {
-                return 0;
-            }
-            U val_2;
-            if (!fromString(wideToUtf8(p.second), val_2))
-            {
-                return 0;
-            }
-            (*out_map)[val_1] = val_2;
-        }
-        return (int)m_attributes.size();
-    }
-
     bool hasChildNamed(const char* name) const;
 
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/

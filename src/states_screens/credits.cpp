@@ -192,7 +192,9 @@ void CreditsScreen::loadedFromFile()
         m_sections.push_back( new CreditsSection("Translations"));
         for (unsigned int i = 1; i < translator.size(); i = i + MAX_PER_SCREEN)
         {
+#ifndef SERVER_ONLY
             line = stringw(translations->getCurrentLanguageName().c_str());
+#endif
             CreditsEntry entry(line);
             getCurrentSection()->addEntry( entry );
 

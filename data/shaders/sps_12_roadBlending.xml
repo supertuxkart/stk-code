@@ -2,15 +2,8 @@
     <shader-info name="roadBlending" fallback-shader="solid" use-tangents="Y"/>
     <first-pass vertex-shader="sp_pass.vert"
         fragment-shader="sp_road_blending.frag">
+        <prefilled-textures>
+            <prefilled-texture name="road_masking" file="hd_roadMarking_a_mask.png" srgb="Y" sampler="trilinear"/>
+        </prefilled-textures>
     </first-pass>
-    <!--
-    <shadow-pass vertex-shader="sp_shadow.vert"
-        fragment-shader="white.frag"
-        skinned-mesh-shader="sp_skinning_shadow.vert">
-    </shadow-pass>
-    <uniform-assigners>
-        <uniform-assigner name="layer"
-        function="shadowCascadeUniformAssigner"/>
-    </uniform-assigners>
-    -->
 </spshader>

@@ -23,7 +23,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
 #  include <vorbis/codec.h>
 #  include <vorbis/vorbisfile.h>
 #  ifdef __APPLE__
@@ -96,25 +96,28 @@ bool SFXBuffer::load()
 {
     if (UserConfigParams::m_sfx == false) return false;
     
-#if HAVE_OGGVORBIS
-    if (m_loaded) return false;
-
-    alGetError(); // clear errors from previously
-
-    alGenBuffers(1, &m_buffer);
-    if (!SFXManager::checkError("generating a buffer"))
+#ifdef ENABLE_SOUND
+    if (UserConfigParams::m_enable_sound)
     {
-        return false;
-    }
-
-    assert( alIsBuffer(m_buffer) );
-
-    if (!loadVorbisBuffer(m_file, m_buffer))
-    {
-        Log::error("SFXBuffer", "Could not load sound effect %s",
-                   m_file.c_str());
-        // TODO: free al buffer here?
-        return false;
+        if (m_loaded) return false;
+    
+        alGetError(); // clear errors from previously
+    
+        alGenBuffers(1, &m_buffer);
+        if (!SFXManager::checkError("generating a buffer"))
+        {
+            return false;
+        }
+    
+        assert(alIsBuffer(m_buffer));
+    
+        if (!loadVorbisBuffer(m_file, m_buffer))
+        {
+            Log::error("SFXBuffer", "Could not load sound effect %s",
+                       m_file.c_str());
+            // TODO: free al buffer here?
+            return false;
+        }
     }
 #endif
 
@@ -130,11 +133,14 @@ bool SFXBuffer::load()
 
 void SFXBuffer::unload()
 {
-#if HAVE_OGGVORBIS
-    if (m_loaded)
+#ifdef ENABLE_SOUND
+    if (UserConfigParams::m_enable_sound)
     {
-        alDeleteBuffers(1, &m_buffer);
-        m_buffer = 0;
+        if (m_loaded)
+        {
+            alDeleteBuffers(1, &m_buffer);
+            m_buffer = 0;
+        }
     }
 #endif
     m_loaded = false;
@@ -147,7 +153,10 @@ void SFXBuffer::unload()
  */
 bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 {
-#if HAVE_OGGVORBIS
+#ifdef ENABLE_SOUND
+    if (!UserConfigParams::m_enable_sound)
+        return false;
+        
     const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
 
 

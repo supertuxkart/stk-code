@@ -25,9 +25,9 @@
                          I18N="Main menu button"  text="Addons"/>
         </buttonbar>
 
-        <spacer width="10" height="7%"/>
+        <spacer width="10" height="6%"/>
 
-        <bottombar width="100%" height="10%" layout="horizontal-row">
+        <bottombar width="100%" height="11%" layout="horizontal-row">
 
             <spacer width="10" height="10" />
 
@@ -38,7 +38,7 @@
 
             <spacer width="10" height="10" />
 
-            <buttonbar id="menu_bottomrow" x="0" y="0" width="38%" height="100%" align="center">
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="42%" height="100%" align="center">
                 <icon-button id="test_gpwin" width="64" height="64" icon="gui/main_options.png"
                              raw_text="TEST: GPWin" label_location="hover"/>
                 <icon-button id="test_gplose" width="64" height="64" icon="gui/main_options.png"

@@ -274,8 +274,9 @@ void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty 
         m_locked_features.erase(p);
     }
 
-    // Add to list of recently unlocked features if the challenge is newly completed
-    if (!c->isSolvedAtAnyDifficulty())
+    // Add to list of recently unlocked features
+    // if the challenge is newly completed at the current difficulty
+    if (!c->isSolved(d))
         m_unlocked_features.push_back(c->getData());
 
     c->setSolved(d);  // reset isActive flag

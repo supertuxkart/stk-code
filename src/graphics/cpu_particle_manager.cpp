@@ -135,6 +135,28 @@ CPUParticleManager::GLParticle::GLParticle(bool flips)
 }   // GLParticle
 
 // ----------------------------------------------------------------------------
+CPUParticleManager::CPUParticleManager()
+{
+    assert(CVS->isGLSL());
+    
+    const float vertices[] =
+    {
+        -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, 1.0f, 1.0f,
+    };
+    glGenBuffers(1, &m_particle_quad);
+    glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    // For preloading shaders
+    ParticleRenderer::getInstance();
+    AlphaTestParticleRenderer::getInstance();
+}   // CPUParticleManager
+
+// ----------------------------------------------------------------------------
 void CPUParticleManager::addBillboardNode(scene::IBillboardSceneNode* node)
 {
     video::ITexture* t = node->getMaterial(0).getTexture(0);

@@ -21,7 +21,7 @@
 #define HEADER_DUMMY_SFX_HPP
 
 #include "audio/sfx_base.hpp"
-
+#include "utils/cpp2011.hpp"
 
 /**
  * \brief Dummy sound when ogg or openal aren't available
@@ -32,41 +32,41 @@ class DummySFX : public SFXBase
 public:
                        DummySFX(SFXBuffer* buffer, bool positional,
                                 float gain) {}
-    virtual           ~DummySFX()                     {}
+    virtual           ~DummySFX() {}
 
     /** Late creation, if SFX was initially disabled */
-    virtual bool       init()                           { return true;  }
-    virtual bool       isLooped()                       { return false; }
-    virtual void       updatePlayingSFX(float dt)       {}
-    virtual void       setLoop(bool status)             {}
-    virtual void       reallySetLoop(bool status)       {}
-    virtual void       setPosition(const Vec3 &p)       {}
-    virtual void       reallySetPosition(const Vec3 &p) {}
+    virtual bool       init() OVERRIDE { return true;  }
+    virtual bool       isLooped() OVERRIDE { return false; }
+    virtual void       updatePlayingSFX(float dt) OVERRIDE {}
+    virtual void       setLoop(bool status) OVERRIDE {}
+    virtual void       reallySetLoop(bool status) OVERRIDE {}
+    virtual void       setPosition(const Vec3 &p) OVERRIDE {}
+    virtual void       reallySetPosition(const Vec3 &p) OVERRIDE {}
     virtual void       setSpeedPosition(float factor,
-                                        const Vec3 &p)  {}
+                                        const Vec3 &p) OVERRIDE {}
     virtual void       reallySetSpeedPosition(float f,
-                                         const Vec3 &p) {}
-    virtual void       play()                           {}
-    virtual void       reallyPlayNow(SFXBuffer* buffer = NULL) {}
-    virtual void       play(const Vec3 &xyz, SFXBuffer* buffer = NULL) {}
-    virtual void       reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) {}
-    virtual void       stop()                           {}
-    virtual void       reallyStopNow()                  {}
-    virtual void       pause()                          {}
-    virtual void       reallyPauseNow()                 {}
-    virtual void       resume()                         {}
-    virtual void       reallyResumeNow()                {}
-    virtual void       deleteSFX()                      { delete this; }
-    virtual void       setSpeed(float factor)           {}
-    virtual void       reallySetSpeed(float factor)     {}
-    virtual void       setVolume(float gain)            {}
-    virtual void       reallySetVolume(float gain)      {}
-    virtual void       setMasterVolume(float gain)      {}
-    virtual void       reallySetMasterVolumeNow(float gain) {}
-    virtual SFXStatus  getStatus()                      { return SFX_STOPPED; }
-    virtual void       onSoundEnabledBack()             {}
-    virtual void       setRolloff(float rolloff)        {}
-    virtual const SFXBuffer* getBuffer() const          { return NULL; }
+                                         const Vec3 &p) OVERRIDE {}
+    virtual void       play() OVERRIDE {}
+    virtual void       reallyPlayNow(SFXBuffer* buffer = NULL) OVERRIDE {}
+    virtual void       play(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE {}
+    virtual void       reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE {}
+    virtual void       stop() OVERRIDE {}
+    virtual void       reallyStopNow() OVERRIDE {}
+    virtual void       pause() OVERRIDE {}
+    virtual void       reallyPauseNow() OVERRIDE {}
+    virtual void       resume() OVERRIDE {}
+    virtual void       reallyResumeNow() OVERRIDE {}
+    virtual void       deleteSFX() OVERRIDE {}
+    virtual void       setSpeed(float factor) OVERRIDE {}
+    virtual void       reallySetSpeed(float factor) OVERRIDE {}
+    virtual void       setVolume(float gain) OVERRIDE {}
+    virtual void       reallySetVolume(float gain) OVERRIDE {}
+    virtual void       setMasterVolume(float gain) OVERRIDE {}
+    virtual void       reallySetMasterVolumeNow(float gain) OVERRIDE {}
+    virtual SFXStatus  getStatus() OVERRIDE { return SFX_STOPPED; }
+    virtual void       onSoundEnabledBack() OVERRIDE {}
+    virtual void       setRolloff(float rolloff) OVERRIDE {}
+    virtual const SFXBuffer* getBuffer() const OVERRIDE { return NULL; }
 
 };   // DummySFX
 

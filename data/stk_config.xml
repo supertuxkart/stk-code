@@ -101,12 +101,35 @@
           any track/library pbject.
       default-moveable-friction: Default friction to be used for any moveable,
           e.g. karts, bowling balls, ...
+      solver-iteation: Number of solver iterations. A lower number reduces
+          the quality, but can reduce bouncing effect.
+      solver-split-impulse:: by default bullet solves for velocity and
+          position at the same time, which can introduce bounce. Setting
+          this to 1 can reduce bounce.
+      solver-split-impulse-threshold: Penetration threshold for using split
+          impulse (ignored if solver-split-impulse is false).
+      solver-mode: Bullet's solver mode is a bit mask, which can be modified.
+          This entry contains a space-separated list of mode-names to either
+          set or unset in this bit mask. Any name starting with a '-' indicate
+          that the bit is to be set to 0, otherwise the bit will be set.
+
+       This field takes two
+          values: the first value is 'and'ed with bullet's default values 
+          (i.e. it can be used to unset bullet defaults), the second value
+          is 'or'ed (i.e. is used to set a bit). A value of -1 for 'and'
+          means to keep all bits. The valid names are listed in stk_config.cpp
+          and correspond to the definitions in btContactSolverInfo.h, e.g.:
+          'randomized_order' corresponds to the bit SOLVER_RANDMIZE_ORDER.
       -->
   <physics smooth-normals="true"
            smooth-angle-limit="0.65"
            fps="120"
            default-track-friction="0.5"
-           default-moveable-friction="0.5" />
+           default-moveable-friction="0.5" 
+           solver-iterations="4"
+           solver-split-impulse="true"
+           solver-split-impulse-threshold="-0.00001"
+           solver-mode=""/>
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
@@ -180,14 +203,11 @@
 
   <!-- Networking 
        state-frequency: how many states the server will send per second.
-       positional-smoothing: smoothing factor used in exponential smoothing
-           depending on error.
-       rotational-smoothing: slerp factor used in exponential smoothing
-           of rotations depending on error.
+       steering-reduction: Reduce a remote kart's steering by this factor
+           each frame. This helps reduces oversteering by high latency
+           clients when they only do minor steering adjustments.
   -->
-  <networking state-frequency="10"
-              positional-smoothing="0.25:0.95 1.0:0.85"
-              rotational-smoothing="0.25:0.95 1.0:0.85" />
+  <networking state-frequency="10" steering-reduction="1.0"/>
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
@@ -415,6 +435,11 @@
            period, which results in less abrupt changes. If set to 0,
            the impulse is only applied once.
          resitution: restitution value to be used for the kart rigid bodies.
+           The restitution used depends on the speed to avoid physics issues
+           (a collision with high speed and high restitution will push the
+           kart high up into the air). The values specified are
+           speed:restitution pairs, the actual restitution will be
+           interpolated based on the points specified here.
          bevel-factor: for each point of the chassis collision box one
            additional point is added, resulting in a bevelled box shape.
            The original Z coordinate of the chassis is multiplied by
@@ -434,7 +459,7 @@
            behaviour of the karts. -->
     <collision impulse-type="normal"
                impulse="3000" impulse-time="0.1" terrain-impulse="160"
-               restitution="1.0" bevel-factor="0.5 0.0 0.3"
+               restitution="0:1.0 5:1.0 20:0.2" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 
      <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
@@ -506,17 +531,15 @@
     Use a slow but high quality colour compressor.
     kColourClusterFit = (32),
     Use a fast but low quality colour compressor.
-    kColourRangeFit	= (64),
+    kColourRangeFit = (64),
     Use a very slow but very high quality colour compressor.
     kColourIterativeClusterFit = (256),
     STK default the low quality.
   -->
   <texture-compression quality="64"/>
 
-  <!-- List of default ports used, by default STK use random ports
-       for client and server, disable it in user config to allow
-       port forward. The server discovery port has to be the same
-       across all clients and servers.
+  <!-- List of default ports used, by default STK use random ports for client.
+       The server discovery port has to be the same across all clients and servers.
   -->
   <network server-discovery-port="2757" client-port="2758" server-port="2759"/>
 

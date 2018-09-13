@@ -93,6 +93,9 @@ private:
     /** Number of wheels that touch the ground. */
     int                 m_num_wheels_on_ground;
 
+    /** Number of time steps during which cushioning is disabled. */
+    unsigned int        m_cushioning_disable_time;
+
     /** Index of the right axis. */
     int                 m_indexRightAxis;
     /** Index of the up axis. */
@@ -121,6 +124,10 @@ private:
 
     void     defaultInit();
     btScalar rayCast(btWheelInfo& wheel, const btVector3& ray);
+    void     updateWheelTransformsWS(btWheelInfo& wheel,
+                                     btTransform chassis_trans,
+                                     bool interpolatedTransform=true,
+                                     float fraction = 1.0f);
 
 public:
 
@@ -155,19 +162,15 @@ public:
                                 bool isFrontWheel);
     const btWheelInfo& getWheelInfo(int index) const;
     btWheelInfo&       getWheelInfo(int index);
-    void               updateWheelTransformsWS(btWheelInfo& wheel,
-                                               bool interpolatedTransform=true,
-                                               float fraction = 1.0f);
     void               updateAllWheelTransformsWS();
     void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
-public:
     void               setSliding(bool active);
     void               instantSpeedIncreaseTo(btScalar speed);
     void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
-    void               getVisualContactPoint(float visual_rotation,
+    void               getVisualContactPoint(const btTransform& chassis_trans,
                                              btVector3 *left, btVector3 *right);
         // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
@@ -220,16 +223,20 @@ public:
     /** Sets an impulse that is applied for a certain amount of time.
      *  \param t Time for the impulse to be active.
      *  \param imp The impulse to apply.  */
-    void setTimedCentralImpulse(float t, const btVector3 &imp)
+    void setTimedCentralImpulse(float t, const btVector3 &imp,
+                                bool rewind = false)
     {
         // Only add impulse if no other impulse is active.
-        if(m_time_additional_impulse>0) return;
+        if (m_time_additional_impulse > 0 && !rewind) return;
         m_additional_impulse      = imp;
         m_time_additional_impulse = t;
     }   // setTimedImpulse
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
     float getCentralImpulseTime() const { return m_time_additional_impulse; }
+    // ------------------------------------------------------------------------
+    const btVector3& getAdditionalImpulse() const
+                                             { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).
@@ -244,6 +251,19 @@ public:
     const btVector3& getTimedRotation() const { return m_additional_rotation;  }
     // ------------------------------------------------------------------------
     float getTimedRotationTime() const { return m_time_additional_rotation;  }
+    // ------------------------------------------------------------------------
+    /** Returns the time cushioning is disabled. Used for networking state
+     *  saving. */
+    unsigned int getCushioningDisableTime() const
+    {
+        return m_cushioning_disable_time;
+    }  // getCushioningDisableTime
+    // ------------------------------------------------------------------------
+    /** Sets the cushioning disable time. Used for networking state saving. */
+    void setCushioningDisableTime(unsigned int cdt)
+    {
+        m_cushioning_disable_time = cdt;
+    }   // setCushioningDisableTime
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 

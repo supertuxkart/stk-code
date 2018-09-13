@@ -59,10 +59,10 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/stk_host.hpp"
 #include "physics/physics.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
-#include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -638,8 +638,11 @@ void IrrDriver::initDevice()
 #endif
 
 #ifndef SERVER_ONLY
-    if(CVS->isGLSL())
+    if (CVS->isGLSL())
+    {
         m_renderer = new ShaderBasedRenderer();
+        preloadShaders();
+    }
     else
         m_renderer = new FixedPipelineRenderer();
 #endif
@@ -795,6 +798,9 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
                               std::string *version)
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+        
     *vendor   = (char*)glGetString(GL_VENDOR  );
     *renderer = (char*)glGetString(GL_RENDERER);
     *version  = (char*)glGetString(GL_VERSION );
@@ -1729,13 +1735,15 @@ void IrrDriver::displayFPS()
         prev_state = current_state;
     }
 
+    uint32_t ping = 0;
+    if (STKHost::existHost())
+        ping = STKHost::get()->getClientPingToServer();
     if (no_trust)
     {
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms",
-            NetworkingLobby::getInstance()->getServerPing()),
+        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
             core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
@@ -1761,22 +1769,19 @@ void IrrDriver::displayFPS()
                       "Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
                     SP::sp_shadow_poly_count, m_last_light_bucket_distance,
-                    m_skinning_joint,
-                    NetworkingLobby::getInstance()->getServerPing());
+                    m_skinning_joint, ping);
     }
     else
     {
         if (CVS->isGLSL())
         {
             fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
-                max, SP::sp_solid_poly_count / 1000,
-                NetworkingLobby::getInstance()->getServerPing());
+                max, SP::sp_solid_poly_count / 1000, ping);
         }
         else
         {
             fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
-                max, (int)roundf(kilotris),
-                NetworkingLobby::getInstance()->getServerPing());
+                max, (int)roundf(kilotris), ping);
         }
     }
 
@@ -1848,22 +1853,6 @@ void IrrDriver::doScreenShot()
  */
 void IrrDriver::update(float dt)
 {
-    // User aborted (e.g. closed window)
-    // =================================
-    if (!m_device->run())
-    {
-        // Don't bother cleaning up GUI, has no use and may result in crashes
-        //GUIEngine::cleanUp();
-        //GUIEngine::deallocate();
-        main_loop->abort();
-        return;
-    }
-
-    // If we quit via the menu the m_device->run() does not return true.
-    // To avoid any other calls, we return here.
-    if(main_loop->isAborted())
-        return;
-
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)

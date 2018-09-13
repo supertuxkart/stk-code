@@ -27,6 +27,9 @@
 #include "items/powerup.hpp"
 #include "items/rubber_ball.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/world.hpp"
+#include "network/dummy_rewinder.hpp"
+#include "network/rewind_manager.hpp"
 
 ProjectileManager *projectile_manager=0;
 
@@ -45,13 +48,8 @@ void ProjectileManager::removeTextures()
 //-----------------------------------------------------------------------------
 void ProjectileManager::cleanup()
 {
-    for(Projectiles::iterator i = m_active_projectiles.begin();
-        i != m_active_projectiles.end(); ++i)
-    {
-        delete *i;
-    }
-
     m_active_projectiles.clear();
+    m_deleted_projectiles.clear();
     for(HitEffects::iterator i  = m_active_hit_effects.begin();
         i != m_active_hit_effects.end(); ++i)
     {
@@ -68,12 +66,8 @@ void ProjectileManager::cleanup()
  */
 void ProjectileManager::updateGraphics(float dt)
 {
-    for (auto p  = m_active_projectiles.begin(); 
-              p != m_active_projectiles.end();   ++p)
-    {
-        (*p)->updateGraphics(dt);
-    }
-
+    for (auto& p : m_active_projectiles)
+        p.second->updateGraphics(dt);
 }   // updateGraphics
 
 // -----------------------------------------------------------------------------
@@ -82,6 +76,8 @@ void ProjectileManager::update(int ticks)
 {
     updateServer(ticks);
 
+    if (RewindManager::get()->isRewinding())
+        return;
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
     {
@@ -107,24 +103,30 @@ void ProjectileManager::update(int ticks)
 /** Updates all rockets on the server (or no networking). */
 void ProjectileManager::updateServer(int ticks)
 {
-    Projectiles::iterator p = m_active_projectiles.begin();
-    while(p!=m_active_projectiles.end())
+    auto p = m_active_projectiles.begin();
+    while (p != m_active_projectiles.end())
     {
-        bool can_be_deleted = (*p)->updateAndDelete(ticks);
-        if(can_be_deleted)
+        if (p->second->isUndoCreation())
         {
-            HitEffect *he = (*p)->getHitEffect();
-            if(he)
-                addHitEffect(he);
-            Flyable *f=*p;
-            Projectiles::iterator p_next=m_active_projectiles.erase(p);
-            delete f;
-            p=p_next;
+            p++;
+            continue;
+        }
+        bool can_be_deleted = p->second->updateAndDelete(ticks);
+        if (can_be_deleted)
+        {
+            if (!p->second->hasUndoneDestruction())
+            {
+                HitEffect *he = p->second->getHitEffect();
+                if (he)
+                    addHitEffect(he);
+            }
+            p->second->handleUndoDestruction();
+            p = m_active_projectiles.erase(p);
         }
         else
             p++;
     }   // while p!=m_active_projectiles.end()
-    
+
 }   // updateServer
 
 // -----------------------------------------------------------------------------
@@ -132,20 +134,40 @@ void ProjectileManager::updateServer(int ticks)
  *  \param kart The kart which shoots the projectile.
  *  \param type Type of projectile.
  */
-Flyable *ProjectileManager::newProjectile(AbstractKart *kart,
-                                          PowerupManager::PowerupType type)
+std::shared_ptr<Flyable>
+    ProjectileManager::newProjectile(AbstractKart *kart,
+                                     PowerupManager::PowerupType type)
 {
-    Flyable *f;
+    const std::string& uid = getUniqueIdentity(kart, type);
+    auto it = m_active_projectiles.find(uid);
+    // Flyable already created during rewind
+    if (it != m_active_projectiles.end())
+        return it->second;
+
+    std::shared_ptr<Flyable> f;
     switch(type)
     {
-        case PowerupManager::POWERUP_BOWLING:    f = new Bowling(kart);  break;
-        case PowerupManager::POWERUP_PLUNGER:    f = new Plunger(kart);  break;
-        case PowerupManager::POWERUP_CAKE:       f = new Cake(kart);     break;
-        case PowerupManager::POWERUP_RUBBERBALL: f = new RubberBall(kart);
-                                                                         break;
-        default:              return NULL;
+        case PowerupManager::POWERUP_BOWLING:
+            f = std::make_shared<Bowling>(kart);
+            break;
+        case PowerupManager::POWERUP_PLUNGER:
+            f = std::make_shared<Plunger>(kart);
+            break;
+        case PowerupManager::POWERUP_CAKE:
+            f = std::make_shared<Cake>(kart);
+            break;
+        case PowerupManager::POWERUP_RUBBERBALL:
+            f = std::make_shared<RubberBall>(kart);
+            break;
+        default:
+            return nullptr;
     }
-    m_active_projectiles.push_back(f);
+    m_active_projectiles[uid] = f;
+    if (RewindManager::get()->isEnabled())
+    {
+        f->addForRewind(uid);
+        f->addRewindInfoEventFunctionAfterFiring();
+    }
     return f;
 }   // newProjectile
 
@@ -158,13 +180,15 @@ Flyable *ProjectileManager::newProjectile(AbstractKart *kart,
 bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
                                          float radius)
 {
-    float r2 = radius*radius;
-
-    for(Projectiles::iterator i  = m_active_projectiles.begin();
-                              i != m_active_projectiles.end();   i++)
+    float r2 = radius * radius;
+    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end();
+        i++)
     {
-        float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
-        if(dist2<r2) return true;
+        if (i->second->isUndoCreation())
+            continue;
+        float dist2 = i->second->getXYZ().distance2(kart->getXYZ());
+        if (dist2 < r2)
+            return true;
     }
     return false;
 }   // projectileIsClose
@@ -179,21 +203,110 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
 int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
                                          float radius, PowerupManager::PowerupType type)
 {
-    float r2 = radius*radius;
-    int projectileCount = 0;
-
-    for(Projectiles::iterator i  = m_active_projectiles.begin();
-                              i != m_active_projectiles.end();   i++)
+    float r2 = radius * radius;
+    int projectile_count = 0;
+    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end();
+         i++)
     {
-        if ((*i)->getType() == type)
+        if (i->second->isUndoCreation())
+            continue;
+        if (i->second->getType() == type)
         {
-            float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
-            if(dist2<r2)
+            float dist2 = i->second->getXYZ().distance2(kart->getXYZ());
+            if (dist2 < r2)
             {
-
-                projectileCount++;
+                projectile_count++;
             }
         }
     }
-    return projectileCount;
+    return projectile_count;
 }   // getNearbyProjectileCount
+
+// -----------------------------------------------------------------------------
+std::string ProjectileManager::getUniqueIdentity(AbstractKart* kart,
+                                                 PowerupManager::PowerupType t)
+{
+    switch (t)
+    {
+        case PowerupManager::POWERUP_BOWLING:
+            return std::string("B_") +
+                StringUtils::toString(kart->getWorldKartId()) + "_" +
+                StringUtils::toString(World::getWorld()->getTicksSinceStart());
+        case PowerupManager::POWERUP_PLUNGER:
+            return std::string("P_") +
+                StringUtils::toString(kart->getWorldKartId()) + "_" +
+                StringUtils::toString(World::getWorld()->getTicksSinceStart());
+        case PowerupManager::POWERUP_CAKE:
+            return std::string("C_") +
+                StringUtils::toString(kart->getWorldKartId()) + "_" +
+                StringUtils::toString(World::getWorld()->getTicksSinceStart());
+        case PowerupManager::POWERUP_RUBBERBALL:
+            return std::string("R_") +
+                StringUtils::toString(kart->getWorldKartId()) + "_" +
+                StringUtils::toString(World::getWorld()->getTicksSinceStart());
+        default:
+            assert(false);
+            return "";
+    }
+}   // getUniqueIdentity
+
+// -----------------------------------------------------------------------------
+std::shared_ptr<Rewinder>
+          ProjectileManager::addRewinderFromNetworkState(const std::string& uid)
+{
+    std::vector<std::string> id = StringUtils::split(uid, '_');
+    if (id.size() != 3)
+        return nullptr;
+    if (!(id[0] == "B" || id[0] == "P" || id[0] == "C" || id[0] == "R"))
+        return nullptr;
+    int world_id = -1;
+    if (!StringUtils::fromString(id[1], world_id))
+        return nullptr;
+    AbstractKart* kart = World::getWorld()->getKart(world_id);
+    char first_id = id[0][0];
+
+    auto it = m_deleted_projectiles.find(uid);
+    if (it != m_deleted_projectiles.end())
+    {
+        Log::debug("ProjectileManager", "Flyable %s locally (early) deleted,"
+            " use a dummy rewinder to skip.", uid.c_str());
+        return std::make_shared<DummyRewinder>();
+    }
+
+    Log::debug("ProjectileManager",
+        "Missed a firing event, add the flyable %s manually.", uid.c_str());
+    switch (first_id)
+    {
+        case 'B':
+        {
+            auto f = std::make_shared<Bowling>(kart);
+            f->addForRewind(uid);
+            m_active_projectiles[uid] = f;
+            return f;
+        }
+        case 'P':
+        {
+            auto f = std::make_shared<Plunger>(kart);
+            f->addForRewind(uid);
+            m_active_projectiles[uid] = f;
+            return f;
+        }
+        case 'C':
+        {
+            auto f = std::make_shared<Cake>(kart);
+            f->addForRewind(uid);
+            m_active_projectiles[uid] = f;
+            return f;
+        }
+        case 'R':
+        {
+            auto f = std::make_shared<RubberBall>(kart);
+            f->addForRewind(uid);
+            m_active_projectiles[uid] = f;
+            return f;
+        }
+        default:
+            assert(false);
+            return nullptr;
+    }
+}   // addProjectileFromNetworkState

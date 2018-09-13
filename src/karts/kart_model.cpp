@@ -40,6 +40,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/profile_world.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -628,6 +629,9 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_kart_lowest_point  = kart_min.getY();
     initInverseBoneMatrices();
 
+    if (ProfileWorld::isNoGraphics())
+        m_mesh->freeMeshVertexBuffer();
+
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
     {
@@ -664,12 +668,15 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 
         // Update min/max, speed weight can be scaled
         Vec3 obj_min, obj_max;
-        MeshTools::minMax3D(obj.m_model->getMesh(0), &obj_min, &obj_max);
+        scene::IMesh* mesh = obj.m_model->getMesh(0);
+        MeshTools::minMax3D(mesh, &obj_min, &obj_max);
         core::vector3df transformed_min, transformed_max;
         obj.m_location.transformVect(transformed_min, obj_min.toIrrVector());
         obj.m_location.transformVect(transformed_max, obj_max.toIrrVector());
         kart_min.min(transformed_min);
         kart_max.max(transformed_max);
+        if (ProfileWorld::isNoGraphics())
+            mesh->freeMeshVertexBuffer();
     }
 
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
@@ -682,12 +689,22 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 #endif
         obj.getModel()->grab();
         irr_driver->grabAllTextures(obj.getModel());
+        if (ProfileWorld::isNoGraphics())
+            obj.getModel()->freeMeshVertexBuffer();
     }
 
     Vec3 size     = kart_max-kart_min;
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
     m_kart_length = size.getZ();
+
+    // TODO: Client and server get slightly different sizes, which
+    // affets the physics (size determines inertia, which is used
+    // in steering). So by rounding to three decimals we get
+    // more consistent physics results.
+    m_kart_width  = int(m_kart_width  * 1000) / 1000.0f;
+    m_kart_height = int(m_kart_height * 1000) / 1000.0f;
+    m_kart_length = int(m_kart_length * 1000) / 1000.0f;
 
     // Now set default some default parameters (if not defined) that
     // depend on the size of the kart model (wheel position, center
@@ -722,6 +739,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // the destructor will only free the textures if a master
         // copy is freed.
         irr_driver->grabAllTextures(m_wheel_model[i]);
+        if (ProfileWorld::isNoGraphics())
+            m_wheel_model[i]->freeMeshVertexBuffer();
     }   // for i<4
 
     return true;

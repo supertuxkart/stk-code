@@ -34,7 +34,7 @@ class RacePausedDialog : public GUIEngine::ModalDialog
 {
     
 protected:
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
 
 public:
     /**
@@ -42,10 +42,9 @@ public:
      */
     RacePausedDialog(const float percentWidth, const float percentHeight);
     virtual ~RacePausedDialog();
-    
-    void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+    virtual void onEnterPressedInternal() OVERRIDE;
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource)
+        OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;
 };
 

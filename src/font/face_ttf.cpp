@@ -20,6 +20,7 @@
 
 #include "font/font_manager.hpp"
 #include "io/file_manager.hpp"
+#include "modes/profile_world.hpp"
 
 // ----------------------------------------------------------------------------
 /** Constructor. Load all TTFs from a list.
@@ -27,6 +28,10 @@
  */
 FaceTTF::FaceTTF(const std::vector<std::string>& ttf_list)
 {
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     for (const std::string& font : ttf_list)
     {
         FT_Face face = NULL;
@@ -36,6 +41,7 @@ FaceTTF::FaceTTF(const std::vector<std::string>& ttf_list)
             loc.c_str(), 0, &face), loc + " is loaded");
         m_faces.push_back(face);
     }
+#endif
 }   // FaceTTF
 
 // ----------------------------------------------------------------------------
@@ -43,17 +49,13 @@ FaceTTF::FaceTTF(const std::vector<std::string>& ttf_list)
  */
 FaceTTF::~FaceTTF()
 {
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     for (unsigned int i = 0; i < m_faces.size(); i++)
     {
         font_manager->checkFTError(FT_Done_Face(m_faces[i]), "removing face");
     }
+#endif
 }   // ~FaceTTF
-// ----------------------------------------------------------------------------
-/** Return a TTF in \ref m_faces.
- *  \param i index of TTF file in \ref m_faces.
- */
-FT_Face FaceTTF::getFace(unsigned int i) const
-{
-    assert(i < m_faces.size());
-    return m_faces[i];
-}   // getFace

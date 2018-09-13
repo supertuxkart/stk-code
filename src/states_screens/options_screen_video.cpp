@@ -32,6 +32,7 @@
 #include "states_screens/dialogs/custom_video_settings.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_language.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -200,12 +201,8 @@ void OptionsScreenVideo::init()
     m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
+    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
-
-    ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
-    ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
-    ribbon->getRibbonChildren()[3].setTooltip( _("Players") );
-    ribbon->getRibbonChildren()[4].setTooltip( _("Controls") );
 
     GUIEngine::ButtonWidget* applyBtn =
         getWidget<GUIEngine::ButtonWidget>("apply_resolution");
@@ -253,6 +250,7 @@ void OptionsScreenVideo::init()
         // old standard resolutions
         // those are always useful for windowed mode
         bool found_1024_768 = false;
+        bool found_1280_720 = false;
 
         for (int n=0; n<amount; n++)
         {
@@ -270,6 +268,10 @@ void OptionsScreenVideo::init()
             {
                 found_1024_768 = true;
             }
+            if (r.width == 1280 && r.height == 720)
+            {
+                found_1280_720 = true;
+            }
         }
 
 #ifndef ANDROID
@@ -283,6 +285,10 @@ void OptionsScreenVideo::init()
             {
                 found_1024_768 = true;
             }
+            if (r.width == 1280 && r.height == 720)
+            {
+                found_1280_720 = true;
+            }
         } // next found resolution
 
         // Add default resolutions that were not found by irrlicht
@@ -290,6 +296,13 @@ void OptionsScreenVideo::init()
         {
             r.width  = 1024;
             r.height = 768;
+            resolutions.push_back(r);
+        }
+
+        if (!found_1280_720)
+        {
+            r.width  = 1280;
+            r.height = 720;
             resolutions.push_back(r);
         }
 #endif
@@ -500,6 +513,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }
@@ -602,4 +617,3 @@ void OptionsScreenVideo::unloaded()
 }   // unloaded
 
 // ----------------------------------------------------------------------------
-

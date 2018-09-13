@@ -49,7 +49,6 @@ WorldStatus::WorldStatus()
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
-    m_server_is_ready.store(false);
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
@@ -63,7 +62,6 @@ WorldStatus::WorldStatus()
 void WorldStatus::reset()
 {
     m_time            = 0.0f;
-    m_adjust_time_by.store(0);
     m_time_ticks      = 0;
     m_auxiliary_ticks = 0;
     m_count_up_ticks  = 0;
@@ -97,10 +95,6 @@ void WorldStatus::reset()
 
     // Set the right music
     Track::getCurrentTrack()->startMusic();
-    // In case of a networked race the race can only start once
-    // all protocols are up. This flag is used to wait for
-    // a confirmation before starting the actual race.
-    m_server_is_ready.store(false);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -272,25 +266,13 @@ void WorldStatus::updateTime(int ticks)
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
         {
-            // Wait for all players to finish loading world
             auto lobby = LobbyProtocol::get<LobbyProtocol>();
-            assert(lobby);
-            if (!lobby->allPlayersReady())
-                return;
-            // This stage is only reached in case of a networked game.
-            // The server waits for a confirmation from
-            // each client that they have started (to guarantee that the
-            // server is running with a local time behind all clients).
-            if (m_play_ready_set_go_sounds)
-                m_prestart_sound->play();
-
-            if (NetworkConfig::get()->isServer() &&
-                m_server_is_ready.load() == false) return;
-
-            m_phase = READY_PHASE;
-            auto cl = LobbyProtocol::get<ClientLobby>();
-            if (cl)
-                cl->startingRaceNow();
+            if (lobby && lobby->isRacing())
+            {
+                if (m_play_ready_set_go_sounds)
+                    m_prestart_sound->play();
+                m_phase = READY_PHASE;
+            }
             return;   // Don't increase time
         }
         case READY_PHASE:
@@ -325,15 +307,6 @@ void WorldStatus::updateTime(int ticks)
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
-                // Save one initial state on a client, in case that an event
-                // is received from a client (trieggering a rollback) before
-                // a state from the server has been received.
-                if (NetworkConfig::get()->isNetworking() &&  
-                    NetworkConfig::get()->isClient()        )
-                {
-                    RewindManager::get()->saveLocalState();
-                    // FIXME TODO: save state in rewind queue!
-                }
                 if (m_play_ready_set_go_sounds)
                 {
                     m_start_sound->play();
@@ -462,7 +435,7 @@ void WorldStatus::updateTime(int ticks)
                 m_count_up_ticks++;
             }
 
-            if(m_time_ticks <= 0.0)
+            if (m_time_ticks <= 0)
             {
                 // event
                 countdownReachedZero();
@@ -472,79 +445,6 @@ void WorldStatus::updateTime(int ticks)
         default: break;
     }   // switch m_phase
 }   // update
-
-//-----------------------------------------------------------------------------
-/** If the server requests that a client's time should be adjusted,
- *  smoothly change the clock speed of this client to go a bit faster
- *  or slower till the overall adjustment was reached.
- *  \param dt Original time step size.
- */
-float WorldStatus::adjustDT(float dt)
-{
-    int adjust_time = m_adjust_time_by.load();
-    if (adjust_time == 0)
-        return dt;
-
-    // If request, adjust world time to go ahead (adjust>0) or
-    // slow down (<0). This is done in 5% of dt steps so that the
-    // user will not notice this.
-    const float FRACTION = 0.10f;   // fraction of dt to be adjusted
-    float adjust_time_by = adjust_time / 1000.0f;
-    float time_adjust;
-    if (adjust_time_by > 0.0f)   // make it run faster
-    {
-        time_adjust = dt * FRACTION;
-
-        if (time_adjust > adjust_time_by)
-        {
-            m_adjust_time_by.fetch_sub(int(adjust_time_by * 1000.f));
-            time_adjust = adjust_time_by;
-        }
-        else
-            m_adjust_time_by.fetch_sub(int(time_adjust * 1000.f));
-
-        Log::verbose("WorldStatus",
-            "At %f %f adjusting time (speed up) by %f dt %f to dt %f for %f",
-            World::getWorld()->getTime(), StkTime::getRealTime(),
-            time_adjust, dt, dt + time_adjust, adjust_time_by);
-    }
-    else   // adjust_time_by negative, i.e. will go slower
-    {
-        time_adjust = -dt * FRACTION;
-
-        if (time_adjust < adjust_time_by)
-        {
-            m_adjust_time_by.fetch_sub(int(adjust_time_by * 1000.f));
-            time_adjust = adjust_time_by;
-        }
-        else
-            m_adjust_time_by.fetch_sub(int(time_adjust * 1000.f));
-
-        Log::verbose("WorldStatus",
-            "At %f %f adjusting time (slow down) by %f dt %f to dt %f for %f",
-            World::getWorld()->getTime(), StkTime::getRealTime(),
-            time_adjust, dt, dt + time_adjust, adjust_time_by);
-    }
-    dt += time_adjust;
-    // No negative or tends to zero dt
-    const float min_dt = stk_config->ticks2Time(1);
-    if (dt < min_dt)
-        dt = min_dt;
-    return dt;
-}  // adjustDT
-
-//-----------------------------------------------------------------------------
-/** Called on the client when it receives a notification from the server that
- *  all clients (and server) are ready to start the race. The server will
- *  then additionally wait for all clients to report back that they are
- *  starting, which guarantees that the server is running far enough behind
- *  clients time that at server time T all events from the clients at time
- *  T have arrived, minimising rollback impact.
- */
-void WorldStatus::startReadySetGo()
-{
-    m_server_is_ready.store(true);
-}   // startReadySetGo
 
 //-----------------------------------------------------------------------------
 /** Sets the time for the clock.
@@ -568,6 +468,23 @@ void WorldStatus::setTicks(int ticks)
     m_time_ticks = ticks;
     m_time = stk_config->ticks2Time(ticks);
 }   // setTicks
+
+//-----------------------------------------------------------------------------
+/** Sets a new time for the world time (used by rewind), measured in ticks.
+ *  \param ticks New time in ticks to set (always count upwards).
+ */
+void WorldStatus::setTicksForRewind(int ticks)
+{
+    m_count_up_ticks = ticks;
+    if (race_manager->hasTimeTarget())
+    {
+        m_time_ticks = stk_config->time2Ticks(race_manager->getTimeTarget()) -
+            m_count_up_ticks;
+    }
+    else
+        m_time_ticks = ticks;
+    m_time = stk_config->ticks2Time(m_time_ticks);
+}   // setTicksForRewind
 
 //-----------------------------------------------------------------------------
 /** Pauses the game and switches to the specified phase.

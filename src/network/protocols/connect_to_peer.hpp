@@ -33,7 +33,7 @@ protected:
     TransportAddress m_peer_address;
 
     /** Timer use for tracking broadcast. */
-    double m_timer = 0.0;
+    uint64_t m_timer = 0;
 
     /** If greater than a certain value, terminate this protocol. */
     unsigned m_tried_connection = 0;

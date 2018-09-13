@@ -19,7 +19,7 @@
             <spacer height="10" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password (optional)"/>
+                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password for private server (optional)"/>
                 <textbox proportion="1" id="password" I18N="In the server creation screen"/>
             </div>
 
@@ -42,8 +42,8 @@
                         I18N="Multiplayer game mode" text="Normal Race"/>
                 <icon-button id="timetrial" width="128" height="128" icon="gui/mode_tt.png"
                         I18N="Multiplayer game mode" text="Time Trial"/>
-                <icon-button id="3strikes" width="128" height="128" icon="gui/mode_3strikes.png"
-                        I18N="Multiplayer game mode" text="3 Strikes Battle"/>
+                <icon-button id="3strikes" width="128" height="128" icon="gui/weapons.png"
+                        I18N="Multiplayer game mode" text="Battle"/>
                 <icon-button id="soccer" width="128" height="128" icon="gui/mode_soccer.png"
                         I18N="Multiplayer game mode" text="Soccer"/>
             </ribbon>

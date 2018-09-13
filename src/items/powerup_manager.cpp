@@ -18,11 +18,13 @@
 
 #include "items/powerup_manager.hpp"
 
+#include <cinttypes>
 #include <stdexcept>
 
 #include <irrlicht.h>
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
@@ -31,7 +33,7 @@
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/rubber_ball.hpp"
-#include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
@@ -129,7 +131,7 @@ void PowerupManager::loadPowerupsModels()
         PowerupType type = getPowerupType(name);
         // The weight nodes will be also included in this list, so ignore those
         if(type!=POWERUP_NOTHING)
-            LoadPowerup(type, *node);
+            loadPowerup(type, *node);
         else
         {
             Log::fatal("PowerupManager",
@@ -147,6 +149,19 @@ void PowerupManager::loadPowerupsModels()
 
     delete root;
 
+    if (ProfileWorld::isNoGraphics())
+    {
+        for (unsigned i = POWERUP_FIRST; i <= POWERUP_LAST; i++)
+        {
+            scene::IMesh *mesh = m_all_meshes[(PowerupType)i];
+            if (mesh)
+            {
+                // After minMax3D from loadPowerup mesh can free its vertex
+                // buffer
+                mesh->freeMeshVertexBuffer();
+            }
+        }
+    }
 }  // loadPowerupsModels
 
 //-----------------------------------------------------------------------------
@@ -264,7 +279,7 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
         std::vector<int> &l = m_weights_for_section.back();
         for (unsigned int i = 0; i < w_prev.size(); i++)
         {
-            float interpolated_weight = w_prev[i] * f + w_next[i] * (1 - f);
+            float interpolated_weight = w_prev[i] * (1-f) + w_next[i] * f;
             l.push_back(int(interpolated_weight + 0.5f));
         }
     }   // for l < prev->m_weights_for_section.size()
@@ -298,7 +313,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     }
 
     // The last kart always uses the data for the last section
-    if (rank == m_num_karts)
+    if (rank == (int)m_num_karts)
     {
         *prev = *next = m_weights_for_section.size() - 1;
         *weight = 1.0f;
@@ -388,18 +403,18 @@ void PowerupManager::WeightsData::precomputeWeights()
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
  */
-int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
+int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
         rank = m_summed_weights_for_rank.size()-1;
     else if (rank<0) rank = 0;  // E.g. battle mode, which has rank -1
-    const std::vector<int> &summed_weights = m_summed_weights_for_rank[rank];
+    const std::vector<unsigned> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
 #undef ITEM_DISTRIBUTION_DEBUG
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    int original_random_number = random_number;
+    uint64_t original_random_number = random_number;
 #endif
     random_number = random_number % summed_weights.back();
     // Put the random number in range [1;max of summed weights],
@@ -415,8 +430,8 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
     // We align with the beginning of the enum and return
     // We don't do more, because it would need to be decoded from enum later
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    Log::verbose("Powerup", "World %d rank %d random %d %d item %d",
-                 World::getWorld()->getTimeTicks(), rank, random_number,
+    Log::verbose("Powerup", "World %d rank %d random %d %" PRIu64 " item %d",
+                 World::getWorld()->getTicksSinceStart(), rank, random_number,
                  original_random_number, powerup);
 #endif
 
@@ -430,7 +445,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
  *  \param type The type of the powerup.
  *  \param node The XML node with the data for this powerup.
  */
-void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
+void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
 {
     std::string icon_file("");
     node.get("icon", &icon_file);
@@ -465,6 +480,9 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
               << "', aborting.";
             throw std::runtime_error(o.str());
         }
+#ifndef SERVER_ONLY
+        SP::uploadSPM(m_all_meshes[type]);
+#endif
         m_all_meshes[type]->grab();
     }
     else
@@ -481,9 +499,9 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
              Cake::init(node, m_all_meshes[type]);       break;
         case POWERUP_RUBBERBALL:
              RubberBall::init(node, m_all_meshes[type]); break;
-        default:;
+        default: break;
     }   // switch
-}   // LoadNode
+}   // loadPowerup
 
 // ----------------------------------------------------------------------------
 /** Create a (potentially interpolated) WeightsData objects for the current
@@ -500,7 +518,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_TIME_TRIAL:     /* fall through */
     case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";     break;
     case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";      break;
-    case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle";   break;
+    case RaceManager::MINOR_MODE_BATTLE:      class_name="battle";   break;
     case RaceManager::MINOR_MODE_TUTORIAL:       class_name="tutorial"; break;
     case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:
@@ -571,7 +589,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
  */
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n,
-                                                             int random_number)
+                                                             uint64_t random_number)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
     if(powerup > POWERUP_LAST)
@@ -600,9 +618,11 @@ void PowerupManager::unitTesting()
     int num_weights = wd.m_summed_weights_for_rank[0].back();
     for(int i=0; i<num_weights; i++)
     {
+#ifdef DEBUG
         unsigned int n;
         assert( powerup_manager->getRandomPowerup(1, &n, i)==POWERUP_BOWLING );
         assert(n==3);
+#endif
     }
 
     // Test 2: Test all possible random numbers for 5 karts and rank 5

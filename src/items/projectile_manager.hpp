@@ -19,6 +19,9 @@
 #ifndef HEADER_PROJECTILEMANAGER_HPP
 #define HEADER_PROJECTILEMANAGER_HPP
 
+#include <map>
+#include <memory>
+#include <unordered_set>
 #include <vector>
 
 namespace irr
@@ -32,6 +35,7 @@ namespace irr
 class AbstractKart;
 class Flyable;
 class HitEffect;
+class Rewinder;
 class Track;
 class Vec3;
 
@@ -41,17 +45,20 @@ class Vec3;
 class ProjectileManager : public NoCopy
 {
 private:
-    typedef std::vector<Flyable*>   Projectiles;
     typedef std::vector<HitEffect*> HitEffects;
 
     /** The list of all active projectiles, i.e. projectiles which are
      *  currently moving on the track. */
-    Projectiles      m_active_projectiles;
+    std::map<std::string, std::shared_ptr<Flyable> > m_active_projectiles;
+
+    std::unordered_set<std::string> m_deleted_projectiles;
 
     /** All active hit effects, i.e. hit effects which are currently
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
+    std::string      getUniqueIdentity(AbstractKart* kart,
+                                       PowerupManager::PowerupType type);
     void             updateServer(int ticks);
 public:
                      ProjectileManager() {}
@@ -60,9 +67,6 @@ public:
     void             cleanup          ();
     void             update           (int ticks);
     void             updateGraphics   (float dt);
-    Flyable*         newProjectile    (AbstractKart *kart,
-                                       PowerupManager::PowerupType type);
-    void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
     bool             projectileIsClose(const AbstractKart * const kart,
                                        float radius);
@@ -74,6 +78,21 @@ public:
      *  \param hit_effect The hit effect to be added. */
     void             addHitEffect(HitEffect *hit_effect)
                                 { m_active_hit_effects.push_back(hit_effect); }
+    // ------------------------------------------------------------------------
+    std::shared_ptr<Rewinder>
+                           addRewinderFromNetworkState(const std::string& uid);
+    // ------------------------------------------------------------------------
+    std::shared_ptr<Flyable> newProjectile(AbstractKart *kart,
+                                           PowerupManager::PowerupType type);
+    // ------------------------------------------------------------------------
+    void addByUID(const std::string& uid, std::shared_ptr<Flyable> f)
+                                             { m_active_projectiles[uid] = f; }
+    // ------------------------------------------------------------------------
+    void removeByUID(const std::string& uid)
+                                           { m_active_projectiles.erase(uid); }
+    // ------------------------------------------------------------------------
+    void addDeletedUID(const std::string& uid)
+                                         { m_deleted_projectiles.insert(uid); }
 };
 
 extern ProjectileManager *projectile_manager;

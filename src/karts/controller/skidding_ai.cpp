@@ -562,7 +562,7 @@ void SkiddingAI::handleSteering(float dt)
 
         // Potentially adjust the point to aim for in order to either
         // aim to collect item, or steer to avoid a bad item.
-        if(m_ai_properties->m_collect_avoid_items)
+        if(m_ai_properties->m_collect_avoid_items && m_kart->getBlockedByPlungerTicks()<=0)
             handleItemCollectionAndAvoidance(&aim_point, last_node);
 
         steer_angle = steerToPoint(aim_point);
@@ -2054,9 +2054,24 @@ void SkiddingAI::handleAcceleration(int ticks)
 
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
-        if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
-            m_controls->setAccel(0.05f);
-        else
+        int item_skill = computeSkill(ITEM_SKILL);
+        float accel_threshold = 0.5f;
+
+        if (item_skill == 0)
+            accel_threshold = 0.3f;
+        else if (item_skill == 1)
+            accel_threshold = 0.5f;
+        else if (item_skill == 2)
+            accel_threshold = 0.6f;
+        else if (item_skill == 3)
+            accel_threshold = 0.7f;
+        else if (item_skill == 4)
+            accel_threshold = 0.8f;
+        // The best players, knowing the track, don't slow down with a plunger
+        else if (item_skill == 5)
+            accel_threshold = 1.0f;
+
+        if(m_kart->getSpeed() > m_kart->getCurrentMaxSpeed() * accel_threshold)
             m_controls->setAccel(0.0f);
         return;
     }
@@ -3071,10 +3086,28 @@ void SkiddingAI::setSteering(float angle, float dt)
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
     // Restrict steering when a plunger is in the face
+    // The degree of restriction depends on item_skill
+
+    //FIXME : the AI speed estimate in curves don't account for this restriction
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
-        if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
-        else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
+        int item_skill = computeSkill(ITEM_SKILL);
+        float steering_limit = 0.5f;
+        if (item_skill == 0)
+            steering_limit = 0.35f;
+        else if (item_skill == 1)
+            steering_limit = 0.45f;
+        else if (item_skill == 2)
+            steering_limit = 0.55f;
+        else if (item_skill == 3)
+            steering_limit = 0.65f;
+        else if (item_skill == 4)
+            steering_limit = 0.75f;
+        else if (item_skill == 5)
+            steering_limit = 0.9f;
+
+        if     (steer_fraction >  steering_limit) steer_fraction =  steering_limit;
+        else if(steer_fraction < -steering_limit) steer_fraction = -steering_limit;
     }
 
     const Skidding *skidding = m_kart->getSkidding();

@@ -758,6 +758,9 @@ PostProcessing::PostProcessing()
     STKTexManager::getInstance()->addTexture(m_areamap);
     areamap->drop();
 
+    // For preloading shaders
+    MotionBlurShader::getInstance();
+    LightningShader::getInstance();
 }   // PostProcessing
 
 // ----------------------------------------------------------------------------

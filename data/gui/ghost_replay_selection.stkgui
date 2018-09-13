@@ -38,8 +38,13 @@
         <div width="99%" align="center" layout="horizontal-row" height="fit">
             <div proportion="2" height="fit" layout="horizontal-row" >
                 <checkbox width="fit" id="replay_difficulty_toggle" text_align="left"/>
-                <spacer width="1%" height="fit"/>
+                <spacer width="2%" height="fit"/>
                 <label height="100%" text_align="left" I18N="In the ghost replay selection screen" text="Only show replays matching the current difficulty"/>
+            </div>
+            <div proportion="1" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="replay_multiplayer_toggle" text_align="left"/>
+                <spacer width="2%" height="fit"/>
+                <label height="100%" text_align="left" I18N="In the ghost replay selection screen" text="Hide multiplayer replays"/>
             </div>
         </div>
 

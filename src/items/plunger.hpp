@@ -42,28 +42,38 @@ private:
     RubberBand  *m_rubber_band;
 
     /** Ticks to keep the plunger alive while the rubber band is working. */
-    int         m_keep_alive;
+    int16_t      m_keep_alive;
 
     btVector3    m_initial_velocity;
 
-    bool m_reverse_mode;
+    bool m_reverse_mode, m_has_locally_played_sound, m_moved_to_infinity;
+
+    virtual void additionalPhysicsProperties() OVERRIDE { m_keep_alive = -1; }
+    virtual void hideNodeWhenUndoDestruction() OVERRIDE;
 public:
                  Plunger(AbstractKart *kart);
                 ~Plunger();
     static  void init(const XMLNode &node, scene::IMesh* missile);
-    virtual bool updateAndDelete(int ticks);
-    virtual void hitTrack ();
-    virtual bool hit      (AbstractKart *kart, PhysicalObject *obj=NULL);
-
+    virtual bool updateAndDelete(int ticks) OVERRIDE;
+    virtual void hitTrack () OVERRIDE;
+    virtual bool hit      (AbstractKart *kart, PhysicalObject *obj=NULL)
+        OVERRIDE;
+    // ------------------------------------------------------------------------
+    void         updateGraphics(float dt) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
      *  at the next update - which is used if the rubber band snaps.
      */
-    void setKeepAlive(int ticks) {m_keep_alive = ticks;}
+    void setKeepAlive(int16_t ticks)                  { m_keep_alive = ticks; }
     // ------------------------------------------------------------------------
     /** No hit effect when it ends. */
-    virtual HitEffect *getHitEffect() const {return NULL; }
+    virtual HitEffect *getHitEffect() const OVERRIDE           { return NULL; }
     // ------------------------------------------------------------------------
+    virtual BareNetworkString* saveState(std::vector<std::string>* ru)
+        OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+
 };   // Plunger
 
 #endif

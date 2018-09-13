@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <stdexcept>
 #include <string>
 #include <string.h>
 #include <vector>
@@ -74,6 +75,10 @@ protected:
     */
     std::string getString(int len) const
     {
+        if (m_current_offset > (int)m_buffer.size() ||
+            m_current_offset + len > (int)m_buffer.size())
+            throw std::out_of_range("getString out of range.");
+
         std::string a(m_buffer.begin() + (m_current_offset      ),
                       m_buffer.begin() + (m_current_offset + len));
         m_current_offset += len;
@@ -101,7 +106,7 @@ protected:
         {
             result <<= 8; // offset one byte
                           // add the data to result
-            result += m_buffer[offset - a];
+            result += m_buffer.at(offset - a);
         }
         return result;
     }   // get(int pos)
@@ -110,7 +115,7 @@ protected:
     template<typename T>
     T get() const
     {
-        return m_buffer[m_current_offset++];
+        return m_buffer.at(m_current_offset++);
     }   // get
 
 public:
@@ -169,6 +174,10 @@ public:
     int decodeStringW(irr::core::stringw *out) const;
     std::string getLogMessage(const std::string &indent="") const;
     // ------------------------------------------------------------------------
+    /** Returns the internal buffer of the network string. */
+    std::vector<uint8_t>& getBuffer() { return m_buffer; }
+
+    // ------------------------------------------------------------------------
     /** Returns a byte pointer to the content of the network string. */
     char* getData() { return (char*)(m_buffer.data()); };
 
@@ -191,7 +200,8 @@ public:
     {
         return (char*)(m_buffer.data()+m_current_offset); 
     }   // getCurrentData
-
+    // ------------------------------------------------------------------------
+    int getCurrentOffset() const                   { return m_current_offset; }
     // ------------------------------------------------------------------------
     /** Returns the remaining length of the network string. */
     unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
@@ -247,6 +257,21 @@ public:
     }   // addUInt32
 
     // ------------------------------------------------------------------------
+    /** Adds unsigned 64 bit integer. */
+    BareNetworkString& addUInt64(const uint64_t& value)
+    {
+        m_buffer.push_back((value >> 56) & 0xff);
+        m_buffer.push_back((value >> 48) & 0xff);
+        m_buffer.push_back((value >> 40) & 0xff);
+        m_buffer.push_back((value >> 32) & 0xff);
+        m_buffer.push_back((value >> 24) & 0xff);
+        m_buffer.push_back((value >> 16) & 0xff);
+        m_buffer.push_back((value >>  8) & 0xff);
+        m_buffer.push_back( value        & 0xff);
+        return *this;
+    }   // addUInt64
+
+    // ------------------------------------------------------------------------
     /** Adds a 4 byte floating point value. */
     BareNetworkString& addFloat(const float value)
     {
@@ -296,6 +321,9 @@ public:
     }   // addTime
 
     // Functions related to getting data from a network string
+    // ------------------------------------------------------------------------
+    /** Returns a unsigned 64 bit integer. */
+    inline uint64_t getUInt64() const { return get<uint64_t, 8>(); }
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getUInt32() const { return get<uint32_t, 4>(); }
@@ -420,8 +448,7 @@ public:
     /** Returns the protocol type of this message. */
     ProtocolType getProtocolType() const
     {
-        assert(!m_buffer.empty());
-        return (ProtocolType)(m_buffer[0] & ~PROTOCOL_SYNCHRONOUS);
+        return (ProtocolType)(m_buffer.at(0) & ~PROTOCOL_SYNCHRONOUS);
     }   // getProtocolType
 
     // ------------------------------------------------------------------------

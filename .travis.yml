@@ -5,6 +5,9 @@
 #
 sudo: false
 language: cpp
+os:
+  - linux
+  - osx
 compiler:
   - gcc
   - clang
@@ -44,33 +47,15 @@ before_script:
   - if "$UNITTEST"; then pushd ../ && mkdir stk-assets && cd stk-assets && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/models models && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/sfx sfx && mkdir library music tracks textures && cd ./textures && touch materials.xml && cd ../tracks/ && svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets/tracks/cave cave && cd ../../ && popd; fi
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-
-  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
-  # Use half of the available threads, gcc is memory hungry
-  - 'if [ ${CC} = "gcc" ]; then
-        export THREADS=$((`nproc` / 2));
-    else
-        export THREADS=$((`nproc` + 1));
-    fi'
-  - echo "THREADS = $THREADS"
-  - free -mt
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew bundle; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo mkdir -p /usr/local/include/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/; fi
 
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
-  - make VERBOSE=1 -j $THREADS
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
+  - make VERBOSE=1 -j3
   - if "$UNITTEST"; then ./bin/supertuxkart --unit-testing; fi
-
-notifications:
-  irc:
-    channels:
-      - "irc.freenode.org#supertuxkart"
-    skip_join: false
-    use_notice: true
-    template:
-      #- "[%{commit}: %{author}] %{message}"
-      #- "%{build_url}"
-      - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
-      - "Diff: %{compare_url}"
-      - "Build: %{build_url}"

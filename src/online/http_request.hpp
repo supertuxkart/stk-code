@@ -71,7 +71,12 @@ namespace Online
         /** String to store the received data in. */
         std::string m_string_buffer;
 
+        static std::string m_cert_location;
+
+        static struct curl_slist* m_http_header;
     protected:
+        bool m_disable_sending_log;
+
         virtual void prepareOperation() OVERRIDE;
         virtual void operation() OVERRIDE;
         virtual void afterOperation() OVERRIDE;

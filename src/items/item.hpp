@@ -130,7 +130,7 @@ protected:
     friend class ItemManager;
     friend class NetworkItemManager;
     // ------------------------------------------------------------------------
-    void setType(ItemType type) { m_type = type; }
+    virtual void setType(ItemType type) { m_type = type; }
 
 public:
          /** Constructor. 
@@ -235,6 +235,9 @@ public:
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
     // ------------------------------------------------------------------------
+    /** Returns the original type of this item. */
+    ItemType getOriginalType() const { return m_original_type; }
+    // ------------------------------------------------------------------------
     /** Sets the index of this item in the item manager list. */
     void setItemId(unsigned int n) { m_item_id = n; }
     // ------------------------------------------------------------------------
@@ -319,7 +322,7 @@ private:
     /** True if this item is predicted to exists. Used in networking only. */
     bool m_is_predicted;
 
-    void          setType(ItemType type);
+    void          setType(ItemType type) OVERRIDE;
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
 

@@ -37,6 +37,7 @@ class ShowCurve;
 
 class Skidding
 {
+friend class KartRewinder;
 public:
     LEAK_CHECK();
 private:
@@ -56,7 +57,7 @@ private:
 
     /** Keeps track on how long a kart has been skidding, in order to
      *  trigger the skidding bonus. */
-    float m_skid_time;
+    uint16_t m_skid_time;
 
     /** True if the kart has skidded long enough to get a skid bonus if it
      *  stopped skidding now. */
@@ -64,6 +65,14 @@ private:
 
     /** Set to >0 when a graphical jump is to be done. */
     float m_remaining_jump_time;
+
+    float m_graphical_remaining_jump_time;
+
+    float m_prev_visual_rotation;
+
+    float m_smoothing_time;
+
+    float m_smoothing_dt;
 
 public:
     /** SKID_NONE: Kart is currently not skidding.
@@ -91,7 +100,7 @@ private:
 
     unsigned int getSkidBonus(float *bonus_time, float *bonus_speed,
                               float *bonus_force) const;
-    float updateSteering(float steer, float dt);
+    float updateSteering(float steer, int ticks);
 public:
          Skidding(Kart *kart);
         ~Skidding();
@@ -105,7 +114,15 @@ public:
     /** Determines how much the graphics model of the kart should be rotated
      *  additionally (for skidding), depending on how long the kart has been
      *  skidding etc. */
-    float getVisualSkidRotation() const { return m_visual_rotation; };
+    float getVisualSkidRotation() const
+    {
+        if (m_smoothing_dt >= 0.0f)
+        {
+            return m_smoothing_dt * m_visual_rotation +
+                (1.0f - m_smoothing_dt) * m_prev_visual_rotation;
+        }
+        return m_visual_rotation;
+    }
     // ------------------------------------------------------------------------
     /** Returns the current skid factor in [1, skid_max_for_this_kart]. */
     float getSkidFactor() const { return m_skid_factor; }
@@ -127,7 +144,12 @@ public:
      *  actually using the skid bonus. */
     bool getSkidBonusReady() const { return m_skid_bonus_ready; }
     // ------------------------------------------------------------------------
-    bool isJumping() const { return m_remaining_jump_time > 0;  }
+    bool isJumping() const { return m_graphical_remaining_jump_time > 0;  }
+    // ------------------------------------------------------------------------
+    void prepareSmoothing();
+    // ------------------------------------------------------------------------
+    void checkSmoothing();
+
 };   // Skidding
 
 

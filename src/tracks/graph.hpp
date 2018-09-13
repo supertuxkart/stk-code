@@ -93,11 +93,13 @@ private:
     // ------------------------------------------------------------------------
     void createMesh(bool show_invisible=true,
                     bool enable_transparency=false,
-                    const video::SColor *track_color=NULL);
+                    const video::SColor *track_color=NULL,
+                    bool invert_x_z = false);
     // ------------------------------------------------------------------------
     void createMeshSP(bool show_invisible=true,
                       bool enable_transparency=false,
-                      const video::SColor *track_color=NULL);
+                      const video::SColor *track_color=NULL,
+                      bool invert_x_z = false);
     // ------------------------------------------------------------------------
     void cleanupDebugMesh();
     // ------------------------------------------------------------------------
@@ -143,7 +145,8 @@ public:
     // ------------------------------------------------------------------------
     RenderTarget* makeMiniMap(const core::dimension2du &dimension,
                               const std::string &name,
-                              const video::SColor &fill_color);
+                              const video::SColor &fill_color,
+                              bool invert_x_z);
     // ------------------------------------------------------------------------
     void mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     // ------------------------------------------------------------------------

@@ -116,21 +116,7 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    CPUParticleManager()
-    {
-        const float vertices[] =
-        {
-            -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, 1.0f, 1.0f,
-        };
-        glGenBuffers(1, &m_particle_quad);
-        glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-            GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+    CPUParticleManager();
     // ------------------------------------------------------------------------
     ~CPUParticleManager()
     {

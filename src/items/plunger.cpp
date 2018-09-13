@@ -39,6 +39,8 @@
 Plunger::Plunger(AbstractKart *kart)
        : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
+    m_has_locally_played_sound = false;
+    m_moved_to_infinity = false;
     const float gravity = 0.0f;
 
     setDoTerrainInfo(false);
@@ -100,7 +102,7 @@ Plunger::Plunger(AbstractKart *kart)
     {
         m_rubber_band = new RubberBand(this, kart);
     }
-    m_keep_alive = -1;
+    additionalPhysicsProperties();
 }   // Plunger
 
 // ----------------------------------------------------------------------------
@@ -117,7 +119,15 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Updates the bowling ball ineach frame. If this function returns true, the
+void Plunger::updateGraphics(float dt)
+{
+    Flyable::updateGraphics(dt);
+    if (m_rubber_band)
+        m_rubber_band->updateGraphics(dt);
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** Updates the plunger in each frame. If this function returns true, the
  *  object will be removed by the projectile manager.
  *  \param dt Time step size.
  *  \returns True of this object should be removed.
@@ -157,7 +167,7 @@ bool Plunger::updateAndDelete(int ticks)
  */
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
-    if(isOwnerImmunity(kart)) return false;
+    if (isOwnerImmunity(kart) || m_moved_to_infinity) return false;
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
@@ -166,8 +176,12 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         if(kart)
         {
             kart->blockViewWithPlunger();
-            if (kart->getController()->isLocalPlayerController())
+            if (kart->getController()->isLocalPlayerController() &&
+                !m_has_locally_played_sound)
+            {
+                m_has_locally_played_sound = true;
                 SFXManager::get()->quickSound("plunger");
+            }
         }
 
         m_keep_alive = 0;
@@ -175,13 +189,16 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 #ifndef SERVER_ONLY
         getNode()->setVisible(false);
 #endif
-        Physics::getInstance()->removeBody(getBody());
+        // Previously removeBody will break rewind
+        moveToInfinity();
+        m_moved_to_infinity = true;
     }
     else
     {
         m_keep_alive = stk_config->time2Ticks(m_owner->getKartProperties()
                                              ->getPlungerBandDuration()    );
 
+#ifndef SERVER_ONLY
         // Make this object invisible by placing it faaar down. Not that if
         // this objects is simply removed from the scene graph, it might be
         // auto-deleted because the ref count reaches zero.
@@ -190,7 +207,10 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         {
             node->setVisible(false);
         }
-        Physics::getInstance()->removeBody(getBody());
+#endif
+        // Previously removeBody will break rewind
+        moveToInfinity();
+        m_moved_to_infinity = true;
 
         if(kart)
         {
@@ -221,4 +241,33 @@ void Plunger::hitTrack()
     hit(NULL, NULL);
 }   // hitTrack
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Plunger::hideNodeWhenUndoDestruction()
+{
+    Flyable::hideNodeWhenUndoDestruction();
+    if (m_rubber_band)
+        m_rubber_band->remove();
+}   // hideNodeWhenUndoDestruction
+
+// ----------------------------------------------------------------------------
+BareNetworkString* Plunger::saveState(std::vector<std::string>* ru)
+{
+    BareNetworkString* buffer = Flyable::saveState(ru);
+    buffer->addUInt16(m_keep_alive).addUInt8(m_moved_to_infinity ? 1 : 0);
+    if (m_rubber_band)
+        buffer->addUInt8(m_rubber_band->getRubberBandTo());
+    else
+        buffer->addUInt8(255);
+    return buffer;
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void Plunger::restoreState(BareNetworkString *buffer, int count)
+{
+    Flyable::restoreState(buffer, count);
+    m_keep_alive = buffer->getUInt16();
+    m_moved_to_infinity = buffer->getUInt8() == 1;
+    int8_t rbt = buffer->getUInt8();
+    if (rbt != -1 && m_rubber_band)
+        m_rubber_band->setRubberBandTo((RubberBand::RubberBandTo)rbt);
+}   // restoreState

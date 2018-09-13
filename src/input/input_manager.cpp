@@ -302,9 +302,9 @@ void InputManager::handleStaticAction(int key, int value)
                 fgets(s, 256, stdin);
                 int t;
                 StringUtils::fromString(s,t);
-                RewindManager::get()->rewindTo(t, world->getTimeTicks());
+                RewindManager::get()->rewindTo(t, world->getTicksSinceStart());
                 Log::info("Rewind", "Rewinding from %d to %d",
-                          world->getTimeTicks(), t);
+                          world->getTicksSinceStart(), t);
             }
             break;
 
@@ -396,7 +396,7 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 if(control_is_pressed && race_manager->getMinorMode()!=
-                                          RaceManager::MINOR_MODE_3_STRIKES)
+                                          RaceManager::MINOR_MODE_BATTLE)
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL,
                                      10000);
                 else
