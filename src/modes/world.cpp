@@ -71,6 +71,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/profiler.hpp"
@@ -556,7 +557,18 @@ void World::onGo()
     // Reset track objects 1 more time to make sure all instances of moveable
     // fall at the same instant when race start in network
     if (NetworkConfig::get()->isNetworking())
-        Track::getCurrentTrack()->getTrackObjectManager()->reset();
+    {
+        PtrVector<TrackObject>& objs = Track::getCurrentTrack()
+            ->getTrackObjectManager()->getObjects();
+        for (TrackObject* curr : objs)
+        {
+            if (curr->getPhysicalObject())
+            {
+                curr->reset();
+                curr->resetEnabled();
+            }
+        }
+    }
 }   // onGo
 
 //-----------------------------------------------------------------------------
