@@ -20,6 +20,8 @@
 
 #include "config/user_config.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -228,7 +230,7 @@ void ServerLobby::setup()
     m_peers_votes.clear();
     m_timeout.store(std::numeric_limits<int64_t>::max());
     m_waiting_for_reset = false;
-
+    m_server_started_at = m_server_delay = 0;
     Log::info("ServerLobby", "Reset server to initial state.");
 }   // setup
 
@@ -2279,7 +2281,9 @@ void ServerLobby::configPeersStartTime()
     Log::info("ServerLobby", "Max ping from peers: %d, jitter tolerance: %d",
         max_ping, jitter_tolerance);
     // Delay server for max ping / 2 from peers and jitter tolerance.
-    start_time += (uint64_t)(max_ping / 2) + (uint64_t)jitter_tolerance;
+    m_server_delay = (uint64_t)(max_ping / 2) + (uint64_t)jitter_tolerance;
+    start_time += m_server_delay;
+    m_server_started_at = start_time;
     delete ns;
     m_state = WAIT_FOR_RACE_STARTED;
 
@@ -2410,3 +2414,27 @@ bool ServerLobby::isBannedForIP(const TransportAddress& addr) const
     }
     return is_banned;
 }   // isBannedForIP
+
+//-----------------------------------------------------------------------------
+float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
+                                                   unsigned kart_id)
+{
+    AbstractKart* k = World::getWorld()->getKart(kart_id);
+    if (k->getStartupBoost() != 0.0f)
+        return k->getStartupBoost();
+    uint64_t now = STKHost::get()->getNetworkTimer();
+    uint64_t client_time = now - ping / 2;
+    uint64_t server_time = client_time + m_server_delay;
+    int ticks = stk_config->time2Ticks(
+        (float)(server_time - m_server_started_at) / 1000.0f);
+    if (ticks < stk_config->time2Ticks(1.0f))
+    {
+        PlayerController* pc =
+            dynamic_cast<PlayerController*>(k->getController());
+        pc->displayPenaltyWarning();
+        return -1.0f;
+    }
+    float f = k->getStartupBoostFromStartTicks(ticks);
+    k->setStartupBoost(f);
+    return f;
+}   // getStartupBoostOrPenaltyForKart

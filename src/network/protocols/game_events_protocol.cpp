@@ -1,11 +1,13 @@
 #include "network/protocols/game_events_protocol.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -89,6 +91,42 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         ctf->resetFlag(data);
         break;
     }
+    case GE_STARTUP_BOOST:
+    {
+        if (NetworkConfig::get()->isServer())
+        {
+            uint8_t kart_id = data.getUInt8();
+            if (!event->getPeer()->availableKartID(kart_id))
+            {
+                Log::warn("GameProtocol", "Wrong kart id %d from %s.",
+                    kart_id, event->getPeer()->getAddress().toString().c_str());
+                return true;
+            }
+            float f = LobbyProtocol::get<ServerLobby>()
+                ->getStartupBoostOrPenaltyForKart(
+                event->getPeer()->getAveragePing(), kart_id);
+            NetworkString *ns = getNetworkString();
+            ns->setSynchronous(true);
+            ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id).addFloat(f);
+            sendMessageToPeers(ns, true);
+            delete ns;
+        }
+        else
+        {
+            uint8_t kart_id = data.getUInt8();
+            float boost = data.getFloat();
+            AbstractKart* k = World::getWorld()->getKart(kart_id);
+            if (boost < 0.0f)
+            {
+                PlayerController* pc =
+                    dynamic_cast<PlayerController*>(k->getController());
+                pc->displayPenaltyWarning();
+            }
+            else
+                k->setStartupBoost(boost);
+        }
+        break;
+    }
     default:
         Log::warn("GameEventsProtocol", "Unkown message type.");
         break;
@@ -146,3 +184,13 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace
+
+// ----------------------------------------------------------------------------
+void GameEventsProtocol::sendStartupBoost(uint8_t kart_id)
+{
+    NetworkString *ns = getNetworkString();
+    ns->setSynchronous(true);
+    ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id);
+    sendToServer(ns, /*reliable*/true);
+    delete ns;
+}   // sendStartupBoost

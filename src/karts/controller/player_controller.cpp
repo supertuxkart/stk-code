@@ -335,7 +335,6 @@ void PlayerController::update(int ticks)
                 World::getWorld()->getPhase() == WorldStatus::READY_PHASE)
             {
                 displayPenaltyWarning();
-                m_penalty_ticks = stk_config->m_penalty_ticks;
             }   // if penalty_time = 0
             m_controls->setBrake(false);
         }   // if key pressed
@@ -405,3 +404,9 @@ core::stringw PlayerController::getName() const
     }
     return name;
 }   // getName
+
+// ----------------------------------------------------------------------------
+void PlayerController::displayPenaltyWarning()
+{
+    m_penalty_ticks = stk_config->m_penalty_ticks;
+}   // displayPenaltyWarning

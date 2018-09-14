@@ -17,7 +17,8 @@ public:
         GE_PLAYER_GOAL = 4,
         GE_BATTLE_KART_SCORE = 5,
         GE_CTF_ATTACH = 6,
-        GE_CTF_RESET = 7
+        GE_CTF_RESET = 7,
+        GE_STARTUP_BOOST = 8,
     };   // GameEventType
 private:
     void eliminatePlayer(const NetworkString &ns);
@@ -29,6 +30,7 @@ public:
     virtual bool notifyEvent(Event* event) OVERRIDE;
     void kartFinishedRace(AbstractKart *kart, float time);
     void kartFinishedRace(const NetworkString &ns);
+    void sendStartupBoost(uint8_t kart_id);
     virtual void setup() OVERRIDE {}
     virtual void update(int ticks) OVERRIDE {};
     virtual void asynchronousUpdate() OVERRIDE{}

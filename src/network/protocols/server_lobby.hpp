@@ -148,6 +148,8 @@ private:
 
     std::atomic<uint32_t> m_waiting_players_counts;
 
+    uint64_t m_server_started_at, m_server_delay;
+
     unsigned m_server_id_online;
 
     bool m_registered_for_once_only;
@@ -275,6 +277,7 @@ public:
     bool isBannedForIP(const TransportAddress& addr) const;
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
+    float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

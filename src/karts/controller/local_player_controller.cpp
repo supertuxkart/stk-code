@@ -170,6 +170,12 @@ bool LocalPlayerController::action(PlayerAction action, int value,
                 World::getWorld()->getAuxiliaryTicks());
             m_kart->setStartupBoost(f);
         }
+        else if (NetworkConfig::get()->isClient())
+        {
+            auto ge = RaceEventManager::getInstance()->getProtocol();
+            assert(ge);
+            ge->sendStartupBoost((uint8_t)m_kart->getWorldKartId());
+        }
     }
 
     // If this event does not change the control state (e.g.
@@ -282,6 +288,7 @@ void LocalPlayerController::update(int ticks)
  */
 void LocalPlayerController::displayPenaltyWarning()
 {
+    PlayerController::displayPenaltyWarning();
     RaceGUIBase* m=World::getWorld()->getRaceGUI();
     if (m)
     {
