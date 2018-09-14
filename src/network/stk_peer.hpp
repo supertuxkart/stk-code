@@ -89,6 +89,8 @@ protected:
 
     std::atomic<uint32_t> m_average_ping;
 
+    std::set<unsigned> m_available_kart_ids;
+
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
     // ------------------------------------------------------------------------
@@ -181,6 +183,13 @@ public:
     bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
     // ------------------------------------------------------------------------
     bool isDisconnected() const               { return m_disconnected.load(); }
+    // ------------------------------------------------------------------------
+    void clearAvailableKartIDs() { m_available_kart_ids.clear(); }
+    // ------------------------------------------------------------------------
+    void addAvailableKartID(unsigned id)   { m_available_kart_ids.insert(id); }
+    // ------------------------------------------------------------------------
+    bool availableKartID(unsigned id)
+        { return m_available_kart_ids.find(id) != m_available_kart_ids.end(); }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

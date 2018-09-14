@@ -184,7 +184,13 @@ void GameProtocol::handleControllerAction(Event *event)
             //rewind_delta = not_rewound - cur_ticks;
         }
         uint8_t kart_id = data.getUInt8();
-        assert(kart_id < World::getWorld()->getNumKarts());
+        if (NetworkConfig::get()->isServer() &&
+            !event->getPeer()->availableKartID(kart_id))
+        {
+            Log::warn("GameProtocol", "Wrong kart id %d from %s.",
+                kart_id, event->getPeer()->getAddress().toString().c_str());
+            return;
+        }
 
         PlayerAction action = (PlayerAction)(data.getUInt8());
         int value   = data.getUInt32();

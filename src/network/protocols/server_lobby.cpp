@@ -496,13 +496,17 @@ void ServerLobby::asynchronousUpdate()
             m_game_setup->sortPlayersForGrandPrix();
             m_game_setup->sortPlayersForTeamGame();
             auto players = m_game_setup->getConnectedPlayers();
+            for (auto& player : players)
+                player->getPeer()->clearAvailableKartIDs();
             NetworkString* load_world = getNetworkString();
             load_world->setSynchronous(true);
             load_world->addUInt8(LE_LOAD_WORLD).encodeString(std::get<0>(result))
                 .addUInt8(std::get<1>(result)).addUInt8(std::get<2>(result))
                 .addUInt8((uint8_t)players.size());
-            for (auto player : players)
+            for (unsigned i = 0; i < players.size(); i++)
             {
+                std::shared_ptr<NetworkPlayerProfile>& player = players[i];
+                player->getPeer()->addAvailableKartID(i);
                 load_world->encodeString(player->getName())
                     .addUInt32(player->getHostId())
                     .addFloat(player->getDefaultKartColor())
