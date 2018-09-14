@@ -108,12 +108,6 @@ void PlayerController::resetInputState()
  */
 bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 {
-    if (!NetworkConfig::get()->isNetworking() ||
-        !NetworkConfig::get()->isServer())
-    {
-        if (m_penalty_ticks > 0)
-            return false;
-    }
     /** If dry_run (parameter) is true, this macro tests if this action would
      *  trigger a state change in the specified variable (without actually
      *  doing it). If it will trigger a state change, the macro will
@@ -330,29 +324,28 @@ void PlayerController::update(int ticks)
 
     if (World::getWorld()->isStartPhase())
     {
-        if (m_controls->getAccel() || m_controls->getBrake()||
-            m_controls->getFire()  || m_controls->getNitro())
+        if ((m_controls->getAccel() || m_controls->getBrake()||
+            m_controls->getFire() || m_controls->getNitro()) &&
+            !NetworkConfig::get()->isNetworking())
         {
-            // Only give penalty time in SET_PHASE.
+            // Only give penalty time in READY_PHASE.
             // Penalty time check makes sure it doesn't get rendered on every
             // update.
             if (m_penalty_ticks == 0 &&
-                World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
+                World::getWorld()->getPhase() == WorldStatus::READY_PHASE)
             {
                 displayPenaltyWarning();
                 m_penalty_ticks = stk_config->m_penalty_ticks;
             }   // if penalty_time = 0
-
             m_controls->setBrake(false);
-            m_controls->setAccel(0.0f);
         }   // if key pressed
 
         return;
     }   // if isStartPhase
 
-    if (!RewindManager::get()->isRewinding() && m_penalty_ticks > 0)
+    if (m_penalty_ticks != 0 &&
+        World::getWorld()->getTicksSinceStart() < m_penalty_ticks)
     {
-        m_penalty_ticks -= ticks;
         m_controls->setBrake(false);
         m_controls->setAccel(0.0f);
         return;

@@ -368,7 +368,6 @@ void Kart::reset()
     m_squash_time          = std::numeric_limits<float>::max();
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
-    m_has_started          = false;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
     m_ticks_last_crash     = 0;
@@ -378,7 +377,7 @@ void Kart::reset()
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
-
+    m_startup_boost        = 0.0f;
     for (int i=0;i<m_xyz_history_size;i++)
     {
         m_previous_xyz[i] = getXYZ();
@@ -1112,23 +1111,26 @@ void Kart::collectedItem(ItemState *item_state)
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
-/** Called the first time a kart accelerates after 'ready-set-go'. It searches
+/** Called the first time a kart accelerates after 'ready'. It searches
  *  through the startup times to find the appropriate slot, and returns the
  *  speed-boost from the corresponding entry.
  *  If the kart started too slow (i.e. slower than the longest time in the
  *  startup times list), it returns 0.
  */
-float Kart::getStartupBoost() const
+float Kart::getStartupBoostFromStartTicks(int ticks) const
 {
-    float t = stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
+    int ticks_since_ready = ticks - stk_config->time2Ticks(1.0f);
+    if (ticks_since_ready < 0)
+        return 0.0f;
+    float t = stk_config->ticks2Time(ticks_since_ready);
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
         if (t <= startup_times[i])
             return m_kart_properties->getStartupBoost()[i];
     }
-    return 0;
-}   // getStartupBoost
+    return 0.0f;
+}   // getStartupBoostFromStartTicks
 
 //-----------------------------------------------------------------------------
 /** Simulates gears by adjusting the force of the engine. It also takes the
@@ -2432,21 +2434,18 @@ bool Kart::playCustomSFX(unsigned int type)
  */
 void Kart::updatePhysics(int ticks)
 {
-    // Check if accel is pressed for the first time. The actual timing
-    // is done in getStartupBoost - it returns 0 if the start was actually
-    // too slow to qualify for a boost.
-    if(!m_has_started && m_controls.getAccel())
+    if (m_controls.getAccel() > 0.0f &&
+        World::getWorld()->getTicksSinceStart() == 1)
     {
-        m_has_started = true;
-        float f       = getStartupBoost();
-        if(f >= 0.0f)
+        if (m_startup_boost > 0.0f)
         {
-            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
+            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER,
+                100.0f * m_startup_boost);
             m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
-                            0.9f*f, f,
-                            /*engine_force*/200.0f,
-                            /*duration*/stk_config->time2Ticks(5.0f),
-                            /*fade_out_time*/stk_config->time2Ticks(5.0f));
+                0.9f * m_startup_boost, m_startup_boost,
+                /*engine_force*/200.0f,
+                /*duration*/stk_config->time2Ticks(5.0f),
+                /*fade_out_time*/stk_config->time2Ticks(5.0f));
         }
     }
     if (m_bounce_back_ticks > std::numeric_limits<int16_t>::min())

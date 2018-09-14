@@ -75,7 +75,7 @@
                      time-per-kart="0"  />
 
   <!-- Startup information.
-       Penalty: Penalty time if a kart accelerates before GO. -->
+       Penalty: Penalty time if a kart accelerates before SET. -->
   <startup penalty="1" />
 
   <!-- How often a news message is going to be displayed before
