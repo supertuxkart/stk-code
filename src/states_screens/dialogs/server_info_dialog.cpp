@@ -108,9 +108,8 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         row.push_back(ListWidget::ListCell(_("Time played"),
             -1, 1, true));
         player_list->addItem("player", row);
-        for (auto& p : players)
+        for (auto& r : players)
         {
-            auto& r = p.second;
             row.clear();
             row.push_back(ListWidget::ListCell(
                 std::get<0>(r) == -1 ? L"-" :
