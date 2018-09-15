@@ -35,72 +35,64 @@
                     <spinner id="skinchoice" width="30%"/>
                 </div>
 
-                <spacer width="5" height="3%"/>
+                <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <div proportion="1" height="fit" layout="horizontal-row">
-                        <checkbox id="showfps"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" I18N="In the ui settings" text="Display FPS" word_wrap="true"/>
-                    </div>
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="showfps"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Display FPS" word_wrap="true"/>
                 </div>
 
-                <spacer width="5" height="3%"/>
+                <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <div layout="horizontal-row" proportion="1" height="fit">
-                        <checkbox id="split_screen_horizontally"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" I18N="In the ui settings" text="Multiplayer splits screen horizontally" word_wrap="true"/>
-                    </div>
-
-                    <spacer width="2%" height="5"/>
-
-                    <div layout="horizontal-row" proportion="1" height="fit">
-                        <checkbox id="perPlayerDifficulty"/>
-                        <spacer width="2%" height="100%" />
-                        <label height="100%" I18N="In the ui settings" text="Enable per-player handicaps" word_wrap="true"/>
-                    </div>
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="split_screen_horizontally"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Multiplayer splits screen horizontally" word_wrap="true"/>
                 </div>
 
-                <spacer width="5" height="3%"/>
+                <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <div proportion="1" height="fit" layout="horizontal-row" >
-                        <checkbox id="enable-internet"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" I18N="In the ui settings" text="Connect to the Internet" word_wrap="true"/>
-                    </div>
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="perPlayerDifficulty"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Enable per-player handicaps" word_wrap="true"/>
+                </div>
 
-                    <spacer width="2%" height="5"/>
+                <spacer width="5" height="2%"/>
+
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="enable-internet"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Connect to the Internet" word_wrap="true"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
                     
-                    <div layout="horizontal-row" proportion="1" height="fit">
-                        <checkbox id="enable-hw-report"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" id="label-hw-report" I18N="In the ui settings"
-                               text="Send anonymous hardware statistics" word_wrap="true"/>
-                    </div>
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="enable-hw-report"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" id="label-hw-report" I18N="In the ui settings"
+                           text="Send anonymous hardware statistics" word_wrap="true"/>
                 </div>
 
-                <spacer width="5" height="3%"/>
+                <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <div layout="horizontal-row" proportion="1" height="fit">
-                        <checkbox id="show-login"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" I18N="In the ui settings" text="Always show login screen" word_wrap="true"/>
-                    </div>
-
-                    <spacer width="2%" height="5"/>
-
-                    <div proportion="1" height="fit" layout="horizontal-row" >
-                        <checkbox id="enable-lobby-chat"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" id="label-lobby-chat" I18N="In the ui settings" text="Enable chatting in networking lobby" word_wrap="true"/>
-                    </div>
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="show-login"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Always show login screen" word_wrap="true"/>
                 </div>
 
-                <spacer width="5" height="3%"/>
+                <spacer width="5" height="2%"/>
+
+                <div layout="horizontal-row" width="100%" height="6%">
+                    <checkbox id="enable-lobby-chat"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" id="label-lobby-chat" I18N="In the ui settings" text="Enable chatting in networking lobby" word_wrap="true"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
             </box>
         </div>
     </div>
