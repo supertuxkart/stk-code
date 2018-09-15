@@ -82,44 +82,78 @@ void OptionsScreenDevice::init()
     tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-    if (!m_config->isKeyboard())
+    ButtonWidget* disable_toggle = getWidget<ButtonWidget>("disable_toggle");
+
+    if (m_config->isGamePadAndroid())
     {
-        core::stringw label = (m_config->isEnabled()
-                            ? //I18N: button to disable a gamepad configuration
-                              _("Disable Device")
-                            : //I18N: button to enable a gamepad configuration
-                              _("Enable Device"));
+        delete_button->setActive(false);
+        disable_toggle->setActive(false);
+    }
+    else
+    {
+        core::stringw label;
+
+        if (!m_config->isKeyboard())
+        {
+            // Only allow to enable or disable a gamepad,
+            // as it is only in the list when connected
+            delete_button->setActive(false);
+
+            label = (m_config->isEnabled()
+                    ? //I18N: button to disable a gamepad configuration
+                        _("Disable Device")
+                    : //I18N: button to enable a gamepad configuration
+                        _("Enable Device"));
+        }
+        else
+        {
+            // Don't allow deleting the last config
+            delete_button->setActive(
+                       input_manager->getDeviceManager()->getKeyboardAmount() > 1);
+
+            label = (m_config->isEnabled()
+                    ? //I18N: button to disable a gamepad configuration
+                        _("Disable Configuration")
+                    : //I18N: button to enable a gamepad configuration
+                        _("Enable Configuration"));
+        }
 
         // Make sure button is wide enough as the text is being changed away
         // from the original value
         core::dimension2d<u32> size =
             GUIEngine::getFont()->getDimension(label.c_str());
-        const int needed = size.Width + delete_button->getWidthNeededAroundLabel();
-        if (delete_button->m_w < needed) delete_button->m_w = needed;
+        const int needed = size.Width + disable_toggle->getWidthNeededAroundLabel();
+        if (disable_toggle->m_w < needed) disable_toggle->m_w = needed;
 
-        delete_button->setLabel(label);
+        disable_toggle->setLabel(label);
     }
-    else if (m_config->isGamePadAndroid())
+
+    // Make the three buttons the same length, not strictly needed but will
+    // look nicer...
+    ButtonWidget* backBtn = getWidget<ButtonWidget>("back_to_device_list");
+    if (disable_toggle->m_w < delete_button->m_w)
     {
-        delete_button->setLabel(_("Delete Configuration"));
-        delete_button->setActive(false);
+        disable_toggle->m_w = delete_button->m_w;
     }
     else
     {
-        delete_button->setLabel(_("Delete Configuration"));
-        // Don't allow deleting the last config
-        delete_button->setActive(
-                   input_manager->getDeviceManager()->getKeyboardAmount() > 1);
+        delete_button->m_w = disable_toggle->m_w;
     }
-
-    // Make the two buttons the same length, not strictly needed but will
-    // look nicer...
-    ButtonWidget* backBtn = getWidget<ButtonWidget>("back_to_device_list");
-    if (backBtn->m_w < delete_button->m_w) backBtn->m_w   = delete_button->m_w;
-    else                               delete_button->m_w = backBtn->m_w;
+    // At this point, the delete button has the same width as the disable button.
+    // One comparison is enough.
+    if (backBtn->m_w < delete_button->m_w)
+    {
+        backBtn->m_w   = delete_button->m_w;
+    }
+    else
+    {
+        disable_toggle->m_w = backBtn->m_w;
+        delete_button->m_w  = backBtn->m_w;
+    }
 
     backBtn->moveIrrlichtElement();
     delete_button->moveIrrlichtElement();
+    disable_toggle->moveIrrlichtElement();
 
     LabelWidget* label = getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str(), false );
@@ -159,12 +193,13 @@ void OptionsScreenDevice::init()
     actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     actions->setSelectionID(0);
 
-    // Disable deletion keyboard configurations
+    // Disable deleting or disabling configuration mid-race
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
     
     if (in_game)
     {
-        getWidget<ButtonWidget>("delete")->setActive(false);
+        delete_button->setActive(false);
+        disable_toggle->setActive(false);
     }
 }   // init
 
@@ -567,27 +602,33 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
     }
     else if (name == "delete")
     {
-        if (m_config->isKeyboard())
+       // keyboard configs may be deleted
+       // They should be the only one to have the button enabled
+       //I18N: shown before deleting an input configuration
+        new MessageDialog( _("Are you sure you want to permanently delete "
+                             "this configuration?"),
+            MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false );
+    }
+    else if (name == "disable_toggle")
+    {
+        // gamepad and keyboard configs may be disabled
+        if (m_config->isEnabled())  m_config->setEnabled(false);
+        else                        m_config->setEnabled(true);
+
+        // update widget label
+        ButtonWidget* disable_toggle = getWidget<ButtonWidget>("disable_toggle");
+        if (!m_config->isKeyboard())
         {
-           // keyboard configs may be deleted
-           //I18N: shown before deleting an input configuration
-            new MessageDialog( _("Are you sure you want to permanently delete "
-                                 "this configuration?"),
-                MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false );
+            disable_toggle->setLabel(m_config->isEnabled() ? _("Disable Device")
+                                                          : _("Enable Device")  );
         }
         else
         {
-            // gamepad configs may be disabled
-            if (m_config->isEnabled())  m_config->setEnabled(false);
-            else                        m_config->setEnabled(true);
-
-            // update widget label
-            ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-            delete_button->setLabel(m_config->isEnabled() ? _("Disable Device")
-                                                      : _("Enable Device")  );
-
-            input_manager->getDeviceManager()->save();
+            disable_toggle->setLabel(m_config->isEnabled() ? _("Disable Configuration")
+                                                          : _("Enable Configuration")  );
         }
+
+        input_manager->getDeviceManager()->save();
     }
 
 }   // eventCallback
