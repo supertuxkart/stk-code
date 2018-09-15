@@ -318,6 +318,7 @@ void Kart::reset()
         stopFlying();
     }
 
+    m_network_finish_check_ticks = 0;
     // Add karts back in case that they have been removed (i.e. in battle
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
@@ -917,6 +918,10 @@ void Kart::finishedRace(float time, bool from_server)
     // it would trigger a race end again.
     if (m_finished_race) return;
 
+    const bool is_linear_race =
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER;
     if (NetworkConfig::get()->isNetworking() && !from_server)
     {
         if (NetworkConfig::get()->isServer())
@@ -928,6 +933,30 @@ void Kart::finishedRace(float time, bool from_server)
         // network game.
         else if (NetworkConfig::get()->isClient())
         {
+            if (is_linear_race && m_saved_controller == NULL &&
+                !RewindManager::get()->isRewinding())
+            {
+                m_network_finish_check_ticks =
+                    World::getWorld()->getTicksSinceStart() +
+                    stk_config->time2Ticks(1.0f);
+                EndController* ec = new EndController(this, m_controller);
+                Controller* old_controller = m_controller;
+                setController(ec);
+                // Seamless endcontroller replay
+                RewindManager::get()->addRewindInfoEventFunction(new
+                RewindInfoEventFunction(
+                    World::getWorld()->getTicksSinceStart(),
+                    /*undo_function*/[old_controller, this]()
+                    {
+                        m_controller = old_controller;
+                    },
+                    /*replay_function*/[ec, old_controller, this]()
+                    {
+                        m_saved_controller = old_controller;
+                        ec->reset();
+                        m_controller = ec;
+                    }));
+            }
             return;
         }
     }   // !from_server
@@ -943,10 +972,7 @@ void Kart::finishedRace(float time, bool from_server)
     // If this is spare tire kart, end now
     if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
-    if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
-         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-         && m_controller->isPlayerController())
+    if (is_linear_race && m_controller->isPlayerController())
     {
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
@@ -976,7 +1002,12 @@ void Kart::finishedRace(float time, bool from_server)
         setRaceResult();
         if (!isGhostKart())
         {
-            setController(new EndController(this, m_controller));
+            if (m_saved_controller == NULL)
+            {
+                setController(new EndController(this, m_controller));
+            }
+            else
+                m_saved_controller->finishedRace(time);
         }
         // Skip animation if this kart is eliminated
         if (m_eliminated || isGhostKart()) return;
@@ -1285,6 +1316,18 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
+    if (m_network_finish_check_ticks != 0 &&
+        World::getWorld()->getTicksSinceStart() >
+        m_network_finish_check_ticks &&
+        !m_finished_race && m_saved_controller != NULL)
+    {
+        Log::warn("Kart", "Missing finish race from server.");
+        m_network_finish_check_ticks = 0;
+        delete m_controller;
+        m_controller = m_saved_controller;
+        m_saved_controller = NULL;
+    }
+
     m_powerup->update(ticks);
 
     // Reset any instand speed increase in the bullet kart
