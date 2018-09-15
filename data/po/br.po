@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-05 08:17+0800\n"
-"PO-Revision-Date: 2018-09-10 13:58+0000\n"
+"POT-Creation-Date: 2018-09-12 22:54+0200\n"
+"PO-Revision-Date: 2018-09-15 15:38+0000\n"
 "Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>\n"
 "Language-Team: Breton (http://www.transifex.com/supertuxkart/supertuxkart/language/br/)\n"
 "MIME-Version: 1.0\n"
@@ -792,8 +792,8 @@ msgstr "Dastumit ar voest-prof glas, reiñ a raio deoc'h galloudoù."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
-#: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:32
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:16
 msgid "Avoid bananas!"
 msgstr "Tremenit e-bioù ar bananez!"
 
@@ -1061,7 +1061,7 @@ msgid ""
 "crown) decides so. Official servers may auto-start races only when there are"
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon kart or track is allowed only if it exists on all "
-"joinned players and the server."
+"joined players and the server."
 msgstr "Ur wech deuet e-barzh ar servijer, ur redadeg a loc'ho ur wech ma vo divizet gant an hini a zo perc'henn warni (diskouezet gant ur gurunenn). Ar servijerioù ofisiel a c'hall em-loc'hañ ar redadegoù pa vez tizhet an niver a c'hoarierien bastus hepken. Goude-se, gellout a rit choaz ho kart ha votiñ evit an droiad da redek warnañ da-heul. Aotreet e vez ul lugant kart pe un droiad ma 'z eus anezhañ gant an holl c'hoarierien kevreet ha war ar servijer."
 
 #. I18N: ./data/gui/help7.stkgui
@@ -1244,7 +1244,7 @@ msgstr "Ger-tremen evit ar servijoù prevez (diret)"
 #. I18N: In the server creation screen
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:130
-#: src/states_screens/server_selection.cpp:118
+#: src/states_screens/server_selection.cpp:121
 msgid "Difficulty"
 msgstr "Diaester"
 
@@ -1296,21 +1296,21 @@ msgstr "SuperTux"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/server_selection.cpp:119
+#: src/states_screens/server_selection.cpp:122
 msgid "Game mode"
 msgstr "Mod c'hoari"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:185 src/race/race_manager.hpp:180
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:180
 msgid "Normal Race"
 msgstr "Redadeg normal"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:187 src/race/race_manager.hpp:182
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:182
 msgid "Time Trial"
 msgstr "A-enep an amzer"
 
@@ -1322,7 +1322,7 @@ msgstr "Emgann"
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:189 src/race/race_manager.hpp:190
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:190
 msgid "Soccer"
 msgstr "Mell-droad"
 
@@ -1334,7 +1334,7 @@ msgstr "Krouiñ"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: Used as a verb, appears on the main networking menu (login button)
-#: src/states_screens/online_screen.cpp:60
+#: src/states_screens/online_screen.cpp:61
 msgid "Login"
 msgstr "Kevreañ"
 
@@ -1386,7 +1386,7 @@ msgstr "Kavout ur servijer"
 #. I18N: In the online multiplayer screen
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
-#: src/states_screens/create_server_screen.cpp:90
+#: src/states_screens/create_server_screen.cpp:91
 msgid "Create Server"
 msgstr "Krouiñ ur servijer"
 
@@ -1448,7 +1448,7 @@ msgstr "Ebarzhiñ chomlec'h ar servijer"
 #. I18N: Networking menu button
 #: src/states_screens/online_profile_base.cpp:112
 #: src/states_screens/online_profile_base.cpp:122
-#: src/states_screens/online_screen.cpp:58
+#: src/states_screens/online_screen.cpp:59
 msgid "Your profile"
 msgstr "Ho profil"
 
@@ -1657,7 +1657,7 @@ msgstr "Ouzhpennañ ur c'hoarier"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: src/states_screens/online_profile_achievements.cpp:71
-#: src/states_screens/server_selection.cpp:116
+#: src/states_screens/server_selection.cpp:119
 msgid "Name"
 msgstr "Anv"
 
@@ -1784,7 +1784,7 @@ msgstr "Etrefas an implijer"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/ghost_replay_selection.cpp:137
-#: src/states_screens/server_selection.cpp:117
+#: src/states_screens/server_selection.cpp:120
 msgid "Players"
 msgstr "C'hoarierien"
 
@@ -2142,218 +2142,223 @@ msgstr "Dilemel"
 msgid "Default kart color"
 msgstr "Liv ar c'hart dre-ziouer"
 
-#. I18N: ../stk-assets/karts/adiumy/kart.xml
+#. I18N: ../supertuxkart-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
 msgstr "Adiumi"
 
-#. I18N: ../stk-assets/karts/amanda/kart.xml
+#. I18N: ../supertuxkart-assets/karts/amanda/kart.xml
 msgid "Amanda"
 msgstr "Amanda"
 
-#. I18N: ../stk-assets/karts/beastie/kart.xml
+#. I18N: ../supertuxkart-assets/karts/beastie/kart.xml
 msgid "Beastie"
 msgstr "Beastie"
 
-#. I18N: ../stk-assets/karts/emule/kart.xml
+#. I18N: ../supertuxkart-assets/karts/emule/kart.xml
 msgid "Emule"
 msgstr "Emule"
 
-#. I18N: ../stk-assets/karts/gavroche/kart.xml
+#. I18N: ../supertuxkart-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
 msgstr "Gavroche"
 
-#. I18N: ../stk-assets/karts/gnu/kart.xml
+#. I18N: ../supertuxkart-assets/karts/gnu/kart.xml
 msgid "Gnu"
 msgstr "Gnu"
 
-#. I18N: ../stk-assets/karts/hexley/kart.xml
+#. I18N: ../supertuxkart-assets/karts/hexley/kart.xml
 msgid "Hexley"
 msgstr "Heksley"
 
-#. I18N: ../stk-assets/karts/kiki/kart.xml
+#. I18N: ../supertuxkart-assets/karts/kiki/kart.xml
 msgid "Kiki"
 msgstr "Kiki"
 
-#. I18N: ../stk-assets/karts/konqi/kart.xml
+#. I18N: ../supertuxkart-assets/karts/konqi/kart.xml
 msgid "Konqi"
 msgstr "Konki"
 
-#. I18N: ../stk-assets/karts/nolok/kart.xml
+#. I18N: ../supertuxkart-assets/karts/nolok/kart.xml
 msgid "Nolok"
 msgstr "Nolok"
 
-#. I18N: ../stk-assets/karts/pidgin/kart.xml
+#. I18N: ../supertuxkart-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
 msgstr "Pidgin"
 
-#. I18N: ../stk-assets/karts/puffy/kart.xml
+#. I18N: ../supertuxkart-assets/karts/puffy/kart.xml
 msgid "Puffy"
 msgstr "Puffy"
 
-#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+#. I18N: ../supertuxkart-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
 msgstr "Sara ar rederez"
 
-#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+#. I18N: ../supertuxkart-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
 msgstr "Sara ar strobinellerez"
 
-#. I18N: ../stk-assets/karts/suzanne/kart.xml
+#. I18N: ../supertuxkart-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
 msgstr "Suzanna"
 
-#. I18N: ../stk-assets/karts/tux/kart.xml
+#. I18N: ../supertuxkart-assets/karts/tux/kart.xml
 msgid "Tux"
 msgstr "Tux"
 
-#. I18N: ../stk-assets/karts/wilber/kart.xml
+#. I18N: ../supertuxkart-assets/karts/wilber/kart.xml
 msgid "Wilber"
 msgstr "Wilber"
 
-#. I18N: ../stk-assets/karts/xue/kart.xml
+#. I18N: ../supertuxkart-assets/karts/xue/kart.xml
 msgid "Xue"
 msgstr "Xue"
 
-#. I18N: ../stk-assets/tracks/abyss/track.xml
+#. I18N: ../supertuxkart-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
 msgstr "Abis rakliñvadel"
 
-#. I18N: ../stk-assets/tracks/battleisland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
 msgstr "Enezenn an emgann"
 
-#. I18N: ../stk-assets/tracks/candela_city/track.xml
+#. I18N: ../supertuxkart-assets/tracks/candela_city/track.xml
 msgid "Candela City"
 msgstr "Kêr Gandela"
 
-#. I18N: ../stk-assets/tracks/cave/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "Kaou X"
 
-#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
 msgstr "Templ Kokoa"
 
-#. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
 msgstr "Treuziñ ur park maïs"
 
-#. I18N: ../stk-assets/tracks/fortmagma/track.xml
+#. I18N: ../supertuxkart-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
 msgstr "Kreñvlec'h Magma"
 
-#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
 msgstr "Enezenn Gran Paradiso"
 
-#. I18N: ../stk-assets/tracks/greenvalley/track.xml
+#. I18N: ../supertuxkart-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
 msgstr "Traonienn c'hlas"
 
-#. I18N: ../stk-assets/tracks/hacienda/track.xml
+#. I18N: ../supertuxkart-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Hacienda"
 
-#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
 msgstr "Tachenn vell-droad skornet"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
 msgstr "Petra c'hoarvezh deoc'h, paourkaezh hipied? Ha steuziet e vefe ho levier Gnu?"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
 msgstr "O ya, sellit, em c'hastell emañ bremañ ha debret e vo da goan..."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
 msgstr "Ur c'hrouadur a-feson on-me memestra, kinnig a ran ur marc'had deoc'h neuze."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
 msgstr "Ma vezit trec'h warnon e-pad ar redadeg e laoskin an den kozh."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
 msgstr " C'hwi, avat, paourkaezh penn skañv ne voc'h ket barrek a-walc'h da reiñ lamm din - Roue ar C'hartoù 'zo ac'hanon!"
 
-#. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
 msgstr "Arenoù an tevennoù traezh"
 
-#. I18N: ../stk-assets/tracks/lasdunasscoccer/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasscoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
 msgstr "Stad Mell-droad an devenn"
 
-#. I18N: ../stk-assets/tracks/lighthouse/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Tro dro d'an tour tan"
 
-#. I18N: ../stk-assets/tracks/mansion/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
 msgstr "Maner Blackhill"
 
-#. I18N: ../stk-assets/tracks/mines/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mines/track.xml
 msgid "Old Mine"
 msgstr "Mengleuz kozh"
 
-#. I18N: ../stk-assets/tracks/minigolf/track.xml
+#. I18N: ../supertuxkart-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
 msgstr "Golf bihan"
 
-#. I18N: ../stk-assets/tracks/olivermath/track.xml
+#. I18N: ../supertuxkart-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "Klas jedoniezh Oliver"
 
-#. I18N: ../stk-assets/tracks/sandtrack/track.xml
+#. I18N: ../supertuxkart-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Lonk-traezh"
 
-#. I18N: ../stk-assets/tracks/scotland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
 msgstr "Poull Nessie"
 
-#. I18N: ../stk-assets/tracks/snowmountain/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
 msgstr "Bod ar C'hreiznoz"
 
-#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
 msgstr "Menez erc'het"
 
-#. I18N: ../stk-assets/tracks/soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
 msgstr "Tachenn mell-droad"
 
-#. I18N: ../stk-assets/tracks/stadium/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stadium/track.xml
 msgid "The Stadium"
 msgstr "Ar stadiom"
 
-#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
 msgstr "Embregerezh STK"
 
-#. I18N: ../stk-assets/tracks/temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/temple/track.xml
 msgid "Temple"
 msgstr "Templ"
 
-#. I18N: ../stk-assets/tracks/volcano_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
 msgstr "Enezenn an dislonk-tan"
 
-#. I18N: ../stk-assets/tracks/xr591/track.xml
+#. I18N: ../supertuxkart-assets/tracks/xr591/track.xml
 msgid "XR591"
 msgstr "XR591"
 
-#. I18N: ../stk-assets/tracks/zengarden/track.xml
+#. I18N: ../supertuxkart-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
 msgstr "Liorzh Zen"
 
@@ -2422,13 +2427,13 @@ msgstr "Kouviad"
 msgid "Guest %d"
 msgstr "Ostiz %d"
 
-#: src/config/user_config.cpp:652
+#: src/config/user_config.cpp:683
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr "Kempennet fall e oa ho kefluniadur, dilamet eo bet ha krouet e vo unan nevez a-benn neuze."
 
-#: src/config/user_config.cpp:663
+#: src/config/user_config.cpp:694
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
@@ -2478,7 +2483,7 @@ msgstr "Efedusted an nitro"
 #: src/guiengine/widgets/player_kart_widget.cpp:756
 #: src/karts/controller/local_player_controller.cpp:415
 #: src/karts/controller/player_controller.cpp:410
-#: src/network/protocols/client_lobby.cpp:672
+#: src/network/protocols/client_lobby.cpp:679
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3176,7 +3181,7 @@ msgstr "Aet eo ar maout ganit!"
 msgid "You finished the race!"
 msgstr "Echuet ho peus ar redadeg!"
 
-#: src/main.cpp:1788
+#: src/main.cpp:1749
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3187,23 +3192,23 @@ msgid ""
 "statistics\")."
 msgstr "Gouest eo SuperTuxKart kevreañ ouzh ur servijer da bellgargañ lugantoù ha kas kemennoù deoc'h diwar-benn an hizivadurioù. Dastum a reomp ivez statistikoù dizanv diwar-benn ar periant evit gellout sikour diorrenn STK. Lennit hor reolennoù a-fet buhez prevez war http://privacy.supertuxkart.net, mar plij. Ha fellout a ra deoc'h enaouiñ an arc'hweladur-mañ ? (Evit cheñch an dibarzh-mañ diwezhatoc'h, kit d'an dibarzhioù, diuzit an ivinell 'Etrefas an implijer' hag aozit \"Kevreañ ouzh an Internet\" ha \"Kas statistikoù dizanv a-fet periant\")."
 
-#: src/main.cpp:1980
+#: src/main.cpp:2006
 msgid "Your screen resolution is too low to run STK."
 msgstr "Ho spisder skramm a zo re izel evit gellet loc'hañ STK."
 
-#: src/main.cpp:2009
+#: src/main.cpp:2035
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Ho stur a zo re gozh e stumm dezhañ. Stailhit ar sturioù video nevesañ, mar plij."
 
-#: src/main.cpp:2027
+#: src/main.cpp:2053
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Re gozh e tiskouez bezañ stumm hoc'h OpenGL. Klaskit kavout un hizivadenn evit ho stur video. SuperTuxKart a c'houlenn %s pe gwelloc'h."
 
-#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:83
+#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:84
 msgid "Server connection timed out."
 msgstr "Kevreadur ouzh ar servijer diamzeriet."
 
@@ -3248,26 +3253,26 @@ msgstr "Vioù: %d /%d"
 msgid "Leader"
 msgstr "Hini kentañ"
 
-#: src/modes/linear_world.cpp:376
+#: src/modes/linear_world.cpp:377
 msgid "Final lap!"
 msgstr "Tro diwezhañ!"
 
-#: src/modes/linear_world.cpp:404
+#: src/modes/linear_world.cpp:405
 #, c-format
 msgid "Lap %i"
 msgstr "Tro %i"
 
-#: src/modes/linear_world.cpp:494
+#: src/modes/linear_world.cpp:495
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s gant %s"
 
-#: src/modes/linear_world.cpp:499
+#: src/modes/linear_world.cpp:500
 msgid "New fastest lap"
 msgstr "Tro herrekañ nevez"
 
-#: src/modes/linear_world.cpp:1026
+#: src/modes/linear_world.cpp:1027
 msgid "WRONG WAY!"
 msgstr "HENT FALL!"
 
@@ -3290,46 +3295,19 @@ msgstr "Skarzhet oc'h bet!"
 msgid "'%s' has been eliminated."
 msgstr "Skarzhet eo bet '%s'."
 
-#: src/network/network_config.cpp:181
-msgid "Normal Race (Grand Prix)"
-msgstr "Redadeg normal (Grand Prix)"
-
-#: src/network/network_config.cpp:183
-msgid "Time Trial (Grand Prix)"
-msgstr "A-enep an amzer (Grand Prix)"
-
-#. I18N: In the create server screen for battle server
-#: src/network/network_config.cpp:193
-#: src/states_screens/create_server_screen.cpp:177
-msgid "Free-For-All"
-msgstr "Pep hini evit e sac'h"
-
-#. I18N: In the create server screen for battle server
-#: src/network/network_config.cpp:195
-#: src/states_screens/create_server_screen.cpp:179
-msgid "Capture The Flag"
-msgstr "Pakañ ar banniel"
-
-#: src/network/protocols/client_lobby.cpp:84
+#: src/network/protocols/client_lobby.cpp:85
 msgid "Server has been shut down."
 msgstr "Chomet eo a-sav ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:85
+#: src/network/protocols/client_lobby.cpp:86
 msgid "You were kicked from the server."
 msgstr "Forbannet oc'h bet diwar ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:87
-#: src/network/protocols/client_lobby.cpp:234
-#: src/network/protocols/client_lobby.cpp:693
+#: src/network/protocols/client_lobby.cpp:88
+#: src/network/protocols/client_lobby.cpp:233
+#: src/network/protocols/client_lobby.cpp:700
 msgid "Bad network connection is detected."
 msgstr "Kevreadur kenrouedadel fall diguzhet."
-
-#. I18N: Message shown in network lobby to tell user that
-#. player name is clickable
-#: src/network/protocols/client_lobby.cpp:91
-msgid ""
-"Press player name in the list for player management and ranking information."
-msgstr "Pouezit war anv ar c'hoarier el listennad evit merañ ar c'hoarier hag an titouroù renkañ."
 
 #: src/network/protocols/client_lobby.cpp:449
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
@@ -3384,15 +3362,22 @@ msgstr "Roudenn: %s,\ntroioù: %d, eilpennet: %s"
 msgid "%s disconnected."
 msgstr "%s digevreet."
 
+#. I18N: Message shown in network lobby to tell user that
+#. player name is clickable
+#: src/network/protocols/client_lobby.cpp:538
+msgid ""
+"Press player name in the list for player management and ranking information."
+msgstr "Pouezit war anv ar c'hoarier el listennad evit merañ ar c'hoarier hag an titouroù renkañ."
+
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:559
+#: src/network/protocols/client_lobby.cpp:566
 #, c-format
 msgid "Server name: %s"
 msgstr "Anv ar servijer: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:567
+#: src/network/protocols/client_lobby.cpp:574
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
@@ -3400,107 +3385,127 @@ msgid "Difficulty: %s"
 msgstr "Live diaester: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:572
+#: src/network/protocols/client_lobby.cpp:579
 #, c-format
 msgid "Max players: %d"
 msgstr "C'hoarierien maksimom: %d"
 
-#: src/network/protocols/client_lobby.cpp:589
-#: src/states_screens/dialogs/server_info_dialog.cpp:90
+#: src/network/protocols/client_lobby.cpp:596
+#: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Mod c'hoari: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:601
-#: src/states_screens/create_server_screen.cpp:193
+#: src/network/protocols/client_lobby.cpp:608
+#: src/states_screens/create_server_screen.cpp:194
 msgid "Time limit"
 msgstr "Bevenn amzerel"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:602
-#: src/states_screens/create_server_screen.cpp:195
+#: src/network/protocols/client_lobby.cpp:609
+#: src/states_screens/create_server_screen.cpp:196
 msgid "Goals limit"
 msgstr "Bevenn palioù"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:606
+#: src/network/protocols/client_lobby.cpp:613
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Doare c'hoari mell-droad: %s"
 
-#: src/network/protocols/client_lobby.cpp:616
+#: src/network/protocols/client_lobby.cpp:623
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Araokadur ar Grand Prix: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:685
+#: src/network/protocols/client_lobby.cpp:692
 msgid "All players joined red or blue team."
 msgstr "An holl c'hoarierien a zo aet er skipailh ruz pe c'hlas."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:715
+#: src/network/protocols/client_lobby.cpp:722
 msgid "You are now the owner of server."
 msgstr "Perc'henner ar servijer emaoc'h bremañ."
 
-#: src/network/protocols/client_lobby.cpp:753
+#: src/network/protocols/client_lobby.cpp:760
 msgid "Connection refused: Server is busy."
 msgstr "Kevreadur nac'het: Ac'hubet emañ ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:757
+#: src/network/protocols/client_lobby.cpp:764
 msgid "Connection refused: You are banned from the server."
 msgstr "Kevreadur nac'het: Forbannet oc'h bet diwar ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:761
+#: src/network/protocols/client_lobby.cpp:768
 msgid "Connection refused: Server password is incorrect."
 msgstr "Kevreadur nac'het: Direizh eo ger-tremen ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:765
+#: src/network/protocols/client_lobby.cpp:772
 msgid "Connection refused: Game data is incompatible."
 msgstr "Kevreadur nac'het: Ne genglot ket roadennoù ar c'hoari."
 
-#: src/network/protocols/client_lobby.cpp:769
+#: src/network/protocols/client_lobby.cpp:776
 msgid "Connection refused: Server is full."
 msgstr "Kevreadur nac'het: Ar servijer 'zo leun-kouch."
 
-#: src/network/protocols/client_lobby.cpp:773
+#: src/network/protocols/client_lobby.cpp:780
 msgid "Connection refused: Invalid player connecting."
 msgstr "Kevreadur nac'het: Direizh eo kevreadur ar c'hoarier."
 
-#: src/network/protocols/connect_to_server.cpp:132
+#: src/network/protocols/connect_to_server.cpp:196
 msgid "No quick play server available."
 msgstr "Servijer lenn fonnus ebet hegerz."
 
-#: src/network/protocols/connect_to_server.cpp:285
-#: src/states_screens/online_screen.cpp:272
+#: src/network/protocols/connect_to_server.cpp:281
+#: src/states_screens/online_screen.cpp:273
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Dibosupl kevreañ ouzh ar servijer %s."
+
+#: src/network/server_config.cpp:234
+msgid "Normal Race (Grand Prix)"
+msgstr "Redadeg normal (Grand Prix)"
+
+#: src/network/server_config.cpp:236
+msgid "Time Trial (Grand Prix)"
+msgstr "A-enep an amzer (Grand Prix)"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:246
+#: src/states_screens/create_server_screen.cpp:178
+msgid "Free-For-All"
+msgstr "Pep hini evit e sac'h"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:248
+#: src/states_screens/create_server_screen.cpp:180
+msgid "Capture The Flag"
+msgstr "Pakañ ar banniel"
 
 #. I18N: Official means this server is hosted by STK team
 #: src/network/server.cpp:110
 msgid "Official"
 msgstr "Ofisiel"
 
-#: src/online/online_player_profile.cpp:436
+#: src/online/online_player_profile.cpp:434
 #, c-format
 msgid "%s is now online."
 msgstr "Enlinenn eo %s bremañ."
 
-#: src/online/online_player_profile.cpp:440
+#: src/online/online_player_profile.cpp:438
 #, c-format
 msgid "%s and %s are now online."
 msgstr "Enlinenn eo %s ha %s bremañ."
 
-#: src/online/online_player_profile.cpp:445
+#: src/online/online_player_profile.cpp:443
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "Enlinenn eo %s, %s ha %s bremañ."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:451
+#: src/online/online_player_profile.cpp:449
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3511,12 +3516,12 @@ msgstr[3] "Bez ez eus %d mignon enlinenn bremañ."
 msgstr[4] "Bez ez eus %d mignon enlinenn bremañ."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:499
+#: src/online/online_player_profile.cpp:497
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s a zo war ar servijer \"%s\" bremañ."
 
-#: src/online/online_player_profile.cpp:530
+#: src/online/online_player_profile.cpp:528
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
@@ -3526,7 +3531,7 @@ msgstr[2] "Bez ho peus %d goulenn mignon nevez!"
 msgstr[3] "Bez ho peus %d goulenn mignon nevez!"
 msgstr[4] "Bez ho peus %d goulenn mignon nevez!"
 
-#: src/online/online_player_profile.cpp:536
+#: src/online/online_player_profile.cpp:534
 msgid "You have a new friend request!"
 msgstr "Bez ho peus goulenn mignon nevez!"
 
@@ -3670,24 +3675,24 @@ msgstr[2] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
 msgstr[3] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
 msgstr[4] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
 
-#: src/states_screens/create_server_screen.cpp:89
+#: src/states_screens/create_server_screen.cpp:90
 msgid "Create LAN Server"
 msgstr "Krouiñ ur servijer mod LAN"
 
-#: src/states_screens/create_server_screen.cpp:94
+#: src/states_screens/create_server_screen.cpp:95
 #, c-format
 msgid "%s's server"
 msgstr "Servijer %s"
 
 #. I18N: In the create server screen
-#: src/states_screens/create_server_screen.cpp:155
+#: src/states_screens/create_server_screen.cpp:156
 msgid "No. of grand prix track(s)"
 msgstr "Nvr. a rodoù grand prix"
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/create_server_screen.cpp:159
+#: src/states_screens/create_server_screen.cpp:160
 #: src/states_screens/dialogs/custom_video_settings.cpp:62
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
@@ -3696,20 +3701,20 @@ msgid "Disabled"
 msgstr "Lazhet"
 
 #. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/create_server_screen.cpp:173
+#: src/states_screens/create_server_screen.cpp:174
 msgid "Battle mode"
 msgstr "Mod emgann"
 
 #. I18N: In the create server screen
-#: src/states_screens/create_server_screen.cpp:189
+#: src/states_screens/create_server_screen.cpp:190
 msgid "Soccer game type"
 msgstr "Doare c'hoari mell-droad"
 
-#: src/states_screens/create_server_screen.cpp:238
+#: src/states_screens/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "Etre 4 ha 30 arouezenn e rank bezañ hirder un anv!"
 
-#: src/states_screens/create_server_screen.cpp:255
+#: src/states_screens/create_server_screen.cpp:256
 msgid "Incorrect characters in password!"
 msgstr "Arouezioù direizh er ger-tremen!"
 
@@ -3952,26 +3957,26 @@ msgstr "Dae an Nitro"
 msgid "Ghost replay race"
 msgstr "Adlenn ar redadeg gant an tasmant"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:100
+#: src/states_screens/dialogs/server_info_dialog.cpp:99
 #: src/states_screens/race_gui_overworld.cpp:147
 msgid "Rank"
 msgstr "Renk"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:103
+#: src/states_screens/dialogs/server_info_dialog.cpp:102
 msgid "Player"
 msgstr "C'hoarier"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:106
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
 msgid "Scores"
 msgstr "Skoroù"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:109
+#: src/states_screens/dialogs/server_info_dialog.cpp:108
 msgid "Time played"
 msgstr "Amzer c'hoariet"
 
@@ -3980,7 +3985,7 @@ msgid "Input device already exists."
 msgstr "Trobarzhell enmont a zo anezhi dija."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
-#: src/states_screens/online_screen.cpp:239
+#: src/states_screens/online_screen.cpp:240
 msgid "No player available for connecting to server."
 msgstr "N'eus c'hoarier ebet da gevreañ ouzh ar servijer."
 
@@ -4193,7 +4198,7 @@ msgid ""
 msgstr "D'an holl dud:\nPouezit war ar bouton 'Diuzañ' evit emezelañ er c'hoari"
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online_screen.cpp:217
+#: src/states_screens/online_screen.cpp:218
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
@@ -4304,17 +4309,17 @@ msgid "Offline"
 msgstr "Ezlinenn"
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online_screen.cpp:107
+#: src/states_screens/online_screen.cpp:108
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Rankout a rit bezañ kevreet evit gellet c'hoari war ar genrouedad hollek. Klikit war hoc'h anv-implijer amañ a-us."
 
-#: src/states_screens/online_screen.cpp:244
+#: src/states_screens/online_screen.cpp:245
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
 msgstr "Ebarzhit chomlec'h ar servijer gant ar chomlec'h IP (diret) heuliet gant: goude ar porzh."
 
-#: src/states_screens/online_screen.cpp:255
+#: src/states_screens/online_screen.cpp:256
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "Chomlec'h servijer direizh: %s."
@@ -4784,25 +4789,25 @@ msgstr "Ar moned ouzh internet a zo lazhet, enaouit ar moned en dibarzhioù, mar
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/server_selection.cpp:124
+#: src/states_screens/server_selection.cpp:127
 msgid "Owner"
 msgstr "Perc'henner"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/server_selection.cpp:126
+#: src/states_screens/server_selection.cpp:129
 msgid "Distance (km)"
 msgstr "Hed (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/server_selection.cpp:209
+#: src/states_screens/server_selection.cpp:214
 msgid "Unknown"
 msgstr "Dizanv"
 
-#: src/states_screens/server_selection.cpp:315
+#: src/states_screens/server_selection.cpp:322
 msgid "No server is available."
 msgstr "N'eus servijer ebet hegerz."
 
-#: src/states_screens/server_selection.cpp:323
+#: src/states_screens/server_selection.cpp:330
 msgid "Fetching servers"
 msgstr "Oc'h adtapout servijoù"
 
@@ -4899,15 +4904,15 @@ msgstr "%d/%m/%Y"
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:408
+#: src/utils/translation.cpp:409
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
-#: ../stk-assets/tracks/overworld/scripting.as:15
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
 msgstr "Echuit an holl zaeioù da zivorailhañ an nor vras!"
 
-#: ../stk-assets/tracks/overworld/scripting.as:63
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:63
 msgid ""
 "You need more points\n"
 "to enter this challenge!\n"
@@ -4915,71 +4920,71 @@ msgid ""
 "available challenges."
 msgstr "Muioc'h a boentoù hoc'h eus ezhomm\nda vont en dae-mañ!\nTaolit ur sell ouzh ar gartenn vihan\nda gavout daeioù hegerz."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:21
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:21
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr "Herrekaat gant  <%s> ha sturit gant <%s> ha <%s>."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
-#: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:37
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:38
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr "Dastumit profoù, ha tennit gant an arm gant <%s> da zistrujañ ar boestadoù-se!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
-#: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:43
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:44
 #, c-format
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
 msgstr "Pouezit war <%s> da sellout war-gil. Tennit gant an arm gant <%s> ha pouezit war <%s> war an dro da dennañ war-gil!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
-#: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:53
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:54
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Implijit an nitro bet tapet ganeoc'h en ur bouezañ war <%s>!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:58
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:58
 msgid "Collect nitro bottles (we will use them after the curve)."
 msgstr "Dastumit boutailhadoù nitro (ganto e vo graet goude ar gammdro)."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:63
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:63
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr "C'hem! Ma c'hoarvez trubuilhoù deoc'h, pouezit war <%s> evit bezañ sikouret."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
-#: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:69
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:70
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
 msgstr "Herrekait ha pouezit war ar bouton <%s> en ur dreiñ evit riklañ. Aesoc'h e vo deoc'h treiñ buanoc'h en ur riklañ un tammig da gemer kammdroioù lemm."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
-#: ../stk-assets/tracks/tutorial/triggers.as:78
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:77
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:78
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr "Notennit eta, ma teuit a-benn da riklañ e-pad un nebeud segondennoù, e vo resevet ganeoc'h ur bonus tizh evel rekoñpañs!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
-#: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:82
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:83
 msgid "You are now ready to race. Good luck!"
 msgstr "Prest oc'h da gemer perzh er redadeg bremañ. Chañs vat!"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:28
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:28
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
 msgstr "Herrekait gant  <%s> ha sturit gant <%s> ha <%s>"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:59
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:59
 msgid "Collect nitro bottles (we will use them after the curve)"
 msgstr "Dastumit boutailhadoù nitro (ganto e vo graet goude ar gammdro)"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:64
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:64
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "C'hem! Ma c'hoarvez trubuilhoù deoc'h, pouezit war <%s> evit bezañ sikouret"
