@@ -112,9 +112,9 @@ void OptionsScreenDevice::init()
                        input_manager->getDeviceManager()->getKeyboardAmount() > 1);
 
             label = (m_config->isEnabled()
-                    ? //I18N: button to disable a gamepad configuration
+                    ? //I18N: button to disable a keyboard configuration
                         _("Disable Configuration")
-                    : //I18N: button to enable a gamepad configuration
+                    : //I18N: button to enable a keyboard configuration
                         _("Enable Configuration"));
         }
 
