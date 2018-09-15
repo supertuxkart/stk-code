@@ -1830,7 +1830,8 @@ void Kart::setSquash(float time, float slowdown)
   */
 bool Kart::isSquashed() const
 {
-    return m_max_speed->isSpeedDecreaseActive(MaxSpeed::MS_DECREASE_SQUASH);
+    return
+        m_max_speed->isSpeedDecreaseActive(MaxSpeed::MS_DECREASE_SQUASH) == 1;
 }   // setSquash
 
 //-----------------------------------------------------------------------------

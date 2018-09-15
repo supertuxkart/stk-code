@@ -484,7 +484,8 @@ void TracksScreen::onUpdate(float dt)
     }
 
     m_votes->setVisible(true);
-    int remaining_time = (m_vote_timeout - StkTime::getRealTimeMs()) / 1000;
+    int remaining_time = (int)
+        ((int64_t)m_vote_timeout - (int64_t)StkTime::getRealTimeMs()) / 1000;
     if (remaining_time < 0)
         remaining_time = 0;
     //I18N: In tracks screen, about voting of tracks in network
