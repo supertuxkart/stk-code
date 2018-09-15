@@ -133,26 +133,6 @@ void AddonsScreen::beforeAddingWidget()
     {
         w_filter_rating->addLabel(StringUtils::toWString(n / 2.0));
     }
-
-
-    GUIEngine::LabelWidget *w_tips =
-        getWidget<GUIEngine::LabelWidget>("tips_label");
-    bool ip = UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
-    if(!ip)
-    {
-        w_tips->setVisible(true);
-
-        w_tips->setText( _("Access to the Internet is disabled. "
-                           "(To enable it, go to options and "
-                           "select tab 'User Interface')"),
-                         false);
-
-        w_tips->m_properties[GUIEngine::PROP_HEIGHT] = "fit";
-        calculateLayout();
-
-        m_show_tips = true;
-    }
-
 }
 // ----------------------------------------------------------------------------
 
@@ -178,7 +158,9 @@ void AddonsScreen::init()
     m_type = "kart";
 
     bool ip = UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
-    if(ip)
+    //TODO : determine if the tips scrolling could be used
+    //       to display other useful messages or if it should be removed
+    if(true)
     {
         // Nothing to show in the tips label, disable it.
 
