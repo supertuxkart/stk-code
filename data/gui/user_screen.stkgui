@@ -61,13 +61,13 @@
 					<icon-button id="ok" width="fit" height="fit" icon="gui/green_check.png"
 								 I18N="In the user screen" text="OK" label_location="bottom"/>
 					<icon-button id="new_user" width="fit" height="fit" icon="gui/blue_plus.png"
-								 I18N="In the user screen" text="Add user" label_location="bottom"/>
+								 I18N="In the user screen" text="Add" label_location="bottom"/>
 					<icon-button id="delete" width="fit" height="fit" icon="gui/remove.png"
 								 I18N="In the user screen" text="Delete" label_location="bottom"/>
 					<icon-button id="rename" width="fit" height="fit" icon="gui/rename.png"
 								 I18N="In the user screen" text="Rename" label_location="bottom"/>
 					<icon-button id="default_kart_color" width="fit" height="fit" icon="gui/edit.png"
-								 I18N="In the user screen" text="Default kart color" label_location="bottom"/>
+								 I18N="In the user screen" text="Kart color" label_location="bottom"/>
 					<icon-button id="cancel" width="fit" height="fit" icon="gui/main_quit.png"
 								 I18N="In the user screen" text="Cancel" label_location="bottom"/>
 				</buttonbar>
