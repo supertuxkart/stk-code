@@ -68,6 +68,7 @@
 #include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"

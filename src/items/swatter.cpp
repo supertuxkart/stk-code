@@ -40,6 +40,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)

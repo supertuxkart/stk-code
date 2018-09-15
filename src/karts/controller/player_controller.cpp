@@ -33,6 +33,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"

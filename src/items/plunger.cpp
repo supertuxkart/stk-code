@@ -29,6 +29,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
+#include "network/network_string.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"

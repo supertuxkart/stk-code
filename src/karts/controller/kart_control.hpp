@@ -19,13 +19,12 @@
 #ifndef HEADER_KART_CONTROL_HPP
 #define HEADER_KART_CONTROL_HPP
 
-#include "network/network_string.hpp"
-#include "network/rewind_info.hpp"
+class BareNetworkString;
 
 /**
   * \ingroup controller
   */
-class KartControl : public EventRewinder
+class KartControl
 {
 public:
     /** The skidding control state: SC_NONE: not pressed;
@@ -51,8 +50,6 @@ private:
     /** True if the kart looks (and shoots) backwards. */
     bool  m_look_back;
 public:
-    virtual void undo(BareNetworkString *buffer);
-    virtual void rewind(BareNetworkString *buffer);
     void setSteer(float f);
     void setAccel(float f);
     void setBrake(bool b);
@@ -100,22 +97,10 @@ public:
     static int getLength() { return 9; }
     // ------------------------------------------------------------------------
     /** Copies the important data from this objects into a memory buffer. */
-    void saveState(BareNetworkString *buffer) const
-    {
-        buffer->add(m_steer);
-        buffer->add(m_accel);
-        buffer->addChar(getButtonsCompressed());
-    }   // saveState
-
+    void saveState(BareNetworkString *buffer) const;
     // ------------------------------------------------------------------------
     /** Restores this object from a previously saved memory  buffer. */
-    void rewindTo(BareNetworkString *buffer)
-    {
-        m_steer = buffer->getFloat();
-        m_accel = buffer->getFloat();
-        setButtonsCompressed(buffer->getUInt8());
-    }   // setFromMemory
-
+    void rewindTo(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Compresses all buttons into a single byte. */
     char getButtonsCompressed() const

@@ -28,6 +28,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"

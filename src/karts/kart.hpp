@@ -30,6 +30,7 @@
 
 #include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 
 #include <SColor.h>

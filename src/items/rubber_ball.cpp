@@ -27,6 +27,8 @@
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
+#include "network/network_string.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"

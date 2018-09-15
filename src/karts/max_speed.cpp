@@ -21,6 +21,7 @@
 #include "config/stk_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "network/network_string.hpp"
 #include "physics/btKart.hpp"
 
 #include <algorithm>
