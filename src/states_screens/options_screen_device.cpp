@@ -107,9 +107,12 @@ void OptionsScreenDevice::init()
         }
         else
         {
-            // Don't allow deleting the last config
-            delete_button->setActive(
-                       input_manager->getDeviceManager()->getKeyboardAmount() > 1);
+            // Don't allow deleting or disabling the last enabled config
+            bool enable = (input_manager->getDeviceManager()
+                                ->getActiveKeyboardAmount() > 1 ||
+                           !m_config->isEnabled());
+            delete_button->setActive(enable);
+            disable_toggle->setActive(enable);
 
             label = (m_config->isEnabled()
                     ? //I18N: button to disable a keyboard configuration
