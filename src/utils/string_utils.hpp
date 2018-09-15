@@ -26,6 +26,7 @@
 #include <vector>
 #include <sstream>
 #include <irrString.h>
+#include "utils/constants.hpp"
 #include "utils/types.hpp"
 #include "utils/log.hpp"
 
@@ -245,7 +246,24 @@ namespace StringUtils
     std::string wideToUtf8(const irr::core::stringw& input);
     std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
     std::string removeWhitespaces(const std::string& input);
-
+    inline std::string getUserAgentString()
+    {
+        std::string uagent(std::string("SuperTuxKart/") + STK_VERSION);
+#ifdef WIN32
+        uagent += (std::string)" (Windows)";
+#elif defined(__APPLE__)
+        uagent += (std::string)" (Macintosh)";
+#elif defined(__FreeBSD__)
+        uagent += (std::string)" (FreeBSD)";
+#elif defined(ANDROID)
+        uagent += (std::string)" (Android)";
+#elif defined(linux)
+        uagent += (std::string)" (Linux)";
+#else
+        // Unknown system type
+#endif
+        return uagent;
+    }
 } // namespace StringUtils
 
 #endif

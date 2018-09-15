@@ -300,7 +300,8 @@ void ClientLobby::update(int ticks)
     {
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
-            .addUInt32(ServerConfig::m_server_version);
+            .addUInt32(ServerConfig::m_server_version)
+            .encodeString(StringUtils::getUserAgentString());
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();

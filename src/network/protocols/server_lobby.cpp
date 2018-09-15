@@ -1362,6 +1362,9 @@ void ServerLobby::connectionRequested(Event* event)
         Log::verbose("ServerLobby", "Player refused: wrong server version");
         return;
     }
+    std::string user_version;
+    data.decodeString(&user_version);
+    event->getPeer()->setUserVersion(user_version);
 
     std::set<std::string> client_karts, client_tracks;
     const unsigned kart_num = data.getUInt16();
@@ -1615,9 +1618,10 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         {
             m_game_setup->addPlayer(npp);
             Log::info("ServerLobby",
-                "New player %s with online id %u from %s.",
+                "New player %s with online id %u from %s with %s.",
                 StringUtils::wideToUtf8(npp->getName()).c_str(),
-                npp->getOnlineId(), peer->getAddress().toString().c_str());
+                npp->getOnlineId(), peer->getAddress().toString().c_str(),
+                peer->getUserVersion().c_str());
         }
         updatePlayerList();
         peer->sendPacket(message_ack);

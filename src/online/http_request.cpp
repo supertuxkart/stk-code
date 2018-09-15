@@ -276,20 +276,7 @@ namespace Online
         } // end log http request
 
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
-        std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
-            #ifdef WIN32
-                    uagent += (std::string)" (Windows)";
-            #elif defined(__APPLE__)
-                    uagent += (std::string)" (Macintosh)";
-            #elif defined(__FreeBSD__)
-                    uagent += (std::string)" (FreeBSD)";
-            #elif defined(ANDROID)
-                    uagent += (std::string)" (Android)";
-            #elif defined(linux)
-                    uagent += (std::string)" (Linux)";
-            #else
-                    // Unknown system type
-            #endif
+        const std::string& uagent = StringUtils::getUserAgentString();
         curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
 
         m_curl_code = curl_easy_perform(m_curl_session);

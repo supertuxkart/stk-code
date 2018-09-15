@@ -35,6 +35,7 @@
 #include <memory>
 #include <numeric>
 #include <set>
+#include <string>
 #include <vector>
 
 class Crypto;
@@ -90,6 +91,8 @@ protected:
     std::atomic<uint32_t> m_average_ping;
 
     std::set<unsigned> m_available_kart_ids;
+
+    std::string m_user_version;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -190,6 +193,11 @@ public:
     // ------------------------------------------------------------------------
     bool availableKartID(unsigned id)
         { return m_available_kart_ids.find(id) != m_available_kart_ids.end(); }
+    // ------------------------------------------------------------------------
+    void setUserVersion(const std::string& uv)         { m_user_version = uv; }
+    // ------------------------------------------------------------------------
+    const std::string& getUserVersion() const        { return m_user_version; }
+
 };   // STKPeer
 
 #endif // STK_PEER_HPP
