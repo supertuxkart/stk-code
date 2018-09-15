@@ -27,6 +27,12 @@
 #include <openssl/hmac.h>
 
 // ============================================================================
+// AES GCM modes never writes anything when finalize, it only handles the tag
+// authentication, so we write to this dummy block instead of out of bounds
+// pointer, and AES GCM mode has the same ciphertext and plaintext size due to
+// block cipher in stream cipher mode.
+std::array<uint8_t, 16> unused_16_blocks;
+// ============================================================================
 std::string Crypto::base64(const std::vector<uint8_t>& input)
 {
     BIO *bmem, *b64;
@@ -85,7 +91,7 @@ bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
     if (EVP_EncryptUpdate(m_encrypt, cipher.data() + 4, &elen,
         ns.m_buffer.data(), (int)ns.m_buffer.size()) != 1)
         return false;
-    if (EVP_EncryptFinal_ex(m_encrypt, cipher.data() + 4 + elen, &elen) != 1)
+    if (EVP_EncryptFinal_ex(m_encrypt, unused_16_blocks.data(), &elen) != 1)
         return false;
     if (EVP_CIPHER_CTX_ctrl(m_encrypt, EVP_CTRL_GCM_GET_TAG, 4, cipher.data())
         != 1)
@@ -112,7 +118,7 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
         (int)(ns.m_buffer.size() - 4)) != 1)
         return false;
 
-    if (EVP_DecryptFinal_ex(m_decrypt, pt.data() + dlen, &dlen) > 0)
+    if (EVP_DecryptFinal_ex(m_decrypt, unused_16_blocks.data(), &dlen) > 0)
     {
         assert(dlen == 0);
         std::swap(ns.m_buffer, pt);
@@ -153,7 +159,7 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
         enet_packet_destroy(p);
         return NULL;
     }
-    if (EVP_EncryptFinal_ex(m_encrypt, packet_start, &elen) != 1)
+    if (EVP_EncryptFinal_ex(m_encrypt, unused_16_blocks.data(), &elen) != 1)
     {
         enet_packet_destroy(p);
         return NULL;
@@ -195,7 +201,7 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     {
         throw std::runtime_error("Failed to decrypt.");
     }
-    if (EVP_DecryptFinal_ex(m_decrypt, ns->m_buffer.data() + dlen, &dlen) > 0)
+    if (EVP_DecryptFinal_ex(m_decrypt, unused_16_blocks.data(), &dlen) > 0)
     {
         assert(dlen == 0);
         NetworkString* result = ns.get();
