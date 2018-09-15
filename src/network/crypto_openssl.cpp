@@ -139,11 +139,15 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
     if (p == NULL)
         return NULL;
 
-    std::array<uint8_t, 12> iv = m_iv;
+    std::array<uint8_t, 12> iv = {};
     std::unique_lock<std::mutex> ul(m_crypto_mutex);
-    uint32_t val = NetworkConfig::get()->isClient() ?
-        m_packet_counter++ : m_packet_counter--;
-    memcpy(iv.data(), &val, 4);
+
+    uint32_t val = ++m_packet_counter;
+    if (NetworkConfig::get()->isClient())
+        memcpy(iv.data(), &val, 4);
+    else
+        memcpy(iv.data() + 4, &val, 4);
+
     uint8_t* packet_start = p->data + 8;
 
     if (EVP_EncryptInit_ex(m_encrypt, NULL, NULL, NULL, iv.data()) != 1)
@@ -172,7 +176,7 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
     }
     ul.unlock();
 
-    memcpy(p->data, iv.data(), 4);
+    memcpy(p->data, &val, 4);
     return p;
 }   // encryptSend
 
@@ -182,8 +186,12 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     int clen = (int)(p->dataLength - 8);
     auto ns = std::unique_ptr<NetworkString>(new NetworkString(p->data, clen));
 
-    std::array<uint8_t, 12> iv = m_iv;
-    memcpy(iv.data(), p->data, 4);
+    std::array<uint8_t, 12> iv = {};
+    if (NetworkConfig::get()->isClient())
+        memcpy(iv.data() + 4, p->data, 4);
+    else
+        memcpy(iv.data(), p->data, 4);
+
     uint8_t* packet_start = p->data + 8;
     uint8_t* tag = p->data + 4;
     if (EVP_DecryptInit_ex(m_decrypt, NULL, NULL, NULL, iv.data()) != 1)

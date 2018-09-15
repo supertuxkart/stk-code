@@ -95,7 +95,7 @@ public:
         assert(!m_client_iv.empty());
         auto c = std::unique_ptr<Crypto>(new Crypto(decode64(m_client_key),
             decode64(m_client_iv)));
-        c->m_packet_counter = 1;
+        c->m_packet_counter = 0;
         return c;
     }
     // ------------------------------------------------------------------------
@@ -131,7 +131,7 @@ public:
         assert(key.size() == 16);
         assert(iv.size() == 12);
         std::copy_n(iv.begin(), 12, m_iv.begin());
-        m_packet_counter = (uint32_t)-1;
+        m_packet_counter = 0;
         gcm_aes128_set_key(&m_aes_context, key.data());
         gcm_aes128_set_iv(&m_aes_context, 12, iv.data());
     }
