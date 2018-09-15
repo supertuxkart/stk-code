@@ -437,10 +437,8 @@ void ServerLobby::asynchronousUpdate()
     {
         if (ServerConfig::m_owner_less)
         {
-            float player_size = (float)m_game_setup->getPlayerCount();
-            if ((player_size >=
-                (float)ServerConfig::m_server_max_players *
-                ServerConfig::m_start_game_threshold ||
+            int player_size = m_game_setup->getPlayerCount();
+            if ((player_size >= ServerConfig::m_min_start_game_players ||
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
             {
@@ -448,9 +446,7 @@ void ServerLobby::asynchronousUpdate()
                     (int64_t)
                     (ServerConfig::m_start_game_counter * 1000.0f));
             }
-            else if (player_size <
-                (float)ServerConfig::m_server_max_players*
-                ServerConfig::m_start_game_threshold &&
+            else if (player_size < ServerConfig::m_min_start_game_players &&
                 !m_game_setup->isGrandPrixStarted())
             {
                 m_timeout.store(std::numeric_limits<int64_t>::max());

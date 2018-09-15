@@ -275,7 +275,11 @@ void loadServerLobbyFromConfig()
         m_owner_less = true;
     }
     if (m_owner_less)
+    {
+        if (m_min_start_game_players > m_server_max_players)
+            m_min_start_game_players = 1;
         m_team_choosing = false;
+    }
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;

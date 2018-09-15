@@ -71,8 +71,9 @@ private:
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
 
-    float m_cur_starting_timer, m_start_threshold, m_start_timeout,
+    float m_cur_starting_timer, m_start_timeout,
         m_server_max_player;
+    unsigned m_min_start_game_players;
 
     bool m_allow_change_team, m_has_auto_start_in_server;
 
@@ -137,7 +138,7 @@ public:
                        KartTeam> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
-    void initAutoStartTimer(bool grand_prix_started, float start_threshold,
+    void initAutoStartTimer(bool grand_prix_started, unsigned min_players,
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t)             { m_cur_starting_timer = t; }
 

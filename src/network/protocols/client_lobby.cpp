@@ -574,9 +574,9 @@ void ClientLobby::handleServerInfo(Event* event)
     each_line = _("Difficulty: %s", difficulty_name);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
-    u_data = data.getUInt8();
+    unsigned max_player = data.getUInt8();
     //I18N: In the networking lobby
-    each_line = _("Max players: %d", (int)u_data);
+    each_line = _("Max players: %d", (int)max_player);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     u_data = data.getUInt8();
@@ -627,11 +627,10 @@ void ClientLobby::handleServerInfo(Event* event)
         }
     }
     // Auto start info
-    float start_threshold = data.getFloat();
+    unsigned min_players = data.getUInt8();
     float start_timeout = data.getFloat();
-    unsigned max_player = data.getUInt8();
     NetworkingLobby::getInstance()->initAutoStartTimer(grand_prix_started,
-        start_threshold, start_timeout, max_player);
+        min_players, start_timeout, max_player);
 
     // MOTD
     core::stringw motd;

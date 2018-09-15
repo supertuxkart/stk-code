@@ -143,8 +143,9 @@ void NetworkingLobby::init()
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
     m_ping_update_timer = 0.0f;
-    m_cur_starting_timer = m_start_threshold = m_start_timeout =
+    m_cur_starting_timer = m_start_timeout =
         m_server_max_player = std::numeric_limits<float>::max();
+    m_min_start_game_players = 0;
     m_timeout_message->setVisible(false);
 
     //I18N: In the networking lobby
@@ -252,13 +253,13 @@ void NetworkingLobby::onUpdate(float delta)
     if (m_has_auto_start_in_server && m_player_list)
     {
         m_timeout_message->setVisible(true);
-        float cur_player = (float)(m_player_list->getItemCount());
-        if (cur_player >= m_server_max_player * m_start_threshold &&
+        unsigned cur_player = m_player_list->getItemCount();
+        if (cur_player >= m_min_start_game_players &&
             m_cur_starting_timer == std::numeric_limits<float>::max())
         {
             m_cur_starting_timer = m_start_timeout;
         }
-        else if (cur_player < m_server_max_player * m_start_threshold)
+        else if (cur_player < m_min_start_game_players)
         {
             m_cur_starting_timer = std::numeric_limits<float>::max();
             //I18N: In the networking lobby, display the number of players
@@ -266,7 +267,7 @@ void NetworkingLobby::onUpdate(float delta)
             core::stringw msg =
                 _P("Game will start if there is more than %d player.",
                "Game will start if there are more than %d players.",
-               (int)ceil(m_server_max_player * m_start_threshold) - 1);
+               (int)(m_min_start_game_players - 1));
             m_timeout_message->setText(msg, true);
         }
 
@@ -534,15 +535,15 @@ void NetworkingLobby::cleanAddedPlayers()
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
-                                         float start_threshold,
+                                         unsigned min_players,
                                          float start_timeout,
                                          unsigned server_max_player)
 {
-    if (start_threshold == 0.0f || start_timeout == 0.0f)
+    if (min_players == 0 || start_timeout == 0.0f)
         return;
 
     m_has_auto_start_in_server = true;
-    m_start_threshold = grand_prix_started ? 0.0f : start_threshold;
+    m_min_start_game_players = grand_prix_started ? 0 : min_players;
     m_start_timeout = start_timeout;
     m_server_max_player = (float)server_max_player;
 }   // initAutoStartTimer

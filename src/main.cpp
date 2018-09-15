@@ -1228,10 +1228,9 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--min-players", &n))
     {
-        float threshold = ((float)(n) - 0.5f) / 
-                                         ServerConfig::m_server_max_players;
-        threshold = std::max(std::min(threshold, 1.0f), 0.0f);
-        ServerConfig::m_start_game_threshold = threshold;
+        if (n > ServerConfig::m_server_max_players)
+            n = 1;
+        ServerConfig::m_min_start_game_players = n;
     }
     if (CommandLine::has("--port", &n))
     {
