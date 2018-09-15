@@ -171,10 +171,12 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 
         break;
     case PA_ACCEL:
-        SET_OR_TEST(m_prev_accel, value);
-        if (value)
+    {
+        uint16_t v16 = (uint16_t)value;
+        SET_OR_TEST(m_prev_accel, v16);
+        if (v16)
         {
-            SET_OR_TEST_GETTER(Accel, value/32768.0f);
+            SET_OR_TEST_GETTER(Accel, v16 / 32768.0f);
             SET_OR_TEST_GETTER(Brake, false);
             SET_OR_TEST_GETTER(Nitro, m_prev_nitro);
         }
@@ -185,6 +187,7 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
             SET_OR_TEST_GETTER(Nitro, false);
         }
         break;
+    }
     case PA_BRAKE:
         SET_OR_TEST(m_prev_brake, value!=0);
         // let's consider below that to be a deadzone
@@ -374,8 +377,8 @@ void PlayerController::saveState(BareNetworkString *buffer) const
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    buffer->addUInt32(m_steer_val).addUInt32(m_prev_accel)
-        .addUInt8(m_prev_brake);
+    buffer->addUInt32(m_steer_val).addUInt16(m_prev_accel)
+        .addUInt8((m_prev_brake ? 1 : 0) | (m_prev_nitro ? 2 : 0));
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -384,8 +387,10 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
     m_steer_val  = buffer->getUInt32();
-    m_prev_accel = buffer->getUInt32();
-    m_prev_brake = buffer->getUInt8();
+    m_prev_accel = buffer->getUInt16();
+    uint8_t c = buffer->getUInt8();
+    m_prev_brake = (c & 1) != 0;
+    m_prev_nitro = (c & 2) != 0;
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
