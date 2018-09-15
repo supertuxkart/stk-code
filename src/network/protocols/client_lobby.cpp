@@ -636,9 +636,13 @@ void ClientLobby::handleServerInfo(Event* event)
     // MOTD
     core::stringw motd;
     data.decodeString16(&motd);
-    if (!motd.empty())
-        NetworkingLobby::getInstance()->addMoreServerInfo(motd);
-
+    const std::vector<core::stringw>& motd_line = StringUtils::split(motd,
+        '\n');
+    if (!motd_line.empty())
+    {
+        for (const core::stringw& motd : motd_line)
+            NetworkingLobby::getInstance()->addMoreServerInfo(motd);
+    }
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------
