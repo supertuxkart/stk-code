@@ -790,12 +790,9 @@ namespace StringUtils
 
     std::string wideToUtf8(const wchar_t* input)
     {
-        static std::vector<char> utf8line;
-        utf8line.clear();
-
+        std::vector<char> utf8line;
         utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
         utf8line.push_back(0);
-
         return std::string(&utf8line[0]);
     }   // wideToUtf8
 
@@ -811,12 +808,9 @@ namespace StringUtils
     /** Converts the irrlicht wide string to an utf8-encoded std::string. */
     irr::core::stringw utf8ToWide(const char* input)
     {
-        static std::vector<wchar_t> utf16line;
-        utf16line.clear();
-
+        std::vector<wchar_t> utf16line;
         utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
         utf16line.push_back(0);
-
         return irr::core::stringw(&utf16line[0]);
     }   // utf8ToWide
 
