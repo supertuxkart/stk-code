@@ -229,12 +229,16 @@ void Item::setType(ItemType type)
 {
     ItemState::setType(type);
     m_rotate = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
-    for (auto* node : m_node->getAllNodes())
+    
+    if (m_node != NULL)
     {
-        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
-        if (spmn)
+        for (auto* node : m_node->getAllNodes())
         {
-            spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+            if (spmn)
+            {
+                spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+            }
         }
     }
 }   // setType
@@ -260,15 +264,21 @@ void Item::switchBack()
     if (ItemState::switchBack()) 
         return;
 
-    Vec3 hpr;
-    hpr.setHPR(m_original_rotation);
-    m_node->setRotation(hpr.toIrrHPR());
+    if (m_node != NULL)
+    {
+        Vec3 hpr;
+        hpr.setHPR(m_original_rotation);
+        m_node->setRotation(hpr.toIrrHPR());
+    }
 }   // switchBack
 
 //-----------------------------------------------------------------------------
 void Item::setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh)
 {
 #ifndef SERVER_ONLY
+    if (m_node == NULL)
+        return;
+        
     unsigned i = 0;
     for (auto* node : m_node->getAllNodes())
     {
@@ -314,6 +324,7 @@ void Item::reset()
 {
     m_was_available_previously = true;
     ItemState::reset();
+    
     if (m_node != NULL)
     {
         m_node->setScale(core::vector3df(1,1,1));
@@ -339,7 +350,8 @@ void Item::setParent(const AbstractKart* parent)
  */
 void Item::updateGraphics(float dt)
 {
-    if(!m_node) return;
+    if (m_node == NULL)
+        return;
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     bool is_visible = isAvailable() || time_till_return <= 1.0f || 
