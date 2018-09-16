@@ -95,10 +95,10 @@ RaceGUIBase::RaceGUIBase()
                    "Can't find 'icons-frame.png' texture, aborting.");
     }
 
-    m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full.png"));
-    m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full_bright.png"));
-    m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_empty.png"));
-    m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_goal.png" ));
+    m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full.png"));
+    m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full_bright.png"));
+    m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_empty.png"));
+    m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_goal.png" ));
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 
@@ -900,7 +900,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             if (ctf->getRedHolder() == (int)kart_id)
             {
                 video::ITexture* red =
-                    irr_driver->getTexture(FileManager::GUI, "red_flag.png");
+                    irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
                 const core::rect<s32> rect(core::position2d<s32>(0, 0),
                     red->getSize());
                 const core::rect<s32> pos1
@@ -910,7 +910,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             else if (ctf->getBlueHolder() == (int)kart_id)
             {
                 video::ITexture* blue =
-                    irr_driver->getTexture(FileManager::GUI, "blue_flag.png");
+                    irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
                 const core::rect<s32> rect(core::position2d<s32>(0, 0),
                     blue->getSize());
                 const core::rect<s32> pos1

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+        <header id="title" text_align="center" width="80%" align="center" I18N="In the server creation screen" text="Server Creation"/>
+        <box proportion="1" width="90%" layout="vertical-row" align="center">
+
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Name of the server"/>
+                <textbox proportion="1" id="name" I18N="In the server creation screen"/>
+            </div>
+
+            <spacer height="10" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of players"/>
+                <gauge id="max_players" proportion="1" min_value="2"/>
+            </div>
+
+            <spacer height="10" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password for private server (optional)"/>
+                <textbox proportion="1" id="password" I18N="In the server creation screen"/>
+            </div>
+
+            <spacer height="5" width="20"/>
+
+            <label width="100%" height="fit" text_align="left" I18N="In the server creation screen" text="Difficulty"/>
+            <ribbon id="difficulty" height="15%" width="90%" align="center">
+                <icon-button id="novice" width="128" height="128" icon="gui/icons/difficulty_easy.png"
+                        I18N="Difficulty" text="Novice"/>
+                <icon-button id="intermediate" width="128" height="128" icon="gui/icons/difficulty_medium.png"
+                        I18N="Difficulty" text="Intermediate"/>
+                <icon-button id="expert" width="128" height="128" icon="gui/icons/difficulty_hard.png"
+                        I18N="Difficulty"  text="Expert"/>
+                <icon-button id="best" width="128" height="128" icon="gui/icons/difficulty_best.png"
+                        I18N="Difficulty"  text="SuperTux"/>
+            </ribbon>
+            <label width="100%" height="fit" text_align="left" I18N="In the server creation screen" text="Game mode"/>
+            <ribbon id="gamemode" height="15%" width="90%" align="center">
+                <icon-button id="normal" width="128" height="128" icon="gui/icons/mode_normal.png"
+                        I18N="Multiplayer game mode" text="Normal Race"/>
+                <icon-button id="timetrial" width="128" height="128" icon="gui/icons/mode_tt.png"
+                        I18N="Multiplayer game mode" text="Time Trial"/>
+                <icon-button id="3strikes" width="128" height="128" icon="gui/icons/weapons.png"
+                        I18N="Multiplayer game mode" text="Battle"/>
+                <icon-button id="soccer" width="128" height="128" icon="gui/icons/mode_soccer.png"
+                        I18N="Multiplayer game mode" text="Soccer"/>
+            </ribbon>
+
+            <spacer height="10" width="20"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="more-options"  proportion="1" text_align="left"/>
+                <spinner id="more-options-spinner" proportion="1" wrap_around="true"/>
+            </div>
+
+            <label id="info" proportion="1" width="100%" align="center" text_align="center" word_wrap="true" text=""/>
+
+            <buttonbar id="options" x="0" y="0" width="25%" height="12%" align="center">
+                <icon-button id="create" width="64" height="64" icon="gui/icons/green_check.png"
+                             I18N="In the server creation screen" text="Create" label_location="bottom"/>
+                <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
+                             I18N="In the server creation screen" text="Cancel" label_location="bottom"/>
+            </buttonbar>
+            
+            <spacer width="10" height="20"/>
+
+        </box>
+        <spacer width="10" height="10"/>
+    </div>
+</stkgui>

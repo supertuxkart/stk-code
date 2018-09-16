@@ -1524,9 +1524,9 @@ void World::initTeamArrows()
 
     //Loading the indicator textures
     std::string red_path =
-            file_manager->getAsset(FileManager::GUI, "red_arrow.png");
+            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
     std::string blue_path =
-            file_manager->getAsset(FileManager::GUI, "blue_arrow.png");
+            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
 
     //Assigning indicators
     for(unsigned int i = 0; i < kart_amount; i++)

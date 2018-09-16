@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Help" text_align="center"/>
+        <spacer height="1%" width="100%"/>
+
+        <div width="100%" height="92%" layout="horizontal-row" >
+
+            <vertical-tabs id="category" height="100%" width="18%">
+                <icon-button id="page1" width="128" height="128" icon="gui/icons/track_random.png"
+                        I18N="Tab in help menu" text="General"/>
+                <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
+                        I18N="Tab in help menu" text="Game Modes"/>
+                <icon-button id="page3" width="128" height="128" icon="gui/icons/weapons.png"
+                        I18N="Tab in help menu" text="Powerups"/>
+                <icon-button id="page4" width="128" height="128" icon="gui/icons/banana.png"
+                        I18N="Tab in help menu" text="Bananas"/>
+                <icon-button id="page5" width="128" height="128" icon="gui/icons/story_mode_book.png"
+                        I18N="Tab in help menu" text="Story Mode"/>
+                <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
+                        I18N="Tab in help menu" text="Kart classes"/>
+                <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
+                        I18N="Tab in help menu" text="Multi-player"/>
+            </vertical-tabs>
+
+            <spacer width="2%" height="100%"/>
+
+            <box width="80%" height="100%" layout="vertical-row">
+                <spacer height="1%" width="10"/>
+                <label align="center" word_wrap="true" text="Not all karts drive the same! They belong to classes with several differences:"/>
+                <spacer height="2%" width="10"/>                
+
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mass.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Mass - there are three classes of karts, depending of their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
+                </div>
+                
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/power.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Acceleration - especially useful at start, after an accident, or in tracks with a lot of sharp curves. The lighter the kart, the faster it accelerates, especially at low speeds."/>
+                </div>
+                
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/speed.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Max speed - the higher it is, the faster the kart can go. Especially useful in tracks with straight lines and gentle curves. Heavier karts have a higher top speed."/>
+                </div>
+
+                <div width="100%" proportion="3" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/nitro.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Nitro consumption - the lower it is, the more speed you can get from a can of nitro. The lighter the kart, the lower its nitro consumption."/>
+                </div>
+
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="128" height="128" icon="gui/icons/slipstream_icon.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%" word_wrap="true"
+                            I18N="In the help menu"
+                            text="If you follow closely another kart for a few seconds, you'll get a slipstream speed bonus when you overtake it. The lighter your kart, the easier it is."/>
+                </div>
+
+            </box>
+        </div>
+    </div>
+</stkgui>

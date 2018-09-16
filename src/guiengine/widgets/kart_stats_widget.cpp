@@ -106,7 +106,7 @@ void KartStatsWidget::setValues(const KartProperties* props,
     m_skills[SKILL_MASS]->setValue((int)
     	(kp_computed.getCombinedCharacteristic()->getMass()/3.89f));
     m_skills[SKILL_MASS]->setIcon(irr::core::stringc(
-            file_manager->getAsset(FileManager::GUI, "mass.png").c_str()));    
+            file_manager->getAsset(FileManager::GUI_ICON, "mass.png").c_str()));    
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
     m_skills[SKILL_MASS]->m_iconbutton->setTooltip( _("Mass") );
     
@@ -115,7 +115,7 @@ void KartStatsWidget::setValues(const KartProperties* props,
     m_skills[SKILL_SPEED]->setValue((int)
     	((kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20) * 15));
     m_skills[SKILL_SPEED]->setIcon(irr::core::stringc(
-            file_manager->getAsset(FileManager::GUI, "speed.png").c_str()));    
+            file_manager->getAsset(FileManager::GUI_ICON, "speed.png").c_str()));    
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
     m_skills[SKILL_SPEED]->m_iconbutton->setTooltip( _("Maximum speed") );
     
@@ -125,7 +125,7 @@ void KartStatsWidget::setValues(const KartProperties* props,
 
     m_skills[SKILL_ACCELERATION]->setValue((int)(kp_computed.getAccelerationEfficiency()*10));
     m_skills[SKILL_ACCELERATION]->setIcon(irr::core::stringc(
-            file_manager->getAsset(FileManager::GUI, "power.png").c_str()));    
+            file_manager->getAsset(FileManager::GUI_ICON, "power.png").c_str()));    
     m_skills[SKILL_ACCELERATION]->m_properties[PROP_ID] =
         StringUtils::insertValues("@p%i_acceleration", m_player_id);
     m_skills[SKILL_ACCELERATION]->m_iconbutton->setTooltip( _("Acceleration") );
@@ -136,7 +136,7 @@ void KartStatsWidget::setValues(const KartProperties* props,
     m_skills[SKILL_NITRO_EFFICIENCY]->setValue((int)
         (90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption()));
     m_skills[SKILL_NITRO_EFFICIENCY]->setIcon(irr::core::stringc(
-            file_manager->getAsset(FileManager::GUI, "nitro.png").c_str()));    
+            file_manager->getAsset(FileManager::GUI_ICON, "nitro.png").c_str()));    
     m_skills[SKILL_NITRO_EFFICIENCY]->m_properties[PROP_ID] =
         StringUtils::insertValues("@p%i_nitro_efficiency", m_player_id);
     m_skills[SKILL_NITRO_EFFICIENCY]->m_iconbutton->setTooltip( _("Nitro efficiency") );

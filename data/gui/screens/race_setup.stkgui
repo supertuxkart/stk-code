@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+        <header height="5%" width="80%" text="Race Setup" align="center" text_align="center" />
+
+        <spacer height="5%" width="25"/>
+        <bright width="100%" text="Select a difficulty" align="center" text_align="left" />
+        <spacer height="10" width="25"/>
+        <box width="100%" proportion="3" padding="10" layout="vertical-row">
+            
+            <ribbon id="difficulty" height="85%" width="100%" align="center">
+                <icon-button id="novice" width="fit" height="fit" icon="gui/icons/difficulty_easy.png"
+                        I18N="Difficulty" text="Novice"/>
+                <icon-button id="intermediate" width="fit" height="fit" icon="gui/icons/difficulty_medium.png"
+                        I18N="Difficulty" text="Intermediate"/>
+                <icon-button id="expert" width="fit" height="fit" icon="gui/icons/difficulty_hard.png"
+                        I18N="Difficulty"  text="Expert"/>
+                <icon-button id="best" width="fit" height="fit" icon="gui/icons/difficulty_best.png"
+                        I18N="Difficulty"  text="SuperTux"/>
+            </ribbon>
+        </box>
+        <spacer height="5%" width="25"/>
+
+        <bright width="100%" text="Select a game mode" align="center" text_align="left" />
+        
+        <spacer height="10" width="25"/>
+        <box width="100%" proportion="4" padding="10" layout="vertical-row">
+            <spacer height="5%" width="25" />
+            <scrollable_toolbar id="gamemode" height="60%" width="95%" label_location="bottom" align="center"
+                                child_width="256" child_height="256" />
+            <spacer proportion="1" width="25" />
+        </box>
+    </div>
+
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+</stkgui>

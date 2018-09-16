@@ -1697,14 +1697,14 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI,
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI_ICON,
                                                      "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                       "cup_gold.png"    ) );
 
     race_manager            = new RaceManager          ();
@@ -1923,7 +1923,7 @@ int main(int argc, char *argv[] )
         // Preload the explosion effects (explode.png)
         ParticleKindManager::get()->getParticles("explosion.xml");
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
@@ -1940,7 +1940,7 @@ int main(int argc, char *argv[] )
         // to initialise the AchievementsStatus, so it is done only now.
         PlayerManager::get()->initRemainingData();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
         projectile_manager->loadData();
 
@@ -1963,13 +1963,13 @@ int main(int argc, char *argv[] )
         powerup_manager->loadPowerupsModels();
         ItemManager::loadDefaultItemMeshes();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gift.png")       );
 
         attachment_manager->loadModels();
         file_manager->popTextureSearchPath();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first

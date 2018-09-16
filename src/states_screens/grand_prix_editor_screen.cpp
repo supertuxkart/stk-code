@@ -238,7 +238,7 @@ void GrandPrixEditorScreen::loadGPList()
             sshot_files.push_back(track->getScreenshotFile());
         }
         if (sshot_files.empty())
-            sshot_files.push_back(file_manager->getAsset(FileManager::GUI,"main_help.png"));
+            sshot_files.push_back(file_manager->getAsset(FileManager::GUI_ICON,"main_help.png"));
 
         if (m_gpgroup == GrandPrixData::GP_NONE || m_gpgroup == gp->getGroup())
         {

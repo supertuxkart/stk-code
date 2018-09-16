@@ -55,7 +55,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     m_track_screenshot_widget->m_tab_stop = false;
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    m_track_screenshot_widget->m_properties[PROP_ICON] = "gui/main_help.png";
+    m_track_screenshot_widget->m_properties[PROP_ICON] = "gui/icons/main_help.png";
 
     irr::video::ITexture* image = STKTexManager::getInstance()
         ->getTexture(track->getScreenshotFile(),

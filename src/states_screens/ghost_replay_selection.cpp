@@ -155,7 +155,7 @@ void GhostReplaySelection::init()
         m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
     }
 
-    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
                                                               "main_help.png"         ));
 
     m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);

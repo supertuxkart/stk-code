@@ -326,19 +326,19 @@ void OptionsScreenVideo::init()
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
 
             if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))
-                res->addItem(label, name, "/gui/screen54.png");
+                res->addItem(label, name, "/gui/icons/screen54.png");
             else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))
-                res->addItem(label, name, "/gui/screen43.png");
+                res->addItem(label, name, "/gui/icons/screen43.png");
             else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))
-                res->addItem(label, name, "/gui/screen1610.png");
+                res->addItem(label, name, "/gui/icons/screen1610.png");
             else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))
-                res->addItem(label, name, "/gui/screen53.png");
+                res->addItem(label, name, "/gui/icons/screen53.png");
             else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))
-                res->addItem(label, name, "/gui/screen32.png");
+                res->addItem(label, name, "/gui/icons/screen32.png");
             else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))
-                res->addItem(label, name, "/gui/screen169.png");
+                res->addItem(label, name, "/gui/icons/screen169.png");
             else
-                res->addItem(label, name, "/gui/screen_other.png");
+                res->addItem(label, name, "/gui/icons/screen_other.png");
 #undef ABOUT_EQUAL
         } // add next resolution
     } // end if not inited

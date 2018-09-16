@@ -103,9 +103,9 @@ void ServerSelection::loadedFromFile()
     m_game_started->setState(false);
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon1 = irr_driver->getTexture(
-        file_manager->getAsset(FileManager::GUI, "green_check.png"));
+        file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
     video::ITexture* icon2 = irr_driver->getTexture(
-        file_manager->getAsset(FileManager::GUI, "hourglass.png"));
+        file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
     m_icon_bank->addTextureAsSprite(icon1);
     m_icon_bank->addTextureAsSprite(icon2);
 }   // loadedFromFile

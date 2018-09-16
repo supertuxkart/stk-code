@@ -164,7 +164,7 @@ void MainMenuScreen::init()
     DemoWorld::resetIdleTime();
 
 #if _IRR_MATERIAL_MAX_TEXTURES_ < 8
-    getWidget<IconButtonWidget>("logo")->setImage("gui/logo_broken.png",
+    getWidget<IconButtonWidget>("logo")->setImage("gui/icons/logo_broken.png",
         IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 #endif
 

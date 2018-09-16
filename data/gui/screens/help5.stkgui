@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Help" text_align="center"/>
+        <spacer height="1%" width="100%"/>
+
+        <div width="100%" height="92%" layout="horizontal-row" >
+
+            <vertical-tabs id="category" height="100%" width="18%">
+                <icon-button id="page1" width="128" height="128" icon="gui/icons/track_random.png"
+                        I18N="Tab in help menu" text="General"/>
+                <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
+                        I18N="Tab in help menu" text="Game Modes"/>
+                <icon-button id="page3" width="128" height="128" icon="gui/icons/weapons.png"
+                        I18N="Tab in help menu" text="Powerups"/>
+                <icon-button id="page4" width="128" height="128" icon="gui/icons/banana.png"
+                        I18N="Tab in help menu" text="Bananas"/>
+                <icon-button id="page5" width="128" height="128" icon="gui/icons/story_mode_book.png"
+                        I18N="Tab in help menu" text="Story Mode"/>
+                <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
+                        I18N="Tab in help menu" text="Kart classes"/>
+                <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
+                        I18N="Tab in help menu" text="Multi-player"/>
+            </vertical-tabs>
+
+            <spacer width="2%" height="100%"/>
+
+            <box width="80%" height="100%" layout="vertical-row">
+                <spacer height="1%" width="10"/>
+                <label align="center" word_wrap="true" text="The evil Nolok has captured Gnu! Here are a few tips to help you:"/>
+                <spacer height="2%" width="10"/>
+                
+                <div width="100%" proportion="5" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/challenge.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="This icon on the minimap shows the available challenges you've not completed. In the top-right of the screen, it also tells you how many points you currently have. Complete as many challenges as possible, and Nolok will accept to race against you. Win to liberate Gnu!"/>
+                </div>
+                
+                <div width="100%" proportion="4" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/cup_gold.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="When you complete a challenge, you get a cup. Each cup is worth several points. The higher the difficulty you completed the challenge in, the better the cup and the more points it is worth."/>
+                </div>
+                
+                <div width="100%" proportion="3" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mystery_unlock.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="When you get the number of points indicated below this icon, you'll be gifted a surprise. There are several to collect."/>
+                </div>
+            </box>
+        </div>
+    </div>
+</stkgui>

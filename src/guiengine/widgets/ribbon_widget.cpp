@@ -410,11 +410,11 @@ void RibbonWidget::add()
                 irr_driver->getTexture((filename).c_str());
             if(!image)
             {
-                std::string file = file_manager->getAsset(FileManager::GUI,"main_help.png");
+                std::string file = file_manager->getAsset(FileManager::GUI_ICON,"main_help.png");
                 image = irr_driver->getTexture(file);
                 if(!image)
                     Log::fatal("RibbonWidget",
-                        "Can't find fallback texture 'gui/main_help.png, aborting.");
+                        "Can't find fallback texture 'gui/icons/main_help.png, aborting.");
             }
 
             float image_h = (float)image->getSize().Height;

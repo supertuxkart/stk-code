@@ -1776,7 +1776,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     SkinConfig::m_render_params["bottom-bar::neutral"].getImage();
                 if(!tex)
                 {
-                    tex = irr_driver->getTexture(FileManager::GUI, "main_help.png");
+                    tex = irr_driver->getTexture(FileManager::GUI_ICON, "main_help.png");
                     if(!tex)
                         Log::fatal("Skin",
                         "Can't find fallback texture 'main_help.png, aborting.");
@@ -1790,7 +1790,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
             else if (widget.isTopBar())
             {
                 ITexture* tex =
-                    irr_driver->getTexture(FileManager::GUI, "top_bar.png");
+                    irr_driver->getTexture(FileManager::GUI_ICON, "top_bar.png");
 
                 core::recti r1(0,               0,
                                (int)widget.m_w, (int)widget.m_h);
@@ -2088,21 +2088,21 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
 {
     if (widget->m_badges & LOCKED_BADGE)
     {
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png");
         float max_icon_size = 0.5f; // Lock badge can be quite big
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & OK_BADGE)
     {
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "green_check.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & BAD_BADGE)
     {
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "red_mark.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, false);
@@ -2110,28 +2110,28 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & TROPHY_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "cup_bronze.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & GAMEPAD_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gamepad.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & LOADING_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
@@ -2410,7 +2410,7 @@ ITexture* Skin::getImage(const char* name)
     }
     else
     {
-        return irr_driver->getTexture(FileManager::GUI,"main_help.png");
+        return irr_driver->getTexture(FileManager::GUI_ICON,"main_help.png");
     }
 }   // getImage
 

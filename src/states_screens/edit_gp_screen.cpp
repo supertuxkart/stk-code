@@ -242,7 +242,7 @@ void EditGPScreen::loadList(const int selected)
         if (screenShot == NULL)
         {
             screenShot = irr_driver->getTexture(
-                file_manager->getAsset(FileManager::GUI, "main_help.png"));
+                file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
         }
         assert (screenShot != NULL);
         m_icons.push_back(m_icon_bank->addTextureAsSprite(screenShot));

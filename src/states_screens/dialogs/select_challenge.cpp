@@ -169,7 +169,7 @@ void SelectChallengeDialog::updateSolvedIcon(const ChallengeStatus* c, RaceManag
     if (c->isSolved(diff))
     {
         IconButtonWidget* btn = getWidget<IconButtonWidget>(widget_name);
-        btn->setImage(file_manager->getAsset(FileManager::GUI, path),
+        btn->setImage(file_manager->getAsset(FileManager::GUI_ICON, path),
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
 } //updateSolvedIcon

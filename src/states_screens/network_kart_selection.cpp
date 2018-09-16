@@ -36,7 +36,7 @@ void NetworkKartSelectionScreen::init()
 
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
-    back_button->setImage("gui/main_quit.png");
+    back_button->setImage("gui/icons/main_quit.png");
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert(w != NULL);

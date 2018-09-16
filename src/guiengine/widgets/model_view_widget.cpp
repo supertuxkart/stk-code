@@ -54,7 +54,7 @@ m_rtt_size(rtt_size)
     m_angle = 0;
 
     // so that the base class doesn't complain there is no icon defined
-    m_properties[PROP_ICON]="gui/main_help.png";
+    m_properties[PROP_ICON]="gui/icons/main_help.png";
 
     m_rtt_unsupported = ProfileWorld::isNoGraphics();
 }   // ModelViewWidget
@@ -70,7 +70,7 @@ ModelViewWidget::~ModelViewWidget()
 void ModelViewWidget::add()
 {
     // so that the base class doesn't complain there is no icon defined
-    m_properties[PROP_ICON]="gui/main_help.png";
+    m_properties[PROP_ICON]="gui/icons/main_help.png";
 
     IconButtonWidget::add();
 

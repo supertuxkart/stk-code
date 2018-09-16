@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="0%" y="0%" width="100%" height="98%" layout="vertical-row" >
+
+        <div x="0" y="0" width="100%" layout="horizontal-row" height="8%">
+            <icon-button id="back"   height="100%" icon="gui/icons/back.png"/>
+            <header text_align="center" proportion="1" text="Server Selection" align="center"/>
+            <icon-button id="reload"   height="90%" icon="gui/icons/restart.png"/>
+        </div>
+
+        <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
+            <list id="server_list" x="0" y="0" width="100%" height="93%"/>
+            <textbox id="searcher" width="100%" height="7%"/>
+        </box>
+        <div width="99%" align="center" layout="vertical-row" height="fit">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="private_server" text_align="left"/>
+                <spacer width="10"/>
+                <label proportion="1" height="100%" text_align="left"
+                       I18N="In the server selection screen" text="Show only private server(s)"/>
+                <checkbox width="fit" id="game_started" text_align="left"/>
+                <spacer width="10"/>
+                <label proportion="1" height="100%" text_align="left"
+                       I18N="In the server selection screen" text="Hide servers with an ongoing game"/>
+            </div>
+        </div>
+    </div>
+</stkgui>

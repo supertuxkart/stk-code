@@ -110,13 +110,13 @@ void NetworkingLobby::loadedFromFile()
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
-        (file_manager->getAsset(FileManager::GUI, "crown.png"));
+        (file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
     video::ITexture* icon_2 = irr_driver->getTexture
-        (file_manager->getAsset(FileManager::GUI, "difficulty_medium.png"));
+        (file_manager->getAsset(FileManager::GUI_ICON, "difficulty_medium.png"));
     video::ITexture* icon_3 = irr_driver->getTexture
-        (file_manager->getAsset(FileManager::GUI, "main_help.png"));
+        (file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
     video::ITexture* icon_4 = irr_driver->getTexture
-        (file_manager->getAsset(FileManager::GUI, "hourglass.png"));
+        (file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);

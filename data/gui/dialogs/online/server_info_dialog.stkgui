@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="0%" width="96%" height="100%" layout="vertical-row" >
+        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"/>
+        <spacer height="30"/>
+        <label id="server-info" width="90%" height="fit" align="left" text_align="left" text=""/>
+        <box x="0%" width="90%" height="50%" align="center" layout="vertical-row">
+            <list id="player-list" x="0" y="0" width="100%" height="100%"/>
+        </box>
+        <div width="100%" height="fit" layout="horizontal-row" >
+            <label id="label_password" text_align="left" proportion="1" text="Password"/>
+            <textbox id="password" proportion="2" height="fit"/>
+        </div>
+        <buttonbar id="options" width="90%" height="15%" align="center">
+                <icon-button id="join" width="64" height="64" icon="gui/icons/green_check.png"
+                             I18N="In the server info dialog"  text="Join" label_location="bottom"/>
+                <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
+                             I18N="In the server info dialog" text="Cancel" label_location="bottom"/>
+        </buttonbar>
+    </div>
+</stkgui>

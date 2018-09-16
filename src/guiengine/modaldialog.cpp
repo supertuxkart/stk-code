@@ -65,7 +65,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
     doInit();
-    std::string path = file_manager->getAssetChecked(FileManager::GUI,xmlFile,
+    std::string path = file_manager->getAssetChecked(FileManager::GUI_DIALOG,xmlFile,
                                                      true);
     IXMLReader* xml = file_manager->createXMLReader(path);
 

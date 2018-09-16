@@ -318,7 +318,7 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
                   "Unlockable has no picture: %s",
                   core::stringc(msg.c_str()).c_str());
         picture = irr_driver->getTexture(
-                     file_manager->getAsset(FileManager::GUI,"main_help.png"));
+                     file_manager->getAsset(FileManager::GUI_ICON,"main_help.png"));
 
     }
 
@@ -672,7 +672,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
         Log::error("FeatureUnlockedCutScene::addUnlockedGP",
                    "Unlocked GP does not exist");
         const std::string t_name =
-            file_manager->getAsset(FileManager::GUI, "main_help.png");
+            file_manager->getAsset(FileManager::GUI_ICON, "main_help.png");
         video::ITexture* WTF_image = irr_driver->getTexture(t_name);
         images.push_back(WTF_image);
     }
@@ -687,7 +687,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
                        "Unlocked GP is empty");
             video::ITexture* WTF_image =
                 irr_driver->getTexture( file_manager
-                                        ->getAsset(FileManager::GUI,"main_help.png"));
+                                        ->getAsset(FileManager::GUI_ICON,"main_help.png"));
             images.push_back(WTF_image);
         }
 
@@ -697,7 +697,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 
             const std::string t_name = 
                 track ? track->getScreenshotFile()
-                      : file_manager->getAsset(FileManager::GUI, "main_help.png");
+                      : file_manager->getAsset(FileManager::GUI_ICON, "main_help.png");
             ITexture* tex = irr_driver->getTexture(t_name);
             images.push_back(tex);
         }

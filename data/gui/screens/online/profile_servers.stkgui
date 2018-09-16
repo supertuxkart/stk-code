@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header id="title" text_align="center" width="80%" align="center" text="Global Networking"/>
+
+        <spacer height="5%" width="10"/>
+        <icon id="logo" align="center" proportion="1" width="100%" icon="gui/icons/logo.png"/>
+        <spacer height="5%" width="10"/>
+        
+        <buttonbar id="wan" proportion="1" width="90%" align="center">
+            <icon-button id="find_wan_server" width="128" height="128"
+                         icon="gui/icons/online/menu_find_server.png" focus_icon="gui/icons/online/menu_find_server_hover.png"
+                         I18N="In the online multiplayer screen" text="Find Server"/>
+            <icon-button id="create_wan_server" width="128" height="128"
+                         icon="gui/icons/online/menu_create_server.png" focus_icon="gui/icons/online/menu_create_server_hover.png"
+                         I18N="In the online multiplayer screen" text="Create Server"/>
+            <icon-button id="quick_wan_play" width="128" height="128"
+                         icon="gui/icons/online/menu_quick_play.png" focus_icon="gui/icons/online/menu_quick_play_hover.png"
+                         I18N="In the online multiplayer screen" text="Quick Play"/>
+        </buttonbar>
+
+        <spacer height="10%" width="10"/>
+        
+    </div>
+</stkgui>
