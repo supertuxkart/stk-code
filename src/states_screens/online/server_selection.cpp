@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/server_selection.hpp"
+#include "states_screens/online/server_selection.hpp"
 
 #include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"

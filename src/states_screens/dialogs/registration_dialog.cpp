@@ -20,7 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/register_screen.hpp"
+#include "states_screens/online/register_screen.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 

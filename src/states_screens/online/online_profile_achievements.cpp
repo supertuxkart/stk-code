@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/online_profile_achievements.hpp"
+#include "states_screens/online/online_profile_achievements.hpp"
 
 #include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"

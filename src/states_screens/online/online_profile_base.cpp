@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/online_profile_base.hpp"
+#include "states_screens/online/online_profile_base.hpp"
 
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -25,10 +25,10 @@
 #include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
-#include "states_screens/online_profile_friends.hpp"
-#include "states_screens/online_profile_achievements.hpp"
-#include "states_screens/online_profile_servers.hpp"
-#include "states_screens/online_profile_settings.hpp"
+#include "states_screens/online/online_profile_friends.hpp"
+#include "states_screens/online/online_profile_achievements.hpp"
+#include "states_screens/online/online_profile_servers.hpp"
+#include "states_screens/online/online_profile_settings.hpp"
 
 #include <iostream>
 #include <sstream>

@@ -16,15 +16,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_OLAN_HPP__
-#define __HEADER_OLAN_HPP__
+#ifndef __HEADER_ONLINE_PROFILE_SETTINGS_HPP__
+#define __HEADER_ONLINE_PROFILE_SETTINGS_HPP__
 
 #include <string>
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "states_screens/online_profile_base.hpp"
+#include "states_screens/online/online_profile_base.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -33,19 +33,17 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineLanScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineLanScreen>
+class OnlineProfileSettings : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileSettings>
 {
 protected:
-    OnlineLanScreen();
+    OnlineProfileSettings();
+    GUIEngine::ButtonWidget * m_change_password_button;
 
 public:
-    friend class GUIEngine::ScreenSingleton<OnlineLanScreen>;
+    friend class GUIEngine::ScreenSingleton<OnlineProfileSettings>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE {}
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void beforeAddingWidget() OVERRIDE;
+    virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
@@ -53,8 +51,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    virtual bool onEscapePressed() OVERRIDE;
-
-};   // class OnlineProfileServers
+};
 
 #endif

@@ -15,14 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/online_profile_servers.hpp"
+#include "states_screens/online/online_profile_servers.hpp"
 
 #include "guiengine/screen.hpp"
 #include "network/network_config.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/create_server_screen.hpp"
-#include "states_screens/online_lan.hpp"
-#include "states_screens/server_selection.hpp"
+#include "states_screens/online/create_server_screen.hpp"
+#include "states_screens/online/online_lan.hpp"
+#include "states_screens/online/server_selection.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIButton.h>

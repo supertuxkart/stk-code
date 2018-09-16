@@ -24,7 +24,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/dialogs/ghost_replay_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"

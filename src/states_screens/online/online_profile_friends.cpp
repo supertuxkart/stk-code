@@ -15,14 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/online_profile_friends.hpp"
+#include "states_screens/online/online_profile_friends.hpp"
 
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
-#include "states_screens/online_user_search.hpp"
+#include "states_screens/online/online_user_search.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 

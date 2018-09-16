@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/network_kart_selection.hpp"
+#include "states_screens/online/network_kart_selection.hpp"
 
 #include "config/user_config.hpp"
 #include "input/device_manager.hpp"
@@ -23,7 +23,7 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 
 using namespace GUIEngine;
 

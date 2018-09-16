@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/create_server_screen.hpp"
+#include "states_screens/online/create_server_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
@@ -25,7 +25,7 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/networking_lobby.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "utils/separate_process.hpp"
 #include "utils/translation.hpp"
 

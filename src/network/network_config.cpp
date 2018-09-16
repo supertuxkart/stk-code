@@ -23,10 +23,10 @@
 #include "network/transport_address.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/networking_lobby.hpp"
-#include "states_screens/online_lan.hpp"
-#include "states_screens/online_profile_servers.hpp"
-#include "states_screens/online_screen.hpp"
+#include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/online/online_lan.hpp"
+#include "states_screens/online/online_profile_servers.hpp"
+#include "states_screens/online/online_screen.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
 

@@ -30,7 +30,7 @@
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/xml_request.hpp"
-#include "states_screens/networking_lobby.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 

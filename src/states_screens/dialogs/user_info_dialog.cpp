@@ -21,8 +21,8 @@
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
-#include "states_screens/online_profile_achievements.hpp"
-#include "states_screens/online_profile_friends.hpp"
+#include "states_screens/online/online_profile_achievements.hpp"
+#include "states_screens/online/online_profile_friends.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 

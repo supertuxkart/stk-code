@@ -24,7 +24,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "states_screens/online_profile_base.hpp"
+#include "states_screens/online/online_profile_base.hpp"
 #include "online/profile_manager.hpp"
 
 

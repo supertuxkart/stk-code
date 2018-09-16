@@ -16,15 +16,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_ONLINE_PROFILE_SERVERS_HPP__
-#define __HEADER_ONLINE_PROFILE_SERVERS_HPP__
+#ifndef __HEADER_OLAN_HPP__
+#define __HEADER_OLAN_HPP__
 
 #include <string>
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "states_screens/online_profile_base.hpp"
+#include "states_screens/online/online_profile_base.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -33,15 +33,13 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileServers : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineProfileServers>
+class OnlineLanScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineLanScreen>
 {
 protected:
-    OnlineProfileServers();
-
-    void doQuickPlay();
+    OnlineLanScreen();
 
 public:
-    friend class GUIEngine::ScreenSingleton<OnlineProfileServers>;
+    friend class GUIEngine::ScreenSingleton<OnlineLanScreen>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE {}

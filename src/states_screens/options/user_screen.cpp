@@ -38,7 +38,7 @@
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
 #include "states_screens/options/options_screen_video.hpp"
-#include "states_screens/register_screen.hpp"
+#include "states_screens/online/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
 
