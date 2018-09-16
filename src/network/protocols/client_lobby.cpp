@@ -376,6 +376,14 @@ void ClientLobby::update(int ticks)
         break;
     case REQUESTING_CONNECTION:
     case CONNECTED:
+        if (STKHost::get()->isAuthorisedToControl() &&
+            NetworkConfig::get()->isAutoConnect())
+        {
+            // Send a message to the server to start
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
+            STKHost::get()->sendToServer(&start, true);
+        }
     case SELECTING_ASSETS:
     case RACING:
     case EXITING:
@@ -709,15 +717,6 @@ void ClientLobby::handleBadConnection()
 void ClientLobby::becomingServerOwner()
 {
     STKHost::get()->setAuthorisedToControl(true);
-    if (m_state.load() == CONNECTED && NetworkConfig::get()->isAutoConnect())
-    {
-        // Send a message to the server to start
-        NetworkString start(PROTOCOL_LOBBY_ROOM);
-        start.setSynchronous(true);
-        start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendToServer(&start, true);
-    }
-
     if (STKHost::get()->isClientServer())
         return;
 

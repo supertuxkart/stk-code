@@ -43,6 +43,7 @@ NetworkAIController::NetworkAIController(AbstractKart *kart,
 // ----------------------------------------------------------------------------
 NetworkAIController::~NetworkAIController()
 {
+    delete m_ai_controller;
     delete m_ai_controls;
 }   // ~NetworkAIController
 
