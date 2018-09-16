@@ -164,7 +164,7 @@ The server you want to test must be able to be connected without NAT penetration
 
 With the network AI tester, it's easier to for example simulate high-loaded servers or bad (high ping with packet loss) network.
 
-Tested on a Raspberry Pi 3 Model B+, if you have 8 players connected to a server hosted on it, the CPU usage of STK is ~60% and there are ~60MB of memory usage for game with heavy tracks like Cocoa Temple or Candela City on the server, you can use the above figures to consider number of STK servers hosting on a same computer.
+Tested on a Raspberry Pi 3 Model B+, if you have 8 players connected to a server hosted on it, the usage of a single CPU core is ~60% and there are ~60MB of memory usage for game with heavy tracks like Cocoa Temple or Candela City on the server, you can use the above figures to consider number of STK servers hosting on a same computer.
 
 For bad network simulation, we recommend `network traffic control` by linux kernel, see [here](https://wiki.linuxfoundation.org/networking/netem) for details.
 
