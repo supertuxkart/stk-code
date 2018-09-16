@@ -54,6 +54,7 @@ NetworkConfig::NetworkConfig()
     m_client_port = UserConfigParams::m_random_client_port ?
         0 : stk_config->m_client_port;
     m_joined_server_version = 0;
+    m_network_ai_tester = false;
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------

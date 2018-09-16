@@ -48,6 +48,7 @@ AIBaseController::AIBaseController(AbstractKart *kart)
 
 void AIBaseController::reset()
 {
+    m_enabled_network_ai = false;
     m_stuck = false;
     m_collision_ticks.clear();
 }   // reset
