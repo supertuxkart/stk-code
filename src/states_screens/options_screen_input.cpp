@@ -57,14 +57,16 @@ OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 
 void OptionsScreenInput::loadedFromFile()
 {
-    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"keyboard.png"   ));
-    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"gamepad.png"    ));
-    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"gamepad_off.png"));
+    video::ITexture* icon1 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"keyboard.png"   ));
+    video::ITexture* icon2 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"keyboard_off.png"   ));
+    video::ITexture* icon3 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"gamepad.png"    ));
+    video::ITexture* icon4 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"gamepad_off.png"));
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
     m_icon_bank->addTextureAsSprite(icon1);
     m_icon_bank->addTextureAsSprite(icon2);
     m_icon_bank->addTextureAsSprite(icon3);
+    m_icon_bank->addTextureAsSprite(icon4);
 
     // scale icons depending on screen resolution. the numbers below are a bit arbitrary
     const int screen_width = irr_driver->getFrameSize().Width;
@@ -99,14 +101,16 @@ void OptionsScreenInput::buildDeviceList()
             // since irrLicht's list widget has the nasty tendency to put the
             // icons very close to the text, I'm adding spaces to compensate.
             devices->addItem(internal_name, (core::stringw("   ") + 
-                             _("Gamepad")).c_str(), 1 /* icon */);
+                             _("Gamepad")).c_str(), 2 /* icon */);
         }
         else
         {
+            const int icon = (config->isEnabled() ? 0 : 1);
+
             // since irrLicht's list widget has the nasty tendency to put the
             // icons very close to the text, I'm adding spaces to compensate.
             devices->addItem(internal_name, (core::stringw("   ") + 
-                             _("Keyboard %i", i)).c_str(), 0 /* icon */);
+                             _("Keyboard %i", i)).c_str(), icon);
         }
     }
 
@@ -134,7 +138,7 @@ void OptionsScreenInput::buildDeviceList()
             gpname << "gamepad" << i;
             const std::string internal_name = gpname.str();
 
-            const int icon = (config->isEnabled() ? 1 : 2);
+            const int icon = (config->isEnabled() ? 2 : 3);
 
             devices->addItem(internal_name, name, icon);
         }   // if config->isPlugged
@@ -145,7 +149,7 @@ void OptionsScreenInput::buildDeviceList()
     if (touch_device != NULL)
     {
         devices->addItem("touch_device", (core::stringw("   ") + 
-                                                _("Touch Device")).c_str(), 1);
+                                                _("Touch Device")).c_str(), 2);
     }
 }   // buildDeviceList
 
