@@ -42,8 +42,7 @@ RegistrationDialog::RegistrationDialog() :
     core::stringw terms = _(L"Please read the terms and conditions "
         L"for SuperTuxKart at '%s'. You must agree "
         L"to these terms in order to register an account for STK. "
-        L"By checking the box below, you are confirming that you understand "
-        L"these terms. If you have any questions or comments regarding these "
+        L"If you have any questions or comments regarding these "
         L"terms, one of the members of the development team would gladly "
         L"assist you.",
         L"http://terms.supertuxkart.net");
