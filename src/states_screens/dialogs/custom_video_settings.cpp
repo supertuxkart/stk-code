@@ -20,7 +20,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
-#include "states_screens/options_screen_video.hpp"
+#include "states_screens/options/options_screen_video.hpp"
 #include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"

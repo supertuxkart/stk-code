@@ -41,7 +41,7 @@
 #include "states_screens/online_profile_servers.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/user_screen.hpp"
+#include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"

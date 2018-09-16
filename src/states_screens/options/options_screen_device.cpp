@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options_screen_device.hpp"
+#include "states_screens/options/options_screen_device.hpp"
 
 #include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
@@ -31,13 +31,13 @@
 #include "input/gamepad_device.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
-#include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_language.hpp"
-#include "states_screens/options_screen_video.hpp"
-#include "states_screens/options_screen_ui.hpp"
+#include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_input.hpp"
+#include "states_screens/options/options_screen_language.hpp"
+#include "states_screens/options/options_screen_video.hpp"
+#include "states_screens/options/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/user_screen.hpp"
+#include "states_screens/options/user_screen.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>

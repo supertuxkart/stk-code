@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options_screen_language.hpp"
+#include "states_screens/options/options_screen_language.hpp"
 
 #include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -39,12 +39,12 @@
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/options_screen_audio.hpp"
-#include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_ui.hpp"
-#include "states_screens/options_screen_video.hpp"
+#include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_input.hpp"
+#include "states_screens/options/options_screen_ui.hpp"
+#include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/user_screen.hpp"
+#include "states_screens/options/user_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
