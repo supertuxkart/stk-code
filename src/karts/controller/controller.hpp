@@ -103,6 +103,8 @@ public:
     /** Get a pointer on the kart controls. */
     virtual KartControl* getControls() { return m_controls; }
     // ------------------------------------------------------------------------
+    void setControls(KartControl* kc) { m_controls = kc; }
+    // ------------------------------------------------------------------------
     /** Only local players can get achievements. */
     virtual bool  canGetAchievements () const { return false; }
     // ------------------------------------------------------------------------

@@ -610,6 +610,8 @@ void cmdLineHelp()
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
     "       --server-id=n      Server id in stk addons for --connect-now.\n"
+    "       --network-ai=n     Numbers of AI for connecting to linear race server, used\n"
+    "                          together with --connect-now.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --init-user        Save the above login and password (if set) in config.\n"
@@ -1272,14 +1274,28 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--connect-now", &s))
     {
-        TransportAddress server_addr(s);
         NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
+        if (CommandLine::has("--network-ai", &n))
+        {
+            NetworkConfig::get()->setNetworkAITester(true);
+            PlayerManager::get()->createGuestPlayers(n);
+            for (int i = 0; i < n; i++)
+            {
+                NetworkConfig::get()->addNetworkPlayer(
+                    NULL, PlayerManager::get()->getPlayer(i),
+                    PLAYER_DIFFICULTY_NORMAL);
+            }
+        }
+        else
+        {
+            NetworkConfig::get()->addNetworkPlayer(
+                input_manager->getDeviceManager()->getLatestUsedDevice(),
+                PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
+        }
+        TransportAddress server_addr(s);
         auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
             !server_password.empty(), false);
-        NetworkConfig::get()->addNetworkPlayer(
-            input_manager->getDeviceManager()->getLatestUsedDevice(),
-            PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         NetworkConfig::get()->doneAddingNetworkPlayers();
         STKHost::create();
         auto cts = std::make_shared<ConnectToServer>(server);

@@ -221,6 +221,8 @@ unsigned int SkiddingAI::getNextSector(unsigned int index)
 void SkiddingAI::update(int ticks)
 {
     float dt = stk_config->ticks2Time(ticks);
+    m_controls->setRescue(false);
+
     // This is used to enable firing an item backwards.
     m_controls->setLookBack(false);
     m_controls->setNitro(false);
@@ -293,7 +295,11 @@ void SkiddingAI::update(int ticks)
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())
     {
-        new RescueAnimation(m_kart);
+        // For network AI controller
+        if (m_enabled_network_ai)
+            m_controls->setRescue(true);
+        else
+            new RescueAnimation(m_kart);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -2085,6 +2091,11 @@ void SkiddingAI::handleRaceStart()
 {
     if( m_start_delay <  0 )
     {
+        if (m_enabled_network_ai)
+        {
+            m_start_delay = 0;
+            return;
+        }
         // Each kart starts at a different, random time, and the time is
         // smaller depending on the difficulty.
         m_start_delay = stk_config->time2Ticks(
@@ -2122,7 +2133,11 @@ void SkiddingAI::handleRescue(const float dt)
         m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)
         {
-            new RescueAnimation(m_kart);
+            // For network AI controller
+            if (m_enabled_network_ai)
+                m_controls->setRescue(true);
+            else
+                new RescueAnimation(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

@@ -1102,7 +1102,7 @@ msgstr "Nachdem die Eingabegeräte konfiguriert worden sind, wähle im Hauptmen�
 #. I18N: ./data/gui/kart_color_slider.stkgui
 #. I18N: In the kart color slider dialog
 msgid "0 to use the original color, otherwise pick one from slider."
-msgstr "0, um Ursprungsfarbe zu wählen, wähle ansonsten eine vom Schieberegler."
+msgstr "0, um Originalfarbe zu wählen, wähle ansonsten eine vom Schieberegler."
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1256,7 +1256,7 @@ msgstr "Passwort für privaten Server (optional)"
 #: src/states_screens/ghost_replay_selection.cpp:130
 #: src/states_screens/server_selection.cpp:121
 msgid "Difficulty"
-msgstr "Schwierigkeitsgrad"
+msgstr "Schwierigk."
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Difficulty
@@ -1398,7 +1398,7 @@ msgstr "Server finden"
 #. I18N: In the online multiplayer screen
 #: src/states_screens/create_server_screen.cpp:91
 msgid "Create Server"
-msgstr "Server Erstellen"
+msgstr "Server erstellen"
 
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
@@ -1775,7 +1775,7 @@ msgstr "Ton"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "User Interface"
-msgstr "Benutzeroberfläche"
+msgstr "Benutzer- oberfläche"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1912,7 +1912,7 @@ msgstr "Bildrate anzeigen"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Multiplayer splits screen horizontally"
-msgstr "Mehrspieler teilt Bildschirm horizontal"
+msgstr "Mehrspieler teilt Bildschirm horiz."
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1927,7 +1927,7 @@ msgstr "Mit dem Internet verbinden"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Send anonymous hardware statistics"
-msgstr "Anonyme Hardwarestatistiken senden"
+msgstr "Anonyme HW-Statistiken senden"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2136,7 +2136,7 @@ msgstr "Passwort speichern"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Add user"
-msgstr "Nutzer hinzufügen"
+msgstr "Neuer Nutzer"
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
@@ -4782,7 +4782,7 @@ msgstr "Inhaber"
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/server_selection.cpp:129
 msgid "Distance (km)"
-msgstr "Entfernung (km)"
+msgstr "Entf. (km)"
 
 #. I18N: In server selection screen, unknown distance to server
 #: src/states_screens/server_selection.cpp:214

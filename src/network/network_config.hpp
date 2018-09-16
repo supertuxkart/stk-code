@@ -65,13 +65,16 @@ private:
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
 
-    /** The LAN port on which a client is waiting for a server connection. */
-    uint16_t m_client_port;
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
 
     bool m_done_adding_network_players;
+
+    bool m_network_ai_tester;
+
+    /** The LAN port on which a client is waiting for a server connection. */
+    uint16_t m_client_port;
 
     /** Used by wan server. */
     uint32_t m_cur_user_id;
@@ -154,7 +157,7 @@ public:
     {
         for (auto& p : m_network_players)
         {
-            if (std::get<0>(p) == device)
+            if (std::get<0>(p) == device && !m_network_ai_tester)
                 return false;
             if (std::get<1>(p) == profile)
                 return false;
@@ -191,6 +194,10 @@ public:
     /** Returns if an immediate connection to the first server was
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
+    // ------------------------------------------------------------------------
+    void setNetworkAITester(bool b) { m_network_ai_tester = b; }
+    // ------------------------------------------------------------------------
+    bool isNetworkAITester() const { return m_network_ai_tester; }
     // ------------------------------------------------------------------------
     void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
     // ------------------------------------------------------------------------
