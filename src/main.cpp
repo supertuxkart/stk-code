@@ -224,6 +224,7 @@
 #include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -608,6 +609,7 @@ void cmdLineHelp()
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
+    "       --server-id=n      Server id in stk addons for --connect-now.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --init-user        Save the above login and password (if set) in config.\n"
@@ -1243,6 +1245,31 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     {
         NetworkConfig::get()->setIsPublicServer();
     }
+
+    unsigned server_id = 0;
+    if ((NetworkConfig::get()->isServer() && ServerConfig::m_wan_server) ||
+        CommandLine::has("--server-id", &server_id))
+    {
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        // Try to use saved user token if exists
+        if (!can_wan && player && player->wasOnlineLastTime() &&
+            player->wasOnlineLastTime() && player->hasSavedSession())
+        {
+            while (PlayerManager::getCurrentOnlineState() !=
+                PlayerProfile::OS_SIGNED_IN)
+            {
+                Online::RequestManager::get()->update(0.0f);
+                StkTime::sleep(1);
+            }
+            can_wan = true;
+        }
+        else if (!can_wan)
+        {
+            Log::warn("main","No saved online player session to create "
+                "or connect to a wan server.");
+        }
+    }
+
     if (CommandLine::has("--connect-now", &s))
     {
         TransportAddress server_addr(s);
@@ -1257,6 +1284,12 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         STKHost::create();
         auto cts = std::make_shared<ConnectToServer>(server);
         cts->setup();
+        if (server_id != 0)
+        {
+            server->setServerId(server_id);
+            server->setSupportsEncryption(true);
+            cts->registerWithSTKServer();
+        }
         Log::info("main", "Trying to connect to server '%s'.",
             server_addr.toString().c_str());
         if (!cts->tryConnect(2000, 15))
@@ -1268,6 +1301,8 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
         else
         {
+            server_addr =
+                STKHost::get()->getServerPeerForClient()->getAddress();
             auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
             cl->requestStart();
         }
@@ -1278,24 +1313,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         const std::string& server_name = ServerConfig::m_server_name;
         if (ServerConfig::m_wan_server)
         {
-            PlayerProfile* player = PlayerManager::getCurrentPlayer();
-            // Try to use saved user token if exists
-            if (!can_wan && player && player->wasOnlineLastTime() &&
-                player->wasOnlineLastTime() && player->hasSavedSession())
-            {
-                while (PlayerManager::getCurrentOnlineState() !=
-                    PlayerProfile::OS_SIGNED_IN)
-                {
-                    Online::RequestManager::get()->update(0.0f);
-                    StkTime::sleep(1);
-                }
-                can_wan = true;
-            }
-            else if (!can_wan)
-            {
-                Log::warn("main",
-                    "No saved online player session to create a wan server");
-            }
             if (can_wan)
             {
                 // Server owner online account will keep online as long as
