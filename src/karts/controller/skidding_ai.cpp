@@ -165,6 +165,7 @@ void SkiddingAI::reset()
     m_time_since_stuck           = 0.0f;
     m_kart_ahead                 = NULL;
     m_distance_ahead             = 0.0f;
+    m_distance_leader            = 999.9f;
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
     m_current_curve_radius       = 0.0f;
@@ -401,13 +402,16 @@ void SkiddingAI::handleBraking()
     m_controls->setBrake(false);
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
+    // TODO : if there is still time in the countdown and the leader is faster,
+    //        the AI kart should not slow down too much, to stay closer to the
+    //        leader once overtaken.
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        m_kart->getPosition() < m_world->getKart(0)->getPosition()           &&
+        m_distance_leader < 2                                                &&
         m_kart->getInitialPosition()>1                                         )
     {
 #ifdef DEBUG
     if(m_ai_debug)
-        Log::debug(getControllerName().c_str(), "braking: %s ahead of leader.",
+        Log::debug(getControllerName().c_str(), "braking: %s too close of leader.",
                    m_kart->getIdent().c_str());
 #endif
 
@@ -1964,7 +1968,7 @@ void SkiddingAI::computeNearestKarts()
     else
         m_kart_behind = NULL;
 
-    m_distance_ahead = m_distance_behind = 9999999.9f;
+    m_distance_leader = m_distance_ahead = m_distance_behind = 9999999.9f;
     float my_dist = m_world->getOverallDistance(m_kart->getWorldKartId());
     if(m_kart_ahead)
     {
@@ -1976,6 +1980,12 @@ void SkiddingAI::computeNearestKarts()
     {
         m_distance_behind = my_dist
             -m_world->getOverallDistance(m_kart_behind->getWorldKartId());
+    }
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
+       m_kart->getWorldKartId() != 0)
+    {
+        m_distance_leader = m_world->getOverallDistance(0 /*leader kart ID*/)
+                            -my_dist;
     }
 
     // Compute distance to target player kart

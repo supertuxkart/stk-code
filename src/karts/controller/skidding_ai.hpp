@@ -144,6 +144,12 @@ private:
     /** Distance to the kard behind. */
     float m_distance_behind;
 
+    /** Distance to the leader kart (used only in FTL)
+        If this kart is leader, contains a high value
+        to avoid the leader slowing down */
+    float m_distance_leader;
+
+
     /** The actual start delay used in ticks. */
     int m_start_delay;
 
