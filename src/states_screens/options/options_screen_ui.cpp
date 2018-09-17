@@ -162,7 +162,8 @@ void OptionsScreenUI::init()
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
-    difficulty->setTooltip(_("In multiplayer mode, players can select handicapped (more difficult) profiles on the kart selection screen"));
+    // I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text fits the screen in low resolutions.
+    difficulty->setTooltip(_("In multiplayer mode, players can select handicapped\n(more difficult) profiles on the kart selection screen"));
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -326,4 +327,3 @@ void OptionsScreenUI::unloaded()
 }   // unloaded
 
 // -----------------------------------------------------------------------------
-
