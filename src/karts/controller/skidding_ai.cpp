@@ -2185,20 +2185,20 @@ void SkiddingAI::handleNitroAndZipper(int item_skill)
    
     m_controls->setNitro(false);
    
-   float energy_reserve = 0;
+    float energy_reserve = 0;
    
-   if (nitro_skill == 2)
-   {
-      energy_reserve = 4;  
-   }
-   if (nitro_skill == 3)
-   {
-      energy_reserve = 8;  
-   }
-   if (nitro_skill == 4)
-   {
-      energy_reserve = 12;  
-   }
+    if (nitro_skill == 2)
+    {
+        energy_reserve = 4;  
+    }
+    if (nitro_skill == 3)
+    {
+        energy_reserve = 8;  
+    }
+    if (nitro_skill == 4)
+    {
+        energy_reserve = 12;  
+    }
    
     // Don't use nitro or zipper if we are braking
     if(m_controls->getBrake()) return;
