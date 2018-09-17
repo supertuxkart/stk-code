@@ -2015,8 +2015,11 @@ void SkiddingAI::computeNearestKarts()
             m_num_players_ahead++;
     }
 
-    if(ProfileWorld::isProfileMode())
-        target_overall_distance = 999999.9f;   // force best driving
+    // Force best driving when profiling and for FTL leaders
+    if(ProfileWorld::isProfileMode() ||
+       (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
+        m_kart->getWorldKartId() == 0))
+        target_overall_distance = 999999.9f;
     // In higher difficulties, rubber band towards the first player,
     // if at all (SuperTux has currently no rubber banding at all)
     else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
