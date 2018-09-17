@@ -407,7 +407,8 @@ void SkiddingAI::handleBraking()
     //        leader once overtaken.
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
         m_distance_leader < 2                                                &&
-        m_kart->getInitialPosition()>1                                         )
+        m_kart->getInitialPosition()>1                                       &&
+        m_world->getOverallDistance(m_kart->getWorldKartId()) > 0             )
     {
 #ifdef DEBUG
     if(m_ai_debug)
@@ -2200,7 +2201,7 @@ void SkiddingAI::handleNitroAndZipper(int item_skill)
         energy_reserve = 12;  
     }
 
-    // No point in building a big nitro reserve in nitro for AIs,
+    // No point in building a big nitro reserve in nitro for FTL AIs,
     // just keep enough to help accelerating after an accident
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
