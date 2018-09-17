@@ -186,9 +186,13 @@ protected:
     btVehicleRaycaster      *m_vehicle_raycaster;
     btKart                  *m_vehicle;
 
-     /** The amount of energy collected by hitting coins. Note that it
+     /** The amount of energy collected with nitro cans. Note that it
       *  must be float, since dt is subtraced in each timestep. */
     float         m_collected_energy;
+
+    float         m_consumption_per_tick;
+
+    float         m_energy_to_min_ratio;
 
     // Graphical effects
     // -----------------

@@ -142,6 +142,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_stars_effect         = NULL;
     m_is_jumping           = false;
     m_min_nitro_ticks      = 0;
+    m_energy_to_min_ratio  = 0;
+    m_consumption_per_tick = stk_config->ticks2Time(1) *
+                             m_kart_properties->getNitroConsumption();
     m_fire_clicked         = 0;
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
@@ -330,6 +333,9 @@ void Kart::reset()
     }
 
     m_min_nitro_ticks = 0;
+    m_energy_to_min_ratio = 0;
+    m_consumption_per_tick = stk_config->ticks2Time(1) *
+                             m_kart_properties->getNitroConsumption();
 
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
@@ -2122,9 +2128,14 @@ void Kart::handleZipper(const Material *material, bool play_sound)
  */
 void Kart::updateNitro(int ticks)
 {
-    if (m_controls.getNitro() && m_min_nitro_ticks <= 0)
+    if (m_collected_energy == 0)
+        m_min_nitro_ticks = 0;
+
+    if (m_controls.getNitro() && m_min_nitro_ticks <= 0 && m_collected_energy > 0)
     {
         m_min_nitro_ticks = m_kart_properties->getNitroMinConsumptionTicks();
+        float min_consumption = m_min_nitro_ticks * m_consumption_per_tick;
+        m_energy_to_min_ratio = std::min<float>(1, m_collected_energy/min_consumption);
     }
     if (m_min_nitro_ticks > 0)
     {
@@ -2147,8 +2158,8 @@ void Kart::updateNitro(int ticks)
         return;
     }
 
-    float dt = stk_config->ticks2Time(ticks);
-    m_collected_energy -= dt * m_kart_properties->getNitroConsumption();
+
+    m_collected_energy -= m_consumption_per_tick*ticks;
     if (m_collected_energy < 0)
     {
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING && !rewinding)
@@ -2161,10 +2172,11 @@ void Kart::updateNitro(int ticks)
     {
         if(m_nitro_sound->getStatus() != SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->play();
+
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
             m_kart_properties->getNitroMaxSpeedIncrease(),
             m_kart_properties->getNitroEngineForce(),
-            stk_config->time2Ticks(m_kart_properties->getNitroDuration()),
+            stk_config->time2Ticks(m_kart_properties->getNitroDuration()*m_energy_to_min_ratio),
             stk_config->time2Ticks(m_kart_properties->getNitroFadeOutTime()));
     }
     else
