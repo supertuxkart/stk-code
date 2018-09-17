@@ -2162,31 +2162,31 @@ void SkiddingAI::handleRescue(const float dt)
  */
 void SkiddingAI::handleNitroAndZipper(int item_skill)
 {
-   int nitro_skill = computeSkill(NITRO_SKILL);
+    int nitro_skill = computeSkill(NITRO_SKILL);
    
-   //Nitro continue to be advantageous during the fadeout
-   int nitro_ticks = m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO);
-   float nitro_time = ( stk_config->ticks2Time(nitro_ticks)
+    //Nitro continue to be advantageous during the fadeout
+    int nitro_ticks = m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO);
+    float nitro_time = ( stk_config->ticks2Time(nitro_ticks)
                        + m_kart->getKartProperties()->getNitroFadeOutTime() );
-   float nitro_max_time = m_kart->getKartProperties()->getNitroDuration()
+    float nitro_max_time = m_kart->getKartProperties()->getNitroDuration()
                          + m_kart->getKartProperties()->getNitroFadeOutTime();
 
-   //Nitro skill 0 : don't use
-   //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
-   //                has a parachute or an anvil attached, or has a plunger in the face.
-   //                Otherwise, use it immediately
-   //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect/fadeout left. Use it when at
-   //                max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
-   //                Tries to builds a reserve of 4 energy to use towards the end
-   //Nitro skill 3 : Same as level 2, but don't use until 0.5 seconds of effect/fadeout left, and don't use close
-   //                to bad items, and has a target reserve of 8 energy
-   //Nitro skill 4 : Same as level 3, but don't use until 0.05 seconds of effect/fadeout left and ignore the plunger
-   //                and has a target reserve of 12 energy
+    //Nitro skill 0 : don't use
+    //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
+    //                has a parachute or an anvil attached, or has a plunger in the face.
+    //                Otherwise, use it immediately
+    //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect/fadeout left. Use it when at
+    //                max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
+    //                Tries to builds a reserve of 4 energy to use towards the end
+    //Nitro skill 3 : Same as level 2, but don't use until 0.5 seconds of effect/fadeout left, and don't use close
+    //                to bad items, and has a target reserve of 8 energy
+    //Nitro skill 4 : Same as level 3, but don't use until 0.05 seconds of effect/fadeout left and ignore the plunger
+    //                and has a target reserve of 12 energy
    
     m_controls->setNitro(false);
-   
+
     float energy_reserve = 0;
-   
+
     if (nitro_skill == 2)
     {
         energy_reserve = 4;  
@@ -2198,6 +2198,13 @@ void SkiddingAI::handleNitroAndZipper(int item_skill)
     if (nitro_skill == 4)
     {
         energy_reserve = 12;  
+    }
+
+    // No point in building a big nitro reserve in nitro for AIs,
+    // just keep enough to help accelerating after an accident
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+    {
+        energy_reserve = std::min<int>(2, energy_reserve);
     }
    
     // Don't use nitro or zipper if we are braking
