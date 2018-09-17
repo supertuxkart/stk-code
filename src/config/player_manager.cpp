@@ -25,6 +25,7 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "online/online_player_profile.hpp"
+#include "race/race_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -468,10 +469,12 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
  */
 void PlayerManager::setCurrentPlayer(PlayerProfile *player)
 {
+    if (m_current_player != player)
+        race_manager->clearKartLastPositionOnOverworld();
+
     m_current_player = player;
     if(m_current_player)
     {
         m_current_player->computeActive();
     }
 }   // setCurrentPlayer
-
