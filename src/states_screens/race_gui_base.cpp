@@ -615,10 +615,10 @@ void RaceGUIBase::drawGlobalMusicDescription()
 void RaceGUIBase::drawGlobalGoal()
 {
     static video::SColor color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                        irr_driver->getActualScreenSize().Height>>1,
-                        irr_driver->getActualScreenSize().Width>>1,
-                        irr_driver->getActualScreenSize().Height>>1);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width/2,
+                        irr_driver->getActualScreenSize().Height/2,
+                        irr_driver->getActualScreenSize().Width/2,
+                        irr_driver->getActualScreenSize().Height/2);
     gui::IGUIFont* font = GUIEngine::getTitleFont();
     font->draw(m_string_goal.c_str(), pos, color, true, true);
 }
@@ -627,52 +627,35 @@ void RaceGUIBase::drawGlobalGoal()
  */
 void RaceGUIBase::drawGlobalReadySetGo()
 {
+    // This function is called only in a relevant phase,
+    // So we can put common elements here
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    int x = irr_driver->getActualScreenSize().Width/2;
+    int y = irr_driver->getActualScreenSize().Height*2/5;
+    core::rect<s32> pos(x,y,x,y);
+
     switch (World::getWorld()->getPhase())
     {
     case WorldStatus::WAIT_FOR_SERVER_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(StringUtils::loadingDots(
                 m_string_waiting_for_others.c_str()), pos, color, true, true);
         }
         break;
     case WorldStatus::READY_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
         break;
     case WorldStatus::SET_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_set.c_str(), pos, color, true, true);
         }
         break;
     case WorldStatus::GO_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            //gui::IGUIFont* font = irr_driver->getRaceFont();
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
-            
             if (race_manager->getCoinTarget() > 0)
                 font->draw(_("Collect nitro!"), pos, color, true, true);
             else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
