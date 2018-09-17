@@ -18,6 +18,7 @@
 
 #include "states_screens/ghost_replay_selection.hpp"
 
+#include "config/player_manager.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "karts/kart_properties.hpp"
@@ -159,6 +160,11 @@ void GhostReplaySelection::init()
                                                               "main_help.png"         ));
 
     m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
+
+    video::ITexture* lock = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
+                                                              "gui_lock.png"         ));
+
+    m_icon_lock = m_icon_bank->addTextureAsSprite(lock);
 
     int icon_height = getHeight()/24;
     // 128 is the height of the image file
@@ -369,13 +375,22 @@ void GhostReplaySelection::loadList()
         row.push_back(GUIEngine::ListWidget::ListCell
             (translations->fribidize(track->getName()) , -1, 9));
         if (m_active_mode_is_linear)
+        {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
+        }
         if (!m_same_difficulty)
+        {
+            bool display_lock = false;
+            if ((RaceManager::Difficulty)rd.m_difficulty == RaceManager::DIFFICULTY_BEST &&
+                PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+                display_lock = true;
+
             row.push_back(GUIEngine::ListWidget::ListCell
                 (race_manager->
                     getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
-                                                                   -1, 4, true));
+                                       display_lock ? m_icon_lock : -1, 4, true));
+        }
         if (m_active_mode_is_linear)
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(rd.m_laps), -1, 3, true));
@@ -419,6 +434,12 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
             selected_index < 0 || !success)
         {
             return;
+        }
+        if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        {
+            const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(selected_index);
+            if((RaceManager::Difficulty)rd.m_difficulty == RaceManager::DIFFICULTY_BEST)
+                return;
         }
 
         new GhostReplayInfoDialog(selected_index, m_replay_to_compare_uid, m_is_comparing);

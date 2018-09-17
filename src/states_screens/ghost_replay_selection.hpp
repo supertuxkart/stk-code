@@ -67,6 +67,8 @@ private:
 
     /** Icon for unknown karts */
     int                        m_icon_unknown_kart;
+    /** Icon for locked replays */
+    int                        m_icon_lock;
 
     void defaultSort();
 
