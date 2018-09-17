@@ -220,6 +220,9 @@ check_servers()
         if [ $(echo $FILE_END | grep -c "Session not valid. Please sign in.") -gt 0 ]; then
             show_message "Error: Check server: Session not valid"
             SUCCESS=0
+        elif [ $(echo $FILE_END | grep curl_easy_perform | grep -c "Timeout was reached") -gt 0 ]; then
+            show_message "Error: Check server: Timeout was reached"
+            SUCCESS=0
         fi
     done
 
@@ -284,6 +287,8 @@ startdaemon()
         if [ $SERVER_OK -eq 0 ]; then
             show_message "Error: Some servers don't work, restart is needed"
             stop_servers
+            
+            DATETIME="$(date +%Y%m%d%H%M%S)"
 
             init_servers
             run_servers
