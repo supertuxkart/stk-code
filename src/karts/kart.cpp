@@ -1488,7 +1488,7 @@ void Kart::update(int ticks)
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
         "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
         "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d heading(43) %f "
-        "noderot(45) %f suslen %f",
+        "bubticks(45) %d bubtor(47) %f",
         getIdent().c_str(),
         World::getWorld()->getTime(), World::getWorld()->getTicksSinceStart(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1509,8 +1509,8 @@ void Kart::update(int ticks)
         m_brake_ticks, //39
         m_controls.getButtonsCompressed(),  //41
         getHeading(),  //43
-        m_node->getAbsoluteTransformation().getRotationDegrees().Y,  //45
-        m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
+        m_bubblegum_ticks, // 45
+        m_bubblegum_torque // 47
     );
 #endif
     // After the physics step was done, the position of the wheels (as stored
