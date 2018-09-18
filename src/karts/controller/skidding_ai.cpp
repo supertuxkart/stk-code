@@ -328,8 +328,6 @@ void SkiddingAI::update(int ticks)
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
 
-    int item_skill = computeSkill(ITEM_SKILL);
-
     // Special behaviour if we have a bomb attach: try to hit the kart ahead
     // of us.
     bool commands_set = false;
@@ -341,7 +339,7 @@ void SkiddingAI::update(int ticks)
        if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner())
        {
            // Use nitro if the kart is far ahead, or faster than this kart
-           handleNitroAndZipper(item_skill);
+           handleNitroAndZipper(50 /*don't check for safe speed */);
           
            // If we are close enough, try to hit this kart
            if(m_distance_ahead<=10)
@@ -370,9 +368,6 @@ void SkiddingAI::update(int ticks)
         handleAccelerationAndBraking(ticks);
         handleSteering(dt);
         handleRescue(dt);
-        // If a bomb is attached, nitro might already be set.
-        if(!m_controls->getNitro())
-            handleNitroAndZipper(item_skill);
     }
 
     // Make sure that not all AI karts use the zipper at the same
@@ -2010,6 +2005,15 @@ void SkiddingAI::handleAccelerationAndBraking(int ticks)
         return;
     }
 
+    // Step 3 : handle nitro and zipper
+
+    // If a bomb is attached, nitro might already be set.
+    // FIXME : the bomb situation should be merged here
+    if(!m_controls->getNitro())
+        handleNitroAndZipper(max_turn_speed);
+
+    // Step 4 : handle plunger effect
+
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
         int item_skill = computeSkill(ITEM_SKILL);
@@ -2172,9 +2176,10 @@ void SkiddingAI::handleRescue(const float dt)
 //-----------------------------------------------------------------------------
 /** Decides wether to use nitro and zipper or not.
  */
-void SkiddingAI::handleNitroAndZipper(int item_skill)
+void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
 {
     int nitro_skill = computeSkill(NITRO_SKILL);
+    int item_skill = computeSkill(ITEM_SKILL);
    
     //Nitro continue to be advantageous during the fadeout
     int nitro_ticks = m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO);
@@ -2241,6 +2246,15 @@ void SkiddingAI::handleNitroAndZipper(int item_skill)
            item_skill = 0;  
        }
     }
+
+    // Don't use nitro or zipper if it would make the kart go too fast
+
+    if(m_kart->getSpeed() + m_kart->getKartProperties()->getNitroMaxSpeedIncrease() > max_safe_speed)
+        nitro_skill = 0;
+
+    // FIXME : as the zipper can give +15, but only gives +5 instant, this may be too conservative
+    if(m_kart->getSpeed() + m_kart->getKartProperties()->getZipperMaxSpeedIncrease() > max_safe_speed)
+        item_skill = 0;
    
     // If a parachute or anvil is attached, the nitro and zipper don't give much
     // benefit. Better wait till later.

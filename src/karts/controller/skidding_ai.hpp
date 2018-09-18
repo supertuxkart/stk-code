@@ -265,7 +265,7 @@ private:
                                      const std::vector<const Item *> &items_to_avoid);
     void  handleRescue(const float dt);
     void  handleBraking(float max_turn_speed, float min_speed);
-    void  handleNitroAndZipper(int item_skill);
+    void  handleNitroAndZipper(float max_safe_speed);
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
