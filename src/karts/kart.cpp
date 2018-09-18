@@ -366,6 +366,8 @@ void Kart::reset()
         m_collision_particles->setCreationRateAbsolute(0.0f);
 #endif
 
+    unsetSquash();
+
     m_race_position        = m_initial_position;
     m_finished_race        = false;
     m_eliminated           = false;
@@ -1831,6 +1833,29 @@ void Kart::setSquash(float time, float slowdown)
 #endif
 }   // setSquash
 
+void Kart::unsetSquash()
+{
+#ifndef SERVER_ONLY
+    m_squash_time = std::numeric_limits<float>::max();
+    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    scene::ISceneNode* node = m_kart_model->getAnimatedNode() ?
+                              m_kart_model->getAnimatedNode() : m_node;
+        
+    if (m_vehicle->getNumWheels() > 0)
+    {
+        scene::ISceneNode** wheels = m_kart_model->getWheelNodes();
+        
+        for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
+        {
+            if (wheels[i])
+            {
+                wheels[i]->setParent(node);
+            }
+        }
+    }
+#endif
+}
+
 //-----------------------------------------------------------------------------
 /** Returns if the kart is currently being squashed
   */
@@ -3020,20 +3045,7 @@ void Kart::updateGraphics(float dt)
         // If squasing time ends, reset the model
         if (m_squash_time <= 0.0f || !isSquashed())
         {
-            m_squash_time = std::numeric_limits<float>::max();
-            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            scene::ISceneNode* node =
-                m_kart_model->getAnimatedNode() ?
-                m_kart_model->getAnimatedNode() : m_node;
-            if (m_vehicle->getNumWheels() > 0)
-            {
-                scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
-                for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); ++i)
-                {
-                    if (wheels[i])
-                        wheels[i]->setParent(node);
-                }
-            }
+            unsetSquash();
         }
     }   // if squashed
 #endif

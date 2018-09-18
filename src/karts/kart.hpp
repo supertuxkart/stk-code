@@ -313,6 +313,7 @@ public:
     virtual void   handleZipper     (const Material *m=NULL,
                                      bool play_sound=false) OVERRIDE;
     virtual void   setSquash        (float time, float slowdown) OVERRIDE;
+    virtual void   unsetSquash      () OVERRIDE;
 
     virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
     virtual void   crashed          (const Material *m, const Vec3 &normal) OVERRIDE;
