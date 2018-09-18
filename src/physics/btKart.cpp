@@ -575,7 +575,7 @@ void btKart::updateVehicle( btScalar step )
     if (v_down.getY()<0 && m_cushioning_disable_time==0 &&
         m_ground_height[0] < step*predicted_fall + offset &&
         m_ground_height[0] > 0 &&
-        m_ground_height[stk_config->time2Ticks(HISTORY_TIME)-1] > 0.6)
+        m_ground_height[stk_config->time2Ticks(HISTORY_TIME)-1] > 0.4)
     {
         // Disable more cushioning for 1 second. This avoids the problem
         // of hovering: a kart gets cushioned on a down-sloping area, still
@@ -1154,3 +1154,4 @@ btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
 }   // rayCast(btWheelInfo& wheel, const btVector3& ray
 
 // ----------------------------------------------------------------------------
+
