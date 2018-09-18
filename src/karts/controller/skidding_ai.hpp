@@ -251,7 +251,7 @@ private:
      *specific action (more like, associated with inaction).
      */
     void  handleRaceStart();
-    void  handleAcceleration(int ticks);
+    void  handleAccelerationAndBraking(int ticks);
     void  handleSteering(float dt);
     int   computeSkill(SkillType type);
     void  handleItems(const float dt, const Vec3 *aim_point,
@@ -264,7 +264,7 @@ private:
     void  handleSwitch(int item_skill, const std::vector<const Item *> &items_to_collect,
                                      const std::vector<const Item *> &items_to_avoid);
     void  handleRescue(const float dt);
-    void  handleBraking();
+    void  handleBraking(float max_turn_speed, float min_speed);
     void  handleNitroAndZipper(int item_skill);
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,

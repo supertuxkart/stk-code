@@ -367,10 +367,9 @@ void SkiddingAI::update(int ticks)
     if(!commands_set)
     {
         /*Response handling functions*/
-        handleAcceleration(ticks);
+        handleAccelerationAndBraking(ticks);
         handleSteering(dt);
         handleRescue(dt);
-        handleBraking();
         // If a bomb is attached, nitro might already be set.
         if(!m_controls->getNitro())
             handleNitroAndZipper(item_skill);
@@ -1973,18 +1972,37 @@ void SkiddingAI::computeNearestKarts()
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
-/** Determines if the AI should accelerate or not.
- *  \param dt Time step size.
+/** Determines if the AI should accelerate or not, and if not if it should brake.
+ *  \param ticks Time step size.
+ * //TODO : make acceleration steering aware
  */
-void SkiddingAI::handleAcceleration(int ticks)
+void SkiddingAI::handleAccelerationAndBraking(int ticks)
 {
-    //Do not accelerate until we have delayed the start enough
+    // Step 0 (start only) : do not accelerate until we have delayed the start enough
     if( m_start_delay > 0 )
     {
         m_start_delay -= ticks;
         m_controls->setAccel(0.0f);
         return;
     }
+
+    // Step 1 : determine the appropriate max speed for the curve we are in
+    //         (this is also calculated in straights, as there is always a
+    //          curve lurking at its end)
+
+    // FIXME - requires fixing of the turn radius bugs
+
+    float max_turn_speed =
+        m_kart->getSpeedForTurnRadius(m_current_curve_radius)*1.5f;
+
+    // A kart will not brake when the speed is already slower than this
+    // value. This prevents a kart from going too slow (or even backwards)
+    // in tight curves.
+    const float MIN_SPEED = 5.0f;
+
+    // Step 2 : handle braking (there are some cases who need braking besides
+    //          a too great speed, like overtaking the leader in FTL)
+    handleBraking(max_turn_speed, MIN_SPEED);
 
     if( m_controls->getBrake())
     {
@@ -2018,7 +2036,7 @@ void SkiddingAI::handleAcceleration(int ticks)
 
     m_controls->setAccel(stk_config->m_ai_acceleration);
 
-}   // handleAcceleration
+}   // handleAccelerationAndBraking
 
 
 //-----------------------------------------------------------------------------
@@ -2029,7 +2047,7 @@ void SkiddingAI::handleAcceleration(int ticks)
  *  it will brake in order to make it easier to re-align itself), and
  *  estimated curve radius (brake to avoid being pushed out of a curve).
  */
-void SkiddingAI::handleBraking()
+void SkiddingAI::handleBraking(float max_turn_speed, float min_speed)
 {
     m_controls->setBrake(false);
     // In follow the leader mode, the kart should brake if they are ahead of
@@ -2052,15 +2070,10 @@ void SkiddingAI::handleBraking()
         return;
     }
 
-    // A kart will not brake when the speed is already slower than this
-    // value. This prevents a kart from going too slow (or even backwards)
-    // in tight curves.
-    const float MIN_SPEED = 5.0f;
-
     // If the kart is not facing roughly in the direction of the track, brake
     // so that it is easier for the kart to turn in the right direction.
     if(m_current_track_direction==DriveNode::DIR_UNDEFINED &&
-        m_kart->getSpeed() > MIN_SPEED)
+        m_kart->getSpeed() > min_speed)
     {
 #ifdef DEBUG
         if(m_ai_debug)
@@ -2074,12 +2087,9 @@ void SkiddingAI::handleBraking()
     if(m_current_track_direction==DriveNode::DIR_LEFT ||
        m_current_track_direction==DriveNode::DIR_RIGHT   )
     {
-        float max_turn_speed =
-            m_kart->getSpeedForTurnRadius(m_current_curve_radius);
-
-        if(m_kart->getSpeed() > 1.5f*max_turn_speed  &&
-            m_kart->getSpeed()>MIN_SPEED             &&
-            fabsf(m_controls->getSteer()) > 0.95f          )
+        if(m_kart->getSpeed() > max_turn_speed  &&
+            m_kart->getSpeed()>min_speed        &&
+            fabsf(m_controls->getSteer()) > 0.95f )
         {
             m_controls->setBrake(true);
 #ifdef DEBUG
