@@ -1836,6 +1836,8 @@ void Kart::setSquash(float time, float slowdown)
 void Kart::unsetSquash()
 {
 #ifndef SERVER_ONLY
+    if (isGhostKart()) return;
+
     m_squash_time = std::numeric_limits<float>::max();
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     scene::ISceneNode* node = m_kart_model->getAnimatedNode() ?
