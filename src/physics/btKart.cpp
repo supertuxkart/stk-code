@@ -22,6 +22,7 @@
 #include "LinearMath/btIDebugDraw.h"
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
+#include "config/stk_config.hpp"
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -551,7 +552,7 @@ void btKart::updateVehicle( btScalar step )
         // of hovering: a kart gets cushioned on a down-sloping area, still
         // moves forwards, gets cushioned again etc. --> kart is hovering
         // and not controllable. 
-        m_cushioning_disable_time = 120;
+        m_cushioning_disable_time = stk_config->time2Ticks(1);
 
         needed_cushioning = true;
         btVector3 impulse = down * (-v_down.getY() + gravity*step)
