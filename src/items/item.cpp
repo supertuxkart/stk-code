@@ -116,6 +116,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
+    m_was_available_previously = true;
     m_distance_2        = 1.2f;
     m_is_predicted      = is_predicted;
     initItem(type, xyz);
@@ -178,6 +179,7 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
+    m_was_available_previously = true;
 }   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
