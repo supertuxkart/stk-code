@@ -623,13 +623,19 @@ void cmdLineHelp()
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --auto-end         Automatically end network game after 1st player finished\n"
     "                          for some time (currently his finished time * 0.25 + 15.0). \n"
+    "       --no-auto-end      Don't automatically end network game after 1st player finished\n"
+    "       --team-choosing    Enable choosing team in lobby for team game.\n"
     "       --no-team-choosing Disable choosing team in lobby for team game.\n"
     "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
     "       --graphical-server Enable graphical view in server.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
+    "       --no-ranked        Server will not submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
     "       --owner-less       Race will auto start and no one can kick players in server.\n"
+    "       --no-owner-less    Race will not auto start and server owner can kick players in server.\n"
+    "       --firewalled-server Turn on all stun related code in server.\n"
+    "       --no-firewalled-server Turn off all stun related code in server.\n"
     "       --connection-debug Print verbose info for sending or receiving packets.\n"
     "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
@@ -1193,20 +1199,45 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     if (CommandLine::has("--motd", &s))
         ServerConfig::m_motd = s;
 
+    if (CommandLine::has("--team-choosing"))
+    {
+        ServerConfig::m_team_choosing = true;
+    }
     if (CommandLine::has("--no-team-choosing"))
+    {
         ServerConfig::m_team_choosing = false;
-
+    }
     if (CommandLine::has("--ranked"))
     {
         ServerConfig::m_ranked = true;
+    }
+    if (CommandLine::has("--no-ranked"))
+    {
+        ServerConfig::m_ranked = false;
     }
     if (CommandLine::has("--auto-end"))
     {
         ServerConfig::m_auto_end = true;
     }
+    if (CommandLine::has("--no-auto-end"))
+    {
+        ServerConfig::m_auto_end = false;
+    }
     if (CommandLine::has("--owner-less"))
     {
         ServerConfig::m_owner_less = true;
+    }
+    if (CommandLine::has("--no-owner-less"))
+    {
+        ServerConfig::m_owner_less = false;
+    }
+    if (CommandLine::has("--firewalled-server"))
+    {
+        ServerConfig::m_firewalled_server = true;
+    }
+    if (CommandLine::has("--no-firewalled-server"))
+    {
+        ServerConfig::m_firewalled_server = false;
     }
     if (CommandLine::has("--connection-debug"))
     {
