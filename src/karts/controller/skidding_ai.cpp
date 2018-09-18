@@ -328,47 +328,10 @@ void SkiddingAI::update(int ticks)
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
 
-    // Special behaviour if we have a bomb attach: try to hit the kart ahead
-    // of us.
-    bool commands_set = false;
-    if(m_ai_properties->m_handle_bomb &&
-        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
-    {
-       //TODO : add logic to allow an AI kart to pass the bomb to a kart
-       //       close behind by slowing/steering slightly
-       if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner())
-       {
-           // Use nitro if the kart is far ahead, or faster than this kart
-           handleNitroAndZipper(50 /*don't check for safe speed */);
-          
-           // If we are close enough, try to hit this kart
-           if(m_distance_ahead<=10)
-           {
-              Vec3 target = m_kart_ahead->getXYZ();
-
-              // If we are faster, try to predict the point where we will hit
-              // the other kart
-              if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
-                  !m_kart_ahead->isGhostKart())
-              {
-                  float time_till_hit = m_distance_ahead
-                                      / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
-                  target += m_kart_ahead->getVelocity()*time_till_hit;
-              }
-              float steer_angle = steerToPoint(target);
-              setSteering(steer_angle, dt);
-              commands_set = true;
-           }
-           handleRescue(dt);
-       }
-    }
-    if(!commands_set)
-    {
-        /*Response handling functions*/
-        handleAccelerationAndBraking(ticks);
-        handleSteering(dt);
-        handleRescue(dt);
-    }
+    /*Response handling functions*/
+    handleAccelerationAndBraking(ticks);
+    handleSteering(dt);
+    handleRescue(dt);
 
     // Make sure that not all AI karts use the zipper at the same
     // time in time trial at start up, so disable it during the 5 first seconds
@@ -393,6 +356,34 @@ void SkiddingAI::update(int ticks)
  */
 void SkiddingAI::handleSteering(float dt)
 {
+    // Special behaviour if we have a bomb attached: try to hit the kart ahead
+    // of us.
+    if(m_ai_properties->m_handle_bomb &&
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
+    {
+        //TODO : add logic to allow an AI kart to pass the bomb to a kart
+        //       close behind by slowing/steering slightly
+        // If we are close enough and can pass the bomb, try to hit this kart
+        if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner() &&
+            m_distance_ahead<=10)
+        {
+            Vec3 target = m_kart_ahead->getXYZ();
+
+            // If we are faster, try to predict the point where we will hit
+            // the other kart
+            if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
+                !m_kart_ahead->isGhostKart())
+            {
+                float time_till_hit = m_distance_ahead
+                                    / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
+                target += m_kart_ahead->getVelocity()*time_till_hit;
+            }
+            float steer_angle = steerToPoint(target);
+            setSteering(steer_angle, dt);
+            return;
+        }
+    }
+
     const int next = m_next_node_index[m_track_node];
 
     float steer_angle = 0.0f;
