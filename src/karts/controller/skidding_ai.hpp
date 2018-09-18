@@ -218,19 +218,17 @@ private:
     RandomGenerator m_random_collect_item;
 
     /** \brief Determines the algorithm to use to select the point-to-aim-for
-     *  There are three different Point Selection Algorithms:
+     *  There are two different Point Selection Algorithms:
      *  1. findNonCrashingPoint() is the default (which is actually slightly
      *     buggy, but so far best one after handling of 90 degree turns was
      *     added).
-     *  2. findNonCrashingPointFixed() which fixes the bugs of the default
-     *     algorithm.
-     *  3. findNonCrashingPointNew() A newly designed algorithm, which is
-     *     faster than the standard one, but does not give as good results
-     *     as the 'buggy' one.
+     *  2. findNonCrashingPointNew() A newly designed algorithm, which is
+     *     faster than a fixed version of findNonCrashingPoint, but does not
+     *     give as good results as the 'buggy' one.
      *
      *  So far the default one has by far the best performance, even though
      *  it has bugs. */
-    enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
+    enum {PSA_DEFAULT, PSA_NEW}
           m_point_selection_algorithm;
 
 #ifdef AI_DEBUG
@@ -282,7 +280,6 @@ private:
                         std::vector<const Item *> *items_to_collect);
 
     void  checkCrashes(const Vec3& pos);
-    void  findNonCrashingPointFixed(Vec3 *result, int *last_node);
     void  findNonCrashingPointNew(Vec3 *result, int *last_node);
     void  findNonCrashingPoint(Vec3 *result, int *last_node);
 

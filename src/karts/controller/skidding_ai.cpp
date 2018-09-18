@@ -75,10 +75,9 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 #ifdef COMPARE_AIS
     std::string name("");
     m_point_selection_algorithm = m_kart->getWorldKartId() % 2
-                                ? PSA_DEFAULT : PSA_FIXED;
+                                ? PSA_DEFAULT : PSA_NEW;
     switch(m_point_selection_algorithm)
     {
-    case PSA_FIXED   : name = "Fixed";   break;
     case PSA_NEW     : name = "New";     break;
     case PSA_DEFAULT : name = "Default"; break;
     }
@@ -551,8 +550,6 @@ void SkiddingAI::handleSteering(float dt)
 
         switch(m_point_selection_algorithm)
         {
-        case PSA_FIXED : findNonCrashingPointFixed(&aim_point, &last_node);
-                         break;
         case PSA_NEW:    findNonCrashingPointNew(&aim_point, &last_node);
                          break;
         case PSA_DEFAULT:findNonCrashingPoint(&aim_point, &last_node);
@@ -2646,81 +2643,6 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
 
     *result = DriveGraph::get()->getNode(*last_node)->getCenter();
 }   // findNonCrashingPointNew
-
-//-----------------------------------------------------------------------------
-/** Find the sector that at the longest distance from the kart, that can be
- *  driven to without crashing with the track, then find towards which of
- *  the two edges of the track is closest to the next curve afterwards,
- *  and return the position of that edge.
- *  \param aim_position The point to aim for, i.e. the point that can be
- *         driven to in a straight line.
- *  \param last_node The graph node index in which the aim_position is.
- */
-void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
-{
-#ifdef AI_DEBUG_KART_HEADING
-    const Vec3 eps(0,0.5f,0);
-    m_curve[CURVE_KART]->clear();
-    m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
-    Vec3 forw(0, 0, 50);
-    m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw)+eps);
-#endif
-    *last_node = m_next_node_index[m_track_node];
-
-    Vec3 direction;
-    Vec3 step_track_coord;
-
-    // The original while(1) loop is replaced with a for loop to avoid
-    // infinite loops (which we had once or twice). Usually the number
-    // of iterations in the while loop is less than 7.
-    for(unsigned int j=0; j<100; j++)
-    {
-        // target_sector is the sector at the longest distance that we can
-        // drive to without crashing with the track.
-        int target_sector = m_next_node_index[*last_node];
-
-        //direction is a vector from our kart to the sectors we are testing
-        direction = DriveGraph::get()->getNode(target_sector)->getCenter()
-                  - m_kart->getXYZ();
-
-        float len=direction.length();
-        unsigned int steps = (unsigned int)( len / m_kart_length );
-        if( steps < 3 ) steps = 3;
-
-        // That shouldn't happen, but since we had one instance of
-        // STK hanging, add an upper limit here (usually it's at most
-        // 20 steps)
-        if( steps>1000) steps = 1000;
-
-        // Protection against having vel_normal with nan values
-        if(len>0.0f) {
-            direction*= 1.0f/len;
-        }
-
-        Vec3 step_coord;
-        //Test if we crash if we drive towards the target sector
-        for(unsigned int i = 2; i < steps; ++i )
-        {
-            step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
-
-            DriveGraph::get()->spatialToTrack(&step_track_coord, step_coord,
-                                             *last_node );
-
-            float distance = fabsf(step_track_coord[0]);
-
-            //If we are outside, the previous node is what we are looking for
-            if ( distance + m_kart_width * 0.5f
-                 > DriveGraph::get()->getNode(*last_node)->getPathWidth()*0.5f )
-            {
-                *aim_position = DriveGraph::get()->getNode(*last_node)
-                                                ->getCenter();
-                return;
-            }
-        }
-        *last_node = target_sector;
-    }   // for i<100
-    *aim_position = DriveGraph::get()->getNode(*last_node)->getCenter();
-}   // findNonCrashingPointFixed
 
 //-----------------------------------------------------------------------------
 /** This is basically the original AI algorithm. It is clearly buggy:
