@@ -136,6 +136,11 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
 {
     m_users.clear();
     const XMLNode * users_xml = input->getNode("users");
+    if (users_xml == NULL)
+    {
+        Log::warn("OnlineSearch", "No users in server response.");
+        return;
+    }
 
     // Try to reserve enough cache space for all found entries.
     unsigned int n = ProfileManager::get()
