@@ -66,6 +66,10 @@ namespace scene
 		indices have changed. Otherwise, changes won't be updated
 		on the GPU in the next render cycle. */
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
+
+		/** This is used in server without graphics to free all mesh vertex buffer if
+		possible, for example: kart, attachment and power model (because they are not used in physics). */
+		virtual void freeMeshVertexBuffer() {}
 	};
 
 } // end namespace scene

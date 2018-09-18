@@ -30,7 +30,9 @@
 
 #include <irrString.h>
 
+#include <map>
 #include <string>
+#include <tuple>
 
 class XMLNode;
 
@@ -49,6 +51,8 @@ protected:
     std::string m_lower_case_name;
 
     std::string m_server_owner_lower_case_name;
+
+    std::string m_lower_case_player_names;
 
     uint32_t m_server_id;
     uint32_t m_server_owner;
@@ -86,15 +90,19 @@ protected:
     bool m_supports_encrytion;
 
     bool m_game_started;
+
+    std::vector<std::tuple<
+        /*rank*/int, core::stringw, /*scores*/double, /*playing time*/float
+        > > m_players;
+
 public:
 
          /** Initialises the object from an XML node. */
-         Server(const XMLNode &xml);
+         Server(const XMLNode& server_info);
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
                 unsigned server_mode, const TransportAddress &address,
                 bool password_protected, bool game_started);
-    bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
     const TransportAddress& getAddress() const { return m_address; }
@@ -138,5 +146,28 @@ public:
     bool isOfficial() const                              { return m_official; }
     // ------------------------------------------------------------------------
     bool isGameStarted() const                       { return m_game_started; }
+    // ------------------------------------------------------------------------
+    const std::vector<std::tuple<int, core::stringw, double, float> >&
+        getPlayers() const                                { return m_players; }
+    // ------------------------------------------------------------------------
+    void setServerId(unsigned id)                         { m_server_id = id; }
+    // ------------------------------------------------------------------------
+    void setPrivatePort(uint16_t port)               { m_private_port = port; }
+    // ------------------------------------------------------------------------
+    void setSupportsEncryption(bool val)        { m_supports_encrytion = val; }
+    // ------------------------------------------------------------------------
+    bool searchByName(const std::string& lower_case_word)
+    {
+        auto list = StringUtils::split(lower_case_word, ' ', false);
+        bool server_name_found = true;
+        for (auto& word : list)
+        {
+            const std::string& for_search = m_lower_case_name +
+                m_lower_case_player_names;
+            server_name_found = server_name_found &&
+                for_search.find(word) != std::string::npos;
+        }
+        return server_name_found;
+    }
 };   // Server
 #endif // HEADER_SERVER_HPP

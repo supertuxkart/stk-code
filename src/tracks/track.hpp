@@ -400,7 +400,7 @@ private:
                              std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
-
+    void freeCachedMeshVertexBuffer();
 public:
 
     /** Static function to get the current track. NULL if no current

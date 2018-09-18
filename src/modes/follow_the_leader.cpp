@@ -60,6 +60,7 @@ void FollowTheLeaderRace::init()
     // we ignore the leader, the points need to be based on number of karts -1
     stk_config->getAllScores(&m_score_for_position, getNumKarts() - 1);
     getKart(0)->setOnScreenText(_("Leader"));
+    getKart(0)->setBoostAI(true);
 }    // init
 
 #if 0

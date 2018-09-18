@@ -281,8 +281,12 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
     const XMLNode *servers_xml = input->getNode("servers");
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
+        const XMLNode* s = servers_xml->getNode(i);
+        assert(s);
+        const XMLNode* si = s->getNode("server-info");
+        assert(si);
         int version = 0;
-        servers_xml->getNode(i)->get("version", &version);
+        si->get("version", &version);
         assert(version != 0);
         if (version < stk_config->m_max_server_version ||
             version > stk_config->m_max_server_version)
@@ -290,8 +294,7 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
             Log::verbose("ServersManager", "Skipping a server");
             continue;
         }
-        m_servers.emplace_back(
-            std::make_shared<Server>(*servers_xml->getNode(i)));
+        m_servers.emplace_back(std::make_shared<Server>(*s));
     }
     m_last_load_time.store(StkTime::getRealTimeMs());
     m_list_updated = true;
@@ -318,7 +321,7 @@ void ServersManager::setDefaultBroadcastAddresses()
     m_broadcast_address.emplace_back(std::string("127.0.0.255")    );
     m_broadcast_address.emplace_back(std::string("127.0.0.1")      );
     for (auto& addr : m_broadcast_address)
-        addr.setPort(NetworkConfig::get()->getServerDiscoveryPort());
+        addr.setPort(stk_config->m_server_discovery_port);
 }   // setDefaultBroadcastAddresses
 
 // ----------------------------------------------------------------------------
@@ -341,8 +344,8 @@ void ServersManager::addAllBroadcastAddresses(const TransportAddress &a, int len
     while (len > 0)
     {
         unsigned int mask = (1 << len) - 1;
-        TransportAddress bcast(a.getIP() | mask, 
-                               NetworkConfig::get()->getServerDiscoveryPort());
+        TransportAddress bcast(a.getIP() | mask,
+            stk_config->m_server_discovery_port);
         Log::info("Broadcast", "address %s length %d mask %x --> %s",
             a.toString().c_str(),
             len, mask,

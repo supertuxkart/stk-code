@@ -87,7 +87,7 @@ public:
         assert(!m_client_iv.empty());
         auto c = std::unique_ptr<Crypto>(new Crypto(decode64(m_client_key),
             decode64(m_client_iv)));
-        c->m_packet_counter = 1;
+        c->m_packet_counter = 0;
         return c;
     }
     // ------------------------------------------------------------------------
@@ -128,7 +128,7 @@ public:
         assert(key.size() == 16);
         assert(iv.size() == 12);
         std::copy_n(iv.begin(), 12, m_iv.begin());
-        m_packet_counter = (uint32_t)-1;
+        m_packet_counter = 0;
         m_encrypt = EVP_CIPHER_CTX_new();
         EVP_CIPHER_CTX_init(m_encrypt);
         EVP_EncryptInit_ex(m_encrypt, EVP_aes_128_gcm(), NULL, key.data(),

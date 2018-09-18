@@ -43,6 +43,7 @@ private:
     bool m_stuck;
 
 protected:
+    bool m_enabled_network_ai;
 
     /** Length of the kart, storing it here saves many function calls. */
     float m_kart_length;
@@ -106,6 +107,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
     virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
+    void setNetworkAI(bool val)                 { m_enabled_network_ai = val; }
 
 };   // AIBaseController
 

@@ -266,7 +266,7 @@ void EasterEggScreen::buildTrackList()
         }
     }
 
-    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
+    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/icons/track_random.png",
                            0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();

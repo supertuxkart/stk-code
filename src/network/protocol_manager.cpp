@@ -20,6 +20,7 @@
 
 #include "network/event.hpp"
 #include "network/protocol.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/time.hpp"
@@ -440,8 +441,10 @@ void ProtocolManager::update(int ticks)
         }
         catch (std::exception& e)
         {
-            Log::error("ProtocolManager", "Synchronous event error: %s",
-                e.what());
+            const std::string& name = (*i)->getPeer()->getAddress().toString();
+            Log::error("ProtocolManager",
+                "Synchronous event error from %s: %s", name.c_str(), e.what());
+            Log::error("ProtocolManager", (*i)->data().getLogMessage().c_str());
         }
         m_sync_events_to_process.lock();
         if (can_be_deleted)
@@ -495,8 +498,11 @@ void ProtocolManager::asynchronousUpdate()
         }
         catch (std::exception& e)
         {
-            Log::error("ProtocolManager", "Asynchronous event error: %s",
-                e.what());
+            const std::string& name = (*i)->getPeer()->getAddress().toString();
+            Log::error("ProtocolManager", "Asynchronous event "
+                "error from %s: %s", name.c_str(), e.what());
+            Log::error("ProtocolManager",
+                (*i)->data().getLogMessage().c_str());
         }
         m_all_protocols[(*i)->getType()].unlock();
 

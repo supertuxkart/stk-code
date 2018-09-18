@@ -25,12 +25,45 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
+#include <fstream>
 #include <random>
+
+//-----------------------------------------------------------------------------
+GameSetup::GameSetup()
+{
+    const std::string& motd = ServerConfig::m_motd;
+    if (motd.find(".txt") != std::string::npos)
+    {
+        const std::string& path = ServerConfig::getConfigDirectory() + "/" +
+            motd;
+        std::ifstream message(path);
+        if (message.is_open())
+        {
+            for (std::string line; std::getline(message, line); )
+            {
+                m_message_of_today += StringUtils::utf8ToWide(line).trim() +
+                    L"\n";
+            }
+            // Remove last newline
+            m_message_of_today.erase(m_message_of_today.size() - 1);
+        }
+    }
+    else if (!motd.empty())
+        m_message_of_today = StringUtils::xmlDecode(motd);
+
+    const std::string& server_name = ServerConfig::m_server_name;
+    m_server_name_utf8 = StringUtils::wideToUtf8
+        (StringUtils::xmlDecode(server_name));
+    m_connected_players_count.store(0);
+    m_extra_server_info = -1;
+    reset();
+}   // GameSetup
 
 //-----------------------------------------------------------------------------
 /** Update and see if any player disconnects.
@@ -148,7 +181,7 @@ void GameSetup::loadWorld()
 bool GameSetup::isGrandPrix() const
 {
     return m_extra_server_info != -1 &&
-        NetworkConfig::get()->getLocalGameMode().second ==
+        ServerConfig::getLocalGameMode().second ==
         RaceManager::MAJOR_MODE_GRAND_PRIX;
 }   // isGrandPrix
 
@@ -156,10 +189,10 @@ bool GameSetup::isGrandPrix() const
 void GameSetup::addServerInfo(NetworkString* ns)
 {
     assert(NetworkConfig::get()->isServer());
-    ns->encodeString(NetworkConfig::get()->getServerName());
-    ns->addUInt8(race_manager->getDifficulty())
-        .addUInt8((uint8_t)NetworkConfig::get()->getMaxPlayers())
-        .addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
+    ns->encodeString(m_server_name_utf8);
+    ns->addUInt8((uint8_t)ServerConfig::m_server_difficulty)
+        .addUInt8((uint8_t)ServerConfig::m_server_max_players)
+        .addUInt8((uint8_t)ServerConfig::m_server_mode);
     if (hasExtraSeverInfo())
     {
         if (isGrandPrix())
@@ -181,16 +214,15 @@ void GameSetup::addServerInfo(NetworkString* ns)
         // No extra server info
         ns->addUInt8((uint8_t)0);
     }
-    if (NetworkConfig::get()->isOwnerLess())
+    if (ServerConfig::m_owner_less)
     {
-        ns->addFloat(UserConfigParams::m_start_game_threshold)
-            .addFloat(UserConfigParams::m_start_game_counter);
+        ns->addUInt8(ServerConfig::m_min_start_game_players)
+            .addFloat(ServerConfig::m_start_game_counter);
     }
     else
-        ns->addFloat(0.0f).addFloat(0.0f);
-    ns->addUInt8(NetworkConfig::get()->getMaxPlayers());
+        ns->addUInt8(0).addFloat(0.0f);
 
-    ns->encodeString16(NetworkConfig::get()->getMOTD());
+    ns->encodeString16(m_message_of_today);
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------
@@ -231,7 +263,7 @@ void GameSetup::sortPlayersForGrandPrix()
 void GameSetup::sortPlayersForTeamGame()
 {
     if (!race_manager->teamEnabled() ||
-        NetworkConfig::get()->hasTeamChoosing())
+        ServerConfig::m_team_choosing)
         return;
     std::lock_guard<std::mutex> lock(m_players_mutex);
     for (unsigned i = 0; i < m_players.size(); i++)

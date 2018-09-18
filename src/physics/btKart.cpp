@@ -22,6 +22,7 @@
 #include "LinearMath/btIDebugDraw.h"
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
+#include "config/stk_config.hpp"
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -50,6 +51,12 @@ btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
                Kart *kart)
       : m_vehicleRaycaster(raycaster)
 {
+    btScalar height = 0;
+    for (int i=0;i<stk_config->time2Ticks(HISTORY_TIME);i++)
+    {
+        m_ground_height.push_back(height);
+    }
+
     m_chassisBody               = chassis;
     m_indexRightAxis            = 0;
     m_indexUpAxis               = 1;
@@ -120,6 +127,10 @@ void btKart::reset()
         wheel.m_raycastInfo.m_suspensionLength = 0;
         updateWheelTransform(i, true);
     }
+    for (int i=0;i<stk_config->time2Ticks(HISTORY_TIME);i++)
+    {
+        m_ground_height[i]                     = 0;
+    }
     m_visual_wheels_touch_ground = false;
     m_allow_sliding              = false;
     m_num_wheels_on_ground       = 0;
@@ -130,6 +141,7 @@ void btKart::reset()
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
     m_cushioning_disable_time    = 0;
+    m_new_ground_height          = 999.9f;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
@@ -277,10 +289,10 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
 
-    // Do a slightly longer raycast to see if the kart might soon hit the 
+    // Do a longer raycast to see if the kart might soon hit the 
     // ground and some 'cushioning' is needed to avoid that the chassis
     // hits the ground.
-    btScalar raylen = max_susp_len + 0.5f;
+    btScalar raylen = max_susp_len*10 + 0.5f;
 
     btVector3 rayvector = wheel.m_raycastInfo.m_wheelDirectionWS * (raylen);
     const btVector3& source = wheel.m_raycastInfo.m_hardPointWS;
@@ -296,6 +308,9 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
     wheel.m_raycastInfo.m_groundObject = 0;
 
     btScalar depth =  raylen * rayResults.m_distFraction;
+
+    if (depth < m_new_ground_height)
+        m_new_ground_height = depth;
     if (object &&  depth < max_susp_len)
     {
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
@@ -517,6 +532,7 @@ void btKart::updateVehicle( btScalar step )
     if(m_cushioning_disable_time>0) m_cushioning_disable_time --;
 
     bool needed_cushioning = false;
+
     btVector3 v =
         m_chassisBody->getVelocityInLocalPoint(m_wheelInfo[wheel_index]
                                                .m_chassisConnectionPointCS);
@@ -527,7 +543,7 @@ void btKart::updateVehicle( btScalar step )
 
 #ifdef DEBUG_CUSHIONING
     Log::verbose("physics",
-        "World %d wheel %d  lsuspl %f vdown %f overall speed %f lenght %f",
+        "World %d wheel %d  lsuspl %f vdown %f overall speed %f length %f",
         World::getWorld()->getTimeTicks(),
         wheel_index,
         m_wheelInfo[wheel_index].m_raycastInfo.m_suspensionLength,
@@ -535,6 +551,14 @@ void btKart::updateVehicle( btScalar step )
         -v_down.getY() + 9.8*step,
         step * (-v_down.getY() + 9.8*step)+offset);
 #endif
+    // Update the ground height history
+    for (int i=stk_config->time2Ticks(HISTORY_TIME)-1;i>0;i--)
+    {
+        m_ground_height[i] = m_ground_height[i-1];
+    }
+    m_ground_height[0]  = m_new_ground_height;
+    m_new_ground_height = 999.9f;
+
     // If the kart is falling, estimate the distance the kart will fall
     // in the next time step: the speed gets increased by the gravity*dt.
     // This approximation is still not good enough (either because of
@@ -543,19 +567,25 @@ void btKart::updateVehicle( btScalar step )
     // predict the upcoming collision correcty - so we add an offset
     // to the predicted kart movement, which was found experimentally:
     btScalar gravity = m_chassisBody->getGravity().length();
+
+    btScalar predicted_fall = -v_down.getY() + gravity*step +
+                              (m_ground_height[stk_config->time2Ticks(HISTORY_TIME)-1]
+                               -m_ground_height[0])/stk_config->time2Ticks(HISTORY_TIME);
+
     if (v_down.getY()<0 && m_cushioning_disable_time==0 &&
-        m_wheelInfo[wheel_index].m_raycastInfo.m_suspensionLength 
-                            < step * (-v_down.getY()+gravity*step)+offset)
+        m_ground_height[0] < step*predicted_fall + offset &&
+        m_ground_height[0] > 0 &&
+        m_ground_height[stk_config->time2Ticks(HISTORY_TIME)-1] > 0.4)
     {
         // Disable more cushioning for 1 second. This avoids the problem
         // of hovering: a kart gets cushioned on a down-sloping area, still
         // moves forwards, gets cushioned again etc. --> kart is hovering
         // and not controllable. 
-        m_cushioning_disable_time = 120;
+        m_cushioning_disable_time = stk_config->time2Ticks(1);
 
         needed_cushioning = true;
-        btVector3 impulse = down * (-v_down.getY() + gravity*step)
-                          / m_chassisBody->getInvMass();
+        btVector3 impulse = down * predicted_fall
+                            / m_chassisBody->getInvMass();
 #ifdef DEBUG_CUSHIONING
         float v_old = m_chassisBody->getLinearVelocity().getY();
 #endif
@@ -563,12 +593,13 @@ void btKart::updateVehicle( btScalar step )
 #ifdef DEBUG_CUSHIONING
         Log::verbose("physics",
             "World %d Cushioning imp %f vdown %f from %f m/s to %f m/s "
-            "contact %f kart %f susp %f relspeed %f",
+            "height %f contact %f kart %f susp %f relspeed %f",
             World::getWorld()->getTimeTicks(),
             impulse.getY(),
             -v_down.getY(),
             v_old,
             m_chassisBody->getLinearVelocity().getY(),
+            m_ground_height[0],
             m_wheelInfo[wheel_index].m_raycastInfo.m_isInContact ?
             m_wheelInfo[wheel_index].m_raycastInfo.m_contactPointWS.getY()
             : -100,
@@ -1123,3 +1154,4 @@ btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
 }   // rayCast(btWheelInfo& wheel, const btVector3& ray
 
 // ----------------------------------------------------------------------------
+

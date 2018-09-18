@@ -117,7 +117,7 @@ namespace scene
 		virtual bool isStatic();
 
 		//! (This feature is not implemented in irrlicht yet)
-		virtual bool setHardwareSkinning(bool on);
+		virtual bool setHardwareSkinning(bool on) { return false; }
 
 		//Interface for the mesh loaders (finalize should lock these functions, and they should have some prefix like loader_
 		//these functions will use the needed arrays, set values, etc to help the loaders
@@ -176,6 +176,8 @@ namespace scene
 
 		core::array<SJoint*> RootJoints;
 
+		virtual void freeMeshVertexBuffer();
+
 private:
 		void toStaticPose();
 
@@ -222,7 +224,7 @@ private:
 		bool HasAnimation;
 		bool PreparedForSkinning;
 		bool AnimateNormals;
-		bool HardwareSkinning;
+		bool m_deleted_vertex_buffer;
 	};
 
 } // end namespace scene

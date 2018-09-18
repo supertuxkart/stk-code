@@ -28,6 +28,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -76,11 +77,17 @@ void GameProtocol::sendActions()
     // Clear left-over data from previous frame. This way the network
     // string will increase till it reaches maximum size necessary
     m_data_to_send->clear();
+    if (m_all_actions.size() > 255)
+    {
+        Log::warn("GameProtocol",
+            "Too many actions unsent %d.", (int)m_all_actions.size());
+        m_all_actions.resize(255);
+    }
     m_data_to_send->addUInt8(GP_CONTROLLER_ACTION)
                    .addUInt8(uint8_t(m_all_actions.size()));
 
     // Add all actions
-    for (auto a : m_all_actions)
+    for (auto& a : m_all_actions)
     {
         if (Network::m_connection_debug)
         {
@@ -91,8 +98,9 @@ void GameProtocol::sendActions()
         }
         m_data_to_send->addUInt32(a.m_ticks);
         m_data_to_send->addUInt8(a.m_kart_id);
-        m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value)
-                       .addUInt32(a.m_value_l).addUInt32(a.m_value_r);
+        const auto& c = compressAction(a);
+        m_data_to_send->addUInt8(std::get<0>(c)).addUInt16(std::get<1>(c))
+            .addUInt16(std::get<2>(c)).addUInt16(std::get<3>(c));
     }   // for a in m_all_actions
 
     // FIXME: for now send reliable
@@ -146,12 +154,12 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     a.m_ticks   = World::getWorld()->getTicksSinceStart();
 
     m_all_actions.push_back(a);
-
+    const auto& c = compressAction(a);
     // Store the event in the rewind manager, which is responsible
     // for freeing the allocated memory
     BareNetworkString *s = new BareNetworkString(4);
-    s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
-                        .addUInt32(val_l).addUInt32(val_r);
+    s->addUInt8(kart_id).addUInt8(std::get<0>(c)).addUInt16(std::get<1>(c))
+        .addUInt16(std::get<2>(c)).addUInt16(std::get<3>(c));
 
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
                                    World::getWorld()->getTicksSinceStart());
@@ -184,21 +192,29 @@ void GameProtocol::handleControllerAction(Event *event)
             //rewind_delta = not_rewound - cur_ticks;
         }
         uint8_t kart_id = data.getUInt8();
-        assert(kart_id < World::getWorld()->getNumKarts());
+        if (NetworkConfig::get()->isServer() &&
+            !event->getPeer()->availableKartID(kart_id))
+        {
+            Log::warn("GameProtocol", "Wrong kart id %d from %s.",
+                kart_id, event->getPeer()->getAddress().toString().c_str());
+            return;
+        }
 
-        PlayerAction action = (PlayerAction)(data.getUInt8());
-        int value   = data.getUInt32();
-        int value_l = data.getUInt32();
-        int value_r = data.getUInt32();
+        uint8_t w = data.getUInt8();
+        uint16_t x = data.getUInt16();
+        uint16_t y = data.getUInt16();
+        uint16_t z = data.getUInt16();
         if (Network::m_connection_debug)
         {
+            const auto& a = decompressAction(w, x, y, z);
             Log::verbose("GameProtocol",
                 "Controller action: %d %d %d %d %d %d",
-                cur_ticks, kart_id, action, value, value_l, value_r);
+                cur_ticks, kart_id, std::get<0>(a), std::get<1>(a),
+                std::get<2>(a), std::get<3>(a));
         }
         BareNetworkString *s = new BareNetworkString(3);
-        s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
-                            .addUInt32(value_l).addUInt32(value_r);
+        s->addUInt8(kart_id).addUInt8(w).addUInt16(x).addUInt16(y)
+            .addUInt16(z);
         RewindManager::get()->addNetworkEvent(this, s, cur_ticks);
     }
 
@@ -418,15 +434,19 @@ void GameProtocol::undo(BareNetworkString *buffer)
 void GameProtocol::rewind(BareNetworkString *buffer)
 {
     int kart_id = buffer->getUInt8();
-    PlayerAction action = PlayerAction(buffer->getUInt8());
-    int value   = buffer->getUInt32();
-    int value_l = buffer->getUInt32();
-    int value_r = buffer->getUInt32();
+    uint8_t w = buffer->getUInt8();
+    uint16_t x = buffer->getUInt16();
+    uint16_t y = buffer->getUInt16();
+    uint16_t z = buffer->getUInt16();
+    const auto& a = decompressAction(w, x, y, z);
     Controller *c = World::getWorld()->getKart(kart_id)->getController();
     PlayerController *pc = dynamic_cast<PlayerController*>(c);
     // This can be endcontroller when finishing the race
     if (pc)
-        pc->actionFromNetwork(action, value, value_l, value_r);
+    {
+        pc->actionFromNetwork(std::get<0>(a), std::get<1>(a), std::get<2>(a),
+            std::get<3>(a));
+    }
 }   // rewind
 
 // ----------------------------------------------------------------------------

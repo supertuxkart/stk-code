@@ -23,6 +23,16 @@
 #include "network/network_string.hpp"
 
 #include <nettle/base64.h>
+#include <nettle/version.h>
+
+#if NETTLE_VERSION_MAJOR > 3 || \
+    (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR > 3)
+typedef const char* NETTLE_CONST_CHAR;
+typedef char* NETTLE_CHAR;
+#else
+typedef const uint8_t* NETTLE_CONST_CHAR;
+typedef uint8_t* NETTLE_CHAR;
+#endif
 
 // ============================================================================
 std::string Crypto::base64(const std::vector<uint8_t>& input)
@@ -30,7 +40,7 @@ std::string Crypto::base64(const std::vector<uint8_t>& input)
     std::string result;
     const size_t char_size = ((input.size() + 3 - 1) / 3) * 4;
     result.resize(char_size, (char)0);
-    base64_encode_raw(&result[0], input.size(), input.data());
+    base64_encode_raw((NETTLE_CHAR)&result[0], input.size(), input.data());
     return result;
 }   // base64
 
@@ -44,14 +54,14 @@ std::vector<uint8_t> Crypto::decode64(std::string input)
     size_t decode_len_by_nettle;
 #ifdef DEBUG
     int ret = base64_decode_update(&ctx, &decode_len_by_nettle, result.data(),
-        input.size(), input.c_str());
+        input.size(), (NETTLE_CONST_CHAR)input.c_str());
     assert(ret == 1);
     ret = base64_decode_final(&ctx);
     assert(ret == 1);
     assert(decode_len_by_nettle == decode_len);
 #else
     base64_decode_update(&ctx, &decode_len_by_nettle, result.data(),
-        input.size(), input.c_str());
+        input.size(), (NETTLE_CONST_CHAR)input.c_str());
     base64_decode_final(&ctx);
 #endif
     return result;
@@ -64,9 +74,9 @@ std::string Crypto::m_client_iv;
 bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
 {
     std::vector<uint8_t> cipher(ns.m_buffer.size() + 4, 0);
-    gcm_aes128_encrypt(&m_aes_context, ns.m_buffer.size(), cipher.data() + 4,
-        ns.m_buffer.data());
-    gcm_aes128_digest(&m_aes_context, 4, cipher.data());
+    gcm_aes128_encrypt(&m_aes_encrypt_context, ns.m_buffer.size(),
+        cipher.data() + 4, ns.m_buffer.data());
+    gcm_aes128_digest(&m_aes_encrypt_context, 4, cipher.data());
     std::swap(ns.m_buffer, cipher);
     return true;
 }   // encryptConnectionRequest
@@ -78,9 +88,9 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
     uint8_t* tag = ns.m_buffer.data();
     std::array<uint8_t, 4> tag_after = {};
 
-    gcm_aes128_decrypt(&m_aes_context, ns.m_buffer.size() - 4, pt.data(),
-        ns.m_buffer.data() + 4);
-    gcm_aes128_digest(&m_aes_context, 4, tag_after.data());
+    gcm_aes128_decrypt(&m_aes_decrypt_context, ns.m_buffer.size() - 4,
+        pt.data(), ns.m_buffer.data() + 4);
+    gcm_aes128_digest(&m_aes_decrypt_context, 4, tag_after.data());
     handleAuthentication(tag, tag_after);
 
     std::swap(ns.m_buffer, pt);
@@ -98,20 +108,24 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
     if (p == NULL)
         return NULL;
 
-    std::array<uint8_t, 12> iv = m_iv;
+    std::array<uint8_t, 12> iv = {};
     std::unique_lock<std::mutex> ul(m_crypto_mutex);
-    uint32_t val = NetworkConfig::get()->isClient() ?
-        m_packet_counter++ : m_packet_counter--;
-    memcpy(iv.data(), &val, 4);
+
+    uint32_t val = ++m_packet_counter;
+    if (NetworkConfig::get()->isClient())
+        memcpy(iv.data(), &val, 4);
+    else
+        memcpy(iv.data() + 4, &val, 4);
+
     uint8_t* packet_start = p->data + 8;
 
-    gcm_aes128_set_iv(&m_aes_context, 12, iv.data());
-    gcm_aes128_encrypt(&m_aes_context, ns.m_buffer.size(), packet_start,
-        ns.m_buffer.data());
-    gcm_aes128_digest(&m_aes_context, 4, p->data + 4);
+    gcm_aes128_set_iv(&m_aes_encrypt_context, 12, iv.data());
+    gcm_aes128_encrypt(&m_aes_encrypt_context, ns.m_buffer.size(),
+        packet_start, ns.m_buffer.data());
+    gcm_aes128_digest(&m_aes_encrypt_context, 4, p->data + 4);
     ul.unlock();
 
-    memcpy(p->data, iv.data(), 4);
+    memcpy(p->data, &val, 4);
     return p;
 }   // encryptSend
 
@@ -121,16 +135,20 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     int clen = (int)(p->dataLength - 8);
     auto ns = std::unique_ptr<NetworkString>(new NetworkString(p->data, clen));
 
-    std::array<uint8_t, 12> iv = m_iv;
-    memcpy(iv.data(), p->data, 4);
+    std::array<uint8_t, 12> iv = {};
+    if (NetworkConfig::get()->isClient())
+        memcpy(iv.data() + 4, p->data, 4);
+    else
+        memcpy(iv.data(), p->data, 4);
+
     uint8_t* packet_start = p->data + 8;
     uint8_t* tag = p->data + 4;
     std::array<uint8_t, 4> tag_after = {};
 
-    gcm_aes128_set_iv(&m_aes_context, 12, iv.data());
-    gcm_aes128_decrypt(&m_aes_context, clen, ns->m_buffer.data(),
+    gcm_aes128_set_iv(&m_aes_decrypt_context, 12, iv.data());
+    gcm_aes128_decrypt(&m_aes_decrypt_context, clen, ns->m_buffer.data(),
         packet_start);
-    gcm_aes128_digest(&m_aes_context, 4, tag_after.data());
+    gcm_aes128_digest(&m_aes_decrypt_context, 4, tag_after.data());
     handleAuthentication(tag, tag_after);
 
     NetworkString* result = ns.get();

@@ -956,7 +956,7 @@ void IrrDriver::applyResolutionSettings()
 
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager
-                               ->getAsset(FileManager::GUI,"options_video.png"))
+                               ->getAsset(FileManager::GUI_ICON,"options_video.png"))
                              );
 
     file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
@@ -972,14 +972,14 @@ void IrrDriver::applyResolutionSettings()
     projectile_manager->loadData();
     Referee::init();
     GUIEngine::addLoadingIcon(
-        irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gift.png")) );
+        irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gift.png")) );
 
 
     kart_properties_manager->loadAllKarts();
 
     attachment_manager->loadModels();
     file_manager->popTextureSearchPath();
-    std::string banana = file_manager->getAsset(FileManager::GUI, "banana.png");
+    std::string banana = file_manager->getAsset(FileManager::GUI_ICON, "banana.png");
     GUIEngine::addLoadingIcon(irr_driver->getTexture(banana) );
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.

@@ -38,7 +38,9 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/game_protocol.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -59,6 +61,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              PerPlayerDifficulty d)
                      : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
+    m_has_started = false;
     m_difficulty = d;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
@@ -117,6 +120,7 @@ void LocalPlayerController::reset()
 {
     PlayerController::reset();
     m_sound_schedule = false;
+    m_has_started = false;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -157,6 +161,23 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         return true;
     }
 
+    if (action == PA_ACCEL && value != 0 && !m_has_started)
+    {
+        m_has_started = true;
+        if (!NetworkConfig::get()->isNetworking())
+        {
+            float f = m_kart->getStartupBoostFromStartTicks(
+                World::getWorld()->getAuxiliaryTicks());
+            m_kart->setStartupBoost(f);
+        }
+        else if (NetworkConfig::get()->isClient())
+        {
+            auto ge = RaceEventManager::getInstance()->getProtocol();
+            assert(ge);
+            ge->sendStartupBoost((uint8_t)m_kart->getWorldKartId());
+        }
+    }
+
     // If this event does not change the control state (e.g.
     // it's a (auto) repeat event), do nothing. This especially
     // optimises traffic to the server and other clients.
@@ -167,7 +188,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         history->addEvent(m_kart->getWorldKartId(), action, value);
 
     // If this is a client, send the action to networking layer
-    if (World::getWorld()->isNetworkWorld() &&
+    if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient() &&
         !RewindManager::get()->isRewinding())
     {
@@ -267,6 +288,7 @@ void LocalPlayerController::update(int ticks)
  */
 void LocalPlayerController::displayPenaltyWarning()
 {
+    PlayerController::displayPenaltyWarning();
     RaceGUIBase* m=World::getWorld()->getRaceGUI();
     if (m)
     {

@@ -22,6 +22,7 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+#include "utils/time.hpp"
 
 #include "irrString.h"
 
@@ -99,10 +100,15 @@ private:
 
     /** Lock this mutex whenever a client is connect / disconnect or
      *  starting race. */
-    std::mutex m_connection_mutex;
+    mutable std::mutex m_connection_mutex;
 
-    /** Ban list ip (in decimal) with online user id. */
-    std::map<uint32_t, uint32_t> m_ban_list;
+    /** Ban list of ip ranges. */
+    std::map</*ip_start*/uint32_t, std::tuple</*ip_end*/uint32_t,
+        /*CIDR*/std::string, /*expired time epoch*/uint32_t> >
+        m_ip_ban_list;
+
+    /** Ban list of online user id. */
+    std::map<uint32_t, /*expired time epoch*/uint32_t> m_online_id_ban_list;
 
     TransportAddress m_server_address;
 
@@ -113,6 +119,8 @@ private:
     std::map<std::weak_ptr<STKPeer>,
         std::pair<uint32_t, BareNetworkString>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_pending_connection;
+
+    std::map<std::string, uint64_t> m_pending_peer_connection;
 
     /* Ranking related variables */
     // If updating the base points, update the base points distribution in DB
@@ -140,7 +148,13 @@ private:
 
     std::atomic<uint32_t> m_waiting_players_counts;
 
+    uint64_t m_server_started_at, m_server_delay;
+
+    unsigned m_server_id_online;
+
     bool m_registered_for_once_only;
+
+    bool m_save_server_config;
 
     // connection management
     void clientDisconnected(Event* event);
@@ -187,11 +201,27 @@ private:
             }
         }
     }
-    void addAndReplaceKeys(const std::map<uint32_t, KeyData>& new_keys)
+    void addPeerConnection(const std::string& addr_str)
+    {
+        m_pending_peer_connection[addr_str] = StkTime::getRealTimeMs();
+    }
+    void removeExpiredPeerConnection()
+    {
+        // Remove connect to peer protocol running more than a 45 seconds
+        // (from stk addons poll server request),
+        for (auto it = m_pending_peer_connection.begin();
+             it != m_pending_peer_connection.end();)
+        {
+            if (StkTime::getRealTimeMs() - it->second > 45000)
+                it = m_pending_peer_connection.erase(it);
+            else
+                it++;
+        }
+    }
+    void replaceKeys(std::map<uint32_t, KeyData>& new_keys)
     {
         std::lock_guard<std::mutex> lock(m_keys_mutex);
-        for (auto& k : new_keys)
-            m_keys[k.first] = k.second;
+        std::swap(m_keys, new_keys);
     }
     void handlePendingConnection();
     void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
@@ -236,14 +266,18 @@ public:
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();
+    std::unique_lock<std::mutex> acquireConnectionMutex() const
+                   { return std::unique_lock<std::mutex>(m_connection_mutex); }
     bool waitingForPlayers() const;
     uint32_t getWaitingPlayersCount() const
                                     { return m_waiting_players_counts.load(); }
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
+    bool isBannedForIP(const TransportAddress& addr) const;
     bool allowJoinedPlayersWaiting() const;
-
+    void setSaveServerConfig(bool val)          { m_save_server_config = val; }
+    float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

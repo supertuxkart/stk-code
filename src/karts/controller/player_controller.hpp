@@ -29,17 +29,13 @@ class PlayerController : public Controller
 friend class KartRewinder;
 protected:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
-    int            m_prev_accel;
+    uint16_t       m_prev_accel;
     bool           m_prev_brake;
     bool           m_prev_nitro;
 
     int            m_penalty_ticks;
 
     virtual void  steer(int ticks, int steer_val);
-    // ------------------------------------------------------------------------
-    /** Called when this kart started too early and got a start penalty. */
-    virtual void  displayPenaltyWarning() {}
-    // ------------------------------------------------------------------------
 
 public:
                  PlayerController(AbstractKart *kart);
@@ -95,6 +91,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Called when this kart started too early and got a start penalty. */
+    virtual void  displayPenaltyWarning();
 
 };   // class PlayerController
 

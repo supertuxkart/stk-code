@@ -151,6 +151,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
+    m_was_available_previously = true;
     m_distance_2        = 1.2f;
     m_is_predicted      = is_predicted;
     initItem(type, xyz);
@@ -213,6 +214,7 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
+    m_was_available_previously = true;
 }   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
@@ -263,12 +265,16 @@ void Item::setType(ItemType type)
 {
     ItemState::setType(type);
     m_rotate = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
-    for (auto* node : m_node->getAllNodes())
+    
+    if (m_node != NULL)
     {
-        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
-        if (spmn)
+        for (auto* node : m_node->getAllNodes())
         {
-            spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+            if (spmn)
+            {
+                spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+            }
         }
     }
 }   // setType
@@ -289,19 +295,26 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
  */
 void Item::switchBack()
 {
-    if (ItemState::switchBack()) return;
-
     setMesh(m_original_mesh, m_original_lowmesh);
+    
+    if (ItemState::switchBack()) 
+        return;
 
-    Vec3 hpr;
-    hpr.setHPR(m_original_rotation);
-    m_node->setRotation(hpr.toIrrHPR());
+    if (m_node != NULL)
+    {
+        Vec3 hpr;
+        hpr.setHPR(m_original_rotation);
+        m_node->setRotation(hpr.toIrrHPR());
+    }
 }   // switchBack
 
 //-----------------------------------------------------------------------------
 void Item::setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh)
 {
 #ifndef SERVER_ONLY
+    if (m_node == NULL)
+        return;
+        
     unsigned i = 0;
     for (auto* node : m_node->getAllNodes())
     {
@@ -347,6 +360,7 @@ void Item::reset()
 {
     m_was_available_previously = true;
     ItemState::reset();
+    
     if (m_node != NULL)
     {
         m_node->setScale(core::vector3df(1,1,1));
@@ -361,11 +375,13 @@ void Item::reset()
  */
 void Item::updateGraphics(float dt)
 {
-    if(!m_node) return;
+    if (m_node == NULL)
+        return;
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     bool is_visible = isAvailable() || time_till_return <= 1.0f || 
-                      (getType() == ITEM_BUBBLEGUM && !isUsedUp() );
+                      (getType() == ITEM_BUBBLEGUM && 
+                       getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
 

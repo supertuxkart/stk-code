@@ -127,6 +127,15 @@ public:
     void addKeyboard(KeyboardDevice* d);
     void                clearKeyboard();
     int                 getKeyboardAmount()                 { return m_keyboards.size(); }
+    int                 getActiveKeyboardAmount()
+    {
+        int active = 0;
+        for (unsigned int i=0;i<m_keyboard_configs.size();i++)
+        {
+            if (m_keyboard_configs[i].isEnabled()) active++;
+        }
+        return active;
+    }
     int                 getKeyboardConfigAmount() const     { return m_keyboard_configs.size(); }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }
     KeyboardConfig*     getKeyboardConfig(const int i)      { return m_keyboard_configs.get(i); }
@@ -190,4 +199,3 @@ public:
 
 
 #endif
-

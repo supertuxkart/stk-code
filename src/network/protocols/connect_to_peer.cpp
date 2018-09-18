@@ -59,25 +59,17 @@ void ConnectToPeer::asynchronousUpdate()
             {
                 m_timer = StkTime::getRealTimeMs();
                 // Send a broadcast packet with the string aloha_stk inside,
-                // the client will know our ip address and will connect
-                // The wan remote should already start its ping message to us now
-                // so we can send packet directly to it.
+                // the client will use enet intercept to discover if server
+                // address or port is different from stk addons database.
+                // (Happens if there is firewall in between)
                 TransportAddress broadcast_address;
                 broadcast_address = m_peer_address;
 
-                BareNetworkString aloha(std::string("aloha_stk"));
+                // Enet packet will not have 0xFFFF for first 2 bytes
+                BareNetworkString aloha("aloha-stk");
+                aloha.getBuffer().insert(aloha.getBuffer().begin(), 2, 0xFF);
                 STKHost::get()->sendRawPacket(aloha, broadcast_address);
-                Log::verbose("ConnectToPeer", "Broadcast aloha sent.");
-                StkTime::sleep(1);
-
-                if (m_peer_address.isPublicAddressLocalhost())
-                {
-                    broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
-                    broadcast_address.setPort(m_peer_address.getPort());
-                    STKHost::get()->sendRawPacket(aloha, broadcast_address);
-                    Log::verbose("ConnectToPeer", "Broadcast aloha to self.");
-                }
-
+                Log::debug("ConnectToPeer", "Broadcast aloha sent.");
                 // 20 seconds timeout
                 if (m_tried_connection++ > 10)
                 {

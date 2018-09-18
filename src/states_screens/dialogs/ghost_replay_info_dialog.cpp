@@ -35,7 +35,7 @@ using namespace irr::core;
 // -----------------------------------------------------------------------------
 GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
                      uint64_t compare_replay_uid, bool compare_ghost)
-                      : ModalDialog(0.9f,0.75f), m_replay_id(replay_id)
+                      : ModalDialog(0.95f,0.75f), m_replay_id(replay_id)
 {
     m_self_destroy         = false;
     m_record_race          = false;
@@ -55,7 +55,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     m_track_screenshot_widget->m_tab_stop = false;
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    m_track_screenshot_widget->m_properties[PROP_ICON] = "gui/main_help.png";
+    m_track_screenshot_widget->m_properties[PROP_ICON] = "gui/icons/main_help.png";
 
     irr::video::ITexture* image = STKTexManager::getInstance()
         ->getTexture(track->getScreenshotFile(),
@@ -140,20 +140,20 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
     // as the header doesn't work with modal dialogs
     if (is_linear)
         row.push_back(GUIEngine::ListWidget::ListCell
-            (_("Reverse"), -1, 3, true));
+            (_C("ghost_info", "Reverse"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_("Difficulty"), -1, 4, true));
+        (_C("ghost_info", "Difficulty"), -1, 4, true));
     if (is_linear)
         row.push_back(GUIEngine::ListWidget::ListCell
-            (_("Laps"), -1, 3, true));
+            (_C("ghost_info", "Laps"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_("Time"), -1, 4, true));
+        (_C("ghost_info", "Time"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_("Kart"), -1, 1, true));
+        (_C("ghost_info", "Kart"), -1, 1, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_("User"), -1, 5, true));
+        (_C("ghost_info", "User"), -1, 5, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_("Version"), -1, 3, true));
+        (_C("ghost_info", "Version"), -1, 2, true));
 
     m_replay_info_widget->addItem(StringUtils::toString(0), row);
 
@@ -203,13 +203,13 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(rd.m_laps), -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
+            (StringUtils::toWString(rd.m_min_time) + L"s", -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             ("", icon, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 5, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (rd.m_stk_version.empty() ? " " : rd.m_stk_version, -1, 3, true));
+            (rd.m_stk_version.empty() ? " " : rd.m_stk_version, -1, 2, true));
 
         m_replay_info_widget->addItem(StringUtils::toString(i), row);
     } // for num_replays_to_list

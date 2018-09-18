@@ -324,9 +324,9 @@ void RaceGUI::drawScores()
     static video::SColor color = video::SColor(255,255,255,255);
 
     //Draw two teams score
-    irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI,
+    irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI_ICON,
                                                             "soccer_ball_red.png");
-    irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI,
+    irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI_ICON,
                                                             "soccer_ball_blue.png");
     irr::video::ITexture *team_icon = red_team;
 
@@ -518,7 +518,7 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI, "red_flag.png");
+            irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
         if (!ctf->isRedFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getRedFlag().getOrigin(),
@@ -539,7 +539,7 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(icon, rp, rs, NULL, NULL, true);
 
-        icon = irr_driver->getTexture(FileManager::GUI, "blue_flag.png");
+        icon = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
         if (!ctf->isBlueFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getBlueFlag().getOrigin(),
@@ -573,7 +573,7 @@ void RaceGUI::drawGlobalMiniMap()
         track->mapPoint2MiniMap(xyz, &draw_at);
 
         video::ITexture* icon = sta ?
-            irr_driver->getTexture(FileManager::GUI, "heart.png") :
+            irr_driver->getTexture(FileManager::GUI_ICON, "heart.png") :
             kart->getKartProperties()->getMinimapIcon();
         if (icon == NULL)
         {
@@ -615,7 +615,7 @@ void RaceGUI::drawGlobalMiniMap()
         track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
         
         video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
+            irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
 
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),

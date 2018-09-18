@@ -44,6 +44,7 @@
 #include "karts/controller/soccer_ai.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/controller/test_ai.hpp"
+#include "karts/controller/network_ai_controller.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -71,6 +72,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/profiler.hpp"
@@ -386,15 +388,22 @@ std::shared_ptr<AbstractKart> World::createKart
     {
     case RaceManager::KT_PLAYER:
     {
-        controller = new LocalPlayerController(new_kart.get(), local_player_id,
-            difficulty);
-        const PlayerProfile* p = StateManager::get()
-            ->getActivePlayer(local_player_id)->getConstProfile();
-        if (p && p->getDefaultKartColor() > 0.0f)
+        if (NetworkConfig::get()->isNetworkAITester())
         {
-            ri->setHue(p->getDefaultKartColor());
+            controller = new NetworkAIController(new_kart.get(),
+                    local_player_id, new SkiddingAI(new_kart.get()));
         }
-
+        else
+        {
+            controller = new LocalPlayerController(new_kart.get(),
+                local_player_id, difficulty);
+            const PlayerProfile* p = StateManager::get()
+                ->getActivePlayer(local_player_id)->getConstProfile();
+            if (p && p->getDefaultKartColor() > 0.0f)
+            {
+                ri->setHue(p->getDefaultKartColor());
+            }
+        }
         m_num_players ++;
         break;
     }
@@ -556,7 +565,18 @@ void World::onGo()
     // Reset track objects 1 more time to make sure all instances of moveable
     // fall at the same instant when race start in network
     if (NetworkConfig::get()->isNetworking())
-        Track::getCurrentTrack()->getTrackObjectManager()->reset();
+    {
+        PtrVector<TrackObject>& objs = Track::getCurrentTrack()
+            ->getTrackObjectManager()->getObjects();
+        for (TrackObject* curr : objs)
+        {
+            if (curr->getPhysicalObject())
+            {
+                curr->reset();
+                curr->resetEnabled();
+            }
+        }
+    }
 }   // onGo
 
 //-----------------------------------------------------------------------------
@@ -1512,9 +1532,9 @@ void World::initTeamArrows()
 
     //Loading the indicator textures
     std::string red_path =
-            file_manager->getAsset(FileManager::GUI, "red_arrow.png");
+            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
     std::string blue_path =
-            file_manager->getAsset(FileManager::GUI, "blue_arrow.png");
+            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
 
     //Assigning indicators
     for(unsigned int i = 0; i < kart_amount; i++)

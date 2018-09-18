@@ -25,6 +25,7 @@
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 

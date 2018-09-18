@@ -2,22 +2,30 @@
 #
 # ./data/po/update_pot.sh
 
-CPP_FILE_LIST="`find ./src              \
-                     -name '*.cpp' -or  \
-                     -name '*.c' -or    \
-                     -name '*.hpp' -or  \
+CPP_FILE_LIST="`find ./src                 \
+                     -name '*.cpp' -or     \
+                     -name '*.c' -or       \
+                     -name '*.hpp' -or     \
                      -name "*.h" | sort -n \
               `"
-XML_FILE_LIST="`find ./data ../stk-assets/tracks ../stk-assets/karts \
-                     -name 'achievements.xml' -or                \
-                     -name 'kart.xml' -or                        \
-                     -name 'track.xml' -or                       \
-                     -name 'scene.xml' -or                       \
-                     -name '*.challenge' -or                     \
-                     -name '*.grandprix' -or                     \
-                     -name '*.stkgui' | sort -n                  \
+XML_FILE_LIST="`find ./data                        \
+                     ../stk-assets/tracks          \
+                     ../stk-assets/karts           \
+                     ../supertuxkart-assets/tracks \
+                     ../supertuxkart-assets/karts  \
+                     -name 'achievements.xml' -or  \
+                     -name 'kart.xml' -or          \
+                     -name 'track.xml' -or         \
+                     -name 'scene.xml' -or         \
+                     -name '*.challenge' -or       \
+                     -name '*.grandprix' -or       \
+                     -name '*.stkgui' | sort -n    \
               `"
-ANGELSCRIPT_FILE_LIST="`find ./data ../stk-assets/tracks -name '*.as'`"
+ANGELSCRIPT_FILE_LIST="`find ./data                        \
+                             ../stk-assets/tracks          \
+                             ../supertuxkart-assets/tracks \
+                             -name '*.as' | sort -n        \
+                      `"
 
 echo "--------------------"
 echo "    Source Files :"

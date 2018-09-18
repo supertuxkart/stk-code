@@ -81,6 +81,12 @@ void Highscores::readEntry(const XMLNode &node)
 
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
+        if (i >= HIGHSCORE_LEN)
+        {
+            Log::warn("Highscores", "Hiscore has too many entries.");
+            break;
+        }
+        
         const XMLNode *entry = node.getNode(i);
         entry->get("time",     &m_time[i]            );
         entry->getAndDecode("name",     &m_name[i]            );

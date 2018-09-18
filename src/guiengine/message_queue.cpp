@@ -24,6 +24,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/translation.hpp"
 
@@ -292,8 +293,12 @@ void updatePosition()
  */
 void add(MessageType mt, const irr::core::stringw &message)
 {
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
     Message *m = new TextMessage(mt, message);
     privateAdd(m);
+#endif
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -305,6 +310,10 @@ void add(MessageType mt, const irr::core::stringw &message)
  */
 void update(float dt)
 {
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     if (!g_container)
         g_container = new SkinWidgetContainer();
 
@@ -325,7 +334,7 @@ void update(float dt)
         current->remove();
     }
     g_all_messages.unlock();
-
+#endif
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -337,7 +346,12 @@ void update(float dt)
  */
 void showProgressBar(int progress, const wchar_t* msg)
 {
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     g_progress_bar_msg.setProgress(progress, msg);
+#endif
 }   // showProgressBar
 
 }   // namespace GUIEngine

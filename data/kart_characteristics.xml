@@ -404,12 +404,12 @@
         <characteristic name="normal" />
         <characteristic name="handicap">
             <engine power="*0.9" max-speed="*0.9" brake-factor="*0.8" brake-time-increase="*0.85" max-speed-reverse-ratio="*0.8" />
-            <skid time-till-bonus="*1.2 1.0" bonus-speed="*0.9 0.8" bonus-force="*0.9 0.9" />
+            <skid time-till-bonus="*1.2 *1.0" bonus-speed="*0.9 *0.8" bonus-force="*0.9 *0.9" />
             <bubblegum duration="*1.5" torque="*1.5" />
             <zipper force="*0.8" speed-gain="*0.8" max-speed-increase="*0.8" />
             <swatter duration="*0.8" squash-duration="*1.3" />
             <plunger band-max-length="*0.8" band-speed-increase="*0.8" in-face-time="*1.3" />
-            <startup time="*0.8 0.8" boost="*0.8 0.8" />
+            <startup time="*0.8 *0.8" boost="*0.8 *0.8" />
             <rescue duration="*1.5" />
             <nitro engine-force="*0.8" max-speed-increase="*0.9" max="*0.8" />
             <slipstream min-collect-time="*1.2" add-power="*0.9"

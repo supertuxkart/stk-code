@@ -99,7 +99,6 @@ EndController::EndController(AbstractKart *kart,
     reset();
 
     m_max_handicap_accel = 1.0f;
-    m_min_steps          = 2;
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
@@ -143,6 +142,7 @@ void EndController::reset()
             m_track_node = DriveGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
         }
     }
+    m_min_steps = 2;
 }   // reset
 
 //-----------------------------------------------------------------------------

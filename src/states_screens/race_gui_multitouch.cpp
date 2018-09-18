@@ -187,24 +187,24 @@ void RaceGUIMultitouch::init()
                         int(first_column_x), int(h - 1 * col_size),
                         int(btn_size), int(btn_size));
                       
-    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                   "android/steering_wheel.png");
-    m_up_down_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_up_down_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                          "android/up_down.png");
-    m_pause_tex = irr_driver->getTexture(FileManager::GUI, "android/pause.png");
-    m_nitro_tex = irr_driver->getTexture(FileManager::GUI, "android/nitro.png");
-    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_pause_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/pause.png");
+    m_nitro_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/nitro.png");
+    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                      "android/nitro_empty.png");
-    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                      "android/wing_mirror.png");
-    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                "android/thunderbird_reset.png");
-    m_drift_tex = irr_driver->getTexture(FileManager::GUI, "android/drift.png");
-    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_drift_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/drift.png");
+    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                   "android/blur_bg_button.png");
-    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI, 
+    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                             "android/blur_bg_button_focus.png");
-    m_gui_action_tex = irr_driver->getTexture(FileManager::GUI,"challenge.png");
+    m_gui_action_tex = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
 
 } // init
 

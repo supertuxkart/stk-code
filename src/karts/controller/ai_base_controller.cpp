@@ -48,6 +48,7 @@ AIBaseController::AIBaseController(AbstractKart *kart)
 
 void AIBaseController::reset()
 {
+    m_enabled_network_ai = false;
     m_stuck = false;
     m_collision_ticks.clear();
 }   // reset
@@ -335,7 +336,7 @@ void AIBaseController::saveState(BareNetworkString *buffer) const
 {
     // Endcontroller needs this for proper offset in kart rewinder
     // Must match the number of bytes in Playercontroller.
-    buffer->addUInt32(0).addUInt32(0).addUInt8(0);
+    buffer->addUInt32(0).addUInt16(0).addUInt8(0);
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -343,5 +344,5 @@ void AIBaseController::rewindTo(BareNetworkString *buffer)
 {
     // Endcontroller needs this for proper offset in kart rewinder.
     // Skip the same number of bytes as PlayerController.
-    buffer->skip(4 * 2 + 1);
+    buffer->skip(4 + 2 + 1);
 }   // rewindTo

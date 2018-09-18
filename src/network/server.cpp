@@ -25,13 +25,15 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+#include <algorithm>
+
 /** Constructor based on XML data received from the stk server.
  *  \param xml The data for one server as received as part of the
  *         get-all stk-server request.
  */
-Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
+Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
 {
-    assert(xml.getName() == "server");
+    const XMLNode& xml = *server_info.getNode("server-info");
 
     m_name = "";
     m_server_id = 0;
@@ -46,7 +48,8 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
 
     xml.get("name", &m_lower_case_name);
     m_name = StringUtils::xmlDecode(m_lower_case_name);
-    m_lower_case_name = StringUtils::toLowerCase(m_lower_case_name);
+    m_lower_case_name = StringUtils::toLowerCase(
+        StringUtils::wideToUtf8(m_name));
 
     xml.get("id", &m_server_id);
     xml.get("host_id", &m_server_owner);
@@ -64,6 +67,35 @@ Server::Server(const XMLNode& xml) : m_supports_encrytion(true)
     xml.get("distance", &m_distance);
     m_server_owner_name = L"-";
     m_server_owner_lower_case_name = "-";
+
+    const XMLNode* players = server_info.getNode("players");
+    assert(players);
+    for (unsigned int i = 0; i < players->getNumNodes(); i++)
+    {
+        const XMLNode* player_info = players->getNode(i);
+        assert(player_info->getName() == "player-info");
+        std::string username;
+        std::tuple<int, core::stringw, double, float> t;
+        // Default rank and scores if none
+        std::get<0>(t) = -1;
+        std::get<2>(t) = 2000.0;
+        player_info->get("rank", &std::get<0>(t));
+        player_info->get("username", &username);
+        std::get<1>(t) = StringUtils::utf8ToWide(username);
+        m_lower_case_player_names += StringUtils::toLowerCase(username);
+        player_info->get("scores", &std::get<2>(t));
+        float time_played = 0.0f;
+        player_info->get("time-played", &time_played);
+        std::get<3>(t) = time_played;
+        m_players.push_back(t);
+    }
+    // Sort by rank
+    std::sort(m_players.begin(), m_players.end(),
+        [](const std::tuple<int, core::stringw, double, float>& a,
+        const std::tuple<int, core::stringw, double, float>& b)->bool
+        {
+            return std::get<0>(a) < std::get<0>(b);
+        });
 
     // Show owner name as Official right now if official server hoster account
     m_official = false;
@@ -143,28 +175,3 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_official = false;
     m_game_started = game_started;
 }   // server(server_id, ...)
-
-// ----------------------------------------------------------------------------
-/** \brief Filter the add-on with a list of words.
- *  \param words A list of words separated by ' '.
- *  \return true if the add-on contains one of the words, otherwise false.
- */
-bool Server::filterByWords(const core::stringw words) const
-{
-    if (words == NULL || words.empty())
-        return true;
-
-    std::vector<core::stringw> list = StringUtils::split(words, ' ', false);
-
-    for (unsigned int i = 0; i < list.size(); i++)
-    {
-        list[i].make_lower();
-
-        if ((core::stringw(m_name).make_lower()).find(list[i].c_str()) != -1)
-        {
-            return true;
-        }
-    }
-
-    return false;
-} // filterByWords

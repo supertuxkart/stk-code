@@ -49,7 +49,7 @@ NetworkItemManager::NetworkItemManager()
         auto peers = STKHost::get()->getPeers();
         for (auto& p : peers)
         {
-            if (!p->isValidated())
+            if (!p->isValidated() || p->isWaitingForGame())
                 continue;
             m_last_confirmed_item_ticks[p] = 0;
         }

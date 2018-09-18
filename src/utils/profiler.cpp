@@ -88,21 +88,28 @@ Profiler::Profiler()
     m_max_frames          = 20 * 120;
     m_current_frame       = 0;
     m_has_wrapped_around  = false;
-
-    const int MAX_THREADS = 10;
-    m_all_threads_data.resize(MAX_THREADS);
-    m_thread_mapping.resize(MAX_THREADS);
-    // Add this thread to the thread mapping
-    m_thread_mapping[0] = pthread_self();
     m_threads_used = 1;
-
-    m_gpu_times.resize(Q_LAST*m_max_frames);
 }   // Profile
 
 //-----------------------------------------------------------------------------
 Profiler::~Profiler()
 {
 }   // ~Profiler
+
+//-----------------------------------------------------------------------------
+/** It is split from the constructor so that it can be avoided allocating
+ *  unnecessary memory when the profiler is never used (for example in no
+ *  graphics). */
+void Profiler::init()
+{
+    const int MAX_THREADS = 10;
+    m_all_threads_data.resize(MAX_THREADS);
+    m_thread_mapping.resize(MAX_THREADS);
+
+    // Add this thread to the thread mapping
+    m_thread_mapping[0] = pthread_self();
+    m_gpu_times.resize(Q_LAST * m_max_frames);
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Returns a unique index for a thread. If the calling thread is not yet in

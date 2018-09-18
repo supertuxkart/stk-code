@@ -117,6 +117,9 @@ private:
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
 
+    /** Used as a timeout for shedule shutdown. */
+    std::atomic<uint64_t> m_shutdown_delay;
+
     /** True if this local host is authorised to control a server. */
     std::atomic_bool m_authorised;
 
@@ -152,7 +155,8 @@ private:
     void init();
     // ------------------------------------------------------------------------
     void handleDirectSocketRequest(Network* direct_socket,
-                                   std::shared_ptr<ServerLobby> sl);
+                                   std::shared_ptr<ServerLobby> sl,
+                                   std::map<std::string, uint64_t>& ctp);
     // ------------------------------------------------------------------------
     void mainLoop();
 
@@ -207,7 +211,20 @@ public:
     void requestShutdown()
     {
         m_shutdown.store(true);
+        m_shutdown_delay.store(0);
     }   // requestExit
+    //-------------------------------------------------------------------------
+    void requestShutdownDelayed(int delay)
+    {
+        m_shutdown.store(true);
+        m_shutdown_delay.store(StkTime::getRealTimeMs() + delay);
+    }
+    //-------------------------------------------------------------------------
+    void cancelShutdown()
+    {
+        m_shutdown.store(false);
+        m_shutdown_delay.store(0);
+    }
     //-------------------------------------------------------------------------
     void shutdown();
     //-------------------------------------------------------------------------
@@ -265,7 +282,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
-    bool requestedShutdown() const                { return m_shutdown.load(); }
+    bool requestedShutdown() const
+    {
+        return m_shutdown.load() && 
+               m_shutdown_delay.load() < StkTime::getRealTimeMs();
+    }
     // ------------------------------------------------------------------------
     int receiveRawPacket(char *buffer, int buffer_len, 
                          TransportAddress* sender, int max_tries = -1)
@@ -279,6 +300,8 @@ public:
     {
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
+    // ------------------------------------------------------------------------
+    Network* getNetwork() const                           { return m_network; }
     // ------------------------------------------------------------------------
     /** Returns a copied list of peers. */
     std::vector<std::shared_ptr<STKPeer> > getPeers() const
@@ -318,7 +341,7 @@ public:
      *  creation screen. */
     bool isClientServer() const          { return m_separate_process != NULL; }
     // ------------------------------------------------------------------------
-    void replaceNetwork(ENetEvent& event, Network* network);
+    void initClientNetwork(ENetEvent& event, Network* new_network);
     // ------------------------------------------------------------------------
     std::map<uint32_t, uint32_t> getPeerPings()
                                            { return m_peer_pings.getAtomic(); }

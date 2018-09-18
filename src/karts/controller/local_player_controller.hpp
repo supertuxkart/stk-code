@@ -41,6 +41,8 @@ private:
     StateManager::ActivePlayer *m_player;
 
     bool           m_sound_schedule;
+    bool           m_has_started;
+    bool           m_is_above_nitro_target;
 
     ParticleEmitter* m_sky_particles_emitter;
 
@@ -57,7 +59,6 @@ private:
     SFXBuffer   *m_full_sound;
     SFXBuffer   *m_unfull_sound;
 
-    bool         m_is_above_nitro_target;
 
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;

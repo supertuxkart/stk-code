@@ -116,11 +116,11 @@ run_servers()
     "$CMD" --ranked                            \
            --max-players=8                     \
            --min-players=2                     \
-           --mode=3                            \
-           --type=1                            \
-           --port=2759                         \
+           --difficulty=2                      \
+           --mode=0                            \
+           --port=2760                         \
            --wan-server="$SERVER_NAME"         \
-           --stdout="$DATETIME-time_trial.log" \
+           --stdout="$DATETIME-normal.log"     \
            --stdout-dir="$STDOUT_DIR"          \
            --no-console-log                    \
            --log=0                               &> /dev/null &
@@ -131,12 +131,28 @@ run_servers()
            --disable-polling                  \
            --max-players=8                    \
            --min-players=2                    \
-           --mode=2                           \
-           --type=3                           \
+           --difficulty=2                     \
+           --mode=3                           \
            --soccer-goals                     \
-           --port=2760                        \
+           --port=2761                        \
            --wan-server="$SERVER_NAME Soccer" \
            --stdout="$DATETIME-soccer.log"    \
+           --stdout-dir="$STDOUT_DIR"         \
+           --no-console-log                   \
+           --log=0                              &> /dev/null &
+
+    sleep 5
+
+    "$CMD" --owner-less                       \
+           --disable-polling                  \
+           --max-players=8                    \
+           --min-players=2                    \
+           --difficulty=2                     \
+           --mode=2                           \
+           --battle-mode=1                    \
+           --port=2762                        \
+           --wan-server="$SERVER_NAME CTF"    \
+           --stdout="$DATETIME-ctf.log"       \
            --stdout-dir="$STDOUT_DIR"         \
            --no-console-log                   \
            --log=0                              &> /dev/null &
@@ -171,6 +187,11 @@ stop_servers()
     done
 
     sleep 10
+
+    for PID in $(pidof -x "$CMD"); do
+        echo "Info: Force killing the STK server $PID"
+        kill -9 $PID
+    done
 }
 
 check_servers()
@@ -184,7 +205,7 @@ check_servers()
 
         if [ $(echo $FILE_BEGIN | grep -c "Done saving user, leaving") -gt 0 ]; then
             echo "Info: Check server: Servers successfully initialized"
-        elif [ $(echo $FILE_BEGIN | grep -c "Server is now online.") -gt 0 ]; then
+        elif [ $(echo $FILE_BEGIN | grep "Server" | grep -c "is now online.") -gt 0 ]; then
             echo "Info: Check server: Servers successfully created"
         elif [ $(echo $FILE_BEGIN | grep -c "Specified server already exists.") -gt 0 ]; then
             show_message "Error: Check server: Specified server already exists"
@@ -198,6 +219,9 @@ check_servers()
 
         if [ $(echo $FILE_END | grep -c "Session not valid. Please sign in.") -gt 0 ]; then
             show_message "Error: Check server: Session not valid"
+            SUCCESS=0
+        elif [ $(echo $FILE_END | grep curl_easy_perform | grep -c "Timeout was reached") -gt 0 ]; then
+            show_message "Error: Check server: Timeout was reached"
             SUCCESS=0
         fi
     done
@@ -238,7 +262,7 @@ start()
     if [ $CHECK_SERVERS -eq 1 ]; then
         check_servers
     fi
-    
+
     echo "Info: Servers started"
 }
 
@@ -263,6 +287,8 @@ startdaemon()
         if [ $SERVER_OK -eq 0 ]; then
             show_message "Error: Some servers don't work, restart is needed"
             stop_servers
+            
+            DATETIME="$(date +%Y%m%d%H%M%S)"
 
             init_servers
             run_servers

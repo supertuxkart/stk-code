@@ -36,6 +36,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
@@ -284,7 +285,9 @@ void Attachment::rewindTo(BareNetworkString *buffer)
         return;
     }
 
-    int16_t ticks_left = buffer->getUInt16();
+    int16_t ticks_left = 0;
+    if (new_type != ATTACH_NOTHING)
+        ticks_left = buffer->getUInt16();
 
     // Now it is a new attachment:
     if (type == (ATTACH_BOMB | 64))   // we have previous owner information

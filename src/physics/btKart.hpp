@@ -11,6 +11,8 @@
 #ifndef BT_KART_HPP
 #define BT_KART_HPP
 
+#include <vector>
+
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 #include "physics/btKartRaycast.hpp"
@@ -116,6 +118,13 @@ private:
     /** Maximum speed for the kart. It is reset to -1 at the end of each
      *  physics steps, so need to be set again by the application. */
     btScalar m_max_speed;
+
+    /** Smallest wheel height to the ground, with a few frames of history */
+    std::vector<btScalar> m_ground_height;
+    const float HISTORY_TIME = 0.05f;
+
+    /** Used to get the smallest weel height in the current frame */
+    btScalar m_new_ground_height;
 
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;

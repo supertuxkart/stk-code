@@ -35,7 +35,7 @@
 #include "race/grand_prix_data.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -175,7 +175,7 @@ void GPInfoScreen::init()
     {
         RibbonWidget *rb = getWidget<RibbonWidget>("buttons");
         rb->setLabel(1,_(L"Reload") );
-        std::string restart = file_manager->getAsset(FileManager::GUI, "restart.png");
+        std::string restart = file_manager->getAsset(FileManager::GUI_ICON, "restart.png");
 
         // We have to recreate the group spinner, but a new group might have
         // been added or deleted since the last time this screen was shown.
@@ -282,7 +282,7 @@ void GPInfoScreen::addScreenshot()
 
     // Temporary icon, will replace it just after
     // (but it will be shown if the given icon is not found)
-    screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
+    screenshot->m_properties[PROP_ICON] = "gui/icons/main_help.png";
 
     const Track *track = track_manager->getTrack(m_gp.getTrackId(0));
     video::ITexture* image = STKTexManager::getInstance()

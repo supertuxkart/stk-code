@@ -30,7 +30,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "network/network_config.hpp"
-#include "states_screens/networking_lobby.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>

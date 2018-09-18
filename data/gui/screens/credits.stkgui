@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+        <icon id="logo" align="center" proportion="4" width="100%" icon="gui/icons/logo_slim.png"/>
+
+        <div x="0" y="0" width="100%" proportion="1" layout="horizontal-row" >
+
+            <header I18N="Title in credits screen" text="Credits" />
+
+            <spacer proportion="1" />
+
+            <button id="donate" width="fit" align="center" text="Donate to help keep SuperTuxKart going!"/>
+
+        </div>
+
+        <box id="animated_area" width="100%" proportion="10" padding="0">
+        </box>
+    </div>
+</stkgui>

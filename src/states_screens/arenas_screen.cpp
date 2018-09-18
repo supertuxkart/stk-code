@@ -334,7 +334,7 @@ void ArenasScreen::buildTrackList()
     }
     if (arenas_have_navmesh || race_manager->getNumLocalPlayers() > 1 ||
         UserConfigParams::m_artist_debug_mode)
-        w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
+        w->addItem(_("Random Arena"), "random_track", "/gui/icons/track_random.png");
     w->updateItemDisplay();
 
     if (m_unsupported_arena.size() > 0)

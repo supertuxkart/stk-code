@@ -135,7 +135,7 @@ void RaceSetupScreen::init()
 
     irr::core::stringw name6 = irr::core::stringw( _("Ghost replay race")) + L"\n";
     name6 += _("Race against ghost karts and try to beat them!");
-    w2->addItem( name6, IDENT_GHOST, "/gui/mode_ghost.png");
+    w2->addItem( name6, IDENT_GHOST, "/gui/icons/mode_ghost.png");
 
     w2->updateItemDisplay();
 

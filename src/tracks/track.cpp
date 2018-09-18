@@ -1198,7 +1198,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 #ifdef SERVER_ONLY
     if (false)
 #else
-    if (m_version < 7 && !CVS->isGLSL())
+    if (m_version < 7 && !CVS->isGLSL() && !ProfileWorld::isNoGraphics())
 #endif
     {
         // The mesh as returned does not have all mesh buffers with the same
@@ -1447,6 +1447,9 @@ bool Track::loadMainTrack(const XMLNode &root)
         convertTrackToBullet(m_all_nodes[i]);
         uploadNodeVertexBuffer(m_all_nodes[i]);
     }
+    // Free the tangent (track mesh) after converting to physics
+    if (ProfileWorld::isNoGraphics())
+        tangent_mesh->freeMeshVertexBuffer();
 
     if (m_track_mesh == NULL)
     {
@@ -1459,6 +1462,16 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     return true;
 }   // loadMainTrack
+
+// ----------------------------------------------------------------------------
+void Track::freeCachedMeshVertexBuffer()
+{
+    if (ProfileWorld::isNoGraphics())
+    {
+        for (unsigned i = 0; i < m_all_cached_meshes.size(); i++)
+            m_all_cached_meshes[i]->freeMeshVertexBuffer();
+    }
+}   // freeCachedMeshVertexBuffer
 
 // ----------------------------------------------------------------------------
 /** Handles animated textures.
@@ -2081,6 +2094,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #endif
 
     createPhysicsModel(main_track_count);
+    freeCachedMeshVertexBuffer();
 
     const bool arena_random_item_created =
         ItemManager::get()->randomItemsForArena(m_start_transforms);

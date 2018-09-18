@@ -31,38 +31,32 @@ class Server;
 class ConnectToServer : public Protocol
 {
 private:
-    uint64_t m_timer = 0;
-    TransportAddress m_server_address;
     std::shared_ptr<Server> m_server;
-    unsigned m_tried_connection = 0;
-
-    /** Protocol currently being monitored. */
-    std::weak_ptr<Protocol> m_current_protocol;
 
     /** State for finite state machine. */
     enum ConnectState : unsigned int
     {
         SET_PUBLIC_ADDRESS,
         GOT_SERVER_ADDRESS,
-        REQUESTING_CONNECTION,
-        CONNECTING,
-        CONNECTED,
         DONE,
         EXITING
     };
     std::atomic<ConnectState> m_state;
 
-    void registerWithSTKServer();
-    void waitingAloha(bool is_wan);
+    void getClientServerInfo();
+    static TransportAddress m_server_address;
+    static int interceptCallback(ENetHost* host, ENetEvent* event);
+    static int m_retry_count;
+    static bool m_done_intecept;
 public:
+    static std::weak_ptr<bool> m_previous_unjoin;
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
-
-    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-    bool handleDirectConnect(int timeout);
+    void registerWithSTKServer();
+    bool tryConnect(int timeout, int retry, bool another_port = false);
 
 };   // class ConnectToServer
 

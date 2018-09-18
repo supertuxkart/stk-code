@@ -95,10 +95,10 @@ RaceGUIBase::RaceGUIBase()
                    "Can't find 'icons-frame.png' texture, aborting.");
     }
 
-    m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full.png"));
-    m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full_bright.png"));
-    m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_empty.png"));
-    m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_goal.png" ));
+    m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full.png"));
+    m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full_bright.png"));
+    m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_empty.png"));
+    m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_goal.png" ));
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 
@@ -615,10 +615,10 @@ void RaceGUIBase::drawGlobalMusicDescription()
 void RaceGUIBase::drawGlobalGoal()
 {
     static video::SColor color = video::SColor(255, 255, 255, 255);
-    core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                        irr_driver->getActualScreenSize().Height>>1,
-                        irr_driver->getActualScreenSize().Width>>1,
-                        irr_driver->getActualScreenSize().Height>>1);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width/2,
+                        irr_driver->getActualScreenSize().Height/2,
+                        irr_driver->getActualScreenSize().Width/2,
+                        irr_driver->getActualScreenSize().Height/2);
     gui::IGUIFont* font = GUIEngine::getTitleFont();
     font->draw(m_string_goal.c_str(), pos, color, true, true);
 }
@@ -627,52 +627,35 @@ void RaceGUIBase::drawGlobalGoal()
  */
 void RaceGUIBase::drawGlobalReadySetGo()
 {
+    // This function is called only in a relevant phase,
+    // So we can put common elements here
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    int x = irr_driver->getActualScreenSize().Width/2;
+    int y = irr_driver->getActualScreenSize().Height*2/5;
+    core::rect<s32> pos(x,y,x,y);
+
     switch (World::getWorld()->getPhase())
     {
     case WorldStatus::WAIT_FOR_SERVER_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(StringUtils::loadingDots(
                 m_string_waiting_for_others.c_str()), pos, color, true, true);
         }
         break;
     case WorldStatus::READY_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
         break;
     case WorldStatus::SET_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_set.c_str(), pos, color, true, true);
         }
         break;
     case WorldStatus::GO_PHASE:
         {
-            static video::SColor color = video::SColor(255, 255, 255, 255);
-            core::rect<s32> pos(irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1,
-                                irr_driver->getActualScreenSize().Width>>1,
-                                irr_driver->getActualScreenSize().Height>>1);
-            //gui::IGUIFont* font = irr_driver->getRaceFont();
-            gui::IGUIFont* font = GUIEngine::getTitleFont();
-            
             if (race_manager->getCoinTarget() > 0)
                 font->draw(_("Collect nitro!"), pos, color, true, true);
             else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -900,7 +883,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             if (ctf->getRedHolder() == (int)kart_id)
             {
                 video::ITexture* red =
-                    irr_driver->getTexture(FileManager::GUI, "red_flag.png");
+                    irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
                 const core::rect<s32> rect(core::position2d<s32>(0, 0),
                     red->getSize());
                 const core::rect<s32> pos1
@@ -910,7 +893,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             else if (ctf->getBlueHolder() == (int)kart_id)
             {
                 video::ITexture* blue =
-                    irr_driver->getTexture(FileManager::GUI, "blue_flag.png");
+                    irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
                 const core::rect<s32> rect(core::position2d<s32>(0, 0),
                     blue->getSize());
                 const core::rect<s32> pos1

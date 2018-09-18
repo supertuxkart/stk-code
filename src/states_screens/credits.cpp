@@ -262,7 +262,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
 
 
     // ---- section name
-    video::SColor color( 255 /* a */, 0 /* r */, 0 /* g */ , 75 /* b */ );
+    video::SColor color =  GUIEngine::getSkin()->getColor("credits_text::neutral");
     video::SColor white_color( 255, 255, 255, 255 );
 
     // manage fade-in

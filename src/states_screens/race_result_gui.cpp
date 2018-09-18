@@ -54,7 +54,7 @@
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/networking_lobby.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -508,9 +508,9 @@ void RaceResultGUI::displayCTFResults()
     //Draw team scores:
     current_y += rect.Height;
     current_x /= 2;
-    irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI,
+    irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI_ICON,
         "red_flag.png");
-    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI,
+    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON,
         "blue_flag.png");
 
     core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
@@ -1247,9 +1247,9 @@ void RaceResultGUI::displayCTFResults()
         //Draw team scores:
         current_y += rect.Height;
         current_x /= 2;
-        irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI,
+        irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI_ICON,
             "soccer_ball_red.png");
-        irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI,
+        irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON,
             "soccer_ball_blue.png");
 
         core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
@@ -1438,7 +1438,7 @@ void RaceResultGUI::displayCTFResults()
             up_button->m_w = w;
             up_button->m_h = font_height;
             up_button->add();
-            up_button->setImage(file_manager->getAsset(FileManager::GUI, "scroll_up.png"));
+            up_button->setImage(file_manager->getAsset(FileManager::GUI_ICON, "scroll_up.png"));
             addGPProgressWidget(up_button);
             y = (up_button->m_y + up_button->m_h + SSHOT_SEPARATION);
 
@@ -1490,7 +1490,7 @@ void RaceResultGUI::displayCTFResults()
             down_button->m_w = w;
             down_button->m_h = font_height;
             down_button->add();
-            down_button->setImage(file_manager->getAsset(FileManager::GUI, "scroll_down.png"));
+            down_button->setImage(file_manager->getAsset(FileManager::GUI_ICON, "scroll_down.png"));
             addGPProgressWidget(down_button);
 
         }   // if MAJOR_MODE_GRAND_PRIX)
@@ -1582,7 +1582,7 @@ void RaceResultGUI::displayCTFResults()
                 }
 
                 int current_x = x;
-                current_y = y + (int)((i + 1) * m_distance_between_rows);
+                current_y = y + (int)((i + 1) * m_distance_between_rows * 1.5f);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
@@ -1676,7 +1676,7 @@ void RaceResultGUI::displayCTFResults()
             // Network grand prix chooses each track 1 by 1
             if (track == NULL)
             {
-                sshot->setImage(file_manager->getAsset(FileManager::GUI,
+                sshot->setImage(file_manager->getAsset(FileManager::GUI_ICON,
                     "main_help.png"));
             }
             else

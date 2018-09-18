@@ -50,7 +50,7 @@ private:
 
     uint32_t m_packet_counter;
 
-    struct gcm_aes128_ctx m_aes_context;
+    struct gcm_aes128_ctx m_aes_encrypt_context, m_aes_decrypt_context;
 
     std::mutex m_crypto_mutex;
 
@@ -95,7 +95,7 @@ public:
         assert(!m_client_iv.empty());
         auto c = std::unique_ptr<Crypto>(new Crypto(decode64(m_client_key),
             decode64(m_client_iv)));
-        c->m_packet_counter = 1;
+        c->m_packet_counter = 0;
         return c;
     }
     // ------------------------------------------------------------------------
@@ -131,9 +131,11 @@ public:
         assert(key.size() == 16);
         assert(iv.size() == 12);
         std::copy_n(iv.begin(), 12, m_iv.begin());
-        m_packet_counter = (uint32_t)-1;
-        gcm_aes128_set_key(&m_aes_context, key.data());
-        gcm_aes128_set_iv(&m_aes_context, 12, iv.data());
+        m_packet_counter = 0;
+        gcm_aes128_set_key(&m_aes_encrypt_context, key.data());
+        gcm_aes128_set_iv(&m_aes_encrypt_context, 12, iv.data());
+        gcm_aes128_set_key(&m_aes_decrypt_context, key.data());
+        gcm_aes128_set_iv(&m_aes_decrypt_context, 12, iv.data());
     }
     // ------------------------------------------------------------------------
     bool encryptConnectionRequest(BareNetworkString& ns);
