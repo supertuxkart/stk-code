@@ -389,83 +389,6 @@ void SkiddingAI::update(int ticks)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** This function decides if the AI should brake.
- *  The decision can be based on race mode (e.g. in follow the leader the AI
- *  will brake if it is ahead of the leader). Otherwise it will depend on
- *  the direction the AI is facing (if it's not facing in the track direction
- *  it will brake in order to make it easier to re-align itself), and
- *  estimated curve radius (brake to avoid being pushed out of a curve).
- */
-void SkiddingAI::handleBraking()
-{
-    m_controls->setBrake(false);
-    // In follow the leader mode, the kart should brake if they are ahead of
-    // the leader (and not the leader, i.e. don't have initial position 1)
-    // TODO : if there is still time in the countdown and the leader is faster,
-    //        the AI kart should not slow down too much, to stay closer to the
-    //        leader once overtaken.
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        m_distance_leader < 2                                                &&
-        m_kart->getInitialPosition()>1                                       &&
-        m_world->getOverallDistance(m_kart->getWorldKartId()) > 0             )
-    {
-#ifdef DEBUG
-    if(m_ai_debug)
-        Log::debug(getControllerName().c_str(), "braking: %s too close of leader.",
-                   m_kart->getIdent().c_str());
-#endif
-
-        m_controls->setBrake(true);
-        return;
-    }
-
-    // A kart will not brake when the speed is already slower than this
-    // value. This prevents a kart from going too slow (or even backwards)
-    // in tight curves.
-    const float MIN_SPEED = 5.0f;
-
-    // If the kart is not facing roughly in the direction of the track, brake
-    // so that it is easier for the kart to turn in the right direction.
-    if(m_current_track_direction==DriveNode::DIR_UNDEFINED &&
-        m_kart->getSpeed() > MIN_SPEED)
-    {
-#ifdef DEBUG
-        if(m_ai_debug)
-            Log::debug(getControllerName().c_str(),
-                       "%s not aligned with track.",
-                       m_kart->getIdent().c_str());
-#endif
-        m_controls->setBrake(true);
-        return;
-    }
-    if(m_current_track_direction==DriveNode::DIR_LEFT ||
-       m_current_track_direction==DriveNode::DIR_RIGHT   )
-    {
-        float max_turn_speed =
-            m_kart->getSpeedForTurnRadius(m_current_curve_radius);
-
-        if(m_kart->getSpeed() > 1.5f*max_turn_speed  &&
-            m_kart->getSpeed()>MIN_SPEED             &&
-            fabsf(m_controls->getSteer()) > 0.95f          )
-        {
-            m_controls->setBrake(true);
-#ifdef DEBUG
-            if(m_ai_debug)
-                Log::debug(getControllerName().c_str(),
-                           "speed %f too tight curve: radius %f ",
-                           m_kart->getSpeed(),
-                           m_kart->getIdent().c_str(),
-                           m_current_curve_radius);
-#endif
-        }
-        return;
-    }
-
-    return;
-
-}   // handleBraking
-
-//-----------------------------------------------------------------------------
 /** Decides in which direction to steer. If the kart is off track, it will
  *  steer towards the center of the track. Otherwise it will call one of
  *  the findNonCrashingPoint() functions to determine a point to aim for. Then
@@ -2096,6 +2019,84 @@ void SkiddingAI::handleAcceleration(int ticks)
     m_controls->setAccel(stk_config->m_ai_acceleration);
 
 }   // handleAcceleration
+
+
+//-----------------------------------------------------------------------------
+/** This function decides if the AI should brake.
+ *  The decision can be based on race mode (e.g. in follow the leader the AI
+ *  will brake if it is ahead of the leader). Otherwise it will depend on
+ *  the direction the AI is facing (if it's not facing in the track direction
+ *  it will brake in order to make it easier to re-align itself), and
+ *  estimated curve radius (brake to avoid being pushed out of a curve).
+ */
+void SkiddingAI::handleBraking()
+{
+    m_controls->setBrake(false);
+    // In follow the leader mode, the kart should brake if they are ahead of
+    // the leader (and not the leader, i.e. don't have initial position 1)
+    // TODO : if there is still time in the countdown and the leader is faster,
+    //        the AI kart should not slow down too much, to stay closer to the
+    //        leader once overtaken.
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
+        m_distance_leader < 2                                                &&
+        m_kart->getInitialPosition()>1                                       &&
+        m_world->getOverallDistance(m_kart->getWorldKartId()) > 0             )
+    {
+#ifdef DEBUG
+    if(m_ai_debug)
+        Log::debug(getControllerName().c_str(), "braking: %s too close of leader.",
+                   m_kart->getIdent().c_str());
+#endif
+
+        m_controls->setBrake(true);
+        return;
+    }
+
+    // A kart will not brake when the speed is already slower than this
+    // value. This prevents a kart from going too slow (or even backwards)
+    // in tight curves.
+    const float MIN_SPEED = 5.0f;
+
+    // If the kart is not facing roughly in the direction of the track, brake
+    // so that it is easier for the kart to turn in the right direction.
+    if(m_current_track_direction==DriveNode::DIR_UNDEFINED &&
+        m_kart->getSpeed() > MIN_SPEED)
+    {
+#ifdef DEBUG
+        if(m_ai_debug)
+            Log::debug(getControllerName().c_str(),
+                       "%s not aligned with track.",
+                       m_kart->getIdent().c_str());
+#endif
+        m_controls->setBrake(true);
+        return;
+    }
+    if(m_current_track_direction==DriveNode::DIR_LEFT ||
+       m_current_track_direction==DriveNode::DIR_RIGHT   )
+    {
+        float max_turn_speed =
+            m_kart->getSpeedForTurnRadius(m_current_curve_radius);
+
+        if(m_kart->getSpeed() > 1.5f*max_turn_speed  &&
+            m_kart->getSpeed()>MIN_SPEED             &&
+            fabsf(m_controls->getSteer()) > 0.95f          )
+        {
+            m_controls->setBrake(true);
+#ifdef DEBUG
+            if(m_ai_debug)
+                Log::debug(getControllerName().c_str(),
+                           "speed %f too tight curve: radius %f ",
+                           m_kart->getSpeed(),
+                           m_kart->getIdent().c_str(),
+                           m_current_curve_radius);
+#endif
+        }
+        return;
+    }
+
+    return;
+
+}   // handleBraking
 
 //-----------------------------------------------------------------------------
 void SkiddingAI::handleRaceStart()
