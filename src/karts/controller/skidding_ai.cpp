@@ -2226,16 +2226,16 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     {
         if ((nitro_skill < 4) && (item_skill < 5))
         {
-           return;
+            return;
         }
-       else if (nitro_skill < 4)
-       {
-           nitro_skill = 0;  
-       }
-       else if (item_skill < 5)
-       {
-           item_skill = 0;  
-       }
+        else if (nitro_skill < 4)
+        {
+            nitro_skill = 0;  
+        }
+        else if (item_skill < 5)
+        {
+            item_skill = 0;  
+        }
     }
 
     // Don't use nitro or zipper if it would make the kart go too fast
@@ -2246,7 +2246,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     // FIXME : as the zipper can give +15, but only gives +5 instant, this may be too conservative
     if(m_kart->getSpeed() + m_kart->getKartProperties()->getZipperMaxSpeedIncrease() > max_safe_speed)
         item_skill = 0;
-   
+
     // If a parachute or anvil is attached, the nitro and zipper don't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment =
@@ -2307,6 +2307,10 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
         // The burster forces the AI to consume its reserve by series of 2 bursts
         // Otherwise the bursting differences of the various nitro skill wouldn't matter here
         // In short races, most AI nitro usage may be at the end with the reserve
+        // FIXME : if there is a lot more nitro than can be used, use it by longer/more frequent bursts
+        // FIXME : waiting for the end of the fade-out for the next burst is not optimal
+        //         as the kart loses nitro top speed time reaccelerating
+        // FIXME : if the nitro reserve goes over 18, use as soon as practical
         float burster;
         
         if ( nitro_time > 0)
