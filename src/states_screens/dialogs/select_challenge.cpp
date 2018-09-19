@@ -211,7 +211,6 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         // Set up race manager appropriately
         race_manager->setNumPlayers(1);
         race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
-        race_manager->setReverseTrack(false);
 
         //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
         input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
