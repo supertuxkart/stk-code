@@ -34,8 +34,6 @@
 #include "input/input_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
-#include "network/network_config.hpp"
-#include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/profiler.hpp"
@@ -184,21 +182,6 @@ bool EventHandler::OnEvent (const SEvent &event)
             {
                 music_manager->resumeMusic();
                 SFXManager::get()->resumeAll();
-            }
-        }
-        else if (cmd == APP_CMD_TERM_WINDOW)
-        {
-            if (STKHost::existHost() && NetworkConfig::get()->isWAN())
-            {
-                STKHost::get()->requestShutdownDelayed(10000);
-            }
-        }
-        else if (cmd == APP_CMD_INIT_WINDOW)
-        {
-            if (STKHost::existHost() && NetworkConfig::get()->isWAN() &&
-                !STKHost::get()->requestedShutdown())
-            {
-                STKHost::get()->cancelShutdown();
             }
         }
         else if (cmd == APP_CMD_LOW_MEMORY)

@@ -308,7 +308,6 @@ void STKHost::init()
 {
     m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
-    m_shutdown_delay   = 0;
     m_authorised       = false;
     m_network          = NULL;
     m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
