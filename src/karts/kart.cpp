@@ -1840,12 +1840,12 @@ void Kart::unsetSquash()
 
     m_squash_time = std::numeric_limits<float>::max();
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-    scene::ISceneNode* node = m_kart_model->getAnimatedNode() ?
-                              m_kart_model->getAnimatedNode() : m_node;
         
-    if (m_vehicle->getNumWheels() > 0)
+    if (m_vehicle && m_vehicle->getNumWheels() > 0)
     {
         scene::ISceneNode** wheels = m_kart_model->getWheelNodes();
+        scene::ISceneNode* node = m_kart_model->getAnimatedNode() ?
+                                  m_kart_model->getAnimatedNode() : m_node;
         
         for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
         {
