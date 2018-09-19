@@ -5,12 +5,14 @@
             <model id="model" width="100%" layout="horizontal-row" height="100%">
             </model>
         </div>
-        <label text="0 to use the original color, otherwise pick one from slider."
-            width="100%" text_align="center" word_wrap="true"
-            I18N="In the kart color slider dialog"/>
+        <div width="20%" height="fit" text-align="left" layout="horizontal-row" >
+            <checkbox id="toggle-slider" />
+            <spacer width="40"/>
+            <label id="toggle-text"/>
+        </div>
         <spacer height="30" width="10"/>
         <div height="fit" width="100%" layout="horizontal-row">
-            <gauge id="color-slider" min_value="0" max_value="100" proportion="1"/>
+            <gauge id="color-slider" min_value="1" max_value="100" proportion="1"/>
         </div>
         <spacer height="30" width="10"/>
         <button id="close" text="Apply" align="center"/>

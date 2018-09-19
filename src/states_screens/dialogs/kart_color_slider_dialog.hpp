@@ -23,7 +23,13 @@
 #include "utils/cpp2011.hpp"
 
 class PlayerProfile;
-namespace GUIEngine { class ModelViewWidget; }
+namespace GUIEngine
+{
+    class CheckBoxWidget;
+    class LabelWidget;
+    class ModelViewWidget;
+    class SpinnerWidget;
+}
 
 /**
  * \ingroup states_screens
@@ -33,8 +39,17 @@ class KartColorSliderDialog : public GUIEngine::ModalDialog
 private:
     PlayerProfile* m_player_profile;
 
+    GUIEngine::CheckBoxWidget* m_toggle_slider;
+
+    GUIEngine::LabelWidget* m_toggle_text;
+
     GUIEngine::ModelViewWidget* m_model_view;
 
+    GUIEngine::SpinnerWidget* m_color_slider;
+
+    core::stringw m_original_color, m_choose_color;
+
+    void toggleSlider();
 public:
     KartColorSliderDialog(PlayerProfile* pp);
 
