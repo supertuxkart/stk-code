@@ -117,9 +117,6 @@ private:
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
 
-    /** Used as a timeout for shedule shutdown. */
-    std::atomic<uint64_t> m_shutdown_delay;
-
     /** True if this local host is authorised to control a server. */
     std::atomic_bool m_authorised;
 
@@ -211,20 +208,7 @@ public:
     void requestShutdown()
     {
         m_shutdown.store(true);
-        m_shutdown_delay.store(0);
     }   // requestExit
-    //-------------------------------------------------------------------------
-    void requestShutdownDelayed(int delay)
-    {
-        m_shutdown.store(true);
-        m_shutdown_delay.store(StkTime::getRealTimeMs() + delay);
-    }
-    //-------------------------------------------------------------------------
-    void cancelShutdown()
-    {
-        m_shutdown.store(false);
-        m_shutdown_delay.store(0);
-    }
     //-------------------------------------------------------------------------
     void shutdown();
     //-------------------------------------------------------------------------
@@ -282,11 +266,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
-    bool requestedShutdown() const
-    {
-        return m_shutdown.load() && 
-               m_shutdown_delay.load() < StkTime::getRealTimeMs();
-    }
+    bool requestedShutdown() const                { return m_shutdown.load(); }
     // ------------------------------------------------------------------------
     int receiveRawPacket(char *buffer, int buffer_len, 
                          TransportAddress* sender, int max_tries = -1)
