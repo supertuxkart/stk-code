@@ -279,6 +279,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     // 2) Apply all events to current confirmed state:
     // -----------------------------------------------
+    World *world = World::getWorld();
     int current_time = m_confirmed_state_time;
     bool has_state = count > 0;
     while(count > 0)
@@ -305,8 +306,21 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         {
             int index = iei.getIndex();
             // An item on the track was collected:
-            AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
-            collectedItem(m_confirmed_state[index], kart);
+            AbstractKart *kart = world->getKart(iei.getKartId());
+
+            // The world clock was set by the RewindManager to be the time
+            // of the state we are rewinding to. But this confirmed collection
+            // event happened in the past (we are replaying item events since
+            // the last confirmed state in order to get a new confirmed state).
+            // So we need to reset the clock to the time at which this event
+            // happened so that (e.g.) kart can use the right time (for
+            // example, bubble gum torque depends on time, and would be wrong
+            // otherwise resulting in stuttering).
+            int old_time = world->getTicksSinceStart();   // Save time we rewind to
+            world->setTicks(iei.getTicks());              // Set time of event
+            collectedItem(m_confirmed_state[index], kart);// Collect item
+            world->setTicks(old_time);                    // Set time to rewind-to
+
             if (m_confirmed_state[index]->isUsedUp())
             {
                 delete m_confirmed_state[index];
@@ -315,7 +329,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
         else if(iei.isNewItem())
         {
-            AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
+            AbstractKart *kart = world->getKart(iei.getKartId());
             ItemState *is = new ItemState(iei.getNewItemType(), kart,
                                           iei.getIndex()             );
             is->initItem(iei.getNewItemType(), iei.getXYZ());
@@ -343,11 +357,11 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     if (has_state)
     {
         if (auto gp = GameProtocol::lock())
-            gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
+            gp->sendItemEventConfirmation(world->getTicksSinceStart());
     }
 
     // Forward the confirmed item state to the world time:
-    int dt = World::getWorld()->getTicksSinceStart() - current_time;
+    int dt = world->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
 
     // 3. Restore the state to the current world time:
@@ -383,11 +397,14 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
         else if (!is && item)
         {
+            Log::info("nim", "About to delete item index %d i %d",
+                item->getItemId(), i);
+
             deleteItem(m_all_items[i]);
         }
     }
 
     // Now we save the current local
-    m_confirmed_state_time = World::getWorld()->getTicksSinceStart();
+    m_confirmed_state_time = world->getTicksSinceStart();
 }   // restoreState
 
