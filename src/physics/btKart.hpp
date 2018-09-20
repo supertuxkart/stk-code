@@ -148,6 +148,7 @@ public:
                               Kart *kart);
      virtual          ~btKart();
     void               reset();
+    void               resetGroundHeight();
     void               debugDraw(btIDebugDraw* debugDrawer);
     const btTransform& getChassisWorldTransform() const;
     btScalar           rayCast(unsigned int index, float fraction=1.0f);

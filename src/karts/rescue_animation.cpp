@@ -25,6 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_config.hpp"
+#include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/drive_graph.hpp"
@@ -60,6 +61,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_up_vector   = m_kart->getTrans().getBasis().getColumn(1);
     m_xyz         = m_kart->getXYZ();
     m_kart->getAttachment()->clear();
+    m_kart->getVehicle()->resetGroundHeight();
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())

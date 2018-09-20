@@ -131,13 +131,21 @@ void btKart::reset()
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
     m_cushioning_disable_time    = 0;
-    m_ground_height              = 0;
-    m_ground_height_old          = 0;
+    resetGroundHeight();
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
 
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Resets the ground height of a kart. This is also called on rescues.
+ */
+void btKart::resetGroundHeight()
+{
+    m_ground_height              = 0.15;
+    m_ground_height_old          = 0.15;
+}   // resetGroundHeight
 
 // ----------------------------------------------------------------------------
 const btTransform& btKart::getWheelTransformWS( int wheelIndex ) const
@@ -530,7 +538,7 @@ void btKart::updateVehicle( btScalar step )
     btVector3 down = -m_chassisBody->getGravity();
     down.normalize();
     btVector3 v_down = (v * down) * down;
-    btScalar offset=0.1f;
+    btScalar offset=0.24;
 
 #ifdef DEBUG_CUSHIONING
     Log::verbose("physics",
@@ -551,18 +559,15 @@ void btKart::updateVehicle( btScalar step )
     // to the predicted kart movement, which was found experimentally:
     btScalar gravity = m_chassisBody->getGravity().length();
 
+    btScalar absolute_fall = step*(-v_down.getY() + gravity*step);
     btScalar predicted_fall = gravity*step*step +
                               (m_ground_height_old-m_ground_height);
 
-    // Limit kart jumping upward brutally if landing just
-    // after a sudden terrain height change ;
-    // no jump in STK is so big to normally go over this value
-    if (predicted_fall > 0.4) predicted_fall = 0.4;
-
-    if (v_down.getY()<0 && m_cushioning_disable_time==0 &&
+    // if the ground_height is below offset-0.01f ;
+    // the terrain has unexpectedly changed - avoid sending the kart flying
+    if (absolute_fall > 0.06 && m_cushioning_disable_time==0 &&
         m_ground_height < predicted_fall + offset &&
-        m_ground_height > 0 && m_ground_height_old > 0.3 &&
-        predicted_fall > 0.05)
+        m_ground_height > (offset-0.01f) && m_ground_height_old > 0.3)
     {
         // Disable more cushioning for 1 second. This avoids the problem
         // of hovering: a kart gets cushioned on a down-sloping area, still
