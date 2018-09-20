@@ -51,12 +51,6 @@ btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
                Kart *kart)
       : m_vehicleRaycaster(raycaster)
 {
-    btScalar height = 0;
-    for (int i=0;i<stk_config->time2Ticks(HISTORY_TIME);i++)
-    {
-        m_ground_height.push_back(height);
-    }
-
     m_chassisBody               = chassis;
     m_indexRightAxis            = 0;
     m_indexUpAxis               = 1;
@@ -127,10 +121,6 @@ void btKart::reset()
         wheel.m_raycastInfo.m_suspensionLength = 0;
         updateWheelTransform(i, true);
     }
-    for (int i=0;i<stk_config->time2Ticks(HISTORY_TIME);i++)
-    {
-        m_ground_height[i]                     = 0;
-    }
     m_visual_wheels_touch_ground = false;
     m_allow_sliding              = false;
     m_num_wheels_on_ground       = 0;
@@ -141,7 +131,8 @@ void btKart::reset()
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
     m_cushioning_disable_time    = 0;
-    m_new_ground_height          = 999.9f;
+    m_ground_height              = 0;
+    m_ground_height_old          = 0;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
@@ -309,8 +300,8 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
 
     btScalar depth =  raylen * rayResults.m_distFraction;
 
-    if (depth < m_new_ground_height)
-        m_new_ground_height = depth;
+    if (depth < m_ground_height)
+        m_ground_height = depth;
     if (object &&  depth < max_susp_len)
     {
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
@@ -551,14 +542,6 @@ void btKart::updateVehicle( btScalar step )
         -v_down.getY() + 9.8*step,
         step * (-v_down.getY() + 9.8*step)+offset);
 #endif
-    // Update the ground height history
-    for (int i=stk_config->time2Ticks(HISTORY_TIME)-1;i>0;i--)
-    {
-        m_ground_height[i] = m_ground_height[i-1];
-    }
-    m_ground_height[0]  = m_new_ground_height;
-    m_new_ground_height = 999.9f;
-
     // If the kart is falling, estimate the distance the kart will fall
     // in the next time step: the speed gets increased by the gravity*dt.
     // This approximation is still not good enough (either because of
@@ -568,14 +551,18 @@ void btKart::updateVehicle( btScalar step )
     // to the predicted kart movement, which was found experimentally:
     btScalar gravity = m_chassisBody->getGravity().length();
 
-    btScalar predicted_fall = -v_down.getY() + gravity*step +
-                              (m_ground_height[stk_config->time2Ticks(HISTORY_TIME)-1]
-                               -m_ground_height[0])/stk_config->time2Ticks(HISTORY_TIME);
+    btScalar predicted_fall = gravity*step*step +
+                              (m_ground_height_old-m_ground_height);
+
+    // Limit kart jumping upward brutally if landing just
+    // after a sudden terrain height change ;
+    // no jump in STK is so big to normally go over this value
+    if (predicted_fall > 0.4) predicted_fall = 0.4;
 
     if (v_down.getY()<0 && m_cushioning_disable_time==0 &&
-        m_ground_height[0] < step*predicted_fall + offset &&
-        m_ground_height[0] > 0 &&
-        m_ground_height[stk_config->time2Ticks(HISTORY_TIME)-1] > 0.4)
+        m_ground_height < predicted_fall + offset &&
+        m_ground_height > 0 && m_ground_height_old > 0.3 &&
+        predicted_fall > 0.05)
     {
         // Disable more cushioning for 1 second. This avoids the problem
         // of hovering: a kart gets cushioned on a down-sloping area, still
@@ -584,7 +571,7 @@ void btKart::updateVehicle( btScalar step )
         m_cushioning_disable_time = stk_config->time2Ticks(1);
 
         needed_cushioning = true;
-        btVector3 impulse = down * predicted_fall
+        btVector3 impulse = down * (predicted_fall/step)
                             / m_chassisBody->getInvMass();
 #ifdef DEBUG_CUSHIONING
         float v_old = m_chassisBody->getLinearVelocity().getY();
@@ -599,7 +586,7 @@ void btKart::updateVehicle( btScalar step )
             -v_down.getY(),
             v_old,
             m_chassisBody->getLinearVelocity().getY(),
-            m_ground_height[0],
+            m_ground_height,
             m_wheelInfo[wheel_index].m_raycastInfo.m_isInContact ?
             m_wheelInfo[wheel_index].m_raycastInfo.m_contactPointWS.getY()
             : -100,
@@ -610,6 +597,9 @@ void btKart::updateVehicle( btScalar step )
         );
 #endif
     }
+    // Update the ground height history
+    m_ground_height_old = m_ground_height;
+    m_ground_height = 999.9f;
 
 
     // Update friction (i.e. forward force)
