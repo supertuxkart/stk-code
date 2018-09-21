@@ -198,6 +198,12 @@ bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
             kart->decreaseShieldTime();
             return true;
         }
+        // Super-Sized karts are immune to bowling balls
+        // (But if they have a gum shield, they lose it)
+        else if (kart && kart->isSuperSized())
+        {
+            return false;
+        }
         else
         {
             m_has_hit_kart = kart != NULL;
