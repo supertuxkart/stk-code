@@ -118,18 +118,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
-    m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
     m_vehicle              = NULL;
     m_initial_position     = position;
-    m_race_position        = position;
-    m_collected_energy     = 0;
-    m_finished_race        = false;
     m_race_result          = false;
-    m_finish_time          = 0.0f;
-    m_bubblegum_ticks      = 0;
-    m_bubblegum_torque     = 0.0f;
-    m_invulnerable_ticks   = 0;
-    m_squash_time          = std::numeric_limits<float>::max();
 
     m_shadow               = NULL;
     m_wheel_box            = NULL;
@@ -138,11 +129,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_skidmarks            = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
-    m_flying               = false;
     m_stars_effect         = NULL;
-    m_is_jumping           = false;
-    m_min_nitro_ticks      = 0;
-    m_energy_to_min_ratio  = 0;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
     m_fire_clicked         = 0;
@@ -157,17 +144,12 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         m_previous_xyz.push_back(initial_position);
         m_previous_xyz_times.push_back(0.0f);
     }
-    m_time_previous_counter = 0.0f;
-
-    m_view_blocked_by_plunger = 0;
-    m_has_caught_nolok_bubblegum = false;
 
     // Initialize custom sound vector (TODO: add back when properly done)
     // m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
 
     // Set position and heading:
     m_reset_transform         = init_transform;
-    m_speed                   = 0.0f;
     m_last_factor_engine_sound = 0.0f;
 
     m_kart_model->setKart(this);
@@ -368,6 +350,7 @@ void Kart::reset()
 
     unsetSquash();
 
+    m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
     m_race_position        = m_initial_position;
     m_finished_race        = false;
     m_eliminated           = false;
@@ -375,8 +358,9 @@ void Kart::reset()
     m_bubblegum_ticks      = 0;
     m_bubblegum_torque     = 0.0f;
     m_invulnerable_ticks   = 0;
+    m_min_nitro_ticks      = 0;
+    m_energy_to_min_ratio  = 0;
     m_squash_time          = std::numeric_limits<float>::max();
-    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     m_collected_energy     = 0;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
@@ -387,7 +371,11 @@ void Kart::reset()
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
+    m_flying               = false;
     m_startup_boost        = 0.0f;
+
+    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+
     for (int i=0;i<m_xyz_history_size;i++)
     {
         m_previous_xyz[i] = getXYZ();
