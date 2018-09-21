@@ -37,7 +37,7 @@
 #include "race/highscore_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/online/tracks_screen.hpp"
+#include "states_screens/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -72,13 +72,11 @@ void TrackInfoScreen::loadedFromFile()
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
 
-    m_kart_icons[0] = getWidget<IconButtonWidget>("iconscore1");
-    m_kart_icons[1] = getWidget<IconButtonWidget>("iconscore2");
-    m_kart_icons[2] = getWidget<IconButtonWidget>("iconscore3");
-
-    m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
-    m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
-    m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
+    for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
+    {
+        m_kart_icons[i] = getWidget<IconButtonWidget>(("iconscore"+std::to_string(i+1)).c_str());
+        m_highscore_entries[i] = getWidget<LabelWidget>(("highscore"+std::to_string(i+1)).c_str());
+    }
     
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
@@ -124,7 +122,7 @@ void TrackInfoScreen::init()
     // images are saved squared, but must be stretched to 4:
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    screenshot->m_properties[PROP_ICON] = "gui/icons/main_help.png";
+    screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
     ITexture* image = STKTexManager::getInstance()
         ->getTexture(m_track->getScreenshotFile(),
@@ -259,13 +257,11 @@ void TrackInfoScreen::init()
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
 
-    m_kart_icons[0]->setVisible(has_highscores);
-    m_kart_icons[1]->setVisible(has_highscores);
-    m_kart_icons[2]->setVisible(has_highscores);
-
-    m_highscore_entries[0]->setVisible(has_highscores);
-    m_highscore_entries[1]->setVisible(has_highscores);
-    m_highscore_entries[2]->setVisible(has_highscores);
+    for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
+    {
+        m_kart_icons[i]->setVisible(has_highscores);
+        m_highscore_entries[i]->setVisible(has_highscores);
+    }
 
     RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
     bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -333,7 +329,7 @@ void TrackInfoScreen::updateHighScores()
 
             ITexture* no_kart_texture =
                 STKTexManager::getInstance()->getTexture
-                (file_manager->getAsset(FileManager::GUI_ICON, "random_kart.png"));
+                (file_manager->getAsset(FileManager::GUI, "random_kart.png"));
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }
@@ -457,3 +453,4 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+

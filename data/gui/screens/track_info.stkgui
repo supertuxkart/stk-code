@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
         <header id="name" height="7%" width="80%" align="center" text_align="center"/>
@@ -19,7 +19,7 @@
                 <spacer width="1" height="2%"/>
 
                 <div width="95%" height="fit" layout="horizontal-row">
-                    <icon id="iconscore1" icon="gui/icons/random_kart.png" width="font" height="font"/>
+                    <icon id="iconscore1" icon="gui/random_kart.png" width="font" height="font"/>
                     <spacer width="2%" height="1"/>
                     <label id="highscore1" proportion="1" text="(Empty)"/>
                 </div>
@@ -27,7 +27,7 @@
                 <spacer width="1" height="2%"/>
 
                 <div width="95%" height="fit" layout="horizontal-row">
-                    <icon id="iconscore2" icon="gui/icons/random_kart.png" width="font" height="font"/>
+                    <icon id="iconscore2" icon="gui/random_kart.png" width="font" height="font"/>
                     <spacer width="2%" height="1"/>
                     <label id="highscore2" proportion="1" text="(Empty)"/>
                 </div>
@@ -35,9 +35,25 @@
                 <spacer width="1" height="2%"/>
 
                 <div width="95%" height="fit" layout="horizontal-row">
-                    <icon id="iconscore3" icon="gui/icons/random_kart.png" width="font" height="font"/>
+                    <icon id="iconscore3" icon="gui/random_kart.png" width="font" height="font"/>
                     <spacer width="2%" height="1"/>
                     <label id="highscore3" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="2%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore4" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore4" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="2%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore5" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore5" proportion="1" text="(Empty)"/>
                 </div>
 
                 <spacer width="1" height="2%"/>
@@ -91,7 +107,7 @@
         </box>
         <spacer width="1" height="1%"/>
         <buttonbar id="buttons" height="17%" width="100%" align="center">
-            <icon-button id="start" width="64" height="64" icon="gui/icons/green_check.png"
+            <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
                     I18N="In the track info screen" text="Start Race"/>
 
         </buttonbar>
