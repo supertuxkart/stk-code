@@ -385,7 +385,8 @@ void ServerLobby::asynchronousUpdate()
         handlePendingConnection();
     }
 
-    if (allowJoinedPlayersWaiting() && m_server_recovering.expired() &&
+    if (NetworkConfig::get()->isWAN() &&
+        allowJoinedPlayersWaiting() && m_server_recovering.expired() &&
         StkTime::getRealTimeMs() > m_last_success_poll_time.load() + 30000)
     {
         Log::warn("ServerLobby", "Trying auto server recovery.");
