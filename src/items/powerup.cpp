@@ -170,6 +170,9 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_ZIPPER:
             break ;
 
+        case PowerupManager::POWERUP_SUPER_SIZE:
+            break ;
+
         case PowerupManager::POWERUP_BOWLING:
             m_sound_use = SFXManager::get()->createSoundSource("bowling_shoot");
             break ;
@@ -275,6 +278,9 @@ void Powerup::use()
     {
     case PowerupManager::POWERUP_ZIPPER:
         m_kart->handleZipper(NULL, true);
+        break ;
+    case PowerupManager::POWERUP_SUPER_SIZE:
+        m_kart->setSuper();
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {

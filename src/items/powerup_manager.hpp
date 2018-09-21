@@ -132,6 +132,7 @@ public:
                       POWERUP_CAKE,
                       POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
                       POWERUP_SWITCH, POWERUP_SWATTER, POWERUP_RUBBERBALL,
+                      POWERUP_SUPER_SIZE,
                       POWERUP_PARACHUTE,
                       POWERUP_ANVIL,      //powerup.cpp assumes these two come last
                       POWERUP_LAST=POWERUP_ANVIL,
