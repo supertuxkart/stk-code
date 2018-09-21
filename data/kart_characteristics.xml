@@ -250,7 +250,7 @@
                 kart-specific maximum kart speed.
             fade-out-time: determines how long it takes for super-size's speed boost
                 to fade out (after 'time'). -->
-        <super duration="12" force="800.0" max-speed-increase="3"
+        <super duration="10" force="800.0" max-speed-increase="3"
                 fade-out-time="0.5" />
 
         <!-- Swatter
