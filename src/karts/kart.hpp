@@ -322,7 +322,7 @@ public:
 
     virtual void   setSuper         () OVERRIDE;
     virtual void   unsetSuper       (bool instant) OVERRIDE;
-    virtual void   updateScale      () OVERRIDE;
+    virtual void   updateScale      (int ticks) OVERRIDE;
 
     virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
     virtual void   crashed          (const Material *m, const Vec3 &normal) OVERRIDE;

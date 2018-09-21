@@ -1876,7 +1876,7 @@ void Kart::setSuper()
 //-----------------------------------------------------------------------------
 /** Update the scale according to m_scale_change_ticks
  */
-void Kart::updateScale()
+void Kart::updateScale(int ticks)
 {
     //TODO update physics model too
     if (m_scale_change_ticks == 0)  return;
@@ -1884,12 +1884,14 @@ void Kart::updateScale()
     float scale_factor;
     if (m_scale_change_ticks > 0)
     {
-        m_scale_change_ticks--;
+        m_scale_change_ticks -= ticks;
+        if (m_scale_change_ticks < 0) m_scale_change_ticks = 0;
         scale_factor = 1.4 - (m_scale_change_ticks*0.01);
     }
     else
     {
-        m_scale_change_ticks++;
+        m_scale_change_ticks += ticks;
+        if (m_scale_change_ticks > 0) m_scale_change_ticks = 0;
         scale_factor = 1.0 - (m_scale_change_ticks*0.01);
     }
 
@@ -1910,7 +1912,6 @@ void Kart::unsetSuper(bool instant)
         // This resets the speed boost
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SUPER,
                                          0, 0, 0, 0);
-        //TODO : force end the max speed bonus
     }
     else
     {
@@ -2583,13 +2584,15 @@ void Kart::updatePhysics(int ticks)
 {
     if (m_super_time != std::numeric_limits<float>::max())
     {
-        m_squash_time -= stk_config->ticks2Time(ticks);
+        m_super_time -= stk_config->ticks2Time(ticks);
         // If super time ends, reset the model
         if (m_super_time <= 0.0f)
         {
             unsetSuper(false /*instant*/);
         }
     }   // if super
+
+    updateScale(ticks);
 
     if (m_controls.getAccel() > 0.0f &&
         World::getWorld()->getTicksSinceStart() == 1)

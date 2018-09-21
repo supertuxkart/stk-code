@@ -286,7 +286,7 @@ public:
     virtual void unsetSuper(bool instant) = 0;
     // ------------------------------------------------------------------------
     /** Updates the kart's current scaling */
-    virtual void updateScale() = 0;
+    virtual void updateScale(int ticks) = 0;
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. This is not declared
      *  pure abstract, since this function is not needed for certain classes,
