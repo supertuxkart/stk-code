@@ -348,6 +348,7 @@ void Kart::reset()
         m_collision_particles->setCreationRateAbsolute(0.0f);
 #endif
 
+    unsetSuper(true /*instant*/);
     unsetSquash();
 
     m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
@@ -360,7 +361,9 @@ void Kart::reset()
     m_invulnerable_ticks   = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
+    m_scale_change_ticks   = 0;
     m_squash_time          = std::numeric_limits<float>::max();
+    m_super_time           = std::numeric_limits<float>::max();
     m_collected_energy     = 0;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
@@ -1792,6 +1795,8 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
 
+    unsetSuper(true /*instant*/);
+
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
                              stk_config->time2Ticks(0.1f), 
                              stk_config->time2Ticks(time));
@@ -1845,6 +1850,71 @@ void Kart::unsetSquash()
     }
 #endif
 }
+
+//-----------------------------------------------------------------------------
+/** This activates super mode for kart ; upscaling it and giving it
+ *  other perks.
+ *  \param time How long the kart will be in super mode. A value of 0 will reset
+ *         the kart to be normal.
+ */
+void Kart::setSuper(float time)
+{
+    if (time <= 0) unsetSuper(false /*instant*/);
+
+    unsetSquash();
+
+    //TODO : set max speed and engine bonus
+
+    if (m_super_time == std::numeric_limits<float>::max())
+    {
+        m_scale_change_ticks = 40;
+        m_super_time = time;
+    }
+}   // setSuper
+
+//-----------------------------------------------------------------------------
+/** Update the scale according to m_scale_change_ticks
+ */
+void Kart::updateScale()
+{
+    //TODO update physics model too
+    if (m_scale_change_ticks == 0)  return;
+
+    float scale_factor;
+    if (m_scale_change_ticks > 0)
+    {
+        m_scale_change_ticks--;
+        scale_factor = 1.4 - (m_scale_change_ticks*0.01);
+    }
+    else
+    {
+        m_scale_change_ticks++;
+        scale_factor = 1.0 - (m_scale_change_ticks*0.01);
+    }
+
+    m_node->setScale(core::vector3df(scale_factor,scale_factor,scale_factor));
+}   // setSuper
+
+//-----------------------------------------------------------------------------
+/** This disables super mode
+ *  \param instant Is this a normal end or a reset */
+void Kart::unsetSuper(bool instant)
+{
+    //TODO update physics model too
+    m_super_time = std::numeric_limits<float>::max();
+    if (instant)
+    {
+        m_node->setScale(core::vector3df(1.0f,1.0f,1.0f));
+        m_scale_change_ticks = 0;
+        //TODO : force end the max speed bonus
+    }
+    else
+    {
+        //Will scale back to normal over time
+        m_scale_change_ticks = -40;
+    }
+}   // unsetSuper
+
 
 //-----------------------------------------------------------------------------
 /** Returns if the kart is currently being squashed
@@ -2506,6 +2576,16 @@ bool Kart::playCustomSFX(unsigned int type)
  */
 void Kart::updatePhysics(int ticks)
 {
+    if (m_super_time != std::numeric_limits<float>::max())
+    {
+        m_squash_time -= stk_config->ticks2Time(ticks);
+        // If super time ends, reset the model
+        if (m_super_time <= 0.0f)
+        {
+            unsetSuper(false /*instant*/);
+        }
+    }   // if super
+
     if (m_controls.getAccel() > 0.0f &&
         World::getWorld()->getTicksSinceStart() == 1)
     {

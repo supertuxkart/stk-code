@@ -277,6 +277,19 @@ public:
     /** Makes the kart unsquashed again. */
     virtual void unsetSquash() = 0;
     // ------------------------------------------------------------------------
+    /** This activates super mode for kart ; upscaling it and giving it
+     *  other perks.
+     *  \param time How long the kart will be in super mode. A value of 0 will reset
+     *         the kart to be normal. */
+    virtual void setSuper(float time) = 0;
+    // ------------------------------------------------------------------------
+    /** This disables super mode
+     *  \param instant Is this a normal end or a reset */
+    virtual void unsetSuper(bool instant) = 0;
+    // ------------------------------------------------------------------------
+    /** Updates the kart's current scaling */
+    virtual void updateScale() = 0;
+    // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. This is not declared
      *  pure abstract, since this function is not needed for certain classes,
      *  like Ghost. */

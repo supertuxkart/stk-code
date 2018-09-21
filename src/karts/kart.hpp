@@ -253,6 +253,11 @@ protected:
     int          m_ticks_last_crash;
     RaceManager::KartType m_type;
 
+    // Used to know where we are when upscaling/downscaling the kart
+    // Set to positive to upscale, to negative to downscale
+    int8_t        m_scale_change_ticks;
+    float         m_super_time;
+
     /** To prevent using nitro in too short bursts */
     int8_t        m_min_nitro_ticks;
 
@@ -314,6 +319,10 @@ public:
                                      bool play_sound=false) OVERRIDE;
     virtual void   setSquash        (float time, float slowdown) OVERRIDE;
     virtual void   unsetSquash      () OVERRIDE;
+
+    virtual void   setSuper         (float time) OVERRIDE;
+    virtual void   unsetSuper       (bool instant) OVERRIDE;
+    virtual void   updateScale      () OVERRIDE;
 
     virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
     virtual void   crashed          (const Material *m, const Vec3 &normal) OVERRIDE;
