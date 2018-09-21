@@ -517,6 +517,9 @@ public:
     /** Returns if the kart is currently being squashed. */
     virtual bool isSquashed() const OVERRIDE;
     // ------------------------------------------------------------------------
+    /** Returns if the kart is currently super sized. */
+    virtual bool isSuperSized() const OVERRIDE;
+    // ------------------------------------------------------------------------
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) OVERRIDE;
     // ------------------------------------------------------------------------

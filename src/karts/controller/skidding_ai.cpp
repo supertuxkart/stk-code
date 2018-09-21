@@ -1241,6 +1241,12 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
             m_controls->setFire(true);
         break;   // POWERUP_PARACHUTE
 
+    case PowerupManager::POWERUP_SUPER_SIZE:
+        // FIXME : this is a temporary AI to avoid crashes
+        if(m_time_since_last_shot > 1.0f)
+            m_controls->setFire(true);
+        break;   // POWERUP_SUPER_SIZE
+
     case PowerupManager::POWERUP_SWATTER:
         {
              // if the kart has a shield, do not break it by using a swatter.

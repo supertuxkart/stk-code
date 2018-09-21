@@ -268,6 +268,9 @@ public:
     /** Returns if the kart is currently being squashed. */
     virtual bool isSquashed() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns if the kart is currently being super-sized. */
+    virtual bool isSuperSized() const = 0;
+    // ------------------------------------------------------------------------
     /** Squashes this kart: it will scale the kart in up direction, and causes
      *  a slowdown while this kart is squashed.
      *  \param time How long the kart will be squashed.

@@ -1795,7 +1795,12 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
 
-    unsetSuper(true /*instant*/);
+    if(isSuperSized())
+    {
+        unsetSuper(true /*instant*/);
+        setInvulnerableTicks(stk_config->time2Ticks(2.5f));
+        return;
+    }
 
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
                              stk_config->time2Ticks(0.1f), 
@@ -1869,6 +1874,8 @@ void Kart::setSuper()
                                      stk_config->time2Ticks(duration),
                                      stk_config->time2Ticks(fade_out_time));
 
+    //FIXME : Use something based on config/Time2Ticks
+    //FIXME : check current scaling status before upscaling
     m_scale_change_ticks = 40;
     m_super_time = duration;
 }   // setSuper
@@ -1878,6 +1885,7 @@ void Kart::setSuper()
  */
 void Kart::updateScale(int ticks)
 {
+
     //TODO update physics model too
     if (m_scale_change_ticks == 0)  return;
 
@@ -1895,7 +1903,9 @@ void Kart::updateScale(int ticks)
         scale_factor = 1.0 - (m_scale_change_ticks*0.01);
     }
 
+#ifndef SERVER_ONLY
     m_node->setScale(core::vector3df(scale_factor,scale_factor,scale_factor));
+#endif
 }   // setSuper
 
 //-----------------------------------------------------------------------------
@@ -1907,7 +1917,9 @@ void Kart::unsetSuper(bool instant)
     m_super_time = std::numeric_limits<float>::max();
     if (instant)
     {
+#ifndef SERVER_ONLY
         m_node->setScale(core::vector3df(1.0f,1.0f,1.0f));
+#endif
         m_scale_change_ticks = 0;
         // This resets the speed boost
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SUPER,
@@ -1930,6 +1942,16 @@ bool Kart::isSquashed() const
     return
         m_max_speed->isSpeedDecreaseActive(MaxSpeed::MS_DECREASE_SQUASH) == 1;
 }   // setSquash
+
+//-----------------------------------------------------------------------------
+/** Returns if the kart is currently super-sized
+  */
+bool Kart::isSuperSized() const
+{
+    return
+        m_max_speed->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_SUPER) > 0;
+}   // setSquash
+
 
 //-----------------------------------------------------------------------------
 /** Plays any terrain specific sound effect.
