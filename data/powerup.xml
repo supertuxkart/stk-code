@@ -154,8 +154,8 @@
               multi   ="  0      0    25     0        0       0       0     0     0     0    0" />
       <weight single  ="160    120   140   190      110      35     100    80     0    30    0"
               multi   ="  0      0    35     0        0       0       0     0     0     0    0" />
-      <weight single  ="135    105    45   215        0      30       0    50    60    90    0"
-              multi   =" 40      0    80   130       20       0       0     0     0     0    0" />
+      <weight single  ="110    100    45   205        0      30       0    50   120    90    0"
+              multi   =" 40      0    80   110       20       0       0     0     0     0    0" />
     </weights>
     <weights num-karts="9">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber super para  anvil -->
@@ -167,8 +167,8 @@
               multi   ="  0      0    35     0        0       0       0     0     0     0    0" />
       <weight single  ="165    115   130   225       70      25      80    60     0    40    0"
               multi   ="  0      0    60     0       30       0       0     0     0     0    0" />
-      <weight single  =" 85     75    35   200        0      15       0    20   140    75    0"
-              multi   =" 75      0    80   180       20       0       0     0     0     0    0" />
+      <weight single  =" 85     75    30   195        0      15       0    20   170    75    0"
+              multi   =" 75      0    75   165       20       0       0     0     0     0    0" />
     </weights>
     <weights num-karts="14">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber super para  anvil -->
@@ -180,8 +180,8 @@
               multi   ="  0      0    40     0        0       0       0     0     0     0    0" />
       <weight single  ="135    105   115   220       60      15      70    40     0    30    0"
               multi   =" 40      0    80    40       50       0       0     0     0     0    0" />
-      <weight single  =" 65     60    15   160        0       0       0     0   200    50    0"
-              multi   ="110      0    80   220       20       0       0     0     0     0    0" />
+      <weight single  =" 65     60    10   160        0       0       0     0   230    50    0"
+              multi   ="110      0    80   215       20       0       0     0     0     0    0" />
     </weights>
     <weights num-karts="20">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber super para  anvil -->
