@@ -317,9 +317,9 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             // example, bubble gum torque depends on time, and would be wrong
             // otherwise resulting in stuttering).
             int old_time = world->getTicksSinceStart();   // Save time we rewind to
-            world->setTicks(iei.getTicks());              // Set time of event
+            world->setTicksForRewind(iei.getTicks());     // Set time of event
             collectedItem(m_confirmed_state[index], kart);// Collect item
-            world->setTicks(old_time);                    // Set time to rewind-to
+            world->setTicksForRewind(old_time);           // Set time to rewind-to
 
             if (m_confirmed_state[index]->isUsedUp())
             {
