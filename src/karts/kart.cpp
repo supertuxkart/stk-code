@@ -1799,6 +1799,7 @@ void Kart::setSquash(float time, float slowdown)
     {
         unsetSuper(true /*instant*/);
         setInvulnerableTicks(stk_config->time2Ticks(2.5f));
+        showStarEffect(2.5f);
         return;
     }
 
