@@ -319,11 +319,14 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             // otherwise resulting in stuttering).
             int old_time = world->getTicksSinceStart();   // Save time we rewind to
             world->setTicksForRewind(iei.getTicks());     // Set time of event
-            collectedItem(m_confirmed_state[index], kart);// Collect item
 
-            // Reset till ticks return from state (required for eating banana with bomb)
-            int ttr = iei.getTicksTillReturn();
-            m_confirmed_state[index]->setTicksTillReturn(ttr);
+            if (m_confirmed_state[index] != NULL)
+            {
+                m_confirmed_state[index]->collected(kart);// Collect item
+                // Reset till ticks return from state (required for eating banana with bomb)
+                int ttr = iei.getTicksTillReturn();
+                m_confirmed_state[index]->setTicksTillReturn(ttr);
+            }
 
             world->setTicksForRewind(old_time);           // Set time to rewind-to
 
