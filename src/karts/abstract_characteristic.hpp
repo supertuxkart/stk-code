@@ -154,6 +154,12 @@ public:
         ZIPPER_MAX_SPEED_INCREASE,
         ZIPPER_FADE_OUT_TIME,
 
+        // Super size
+        SUPER_DURATION,
+        SUPER_FORCE,
+        SUPER_MAX_SPEED_INCREASE,
+        SUPER_FADE_OUT_TIME,
+
         // Swatter
         SWATTER_DURATION,
         SWATTER_DISTANCE,
@@ -328,6 +334,11 @@ public:
     float getZipperSpeedGain() const;
     float getZipperMaxSpeedIncrease() const;
     float getZipperFadeOutTime() const;
+
+    float getSuperDuration() const;
+    float getSuperForce() const;
+    float getSuperMaxSpeedIncrease() const;
+    float getSuperFadeOutTime() const;
 
     float getSwatterDuration() const;
     float getSwatterDistance() const;

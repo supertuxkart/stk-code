@@ -320,7 +320,7 @@ public:
     virtual void   setSquash        (float time, float slowdown) OVERRIDE;
     virtual void   unsetSquash      () OVERRIDE;
 
-    virtual void   setSuper         (float time) OVERRIDE;
+    virtual void   setSuper         () OVERRIDE;
     virtual void   unsetSuper       (bool instant) OVERRIDE;
     virtual void   updateScale      () OVERRIDE;
 

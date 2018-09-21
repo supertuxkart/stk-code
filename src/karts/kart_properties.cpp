@@ -902,6 +902,30 @@ float KartProperties::getZipperFadeOutTime() const
 }  // getZipperFadeOutTime
 
 // ----------------------------------------------------------------------------
+float KartProperties::getSuperDuration() const
+{
+    return m_cached_characteristic->getSuperDuration();
+}  // getSuperDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSuperForce() const
+{
+    return m_cached_characteristic->getSuperForce();
+}  // getSuperForce
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSuperMaxSpeedIncrease() const
+{
+    return m_cached_characteristic->getSuperMaxSpeedIncrease();
+}  // getSuperMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSuperFadeOutTime() const
+{
+    return m_cached_characteristic->getSuperFadeOutTime();
+}  // getSuperFadeOutTime
+
+// ----------------------------------------------------------------------------
 float KartProperties::getSwatterDuration() const
 {
     return m_cached_characteristic->getSwatterDuration();

@@ -161,6 +161,14 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case ZIPPER_FADE_OUT_TIME:
         return TYPE_FLOAT;
+    case SUPER_DURATION:
+        return TYPE_FLOAT;
+    case SUPER_FORCE:
+        return TYPE_FLOAT;
+    case SUPER_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case SUPER_FADE_OUT_TIME:
+        return TYPE_FLOAT;
     case SWATTER_DURATION:
         return TYPE_FLOAT;
     case SWATTER_DISTANCE:
@@ -397,6 +405,14 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ZIPPER_MAX_SPEED_INCREASE";
     case ZIPPER_FADE_OUT_TIME:
         return "ZIPPER_FADE_OUT_TIME";
+    case SUPER_DURATION:
+        return "SUPER_DURATION";
+    case SUPER_FORCE:
+        return "SUPER_FORCE";
+    case SUPER_MAX_SPEED_INCREASE:
+        return "SUPER_MAX_SPEED_INCREASE";
+    case SUPER_FADE_OUT_TIME:
+        return "SUPER_FADE_OUT_TIME";
     case SWATTER_DURATION:
         return "SWATTER_DURATION";
     case SWATTER_DISTANCE:
@@ -1154,6 +1170,54 @@ float AbstractCharacteristic::getZipperFadeOutTime() const
                     getName(ZIPPER_FADE_OUT_TIME).c_str());
     return result;
 }  // getZipperFadeOutTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSuperDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(SUPER_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SUPER_DURATION).c_str());
+    return result;
+}  // getSuperDuration
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSuperForce() const
+{
+    float result;
+    bool is_set = false;
+    process(SUPER_FORCE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SUPER_FORCE).c_str());
+    return result;
+}  // getSuperForce
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSuperMaxSpeedIncrease() const
+{
+    float result;
+    bool is_set = false;
+    process(SUPER_MAX_SPEED_INCREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SUPER_MAX_SPEED_INCREASE).c_str());
+    return result;
+}  // getSuperMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSuperFadeOutTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SUPER_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SUPER_FADE_OUT_TIME).c_str());
+    return result;
+}  // getSuperFadeOutTime
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSwatterDuration() const

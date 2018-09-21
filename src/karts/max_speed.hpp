@@ -30,7 +30,7 @@ friend class KartRewinder;
 public:
     /** The categories to use for increasing the speed of a kart:
      *  Increase due to zipper, slipstream, nitro, rubber band,
-     *  skidding usage. */
+     *  skidding usage, or super bonus (big kart). */
     enum  {MS_INCREASE_MIN,
            MS_INCREASE_ZIPPER = MS_INCREASE_MIN,
            MS_INCREASE_SLIPSTREAM,
@@ -38,6 +38,7 @@ public:
            MS_INCREASE_RUBBER,
            MS_INCREASE_SKIDDING,
            MS_INCREASE_RED_SKIDDING,
+           MS_INCREASE_SUPER,
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:

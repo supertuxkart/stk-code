@@ -278,10 +278,8 @@ public:
     virtual void unsetSquash() = 0;
     // ------------------------------------------------------------------------
     /** This activates super mode for kart ; upscaling it and giving it
-     *  other perks.
-     *  \param time How long the kart will be in super mode. A value of 0 will reset
-     *         the kart to be normal. */
-    virtual void setSuper(float time) = 0;
+     *  other perks. */
+    virtual void setSuper() = 0;
     // ------------------------------------------------------------------------
     /** This disables super mode
      *  \param instant Is this a normal end or a reset */

@@ -483,6 +483,18 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ZIPPER_FADE_OUT_TIME]);
     }
 
+    if (const XMLNode *sub_node = node->getNode("super"))
+    {
+        sub_node->get("duration",
+            &m_values[SUPER_DURATION]);
+        sub_node->get("force",
+            &m_values[SUPER_FORCE]);
+        sub_node->get("max-speed-increase",
+            &m_values[SUPER_MAX_SPEED_INCREASE]);
+        sub_node->get("fade-out-time",
+            &m_values[SUPER_FADE_OUT_TIME]);
+    }
+
     if (const XMLNode *sub_node = node->getNode("swatter"))
     {
         sub_node->get("duration",

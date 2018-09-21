@@ -243,6 +243,16 @@
         <zipper duration="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
                 fade-out-time="1.0" />
 
+        <!-- Super
+            duration: Time super-size is active.
+            force: Additional engine force.
+            max-speed-increase: Additional speed allowed on top of the
+                kart-specific maximum kart speed.
+            fade-out-time: determines how long it takes for super-size's speed boost
+                to fade out (after 'time'). -->
+        <super duration="12" force="800.0" max-speed-increase="3"
+                fade-out-time="0.5" />
+
         <!-- Swatter
             duration: How long can the swatter be active.
             distance: How close a kart or an item must be before it can be hit.

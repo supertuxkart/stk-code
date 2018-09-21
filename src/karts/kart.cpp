@@ -1853,23 +1853,24 @@ void Kart::unsetSquash()
 
 //-----------------------------------------------------------------------------
 /** This activates super mode for kart ; upscaling it and giving it
- *  other perks.
- *  \param time How long the kart will be in super mode. A value of 0 will reset
- *         the kart to be normal.
- */
-void Kart::setSuper(float time)
+ *  other perks. */
+void Kart::setSuper()
 {
-    if (time <= 0) unsetSuper(false /*instant*/);
-
     unsetSquash();
 
-    //TODO : set max speed and engine bonus
+    float max_speed_increase = m_kart_properties->getSuperMaxSpeedIncrease();
+    float duration           = m_kart_properties->getSuperDuration();
+    float fade_out_time      = m_kart_properties->getSuperFadeOutTime();
+    float engine_force       = m_kart_properties->getSuperForce();
 
-    if (m_super_time == std::numeric_limits<float>::max())
-    {
-        m_scale_change_ticks = 40;
-        m_super_time = time;
-    }
+    m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SUPER,
+                                     max_speed_increase,
+                                     engine_force,
+                                     stk_config->time2Ticks(duration),
+                                     stk_config->time2Ticks(fade_out_time));
+
+    m_scale_change_ticks = 40;
+    m_super_time = duration;
 }   // setSuper
 
 //-----------------------------------------------------------------------------
@@ -1906,12 +1907,16 @@ void Kart::unsetSuper(bool instant)
     {
         m_node->setScale(core::vector3df(1.0f,1.0f,1.0f));
         m_scale_change_ticks = 0;
+        // This resets the speed boost
+        m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SUPER,
+                                         0, 0, 0, 0);
         //TODO : force end the max speed bonus
     }
     else
     {
-        //Will scale back to normal over time
+        // Will scale back to normal over time
         m_scale_change_ticks = -40;
+        // The speed boost will end by itself
     }
 }   // unsetSuper
 
