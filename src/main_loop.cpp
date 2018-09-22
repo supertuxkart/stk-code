@@ -65,7 +65,8 @@ LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
 
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
-        : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
+        : m_abort(false), m_request_abort(false), m_ticks_adjustment(0), 
+          m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
@@ -327,14 +328,20 @@ void MainLoop::run()
 
         // Shutdown next frame if shutdown request is sent while loading the
         // world
-        if (STKHost::existHost() && STKHost::get()->requestedShutdown())
+        if (STKHost::existHost() && 
+            (STKHost::get()->requestedShutdown() || m_request_abort))
         {
-            SFXManager::get()->quickSound("anvil");
             core::stringw msg = _("Server connection timed out.");
-            if (!STKHost::get()->getErrorMessage().empty())
+            
+            if (!ProfileWorld::isNoGraphics())
             {
-                msg = STKHost::get()->getErrorMessage();
+                SFXManager::get()->quickSound("anvil");
+                if (!STKHost::get()->getErrorMessage().empty())
+                {
+                    msg = STKHost::get()->getErrorMessage();
+                }
             }
+            
             STKHost::get()->shutdown();
             // In case the user opened a race pause dialog
             GUIEngine::ModalDialog::dismiss();
@@ -363,6 +370,11 @@ void MainLoop::run()
                 MessageQueue::add(MessageQueue::MT_ERROR, msg);
             }
             NetworkConfig::get()->unsetNetworking();
+        }
+        
+        if (m_request_abort)
+        {
+            m_abort = true;
         }
 
         if (!m_abort)
@@ -481,13 +493,5 @@ void MainLoop::run()
 #endif
 
 }   // run
-
-//-----------------------------------------------------------------------------
-/** Set the abort flag, causing the mainloop to be left.
- */
-void MainLoop::abort()
-{
-    m_abort = true;
-}   // abort
 
 /* EOF */

@@ -1841,7 +1841,7 @@ void main_abort()
 {
     if (main_loop)
     {
-        main_loop->abort();
+        main_loop->requestAbort();
     }
 }
 #ifdef ANDROID
