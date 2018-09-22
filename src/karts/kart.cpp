@@ -1862,7 +1862,8 @@ void Kart::unsetSquash()
  *  other perks. */
 void Kart::setSuper()
 {
-    unsetSquash();
+    if (isSquashed())
+        unsetSquash();
 
     float max_speed_increase = m_kart_properties->getSuperMaxSpeedIncrease();
     float duration           = m_kart_properties->getSuperDuration();
@@ -1874,10 +1875,11 @@ void Kart::setSuper()
                                      engine_force,
                                      stk_config->time2Ticks(duration),
                                      stk_config->time2Ticks(fade_out_time));
+    // Kart small or downscaling and not currently upscaling
+    if (m_scale_change_ticks <= 0 && m_super_time == std::numeric_limits<float>::max())
+        m_scale_change_ticks = stk_config->time2Ticks(SUPER_TRANSITION_TIME) +
+                               m_scale_change_ticks;
 
-    //FIXME : Use something based on config/Time2Ticks
-    //FIXME : check current scaling status before upscaling
-    m_scale_change_ticks = 40;
     m_super_time = duration;
 }   // setSuper
 
@@ -1886,22 +1888,22 @@ void Kart::setSuper()
  */
 void Kart::updateScale(int ticks)
 {
-
     //TODO update physics model too
     if (m_scale_change_ticks == 0)  return;
 
+    float scale_by_tick = 0.5/(float)stk_config->time2Ticks(SUPER_TRANSITION_TIME);
     float scale_factor;
     if (m_scale_change_ticks > 0)
     {
         m_scale_change_ticks -= ticks;
         if (m_scale_change_ticks < 0) m_scale_change_ticks = 0;
-        scale_factor = 1.4 - (m_scale_change_ticks*0.01);
+        scale_factor = 1.5 - (m_scale_change_ticks*scale_by_tick);
     }
     else
     {
         m_scale_change_ticks += ticks;
         if (m_scale_change_ticks > 0) m_scale_change_ticks = 0;
-        scale_factor = 1.0 - (m_scale_change_ticks*0.01);
+        scale_factor = 1.0 - (m_scale_change_ticks*scale_by_tick);
     }
 
 #ifndef SERVER_ONLY

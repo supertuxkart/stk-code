@@ -257,6 +257,7 @@ protected:
     // Set to positive to upscale, to negative to downscale
     int8_t        m_scale_change_ticks;
     float         m_super_time;
+    const float   SUPER_TRANSITION_TIME = 0.5;//TODO : move to config
 
     /** To prevent using nitro in too short bursts */
     int8_t        m_min_nitro_ticks;
