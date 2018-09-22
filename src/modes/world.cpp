@@ -229,8 +229,8 @@ void World::init()
                 global_player_id, race_manager->getKartType(i),
                 race_manager->getPlayerDifficulty(i));
         }
+        new_kart->setBoostAI(race_manager->hasBoostedAI(i));
         m_karts.push_back(new_kart);
-
     }  // for i
 
     // Load other custom models if needed

@@ -1063,7 +1063,6 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
  *  Level 2 to 5 AI : strategy detailed before each item
  *  Each successive level is overall stronger (5 the strongest, 2 the weakest of
  *  non-random strategies), but two levels may share a strategy for a given item.
- *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or boss races)
  *  \param dt Time step size.
  *  STATE: shield on -> avoid usage of offensive items (with certain tolerance)
  *  STATE: swatter on -> avoid usage of shield
