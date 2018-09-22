@@ -135,6 +135,7 @@ public:
     void           reset           ();
     virtual void   collectedItem   (Item *item, AbstractKart *kart);
     void           switchItems     ();
+    bool           areItemSwitched() { return (m_switch_ticks > 0); }
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
     // ------------------------------------------------------------------------
     /** Only used in the NetworkItemManager. */

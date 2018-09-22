@@ -1424,7 +1424,8 @@ void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *>
         if (abs_angle < 0.2f) straight_behind = true;
     }
 
-    if(m_distance_behind < 8.0f && straight_behind   )
+    if(m_distance_behind < 8.0f && straight_behind &&
+       (!ItemManager::get()->areItemSwitched() || item_skill < 4))
     {
         m_controls->setFire(true);
         m_controls->setLookBack(true);
