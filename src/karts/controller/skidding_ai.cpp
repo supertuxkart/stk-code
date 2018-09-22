@@ -316,6 +316,9 @@ void SkiddingAI::update(int ticks)
 
     int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
     int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+    // Karts with boosted AI get a better speed cap value
+    if (m_kart->getBoostAI())
+        position_among_ai = 1;
 
     float speed_cap = m_ai_properties->getSpeedCap(m_distance_to_player,
                                                    position_among_ai,
