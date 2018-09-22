@@ -74,8 +74,8 @@ void TrackInfoScreen::loadedFromFile()
 
     for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
     {
-        m_kart_icons[i] = getWidget<IconButtonWidget>(("iconscore"+std::to_string(i+1)).c_str());
-        m_highscore_entries[i] = getWidget<LabelWidget>(("highscore"+std::to_string(i+1)).c_str());
+        m_kart_icons[i] = getWidget<IconButtonWidget>(("iconscore"+StringUtils::toString(i+1)).c_str());
+        m_highscore_entries[i] = getWidget<LabelWidget>(("highscore"+StringUtils::toString(i+1)).c_str());
     }
     
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
