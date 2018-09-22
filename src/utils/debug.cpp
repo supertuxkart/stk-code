@@ -104,6 +104,7 @@ enum DebugMenuCommand
     DEBUG_POWERUP_PARACHUTE,
     DEBUG_POWERUP_PLUNGER,
     DEBUG_POWERUP_RUBBERBALL,
+    DEBUG_POWERUP_SUPER,
     DEBUG_POWERUP_SWATTER,
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
@@ -500,6 +501,9 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_POWERUP_RUBBERBALL:
         addPowerup(PowerupManager::POWERUP_RUBBERBALL);
+        break;
+    case DEBUG_POWERUP_SUPER:
+        addPowerup(PowerupManager::POWERUP_SUPER_SIZE);
         break;
     case DEBUG_POWERUP_SWATTER:
         addPowerup(PowerupManager::POWERUP_SWATTER);
@@ -904,6 +908,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Cake", DEBUG_POWERUP_CAKE );
             sub->addItem(L"Parachute", DEBUG_POWERUP_PARACHUTE );
             sub->addItem(L"Plunger", DEBUG_POWERUP_PLUNGER );
+            sub->addItem(L"SuperSize", DEBUG_POWERUP_SUPER );
             sub->addItem(L"Swatter", DEBUG_POWERUP_SWATTER );
             sub->addItem(L"Switch", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
