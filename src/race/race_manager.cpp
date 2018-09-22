@@ -327,6 +327,7 @@ void RaceManager::startNew(bool from_overworld)
         m_num_ghost_karts = ReplayPlay::get()->getNumGhostKart();
 
     m_started_from_overworld = from_overworld;
+    if (m_started_from_overworld) m_continue_saved_gp = false;
     m_saved_gp = NULL; // There will be checks for this being NULL done later
 
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX)
