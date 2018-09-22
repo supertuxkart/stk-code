@@ -1360,7 +1360,7 @@ void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *>
     //if it is a bomb, wait : we may pass it to another kart before the timer runs out
     if (item_skill == 5 && type == Attachment::ATTACH_BOMB)
     {
-        if (m_kart->getAttachment()->getTicksLeft() > stk_config->time2Ticks(3))
+        if (m_kart->getAttachment()->getTicksLeft() < stk_config->time2Ticks(2))
         {
             m_controls->setFire(true);
             m_controls->setLookBack(false);
