@@ -298,7 +298,7 @@ Kart::~Kart()
  */
 void Kart::reset()
 {
-    if (m_flying)
+    if (m_flying && !isGhostKart())
     {
         m_flying = false;
         stopFlying();
