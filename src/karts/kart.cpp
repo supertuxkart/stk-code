@@ -135,6 +135,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_fire_clicked         = 0;
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
+    m_flying               = false;
 
     m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
 
