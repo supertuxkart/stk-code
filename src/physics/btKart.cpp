@@ -563,11 +563,12 @@ void btKart::updateVehicle( btScalar step )
     btScalar predicted_fall = gravity*step*step +
                               (m_ground_height_old-m_ground_height);
 
-    // if the ground_height is below offset-0.01f ;
+    // if the ground_height is below offset-0.01f or predicted_fall > 0.4,
     // the terrain has unexpectedly changed - avoid sending the kart flying
     if (absolute_fall > 0.06 && m_cushioning_disable_time==0 &&
         m_ground_height < predicted_fall + offset &&
-        m_ground_height > (offset-0.01f) && m_ground_height_old > 0.3)
+        m_ground_height > (offset-0.01f) && m_ground_height_old > 0.3 &&
+        predicted_fall < 0.4)
     {
         // Disable more cushioning for 1 second. This avoids the problem
         // of hovering: a kart gets cushioned on a down-sloping area, still
