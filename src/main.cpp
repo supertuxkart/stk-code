@@ -2279,8 +2279,10 @@ int main(int argc, char *argv[] )
     {
         Log::closeOutputFiles();
 #endif
+#ifndef ANDROID
         fclose(stderr);
         fclose(stdout);
+#endif
 #ifndef WIN32
     }
 #endif
