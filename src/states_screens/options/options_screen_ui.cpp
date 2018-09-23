@@ -114,8 +114,11 @@ void OptionsScreenUI::loadedFromFile()
 
     minimap_options->m_properties[PROP_WRAP_AROUND] = "true";
     minimap_options->clearLabels();
+    //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("In the bottom-left")));
+    //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("On the right side")));
+    //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("Hidden")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     if (UserConfigParams::m_multitouch_enabled && 
