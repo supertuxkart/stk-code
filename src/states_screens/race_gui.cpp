@@ -1162,7 +1162,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     irr::video::ITexture *lap_flag= irr_driver->getTexture(FileManager::GUI_ICON,
                                                             "lap_flag.png");
 
-    int icon_width = (int)(scaling.Y*32);
+    int icon_width = irr_driver->getActualScreenSize().Height/19;
     core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
                                   pos.UpperLeftCorner.Y,
                                   viewport.LowerRightCorner.X - 10,
