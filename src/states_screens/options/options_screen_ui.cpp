@@ -108,6 +108,20 @@ void OptionsScreenUI::loadedFromFile()
     skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
 
 
+    // Setup the minimap options spinner
+    GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
+    assert( minimap_options != NULL );
+
+    minimap_options->m_properties[PROP_WRAP_AROUND] = "true";
+    minimap_options->clearLabels();
+    minimap_options->addLabel( core::stringw(_("In the bottom-left")));
+    minimap_options->addLabel( core::stringw(_("On the right side")));
+    minimap_options->addLabel( core::stringw(_("Hidden")));
+    minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+#ifdef ANDROID
+    minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+#endif
+    minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -122,6 +136,14 @@ void OptionsScreenUI::init()
 
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
+
+    GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
+    assert( minimap_options != NULL );
+#ifdef ANDROID
+    if (UserConfigParams::m_minimap_display == 0)
+        UserConfigParams::m_minimap_display = 1;
+#endif
+    minimap_options->setValue(UserConfigParams::m_minimap_display);
 
     // ---- video modes
     CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -234,6 +256,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
         irr_driver->setMaxTextureSize();
+    }
+    else if (name == "minimap")
+    {
+        GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
+        assert( minimap_options != NULL );
+        UserConfigParams::m_minimap_display = minimap_options->getValue();
     }
     else if (name == "split_screen_horizontally")
     {

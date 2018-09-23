@@ -140,8 +140,19 @@ RaceGUI::RaceGUI()
     m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
     m_map_width             = (int)(map_size * scaling);
     m_map_height            = (int)(map_size * scaling);
-    m_map_left              = (int)( 10.0f * scaling);
-    m_map_bottom            = (int)( 10.0f * scaling);
+
+    if(UserConfigParams::m_minimap_display == 1 /*map on the right side*/)
+    {
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width - 10.0f*scaling);
+        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
+                                                        m_map_height);
+    }
+    else // default, map in the bottom-left corner
+    {
+        m_map_left          = (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
 
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -262,7 +273,13 @@ void RaceGUI::renderGlobal(float dt)
         }
     }
 
-    if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
+    if (!m_is_tutorial)
+    {
+        if(UserConfigParams::m_minimap_display == 0 /*map in the bottom-left*/)
+            drawGlobalPlayerIcons(m_map_height);
+        else // map hidden or on the right side
+            drawGlobalPlayerIcons(0);
+    }
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         drawScores();
 #endif
@@ -498,6 +515,10 @@ void RaceGUI::drawLiveDifference()
 void RaceGUI::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
+    //TODO : exception for some game modes ? Another option "Hidden in race, shown in battle ?"
+    if(UserConfigParams::m_minimap_display == 2 /*map hidden*/)
+        return;
+
     // draw a map when arena has a navigation mesh.
     Track *track = Track::getCurrentTrack();
     if ( (track->isArena() || track->isSoccer()) && !(track->hasNavMesh()) )
