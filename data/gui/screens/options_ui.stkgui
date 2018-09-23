@@ -30,17 +30,21 @@
 
                 <!-- ************ SKIN CHOICE ************ -->
                 <div layout="horizontal-row" width="100%" height="fit">
-                    <label I18N="In the ui settings" text="Skin" align="center"/>
+                    <label proportion="1" I18N="In the ui settings" text="Skin" align="center"/>
                     <spacer width="2%" height="20"/>
-                    <spinner id="skinchoice" width="30%"/>
+                    <div layout="horizontal-row" proportion="5" height="100%">
+                        <spinner id="skinchoice" width="60%"/>
+                    </div>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
-                    <label I18N="In the ui settings" text="Minimap" align="center"/>
+                    <label proportion="1" I18N="In the ui settings" text="Minimap" align="center"/>
                     <spacer width="2%" height="20"/>
-                    <spinner id="minimap" width="30%"/>
+                    <div layout="horizontal-row" proportion="5" height="100%">
+                        <spinner id="minimap" width="60%"/>
+                    </div>
                 </div>
 
                 <spacer width="5" height="2%"/>
