@@ -192,9 +192,8 @@ ItemManager::ItemManager()
 void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
 {
     for(unsigned int i=ItemState::ITEM_FIRST; i<ItemState::ITEM_COUNT; i++)
-        m_switch_to[i]=(ItemState::ItemType)stk_config->m_switch_items[i];
+        m_switch_to[i]=(ItemState::ItemType)switch_items[i];
 }   // setSwitchItems
-
 
 //-----------------------------------------------------------------------------
 /** Destructor. Cleans up all items and meshes stored.
