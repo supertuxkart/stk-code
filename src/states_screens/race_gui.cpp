@@ -1102,14 +1102,14 @@ unsigned int RaceGUI::computeVerticesForMeter(core::vector2df position[], float 
 } //computeVerticesForMeter
 
 //-----------------------------------------------------------------------------
-/** Displays the rank and the lap of the kart.
+/** Displays the lap of the kart.
  *  \param info Info object c
 */
 void RaceGUI::drawLap(const AbstractKart* kart,
                       const core::recti &viewport,
                       const core::vector2df &scaling)
 {
-    // Don't display laps or ranks if the kart has already finished the race.
+    // Don't display laps if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
 
     World *world = World::getWorld();
@@ -1158,6 +1158,23 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;
 
+    // Display lap flag
+    irr::video::ITexture *lap_flag= irr_driver->getTexture(FileManager::GUI_ICON,
+                                                            "lap_flag.png");
+
+    int icon_width = (int)(scaling.Y*32);
+    core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
+                                  pos.UpperLeftCorner.Y,
+                                  viewport.LowerRightCorner.X - 10,
+                                  pos.UpperLeftCorner.Y + icon_width);
+    core::rect<s32> source_rect(core::position2d<s32>(0,0),
+                                               lap_flag->getSize());
+    draw2DImage(lap_flag,indicator_pos,source_rect,
+        NULL,NULL,true);
+
+    pos.UpperLeftCorner.X -= icon_width;
+    pos.LowerRightCorner.X -= icon_width;
+
     static video::SColor color = video::SColor(255, 255, 255, 255);
     std::ostringstream out;
     out << lap + 1 << "/" << race_manager->getNumLaps();
@@ -1168,3 +1185,4 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     font->setScale(1.0f);
 
 } // drawLap
+

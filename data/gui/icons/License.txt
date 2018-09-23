@@ -44,6 +44,8 @@ options_language.png by Alayan, based on http://www.languageicon.org/, released 
 
 blue_flag.png, heart.png and red_flag.png by Benau, released under CC-BY-SA 4
 
+lap_flag.png, modified by Alayan, original by Alina Oleynik from The Noun Project, under CC-BY 3.0
+
 ====
 
 Glass Skin by Auria, under CC-BY-SA 3+
