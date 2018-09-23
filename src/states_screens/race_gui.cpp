@@ -276,7 +276,7 @@ void RaceGUI::renderGlobal(float dt)
     if (!m_is_tutorial)
     {
         if(UserConfigParams::m_minimap_display == 0 /*map in the bottom-left*/)
-            drawGlobalPlayerIcons(m_map_height);
+            drawGlobalPlayerIcons(m_map_height + m_map_bottom);
         else // map hidden or on the right side
             drawGlobalPlayerIcons(0);
     }
