@@ -118,9 +118,9 @@ void OptionsScreenUI::loadedFromFile()
     minimap_options->addLabel( core::stringw(_("On the right side")));
     minimap_options->addLabel( core::stringw(_("Hidden")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-#ifdef ANDROID
-    minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
-#endif
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0)
+        minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
 }   // loadedFromFile
 
@@ -139,10 +139,13 @@ void OptionsScreenUI::init()
 
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
-#ifdef ANDROID
-    if (UserConfigParams::m_minimap_display == 0)
+
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
+        UserConfigParams::m_minimap_display == 0)
+    {
         UserConfigParams::m_minimap_display = 1;
-#endif
+    }
     minimap_options->setValue(UserConfigParams::m_minimap_display);
 
     // ---- video modes
