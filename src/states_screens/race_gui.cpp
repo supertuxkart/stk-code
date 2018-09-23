@@ -184,6 +184,15 @@ RaceGUI::RaceGUI()
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     m_speed_bar_icon->getTexture(false,false);
     //createMarkerTexture();
+
+    // Load icon textures for later reuse
+    m_lap_flag = irr_driver->getTexture(FileManager::GUI_ICON, "lap_flag.png");
+    m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
+    m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
+    m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
+    m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
+    m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -346,11 +355,7 @@ void RaceGUI::drawScores()
     static video::SColor color = video::SColor(255,255,255,255);
 
     //Draw two teams score
-    irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI_ICON,
-                                                            "soccer_ball_red.png");
-    irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI_ICON,
-                                                            "soccer_ball_blue.png");
-    irr::video::ITexture *team_icon = red_team;
+    irr::video::ITexture *team_icon = m_red_team;
 
     for(unsigned int i=0; i<2; i++)
     {
@@ -369,7 +374,7 @@ void RaceGUI::drawScores()
 
         if (i == 1)
         {
-            team_icon = blue_team;
+            team_icon = m_blue_team;
         }
         core::rect<s32> indicator_pos(offset_x, offset_y,
                                      offset_x + (int)(m_minimap_player_size*2),
@@ -543,48 +548,45 @@ void RaceGUI::drawGlobalMiniMap()
     if (ctf)
     {
         Vec3 draw_at;
-        video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
         if (!ctf->isRedFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getRedFlag().getOrigin(),
                 &draw_at);
-            core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+            core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
             core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-            draw2DImage(icon, rp, rs, NULL, NULL, true, true);
+            draw2DImage(m_red_flag, rp, rs, NULL, NULL, true, true);
         }
 
         track->mapPoint2MiniMap(ctf->getRedFlag(), &draw_at);
-        core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
         core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-        draw2DImage(icon, rp, rs, NULL, NULL, true);
+        draw2DImage(m_red_flag, rp, rs, NULL, NULL, true);
 
-        icon = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
         if (!ctf->isBlueFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getBlueFlag().getOrigin(),
                 &draw_at);
-            core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+            core::rect<s32> rs(core::position2di(0, 0), m_blue_flag->getSize());
             core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-            draw2DImage(icon, rp, rs, NULL, NULL, true, true);
+            draw2DImage(m_blue_flag, rp, rs, NULL, NULL, true, true);
         }
 
         track->mapPoint2MiniMap(ctf->getBlueFlag(), &draw_at);
-        core::rect<s32> bs(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> bs(core::position2di(0, 0), m_blue_flag->getSize());
         core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-        draw2DImage(icon, bp, bs, NULL, NULL, true);
+        draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -598,8 +600,7 @@ void RaceGUI::drawGlobalMiniMap()
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
 
-        video::ITexture* icon = sta ?
-            irr_driver->getTexture(FileManager::GUI_ICON, "heart.png") :
+        video::ITexture* icon = sta ? m_heart_icon :
             kart->getKartProperties()->getMinimapIcon();
         if (icon == NULL)
         {
@@ -639,16 +640,13 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
-        
-        video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
 
-        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> source(core::position2di(0, 0), m_soccer_ball->getSize());
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
-        draw2DImage(icon, position, source, NULL, NULL, true);
+        draw2DImage(m_soccer_ball, position, source, NULL, NULL, true);
     }
 #endif
 }   // drawGlobalMiniMap
@@ -1186,8 +1184,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     if (lap < 0 ) return;
 
     // Display lap flag
-    irr::video::ITexture *lap_flag= irr_driver->getTexture(FileManager::GUI_ICON,
-                                                            "lap_flag.png");
+
 
     int icon_width = irr_driver->getActualScreenSize().Height/19;
     core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
@@ -1195,8 +1192,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
                                   viewport.LowerRightCorner.X - 10,
                                   pos.UpperLeftCorner.Y + icon_width);
     core::rect<s32> source_rect(core::position2d<s32>(0,0),
-                                               lap_flag->getSize());
-    draw2DImage(lap_flag,indicator_pos,source_rect,
+                                               m_lap_flag->getSize());
+    draw2DImage(m_lap_flag,indicator_pos,source_rect,
         NULL,NULL,true);
 
     pos.UpperLeftCorner.X -= icon_width;
