@@ -51,6 +51,7 @@ FloatServerConfigParam::FloatServerConfigParam(float default_value,
                                                const char* comment)
                       : FloatUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -62,6 +63,7 @@ IntServerConfigParam::IntServerConfigParam(int default_value,
                                            const char* comment)
                     : IntUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -73,6 +75,7 @@ BoolServerConfigParam::BoolServerConfigParam(bool default_value,
                                              const char* comment)
                      : BoolUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -84,6 +87,7 @@ StringServerConfigParam::StringServerConfigParam(std::string default_value,
                                                  const char* comment)
                        : StringUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);

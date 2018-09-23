@@ -66,6 +66,7 @@ class UserConfigParam
 {
     friend class GroupUserConfigParam;
 protected:
+    bool m_can_be_deleted = true;
     std::string m_param_name;
     std::string m_comment;
 public:
