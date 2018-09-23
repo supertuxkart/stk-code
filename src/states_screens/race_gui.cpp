@@ -141,7 +141,8 @@ RaceGUI::RaceGUI()
     m_map_width             = (int)(map_size * scaling);
     m_map_height            = (int)(map_size * scaling);
 
-    if(UserConfigParams::m_minimap_display == 1 /*map on the right side*/)
+    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
+       race_manager->getNumLocalPlayers() == 1)
     {
         m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
                                                         m_map_width - 10.0f*scaling);
@@ -163,7 +164,9 @@ RaceGUI::RaceGUI()
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
+        m_map_left = irr_driver->getActualScreenSize().Width -
+                     m_map_width - (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
     }
     else if (m_multitouch_gui != NULL)
     {
@@ -275,7 +278,9 @@ void RaceGUI::renderGlobal(float dt)
 
     if (!m_is_tutorial)
     {
-        if(UserConfigParams::m_minimap_display == 0 /*map in the bottom-left*/)
+        if(UserConfigParams::m_minimap_display == 0 || /*map in the bottom-left*/
+           (UserConfigParams::m_minimap_display == 1 &&
+            race_manager->getNumLocalPlayers() >= 2))
             drawGlobalPlayerIcons(m_map_height + m_map_bottom);
         else // map hidden or on the right side
             drawGlobalPlayerIcons(0);
