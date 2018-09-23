@@ -1201,7 +1201,6 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     out << lap + 1 << "/" << race_manager->getNumLaps();
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
     font->draw(out.str().c_str(), pos, color);
     font->setScale(1.0f);
 
