@@ -1135,6 +1135,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
                       const core::recti &viewport,
                       const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     // Don't display laps if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
 
@@ -1208,6 +1209,6 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     font->draw(out.str().c_str(), pos, color);
     font->setScale(1.0f);
-
+#endif
 } // drawLap
 
