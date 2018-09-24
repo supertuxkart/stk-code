@@ -875,22 +875,27 @@ float Kart::getSpeedForTurnRadius(float radius) const
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
-            turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sin( 1.0 / turn_angle_at_speed.getY(i)));
 
-    float angle = sin(m_kart_properties->getWheelBase() / radius);
+    float angle = sin(1.0 / radius);
     return turn_angle_at_speed.getReverse(angle);
 }   // getSpeedForTurnRadius
 
 // ------------------------------------------------------------------------
-/** Returns the maximum steering angle (depending on speed). */
+/** Returns the maximum steering angle (depending on speed).
+    This is proportional to kart length because physics reverse this effect,
+    the results of this function should not be used to determine the
+    real raw steer angle. */
 float Kart::getMaxSteerAngle(float speed) const
 {
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
+    // We multiply by wheel base to keep turn radius identical
+    // across karts of different lengths sharing the same
+    // turn radius properties
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
-            turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sin( 1.0 / turn_angle_at_speed.getY(i))
+                                    * m_kart_properties->getWheelBase());
 
     return turn_angle_at_speed.get(speed);
 }   // getMaxSteerAngle
@@ -1314,6 +1319,10 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
+    //FIXME : theses are debug prints, don't forget to remove them afterwards !
+    printf("Position is x: %f ; y: %f ; z: %f\n",getXYZ().x(), getXYZ().y(), getXYZ().z());
+
+
     if (m_network_finish_check_ticks != 0 &&
         World::getWorld()->getTicksSinceStart() >
         m_network_finish_check_ticks &&
