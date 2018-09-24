@@ -140,8 +140,20 @@ RaceGUI::RaceGUI()
     m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
     m_map_width             = (int)(map_size * scaling);
     m_map_height            = (int)(map_size * scaling);
-    m_map_left              = (int)( 10.0f * scaling);
-    m_map_bottom            = (int)( 10.0f * scaling);
+
+    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
+       race_manager->getNumLocalPlayers() == 1)
+    {
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width - 10.0f*scaling);
+        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
+                                                        m_map_height);
+    }
+    else // default, map in the bottom-left corner
+    {
+        m_map_left          = (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
 
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
@@ -152,7 +164,9 @@ RaceGUI::RaceGUI()
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
+        m_map_left = irr_driver->getActualScreenSize().Width -
+                     m_map_width - (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
     }
     else if (m_multitouch_gui != NULL)
     {
@@ -170,6 +184,15 @@ RaceGUI::RaceGUI()
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     m_speed_bar_icon->getTexture(false,false);
     //createMarkerTexture();
+
+    // Load icon textures for later reuse
+    m_lap_flag = irr_driver->getTexture(FileManager::GUI_ICON, "lap_flag.png");
+    m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
+    m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
+    m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
+    m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
+    m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -262,7 +285,15 @@ void RaceGUI::renderGlobal(float dt)
         }
     }
 
-    if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
+    if (!m_is_tutorial)
+    {
+        if(UserConfigParams::m_minimap_display == 0 || /*map in the bottom-left*/
+           (UserConfigParams::m_minimap_display == 1 &&
+            race_manager->getNumLocalPlayers() >= 2))
+            drawGlobalPlayerIcons(m_map_height + m_map_bottom);
+        else // map hidden or on the right side
+            drawGlobalPlayerIcons(0);
+    }
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         drawScores();
 #endif
@@ -324,11 +355,7 @@ void RaceGUI::drawScores()
     static video::SColor color = video::SColor(255,255,255,255);
 
     //Draw two teams score
-    irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI_ICON,
-                                                            "soccer_ball_red.png");
-    irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI_ICON,
-                                                            "soccer_ball_blue.png");
-    irr::video::ITexture *team_icon = red_team;
+    irr::video::ITexture *team_icon = m_red_team;
 
     for(unsigned int i=0; i<2; i++)
     {
@@ -347,7 +374,7 @@ void RaceGUI::drawScores()
 
         if (i == 1)
         {
-            team_icon = blue_team;
+            team_icon = m_blue_team;
         }
         core::rect<s32> indicator_pos(offset_x, offset_y,
                                      offset_x + (int)(m_minimap_player_size*2),
@@ -498,6 +525,10 @@ void RaceGUI::drawLiveDifference()
 void RaceGUI::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
+    //TODO : exception for some game modes ? Another option "Hidden in race, shown in battle ?"
+    if(UserConfigParams::m_minimap_display == 2 /*map hidden*/)
+        return;
+
     // draw a map when arena has a navigation mesh.
     Track *track = Track::getCurrentTrack();
     if ( (track->isArena() || track->isSoccer()) && !(track->hasNavMesh()) )
@@ -517,48 +548,45 @@ void RaceGUI::drawGlobalMiniMap()
     if (ctf)
     {
         Vec3 draw_at;
-        video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
         if (!ctf->isRedFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getRedFlag().getOrigin(),
                 &draw_at);
-            core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+            core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
             core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-            draw2DImage(icon, rp, rs, NULL, NULL, true, true);
+            draw2DImage(m_red_flag, rp, rs, NULL, NULL, true, true);
         }
 
         track->mapPoint2MiniMap(ctf->getRedFlag(), &draw_at);
-        core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
         core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-        draw2DImage(icon, rp, rs, NULL, NULL, true);
+        draw2DImage(m_red_flag, rp, rs, NULL, NULL, true);
 
-        icon = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
         if (!ctf->isBlueFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getBlueFlag().getOrigin(),
                 &draw_at);
-            core::rect<s32> rs(core::position2di(0, 0), icon->getSize());
+            core::rect<s32> rs(core::position2di(0, 0), m_blue_flag->getSize());
             core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-            draw2DImage(icon, rp, rs, NULL, NULL, true, true);
+            draw2DImage(m_blue_flag, rp, rs, NULL, NULL, true, true);
         }
 
         track->mapPoint2MiniMap(ctf->getBlueFlag(), &draw_at);
-        core::rect<s32> bs(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> bs(core::position2di(0, 0), m_blue_flag->getSize());
         core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-        draw2DImage(icon, bp, bs, NULL, NULL, true);
+        draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -572,8 +600,7 @@ void RaceGUI::drawGlobalMiniMap()
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
 
-        video::ITexture* icon = sta ?
-            irr_driver->getTexture(FileManager::GUI_ICON, "heart.png") :
+        video::ITexture* icon = sta ? m_heart_icon :
             kart->getKartProperties()->getMinimapIcon();
         if (icon == NULL)
         {
@@ -613,16 +640,13 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
-        
-        video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
 
-        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> source(core::position2di(0, 0), m_soccer_ball->getSize());
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
-        draw2DImage(icon, position, source, NULL, NULL, true);
+        draw2DImage(m_soccer_ball, position, source, NULL, NULL, true);
     }
 #endif
 }   // drawGlobalMiniMap
@@ -1102,14 +1126,15 @@ unsigned int RaceGUI::computeVerticesForMeter(core::vector2df position[], float 
 } //computeVerticesForMeter
 
 //-----------------------------------------------------------------------------
-/** Displays the rank and the lap of the kart.
+/** Displays the lap of the kart.
  *  \param info Info object c
 */
 void RaceGUI::drawLap(const AbstractKart* kart,
                       const core::recti &viewport,
                       const core::vector2df &scaling)
 {
-    // Don't display laps or ranks if the kart has already finished the race.
+#ifndef SERVER_ONLY
+    // Don't display laps if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
 
     World *world = World::getWorld();
@@ -1158,13 +1183,29 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;
 
+    // Display lap flag
+
+
+    int icon_width = irr_driver->getActualScreenSize().Height/19;
+    core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
+                                  pos.UpperLeftCorner.Y,
+                                  viewport.LowerRightCorner.X - 10,
+                                  pos.UpperLeftCorner.Y + icon_width);
+    core::rect<s32> source_rect(core::position2d<s32>(0,0),
+                                               m_lap_flag->getSize());
+    draw2DImage(m_lap_flag,indicator_pos,source_rect,
+        NULL,NULL,true);
+
+    pos.UpperLeftCorner.X -= icon_width;
+    pos.LowerRightCorner.X -= icon_width;
+
     static video::SColor color = video::SColor(255, 255, 255, 255);
     std::ostringstream out;
     out << lap + 1 << "/" << race_manager->getNumLaps();
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
     font->draw(out.str().c_str(), pos, color);
     font->setScale(1.0f);
-
+#endif
 } // drawLap
+
