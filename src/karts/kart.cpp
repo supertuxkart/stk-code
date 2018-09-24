@@ -1319,10 +1319,6 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
-    //FIXME : theses are debug prints, don't forget to remove them afterwards !
-    printf("Position is x: %f ; y: %f ; z: %f\n",getXYZ().x(), getXYZ().y(), getXYZ().z());
-
-
     if (m_network_finish_check_ticks != 0 &&
         World::getWorld()->getTicksSinceStart() >
         m_network_finish_check_ticks &&
