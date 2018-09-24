@@ -435,7 +435,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
     if (m_is_ghost_replay)
     {
         const bool result = ReplayPlay::get()->addReplayFile(file_manager
-            ->getAsset(FileManager::CHALLENGE, m_replay_files[d]),
+            ->getAsset(FileManager::REPLAY, m_replay_files[d]),
             true/*custom_replay*/);
         if (!result)
             Log::fatal("ChallengeData", "Can't open replay for challenge!");
