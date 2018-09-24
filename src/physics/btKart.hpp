@@ -122,6 +122,8 @@ private:
     /** Smallest wheel height to the ground */
     btScalar m_ground_height;
     btScalar m_ground_height_old;
+    /** Highest wheel height to the ground (to detect brutal changes) */
+    btScalar m_max_ground_height;
 
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;

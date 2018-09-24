@@ -145,6 +145,7 @@ void btKart::resetGroundHeight()
 {
     m_ground_height              = 0.15;
     m_ground_height_old          = 0.15;
+    m_max_ground_height          = 0.15;
 }   // resetGroundHeight
 
 // ----------------------------------------------------------------------------
@@ -310,6 +311,8 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
 
     if (depth < m_ground_height)
         m_ground_height = depth;
+    if (depth > m_max_ground_height)
+        m_max_ground_height = depth;
     if (object &&  depth < max_susp_len)
     {
         wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
@@ -563,12 +566,15 @@ void btKart::updateVehicle( btScalar step )
     btScalar predicted_fall = gravity*step*step +
                               (m_ground_height_old-m_ground_height);
 
-    // if the ground_height is below offset-0.01f or predicted_fall > 0.4,
+    // if the ground height is below offset-0.01f, if predicted_fall > 0.4,
+    // or if max ground height is significantly different,
     // the terrain has unexpectedly changed - avoid sending the kart flying
+    // TODO : check length between front and back wheels
     if (absolute_fall > 0.06 && m_cushioning_disable_time==0 &&
         m_ground_height < predicted_fall + offset &&
         m_ground_height > (offset-0.01f) && m_ground_height_old > 0.3 &&
-        predicted_fall < 0.4)
+        predicted_fall < 0.4 && m_max_ground_height > 0 &&
+        m_max_ground_height < 0.8)
     {
         // Disable more cushioning for 1 second. This avoids the problem
         // of hovering: a kart gets cushioned on a down-sloping area, still
@@ -606,6 +612,7 @@ void btKart::updateVehicle( btScalar step )
     // Update the ground height history
     m_ground_height_old = m_ground_height;
     m_ground_height = 999.9f;
+    m_max_ground_height = -100.0f;
 
 
     // Update friction (i.e. forward force)
