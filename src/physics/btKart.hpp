@@ -11,8 +11,6 @@
 #ifndef BT_KART_HPP
 #define BT_KART_HPP
 
-#include <vector>
-
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 #include "physics/btKartRaycast.hpp"
@@ -119,12 +117,6 @@ private:
      *  physics steps, so need to be set again by the application. */
     btScalar m_max_speed;
 
-    /** Smallest wheel height to the ground */
-    btScalar m_ground_height;
-    btScalar m_ground_height_old;
-    /** Highest wheel height to the ground (to detect brutal changes) */
-    btScalar m_max_ground_height;
-
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;
 
@@ -150,7 +142,6 @@ public:
                               Kart *kart);
      virtual          ~btKart();
     void               reset();
-    void               resetGroundHeight();
     void               debugDraw(btIDebugDraw* debugDrawer);
     const btTransform& getChassisWorldTransform() const;
     btScalar           rayCast(unsigned int index, float fraction=1.0f);
@@ -301,3 +292,4 @@ public:
 };   // class btKart
 
 #endif //BT_KART_HPP
+
