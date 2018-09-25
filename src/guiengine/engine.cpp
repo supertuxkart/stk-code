@@ -974,21 +974,39 @@ namespace GUIEngine
         if (ScreenKeyboard::isActive()) ScreenKeyboard::dismiss();
         if (ModalDialog::isADialogActive()) ModalDialog::dismiss();
 
-        //delete g_font;
-        g_font->drop();
-        g_font = NULL;
-        //delete g_title_font;
-        g_title_font->drop();
-        g_title_font = NULL;
-        //delete g_small_font;
-        g_small_font->drop();
-        g_small_font = NULL;
-        g_large_font->drop();
-        g_large_font = NULL;
-        g_digit_font->drop();
-        g_digit_font = NULL;
-        g_outline_font->drop();
-        g_outline_font = NULL;
+        if (g_font)
+        {
+            //delete g_font;
+            g_font->drop();
+            g_font = NULL;
+        }
+        if (g_title_font)
+        {
+            //delete g_title_font;
+            g_title_font->drop();
+            g_title_font = NULL;
+        }
+        if (g_small_font)
+        {
+            //delete g_small_font;
+            g_small_font->drop();
+            g_small_font = NULL;
+        }
+        if (g_large_font)
+        {
+            g_large_font->drop();
+            g_large_font = NULL;
+        }
+        if (g_digit_font)
+        {
+            g_digit_font->drop();
+            g_digit_font = NULL;
+        }
+        if (g_outline_font)
+        {
+            g_outline_font->drop();
+            g_outline_font = NULL;
+        }
 
         // nothing else to delete for now AFAIK, irrlicht will automatically
         // kill everything along the device
