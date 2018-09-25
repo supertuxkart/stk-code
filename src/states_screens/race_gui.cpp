@@ -1150,7 +1150,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
         !race_manager->getIfEmptyScreenSpaceExists()) 
     {
-        pos.UpperLeftCorner.Y += m_font_height;
+        pos.UpperLeftCorner.Y = irr_driver->getActualScreenSize().Height*12/100;
     }
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
