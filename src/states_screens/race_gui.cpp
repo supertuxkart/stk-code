@@ -962,8 +962,6 @@ void RaceGUI::drawSpeedEnergy(const AbstractKart* kart,
                                                meter_texture->getSize());
     draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL,
                        NULL, true);
-    // TODO: temporary workaround, shouldn't have to use
-    // draw2DVertexPrimitiveList to render a simple rectangle
 
     const float speed =  kart->getSpeed();
 
