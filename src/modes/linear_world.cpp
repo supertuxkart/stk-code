@@ -24,6 +24,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/cannon_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -240,7 +241,9 @@ void LinearWorld::updateTrackSectors()
 
         // Nothing to do for karts that are currently being
         // rescued or eliminated
-        if(kart->getKartAnimation()) continue;
+        if(kart->getKartAnimation() &&
+           !dynamic_cast<CannonAnimation*>(kart->getKartAnimation()))
+            continue;
         // If the kart is off road, and 'flying' over a reset plane
         // don't adjust the distance of the kart, to avoid a jump
         // in the position of the kart (e.g. while falling the kart
