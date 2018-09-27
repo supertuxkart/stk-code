@@ -373,7 +373,7 @@
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium">
-            <turn radius="0:2.2 10:8.25 25:16.5 45:33" />
+            <turn radius="0:2.3 10:8.625 25:17.25 45:34.5" />
             <engine power="*0.875" max-speed="*1" brake-factor="*0.8"
                     max-speed-reverse-ratio="*0.75" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
@@ -385,7 +385,7 @@
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
-            <turn radius="0:2.3 10:8.625 25:17.25 45:34.5" />
+            <turn radius="0:2.6 10:9.75 25:19.5 45:39" />
             <engine power="*1" max-speed="*1.05" brake-factor="*0.6"
                     max-speed-reverse-ratio="*0.7" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
