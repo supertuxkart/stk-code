@@ -41,13 +41,18 @@ private:
     /** The graph node the object is on. */
     int  m_current_graph_node;
 
-    /** The index of the last valid graph node. */
+    /** The index of the estimated valid graph node. Used for distance. */
+    int  m_estimated_valid_graph_node;
+
+    /** The index of the last valid graph node. Used for rescue */
     int  m_last_valid_graph_node;
 
     /** The coordinates of this object on the track, i.e. how far from
      *  the start of the track, and how far to the left or right
      *  of the center driveline. */
     Vec3 m_current_track_coords;
+
+    Vec3 m_estimated_valid_track_coords;
 
     Vec3 m_latest_valid_track_coords;
 
@@ -64,10 +69,12 @@ public:
     float getRelativeDistanceToCenter() const;
     // ------------------------------------------------------------------------
     /** Returns how far the the object is from the start line. */
-    float getDistanceFromStart(bool account_for_checklines) const
+    float getDistanceFromStart(bool account_for_checklines, bool strict=false) const
     {
-        if (account_for_checklines)
+        if (account_for_checklines && strict)
             return m_latest_valid_track_coords.getZ();
+        else if (account_for_checklines)
+            return m_estimated_valid_track_coords.getZ();
         else
             return m_current_track_coords.getZ();
     }
