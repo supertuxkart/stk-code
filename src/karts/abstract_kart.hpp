@@ -274,6 +274,9 @@ public:
      *  \param slowdown Reduction of max speed.    */
     virtual void setSquash(float time, float slowdown) = 0;
     // ------------------------------------------------------------------------
+    /** Makes the kart unsquashed again. */
+    virtual void unsetSquash() = 0;
+    // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. This is not declared
      *  pure abstract, since this function is not needed for certain classes,
      *  like Ghost. */
@@ -511,7 +514,12 @@ public:
     virtual bool isVisible() = 0;
     // ------------------------------------------------------------------------
     virtual void makeKartRest();
-
+    // ------------------------------------------------------------------------
+    virtual void setStartupBoost(float val) = 0;
+    // ------------------------------------------------------------------------
+    virtual float getStartupBoost() const = 0;
+    // ------------------------------------------------------------------------
+    virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
 };   // AbstractKart
 
 

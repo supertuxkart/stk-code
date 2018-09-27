@@ -179,7 +179,7 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
     {
         // Add heart billboard above it
         std::string heart_path =
-            file_manager->getAsset(FileManager::GUI, "heart.png");
+            file_manager->getAsset(FileManager::GUI_ICON, "heart.png");
         float height = kart->getKartHeight() + 0.5f;
 
         scene::ISceneNode* billboard = irr_driver->addBillboard

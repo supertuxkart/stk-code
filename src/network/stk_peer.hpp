@@ -35,6 +35,7 @@
 #include <memory>
 #include <numeric>
 #include <set>
+#include <string>
 #include <vector>
 
 class Crypto;
@@ -67,6 +68,8 @@ protected:
     /** True if this peer is waiting for game. */
     std::atomic_bool m_waiting_for_game;
 
+    std::atomic_bool m_disconnected;
+
     /** Host id of this peer. */
     uint32_t m_host_id;
 
@@ -86,6 +89,10 @@ protected:
     std::deque<uint32_t> m_previous_pings;
 
     std::atomic<uint32_t> m_average_ping;
+
+    std::set<unsigned> m_available_kart_ids;
+
+    std::string m_user_version;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -177,6 +184,19 @@ public:
     void setWaitingForGame(bool val)         { m_waiting_for_game.store(val); }
     // ------------------------------------------------------------------------
     bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
+    // ------------------------------------------------------------------------
+    bool isDisconnected() const               { return m_disconnected.load(); }
+    // ------------------------------------------------------------------------
+    void clearAvailableKartIDs() { m_available_kart_ids.clear(); }
+    // ------------------------------------------------------------------------
+    void addAvailableKartID(unsigned id)   { m_available_kart_ids.insert(id); }
+    // ------------------------------------------------------------------------
+    bool availableKartID(unsigned id)
+        { return m_available_kart_ids.find(id) != m_available_kart_ids.end(); }
+    // ------------------------------------------------------------------------
+    void setUserVersion(const std::string& uv)         { m_user_version = uv; }
+    // ------------------------------------------------------------------------
+    const std::string& getUserVersion() const        { return m_user_version; }
 
 };   // STKPeer
 

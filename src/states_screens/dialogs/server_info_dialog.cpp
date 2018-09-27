@@ -26,7 +26,7 @@
 #include "network/server.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/networking_lobby.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -108,9 +108,8 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         row.push_back(ListWidget::ListCell(_("Time played"),
             -1, 1, true));
         player_list->addItem("player", row);
-        for (auto& p : players)
+        for (auto& r : players)
         {
-            auto& r = p.second;
             row.clear();
             row.push_back(ListWidget::ListCell(
                 std::get<0>(r) == -1 ? L"-" :

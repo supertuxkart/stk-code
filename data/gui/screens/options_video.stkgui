@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Options" text_align="center"/>
+        <spacer width="100%" height="1%"/>
+
+        <div width="100%" height="92%" layout="horizontal-row" >
+
+            <vertical-tabs id="options_choice" height="100%" width="18%">
+                <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
+                        I18N="Section in the settings menu" text="Graphics"/>
+                <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
+                        I18N="Section in the settings menu" text="Audio"/>
+                <icon-button id="tab_ui" width="128" height="128" icon="gui/icons/options_ui.png"
+                        I18N="Section in the settings menu" text="User Interface"/>
+                <icon-button id="tab_players" width="128" height="128" icon="gui/icons/options_players.png"
+                        I18N="Section in the settings menu" text="Players"/>
+                <icon-button id="tab_controls" width="128" height="128" icon="gui/icons/options_input.png"
+                        I18N="Section in the settings menu" text="Controls"/>
+                <icon-button id="tab_language" width="128" height="128" icon="gui/icons/options_language.png"
+                        I18N="Section in the settings menu" text="Language"/>
+            </vertical-tabs>
+
+            <spacer width="2%" height="100%"/>
+
+            <box width="80%" height="100%" layout="vertical-row">
+
+                <spacer width="5" height="1%"/>
+
+                <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
+                <div width="75%" height="fit" layout="horizontal-row" id="outer_box" >
+                    <label I18N="In the video settings" text="Graphical Effects Level" align="center"/>
+                    <spacer width="20" height="20"/>
+
+                    <div layout="vertical-row" proportion="1" height="fit" id="inner_box">
+                        <gauge id="gfx_level" min_value="1" max_value="8" width="300" align="center" />
+                        <spacer height="5" width="10"/>
+                        <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="1%"/>
+
+                <!-- ************ VSYNC ************ -->
+                <div width="75%" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="2" />
+                    <checkbox id="vsync"/>
+                    <spacer width="20" height="2" />
+                    <label height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)"/>
+                </div>
+
+                <spacer width="5" height="1%"/>
+
+                <!-- ************ RESOLUTION CHOICE ************ -->
+                <spacer width="5" height="1%"/>
+                <label width="100%" I18N="In the video settings" text="Resolution"/>
+
+                <scrollable_ribbon id="resolutions" proportion="1" label_location="each"
+                                   width="100%" square_items="false"
+                                   align="center" child_width="128" child_height="128" max_height="150" />
+
+                <spacer width="5" height="1%"/>
+
+                <div width="75%" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="100%" />
+                    <checkbox id="fullscreen"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the video settings" text="Fullscreen"/>
+                </div>
+
+                <div width="75%" layout="horizontal-row" height="fit">
+                    <spacer width="40" height="100%" />
+                    <checkbox id="rememberWinpos"/>
+                    <spacer width="20" height="100%" />
+                    <label I18N="In the video settings" text="Remember window location"/>
+                </div>
+
+                <spacer width="5" height="1%"/>
+
+                <div width="100%" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="100%" />
+                    <button id="apply_resolution"
+                        I18N="In the video settings" text="Apply new resolution" />
+                </div>
+
+                <spacer width="5" height="1%"/>
+
+            </box>
+        </div>
+    </div>
+</stkgui>

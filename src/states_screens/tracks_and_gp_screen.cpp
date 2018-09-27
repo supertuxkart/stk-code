@@ -205,7 +205,7 @@ void TracksAndGPScreen::init()
 
     // Random GP
     std::vector<std::string> screenshots;
-    screenshots.push_back(file_manager->getAsset(FileManager::GUI, "main_help.png"));
+    screenshots.push_back(file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
     gps_widget->addAnimatedItem(translations->fribidize(GrandPrixData::getRandomGPName()),
                                 GrandPrixData::getRandomGPID(),
                                 screenshots, 1.5f, 0,
@@ -287,7 +287,7 @@ void TracksAndGPScreen::buildTrackList()
     }
 
     tracks_widget->addItem(_("Random Track"), "random_track",
-                           "/gui/track_random.png", 0 /* no badge */,
+                           "/gui/icons/track_random.png", 0 /* no badge */,
                            IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();

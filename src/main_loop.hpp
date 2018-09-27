@@ -31,6 +31,8 @@ class MainLoop
 private:
     /** True if the main loop should exit. */
     std::atomic_bool m_abort;
+    
+    std::atomic_bool m_request_abort;
 
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
@@ -48,7 +50,9 @@ public:
          MainLoop(unsigned parent_pid);
         ~MainLoop();
     void run();
-    void abort();
+    /** Set the abort flag, causing the mainloop to be left. */
+    void abort() { m_abort = true; }
+    void requestAbort() { m_request_abort = true; }
     void setThrottleFPS(bool throttle) { m_throttle_fps = throttle; }
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */

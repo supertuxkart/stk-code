@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Help" text_align="center"/>
+        <spacer height="1%" width="100%"/>
+
+        <div width="100%" height="92%" layout="horizontal-row" >
+
+            <vertical-tabs id="category" height="100%" width="18%">
+                <icon-button id="page1" width="128" height="128" icon="gui/icons/track_random.png"
+                        I18N="Tab in help menu" text="General"/>
+                <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
+                        I18N="Tab in help menu" text="Game Modes"/>
+                <icon-button id="page3" width="128" height="128" icon="gui/icons/weapons.png"
+                        I18N="Tab in help menu" text="Powerups"/>
+                <icon-button id="page4" width="128" height="128" icon="gui/icons/banana.png"
+                        I18N="Tab in help menu" text="Bananas"/>
+                <icon-button id="page5" width="128" height="128" icon="gui/icons/story_mode_book.png"
+                        I18N="Tab in help menu" text="Story Mode"/>
+                <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
+                        I18N="Tab in help menu" text="Kart classes"/>
+                <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
+                        I18N="Tab in help menu" text="Multi-player"/>
+            </vertical-tabs>
+
+            <spacer width="2%" height="100%"/>
+
+            <box width="80%" height="100%" layout="vertical-row">
+                <spacer height="1%" width="10"/>
+                <label align="center" word_wrap="true" text="SuperTuxKart features several game modes:"/>
+                <spacer height="2%" width="10"/>
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mode_normal.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Regular Race: All blows allowed, so collect powerups and use them smartly!"/>
+                </div>
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mode_tt.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Time Trial: Contains no powerups, so only your driving skills matter!"/>
+                </div>
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mode_ftl.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Follow the leader: Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware: going in front of the leader will get you eliminated too!"/>
+                </div>
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/weapons.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="There are 3 types of battle mode: In 3 Strikes Battle, you need to hit others with weapons until they lose all their lives. In Free-For-All, the player who hits others the most will win in a given hit or time limit. In Capture The Flag, your team needs to bring the flag of the other team to your own flag base, as long as your flag is not captured by the other team."/>
+                </div>
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mode_soccer.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Soccer: Use your kart to push the ball into the goal."/>
+                </div>
+
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mode_easter.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Egg hunt: Explore tracks to find all hidden eggs."/>
+                </div>
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/mode_ghost.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and record your own!"/>
+                </div>
+
+               <bubble proportion="4" width="100%" I18N="In the help menu"
+                    text="* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
+
+            </box>
+        </div>
+    </div>
+</stkgui>

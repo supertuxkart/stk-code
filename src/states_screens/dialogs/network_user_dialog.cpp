@@ -98,7 +98,7 @@ void NetworkUserDialog::beforeAddingWidgets()
         m_change_team_widget->setVisible(true);
         //I18N: In the network user dialog
         m_change_team_widget->setText(_("Change team"));
-        m_change_team_widget->setImage(file_manager->getAsset(FileManager::GUI,
+        m_change_team_widget->setImage(file_manager->getAsset(FileManager::GUI_ICON,
             "race_giveup.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
     else

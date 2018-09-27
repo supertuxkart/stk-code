@@ -107,7 +107,8 @@ void mainLoop(STKHost* host)
             for (unsigned int i = 0; i < peers.size(); i++)
             {
                 std::cout << peers[i]->getHostId() << ": " <<
-                    peers[i]->getAddress().toString() << std::endl;
+                    peers[i]->getAddress().toString() <<  " " <<
+                    peers[i]->getUserVersion() << std::endl;
             }
         }
         else if (str == "listban")

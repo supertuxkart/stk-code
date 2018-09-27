@@ -18,13 +18,14 @@
 
 #include "states_screens/ghost_replay_selection.hpp"
 
+#include "config/player_manager.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/dialogs/ghost_replay_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -123,20 +124,20 @@ void GhostReplaySelection::loadedFromFile()
  */
 void GhostReplaySelection::beforeAddingWidget()
 {
-    m_replay_list_widget->addColumn( _("Track"), 9 );
+    m_replay_list_widget->addColumn(_C("ghost_info", "Track"), 9 );
     if (m_active_mode_is_linear)
-        m_replay_list_widget->addColumn( _("Reverse"), 3);
+        m_replay_list_widget->addColumn(_C("ghost_info", "Reverse"), 3);
     if (!m_same_difficulty)
-        m_replay_list_widget->addColumn( _("Difficulty"), 4);
+        m_replay_list_widget->addColumn(_C("ghost_info", "Difficulty"), 4);
     if (m_active_mode_is_linear)
-        m_replay_list_widget->addColumn( _("Laps"), 3);
-    m_replay_list_widget->addColumn( _("Time"), 4);
-    m_replay_list_widget->addColumn( _("Kart"), 1);
-    m_replay_list_widget->addColumn( _("User"), 5);
+        m_replay_list_widget->addColumn(_C("ghost_info", "Laps"), 3);
+    m_replay_list_widget->addColumn(_C("ghost_info", "Time"), 4);
+    m_replay_list_widget->addColumn(_C("ghost_info", "Kart"), 1);
+    m_replay_list_widget->addColumn(_C("ghost_info", "User"), 5);
     if (m_multiplayer)
-        m_replay_list_widget->addColumn( _("Players"), 3);
+        m_replay_list_widget->addColumn(_C("ghost_info", "Players"), 3);
     if (!m_same_version)
-        m_replay_list_widget->addColumn( _("Version"), 3);
+        m_replay_list_widget->addColumn(_C("ghost_info", "Version"), 3);
 
     m_replay_list_widget->createHeader();
 }   // beforeAddingWidget
@@ -155,10 +156,15 @@ void GhostReplaySelection::init()
         m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
     }
 
-    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,
+    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
                                                               "main_help.png"         ));
 
     m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
+
+    video::ITexture* lock = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
+                                                              "gui_lock.png"         ));
+
+    m_icon_lock = m_icon_bank->addTextureAsSprite(lock);
 
     int icon_height = getHeight()/24;
     // 128 is the height of the image file
@@ -369,13 +375,22 @@ void GhostReplaySelection::loadList()
         row.push_back(GUIEngine::ListWidget::ListCell
             (translations->fribidize(track->getName()) , -1, 9));
         if (m_active_mode_is_linear)
+        {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
+        }
         if (!m_same_difficulty)
+        {
+            bool display_lock = false;
+            if ((RaceManager::Difficulty)rd.m_difficulty == RaceManager::DIFFICULTY_BEST &&
+                PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+                display_lock = true;
+
             row.push_back(GUIEngine::ListWidget::ListCell
                 (race_manager->
                     getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
-                                                                   -1, 4, true));
+                                       display_lock ? m_icon_lock : -1, 4, true));
+        }
         if (m_active_mode_is_linear)
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(rd.m_laps), -1, 3, true));
@@ -419,6 +434,12 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
             selected_index < 0 || !success)
         {
             return;
+        }
+        if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        {
+            const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(selected_index);
+            if((RaceManager::Difficulty)rd.m_difficulty == RaceManager::DIFFICULTY_BEST)
+                return;
         }
 
         new GhostReplayInfoDialog(selected_index, m_replay_to_compare_uid, m_is_comparing);

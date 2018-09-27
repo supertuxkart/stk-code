@@ -173,14 +173,14 @@ namespace ServerConfig
     SERVER_CFG_PREFIX FloatServerConfigParam m_start_game_counter
         SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "start-game-counter",
         "Time to wait before entering kart selection screen "
-        "if satisfied start-game-threshold below for owner less or ranked "
+        "if satisfied min-start-game-players below for owner less or ranked "
         "server."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_start_game_threshold
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(0.5f, "start-game-threshold",
+    SERVER_CFG_PREFIX IntServerConfigParam m_min_start_game_players
+        SERVER_CFG_DEFAULT(IntServerConfigParam(2, "min-start-game-players",
         "Only auto start kart selection when number of "
-        "connected player is larger than max player * this value, for "
-        "owner less or ranked server, after start-game-counter."));
+        "connected player is larger than or equals this value, for "
+        "owner less or ranked server, after start-game-counter reaches 0."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_auto_end
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "auto-end",

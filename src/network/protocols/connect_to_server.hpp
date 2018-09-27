@@ -44,7 +44,6 @@ private:
     std::atomic<ConnectState> m_state;
 
     void getClientServerInfo();
-    void registerWithSTKServer();
     static TransportAddress m_server_address;
     static int interceptCallback(ENetHost* host, ENetEvent* event);
     static int m_retry_count;
@@ -56,6 +55,7 @@ public:
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
+    void registerWithSTKServer();
     bool tryConnect(int timeout, int retry, bool another_port = false);
 
 };   // class ConnectToServer

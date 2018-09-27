@@ -45,7 +45,7 @@
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/options_screen_device.hpp"
+#include "states_screens/options/options_screen_device.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"

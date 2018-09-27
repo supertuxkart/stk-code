@@ -1,21 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Ander Elortondo, 2016-2017
+# Ander Elortondo, 2016-2018
 # Asier Iturralde Sarasola <asier.iturralde@gmail.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Manex Agirrezabal <manex.agirrezabal@gmail.com>, 2015
 # Mikel Olasagasti Uranga <mikel@olasagasti.info>, 2015
+# Osoitz <oelkoro@gmail.com>, 2018
 # Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Ander Elortondo\n"
+"POT-Creation-Date: 2018-09-12 22:54+0200\n"
+"PO-Revision-Date: 2018-09-15 15:37+0000\n"
+"Last-Translator: Deve <deveee@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/supertuxkart/supertuxkart/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -118,11 +119,11 @@ msgid "Penguin Playground"
 msgstr "Pinguinoen jolastokia"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
-msgid "Off the beaten track"
+msgid "Off the Beaten Track"
 msgstr "Ohiko bideetatik kanpo"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
-msgid "To the moon and back"
+msgid "To the Moon and Back"
 msgstr "Ilargira eta itzuli"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
@@ -145,7 +146,7 @@ msgstr "Desinstalatu"
 #. I18N: Ghost replay info action
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:285
+#: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr "Atzera"
 
@@ -184,11 +185,95 @@ msgstr "Zirkuituak"
 msgid "Arenas"
 msgstr "Borroka-zelaia"
 
+#. I18N: ./data/gui/android/init_android.stkgui
+msgid "Select a type of control that you prefer"
+msgstr "Aukeratu nahiago duzun kontrol mota"
+
+#. I18N: ./data/gui/android/init_android.stkgui
+#. I18N: Control type
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Accelerometer"
+msgstr "Azelerometroa"
+
+#. I18N: ./data/gui/android/init_android.stkgui
+#. I18N: Control type
+msgid "Steering wheel"
+msgstr "Bolantea"
+
+#. I18N: ./data/gui/android/init_android.stkgui
+msgid "You can change it later in touch device settings."
+msgstr "Gero aldatu dezakezu ukimen gailu ezarpenetan."
+
+#. I18N: ./data/gui/android/init_android.stkgui
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: ./data/gui/kart_color_slider.stkgui
+msgid "Apply"
+msgstr "Aplikatu"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+msgid "Touch Device Settings"
+msgstr "Ukimen gailuen ezarpenak"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: Tab in help menu
+msgid "General"
+msgstr "Orokorra"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Device enabled"
+msgstr "Gailua gaitua"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Inverted buttons"
+msgstr "Botoiak alderantzikatuak"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Buttons scale"
+msgstr "Botoien eskala"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Advanced"
+msgstr "Aurreratua"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Deadzone"
+msgstr "Botoi eragin puntua (Deadzone)"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Sensitivity"
+msgstr "Sentsibilitatea"
+
+#. I18N: ./data/gui/android/multitouch_settings.stkgui
+msgid "Restore defaults"
+msgstr "Lehenetsiak berrezarri"
+
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
-#: src/states_screens/grand_prix_editor_screen.cpp:337
+#: src/states_screens/grand_prix_editor_screen.cpp:334
 msgid "Standard"
 msgstr "Arrunta"
 
@@ -200,11 +285,11 @@ msgstr "Arrunta"
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:83
-#: src/states_screens/easter_egg_screen.cpp:145
-#: src/states_screens/grand_prix_editor_screen.cpp:339
-#: src/states_screens/kart_selection.cpp:287
-#: src/states_screens/tracks_and_gp_screen.cpp:148
+#: src/states_screens/arenas_screen.cpp:81
+#: src/states_screens/easter_egg_screen.cpp:144
+#: src/states_screens/grand_prix_editor_screen.cpp:336
+#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "Gehigarriak"
 
@@ -215,25 +300,24 @@ msgstr "Gehigarriak"
 #. I18N: Time filters for add-ons
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
-#. I18N: if all kart animations are enabled
-#. I18N: name of the tab that will show tracks from all groups
-#: src/states_screens/addons_screen.cpp:49
-#: src/states_screens/arenas_screen.cpp:75
-#: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:147
-#: src/states_screens/gp_info_screen.cpp:76
-#: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:279
-#: src/states_screens/options_screen_video.cpp:456
-#: src/states_screens/tracks_and_gp_screen.cpp:138
-#: src/states_screens/tracks_screen.cpp:141
+#: src/states_screens/addons_screen.cpp:47
+#: src/states_screens/arenas_screen.cpp:73
+#: src/states_screens/easter_egg_screen.cpp:136
+#: src/states_screens/edit_track_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/grand_prix_editor_screen.cpp:333
+#: src/states_screens/kart_selection.cpp:282
+#: src/states_screens/tracks_and_gp_screen.cpp:135
+#: src/states_screens/tracks_screen.cpp:207
 msgid "All"
 msgstr "Guztiak"
 
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/states_screens/edit_gp_screen.cpp:257
-#: src/states_screens/ghost_replay_selection.cpp:117
+#: src/network/protocols/client_lobby.cpp:448
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/edit_gp_screen.cpp:255
+#: src/states_screens/ghost_replay_selection.cpp:373
 msgid "Yes"
 msgstr "Bai"
 
@@ -255,13 +339,16 @@ msgstr "Bai"
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/addons_loading.cpp:228
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
-#: src/states_screens/user_screen.cpp:112
+#: src/states_screens/dialogs/addons_loading.cpp:236
+#: src/states_screens/register_screen.cpp:119
+#: src/states_screens/user_screen.cpp:114
 msgid "Cancel"
 msgstr "Utzi"
 
@@ -275,6 +362,10 @@ msgstr "Mantendu bereizmen hau"
 #. I18N: Title in credits screen
 msgid "Credits"
 msgstr "Kredituak"
+
+#. I18N: ./data/gui/credits.stkgui
+msgid "Donate to help keep SuperTuxKart going!"
+msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -292,11 +383,6 @@ msgstr "Itzalak"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Image-based lighting"
-msgstr "Irudi-oinarriko argiak"
-
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
 msgid "Bloom"
 msgstr "Lorea"
 
@@ -307,17 +393,17 @@ msgstr "Argi izpiak (hodei arteko izpiak)"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Ambient Occlusion"
+msgid "Ambient occlusion"
 msgstr "Giro oklusioa"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Global illumination"
-msgstr "Argiztapen orokorra"
+msgid "Depth of field"
+msgstr "Eremu-sakonera"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Glow (outlines)"
+msgid "Glow (Outlines)"
 msgstr "Distirak (Ertzak)"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
@@ -332,13 +418,13 @@ msgstr "Mugimendu lausotzea"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Depth of field"
-msgstr "Eremu-sakonera"
+msgid "Image-based lighting"
+msgstr "Irudi-oinarriko argiak"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Weather Effects"
-msgstr "Eguraldi efektuak"
+msgid "Animated characters"
+msgstr "Pertsonaia animatuak"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -347,13 +433,8 @@ msgstr "Testuren konpresioa"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Animated Scenery"
-msgstr "Paisaia animatua"
-
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: Video settings
-msgid "Animated Characters"
-msgstr "Pertsonaia animatuak"
+msgid "Particle effects"
+msgstr "Partikula efektuak"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -370,17 +451,12 @@ msgstr "Zehetasun geometrikoa"
 msgid "* Restart STK to apply new settings"
 msgstr "* Berrabiarazi STK ezarpen berriak aplikatzeko"
 
-#. I18N: ./data/gui/custom_video_settings.stkgui
-#. I18N: ./data/gui/multitouch_settings.stkgui
-msgid "Apply"
-msgstr "Aplikatu"
-
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: In the track selection screen
 #. I18N: ./data/gui/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: In the track selection screen
 msgid "All Tracks"
 msgstr "Zirkuitu guztiak"
 
@@ -440,6 +516,7 @@ msgstr "Alderantziz:"
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
+#. I18N: ./data/gui/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/user_screen.stkgui
@@ -458,7 +535,8 @@ msgstr "Ados"
 #. I18N: In soccer setup screen
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#: src/states_screens/race_result_gui.cpp:205
+#: src/states_screens/race_result_gui.cpp:173
+#: src/states_screens/race_result_gui.cpp:198
 msgid "Continue"
 msgstr "Jarraitu"
 
@@ -475,15 +553,23 @@ msgid "Watch replay only"
 msgstr "Errepikapena begiratzea bakarrik"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+msgid "Compare to another ghost"
+msgstr "Konparatu beste mamu bategaz"
+
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the network lobby
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
 msgstr "Hasi lasterketa"
+
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info screen action
+msgid "Compare ghost"
+msgstr "Konparatu mamuaz"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -492,12 +578,42 @@ msgstr "Mamu errepikapen aukera"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+msgid "Time trial"
+msgstr "Ordulariaren kontra"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Egg hunt"
+msgstr "Arrautza ehiza"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Only show the best times"
+msgstr "Denbora onenak bakarrik erakutsi"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Compare replay"
+msgstr "Konparatu errepikapena"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
 msgstr "Uneko zailtasuneko errepikapenak bakarrik ikusgai"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Record ghost replay"
+msgid "Hide multiplayer replays"
+msgstr ""
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Only show replays matching the current version"
+msgstr "Uneko bertsioko errepikapenak bakarrik erakutsi"
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Record a ghost replay"
 msgstr "Mamu errepikapena grabatu"
 
 #. I18N: ./data/gui/gp_info.stkgui
@@ -507,7 +623,8 @@ msgstr "AA kart"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/ghost_replay_selection.cpp:79
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:143
+#: src/states_screens/ghost_replay_selection.cpp:128
 msgid "Reverse"
 msgstr "Birak alderantzizkoan"
 
@@ -518,7 +635,7 @@ msgstr "Zirkuitu taldea"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:147
+#: src/states_screens/gp_info_screen.cpp:145
 msgid "Continue saved GP"
 msgstr "Jarraitu gordetako txapelketa"
 
@@ -556,6 +673,8 @@ msgstr "Gorde txapelketa"
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: ./data/gui/help5.stkgui
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: ./data/gui/help7.stkgui
 msgid "SuperTuxKart Help"
 msgstr "SuperTuxKart laguntza"
 
@@ -569,33 +688,9 @@ msgstr "SuperTuxKart laguntza"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "General"
-msgstr "Orokorra"
-
-#. I18N: ./data/gui/help1.stkgui
+#. I18N: ./data/gui/help6.stkgui
 #. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help3.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help5.stkgui
-#. I18N: Tab in help menu
-msgid "Weapons"
-msgstr "Armak"
-
-#. I18N: ./data/gui/help1.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help2.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help3.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help4.stkgui
-#. I18N: Tab in help menu
-#. I18N: ./data/gui/help5.stkgui
+#. I18N: ./data/gui/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
 msgstr "Jolas moduak"
@@ -610,8 +705,12 @@ msgstr "Jolas moduak"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
-msgid "Multi-player"
-msgstr "Hainbat jokalari"
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: Tab in help menu
+msgid "Powerups"
+msgstr "Opariak"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -623,8 +722,65 @@ msgstr "Hainbat jokalari"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: Tab in help menu
 msgid "Bananas"
 msgstr "Bananak"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/main_menu.stkgui
+#. I18N: Main menu button
+msgid "Story Mode"
+msgstr "Istorio modua"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: Tab in help menu
+msgid "Kart classes"
+msgstr "Kart motak"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: Tab in help menu
+msgid "Multi-player"
+msgstr "Hainbat jokalari"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Start the tutorial"
@@ -632,13 +788,13 @@ msgstr "Hasi tutoriala"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-msgid "Collect blue boxes. They will give you weapons or other powerups."
-msgstr "Batu kutxa urdinak. Tiro egiteko armak eta bestelako hobekuntzak jasoko dituzu."
+msgid "Collect blue gift boxes, they will give you powerups."
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
-#: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:32
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:16
 msgid "Avoid bananas!"
 msgstr "Ez zapaldu bananak"
 
@@ -647,8 +803,8 @@ msgstr "Ez zapaldu bananak"
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the"
-" bar at the right of the game screen."
-msgstr "Nitroak batzean dagokion teklan sakatuz zure abiadura handitu dezakezu edonon. Zure nitro bilketa maila eskumako barran dago ikusgai."
+" gauge at the bottom-right of the race screen."
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -658,9 +814,12 @@ msgid ""
 msgstr "Botoi bat giltzapetuta ikusten baduzu, horrek erronka bat betetzear duzula esan nahi du."
 
 #. I18N: ./data/gui/help1.stkgui
-#. I18N: in the help menu
-msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr "''irristatu\" teklaz bihurgune itxietan irristatuz bultzada bat lor dezakezu."
+#. I18N: In the help menu
+msgid ""
+"The 'skidding' key allows you to skid. Short skids help to take sharp turns."
+" If you skid long enough, you will get a boost. You can't stop turning while"
+" skidding, so orient your kart carefully before!"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -668,72 +827,21 @@ msgid "* Current key bindings can be seen/changed in menu Options"
 msgstr "* Uneko laster-teklak Aukerak menuan ikus/alda daitezke"
 
 #. I18N: ./data/gui/help2.stkgui
-#. I18N: In the help menu
-msgid "To help you win, there are some powerups you can collect:"
-msgstr "Irabazten laguntzeko, badira batu ditzakezun hainbat \"pizgarri\"."
+msgid "SuperTuxKart features several game modes:"
+msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"BubbleGum - protect yourself with a shield, or use while looking back to "
-"leave a sticky pink puddle behind you."
-msgstr "Txiklea - babes zaitez ezkutu batekin edo erabil ezazu atzera begiratzean, zure atzean putzu arrosa itsaskor bat uzteko."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr "Pastela - Irauli gertuko aurkaria, onena distantzia motzetan edo bide zuzen luzeetan."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Plunger - throw straight to pull an opponent back, or throw while looking "
-"back to make one lose sight."
-msgstr "Bentosa - Bota aurrekoari honi atzeraka eginaz azkartzeko, edo atzera begira bota atzekoak ikusmena gal dezan."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
-" backwards."
-msgstr "Bolatokiko bola - hormetan errebotatzen du. Atzeraka begira bazaude atzekoei bota diezaiekezu."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid "Parachute - slows down all karts in a better position."
-msgstr "Jausgailua - Zure aurretik doazen kart guztiak moteltzen ditu."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Swapper - gift boxes are transformed into bananas and vice versa for a short"
-" time."
-msgstr "Aldatzailea -  opari kutxak banana bihurtzen ditu eta alderantziz denbora tartetxo batean."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Basket Ball - bounces after the leader, and might squash and slow down karts"
-" down on the way."
-msgstr "Saskibaloiko baloia - liderraren bila joaten da punpaka eta bidean kart-ak mantsotu ditzake."
-
-#. I18N: ./data/gui/help2.stkgui
-msgid "Swatter - will squash karts close by, slowing them down."
-msgstr "Euli hiltzekoa - gertuko Kartak zapaltzen ditu, motelduz."
-
-#. I18N: ./data/gui/help3.stkgui
-msgid "SuperTuxKart features several game modes"
-msgstr "SuperTuxKart jolasteko era ezberdinak daude"
-
-#. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid ""
-"Regular Race: All blows allowed, so catch weapons and make clever use of "
-"them!"
-msgstr "Lasterketa normala: Kolpe guztiak onartzen dira, beraz hartu armak eta erabili burua!"
+"Regular Race: All blows allowed, so collect powerups and use them smartly!"
+msgstr ""
 
-#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
-msgid ""
-"Time Trial: Contains no powerups, so only your driving skills matter! This "
-"mode allows you to record the race for replaying."
-msgstr "Ordulariaren kontra: ez daude opariak, zure gidatze gaitasunak du garrantzia! Modu honetan lasterketa grabatu dezakezu gero berrikusteko."
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr ""
 
-#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
@@ -741,23 +849,34 @@ msgid ""
 " leader will get you eliminated too!"
 msgstr "Jarraitu liderra: bigarren postuaren bila joan, kontagailua zerora iristen den aldiro azken kart-a kaleratua izango baita. Kontuz, liderraren aurretik bazoaz ere kanporatua izango zara!"
 
-#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 msgid ""
-"3 Strikes Battle: Hit others with weapons until they lose all their lives."
-msgstr "3 joaldiko borroka: jo beste jokalariak armekin besteek bizi guztiak galdu arte."
+"There are 3 types of battle mode: In 3 Strikes Battle, you need to hit "
+"others with weapons until they lose all their lives. In Free-For-All, the "
+"player who hits others the most will win in a given hit or time limit. In "
+"Capture The Flag, your team needs to bring the flag of the other team to "
+"your own flag base, as long as your flag is not captured by the other team."
+msgstr ""
 
-#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 msgid "Soccer: Use your kart to push the ball into the goal."
 msgstr "Futbola: Erabili zure Kart bola bultzatu eta gola sartzeko."
 
-#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
 msgstr "Arrautza ehiza: Arakatu zirkuituak arrautza guztiak aurkitzeko."
 
-#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: In the help menu
+msgid ""
+"Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and"
+" record your own!"
+msgstr ""
+
+#. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion: "
@@ -766,70 +885,220 @@ msgid ""
 "wins the cup."
 msgstr "* Jokatzeko modu gehienak txapelketa eran jolas daitezke: Lasterketa bakarra korritu beharrean, hainbat jarraian egiten dira. Gero eta hobe ibili bakoitzean, puntu gehiago lortuko dituzu. Amaieran puntu gehien duen jokalariak irabaziko du txapelketa."
 
-#. I18N: ./data/gui/help4.stkgui
-msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
-msgstr "SuperTuxKart hainbat jokalariekin jolas daiteke konputagailu berdinean"
-
-#. I18N: ./data/gui/help4.stkgui
-msgid "(network play is not yet available)"
-msgstr "(Sare jolasa ez dago oraindik erabilgarri)"
-
-#. I18N: ./data/gui/help4.stkgui
+#. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
+msgid "To help you win, there are some powerups you can collect:"
+msgstr "Irabazten laguntzeko, badira batu ditzakezun hainbat \"pizgarri\"."
+
+#. I18N: ./data/gui/help3.stkgui
 msgid ""
-"First, you will need several input devices (having multiple gamepads or "
-"joysticks is the best way to play with several people). Go in the input "
-"configuration screen and setup the gamepads. It is also possible to play on "
-"keyboard(s), however each player will need a different set of keys, and keep"
-" in mind that most keyboards are not appropriate for multiplayer gameplay "
-"because they do not support large number of keypresses."
-msgstr "Lehenik, hainbat sarrera gailu behar dituzu (hainbat joystick edo jolas gailu izatea da erarik egokiena). Zoaz sarrera gailuen konfigurazio pantailara eta jolas gailuen konfiguratu. Teklatu(ar)ekin jolastea ere posible da, baina jokalari bakoitzak tekla ezarpen ezberdinak behar ditu eta kontuan izan behar da teklatu gehienak ez direla egokiak, ez dutelako onartzen aldi berean hainbat tekla sakatzea."
+"BubbleGum - protect yourself with a shield, or use while looking back to "
+"leave a sticky pink puddle behind you."
+msgstr "Txiklea - babes zaitez ezkutu batekin edo erabil ezazu atzera begiratzean, zure atzean putzu arrosa itsaskor bat uzteko."
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Zipper - will give you a strong speed boost. But beware of not losing "
+"control of your kart!"
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Cake - thrown at the closest rival, best on short ranges and long straights."
+" It also affects other karts close to the explosion."
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Plunger - throw straight to pull an opponent back, or throw while looking "
+"back to make one lose sight."
+msgstr "Bentosa - Bota aurrekoari honi atzeraka eginaz azkartzeko, edo atzera begira bota atzekoak ikusmena gal dezan."
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Bowling Ball - goes straight until it strikes, it can bounce off walls. If "
+"you are looking back, it will be thrown backwards."
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+msgid "Parachute - slows down all karts in a better position."
+msgstr "Jausgailua - Zure aurretik doazen kart guztiak moteltzen ditu."
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Swapper - gift boxes are transformed into bananas, nitro cans into "
+"bubblegums, and vice versa for a short time."
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Basket Ball - bounces after the leader, and might squash and slow down karts"
+" down on the way."
+msgstr "Saskibaloiko baloia - liderraren bila joaten da punpaka eta bidean kart-ak mantsotu ditzake."
+
+#. I18N: ./data/gui/help3.stkgui
+msgid ""
+"Swatter - will squash karts close by, slowing them down. Can also be used to"
+" remove parachutes and bombs."
+msgstr ""
 
 #. I18N: ./data/gui/help4.stkgui
-#. I18N: In the help menu
-msgid ""
-"When input devices are configured, you are ready to play. Select the "
-"'multiplayer race' icon in the main menu. When it is time to choose a kart, "
-"each player can press on the 'fire' key of their gamepad or keyboard to join"
-" the game. Each player can use their input device to select their kart. The "
-"game continues when everyone selected their kart. Note that the mouse may "
-"not be used for this operation."
-msgstr "Sarrerako gailuak konfiguratuta daudenean jolasteko prest zaude. Hautatu \"hainbat jokalari\" aukera menu nagusian. Karta aukeratzeko orduan jokalariek \"tiro\" sakatu behar dute parte hartzeko. Jokalari bakoitzak bere gailua erabiliko du Kart aukeraketan. Denek Kart bana aukeratzean jarraituko du jolasak. Kontutan izan operazio honetan ezin dela sagua erabili."
-
-#. I18N: ./data/gui/help5.stkgui
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
 msgstr "Banana bat harrapatzean ondorengoetako bat itsatsiko zaio Kart horri: "
 
-#. I18N: ./data/gui/help5.stkgui
+#. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-msgid "Anchor - slows down the kart."
-msgstr "Aingura: Kart ibilgailua moteltzen du."
+msgid "Anchor - slows down the kart suddenly."
+msgstr ""
+
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu
+msgid ""
+"Parachute - slows down the kart, more progressively than the anchor. The "
+"faster you go, the stronger it slows you down."
+msgstr ""
+
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu
+msgid ""
+"Bomb - detonates after some amount of time, throwing the kart up in the air."
+" Bump into another kart to transfer the bomb to it."
+msgstr ""
 
 #. I18N: ./data/gui/help5.stkgui
-#. I18N: In the help menu
-msgid "Parachute - slows down the kart less than the anchor."
-msgstr "Jausgailua: Kart ibilgailua aingurak baino gutxiago moteltzen du"
+msgid "The evil Nolok has captured Gnu! Here are a few tips to help you:"
+msgstr ""
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid ""
-"Bomb - detonates after a short amount of time to throw the kart up in the "
-"air. Bump into another kart to transfer the bomb to another player."
-msgstr "Bonba: Eztanda egiten du denbora bat igarotzean Kart ibilgailua aireratuz. Jo beste kart bati bonba beste jokalariari pasatzeko."
+"This icon on the minimap shows the available challenges you've not "
+"completed. In the top-right of the screen, it also tells you how many points"
+" you currently have. Complete as many challenges as possible, and Nolok will"
+" accept to race against you. Win to liberate Gnu!"
+msgstr ""
+
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: In the help menu
+msgid ""
+"When you complete a challenge, you get a cup. Each cup is worth several "
+"points. The higher the difficulty you completed the challenge in, the better"
+" the cup and the more points it is worth."
+msgstr ""
+
+#. I18N: ./data/gui/help5.stkgui
+#. I18N: In the help menu
+msgid ""
+"When you get the number of points indicated below this icon, you'll be "
+"gifted a surprise. There are several to collect."
+msgstr ""
+
+#. I18N: ./data/gui/help6.stkgui
+msgid ""
+"Not all karts drive the same! They belong to classes with several "
+"differences:"
+msgstr ""
+
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: In the help menu
+msgid ""
+"Mass - there are three classes of karts, depending of their mass: light, "
+"medium and heavy. Heavier karts are less affected by parachutes and are more"
+" resistant to explosions."
+msgstr ""
+
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: In the help menu
+msgid ""
+"Acceleration - especially useful at start, after an accident, or in tracks "
+"with a lot of sharp curves. The lighter the kart, the faster it accelerates,"
+" especially at low speeds."
+msgstr ""
+
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: In the help menu
+msgid ""
+"Max speed - the higher it is, the faster the kart can go. Especially useful "
+"in tracks with straight lines and gentle curves. Heavier karts have a higher"
+" top speed."
+msgstr ""
+
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: In the help menu
+msgid ""
+"Nitro consumption - the lower it is, the more speed you can get from a can "
+"of nitro. The lighter the kart, the lower its nitro consumption."
+msgstr ""
+
+#. I18N: ./data/gui/help6.stkgui
+#. I18N: In the help menu
+msgid ""
+"If you follow closely another kart for a few seconds, you'll get a "
+"slipstream speed bonus when you overtake it. The lighter your kart, the "
+"easier it is."
+msgstr ""
+
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: In the help menu
+msgid "SuperTuxKart can be played in multiplayer mode online...:"
+msgstr ""
+
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: In the help menu
+msgid ""
+"First, select the 'online' icon in the main menu. Choose either local "
+"networking, or global networking (requires internet to be enabled in the "
+"options). Then, you can either create your own server with custom options, "
+"or search among a list of existing servers to join. Some of them are "
+"official servers with optionally ranked races."
+msgstr ""
+
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: In the help menu
+msgid ""
+"Once in a server, a race will begin once its owner (symbolized with the "
+"crown) decides so. Official servers may auto-start races only when there are"
+" enough players. Then, you can choose your kart and vote for the next track "
+"to race on. An addon kart or track is allowed only if it exists on all "
+"joined players and the server."
+msgstr ""
+
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: In the help menu
+msgid "... or on the same computer:"
+msgstr "... edo ordenagailu berean:"
+
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: In the help menu
+msgid ""
+"First, you will need several input devices. Use the input configuration "
+"screen to set them up. Multiple gamepads or joysticks are ideal: on "
+"keyboard(s), each player will need a different set of keys, and most "
+"keyboards are not appropriate for multiplayer because they don't support "
+"multiple simultaneous keypresses."
+msgstr ""
+
+#. I18N: ./data/gui/help7.stkgui
+#. I18N: In the help menu
+msgid ""
+"When input devices are configured, select the 'multiplayer' icon in the main"
+" menu. Each player can press the 'fire' key of their gamepad or keyboard to "
+"join the game, and use their input device to select their kart. The game "
+"continues when everyone selected their kart. Note that the mouse may not be "
+"used for this operation."
+msgstr ""
+
+#. I18N: ./data/gui/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
+msgid "0 to use the original color, otherwise pick one from slider."
+msgstr ""
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
-#. I18N: ./data/gui/karts_online.stkgui
-#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Aukeratu Kart bat"
-
-#. I18N: ./data/gui/main_menu.stkgui
-#. I18N: Main menu button
-msgid "Story Mode"
-msgstr "Istorio modua"
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
@@ -843,12 +1112,12 @@ msgstr "Hainbat jokalari"
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
+#. I18N: ./data/gui/online/online.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/main_menu_screen.cpp:78
-#: src/states_screens/online_profile_friends.cpp:222
+#: src/states_screens/online_profile_friends.cpp:206
 msgid "Online"
 msgstr "Linean"
 
@@ -877,7 +1146,7 @@ msgstr "Laguntza"
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:511
+#: src/states_screens/race_gui_overworld.cpp:583
 msgid "Tutorial"
 msgstr "Tutoriala"
 
@@ -885,7 +1154,7 @@ msgstr "Tutoriala"
 #. I18N: In the main screen
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:112
+#: src/states_screens/online_profile_base.cpp:107
 msgid "Achievements"
 msgstr "Lorpenak"
 
@@ -903,49 +1172,6 @@ msgstr "Honi buruz"
 #. I18N: In the main screen
 msgid "Quit"
 msgstr "Irten"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-msgid "Touch Device Settings"
-msgstr "Ukimen gailuen ezarpenak"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Device enabled"
-msgstr "Gailua gaitua"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Inverted buttons"
-msgstr "Botoiak alderantzikatuak"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Buttons scale"
-msgstr "Botoien eskala"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Accelerometer"
-msgstr "Azelerometroa"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Advanced"
-msgstr "Aurreratua"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Deadzone"
-msgstr "Botoi eragin puntua (Deadzone)"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-#. I18N: In the multitouch settings screen
-msgid "Sensitivity"
-msgstr "Sentsibilitatea"
-
-#. I18N: ./data/gui/multitouch_settings.stkgui
-msgid "Restore defaults"
-msgstr "Lehenetsiak berrezarri"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -1012,13 +1238,14 @@ msgstr "Gehienezko jokalari kopurua"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-msgid "Password (optional)"
-msgstr "Pasahitza (aukerakoa)"
+msgid "Password for private server (optional)"
+msgstr ""
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/ghost_replay_selection.cpp:80
-#: src/states_screens/server_selection.cpp:104
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
+#: src/states_screens/ghost_replay_selection.cpp:130
+#: src/states_screens/server_selection.cpp:121
 msgid "Difficulty"
 msgstr "Zailtasuna"
 
@@ -1026,10 +1253,11 @@ msgstr "Zailtasuna"
 #. I18N: Difficulty
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:546
-#: src/states_screens/ghost_replay_selection.cpp:121
+#: src/race/race_manager.hpp:582
 msgid "Novice"
 msgstr "Hasiberria"
 
@@ -1037,10 +1265,11 @@ msgstr "Hasiberria"
 #. I18N: Difficulty
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:547
-#: src/states_screens/ghost_replay_selection.cpp:121
+#: src/race/race_manager.hpp:583
 msgid "Intermediate"
 msgstr "Tartekoa"
 
@@ -1048,10 +1277,11 @@ msgstr "Tartekoa"
 #. I18N: Difficulty
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:548
-#: src/states_screens/ghost_replay_selection.cpp:120
+#: src/race/race_manager.hpp:584
 msgid "Expert"
 msgstr "Aditua"
 
@@ -1059,30 +1289,43 @@ msgstr "Aditua"
 #. I18N: Difficulty
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:549
-#: src/states_screens/ghost_replay_selection.cpp:119
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:585
 msgid "SuperTux"
 msgstr "SuperTux"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/server_selection.cpp:105
+#: src/states_screens/server_selection.cpp:122
 msgid "Game mode"
 msgstr "Jolas mota"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/race/race_manager.hpp:175
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:180
 msgid "Normal Race"
 msgstr "Lasterketa normala"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/race/race_manager.hpp:177
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:182
 msgid "Time Trial"
 msgstr "Ordulariaren kontra"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+msgid "Battle"
+msgstr "Borroka"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:190
+msgid "Soccer"
+msgstr "Futbola"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1091,8 +1334,8 @@ msgstr "Sortu"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#. I18N: Used as a verb, appears on the main menu (login button)
-#: src/states_screens/main_menu_screen.cpp:80
+#. I18N: Used as a verb, appears on the main networking menu (login button)
+#: src/states_screens/online_screen.cpp:61
 msgid "Login"
 msgstr "Hasi saioa"
 
@@ -1129,6 +1372,25 @@ msgstr "Saioa gonbidatu bezala hasita lineako lasterketetan parte hartu ahal duz
 msgid "Log In"
 msgstr "Hasi saioa"
 
+#. I18N: ./data/gui/online/lan.stkgui
+msgid "Local Networking"
+msgstr "Sare lokala"
+
+#. I18N: ./data/gui/online/lan.stkgui
+#. I18N: In the online multiplayer screen
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Find Server"
+msgstr "Bilatu zerbitzaria"
+
+#. I18N: ./data/gui/online/lan.stkgui
+#. I18N: In the online multiplayer screen
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+#: src/states_screens/create_server_screen.cpp:91
+msgid "Create Server"
+msgstr "Sortu zerbitzaria"
+
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Lobby Settings"
@@ -1136,32 +1398,23 @@ msgstr "Itxaron gela ezarpenak"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
 #. I18N: In networking lobby
+#. I18N: In the networking lobby
+#: src/states_screens/networking_lobby.cpp:151
 msgid "Lobby"
 msgstr "Itxaron gela"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the networking lobby
-msgid "Server name:"
-msgstr "Zerbitzariaren izena:"
+#. I18N: In the network lobby
+msgid "Send"
+msgstr "Bidali"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the networking lobby
-msgid "Difficulty:"
-msgstr "Zailtasuna:"
+#. I18N: In the network lobby
+msgid "Start race"
+msgstr "Hasi lasterketa"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the networking lobby
-msgid "Game mode:"
-msgstr "Jolas mota:"
-
-#. I18N: ./data/gui/online/networking_lobby.stkgui
-#. I18N: In the networking lobby
+#. I18N: In the network lobby
 msgid "Exit"
 msgstr "Irten"
 
@@ -1172,18 +1425,59 @@ msgstr "Irten"
 msgid "View"
 msgstr "Ikusi"
 
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: In the networking menu
+msgid "Enable splitscreen or player handicaps"
+msgstr ""
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+msgid "Local networking"
+msgstr "Sare lokala"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+msgid "Global networking"
+msgstr "Sare globala"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+msgid "Enter server address"
+msgstr "Sartu zerbitzari helbidea"
+
+#. I18N: ./data/gui/online/online.stkgui
+#. I18N: Networking menu button
+#: src/states_screens/online_profile_base.cpp:112
+#: src/states_screens/online_profile_base.cpp:122
+#: src/states_screens/online_screen.cpp:59
+msgid "Your profile"
+msgstr "Zure profila"
+
+#. I18N: ./data/gui/online/player_rankings_dialog.stkgui
+#. I18N: In player rankings dialog
+msgid "Top 10 players"
+msgstr "10 jokalari onenak"
+
+#. I18N: ./data/gui/online/player_rankings_dialog.stkgui
+msgid "Refresh"
+msgstr "Freskatu"
+
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/profile_overview.stkgui
-#. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
 msgstr "..."
 
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: In the achievements screen
+msgid "Player rankings"
+msgstr "Jokalari sailkapenak"
+
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:111
+#: src/states_screens/online_profile_base.cpp:106
 msgid "Friends"
 msgstr "Lagunak"
 
@@ -1203,27 +1497,6 @@ msgid "Overview"
 msgstr "Ikuspegi orokorra"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
-#. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:110
-msgid "Servers"
-msgstr "Zerbitzariak"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
-msgid "Local Networking"
-msgstr "Sare lokala"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Find Server"
-msgstr "Bilatu zerbitzaria"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
-#. I18N: In the online multiplayer screen
-#: src/states_screens/create_server_screen.cpp:83
-msgid "Create Server"
-msgstr "Sortu zerbitzaria"
-
-#. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Global Networking"
 msgstr "Sare globala"
 
@@ -1234,7 +1507,7 @@ msgstr "Joko azkarra"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:113
+#: src/states_screens/online_profile_base.cpp:108
 msgid "Account Settings"
 msgstr "Kontuaren ezarpenak"
 
@@ -1273,8 +1546,8 @@ msgstr "Pasahitza berrezarri ahal izateko idatzi erregistratzean erabili zenitue
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online_profile_friends.cpp:72
-#: src/states_screens/online_user_search.cpp:73
+#: src/states_screens/online_profile_friends.cpp:71
+#: src/states_screens/online_user_search.cpp:71
 msgid "Username"
 msgstr "Erabiltzaile-izena"
 
@@ -1317,12 +1590,19 @@ msgstr "Lineako erabiltzaile-izena"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the registration dialog
+#. I18N: In the user screen
 msgid "Password"
 msgstr "Pasahitza"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: ./data/gui/user_screen_tab.stkgui
+msgid "Reset password"
+msgstr "Berrezarri pasahitza"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1351,11 +1631,6 @@ msgstr "Onartu"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-msgid "Server Info"
-msgstr "Zerbitzariaren informazioa"
-
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the server info dialog
 msgid "Join"
 msgstr "Sartu"
 
@@ -1363,17 +1638,54 @@ msgstr "Sartu"
 msgid "Server Selection"
 msgstr "Zerbitzari aukeraketa"
 
+#. I18N: ./data/gui/online/server_selection.stkgui
+#. I18N: In the server selection screen
+msgid "Show only private server(s)"
+msgstr "Erakutsi bakarri zerbitzari pribatua(k)"
+
+#. I18N: ./data/gui/online/server_selection.stkgui
+#. I18N: In the server selection screen
+msgid "Hide servers with an ongoing game"
+msgstr ""
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Add player"
+msgstr "Gehitu jokalaria"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#: src/states_screens/online_profile_achievements.cpp:71
+#: src/states_screens/server_selection.cpp:119
+msgid "Name"
+msgstr "Izena"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Handicap"
+msgstr "Ezintasuna"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Press the 'All players ready' button after the player list is ready."
+msgstr "Sakatu \"jokalari guztiak prest\" botoia jokalarien zerrenda prest dagoenean."
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "All players ready"
+msgstr "Jokalari guztiak prest"
+
+#. I18N: ./data/gui/online/splitscreen_player_dialog.stkgui
+#. I18N: Splitscreen player in network
+msgid "Clear added player"
+msgstr "Garbitu gehitutako jokalaria"
+
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog' dialog
 msgid "User Info"
 msgstr "Erabiltzailearen informazioa"
-
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#: src/states_screens/online_profile_achievements.cpp:73
-#: src/states_screens/server_selection.cpp:102
-msgid "Name"
-msgstr "Izena"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -1394,14 +1706,10 @@ msgstr "Erabiltzaileen bilaketa"
 msgid "Vote"
 msgstr "Bozkatu"
 
-#. I18N: ./data/gui/online/waiting_for_others.stkgui
-#. I18N: Networking screen
-msgid "Waiting for the others..."
-msgstr "Beste betzuk itxaroten..."
-
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: ./data/gui/options_input.stkgui
+#. I18N: ./data/gui/options_language.stkgui
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: ./data/gui/options_video.stkgui
@@ -1411,13 +1719,109 @@ msgstr "SuperTuxKart aukerak"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_device.cpp:86
-#: src/states_screens/options_screen_input.cpp:151
-#: src/states_screens/options_screen_ui.cpp:123
-#: src/states_screens/options_screen_video.cpp:238
-#: src/states_screens/user_screen.cpp:660
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+msgid "Graphics"
+msgstr "Grafikoak"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
 msgid "Audio"
 msgstr "Soinua"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+msgid "User Interface"
+msgstr "Erabiltzaile-interfazea"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/ghost_replay_selection.cpp:137
+#: src/states_screens/server_selection.cpp:120
+msgid "Players"
+msgstr "Jokalariak"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+msgid "Controls"
+msgstr "Kontrolak"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+msgid "Language"
+msgstr "Hizkuntza"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -1428,8 +1832,8 @@ msgstr "Musika"
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:68
-#: src/states_screens/options_screen_video.cpp:451
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
+#: src/states_screens/options_screen_video.cpp:428
 msgid "Enabled"
 msgstr "Gaitua"
 
@@ -1444,19 +1848,9 @@ msgid "Sound Effects"
 msgstr "Soinu-efektuak"
 
 #. I18N: ./data/gui/options_device.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/options_input.stkgui
-#. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:68
-#: src/states_screens/options_screen_ui.cpp:125
-#: src/states_screens/options_screen_video.cpp:241
-#: src/states_screens/user_screen.cpp:662
-msgid "Controls"
-msgstr "Kontrolak"
-
-#. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: src/states_screens/options_screen_device.cpp:111
+#: src/states_screens/options_screen_device.cpp:104
+#: src/states_screens/options_screen_device.cpp:109
 msgid "Delete Configuration"
 msgstr "Ezabatu konfigurazioa"
 
@@ -1483,20 +1877,6 @@ msgid ""
 msgstr "* Zein konfigurazio erabiliko den, jolasera elkartzean \"aukeratu\" tekla sakatzean erabakiko da."
 
 #. I18N: ./data/gui/options_players.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: Section in the settings menu
-#: src/states_screens/ghost_replay_selection.cpp:78
-#: src/states_screens/options_screen_audio.cpp:67
-#: src/states_screens/options_screen_device.cpp:88
-#: src/states_screens/options_screen_input.cpp:153
-#: src/states_screens/options_screen_ui.cpp:124
-#: src/states_screens/options_screen_video.cpp:240
-#: src/states_screens/server_selection.cpp:103
-msgid "Players"
-msgstr "Jokalariak"
-
-#. I18N: ./data/gui/options_players.stkgui
 msgid "You are playing as"
 msgstr "Zure jokalaria hau da:"
 
@@ -1511,16 +1891,6 @@ msgid "Add Player"
 msgstr "Gehitu jokalaria"
 
 #. I18N: ./data/gui/options_ui.stkgui
-#. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_device.cpp:87
-#: src/states_screens/options_screen_input.cpp:152
-#: src/states_screens/options_screen_video.cpp:239
-#: src/states_screens/user_screen.cpp:661
-msgid "User Interface"
-msgstr "Erabiltzaile-interfazea"
-
-#. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
 msgstr "Itxura"
@@ -1532,13 +1902,8 @@ msgstr "Erakutsi FPS"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
-msgid "Always show login screen"
-msgstr "Erakutsi beti saio hasierako pantaila"
-
-#. I18N: ./data/gui/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Send anonymous HW statistics"
-msgstr "Bidali HW estatistika anonimoak"
+msgid "Multiplayer splits screen horizontally"
+msgstr ""
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1550,15 +1915,20 @@ msgstr "Gaitu jokalarien ezintasunak"
 msgid "Connect to the Internet"
 msgstr "Konektatu internetera"
 
-#. I18N: ./data/gui/options_video.stkgui
-#. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:65
-#: src/states_screens/options_screen_device.cpp:85
-#: src/states_screens/options_screen_input.cpp:150
-#: src/states_screens/options_screen_ui.cpp:122
-#: src/states_screens/user_screen.cpp:659
-msgid "Graphics"
-msgstr "Grafikoak"
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Send anonymous hardware statistics"
+msgstr ""
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Always show login screen"
+msgstr "Erakutsi beti saio hasierako pantaila"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable chatting in networking lobby"
+msgstr ""
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1616,8 +1986,9 @@ msgid "Back to menu"
 msgstr "Itzuli menura"
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
-msgid "Press a key"
-msgstr "Sakatu tekla bat"
+#. I18N: When changing input configurations
+msgid "Press fully and release..."
+msgstr ""
 
 #. I18N: ./data/gui/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -1641,7 +2012,7 @@ msgstr "Itzuli lasterketara"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:228
+#: src/states_screens/race_result_gui.cpp:232
 msgid "Setup New Race"
 msgstr "Konfiguratu lasterketa berria"
 
@@ -1661,6 +2032,7 @@ msgid "Exit Race"
 msgstr "Irten lasterketatik"
 
 #. I18N: ./data/gui/race_setup.stkgui
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: ./data/gui/soccer_setup.stkgui
 msgid "Race Setup"
@@ -1674,6 +2046,8 @@ msgstr "Hautatu zailtasuna"
 msgid "Select a game mode"
 msgstr "Hautatu jolasteko era"
 
+#. I18N: ./data/gui/select_challenge_nobest.stkgui
+#. I18N: Type of race, in a challenge
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
 msgid "Type:"
@@ -1681,11 +2055,25 @@ msgstr "Mota:"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
+msgid "Red Team"
+msgstr "Talde gorria"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Blue Team"
+msgstr "Talde urdina"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+#. I18N: In track screen
+#: src/states_screens/tracks_screen.cpp:287
 msgid "Number of goals to win"
 msgstr "Gol kopurua irabazteko"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
+#. I18N: In track screen
+#: src/states_screens/tracks_screen.cpp:295
 msgid "Maximum time (min.)"
 msgstr "Gehienezko denbora (min.)"
 
@@ -1699,34 +2087,20 @@ msgstr "Joko mota (Gol kopurua / Denbora muga)"
 msgid "Use left/right to choose your team and press fire"
 msgstr "Erabili ezker/eskuin zure taldea aukeratzeko eta sakatu tiro"
 
-#. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-msgid "Red Team"
-msgstr "Talde gorria"
-
-#. I18N: ./data/gui/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-msgid "Blue Team"
-msgstr "Talde urdina"
-
-#. I18N: ./data/gui/tracks_and_gp.stkgui
-#. I18N: In the track and grand prix selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:147
-msgid "Grand Prix"
-msgstr "Txapelketa"
-
 #. I18N: ./data/gui/track_info.stkgui
 msgid "= Highscores ="
 msgstr "= puntuazio onenak ="
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:322
+#: src/states_screens/track_info_screen.cpp:332
 msgid "(Empty)"
 msgstr "(Hutsik)"
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
+#. I18N: In track screen
+#: src/states_screens/tracks_screen.cpp:320
 msgid "Number of laps"
 msgstr "Bira kopurua"
 
@@ -1734,6 +2108,12 @@ msgstr "Bira kopurua"
 #. I18N: In the track info screen
 msgid "Number of AI karts"
 msgstr "AA kart kopurua"
+
+#. I18N: ./data/gui/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
+#: src/states_screens/dialogs/select_challenge.cpp:172
+msgid "Grand Prix"
+msgstr "Txapelketa"
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
@@ -1756,263 +2136,279 @@ msgstr "Gehitu erabiltzailea"
 msgid "Delete"
 msgstr "Ezabatu"
 
-#. I18N: ../stk-assets/tracks/abyss/track.xml
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Default kart color"
+msgstr "Kart kolore lehenetsia"
+
+#. I18N: ../supertuxkart-assets/karts/adiumy/kart.xml
+msgid "Adiumy"
+msgstr "Adiumy"
+
+#. I18N: ../supertuxkart-assets/karts/amanda/kart.xml
+msgid "Amanda"
+msgstr "Amanda"
+
+#. I18N: ../supertuxkart-assets/karts/beastie/kart.xml
+msgid "Beastie"
+msgstr "Beastie"
+
+#. I18N: ../supertuxkart-assets/karts/emule/kart.xml
+msgid "Emule"
+msgstr "Emule"
+
+#. I18N: ../supertuxkart-assets/karts/gavroche/kart.xml
+msgid "Gavroche"
+msgstr "Gavroche"
+
+#. I18N: ../supertuxkart-assets/karts/gnu/kart.xml
+msgid "Gnu"
+msgstr "Gnu"
+
+#. I18N: ../supertuxkart-assets/karts/hexley/kart.xml
+msgid "Hexley"
+msgstr "Hexley"
+
+#. I18N: ../supertuxkart-assets/karts/kiki/kart.xml
+msgid "Kiki"
+msgstr "Kiki"
+
+#. I18N: ../supertuxkart-assets/karts/konqi/kart.xml
+msgid "Konqi"
+msgstr "Konqi"
+
+#. I18N: ../supertuxkart-assets/karts/nolok/kart.xml
+msgid "Nolok"
+msgstr "Nolok"
+
+#. I18N: ../supertuxkart-assets/karts/pidgin/kart.xml
+msgid "Pidgin"
+msgstr "Pidgin"
+
+#. I18N: ../supertuxkart-assets/karts/puffy/kart.xml
+msgid "Puffy"
+msgstr "Puffy"
+
+#. I18N: ../supertuxkart-assets/karts/sara_the_racer/kart.xml
+msgid "Sara the Racer"
+msgstr "Sara lasterkaria"
+
+#. I18N: ../supertuxkart-assets/karts/sara_the_wizard/kart.xml
+msgid "Sara the Wizard"
+msgstr "Sara aztia"
+
+#. I18N: ../supertuxkart-assets/karts/suzanne/kart.xml
+msgid "Suzanne"
+msgstr "Suzanne"
+
+#. I18N: ../supertuxkart-assets/karts/tux/kart.xml
+msgid "Tux"
+msgstr "Tux"
+
+#. I18N: ../supertuxkart-assets/karts/wilber/kart.xml
+msgid "Wilber"
+msgstr "Wilber"
+
+#. I18N: ../supertuxkart-assets/karts/xue/kart.xml
+msgid "Xue"
+msgstr "Xue"
+
+#. I18N: ../supertuxkart-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
 msgstr "Uholde handi aurreko zuloa"
 
-#. I18N: ../stk-assets/tracks/battleisland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
 msgstr "Borroka irla"
 
-#. I18N: ../stk-assets/tracks/candela_city/track.xml
+#. I18N: ../supertuxkart-assets/tracks/candela_city/track.xml
 msgid "Candela City"
 msgstr "Candela Hiria"
 
-#. I18N: ../stk-assets/tracks/cave/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "X kobazuloa"
 
-#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
 msgstr "Kakaoaren tenplua"
 
-#. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
 msgstr "Cornfield Crossing"
 
-#. I18N: ../stk-assets/tracks/fortmagma/track.xml
+#. I18N: ../supertuxkart-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
 msgstr "Magma gaztelua"
 
-#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
 msgstr "Gran Paradiso irla"
 
-#. I18N: ../stk-assets/tracks/greenvalley/track.xml
+#. I18N: ../supertuxkart-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
 msgstr "Bailara orlegia"
 
-#. I18N: ../stk-assets/tracks/hacienda/track.xml
+#. I18N: ../supertuxkart-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Etxaldea"
 
-#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
 msgstr "Izotz futbol zelaia"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
 msgstr "Zer gertatzen da hippy txiki hori? Zure gnu buruzagi handia galdurik?"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
 msgstr "Entzun ondo, nire gazteluan dago orain eta afarian jango dugu..."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
 msgstr "Baina ni morroi zuzena naiz, beraz emandako hitza beteko dizut."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
 msgstr "Lasterketan irabazten badidak, aguretxoa askatuko diat."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
 msgstr " Baina zuok ziztrinok ez zarete inoiz gai izango ni garaitzeko - Karten Erregea!"
 
-#. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
 msgstr "Dunak borroka-zelaia"
 
-#. I18N: ../stk-assets/tracks/lighthouse/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasscoccer/track.xml
+msgid "Las Dunas Soccer Stadium"
+msgstr ""
+
+#. I18N: ../supertuxkart-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Itsasargiaren inguruan"
 
-#. I18N: ../stk-assets/tracks/mansion/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
 msgstr "Mendi beltzeko etxea"
 
-#. I18N: ../stk-assets/tracks/mines/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mines/track.xml
 msgid "Old Mine"
 msgstr "Meatze zaharra"
 
-#. I18N: ../stk-assets/tracks/minigolf/track.xml
+#. I18N: ../supertuxkart-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
 msgstr "Minigolfa"
 
-#. I18N: ../stk-assets/tracks/olivermath/track.xml
+#. I18N: ../supertuxkart-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "Oliver-en matematika klasea"
 
-#. I18N: ../stk-assets/tracks/sandtrack/track.xml
+#. I18N: ../supertuxkart-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Hondar mugikorrak"
 
-#. I18N: ../stk-assets/tracks/scotland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
 msgstr "Nessie-ren urmaela"
 
-#. I18N: ../stk-assets/tracks/snowmountain/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
 msgstr "Oporrak elurretan"
 
-#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
 msgstr "Tontor edurtua"
 
-#. I18N: ../stk-assets/tracks/soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
 msgstr "Futbol zelaia"
 
-#. I18N: ../stk-assets/tracks/stadium/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stadium/track.xml
 msgid "The Stadium"
 msgstr "Estadioa"
 
-#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
 msgstr "STK Enterprise"
 
-#. I18N: ../stk-assets/tracks/temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/temple/track.xml
 msgid "Temple"
 msgstr "Tenplua"
 
-#. I18N: ../stk-assets/tracks/volcano_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
 msgstr "Sumendi irla"
 
-#. I18N: ../stk-assets/tracks/xr591/track.xml
+#. I18N: ../supertuxkart-assets/tracks/xr591/track.xml
 msgid "XR591"
 msgstr "XR591"
 
-#. I18N: ../stk-assets/tracks/zengarden/track.xml
+#. I18N: ../supertuxkart-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
 msgstr "Zen lorategia"
-
-#. I18N: ../stk-assets/karts/adiumy/kart.xml
-msgid "Adiumy"
-msgstr "Adiumy"
-
-#. I18N: ../stk-assets/karts/amanda/kart.xml
-msgid "Amanda"
-msgstr "Amanda"
-
-#. I18N: ../stk-assets/karts/beastie/kart.xml
-msgid "Beastie"
-msgstr "Beastie"
-
-#. I18N: ../stk-assets/karts/emule/kart.xml
-msgid "Emule"
-msgstr "Emule"
-
-#. I18N: ../stk-assets/karts/gavroche/kart.xml
-msgid "Gavroche"
-msgstr "Gavroche"
-
-#. I18N: ../stk-assets/karts/gnu/kart.xml
-msgid "Gnu"
-msgstr "Gnu"
-
-#. I18N: ../stk-assets/karts/hexley/kart.xml
-msgid "Hexley"
-msgstr "Hexley"
-
-#. I18N: ../stk-assets/karts/kiki/kart.xml
-msgid "Kiki"
-msgstr "Kiki"
-
-#. I18N: ../stk-assets/karts/konqi/kart.xml
-msgid "Konqi"
-msgstr "Konqi"
-
-#. I18N: ../stk-assets/karts/nolok/kart.xml
-msgid "Nolok"
-msgstr "Nolok"
-
-#. I18N: ../stk-assets/karts/pidgin/kart.xml
-msgid "Pidgin"
-msgstr "Pidgin"
-
-#. I18N: ../stk-assets/karts/puffy/kart.xml
-msgid "Puffy"
-msgstr "Puffy"
-
-#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
-msgid "Sara the Racer"
-msgstr "Sara lasterkaria"
-
-#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
-msgid "Sara the Wizard"
-msgstr "Sara aztia"
-
-#. I18N: ../stk-assets/karts/suzanne/kart.xml
-msgid "Suzanne"
-msgstr "Suzanne"
-
-#. I18N: ../stk-assets/karts/tux/kart.xml
-msgid "Tux"
-msgstr "Tux"
-
-#. I18N: ../stk-assets/karts/wilber/kart.xml
-msgid "Wilber"
-msgstr "Wilber"
-
-#. I18N: ../stk-assets/karts/xue/kart.xml
-msgid "Xue"
-msgstr "Xue"
 
 #: src/achievements/achievement.cpp:209
 #, c-format
 msgid "Completed achievement \"%s\"."
 msgstr "\"%s\" lorpena erdietsita."
 
-#: src/addons/addons_manager.cpp:104 src/addons/news_manager.cpp:322
+#: src/addons/addons_manager.cpp:106 src/addons/news_manager.cpp:324
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "SuperTuxKart gehigarrien zerbitzarira konexioak huts egin du."
 
-#: src/addons/news_manager.cpp:179
+#: src/addons/news_manager.cpp:181
 #, c-format
 msgid "Error downloading news: '%s'."
 msgstr "Errorea albisteak deskargatzean: '%s'."
 
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:266
-#: src/states_screens/race_result_gui.cpp:1424
+#: src/challenges/challenge_data.cpp:278
+#: src/states_screens/race_result_gui.cpp:1632
 #, c-format
 msgid "Laps: %i"
 msgstr "Birak: %i"
 
-#: src/challenges/challenge_data.cpp:272
+#: src/challenges/challenge_data.cpp:284
 msgid "Follow the leader"
 msgstr "Jarraitu liderra"
 
-#: src/challenges/challenge_data.cpp:518
+#: src/challenges/challenge_data.cpp:545
 #, c-format
 msgid "New track '%s' now available"
 msgstr "Zirkuitu berria orain erabilgarri: '%s'"
 
-#: src/challenges/challenge_data.cpp:522
+#: src/challenges/challenge_data.cpp:549
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "Jolas mota berria orain erabilgarri '%s'"
 
-#: src/challenges/challenge_data.cpp:532
+#: src/challenges/challenge_data.cpp:559
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "Txapelketa berria '%s' orain erabilgarri"
 
-#: src/challenges/challenge_data.cpp:536
+#: src/challenges/challenge_data.cpp:563
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "Zailtasun berria '%s' orain erabilgarri"
 
-#: src/challenges/challenge_data.cpp:546
+#: src/challenges/challenge_data.cpp:573
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "Kart berria orain erabilgarri: '%s'"
@@ -2022,558 +2418,599 @@ msgid "Currently not signed in"
 msgstr "Unean saioa hasi gabe"
 
 #. I18N: Name of first guest player (without number)
-#: src/config/player_manager.cpp:392
+#: src/config/player_manager.cpp:394
 msgid "Guest"
 msgstr "Gonbidatua"
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
-#: src/config/player_manager.cpp:397
+#: src/config/player_manager.cpp:399
 #, c-format
 msgid "Guest %d"
 msgstr "%d gonbidatua"
 
-#: src/config/user_config.cpp:700
+#: src/config/user_config.cpp:683
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr "Zure konfigurazio fitxategia hondatua dago, ezabatu egingo da eta berria sortu."
 
-#: src/config/user_config.cpp:711
+#: src/config/user_config.cpp:694
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr "Zure konfigurazio fitxategia zaharregia da, ezabatu egingo da eta berria sortu."
 
-#: src/graphics/irr_driver.cpp:535
+#: src/graphics/irr_driver.cpp:585
 msgid "Video recording started."
 msgstr "Bideo grabaketa hasi da."
 
-#: src/graphics/irr_driver.cpp:541
+#: src/graphics/irr_driver.cpp:591
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "\"%s\" gorde da bideoa."
 
-#: src/graphics/irr_driver.cpp:545
+#: src/graphics/irr_driver.cpp:595
 msgid "Encoding progress:"
 msgstr "kodeketa aurrerapena:"
 
-#: src/graphics/irr_driver.cpp:1682
+#: src/graphics/irr_driver.cpp:1778 src/graphics/irr_driver.cpp:1783
 #, c-format
-msgid "FPS: %d/%d/%d - %d KTris"
-msgstr "FPS: %d/%d/%d - %d KTris"
+msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
+msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#: src/guiengine/engine.cpp:1296
+#: src/guiengine/engine.cpp:1311
 msgid "Loading"
 msgstr "Kargatzen"
 
+#: src/guiengine/widgets/kart_stats_widget.cpp:111
+msgid "Mass"
+msgstr ""
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:120
+msgid "Maximum speed"
+msgstr ""
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:131
+msgid "Acceleration"
+msgstr "Azelerazioa"
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:142
+msgid "Nitro efficiency"
+msgstr ""
+
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
-#: src/guiengine/widgets/player_kart_widget.cpp:392
+#: src/guiengine/widgets/player_kart_widget.cpp:384
+#: src/guiengine/widgets/player_kart_widget.cpp:756
+#: src/karts/controller/local_player_controller.cpp:415
+#: src/karts/controller/player_controller.cpp:410
+#: src/network/protocols/client_lobby.cpp:679
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (Ezintasuna)"
 
-#: src/guiengine/widgets/player_kart_widget.cpp:451
+#: src/guiengine/widgets/player_kart_widget.cpp:443
 #, c-format
 msgid "%s is ready"
 msgstr "%s prest dago"
 
 #. I18N: Unbound key binding
-#: src/input/binding.cpp:90
+#: src/input/binding.cpp:94
 msgid "[none]"
 msgstr "[bat ere ez]"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:114
+#: src/input/binding.cpp:104
 msgctxt "input_key"
 msgid "Left Mouse Button"
 msgstr "Saguaren ezkerreko botoia"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:116
+#: src/input/binding.cpp:106
 msgctxt "input_key"
 msgid "Right Mouse Button"
 msgstr "Saguaren eskumako botoia"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:118
+#: src/input/binding.cpp:108
 msgctxt "input_key"
 msgid "Cancel"
 msgstr "Utzi"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:120
+#: src/input/binding.cpp:110
 msgctxt "input_key"
 msgid "Middle Mouse Button"
 msgstr "Saguaren erdiko botoia"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:122
+#: src/input/binding.cpp:112
 msgctxt "input_key"
 msgid "X1 Mouse Button"
 msgstr "Saguaren X1 botoia"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:124
+#: src/input/binding.cpp:114
 msgctxt "input_key"
 msgid "X2 Mouse Button"
 msgstr "Saguaren X2 botoia"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:126
+#: src/input/binding.cpp:116
 msgctxt "input_key"
 msgid "Backspace"
 msgstr "Atzera tekla"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:128
+#: src/input/binding.cpp:118
 msgctxt "input_key"
 msgid "Tab"
 msgstr "Tabuladorea"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:130
+#: src/input/binding.cpp:120
 msgctxt "input_key"
 msgid "Clear"
 msgstr "Garbitu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:132
+#: src/input/binding.cpp:122
 msgctxt "input_key"
 msgid "Return"
 msgstr "Itzuli"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:134
+#: src/input/binding.cpp:124
 msgctxt "input_key"
 msgid "Shift"
 msgstr "Maius"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:136
+#: src/input/binding.cpp:126
 msgctxt "input_key"
 msgid "Control"
 msgstr "Kontrol"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:138
+#: src/input/binding.cpp:128
 msgctxt "input_key"
 msgid "Alt/Menu"
 msgstr "Alt/Menu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:140
+#: src/input/binding.cpp:130
 msgctxt "input_key"
 msgid "Pause"
 msgstr "Pausa"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:142
+#: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Caps Lock"
 msgstr "Blok Maius"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:144
+#: src/input/binding.cpp:134
 msgctxt "input_key"
 msgid "Kana"
 msgstr "Kana"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:146
+#: src/input/binding.cpp:136
 msgctxt "input_key"
 msgid "Junja"
 msgstr "Junja"
 
 #. I18N: input configuration screen: keyboard key
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:149
+#: src/input/binding.cpp:139
 msgctxt "input_key"
 msgid "Final"
 msgstr "Azkena"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:151
+#: src/input/binding.cpp:141
 msgctxt "input_key"
 msgid "Escape"
 msgstr "Ihes"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:153
+#: src/input/binding.cpp:143
 msgctxt "input_key"
 msgid "Convert"
 msgstr "Bihurtu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:155
+#: src/input/binding.cpp:145
 msgctxt "input_key"
 msgid "Nonconvert"
 msgstr "Ez bihurtu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:157
+#: src/input/binding.cpp:147
 msgctxt "input_key"
 msgid "Accept"
 msgstr "Onartu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:159
+#: src/input/binding.cpp:149
 msgctxt "input_key"
 msgid "Modechange"
 msgstr "Modu aldaketa"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:161
+#: src/input/binding.cpp:151
 msgctxt "input_key"
 msgid "Space"
 msgstr "Zuriunea"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:163
+#: src/input/binding.cpp:153
 msgctxt "input_key"
 msgid "Page Up"
 msgstr "Orria gora"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:165
+#: src/input/binding.cpp:155
 msgctxt "input_key"
 msgid "Page Down"
 msgstr "Orria behera"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:167
+#: src/input/binding.cpp:157
 msgctxt "input_key"
 msgid "End"
 msgstr "Amaiera"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:169
+#: src/input/binding.cpp:159
 msgctxt "input_key"
 msgid "Home"
 msgstr "Etxea"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:171
+#: src/input/binding.cpp:161 src/input/gamepad_android_config.cpp:57
 msgctxt "input_key"
 msgid "Left"
 msgstr "Ezkerra"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:173
+#: src/input/binding.cpp:163 src/input/gamepad_android_config.cpp:63
 msgctxt "input_key"
 msgid "Up"
 msgstr "Gora"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:175
+#: src/input/binding.cpp:165 src/input/gamepad_android_config.cpp:60
 msgctxt "input_key"
 msgid "Right"
 msgstr "Eskuina"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:177
+#: src/input/binding.cpp:167 src/input/gamepad_android_config.cpp:66
 msgctxt "input_key"
 msgid "Down"
 msgstr "Behera"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:179
+#: src/input/binding.cpp:169 src/input/gamepad_android_config.cpp:108
 msgctxt "input_key"
 msgid "Select"
 msgstr "Hautatu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:181
+#: src/input/binding.cpp:171
 msgctxt "input_key"
 msgid "Print"
 msgstr "Inprimatu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:183
+#: src/input/binding.cpp:173
 msgctxt "input_key"
 msgid "Exec"
 msgstr "Exec"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:185
+#: src/input/binding.cpp:175
 msgctxt "input_key"
 msgid "Print Screen"
 msgstr "Inprimatu pantaila"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:187
+#: src/input/binding.cpp:177
 msgctxt "input_key"
 msgid "Insert"
 msgstr "Txertatu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:189
+#: src/input/binding.cpp:179
 msgctxt "input_key"
 msgid "Delete"
 msgstr "Ezabatu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:191
+#: src/input/binding.cpp:181
 msgctxt "input_key"
 msgid "Help"
 msgstr "Laguntza"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:229
+#: src/input/binding.cpp:219
 msgctxt "input_key"
 msgid "Left Logo"
 msgstr "Ezkerreko logoa"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:231
+#: src/input/binding.cpp:221
 msgctxt "input_key"
 msgid "Right Logo"
 msgstr "Eskumako logoa"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:233
+#: src/input/binding.cpp:223
 msgctxt "input_key"
 msgid "Apps"
 msgstr "Programak"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:235
+#: src/input/binding.cpp:225
 msgctxt "input_key"
 msgid "Sleep"
 msgstr "Lo"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:237
+#: src/input/binding.cpp:227
 msgctxt "input_key"
 msgid "Numpad 0"
 msgstr "Zenb. teklatuan 0"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:239
+#: src/input/binding.cpp:229
 msgctxt "input_key"
 msgid "Numpad 1"
 msgstr "Zenb. teklatuan 1"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:241
+#: src/input/binding.cpp:231
 msgctxt "input_key"
 msgid "Numpad 2"
 msgstr "Zenb. teklatuan 2"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:243
+#: src/input/binding.cpp:233
 msgctxt "input_key"
 msgid "Numpad 3"
 msgstr "Zenb. teklatuan 3"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:245
+#: src/input/binding.cpp:235
 msgctxt "input_key"
 msgid "Numpad 4"
 msgstr "Zenb. teklatuan 4"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:247
+#: src/input/binding.cpp:237
 msgctxt "input_key"
 msgid "Numpad 5"
 msgstr "Zenb. teklatuan 5"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:249
+#: src/input/binding.cpp:239
 msgctxt "input_key"
 msgid "Numpad 6"
 msgstr "Zenb. teklatuan 6"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:251
+#: src/input/binding.cpp:241
 msgctxt "input_key"
 msgid "Numpad 7"
 msgstr "Zenb. teklatuan 7"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:253
+#: src/input/binding.cpp:243
 msgctxt "input_key"
 msgid "Numpad 8"
 msgstr "Zenb. teklatuan 8"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:255
+#: src/input/binding.cpp:245
 msgctxt "input_key"
 msgid "Numpad 9"
 msgstr "Zenb. teklatuan 9"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:259
+#: src/input/binding.cpp:249
 msgctxt "input_key"
 msgid "Separator"
 msgstr "Banatzailea"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:261
+#: src/input/binding.cpp:251
 msgctxt "input_key"
 msgid "- (Subtract)"
 msgstr "- (kenketa)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:263
+#: src/input/binding.cpp:253
 msgctxt "input_key"
 msgid "Decimal"
 msgstr "koma"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:265
+#: src/input/binding.cpp:255
 msgctxt "input_key"
 msgid "/ (Divide)"
 msgstr "/ (zatiketa)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:291
+#: src/input/binding.cpp:281
 msgctxt "input_key"
 msgid "Num Lock"
 msgstr "Blok Zenb"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:293
+#: src/input/binding.cpp:283
 msgctxt "input_key"
 msgid "Scroll Lock"
 msgstr "Blok Korr"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:295
+#: src/input/binding.cpp:285
 msgctxt "input_key"
 msgid "Left Shift"
 msgstr "Ezkerreko Maius"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:297
+#: src/input/binding.cpp:287
 msgctxt "input_key"
 msgid "Right Shift"
 msgstr "Eskumako Maius"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:299
+#: src/input/binding.cpp:289
 msgctxt "input_key"
 msgid "Left Control"
 msgstr "Ezkerreko Ctrl"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:301
+#: src/input/binding.cpp:291
 msgctxt "input_key"
 msgid "Right Control"
 msgstr "Eskumako Ctrl"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:303
+#: src/input/binding.cpp:293
 msgctxt "input_key"
 msgid "Left Menu"
 msgstr "Ezkerreko menu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:305
+#: src/input/binding.cpp:295
 msgctxt "input_key"
 msgid "Right Menu"
 msgstr "Eskumako Menu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:311
+#: src/input/binding.cpp:301
 msgctxt "input_key"
 msgid "Attn"
 msgstr "Attn"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:313
+#: src/input/binding.cpp:303
 msgctxt "input_key"
 msgid "Crsel"
 msgstr "Crsel"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:315
+#: src/input/binding.cpp:305
 msgctxt "input_key"
 msgid "Exsel"
 msgstr "Exsel"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:317
+#: src/input/binding.cpp:307
 msgctxt "input_key"
 msgid "Ereof"
 msgstr "Ereof"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:319
+#: src/input/binding.cpp:309
 msgctxt "input_key"
 msgid "Play"
 msgstr "Jolastu"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:321
+#: src/input/binding.cpp:311
 msgctxt "input_key"
 msgid "Zoom"
 msgstr "Zoom"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:323
+#: src/input/binding.cpp:313
 msgctxt "input_key"
 msgid "Pa1"
 msgstr "Pa1"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:325
+#: src/input/binding.cpp:315
 msgctxt "input_key"
 msgid "Oem Clear"
 msgstr "Fabrikakora garbitu"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
-#: src/input/binding.cpp:334 src/input/binding.cpp:339
+#: src/input/binding.cpp:355 src/input/binding.cpp:360
 #, c-format
 msgid "Gamepad hat %d"
 msgstr "Norabide botoian: %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:346
+#: src/input/binding.cpp:367
 #, c-format
 msgid "Axis %d %s"
 msgstr "Ardatza %d %s"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:353
+#: src/input/binding.cpp:374
 #, c-format
 msgid "Axis %d inverted"
 msgstr "%d ardatza alderantzikatuta"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:358
+#: src/input/binding.cpp:379
 #, c-format
 msgid "Axis %d"
 msgstr "%d ardatza"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
-#: src/input/binding.cpp:366
+#: src/input/binding.cpp:387
 #, c-format
 msgid "Gamepad button %d"
 msgstr "Jolas gailu botoia %d"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
-#: src/input/binding.cpp:369
+#: src/input/binding.cpp:390
 #, c-format
 msgid "Mouse button %d"
 msgstr "Saguaren botoia %d"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
-#: src/input/binding.cpp:373
+#: src/input/binding.cpp:394
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr "Saguaren ardatza %d %s"
 
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:543
+#: src/input/device_manager.cpp:575
 msgid "Please re-configure your key bindings."
 msgstr "Mesedez, berriz konfiguratu zure laster-teklak"
 
-#: src/input/device_manager.cpp:544
+#: src/input/device_manager.cpp:576
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "Zure sarrera konfigurazio fitxategia ez da bateragarria STK bertsio honekin"
+
+#: src/input/gamepad_android_config.cpp:99
+msgctxt "input_key"
+msgid "Thumb Left"
+msgstr "Ezkerreko koadroa"
+
+#: src/input/gamepad_android_config.cpp:102
+msgctxt "input_key"
+msgid "Thumb Right"
+msgstr "Eskumako koadroa"
+
+#: src/input/gamepad_android_config.cpp:105
+msgctxt "input_key"
+msgid "Start"
+msgstr "Hasi"
+
+#: src/input/gamepad_android_config.cpp:111
+msgctxt "input_key"
+msgid "Mode"
+msgstr "Modua"
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
@@ -2686,12 +3123,12 @@ msgstr "Ezkerreko koadroko behera"
 msgid "Left thumb up"
 msgstr "Ezkerreko koadroko gora"
 
-#: src/input/input_manager.cpp:807
+#: src/input/input_manager.cpp:845
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s' alboratzen. Lehenago etorri behar zinen jolasteko!"
 
-#: src/input/input_manager.cpp:837
+#: src/input/input_manager.cpp:875
 msgid "Only the Game Master may act at this point!"
 msgstr "Une honetan jolasaren arduraduna bakarrik aritu daiteke."
 
@@ -2718,11 +3155,11 @@ msgstr[1] "%d wiimote aurkitu dira"
 msgid "Could not detect any wiimote :/"
 msgstr "Ezin da wiimote antzeman :/"
 
-#: src/karts/controller/local_player_controller.cpp:241
+#: src/karts/controller/local_player_controller.cpp:273
 msgid "Penalty time!!"
 msgstr "Atzerapen denbora!"
 
-#: src/karts/controller/local_player_controller.cpp:243
+#: src/karts/controller/local_player_controller.cpp:276
 msgid "Don't accelerate before go"
 msgstr "Ez azeleratu irten aurretik"
 
@@ -2734,15 +3171,15 @@ msgstr "Gehienez 3 bizitza izan ditzakezu!"
 msgid "+1 life."
 msgstr "+1 bizitza."
 
-#: src/karts/kart.cpp:908 src/karts/kart.cpp:913
+#: src/karts/kart.cpp:957 src/karts/kart.cpp:962
 msgid "You won the race!"
 msgstr "Lasterketa irabazi duzu!"
 
-#: src/karts/kart.cpp:913
+#: src/karts/kart.cpp:962
 msgid "You finished the race!"
 msgstr "Lasterketa amaitu duzu!"
 
-#: src/main.cpp:1501
+#: src/main.cpp:1749
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2753,120 +3190,347 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart zerbitzari batera konekta daiteke  gehigarriak jaisteko eta zuri eguneraketak jakinarazteko. Honez gain era anonimoan hardware estatistikak batzen ditugu STK garapenean laguntzeko. Mesedez irakurri gure pribatutasun politika http://privacy.supertuxkart.net. gunean.\nNahi duzu ezaugarri hau gaitu? (Beranduago ezarpen hau aldatzeko, joan aukeretara, aukeratu \"erabiltzaile interfazea\" fitxa eta editatu \"internetera konektatu\" eta \"Bidali HW estatistika anonimoak\")."
 
-#: src/main.cpp:1654
+#: src/main.cpp:2006
 msgid "Your screen resolution is too low to run STK."
 msgstr "Zure pantaila bereizmena txikiegia da STK exekutatzeko."
 
-#: src/main.cpp:1668
+#: src/main.cpp:2035
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Zure kontrolatzailearen bertsioa zaharregia da. Mesedez instalatu bideo kontrolatzaile berrienak."
 
-#: src/main.cpp:1685
+#: src/main.cpp:2053
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Zure OpenGL bertsioa zaharregia da. Mesedez begiratu zure bideo txartelaren driver eguneratzerik dagoen. SuperTuxKart %s edo berriagoa den bertsioa behar du."
 
-#: src/modes/easter_egg_hunt.cpp:202
+#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:84
+msgid "Server connection timed out."
+msgstr "Denboraz kanpo zerbitzari konexioa"
+
+#. I18N: Show when a player gets the flag in CTF
+#: src/modes/capture_the_flag.cpp:366
+#, c-format
+msgid "%s has the red flag!"
+msgstr ""
+
+#. I18N: Show when a player gets the flag in CTF
+#: src/modes/capture_the_flag.cpp:375
+#, c-format
+msgid "%s has the blue flag!"
+msgstr ""
+
+#. I18N: Show when a player captured the flag in CTF
+#: src/modes/capture_the_flag.cpp:402
+#, c-format
+msgid "%s captured the red flag!"
+msgstr ""
+
+#. I18N: Show when a player captured the flag in CTF
+#: src/modes/capture_the_flag.cpp:413
+#, c-format
+msgid "%s captured the blue flag!"
+msgstr ""
+
+#: src/modes/capture_the_flag.cpp:431
+msgid "The red flag has returned!"
+msgstr ""
+
+#: src/modes/capture_the_flag.cpp:447
+msgid "The blue flag has returned!"
+msgstr ""
+
+#: src/modes/easter_egg_hunt.cpp:236
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "Arrautzak: %d / %d"
 
-#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:285
+#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:286
 msgid "Leader"
 msgstr "Liderra"
 
-#: src/modes/linear_world.cpp:287
+#: src/modes/linear_world.cpp:377
 msgid "Final lap!"
 msgstr "Azken bira!"
 
-#: src/modes/linear_world.cpp:314
+#: src/modes/linear_world.cpp:405
 #, c-format
 msgid "Lap %i"
 msgstr "%i. bira"
 
-#: src/modes/linear_world.cpp:369
+#: src/modes/linear_world.cpp:495
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s %s(e)k egina"
 
-#: src/modes/linear_world.cpp:374
+#: src/modes/linear_world.cpp:500
 msgid "New fastest lap"
 msgstr "Bira azkarren berria"
 
-#: src/modes/linear_world.cpp:891
+#: src/modes/linear_world.cpp:1027
 msgid "WRONG WAY!"
 msgstr "ALDERANTZIZKO BIDEA!"
 
-#: src/modes/three_strikes_battle.cpp:664
+#: src/modes/three_strikes_battle.cpp:661
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] " Kart ordezko gurpil %i sortu da!"
 msgstr[1] " %i Kart ordezko gurpil sortu dira!"
 
-#: src/modes/world.cpp:1202
+#: src/modes/world.cpp:1256
 msgid "You have been eliminated!"
 msgstr "Kanporatua izan zara!"
 
-#: src/modes/world.cpp:1205
+#: src/modes/world.cpp:1263
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' kaleratua izan da."
 
-#: src/network/protocols/server_lobby.cpp:318
+#: src/network/protocols/client_lobby.cpp:85
+msgid "Server has been shut down."
+msgstr "Zerbitzaria erori da."
+
+#: src/network/protocols/client_lobby.cpp:86
+msgid "You were kicked from the server."
+msgstr "Zerbitzaritik kaleratua izan zara."
+
+#: src/network/protocols/client_lobby.cpp:88
+#: src/network/protocols/client_lobby.cpp:233
+#: src/network/protocols/client_lobby.cpp:700
+msgid "Bad network connection is detected."
+msgstr ""
+
+#: src/network/protocols/client_lobby.cpp:449
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:255
+#: src/states_screens/ghost_replay_selection.cpp:373
+msgid "No"
+msgstr "Ez"
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:455
 #, c-format
-msgid "Failed to register server: %s"
-msgstr "Errorea zerbitzarian erregistratzerakoan: %s"
+msgid ""
+"Track: %s,\n"
+"random item location: %s"
+msgstr ""
 
-#: src/network/servers_manager.cpp:198
-msgid "No LAN server detected"
-msgstr "Ez da LAN zerbitzaririk aurkitu"
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:463
+#, c-format
+msgid "Track: %s"
+msgstr ""
 
-#: src/online/online_player_profile.cpp:419
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:470
+#, c-format
+msgid ""
+"Track: %s,\n"
+"number of goals to win: %d,\n"
+"random item location: %s"
+msgstr ""
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:477
+#, c-format
+msgid ""
+"Track: %s,\n"
+"maximum time: %d,\n"
+"random item location: %s"
+msgstr ""
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:485
+#, c-format
+msgid ""
+"Track: %s,\n"
+"laps: %d, reversed: %s"
+msgstr "Pista: %s,\nBirak: %d, alderantziz: %s"
+
+#: src/network/protocols/client_lobby.cpp:515
+#, c-format
+msgid "%s disconnected."
+msgstr "%s deskonektatua."
+
+#. I18N: Message shown in network lobby to tell user that
+#. player name is clickable
+#: src/network/protocols/client_lobby.cpp:538
+msgid ""
+"Press player name in the list for player management and ranking information."
+msgstr ""
+
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:566
+#, c-format
+msgid "Server name: %s"
+msgstr "Zerbitzariaren izena: %s"
+
+#. I18N: In the networking lobby
+#. I18N: In server info dialog
+#: src/network/protocols/client_lobby.cpp:574
+#: src/states_screens/dialogs/server_info_dialog.cpp:83
+#: src/states_screens/race_result_gui.cpp:1640
+#, c-format
+msgid "Difficulty: %s"
+msgstr "Zailtasuna: %s"
+
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:579
+#, c-format
+msgid "Max players: %d"
+msgstr "Jokalari maximoa: %d"
+
+#: src/network/protocols/client_lobby.cpp:596
+#: src/states_screens/dialogs/server_info_dialog.cpp:89
+#, c-format
+msgid "Game mode: %s"
+msgstr "Jolas mota: %s"
+
+#. I18N: In the create server screen for soccer server
+#: src/network/protocols/client_lobby.cpp:608
+#: src/states_screens/create_server_screen.cpp:194
+msgid "Time limit"
+msgstr "Denbora limitea"
+
+#. I18N: In the create server screen for soccer server
+#: src/network/protocols/client_lobby.cpp:609
+#: src/states_screens/create_server_screen.cpp:196
+msgid "Goals limit"
+msgstr "Gol limitea"
+
+#. I18N: In the networking lobby
+#: src/network/protocols/client_lobby.cpp:613
+#, c-format
+msgid "Soccer game type: %s"
+msgstr "Futbol jolas mota: %s"
+
+#: src/network/protocols/client_lobby.cpp:623
+#, c-format
+msgid "Grand prix progress: %d / %d"
+msgstr "Txapelketaren egoera: %d / %d"
+
+#. I18N: Display when all players are in red or blue team, which the race
+#. will not be allowed to start
+#: src/network/protocols/client_lobby.cpp:692
+msgid "All players joined red or blue team."
+msgstr ""
+
+#. I18N: Display when a player is allow to control the server
+#: src/network/protocols/client_lobby.cpp:722
+msgid "You are now the owner of server."
+msgstr "Orain zerbitzariaren jabea zara."
+
+#: src/network/protocols/client_lobby.cpp:760
+msgid "Connection refused: Server is busy."
+msgstr "Konexio ukatua: Zerbitzaria okupatua."
+
+#: src/network/protocols/client_lobby.cpp:764
+msgid "Connection refused: You are banned from the server."
+msgstr "Konexio ukatua: Zerbitzaritik kanporatua izan zara."
+
+#: src/network/protocols/client_lobby.cpp:768
+msgid "Connection refused: Server password is incorrect."
+msgstr "Konexio ukatua: Zerbitzari pasahitza ez zuzena."
+
+#: src/network/protocols/client_lobby.cpp:772
+msgid "Connection refused: Game data is incompatible."
+msgstr "Konexio ukatua: Joko datuak ez konpatibleak."
+
+#: src/network/protocols/client_lobby.cpp:776
+msgid "Connection refused: Server is full."
+msgstr "Konexio ukatua: Zerbitzaria beteta."
+
+#: src/network/protocols/client_lobby.cpp:780
+msgid "Connection refused: Invalid player connecting."
+msgstr "Konexio ukatua: Jokalari baliogabea konektatzen."
+
+#: src/network/protocols/connect_to_server.cpp:196
+msgid "No quick play server available."
+msgstr "Ez dago joko azkar zerbitzaririk erabilgarri."
+
+#: src/network/protocols/connect_to_server.cpp:281
+#: src/states_screens/online_screen.cpp:273
+#, c-format
+msgid "Cannot connect to server %s."
+msgstr "Ezin konektatu %s zerbitzarira."
+
+#: src/network/server_config.cpp:234
+msgid "Normal Race (Grand Prix)"
+msgstr "Lasterketa normala (Txapelketa)"
+
+#: src/network/server_config.cpp:236
+msgid "Time Trial (Grand Prix)"
+msgstr "Ordulariaren kontra (Txapelketa)"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:246
+#: src/states_screens/create_server_screen.cpp:178
+msgid "Free-For-All"
+msgstr ""
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:248
+#: src/states_screens/create_server_screen.cpp:180
+msgid "Capture The Flag"
+msgstr ""
+
+#. I18N: Official means this server is hosted by STK team
+#: src/network/server.cpp:110
+msgid "Official"
+msgstr "Ofiziala"
+
+#: src/online/online_player_profile.cpp:434
 #, c-format
 msgid "%s is now online."
 msgstr "%s linean dago."
 
-#: src/online/online_player_profile.cpp:423
+#: src/online/online_player_profile.cpp:438
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s eta %s linean daude orain."
 
-#: src/online/online_player_profile.cpp:428
+#: src/online/online_player_profile.cpp:443
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s eta %s linean daude orain."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:434
+#: src/online/online_player_profile.cpp:449
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
 msgstr[0] "Lagun %d dago linean orain."
 msgstr[1] "%d lagun daude linean orain."
 
-#: src/online/online_player_profile.cpp:471
+#. I18N: Tell your friend if he is on any server in game
+#: src/online/online_player_profile.cpp:497
+#, c-format
+msgid "%s is now on server \"%s\"."
+msgstr ""
+
+#: src/online/online_player_profile.cpp:528
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
 msgstr[0] "Lagun eskaera %d daukazu!"
 msgstr[1] "%d lagun eskaera dituzu!"
 
-#: src/online/online_player_profile.cpp:477
+#: src/online/online_player_profile.cpp:534
 msgid "You have a new friend request!"
 msgstr "Lagun eskaera berri bat daukazu!"
 
-#: src/online/xml_request.cpp:83
+#: src/online/xml_request.cpp:84
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
 msgstr "Ezin da zerbitzarira konektatu. Egiaztatu zure internet konexioa eta saiatu beranduago."
 
-#: src/race/grand_prix_data.hpp:171
+#: src/race/grand_prix_data.hpp:174
 msgid "Random Grand Prix"
 msgstr "Ausazko txapelketa"
 
@@ -2874,96 +3538,91 @@ msgstr "Ausazko txapelketa"
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "Puntuazio onenen fitxategia oso zaharra da.\nPuntuazio on zahar horiek ezabatuko dira."
+msgstr "Puntuazio onenen fitxategia oso zaharra zen,\npuntuazio on zahar horiek ezabatu dira."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:179
+#: src/race/race_manager.hpp:184
 msgid "Follow the Leader"
 msgstr "Jarraitu liderra"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:181
+#: src/race/race_manager.hpp:186
 msgid "3 Strikes Battle"
 msgstr "3 joaldietara borroka jokoa"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:183
+#: src/race/race_manager.hpp:188
 msgid "Egg Hunt"
 msgstr "Arrautza ehiza"
 
-#. I18N: Game mode
-#: src/race/race_manager.hpp:185
-msgid "Soccer"
-msgstr "Futbola"
-
-#: src/replay/replay_recorder.cpp:183
+#: src/replay/replay_recorder.cpp:358
 msgid "Incomplete replay file will not be saved."
 msgstr "Osatugabeko errepikapena, fitxategia ez da gordeko."
 
-#: src/replay/replay_recorder.cpp:219
+#: src/replay/replay_recorder.cpp:394
 #, c-format
 msgid "Replay saved in \"%s\"."
 msgstr "\"%s\" gorde da errepikapena."
 
-#: src/states_screens/addons_screen.cpp:50
+#: src/states_screens/addons_screen.cpp:48
 msgid "1 week"
 msgstr "Aste 1"
 
-#: src/states_screens/addons_screen.cpp:51
+#: src/states_screens/addons_screen.cpp:49
 msgid "2 weeks"
 msgstr "2 aste"
 
-#: src/states_screens/addons_screen.cpp:52
+#: src/states_screens/addons_screen.cpp:50
 msgid "1 month"
 msgstr "Hilabete 1"
 
-#: src/states_screens/addons_screen.cpp:53
+#: src/states_screens/addons_screen.cpp:51
 msgid "3 months"
 msgstr "3 hilabete"
 
-#: src/states_screens/addons_screen.cpp:54
+#: src/states_screens/addons_screen.cpp:52
 msgid "6 months"
 msgstr "6 hilabete"
 
-#: src/states_screens/addons_screen.cpp:55
+#: src/states_screens/addons_screen.cpp:53
 msgid "9 months"
 msgstr "9 hilabete"
 
-#: src/states_screens/addons_screen.cpp:56
+#: src/states_screens/addons_screen.cpp:54
 msgid "1 year"
 msgstr "Urte 1"
 
-#: src/states_screens/addons_screen.cpp:57
+#: src/states_screens/addons_screen.cpp:55
 msgid "2 years"
 msgstr "2 urte"
 
-#: src/states_screens/addons_screen.cpp:115
+#: src/states_screens/addons_screen.cpp:113
 msgid "Add-on name"
 msgstr "Gehigarriaren izena"
 
-#: src/states_screens/addons_screen.cpp:116
+#: src/states_screens/addons_screen.cpp:114
 msgid "Updated date"
 msgstr "Eguneratze data"
 
-#: src/states_screens/addons_screen.cpp:147
+#: src/states_screens/addons_screen.cpp:145
 msgid ""
 "Access to the Internet is disabled. (To enable it, go to options and select "
 "tab 'User Interface')"
 msgstr "Internetera sarbidea ezgaitua dago. (gaitzeko, joan aukeretara eta aukeratu \"erabiltzaile interfasea\" fitxa)"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:343
+#: src/states_screens/addons_screen.cpp:337
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s %s(e)k egina"
 
-#: src/states_screens/addons_screen.cpp:474
+#: src/states_screens/addons_screen.cpp:457
 msgid "Please wait while addons are updated"
 msgstr "Itxaron gehigarriak eguneratu arte mesedez"
 
-#: src/states_screens/addons_screen.cpp:551
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/addons_screen.cpp:535
+#: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -2974,106 +3633,80 @@ msgstr "Barkatu, errore bat egon da gehigarrien webguneaz konektatzean. Ziurtatu
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:81
-#: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:285
-#: src/states_screens/tracks_and_gp_screen.cpp:146
+#: src/states_screens/arenas_screen.cpp:79
+#: src/states_screens/easter_egg_screen.cpp:142
+#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "arrunta"
 
-#: src/states_screens/arenas_screen.cpp:275
-#: src/states_screens/arenas_screen.cpp:327
-#: src/states_screens/easter_egg_screen.cpp:225
-#: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:864
-#: src/states_screens/kart_selection.cpp:1481
+#: src/states_screens/arenas_screen.cpp:273
+#: src/states_screens/arenas_screen.cpp:325
+#: src/states_screens/easter_egg_screen.cpp:224
+#: src/states_screens/easter_egg_screen.cpp:255
+#: src/states_screens/kart_selection.cpp:886
+#: src/states_screens/kart_selection.cpp:1506
 #: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Giltzatuta: gainditu erronka aktiboak gehiagotara sartu ahal izateko!"
 
-#: src/states_screens/arenas_screen.cpp:339
+#: src/states_screens/arenas_screen.cpp:337
 msgid "Random Arena"
 msgstr "Ausazko borroka-zelaia"
 
-#: src/states_screens/arenas_screen.cpp:343
+#: src/states_screens/arenas_screen.cpp:341
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "Jokalari bakarreko borroka-zelai %d ez dago erabilgarri."
 msgstr[1] "Jokalari bakarreko %d borroka-zelai ez daude erabilgarri."
 
-#: src/states_screens/create_server_screen.cpp:82
+#: src/states_screens/create_server_screen.cpp:90
 msgid "Create LAN Server"
 msgstr "Sortu LAN zerbitzaria"
 
-#: src/states_screens/create_server_screen.cpp:87
+#: src/states_screens/create_server_screen.cpp:95
 #, c-format
 msgid "%s's server"
 msgstr "%s(r)en zerbitzaria"
 
-#: src/states_screens/create_server_screen.cpp:154
-msgid "Creating server"
-msgstr "Zerbitzaria sortzen"
+#. I18N: In the create server screen
+#: src/states_screens/create_server_screen.cpp:156
+msgid "No. of grand prix track(s)"
+msgstr "Txapelketako pista kopurua"
 
-#: src/states_screens/create_server_screen.cpp:181
+#. I18N: Geometry level disabled : lowest level, no details
+#. I18N: in the graphical options tooltip;
+#. indicates a graphical feature is disabled
+#: src/states_screens/create_server_screen.cpp:160
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:69
+#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/options_screen_video.cpp:431
+msgid "Disabled"
+msgstr "Desgaitua"
+
+#. I18N: In the create server screen, show various battle mode available
+#: src/states_screens/create_server_screen.cpp:174
+msgid "Battle mode"
+msgstr "Borroka modua"
+
+#. I18N: In the create server screen
+#: src/states_screens/create_server_screen.cpp:190
+msgid "Soccer game type"
+msgstr "Futbol jolas mota"
+
+#: src/states_screens/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "Izenak 4 eta 30 karaktere bitarteko luzeera behar du!"
 
-#: src/states_screens/create_server_screen.cpp:188
-msgid "The maxinum number of players has to be between 2 and 12."
-msgstr "Gehienezko jokalari kopuruak 2 eta 12 artean egon behar du."
+#: src/states_screens/create_server_screen.cpp:256
+msgid "Incorrect characters in password!"
+msgstr "Karaktere baliogabeak pasahitzan"
 
-#: src/states_screens/credits.cpp:180
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Ander Elortondo https://launchpad.net/~ander-elor\n  Asier Iturralde Sarasola https://launchpad.net/~asier-iturralde\n  Jan Mees https://launchpad.net/~jmees001\n  Mikel Iturbe Urretxa https://launchpad.net/~mik-iturbe\n  STK-team https://launchpad.net/~stk"
-
-#: src/states_screens/dialogs/addons_loading.cpp:97
-msgid "Update"
-msgstr "Eguneratu"
-
-#: src/states_screens/dialogs/addons_loading.cpp:109
-#, c-format
-msgid "Version: %d"
-msgstr "Bertsioa: %d"
-
-#: src/states_screens/dialogs/addons_loading.cpp:140
-msgid "featured"
-msgstr "Nabarmendua"
-
-#: src/states_screens/dialogs/addons_loading.cpp:166
-#, c-format
-msgid "%s MB"
-msgstr "%s MB"
-
-#: src/states_screens/dialogs/addons_loading.cpp:173
-#: src/states_screens/dialogs/addons_loading.cpp:177
-#, c-format
-msgid "%s KB"
-msgstr "%s KB"
-
-#: src/states_screens/dialogs/addons_loading.cpp:178
-#, c-format
-msgid "Size: %s"
-msgstr "Tamaina: %s"
-
-#: src/states_screens/dialogs/addons_loading.cpp:280
-msgid "Sorry, downloading the add-on failed"
-msgstr "Barkatu, gehigarria jaisteak huts egin du"
-
-#: src/states_screens/dialogs/addons_loading.cpp:361
-#, c-format
-msgid "Problems installing the addon '%s'."
-msgstr "Arazoak '%s' gehigarria instalatzean."
-
-#: src/states_screens/dialogs/addons_loading.cpp:372
-#: src/states_screens/dialogs/addons_loading.cpp:409
-msgid "Try again"
-msgstr "Saiatu berriro"
-
-#: src/states_screens/dialogs/addons_loading.cpp:398
-#, c-format
-msgid "Problems removing the addon '%s'."
-msgstr "Arazoak '%s' gehigarria kentzean."
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -3092,17 +3725,65 @@ msgstr "Gehitu Wiimote-a"
 msgid "Add Keyboard Configuration"
 msgstr "Gehitu teklatu konfigurazioa"
 
+#: src/states_screens/dialogs/addons_loading.cpp:103
+msgid "Update"
+msgstr "Eguneratu"
+
+#: src/states_screens/dialogs/addons_loading.cpp:115
+#, c-format
+msgid "Version: %d"
+msgstr "Bertsioa: %d"
+
+#: src/states_screens/dialogs/addons_loading.cpp:146
+msgid "featured"
+msgstr "Nabarmendua"
+
+#: src/states_screens/dialogs/addons_loading.cpp:172
+#, c-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: src/states_screens/dialogs/addons_loading.cpp:179
+#: src/states_screens/dialogs/addons_loading.cpp:183
+#, c-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#: src/states_screens/dialogs/addons_loading.cpp:184
+#, c-format
+msgid "Size: %s"
+msgstr "Tamaina: %s"
+
+#: src/states_screens/dialogs/addons_loading.cpp:292
+msgid "Sorry, downloading the add-on failed"
+msgstr "Barkatu, gehigarria jaisteak huts egin du"
+
+#: src/states_screens/dialogs/addons_loading.cpp:376
+#, c-format
+msgid "Problems installing the addon '%s'."
+msgstr "Arazoak '%s' gehigarria instalatzean."
+
+#: src/states_screens/dialogs/addons_loading.cpp:387
+#: src/states_screens/dialogs/addons_loading.cpp:426
+msgid "Try again"
+msgstr "Saiatu berriro"
+
+#: src/states_screens/dialogs/addons_loading.cpp:415
+#, c-format
+msgid "Problems removing the addon '%s'."
+msgstr "Arazoak '%s' gehigarria kentzean."
+
 #: src/states_screens/dialogs/change_password_dialog.cpp:134
 msgid "Current password invalid."
 msgstr "Uneko pasahitz baliogabea."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
-#: src/states_screens/register_screen.cpp:289
+#: src/states_screens/register_screen.cpp:310
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Pasahitzak 8 eta 30 karaktere artean izan behar ditu!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
-#: src/states_screens/register_screen.cpp:273
+#: src/states_screens/register_screen.cpp:294
 msgid "Passwords don't match!"
 msgstr "Pasahitzak ez datoz bat!"
 
@@ -3112,7 +3793,7 @@ msgstr "Pasahitza behar bezala aldatu da."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
-#: src/states_screens/register_screen.cpp:354
+#: src/states_screens/register_screen.cpp:375
 msgid "Validating info"
 msgstr "Informazioa balioztatzen"
 
@@ -3125,80 +3806,96 @@ msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] "Baieztatu bereizmena %i segundotan"
 msgstr[1] "Baieztatu bereizmena %i segundotan"
 
-#. I18N: Geometry level disabled : lowest level, no details
-#. I18N: in the graphical options tooltip;
-#. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/dialogs/custom_video_settings.cpp:72
-#: src/states_screens/dialogs/custom_video_settings.cpp:84
-#: src/states_screens/dialogs/custom_video_settings.cpp:101
-#: src/states_screens/dialogs/multitouch_settings_dialog.cpp:59
-#: src/states_screens/options_screen_video.cpp:454
-msgid "Disabled"
-msgstr "Desgaitua"
-
-#. I18N: if only important animated scenery is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:67
-#: src/states_screens/options_screen_video.cpp:462
+#. I18N: if only important particles effects is enabled
+#: src/states_screens/dialogs/custom_video_settings.cpp:63
+#: src/states_screens/options_screen_video.cpp:433
 msgid "Important only"
 msgstr "Garrantzitsua bakarrik"
-
-#. I18N: animations setting (only karts with human players are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:74
-msgid "Human players only"
-msgstr "Giza-jokalariak bakarrik"
-
-#: src/states_screens/dialogs/custom_video_settings.cpp:77
-msgid "Enabled for all"
-msgstr "Gaitu guztientzat"
 
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
+#: src/states_screens/dialogs/custom_video_settings.cpp:71
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/dialogs/custom_video_settings.cpp:95
-#: src/states_screens/dialogs/custom_video_settings.cpp:102
-#: src/states_screens/options_screen_video.cpp:469
+#: src/states_screens/options_screen_video.cpp:440
 msgid "Low"
 msgstr "Baxua"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/dialogs/custom_video_settings.cpp:96
-#: src/states_screens/dialogs/custom_video_settings.cpp:103
-#: src/states_screens/options_screen_video.cpp:472
+#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/options_screen_video.cpp:443
 msgid "High"
 msgstr "Altua"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:94
-#: src/states_screens/options_screen_video.cpp:466
+#: src/states_screens/dialogs/custom_video_settings.cpp:79
+#: src/states_screens/options_screen_video.cpp:437
 msgid "Very Low"
 msgstr "Oso baxua"
 
-#. I18N: in the graphical options tooltip;
-#. indicates the rendered image quality is very high
-#: src/states_screens/dialogs/custom_video_settings.cpp:97
-#: src/states_screens/options_screen_video.cpp:475
-msgid "Very High"
-msgstr "Oso altua"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
+#: src/states_screens/edit_gp_screen.cpp:65
+#: src/states_screens/ghost_replay_selection.cpp:132
+msgid "Laps"
+msgstr "Bira"
 
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:257
-#: src/states_screens/ghost_replay_selection.cpp:117
-msgid "No"
-msgstr "Ez"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
+#: src/states_screens/ghost_replay_selection.cpp:133
+msgid "Time"
+msgstr "Denbora"
 
-#: src/states_screens/dialogs/multitouch_settings_dialog.cpp:60
-msgid "Tablet"
-msgstr "Tablet"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
+#: src/states_screens/ghost_replay_selection.cpp:134
+msgid "Kart"
+msgstr ""
 
-#: src/states_screens/dialogs/multitouch_settings_dialog.cpp:61
-msgid "Phone"
-msgstr "Telefonoa"
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
+#: src/states_screens/ghost_replay_selection.cpp:135
+msgid "User"
+msgstr "Erabiltzailea"
+
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
+#: src/states_screens/ghost_replay_selection.cpp:139
+msgid "Version"
+msgstr "Bertsioa"
+
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:82
+msgid "Kick"
+msgstr "Ostikoa"
+
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:100
+msgid "Change team"
+msgstr "Aldatu taldea"
+
+#. I18N: In the network player dialog, showing when waiting for
+#. the result of the ranking info of a player
+#: src/states_screens/dialogs/network_user_dialog.cpp:117
+#: src/states_screens/dialogs/player_rankings_dialog.cpp:140
+#, c-format
+msgid "Fetching ranking info for %s"
+msgstr ""
+
+#. I18N: In the network player dialog, indiciating a network
+#. player has no ranking
+#: src/states_screens/dialogs/ranking_callback.hpp:57
+#, c-format
+msgid "%s has no ranking yet."
+msgstr "%s ez dauka sailkapenik oraindik."
+
+#. I18N: In the network player dialog show rank and
+#. score of a player
+#: src/states_screens/dialogs/ranking_callback.hpp:68
+#, c-format
+msgid "%s has a rank of %d with score %f."
+msgstr "%sren sailkapena %d da, %f punturekin."
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
@@ -3212,7 +3909,7 @@ msgid ""
 "the box below, you are confirming that you understand these terms. If you "
 "have any questions or comments regarding these terms, one of the members of "
 "the development team would gladly assist you."
-msgstr "Mesedez irakurri SuperTuxKart erabilera baldintzak '%s' helbidean. STK kontua irekitzeko baldintza horiek onartu behar dira. Markatuz azpiko kutxatila, baldintza hauek onartzen eta ulertzen dituzula ziurtatzen duzu. Baldintza hauen inguruko galdera edo iruzkinik baduzu, garapen taldeko batek gustura asko artatuko zaitu."
+msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:52
 #, c-format
@@ -3234,18 +3931,46 @@ msgstr "Beharrezkoak diren nitro puntuak: %i"
 msgid "Number of AI Karts: %i"
 msgstr "AA kart kopurua: %i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:149
+#: src/states_screens/dialogs/select_challenge.cpp:174
 msgid "Nitro challenge"
 msgstr "NItro erronka"
 
-#: src/states_screens/dialogs/select_challenge.cpp:151
+#: src/states_screens/dialogs/select_challenge.cpp:176
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
 msgstr "Mamu errepikapen lasterketa"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:75
-msgid "Server successfully created. You can now join it."
-msgstr "Zerbitzaria egoki sortu da. Orain bat egin dezakezu."
+#: src/states_screens/dialogs/server_info_dialog.cpp:99
+#: src/states_screens/race_gui_overworld.cpp:147
+msgid "Rank"
+msgstr "Sailkapena"
+
+#. I18N: Show above the player list in server info dialog, tell
+#. the user name on server
+#: src/states_screens/dialogs/server_info_dialog.cpp:102
+msgid "Player"
+msgstr "Jokalaria"
+
+#. I18N: Show above the player list in server info dialog, tell
+#. the scores of user calculated by player rankings
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
+msgid "Scores"
+msgstr "Puntuazioak"
+
+#. I18N: Show above the player list in server info dialog, tell
+#. the user time played on server
+#: src/states_screens/dialogs/server_info_dialog.cpp:108
+msgid "Time played"
+msgstr ""
+
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:129
+msgid "Input device already exists."
+msgstr "Sartu jada existitzen den gailua."
+
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
+#: src/states_screens/online_screen.cpp:240
+msgid "No player available for connecting to server."
+msgstr "Ez dago jokalaririk eskuragarri zerbitzarira konektatzeko."
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 msgid "Cancel Request"
@@ -3280,374 +4005,426 @@ msgstr "Lagun eskaera bertan behera utzita!"
 msgid "Processing"
 msgstr "Prozesatzen"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:171
+#: src/states_screens/dialogs/vote_dialog.cpp:172
 msgid "Fetching last vote"
 msgstr "Azken botoa eskuratzen"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:190
+#: src/states_screens/dialogs/vote_dialog.cpp:191
 msgid "You can adapt your previous rating by clicking the stars beneath."
 msgstr "Zure aurreko balorazioa egokitu dezakezu azpiko izarretan klikatuz."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:195
+#: src/states_screens/dialogs/vote_dialog.cpp:196
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
 msgstr "Gehigarri hau oraindik ez duzu bozkatu. Aukeratu zure balorazioa azpiko izarretan klikatuz."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:230
+#: src/states_screens/dialogs/vote_dialog.cpp:231
 msgid "Vote successful! You can now close the window."
 msgstr "Baliozko botoa! Leihoa itxi dezakezu orain."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:247
+#: src/states_screens/dialogs/vote_dialog.cpp:248
 msgid "Performing vote"
 msgstr "Bozketa gauzatzen..."
 
-#: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/tracks_and_gp_screen.cpp:292
-#: src/states_screens/tracks_screen.cpp:241
+#: src/states_screens/easter_egg_screen.cpp:269
+#: src/states_screens/tracks_and_gp_screen.cpp:289
+#: src/states_screens/tracks_screen.cpp:411
 msgid "Random Track"
 msgstr "Ausazko zirkuitua"
 
-#: src/states_screens/edit_gp_screen.cpp:66
-#: src/states_screens/ghost_replay_selection.cpp:77
+#: src/states_screens/edit_gp_screen.cpp:64
+#: src/states_screens/ghost_replay_selection.cpp:126
 msgid "Track"
 msgstr "Zirkuitua"
 
-#: src/states_screens/edit_gp_screen.cpp:67
-#: src/states_screens/ghost_replay_selection.cpp:81
-msgid "Laps"
-msgstr "Bira"
-
-#: src/states_screens/edit_gp_screen.cpp:68
+#: src/states_screens/edit_gp_screen.cpp:66
 msgid "Reversed"
 msgstr "Alderantziz"
 
-#: src/states_screens/edit_gp_screen.cpp:124
-#: src/states_screens/ghost_replay_selection.cpp:177
-#: src/states_screens/grand_prix_editor_screen.cpp:112
+#: src/states_screens/edit_gp_screen.cpp:122
+#: src/states_screens/ghost_replay_selection.cpp:478
+#: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr "Ziur zaude '%s' kendu nahi duzula?"
 
-#: src/states_screens/edit_gp_screen.cpp:141
+#: src/states_screens/edit_gp_screen.cpp:139
 msgid "Do you want to save your changes?"
 msgstr "Aldaketak gorde nahi dituzu?"
 
 #. I18N: Indicate that the grand prix is modified and not saved
-#: src/states_screens/edit_gp_screen.cpp:286
+#: src/states_screens/edit_gp_screen.cpp:284
 #, c-format
 msgid "%s (+)"
 msgstr "%s (+)"
 
-#: src/states_screens/edit_gp_screen.cpp:325
+#: src/states_screens/edit_gp_screen.cpp:324
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Errore bat gertatu da zure txapelketa gordetzen saiatzean."
 
-#: src/states_screens/edit_track_screen.cpp:235
+#: src/states_screens/edit_track_screen.cpp:233
 msgid "Select a track"
 msgstr "Hautatu zirkuitua"
 
-#: src/states_screens/feature_unlocked.cpp:201
+#: src/states_screens/feature_unlocked.cpp:244
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr "Erronka erraza amaitu duzu! maila honetan lortutako puntuak:  %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:205
+#: src/states_screens/feature_unlocked.cpp:250
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr "Erronka ertaina amaitu duzu! maila honetan lortutako puntuak: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:209
+#: src/states_screens/feature_unlocked.cpp:256
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr "Erronka zaila amaitu duzu! maila honetan lortutako puntuak: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:494
+#: src/states_screens/feature_unlocked.cpp:262
+#, c-format
+msgid ""
+"You completed the SuperTux challenge! Points earned on this level: %i/%i"
+msgstr ""
+
+#: src/states_screens/feature_unlocked.cpp:305
+#, c-format
+msgid "You unlocked %s!"
+msgstr "%s ireki duzu!"
+
+#: src/states_screens/feature_unlocked.cpp:622
 msgid "Challenge Completed"
 msgstr "Erronka betea"
 
-#: src/states_screens/feature_unlocked.cpp:531
+#: src/states_screens/feature_unlocked.cpp:661
 msgid "You unlocked track %0"
 msgstr "%0 zirkuitura sarrera lortu duzu"
 
-#: src/states_screens/feature_unlocked.cpp:569
+#: src/states_screens/feature_unlocked.cpp:707
 msgid "You unlocked grand prix %0"
 msgstr "%0 txapelketara  sarrera lortu duzu"
 
-#: src/states_screens/ghost_replay_selection.cpp:82
-msgid "Finish Time"
-msgstr "Amaierako denbora"
-
-#: src/states_screens/ghost_replay_selection.cpp:83
-msgid "User"
-msgstr "Erabiltzailea"
-
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:72
 msgid "Default"
 msgstr "Lehenetsia"
 
-#. I18N: if no kart animations are enabled
-#: src/states_screens/gp_info_screen.cpp:75
-#: src/states_screens/options_screen_video.cpp:460
+#: src/states_screens/gp_info_screen.cpp:73
 msgid "None"
 msgstr "Bat ere ez"
 
-#: src/states_screens/gp_info_screen.cpp:77
+#: src/states_screens/gp_info_screen.cpp:75
 msgid "Random"
 msgstr "Ausazkoa"
 
-#: src/states_screens/gp_info_screen.cpp:154
-#: src/states_screens/gp_info_screen.cpp:179
+#: src/states_screens/gp_info_screen.cpp:152
+#: src/states_screens/gp_info_screen.cpp:177
 msgid "Reload"
 msgstr "Birkargatu"
 
 #: src/states_screens/grand_prix_cutscene.cpp:75
-#: src/states_screens/grand_prix_editor_screen.cpp:101
-#: src/states_screens/grand_prix_editor_screen.cpp:118
+#: src/states_screens/grand_prix_editor_screen.cpp:98
+#: src/states_screens/grand_prix_editor_screen.cpp:115
 msgid "Please enter the name of the grand prix"
 msgstr "Sartu txapelketa berriaren izena"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:169
+#: src/states_screens/grand_prix_editor_screen.cpp:166
 msgid "Please select a Grand Prix"
 msgstr "Mesedez, aukeratu Grand Prix"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:338
+#: src/states_screens/grand_prix_editor_screen.cpp:335
 msgid "User defined"
 msgstr "Erabiltzaileak definitua"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:351
+#: src/states_screens/grand_prix_editor_screen.cpp:348
 msgid "Name is empty."
 msgstr "Izena hutsik dago."
 
-#: src/states_screens/grand_prix_editor_screen.cpp:359
+#: src/states_screens/grand_prix_editor_screen.cpp:356
 msgid "Another grand prix with this name already exists."
 msgstr "Izen hori duen txapelketa bat existitzen da dagoeneko."
 
-#: src/states_screens/grand_prix_editor_screen.cpp:365
+#: src/states_screens/grand_prix_editor_screen.cpp:362
 msgid "Name is too long."
 msgstr "Izena luzeegia da."
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:155
+#: src/states_screens/grand_prix_lose.cpp:153
 msgid "Better luck next time!"
 msgstr "Saiatu hurrengoan ere!"
 
-#: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:194
+#: src/states_screens/grand_prix_win.cpp:162
+#: src/states_screens/race_result_gui.cpp:186
 msgid "You completed a challenge!"
 msgstr "Erronka bete duzu!"
 
-#: src/states_screens/grand_prix_win.cpp:322
+#: src/states_screens/grand_prix_win.cpp:319
 msgid "You completed the Grand Prix!"
 msgstr "Txapelketa amaitu duzu!"
 
-#: src/states_screens/kart_selection.cpp:843
-#: src/states_screens/kart_selection.cpp:1499
+#: src/states_screens/kart_selection.cpp:862
+#: src/states_screens/kart_selection.cpp:1524
 msgid "Random Kart"
 msgstr "Ausazko karta"
 
-#: src/states_screens/kart_selection.cpp:859
+#: src/states_screens/kart_selection.cpp:881
 msgid "Locked"
 msgstr "Giltzatuta"
 
-#: src/states_screens/kart_selection.cpp:961
+#: src/states_screens/kart_selection.cpp:982
+#: src/states_screens/networking_lobby.cpp:292
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Guztiok:\nSakatu 'aukeratu' botoia jolasera batzeko"
 
-#: src/states_screens/main_menu_screen.cpp:510
+#: src/states_screens/main_menu_screen.cpp:492
+#: src/states_screens/online_screen.cpp:218
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr "Ezin duzu linean jolastu internet sarrerarik gabe. Linean jolastu nahi baduzu, joan aukeretara, aukeratu \"erabiltzaile interfasea\" fitxa, eta editatu \"Konektatu internetera\"."
 
-#: src/states_screens/main_menu_screen.cpp:534
+#: src/states_screens/main_menu_screen.cpp:508
 msgid ""
 "You can not download addons without internet access. If you want to download"
-" addons, go to options, select  tab 'User Interface', and edit \"Connect to "
-"the Internet\"."
-msgstr "Ezin duzu gehigarririk jaitsi internet sarrerarik gabe. Gehigarriak jaitsi nahi badituzu, joan aukeretara, aukeratu \"erabiltzaile interfasea\" fitxa, eta editatu \"Konektatu internetera\"."
+" addons, go to options, select the 'User Interface' tab, and check \"Connect"
+" to the Internet\"."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:566
+#: src/states_screens/main_menu_screen.cpp:517
+msgid ""
+"You can not download addons without internet access. If you want to download addons, go to options, select the 'User Interface' tab, and check \"Connect to the Internet\".\n"
+"\n"
+"You can however delete already downloaded addons."
+msgstr ""
+
+#: src/states_screens/main_menu_screen.cpp:553
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Gehigarrien modulua ezgaitua dago aukeren pantailan"
 
-#: src/states_screens/main_menu_screen.cpp:578
+#: src/states_screens/main_menu_screen.cpp:565
 msgid "Please wait while the add-ons are loading"
 msgstr "Itxaron gehigarriak kargatu arte mesedez"
 
-#: src/states_screens/online_profile_achievements.cpp:79
+#: src/states_screens/networking_lobby.cpp:229
+#, c-format
+msgid "Lobby (ping: %dms)"
+msgstr ""
+
+#. I18N: In the networking lobby, show when player is required to wait
+#. before the current game finish
+#: src/states_screens/networking_lobby.cpp:239
+msgid "Please wait for current game to end."
+msgstr ""
+
+#: src/states_screens/networking_lobby.cpp:267
+#, c-format
+msgid "Game will start if there is more than %d player."
+msgid_plural "Game will start if there are more than %d players."
+msgstr[0] ""
+msgstr[1] ""
+
+#. I18N: In the networking lobby, display the starting timeout
+#. for owner-less server
+#: src/states_screens/networking_lobby.cpp:280
+#, c-format
+msgid "Game will start after %d second."
+msgid_plural "Game will start after %d seconds."
+msgstr[0] "%d segundo ondoren hasiko da jolasa. "
+msgstr[1] "%d segundo ondoren hasiko da jolasa."
+
+#: src/states_screens/networking_lobby.cpp:312
+#, c-format
+msgid "Connecting to server %s"
+msgstr "%s zerbitzarira konektatzen."
+
+#: src/states_screens/networking_lobby.cpp:317
+msgid "Finding a quick play server"
+msgstr "Joko azkarrerako zerbitzaria bilatzen"
+
+#: src/states_screens/online_profile_achievements.cpp:77
 msgid "Progress"
 msgstr "Aurrerapena"
 
-#: src/states_screens/online_profile_achievements.cpp:131
-#: src/states_screens/online_profile_achievements.cpp:171
+#: src/states_screens/online_profile_achievements.cpp:129
+#: src/states_screens/online_profile_achievements.cpp:174
 msgid "Fetching achievements"
 msgstr "Lorpenak eskuratzen"
 
-#: src/states_screens/online_profile_base.cpp:117
-#: src/states_screens/online_profile_base.cpp:127
-msgid "Your profile"
-msgstr "Zure profila"
-
-#: src/states_screens/online_profile_base.cpp:120
+#: src/states_screens/online_profile_base.cpp:115
 #, c-format
 msgid "%s's profile"
 msgstr "%s(r)en profila"
 
-#: src/states_screens/online_profile_friends.cpp:75
+#: src/states_screens/online_profile_friends.cpp:74
 msgid "Since"
 msgstr "Noiztik:"
 
-#: src/states_screens/online_profile_friends.cpp:76
+#: src/states_screens/online_profile_friends.cpp:75
 msgid "Status"
 msgstr "Egoera"
 
-#: src/states_screens/online_profile_friends.cpp:96
-#: src/states_screens/online_profile_friends.cpp:247
+#: src/states_screens/online_profile_friends.cpp:93
+#: src/states_screens/online_profile_friends.cpp:231
 msgid "Fetching friends"
 msgstr "Lagunak eskuratzen"
 
-#: src/states_screens/online_profile_friends.cpp:218
+#: src/states_screens/online_profile_friends.cpp:202
 msgid "New Request"
 msgstr "Eskaera berria"
 
-#: src/states_screens/online_profile_friends.cpp:219
+#: src/states_screens/online_profile_friends.cpp:203
 msgid "Pending"
 msgstr "Zain"
 
-#: src/states_screens/online_profile_friends.cpp:223
+#: src/states_screens/online_profile_friends.cpp:207
 msgid "Offline"
 msgstr "Lineaz kanpo"
 
-#: src/states_screens/online_user_search.cpp:207
-#: src/states_screens/online_user_search.cpp:271
+#. I18N: Shown to players when he is not is not logged in
+#: src/states_screens/online_screen.cpp:108
+msgid ""
+"You must be logged in to play Global networking. Click your username above."
+msgstr ""
+
+#: src/states_screens/online_screen.cpp:245
+msgid ""
+"Enter the server address with IP (optional) followed by : and then port."
+msgstr ""
+
+#: src/states_screens/online_screen.cpp:256
+#, c-format
+msgid "Invalid server address: %s."
+msgstr "Zerbitzari helbide baliogabea: %s."
+
+#: src/states_screens/online_user_search.cpp:205
+#: src/states_screens/online_user_search.cpp:269
 msgid "Searching"
 msgstr "Bilatzen"
 
-#: src/states_screens/options_screen_device.cpp:71
+#: src/states_screens/options_screen_device.cpp:69
 msgid "Action"
 msgstr "Ekintza"
 
-#: src/states_screens/options_screen_device.cpp:72
+#: src/states_screens/options_screen_device.cpp:70
 msgid "Key binding"
 msgstr "Laster-teklak"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_device.cpp:96
-#: src/states_screens/options_screen_device.cpp:579
+#: src/states_screens/options_screen_device.cpp:89
+#: src/states_screens/options_screen_device.cpp:586
 msgid "Disable Device"
 msgstr "Desgaitu gailua"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_device.cpp:98
-#: src/states_screens/options_screen_device.cpp:580
+#: src/states_screens/options_screen_device.cpp:91
+#: src/states_screens/options_screen_device.cpp:587
 msgid "Enable Device"
 msgstr "Gaitu gailua"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_device.cpp:137
+#: src/states_screens/options_screen_device.cpp:134
 msgid "Game Keys"
 msgstr "Jolas teklak"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_device.cpp:151
+#: src/states_screens/options_screen_device.cpp:148
 msgid "Menu Keys"
 msgstr "Menu teklak"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:218
+#: src/states_screens/options_screen_device.cpp:223
 msgid "Steer Left"
 msgstr "Ezkerrera gidatu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:221
+#: src/states_screens/options_screen_device.cpp:226
 msgid "Steer Right"
 msgstr "Eskuinera gidatu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:224
+#: src/states_screens/options_screen_device.cpp:229
 msgid "Accelerate"
 msgstr "Azeleratu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:227
+#: src/states_screens/options_screen_device.cpp:232
 msgid "Brake"
 msgstr "Frenatu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:230
+#: src/states_screens/options_screen_device.cpp:235
 msgid "Fire"
 msgstr "Tiro"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:233
+#: src/states_screens/options_screen_device.cpp:238
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:236
+#: src/states_screens/options_screen_device.cpp:241
 msgid "Skidding"
 msgstr "Irristatu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:239
+#: src/states_screens/options_screen_device.cpp:244
 msgid "Look Back"
 msgstr "Begiratu atzera"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:242
+#: src/states_screens/options_screen_device.cpp:247
 msgid "Rescue"
 msgstr "Berreskuratu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:245
+#: src/states_screens/options_screen_device.cpp:250
 msgid "Pause Game"
 msgstr "Eten jolasa"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:250
+#: src/states_screens/options_screen_device.cpp:255
 msgid "Up"
 msgstr "Gora"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:253
+#: src/states_screens/options_screen_device.cpp:258
 msgid "Down"
 msgstr "Behera"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:256
+#: src/states_screens/options_screen_device.cpp:261
 msgid "Left"
 msgstr "Ezkerra"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:259
+#: src/states_screens/options_screen_device.cpp:264
 msgid "Right"
 msgstr "Eskuina"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:262
+#: src/states_screens/options_screen_device.cpp:267
 msgid "Select"
 msgstr "Hautatu"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_device.cpp:265
+#: src/states_screens/options_screen_device.cpp:270
 msgid "Cancel/Back"
 msgstr "Utzi/Atzera"
 
-#: src/states_screens/options_screen_device.cpp:360
+#: src/states_screens/options_screen_device.cpp:365
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Elementu urdinak beste konfigurazio batekin gatazka dagoela esan nahi du"
 
-#: src/states_screens/options_screen_device.cpp:365
+#: src/states_screens/options_screen_device.cpp:370
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Elementu gorri batek gatazka bat adierazten du uneko konfigurazioan"
 
-#: src/states_screens/options_screen_device.cpp:471
+#: src/states_screens/options_screen_device.cpp:476
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -3655,269 +4432,260 @@ msgid ""
 msgstr "Kontuz: \"Maius\" tekla ez da gomendagarria. \"Maius\" tekla sakatua dagoenean maiuskuletan karaktere ezberdina duten tekla guztiak ez dute funtzionatuko."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options_screen_device.cpp:567
+#: src/states_screens/options_screen_device.cpp:574
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Ziur zaude konfigurazio hau betiko ezabatu nahi duzula?"
 
-#: src/states_screens/options_screen_input.cpp:100
+#: src/states_screens/options_screen_input.cpp:102
+msgid "Gamepad"
+msgstr ""
+
+#: src/states_screens/options_screen_input.cpp:109
 #, c-format
 msgid "Keyboard %i"
 msgstr "Teklatua %i"
 
-#: src/states_screens/options_screen_input.cpp:138
+#: src/states_screens/options_screen_input.cpp:148
 msgid "Touch Device"
 msgstr "Ukimen gailua"
 
-#: src/states_screens/options_screen_ui.cpp:159
+#. I18N: in the language choice, to select the same language as the OS
+#: src/states_screens/options_screen_language.cpp:87
+msgid "System Language"
+msgstr "Sistemaren hizkuntza"
+
+#: src/states_screens/options_screen_ui.cpp:165
 msgid ""
 "In multiplayer mode, players can select handicapped (more difficult) "
 "profiles on the kart selection screen"
 msgstr "Hainbat jokalari moduan, jokalariek profil ezinduak (Zailagoak) aukeratu ditzakete kart aukeraketa pantailan"
 
-#. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options_screen_ui.cpp:191
-msgid "System Language"
-msgstr "Sistemaren hizkuntza"
-
 #. I18N: custom video settings
-#: src/states_screens/options_screen_video.cpp:433
+#: src/states_screens/options_screen_video.cpp:410
 msgid "Custom"
 msgstr "Pertsonalizatua"
 
-#. I18N: if some kart animations are enabled
-#: src/states_screens/options_screen_video.cpp:458
-msgid "Me Only"
-msgstr "Ni bakarrik"
-
 #. I18N: in graphical options
-#. tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
-#. UserConfigParams::m_pixel_shaders ? enabled : disabled);
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:481
+#: src/states_screens/options_screen_video.cpp:446
 #, c-format
-msgid "Animated Scenery: %s"
-msgstr "Paisaia animatua: %s"
+msgid "Particles Effects: %s"
+msgstr "Partikula efektuak: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:487
-#, c-format
-msgid "Weather Effects: %s"
-msgstr "Eguraldi efektuak: %s"
-
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:490
+#: src/states_screens/options_screen_video.cpp:452
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Pertsonaia animatuak: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:495
+#: src/states_screens/options_screen_video.cpp:455
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Argi dinamikoak: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:498
+#: src/states_screens/options_screen_video.cpp:458
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Mugimendu lausotzea: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:501
+#: src/states_screens/options_screen_video.cpp:461
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Anti-aliasing-a: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:504
+#: src/states_screens/options_screen_video.cpp:464
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Giro oklusioa: %s"
 
-#: src/states_screens/options_screen_video.cpp:508
+#: src/states_screens/options_screen_video.cpp:468
 #, c-format
 msgid "Shadows: %s"
 msgstr "Itzalak: %s"
 
-#: src/states_screens/options_screen_video.cpp:510
+#: src/states_screens/options_screen_video.cpp:470
 #, c-format
 msgid "Shadows: %i"
 msgstr "Itzalak: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:513
+#: src/states_screens/options_screen_video.cpp:473
 #, c-format
 msgid "Bloom: %s"
 msgstr "Lorea : %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:517
+#: src/states_screens/options_screen_video.cpp:477
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Distirak (Ertzak): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:521
+#: src/states_screens/options_screen_video.cpp:481
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Argi izpiak (hodei arteko izpiak): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:525
+#: src/states_screens/options_screen_video.cpp:485
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Eremu-sakonera: %s"
 
-#. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:529
-#, c-format
-msgid "Global illumination: %s"
-msgstr "Argiztapen orokorra: %s"
-
-#: src/states_screens/options_screen_video.cpp:534
+#: src/states_screens/options_screen_video.cpp:490
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Irudi errendatuaren kalitatea: %s"
 
-#: src/states_screens/race_gui.cpp:358 src/states_screens/race_gui.cpp:360
-msgid "Challenge Failed"
-msgstr "Erronka ez betea"
-
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:65
+#: src/states_screens/race_gui_base.cpp:66
 msgid "Ready!"
 msgstr "Prest!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:67
+#: src/states_screens/race_gui_base.cpp:68
 msgid "Set!"
 msgstr "Prest!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:69
+#: src/states_screens/race_gui_base.cpp:70
 msgid "Go!"
 msgstr "Aurrera!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:72
 msgid "GOAL!"
 msgstr "GOLA!"
 
+#. I18N: Shown waiting for other players in network to finish loading or
+#. waiting
+#: src/states_screens/race_gui_base.cpp:75
+#: src/states_screens/race_result_gui.cpp:268
+msgid "Waiting for others"
+msgstr "Besteei itxaroten"
+
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:517
+#: src/states_screens/race_gui_base.cpp:555
 msgid "by"
 msgstr "Egilea:"
 
-#: src/states_screens/race_gui_base.cpp:626
+#: src/states_screens/race_gui_base.cpp:677
 msgid "Collect nitro!"
 msgstr "Bildu nitroak!"
 
-#: src/states_screens/race_gui_base.cpp:628
+#: src/states_screens/race_gui_base.cpp:679
 msgid "Follow the leader!"
 msgstr "Jarraitu liderra!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:806
+#: src/states_screens/race_gui_base.cpp:860
 #, c-format
 msgid "Top %i"
 msgstr "lehen %iak"
 
+#: src/states_screens/race_gui.cpp:401 src/states_screens/race_gui.cpp:403
+msgid "Challenge Failed"
+msgstr "Erronka ez betea"
+
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui_overworld.cpp:143
+#: src/states_screens/race_gui_overworld.cpp:146
 msgid "Lap"
 msgstr "Bira"
 
-#: src/states_screens/race_gui_overworld.cpp:144
-msgid "Rank"
-msgstr "Sailkapena"
-
-#: src/states_screens/race_gui_overworld.cpp:518
+#: src/states_screens/race_gui_overworld.cpp:590
 msgid "Press fire to start the tutorial"
 msgstr "Sakatu tiro tutorialean hasteko"
 
-#: src/states_screens/race_gui_overworld.cpp:557
+#: src/states_screens/race_gui_overworld.cpp:629
 msgid "Type: Grand Prix"
 msgstr "Mota: Txapelketa"
 
-#: src/states_screens/race_gui_overworld.cpp:594
+#: src/states_screens/race_gui_overworld.cpp:666
 msgid "Press fire to start the challenge"
 msgstr "Sakatu tiroa txapelketa hasteko"
 
-#: src/states_screens/race_result_gui.cpp:175
-msgid "Continue."
-msgstr "Jarraitu."
+#: src/states_screens/race_result_gui.cpp:176
+msgid "Quit the server"
+msgstr "Irten zerbitzaritik"
 
-#: src/states_screens/race_result_gui.cpp:178
-msgid "Quit the server."
-msgstr "Irten zerbitzaritik."
-
-#: src/states_screens/race_result_gui.cpp:195
+#: src/states_screens/race_result_gui.cpp:187
 msgid "You completed challenges!"
 msgstr "Erronkak bete dituzu!"
 
-#: src/states_screens/race_result_gui.cpp:208
+#: src/states_screens/race_result_gui.cpp:203
 msgid "Abort Grand Prix"
 msgstr "Bertan behera utzi txapelketa"
 
-#: src/states_screens/race_result_gui.cpp:218
+#: src/states_screens/race_result_gui.cpp:219
 msgid "Restart"
 msgstr "Hasi berriro"
 
-#: src/states_screens/race_result_gui.cpp:224
+#: src/states_screens/race_result_gui.cpp:225
 msgid "Back to challenge selection"
 msgstr "Itzuli erronka hautapenera"
 
 #: src/states_screens/race_result_gui.cpp:230
+msgid "Race against the new ghost replay"
+msgstr "Lasterketa mamu errepikapen berriaren aurka"
+
+#: src/states_screens/race_result_gui.cpp:234
 msgid "Back to the menu"
 msgstr "Itzuli menura"
 
-#: src/states_screens/race_result_gui.cpp:372
+#: src/states_screens/race_result_gui.cpp:379
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Ziur zaude txapelketa bertan behera utzi nahi duzula?"
 
-#: src/states_screens/race_result_gui.cpp:499
-#: src/states_screens/race_result_gui.cpp:865
-msgid "Eliminated"
-msgstr "Kanporatua"
+#: src/states_screens/race_result_gui.cpp:464
+msgid "Network grand prix has been finished."
+msgstr "Sareko txapelketa bukatu da."
 
-#: src/states_screens/race_result_gui.cpp:1012
+#: src/states_screens/race_result_gui.cpp:497
+#: src/states_screens/race_result_gui.cpp:1231
 msgid "Red Team Wins"
 msgstr "Talde gorriak irabazi du"
 
-#: src/states_screens/race_result_gui.cpp:1016
+#: src/states_screens/race_result_gui.cpp:499
+#: src/states_screens/race_result_gui.cpp:1235
 msgid "Blue Team Wins"
 msgstr "Talde urdinak irabazi du"
 
-#: src/states_screens/race_result_gui.cpp:1021
+#: src/states_screens/race_result_gui.cpp:501
+#: src/states_screens/race_result_gui.cpp:1240
 msgid "It's a draw"
 msgstr "Berdinketa"
 
+#: src/states_screens/race_result_gui.cpp:563
+#: src/states_screens/race_result_gui.cpp:602
+#: src/states_screens/race_result_gui.cpp:700
+#: src/states_screens/race_result_gui.cpp:1084
+msgid "Eliminated"
+msgstr "Kanporatua"
+
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1098
-#: src/states_screens/race_result_gui.cpp:1154
+#: src/states_screens/race_result_gui.cpp:1311
+#: src/states_screens/race_result_gui.cpp:1360
 msgid "(Own Goal)"
 msgstr "(Norberaren helburua)"
 
-#: src/states_screens/race_result_gui.cpp:1220
+#: src/states_screens/race_result_gui.cpp:1426
 #, c-format
 msgid "Track %i/%i"
 msgstr "%i%i zirkuitua"
 
-#: src/states_screens/race_result_gui.cpp:1304
+#: src/states_screens/race_result_gui.cpp:1510
 msgid "Grand Prix progress:"
 msgstr "Txapelketaren egoera:"
 
-#: src/states_screens/race_result_gui.cpp:1346
+#: src/states_screens/race_result_gui.cpp:1554
 msgid "Highscores"
 msgstr "Puntuazio onenak"
 
-#: src/states_screens/race_result_gui.cpp:1432
-#, c-format
-msgid "Difficulty: %s"
-msgstr "Zailtasuna: %s"
-
-#: src/states_screens/race_result_gui.cpp:1440
+#: src/states_screens/race_result_gui.cpp:1648
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Bira denborarik onena: %s"
@@ -3951,111 +4719,156 @@ msgstr "Arakatu zirkuituak ezkutuko arrautza guztiak aurkitzeko"
 msgid "Race against ghost karts and try to beat them!"
 msgstr "Lasterketa kart mamuen aurka eta saiatu mamuak irabazten!"
 
-#: src/states_screens/register_screen.cpp:218
-#: src/states_screens/register_screen.cpp:225
+#: src/states_screens/register_screen.cpp:120
+#: src/states_screens/user_screen.cpp:113
+msgid "Exit game"
+msgstr "Irten jokotik"
+
+#: src/states_screens/register_screen.cpp:232
+#: src/states_screens/register_screen.cpp:239
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "Ezin izan da '%s' jokalaria sortu."
 
-#: src/states_screens/register_screen.cpp:277
+#: src/states_screens/register_screen.cpp:256
+msgid "User name cannot be empty."
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:298
 msgid "Emails don't match!"
 msgstr "E-postak ez datoz bat"
 
-#: src/states_screens/register_screen.cpp:281
+#: src/states_screens/register_screen.cpp:302
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Lineako erabiltzaile-izenak 3 eta 30 karaktere artean izan behar ditu!"
 
-#: src/states_screens/register_screen.cpp:285
+#: src/states_screens/register_screen.cpp:306
 msgid "Online username must not start with a number!"
 msgstr "Lineako erabiltzaile-izenak ezin du zenbaki batekin hasi!"
 
-#: src/states_screens/register_screen.cpp:293
+#: src/states_screens/register_screen.cpp:314
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Posta helbideak 5 eta 254 karaktere artean izan behar ditu."
 
-#: src/states_screens/register_screen.cpp:299
+#: src/states_screens/register_screen.cpp:320
 msgid "Email is invalid!"
 msgstr "E-posta baliogabea"
 
-#: src/states_screens/register_screen.cpp:362
+#: src/states_screens/register_screen.cpp:383
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "E-posta bat jasoko duzu argibide gehiagorekin zure kontua aktibatzeko. Izan pazientzia eta egon ziur zure zabor posta karpeta ere begiratu duzula."
 
-#: src/states_screens/register_screen.cpp:402
-#: src/states_screens/user_screen.cpp:338
+#: src/states_screens/register_screen.cpp:423
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Interneteko sarbidea desgaituta dago, mesedez gaitu aukeretan"
 
-#: src/states_screens/server_selection.cpp:79
-#: src/states_screens/server_selection.cpp:247
+#. I18N: In server selection screen, owner of server, only displayed
+#. if it's localhost or friends'
+#: src/states_screens/server_selection.cpp:127
+msgid "Owner"
+msgstr "Jabea"
+
+#. I18N: In server selection screen, distance to server
+#: src/states_screens/server_selection.cpp:129
+msgid "Distance (km)"
+msgstr "Distantzia (Km)"
+
+#. I18N: In server selection screen, unknown distance to server
+#: src/states_screens/server_selection.cpp:214
+msgid "Unknown"
+msgstr "Ezezaguna"
+
+#: src/states_screens/server_selection.cpp:322
+msgid "No server is available."
+msgstr "Ez dago zerbitzaririk erabilgarri."
+
+#: src/states_screens/server_selection.cpp:330
 msgid "Fetching servers"
 msgstr "Zerbitzariak eskuratzen"
 
-#. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:144
-msgid "all"
-msgstr "guztiak"
-
-#: src/states_screens/tracks_and_gp_screen.cpp:195
-msgid "Locked!"
-msgstr "Giltzatuta!"
-
-#: src/states_screens/tracks_and_gp_screen.cpp:278
-#: src/states_screens/tracks_screen.cpp:227
-msgid "Locked: solve active challenges to gain access to more!"
-msgstr "Blokeatua: irabazi erronka aktiboak gehiagoetara sarrera lortzeko!"
-
-#: src/states_screens/tracks_screen.cpp:194
-msgid "Only official tracks are supported."
-msgstr "Zirkuitu ofizialak bakarrik onartzen dira."
-
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:112
+#: src/states_screens/track_info_screen.cpp:110
 #, c-format
 msgid "Track by %s"
 msgstr "Zirkuituaren egilea: %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:120
+#: src/states_screens/track_info_screen.cpp:118
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Onartutako jokalari maximoa: %d"
 
 #. I18N: In the track info screen
-#: src/states_screens/track_info_screen.cpp:213
+#. I18N: In track screen
+#: src/states_screens/track_info_screen.cpp:216
+#: src/states_screens/tracks_screen.cpp:328
 msgid "Drive in reverse"
 msgstr "Gidatu alderantzizko aldera"
 
 #. I18N: In the track info screen
-#: src/states_screens/track_info_screen.cpp:218
+#. I18N: In track screen
+#: src/states_screens/track_info_screen.cpp:221
+#: src/states_screens/tracks_screen.cpp:266
+#: src/states_screens/tracks_screen.cpp:302
 msgid "Random item location"
 msgstr "Elementuaren ausazko kokapena"
 
-#: src/states_screens/user_screen.cpp:111
-msgid "Exit game"
-msgstr "Irten jokotik"
+#. I18N: track group name
+#: src/states_screens/tracks_and_gp_screen.cpp:141
+msgid "all"
+msgstr "guztiak"
 
-#: src/states_screens/user_screen.cpp:484
+#: src/states_screens/tracks_and_gp_screen.cpp:192
+msgid "Locked!"
+msgstr "Giltzatuta!"
+
+#: src/states_screens/tracks_and_gp_screen.cpp:275
+#: src/states_screens/tracks_screen.cpp:397
+msgid "Locked: solve active challenges to gain access to more!"
+msgstr "Blokeatua: irabazi erronka aktiboak gehiagoetara sarrera lortzeko!"
+
+#. I18N: In track screen for networking, clarify voting phase
+#: src/states_screens/tracks_screen.cpp:177
+msgid ""
+"If a majority of players all select the same track and race settings, voting"
+" will end early."
+msgstr ""
+
+#. I18N: In tracks screen, about voting of tracks in network
+#: src/states_screens/tracks_screen.cpp:491
+#, c-format
+msgid "Remaining time: %d"
+msgstr ""
+
+#: src/states_screens/user_screen.cpp:344
+msgid "Internet access is disabled. Do you want to enable it?"
+msgstr ""
+
+#: src/states_screens/user_screen.cpp:537
 msgid "You need to enter a password."
 msgstr "Pasahitza sartu behar duzu."
 
-#: src/states_screens/user_screen.cpp:505
+#: src/states_screens/user_screen.cpp:558
 #, c-format
 msgid "Logging out '%s'"
 msgstr "'%s' saioa amaitzen"
 
-#: src/states_screens/user_screen.cpp:506
+#: src/states_screens/user_screen.cpp:559
 #, c-format
 msgid "Logging in '%s'"
 msgstr "'%s'(e)n saioa hasten"
 
+#: src/states_screens/user_screen.cpp:640
+msgid "You can't delete the only player."
+msgstr "Ezin duzu dagoen jokalari bakarra ezabatu."
+
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/user_screen.cpp:595
+#: src/states_screens/user_screen.cpp:648
 #, c-format
-msgid "Do you really want to delete player '%s' ?"
+msgid "Do you really want to delete player '%s'?"
 msgstr "Ziur '%s' jokalaria ezabatu nahi duzula?"
 
 #. I18N: Format for dates (%d = day, %m = month, %Y = year). See
@@ -4068,15 +4881,15 @@ msgstr "%Y/%m/%d"
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:376
+#: src/utils/translation.cpp:409
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
-#: ../stk-assets/tracks/overworld/scripting.as:15
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
 msgstr "Bete erronka guztiak ate handia irekitzeko!"
 
-#: ../stk-assets/tracks/overworld/scripting.as:63
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:63
 msgid ""
 "You need more points\n"
 "to enter this challenge!\n"
@@ -4084,71 +4897,71 @@ msgid ""
 "available challenges."
 msgstr "Puntu gehiago behar dira\nerronka honetan sartzeko!\nIkusi mini-mapan\nerronka jokagarriak."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:21
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:21
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr "Azeleratu <%s>(r)ekin eta gidatu <%s> eta <%s>(r)ekin"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
-#: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:37
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:38
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr "Bildu opari kutxak eta egin tiro armarekin <%s> erabiliz kutxa hauek lehertzeko!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
-#: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:43
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:44
 #, c-format
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
 msgstr "Sakatu <%s> atzera begiratzeko. egin tiro <%s> sakatuz <%s> ere sakatzean atzerantz tiro egiteko!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
-#: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:53
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:54
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Erabili bildutako nitroak <%s> sakatuz!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:58
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:58
 msgid "Collect nitro bottles (we will use them after the curve)."
 msgstr "Bildu nitro botilak (kurbaren ondoren erabiliko ditugu)"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:63
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:63
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr "Oops! Arazotan zaudenean sakatu  <%s> erreskata zaitzaten"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
-#: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:69
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:70
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
 msgstr "Azeleratu eta sakatu <%s> biratu bitartean irristatzeko. Aldi batez irristatzeak bihurgune itxiak azkarrago hartzen lagun zaitzake."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
-#: ../stk-assets/tracks/tutorial/triggers.as:78
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:77
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:78
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr "Kontutan izan zenbait segundoz irristatzea lortzen baduzu abiadura bizkortze bat jasoko duzula sari bezala!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
-#: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:82
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:83
 msgid "You are now ready to race. Good luck!"
 msgstr "Lasterketa asteko prest zaude. Zorte on!"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:28
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:28
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
 msgstr "Azeleratu <%s>(r)ekin eta gidatu <%s> eta <%s>(r)ekin"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:59
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:59
 msgid "Collect nitro bottles (we will use them after the curve)"
 msgstr "Bildu nitro botilak (kurbaren ondoren erabiliko ditugu)"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:64
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:64
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oops! Arazotan zaudenean sakatu  <%s> erreskata zaitzaten"

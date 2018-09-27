@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Options" text_align="center"/>
+        <spacer width="100%" height="1%"/>
+
+        <div width="100%" height="92%" layout="horizontal-row" >
+
+            <vertical-tabs id="options_choice" height="100%" width="18%">
+                <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
+                        I18N="Section in the settings menu" text="Graphics"/>
+                <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
+                        I18N="Section in the settings menu" text="Audio"/>
+                <icon-button id="tab_ui" width="128" height="128" icon="gui/icons/options_ui.png"
+                        I18N="Section in the settings menu" text="User Interface"/>
+                <icon-button id="tab_players" width="128" height="128" icon="gui/icons/options_players.png"
+                        I18N="Section in the settings menu" text="Players"/>
+                <icon-button id="tab_controls" width="128" height="128" icon="gui/icons/options_input.png"
+                        I18N="Section in the settings menu" text="Controls"/>
+                <icon-button id="tab_language" width="128" height="128" icon="gui/icons/options_language.png"
+                        I18N="Section in the settings menu" text="Language"/>
+            </vertical-tabs>
+
+            <spacer width="2%" height="100%"/>
+
+            <box width="80%" height="100%" layout="vertical-row">
+
+                <spacer height="2%" width="10"/>
+
+                <scrollable_ribbon id="players" height="18%" y="10" x="10" width="98%" align="center" label_location="each"
+                                   square_items="true" child_width="128" child_height="128" />
+
+                <spacer height="2%" width="10"/>
+                <div width="90%" align="center" layout="vertical-row" proportion="1">
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <checkbox width="fit" id="online" I18N="In the user screen" text_align="left"/>
+                        <spacer width="10"/>
+                        <label proportion="1" height="100%" text_align="left" I18N="In the user screen" text="Online"/>
+                    </div>
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <checkbox width="fit" id="remember-user" I18N="In the user screen" text_align="left"/>
+                        <spacer width="10"/>
+                        <label proportion="1" id="label_remember" height="100%" text_align="left"
+                                  I18N="In the user screen" text="Remember password"/>
+                    </div>
+                    <!-- Disable guest accounts for now
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label width="40%" id="label_guest" height="100%" text_align="left"
+                               I18N="In the user screen" text="Guest login"/>
+                        <checkbox id="guest" I18N="In the user screen" text_align="left"/>
+                    </div>
+                    -->
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label width="40%" id="label_username" height="100%" text_align="left"
+                               I18N="In the user screen" text="Username"/>
+                        <textbox id="username" proportion="2" height="fit" I18N="In the user screen"/>
+                    </div>
+                    <spacer height="5%" width="20"/>
+
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label id="label_password" width="40%" height="100%" text_align="left"
+                               I18N="In the user screen" text="Password"/>
+                        <textbox id="password" proportion="2" height="fit" I18N="In the user screen"/>
+                    </div>
+                    
+                    <spacer height="5%" width="20"/>
+
+                    <button id="password_reset" width="fit" text="Reset password"/>
+
+                    <spacer height="5%" width="20"/>
+                    
+                    <label id="message" width="100%" text_align="center"/>
+                </div>
+                
+                <spacer width="20" height="2%"/>
+
+                <div width="100%" align="center" layout="vertical-row" height="18%">
+                    <buttonbar id="options" width="100%" height="100%" align="center">
+                        <icon-button id="ok" width="fit" height="fit" icon="gui/icons/green_check.png"
+                                     I18N="In the user screen" text="OK" label_location="bottom"/>
+                        <icon-button id="new_user" width="fit" height="fit" icon="gui/icons/blue_plus.png"
+                                     I18N="In the user screen" text="Add" label_location="bottom"/>
+                        <icon-button id="delete" width="fit" height="fit" icon="gui/icons/remove.png"
+                                     I18N="In the user screen" text="Delete" label_location="bottom"/>
+                        <icon-button id="rename" width="fit" height="fit" icon="gui/icons/rename.png"
+                                     I18N="In the user screen" text="Rename" label_location="bottom"/>
+                        <icon-button id="default_kart_color" width="fit" height="fit" icon="gui/icons/edit.png"
+                                     I18N="In the user screen" text="Kart color" label_location="bottom"/>
+                        <icon-button id="cancel" width="fit" height="fit" icon="gui/icons/main_quit.png"
+                                     I18N="In the user screen" text="Cancel" label_location="bottom"/>
+                    </buttonbar>
+                </div>
+                <spacer width="20" height="5%"/>
+            </box>
+        </div>
+    </div>
+</stkgui>

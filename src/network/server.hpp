@@ -52,6 +52,8 @@ protected:
 
     std::string m_server_owner_lower_case_name;
 
+    std::string m_lower_case_player_names;
+
     uint32_t m_server_id;
     uint32_t m_server_owner;
 
@@ -89,9 +91,9 @@ protected:
 
     bool m_game_started;
 
-    std::vector<std::pair</*lower case username*/std::string, std::tuple<
+    std::vector<std::tuple<
         /*rank*/int, core::stringw, /*scores*/double, /*playing time*/float
-        > > > m_players;
+        > > m_players;
 
 public:
 
@@ -145,9 +147,8 @@ public:
     // ------------------------------------------------------------------------
     bool isGameStarted() const                       { return m_game_started; }
     // ------------------------------------------------------------------------
-    const std::vector<std::pair<std::string,
-        std::tuple<int, core::stringw, double, float> > >& getPlayers() const
-                                                          { return m_players; }
+    const std::vector<std::tuple<int, core::stringw, double, float> >&
+        getPlayers() const                                { return m_players; }
     // ------------------------------------------------------------------------
     void setServerId(unsigned id)                         { m_server_id = id; }
     // ------------------------------------------------------------------------
@@ -158,18 +159,13 @@ public:
     bool searchByName(const std::string& lower_case_word)
     {
         auto list = StringUtils::split(lower_case_word, ' ', false);
-        bool server_name_found = false;
+        bool server_name_found = true;
         for (auto& word : list)
         {
-            server_name_found =
-                m_lower_case_name.find(word) != std::string::npos;
-            if (server_name_found)
-                break;
-            for (auto& p : m_players)
-            {
-                if (p.first.find(word) != std::string::npos)
-                    return true;
-            }
+            const std::string& for_search = m_lower_case_name +
+                m_lower_case_player_names;
+            server_name_found = server_name_found &&
+                for_search.find(word) != std::string::npos;
         }
         return server_name_found;
     }

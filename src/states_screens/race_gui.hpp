@@ -91,6 +91,16 @@ private:
     /** Height of the digit font. */
     int              m_font_height;
 
+    /** Icon textures (stored as variables to not look up
+        their location on every frame) */
+    irr::video::ITexture *m_lap_flag;
+    irr::video::ITexture *m_red_team;
+    irr::video::ITexture *m_blue_team;
+    irr::video::ITexture *m_red_flag;
+    irr::video::ITexture *m_blue_flag;
+    irr::video::ITexture *m_soccer_ball;
+    irr::video::ITexture *m_heart_icon;
+
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
     enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};

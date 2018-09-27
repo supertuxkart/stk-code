@@ -1,6 +1,8 @@
 # Online networking games for STK
 
 ## Hosting server
+First of all, you can compile STK with `-DSERVER_ONLY=ON` which will produce a GUI-less STK binary optimized for size and memory usage, useful for situation like in VPS.
+
 ### Hosting WAN (public internet) server
 You are required to have an stk online account first, go [here](https://addons.supertuxkart.net/register.php) for registration.
 
@@ -36,7 +38,7 @@ The current server configuration xml looks like this:
     <!-- Number of grand prix tracks per game (If grand prix enabled). -->
     <gp-track-count value="3" />
 
-    <!-- Use goal torget in soccer. -->
+    <!-- Use goal target in soccer. -->
     <soccer-goal-target value="false" />
 
     <!-- Enable wan server, which requires you to have an stk-addons account with a saved session. Check init-user command for details. -->
@@ -69,11 +71,11 @@ The current server configuration xml looks like this:
     <!-- No server owner in lobby which can control the starting of game or kick any players. -->
     <owner-less value="false" />
 
-    <!-- Time to wait before entering kart selection screen if satisfied start-game-threshold below for owner less or ranked server. -->
+    <!-- Time to wait before entering kart selection screen if satisfied min-start-game-players below for owner less or ranked server. -->
     <start-game-counter value="30" />
 
-    <!-- Only auto start kart selection when number of connected player is larger than max player * this value, for owner less or ranked server, after start-game-counter. -->
-    <start-game-threshold value="0.5" />
+    <!-- Only auto start kart selection when number of connected player is larger than or equals this value, for owner less or ranked server, after start-game-counter reaches 0. -->
+    <min-start-game-players value="2" />
 
     <!-- Automatically end linear race game after 1st player finished for some time (currently his finished time * 0.25 + 15.0). -->
     <auto-end value="false" />
@@ -123,16 +125,17 @@ The current server configuration xml looks like this:
 
 </server-config>
 
+
 ```
 
-At the moment STK has a list of STUN servers for NAT penetration which allows players or servers behind a firewall or router to make connectable to each other, but in case it doesn't work, you have to manually disable firewall / do a port-forward for the server port STK using.
-By default STK uses `2759` for server port, for example in Ubuntu alike Linux distribution do the following to disable firewall on such port:
+At the moment STK has a list of STUN servers for NAT penetration which allows players or servers behind a firewall or router to be able to connect to each other, but in case it doesn't work, you have to manually disable the firewall or port forward the port(s) used by the STK.
+By default STK servers use port `2759`. For example, in Ubuntu based distributions, run the following command to disable the firewall on that port:
 
 `sudo ufw allow 2759`
 
 You may also need to handle the server discovery port `2757` for connecting your WAN server in LAN / localhost.
 
-Notice: You don't need to make any firewall or router configuration if you connect to our official servers.
+Notice: You don't need to make any firewall or router configuration changes if you connect to our official servers.
 
 ### Hosting LAN (local internet) server
 Everything is basically the same as WAN one, except you don't need an stk online account, just do:
@@ -148,3 +151,21 @@ After the first time configuration, you can just start the server with the comma
 
 You can find out that directory location [here (See Where is the configuration stored?)](https://supertuxkart.net/FAQ)
 
+## Testing server
+There is a network AI tester in STK which can use AI on player controller for server hosting linear races game mode, which helps automating the testing for servers, to enable it use:
+
+`supertuxkart --connect-now=x.x.x.x:y --server-id=id --network-ai=n --auto-connect --no-graphics`
+
+x.x.x.x:y is your server ip address with its port, id is the id field of server-info in STK server xml list, omit it if you are testing LAN server, n is the number of AI you want to create.
+
+You can see STK server xml list [here](https://addons.supertuxkart.net/api/v2/server/get-all).
+
+The server you want to test must be able to be connected without NAT penetration. You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
+
+With the network AI tester, it's easier to for example simulate high-loaded servers or bad (high ping with packet loss) network.
+
+Tested on a Raspberry Pi 3 Model B+, if you have 8 players connected to a server hosted on it, the usage of a single CPU core is ~60% and there are ~60MB of memory usage for game with heavy tracks like Cocoa Temple or Candela City on the server, you can use the above figures to consider number of STK servers hosting on a same computer.
+
+For bad network simulation, we recommend `network traffic control` by linux kernel, see [here](https://wiki.linuxfoundation.org/networking/netem) for details.
+
+You have the best gaming experience when choosing server less than 100ms ping with no packet loss.

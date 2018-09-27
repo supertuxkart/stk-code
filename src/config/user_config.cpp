@@ -41,6 +41,7 @@ static std::vector<UserConfigParam*> all_params;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
@@ -53,9 +54,12 @@ const int UserConfig::m_current_config_version = 8;
 // ----------------------------------------------------------------------------
 UserConfigParam::~UserConfigParam()
 {
-    // Now we have server config param so we cannot do this anymore,
-    // esp all params are kept until the closing of stk anyway
-    //all_params.remove(this);
+    if (m_can_be_deleted)
+    {
+        auto it = std::find(all_params.begin(), all_params.end(), this);
+        if (it != all_params.end())
+            all_params.erase(it);
+    }
 }   // ~UserConfigParam
 
 // ----------------------------------------------------------------------------

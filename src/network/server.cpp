@@ -75,30 +75,26 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
         const XMLNode* player_info = players->getNode(i);
         assert(player_info->getName() == "player-info");
         std::string username;
-        std::pair<std::string, std::tuple<int, core::stringw, double, float> >
-            p;
-        auto& t = p.second;
+        std::tuple<int, core::stringw, double, float> t;
         // Default rank and scores if none
         std::get<0>(t) = -1;
         std::get<2>(t) = 2000.0;
         player_info->get("rank", &std::get<0>(t));
         player_info->get("username", &username);
         std::get<1>(t) = StringUtils::utf8ToWide(username);
-        p.first = StringUtils::toLowerCase(username);
+        m_lower_case_player_names += StringUtils::toLowerCase(username);
         player_info->get("scores", &std::get<2>(t));
         float time_played = 0.0f;
         player_info->get("time-played", &time_played);
         std::get<3>(t) = time_played;
-        m_players.emplace_back(std::move(p));
+        m_players.push_back(t);
     }
     // Sort by rank
     std::sort(m_players.begin(), m_players.end(),
-        [](const std::pair<std::string,
-        std::tuple<int, core::stringw, double, float> >& a,
-        const std::pair<std::string,
-        std::tuple<int, core::stringw, double, float> >& b)->bool
+        [](const std::tuple<int, core::stringw, double, float>& a,
+        const std::tuple<int, core::stringw, double, float>& b)->bool
         {
-            return std::get<0>(a.second) < std::get<0>(b.second);
+            return std::get<0>(a) < std::get<0>(b);
         });
 
     // Show owner name as Official right now if official server hoster account

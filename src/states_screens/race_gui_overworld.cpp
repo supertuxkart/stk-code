@@ -81,10 +81,10 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
-    m_trophy1 = irr_driver->getTexture(FileManager::GUI, "cup_bronze.png");
-    m_trophy2 = irr_driver->getTexture(FileManager::GUI, "cup_silver.png");
-    m_trophy3 = irr_driver->getTexture(FileManager::GUI, "cup_gold.png"  );
-    m_trophy4 = irr_driver->getTexture(FileManager::GUI, "cup_platinum.png"  );
+    m_trophy1 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
+    m_trophy2 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_silver.png");
+    m_trophy3 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
+    m_trophy4 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
     float scaling = irr_driver->getFrameSize().Height / 420.0f;
     const float map_size = 250.0f;
@@ -153,9 +153,9 @@ RaceGUIOverworld::RaceGUIOverworld()
     gui::ScalableFont* font = GUIEngine::getFont();
     m_trophy_points_width = font->getDimension(L"1000").Width;
 
-    m_lock           = irr_driver->getTexture(FileManager::GUI,"gui_lock.png");
-    m_open_challenge = irr_driver->getTexture(FileManager::GUI,"challenge.png");
-    m_locked_bonus   = irr_driver->getTexture(FileManager::GUI,"mystery_unlock.png");
+    m_lock           = irr_driver->getTexture(FileManager::GUI_ICON,"gui_lock.png");
+    m_open_challenge = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
+    m_locked_bonus   = irr_driver->getTexture(FileManager::GUI_ICON,"mystery_unlock.png");
 
     m_icons[0] = m_lock;
     m_icons[1] = m_open_challenge;

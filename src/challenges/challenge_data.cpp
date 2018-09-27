@@ -39,6 +39,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_mode         = CM_SINGLE_RACE;
     m_minor        = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_num_laps     = -1;
+    m_reverse      = false;
     m_track_id     = "";
     m_gp_id        = "";
     m_version      = 0;
@@ -182,6 +183,12 @@ ChallengeData::ChallengeData(const std::string& filename)
         {
             error("laps");
         }
+        if (!track_node->get("reverse", &m_reverse))
+        {
+            Log::warn("Challenge Data",
+                      "No reverse mode specified for challenge %s, defaulting to normal",
+                      filename.c_str());
+        }
     }
     else if (gp_node != NULL)
     {
@@ -282,6 +289,10 @@ const irr::core::stringw ChallengeData::getChallengeDescription() const
         {
             // Follow the leader mode:
             description = _("Follow the leader");
+        }
+        if (m_reverse == true)
+        {
+            description += _("Reverse");
         }
     }
     return description;
@@ -397,6 +408,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setMinorMode(m_minor);
         race_manager->setTrack(m_track_id);
         race_manager->setNumLaps(m_num_laps);
+        race_manager->setReverseTrack(m_reverse);
         race_manager->setNumKarts(m_default_num_karts[d]);
         race_manager->setNumPlayers(1);
         race_manager->setCoinTarget(m_energy[d]);
@@ -423,7 +435,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
     if (m_is_ghost_replay)
     {
         const bool result = ReplayPlay::get()->addReplayFile(file_manager
-            ->getAsset(FileManager::CHALLENGE, m_replay_files[d]),
+            ->getAsset(FileManager::REPLAY, m_replay_files[d]),
             true/*custom_replay*/);
         if (!result)
             Log::fatal("ChallengeData", "Can't open replay for challenge!");
@@ -460,7 +472,7 @@ bool ChallengeData::isChallengeFulfilled() const
 
     if (kart->isEliminated()                                    ) return false;
     if (track_name != m_track_id                                ) return false;
-    if ((int)world->getNumKarts() < m_default_num_karts[d]              ) return false;
+    if ((int)world->getNumKarts() < m_default_num_karts[d]      ) return false;
     if (m_energy[d] > 0   && kart->getEnergy() < m_energy[d]    ) return false;
     if (m_position[d] > 0 && kart->getPosition() > m_position[d]) return false;
 

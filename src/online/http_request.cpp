@@ -30,7 +30,6 @@
 
 namespace Online
 {
-    std::string HTTPRequest::m_cert_location;
     struct curl_slist* HTTPRequest::m_http_header = NULL;
     const std::string API::USER_PATH = "user/";
     const std::string API::SERVER_PATH = "server/";
@@ -96,11 +95,6 @@ namespace Online
         m_parameters    = "";
         m_curl_code     = CURLE_OK;
         m_progress.setAtomic(0);
-        if (m_cert_location.empty())
-        {
-            m_cert_location =
-                file_manager->getAsset("addons.supertuxkart.net.pem");
-        }
         if (m_http_header == NULL)
         {
             m_http_header = curl_slist_append(m_http_header,
@@ -191,12 +185,13 @@ namespace Online
             assert(m_http_header != NULL);
             curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER,
                 m_http_header);
+            const std::string& ci = file_manager->getCertLocation();
             CURLcode error = curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
-                m_cert_location.c_str());
+                ci.c_str());
             if (error != CURLE_OK)
             {
                 Log::error("HTTPRequest", "Error setting CAINFO to '%s'",
-                    m_cert_location.c_str());
+                    ci.c_str());
                 Log::error("HTTPRequest", "Error: '%s'.", error,
                     curl_easy_strerror(error));
             }
@@ -281,20 +276,7 @@ namespace Online
         } // end log http request
 
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
-        std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
-            #ifdef WIN32
-                    uagent += (std::string)" (Windows)";
-            #elif defined(__APPLE__)
-                    uagent += (std::string)" (Macintosh)";
-            #elif defined(__FreeBSD__)
-                    uagent += (std::string)" (FreeBSD)";
-            #elif defined(ANDROID)
-                    uagent += (std::string)" (Android)";
-            #elif defined(linux)
-                    uagent += (std::string)" (Linux)";
-            #else
-                    // Unknown system type
-            #endif
+        const std::string& uagent = StringUtils::getUserAgentString();
         curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
 
         m_curl_code = curl_easy_perform(m_curl_session);

@@ -1560,11 +1560,14 @@ void SkiddingAI::handleRaceStart()
                ? 0.0f  : m_ai_properties->m_false_start_probability;
 
         // Now check for a false start. If so, add 1 second penalty time.
-        if(rand() < RAND_MAX * false_start_probability)
+        if (rand() < RAND_MAX * false_start_probability)
         {
             m_start_delay+=stk_config->m_penalty_ticks;
             return;
         }
+        m_kart->setStartupBoost(m_kart->getStartupBoostFromStartTicks(
+            m_start_delay + stk_config->time2Ticks(1.0f)));
+        m_start_delay = 0;
     }
 }   // handleRaceStart
 
@@ -1576,7 +1579,7 @@ void SkiddingAI::handleRescue(const float dt)
 {
     // check if kart is stuck
     if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() &&
-        !m_world->isStartPhase())
+        !m_world->isStartPhase() && m_start_delay == 0)
     {
         m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)

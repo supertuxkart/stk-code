@@ -74,9 +74,9 @@ std::string Crypto::m_client_iv;
 bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
 {
     std::vector<uint8_t> cipher(ns.m_buffer.size() + 4, 0);
-    gcm_aes128_encrypt(&m_aes_context, ns.m_buffer.size(), cipher.data() + 4,
-        ns.m_buffer.data());
-    gcm_aes128_digest(&m_aes_context, 4, cipher.data());
+    gcm_aes128_encrypt(&m_aes_encrypt_context, ns.m_buffer.size(),
+        cipher.data() + 4, ns.m_buffer.data());
+    gcm_aes128_digest(&m_aes_encrypt_context, 4, cipher.data());
     std::swap(ns.m_buffer, cipher);
     return true;
 }   // encryptConnectionRequest
@@ -88,9 +88,9 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
     uint8_t* tag = ns.m_buffer.data();
     std::array<uint8_t, 4> tag_after = {};
 
-    gcm_aes128_decrypt(&m_aes_context, ns.m_buffer.size() - 4, pt.data(),
-        ns.m_buffer.data() + 4);
-    gcm_aes128_digest(&m_aes_context, 4, tag_after.data());
+    gcm_aes128_decrypt(&m_aes_decrypt_context, ns.m_buffer.size() - 4,
+        pt.data(), ns.m_buffer.data() + 4);
+    gcm_aes128_digest(&m_aes_decrypt_context, 4, tag_after.data());
     handleAuthentication(tag, tag_after);
 
     std::swap(ns.m_buffer, pt);
@@ -108,20 +108,24 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
     if (p == NULL)
         return NULL;
 
-    std::array<uint8_t, 12> iv = m_iv;
+    std::array<uint8_t, 12> iv = {};
     std::unique_lock<std::mutex> ul(m_crypto_mutex);
-    uint32_t val = NetworkConfig::get()->isClient() ?
-        m_packet_counter++ : m_packet_counter--;
-    memcpy(iv.data(), &val, 4);
+
+    uint32_t val = ++m_packet_counter;
+    if (NetworkConfig::get()->isClient())
+        memcpy(iv.data(), &val, 4);
+    else
+        memcpy(iv.data() + 4, &val, 4);
+
     uint8_t* packet_start = p->data + 8;
 
-    gcm_aes128_set_iv(&m_aes_context, 12, iv.data());
-    gcm_aes128_encrypt(&m_aes_context, ns.m_buffer.size(), packet_start,
-        ns.m_buffer.data());
-    gcm_aes128_digest(&m_aes_context, 4, p->data + 4);
+    gcm_aes128_set_iv(&m_aes_encrypt_context, 12, iv.data());
+    gcm_aes128_encrypt(&m_aes_encrypt_context, ns.m_buffer.size(),
+        packet_start, ns.m_buffer.data());
+    gcm_aes128_digest(&m_aes_encrypt_context, 4, p->data + 4);
     ul.unlock();
 
-    memcpy(p->data, iv.data(), 4);
+    memcpy(p->data, &val, 4);
     return p;
 }   // encryptSend
 
@@ -131,16 +135,20 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     int clen = (int)(p->dataLength - 8);
     auto ns = std::unique_ptr<NetworkString>(new NetworkString(p->data, clen));
 
-    std::array<uint8_t, 12> iv = m_iv;
-    memcpy(iv.data(), p->data, 4);
+    std::array<uint8_t, 12> iv = {};
+    if (NetworkConfig::get()->isClient())
+        memcpy(iv.data() + 4, p->data, 4);
+    else
+        memcpy(iv.data(), p->data, 4);
+
     uint8_t* packet_start = p->data + 8;
     uint8_t* tag = p->data + 4;
     std::array<uint8_t, 4> tag_after = {};
 
-    gcm_aes128_set_iv(&m_aes_context, 12, iv.data());
-    gcm_aes128_decrypt(&m_aes_context, clen, ns->m_buffer.data(),
+    gcm_aes128_set_iv(&m_aes_decrypt_context, 12, iv.data());
+    gcm_aes128_decrypt(&m_aes_decrypt_context, clen, ns->m_buffer.data(),
         packet_start);
-    gcm_aes128_digest(&m_aes_context, 4, tag_after.data());
+    gcm_aes128_digest(&m_aes_decrypt_context, 4, tag_after.data());
     handleAuthentication(tag, tag_after);
 
     NetworkString* result = ns.get();

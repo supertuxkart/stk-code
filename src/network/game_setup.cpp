@@ -216,12 +216,11 @@ void GameSetup::addServerInfo(NetworkString* ns)
     }
     if (ServerConfig::m_owner_less)
     {
-        ns->addFloat(ServerConfig::m_start_game_threshold)
+        ns->addUInt8(ServerConfig::m_min_start_game_players)
             .addFloat(ServerConfig::m_start_game_counter);
     }
     else
-        ns->addFloat(0.0f).addFloat(0.0f);
-    ns->addUInt8(ServerConfig::m_server_max_players);
+        ns->addUInt8(0).addFloat(0.0f);
 
     ns->encodeString16(m_message_of_today);
 }   // addServerInfo

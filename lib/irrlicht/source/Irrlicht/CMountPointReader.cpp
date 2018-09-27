@@ -121,6 +121,9 @@ void CMountPointReader::buildDirectory()
 		io::path full = list->getFullFileName(i);
 		full = full.subString(Path.size(), full.size() - Path.size());
 
+		if (full == "")
+			continue;
+
 		if (!list->isDirectory(i))
 		{
 			addItem(full, list->getFileOffset(i), list->getFileSize(i), false, RealFileNames.size());

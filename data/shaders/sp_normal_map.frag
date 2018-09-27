@@ -4,7 +4,6 @@ in float hue_change;
 in vec3 normal;
 in vec3 tangent;
 in vec2 uv;
-in vec4 world_position;
 
 layout(location = 0) out vec4 o_diffuse_color;
 layout(location = 1) out vec4 o_normal_color;
@@ -13,17 +12,9 @@ layout(location = 1) out vec4 o_normal_color;
 #stk_include "utils/rgb_conversion.frag"
 #stk_include "utils/sp_texture_sampling.frag"
 
-uniform sampler2D g_detail_map;
-
 void main()
 {
-    // Triplanar detail map
-    vec2 xyuv = vec2(world_position.x, world_position.y);
-    float detail = texture(g_detail_map, uv * 32.0).r;
-    detail *= 2.5;
-
     vec4 col = sampleTextureLayer0(uv);
-    col = (col - detail) + 0.5;
     if (hue_change > 0.0)
     {
         float mask = col.a;

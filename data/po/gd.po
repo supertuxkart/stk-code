@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# GunChleoc, 2015-2017
+# GunChleoc, 2015-2018
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012
 # GunChleoc, 2012-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-05 08:17+0800\n"
-"PO-Revision-Date: 2018-09-05 10:58+0000\n"
+"POT-Creation-Date: 2018-09-12 22:54+0200\n"
+"PO-Revision-Date: 2018-09-15 15:38+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/supertuxkart/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -789,8 +789,8 @@ msgstr "Tog bogsaichean tìodhlaic gorma. Bheir iad cumhachdan dhut."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
-#: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:32
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:16
 msgid "Avoid bananas!"
 msgstr "Seachnaich bananathan!"
 
@@ -1058,7 +1058,7 @@ msgid ""
 "crown) decides so. Official servers may auto-start races only when there are"
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon kart or track is allowed only if it exists on all "
-"joinned players and the server."
+"joined players and the server."
 msgstr "Nuair a bhios tu am broinn frithealaiche, tòisichidh an rèis nuair a chuireas an sealbhadair (agus crùn air/oirre) sin roimhe. Chan fhaod frithealaichean oifigeil tòiseachadh air rèis gu fèin-obrachail ach nuair a bhios cluicheadairean gu leòr ann. ’S urrainn dhut an cart agad a thaghadh agus bhòtadh airson na h-ath-shlighe an uairsin. Cha bhi cart no slighe tuilleadain ceadaichte ach nuair a bhios e aig a h-uile cluicheadair agus aig an fhrithealaiche."
 
 #. I18N: ./data/gui/help7.stkgui
@@ -1241,7 +1241,7 @@ msgstr "Facal-faire airson an fhrithealaiche phrìobhaidich (roghainneil)"
 #. I18N: In the server creation screen
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:130
-#: src/states_screens/server_selection.cpp:118
+#: src/states_screens/server_selection.cpp:121
 msgid "Difficulty"
 msgstr "Duilgheas"
 
@@ -1293,21 +1293,21 @@ msgstr "SuperTux"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/server_selection.cpp:119
+#: src/states_screens/server_selection.cpp:122
 msgid "Game mode"
 msgstr "Modh a’ gheama"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:185 src/race/race_manager.hpp:180
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:180
 msgid "Normal Race"
 msgstr "Rèis àbhaisteach"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:187 src/race/race_manager.hpp:182
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:182
 msgid "Time Trial"
 msgstr "An aghaidh na h-ùine"
 
@@ -1319,7 +1319,7 @@ msgstr "Còmhrag"
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:189 src/race/race_manager.hpp:190
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:190
 msgid "Soccer"
 msgstr "Ball-coise"
 
@@ -1331,7 +1331,7 @@ msgstr "Cruthaich"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: Used as a verb, appears on the main networking menu (login button)
-#: src/states_screens/online_screen.cpp:60
+#: src/states_screens/online_screen.cpp:61
 msgid "Login"
 msgstr "Clàradh a-steach"
 
@@ -1383,7 +1383,7 @@ msgstr "Lorg frithealaiche"
 #. I18N: In the online multiplayer screen
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
-#: src/states_screens/create_server_screen.cpp:90
+#: src/states_screens/create_server_screen.cpp:91
 msgid "Create Server"
 msgstr "Cruthaich frithealaiche"
 
@@ -1445,7 +1445,7 @@ msgstr "Cuir a-steach seòladh an fhrithealaiche"
 #. I18N: Networking menu button
 #: src/states_screens/online_profile_base.cpp:112
 #: src/states_screens/online_profile_base.cpp:122
-#: src/states_screens/online_screen.cpp:58
+#: src/states_screens/online_screen.cpp:59
 msgid "Your profile"
 msgstr "Do phròifil"
 
@@ -1654,7 +1654,7 @@ msgstr "Cuir cluicheadair ris"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: src/states_screens/online_profile_achievements.cpp:71
-#: src/states_screens/server_selection.cpp:116
+#: src/states_screens/server_selection.cpp:119
 msgid "Name"
 msgstr "Ainm"
 
@@ -1781,7 +1781,7 @@ msgstr "Eadar-aghaidh"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/ghost_replay_selection.cpp:137
-#: src/states_screens/server_selection.cpp:117
+#: src/states_screens/server_selection.cpp:120
 msgid "Players"
 msgstr "Cluicheadairean"
 
@@ -2139,218 +2139,223 @@ msgstr "Sguab às"
 msgid "Default kart color"
 msgstr "Dath tùsail na cairte"
 
-#. I18N: ../stk-assets/karts/adiumy/kart.xml
+#. I18N: ../supertuxkart-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
 msgstr "Adiumy"
 
-#. I18N: ../stk-assets/karts/amanda/kart.xml
+#. I18N: ../supertuxkart-assets/karts/amanda/kart.xml
 msgid "Amanda"
 msgstr "Amanda"
 
-#. I18N: ../stk-assets/karts/beastie/kart.xml
+#. I18N: ../supertuxkart-assets/karts/beastie/kart.xml
 msgid "Beastie"
 msgstr "Beastie"
 
-#. I18N: ../stk-assets/karts/emule/kart.xml
+#. I18N: ../supertuxkart-assets/karts/emule/kart.xml
 msgid "Emule"
 msgstr "Emule"
 
-#. I18N: ../stk-assets/karts/gavroche/kart.xml
+#. I18N: ../supertuxkart-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
 msgstr "Gavroche"
 
-#. I18N: ../stk-assets/karts/gnu/kart.xml
+#. I18N: ../supertuxkart-assets/karts/gnu/kart.xml
 msgid "Gnu"
 msgstr "Gnu"
 
-#. I18N: ../stk-assets/karts/hexley/kart.xml
+#. I18N: ../supertuxkart-assets/karts/hexley/kart.xml
 msgid "Hexley"
 msgstr "Hexley"
 
-#. I18N: ../stk-assets/karts/kiki/kart.xml
+#. I18N: ../supertuxkart-assets/karts/kiki/kart.xml
 msgid "Kiki"
 msgstr "Kiki"
 
-#. I18N: ../stk-assets/karts/konqi/kart.xml
+#. I18N: ../supertuxkart-assets/karts/konqi/kart.xml
 msgid "Konqi"
 msgstr "Konqi"
 
-#. I18N: ../stk-assets/karts/nolok/kart.xml
+#. I18N: ../supertuxkart-assets/karts/nolok/kart.xml
 msgid "Nolok"
 msgstr "Nolok"
 
-#. I18N: ../stk-assets/karts/pidgin/kart.xml
+#. I18N: ../supertuxkart-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
 msgstr "Pidgin"
 
-#. I18N: ../stk-assets/karts/puffy/kart.xml
+#. I18N: ../supertuxkart-assets/karts/puffy/kart.xml
 msgid "Puffy"
 msgstr "Puffy"
 
-#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+#. I18N: ../supertuxkart-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
 msgstr "An rèisear Sara"
 
-#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+#. I18N: ../supertuxkart-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
 msgstr "A’ bhan-draoidh Sara"
 
-#. I18N: ../stk-assets/karts/suzanne/kart.xml
+#. I18N: ../supertuxkart-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
 msgstr "Suzanne"
 
-#. I18N: ../stk-assets/karts/tux/kart.xml
+#. I18N: ../supertuxkart-assets/karts/tux/kart.xml
 msgid "Tux"
 msgstr "Tux"
 
-#. I18N: ../stk-assets/karts/wilber/kart.xml
+#. I18N: ../supertuxkart-assets/karts/wilber/kart.xml
 msgid "Wilber"
 msgstr "Wilber"
 
-#. I18N: ../stk-assets/karts/xue/kart.xml
+#. I18N: ../supertuxkart-assets/karts/xue/kart.xml
 msgid "Xue"
 msgstr "Xue"
 
-#. I18N: ../stk-assets/tracks/abyss/track.xml
+#. I18N: ../supertuxkart-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
 msgstr "Aigeann aigneach"
 
-#. I18N: ../stk-assets/tracks/battleisland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
 msgstr "Eilean a’ bhlàir"
 
-#. I18N: ../stk-assets/tracks/candela_city/track.xml
+#. I18N: ../supertuxkart-assets/tracks/candela_city/track.xml
 msgid "Candela City"
 msgstr "Baile nan coinneal"
 
-#. I18N: ../stk-assets/tracks/cave/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "Uamh X"
 
-#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
 msgstr "Teampall Còco"
 
-#. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
 msgstr "Thar an achaidh"
 
-#. I18N: ../stk-assets/tracks/fortmagma/track.xml
+#. I18N: ../supertuxkart-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
 msgstr "Dùn Mhagma"
 
-#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
 msgstr "Eilean Gran Paradiso"
 
-#. I18N: ../stk-assets/tracks/greenvalley/track.xml
+#. I18N: ../supertuxkart-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
 msgstr "Gleann gorm"
 
-#. I18N: ../stk-assets/tracks/hacienda/track.xml
+#. I18N: ../supertuxkart-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Hacienda"
 
-#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
 msgstr "Raon ball-coise reòite"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
 msgstr "Dè tha cearr, hippies beaga? A bheil an ceannard mòr Gnu air falbh?"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
 msgstr "Ò, seadh, tha e sa chaisteal agam an-dràsta is thèid e ’na dhìnnear ..."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
 msgstr "Co-dhiù, ’s e creutair cothromach a th’ annam is bheir mi seans dhuibh."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
 msgstr "Ma nì sibh a chùis orm air an rèis, leigidh mi am bodach fa sgaoil."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
 msgstr " Ach cha dèan sibhs’ a’ chùis orm, amadain, oir is mise rìgh nan cartaichean!"
 
-#. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
 msgstr "Raon Las Dunas"
 
-#. I18N: ../stk-assets/tracks/lasdunasscoccer/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasscoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
 msgstr "Raon buill-choise Las Dunas"
 
-#. I18N: ../stk-assets/tracks/lighthouse/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Timcheall air an taigh-sholais"
 
-#. I18N: ../stk-assets/tracks/mansion/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
 msgstr "Taigh-mòr a’ chnuic dhuibh"
 
-#. I18N: ../stk-assets/tracks/mines/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mines/track.xml
 msgid "Old Mine"
 msgstr "Seann mhèinn"
 
-#. I18N: ../stk-assets/tracks/minigolf/track.xml
+#. I18N: ../supertuxkart-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
 msgstr "Meanbh-ghoilf"
 
-#. I18N: ../stk-assets/tracks/olivermath/track.xml
+#. I18N: ../supertuxkart-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "Clas matamataig Oliver"
 
-#. I18N: ../stk-assets/tracks/sandtrack/track.xml
+#. I18N: ../supertuxkart-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Beò-ghainmheach"
 
-#. I18N: ../stk-assets/tracks/scotland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
 msgstr "Lòn Niseige"
 
-#. I18N: ../stk-assets/tracks/snowmountain/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
 msgstr "Baile taobh tuath"
 
-#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
 msgstr "Sgurr an t-sneachda"
 
-#. I18N: ../stk-assets/tracks/soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
 msgstr "Raon ball-coise"
 
-#. I18N: ../stk-assets/tracks/stadium/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stadium/track.xml
 msgid "The Stadium"
 msgstr "An lann-cluiche"
 
-#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
 msgstr "Iomairt STK"
 
-#. I18N: ../stk-assets/tracks/temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/temple/track.xml
 msgid "Temple"
 msgstr "Teampall"
 
-#. I18N: ../stk-assets/tracks/volcano_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
 msgstr "Eilean na beinne-teine"
 
-#. I18N: ../stk-assets/tracks/xr591/track.xml
+#. I18N: ../supertuxkart-assets/tracks/xr591/track.xml
 msgid "XR591"
 msgstr "XR591"
 
-#. I18N: ../stk-assets/tracks/zengarden/track.xml
+#. I18N: ../supertuxkart-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
 msgstr "Lios Zen"
 
@@ -2419,13 +2424,13 @@ msgstr "Aoigh"
 msgid "Guest %d"
 msgstr "Aoigh “%d”"
 
-#: src/config/user_config.cpp:652
+#: src/config/user_config.cpp:683
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr "Bha cruth cearr air an fhaidhle rèiteachaidh agad, mar sin chaidh sguabadh às is thèid fear ùr a chruthachadh."
 
-#: src/config/user_config.cpp:663
+#: src/config/user_config.cpp:694
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
@@ -2475,7 +2480,7 @@ msgstr "Èifeachdachd naidhtreo"
 #: src/guiengine/widgets/player_kart_widget.cpp:756
 #: src/karts/controller/local_player_controller.cpp:415
 #: src/karts/controller/player_controller.cpp:410
-#: src/network/protocols/client_lobby.cpp:672
+#: src/network/protocols/client_lobby.cpp:679
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3172,7 +3177,7 @@ msgstr "Bhuannaich thu an rèis!"
 msgid "You finished the race!"
 msgstr "Choilean thu an rèis!"
 
-#: src/main.cpp:1788
+#: src/main.cpp:1749
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3183,23 +3188,23 @@ msgid ""
 "statistics\")."
 msgstr "Dh’fhaoidte gun ceangail SuperTuxKart ri frithealaiche gus tuilleadain a luchdadh a-nuas is naidheachdan mu ùrachaidhean a thoirt dhut. Cruinnichidh sinn stadastaireachd gun ainm air a’ bhathar-chruaidh cuideachd gus taic a thoirt dhuinn le leasachadh STK. Leugh a’ phoileasaidh phrìobhaideachd againn air http://privacy.supertuxkart.net.  A bheil thu airson an roghainn seo a chur an comas? (Gus an roghainn seo atharrachadh uair sam bith, rach gu “Roghainnean”, tagh an taba “Eadar-aghaidh” agus deasaich “Ceangail ris an eadar-lìon” agus “Cuir a-null stadastaireachd bathair-chruaidh gun urra”)."
 
-#: src/main.cpp:1980
+#: src/main.cpp:2006
 msgid "Your screen resolution is too low to run STK."
 msgstr "Tha dùmhlachd-bhreacaidh na sgìn agad ro ìosal gus STK a ruith."
 
-#: src/main.cpp:2009
+#: src/main.cpp:2035
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Tha tionndadh an draibheir agad ro shean. Feuch an stàlaich thu na draibhearan video as ùire."
 
-#: src/main.cpp:2027
+#: src/main.cpp:2053
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Tha coltas gu bheil an tionndadh agad de dh’OpenGL ro shean. Thoir sùil a bheil ùrachadh air draibhear a’ video agad ri fhaighinn. Tha %s no nas fhearr riatanach airson SuperTuxKart."
 
-#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:83
+#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:84
 msgid "Server connection timed out."
 msgstr "Dh’fhalbh an ùine air a’ cheangal dhan fhrithealaiche."
 
@@ -3244,26 +3249,26 @@ msgstr "Uighean: %d / %d"
 msgid "Leader"
 msgstr "Toisiche"
 
-#: src/modes/linear_world.cpp:376
+#: src/modes/linear_world.cpp:377
 msgid "Final lap!"
 msgstr "Cuairt mu dheireadh!"
 
-#: src/modes/linear_world.cpp:404
+#: src/modes/linear_world.cpp:405
 #, c-format
 msgid "Lap %i"
 msgstr "Cuairt %i"
 
-#: src/modes/linear_world.cpp:494
+#: src/modes/linear_world.cpp:495
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s le %s"
 
-#: src/modes/linear_world.cpp:499
+#: src/modes/linear_world.cpp:500
 msgid "New fastest lap"
 msgstr "Cuairt as luaithe ùr"
 
-#: src/modes/linear_world.cpp:1026
+#: src/modes/linear_world.cpp:1027
 msgid "WRONG WAY!"
 msgstr "RATHAD CEÀRR!"
 
@@ -3285,46 +3290,19 @@ msgstr "Chaidh do ruaig!"
 msgid "'%s' has been eliminated."
 msgstr "Tha “%s” air a ruaig"
 
-#: src/network/network_config.cpp:181
-msgid "Normal Race (Grand Prix)"
-msgstr "Rèis àbhaisteach (Grand Prix)"
-
-#: src/network/network_config.cpp:183
-msgid "Time Trial (Grand Prix)"
-msgstr "An aghaidh na h-ùine (Grand Prix)"
-
-#. I18N: In the create server screen for battle server
-#: src/network/network_config.cpp:193
-#: src/states_screens/create_server_screen.cpp:177
-msgid "Free-For-All"
-msgstr "An aghaidh càch a chèile"
-
-#. I18N: In the create server screen for battle server
-#: src/network/network_config.cpp:195
-#: src/states_screens/create_server_screen.cpp:179
-msgid "Capture The Flag"
-msgstr "Glac a’ bhratach"
-
-#: src/network/protocols/client_lobby.cpp:84
+#: src/network/protocols/client_lobby.cpp:85
 msgid "Server has been shut down."
 msgstr "Chaidh am frithealaiche a dhùnadh sìos."
 
-#: src/network/protocols/client_lobby.cpp:85
+#: src/network/protocols/client_lobby.cpp:86
 msgid "You were kicked from the server."
 msgstr "Fhuair thu a’ bhròg on fhrithealaiche."
 
-#: src/network/protocols/client_lobby.cpp:87
-#: src/network/protocols/client_lobby.cpp:234
-#: src/network/protocols/client_lobby.cpp:693
+#: src/network/protocols/client_lobby.cpp:88
+#: src/network/protocols/client_lobby.cpp:233
+#: src/network/protocols/client_lobby.cpp:700
 msgid "Bad network connection is detected."
 msgstr "Mhothaich sinn do dhroch-cheangal lìonraidh."
-
-#. I18N: Message shown in network lobby to tell user that
-#. player name is clickable
-#: src/network/protocols/client_lobby.cpp:91
-msgid ""
-"Press player name in the list for player management and ranking information."
-msgstr "Tagh ainm cluicheadair air an liosta airson stiùireadh a’ chluicheadair agus fiosrachadh rangachaidh."
 
 #: src/network/protocols/client_lobby.cpp:449
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
@@ -3379,15 +3357,22 @@ msgstr "Slighe: %s,\ncuairtean: %d, contrarra: %s"
 msgid "%s disconnected."
 msgstr "Chaidh %s a dhì-cheangal."
 
+#. I18N: Message shown in network lobby to tell user that
+#. player name is clickable
+#: src/network/protocols/client_lobby.cpp:538
+msgid ""
+"Press player name in the list for player management and ranking information."
+msgstr "Tagh ainm cluicheadair air an liosta airson stiùireadh a’ chluicheadair agus fiosrachadh rangachaidh."
+
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:559
+#: src/network/protocols/client_lobby.cpp:566
 #, c-format
 msgid "Server name: %s"
 msgstr "Ainm an fhrithealaiche: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:567
+#: src/network/protocols/client_lobby.cpp:574
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
@@ -3395,107 +3380,127 @@ msgid "Difficulty: %s"
 msgstr "Duilgheas: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:572
+#: src/network/protocols/client_lobby.cpp:579
 #, c-format
 msgid "Max players: %d"
 msgstr "Cluicheadairean as motha: %d"
 
-#: src/network/protocols/client_lobby.cpp:589
-#: src/states_screens/dialogs/server_info_dialog.cpp:90
+#: src/network/protocols/client_lobby.cpp:596
+#: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Modh a’ gheama: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:601
-#: src/states_screens/create_server_screen.cpp:193
+#: src/network/protocols/client_lobby.cpp:608
+#: src/states_screens/create_server_screen.cpp:194
 msgid "Time limit"
 msgstr "Crìoch-ùine"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:602
-#: src/states_screens/create_server_screen.cpp:195
+#: src/network/protocols/client_lobby.cpp:609
+#: src/states_screens/create_server_screen.cpp:196
 msgid "Goals limit"
 msgstr "Crìoch-thadhlan"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:606
+#: src/network/protocols/client_lobby.cpp:613
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Seòrsa a’ gheama buill-choise: %s"
 
-#: src/network/protocols/client_lobby.cpp:616
+#: src/network/protocols/client_lobby.cpp:623
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Adhartas a’ Grand Prix: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:685
+#: src/network/protocols/client_lobby.cpp:692
 msgid "All players joined red or blue team."
 msgstr "Fhuair a h-uile cluicheadair ballrachd san sgioba dearg no ghorm."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:715
+#: src/network/protocols/client_lobby.cpp:722
 msgid "You are now the owner of server."
 msgstr "’S ann leatsa a tha am frithealaiche a-nis."
 
-#: src/network/protocols/client_lobby.cpp:753
+#: src/network/protocols/client_lobby.cpp:760
 msgid "Connection refused: Server is busy."
 msgstr "Chaidh an ceangal a dhiùltadh: Tha am frithealaiche trang."
 
-#: src/network/protocols/client_lobby.cpp:757
+#: src/network/protocols/client_lobby.cpp:764
 msgid "Connection refused: You are banned from the server."
 msgstr "chaidh an ceangal a dhiùltadh: Chaidh do thoirmeasg on fhrithealaiche"
 
-#: src/network/protocols/client_lobby.cpp:761
+#: src/network/protocols/client_lobby.cpp:768
 msgid "Connection refused: Server password is incorrect."
 msgstr "Chaidh an ceangal a dhiùltadh: Chan eil facal-faire an fhrithealaiche mar bu chòir."
 
-#: src/network/protocols/client_lobby.cpp:765
+#: src/network/protocols/client_lobby.cpp:772
 msgid "Connection refused: Game data is incompatible."
 msgstr "Chaidh an ceangal a dhiùltadh: Chan eil dàta a’ gheama co-chòrdail."
 
-#: src/network/protocols/client_lobby.cpp:769
+#: src/network/protocols/client_lobby.cpp:776
 msgid "Connection refused: Server is full."
 msgstr "Chaidh an ceangal a dhiùltadh: Tha am frithealaiche làn."
 
-#: src/network/protocols/client_lobby.cpp:773
+#: src/network/protocols/client_lobby.cpp:780
 msgid "Connection refused: Invalid player connecting."
 msgstr "Chaidh an ceangal a dhiùltadh: Tha an cluicheadair a tha ’ga cheangal mì-dhligheach."
 
-#: src/network/protocols/connect_to_server.cpp:132
+#: src/network/protocols/connect_to_server.cpp:196
 msgid "No quick play server available."
 msgstr "Chan eil frithealaiche airson cluiche luath ri fhaighinn."
 
-#: src/network/protocols/connect_to_server.cpp:285
-#: src/states_screens/online_screen.cpp:272
+#: src/network/protocols/connect_to_server.cpp:281
+#: src/states_screens/online_screen.cpp:273
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Cha ghabh ceangal ri frithealaiche %s."
+
+#: src/network/server_config.cpp:234
+msgid "Normal Race (Grand Prix)"
+msgstr "Rèis àbhaisteach (Grand Prix)"
+
+#: src/network/server_config.cpp:236
+msgid "Time Trial (Grand Prix)"
+msgstr "An aghaidh na h-ùine (Grand Prix)"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:246
+#: src/states_screens/create_server_screen.cpp:178
+msgid "Free-For-All"
+msgstr "An aghaidh càch a chèile"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:248
+#: src/states_screens/create_server_screen.cpp:180
+msgid "Capture The Flag"
+msgstr "Glac a’ bhratach"
 
 #. I18N: Official means this server is hosted by STK team
 #: src/network/server.cpp:110
 msgid "Official"
 msgstr "Oifigeil"
 
-#: src/online/online_player_profile.cpp:436
+#: src/online/online_player_profile.cpp:434
 #, c-format
 msgid "%s is now online."
 msgstr "Tha %s air loidhne a-nis."
 
-#: src/online/online_player_profile.cpp:440
+#: src/online/online_player_profile.cpp:438
 #, c-format
 msgid "%s and %s are now online."
 msgstr "Tha %s agus %s air loidhne a-nis."
 
-#: src/online/online_player_profile.cpp:445
+#: src/online/online_player_profile.cpp:443
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "Tha %s, %s agus %s air loidhne a-nis."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:451
+#: src/online/online_player_profile.cpp:449
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3505,12 +3510,12 @@ msgstr[2] "Tha %d caraidean air loidhne a-nis."
 msgstr[3] "Tha %d caraid air loidhne a-nis."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:499
+#: src/online/online_player_profile.cpp:497
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "Tha %s air an fhrithealaiche “%s” a-nis."
 
-#: src/online/online_player_profile.cpp:530
+#: src/online/online_player_profile.cpp:528
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
@@ -3519,7 +3524,7 @@ msgstr[1] "Dh’iarr %d càirdeas ort!"
 msgstr[2] "Dh’iarr %d càirdeas ort!"
 msgstr[3] "Dh’iarr %d càirdeas ort!"
 
-#: src/online/online_player_profile.cpp:536
+#: src/online/online_player_profile.cpp:534
 msgid "You have a new friend request!"
 msgstr "Dh’iarr cuideigin càirdeas ort!"
 
@@ -3662,24 +3667,24 @@ msgstr[1] "Tha %d raon spòrs ann nach fhaigh thu sa mhodh aon-chluicheadair."
 msgstr[2] "Tha %d raointean spòrs ann nach fhaigh thu sa mhodh aon-chluicheadair."
 msgstr[3] "Tha %d raon spòrs ann nach fhaigh thu sa mhodh aon-chluicheadair."
 
-#: src/states_screens/create_server_screen.cpp:89
+#: src/states_screens/create_server_screen.cpp:90
 msgid "Create LAN Server"
 msgstr "Cruthaich frithealaiche ionadail"
 
-#: src/states_screens/create_server_screen.cpp:94
+#: src/states_screens/create_server_screen.cpp:95
 #, c-format
 msgid "%s's server"
 msgstr "Am frithealaiche aig %s"
 
 #. I18N: In the create server screen
-#: src/states_screens/create_server_screen.cpp:155
+#: src/states_screens/create_server_screen.cpp:156
 msgid "No. of grand prix track(s)"
 msgstr "Àireamh de shlighean Grand Prix"
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/create_server_screen.cpp:159
+#: src/states_screens/create_server_screen.cpp:160
 #: src/states_screens/dialogs/custom_video_settings.cpp:62
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
@@ -3688,20 +3693,20 @@ msgid "Disabled"
 msgstr "À comas"
 
 #. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/create_server_screen.cpp:173
+#: src/states_screens/create_server_screen.cpp:174
 msgid "Battle mode"
 msgstr "Modh còmhraige"
 
 #. I18N: In the create server screen
-#: src/states_screens/create_server_screen.cpp:189
+#: src/states_screens/create_server_screen.cpp:190
 msgid "Soccer game type"
 msgstr "Seòrsa a’ gheama buill-choise"
 
-#: src/states_screens/create_server_screen.cpp:238
+#: src/states_screens/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "Feumaidh an t-ainm a bhith eadar 4 is 30 caractar a dh’fhaid!"
 
-#: src/states_screens/create_server_screen.cpp:255
+#: src/states_screens/create_server_screen.cpp:256
 msgid "Incorrect characters in password!"
 msgstr "Tha caractaran cearr san fhacal-fhaire!"
 
@@ -3943,26 +3948,26 @@ msgstr "Dùbhlan naidhtreo"
 msgid "Ghost replay race"
 msgstr "Rèis ath-chluiche thaibhsean"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:100
+#: src/states_screens/dialogs/server_info_dialog.cpp:99
 #: src/states_screens/race_gui_overworld.cpp:147
 msgid "Rank"
 msgstr "Rang"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:103
+#: src/states_screens/dialogs/server_info_dialog.cpp:102
 msgid "Player"
 msgstr "Cluicheadair"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:106
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
 msgid "Scores"
 msgstr "Sgòran"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:109
+#: src/states_screens/dialogs/server_info_dialog.cpp:108
 msgid "Time played"
 msgstr "Ùine air a chluich"
 
@@ -3971,7 +3976,7 @@ msgid "Input device already exists."
 msgstr "Tha an t-uidheam ion-chuir ann mar-thà."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
-#: src/states_screens/online_screen.cpp:239
+#: src/states_screens/online_screen.cpp:240
 msgid "No player available for connecting to server."
 msgstr "Chan eil cluicheadair ri làimh airson ceangal ris an fhrithealaiche."
 
@@ -4184,7 +4189,7 @@ msgid ""
 msgstr "A h-uile duine:\nBrùth air a’ phutan “Tagh” gus pàirt a ghabhail sa gheama"
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online_screen.cpp:217
+#: src/states_screens/online_screen.cpp:218
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
@@ -4293,17 +4298,17 @@ msgid "Offline"
 msgstr "Far loidhne"
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online_screen.cpp:107
+#: src/states_screens/online_screen.cpp:108
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Feumaidh tu clàradh a-steach airson cluich air lìonra an t-saoghail. Briog air d’ ainm-cleachdaiche gu h-àrd."
 
-#: src/states_screens/online_screen.cpp:244
+#: src/states_screens/online_screen.cpp:245
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
 msgstr "Cuir a-steach seòladh an fhrithealaiche le IP (roghainneil) is an uairsin : agus am port."
 
-#: src/states_screens/online_screen.cpp:255
+#: src/states_screens/online_screen.cpp:256
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "Seòladh frithealaiche mì-dhligheach: %s."
@@ -4773,25 +4778,25 @@ msgstr "Tha an t-inntrigeadh dhan eadar-lìon à comas, cuir an comas e sna rogh
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/server_selection.cpp:124
+#: src/states_screens/server_selection.cpp:127
 msgid "Owner"
 msgstr "Seilbheadair"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/server_selection.cpp:126
+#: src/states_screens/server_selection.cpp:129
 msgid "Distance (km)"
 msgstr "Astar (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/server_selection.cpp:209
+#: src/states_screens/server_selection.cpp:214
 msgid "Unknown"
 msgstr "Chan eil fhios"
 
-#: src/states_screens/server_selection.cpp:315
+#: src/states_screens/server_selection.cpp:322
 msgid "No server is available."
 msgstr "Chan eil frithealaiche ri fhaighinn."
 
-#: src/states_screens/server_selection.cpp:323
+#: src/states_screens/server_selection.cpp:330
 msgid "Fetching servers"
 msgstr "A’ faighinn nam frithealaichean"
 
@@ -4888,15 +4893,15 @@ msgstr "%d/%m/%Y"
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:408
+#: src/utils/translation.cpp:409
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
-#: ../stk-assets/tracks/overworld/scripting.as:15
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
 msgstr "Coilean na dùbhlain uile gus an doras mòr fhosgladh!"
 
-#: ../stk-assets/tracks/overworld/scripting.as:63
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:63
 msgid ""
 "You need more points\n"
 "to enter this challenge!\n"
@@ -4904,71 +4909,71 @@ msgid ""
 "available challenges."
 msgstr "Tha puing no dhà a dhìth ort\ngus dol a-steach dhan dùbhlan seo!\nThoir sùil air a’ mheanbh-mhapa\nairson dùbhlain a tha ri làimh dhut."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:21
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:21
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr "Luathaich le <%s> is stiùirich le <%s> is <%s>."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
-#: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:37
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:38
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr "Tog bogsaichean tìodhlaic is loisg an arm le <%s> gus na bogsaichean ud a sprèidheadh!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
-#: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:43
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:44
 #, c-format
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
 msgstr "Brùth air <%s> gus coimhead air do chùlaibh. Loisg an t-arm le <%s> fhad ’s a tha thu a’ brùthadh <%s> gus losgadh gun chùlaibh!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
-#: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:53
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:54
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Cleachd an naidhtreo a thog thu ’s tu a’ brùthadh air <%s>!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:58
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:58
 msgid "Collect nitro bottles (we will use them after the curve)."
 msgstr "Tog botalan naidhtreo (cleachdaidh sinn taobh thall na lùib iad)."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:63
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:63
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr "Oich! Nuair a bhios tu ann an staing, brùth air <%s> gus cobhair fhaighinn."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
-#: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:69
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:70
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
 msgstr "Luathaich is brùth air an iuchair <%s> gus sleamhnachadh. Ma nì thu sleamhnachadh greiseag, tionndaidhidh tu nas luaithe ann an lùban casa."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
-#: ../stk-assets/tracks/tutorial/triggers.as:78
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:77
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:78
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr "Thoir an aire nuair a thèid leat sleamhnachadh diog no dhà gum fàs thu nas luaithe mar dhuais!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
-#: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:82
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:83
 msgid "You are now ready to race. Good luck!"
 msgstr "Tha thu ullamh gus rèis a dhraibheadh a-nis. Guma math a thèid leat!"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:28
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:28
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
 msgstr "Luathaich le <%s> is stiùirich le <%s> is <%s>"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:59
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:59
 msgid "Collect nitro bottles (we will use them after the curve)"
 msgstr "Tog botalan naidhtreo (cleachdaidh sinn taobh thall na lùib iad)"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:64
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:64
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oich! Ma tha thu ann an staing, brùth air <%s> gus cobhair fhaighinn"

@@ -158,12 +158,12 @@ public:
     {
         switch (mode)
         {
-            case MINOR_MODE_NORMAL_RACE:    return "/gui/mode_normal.png";
-            case MINOR_MODE_TIME_TRIAL:     return "/gui/mode_tt.png";
-            case MINOR_MODE_FOLLOW_LEADER:  return "/gui/mode_ftl.png";
-            case MINOR_MODE_BATTLE:      return "/gui/mode_3strikes.png";
-            case MINOR_MODE_EASTER_EGG:     return "/gui/mode_easter.png";
-            case MINOR_MODE_SOCCER:         return "/gui/mode_soccer.png";
+            case MINOR_MODE_NORMAL_RACE:    return "/gui/icons/mode_normal.png";
+            case MINOR_MODE_TIME_TRIAL:     return "/gui/icons/mode_tt.png";
+            case MINOR_MODE_FOLLOW_LEADER:  return "/gui/icons/mode_ftl.png";
+            case MINOR_MODE_BATTLE:      return "/gui/icons/mode_3strikes.png";
+            case MINOR_MODE_EASTER_EGG:     return "/gui/icons/mode_easter.png";
+            case MINOR_MODE_SOCCER:         return "/gui/icons/mode_soccer.png";
             default: assert(false); return NULL;
         }
     }   // getIconOf
@@ -276,6 +276,8 @@ public:
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
+        /** Boosted status (AI only). */
+        bool        m_boosted_ai;
         /** The difficulty for this player. */
         PerPlayerDifficulty m_difficulty;
 
@@ -289,7 +291,7 @@ public:
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
-                {}
+                { m_boosted_ai = false; }
 
     };   // KartStatus
 private:
@@ -642,6 +644,11 @@ public:
     {
         return m_kart_status[kart].m_difficulty;
     }   // getPlayerDifficulty
+    // ------------------------------------------------------------------------
+    float hasBoostedAI(int kart) const
+    {
+        return m_kart_status[kart].m_boosted_ai;
+    }   // getKartRaceTime
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }
     // ------------------------------------------------------------------------

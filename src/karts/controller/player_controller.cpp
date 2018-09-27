@@ -33,6 +33,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -108,12 +109,6 @@ void PlayerController::resetInputState()
  */
 bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 {
-    if (!NetworkConfig::get()->isNetworking() ||
-        !NetworkConfig::get()->isServer())
-    {
-        if (m_penalty_ticks > 0)
-            return false;
-    }
     /** If dry_run (parameter) is true, this macro tests if this action would
      *  trigger a state change in the specified variable (without actually
      *  doing it). If it will trigger a state change, the macro will
@@ -176,10 +171,12 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 
         break;
     case PA_ACCEL:
-        SET_OR_TEST(m_prev_accel, value);
-        if (value)
+    {
+        uint16_t v16 = (uint16_t)value;
+        SET_OR_TEST(m_prev_accel, v16);
+        if (v16)
         {
-            SET_OR_TEST_GETTER(Accel, value/32768.0f);
+            SET_OR_TEST_GETTER(Accel, v16 / 32768.0f);
             SET_OR_TEST_GETTER(Brake, false);
             SET_OR_TEST_GETTER(Nitro, m_prev_nitro);
         }
@@ -190,6 +187,7 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
             SET_OR_TEST_GETTER(Nitro, false);
         }
         break;
+    }
     case PA_BRAKE:
         SET_OR_TEST(m_prev_brake, value!=0);
         // let's consider below that to be a deadzone
@@ -330,29 +328,27 @@ void PlayerController::update(int ticks)
 
     if (World::getWorld()->isStartPhase())
     {
-        if (m_controls->getAccel() || m_controls->getBrake()||
-            m_controls->getFire()  || m_controls->getNitro())
+        if ((m_controls->getAccel() || m_controls->getBrake()||
+            m_controls->getFire() || m_controls->getNitro()) &&
+            !NetworkConfig::get()->isNetworking())
         {
-            // Only give penalty time in SET_PHASE.
+            // Only give penalty time in READY_PHASE.
             // Penalty time check makes sure it doesn't get rendered on every
             // update.
             if (m_penalty_ticks == 0 &&
-                World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
+                World::getWorld()->getPhase() == WorldStatus::READY_PHASE)
             {
                 displayPenaltyWarning();
-                m_penalty_ticks = stk_config->m_penalty_ticks;
             }   // if penalty_time = 0
-
             m_controls->setBrake(false);
-            m_controls->setAccel(0.0f);
         }   // if key pressed
 
         return;
     }   // if isStartPhase
 
-    if (!RewindManager::get()->isRewinding() && m_penalty_ticks > 0)
+    if (m_penalty_ticks != 0 &&
+        World::getWorld()->getTicksSinceStart() < m_penalty_ticks)
     {
-        m_penalty_ticks -= ticks;
         m_controls->setBrake(false);
         m_controls->setAccel(0.0f);
         return;
@@ -381,8 +377,8 @@ void PlayerController::saveState(BareNetworkString *buffer) const
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    buffer->addUInt32(m_steer_val).addUInt32(m_prev_accel)
-        .addUInt8(m_prev_brake);
+    buffer->addUInt32(m_steer_val).addUInt16(m_prev_accel)
+        .addUInt8((m_prev_brake ? 1 : 0) | (m_prev_nitro ? 2 : 0));
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -391,8 +387,10 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
     m_steer_val  = buffer->getUInt32();
-    m_prev_accel = buffer->getUInt32();
-    m_prev_brake = buffer->getUInt8();
+    m_prev_accel = buffer->getUInt16();
+    uint8_t c = buffer->getUInt8();
+    m_prev_brake = (c & 1) != 0;
+    m_prev_nitro = (c & 2) != 0;
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
@@ -412,3 +410,9 @@ core::stringw PlayerController::getName() const
     }
     return name;
 }   // getName
+
+// ----------------------------------------------------------------------------
+void PlayerController::displayPenaltyWarning()
+{
+    m_penalty_ticks = stk_config->m_penalty_ticks;
+}   // displayPenaltyWarning

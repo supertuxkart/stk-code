@@ -918,26 +918,15 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     matrices.push_back(node->getAbsoluteTransformation());
 
     scene::IMesh *mesh;
-    // In case of readonly materials we have to get the material from
-    // the mesh, otherwise from the node. This is esp. important for
-    // water nodes, which only have the material defined in the node,
-    // but not in the mesh at all!
-    bool is_readonly_material=false;
-
-
     switch(node->getType())
     {
         case scene::ESNT_MESH          :
         case scene::ESNT_WATER_SURFACE :
         case scene::ESNT_OCTREE        :
              mesh = ((scene::IMeshSceneNode*)node)->getMesh();
-             is_readonly_material =
-                 ((scene::IMeshSceneNode*)node)->isReadOnlyMaterials();
              break;
         case scene::ESNT_ANIMATED_MESH :
              mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
-             is_readonly_material =
-                 ((scene::IAnimatedMeshSceneNode*)node)->isReadOnlyMaterials();
              break;
         case scene::ESNT_SKY_BOX :
         case scene::ESNT_SKY_DOME:
@@ -1021,38 +1010,35 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         else
 #endif
         {
-            // Handle readonly materials correctly: mb->getMaterial can return
-            // NULL if the node is not using readonly materials. E.g. in case
-            // of a water scene node, the mesh (which is the animated copy of
-            // the original mesh) does not contain any material information,
-            // the material is only available in the node.
-            const video::SMaterial &irrMaterial =
-                is_readonly_material ? mb->getMaterial()
-                                     : node->getMaterial(i);
-            video::ITexture* t=irrMaterial.getTexture(0);
-
-            const Material* material=0;
-            TriangleMesh *tmesh = m_track_mesh;
-            if(t)
+            const video::SMaterial& irrMaterial = mb->getMaterial();
+            std::string t1_full_path, t2_full_path;
+            video::ITexture* t1 = irrMaterial.getTexture(0);
+            if (t1)
             {
-                std::string image = t->getName().getPtr();
-
-                // the third boolean argument is false because at this point we're
-                // dealing physics, so it's useless to warn about missing textures,
-                // we'd just get duplicate/useless warnings
-                material=material_manager->getMaterial(StringUtils::getBasename(image),
-                                                       false, false, false);
-                // Special gfx meshes will not be stored as a normal physics body,
-                // but converted to a collision body only, so that ray tests
-                // against them can be done.
-                if(material->isSurface())
-                    tmesh = m_gfx_effect_mesh;
-                // A material which is a surface must be converted,
-                // even if it's marked as ignore. So only ignore
-                // non-surface materials.
-                else if(material->isIgnore())
-                    continue;
+                t1_full_path = t1->getName().getPtr();
+                t1_full_path = file_manager->getFileSystem()->getAbsolutePath(
+                    t1_full_path.c_str()).c_str();
             }
+            video::ITexture* t2 = irrMaterial.getTexture(1);
+            if (t2)
+            {
+                t2_full_path = t2->getName().getPtr();
+                t2_full_path = file_manager->getFileSystem()->getAbsolutePath(
+                    t2_full_path.c_str()).c_str();
+            }
+            const Material* material = material_manager->getMaterialSPM(
+                t1_full_path, t2_full_path);
+            TriangleMesh *tmesh = m_track_mesh;
+            // Special gfx meshes will not be stored as a normal physics body,
+            // but converted to a collision body only, so that ray tests
+            // against them can be done.
+            if (material->isSurface())
+                tmesh = m_gfx_effect_mesh;
+            // A material which is a surface must be converted,
+            // even if it's marked as ignore. So only ignore
+            // non-surface materials.
+            else if(material->isIgnore())
+                continue;
 
             if (mb->getVertexType() == video::EVT_STANDARD)
             {

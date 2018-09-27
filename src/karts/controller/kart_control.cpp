@@ -17,35 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/controller/kart_control.hpp"
-
-#include "network/protocols/game_protocol.hpp"
-#include "network/rewind_manager.hpp"
-
-
-// ------------------------------------------------------------------------
-/** Called when going back in time during a rewind. Nothing to do here
- *  in this case.
- */
-void KartControl::undo(BareNetworkString *buffer)
-{
-}   // undo
-
-// ------------------------------------------------------------------------
-/** Replay an event for a KartControl object from the buffer.
- *  \param buffer BareNetworkString with saved event into.
- */
-void KartControl::rewind(BareNetworkString *buffer)
-{
-    if(buffer->getTotalSize()>1)
-    {
-        // Full state including accel and steering was saved
-        rewindTo(buffer);
-    }
-    else // only a button event was stored
-    {
-        setButtonsCompressed(buffer->getUInt8());
-    }
-}   // rewind
+#include "network/network_string.hpp"
 
 // ------------------------------------------------------------------------
 /** Sets the current steering value. */
@@ -102,3 +74,20 @@ void KartControl::setLookBack(bool b)
 {
     m_look_back   = b;
 }   // setLookBack
+// ----------------------------------------------------------------------------
+/** Copies the important data from this objects into a memory buffer. */
+void KartControl::saveState(BareNetworkString *buffer) const
+{
+    buffer->add(m_steer);
+    buffer->add(m_accel);
+    buffer->addChar(getButtonsCompressed());
+}   // saveState
+
+// ----------------------------------------------------------------------------
+/** Restores this object from a previously saved memory  buffer. */
+void KartControl::rewindTo(BareNetworkString *buffer)
+{
+    m_steer = buffer->getFloat();
+    m_accel = buffer->getFloat();
+    setButtonsCompressed(buffer->getUInt8());
+}   // setFromMemory

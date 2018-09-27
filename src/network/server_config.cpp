@@ -51,6 +51,7 @@ FloatServerConfigParam::FloatServerConfigParam(float default_value,
                                                const char* comment)
                       : FloatUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -62,6 +63,7 @@ IntServerConfigParam::IntServerConfigParam(int default_value,
                                            const char* comment)
                     : IntUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -73,6 +75,7 @@ BoolServerConfigParam::BoolServerConfigParam(bool default_value,
                                              const char* comment)
                      : BoolUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -84,6 +87,7 @@ StringServerConfigParam::StringServerConfigParam(std::string default_value,
                                                  const char* comment)
                        : StringUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -275,7 +279,11 @@ void loadServerLobbyFromConfig()
         m_owner_less = true;
     }
     if (m_owner_less)
+    {
+        if (m_min_start_game_players > m_server_max_players)
+            m_min_start_game_players = 1;
         m_team_choosing = false;
+    }
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;

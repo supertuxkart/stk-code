@@ -388,30 +388,40 @@ void MultitouchDevice::updateAxisY(float value)
  */
 void MultitouchDevice::handleControls(MultitouchButton* button)
 {
-    if (m_controller == NULL)
+    if (!isGameRunning())
         return;
-        
-    if (button->type == MultitouchButtonType::BUTTON_STEERING)
-    {
-        updateAxisX(button->axis_x);
-        updateAxisY(button->axis_y);
-    }
-    else if (button->type == MultitouchButtonType::BUTTON_UP_DOWN)
-    {
-        updateAxisY(button->axis_y);
-    }
-    else if (button->type == MultitouchButtonType::BUTTON_ESCAPE)
+
+    if (button->type == MultitouchButtonType::BUTTON_ESCAPE)
     {
         StateManager::get()->escapePressed();
     }
-    else
+    
+    if (m_controller != NULL && !race_manager->isWatchingReplay())
     {
-        if (button->action != PA_BEFORE_FIRST)
+        if (button->type == MultitouchButtonType::BUTTON_STEERING)
+        {
+            updateAxisX(button->axis_x);
+            updateAxisY(button->axis_y);
+        }
+        else if (button->type == MultitouchButtonType::BUTTON_UP_DOWN)
+        {
+            updateAxisY(button->axis_y);
+        }
+        else if (button->action != PA_BEFORE_FIRST)
         {
             int value = button->pressed ? Input::MAX_VALUE : 0;
             m_controller->action(button->action, value);
         }
     }
+}
+
+// ----------------------------------------------------------------------------
+
+bool MultitouchDevice::isGameRunning()
+{
+    return StateManager::get()->getGameState() == GUIEngine::GAME &&
+           !GUIEngine::ModalDialog::isADialogActive() &&
+           !GUIEngine::ScreenKeyboard::isActive();
 }
 
 // ----------------------------------------------------------------------------
@@ -427,10 +437,7 @@ void MultitouchDevice::updateController()
     // Handle multitouch events only when race is running. It avoids to process
     // it when pause dialog is active during the race. And there is no reason
     // to use it for GUI navigation.
-    if (StateManager::get()->getGameState() != GUIEngine::GAME ||
-        GUIEngine::ModalDialog::isADialogActive() ||
-        GUIEngine::ScreenKeyboard::isActive() ||
-        race_manager->isWatchingReplay())
+    if (!isGameRunning())
     {
         m_controller = NULL;
         return;

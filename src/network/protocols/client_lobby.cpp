@@ -42,11 +42,11 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
-#include "states_screens/networking_lobby.hpp"
-#include "states_screens/network_kart_selection.hpp"
+#include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/online/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
@@ -300,7 +300,8 @@ void ClientLobby::update(int ticks)
     {
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
-            .addUInt32(ServerConfig::m_server_version);
+            .addUInt32(ServerConfig::m_server_version)
+            .encodeString(StringUtils::getUserAgentString());
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
@@ -375,6 +376,14 @@ void ClientLobby::update(int ticks)
         break;
     case REQUESTING_CONNECTION:
     case CONNECTED:
+        if (STKHost::get()->isAuthorisedToControl() &&
+            NetworkConfig::get()->isAutoConnect())
+        {
+            // Send a message to the server to start
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
+            STKHost::get()->sendToServer(&start, true);
+        }
     case SELECTING_ASSETS:
     case RACING:
     case EXITING:
@@ -574,9 +583,9 @@ void ClientLobby::handleServerInfo(Event* event)
     each_line = _("Difficulty: %s", difficulty_name);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
-    u_data = data.getUInt8();
+    unsigned max_player = data.getUInt8();
     //I18N: In the networking lobby
-    each_line = _("Max players: %d", (int)u_data);
+    each_line = _("Max players: %d", (int)max_player);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     u_data = data.getUInt8();
@@ -627,18 +636,21 @@ void ClientLobby::handleServerInfo(Event* event)
         }
     }
     // Auto start info
-    float start_threshold = data.getFloat();
+    unsigned min_players = data.getUInt8();
     float start_timeout = data.getFloat();
-    unsigned max_player = data.getUInt8();
     NetworkingLobby::getInstance()->initAutoStartTimer(grand_prix_started,
-        start_threshold, start_timeout, max_player);
+        min_players, start_timeout, max_player);
 
     // MOTD
     core::stringw motd;
     data.decodeString16(&motd);
-    if (!motd.empty())
-        NetworkingLobby::getInstance()->addMoreServerInfo(motd);
-
+    const std::vector<core::stringw>& motd_line = StringUtils::split(motd,
+        '\n');
+    if (!motd_line.empty())
+    {
+        for (const core::stringw& motd : motd_line)
+            NetworkingLobby::getInstance()->addMoreServerInfo(motd);
+    }
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------
@@ -705,15 +717,6 @@ void ClientLobby::handleBadConnection()
 void ClientLobby::becomingServerOwner()
 {
     STKHost::get()->setAuthorisedToControl(true);
-    if (m_state.load() == CONNECTED && NetworkConfig::get()->isAutoConnect())
-    {
-        // Send a message to the server to start
-        NetworkString start(PROTOCOL_LOBBY_ROOM);
-        start.setSynchronous(true);
-        start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendToServer(&start, true);
-    }
-
     if (STKHost::get()->isClientServer())
         return;
 

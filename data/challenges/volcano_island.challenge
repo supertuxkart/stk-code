@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <challenge version="3">
     <unlock_list list="false"/>
-    <track id="volcano_island" laps="2"/>
+    <track id="volcano_island" laps="2" reverse="false"/>
     <mode major="single" minor="quickrace"/>
     <requirements trophies="15"/>
     
     <best>
         <karts number="8"/>
-        <requirements position="1"/>
+        <requirements position="1" time="165"/>
     </best>
     <hard>
         <karts number="7"/>

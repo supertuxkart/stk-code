@@ -3,10 +3,6 @@
     <first-pass vertex-shader="sp_pass.vert"
         fragment-shader="sp_normal_map.frag"
         skinned-mesh-shader="sp_skinning.vert">
-    <prefilled-textures>
-            <prefilled-texture name="g_detail_map" file="gfx_detailmap_a.png"
-                 srgb="Y" sampler="trilinear"/>
-    </prefilled-textures>
     </first-pass>
     <shadow-pass vertex-shader="sp_shadow.vert"
         fragment-shader="white.frag"

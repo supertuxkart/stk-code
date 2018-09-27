@@ -188,7 +188,7 @@ const std::string PlayerProfile::getIconFilename() const
     if(m_icon_filename.size()==0 ||
        !file_manager->fileExists(file_manager->getUserConfigFile(m_icon_filename)))
     {
-        return file_manager->getAsset(FileManager::GUI, "main_help.png");
+        return file_manager->getAsset(FileManager::GUI_ICON, "main_help.png");
     }
 
     return file_manager->getUserConfigFile(m_icon_filename);

@@ -598,7 +598,8 @@ void LinearWorld::getKartsDisplayInfo(
 
         // Don't compare times when crossing the start line first
         if(laps_of_leader>0                                                &&
-           (getTimeTicks() - getTicksAtLapForKart(kart->getWorldKartId())<5||
+           (getTimeTicks() - getTicksAtLapForKart(kart->getWorldKartId())  <
+            stk_config->time2Ticks(8)                                      ||
             rank_info.lap != laps_of_leader)                               &&
             raceHasLaps())
         {  // Display for 5 seconds

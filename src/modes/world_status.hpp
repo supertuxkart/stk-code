@@ -204,6 +204,9 @@ public:
     // ------------------------------------------------------------------------
     /** Get the ticks since start regardless of which way the clock counts */
     int getTicksSinceStart() const { return m_count_up_ticks; }
+    // ------------------------------------------------------------------------
+    int getAuxiliaryTicks() const { return m_auxiliary_ticks; }
+
 };   // WorldStatus
 
 

@@ -95,6 +95,8 @@ private:
     /** It indicates if this server is unregistered with the stk server. */
     std::weak_ptr<bool> m_server_unregistered;
 
+    std::weak_ptr<bool> m_server_recovering;
+
     /** Timeout counter for various state. */
     std::atomic<int64_t> m_timeout;
 
@@ -148,7 +150,11 @@ private:
 
     std::atomic<uint32_t> m_waiting_players_counts;
 
-    unsigned m_server_id_online;
+    std::atomic<uint64_t> m_last_success_poll_time;
+
+    uint64_t m_server_started_at, m_server_delay;
+
+    std::atomic<uint32_t> m_server_id_online;
 
     bool m_registered_for_once_only;
 
@@ -162,7 +168,7 @@ private:
     // Track(s) votes
     void playerVote(Event *event);
     void playerFinishedResult(Event *event);
-    bool registerServer();
+    bool registerServer(bool now);
     void finishedLoadingWorldClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
@@ -275,6 +281,7 @@ public:
     bool isBannedForIP(const TransportAddress& addr) const;
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
+    float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

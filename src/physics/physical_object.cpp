@@ -354,13 +354,6 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
     case MP_EXACT:
     {
         extend.setY(0);
-
-        // In case of readonly materials we have to get the material from
-        // the mesh, otherwise from the node. This is esp. important for
-        // water nodes, which only have the material defined in the node,
-        // but not in the mesh at all!
-        bool is_readonly_material = false;
-
         scene::IMesh* mesh = NULL;
         switch (presentation->getNode()->getType())
         {
@@ -371,7 +364,6 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
                     scene::IMeshSceneNode *node =
                         (scene::IMeshSceneNode*)presentation->getNode();
                     mesh = node->getMesh();
-                    is_readonly_material = node->isReadOnlyMaterials();
                     break;
                 }
             case scene::ESNT_ANIMATED_MESH :
@@ -380,7 +372,6 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
                     scene::IAnimatedMeshSceneNode *node =
                       (scene::IAnimatedMeshSceneNode*)presentation->getNode();
                     mesh = node->getMesh()->getMesh(0);
-                    is_readonly_material = node->isReadOnlyMaterials();
                     break;
                 }
             default:
@@ -436,27 +427,27 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
                               mb->getVertexType());
                     continue;
                 }
-
-                // Handle readonly materials correctly: mb->getMaterial can return
-                // NULL if the node is not using readonly materials. E.g. in case
-                // of a water scene node, the mesh (which is the animated copy of
-                // the original mesh) does not contain any material information,
-                // the material is only available in the node.
-                const video::SMaterial &irrMaterial =
-                    is_readonly_material ? mb->getMaterial()
-                    : presentation->getNode()->getMaterial(i);
-                video::ITexture* t=irrMaterial.getTexture(0);
-
-                const Material* material=0;
-                if(t)
+                const video::SMaterial& irrMaterial = mb->getMaterial();
+                std::string t1_full_path, t2_full_path;
+                video::ITexture* t1 = irrMaterial.getTexture(0);
+                if (t1)
                 {
-                    std::string image =
-                                  std::string(core::stringc(t->getName()).c_str());
-                    material = material_manager
-                             ->getMaterial(StringUtils::getBasename(image));
-                    if(material->isIgnore())
-                        continue;
+                    t1_full_path = t1->getName().getPtr();
+                    t1_full_path = file_manager->getFileSystem()->getAbsolutePath(
+                        t1_full_path.c_str()).c_str();
                 }
+                video::ITexture* t2 = irrMaterial.getTexture(1);
+                if (t2)
+                {
+                    t2_full_path = t2->getName().getPtr();
+                    t2_full_path = file_manager->getFileSystem()->getAbsolutePath(
+                        t2_full_path.c_str()).c_str();
+                }
+                const Material* material = material_manager->getMaterialSPM(
+                    t1_full_path, t2_full_path);
+                if (material->isIgnore())
+                    continue;
+
                 if (mb->getVertexType() == video::EVT_STANDARD)
                 {
                     irr::video::S3DVertex* mbVertices =

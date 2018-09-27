@@ -224,6 +224,7 @@
 #include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -233,10 +234,10 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/networking_lobby.hpp"
-#include "states_screens/register_screen.hpp"
+#include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/online/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/user_screen.hpp"
+#include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/arena_graph.hpp"
@@ -608,6 +609,9 @@ void cmdLineHelp()
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
+    "       --server-id=n      Server id in stk addons for --connect-now.\n"
+    "       --network-ai=n     Numbers of AI for connecting to linear race server, used\n"
+    "                          together with --connect-now.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --init-user        Save the above login and password (if set) in config.\n"
@@ -619,13 +623,19 @@ void cmdLineHelp()
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --auto-end         Automatically end network game after 1st player finished\n"
     "                          for some time (currently his finished time * 0.25 + 15.0). \n"
+    "       --no-auto-end      Don't automatically end network game after 1st player finished\n"
+    "       --team-choosing    Enable choosing team in lobby for team game.\n"
     "       --no-team-choosing Disable choosing team in lobby for team game.\n"
     "       --network-gp=n     Specify number of tracks used in network grand prix.\n"
     "       --graphical-server Enable graphical view in server.\n"
     "       --no-validation    Allow non validated and unencrypted connection in wan.\n"
     "       --ranked           Server will submit ranking to stk addons server.\n"
+    "       --no-ranked        Server will not submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
     "       --owner-less       Race will auto start and no one can kick players in server.\n"
+    "       --no-owner-less    Race will not auto start and server owner can kick players in server.\n"
+    "       --firewalled-server Turn on all stun related code in server.\n"
+    "       --no-firewalled-server Turn off all stun related code in server.\n"
     "       --connection-debug Print verbose info for sending or receiving packets.\n"
     "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
@@ -1189,20 +1199,45 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     if (CommandLine::has("--motd", &s))
         ServerConfig::m_motd = s;
 
+    if (CommandLine::has("--team-choosing"))
+    {
+        ServerConfig::m_team_choosing = true;
+    }
     if (CommandLine::has("--no-team-choosing"))
+    {
         ServerConfig::m_team_choosing = false;
-
+    }
     if (CommandLine::has("--ranked"))
     {
         ServerConfig::m_ranked = true;
+    }
+    if (CommandLine::has("--no-ranked"))
+    {
+        ServerConfig::m_ranked = false;
     }
     if (CommandLine::has("--auto-end"))
     {
         ServerConfig::m_auto_end = true;
     }
+    if (CommandLine::has("--no-auto-end"))
+    {
+        ServerConfig::m_auto_end = false;
+    }
     if (CommandLine::has("--owner-less"))
     {
         ServerConfig::m_owner_less = true;
+    }
+    if (CommandLine::has("--no-owner-less"))
+    {
+        ServerConfig::m_owner_less = false;
+    }
+    if (CommandLine::has("--firewalled-server"))
+    {
+        ServerConfig::m_firewalled_server = true;
+    }
+    if (CommandLine::has("--no-firewalled-server"))
+    {
+        ServerConfig::m_firewalled_server = false;
     }
     if (CommandLine::has("--connection-debug"))
     {
@@ -1228,10 +1263,9 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--min-players", &n))
     {
-        float threshold = ((float)(n) - 0.5f) / 
-                                         ServerConfig::m_server_max_players;
-        threshold = std::max(std::min(threshold, 1.0f), 0.0f);
-        ServerConfig::m_start_game_threshold = threshold;
+        if (n > ServerConfig::m_server_max_players)
+            n = 1;
+        ServerConfig::m_min_start_game_players = n;
     }
     if (CommandLine::has("--port", &n))
     {
@@ -1244,20 +1278,65 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     {
         NetworkConfig::get()->setIsPublicServer();
     }
+
+    unsigned server_id = 0;
+    if ((NetworkConfig::get()->isServer() && ServerConfig::m_wan_server) ||
+        CommandLine::has("--server-id", &server_id))
+    {
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        // Try to use saved user token if exists
+        if (!can_wan && player && player->wasOnlineLastTime() &&
+            player->wasOnlineLastTime() && player->hasSavedSession())
+        {
+            while (PlayerManager::getCurrentOnlineState() !=
+                PlayerProfile::OS_SIGNED_IN)
+            {
+                Online::RequestManager::get()->update(0.0f);
+                StkTime::sleep(1);
+            }
+            can_wan = true;
+        }
+        else if (!can_wan)
+        {
+            Log::warn("main","No saved online player session to create "
+                "or connect to a wan server.");
+        }
+    }
+
     if (CommandLine::has("--connect-now", &s))
     {
-        TransportAddress server_addr(s);
         NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
+        if (CommandLine::has("--network-ai", &n))
+        {
+            NetworkConfig::get()->setNetworkAITester(true);
+            PlayerManager::get()->createGuestPlayers(n);
+            for (int i = 0; i < n; i++)
+            {
+                NetworkConfig::get()->addNetworkPlayer(
+                    NULL, PlayerManager::get()->getPlayer(i),
+                    PLAYER_DIFFICULTY_NORMAL);
+            }
+        }
+        else
+        {
+            NetworkConfig::get()->addNetworkPlayer(
+                input_manager->getDeviceManager()->getLatestUsedDevice(),
+                PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
+        }
+        TransportAddress server_addr(s);
         auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
             !server_password.empty(), false);
-        NetworkConfig::get()->addNetworkPlayer(
-            input_manager->getDeviceManager()->getLatestUsedDevice(),
-            PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         NetworkConfig::get()->doneAddingNetworkPlayers();
         STKHost::create();
         auto cts = std::make_shared<ConnectToServer>(server);
         cts->setup();
+        if (server_id != 0)
+        {
+            server->setServerId(server_id);
+            server->setSupportsEncryption(true);
+            cts->registerWithSTKServer();
+        }
         Log::info("main", "Trying to connect to server '%s'.",
             server_addr.toString().c_str());
         if (!cts->tryConnect(2000, 15))
@@ -1269,6 +1348,8 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
         else
         {
+            server_addr =
+                STKHost::get()->getServerPeerForClient()->getAddress();
             auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
             cl->requestStart();
         }
@@ -1279,24 +1360,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         const std::string& server_name = ServerConfig::m_server_name;
         if (ServerConfig::m_wan_server)
         {
-            PlayerProfile* player = PlayerManager::getCurrentPlayer();
-            // Try to use saved user token if exists
-            if (!can_wan && player && player->wasOnlineLastTime() &&
-                player->wasOnlineLastTime() && player->hasSavedSession())
-            {
-                while (PlayerManager::getCurrentOnlineState() !=
-                    PlayerProfile::OS_SIGNED_IN)
-                {
-                    Online::RequestManager::get()->update(0.0f);
-                    StkTime::sleep(1);
-                }
-                can_wan = true;
-            }
-            else if (!can_wan)
-            {
-                Log::warn("main",
-                    "No saved online player session to create a wan server");
-            }
             if (can_wan)
             {
                 // Server owner online account will keep online as long as
@@ -1681,14 +1744,14 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI,
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI_ICON,
                                                      "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
     grand_prix_manager->checkConsistency();
-    GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+    GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                       "cup_gold.png"    ) );
 
     race_manager            = new RaceManager          ();
@@ -1778,7 +1841,7 @@ void main_abort()
 {
     if (main_loop)
     {
-        main_loop->abort();
+        main_loop->requestAbort();
     }
 }
 #ifdef ANDROID
@@ -1907,7 +1970,7 @@ int main(int argc, char *argv[] )
         // Preload the explosion effects (explode.png)
         ParticleKindManager::get()->getParticles("explosion.xml");
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
@@ -1924,7 +1987,7 @@ int main(int argc, char *argv[] )
         // to initialise the AchievementsStatus, so it is done only now.
         PlayerManager::get()->initRemainingData();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
         projectile_manager->loadData();
 
@@ -1947,13 +2010,13 @@ int main(int argc, char *argv[] )
         powerup_manager->loadPowerupsModels();
         ItemManager::loadDefaultItemMeshes();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gift.png")       );
 
         attachment_manager->loadModels();
         file_manager->popTextureSearchPath();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
@@ -2216,8 +2279,10 @@ int main(int argc, char *argv[] )
     {
         Log::closeOutputFiles();
 #endif
+#ifndef ANDROID
         fclose(stderr);
         fclose(stdout);
+#endif
 #ifndef WIN32
     }
 #endif
@@ -2273,6 +2338,9 @@ static void cleanSuperTuxKart()
     if(unlock_manager)          delete unlock_manager;
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
+    GUIEngine::clear();
+    GUIEngine::cleanUp();
+    GUIEngine::clearScreenCache();
     if(font_manager)            delete font_manager;
 
     // Now finish shutting down objects which a separate thread. The

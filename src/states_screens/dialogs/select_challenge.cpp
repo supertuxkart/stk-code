@@ -111,35 +111,10 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                              ->getChallengeStatus(challenge_id);
 
-    if (c->isSolved(RaceManager::DIFFICULTY_EASY))
-    {
-        IconButtonWidget* btn = getWidget<IconButtonWidget>("novice");
-        btn->setImage(file_manager->getAsset(FileManager::GUI, "cup_bronze.png"),
-                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    }
-
-    if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM))
-    {
-        IconButtonWidget* btn = getWidget<IconButtonWidget>("intermediate");
-        btn->setImage(file_manager->getAsset(FileManager::GUI,"cup_silver.png"),
-                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    }
-
-    if (c->isSolved(RaceManager::DIFFICULTY_HARD))
-    {
-        IconButtonWidget* btn = getWidget<IconButtonWidget>("expert");
-        btn->setImage(file_manager->getAsset(FileManager::GUI,"cup_gold.png"),
-                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    }
-
-    if (c->isSolved(RaceManager::DIFFICULTY_BEST)
-        && !PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-    {
-        IconButtonWidget* btn = getWidget<IconButtonWidget>("supertux");
-        btn->setImage(file_manager->getAsset(FileManager::GUI,"cup_platinum.png"),
-                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    }
-
+    updateSolvedIcon(c, RaceManager::DIFFICULTY_EASY,   "novice",       "cup_bronze.png");
+    updateSolvedIcon(c, RaceManager::DIFFICULTY_MEDIUM, "intermediate", "cup_silver.png");
+    updateSolvedIcon(c, RaceManager::DIFFICULTY_HARD,   "expert",       "cup_gold.png");
+    updateSolvedIcon(c, RaceManager::DIFFICULTY_BEST,   "supertux",     "cup_platinum.png");
 
     LabelWidget* novice_label = getWidget<LabelWidget>("novice_label");
     LabelWidget* medium_label = getWidget<LabelWidget>("intermediate_label");
@@ -188,6 +163,19 @@ SelectChallengeDialog::~SelectChallengeDialog()
 
 // ----------------------------------------------------------------------------
 
+void SelectChallengeDialog::updateSolvedIcon(const ChallengeStatus* c, RaceManager::Difficulty diff,
+                                             const char* widget_name, const char* path)
+{
+    if (c->isSolved(diff))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>(widget_name);
+        btn->setImage(file_manager->getAsset(FileManager::GUI_ICON, path),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+} //updateSolvedIcon
+
+// ----------------------------------------------------------------------------
+
 GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSourceParam)
 {
     std::string eventSource = eventSourceParam;
@@ -223,7 +211,6 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         // Set up race manager appropriately
         race_manager->setNumPlayers(1);
         race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
-        race_manager->setReverseTrack(false);
 
         //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
         input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
@@ -237,7 +224,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         // Initialise global data - necessary even in local games to avoid
         // many if tests in other places (e.g. if network_game call
         // network_manager else call race_manager).
-//        network_manager->initCharacterDataStructures();
+        // network_manager->initCharacterDataStructures();
 
         // Launch challenge
         if (eventSource == "novice")

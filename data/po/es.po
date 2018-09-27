@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-05 08:17+0800\n"
-"PO-Revision-Date: 2018-09-05 17:19+0000\n"
+"POT-Creation-Date: 2018-09-12 22:54+0200\n"
+"PO-Revision-Date: 2018-09-15 15:37+0000\n"
 "Last-Translator: Marc Coll Carrillo <marc.coll.carrillo@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/supertuxkart/supertuxkart/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -790,8 +790,8 @@ msgstr "Recoge las cajas azules, te darán mejoras."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
-#: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:32
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:16
 msgid "Avoid bananas!"
 msgstr "¡Evita los plátanos!"
 
@@ -1059,7 +1059,7 @@ msgid ""
 "crown) decides so. Official servers may auto-start races only when there are"
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon kart or track is allowed only if it exists on all "
-"joinned players and the server."
+"joined players and the server."
 msgstr "Una vez estés en un servidor, una carrera comenzará en cuanto su propietario (simbolitzado con la corona) lo decida. Los servidores oficiales pueden comenzar carreras automáticamente sólo cuando haya suficientes jugadores. Entonces, podrás elegir tu kart i votar por el próximo circuito donde correr. Un kart o un circuito de complemento sólo se permite si existe en todos los jugadores que se han unido y en el servidor."
 
 #. I18N: ./data/gui/help7.stkgui
@@ -1242,7 +1242,7 @@ msgstr "Contraseña para el servidor privado (opcional)"
 #. I18N: In the server creation screen
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:130
-#: src/states_screens/server_selection.cpp:118
+#: src/states_screens/server_selection.cpp:121
 msgid "Difficulty"
 msgstr "Dificultad"
 
@@ -1294,21 +1294,21 @@ msgstr "SuperTux"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/server_selection.cpp:119
+#: src/states_screens/server_selection.cpp:122
 msgid "Game mode"
 msgstr "Modo de juego"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:185 src/race/race_manager.hpp:180
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:180
 msgid "Normal Race"
 msgstr "Carrera normal"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:187 src/race/race_manager.hpp:182
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:182
 msgid "Time Trial"
 msgstr "Contrarreloj"
 
@@ -1320,7 +1320,7 @@ msgstr "Batalla"
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/network_config.cpp:189 src/race/race_manager.hpp:190
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:190
 msgid "Soccer"
 msgstr "Fútbol"
 
@@ -1332,7 +1332,7 @@ msgstr "Crear"
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: Used as a verb, appears on the main networking menu (login button)
-#: src/states_screens/online_screen.cpp:60
+#: src/states_screens/online_screen.cpp:61
 msgid "Login"
 msgstr "Iniciar sesión"
 
@@ -1384,7 +1384,7 @@ msgstr "Encontrar servidor"
 #. I18N: In the online multiplayer screen
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
-#: src/states_screens/create_server_screen.cpp:90
+#: src/states_screens/create_server_screen.cpp:91
 msgid "Create Server"
 msgstr "Crear servidor"
 
@@ -1446,7 +1446,7 @@ msgstr "Introduce la dirección del servidor"
 #. I18N: Networking menu button
 #: src/states_screens/online_profile_base.cpp:112
 #: src/states_screens/online_profile_base.cpp:122
-#: src/states_screens/online_screen.cpp:58
+#: src/states_screens/online_screen.cpp:59
 msgid "Your profile"
 msgstr "Tu perfil"
 
@@ -1655,7 +1655,7 @@ msgstr "Añadir jugador"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: src/states_screens/online_profile_achievements.cpp:71
-#: src/states_screens/server_selection.cpp:116
+#: src/states_screens/server_selection.cpp:119
 msgid "Name"
 msgstr "Nombre"
 
@@ -1782,7 +1782,7 @@ msgstr "Interfaz de usuario"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/ghost_replay_selection.cpp:137
-#: src/states_screens/server_selection.cpp:117
+#: src/states_screens/server_selection.cpp:120
 msgid "Players"
 msgstr "Jugadores"
 
@@ -2140,218 +2140,223 @@ msgstr "Borrar"
 msgid "Default kart color"
 msgstr "Color del kart por defecto"
 
-#. I18N: ../stk-assets/karts/adiumy/kart.xml
+#. I18N: ../supertuxkart-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
 msgstr "Adiumy"
 
-#. I18N: ../stk-assets/karts/amanda/kart.xml
+#. I18N: ../supertuxkart-assets/karts/amanda/kart.xml
 msgid "Amanda"
 msgstr "Amanda"
 
-#. I18N: ../stk-assets/karts/beastie/kart.xml
+#. I18N: ../supertuxkart-assets/karts/beastie/kart.xml
 msgid "Beastie"
 msgstr "Beastie"
 
-#. I18N: ../stk-assets/karts/emule/kart.xml
+#. I18N: ../supertuxkart-assets/karts/emule/kart.xml
 msgid "Emule"
 msgstr "Emule"
 
-#. I18N: ../stk-assets/karts/gavroche/kart.xml
+#. I18N: ../supertuxkart-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
 msgstr "Gavroche"
 
-#. I18N: ../stk-assets/karts/gnu/kart.xml
+#. I18N: ../supertuxkart-assets/karts/gnu/kart.xml
 msgid "Gnu"
 msgstr "Gnu"
 
-#. I18N: ../stk-assets/karts/hexley/kart.xml
+#. I18N: ../supertuxkart-assets/karts/hexley/kart.xml
 msgid "Hexley"
 msgstr "Hexley"
 
-#. I18N: ../stk-assets/karts/kiki/kart.xml
+#. I18N: ../supertuxkart-assets/karts/kiki/kart.xml
 msgid "Kiki"
 msgstr "Kiki"
 
-#. I18N: ../stk-assets/karts/konqi/kart.xml
+#. I18N: ../supertuxkart-assets/karts/konqi/kart.xml
 msgid "Konqi"
 msgstr "Konqi"
 
-#. I18N: ../stk-assets/karts/nolok/kart.xml
+#. I18N: ../supertuxkart-assets/karts/nolok/kart.xml
 msgid "Nolok"
 msgstr "Nolok"
 
-#. I18N: ../stk-assets/karts/pidgin/kart.xml
+#. I18N: ../supertuxkart-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
 msgstr "Pidgin"
 
-#. I18N: ../stk-assets/karts/puffy/kart.xml
+#. I18N: ../supertuxkart-assets/karts/puffy/kart.xml
 msgid "Puffy"
 msgstr "Puffy"
 
-#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+#. I18N: ../supertuxkart-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
 msgstr "Sara la corredora"
 
-#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+#. I18N: ../supertuxkart-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
 msgstr "Sara la hechicera"
 
-#. I18N: ../stk-assets/karts/suzanne/kart.xml
+#. I18N: ../supertuxkart-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
 msgstr "Suzanne"
 
-#. I18N: ../stk-assets/karts/tux/kart.xml
+#. I18N: ../supertuxkart-assets/karts/tux/kart.xml
 msgid "Tux"
 msgstr "Tux"
 
-#. I18N: ../stk-assets/karts/wilber/kart.xml
+#. I18N: ../supertuxkart-assets/karts/wilber/kart.xml
 msgid "Wilber"
 msgstr "Wilber"
 
-#. I18N: ../stk-assets/karts/xue/kart.xml
+#. I18N: ../supertuxkart-assets/karts/xue/kart.xml
 msgid "Xue"
 msgstr "Xue"
 
-#. I18N: ../stk-assets/tracks/abyss/track.xml
+#. I18N: ../supertuxkart-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
 msgstr "Abismo antediluviano"
 
-#. I18N: ../stk-assets/tracks/battleisland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
 msgstr "Isla de batalla"
 
-#. I18N: ../stk-assets/tracks/candela_city/track.xml
+#. I18N: ../supertuxkart-assets/tracks/candela_city/track.xml
 msgid "Candela City"
 msgstr "Candela City"
 
-#. I18N: ../stk-assets/tracks/cave/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "Cueva X"
 
-#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
 msgstr "Templo del cacao"
 
-#. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
+#. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
 msgstr "Campo de maíz"
 
-#. I18N: ../stk-assets/tracks/fortmagma/track.xml
+#. I18N: ../supertuxkart-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
 msgstr "Fort Magma"
 
-#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
 msgstr "Isla Gran Paradiso"
 
-#. I18N: ../stk-assets/tracks/greenvalley/track.xml
+#. I18N: ../supertuxkart-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
 msgstr "Valle verde"
 
-#. I18N: ../stk-assets/tracks/hacienda/track.xml
+#. I18N: ../supertuxkart-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Hacienda"
 
-#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
 msgstr "Campo de fútbol helado"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
 msgstr "¿Qué pasa, pequeños hippies? ¿Vuestro gran líder Gnu ha desaparecido?"
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
 msgstr "¡Oh,sí! Ahora está en mi castillo, y será servido como cena..."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
 msgstr "Pero soy una criatura justa, así que os ofreceré un trato."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
 msgstr "Si podéis ganarme en una carrera, soltaré al vejestorio."
 
-#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
-#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: Cutscene subtitle from ../supertuxkart-
+#. assets/tracks/introcutscene2/scene.xml
+#. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
 msgstr " ¡Pero nunca podréis vencerme, patéticos idiotas, porque yo soy el rey de los karts!"
 
-#. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
 msgstr "Arena Las Dunas"
 
-#. I18N: ../stk-assets/tracks/lasdunasscoccer/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lasdunasscoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
 msgstr "Estadio de fútbol Las Dunas"
 
-#. I18N: ../stk-assets/tracks/lighthouse/track.xml
+#. I18N: ../supertuxkart-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Alrededor del faro"
 
-#. I18N: ../stk-assets/tracks/mansion/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mansion/track.xml
 msgid "Blackhill Mansion"
 msgstr "Mansión Blackhill"
 
-#. I18N: ../stk-assets/tracks/mines/track.xml
+#. I18N: ../supertuxkart-assets/tracks/mines/track.xml
 msgid "Old Mine"
 msgstr "La vieja mina"
 
-#. I18N: ../stk-assets/tracks/minigolf/track.xml
+#. I18N: ../supertuxkart-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
 msgstr "Minigolf"
 
-#. I18N: ../stk-assets/tracks/olivermath/track.xml
+#. I18N: ../supertuxkart-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "Clase de mates de Oliver"
 
-#. I18N: ../stk-assets/tracks/sandtrack/track.xml
+#. I18N: ../supertuxkart-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Arenas movedizas"
 
-#. I18N: ../stk-assets/tracks/scotland/track.xml
+#. I18N: ../supertuxkart-assets/tracks/scotland/track.xml
 msgid "Nessie's pond"
 msgstr "El estanque de Nessie"
 
-#. I18N: ../stk-assets/tracks/snowmountain/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
 msgstr "Resort nórdico"
 
-#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
+#. I18N: ../supertuxkart-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
 msgstr "Pico nevado"
 
-#. I18N: ../stk-assets/tracks/soccer_field/track.xml
+#. I18N: ../supertuxkart-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
 msgstr "Campo de fútbol"
 
-#. I18N: ../stk-assets/tracks/stadium/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stadium/track.xml
 msgid "The Stadium"
 msgstr "El estadio"
 
-#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
+#. I18N: ../supertuxkart-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
 msgstr "STK Enterprise"
 
-#. I18N: ../stk-assets/tracks/temple/track.xml
+#. I18N: ../supertuxkart-assets/tracks/temple/track.xml
 msgid "Temple"
 msgstr "Templo"
 
-#. I18N: ../stk-assets/tracks/volcano_island/track.xml
+#. I18N: ../supertuxkart-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
 msgstr "Isla volcánica"
 
-#. I18N: ../stk-assets/tracks/xr591/track.xml
+#. I18N: ../supertuxkart-assets/tracks/xr591/track.xml
 msgid "XR591"
 msgstr "XR591"
 
-#. I18N: ../stk-assets/tracks/zengarden/track.xml
+#. I18N: ../supertuxkart-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
 msgstr "Jardín zen"
 
@@ -2420,13 +2425,13 @@ msgstr "Invitado"
 msgid "Guest %d"
 msgstr "Invitado %d"
 
-#: src/config/user_config.cpp:652
+#: src/config/user_config.cpp:683
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr "Tu fichero de configuración estaba mal formado, así que ha sido borrado y uno nuevo será creado."
 
-#: src/config/user_config.cpp:663
+#: src/config/user_config.cpp:694
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
@@ -2476,7 +2481,7 @@ msgstr "Eficiencia de nitro"
 #: src/guiengine/widgets/player_kart_widget.cpp:756
 #: src/karts/controller/local_player_controller.cpp:415
 #: src/karts/controller/player_controller.cpp:410
-#: src/network/protocols/client_lobby.cpp:672
+#: src/network/protocols/client_lobby.cpp:679
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3171,7 +3176,7 @@ msgstr "¡Has ganado la carrera!"
 msgid "You finished the race!"
 msgstr "¡Has finalizado la carrera!"
 
-#: src/main.cpp:1788
+#: src/main.cpp:1749
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3182,23 +3187,23 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart puede conectarse a un servidor para descargar complementos y notificarte actualizaciones. También recogemos estadísticas anónimas de hardware para ayudar en el desarrollo de STK. Lee nuestra declaración de privacidad en http://privacy.supertuxkart.net. ¿Te gustaría habilitar esta característica? (Para cambiar este parámetro más adelante, ve a las opciones, selecciona la pestaña \"Interfaz de usuario\", y edita los parámetros \"Conectarse a Internet\" y \"Enviar estadísticas de hardware anónimas\")."
 
-#: src/main.cpp:1980
+#: src/main.cpp:2006
 msgid "Your screen resolution is too low to run STK."
 msgstr "La resolución de tu pantalla es demasiado baja para ejecutar STK."
 
-#: src/main.cpp:2009
+#: src/main.cpp:2035
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "La versión de tu controlador gráfico es demasiado antigua. Por favor, instala la última versión."
 
-#: src/main.cpp:2027
+#: src/main.cpp:2053
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Tu versión de OpenGL parece ser demasiado antigua. Comprueba si hay disponible una actualización de tu controlador gráfico. SuperTuxKart necesita %s o superior."
 
-#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:83
+#: src/main_loop.cpp:333 src/network/protocols/client_lobby.cpp:84
 msgid "Server connection timed out."
 msgstr "La conexión con el servidor ha superado el tiempo de espera."
 
@@ -3243,26 +3248,26 @@ msgstr "Huevos: %d / %d"
 msgid "Leader"
 msgstr "Líder"
 
-#: src/modes/linear_world.cpp:376
+#: src/modes/linear_world.cpp:377
 msgid "Final lap!"
 msgstr "¡Última vuelta!"
 
-#: src/modes/linear_world.cpp:404
+#: src/modes/linear_world.cpp:405
 #, c-format
 msgid "Lap %i"
 msgstr "Vuelta %i"
 
-#: src/modes/linear_world.cpp:494
+#: src/modes/linear_world.cpp:495
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s por %s"
 
-#: src/modes/linear_world.cpp:499
+#: src/modes/linear_world.cpp:500
 msgid "New fastest lap"
 msgstr "Nueva vuelta rápida"
 
-#: src/modes/linear_world.cpp:1026
+#: src/modes/linear_world.cpp:1027
 msgid "WRONG WAY!"
 msgstr "¡DIRECCIÓN CONTRARIA!"
 
@@ -3282,46 +3287,19 @@ msgstr "¡Has sido eliminado!"
 msgid "'%s' has been eliminated."
 msgstr "'%s' ha sido eliminado."
 
-#: src/network/network_config.cpp:181
-msgid "Normal Race (Grand Prix)"
-msgstr "Carrera normal (campeonato)"
-
-#: src/network/network_config.cpp:183
-msgid "Time Trial (Grand Prix)"
-msgstr "Carrera contrarreloj (campeonato)"
-
-#. I18N: In the create server screen for battle server
-#: src/network/network_config.cpp:193
-#: src/states_screens/create_server_screen.cpp:177
-msgid "Free-For-All"
-msgstr "Por libre"
-
-#. I18N: In the create server screen for battle server
-#: src/network/network_config.cpp:195
-#: src/states_screens/create_server_screen.cpp:179
-msgid "Capture The Flag"
-msgstr "Capturar la bandera"
-
-#: src/network/protocols/client_lobby.cpp:84
+#: src/network/protocols/client_lobby.cpp:85
 msgid "Server has been shut down."
 msgstr "El servidor ha sido cerrado."
 
-#: src/network/protocols/client_lobby.cpp:85
+#: src/network/protocols/client_lobby.cpp:86
 msgid "You were kicked from the server."
 msgstr "Te han expulsado del servidor."
 
-#: src/network/protocols/client_lobby.cpp:87
-#: src/network/protocols/client_lobby.cpp:234
-#: src/network/protocols/client_lobby.cpp:693
+#: src/network/protocols/client_lobby.cpp:88
+#: src/network/protocols/client_lobby.cpp:233
+#: src/network/protocols/client_lobby.cpp:700
 msgid "Bad network connection is detected."
 msgstr "Se ha detectado una mala conexión de red."
-
-#. I18N: Message shown in network lobby to tell user that
-#. player name is clickable
-#: src/network/protocols/client_lobby.cpp:91
-msgid ""
-"Press player name in the list for player management and ranking information."
-msgstr "Pulsa en el nombre del usuario de la lista para gestionar el jugador y ver información de su classificación."
 
 #: src/network/protocols/client_lobby.cpp:449
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
@@ -3376,15 +3354,22 @@ msgstr "Circuito: %s,\nvueltas: %d, al revés: %s"
 msgid "%s disconnected."
 msgstr "%s se ha desconectado."
 
+#. I18N: Message shown in network lobby to tell user that
+#. player name is clickable
+#: src/network/protocols/client_lobby.cpp:538
+msgid ""
+"Press player name in the list for player management and ranking information."
+msgstr "Pulsa en el nombre del usuario de la lista para gestionar el jugador y ver información de su classificación."
+
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:559
+#: src/network/protocols/client_lobby.cpp:566
 #, c-format
 msgid "Server name: %s"
 msgstr "Nombre del servidor: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:567
+#: src/network/protocols/client_lobby.cpp:574
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
@@ -3392,107 +3377,127 @@ msgid "Difficulty: %s"
 msgstr "Dificultad: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:572
+#: src/network/protocols/client_lobby.cpp:579
 #, c-format
 msgid "Max players: %d"
 msgstr "Máximos jugadores: %d"
 
-#: src/network/protocols/client_lobby.cpp:589
-#: src/states_screens/dialogs/server_info_dialog.cpp:90
+#: src/network/protocols/client_lobby.cpp:596
+#: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Modo de juego: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:601
-#: src/states_screens/create_server_screen.cpp:193
+#: src/network/protocols/client_lobby.cpp:608
+#: src/states_screens/create_server_screen.cpp:194
 msgid "Time limit"
 msgstr "Límite de tiempo"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:602
-#: src/states_screens/create_server_screen.cpp:195
+#: src/network/protocols/client_lobby.cpp:609
+#: src/states_screens/create_server_screen.cpp:196
 msgid "Goals limit"
 msgstr "Límite de goles"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:606
+#: src/network/protocols/client_lobby.cpp:613
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Tipo de partida de fútbol: %s"
 
-#: src/network/protocols/client_lobby.cpp:616
+#: src/network/protocols/client_lobby.cpp:623
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Progreso del campeonato: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:685
+#: src/network/protocols/client_lobby.cpp:692
 msgid "All players joined red or blue team."
 msgstr "Todos los jugadores se han unido al equipo rojo o azul."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:715
+#: src/network/protocols/client_lobby.cpp:722
 msgid "You are now the owner of server."
 msgstr "Ahora eres el propietario del servidor."
 
-#: src/network/protocols/client_lobby.cpp:753
+#: src/network/protocols/client_lobby.cpp:760
 msgid "Connection refused: Server is busy."
 msgstr "Conexión rechazada: el servidor está ocupado."
 
-#: src/network/protocols/client_lobby.cpp:757
+#: src/network/protocols/client_lobby.cpp:764
 msgid "Connection refused: You are banned from the server."
 msgstr "Conexión rechazada: has sido expulsado del servidor."
 
-#: src/network/protocols/client_lobby.cpp:761
+#: src/network/protocols/client_lobby.cpp:768
 msgid "Connection refused: Server password is incorrect."
 msgstr "Conexión rechazada: la contraseña del servidor es incorrecta."
 
-#: src/network/protocols/client_lobby.cpp:765
+#: src/network/protocols/client_lobby.cpp:772
 msgid "Connection refused: Game data is incompatible."
 msgstr "Conexión rechazada: Los datos del juego son incompatibles."
 
-#: src/network/protocols/client_lobby.cpp:769
+#: src/network/protocols/client_lobby.cpp:776
 msgid "Connection refused: Server is full."
 msgstr "Conexión rechazada: el servidor está lleno."
 
-#: src/network/protocols/client_lobby.cpp:773
+#: src/network/protocols/client_lobby.cpp:780
 msgid "Connection refused: Invalid player connecting."
 msgstr "Conexión rechazada: se está conectando un jugador inválido."
 
-#: src/network/protocols/connect_to_server.cpp:132
+#: src/network/protocols/connect_to_server.cpp:196
 msgid "No quick play server available."
 msgstr "No hay ningún servidor de partidas rápidas disponible."
 
-#: src/network/protocols/connect_to_server.cpp:285
-#: src/states_screens/online_screen.cpp:272
+#: src/network/protocols/connect_to_server.cpp:281
+#: src/states_screens/online_screen.cpp:273
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "No se ha podido conectar al servidor %s."
+
+#: src/network/server_config.cpp:234
+msgid "Normal Race (Grand Prix)"
+msgstr "Carrera normal (campeonato)"
+
+#: src/network/server_config.cpp:236
+msgid "Time Trial (Grand Prix)"
+msgstr "Carrera contrarreloj (campeonato)"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:246
+#: src/states_screens/create_server_screen.cpp:178
+msgid "Free-For-All"
+msgstr "Por libre"
+
+#. I18N: In the create server screen for battle server
+#: src/network/server_config.cpp:248
+#: src/states_screens/create_server_screen.cpp:180
+msgid "Capture The Flag"
+msgstr "Capturar la bandera"
 
 #. I18N: Official means this server is hosted by STK team
 #: src/network/server.cpp:110
 msgid "Official"
 msgstr "Oficial"
 
-#: src/online/online_player_profile.cpp:436
+#: src/online/online_player_profile.cpp:434
 #, c-format
 msgid "%s is now online."
 msgstr "%s está en línea."
 
-#: src/online/online_player_profile.cpp:440
+#: src/online/online_player_profile.cpp:438
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s y %s están en línea."
 
-#: src/online/online_player_profile.cpp:445
+#: src/online/online_player_profile.cpp:443
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s y %s están en línea."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:451
+#: src/online/online_player_profile.cpp:449
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3500,19 +3505,19 @@ msgstr[0] "%d amigo está en línea."
 msgstr[1] "%d amigos están en línea."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:499
+#: src/online/online_player_profile.cpp:497
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s ahora está en el servidor \"%s\"."
 
-#: src/online/online_player_profile.cpp:530
+#: src/online/online_player_profile.cpp:528
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
 msgstr[0] "¡Tienes %d nueva petición de amistad!"
 msgstr[1] "¡Tienes %d nuevas peticiones de amistad!"
 
-#: src/online/online_player_profile.cpp:536
+#: src/online/online_player_profile.cpp:534
 msgid "You have a new friend request!"
 msgstr "¡Tienes una nueva petición de amistad!"
 
@@ -3653,24 +3658,24 @@ msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d arena no disponible en modo de un jugador"
 msgstr[1] "%d arenas no disponibles en modo de un jugador"
 
-#: src/states_screens/create_server_screen.cpp:89
+#: src/states_screens/create_server_screen.cpp:90
 msgid "Create LAN Server"
 msgstr "Crear servidor LAN"
 
-#: src/states_screens/create_server_screen.cpp:94
+#: src/states_screens/create_server_screen.cpp:95
 #, c-format
 msgid "%s's server"
 msgstr "Servidor de %s"
 
 #. I18N: In the create server screen
-#: src/states_screens/create_server_screen.cpp:155
+#: src/states_screens/create_server_screen.cpp:156
 msgid "No. of grand prix track(s)"
 msgstr "Nº de circuitos del campeonato"
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/create_server_screen.cpp:159
+#: src/states_screens/create_server_screen.cpp:160
 #: src/states_screens/dialogs/custom_video_settings.cpp:62
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
@@ -3679,20 +3684,20 @@ msgid "Disabled"
 msgstr "Desactivado"
 
 #. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/create_server_screen.cpp:173
+#: src/states_screens/create_server_screen.cpp:174
 msgid "Battle mode"
 msgstr "Modo de batalla"
 
 #. I18N: In the create server screen
-#: src/states_screens/create_server_screen.cpp:189
+#: src/states_screens/create_server_screen.cpp:190
 msgid "Soccer game type"
 msgstr "Tipo de partida de fútbol"
 
-#: src/states_screens/create_server_screen.cpp:238
+#: src/states_screens/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "¡El nombre debe tener entre 4 y 30 caracteres!"
 
-#: src/states_screens/create_server_screen.cpp:255
+#: src/states_screens/create_server_screen.cpp:256
 msgid "Incorrect characters in password!"
 msgstr "¡Caracteres incorrectos en la contraseña!"
 
@@ -3932,26 +3937,26 @@ msgstr "Reto de nitro"
 msgid "Ghost replay race"
 msgstr "Carrera de repetición fantasma"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:100
+#: src/states_screens/dialogs/server_info_dialog.cpp:99
 #: src/states_screens/race_gui_overworld.cpp:147
 msgid "Rank"
 msgstr "Posición"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:103
+#: src/states_screens/dialogs/server_info_dialog.cpp:102
 msgid "Player"
 msgstr "Jugador"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:106
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
 msgid "Scores"
 msgstr "Puntuaciones"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:109
+#: src/states_screens/dialogs/server_info_dialog.cpp:108
 msgid "Time played"
 msgstr "Tiempo jugado"
 
@@ -3960,7 +3965,7 @@ msgid "Input device already exists."
 msgstr "El dispositivo de entrada ya existe."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
-#: src/states_screens/online_screen.cpp:239
+#: src/states_screens/online_screen.cpp:240
 msgid "No player available for connecting to server."
 msgstr "No hay ningún jugador disponible para conectarse al servidor."
 
@@ -4173,7 +4178,7 @@ msgid ""
 msgstr "Todo el mundo:\n¡Pulsad el botón 'Seleccionar' para uniros a la partida!"
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online_screen.cpp:217
+#: src/states_screens/online_screen.cpp:218
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
@@ -4278,17 +4283,17 @@ msgid "Offline"
 msgstr "Desconectado"
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online_screen.cpp:107
+#: src/states_screens/online_screen.cpp:108
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Debes iniciar sesión para poder jugar en red global. Pulsa en tu nombre de usuario aquí arriba."
 
-#: src/states_screens/online_screen.cpp:244
+#: src/states_screens/online_screen.cpp:245
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
 msgstr "Introduce la dirección del servidor con IP (opcional) seguida de : y el puerto."
 
-#: src/states_screens/online_screen.cpp:255
+#: src/states_screens/online_screen.cpp:256
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "Dirección del servidor inválida: %s."
@@ -4758,25 +4763,25 @@ msgstr "El acceso a Internet se encuentra desactivado, actívalo en las opciones
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/server_selection.cpp:124
+#: src/states_screens/server_selection.cpp:127
 msgid "Owner"
 msgstr "Propietario"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/server_selection.cpp:126
+#: src/states_screens/server_selection.cpp:129
 msgid "Distance (km)"
 msgstr "Distancia (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/server_selection.cpp:209
+#: src/states_screens/server_selection.cpp:214
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: src/states_screens/server_selection.cpp:315
+#: src/states_screens/server_selection.cpp:322
 msgid "No server is available."
 msgstr "No hay servidores disponibles."
 
-#: src/states_screens/server_selection.cpp:323
+#: src/states_screens/server_selection.cpp:330
 msgid "Fetching servers"
 msgstr "Obteniendo servidores"
 
@@ -4873,15 +4878,15 @@ msgstr "%d/%m/%Y"
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:408
+#: src/utils/translation.cpp:409
 msgid "   Is this a RTL language?"
 msgstr "   N"
 
-#: ../stk-assets/tracks/overworld/scripting.as:15
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
 msgstr "¡Completa todos los retos para desbloquear la puerta grande!"
 
-#: ../stk-assets/tracks/overworld/scripting.as:63
+#: ../supertuxkart-assets/tracks/overworld/scripting.as:63
 msgid ""
 "You need more points\n"
 "to enter this challenge!\n"
@@ -4889,71 +4894,71 @@ msgid ""
 "available challenges."
 msgstr "¡Necesitas más puntos\npara entrar en este reto!\nBusca los retos disponibles\nen el mapa en miniatura."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:21
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:21
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr "Acelera con <%s>, y gira con <%s> y <%s>."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
-#: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:37
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:38
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr "¡Recoge cajas de regalo, y dispara el arma con <%s> para hacer explotar esas cajas!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
-#: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:43
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:44
 #, c-format
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
 msgstr "Pulsa <%s> para mirar detrás de ti. ¡Dispara el arma con <%s> mientras pulsas <%s> para disparar hacia atrás!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
-#: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:53
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:54
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "¡Usa la nitro que has recogido pulsando <%s>!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:58
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:58
 msgid "Collect nitro bottles (we will use them after the curve)."
 msgstr "Recoge botellas de nitro (las usaremos después de la curva)."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:63
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:63
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr "¡Ups! Cuando tengas problemas, pulsa <%s> para que te rescaten."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
-#: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:69
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:70
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
 msgstr "Acelera y pulsa la tecla <%s> mientras giras para derrapar. Derrapar un poco puede ayudarte a girar más rápido para tomar curvas cerradas."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
-#: ../stk-assets/tracks/tutorial/triggers.as:78
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:77
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:78
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr "Ten en cuenta que si consigues derrapar durante varios segundos, ¡recibirás un incremento de velocidad como recompensa!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
-#: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../supertuxkart-assets/tracks/tutorial/scripting.as:82
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:83
 msgid "You are now ready to race. Good luck!"
 msgstr "Ya estás preparado para competir. ¡Buena suerte!"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:28
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:28
 #, c-format
 msgid "Accelerate with <%s> and steer with <%s> and <%s>"
 msgstr "Acelera con <%s> y gira con <%s> y <%s>."
 
-#: ../stk-assets/tracks/tutorial/triggers.as:59
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:59
 msgid "Collect nitro bottles (we will use them after the curve)"
 msgstr "Recoge botellas de nitro (las usaremos después de la curva)"
 
-#: ../stk-assets/tracks/tutorial/triggers.as:64
+#: ../supertuxkart-assets/tracks/tutorial/triggers.as:64
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "¡Ups! Cuando tengas problemas, pulsa <%s> para que te rescaten"

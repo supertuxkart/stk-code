@@ -59,7 +59,8 @@ public:
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
-                    GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC, REPLAY,
+                    GFX, GRANDPRIX, GUI_ICON, GUI_SCREEN, GUI_DIALOG,
+                    LIBRARY, MODEL, MUSIC, REPLAY,
                     SCRIPT, SFX, SHADER, SKIN, TEXTURE, TTF,
                     TRANSLATION, ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
@@ -98,6 +99,8 @@ private:
 
     /** Directory where user-defined grand prix are stored. */
     std::string       m_gp_dir;
+
+    std::string       m_cert_location;
 
     std::vector<TextureSearchPath> m_texture_search_path;
 
@@ -225,6 +228,7 @@ public:
     {
         return m_subdir_name[SHADER];
     }
+    const std::string& getCertLocation() const { return m_cert_location; }
 };   // FileManager
 
 extern FileManager* file_manager;

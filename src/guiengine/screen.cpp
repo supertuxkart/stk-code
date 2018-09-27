@@ -130,7 +130,7 @@ void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
 
-    std::string path = file_manager->getAssetChecked(FileManager::GUI, m_filename, true);
+    std::string path = file_manager->getAssetChecked(FileManager::GUI_SCREEN, m_filename, true);
     IXMLReader* xml = file_manager->createXMLReader( path );
 
     parseScreenFileDiv(xml, m_widgets);

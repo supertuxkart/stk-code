@@ -1221,6 +1221,8 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     std::unique_lock<std::mutex> lock(m_peers_mutex);
     for (auto peer : m_peers)
     {
+        if (peer.second->isDisconnected())
+            continue;
         auto peer_profile = peer.second->getPlayerProfiles();
         p.insert(p.end(), peer_profile.begin(), peer_profile.end());
     }
