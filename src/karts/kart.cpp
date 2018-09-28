@@ -185,7 +185,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_terrain_sound          = NULL;
     m_last_sound_material    = NULL;
     m_previous_terrain_sound = NULL;
-
+    m_graphical_view_blocked_by_plunger = 0.0f;
 }   // Kart
 
 // -----------------------------------------------------------------------------
@@ -370,6 +370,7 @@ void Kart::reset()
     m_current_lean         = 0.0f;
     m_falling_time         = 0.0f;
     m_view_blocked_by_plunger = 0;
+    m_graphical_view_blocked_by_plunger = 0.0f;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
     m_flying               = false;
@@ -590,8 +591,15 @@ void Kart::blockViewWithPlunger()
 {
     // Avoid that a plunger extends the plunger time
     if(m_view_blocked_by_plunger<=0 && !isShielded())
+    {
         m_view_blocked_by_plunger = 
         stk_config->time2Ticks(m_kart_properties->getPlungerInFaceTime());
+        if (m_graphical_view_blocked_by_plunger == 0.0f)
+        {
+             m_graphical_view_blocked_by_plunger =
+                m_kart_properties->getPlungerInFaceTime();
+        }
+    }
     if(isShielded())
     {
         decreaseShieldTime();
@@ -1434,7 +1442,10 @@ void Kart::update(int ticks)
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= ticks;
     //unblock the view if kart just became shielded
     if(isShielded())
+    {
         m_view_blocked_by_plunger = 0;
+        m_graphical_view_blocked_by_plunger = 0.0f;
+    }
     // Decrease remaining invulnerability time
     if(m_invulnerable_ticks>0)
     {
@@ -1674,6 +1685,7 @@ void Kart::update(int ticks)
     if (emergency)
     {
         m_view_blocked_by_plunger = 0;
+        m_graphical_view_blocked_by_plunger = 0.0f;
         if (m_flying)
         {
             stopFlying();
@@ -3050,6 +3062,10 @@ void Kart::updateGraphics(float dt)
             unsetSquash();
         }
     }   // if squashed
+    if (m_graphical_view_blocked_by_plunger > 0.0f)
+        m_graphical_view_blocked_by_plunger -= dt;
+    if (m_graphical_view_blocked_by_plunger < 0.0f)
+        m_graphical_view_blocked_by_plunger = 0.0f;
 #endif
 
     for (int i = 0; i < EMITTER_COUNT; i++)
