@@ -1936,8 +1936,11 @@ int main(int argc, char *argv[] )
         }
         else if (CommandLine::has("--lan-server", &s))
         {
-            ProfileWorld::disableGraphics();
-            UserConfigParams::m_enable_sound = false;
+            if (no_graphics)
+            {
+                ProfileWorld::disableGraphics();
+                UserConfigParams::m_enable_sound = false;
+            }
             NetworkConfig::get()->setIsServer(true);
             ServerConfig::m_server_name = s;
             ServerConfig::m_wan_server = false;
