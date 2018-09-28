@@ -762,7 +762,7 @@ namespace UserConfigParams
         &m_network_group, "Use random port for server connection "
         "(check stk_config.xml for default value)"));
     PARAM_PREFIX BoolUserConfigParam m_lobby_chat
-        PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
     PARAM_PREFIX IntUserConfigParam m_max_players
