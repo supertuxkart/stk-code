@@ -634,8 +634,7 @@ void STKHost::setErrorMessage(const irr::core::stringw &message)
 {
     if (!message.empty())
     {
-        irr::core::stringc s(message.c_str());
-        Log::error("STKHost", "%s", s.c_str());
+        Log::error("STKHost", "%s", StringUtils::wideToUtf8(message).c_str());
     }
     m_error_message = message;
 }   // setErrorMessage
