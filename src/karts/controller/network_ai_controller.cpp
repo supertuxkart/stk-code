@@ -101,6 +101,8 @@ void NetworkAIController::convertAIToPlayerActions()
         0 : 32768);
     all_actions.emplace_back(PA_RESCUE,
         m_ai_controls->getRescue() ? 32768 : 0);
+    all_actions.emplace_back(PA_LOOK_BACK,
+        m_ai_controls->getLookBack() ? 32768 : 0);
 
     for (const auto& a : all_actions)
     {
