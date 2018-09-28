@@ -951,10 +951,16 @@ void Kart::finishedRace(float time, bool from_server)
                     World::getWorld()->getTicksSinceStart(),
                     /*undo_function*/[old_controller, this]()
                     {
+                        if (m_network_finish_check_ticks == -1)
+                            return;
+
                         m_controller = old_controller;
                     },
                     /*replay_function*/[ec, old_controller, this]()
                     {
+                        if (m_network_finish_check_ticks == -1)
+                            return;
+
                         m_saved_controller = old_controller;
                         ec->reset();
                         m_controller = ec;
@@ -1319,13 +1325,13 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
-    if (m_network_finish_check_ticks != 0 &&
+    if (m_network_finish_check_ticks > 0 &&
         World::getWorld()->getTicksSinceStart() >
         m_network_finish_check_ticks &&
         !m_finished_race && m_saved_controller != NULL)
     {
         Log::warn("Kart", "Missing finish race from server.");
-        m_network_finish_check_ticks = 0;
+        m_network_finish_check_ticks = -1;
         delete m_controller;
         m_controller = m_saved_controller;
         m_saved_controller = NULL;
