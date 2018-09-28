@@ -33,6 +33,7 @@ private:
     btTransform m_transfrom_from_network;
     float m_prev_steering, m_steering_smoothing_dt, m_steering_smoothing_time;
 
+    int m_last_animation_end_ticks;
 public:
     KartRewinder(const std::string& ident, unsigned int world_kart_id,
                  int position, const btTransform& init_transform,
