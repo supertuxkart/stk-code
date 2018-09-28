@@ -256,7 +256,7 @@ BareNetworkString* Plunger::saveState(std::vector<std::string>* ru)
     BareNetworkString* buffer = Flyable::saveState(ru);
     buffer->addUInt16(m_keep_alive).addUInt8(m_moved_to_infinity ? 1 : 0);
     if (m_rubber_band)
-        buffer->addUInt8(m_rubber_band->getRubberBandTo());
+        buffer->addUInt8(m_rubber_band->get8BitState());
     else
         buffer->addUInt8(255);
     return buffer;
@@ -268,7 +268,20 @@ void Plunger::restoreState(BareNetworkString *buffer, int count)
     Flyable::restoreState(buffer, count);
     m_keep_alive = buffer->getUInt16();
     m_moved_to_infinity = buffer->getUInt8() == 1;
-    int8_t rbt = buffer->getUInt8();
-    if (rbt != -1 && m_rubber_band)
-        m_rubber_band->setRubberBandTo((RubberBand::RubberBandTo)rbt);
+    uint8_t bit_state = buffer->getUInt8();
+    if (bit_state == 255 && m_rubber_band)
+    {
+        delete m_rubber_band;
+        m_rubber_band = NULL;
+        if (!m_reverse_mode)
+            m_reverse_mode = true;
+    }
+    else if (bit_state != 255 && !m_rubber_band)
+    {
+        m_rubber_band = new RubberBand(this, m_owner);
+        if (m_reverse_mode)
+            m_reverse_mode = false;
+    }
+    if (bit_state != 255)
+        m_rubber_band->set8BitState(bit_state);
 }   // restoreState
