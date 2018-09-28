@@ -73,7 +73,7 @@ public:
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                          int ticks) OVERRIDE;
-    virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;
+    virtual void collectedItem(ItemState *item, AbstractKart *kart) OVERRIDE;
     virtual Item* dropNewItem(ItemState::ItemType type, const AbstractKart *kart,
                               const Vec3 *xyz=NULL) OVERRIDE;
     virtual BareNetworkString* saveState(std::vector<std::string>* ru)

@@ -561,11 +561,6 @@ void Powerup::hitBonusBox(const ItemState &item_state)
 
     new_powerup = powerup_manager->getRandomPowerup(position, &n, 
                                                     random_number);
-    // FIXME Disable switch and bubblegum for now in network
-    if (NetworkConfig::get()->isNetworking() &&
-        (new_powerup == PowerupManager::POWERUP_BUBBLEGUM ||
-        new_powerup == PowerupManager::POWERUP_SWITCH))
-        new_powerup = PowerupManager::POWERUP_BOWLING;
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).
