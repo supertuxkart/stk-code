@@ -116,7 +116,8 @@ public:
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
                AbstractKart *previous_kart=NULL,
-               bool disable_swatter_animation = false);
+               bool disable_swatter_animation = false,
+               bool set_by_rewind_parachute = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
 
