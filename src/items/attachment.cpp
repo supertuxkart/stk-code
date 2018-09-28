@@ -354,6 +354,12 @@ void Attachment::hitBanana(ItemState *item_state)
         return;
     }
 
+    // Make it consistent with attachment rewind when eating banana with bomb
+    // see if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
+    // in 515
+    if (m_kart->getKartAnimation())
+        return;
+
     AttachmentType new_attachment = ATTACH_NOTHING;
     const KartProperties *kp = m_kart->getKartProperties();
     // Use this as a basic random number to make sync with server easier.
