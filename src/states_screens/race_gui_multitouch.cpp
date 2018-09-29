@@ -340,6 +340,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
                      kart->getPowerup()->getNum() > 1 && 
+                     !kart->hasFinishedRace() &&
                      m_gui_action == false)
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
