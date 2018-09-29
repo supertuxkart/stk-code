@@ -100,7 +100,8 @@ private:
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;
     irr::video::ITexture *m_heart_icon;
-    irr::video::ITexture *m_danger[2];
+    irr::video::ITexture *m_danger[3];
+    irr::video::ITexture *m_projectile[3];
 
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */

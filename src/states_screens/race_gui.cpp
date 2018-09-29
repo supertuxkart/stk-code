@@ -38,6 +38,7 @@ using namespace irr;
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
+#include "items/attachment.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -196,7 +197,10 @@ RaceGUI::RaceGUI()
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
     m_danger[0] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_nodanger.png");
     m_danger[1] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_danger.png");
-    m_danger[2] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_bigdanger.png"); 
+    m_danger[2] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_bigdanger.png");
+    m_projectile[0] = powerup_manager->getIcon(PowerupManager::POWERUP_BOWLING)->getTexture();
+    m_projectile[1] = powerup_manager->getIcon(PowerupManager::POWERUP_CAKE)->getTexture();
+    m_projectile[2] = powerup_manager->getIcon(PowerupManager::POWERUP_RUBBERBALL)->getTexture();
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -833,20 +837,38 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
             }
         }
 
-        int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
+        // Plungers are not shown, because they are not very dangerous,
+        // and in most cases fly too quickly to make an alert useful
+        int projectile_types[3]; //[2] basket, [1] cakes, [0] bowling
         projectile_types[0] = projectile_manager->getNearbyProjectileCount(kart, 15.0f /*alert radius*/,
                                                                            PowerupManager::POWERUP_BOWLING);
-        projectile_types[1] = projectile_manager->getNearbyProjectileCount(kart, 20.0f /*alert radius*/,
-                                                                           PowerupManager::POWERUP_PLUNGER);
-        projectile_types[2] = projectile_manager->getNearbyProjectileCount(kart, 25.0f /*alert radius*/,
+        projectile_types[1] = projectile_manager->getNearbyProjectileCount(kart, 25.0f /*alert radius*/,
                                                                            PowerupManager::POWERUP_CAKE);
-        projectile_types[3] = projectile_manager->getNearbyProjectileCount(kart, 50.0f /*alert radius*/,
+        projectile_types[2] = projectile_manager->getNearbyProjectileCount(kart, 50.0f /*alert radius*/,
                                                                            PowerupManager::POWERUP_RUBBERBALL);
 
-        int icon_to_use = 0;
+        int icon_to_use = 2;
+        int projectile_to_show = -1;
 
-        if (closest_kart_id >= 0 && closest_kart_dist_squared < 900.0f)
-            icon_to_use = 1;
+        // We show dangerous projectile with priority :
+        // basket ball > cake > bowling ball > plunger
+        if (projectile_types[2] >= 1)
+            projectile_to_show = 2;
+        else if (projectile_types[1] >= 1)
+            projectile_to_show = 1;
+        else if (projectile_types[0] >= 1)
+            projectile_to_show = 0;
+        // If no dangerous projectile and another kart close, show it
+        else if (closest_kart_id >= 0 && closest_kart_dist_squared < 900.0f)
+        {
+            if (world->getKart(closest_kart_id)->getAttachment()->getType() == Attachment::ATTACH_BOMB ||
+                world->getKart(closest_kart_id)->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+                icon_to_use = 2;
+            else
+                icon_to_use = 1;
+        }
+        else
+            icon_to_use = 0;
         
 
         int icon_width = meter_width/2;
@@ -854,16 +876,30 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
         int y = int(offset.Y - 0.235f*meter_height) - icon_width;
         core::rect<s32> indicator_pos(x, y, x + icon_width, y + icon_width);
         core::rect<s32> source_rect(core::position2d<s32>(0,0),
-                                               m_danger[icon_to_use]->getSize());
+                                    m_danger[icon_to_use]->getSize());
         draw2DImage(m_danger[icon_to_use],indicator_pos,source_rect,
                     NULL,NULL,true);
 
+        x = x+0.1875f*icon_width;
+        y = y+0.1875f*icon_width;
+        icon_width = 0.625f*icon_width;
+
         // Draw kart's icon
-        if (icon_to_use == 1)
+        if (icon_to_use == 1 ||
+            (icon_to_use == 2 && projectile_to_show == -1))
         {
             drawPlayerIcon(world->getKart(closest_kart_id),
-                           x+0.1875f*icon_width,y+0.1875f*icon_width,
-                           0.625f*icon_width);
+                           x, y, icon_width);
+        }
+
+        // Draw projectile's icon
+        if (icon_to_use == 2 && projectile_to_show >= 0)
+        {
+            core::rect<s32> proj_icon_pos(x, y, x + icon_width, y + icon_width);
+            core::rect<s32> base_rect(core::position2d<s32>(0,0),
+                                      m_projectile[projectile_to_show]->getSize());
+            draw2DImage(m_projectile[projectile_to_show],proj_icon_pos,base_rect,
+                        NULL,NULL,true);
         }
     }
 } // drawMiscInfo
