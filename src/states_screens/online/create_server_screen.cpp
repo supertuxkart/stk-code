@@ -258,9 +258,9 @@ void CreateServerScreen::createServer()
         return;
     }
 
+    const bool private_server = !password.empty();
     ServerConfig::m_private_server_password = password;
-    if (!password.empty())
-        password = std::string(" --server-password=") + password;
+    password = std::string(" --server-password=") + password;
 
     TransportAddress server_address(0x7f000001,
         stk_config->m_server_discovery_port);
@@ -268,7 +268,7 @@ void CreateServerScreen::createServer()
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        0, server_address, !password.empty(), false);
+        0, server_address, private_server, false);
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
