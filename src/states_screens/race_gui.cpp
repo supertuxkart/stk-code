@@ -841,11 +841,14 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
         // and in most cases fly too quickly to make an alert useful
         int projectile_types[3]; //[2] basket, [1] cakes, [0] bowling
         projectile_types[0] = projectile_manager->getNearbyProjectileCount(kart, 15.0f /*alert radius*/,
-                                                                           PowerupManager::POWERUP_BOWLING);
+                                                                           PowerupManager::POWERUP_BOWLING,
+                                                                           true /* exclude if owned by the kart */);
         projectile_types[1] = projectile_manager->getNearbyProjectileCount(kart, 25.0f /*alert radius*/,
-                                                                           PowerupManager::POWERUP_CAKE);
+                                                                           PowerupManager::POWERUP_CAKE,
+                                                                           true /* exclude if owned by the kart */);
         projectile_types[2] = projectile_manager->getNearbyProjectileCount(kart, 50.0f /*alert radius*/,
-                                                                           PowerupManager::POWERUP_RUBBERBALL);
+                                                                           PowerupManager::POWERUP_RUBBERBALL,
+                                                                           true /* exclude if owned by the kart */);
 
         int icon_to_use = 2;
         int projectile_to_show = -1;

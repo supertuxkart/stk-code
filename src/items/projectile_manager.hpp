@@ -72,7 +72,8 @@ public:
                                        float radius);
 
     int              getNearbyProjectileCount(const AbstractKart * const kart,
-                                       float radius, PowerupManager::PowerupType type);
+                                       float radius, PowerupManager::PowerupType type,
+                                       bool exclude_owned=false);
     // ------------------------------------------------------------------------
     /** Adds a special hit effect to be shown.
      *  \param hit_effect The hit effect to be added. */

@@ -225,6 +225,9 @@ public:
     /** Returns the type of flyable. */
     PowerupManager::PowerupType getType() const {return m_type;}
     // ------------------------------------------------------------------------
+    /** Returns the owner's kart */
+    AbstractKart *getOwner() const { return m_owner;}  
+    // ------------------------------------------------------------------------
     /** Sets wether Flyable should update TerrainInfo as part of its update
      *  call, or if the inheriting object will update TerrainInfo itself
      *  (or perhaps not at all if it is not needed). */
