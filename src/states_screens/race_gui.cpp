@@ -39,6 +39,7 @@ using namespace irr;
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -193,6 +194,9 @@ RaceGUI::RaceGUI()
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
+    m_danger[0] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_nodanger.png");
+    m_danger[1] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_danger.png");
+    m_danger[2] = irr_driver->getTexture(FileManager::GUI_ICON, "alert_bigdanger.png"); 
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -811,6 +815,56 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
         font->draw(oss.str().c_str(), pos, color, true, true);
         font->setScale(1.0f);
         return;
+    }
+    else if (race_manager->isLinearRaceMode())
+    {
+        float closest_kart_dist_squared = 99999.9f;
+        int closest_kart_id = -1;
+
+        World *world = World::getWorld();
+
+        for(unsigned int i=0;i<world->getNumKarts();i++)
+        {
+            float dist2 = world->getKart(i)->getXYZ().distance2(kart->getXYZ());
+            if (dist2 > 0 && dist2 < closest_kart_dist_squared)
+            {
+                closest_kart_id = i;
+                closest_kart_dist_squared = dist2;
+            }
+        }
+
+        int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
+        projectile_types[0] = projectile_manager->getNearbyProjectileCount(kart, 15.0f /*alert radius*/,
+                                                                           PowerupManager::POWERUP_BOWLING);
+        projectile_types[1] = projectile_manager->getNearbyProjectileCount(kart, 20.0f /*alert radius*/,
+                                                                           PowerupManager::POWERUP_PLUNGER);
+        projectile_types[2] = projectile_manager->getNearbyProjectileCount(kart, 25.0f /*alert radius*/,
+                                                                           PowerupManager::POWERUP_CAKE);
+        projectile_types[3] = projectile_manager->getNearbyProjectileCount(kart, 50.0f /*alert radius*/,
+                                                                           PowerupManager::POWERUP_RUBBERBALL);
+
+        int icon_to_use = 0;
+
+        if (closest_kart_id >= 0 && closest_kart_dist_squared < 900.0f)
+            icon_to_use = 1;
+        
+
+        int icon_width = meter_width/2;
+        int x = int(offset.X + 0.375f*meter_width);
+        int y = int(offset.Y - 0.235f*meter_height) - icon_width;
+        core::rect<s32> indicator_pos(x, y, x + icon_width, y + icon_width);
+        core::rect<s32> source_rect(core::position2d<s32>(0,0),
+                                               m_danger[icon_to_use]->getSize());
+        draw2DImage(m_danger[icon_to_use],indicator_pos,source_rect,
+                    NULL,NULL,true);
+
+        // Draw kart's icon
+        if (icon_to_use == 1)
+        {
+            drawPlayerIcon(world->getKart(closest_kart_id),
+                           x+0.1875f*icon_width,y+0.1875f*icon_width,
+                           0.625f*icon_width);
+        }
     }
 } // drawMiscInfo
 
