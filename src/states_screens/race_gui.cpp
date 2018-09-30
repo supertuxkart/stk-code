@@ -824,14 +824,22 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
     {
         float closest_kart_dist_squared = 99999.9f;
         int closest_kart_id = -1;
+        bool closest_with_bad_attach = false;
 
         World *world = World::getWorld();
 
         for(unsigned int i=0;i<world->getNumKarts();i++)
         {
             float dist2 = world->getKart(i)->getXYZ().distance2(kart->getXYZ());
-            if (dist2 > 0 && dist2 < closest_kart_dist_squared)
+            if (dist2 > 0 && dist2 < 900.0f &&
+                (!closest_with_bad_attach || dist2 < closest_kart_dist_squared))
             {
+                if (world->getKart(i)->getAttachment()->getType() == Attachment::ATTACH_BOMB ||
+                    world->getKart(i)->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+                    closest_with_bad_attach = true;
+
+                // The id and distance is not important if not bomb or swatter,
+                // as the kart icon's is not shown then.
                 closest_kart_id = i;
                 closest_kart_dist_squared = dist2;
             }
@@ -862,10 +870,9 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
         else if (projectile_types[0] >= 1)
             projectile_to_show = 0;
         // If no dangerous projectile and another kart close, show it
-        else if (closest_kart_id >= 0 && closest_kart_dist_squared < 900.0f)
+        else if (closest_kart_id >= 0)
         {
-            if (world->getKart(closest_kart_id)->getAttachment()->getType() == Attachment::ATTACH_BOMB ||
-                world->getKart(closest_kart_id)->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+            if (closest_with_bad_attach)
                 icon_to_use = 2;
             else
                 icon_to_use = 1;
@@ -888,8 +895,7 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
         icon_width = 0.625f*icon_width;
 
         // Draw kart's icon
-        if (icon_to_use == 1 ||
-            (icon_to_use == 2 && projectile_to_show == -1))
+        if (icon_to_use == 2 && projectile_to_show == -1)
         {
             drawPlayerIcon(world->getKart(closest_kart_id),
                            x, y, icon_width);
