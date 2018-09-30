@@ -66,6 +66,8 @@ public:
     void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const        { return m_scores.at(kart_id); }
+    // ------------------------------------------------------------------------
+    bool getKartFFAResult(int kart_id) const;
 };   // FreeForAll
 
 

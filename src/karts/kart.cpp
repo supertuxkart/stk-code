@@ -1078,9 +1078,8 @@ void Kart::setRaceResult()
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
     {
-        // the top kart wins
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
-        m_race_result = ffa->getKartAtPosition(1) == this;
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
     {
