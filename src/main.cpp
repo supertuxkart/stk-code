@@ -2357,7 +2357,8 @@ static void cleanSuperTuxKart()
 #ifndef SERVER_ONLY
     if (!ProfileWorld::isNoGraphics())
     {
-        if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+        if (UserConfigParams::m_internet_status == Online::RequestManager::
+            IPERM_ALLOWED && !NewsManager::get()->waitForReadyToDeleted(2.0f))
         {
             Log::info("Thread", "News manager not stopping, exiting anyway.");
         }
