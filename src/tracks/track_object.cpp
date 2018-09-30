@@ -169,9 +169,9 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         // FIXME: at this time sound emitters are just disabled in multiplayer
         //        otherwise the sounds would be constantly heard, for networking
         //        the index of item needs to be same so we create and disable it
-        m_presentation = new TrackObjectPresentationSound(xml_node, parent);
-        if (race_manager->getNumLocalPlayers() < 2)
-            m_presentation->setEnable(false);
+        //        in TrackObjectPresentationSound constructor
+        m_presentation = new TrackObjectPresentationSound(xml_node, parent,
+            race_manager->getNumLocalPlayers() > 1);
     }
     else if (type == "action-trigger")
     {
