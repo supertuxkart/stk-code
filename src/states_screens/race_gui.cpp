@@ -261,12 +261,13 @@ void RaceGUI::renderGlobal(float dt)
     if(world->getPhase() == World::GOAL_PHASE)
         drawGlobalGoal();
 
+    if (!m_enabled) return;
+
     // MiniMap is drawn when the players wait for the start countdown to end
     drawGlobalMiniMap();
-    
+
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;
-    if (!m_enabled) return;
 
     //drawGlobalTimer checks if it should display in the current phase/mode
     drawGlobalTimer();
