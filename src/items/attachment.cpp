@@ -311,8 +311,6 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     if (m_type == new_type)
     {
         setTicksLeft(ticks_left);
-        if (m_type != new_type && new_type != ATTACH_SWATTER)
-            m_type = new_type;
         return;
     }
 
@@ -536,13 +534,19 @@ void Attachment::update(int ticks)
         m_node->setVisible((division & 0x1) == 0);
     }
 
-    if(m_plugin)
+    if (m_plugin)
     {
-        bool discard = m_plugin->updateAndTestFinished(ticks);
-        if(discard)
+        int discard_ticks = m_plugin->updateAndTestFinished(ticks);
+        if (discard_ticks != -1)
         {
-            clear();  // also removes the plugin
-            return;
+            // Save it for rewinding
+            m_ticks_left =
+                discard_ticks - World::getWorld()->getTicksSinceStart();
+            if (m_ticks_left <= 0)
+            {
+                clear();  // also removes the plugin
+                return;
+            }
         }
     }
 

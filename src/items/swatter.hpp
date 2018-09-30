@@ -87,7 +87,7 @@ public:
                      scene::ISceneNode* bomb_scene_node, int ticks);
     virtual ~Swatter();
     void     updateGrahpics(float dt) OVERRIDE;
-    bool     updateAndTestFinished(int ticks) OVERRIDE;
+    int      updateAndTestFinished(int ticks) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns if the swatter is currently aiming, i.e. can be used to
