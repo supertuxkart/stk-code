@@ -189,6 +189,7 @@ RaceGUI::RaceGUI()
 
     // Load icon textures for later reuse
     m_lap_flag = irr_driver->getTexture(FileManager::GUI_ICON, "lap_flag.png");
+    m_rank_icon = irr_driver->getTexture(FileManager::GUI_ICON, "podium.png");
     m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
     m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
     m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
@@ -834,14 +835,18 @@ void RaceGUI::drawMiscInfo(const AbstractKart *kart,
             if (dist2 > 0 && dist2 < 900.0f &&
                 (!closest_with_bad_attach || dist2 < closest_kart_dist_squared))
             {
+                if (!closest_with_bad_attach)
+                {
+                    closest_kart_id = i;
+                    closest_kart_dist_squared = dist2;
+                }
                 if (world->getKart(i)->getAttachment()->getType() == Attachment::ATTACH_BOMB ||
                     world->getKart(i)->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+                {
                     closest_with_bad_attach = true;
-
-                // The id and distance is not important if not bomb or swatter,
-                // as the kart icon's is not shown then.
-                closest_kart_id = i;
-                closest_kart_dist_squared = dist2;
+                    closest_kart_id = i;
+                    closest_kart_dist_squared = dist2;
+                }
             }
         }
 
@@ -981,31 +986,56 @@ void RaceGUI::drawRank(const AbstractKart *kart, const core::recti &viewport,
         m_last_ranks[id] = kart->getPosition();
     }
 
+    // If the time display in the top right is in this viewport,
+    // move the rank display down a little bit so that it is
+    // displayed under the time and laps.
+    core::recti pos;
+
+    pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y +
+                            irr_driver->getActualScreenSize().Height*6/100;
+    if (viewport.UpperLeftCorner.Y == 0 &&
+        viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
+        !race_manager->getIfEmptyScreenSpaceExists()) 
+    {
+        pos.UpperLeftCorner.Y = irr_driver->getActualScreenSize().Height*18/100;
+    }
+    pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
+
+    // 1. Draw the rank icon
+    int icon_width = irr_driver->getActualScreenSize().Height/19;
+    core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
+                                  pos.UpperLeftCorner.Y,
+                                  viewport.LowerRightCorner.X - 10,
+                                  pos.UpperLeftCorner.Y + icon_width);
+    core::rect<s32> source_rect(core::position2d<s32>(0,0),
+                                               m_rank_icon->getSize());
+    draw2DImage(m_rank_icon,indicator_pos,source_rect,
+        NULL,NULL,true);
+
+    // 2. Draw the total number of karts
+    // Fonts are drawn in the middle of the available area
+    // So we use the pos to specify the center of the desired area
+
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
 
-    int rank_offset = 8;
-    if(race_manager->getNumLocalPlayers() == 1 ||
-       (race_manager->getNumLocalPlayers() == 2 &&
-        UserConfigParams::split_screen_horizontally == true))
-        rank_offset = 22;
-
-    // First draw the total number of karts
     std::ostringstream oss2;
     oss2 << "/" << world->getNumKarts();
 
     float offset = font->getDimension(world->getNumKarts() < 10 ? L"/9" : L"/19").Width;
+    float voffset = font->getDimension(L"9").Height;
+    font->setScale(min_ratio);
+    voffset = std::max<float>(voffset,font->getDimension(L"9").Height);
+    font->setScale(1.0f);
 
-    int middle_x = viewport.UpperLeftCorner.X +
-                   int(irr_driver->getActualScreenSize().Width*rank_offset/100);
-    int middle_y = viewport.UpperLeftCorner.Y +
-                   int(irr_driver->getActualScreenSize().Height*5/100);
-
-    core::recti pos;
+    int middle_x = viewport.LowerRightCorner.X - (icon_width+20) - int(offset/2);
+    int middle_y = pos.UpperLeftCorner.Y + icon_width/2;
 
     pos.LowerRightCorner = core::vector2di(middle_x, middle_y);
     pos.UpperLeftCorner = core::vector2di(middle_x, middle_y);
 
     font->draw(oss2.str().c_str(), pos, color, true, true);
+
+    // 3. Draw the rank itself
 
     font->setScale(min_ratio * scale);
     font->setShadow(video::SColor(255, 128, 0, 0));
@@ -1013,8 +1043,7 @@ void RaceGUI::drawRank(const AbstractKart *kart, const core::recti &viewport,
     oss << rank; // the current font has no . :(   << ".";
 
     offset += font->getDimension(rank < 10 ? L"9" : L"19").Width;
-    offset = offset/2;
-    middle_x -= offset;
+    middle_x -= (offset/2);
 
     pos.LowerRightCorner = core::vector2di(middle_x, middle_y);
     pos.UpperLeftCorner = core::vector2di(middle_x, middle_y);
