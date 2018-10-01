@@ -165,6 +165,30 @@ public:
         a->increase(key, goal_key.empty() ? key : goal_key, increase);
 
     }   // increaseAchievement
+
+    // ------------------------------------------------------------------------
+    /** A handy shortcut to increase points for an achievement data of the
+     *  current player.
+     *  \param achievement_data_id The achievement data id
+     *  \param increase How much to increase the current value.
+     */
+    static void increaseAchievement(unsigned int achievement_data_id,
+                                    int increase = 1)
+    {
+        getCurrentAchievementsStatus()
+            ->increaseDataVar(achievement_data_id, increase);
+    }   // increaseAchievement
+
+    // ------------------------------------------------------------------------
+    /** Reset an achievement data for current player.
+     *  \param achievement_data_id The achievement data id
+     */
+    static void resetAchievementData(unsigned int achievement_data_id)
+    {
+        getCurrentAchievementsStatus()
+            ->resetDataVar(achievement_data_id);
+    }   // resetAchievementData
+
     // ------------------------------------------------------------------------
 };   // PlayerManager
 #endif

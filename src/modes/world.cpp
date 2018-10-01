@@ -624,61 +624,43 @@ void World::terminateRace()
                                            "laps", race_manager->getNumLaps());
     }
 
-    Achievement *achiev = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
-    if (achiev)
+    // Increment won races counts
+    if (race_manager->isLinearRaceMode())
     {
-        std::string mode_name = getIdent(); // Get the race mode name
-        int winner_position = 1;
-        unsigned int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
-        if (mode_name == IDENT_FTL)
-        {
-            winner_position = 2;
-            opponents++;
-        }
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
             if (m_karts[i]->getController()->canGetAchievements())
             {
+                int winner_position = 1;
+                if (race_manager->isFollowMode()) winner_position = 2;//TODO : check this always work
                 // Check if the player has won
-                if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
+                if (m_karts[i]->getPosition() == winner_position && race_manager->getNumberOfAIKarts() >= 3)
                 {
-                    // Update the achievement
-                    mode_name = StringUtils::toLowerCase(mode_name);
-                    if (achiev->getValue("opponents") <= 0)
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
-                                                            "opponents", opponents);
-                    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
-                                                        mode_name, 1);
-                }
-            }
-        } // for i < kart_amount
-    } // if (achiev)
+                    PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
+                    PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES,1);
+                    if (race_manager->isTimeTrialMode())
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_TT_RACES,1);
+                    else if (race_manager->isFollowMode())
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_FTL_RACES,1);
+                    else // normal race
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_NORMAL_RACES,1);
 
-    Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
-    //if achivement has been unlocked
-    if (win->getValue("wins") < 5 )
-    {
-        for(unsigned int i = 0; i < kart_amount; i++)
-        {
-            // Retrieve the current player
-            if (m_karts[i]->getController()->canGetAchievements())
-            {
-                // Check if the player has won
-                if (m_karts[i]->getPosition() == 1 )
-                {
-                    // Increase number of consecutive wins
-                       PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE,
-                                                            "wins", 1);
+                    if (race_manager->getNumberOfAIKarts() >= 5 &&
+                        (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                         race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST))
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD,1);
                 }
-                else
+                // Race lost, reset the consecutive wins counters
+                else if (m_karts[i]->getPosition() > winner_position)
                 {
-                      //Set number of consecutive wins to 0
-                      win->reset();
+                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES);
+                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD);
                 }
             }
-         }
-    }
+         } // for i<kart_amount
+    } // if isLinearRaceMode
+
     PlayerManager::getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();

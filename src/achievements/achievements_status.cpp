@@ -41,6 +41,10 @@ AchievementsStatus::AchievementsStatus()
 {
     m_valid  = true;
     m_online = true;
+    for (unsigned int i=0; i<ACHIEVE_DATA_NUM; i++)
+    {
+        m_variables[i].counter = 0;
+    }
 }   // AchievementsStatus
 
 // ----------------------------------------------------------------------------
@@ -78,6 +82,29 @@ void AchievementsStatus::load(const XMLNode * input)
         achievement->load(xml_achievements[i]);
     }   // for i in xml_achievements
 
+    // Load achievement data
+    int data_version = -1;
+    const XMLNode *n = input->getNode("data");
+    if (n!=NULL)
+        n->get("version", &data_version);
+    if (data_version == DATA_VERSION)
+    {
+        std::vector<XMLNode*> xml_achievement_data;
+        input->getNodes("var", xml_achievement_data);
+        for (unsigned int i = 0; i < xml_achievement_data.size(); i++)
+        {
+            if (i>=ACHIEVE_DATA_NUM)
+            {
+                Log::warn("AchievementsStatus",
+                    "Found more saved achievement data "
+                    "than there should be. Discarding.");
+                continue;
+            }
+            xml_achievement_data[i]->get("counter",&m_variables[i].counter); 
+        }
+    }
+    // If there is nothing valid to load ; we keep the init values
+
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -100,6 +127,11 @@ void AchievementsStatus::save(UTFWriter &out)
     {
         if (i->second != NULL)
             i->second->save(out);
+    }
+    out << "          <data version=\"1\"/>\n";
+    for(int i=0;i<ACHIEVE_DATA_NUM;i++)
+    {
+        out << "          <var counter=\"" << m_variables[i].counter << "\"/>\n";
     }
     out << "      </achievements>\n";
 }   // save
@@ -156,6 +188,65 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
         request->queue();
     }
 }   // sync
+
+/* This function checks over achievements to update their goals
+   FIXME It is currently hard-coded to specific achievements,
+   until it can entirely supersedes the previous system and
+   removes its complications. */
+void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id)
+{
+    Achievement *gold_driver = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
+    Achievement *unstoppable = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
+
+    if (!unstoppable->isAchieved())
+    {
+        unstoppable->reset();
+        unstoppable->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES].counter);
+    }
+
+    if (!gold_driver->isAchieved())
+    {
+        gold_driver->reset();
+        gold_driver->increase("standard", "standard", m_variables[ACHIEVE_WON_NORMAL_RACES].counter);
+        gold_driver->increase("std_timetrial", "std_timetrial", m_variables[ACHIEVE_WON_TT_RACES].counter);
+        gold_driver->increase("follow_leader", "follow_leader", m_variables[ACHIEVE_WON_FTL_RACES].counter);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::increaseDataVar(unsigned int achieve_data_id, int increase)
+{
+    if (achieve_data_id<ACHIEVE_DATA_NUM)
+    {
+        m_variables[achieve_data_id].counter += increase;
+        updateAchievementsProgress(achieve_data_id);
+        if (m_variables[achieve_data_id].counter > 10000000)
+            m_variables[achieve_data_id].counter = 10000000;
+    }
+#ifdef DEBUG
+    else
+    {
+        Log::error("Achievements", "Achievement data id %i don't match any variable.",
+                  achieve_data_id);
+    }
+#endif
+}   // increaseDataVar
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::resetDataVar(unsigned int achieve_data_id)
+{
+    if (achieve_data_id<ACHIEVE_DATA_NUM)
+    {
+        m_variables[achieve_data_id].counter = 0;
+    }
+#ifdef DEBUG
+    else
+    {
+        Log::error("Achievements", "Achievement data id %i don't match any variable.",
+                  achieve_data_id);
+    }
+#endif
+}   // resetDataVar
 
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onRaceEnd()
