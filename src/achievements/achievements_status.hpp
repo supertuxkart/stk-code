@@ -40,10 +40,44 @@ class XMLNode;
 */
 class AchievementsStatus
 {
+public :
+    enum { // Won races values share the following properties :
+           // 1. Only races with at least 3 AI count unless otherwise specified.
+           ACHIEVE_WON_RACES             = 0, // Normal, time-trial and FTL
+           ACHIEVE_WON_NORMAL_RACES      = 1, // Normal race only
+           ACHIEVE_WON_TT_RACES          = 2, // Time-trial race only
+           ACHIEVE_WON_FTL_RACES         = 3, // Follow-the-leader race only
+           // Consecutive won race values :
+           // 1. Ignore races with not enough AIs for incrementation
+           // 2. Reset the counter in case of loss against any number of AIs
+           ACHIEVE_CONS_WON_RACES        = 4,
+           // Won races in (at least) hard requires at least 5 AI opponents
+           ACHIEVE_CONS_WON_RACES_HARD   = 5,
+
+           ACHIEVE_DATA_NUM              = 6
+    };
+
 private:
     std::map<uint32_t, Achievement *> m_achievements;
-    bool         m_online;
-    bool         m_valid;
+
+    // Variables used to track achievements progress,
+    // one variable may be used by several achievements.
+    // TODO
+    // Currently this only uses an int counter.
+    // Evaluate if additional data keeping (max achived ?) can be useful,
+    // and either expand the struct or remove it.
+    struct AchievementVariable
+    {
+        int counter;
+    };
+
+    const int DATA_VERSION = 1;
+
+    // The tracked values are defined at compile time
+    AchievementVariable m_variables[ACHIEVE_DATA_NUM];
+
+    bool                m_online;
+    bool                m_valid;
 
     class SyncAchievementsRequest : public Online::XMLRequest {
         virtual void callback ();
@@ -59,6 +93,9 @@ public :
     void save(UTFWriter &out);
     void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
+    void updateAchievementsProgress(unsigned int achieve_data_id);
+    void increaseDataVar(unsigned int achieve_data_id, int increase);
+    void resetDataVar(unsigned int achieve_data_id);
     void onRaceEnd();
     void onLapEnd();
     // ------------------------------------------------------------------------
