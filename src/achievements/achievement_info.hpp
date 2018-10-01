@@ -40,6 +40,7 @@ class Achievement;
 class AchievementInfo
 {
 public:
+    //FIXME : try to get rid of this list
     /** Some handy names for the various achievements. */
     enum { ACHIEVE_COLUMBUS      = 1,
            ACHIEVE_FIRST         = ACHIEVE_COLUMBUS,
@@ -49,9 +50,10 @@ public:
            ACHIEVE_SKIDDING      = 5,
            ACHIEVE_GOLD_DRIVER   = 6,
            ACHIEVE_POWERUP_LOVER = 7,
-           ACHIEVE_UNSTOPPABLE   = 8,
+           ACHIEVE_BEYOND_LUCK   = 8,
            ACHIEVE_BANANA        = 9,
-           ACHIEVE_MOSQUITO      = 11
+           ACHIEVE_MOSQUITO      = 11,
+           ACHIEVE_UNSTOPPABLE   = 12
     };
 
     /** Achievement check type:

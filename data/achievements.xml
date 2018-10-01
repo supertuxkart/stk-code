@@ -41,7 +41,7 @@
     <skidding goal="5"/>
   </achievement>
   <achievement id="6" check-type="all-at-least" reset-type="never"
-               name="Gold driver" description="Win against at least 3 opponents in all single player modes.">
+               name="Gold driver" description="Win against at least 3 AIs in normal race, time-trial, and follow the leader.">
     <standard goal="1"/>
     <std_timetrial goal="1"/>
     <follow_leader goal="1"/>
@@ -51,7 +51,7 @@
     <poweruplover goal="10"/>
   </achievement>
   <achievement id="8" check-type="all-at-least" reset-type="never"
-               name="Unstoppable" description="Win 5 single races in a row.">
+               name="Beyond Luck" description="Win 5 single races in a row against at least 3 AIs.">
     <wins goal="5"/>
   </achievement>
   <achievement id="9" check-type="all-at-least" reset-type="race"
@@ -64,5 +64,9 @@
   <achievement id="11" check-type="all-at-least" reset-type="race"
                name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race.">
     <swatter goal="5"/>
+  </achievement>
+  <achievement id="12" check-type="all-at-least" reset-type="never"
+               name="Unstoppable" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs.">
+    <wins goal="10"/>
   </achievement>
 </achievements>
