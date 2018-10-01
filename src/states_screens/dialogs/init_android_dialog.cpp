@@ -64,12 +64,14 @@ void InitAndroidDialog::load()
 void InitAndroidDialog::beforeAddingWidgets()
 {
     bool accelerometer_available = false;
+    bool gyroscope_available = false;
     
 #ifdef ANDROID
     CIrrDeviceAndroid* android_device = dynamic_cast<CIrrDeviceAndroid*>(
                                                     irr_driver->getDevice());
     assert(android_device != NULL);
     accelerometer_available = android_device->isAccelerometerAvailable();
+    gyroscope_available = android_device->isGyroscopeAvailable() && accelerometer_available;
 #endif
 
     if (!accelerometer_available)
@@ -82,6 +84,21 @@ void InitAndroidDialog::beforeAddingWidgets()
         accelerometer->setActive(false);
         
         if (UserConfigParams::m_multitouch_controls == 2)
+        {
+            UserConfigParams::m_multitouch_controls = 1;
+        }
+    }
+
+    if (!gyroscope_available)
+    {
+        RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+        assert(control_type != NULL);
+
+        int index = control_type->findItemNamed("gyroscope");
+        Widget* gyroscope = &control_type->getChildren()[index];
+        gyroscope->setActive(false);
+        
+        if (UserConfigParams::m_multitouch_controls == 3)
         {
             UserConfigParams::m_multitouch_controls = 1;
         }
@@ -116,6 +133,10 @@ GUIEngine::EventPropagation InitAndroidDialog::processEvent(
         {
             UserConfigParams::m_multitouch_controls = 2;
         }
+        else if (selected == "gyroscope")
+        {
+            UserConfigParams::m_multitouch_controls = 3;
+        }
         
         user_config->saveConfig();
         
@@ -136,6 +157,11 @@ void InitAndroidDialog::updateValues()
     if (UserConfigParams::m_multitouch_controls == 2)
     {
         int id = control_type->findItemNamed("accelerometer");
+        control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+    }
+    else if (UserConfigParams::m_multitouch_controls == 3)
+    {
+        int id = control_type->findItemNamed("gyroscope");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
     }
     else
