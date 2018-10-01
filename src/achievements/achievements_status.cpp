@@ -197,11 +197,18 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
 {
     Achievement *gold_driver = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
     Achievement *unstoppable = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
+    Achievement *beyond_luck = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BEYOND_LUCK);
+
+    if (!beyond_luck->isAchieved())
+    {
+        beyond_luck->reset();
+        beyond_luck->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES].counter);
+    }
 
     if (!unstoppable->isAchieved())
     {
         unstoppable->reset();
-        unstoppable->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES].counter);
+        unstoppable->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES_HARD].counter);
     }
 
     if (!gold_driver->isAchieved())
