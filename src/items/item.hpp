@@ -132,6 +132,24 @@ protected:
     friend class NetworkItemManager;
     // ------------------------------------------------------------------------
     virtual void setType(ItemType type) { m_type = type; }
+    // ------------------------------------------------------------------------
+    // Some convenient functions for the AI only
+    friend class SkiddingAI;
+    friend class TestAI;
+    /** Returns true if the specified line segment would come close enough
+     *  to this item so that this item would be collected.
+     *  \param line The line segment which is tested if it is close enough
+     *         to this item so that this item would be collected.
+     */
+    bool hitLine(const core::line3df &line,
+                 const AbstractKart *kart = NULL) const
+    {
+        if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
+            return false;
+
+        Vec3 closest = line.getClosestPoint(getXYZ().toIrrVector());
+        return hitKart(closest, kart);
+    }   // hitLine
 
 public:
          ItemState(ItemType type, const AbstractKart *owner=NULL, int id = -1);
@@ -143,6 +161,48 @@ public:
     virtual ~ItemState() {}
          
     // -----------------------------------------------------------------------
+    /** Dummy implementation, causing an abort if it should be called to
+     *  catch any errors early. */
+    virtual void updateGraphics(float dt)
+    {
+        Log::fatal("ItemState", "updateGraphics() called for ItemState.");
+    }   // updateGraphics
+
+    // -----------------------------------------------------------------------
+    virtual bool hitKart(const Vec3 &xyz,
+                         const AbstractKart *kart = NULL) const
+    {
+        Log::fatal("ItemState", "hitKart() called for ItemState.");
+        return false;
+    }   // hitKart
+    // -----------------------------------------------------------------------
+    virtual bool isPredicted() const
+    { 
+        Log::fatal("ItemState", "isPredicted() called for ItemState.");
+        return false;
+    }   // isPredicted
+    // -----------------------------------------------------------------------
+    virtual int getGraphNode() const 
+    {
+        Log::fatal("ItemState", "getGraphNode() called for ItemState.");
+        return 0;
+    }   // getGraphNode
+    // -----------------------------------------------------------------------
+    const Vec3 *getAvoidancePoint(bool left) const
+    {
+        Log::fatal("ItemState", "getAvoidancePoint() called for ItemState.");
+        // Return doesn't matter, fatal aborts
+        return &m_xyz;
+    }   // getAvoidancePoint
+    // -----------------------------------------------------------------------
+    float getDistanceFromCenter() const
+    {
+        Log::fatal("itemState",
+                   "getDistanceFromCentre() called for ItemState.");
+        return 0;
+    }   // getDistanceFromCentre
+    // -----------------------------------------------------------------------
+    /** Resets an item to its start state. */
     void reset()
     {
         m_deactive_ticks    = 0;
@@ -156,22 +216,27 @@ public:
         }
     }   // reset
 
-    // ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     /** Switches an item to be of a different type. Used for the switch
      *  powerup.
      *  \param type New type for this item.
+     *  \param mesh Ignored.
+     *  \param lowmesh Ignored.
      */
-    void switchTo(ItemType type)
+    virtual void switchTo(ItemType type, scene::IMesh *mesh,
+                          scene::IMesh *lowmesh)
     {
         // triggers and easter eggs should not be switched
         if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
         m_original_type = m_type;
         setType(type);
+        return;
     }   // switchTo
+
     // ------------------------------------------------------------------------
     /** Returns true if this item was not actually switched (e.g. trigger etc)
      */
-    bool switchBack()
+    virtual bool switchBack()
     {
         // triggers should not be switched
         if (m_type == ITEM_TRIGGER) return true;
@@ -311,12 +376,12 @@ public:
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();
-    void          updateGraphics(float dt);
+    virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  collected(const AbstractKart *kart) OVERRIDE;
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh,
                            scene::IMesh *lowmesh);
-    void          switchBack();
+    virtual bool  switchBack() OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is
@@ -326,7 +391,7 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-    bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
+    virtual bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
         if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
             return false;
@@ -336,35 +401,16 @@ public:
         return lc.length2() < m_distance_2;
     }   // hitKart
 
-protected:
-    // ------------------------------------------------------------------------
-    // Some convenient functions for the AI only
-    friend class SkiddingAI;
-    friend class TestAI;
-    /** Returns true if the specified line segment would come close enough
-     *  to this item so that this item would be collected.
-     *  \param line The line segment which is tested if it is close enough
-     *         to this item so that this item would be collected.
-     */
-    bool hitLine(const core::line3df &line,
-                  const AbstractKart *kart=NULL) const
-    {
-        if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
-            return false;
-
-        Vec3 closest = line.getClosestPoint(getXYZ().toIrrVector());
-        return hitKart(closest, kart);
-    }   // hitLine
 public:
     // ------------------------------------------------------------------------
     /** Sets if this is a predicted item or not. */
     void setPredicted(bool p) { m_is_predicted = p; }
     // ------------------------------------------------------------------------
     /** Returns if this item is predicted or not. */
-    bool isPredicted() const { return m_is_predicted; }
+    virtual bool isPredicted() const OVERRIDE { return m_is_predicted; }
     // ------------------------------------------------------------------------
     /** Returns the index of the graph node this item is on. */
-    int getGraphNode() const { return m_graph_node; }
+    virtual int getGraphNode() const OVERRIDE { return m_graph_node; }
     // ------------------------------------------------------------------------
     /** Returns the distance from center: negative means left of center,
      *  positive means right of center. */

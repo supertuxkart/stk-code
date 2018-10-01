@@ -99,7 +99,7 @@ public:
     // ========================================================================
 protected:
     /** The vector of all items of the current track. */
-    typedef std::vector<Item*> AllItemTypes;
+    typedef std::vector<ItemState*> AllItemTypes;
     AllItemTypes m_all_items;
 
 private:
@@ -111,14 +111,16 @@ private:
     /** What item this item is switched to. */
     std::vector<ItemState::ItemType> m_switch_to;
 
+protected:
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
     int m_switch_ticks;
 
-protected:
-    void deleteItem(Item *item);
+    void deleteItem(ItemState *item);
     virtual unsigned int insertItem(Item *item);
+    void switchItemsInternal(std::vector < ItemState*> &all_items);
     void setSwitchItems(const std::vector<int> &switch_items);
+
              ItemManager();
 public:
     virtual ~ItemManager();
@@ -134,7 +136,7 @@ public:
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
     virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
-    void           switchItems     ();
+    virtual void   switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
     // ------------------------------------------------------------------------
     /** Only used in the NetworkItemManager. */
@@ -151,10 +153,16 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
-    const Item*   getItem(unsigned int n) const { return m_all_items[n]; };
+    const ItemState* getItem(unsigned int n) const
+    { 
+        return dynamic_cast<Item*>(m_all_items[n]);
+    };
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
-    Item* getItem(unsigned int n)  { return m_all_items[n]; };
+    ItemState* getItem(unsigned int n)
+    {
+        return dynamic_cast<Item*>(m_all_items[n]);
+    }
     // ------------------------------------------------------------------------
     /** Returns a reference to the array of all items on the specified quad.
      */
@@ -171,8 +179,9 @@ public:
     {
         assert(m_items_in_quads);
         assert(n < m_items_in_quads->size());
-        return ((*m_items_in_quads)[n]).empty() ? NULL :
-            (*m_items_in_quads)[n].front();
+        return ((*m_items_in_quads)[n]).empty()
+              ? NULL 
+             : dynamic_cast<Item*>((*m_items_in_quads)[n].front());
     }   // getFirstItemInQuad
 };   // ItemManager
 

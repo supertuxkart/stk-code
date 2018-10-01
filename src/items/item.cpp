@@ -287,18 +287,21 @@ void Item::setType(ItemType type)
 void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
     setMesh(mesh, lowmesh);
-    ItemState::switchTo(type);
+    ItemState::switchTo(type, mesh, lowmesh);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
-/** Switch  backs to the original item.
+/** Switch  backs to the original item. Returns true if the item wa snot
+ *  actually switched (e.g. trigger, or bubblegum dropped during switch
+ *  time). The return value is not actually used, but necessary in order
+ *  to overwrite ItemState::switchBack()
  */
-void Item::switchBack()
+bool Item::switchBack()
 {
     setMesh(m_original_mesh, m_original_lowmesh);
     
     if (ItemState::switchBack()) 
-        return;
+        return true;
 
     if (m_node != NULL)
     {
@@ -306,6 +309,7 @@ void Item::switchBack()
         hpr.setHPR(m_original_rotation);
         m_node->setRotation(hpr.toIrrHPR());
     }
+    return false;
 }   // switchBack
 
 //-----------------------------------------------------------------------------

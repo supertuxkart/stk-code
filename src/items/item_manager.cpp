@@ -460,8 +460,8 @@ void ItemManager::update(int ticks)
         m_switch_ticks -= ticks;
         if(m_switch_ticks<0)
         {
-            for(AllItemTypes::iterator i =m_all_items.begin();
-                i!=m_all_items.end();  i++)
+            for(AllItemTypes::iterator i = m_all_items.begin();
+                                       i!= m_all_items.end();  i++)
             {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
@@ -501,7 +501,7 @@ void ItemManager::updateGraphics(float dt)
  *  items, and then frees the item itself.
  *  \param The item to delete.
  */
-void ItemManager::deleteItem(Item *item)
+void ItemManager::deleteItem(ItemState *item)
 {
     // First check if the item needs to be removed from the items-in-quad list
     if(m_items_in_quads)
@@ -523,12 +523,21 @@ void ItemManager::deleteItem(Item *item)
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain
- *  amount of time (as defined in stk_config.xml.
+ *  amount of time (as defined in stk_config.xml).
  */
 void ItemManager::switchItems()
 {
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+    switchItemsInternal(m_all_items);
+}  // switchItems
+
+//-----------------------------------------------------------------------------
+/** Switches all items: boxes become bananas and vice versa for a certain
+ *  amount of time (as defined in stk_config.xml).
+ */
+void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
+{
+    for(AllItemTypes::iterator i = m_all_items.begin();
+        i != m_all_items.end();  i++)
     {
         if(!*i) continue;
 
@@ -546,7 +555,8 @@ void ItemManager::switchItems()
         if (new_type == (*i)->getType())
             continue;
         if(m_switch_ticks<0)
-            (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
+            (*i)->switchTo(new_type, m_item_mesh[(int)new_type],
+                           m_item_lowres_mesh[(int)new_type]);
         else
             (*i)->switchBack();
     }   // for m_all_items

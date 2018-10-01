@@ -51,7 +51,7 @@
 
 #include <line3d.h>
 
-class Item;
+class ItemState;
 
 #ifdef AI_DEBUG
   class ShowCurve;
@@ -131,7 +131,7 @@ private:
     unsigned int m_last_direction_node;
 
     /** If set an item that the AI should aim for. */
-    const Item *m_item_to_collect;
+    const ItemState *m_item_to_collect;
 
     /** True if items to avoid are close by. Used to avoid using zippers
      *  (which would make it more difficult to avoid items). */
@@ -156,7 +156,7 @@ private:
 
     /** The last item selected for collection, for which a probability
      *  was determined. */
-    const Item *m_last_item_random;
+    const ItemState *m_last_item_random;
 
     /** True if m_last_item_random was randomly selected to be collected. */
     bool m_really_collect_item;
@@ -210,14 +210,14 @@ private:
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
     bool  handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point);
-    bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
+    bool  steerToAvoid(const std::vector<const ItemState *> &items_to_avoid,
                        const core::line3df &line_to_target,
                        Vec3 *aim_point);
-    bool  hitBadItemWhenAimAt(const Item *item,
-                              const std::vector<const Item *> &items_to_avoid);
-    void  evaluateItems(const Item *item, Vec3 kart_aim_direction,
-                        std::vector<const Item *> *items_to_avoid,
-                        std::vector<const Item *> *items_to_collect);
+    bool  hitBadItemWhenAimAt(const ItemState *item,
+                              const std::vector<const ItemState *> &items_to_avoid);
+    void  evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
+                        std::vector<const ItemState *> *items_to_avoid,
+                        std::vector<const ItemState *> *items_to_collect);
 
     void  checkCrashes(const Vec3& pos);
     void  findNonCrashingPointFixed(Vec3 *result, int *last_node);
