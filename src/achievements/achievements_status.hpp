@@ -96,12 +96,31 @@ private:
         // counters for standard, TT & FTL races
         int race_started; 
         int race_finished;
-        int race_won;
+        int race_won; // doesn't count race without any other AI/player
         int race_finished_reverse;
-        // TODO : Add data to keep track of egg hunts, battle, soccer
+        int race_finished_alone; // races against replays are counted, too
+        // counters for egg hunts
+        int egg_hunt_started;
+        int egg_hunt_finished;
     };
 
+// Switching a few times from public to private
+// helps here to keep related things next to each other
+public:
+    enum TrackData {
+        TR_STARTED           = 0,
+        TR_FINISHED          = 1,
+        TR_WON               = 2,
+        TR_FINISHED_REVERSE  = 3,
+        TR_FINISHED_ALONE    = 4,
+        TR_EGG_HUNT_STARTED  = 5,
+        TR_EGG_HUNT_FINISHED = 6
+    };    
+
+private:
     std::vector<TrackStats> m_track_stats;
+
+    // TODO : keep track of battle/soccer arenas
 
     bool                m_online;
     bool                m_valid;
@@ -125,10 +144,7 @@ public :
     void resetDataVar(unsigned int achieve_data_id);
     void onRaceEnd(bool aborted=false);
     void onLapEnd();
-    void raceStarted(std::string track_ident);
-    void raceFinished(std::string track_ident);
-    void raceWon(std::string track_ident);
-    void raceFinishedReverse(std::string track_ident);
+    void trackEvent(std::string track_ident, AchievementsStatus::TrackData event);
     // ------------------------------------------------------------------------
     const std::map<uint32_t, Achievement *>& getAllAchievements()
     {
