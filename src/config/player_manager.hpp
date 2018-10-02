@@ -200,28 +200,13 @@ public:
 
 
     // ----------------------------------------------------------------------------
-    static void raceStarted(std::string track_ident)
+    /** Transmit an incrementation request of one of the track event counters
+     *  \param track_ident - the internal name of the track
+     *  \param event - the type of counter to increment */
+    static void trackEvent(std::string track_ident, AchievementsStatus::TrackData event)
     {
-        getCurrentAchievementsStatus()->raceStarted(track_ident);
-    } // raceStarted
-    
-    // ----------------------------------------------------------------------------
-    static void raceFinished(std::string track_ident)
-    {
-        getCurrentAchievementsStatus()->raceFinished(track_ident);
-    } // raceFinished
-    
-    // ----------------------------------------------------------------------------
-    static void raceWon(std::string track_ident)
-    {
-        getCurrentAchievementsStatus()->raceWon(track_ident);
-    } // raceWon
-    
-    // ----------------------------------------------------------------------------
-    static void raceFinishedReverse(std::string track_ident)
-    {
-        getCurrentAchievementsStatus()->raceFinishedReverse(track_ident);
-    } // raceFinishedReverse
+        getCurrentAchievementsStatus()->trackEvent(track_ident, event);
+    } // trackEvent
 
     // ------------------------------------------------------------------------
 };   // PlayerManager

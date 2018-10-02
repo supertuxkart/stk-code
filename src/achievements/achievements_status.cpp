@@ -59,7 +59,8 @@ AchievementsStatus::AchievementsStatus()
         TrackStats new_track;
         new_track.ident = curr->getIdent();
         new_track.race_started = new_track.race_finished = new_track.race_won = 0;
-        new_track.race_finished_reverse = 0;
+        new_track.race_finished_reverse = new_track.race_finished_alone = 0;
+        new_track.egg_hunt_started = new_track.egg_hunt_finished = 0;
 
         m_track_stats.push_back(new_track);
     }   // for n<track_amount
@@ -138,6 +139,9 @@ void AchievementsStatus::load(const XMLNode * input)
                     xml_achievement_tracks[i]->get("finished",&m_track_stats[j].race_finished);
                     xml_achievement_tracks[i]->get("won",&m_track_stats[j].race_won);
                     xml_achievement_tracks[i]->get("finished_reverse",&m_track_stats[j].race_finished_reverse);
+                    xml_achievement_tracks[i]->get("finished_alone",&m_track_stats[j].race_finished_alone);
+                    xml_achievement_tracks[i]->get("egg_hunt_started",&m_track_stats[j].egg_hunt_started);
+                    xml_achievement_tracks[i]->get("egg_hunt_finished",&m_track_stats[j].egg_hunt_finished);
                     track_found = true;
                     break;
                 }
@@ -151,6 +155,9 @@ void AchievementsStatus::load(const XMLNode * input)
                 xml_achievement_tracks[i]->get("finished",&new_track.race_finished);
                 xml_achievement_tracks[i]->get("won",&new_track.race_won);
                 xml_achievement_tracks[i]->get("finished_reverse",&new_track.race_finished_reverse);
+                xml_achievement_tracks[i]->get("finished_alone",&new_track.race_finished_alone);
+                xml_achievement_tracks[i]->get("egg_hunt_started",&new_track.egg_hunt_started);
+                xml_achievement_tracks[i]->get("egg_hunt_finished",&new_track.egg_hunt_finished);
 
                 m_track_stats.push_back(new_track);
             }
@@ -192,7 +199,11 @@ void AchievementsStatus::save(UTFWriter &out)
         out << " started=\"" << m_track_stats[n].race_started << "\"";
         out << " finished=\"" << m_track_stats[n].race_finished << "\"";
         out << " won=\"" << m_track_stats[n].race_won << "\"";
-        out << " finished_reverse=\"" << m_track_stats[n].race_finished_reverse << "\"/>\n";
+        out << " finished_reverse=\"" << m_track_stats[n].race_finished_reverse << "\"";
+        out << " finished_alone=\"" << m_track_stats[n].race_finished_alone << "\"";
+        out << " egg_hunt_started=\"" << m_track_stats[n].egg_hunt_started << "\"";
+        out << " egg_hunt_finished=\"" << m_track_stats[n].egg_hunt_finished << "\"";
+        out << "/>\n";
     }   // for n<m_track_stats.size()
     out << "      </achievements>\n";
 }   // save
@@ -391,53 +402,32 @@ void AchievementsStatus::onLapEnd()
 }   // onLapEnd
 
 // ----------------------------------------------------------------------------
-void AchievementsStatus::raceStarted(std::string track_ident)
+/** Use the event type to increment the correct track event counter
+ *  \param track_ident - the internal name of the track
+ *  \param event - the type of counter to increment */
+void AchievementsStatus::trackEvent(std::string track_ident, AchievementsStatus::TrackData event)
 {
+    int track_id = -1;
     for (unsigned int i=0;i<m_track_stats.size();i++)
     {
         if (m_track_stats[i].ident == track_ident)
         {
-            m_track_stats[i].race_started++;
+            track_id = i;
             break;
         }
     }
-} // raceStarted
-
-// ----------------------------------------------------------------------------
-void AchievementsStatus::raceFinished(std::string track_ident)
-{
-    for (unsigned int i=0;i<m_track_stats.size();i++)
-    {
-        if (m_track_stats[i].ident == track_ident)
-        {
-            m_track_stats[i].race_finished++;
-            break;
-        }
-    }
-} // raceFinished
-
-// ----------------------------------------------------------------------------
-void AchievementsStatus::raceWon(std::string track_ident)
-{
-    for (unsigned int i=0;i<m_track_stats.size();i++)
-    {
-        if (m_track_stats[i].ident == track_ident)
-        {
-            m_track_stats[i].race_won++;
-            break;
-        }
-    }
-} // raceWon
-
-// ----------------------------------------------------------------------------
-void AchievementsStatus::raceFinishedReverse(std::string track_ident)
-{
-    for (unsigned int i=0;i<m_track_stats.size();i++)
-    {
-        if (m_track_stats[i].ident == track_ident)
-        {
-            m_track_stats[i].race_finished_reverse++;
-            break;
-        }
-    }
-} // raceFinishedReverse
+    if (event==TR_STARTED)
+        m_track_stats[track_id].race_started++;
+    else if (event==TR_FINISHED)
+        m_track_stats[track_id].race_finished++;
+    else if (event==TR_WON)
+        m_track_stats[track_id].race_won++;
+    else if (event==TR_FINISHED_REVERSE)
+        m_track_stats[track_id].race_finished_reverse++;
+    else if (event==TR_FINISHED_ALONE)
+        m_track_stats[track_id].race_finished_alone++;
+    else if (event==TR_EGG_HUNT_STARTED)
+        m_track_stats[track_id].egg_hunt_started++;
+    else if (event==TR_EGG_HUNT_FINISHED)
+        m_track_stats[track_id].egg_hunt_finished++;
+} // trackEvent

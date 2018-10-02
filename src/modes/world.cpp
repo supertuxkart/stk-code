@@ -294,8 +294,10 @@ void World::reset(bool restart)
         (*i)->reset();
         if ((*i)->getController()->canGetAchievements())
         {
-            printf("Track name is %s\n", race_manager->getTrackName().c_str());
-            PlayerManager::raceStarted(race_manager->getTrackName());
+            if (race_manager->isLinearRaceMode())
+                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_STARTED);
+            else if (race_manager->isEggHuntMode())
+                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
             if (restart)
                 PlayerManager::onRaceEnd(true /* previous race aborted */);
         }
@@ -629,7 +631,8 @@ void World::terminateRace()
                                            "laps", race_manager->getNumLaps());
     }
 
-    // Increment won races counts
+    //TODO : move this stuff to a sub-function
+    // Increment won races counts and track finished counts
     if (race_manager->isLinearRaceMode())
     {
         for(unsigned int i = 0; i < kart_amount; i++)
@@ -638,15 +641,18 @@ void World::terminateRace()
             // Retrieve the current player
             if (m_karts[i]->getController()->canGetAchievements())
             {
-                PlayerManager::raceFinished(race_manager->getTrackName());
+                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED);
                 if (race_manager->getReverseTrack())
-                    PlayerManager::raceFinishedReverse(race_manager->getTrackName());
+                    PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_REVERSE);
                 int winner_position = 1;
                 if (race_manager->isFollowMode()) winner_position = 2;//TODO : check this always work
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position)
                 {
-                    PlayerManager::raceWon(race_manager->getTrackName());
+                    if (race_manager->getNumNonGhostKarts() >= 2)
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_WON);
+                    else
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_ALONE);
                     if (race_manager->getNumberOfAIKarts() >= 3)
                     {
                         PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
@@ -672,6 +678,12 @@ void World::terminateRace()
             }
          } // for i<kart_amount
     } // if isLinearRaceMode
+
+    // Increment egg hunt finished count
+    if (race_manager->isEggHuntMode())
+    {
+        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_EGG_HUNT_FINISHED);
+    }
 
     PlayerManager::getCurrentPlayer()->raceFinished();
 
