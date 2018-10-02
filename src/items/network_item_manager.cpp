@@ -42,6 +42,7 @@ void NetworkItemManager::create()
 NetworkItemManager::NetworkItemManager()
                   : Rewinder("N"), ItemManager()
 {
+    m_confirmed_switch_ticks = -1;
     m_last_confirmed_item_ticks.clear();
 
     if (NetworkConfig::get()->isServer())
@@ -71,6 +72,7 @@ NetworkItemManager::~NetworkItemManager()
 //-----------------------------------------------------------------------------
 void NetworkItemManager::reset()
 {
+    m_confirmed_switch_ticks = -1;
     ItemManager::reset();
 }   // reset
 
@@ -113,6 +115,25 @@ void NetworkItemManager::collectedItem(ItemState *item, AbstractKart *kart)
         ItemManager::collectedItem(item, kart);
     }
 }   // collectedItem
+
+// ----------------------------------------------------------------------------
+/** Called when a switch is activated. On the server adds this information to
+ *  the item state so it can be sent to all clients.
+ */
+void NetworkItemManager::switchItems()
+{
+    if (NetworkConfig::get()->isServer())
+    {
+        // The server saves the collected item as item event info
+        m_item_events.lock();
+        // Create a switch event - the constructor called determines
+        // the type of the event automatically.
+        m_item_events.getData()
+                     .emplace_back(World::getWorld()->getTicksSinceStart());
+        m_item_events.unlock();
+    }
+    ItemManager::switchItems();
+}   // switchItems
 
 // ----------------------------------------------------------------------------
 /** Called when a new item is created, e.g. bubble gum.
@@ -233,6 +254,13 @@ void NetworkItemManager::forwardTime(int ticks)
     {
         if (i) i->update(ticks);
     }   // for m_all_items
+    if(m_switch_ticks>ticks)
+        m_switch_ticks -= ticks;
+    else if (m_switch_ticks >= 0)
+    {
+        switchItemsInternal(m_confirmed_state);
+        m_switch_ticks = -1;
+    }
 }   // forwardTime
 
 //-----------------------------------------------------------------------------
@@ -245,6 +273,7 @@ void NetworkItemManager::forwardTime(int ticks)
  */
 void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 {
+
     assert(NetworkConfig::get()->isClient());
     // The state at World::getTicksSinceStart() needs to be restored. The confirmed
     // state in this instance was taken at m_confirmed_state_time. First
@@ -270,18 +299,34 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // --------------------------
     for (unsigned int i=0; i<m_all_items.size(); i++)
     {
-        Item *item = m_all_items[i];
+        ItemState *item = m_all_items[i];
         if(item && item->isPredicted())
         {
             deleteItem(item);
         }
     }   // for i in m_all_items
 
+    // Reset a predicted switch time: if the items are currently
+    // predicted to be switched, but not switched at the confirmed
+    // state time or vice versa, we need to switch them back. This
+    // is tested by seeing if the signs of the switch_ticks and
+    // confirmed switch_ticks are opposite:
+    if(m_switch_ticks * m_confirmed_switch_ticks < 0)
+    {
+        switchItemsInternal(m_all_items);
+    }
+    m_switch_ticks = m_confirmed_switch_ticks;
+
+
     // 2) Apply all events to current confirmed state:
     // -----------------------------------------------
     World *world = World::getWorld();
     int current_time = m_confirmed_state_time;
     bool has_state = count > 0;
+
+    // Note that the actual ItemManager states must NOT be changed here, only
+    // the confirmed states in the Network manager are allowed to be modified.
+    // They will all be copied to the ItemManager states after the loop.
     while(count > 0)
     {
         // 2.1) Decode the event in the message
@@ -292,16 +337,14 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         //      the time to the time of this event:
         // ----------------------------------------------
         int dt = iei.getTicks() - current_time;
-        // Skip an event that are 'in the past' (i.e. have been sent again by
+        // Skip an event that is 'in the past' (i.e. have been sent again by
         // the server because it has not yet received confirmation from all
-        // clients.
+        // clients).
         if(dt<0) continue;
 
         // Forward the saved state:
         if (dt>0) forwardTime(dt);
 
-        // TODO: apply the various events types, atm only collection
-        // and new items are supported.
         if(iei.isItemCollection())
         {
             int index = iei.getIndex();
@@ -348,6 +391,19 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                 }
             }
         }
+        else if(iei.isSwitch())
+        {
+            // Reset current switch ticks
+            m_switch_ticks = -1;
+            ItemManager::switchItemsInternal(m_confirmed_state);
+            m_confirmed_switch_ticks = m_switch_ticks;
+        }
+        else
+        {
+            Log::error("NetworkItemManager",
+                       "Received unknown event type at %d",
+                       iei.getTicks());
+        }
         current_time = iei.getTicks();
     }   // while count >0
 
@@ -360,6 +416,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             gp->sendItemEventConfirmation(world->getTicksSinceStart());
     }
 
+    m_switch_ticks = m_confirmed_switch_ticks;
+
     // Forward the confirmed item state to the world time:
     int dt = world->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
@@ -369,7 +427,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     for(unsigned int i=0; i<m_confirmed_state.size(); i++)
     {
-        Item *item = i < m_all_items.size() ?  m_all_items[i] : NULL;
+        ItemState *item = i < m_all_items.size() ?  m_all_items[i] : NULL;
         const ItemState *is = m_confirmed_state[i];
         if (is && item)
             *(ItemState*)item = *is;
@@ -383,8 +441,6 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                 // The server has this item at a different index in the list
                 // of all items, which means the client has an incorrect
                 // item at the index given by the server - delete that item
-                Log::info("nim", "about to delete item with not matching index i %d item %d",
-                    i, item_new->getItemId());
                 if(m_all_items[i])
                     deleteItem(m_all_items[i]);
                 m_all_items[item_new->getItemId()] = NULL;
@@ -397,14 +453,12 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
         else if (!is && item)
         {
-            Log::info("nim", "About to delete item index %d i %d",
-                item->getItemId(), i);
-
             deleteItem(m_all_items[i]);
         }
     }
 
     // Now we save the current local
-    m_confirmed_state_time = world->getTicksSinceStart();
+    m_confirmed_state_time   = world->getTicksSinceStart();
+    m_confirmed_switch_ticks = m_switch_ticks;
 }   // restoreState
 

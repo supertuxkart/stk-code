@@ -48,6 +48,9 @@ private:
       * server data. This is used in case of rewind. */
     std::vector<ItemState*> m_confirmed_state;
 
+    /** The switch ticks value at the lime of the last confirmed state. */
+    int m_confirmed_switch_ticks;
+
     /** Time at which m_confirmed_state was taken. */
     int m_confirmed_state_time;
 
@@ -66,14 +69,14 @@ public:
     static void create();
     virtual ~NetworkItemManager();
 
-    void setSwitchItems(const std::vector<int> &switch_items);
     void sendItemUpdate();
     void initClientConfirmState();
 
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                          int ticks) OVERRIDE;
-    virtual void collectedItem(ItemState *item, AbstractKart *kart) OVERRIDE;
+    virtual void  collectedItem(ItemState *item, AbstractKart *kart) OVERRIDE;
+    virtual void  switchItems() OVERRIDE;
     virtual Item* dropNewItem(ItemState::ItemType type, const AbstractKart *kart,
                               const Vec3 *xyz=NULL) OVERRIDE;
     virtual BareNetworkString* saveState(std::vector<std::string>* ru)
