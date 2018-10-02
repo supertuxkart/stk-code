@@ -212,11 +212,11 @@ bool EasterEggHunt::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-/** Called then a battle is restarted.
+/** Called when an egg hunt is restarted.
  */
-void EasterEggHunt::reset()
+void EasterEggHunt::reset(bool restart)
 {
-    LinearWorld::reset();
+    LinearWorld::reset(restart);
 
     for(unsigned int i=0; i<m_eggs_collected.size(); i++)
         m_eggs_collected[i] = 0;

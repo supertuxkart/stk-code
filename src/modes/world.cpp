@@ -266,7 +266,7 @@ void World::init()
  *  calling init() when starting a race for the first time, or after
  *  restarting a race, in which case no init() is called.
  */
-void World::reset()
+void World::reset(bool restart)
 {
     RewindManager::get()->reset();
 
@@ -283,7 +283,7 @@ void World::reset()
     m_schedule_pause = false;
     m_schedule_unpause = false;
 
-    WorldStatus::reset();
+    WorldStatus::reset(restart);
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -292,6 +292,8 @@ void World::reset()
     for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {
         (*i)->reset();
+        if (restart && (*i)->getController()->canGetAchievements())
+            PlayerManager::onRaceEnd(true /* previous race aborted */);
     }
 
     Camera::resetAllCameras();

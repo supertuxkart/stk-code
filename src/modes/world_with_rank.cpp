@@ -63,9 +63,9 @@ void WorldWithRank::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void WorldWithRank::reset()
+void WorldWithRank::reset(bool restart)
 {
-    World::reset();
+    World::reset(restart);
     for (unsigned int i = 0; i < m_kart_track_sector.size(); i++)
     {
         getTrackSector(i)->reset();

@@ -59,7 +59,7 @@ WorldStatus::WorldStatus()
 //-----------------------------------------------------------------------------
 /** Resets all status information, used when starting a new race.
  */
-void WorldStatus::reset()
+void WorldStatus::reset(bool restart)
 {
     m_time            = 0.0f;
     m_time_ticks      = 0;

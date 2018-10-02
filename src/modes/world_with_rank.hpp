@@ -74,7 +74,7 @@ public:
         classes must be instanciated, otherwise polymorphism will fail and the
         results will be incorrect */
     virtual void  init() OVERRIDE;
-    virtual void  reset() OVERRIDE;
+    virtual void  reset(bool restart=false) OVERRIDE;
 
     bool          displayRank() const { return m_display_rank; }
 

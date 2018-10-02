@@ -21,6 +21,7 @@
 #include <iostream>
 #include <algorithm>
 
+#include "achievements/achievements_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"
@@ -919,7 +920,7 @@ void RaceManager::rerunRace()
         m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
     }
-    World::getWorld()->reset();
+    World::getWorld()->reset(true /* restart */);
 }   // rerunRace
 
 //-----------------------------------------------------------------------------

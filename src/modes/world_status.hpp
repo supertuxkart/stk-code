@@ -138,7 +138,7 @@ public:
              WorldStatus();
     virtual ~WorldStatus();
 
-    virtual void reset();
+    virtual void reset(bool restart);
     virtual void updateTime(int ticks);
     virtual void update(int ticks);
     void         startReadySetGo();

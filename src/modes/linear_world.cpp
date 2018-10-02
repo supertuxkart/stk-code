@@ -91,9 +91,9 @@ LinearWorld::~LinearWorld()
  *  structures that keep track of position and distance long track of
  *  all karts.
  */
-void LinearWorld::reset()
+void LinearWorld::reset(bool restart)
 {
-    WorldWithRank::reset();
+    WorldWithRank::reset(restart);
     m_finish_timeout = std::numeric_limits<float>::max();
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;

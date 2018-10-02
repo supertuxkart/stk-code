@@ -46,7 +46,7 @@ public:
     virtual int  getScoreForPosition(int p) OVERRIDE;
 
     // overriding World methods
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
     virtual const btTransform &getStartTransform(int index) OVERRIDE;
     virtual void getKartsDisplayInfo(

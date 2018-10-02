@@ -190,5 +190,15 @@ public:
     }   // resetAchievementData
 
     // ------------------------------------------------------------------------
+    /** Reset achievements which have to be done in one race
+     *  \param restart - if the race has been restarted
+     */
+    static void onRaceEnd(bool restart)
+    {
+        getCurrentAchievementsStatus()
+            ->onRaceEnd(restart);
+    }   // resetAchievementData
+
+    // ------------------------------------------------------------------------
 };   // PlayerManager
 #endif

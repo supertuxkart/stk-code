@@ -273,6 +273,13 @@ void AchievementsStatus::onRaceEnd(bool aborted)
     }
 
     m_variables[ACHIEVE_POWERUP_USED_1RACE].counter = 0;
+
+    // Prevent restart from being abused to get consecutive wins achievement
+    if (aborted)
+    {
+        m_variables[ACHIEVE_CONS_WON_RACES].counter = 0;
+        m_variables[ACHIEVE_CONS_WON_RACES_HARD].counter = 0;
+    }
 }   // onRaceEnd
 
 // ----------------------------------------------------------------------------
