@@ -129,9 +129,9 @@ void SoccerWorld::init()
 //-----------------------------------------------------------------------------
 /** Called when a soccer game is restarted.
  */
-void SoccerWorld::reset()
+void SoccerWorld::reset(bool restart)
 {
-    WorldWithRank::reset();
+    WorldWithRank::reset(restart);
     if (race_manager->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,

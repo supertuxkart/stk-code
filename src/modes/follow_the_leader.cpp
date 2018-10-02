@@ -75,9 +75,9 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 //-----------------------------------------------------------------------------
 /** Called just before a race is started.
  */
-void FollowTheLeaderRace::reset()
+void FollowTheLeaderRace::reset(bool restart)
 {
-    LinearWorld::reset();
+    LinearWorld::reset(restart);
     m_last_eliminated_time = 0.0f;
     m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;

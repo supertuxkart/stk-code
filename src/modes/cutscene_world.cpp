@@ -172,9 +172,9 @@ CutsceneWorld::~CutsceneWorld()
 {
 }   // ~CutsceneWorld
 //-----------------------------------------------------------------------------
-void CutsceneWorld::reset()
+void CutsceneWorld::reset(bool restart)
 {
-    World::reset();
+    World::reset(restart);
     m_phase = RACE_PHASE;
 }
 //-----------------------------------------------------------------------------

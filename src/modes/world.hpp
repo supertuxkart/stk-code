@@ -256,7 +256,7 @@ public:
     virtual void    init();
     virtual void    updateGraphics(float dt);
     virtual void    terminateRace() OVERRIDE;
-    virtual void    reset() OVERRIDE;
+    virtual void    reset(bool restart=false) OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type,

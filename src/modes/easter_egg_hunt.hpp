@@ -56,7 +56,7 @@ public:
     virtual bool isRaceOver() OVERRIDE;
 
     // overriding World methods
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
 
     virtual bool raceHasLaps() OVERRIDE { return false; }
 
