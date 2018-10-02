@@ -53,8 +53,11 @@ public :
            ACHIEVE_CONS_WON_RACES        = 4,
            // Won races in (at least) hard requires at least 5 AI opponents
            ACHIEVE_CONS_WON_RACES_HARD   = 5,
+           // Count the number of powerups used by the player.
+           ACHIEVE_POWERUP_USED          = 6,
+           ACHIEVE_POWERUP_USED_1RACE    = 7,
 
-           ACHIEVE_DATA_NUM              = 6
+           ACHIEVE_DATA_NUM              = 8
     };
 
 private:
@@ -96,7 +99,7 @@ public :
     void updateAchievementsProgress(unsigned int achieve_data_id);
     void increaseDataVar(unsigned int achieve_data_id, int increase);
     void resetDataVar(unsigned int achieve_data_id);
-    void onRaceEnd();
+    void onRaceEnd(bool aborted=false);
     void onLapEnd();
     // ------------------------------------------------------------------------
     const std::map<uint32_t, Achievement *>& getAllAchievements()
