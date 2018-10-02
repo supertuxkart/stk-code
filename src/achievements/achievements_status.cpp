@@ -226,6 +226,14 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         powerup_lover->reset();
         powerup_lover->increase("poweruplover", "poweruplover", m_variables[ACHIEVE_POWERUP_USED_1RACE].counter);
     }
+
+    Achievement *banana_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BANANA);
+
+    if (!banana_lover->isAchieved())
+    {
+        banana_lover->reset();
+        banana_lover->increase("banana", "banana", m_variables[ACHIEVE_BANANA_1RACE].counter);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -273,6 +281,7 @@ void AchievementsStatus::onRaceEnd(bool aborted)
     }
 
     m_variables[ACHIEVE_POWERUP_USED_1RACE].counter = 0;
+    m_variables[ACHIEVE_BANANA_1RACE].counter = 0;
 
     // Prevent restart from being abused to get consecutive wins achievement
     if (aborted)
