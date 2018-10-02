@@ -218,6 +218,14 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         gold_driver->increase("std_timetrial", "std_timetrial", m_variables[ACHIEVE_WON_TT_RACES].counter);
         gold_driver->increase("follow_leader", "follow_leader", m_variables[ACHIEVE_WON_FTL_RACES].counter);
     }
+
+    Achievement *powerup_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER);
+
+    if (!powerup_lover->isAchieved())
+    {
+        powerup_lover->reset();
+        powerup_lover->increase("poweruplover", "poweruplover", m_variables[ACHIEVE_POWERUP_USED_1RACE].counter);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -256,13 +264,15 @@ void AchievementsStatus::resetDataVar(unsigned int achieve_data_id)
 }   // resetDataVar
 
 // ----------------------------------------------------------------------------
-void AchievementsStatus::onRaceEnd()
+void AchievementsStatus::onRaceEnd(bool aborted)
 {
     //reset all values that need to be reset
     std::map<uint32_t, Achievement *>::iterator iter;
     for ( iter = m_achievements.begin(); iter != m_achievements.end(); ++iter ) {
         iter->second->onRaceEnd();
     }
+
+    m_variables[ACHIEVE_POWERUP_USED_1RACE].counter = 0;
 }   // onRaceEnd
 
 // ----------------------------------------------------------------------------
