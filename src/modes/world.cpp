@@ -295,9 +295,19 @@ void World::reset(bool restart)
         if ((*i)->getController()->canGetAchievements())
         {
             if (race_manager->isLinearRaceMode())
+            {
                 PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_STARTED);
+                AchievementsStatus::AchievementData diff;
+                diff = (race_manager->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_STARTED :
+                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_STARTED :
+                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_STARTED :
+                                                                                           AchievementsStatus::BEST_STARTED;
+                PlayerManager::increaseAchievement(diff,1);
+            }
             else if (race_manager->isEggHuntMode())
+            {
                 PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
+            }
             if (restart)
                 PlayerManager::onRaceEnd(true /* previous race aborted */);
         }
@@ -641,6 +651,13 @@ void World::terminateRace()
             // Retrieve the current player
             if (m_karts[i]->getController()->canGetAchievements())
             {
+                AchievementsStatus::AchievementData diff;
+                diff = (race_manager->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_FINISHED :
+                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_FINISHED :
+                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_FINISHED :
+                                                                                           AchievementsStatus::BEST_FINISHED;
+                PlayerManager::increaseAchievement(diff,1);
+
                 PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED);
                 if (race_manager->getReverseTrack())
                     PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_REVERSE);
