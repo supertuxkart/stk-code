@@ -88,6 +88,21 @@ private:
     // The tracked values are defined at compile time
     AchievementVariable m_variables[ACHIEVE_DATA_NUM];
 
+    // To keep track of track-specific data without hardcoding
+    // a list of tracks, we use a special structure.
+    struct TrackStats
+    {
+        std::string ident;
+        // counters for standard, TT & FTL races
+        int race_started; 
+        int race_finished;
+        int race_won;
+        int race_finished_reverse;
+        // TODO : Add data to keep track of egg hunts, battle, soccer
+    };
+
+    std::vector<TrackStats> m_track_stats;
+
     bool                m_online;
     bool                m_valid;
 
@@ -110,6 +125,10 @@ public :
     void resetDataVar(unsigned int achieve_data_id);
     void onRaceEnd(bool aborted=false);
     void onLapEnd();
+    void raceStarted(std::string track_ident);
+    void raceFinished(std::string track_ident);
+    void raceWon(std::string track_ident);
+    void raceFinishedReverse(std::string track_ident);
     // ------------------------------------------------------------------------
     const std::map<uint32_t, Achievement *>& getAllAchievements()
     {
