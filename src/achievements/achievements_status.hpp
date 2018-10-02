@@ -61,8 +61,12 @@ public :
            // Count the number of bananas hit
            ACHIEVE_BANANA                = 8,
            ACHIEVE_BANANA_1RACE          = 9,
+           // Count how many times the player skidded
+           ACHIEVE_SKIDDING_1LAP         = 10,
+           ACHIEVE_SKIDDING_1RACE        = 11,
+           ACHIEVE_SKIDDING              = 12,
 
-           ACHIEVE_DATA_NUM              = 10
+           ACHIEVE_DATA_NUM              = 13
     };
 
 private:

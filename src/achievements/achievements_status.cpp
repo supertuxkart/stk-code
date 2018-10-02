@@ -234,6 +234,14 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         banana_lover->reset();
         banana_lover->increase("banana", "banana", m_variables[ACHIEVE_BANANA_1RACE].counter);
     }
+
+    Achievement *skidding = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_SKIDDING);
+
+    if (!skidding->isAchieved())
+    {
+        skidding->reset();
+        skidding->increase("skidding", "skidding", m_variables[ACHIEVE_SKIDDING_1LAP].counter);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -282,6 +290,7 @@ void AchievementsStatus::onRaceEnd(bool aborted)
 
     m_variables[ACHIEVE_POWERUP_USED_1RACE].counter = 0;
     m_variables[ACHIEVE_BANANA_1RACE].counter = 0;
+    m_variables[ACHIEVE_SKIDDING_1RACE].counter = 0;
 
     // Prevent restart from being abused to get consecutive wins achievement
     if (aborted)
@@ -299,4 +308,6 @@ void AchievementsStatus::onLapEnd()
     for (iter = m_achievements.begin(); iter != m_achievements.end(); ++iter) {
         iter->second->onLapEnd();
     }
+
+    m_variables[ACHIEVE_SKIDDING_1LAP].counter = 0;
 }   // onLapEnd
