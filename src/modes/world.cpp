@@ -292,8 +292,13 @@ void World::reset(bool restart)
     for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {
         (*i)->reset();
-        if (restart && (*i)->getController()->canGetAchievements())
-            PlayerManager::onRaceEnd(true /* previous race aborted */);
+        if ((*i)->getController()->canGetAchievements())
+        {
+            printf("Track name is %s\n", race_manager->getTrackName().c_str());
+            PlayerManager::raceStarted(race_manager->getTrackName());
+            if (restart)
+                PlayerManager::onRaceEnd(true /* previous race aborted */);
+        }
     }
 
     Camera::resetAllCameras();
@@ -618,8 +623,6 @@ void World::terminateRace()
     }
 
     // Check achievements
-    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
-                                       Track::getCurrentTrack()->getIdent(), 1);
     if (raceHasLaps())
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
@@ -631,23 +634,30 @@ void World::terminateRace()
     {
         for(unsigned int i = 0; i < kart_amount; i++)
         {
+            // TODO : does this work in multiplayer ?
             // Retrieve the current player
             if (m_karts[i]->getController()->canGetAchievements())
             {
+                PlayerManager::raceFinished(race_manager->getTrackName());
+                if (race_manager->getReverseTrack())
+                    PlayerManager::raceFinishedReverse(race_manager->getTrackName());
                 int winner_position = 1;
                 if (race_manager->isFollowMode()) winner_position = 2;//TODO : check this always work
                 // Check if the player has won
-                if (m_karts[i]->getPosition() == winner_position && race_manager->getNumberOfAIKarts() >= 3)
+                if (m_karts[i]->getPosition() == winner_position)
                 {
-                    PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
-                    PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES,1);
-                    if (race_manager->isTimeTrialMode())
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_TT_RACES,1);
-                    else if (race_manager->isFollowMode())
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_FTL_RACES,1);
-                    else // normal race
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_NORMAL_RACES,1);
-
+                    PlayerManager::raceWon(race_manager->getTrackName());
+                    if (race_manager->getNumberOfAIKarts() >= 3)
+                    {
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES,1);
+                        if (race_manager->isTimeTrialMode())
+                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_TT_RACES,1);
+                        else if (race_manager->isFollowMode())
+                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_FTL_RACES,1);
+                        else // normal race
+                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_NORMAL_RACES,1);
+                    }
                     if (race_manager->getNumberOfAIKarts() >= 5 &&
                         (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
                          race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST))

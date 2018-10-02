@@ -24,6 +24,8 @@
 #include "achievements/achievements_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/utf_writer.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
@@ -45,6 +47,22 @@ AchievementsStatus::AchievementsStatus()
     {
         m_variables[i].counter = 0;
     }
+
+    // Create one TrackStats instance for all existing tracks
+    const unsigned int track_amount = track_manager->getNumberOfTracks();
+
+    for (unsigned int n = 0; n < track_amount; n++)
+    {
+        Track* curr = track_manager->getTrack(n);
+        if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
+
+        TrackStats new_track;
+        new_track.ident = curr->getIdent();
+        new_track.race_started = new_track.race_finished = new_track.race_won = 0;
+        new_track.race_finished_reverse = 0;
+
+        m_track_stats.push_back(new_track);
+    }   // for n<track_amount
 }   // AchievementsStatus
 
 // ----------------------------------------------------------------------------
@@ -102,6 +120,41 @@ void AchievementsStatus::load(const XMLNode * input)
             }
             xml_achievement_data[i]->get("counter",&m_variables[i].counter); 
         }
+        // Load track usage data
+        std::vector<XMLNode*> xml_achievement_tracks;
+        input->getNodes("track_stats", xml_achievement_tracks);
+        //FIXME : while this doesn't happen in a performance-critical part
+        //        of the code, this double-loop is not very efficient.
+        for (unsigned int i=0; i < xml_achievement_tracks.size(); i++)
+        {
+            bool track_found = false;
+            std::string ident;
+            xml_achievement_tracks[i]->get("ident",&ident);
+            for (unsigned int j=0 ; j < m_track_stats.size(); j++)
+            {
+                if (ident == m_track_stats[j].ident)
+                {
+                    xml_achievement_tracks[i]->get("started",&m_track_stats[j].race_started);
+                    xml_achievement_tracks[i]->get("finished",&m_track_stats[j].race_finished);
+                    xml_achievement_tracks[i]->get("won",&m_track_stats[j].race_won);
+                    xml_achievement_tracks[i]->get("finished_reverse",&m_track_stats[j].race_finished_reverse);
+                    track_found = true;
+                    break;
+                }
+            }
+            // Useful if, e.g. an addon track get deleted
+            if (!track_found)
+            {
+                TrackStats new_track;
+                new_track.ident = ident;
+                xml_achievement_tracks[i]->get("started",&new_track.race_started);
+                xml_achievement_tracks[i]->get("finished",&new_track.race_finished);
+                xml_achievement_tracks[i]->get("won",&new_track.race_won);
+                xml_achievement_tracks[i]->get("finished_reverse",&new_track.race_finished_reverse);
+
+                m_track_stats.push_back(new_track);
+            }
+        }
     }
     // If there is nothing valid to load ; we keep the init values
 
@@ -133,6 +186,14 @@ void AchievementsStatus::save(UTFWriter &out)
     {
         out << "          <var counter=\"" << m_variables[i].counter << "\"/>\n";
     }
+    for (unsigned int n = 0; n < m_track_stats.size(); n++)
+    {
+        out << "          <track_stats ident=\"" << m_track_stats[n].ident << "\"";
+        out << " started=\"" << m_track_stats[n].race_started << "\"";
+        out << " finished=\"" << m_track_stats[n].race_finished << "\"";
+        out << " won=\"" << m_track_stats[n].race_won << "\"";
+        out << " finished_reverse=\"" << m_track_stats[n].race_finished_reverse << "\"/>\n";
+    }   // for n<m_track_stats.size()
     out << "      </achievements>\n";
 }   // save
 
@@ -192,25 +253,25 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
 /* This function checks over achievements to update their goals
    FIXME It is currently hard-coded to specific achievements,
    until it can entirely supersedes the previous system and
-   removes its complications. */
+   removes its complications.
+   FIXME : a data id don't cover some situations, and the function itself ignores it */
 void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id)
 {
-    Achievement *gold_driver = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
-    Achievement *unstoppable = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
     Achievement *beyond_luck = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BEYOND_LUCK);
-
     if (!beyond_luck->isAchieved())
     {
         beyond_luck->reset();
         beyond_luck->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES].counter);
     }
 
+    Achievement *unstoppable = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
     if (!unstoppable->isAchieved())
     {
         unstoppable->reset();
         unstoppable->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES_HARD].counter);
     }
 
+    Achievement *gold_driver = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
     if (!gold_driver->isAchieved())
     {
         gold_driver->reset();
@@ -220,7 +281,6 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
     }
 
     Achievement *powerup_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER);
-
     if (!powerup_lover->isAchieved())
     {
         powerup_lover->reset();
@@ -228,7 +288,6 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
     }
 
     Achievement *banana_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BANANA);
-
     if (!banana_lover->isAchieved())
     {
         banana_lover->reset();
@@ -236,12 +295,26 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
     }
 
     Achievement *skidding = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_SKIDDING);
-
     if (!skidding->isAchieved())
     {
         skidding->reset();
         skidding->increase("skidding", "skidding", m_variables[ACHIEVE_SKIDDING_1LAP].counter);
     }
+
+    Achievement *columbus = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_COLUMBUS);
+    if (!columbus->isAchieved())
+    {
+        columbus->reset();
+        for (unsigned int i=0;i<m_track_stats.size();i++)
+        {
+            // ignore addons tracks (compare returns 0 when the values are equal)
+            if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
+                continue;
+
+            columbus->increase(m_track_stats[i].ident, m_track_stats[i].ident, std::min<int>(m_track_stats[i].race_finished,1));
+        }
+    }
+
 }
 
 // ----------------------------------------------------------------------------
@@ -250,9 +323,10 @@ void AchievementsStatus::increaseDataVar(unsigned int achieve_data_id, int incre
     if (achieve_data_id<ACHIEVE_DATA_NUM)
     {
         m_variables[achieve_data_id].counter += increase;
-        updateAchievementsProgress(achieve_data_id);
         if (m_variables[achieve_data_id].counter > 10000000)
             m_variables[achieve_data_id].counter = 10000000;
+
+        updateAchievementsProgress(achieve_data_id);
     }
 #ifdef DEBUG
     else
@@ -282,6 +356,8 @@ void AchievementsStatus::resetDataVar(unsigned int achieve_data_id)
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onRaceEnd(bool aborted)
 {
+    updateAchievementsProgress(0);
+
     //reset all values that need to be reset
     std::map<uint32_t, Achievement *>::iterator iter;
     for ( iter = m_achievements.begin(); iter != m_achievements.end(); ++iter ) {
@@ -303,6 +379,8 @@ void AchievementsStatus::onRaceEnd(bool aborted)
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onLapEnd()
 {
+    updateAchievementsProgress(0);
+
     //reset all values that need to be reset
     std::map<uint32_t, Achievement *>::iterator iter;
     for (iter = m_achievements.begin(); iter != m_achievements.end(); ++iter) {
@@ -311,3 +389,55 @@ void AchievementsStatus::onLapEnd()
 
     m_variables[ACHIEVE_SKIDDING_1LAP].counter = 0;
 }   // onLapEnd
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::raceStarted(std::string track_ident)
+{
+    for (unsigned int i=0;i<m_track_stats.size();i++)
+    {
+        if (m_track_stats[i].ident == track_ident)
+        {
+            m_track_stats[i].race_started++;
+            break;
+        }
+    }
+} // raceStarted
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::raceFinished(std::string track_ident)
+{
+    for (unsigned int i=0;i<m_track_stats.size();i++)
+    {
+        if (m_track_stats[i].ident == track_ident)
+        {
+            m_track_stats[i].race_finished++;
+            break;
+        }
+    }
+} // raceFinished
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::raceWon(std::string track_ident)
+{
+    for (unsigned int i=0;i<m_track_stats.size();i++)
+    {
+        if (m_track_stats[i].ident == track_ident)
+        {
+            m_track_stats[i].race_won++;
+            break;
+        }
+    }
+} // raceWon
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::raceFinishedReverse(std::string track_ident)
+{
+    for (unsigned int i=0;i<m_track_stats.size();i++)
+    {
+        if (m_track_stats[i].ident == track_ident)
+        {
+            m_track_stats[i].race_finished_reverse++;
+            break;
+        }
+    }
+} // raceFinishedReverse

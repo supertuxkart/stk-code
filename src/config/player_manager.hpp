@@ -195,9 +195,33 @@ public:
      */
     static void onRaceEnd(bool restart)
     {
-        getCurrentAchievementsStatus()
-            ->onRaceEnd(restart);
-    }   // resetAchievementData
+        getCurrentAchievementsStatus()->onRaceEnd(restart);
+    }   // onRaceEnd
+
+
+    // ----------------------------------------------------------------------------
+    static void raceStarted(std::string track_ident)
+    {
+        getCurrentAchievementsStatus()->raceStarted(track_ident);
+    } // raceStarted
+    
+    // ----------------------------------------------------------------------------
+    static void raceFinished(std::string track_ident)
+    {
+        getCurrentAchievementsStatus()->raceFinished(track_ident);
+    } // raceFinished
+    
+    // ----------------------------------------------------------------------------
+    static void raceWon(std::string track_ident)
+    {
+        getCurrentAchievementsStatus()->raceWon(track_ident);
+    } // raceWon
+    
+    // ----------------------------------------------------------------------------
+    static void raceFinishedReverse(std::string track_ident)
+    {
+        getCurrentAchievementsStatus()->raceFinishedReverse(track_ident);
+    } // raceFinishedReverse
 
     // ------------------------------------------------------------------------
 };   // PlayerManager
