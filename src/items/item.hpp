@@ -188,14 +188,14 @@ public:
         return 0;
     }   // getGraphNode
     // -----------------------------------------------------------------------
-    const Vec3 *getAvoidancePoint(bool left) const
+    virtual const Vec3 *getAvoidancePoint(bool left) const
     {
         Log::fatal("ItemState", "getAvoidancePoint() called for ItemState.");
         // Return doesn't matter, fatal aborts
         return &m_xyz;
     }   // getAvoidancePoint
     // -----------------------------------------------------------------------
-    float getDistanceFromCenter() const
+    virtual float getDistanceFromCenter() const
     {
         Log::fatal("itemState",
                    "getDistanceFromCentre() called for ItemState.");
@@ -414,13 +414,16 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the distance from center: negative means left of center,
      *  positive means right of center. */
-    float getDistanceFromCenter() const { return m_distance_from_center; }
+    virtual float getDistanceFromCenter() const OVERRIDE
+    {
+        return m_distance_from_center;
+    }   // getDistanceFromCenter
     // ------------------------------------------------------------------------
     /** Returns a point to the left or right of the item which will not trigger
      *  a collection of this item.
      *  \param left If true, return a point to the left, else a point to
      *         the right. */
-    const Vec3 *getAvoidancePoint(bool left) const
+    virtual const Vec3 *getAvoidancePoint(bool left) const OVERRIDE
     {
         if(left) return m_avoidance_points[0];
         return m_avoidance_points[1];
