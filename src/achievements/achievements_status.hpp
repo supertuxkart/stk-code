@@ -41,6 +41,8 @@ class XMLNode;
 class AchievementsStatus
 {
 public :
+    // Warning : changing what an existing id does breaks
+    // save-game compatibility. Bump version number if doing so.
     enum { // Won races values share the following properties :
            // 1. Only races with at least 3 AI count unless otherwise specified.
            ACHIEVE_WON_RACES             = 0, // Normal, time-trial and FTL
@@ -56,8 +58,11 @@ public :
            // Count the number of powerups used by the player.
            ACHIEVE_POWERUP_USED          = 6,
            ACHIEVE_POWERUP_USED_1RACE    = 7,
+           // Count the number of bananas hit
+           ACHIEVE_BANANA                = 8,
+           ACHIEVE_BANANA_1RACE          = 9,
 
-           ACHIEVE_DATA_NUM              = 8
+           ACHIEVE_DATA_NUM              = 10
     };
 
 private:
