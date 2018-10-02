@@ -272,7 +272,9 @@ PlayerKartWidget::~PlayerKartWidget()
 
     if (m_kart_name->getIrrlichtElement() != NULL)
         m_kart_name->getIrrlichtElement()->remove();
-    getCurrentScreen()->manualRemoveWidget(this);
+        
+    if (getCurrentScreen() != NULL)
+        getCurrentScreen()->manualRemoveWidget(this);
 
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
