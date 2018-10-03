@@ -46,16 +46,16 @@ public :
     enum AchievementData {
            // Won races values share the following properties :
            // 1. Only races with at least 3 AI count unless otherwise specified.
-           ACHIEVE_WON_RACES             = 0, // Normal, time-trial and FTL
-           ACHIEVE_WON_NORMAL_RACES      = 1, // Normal race only
-           ACHIEVE_WON_TT_RACES          = 2, // Time-trial race only
-           ACHIEVE_WON_FTL_RACES         = 3, // Follow-the-leader race only
+           WON_RACES                     = 0, // Normal, time-trial and FTL
+           WON_NORMAL_RACES              = 1, // Normal race only
+           WON_TT_RACES                  = 2, // Time-trial race only
+           WON_FTL_RACES                 = 3, // Follow-the-leader race only
            // Consecutive won race values :
            // 1. Ignore races with not enough AIs for incrementation
            // 2. Reset the counter in case of loss against any number of AIs
-           ACHIEVE_CONS_WON_RACES        = 4,
+           CONS_WON_RACES                = 4,
            // Won races in (at least) hard requires at least 5 AI opponents
-           ACHIEVE_CONS_WON_RACES_HARD   = 5,
+           CONS_WON_RACES_HARD           = 5,
            // Count how many normal, TT & FTL races were started and finished by difficulty
            EASY_STARTED                  = 6,
            EASY_FINISHED                 = 7,
@@ -66,15 +66,15 @@ public :
            BEST_STARTED                  = 12,
            BEST_FINISHED                 = 13,
            // Count the number of powerups used by the player.
-           ACHIEVE_POWERUP_USED          = 14,
-           ACHIEVE_POWERUP_USED_1RACE    = 15,
+           POWERUP_USED                  = 14,
+           POWERUP_USED_1RACE            = 15,
            // Count the number of bananas hit
-           ACHIEVE_BANANA                = 16,
-           ACHIEVE_BANANA_1RACE          = 17,
+           BANANA                        = 16,
+           BANANA_1RACE                  = 17,
            // Count how many times the player skidded
-           ACHIEVE_SKIDDING_1LAP         = 18,
-           ACHIEVE_SKIDDING_1RACE        = 19,
-           ACHIEVE_SKIDDING              = 20,
+           SKIDDING_1LAP                 = 18,
+           SKIDDING_1RACE                = 19,
+           SKIDDING                      = 20,
            // Count how many times a bowling ball from the player hit a kart
            BOWLING_HIT                   = 21,
            BOWLING_HIT_1RACE             = 22,

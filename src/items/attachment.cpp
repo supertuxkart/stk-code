@@ -329,8 +329,8 @@ void Attachment::hitBanana(ItemState *item_state)
 {
     if (m_kart->getController()->canGetAchievements())
     {
-        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_BANANA, 1);
-        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_BANANA_1RACE, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::BANANA, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
