@@ -51,7 +51,7 @@
     <poweruplover goal="10"/>
   </achievement>
   <achievement id="8" check-type="all-at-least" reset-type="never"
-               name="Beyond Luck" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race count as a loss.">
+               name="Beyond Luck" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
     <wins goal="5"/>
   </achievement>
   <achievement id="9" check-type="all-at-least" reset-type="race"
@@ -66,7 +66,7 @@
     <swatter goal="5"/>
   </achievement>
   <achievement id="12" check-type="all-at-least" reset-type="never"
-               name="Unstoppable" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race count as a loss.">
+               name="Unstoppable" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
     <wins goal="10"/>
   </achievement>
 </achievements>

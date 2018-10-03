@@ -634,86 +634,7 @@ void World::terminateRace()
         updateHighscores(&best_highscore_rank);
     }
 
-    //TODO : move this stuff to a sub-function
-    // Increment won races counts and track finished counts
-    if (race_manager->isLinearRaceMode())
-    {
-        for(unsigned int i = 0; i < kart_amount; i++)
-        {
-            // TODO : does this work in multiplayer ?
-            // TODO : check what happens when abandonning a race in a GP
-            // Retrieve the current player
-            if (m_karts[i]->getController()->canGetAchievements())
-            {
-                AchievementsStatus::AchievementData diff;
-                diff = (race_manager->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_FINISHED :
-                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_FINISHED :
-                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_FINISHED :
-                                                                                           AchievementsStatus::BEST_FINISHED;
-                PlayerManager::increaseAchievement(diff,1);
-
-                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED);
-                if (race_manager->getReverseTrack())
-                    PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_REVERSE);
-
-                if (race_manager->modeHasLaps())
-                {
-                    Track* track = track_manager->getTrack(race_manager->getTrackName());
-                    int default_lap_num = track->getDefaultNumberOfLaps();
-                    if (race_manager->getNumLaps() < default_lap_num)
-                    {
-                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_LESS_LAPS);
-                    }
-                    else if (race_manager->getNumLaps() > default_lap_num)
-                    {
-                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_MORE_LAPS);
-                        if (race_manager->getNumLaps() >= 2*default_lap_num)
-                            PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_MIN_TWICE_LAPS);
-                    }
-                }
-
-                int winner_position = 1;
-                //TODO : check this always work : what happens if the leader is overtaken between the last elimination
-                //       and the results screen ?
-                if (race_manager->isFollowMode()) winner_position = 2;
-                // Check if the player has won
-                if (m_karts[i]->getPosition() == winner_position)
-                {
-                    if (race_manager->getNumNonGhostKarts() >= 2)
-                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_WON);
-                    else
-                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_ALONE);
-                    if (race_manager->getNumberOfAIKarts() >= 3)
-                    {
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES,1);
-                        if (race_manager->isTimeTrialMode())
-                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_TT_RACES,1);
-                        else if (race_manager->isFollowMode())
-                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_FTL_RACES,1);
-                        else // normal race
-                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_NORMAL_RACES,1);
-                    }
-                    if (race_manager->getNumberOfAIKarts() >= 5 &&
-                        (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
-                         race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST))
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD,1);
-                }
-                // Race lost, reset the consecutive wins counters
-                else if (m_karts[i]->getPosition() > winner_position)
-                {
-                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES);
-                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD);
-                }
-            }
-         } // for i<kart_amount
-    } // if isLinearRaceMode
-
-    // Increment egg hunt finished count
-    if (race_manager->isEggHuntMode())
-    {
-        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_EGG_HUNT_FINISHED);
-    }
+    updateAchievementDataEndRace();
 
     PlayerManager::getCurrentPlayer()->raceFinished();
 
@@ -1646,3 +1567,90 @@ void World::setAITeam()
     Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 
 }   // setAITeam
+
+//-----------------------------------------------------------------------------
+/* This function takes care to update all relevant achievements
+ * and statistics counters related to a finished race. */
+void World::updateAchievementDataEndRace()
+{
+    const unsigned int kart_amount = getNumKarts();
+    // Increment won races counts and track finished counts
+    if (race_manager->isLinearRaceMode())
+    {
+        for(unsigned int i = 0; i < kart_amount; i++)
+        {
+            // TODO : does this work in multiplayer ?
+            // TODO : check what happens when abandonning a race in a GP
+            // Retrieve the current player
+            if (m_karts[i]->getController()->canGetAchievements())
+            {
+                AchievementsStatus::AchievementData diff;
+                diff = (race_manager->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_FINISHED :
+                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_FINISHED :
+                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_FINISHED :
+                                                                                           AchievementsStatus::BEST_FINISHED;
+                PlayerManager::increaseAchievement(diff,1);
+
+                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED);
+                if (race_manager->getReverseTrack())
+                    PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_REVERSE);
+
+                if (race_manager->modeHasLaps())
+                {
+                    Track* track = track_manager->getTrack(race_manager->getTrackName());
+                    int default_lap_num = track->getDefaultNumberOfLaps();
+                    if (race_manager->getNumLaps() < default_lap_num)
+                    {
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_LESS_LAPS);
+                    }
+                    else if (race_manager->getNumLaps() > default_lap_num)
+                    {
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_MORE_LAPS);
+                        if (race_manager->getNumLaps() >= 2*default_lap_num)
+                            PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_MIN_TWICE_LAPS);
+                    }
+                }
+
+                int winner_position = 1;
+                //TODO : check this always work : what happens if the leader is overtaken between the last elimination
+                //       and the results screen ?
+                if (race_manager->isFollowMode()) winner_position = 2;
+                // Check if the player has won
+                if (m_karts[i]->getPosition() == winner_position)
+                {
+                    if (race_manager->getNumNonGhostKarts() >= 2)
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_WON);
+                    else
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_ALONE);
+                    if (race_manager->getNumberOfAIKarts() >= 3)
+                    {
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES,1);
+                        if (race_manager->isTimeTrialMode())
+                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_TT_RACES,1);
+                        else if (race_manager->isFollowMode())
+                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_FTL_RACES,1);
+                        else // normal race
+                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_NORMAL_RACES,1);
+                    }
+                    if (race_manager->getNumberOfAIKarts() >= 5 &&
+                        (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                         race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST))
+                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD,1);
+                }
+                // Race lost, reset the consecutive wins counters
+                else if (m_karts[i]->getPosition() > winner_position)
+                {
+                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES);
+                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD);
+                }
+            }
+         } // for i<kart_amount
+    } // if isLinearRaceMode
+
+    // Increment egg hunt finished count
+    if (race_manager->isEggHuntMode())
+    {
+        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_EGG_HUNT_FINISHED);
+    }
+} // updateAchievementDataEndRace
