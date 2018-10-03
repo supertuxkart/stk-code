@@ -516,11 +516,11 @@ void Skidding::update(int ticks, bool is_on_ground,
                     if (m_kart->getController()->canGetAchievements())
                     {
                         PlayerManager::increaseAchievement(
-                                AchievementsStatus::ACHIEVE_SKIDDING_1LAP, 1);
+                                AchievementsStatus::SKIDDING_1LAP, 1);
                         PlayerManager::increaseAchievement(
-                                AchievementsStatus::ACHIEVE_SKIDDING_1RACE, 1);
+                                AchievementsStatus::SKIDDING_1RACE, 1);
                         PlayerManager::increaseAchievement(
-                                AchievementsStatus::ACHIEVE_SKIDDING, 1);
+                                AchievementsStatus::SKIDDING, 1);
                     }
                 }
                 else {

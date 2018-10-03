@@ -254,8 +254,8 @@ void Powerup::use()
     if (m_type != PowerupManager::POWERUP_NOTHING      &&
         m_kart->getController()->canGetAchievements()    )
     {
-        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_POWERUP_USED, 1);
-        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_POWERUP_USED_1RACE, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED_1RACE, 1);
     }
 
     // Play custom kart sound when collectible is used //TODO: what about the bubble gum?

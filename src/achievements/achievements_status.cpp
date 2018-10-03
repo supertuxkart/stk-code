@@ -281,44 +281,44 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
     if (!beyond_luck->isAchieved())
     {
         beyond_luck->reset();
-        beyond_luck->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES].counter);
+        beyond_luck->increase("wins", "wins", m_variables[CONS_WON_RACES].counter);
     }
 
     Achievement *unstoppable = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
     if (!unstoppable->isAchieved())
     {
         unstoppable->reset();
-        unstoppable->increase("wins", "wins", m_variables[ACHIEVE_CONS_WON_RACES_HARD].counter);
+        unstoppable->increase("wins", "wins", m_variables[CONS_WON_RACES_HARD].counter);
     }
 
     Achievement *gold_driver = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
     if (!gold_driver->isAchieved())
     {
         gold_driver->reset();
-        gold_driver->increase("standard", "standard", m_variables[ACHIEVE_WON_NORMAL_RACES].counter);
-        gold_driver->increase("std_timetrial", "std_timetrial", m_variables[ACHIEVE_WON_TT_RACES].counter);
-        gold_driver->increase("follow_leader", "follow_leader", m_variables[ACHIEVE_WON_FTL_RACES].counter);
+        gold_driver->increase("standard", "standard", m_variables[WON_NORMAL_RACES].counter);
+        gold_driver->increase("std_timetrial", "std_timetrial", m_variables[WON_TT_RACES].counter);
+        gold_driver->increase("follow_leader", "follow_leader", m_variables[WON_FTL_RACES].counter);
     }
 
-    Achievement *powerup_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER);
+    Achievement *powerup_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::POWERUP_LOVER);
     if (!powerup_lover->isAchieved())
     {
         powerup_lover->reset();
-        powerup_lover->increase("poweruplover", "poweruplover", m_variables[ACHIEVE_POWERUP_USED_1RACE].counter);
+        powerup_lover->increase("poweruplover", "poweruplover", m_variables[POWERUP_USED_1RACE].counter);
     }
 
-    Achievement *banana_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BANANA);
+    Achievement *banana_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::BANANA);
     if (!banana_lover->isAchieved())
     {
         banana_lover->reset();
-        banana_lover->increase("banana", "banana", m_variables[ACHIEVE_BANANA_1RACE].counter);
+        banana_lover->increase("banana", "banana", m_variables[BANANA_1RACE].counter);
     }
 
-    Achievement *skidding = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_SKIDDING);
+    Achievement *skidding = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::SKIDDING);
     if (!skidding->isAchieved())
     {
         skidding->reset();
-        skidding->increase("skidding", "skidding", m_variables[ACHIEVE_SKIDDING_1LAP].counter);
+        skidding->increase("skidding", "skidding", m_variables[SKIDDING_1LAP].counter);
     }
 
     Achievement *strike = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_STRIKE);
@@ -416,9 +416,9 @@ void AchievementsStatus::onRaceEnd(bool aborted)
         iter->second->onRaceEnd();
     }
 
-    m_variables[ACHIEVE_POWERUP_USED_1RACE].counter = 0;
-    m_variables[ACHIEVE_BANANA_1RACE].counter = 0;
-    m_variables[ACHIEVE_SKIDDING_1RACE].counter = 0;
+    m_variables[POWERUP_USED_1RACE].counter = 0;
+    m_variables[BANANA_1RACE].counter = 0;
+    m_variables[SKIDDING_1RACE].counter = 0;
     m_variables[BOWLING_HIT_1RACE].counter = 0;
     m_variables[SWATTER_HIT_1RACE].counter = 0;
 
@@ -426,8 +426,8 @@ void AchievementsStatus::onRaceEnd(bool aborted)
     // Prevent restart from being abused to get consecutive wins achievement
     if (aborted)
     {
-        m_variables[ACHIEVE_CONS_WON_RACES].counter = 0;
-        m_variables[ACHIEVE_CONS_WON_RACES_HARD].counter = 0;
+        m_variables[CONS_WON_RACES].counter = 0;
+        m_variables[CONS_WON_RACES_HARD].counter = 0;
     }
 }   // onRaceEnd
 
@@ -442,7 +442,7 @@ void AchievementsStatus::onLapEnd()
         iter->second->onLapEnd();
     }
 
-    m_variables[ACHIEVE_SKIDDING_1LAP].counter = 0;
+    m_variables[SKIDDING_1LAP].counter = 0;
 }   // onLapEnd
 
 // ----------------------------------------------------------------------------

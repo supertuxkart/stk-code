@@ -1624,25 +1624,25 @@ void World::updateAchievementDataEndRace()
                         PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_ALONE);
                     if (race_manager->getNumberOfAIKarts() >= 3)
                     {
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_RACES,1);
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES,1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::WON_RACES,1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::CONS_WON_RACES,1);
                         if (race_manager->isTimeTrialMode())
-                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_TT_RACES,1);
+                            PlayerManager::increaseAchievement(AchievementsStatus::WON_TT_RACES,1);
                         else if (race_manager->isFollowMode())
-                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_FTL_RACES,1);
+                            PlayerManager::increaseAchievement(AchievementsStatus::WON_FTL_RACES,1);
                         else // normal race
-                            PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_WON_NORMAL_RACES,1);
+                            PlayerManager::increaseAchievement(AchievementsStatus::WON_NORMAL_RACES,1);
                     }
                     if (race_manager->getNumberOfAIKarts() >= 5 &&
                         (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
                          race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST))
-                        PlayerManager::increaseAchievement(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD,1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::CONS_WON_RACES_HARD,1);
                 }
                 // Race lost, reset the consecutive wins counters
                 else if (m_karts[i]->getPosition() > winner_position)
                 {
-                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES);
-                    PlayerManager::resetAchievementData(AchievementsStatus::ACHIEVE_CONS_WON_RACES_HARD);
+                    PlayerManager::resetAchievementData(AchievementsStatus::CONS_WON_RACES);
+                    PlayerManager::resetAchievementData(AchievementsStatus::CONS_WON_RACES_HARD);
                 }
             }
          } // for i<kart_amount
