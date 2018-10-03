@@ -196,6 +196,7 @@ protected:
     /** Set the team arrow on karts if necessary*/
     void initTeamArrows();
     void updateAchievementDataEndRace();
+    void updateAchievementModeCounters(bool start);
 
 public:
                     World();

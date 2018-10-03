@@ -60,6 +60,7 @@ AchievementsStatus::AchievementsStatus()
         new_track.ident = curr->getIdent();
         new_track.race_started = new_track.race_finished = new_track.race_won = 0;
         new_track.race_finished_reverse = new_track.race_finished_alone = 0;
+        new_track.less_laps = new_track.more_laps = new_track.min_twice_laps = 0;
         new_track.egg_hunt_started = new_track.egg_hunt_finished = 0;
 
         m_track_stats.push_back(new_track);
@@ -135,16 +136,16 @@ void AchievementsStatus::load(const XMLNode * input)
             {
                 if (ident == m_track_stats[j].ident)
                 {
-                    xml_achievement_tracks[i]->get("started",&m_track_stats[j].race_started);
-                    xml_achievement_tracks[i]->get("finished",&m_track_stats[j].race_finished);
+                    xml_achievement_tracks[i]->get("sta",&m_track_stats[j].race_started);
+                    xml_achievement_tracks[i]->get("fin",&m_track_stats[j].race_finished);
                     xml_achievement_tracks[i]->get("won",&m_track_stats[j].race_won);
-                    xml_achievement_tracks[i]->get("finished_reverse",&m_track_stats[j].race_finished_reverse);
-                    xml_achievement_tracks[i]->get("finished_alone",&m_track_stats[j].race_finished_alone);
+                    xml_achievement_tracks[i]->get("fin_rev",&m_track_stats[j].race_finished_reverse);
+                    xml_achievement_tracks[i]->get("fin_al",&m_track_stats[j].race_finished_alone);
                     xml_achievement_tracks[i]->get("less_laps",&m_track_stats[j].less_laps);
                     xml_achievement_tracks[i]->get("more_laps",&m_track_stats[j].more_laps);
                     xml_achievement_tracks[i]->get("twice_laps",&m_track_stats[j].min_twice_laps);
-                    xml_achievement_tracks[i]->get("egg_hunt_started",&m_track_stats[j].egg_hunt_started);
-                    xml_achievement_tracks[i]->get("egg_hunt_finished",&m_track_stats[j].egg_hunt_finished);
+                    xml_achievement_tracks[i]->get("eh_sta",&m_track_stats[j].egg_hunt_started);
+                    xml_achievement_tracks[i]->get("eh_fin",&m_track_stats[j].egg_hunt_finished);
                     track_found = true;
                     break;
                 }
@@ -154,16 +155,16 @@ void AchievementsStatus::load(const XMLNode * input)
             {
                 TrackStats new_track;
                 new_track.ident = ident;
-                xml_achievement_tracks[i]->get("started",&new_track.race_started);
-                xml_achievement_tracks[i]->get("finished",&new_track.race_finished);
+                xml_achievement_tracks[i]->get("sta",&new_track.race_started);
+                xml_achievement_tracks[i]->get("fin",&new_track.race_finished);
                 xml_achievement_tracks[i]->get("won",&new_track.race_won);
-                xml_achievement_tracks[i]->get("finished_reverse",&new_track.race_finished_reverse);
-                xml_achievement_tracks[i]->get("finished_alone",&new_track.race_finished_alone);
+                xml_achievement_tracks[i]->get("fin_rev",&new_track.race_finished_reverse);
+                xml_achievement_tracks[i]->get("fin_al",&new_track.race_finished_alone);
                 xml_achievement_tracks[i]->get("less_laps",&new_track.less_laps);
                 xml_achievement_tracks[i]->get("more_laps",&new_track.more_laps);
                 xml_achievement_tracks[i]->get("twice_laps",&new_track.min_twice_laps);
-                xml_achievement_tracks[i]->get("egg_hunt_started",&new_track.egg_hunt_started);
-                xml_achievement_tracks[i]->get("egg_hunt_finished",&new_track.egg_hunt_finished);
+                xml_achievement_tracks[i]->get("eh_sta",&new_track.egg_hunt_started);
+                xml_achievement_tracks[i]->get("eh_fin",&new_track.egg_hunt_finished);
 
                 m_track_stats.push_back(new_track);
             }
@@ -194,7 +195,7 @@ void AchievementsStatus::save(UTFWriter &out)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << "          <data version=\"1\"/>\n";
+    out << "          <data version=\"" << DATA_VERSION << "\"/>\n";
     for(int i=0;i<ACHIEVE_DATA_NUM;i++)
     {
         out << "          <var counter=\"" << m_variables[i].counter << "\"/>\n";
@@ -202,16 +203,16 @@ void AchievementsStatus::save(UTFWriter &out)
     for (unsigned int n = 0; n < m_track_stats.size(); n++)
     {
         out << "          <track_stats ident=\"" << m_track_stats[n].ident << "\"";
-        out << " started=\"" << m_track_stats[n].race_started << "\"";
-        out << " finished=\"" << m_track_stats[n].race_finished << "\"";
+        out << " sta=\"" << m_track_stats[n].race_started << "\"";
+        out << " fin=\"" << m_track_stats[n].race_finished << "\"";
         out << " won=\"" << m_track_stats[n].race_won << "\"";
-        out << " finished_reverse=\"" << m_track_stats[n].race_finished_reverse << "\"";
-        out << " finished_alone=\"" << m_track_stats[n].race_finished_alone << "\"";
+        out << " fin_rev=\"" << m_track_stats[n].race_finished_reverse << "\"";
+        out << " fin_al=\"" << m_track_stats[n].race_finished_alone << "\"";
         out << " less_laps=\"" << m_track_stats[n].less_laps << "\"";
         out << " more_laps=\"" << m_track_stats[n].more_laps << "\"";
         out << " twice_laps=\"" << m_track_stats[n].min_twice_laps << "\"";
-        out << " egg_hunt_started=\"" << m_track_stats[n].egg_hunt_started << "\"";
-        out << " egg_hunt_finished=\"" << m_track_stats[n].egg_hunt_finished << "\"";
+        out << " eh_sta=\"" << m_track_stats[n].egg_hunt_started << "\"";
+        out << " eh_fin=\"" << m_track_stats[n].egg_hunt_finished << "\"";
         out << "/>\n";
     }   // for n<m_track_stats.size()
     out << "      </achievements>\n";
@@ -422,6 +423,8 @@ void AchievementsStatus::resetDataVar(unsigned int achieve_data_id)
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onRaceEnd(bool aborted)
 {
+    onLapEnd();
+
     updateAchievementsProgress(0);
 
     //reset all values that need to be reset
