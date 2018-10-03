@@ -319,6 +319,13 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         strike->increase("ball", "ball", m_variables[BOWLING_HIT].counter);
     }
 
+    Achievement *mosquito = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_MOSQUITO);
+    if (!mosquito->isAchieved())
+    {
+        mosquito->reset();
+        mosquito->increase("swatter", "swatter", m_variables[SWATTER_HIT_1RACE].counter);
+    }
+
     Achievement *columbus = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_COLUMBUS);
     if (!columbus->isAchieved())
     {
@@ -386,6 +393,7 @@ void AchievementsStatus::onRaceEnd(bool aborted)
     m_variables[ACHIEVE_BANANA_1RACE].counter = 0;
     m_variables[ACHIEVE_SKIDDING_1RACE].counter = 0;
     m_variables[BOWLING_HIT_1RACE].counter = 0;
+    m_variables[SWATTER_HIT_1RACE].counter = 0;
 
 
     // Prevent restart from being abused to get consecutive wins achievement

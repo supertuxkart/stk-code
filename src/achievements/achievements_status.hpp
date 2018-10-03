@@ -78,8 +78,11 @@ public :
            // Count how many times a bowling ball from the player hit a kart
            BOWLING_HIT                   = 21,
            BOWLING_HIT_1RACE             = 22,
+           // Count how many times a swatter from the player hit a kart
+           SWATTER_HIT                   = 23,
+           SWATTER_HIT_1RACE             = 24,
 
-           ACHIEVE_DATA_NUM              = 23
+           ACHIEVE_DATA_NUM              = 25
     };
 
 private:

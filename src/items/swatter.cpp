@@ -25,7 +25,7 @@
 // TODO: move some constants to KartProperties, use all constants from KartProperties
 
 #include "items/swatter.hpp"
-#include "achievements/achievement_info.hpp"
+#include "achievements/achievements_status.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
@@ -362,8 +362,8 @@ void Swatter::squashThingsAround()
     // Handle achievement if the swatter is used by the current player
     if (m_kart->getController()->canGetAchievements())
     {
-        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
-                                           "swatter", 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
     }
 
     if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
