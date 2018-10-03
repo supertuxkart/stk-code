@@ -527,7 +527,8 @@ void RaceGUI::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
     //TODO : exception for some game modes ? Another option "Hidden in race, shown in battle ?"
-    if(UserConfigParams::m_minimap_display == 2 /*map hidden*/)
+    if (UserConfigParams::m_minimap_display == 2 /*map hidden*/ ||
+        UserConfigParams::m_multitouch_scale > 1.3f)
         return;
 
     // draw a map when arena has a navigation mesh.
