@@ -208,6 +208,18 @@ public:
         getCurrentAchievementsStatus()->trackEvent(track_ident, event);
     } // trackEvent
 
+    // ----------------------------------------------------------------------------
+    static void resetKartHits(int num_karts)
+    {
+        getCurrentAchievementsStatus()->resetKartHits(num_karts);
+    } // resetKartHits
+
+    // ----------------------------------------------------------------------------
+    static void addKartHit(int kart_id)
+    {
+        getCurrentAchievementsStatus()->addKartHit(kart_id);
+    } // addKartHit
+
     // ------------------------------------------------------------------------
 };   // PlayerManager
 #endif

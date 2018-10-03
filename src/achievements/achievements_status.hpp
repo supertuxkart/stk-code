@@ -81,8 +81,12 @@ public :
            // Count how many times a swatter from the player hit a kart
            SWATTER_HIT                   = 23,
            SWATTER_HIT_1RACE             = 24,
+           // Count how many times a swatter, bowling ball or cake from
+           // the player hit a kart (excluding the player's own kart)
+           ALL_HITS                      = 25,
+           ALL_HITS_1RACE                = 26,
 
-           ACHIEVE_DATA_NUM              = 25
+           ACHIEVE_DATA_NUM              = 27
     };
 
 private:
@@ -146,6 +150,11 @@ private:
 
     // TODO : keep track of battle/soccer arenas
 
+    // Keeps track of hits inflicted to other karts,
+    // identified by their world id.
+    // Reset at the beginning of a race
+    std::vector<int> m_kart_hits;
+
     bool                m_online;
     bool                m_valid;
 
@@ -169,6 +178,8 @@ public :
     void onRaceEnd(bool aborted=false);
     void onLapEnd();
     void trackEvent(std::string track_ident, AchievementsStatus::TrackData event);
+    void resetKartHits(int num_karts);
+    void addKartHit(int kart_id);
     // ------------------------------------------------------------------------
     const std::map<uint32_t, Achievement *>& getAllAchievements()
     {

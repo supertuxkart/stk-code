@@ -25,6 +25,7 @@
 // TODO: move some constants to KartProperties, use all constants from KartProperties
 
 #include "items/swatter.hpp"
+
 #include "achievements/achievements_status.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
@@ -344,7 +345,9 @@ void Swatter::squashThingsAround()
     AbstractKart* closest_kart = m_closest_kart;
     float duration = kp->getSwatterSquashDuration();
     float slowdown =  kp->getSwatterSquashSlowdown();
-    closest_kart->setSquash(duration, slowdown);
+    // The squash attempt may fail because of invulnerability, shield, etc.
+    // Making a bomb explode counts as a success
+    bool success = closest_kart->setSquash(duration, slowdown);
 
     // Locally add a event to replay the squash during rewind
     if (NetworkConfig::get()->isNetworking() &&
@@ -359,13 +362,23 @@ void Swatter::squashThingsAround()
             }));
     }
 
-    // Handle achievement if the swatter is used by the current player
-    if (m_kart->getController()->canGetAchievements())
+    if (success)
     {
-        PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
-        PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
+        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
+            m_kart->getWorldKartId());
+
+        // Handle achievement if the swatter is used by the current player
+        if (m_kart->getController()->canGetAchievements())
+        {
+            PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
+            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+        }
     }
 
+    //FIXME : setSquash also do a bomb check
     if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
     {   // make bomb explode
         m_closest_kart->getAttachment()->update(10000);
@@ -375,12 +388,6 @@ void Swatter::squashThingsAround()
         projectile_manager->addHitEffect(he);
         ExplosionAnimation::create(m_closest_kart);
     }   // if kart has bomb attached
-    if (m_closest_kart->isSquashed())
-    {
-        // The kart may not be squashed if it was protected by a bubblegum shield
-        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
-            m_kart->getWorldKartId());
-    }
 
     // TODO: squash items
 }   // squashThingsAround
