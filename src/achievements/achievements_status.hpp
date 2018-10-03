@@ -115,6 +115,11 @@ private:
         int race_won; // doesn't count race without any other AI/player
         int race_finished_reverse;
         int race_finished_alone; // races against replays are counted, too
+        // counters for standard & TT races, apply to finished races only,
+        // lap number compared to track default.
+        int less_laps;
+        int more_laps;
+        int min_twice_laps; // at least twice the track's default lap count
         // counters for egg hunts
         int egg_hunt_started;
         int egg_hunt_finished;
@@ -128,9 +133,12 @@ public:
         TR_FINISHED          = 1,
         TR_WON               = 2,
         TR_FINISHED_REVERSE  = 3,
-        TR_FINISHED_ALONE    = 4,
-        TR_EGG_HUNT_STARTED  = 5,
-        TR_EGG_HUNT_FINISHED = 6
+        TR_LESS_LAPS         = 4,
+        TR_MORE_LAPS         = 5,
+        TR_MIN_TWICE_LAPS    = 6,
+        TR_FINISHED_ALONE    = 7,
+        TR_EGG_HUNT_STARTED  = 8,
+        TR_EGG_HUNT_FINISHED = 9
     };    
 
 private:

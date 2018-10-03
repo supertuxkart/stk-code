@@ -140,13 +140,16 @@ void AchievementsStatus::load(const XMLNode * input)
                     xml_achievement_tracks[i]->get("won",&m_track_stats[j].race_won);
                     xml_achievement_tracks[i]->get("finished_reverse",&m_track_stats[j].race_finished_reverse);
                     xml_achievement_tracks[i]->get("finished_alone",&m_track_stats[j].race_finished_alone);
+                    xml_achievement_tracks[i]->get("less_laps",&m_track_stats[j].less_laps);
+                    xml_achievement_tracks[i]->get("more_laps",&m_track_stats[j].more_laps);
+                    xml_achievement_tracks[i]->get("twice_laps",&m_track_stats[j].min_twice_laps);
                     xml_achievement_tracks[i]->get("egg_hunt_started",&m_track_stats[j].egg_hunt_started);
                     xml_achievement_tracks[i]->get("egg_hunt_finished",&m_track_stats[j].egg_hunt_finished);
                     track_found = true;
                     break;
                 }
             }
-            // Useful if, e.g. an addon track get deleted
+            // Useful if, e.g. an addon track gets deleted
             if (!track_found)
             {
                 TrackStats new_track;
@@ -156,6 +159,9 @@ void AchievementsStatus::load(const XMLNode * input)
                 xml_achievement_tracks[i]->get("won",&new_track.race_won);
                 xml_achievement_tracks[i]->get("finished_reverse",&new_track.race_finished_reverse);
                 xml_achievement_tracks[i]->get("finished_alone",&new_track.race_finished_alone);
+                xml_achievement_tracks[i]->get("less_laps",&new_track.less_laps);
+                xml_achievement_tracks[i]->get("more_laps",&new_track.more_laps);
+                xml_achievement_tracks[i]->get("twice_laps",&new_track.min_twice_laps);
                 xml_achievement_tracks[i]->get("egg_hunt_started",&new_track.egg_hunt_started);
                 xml_achievement_tracks[i]->get("egg_hunt_finished",&new_track.egg_hunt_finished);
 
@@ -201,6 +207,9 @@ void AchievementsStatus::save(UTFWriter &out)
         out << " won=\"" << m_track_stats[n].race_won << "\"";
         out << " finished_reverse=\"" << m_track_stats[n].race_finished_reverse << "\"";
         out << " finished_alone=\"" << m_track_stats[n].race_finished_alone << "\"";
+        out << " less_laps=\"" << m_track_stats[n].less_laps << "\"";
+        out << " more_laps=\"" << m_track_stats[n].more_laps << "\"";
+        out << " twice_laps=\"" << m_track_stats[n].min_twice_laps << "\"";
         out << " egg_hunt_started=\"" << m_track_stats[n].egg_hunt_started << "\"";
         out << " egg_hunt_finished=\"" << m_track_stats[n].egg_hunt_finished << "\"";
         out << "/>\n";
@@ -326,6 +335,24 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         mosquito->increase("swatter", "swatter", m_variables[SWATTER_HIT_1RACE].counter);
     }
 
+    Achievement *marathoner = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_MARATHONER);
+    if (!marathoner->isAchieved())
+    {
+        marathoner->reset();
+        for (unsigned int i=0;i<m_track_stats.size();i++)
+        {
+            // ignore addons tracks (compare returns 0 when the values are equal)
+            if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
+                continue;
+
+            if (m_track_stats[i].min_twice_laps >= 1)
+            {
+                marathoner->increase("laps", "laps", 1);
+                break;
+            }
+        }
+    }
+
     Achievement *columbus = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_COLUMBUS);
     if (!columbus->isAchieved())
     {
@@ -443,6 +470,12 @@ void AchievementsStatus::trackEvent(std::string track_ident, AchievementsStatus:
         m_track_stats[track_id].race_finished_reverse++;
     else if (event==TR_FINISHED_ALONE)
         m_track_stats[track_id].race_finished_alone++;
+    else if (event==TR_LESS_LAPS)
+        m_track_stats[track_id].less_laps++;
+    else if (event==TR_MORE_LAPS)
+        m_track_stats[track_id].more_laps++;
+    else if (event==TR_MIN_TWICE_LAPS)
+        m_track_stats[track_id].min_twice_laps++;
     else if (event==TR_EGG_HUNT_STARTED)
         m_track_stats[track_id].egg_hunt_started++;
     else if (event==TR_EGG_HUNT_FINISHED)

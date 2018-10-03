@@ -634,13 +634,6 @@ void World::terminateRace()
         updateHighscores(&best_highscore_rank);
     }
 
-    // Check achievements
-    if (raceHasLaps())
-    {
-        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
-                                           "laps", race_manager->getNumLaps());
-    }
-
     //TODO : move this stuff to a sub-function
     // Increment won races counts and track finished counts
     if (race_manager->isLinearRaceMode())
@@ -648,6 +641,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // TODO : does this work in multiplayer ?
+            // TODO : check what happens when abandonning a race in a GP
             // Retrieve the current player
             if (m_karts[i]->getController()->canGetAchievements())
             {
@@ -661,8 +655,27 @@ void World::terminateRace()
                 PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED);
                 if (race_manager->getReverseTrack())
                     PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_FINISHED_REVERSE);
+
+                if (race_manager->modeHasLaps())
+                {
+                    Track* track = track_manager->getTrack(race_manager->getTrackName());
+                    int default_lap_num = track->getDefaultNumberOfLaps();
+                    if (race_manager->getNumLaps() < default_lap_num)
+                    {
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_LESS_LAPS);
+                    }
+                    else if (race_manager->getNumLaps() > default_lap_num)
+                    {
+                        PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_MORE_LAPS);
+                        if (race_manager->getNumLaps() >= 2*default_lap_num)
+                            PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_MIN_TWICE_LAPS);
+                    }
+                }
+
                 int winner_position = 1;
-                if (race_manager->isFollowMode()) winner_position = 2;//TODO : check this always work
+                //TODO : check this always work : what happens if the leader is overtaken between the last elimination
+                //       and the results screen ?
+                if (race_manager->isFollowMode()) winner_position = 2;
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position)
                 {
