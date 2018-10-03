@@ -38,6 +38,7 @@ class XMLNode;
  *  an achievement (e.g. an achievement to race every track in STK needs
  *  to keep information about which tracks have already been used.)
 */
+
 class AchievementsStatus
 {
 public :
@@ -65,28 +66,50 @@ public :
            HARD_FINISHED                 = 11,
            BEST_STARTED                  = 12,
            BEST_FINISHED                 = 13,
+           // Count how many time a race/match was started and finished by game mode.
+           // Races with ghost replays technically belong to TT or egg hunt race mode,
+           // they increment both the with_ghost counter and the relevant mode counter.
+           NORMAL_STARTED                = 14,
+           NORMAL_FINISHED               = 15,
+           TT_STARTED                    = 16,
+           TT_FINISHED                   = 17,
+           FTL_STARTED                   = 18,
+           FTL_FINISHED                  = 19,
+           THREE_STRIKES_STARTED         = 20,
+           THREE_STRIKES_FINISHED        = 21,
+           SOCCER_STARTED                = 22,
+           SOCCER_FINISHED               = 23,
+           EGG_HUNT_STARTED              = 24,
+           EGG_HUNT_FINISHED             = 25,
+           WITH_GHOST_STARTED            = 26,
+           WITH_GHOST_FINISHED           = 27,
+           CTF_STARTED                   = 28,
+           CTF_FINISHED                  = 29,
+           FFA_STARTED                   = 30,
+           FFA_FINISHED                  = 31,
+
            // Count the number of powerups used by the player.
-           POWERUP_USED                  = 14,
-           POWERUP_USED_1RACE            = 15,
-           // Count the number of bananas hit
-           BANANA                        = 16,
-           BANANA_1RACE                  = 17,
-           // Count how many times the player skidded
-           SKIDDING_1LAP                 = 18,
-           SKIDDING_1RACE                = 19,
-           SKIDDING                      = 20,
+           POWERUP_USED                  = 32,
+           POWERUP_USED_1RACE            = 33,
            // Count how many times a bowling ball from the player hit a kart
-           BOWLING_HIT                   = 21,
-           BOWLING_HIT_1RACE             = 22,
+           BOWLING_HIT                   = 34,
+           BOWLING_HIT_1RACE             = 35,
            // Count how many times a swatter from the player hit a kart
-           SWATTER_HIT                   = 23,
-           SWATTER_HIT_1RACE             = 24,
+           SWATTER_HIT                   = 36,
+           SWATTER_HIT_1RACE             = 37,
            // Count how many times a swatter, bowling ball or cake from
            // the player hit a kart (excluding the player's own kart)
-           ALL_HITS                      = 25,
-           ALL_HITS_1RACE                = 26,
+           ALL_HITS                      = 38,
+           ALL_HITS_1RACE                = 39,
+           // Count the number of bananas hit
+           BANANA                        = 40,
+           BANANA_1RACE                  = 41,
+           // Count how many times the player skidded
+           SKIDDING_1LAP                 = 42,
+           SKIDDING_1RACE                = 43,
+           SKIDDING                      = 44,
 
-           ACHIEVE_DATA_NUM              = 27
+           ACHIEVE_DATA_NUM              = 45
     };
 
 private:
@@ -103,7 +126,7 @@ private:
         int counter;
     };
 
-    const int DATA_VERSION = 2;
+    const int DATA_VERSION = 3;
 
     // The tracked values are defined at compile time
     AchievementVariable m_variables[ACHIEVE_DATA_NUM];
