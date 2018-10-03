@@ -76,10 +76,10 @@ public :
            ACHIEVE_SKIDDING_1RACE        = 19,
            ACHIEVE_SKIDDING              = 20,
            // Count how many times a bowling ball from the player hit a kart
-           ACHIEVE_BOWLING_HIT           = 21,
-           ACHIEVE_BOWLING_HIT_1RACE     = 22,
+           BOWLING_HIT                   = 21,
+           BOWLING_HIT_1RACE             = 22,
 
-           ACHIEVE_DATA_NUM              = 13
+           ACHIEVE_DATA_NUM              = 23
     };
 
 private:
