@@ -94,6 +94,7 @@ private:
 
     float getSteeringFactor(float value);
     void handleControls(MultitouchButton* button);
+    bool isGameRunning();
 
 public:
     /** The array that contains data for all multitouch input events */

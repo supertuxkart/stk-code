@@ -65,7 +65,8 @@ LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
 
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
-        : m_abort(false), m_ticks_adjustment(0), m_parent_pid(parent_pid)
+        : m_abort(false), m_request_abort(false), m_ticks_adjustment(0), 
+          m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
@@ -307,16 +308,22 @@ void MainLoop::run()
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
                 if (msg.message == WM_QUIT)
-                    m_abort = true;
+                {
+                    m_request_abort = true;
+                }
             }
             // If parent is killed, abort the child main loop too
             if (WaitForSingleObject(parent, 0) != WAIT_TIMEOUT)
-                m_abort = true;
+            {
+                m_request_abort = true;
+            }
         }
 #else
         // POSIX equivalent
         if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
-            m_abort = true;
+        {
+            m_request_abort = true;
+        }
 #endif
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
@@ -327,17 +334,28 @@ void MainLoop::run()
 
         // Shutdown next frame if shutdown request is sent while loading the
         // world
-        if (STKHost::existHost() && STKHost::get()->requestedShutdown())
+        if ((STKHost::existHost() && STKHost::get()->requestedShutdown()) ||
+            m_request_abort)
         {
-            SFXManager::get()->quickSound("anvil");
+            bool exist_host = STKHost::existHost();
             core::stringw msg = _("Server connection timed out.");
-            if (!STKHost::get()->getErrorMessage().empty())
+            
+            if (!m_request_abort)
             {
-                msg = STKHost::get()->getErrorMessage();
+                if (!ProfileWorld::isNoGraphics())
+                {
+                    SFXManager::get()->quickSound("anvil");
+                    if (!STKHost::get()->getErrorMessage().empty())
+                    {
+                        msg = STKHost::get()->getErrorMessage();
+                    }
+                }
             }
-            STKHost::get()->shutdown();
-            // In case the user opened a race pause dialog
-            GUIEngine::ModalDialog::dismiss();
+         
+            if (exist_host == true)
+            {
+                STKHost::get()->shutdown();
+            }
 
 #ifndef SERVER_ONLY
             if (CVS->isGLSL())
@@ -350,19 +368,32 @@ void MainLoop::run()
                     irr_driver->getActualScreenSize().Height);
             }
 #endif
-
+            
+            // In case the user opened a race pause dialog
+            GUIEngine::ModalDialog::dismiss();
+    
             if (World::getWorld())
             {
                 race_manager->clearNetworkGrandPrixResult();
                 race_manager->exitRace();
             }
-            if (!ProfileWorld::isNoGraphics())
+            
+            if (exist_host == true)
             {
-                StateManager::get()->resetAndSetStack(
-                    NetworkConfig::get()->getResetScreens().data());
-                MessageQueue::add(MessageQueue::MT_ERROR, msg);
+                if (!ProfileWorld::isNoGraphics())
+                {
+                    StateManager::get()->resetAndSetStack(
+                        NetworkConfig::get()->getResetScreens().data());
+                    MessageQueue::add(MessageQueue::MT_ERROR, msg);
+                }
+                
+                NetworkConfig::get()->unsetNetworking();
             }
-            NetworkConfig::get()->unsetNetworking();
+            
+            if (m_request_abort)
+            {
+                m_abort = true;
+            }
         }
 
         if (!m_abort)
@@ -392,84 +423,96 @@ void MainLoop::run()
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
             Online::RequestManager::get()->update(frame_duration);
             PROFILER_POP_CPU_MARKER();
-        }
 
-        m_ticks_adjustment.lock();
-        if (m_ticks_adjustment.getData() != 0)
-        {
-            if (m_ticks_adjustment.getData() > 0)
+            m_ticks_adjustment.lock();
+            if (m_ticks_adjustment.getData() != 0)
             {
-                num_steps += m_ticks_adjustment.getData();
-                m_ticks_adjustment.getData() = 0;
-            }
-            else if (m_ticks_adjustment.getData() < 0)
-            {
-                int new_steps = num_steps + m_ticks_adjustment.getData();
-                if (new_steps < 0)
+                if (m_ticks_adjustment.getData() > 0)
                 {
-                    num_steps = 0;
-                    m_ticks_adjustment.getData() = new_steps;
-                }
-                else
-                {
-                    num_steps = new_steps;
+                    num_steps += m_ticks_adjustment.getData();
                     m_ticks_adjustment.getData() = 0;
                 }
-            }
-        }
-        m_ticks_adjustment.unlock();
-
-        for(int i=0; i<num_steps; i++)
-        {
-            if (World::getWorld() && history->replayHistory())
-                history->updateReplay(World::getWorld()->getTicksSinceStart());
-
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
-                                     0x7F, 0x00, 0x7F);
-            if (auto pm = ProtocolManager::lock())
-            {
-                pm->update(1);
-            }
-            PROFILER_POP_CPU_MARKER();
-
-            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            if (World::getWorld()) updateRace(1);
-            PROFILER_POP_CPU_MARKER();
-
-            // We need to check again because update_race may have requested
-            // the main loop to abort; and it's not a good idea to continue
-            // since the GUI engine is no more to be called then.
-            if (m_abort) break;
-
-            if (m_frame_before_loading_world)
-            {
-                m_frame_before_loading_world = false;
-                break;
-            }
-            if (World::getWorld())
-            {
-                if (World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE)
+                else if (m_ticks_adjustment.getData() < 0)
                 {
-                    // Skip the large num steps contributed by loading time
-                    World::getWorld()->updateTime(1);
+                    int new_steps = num_steps + m_ticks_adjustment.getData();
+                    if (new_steps < 0)
+                    {
+                        num_steps = 0;
+                        m_ticks_adjustment.getData() = new_steps;
+                    }
+                    else
+                    {
+                        num_steps = new_steps;
+                        m_ticks_adjustment.getData() = 0;
+                    }
+                }
+            }
+            m_ticks_adjustment.unlock();
+    
+            for (int i = 0; i < num_steps; i++)
+            {
+                if (World::getWorld() && history->replayHistory())
+                {
+                    history->updateReplay(
+                                       World::getWorld()->getTicksSinceStart());
+                }
+    
+                PROFILER_PUSH_CPU_MARKER("Protocol manager update",
+                                         0x7F, 0x00, 0x7F);
+                if (auto pm = ProtocolManager::lock())
+                {
+                    pm->update(1);
+                }
+                PROFILER_POP_CPU_MARKER();
+    
+                PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+                if (World::getWorld())
+                {
+                    updateRace(1);
+                }
+                PROFILER_POP_CPU_MARKER();
+    
+                // We need to check again because update_race may have requested
+                // the main loop to abort; and it's not a good idea to continue
+                // since the GUI engine is no more to be called then.
+                if (m_abort || m_request_abort) 
+                    break;
+    
+                if (m_frame_before_loading_world)
+                {
+                    m_frame_before_loading_world = false;
                     break;
                 }
-                World::getWorld()->updateTime(1);
-            }
-        }   // for i < num_steps
+                
+                if (World::getWorld())
+                {
+                    if (World::getWorld()->getPhase()==WorldStatus::SETUP_PHASE)
+                    {
+                        // Skip the large num steps contributed by loading time
+                        World::getWorld()->updateTime(1);
+                        break;
+                    }
+                    World::getWorld()->updateTime(1);
+                }
+            }   // for i < num_steps
 
-        // Handle controller the last to avoid slow PC sending actions too late
-        if (!m_abort)
-        {
+            // Handle controller the last to avoid slow PC sending actions too 
+            // late
             if (!ProfileWorld::isNoGraphics())
             {
                 // User aborted (e.g. closed window)
                 bool abort = !irr_driver->getDevice()->run();
+                
                 if (abort)
-                    m_abort = true;
+                {
+                    m_request_abort = true;
+                }
             }
+            
             if (auto gp = GameProtocol::lock())
+            {
                 gp->sendActions();
+            }
         }
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
@@ -481,13 +524,5 @@ void MainLoop::run()
 #endif
 
 }   // run
-
-//-----------------------------------------------------------------------------
-/** Set the abort flag, causing the mainloop to be left.
- */
-void MainLoop::abort()
-{
-    m_abort = true;
-}   // abort
 
 /* EOF */

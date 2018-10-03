@@ -697,10 +697,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
 
     // -2 because that's the spacing further on
-    int ICON_PLAYER_WIDTH = y_space / num_karts - 2;
+    int ICON_PLAYER_WIDTH = y_space / (num_karts) - 2;
 
-    int icon_width_max = (int)(50*(irr_driver->getActualScreenSize().Width/800.0f));
-    int icon_width_min = (int)(35*(irr_driver->getActualScreenSize().Height/600.0f));
+    int icon_width_max = (int)(60*(irr_driver->getActualScreenSize().Width/1024.0f));
+    int icon_width_min = (int)(35*((irr_driver->getActualScreenSize().Height - (y_base+10))/720.0f));
+    if (icon_width_min < 35) icon_width_min = 35;
     if (icon_width_min > icon_width_max)
     {
         int icon_width_tmp = icon_width_max;
@@ -712,14 +713,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     if (ICON_PLAYER_WIDTH > icon_width_max) ICON_PLAYER_WIDTH = icon_width_max;
     if (ICON_PLAYER_WIDTH < icon_width_min) ICON_PLAYER_WIDTH = icon_width_min;
 
-    // TODO: Is this absolute treshold necessary?
-    if(irr_driver->getActualScreenSize().Height<600)
-    {
-        ICON_PLAYER_WIDTH = 35;
-    }
-
     // Icon width for the AI karts
-    int ICON_WIDTH = ICON_PLAYER_WIDTH * 4 / 5;
+    int ICON_WIDTH = ICON_PLAYER_WIDTH * 5 / 6;
 
     WorldWithRank* world = dynamic_cast<WorldWithRank*>(World::getWorld());
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
@@ -992,7 +987,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         }
 
         //Plunger
-        if (kart->getBlockedByPlungerTicks()>0)
+        if (kart->getGraphicalViewBlockedByPlunger() > 0.0f)
         {
             video::ITexture *icon_plunger =
             powerup_manager->getIcon(PowerupManager::POWERUP_PLUNGER)->getTexture();
@@ -1036,7 +1031,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
 #ifndef SERVER_ONLY
     const AbstractKart *kart = camera->getKart();
-    if (kart->getBlockedByPlungerTicks()<=0)
+    if (kart->getGraphicalViewBlockedByPlunger() <= 0.0f)
     {
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
@@ -1061,7 +1056,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
         {
             const float fast_time = 0.3f;
-            if(kart->getBlockedByPlungerTicks()<stk_config->time2Ticks(fast_time))
+            if (kart->getGraphicalViewBlockedByPlunger() < fast_time)
             {
                 // First time we reach faste state: select random target point
                 // at top of screen and set speed accordingly

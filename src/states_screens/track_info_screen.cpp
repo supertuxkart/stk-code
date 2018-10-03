@@ -72,13 +72,11 @@ void TrackInfoScreen::loadedFromFile()
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
 
-    m_kart_icons[0] = getWidget<IconButtonWidget>("iconscore1");
-    m_kart_icons[1] = getWidget<IconButtonWidget>("iconscore2");
-    m_kart_icons[2] = getWidget<IconButtonWidget>("iconscore3");
-
-    m_highscore_entries[0] = getWidget<LabelWidget>("highscore1");
-    m_highscore_entries[1] = getWidget<LabelWidget>("highscore2");
-    m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
+    for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
+    {
+        m_kart_icons[i] = getWidget<IconButtonWidget>(("iconscore"+StringUtils::toString(i+1)).c_str());
+        m_highscore_entries[i] = getWidget<LabelWidget>(("highscore"+StringUtils::toString(i+1)).c_str());
+    }
     
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
@@ -259,13 +257,11 @@ void TrackInfoScreen::init()
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
 
-    m_kart_icons[0]->setVisible(has_highscores);
-    m_kart_icons[1]->setVisible(has_highscores);
-    m_kart_icons[2]->setVisible(has_highscores);
-
-    m_highscore_entries[0]->setVisible(has_highscores);
-    m_highscore_entries[1]->setVisible(has_highscores);
-    m_highscore_entries[2]->setVisible(has_highscores);
+    for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
+    {
+        m_kart_icons[i]->setVisible(has_highscores);
+        m_highscore_entries[i]->setVisible(has_highscores);
+    }
 
     RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
     bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -457,3 +453,4 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+

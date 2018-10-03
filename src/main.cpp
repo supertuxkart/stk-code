@@ -1841,7 +1841,7 @@ void main_abort()
 {
     if (main_loop)
     {
-        main_loop->abort();
+        main_loop->requestAbort();
     }
 }
 #ifdef ANDROID
@@ -1936,8 +1936,11 @@ int main(int argc, char *argv[] )
         }
         else if (CommandLine::has("--lan-server", &s))
         {
-            ProfileWorld::disableGraphics();
-            UserConfigParams::m_enable_sound = false;
+            if (no_graphics)
+            {
+                ProfileWorld::disableGraphics();
+                UserConfigParams::m_enable_sound = false;
+            }
             NetworkConfig::get()->setIsServer(true);
             ServerConfig::m_server_name = s;
             ServerConfig::m_wan_server = false;
@@ -2279,8 +2282,10 @@ int main(int argc, char *argv[] )
     {
         Log::closeOutputFiles();
 #endif
+#ifndef ANDROID
         fclose(stderr);
         fclose(stdout);
+#endif
 #ifndef WIN32
     }
 #endif
@@ -2336,6 +2341,9 @@ static void cleanSuperTuxKart()
     if(unlock_manager)          delete unlock_manager;
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
+    GUIEngine::clear();
+    GUIEngine::cleanUp();
+    GUIEngine::clearScreenCache();
     if(font_manager)            delete font_manager;
 
     // Now finish shutting down objects which a separate thread. The
@@ -2349,7 +2357,8 @@ static void cleanSuperTuxKart()
 #ifndef SERVER_ONLY
     if (!ProfileWorld::isNoGraphics())
     {
-        if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+        if (UserConfigParams::m_internet_status == Online::RequestManager::
+            IPERM_ALLOWED && !NewsManager::get()->waitForReadyToDeleted(2.0f))
         {
             Log::info("Thread", "News manager not stopping, exiting anyway.");
         }

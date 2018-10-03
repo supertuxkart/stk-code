@@ -133,6 +133,20 @@ namespace scene
 			}
 		}
 
+		virtual void recursiveUpdateAbsolutePosition()
+		{
+			if (IsVisible)
+			{
+				// update absolute position
+				updateAbsolutePosition();
+
+				// perform the post render process on all children
+
+				ISceneNodeList::Iterator it = Children.begin();
+				for (; it != Children.end(); ++it)
+					(*it)->recursiveUpdateAbsolutePosition();
+			}
+		}
 
 		//! Renders the node.
 		virtual void render() = 0;

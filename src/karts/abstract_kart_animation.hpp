@@ -30,6 +30,14 @@
 
 class AbstractKart;
 
+enum KartAnimationType : uint8_t
+{
+    KAT_RESCUE = 0,
+    KAT_EXPLOSION_DIRECT_HIT = 1,
+    KAT_EXPLOSION = 2,
+    KAT_CANNON = 3
+};
+
 /** The base class for all kart animation, like rescue, explosion, or cannon.
  *  Kart animations are done by removing the physics body from the physics
  *  world, and instead modifying the rotation and position of the kart
@@ -94,10 +102,12 @@ public:
         m_end_transform = t;
         m_end_ticks = ticks;
     }
-    // ----------------------------------------------------------------------------
-    void checkNetworkAnimationCreationSucceed(const btTransform& fallback_trans);
-    // ----------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    void checkNetworkAnimationCreationSucceed(const btTransform& fb_trans);
+    // ------------------------------------------------------------------------
     int getEndTicks() const { return m_end_ticks; }
+    // ------------------------------------------------------------------------
+    virtual KartAnimationType getAnimationType() const = 0;
 };   // AbstractKartAnimation
 
 #endif

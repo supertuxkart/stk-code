@@ -308,7 +308,6 @@ void STKHost::init()
 {
     m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
-    m_shutdown_delay   = 0;
     m_authorised       = false;
     m_network          = NULL;
     m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
@@ -635,8 +634,7 @@ void STKHost::setErrorMessage(const irr::core::stringw &message)
 {
     if (!message.empty())
     {
-        irr::core::stringc s(message.c_str());
-        Log::error("STKHost", "%s", s.c_str());
+        Log::error("STKHost", "%s", StringUtils::wideToUtf8(message).c_str());
     }
     m_error_message = message;
 }   // setErrorMessage

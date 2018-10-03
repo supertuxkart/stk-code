@@ -39,7 +39,7 @@ class Track;
 class TrackInfoScreen : public GUIEngine::Screen,
                         public GUIEngine::ScreenSingleton<TrackInfoScreen>
 {
-    static const int HIGHSCORE_COUNT = 3;
+    static const int HIGHSCORE_COUNT = 5;
 
     /** A pointer to the track of which the info is shown. */
     Track *m_track;

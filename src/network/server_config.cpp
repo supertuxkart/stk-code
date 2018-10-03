@@ -51,6 +51,7 @@ FloatServerConfigParam::FloatServerConfigParam(float default_value,
                                                const char* comment)
                       : FloatUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -62,6 +63,7 @@ IntServerConfigParam::IntServerConfigParam(int default_value,
                                            const char* comment)
                     : IntUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -73,6 +75,7 @@ BoolServerConfigParam::BoolServerConfigParam(bool default_value,
                                              const char* comment)
                      : BoolUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -84,6 +87,7 @@ StringServerConfigParam::StringServerConfigParam(std::string default_value,
                                                  const char* comment)
                        : StringUserConfigParam(param_name, comment)
 {
+    m_can_be_deleted = false;
     m_value = default_value;
     m_default_value = default_value;
     g_server_params.push_back(this);
@@ -132,7 +136,7 @@ void loadServerConfigXML(const XMLNode* root)
         return;
     }
 
-    int config_file_version = -1;
+    /*int config_file_version = -1;
     if (root->get("version", &config_file_version) < 1 ||
         config_file_version < stk_config->m_min_server_version ||
         config_file_version > stk_config->m_max_server_version)
@@ -142,7 +146,7 @@ void loadServerConfigXML(const XMLNode* root)
         delete root;
         writeServerConfigToDisk();
         return;
-    }
+    }*/
 
     for (unsigned i = 0; i < g_server_params.size(); i++)
         g_server_params[i]->findYourDataInAChildOf(root);

@@ -652,7 +652,8 @@ void TrackObjectPresentationMesh::reset()
 // ----------------------------------------------------------------------------
 TrackObjectPresentationSound::TrackObjectPresentationSound(
                                                      const XMLNode& xml_node,
-                                                     scene::ISceneNode* parent)
+                                                     scene::ISceneNode* parent,
+                                                     bool disable_for_multiplayer)
                             : TrackObjectPresentation(xml_node)
 {
     // TODO: respect 'parent' if any
@@ -680,6 +681,13 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
     float max_dist = 390.0f;
     xml_node.get("max_dist", &max_dist );
 
+    if (trigger_when_near)
+    {
+        ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
+    }
+
+    if (disable_for_multiplayer)
+        return;
     // first try track dir, then global dir
     std::string soundfile = Track::getCurrentTrack()->getTrackFile(sound);
     //std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
@@ -708,10 +716,6 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
     else
         Log::error("TrackObject", "Sound emitter object could not be created.");
 
-    if (trigger_when_near)
-    {
-        ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
-    }
 }   // TrackObjectPresentationSound
 
 // ----------------------------------------------------------------------------

@@ -45,6 +45,7 @@
 RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
           : m_plunger(plunger), m_owner(kart)
 {
+    m_hit_kart = NULL;
     m_attached_state = RB_TO_PLUNGER;
     updatePosition();
 
@@ -276,6 +277,7 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
     // =================
     m_hit_position   = *track_xyz;
     m_attached_state = RB_TO_TRACK;
+    m_hit_kart       = NULL;
 }   // hit
 
 // ----------------------------------------------------------------------------
@@ -289,3 +291,24 @@ void RubberBand::remove()
     }
 #endif
 }   // remove
+
+// ----------------------------------------------------------------------------
+uint8_t RubberBand::get8BitState() const
+{
+    uint8_t state = (uint8_t)(m_attached_state & 3);
+    state |= m_attached_state == RB_TO_KART && m_hit_kart ?
+        (m_hit_kart->getWorldKartId() << 3) : 0;
+    return state;
+}   // get8BitState
+
+// ----------------------------------------------------------------------------
+void RubberBand::set8BitState(uint8_t bit_state)
+{
+    m_hit_kart = NULL;
+    m_attached_state = (RubberBandTo)(bit_state & 3);
+    if (m_attached_state == RB_TO_KART)
+    {
+        unsigned kart = bit_state >> 3;
+        m_hit_kart = World::getWorld()->getKart(kart);
+    }
+}   // set8BitState

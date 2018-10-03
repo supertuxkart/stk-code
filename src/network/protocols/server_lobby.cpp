@@ -93,6 +93,7 @@
  */
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
+    m_last_success_poll_time.store(StkTime::getRealTimeMs() + 30000);
     m_waiting_players_counts.store(0);
     m_server_owner_id.store(-1);
     m_registered_for_once_only = false;
@@ -110,7 +111,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_result_ns = getNetworkString();
     m_result_ns->setSynchronous(true);
     m_waiting_for_reset = false;
-    m_server_id_online = 0;
+    m_server_id_online.store(0);
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -356,7 +357,7 @@ void ServerLobby::createServerIdFile()
     if (!sid.empty() && !m_has_created_server_id_file)
     {
         std::fstream fs;
-        sid += StringUtils::toString(m_server_id_online) + "_" +
+        sid += StringUtils::toString(m_server_id_online.load()) + "_" +
             StringUtils::toString(STKHost::get()->getPrivatePort());
         fs.open(sid, std::ios::out);
         fs.close();
@@ -382,6 +383,14 @@ void ServerLobby::asynchronousUpdate()
         if (NetworkConfig::get()->isWAN())
             checkIncomingConnectionRequests();
         handlePendingConnection();
+    }
+
+    if (NetworkConfig::get()->isWAN() &&
+        allowJoinedPlayersWaiting() && m_server_recovering.expired() &&
+        StkTime::getRealTimeMs() > m_last_success_poll_time.load() + 30000)
+    {
+        Log::warn("ServerLobby", "Trying auto server recovery.");
+        registerServer(false/*now*/);
     }
 
     switch (m_state.load())
@@ -420,7 +429,7 @@ void ServerLobby::asynchronousUpdate()
         // Register this server with the STK server. This will block
         // this thread, because there is no need for the protocol manager
         // to react to any requests before the server is registered.
-        if (registerServer())
+        if (registerServer(true/*now*/))
         {
             if (allowJoinedPlayersWaiting())
                 m_registered_for_once_only = true;
@@ -690,12 +699,56 @@ void ServerLobby::update(int ticks)
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
-bool ServerLobby::registerServer()
+bool ServerLobby::registerServer(bool now)
 {
-    while (!m_server_unregistered.expired())
+    while (now && !m_server_unregistered.expired())
         StkTime::sleep(1);
 
-    Online::XMLRequest *request = new Online::XMLRequest();
+    // ========================================================================
+    class RegisterServerRequest : public Online::XMLRequest
+    {
+    private:
+        std::weak_ptr<ServerLobby> m_server_lobby;
+    protected:
+        virtual void afterOperation()
+        {
+            Online::XMLRequest::afterOperation();
+            const XMLNode* result = getXMLData();
+            std::string rec_success;
+            auto sl = m_server_lobby.lock();
+            if (!sl)
+                return;
+
+            if (result->get("success", &rec_success) &&
+                rec_success == "yes")
+            {
+                const XMLNode* server = result->getNode("server");
+                assert(server);
+                const XMLNode* server_info = server->getNode("server-info");
+                assert(server_info);
+                unsigned server_id_online = 0;
+                server_info->get("id", &server_id_online);
+                assert(server_id_online != 0);
+                Log::info("ServerLobby",
+                    "Server %d is now online.", server_id_online);
+                sl->m_server_id_online.store(server_id_online);
+                sl->m_last_success_poll_time.store(StkTime::getRealTimeMs());
+                return;
+            }
+            Log::error("ServerLobby", "%s",
+                StringUtils::wideToUtf8(getInfo()).c_str());
+            // For auto server recovery wait 3 seconds for next try
+            // This sleep only the request manager thread
+            if (manageMemory())
+                StkTime::sleep(3000);
+        }
+    public:
+        RegisterServerRequest(bool now, std::shared_ptr<ServerLobby> sl)
+        : XMLRequest(!now/*manage memory*/), m_server_lobby(sl) {}
+    };   // RegisterServerRequest
+
+    RegisterServerRequest *request = new RegisterServerRequest(now,
+        std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
     NetworkConfig::get()->setServerDetails(request, "create");
     request->addParameter("address",      m_server_address.getIP()        );
     request->addParameter("port",         m_server_address.getPort()      );
@@ -715,29 +768,19 @@ bool ServerLobby::registerServer()
     Log::info("ServerLobby", "Public server address %s",
         m_server_address.toString().c_str());
 
-    request->executeNow();
-
-    const XMLNode* result = request->getXMLData();
-    std::string rec_success;
-
-    if (result->get("success", &rec_success) && rec_success == "yes")
+    if (now)
     {
-        const XMLNode* server = result->getNode("server");
-        assert(server);
-        const XMLNode* server_info = server->getNode("server-info");
-        assert(server_info);
-        server_info->get("id", &m_server_id_online);
-        assert(m_server_id_online != 0);
-        Log::info("ServerLobby",
-            "Server %d is now online.", m_server_id_online);
+        request->executeNow();
         delete request;
-        return true;
+        if (m_server_id_online.load() == 0)
+            return false;
     }
-
-    irr::core::stringc error(request->getInfo().c_str());
-    Log::error("ServerLobby", "%s", error.c_str());
-    delete request;
-    return false;
+    else
+    {
+        request->queue();
+        m_server_recovering = request->observeExistence();
+    }
+    return true;
 }   // registerServer
 
 //-----------------------------------------------------------------------------
@@ -811,7 +854,7 @@ void ServerLobby::startSelection(const Event *event)
     if (!allowJoinedPlayersWaiting())
     {
         ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
-        if (NetworkConfig::get()->isWAN() )
+        if (NetworkConfig::get()->isWAN())
         {
             unregisterServer(false/*now*/);
         }
@@ -903,7 +946,9 @@ void ServerLobby::checkIncomingConnectionRequests()
     // First poll every 5 seconds. Return if no polling needs to be done.
     const uint64_t POLL_INTERVAL = 5000;
     static uint64_t last_poll_time = 0;
-    if (StkTime::getRealTimeMs() < last_poll_time + POLL_INTERVAL)
+    if (StkTime::getRealTimeMs() < last_poll_time + POLL_INTERVAL ||
+        StkTime::getRealTimeMs() > m_last_success_poll_time.load() + 30000 ||
+        m_server_id_online.load() == 0)
         return;
 
     // Keep the port open, it can be sent to anywhere as we will send to the
@@ -927,12 +972,13 @@ void ServerLobby::checkIncomingConnectionRequests()
         virtual void afterOperation()
         {
             Online::XMLRequest::afterOperation();
-            const XMLNode *result = getXMLData();
+            const XMLNode* result = getXMLData();
             std::string success;
 
             if (!result->get("success", &success) || success != "yes")
             {
-                Log::error("ServerLobby", "Cannot retrieve the list.");
+                Log::error("ServerLobby", "Poll server request failed: %s",
+                    StringUtils::wideToUtf8(getInfo()).c_str());
                 return;
             }
 
@@ -942,6 +988,7 @@ void ServerLobby::checkIncomingConnectionRequests()
             auto sl = m_server_lobby.lock();
             if (!sl)
                 return;
+            sl->m_last_success_poll_time.store(StkTime::getRealTimeMs());
             if (sl->m_state.load() != WAITING_FOR_START_GAME &&
                 !sl->allowJoinedPlayersWaiting())
             {

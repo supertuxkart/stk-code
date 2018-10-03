@@ -11,7 +11,7 @@
 
   <!-- Minimum and maxium server versions that be be read by this binary.
        Older versions will be ignored. -->
-  <server-version min="1" max="1"/>
+  <server-version min="2" max="2"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -114,7 +114,7 @@
           that the bit is to be set to 0, otherwise the bit will be set.
 
        This field takes two
-          values: the first value is 'and'ed with bullet's default values 
+          values: the first value is 'and'ed with bullet's default values
           (i.e. it can be used to unset bullet defaults), the second value
           is 'or'ed (i.e. is used to set a bit). A value of -1 for 'and'
           means to keep all bits. The valid names are listed in stk_config.cpp
@@ -125,7 +125,7 @@
            smooth-angle-limit="0.65"
            fps="120"
            default-track-friction="0.5"
-           default-moveable-friction="0.5" 
+           default-moveable-friction="0.5"
            solver-iterations="4"
            solver-split-impulse="true"
            solver-split-impulse-threshold="-0.00001"
@@ -149,14 +149,14 @@
   <replay max-frames="12000" delta-t="0.200"  delta-speed="0.6"
           delta-steering="0.35" />
 
-  <!--  Determines the minimap related values. 
+  <!--  Determines the minimap related values.
         size: The size of the minimap (scaled afterwards) 480 = full screen height)
         ai-icon: The size of the icons for the AI karts on the minimap.
         player-icon: The size of the icons for the player karts. -->
 
   <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
-  <urls donate="https://supertuxkart.net/Donate" 
+  <urls donate="https://supertuxkart.net/Donate"
         password-reset="http://addons.supertuxkart.net/password-reset.php" />
 
   <!-- Skidmark data: maximum number of skid marks, and
@@ -201,7 +201,7 @@
        away if there is an explosion. -->
   <explosion impulse-objects="500.0" />
 
-  <!-- Networking 
+  <!-- Networking
        state-frequency: how many states the server will send per second.
        steering-reduction: Reduce a remote kart's steering by this factor
            each frame. This helps reduces oversteering by high latency

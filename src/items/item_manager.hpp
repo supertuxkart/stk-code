@@ -138,6 +138,10 @@ public:
     virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
     virtual void   switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
+
+    // ------------------------------------------------------------------------
+    /** Returns true if the items are switched atm. */
+    bool           areItemsSwitched() { return (m_switch_ticks > 0); }
     // ------------------------------------------------------------------------
     /** Only used in the NetworkItemManager. */
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,

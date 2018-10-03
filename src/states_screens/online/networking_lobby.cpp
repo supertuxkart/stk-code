@@ -451,6 +451,8 @@ void NetworkingLobby::tearDown()
 // ----------------------------------------------------------------------------
 bool NetworkingLobby::onEscapePressed()
 {
+    if (NetworkConfig::get()->isAddingNetworkPlayers())
+        NetworkConfig::get()->cleanNetworkPlayers();
     m_joined_server.reset();
     input_manager->getDeviceManager()->mapFireToSelect(false);
     STKHost::get()->shutdown();

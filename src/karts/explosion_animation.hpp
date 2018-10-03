@@ -74,9 +74,9 @@ protected:
     Vec3 m_reset_xyz, m_reset_normal;
 
     ExplosionAnimation(AbstractKart *kart);
-    ExplosionAnimation(AbstractKart *kart, const Vec3 &pos,
-                       bool direct_hit);
 public:
+    ExplosionAnimation(AbstractKart *kart, const Vec3 &pos,
+                       bool direct_hit, bool from_state = false);
     static ExplosionAnimation *create(AbstractKart *kart, const Vec3 &pos,
                                       bool direct_hit);
     static ExplosionAnimation *create(AbstractKart *kart);
@@ -85,5 +85,8 @@ public:
     virtual void update(int ticks);
     bool hasResetAlready() const
                      { return m_reset_ticks != -1 && m_timer < m_reset_ticks; }
+    // ------------------------------------------------------------------------
+    virtual KartAnimationType getAnimationType() const
+            { return m_direct_hit ? KAT_EXPLOSION_DIRECT_HIT : KAT_EXPLOSION; }
 };   // ExplosionAnimation
 #endif

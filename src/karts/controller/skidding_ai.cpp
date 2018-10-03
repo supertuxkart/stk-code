@@ -316,6 +316,9 @@ void SkiddingAI::update(int ticks)
 
     int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
     int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+    // Karts with boosted AI get a better speed cap value
+    if (m_kart->getBoostAI())
+        position_among_ai = 1;
 
     float speed_cap = m_ai_properties->getSpeedCap(m_distance_to_player,
                                                    position_among_ai,
@@ -1063,7 +1066,6 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
  *  Level 2 to 5 AI : strategy detailed before each item
  *  Each successive level is overall stronger (5 the strongest, 2 the weakest of
  *  non-random strategies), but two levels may share a strategy for a given item.
- *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or boss races)
  *  \param dt Time step size.
  *  STATE: shield on -> avoid usage of offensive items (with certain tolerance)
  *  STATE: swatter on -> avoid usage of shield
@@ -1361,7 +1363,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
     //if it is a bomb, wait : we may pass it to another kart before the timer runs out
     if (item_skill == 5 && type == Attachment::ATTACH_BOMB)
     {
-        if (m_kart->getAttachment()->getTicksLeft() > stk_config->time2Ticks(3))
+        if (m_kart->getAttachment()->getTicksLeft() < stk_config->time2Ticks(2))
         {
             m_controls->setFire(true);
             m_controls->setLookBack(false);
@@ -1425,7 +1427,8 @@ void SkiddingAI::handleBubblegum(int item_skill,
         if (abs_angle < 0.2f) straight_behind = true;
     }
 
-    if(m_distance_behind < 8.0f && straight_behind   )
+    if(m_distance_behind < 8.0f && straight_behind &&
+       (!ItemManager::get()->areItemsSwitched() || item_skill < 4))
     {
         m_controls->setFire(true);
         m_controls->setLookBack(true);

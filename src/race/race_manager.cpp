@@ -327,6 +327,7 @@ void RaceManager::startNew(bool from_overworld)
         m_num_ghost_karts = ReplayPlay::get()->getNumGhostKart();
 
     m_started_from_overworld = from_overworld;
+    if (m_started_from_overworld) m_continue_saved_gp = false;
     m_saved_gp = NULL; // There will be checks for this being NULL done later
 
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX)
@@ -509,6 +510,31 @@ void RaceManager::startNextRace()
                          m_kart_status.end() - player_last_offset);
         }
     }   // not first race
+
+    // set boosted AI status for AI karts
+    int boosted_ai_count = std::min<int>(m_ai_kart_list.size(),
+                                         (m_kart_status.size()-2)/4 + 1);
+    if (boosted_ai_count > 4) boosted_ai_count = 4;
+    int ai_count = m_ai_kart_list.size();
+
+    for (unsigned int i=0;i<m_kart_status.size();i++)
+    {
+        if (m_kart_status[i].m_kart_type == KT_AI)
+        {
+            if (boosted_ai_count > 0 &&
+                (UserConfigParams::m_gp_most_points_first ||
+                ai_count == boosted_ai_count))
+            {
+                m_kart_status[i].m_boosted_ai = true;
+                boosted_ai_count--;
+            }
+            else
+            {
+                m_kart_status[i].m_boosted_ai = false;
+            }
+            ai_count--;
+        }
+    }
 
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies

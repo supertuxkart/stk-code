@@ -110,7 +110,8 @@ Attachment::~Attachment()
  */
 void Attachment::set(AttachmentType type, int ticks,
                      AbstractKart *current_kart,
-                     bool disable_swatter_animation)
+                     bool disable_swatter_animation,
+                     bool set_by_rewind_parachute)
 {
     // Don't override currently player swatter removing bomb animation
     Swatter* s = dynamic_cast<Swatter*>(m_plugin);
@@ -179,7 +180,8 @@ void Attachment::set(AttachmentType type, int ticks,
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
     // by slowing down.
-    if(m_type==ATTACH_PARACHUTE)
+    // if set by rewind the parachute ticks is already correct
+    if (m_type == ATTACH_PARACHUTE && !set_by_rewind_parachute)
     {
         const KartProperties *kp = m_kart->getKartProperties();
         float speed_mult;
@@ -306,19 +308,16 @@ void Attachment::rewindTo(BareNetworkString *buffer)
 
     // Attaching an object can be expensive (loading new models, ...)
     // so avoid doing this if there is no change in attachment type
-    // Don't use set to reset a model on local player if it's already cleared
-    // (or m_initial_speed is redone / model is re-shown again when rewinding)
-    if (m_type == new_type || m_type == ATTACH_NOTHING)
+    if (m_type == new_type)
     {
         setTicksLeft(ticks_left);
-        if (m_type != new_type && new_type != ATTACH_SWATTER)
-            m_type = new_type;
         return;
     }
 
     set(new_type, ticks_left, m_previous_owner,
         new_type == ATTACH_SWATTER && !is_removing_bomb
-        /*disable_swatter_animation*/);
+        /*disable_swatter_animation*/,
+        new_type == ATTACH_PARACHUTE);
 }   // rewindTo
 
 // -----------------------------------------------------------------------------
@@ -352,6 +351,12 @@ void Attachment::hitBanana(ItemState *item_state)
             ExplosionAnimation::create(m_kart);
         return;
     }
+
+    // Make it consistent with attachment rewind when eating banana with bomb
+    // see if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
+    // in 515
+    if (m_kart->getKartAnimation())
+        return;
 
     AttachmentType new_attachment = ATTACH_NOTHING;
     const KartProperties *kp = m_kart->getKartProperties();
@@ -529,13 +534,19 @@ void Attachment::update(int ticks)
         m_node->setVisible((division & 0x1) == 0);
     }
 
-    if(m_plugin)
+    if (m_plugin)
     {
-        bool discard = m_plugin->updateAndTestFinished(ticks);
-        if(discard)
+        int discard_ticks = m_plugin->updateAndTestFinished(ticks);
+        if (discard_ticks != -1)
         {
-            clear();  // also removes the plugin
-            return;
+            // Save it for rewinding
+            m_ticks_left =
+                discard_ticks - World::getWorld()->getTicksSinceStart();
+            if (m_ticks_left <= 0)
+            {
+                clear();  // also removes the plugin
+                return;
+            }
         }
     }
 

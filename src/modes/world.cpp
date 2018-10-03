@@ -229,8 +229,8 @@ void World::init()
                 global_player_id, race_manager->getKartType(i),
                 race_manager->getPlayerDifficulty(i));
         }
+        new_kart->setBoostAI(race_manager->hasBoostedAI(i));
         m_karts.push_back(new_kart);
-
     }  // for i
 
     // Load other custom models if needed
@@ -587,6 +587,9 @@ void World::onGo()
  */
 void World::terminateRace()
 {
+    // In case the user opened paused dialog in network
+    GUIEngine::ModalDialog::dismiss();
+
     m_schedule_pause = false;
     m_schedule_unpause = false;
 

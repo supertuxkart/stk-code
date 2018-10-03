@@ -108,6 +108,23 @@ void OptionsScreenUI::loadedFromFile()
     skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
 
 
+    // Setup the minimap options spinner
+    GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
+    assert( minimap_options != NULL );
+
+    minimap_options->m_properties[PROP_WRAP_AROUND] = "true";
+    minimap_options->clearLabels();
+    //I18N: In the UI options, minimap position in the race UI 
+    minimap_options->addLabel( core::stringw(_("In the bottom-left")));
+    //I18N: In the UI options, minimap position in the race UI 
+    minimap_options->addLabel( core::stringw(_("On the right side")));
+    //I18N: In the UI options, minimap position in the race UI 
+    minimap_options->addLabel( core::stringw(_("Hidden")));
+    minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0)
+        minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+    minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -122,6 +139,17 @@ void OptionsScreenUI::init()
 
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
+
+    GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
+    assert( minimap_options != NULL );
+
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
+        UserConfigParams::m_minimap_display == 0)
+    {
+        UserConfigParams::m_minimap_display = 1;
+    }
+    minimap_options->setValue(UserConfigParams::m_minimap_display);
 
     // ---- video modes
     CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -234,6 +262,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
         irr_driver->setMaxTextureSize();
+    }
+    else if (name == "minimap")
+    {
+        GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
+        assert( minimap_options != NULL );
+        UserConfigParams::m_minimap_display = minimap_options->getValue();
     }
     else if (name == "split_screen_horizontally")
     {

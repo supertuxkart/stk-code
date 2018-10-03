@@ -276,6 +276,8 @@ public:
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
+        /** Boosted status (AI only). */
+        bool        m_boosted_ai;
         /** The difficulty for this player. */
         PerPlayerDifficulty m_difficulty;
 
@@ -289,7 +291,7 @@ public:
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
-                {}
+                { m_boosted_ai = false; }
 
     };   // KartStatus
 private:
@@ -642,6 +644,11 @@ public:
     {
         return m_kart_status[kart].m_difficulty;
     }   // getPlayerDifficulty
+    // ------------------------------------------------------------------------
+    float hasBoostedAI(int kart) const
+    {
+        return m_kart_status[kart].m_boosted_ai;
+    }   // getKartRaceTime
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }
     // ------------------------------------------------------------------------

@@ -261,6 +261,8 @@ public:
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const = 0;
     // ------------------------------------------------------------------------
+    virtual float getGraphicalViewBlockedByPlunger() const = 0;
+    // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
     virtual void blockViewWithPlunger() = 0;
@@ -273,6 +275,9 @@ public:
      *  \param time How long the kart will be squashed.
      *  \param slowdown Reduction of max speed.    */
     virtual void setSquash(float time, float slowdown) = 0;
+    // ------------------------------------------------------------------------
+    /** Makes the kart unsquashed again. */
+    virtual void unsetSquash() = 0;
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. This is not declared
      *  pure abstract, since this function is not needed for certain classes,

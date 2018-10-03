@@ -421,6 +421,7 @@ void Skidding::update(int ticks, bool is_on_ground,
             m_predicted_curve->setHeading(m_kart->getHeading());
             float angle = m_kart->getMaxSteerAngle(SPEED)
                         * fabsf(getSteeringFraction());
+            //FIXME : what is this for ?
             float r = kp->getWheelBase()
                     / asin(angle)*1.0f;
 

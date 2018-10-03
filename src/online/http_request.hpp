@@ -63,7 +63,7 @@ namespace Online
         std::string m_filename;
 
         /** Pointer to the curl data structure for this request. */
-        CURL *m_curl_session;
+        CURL *m_curl_session = NULL;
 
         /** curl return code. */
         CURLcode m_curl_code;
@@ -93,7 +93,14 @@ namespace Online
                     int priority = 1);
         HTTPRequest(const char * const filename, bool manage_memory = false,
                     int priority = 1);
-        virtual           ~HTTPRequest() {}
+        virtual           ~HTTPRequest()
+        {
+            if (m_curl_session)
+            {
+                curl_easy_cleanup(m_curl_session);
+                m_curl_session = NULL;
+            }
+        }
         virtual bool       isAllowedToAdd() const OVERRIDE;
         void               setApiURL(const std::string& url, const std::string &action);
         void               setAddonsURL(const std::string& path);

@@ -53,8 +53,9 @@ public:
 
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
-     *  function returns true, the attachment is discarded. */
-    virtual bool updateAndTestFinished(int ticks) = 0;
+     *  function returns a non-negative number, the attachment is discarded
+     *  when world ticks >= that number. */
+    virtual int updateAndTestFinished(int ticks) = 0;
 
     // ------------------------------------------------------------------------
     /** Called when the animation of the Attachment's node is done. */

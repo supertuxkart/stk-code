@@ -72,7 +72,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 // ----------------------------------------------------------------------------
 ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                                        const Vec3 &explosion_position,
-                                       bool direct_hit)
+                                       bool direct_hit, bool from_state)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
     m_direct_hit = direct_hit;
@@ -148,7 +148,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
 
     m_kart->getAttachment()->clear();
     // Clear powerups when direct hit in CTF
-    addNetworkAnimationChecker(m_reset_ticks != -1);
+    if (!from_state)
+        addNetworkAnimationChecker(m_reset_ticks != -1);
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------

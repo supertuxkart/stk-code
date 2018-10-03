@@ -66,6 +66,7 @@ class UserConfigParam
 {
     friend class GroupUserConfigParam;
 protected:
+    bool m_can_be_deleted = true;
     std::string m_param_name;
     std::string m_comment;
 public:
@@ -761,7 +762,7 @@ namespace UserConfigParams
         &m_network_group, "Use random port for server connection "
         "(check stk_config.xml for default value)"));
     PARAM_PREFIX BoolUserConfigParam m_lobby_chat
-        PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
     PARAM_PREFIX IntUserConfigParam m_max_players
@@ -901,6 +902,10 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file",
                                                   "Name of the skin to use") );
+
+    PARAM_PREFIX IntUserConfigParam        m_minimap_display
+        PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
+                      "Minimap: 0 bottom-left, 1 middle-right, 2 hidden"));
 
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap

@@ -49,9 +49,13 @@ protected:
     Referee      *m_referee;
 
 public:
-                 RescueAnimation(AbstractKart *kart, bool is_auto_rescue=false);
+                 RescueAnimation(AbstractKart *kart,
+                                 bool is_auto_rescue = false,
+                                 bool from_state = false);
     float maximumHeight();
     virtual     ~RescueAnimation();
     virtual void update(int ticks);
+    // ------------------------------------------------------------------------
+    virtual KartAnimationType getAnimationType() const   { return KAT_RESCUE; }
 };   // RescueAnimation
 #endif

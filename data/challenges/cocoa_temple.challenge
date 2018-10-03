@@ -1,24 +1,31 @@
 <?xml version="1.0"?>
 <challenge version="3">
     <unlock_list list="false"/>
-    <track id="cocoa_temple" laps="3"/>
-    <mode major="single" minor="quickrace"/>
-    <requirements trophies="5"/>
+    <track id="cocoa_temple" laps="3" reverse="false"/>
+    <mode major="single" minor="timetrial"/>
+    <requirements trophies="0"/>
 
     <best>
-        <karts number="8"/>
-        <requirements position="1" time="125"/>
+        <karts number="1"
+               replay_file="challenge_cocoa_temple_supertux.replay"/>
+        <requirements position="1"/>
     </best>
     <hard>
-        <karts number="7"/>
-        <requirements position="1" time="160"/>
+        <karts number="1"
+               replay_file="challenge_cocoa_temple_expert.replay"/>
+        <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="6"/>
+        <karts number="1"
+               replay_file="challenge_cocoa_temple_intermediate.replay"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="5"/>
+        <karts number="1"
+               replay_file="challenge_cocoa_temple_novice.replay"/>
+        <karts number="1"/>
         <requirements position="1"/>
     </easy>
+
+    <unlock kart="suzanne"/>
 </challenge>

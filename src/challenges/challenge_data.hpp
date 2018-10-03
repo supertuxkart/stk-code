@@ -94,6 +94,7 @@ private:
     RaceManager::MinorRaceModeType m_minor;
 
     int                            m_num_laps;
+    bool                           m_reverse;
     int                            m_position[RaceManager::DIFFICULTY_COUNT];
     int                            m_default_num_karts[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_ai_kart_ident[RaceManager::DIFFICULTY_COUNT];
@@ -184,6 +185,9 @@ public:
         return m_num_laps;
     }   // getNumLaps
 
+    // ------------------------------------------------------------------------
+    /** Return reverse mode. */
+    bool getReverse() const { return m_reverse; }
     // ------------------------------------------------------------------------
     /** Get number of required trophies to start this challenge */
     int getNumTrophies() const { return m_num_trophies; }
