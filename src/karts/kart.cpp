@@ -1795,24 +1795,25 @@ void Kart::showZipperFire()
 //-----------------------------------------------------------------------------
 /** Squashes this kart: it will scale the kart in up direction, and causes
  *  a slowdown while this kart is squashed.
+ *  Returns true if the squash is successful, false otherwise.
  *  \param time How long the kart will be squashed. A value of 0 will reset
  *         the kart to be unsquashed.
  *  \param slowdown Reduction of max speed.
  */
-void Kart::setSquash(float time, float slowdown)
+bool Kart::setSquash(float time, float slowdown)
 {
-    if (isInvulnerable()) return;
+    if (isInvulnerable()) return false;
 
     if (isShielded())
     {
         decreaseShieldTime();
-        return;
+        return false;
     }
 
     if(m_attachment->getType()==Attachment::ATTACH_BOMB && time>0)
     {
         ExplosionAnimation::create(this);
-        return;
+        return true;
     }
 
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
@@ -1842,6 +1843,7 @@ void Kart::setSquash(float time, float slowdown)
         m_squash_time = time;
     }
 #endif
+    return true;
 }   // setSquash
 
 void Kart::unsetSquash()

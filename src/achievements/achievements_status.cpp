@@ -300,21 +300,21 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         gold_driver->increase("follow_leader", "follow_leader", m_variables[WON_FTL_RACES].counter);
     }
 
-    Achievement *powerup_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::POWERUP_LOVER);
+    Achievement *powerup_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER);
     if (!powerup_lover->isAchieved())
     {
         powerup_lover->reset();
         powerup_lover->increase("poweruplover", "poweruplover", m_variables[POWERUP_USED_1RACE].counter);
     }
 
-    Achievement *banana_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::BANANA);
+    Achievement *banana_lover = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BANANA);
     if (!banana_lover->isAchieved())
     {
         banana_lover->reset();
         banana_lover->increase("banana", "banana", m_variables[BANANA_1RACE].counter);
     }
 
-    Achievement *skidding = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::SKIDDING);
+    Achievement *skidding = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_SKIDDING);
     if (!skidding->isAchieved())
     {
         skidding->reset();
@@ -334,6 +334,20 @@ void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id
         mosquito->reset();
         mosquito->increase("swatter", "swatter", m_variables[SWATTER_HIT_1RACE].counter);
     }
+
+    Achievement *arch_enemy = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY);
+    if (!arch_enemy->isAchieved())
+    {
+        arch_enemy->reset();
+        int max_hits = 0;
+        for (unsigned int i=0;i<m_kart_hits.size();i++)
+        {
+            if (m_kart_hits[i] > max_hits)
+                max_hits = m_kart_hits[i];
+        }
+        arch_enemy->increase("hit", "hit", max_hits);
+    }
+
 
     Achievement *marathoner = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_MARATHONER);
     if (!marathoner->isAchieved())
@@ -421,7 +435,7 @@ void AchievementsStatus::onRaceEnd(bool aborted)
     m_variables[SKIDDING_1RACE].counter = 0;
     m_variables[BOWLING_HIT_1RACE].counter = 0;
     m_variables[SWATTER_HIT_1RACE].counter = 0;
-
+    m_variables[ALL_HITS_1RACE].counter = 0;
 
     // Prevent restart from being abused to get consecutive wins achievement
     if (aborted)
@@ -481,3 +495,17 @@ void AchievementsStatus::trackEvent(std::string track_ident, AchievementsStatus:
     else if (event==TR_EGG_HUNT_FINISHED)
         m_track_stats[track_id].egg_hunt_finished++;
 } // trackEvent
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::resetKartHits(int num_karts)
+{
+    m_kart_hits.clear();
+    m_kart_hits.resize(num_karts);
+} // resetKartHits
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::addKartHit(int kart_id)
+{
+    m_kart_hits[kart_id]++;
+    updateAchievementsProgress(0);
+} // addKartHit

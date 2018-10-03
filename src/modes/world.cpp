@@ -294,6 +294,7 @@ void World::reset(bool restart)
         (*i)->reset();
         if ((*i)->getController()->canGetAchievements())
         {
+            PlayerManager::resetKartHits(getNumKarts());
             if (race_manager->isLinearRaceMode())
             {
                 PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_STARTED);

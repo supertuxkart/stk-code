@@ -272,9 +272,10 @@ public:
     // ------------------------------------------------------------------------
     /** Squashes this kart: it will scale the kart in up direction, and causes
      *  a slowdown while this kart is squashed.
+     *  Returns true if the squash is successful, false otherwise.
      *  \param time How long the kart will be squashed.
      *  \param slowdown Reduction of max speed.    */
-    virtual void setSquash(float time, float slowdown) = 0;
+    virtual bool setSquash(float time, float slowdown) = 0;
     // ------------------------------------------------------------------------
     /** Makes the kart unsquashed again. */
     virtual void unsetSquash() = 0;
