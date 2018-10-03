@@ -26,6 +26,7 @@
 
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/log.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
