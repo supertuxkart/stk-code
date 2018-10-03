@@ -49,8 +49,11 @@ ItemState::ItemState(ItemType type, const AbstractKart *owner, int id)
     setType(type);
     m_item_id = id;
     m_previous_owner = owner;
-    if (owner)
-        setDeactivatedTicks(stk_config->time2Ticks(1.5f));
+    m_used_up_counter = -1;
+     if (owner)
+         setDeactivatedTicks(stk_config->time2Ticks(1.5f));
+    else
+        setDeactivatedTicks(0);
 }   // ItemState(ItemType)
 
 // ------------------------------------------------------------------------

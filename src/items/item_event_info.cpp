@@ -31,6 +31,7 @@
  */
 ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
 {
+    m_ticks_till_return = 0;
     m_type    = (EventType)buffer->getUInt8();
     m_ticks   = buffer->getTime();
     *count   -= 5;
@@ -44,11 +45,15 @@ ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
             m_xyz = buffer->getVec3();
             *count -= 12;
         }
+        else   // IEI_COLLECT
+        {
+            m_ticks_till_return = buffer->getUInt16();
+            *count -= 2;
+        }
     }   // is not switch
     else   // switch
     {
         m_kart_id = -1;
-
     }
 }   // ItemEventInfo(BareNetworkString, int *count)
 
@@ -66,8 +71,7 @@ void ItemEventInfo::saveState(BareNetworkString *buffer)
         buffer->addUInt8(m_kart_id).addUInt16(m_index);
         if (m_type == IEI_NEW)
             buffer->add(m_xyz);
+        else if (m_type == IEI_COLLECT)
+            buffer->addUInt16(m_ticks_till_return);
     }
 }   // saveState
-
- 
-  

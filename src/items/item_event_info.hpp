@@ -51,13 +51,20 @@ private:
     /** In case of new items the position of the new item. */
     Vec3 m_xyz;
 
+    /** Ticks for the item to return, atm used by collecting banana
+     *  with bomb to delay the return for banana. */
+    int16_t m_ticks_till_return;
+
 public:
     /** Constructor for collecting an existing item.
      *  \param ticks Time of the event.
      *  \param item_id The index of the item that was collected.
-     *  \param kart_id the kart that collected the item. */
-    ItemEventInfo(int ticks, int index, int kart_id)
-        : m_ticks(ticks), m_index(index), m_kart_id(kart_id)
+     *  \param kart_id the kart that collected the item.
+    *   \param ttr Ticks till return after being collected. */
+
+    ItemEventInfo(int ticks, int index, int kart_id, int16_t ttr)
+        : m_ticks(ticks), m_index(index), m_kart_id(kart_id),
+          m_ticks_till_return(ttr)
     {
         m_type = IEI_COLLECT;
     }   // ItemEventInfo(collected existing item)
@@ -69,14 +76,15 @@ public:
      */
     ItemEventInfo(int ticks, ItemState::ItemType type, int index,
                   int kart_id, const Vec3 &xyz)
-        : m_ticks(ticks), m_index(index), m_kart_id(kart_id), m_xyz(xyz)
+        : m_ticks(ticks), m_index(index), m_kart_id(kart_id), m_xyz(xyz),
+          m_ticks_till_return(0)
     {
         m_type = IEI_NEW;
     }   // ItemEventInfo(new item)
 
     // --------------------------------------------------------------------
     /** Constructor for switching items. */
-    ItemEventInfo(int ticks) : m_ticks(ticks)
+    ItemEventInfo(int ticks) : m_ticks(ticks), m_ticks_till_return(0)
     {
         m_type = IEI_SWITCH;
     }   // ItemEventInfo(switch)
@@ -115,6 +123,9 @@ public:
         assert(isNewItem());
         return m_xyz;
     }   // getXYZ
+    // --------------------------------------------------------------------
+    /** Returns the ticks till return, used only by collection events. */
+    int getTicksTillReturn() const          { return m_ticks_till_return; }
     // --------------------------------------------------------------------
     /** Returns the type of this item. Note at this stage only bubble gums
      *  can be created during a race. */
