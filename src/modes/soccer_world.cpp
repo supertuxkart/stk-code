@@ -213,11 +213,11 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(int ticks)
 {
     updateBallPosition(ticks);
-    updateSectorForKarts();
-    if (Track::getCurrentTrack()->hasNavMesh() &&
-        !NetworkConfig::get()->isNetworking())
+    if (Track::getCurrentTrack()->hasNavMesh())
     {
-        updateAIData();
+        updateSectorForKarts();
+        if (!NetworkConfig::get()->isNetworking())
+            updateAIData();
     }
 
     WorldWithRank::update(ticks);
@@ -652,6 +652,9 @@ int SoccerWorld::getAttacker(KartTeam team) const
 //-----------------------------------------------------------------------------
 unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
 {
+    if (!Track::getCurrentTrack()->hasNavMesh())
+        return m_kart_position_map.at(kart->getWorldKartId());
+
     int last_valid_node =
         getTrackSector(kart->getWorldKartId())->getLastValidGraphNode();
     if (last_valid_node >= 0)
@@ -663,6 +666,9 @@ unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 btTransform SoccerWorld::getRescueTransform(unsigned int rescue_pos) const
 {
+    if (!Track::getCurrentTrack()->hasNavMesh())
+        return WorldWithRank::getRescueTransform(rescue_pos);
+
     const Vec3 &xyz = Graph::get()->getQuad(rescue_pos)->getCenter();
     const Vec3 &normal = Graph::get()->getQuad(rescue_pos)->getNormal();
     btTransform pos;
