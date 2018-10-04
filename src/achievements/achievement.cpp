@@ -35,7 +35,6 @@
 Achievement::Achievement(const AchievementInfo * info)
            : m_achievement_info(info)
 {
-    m_id       = info->getID();
     m_achieved = false;
 }   // Achievement
 
@@ -47,43 +46,21 @@ Achievement::~Achievement()
 // ----------------------------------------------------------------------------
 /** Loads the value from an XML node.
  *  \param input*/
-void Achievement::load(const XMLNode *node)
+void Achievement::loadProgress(const XMLNode *node)
 {
-    node->get("id",       &m_id      );
     node->get("achieved", &m_achieved);
-
-    for (unsigned int i = 0; i < node->getNumNodes(); i++)
-    {
-        const XMLNode *n = node->getNode(i);
-        std::string key = n->getName();
-        int value = 0;
-        n->get("value", &value);
-        m_progress_map[key] = value;
-    }
 }   // load
 
 // ----------------------------------------------------------------------------
 /** Saves the achievement status to a file.
  *  \param Output stream.
  */
-void Achievement::save(UTFWriter &out)
+void Achievement::saveProgress(UTFWriter &out)
 {
-    out << "        <achievement id=\"" << m_id << "\" "
+    out << "        <achievement id=\"" << getID() << "\" "
         << "achieved=\"" << m_achieved << "\"";
-    if (isAchieved())
-    {
-        out << "/>\n";
-        return;
-    }
-
-    out << ">\n";
-    std::map<std::string, int>::iterator i;
-    for (i = m_progress_map.begin(); i != m_progress_map.end(); ++i)
-    {
-        out << "          <" << i->first
-            << " value=\"" << i->second << "\"/>\n";
-    }
-    out << "        </achievement>\n";
+ 
+    out << "/>\n";
 }   // save
 
 // ----------------------------------------------------------------------------
@@ -122,24 +99,11 @@ irr::core::stringw Achievement::getProgressAsString() const
     if (m_achieved)
         return getInfo()->toString() +"/" + getInfo()->toString();
 
-    switch (m_achievement_info->getCheckType())
-    {
-    case AchievementInfo::AC_ALL_AT_LEAST:
-        for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
-        {
-            progress += iter->second;
-        }
-        break;
-    case AchievementInfo::AC_ONE_AT_LEAST:
-        for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
-        {
-            if(iter->second>progress) progress = iter->second;
-        }
-        break;
-    default:
-        Log::fatal("Achievement", "Missing getProgressAsString for type %d.",
-                   m_achievement_info->getCheckType());
-    }
+     for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+     {
+        progress += iter->second;
+     }
+
     return StringUtils::toWString(progress) + "/" + getInfo()->toString();
 }   // getProgressAsString
 
@@ -172,24 +136,6 @@ void Achievement::increase(const std::string & key,
 }   // increase
 
 // ----------------------------------------------------------------------------
-/** Called at the end of a race to potentially reset values.
- */
-void Achievement::onRaceEnd()
-{
-    if(m_achievement_info->needsResetAfterRace())
-        reset();
-}   // onRaceEnd
-
-// ----------------------------------------------------------------------------
-/** Called at the end of a lap to potentially reset values.
-*/
-void Achievement::onLapEnd()
-{
-    if (m_achievement_info->needsResetAfterLap())
-        reset();
-}   // onLapEnd
-
-// ----------------------------------------------------------------------------
 /** Checks if this achievement has been achieved.
  */
 void Achievement::check()
@@ -215,7 +161,7 @@ void Achievement::check()
         {
             Online::HTTPRequest * request = new Online::HTTPRequest(true);
             PlayerManager::setUserDetails(request, "achieving");
-            request->addParameter("achievementid", m_id);
+            request->addParameter("achievementid", getID());
             request->queue();
         }
 

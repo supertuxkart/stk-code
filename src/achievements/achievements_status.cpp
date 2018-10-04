@@ -99,7 +99,7 @@ void AchievementsStatus::load(const XMLNode * input)
                 "achievement. Discarding.");
             continue;
         }
-        achievement->load(xml_achievements[i]);
+        achievement->loadProgress(xml_achievements[i]);
     }   // for i in xml_achievements
 
     // Load achievement data
@@ -193,7 +193,7 @@ void AchievementsStatus::save(UTFWriter &out)
     for(i = m_achievements.begin(); i != m_achievements.end();  i++)
     {
         if (i->second != NULL)
-            i->second->save(out);
+            i->second->saveProgress(out);
     }
     out << "          <data version=\"" << DATA_VERSION << "\"/>\n";
     for(int i=0;i<ACHIEVE_DATA_NUM;i++)
@@ -272,11 +272,15 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
 }   // sync
 
 /* This function checks over achievements to update their goals
+ * \param type - the data type triggering the update, used to know
+ *               to what enum the enum_id refers to.
+ * \param enum_id - the id of the enum identifying the change triggering
+ *                  the update.
    FIXME It is currently hard-coded to specific achievements,
    until it can entirely supersedes the previous system and
    removes its complications.
    FIXME : a data id don't cover some situations, and the function itself ignores it */
-void AchievementsStatus::updateAchievementsProgress(unsigned int achieve_data_id)
+void AchievementsStatus::updateAchievementsProgress(UpdateType type, unsigned int enum_id)
 {
     Achievement *beyond_luck = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_BEYOND_LUCK);
     if (!beyond_luck->isAchieved())
@@ -393,7 +397,7 @@ void AchievementsStatus::increaseDataVar(unsigned int achieve_data_id, int incre
         if (m_variables[achieve_data_id].counter > 10000000)
             m_variables[achieve_data_id].counter = 10000000;
 
-        updateAchievementsProgress(achieve_data_id);
+        updateAchievementsProgress(UP_ACHIEVEMENT_DATA, achieve_data_id);
     }
 #ifdef DEBUG
     else
@@ -425,13 +429,7 @@ void AchievementsStatus::onRaceEnd(bool aborted)
 {
     onLapEnd();
 
-    updateAchievementsProgress(0);
-
-    //reset all values that need to be reset
-    std::map<uint32_t, Achievement *>::iterator iter;
-    for ( iter = m_achievements.begin(); iter != m_achievements.end(); ++iter ) {
-        iter->second->onRaceEnd();
-    }
+    updateAchievementsProgress(UP_ACHIEVEMENT_DATA, 0);
 
     m_variables[POWERUP_USED_1RACE].counter = 0;
     m_variables[BANANA_1RACE].counter = 0;
@@ -451,13 +449,7 @@ void AchievementsStatus::onRaceEnd(bool aborted)
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onLapEnd()
 {
-    updateAchievementsProgress(0);
-
-    //reset all values that need to be reset
-    std::map<uint32_t, Achievement *>::iterator iter;
-    for (iter = m_achievements.begin(); iter != m_achievements.end(); ++iter) {
-        iter->second->onLapEnd();
-    }
+    updateAchievementsProgress(UP_ACHIEVEMENT_DATA, 0);
 
     m_variables[SKIDDING_1LAP].counter = 0;
 }   // onLapEnd
@@ -510,5 +502,5 @@ void AchievementsStatus::resetKartHits(int num_karts)
 void AchievementsStatus::addKartHit(int kart_id)
 {
     m_kart_hits[kart_id]++;
-    updateAchievementsProgress(0);
+    updateAchievementsProgress(UP_KART_HITS, 0);
 } // addKartHit

@@ -178,6 +178,16 @@ private:
     // Reset at the beginning of a race
     std::vector<int> m_kart_hits;
 
+    // To avoid updating achievement progress being
+    // too computationally wasteful, we restrain
+    // what is checked on an update
+    enum UpdateType
+    {
+        UP_ACHIEVEMENT_DATA = 0,
+        UP_TRACK_DATA = 1,
+        UP_KART_HITS = 2,
+    };
+
     bool                m_online;
     bool                m_valid;
 
@@ -195,7 +205,7 @@ public :
     void save(UTFWriter &out);
     void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
-    void updateAchievementsProgress(unsigned int achieve_data_id);
+    void updateAchievementsProgress(UpdateType type, unsigned int enum_id);
     void increaseDataVar(unsigned int achieve_data_id, int increase);
     void resetDataVar(unsigned int achieve_data_id);
     void onRaceEnd(bool aborted=false);

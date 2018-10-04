@@ -18,11 +18,9 @@
 
 #include "items/powerup.hpp"
 
-#include "achievements/achievement_info.hpp"
-#include "config/player_manager.hpp"
-
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"

@@ -20,7 +20,6 @@
 #ifndef HEADER_ACHIEVEMENT_INFO_HPP
 #define HEADER_ACHIEVEMENT_INFO_HPP
 
-#include "achievements/achievement.hpp"
 #include "io/xml_node.hpp"
 #include "utils/translation.hpp"
 #include "utils/types.hpp"
@@ -32,9 +31,10 @@
 
 class Achievement;
 
-/** This is the base class for storing the definition of an achievement, e.g.
- *  title, description (which is common for all achievements), but also how
- *  to achieve this achievement.
+/** This class stores an achievement definition from the xml file, including
+ *  title, description, but also how to achieve this achievement.
+ *  Constrat with the Achievement class, which is a player-specific instance
+ *  tracking the progress of the achievement.
  * \ingroup achievements
  */
 class AchievementInfo
@@ -56,27 +56,6 @@ public:
            ACHIEVE_UNSTOPPABLE   = 12
     };
 
-    /** Achievement check type:
-     *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
-     *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
-     */
-    enum AchievementCheckType
-    {
-        AC_ALL_AT_LEAST,
-        AC_ONE_AT_LEAST
-    };
-    /** Achievement reset type:
-     *  AFTER_LAP:  Achievement needs to be reset after each lap.
-     *  AFTER_RACE: Achievement needs to be reset after each race.
-     *  NEVER:      Achievement does not need to be reset
-     */
-    enum ResetType
-    {
-        AFTER_LAP  = 1,
-        AFTER_RACE = 2,
-        NEVER      = 3
-    };
-
 private:
     /** The id of this Achievement. */
     uint32_t           m_id;
@@ -87,14 +66,8 @@ private:
     /** The description of this achievement. */
     irr::core::stringw m_description;
 
-    /** Determines how this achievement is checked if it is successful. */
-    AchievementCheckType  m_check_type;
-
     /** The target values needed to be reached. */
     std::map<std::string, int> m_goal_values;
-
-    /** Determines when the achievement needs to be reset */
-    ResetType m_reset_type;
 
     /** A secret achievement has its progress not shown. */
     bool m_is_secret;
@@ -107,26 +80,10 @@ public:
     virtual bool checkCompletion(Achievement * achievement) const;
     int getGoalValue(const std::string &key) const;
 
-    // ------------------------------------------------------------------------
-    /** Returns the id of this achievement. */
-    uint32_t getID() const { return m_id; }
-    // ------------------------------------------------------------------------
-    /** Returns the description of this achievement. */
+    uint32_t           getID()          const { return m_id; }
     irr::core::stringw getDescription() const { return _(m_description.c_str()); }
-    // ------------------------------------------------------------------------
-    /** Returns the name of this achievement. */
-    irr::core::stringw getName() const { return _LTR(m_name.c_str()); }
-    // ------------------------------------------------------------------------
-    bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
-    // ------------------------------------------------------------------------
-    bool needsResetAfterLap() const { return m_reset_type == AFTER_LAP; }
-    // ------------------------------------------------------------------------
-    /** Returns the check type for this achievement. */
-    AchievementCheckType getCheckType() const { return m_check_type; }
-    // ------------------------------------------------------------------------
-    /** Returns if this achievement is a secret achievement. */
-    bool isSecret() const { return m_is_secret; }
-    // ------------------------------------------------------------------------
+    irr::core::stringw getName()        const { return _LTR(m_name.c_str()); }
+    bool               isSecret()       const { return m_is_secret; }
 };   // class AchievementInfo
 
 
