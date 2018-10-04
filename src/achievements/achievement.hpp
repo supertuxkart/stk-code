@@ -20,6 +20,7 @@
 #ifndef HEADER_ACHIEVEMENT_HPP
 #define HEADER_ACHIEVEMENT_HPP
 
+#include "achievements/achievement_info.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
@@ -30,8 +31,9 @@ class UTFWriter;
 class XMLNode;
 
 // ============================================================================
-/** This is the base class for any achievement. It allows achievement status
- *  to be saved, and detects when an achievement is fulfilled. It provides
+/** This class tracks the progress of an achievement for a player, whose
+ *  definition is stored by an associated AchievementInfo. It allows achievement
+ *  status to be saved, and detects when an achievement is fulfilled. It provides
  *  storage for state information by a generic key-value mapping. The values
  *  are stored as strings, but can be used to store numerical values. E.g.
  *  you can call increase("key", 10) for an achievement, which will convert
@@ -44,9 +46,6 @@ class AchievementInfo;
 class Achievement
 {
 private:
-    /** The id of this achievement. */
-    uint32_t               m_id;
-
     /** True if this achievement has been achieved. */
     bool                   m_achieved;
 
@@ -62,27 +61,19 @@ public:
 
              Achievement(const AchievementInfo * info);
     virtual ~Achievement();
-    virtual void load(const XMLNode *node);
-    virtual void save(UTFWriter &out);
+    virtual void loadProgress(const XMLNode *node);
+    virtual void saveProgress(UTFWriter &out);
     virtual int getValue(const std::string & key);
     void increase(const std::string & key, const std::string &goal_key,
                   int increase = 1);
 
     virtual void reset();
     virtual irr::core::stringw getProgressAsString() const;
-    void onRaceEnd();
-    void onLapEnd();
-    // ------------------------------------------------------------------------
-    /** Returns the id of this achievement. */
-    uint32_t getID() const { return m_id; }
-    // ------------------------------------------------------------------------
-    /** Returns the AchievementInfo for this achievement. */
+
+    uint32_t                getID()   const { return m_achievement_info->getID(); }
     const AchievementInfo * getInfo() const { return m_achievement_info; }
-    // ------------------------------------------------------------------------
-    /** Sets this achievement to be fulfilled. */
+
     void setAchieved() { m_achieved = true; };
-    // ------------------------------------------------------------------------
-    /** Returns if this achievement has been fulfilled. */
     bool isAchieved() const { return m_achieved;  }
     // ------------------------------------------------------------------------
     const std::map<std::string, int>& getProgress() const
