@@ -33,12 +33,7 @@ class XMLNode;
 // ============================================================================
 /** This class tracks the progress of an achievement for a player, whose
  *  definition is stored by an associated AchievementInfo. It allows achievement
- *  status to be saved, and detects when an achievement is fulfilled. It provides
- *  storage for state information by a generic key-value mapping. The values
- *  are stored as strings, but can be used to store numerical values. E.g.
- *  you can call increase("key", 10) for an achievement, which will convert
- *  the string to int, add 10, then convert the result back to string for
- *  storage.
+ *  status to be saved, and detects when an achievement is fulfilled.
  * \ingroup achievements
  */
 class AchievementInfo;
@@ -47,38 +42,36 @@ class Achievement
 {
 private:
     /** True if this achievement has been achieved. */
-    bool                   m_achieved;
+    bool                      m_achieved;
 
-    /** The map of key-value pairs. */
-    std::map<std::string, int> m_progress_map;
+    /** The tree of goals. It is identical to the
+      * goal tree of the matching AchievementInfo,
+      * except that the stored values represent the
+      * achieved values instead of the values to meet.  */
+    AchievementInfo::goalTree m_progress_goal_tree;
 
     /** A pointer to the corresponding AchievementInfo instance. */
-    const AchievementInfo *m_achievement_info;
+    AchievementInfo    *m_achievement_info;
 
-    void check();
-
+    void onCompletion();
+    bool recursiveSetGoalValue(AchievementInfo::goalTree &tree, const std::string &goal_string, int value,
+                               bool and_or, bool sum_andatonce);
+    bool recursiveCompletionCheck(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
 public:
 
-             Achievement(const AchievementInfo * info);
+             Achievement(AchievementInfo * info);
     virtual ~Achievement();
     virtual void loadProgress(const XMLNode *node);
     virtual void saveProgress(UTFWriter &out);
-    virtual int getValue(const std::string & key);
-    void increase(const std::string & key, const std::string &goal_key,
-                  int increase = 1);
 
-    virtual void reset();
-    virtual irr::core::stringw getProgressAsString() const;
+    virtual irr::core::stringw getProgressAsString();
 
-    uint32_t                getID()   const { return m_achievement_info->getID(); }
-    const AchievementInfo * getInfo() const { return m_achievement_info; }
+    uint32_t          getID()   const { return m_achievement_info->getID(); }
+    AchievementInfo * getInfo() { return m_achievement_info; }
 
     void setAchieved() { m_achieved = true; };
     bool isAchieved() const { return m_achieved;  }
-    // ------------------------------------------------------------------------
-    const std::map<std::string, int>& getProgress() const
-    {
-        return m_progress_map;
-    }   // getProgress
+
+    void setGoalValue(std::string &goal_string, int value);
 };   // class Achievement
 #endif

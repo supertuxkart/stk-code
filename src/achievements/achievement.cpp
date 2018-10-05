@@ -32,10 +32,11 @@
 /** Constructur, initialises this object with the data from the
  *  corresponding AchievementInfo.
  */
-Achievement::Achievement(const AchievementInfo * info)
+Achievement::Achievement(AchievementInfo * info)
            : m_achievement_info(info)
 {
     m_achieved = false;
+    m_achievement_info->copyGoalTree(m_progress_goal_tree, m_achievement_info->m_goal_tree, true /*set values to 0*/);
 }   // Achievement
 
 // ----------------------------------------------------------------------------
@@ -64,108 +65,185 @@ void Achievement::saveProgress(UTFWriter &out)
 }   // save
 
 // ----------------------------------------------------------------------------
-/** Returns the value for a key.
- */
-int Achievement::getValue(const std::string & key)
-{
-    if (m_progress_map.find(key) != m_progress_map.end())
-        return m_progress_map[key];
-    return 0;
-}
-// ----------------------------------------------------------------------------
-/** Resets all currently key values to 0. Called if the reset-after-race flag
- *  is set for the corresponding AchievementInfo.
- */
-void Achievement::reset()
-{
-    std::map<std::string, int>::iterator iter;
-    for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
-    {
-        iter->second = 0;
-    }
-}   // reset
-
-// ----------------------------------------------------------------------------
 /** Returns how much of an achievement has been achieved in the form n/m.
- *  The AchievementInfo adds up all goal values to get 'm', and this
- *  this class end up all current key values for 'n'.
+ *  The AchievementInfo adds up the number of goals if there are several,
+ *  or take the target value of the goal if there is only one.
+ *  This do the same, but with achieved value or fullfilled goals.
  */
-irr::core::stringw Achievement::getProgressAsString() const
+irr::core::stringw Achievement::getProgressAsString()
 {
+    //TODO : add a progress computation function.
     int progress = 0;
-    std::map<std::string, int>::const_iterator iter;
+    irr::core::stringw target = getInfo()->toString();
 
     // For now return N/N in case of an achieved achievement.
     if (m_achieved)
-        return getInfo()->toString() +"/" + getInfo()->toString();
+        return target + "/" + target;
 
-     for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
-     {
-        progress += iter->second;
-     }
-
-    return StringUtils::toWString(progress) + "/" + getInfo()->toString();
+    return StringUtils::toWString(progress) + "/" + target;
 }   // getProgressAsString
 
 // ----------------------------------------------------------------------------
-/** Increases the value of a key by a specified amount, but make sure to not
- *  increase the value above the goal (otherwise the achievement progress
- *  could be 12/10 (e.g. if one track is used 12 times for the Christoffel
- *  achievement), even though the achievement is not achieved.
- *  \param key The key whose value is increased.
- *  \param increase Amount to add to the value of this key.
+/** Set any leaf of the progress goal tree whose type matches the
+ *  goal_string to the value passed as parameter.
+ *  The goal string can contain a logical prefix.
+ *  If it is LOGC- ; the update is for the current value of a
+ *  resetable counter. It is applied if the parent node is of type
+ *  SUM or AND-AT-ONCE, ignored otherwise.
+ *  If it is LOGM- ; the update is for the highest achieved value of a
+ *  resetable counter. It is appliedif the parent node is of type
+ *  AND or OR, ignored otherwise.
+ *  If there is no logical prefix, the new value is set in all cases.
+ *
+ *  If the leaf has an operator defined, this will trigger an update of the
+ *  relevant values.
+ *  If the leaf's new value match or exceed its target goal value,
+ *  a check for the achievement's completions is triggered.
  */
-void Achievement::increase(const std::string & key, 
-                           const std::string &goal_key, int increase)
+void Achievement::setGoalValue(std::string &goal_string, int value)
 {
-    std::map<std::string, int>::iterator it;
-    it = m_progress_map.find(key);
-    if (it != m_progress_map.end())
+    if(m_achieved) // This should not happen, but it costs little to double-check
+        return;
+
+    bool AO = true;
+    bool SAAO = true;
+    if (goal_string.compare(0 /*start of sub-string*/,5/*length*/,"LOGC-") == 0)
     {
-        it->second += increase;
-        if (it->second > m_achievement_info->getGoalValue(goal_key))
-            it->second = m_achievement_info->getGoalValue(goal_key);
+        AO = false;
+        goal_string = goal_string.substr(5,999);
     }
-    else
+    else if (goal_string.compare(0 /*start of sub-string*/,5/*length*/,"LOGM-") == 0)
     {
-        if (increase>m_achievement_info->getGoalValue(goal_key))
-            increase = m_achievement_info->getGoalValue(goal_key);
-        m_progress_map[key] = increase;
+        SAAO = false;
+        goal_string = goal_string.substr(5,999);
     }
-    check();
-}   // increase
+
+    bool found = recursiveSetGoalValue(m_progress_goal_tree, goal_string, value, AO, SAAO);
+
+    // If a value has been updated, check for completion
+    if (found && recursiveCompletionCheck(m_progress_goal_tree, m_achievement_info->m_goal_tree))
+    {
+        setAchieved();
+        onCompletion();
+    }
+} // setGoalValue
+
+bool Achievement::recursiveSetGoalValue(AchievementInfo::goalTree &tree, const std::string &goal_string, int value,
+                                        bool and_or, bool sum_andatonce)
+{
+    if (tree.type == goal_string)
+    {
+        // We don't update here, because it may yet be cancelled
+        // depending on the parent tree logical type.
+        return true;
+    }
+
+    bool can_set_child = ((and_or && (tree.type == "AND" || tree.type == "OR")) ||
+                          (sum_andatonce && (tree.type == "SUM" || tree.type == "AND-AT-ONCE")));
+
+    bool value_set = false;
+    for (unsigned int i=0;i<tree.children.size();i++)
+    {
+        if(recursiveSetGoalValue(tree.children[i],goal_string,value, and_or, sum_andatonce))
+        {
+            // The value has already been set, pass on the information
+            if (tree.children[i].type == "AND" ||
+                tree.children[i].type == "OR"  ||
+                tree.children[i].type == "SUM" ||
+                tree.children[i].type == "AND-AT-ONCE")
+            {
+
+                value_set = true;
+            }
+            // The child has the good type and we can increment the goal;
+            else if (can_set_child)
+            {
+                tree.children[i].value = value;
+                value_set = true;
+            }
+        }
+    }
+    // Recompute the sum
+    if (tree.type == "SUM" && value_set)
+    {
+        int new_value = 0;
+        for (unsigned int i=0;i<tree.children.size();i++)
+        {
+            if(tree.children[i].operation == AchievementInfo::OP_ADD)
+                new_value += tree.children[i].value;
+            else if(tree.children[i].operation == AchievementInfo::OP_SUBSTRACT)
+                new_value -= tree.children[i].value;
+        }
+        tree.value = new_value;
+    }
+
+    return value_set;
+} // recursiveSetGoalValue
 
 // ----------------------------------------------------------------------------
 /** Checks if this achievement has been achieved.
  */
-void Achievement::check()
+bool Achievement::recursiveCompletionCheck(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference)
 {
-    if(m_achieved)
-        return;
-
-    if(m_achievement_info->checkCompletion(this))
+    bool completed = false;
+    if (progress.type == "AND" || progress.type == "AND-AT-ONCE")
     {
-        //show achievement
-        // Note: the "name" variable is required, see issue #2068
-        // calling _("...", info->getName()) is invalid because getName also calls
-        // _() and thus the string it returns is mapped to a temporary buffer
-        // in theory, it should return a copy of the string, but clang tries to
-        // optimise away the copy
-        core::stringw name = m_achievement_info->getName();
-        core::stringw s = _("Completed achievement \"%s\".", name);
-        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
-
-        // Sends a confirmation to the server that an achievement has been
-        // completed, if a user is signed in.
-        if (PlayerManager::isCurrentLoggedIn())
+        completed = true;
+        for (unsigned int i=0;i<progress.children.size();i++)
         {
-            Online::HTTPRequest * request = new Online::HTTPRequest(true);
-            PlayerManager::setUserDetails(request, "achieving");
-            request->addParameter("achievementid", getID());
-            request->queue();
+            if (!recursiveCompletionCheck(progress.children[i], reference.children[i]))
+            {
+                completed = false;
+                break;
+            }
         }
-
-        m_achieved = true;
     }
-}   // check
+    else if (progress.type == "OR")
+    {
+        completed = false;
+        for (unsigned int i=0;i<progress.children.size();i++)
+        {
+            if (recursiveCompletionCheck(progress.children[i], reference.children[i]))
+            {
+                completed = true;
+                break;
+            }
+        }
+    }
+    // Whether a sum or a leaf node, it has a value.
+    // The value for sums are updated when the underlying values are,
+    // we don't need to do it again
+    else if (progress.value >= reference.value)
+    {
+        completed = true;
+    }
+    return completed;
+} // recursiveCompletionCheck
 
+// ----------------------------------------------------------------------------
+/** Manages what needs to happen once the achievement is completed,
+ *  like displaying the completion message to the player or synching
+ *  with the server.
+ */
+void Achievement::onCompletion()
+{
+    //show achievement
+    // Note: the "name" variable is required, see issue #2068
+    // calling _("...", info->getName()) is invalid because getName also calls
+    // _() and thus the string it returns is mapped to a temporary buffer
+    // in theory, it should return a copy of the string, but clang tries to
+    // optimise away the copy
+    core::stringw name = m_achievement_info->getName();
+    core::stringw s = _("Completed achievement \"%s\".", name);
+    MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
+
+    // Sends a confirmation to the server that an achievement has been
+    // completed, if a user is signed in.
+    if (PlayerManager::isCurrentLoggedIn())
+    {
+        Online::HTTPRequest * request = new Online::HTTPRequest(true);
+        PlayerManager::setUserDetails(request, "achieving");
+        request->addParameter("achievementid", getID());
+        request->queue();
+    }
+}   // onCompletion
