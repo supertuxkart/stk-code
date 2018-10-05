@@ -86,6 +86,8 @@ AchievementsStatus*
         status->add(achievement);
     }
 
+    status->updateAllAchievementsProgress();
+
     if (node)
         status->load(node);
 
