@@ -631,3 +631,26 @@ std::string AssetsAndroid::getDataPath()
 
     return "";
 }
+
+//-----------------------------------------------------------------------------
+/** Get a path for internal lib directory
+ *  \return Path for internal lib directory or empty string when failed
+ */
+std::string AssetsAndroid::getLibPath()
+{
+#ifdef ANDROID
+    AndroidApplicationInfo application_info = 
+        CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+
+    std::string lib_path = application_info.native_lib_dir;
+
+    if (access(lib_path.c_str(), R_OK) != 0)
+    {
+        lib_path = "";
+    }
+
+    return lib_path;
+#endif
+
+    return "";
+}

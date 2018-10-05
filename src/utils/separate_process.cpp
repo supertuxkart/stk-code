@@ -283,9 +283,27 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     }
     
     std::string data_path = AssetsAndroid::getDataPath();
-    std::string main_path = data_path + "/lib/libmain.so";
+    std::string main_path;
     
-    if (data_path.empty() || access(main_path.c_str(), R_OK) != 0)
+    if (!data_path.empty())
+    {
+        main_path = data_path + "/lib/libmain.so";
+    }
+
+    if (main_path.empty() || access(main_path.c_str(), R_OK) != 0)
+    {
+        std::string lib_path = AssetsAndroid::getLibPath();
+        
+        if (!lib_path.empty())
+        {
+            main_path = lib_path + "/libmain.so";
+        }
+        
+        Log::info("SeparateProcess", "Trying to use fallback lib path: %s", 
+                  main_path.c_str());
+    }
+        
+    if (main_path.empty() || access(main_path.c_str(), R_OK) != 0)
     {
         Log::error("SeparateProcess", "Error: Cannot read libmain.so");
         return false;

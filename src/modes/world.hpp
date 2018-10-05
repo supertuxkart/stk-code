@@ -42,7 +42,7 @@
 class AbstractKart;
 class btRigidBody;
 class Controller;
-class Item;
+class ItemState;
 class PhysicalObject;
 
 namespace Scripting
@@ -263,7 +263,8 @@ public:
                                            int *amount );
     // ------------------------------------------------------------------------
     /** Receives notification if an item is collected. Used for easter eggs. */
-    virtual void collectedItem(const AbstractKart *kart, const Item *item) {}
+    virtual void collectedItem(const AbstractKart *kart, 
+                               const ItemState *item    ) {}
     // ------------------------------------------------------------------------
     virtual void endRaceEarly() { return; }
     // ------------------------------------------------------------------------

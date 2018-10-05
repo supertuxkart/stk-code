@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div y="2%" width="100%" height="96%" layout="vertical-row">
+    <div x="1%" y="2%" width="98%" height="96%" layout="vertical-row">
 
         <div width="100%" height="40%" layout="vertical-row">
             <div width="100%" height="25%" layout="vertical-row" >
                 <label id="name" width="100%" text_align="center"/>
             </div>
             <!-- This is filled in programmatically -->
-            <box width="98%" height="75%" align="center" layout="vertical-row" padding="1">
+            <box width="100%" height="75%" align="center" layout="vertical-row" padding="1">
                 <list id="current_replay_info" x="0" y="0" width="100%" height="100%"/>
             </box>
         </div>
@@ -18,8 +18,8 @@
             </div>
 
             <div width="64%" height="100%" layout="vertical-row">
-                <div width="95%" align="center" layout="vertical-row" height="fit">
-                    <div width="100%" height="40" layout="horizontal-row" >
+                <div width="95%" align="center" layout="vertical-row" height="50%">
+                    <div width="100%" height="fit" layout="horizontal-row" >
                         <checkbox width="fit" id="record-race" I18N="Ghost replay info action" text_align="left"/>
                         <spacer width="10"/>
                         <label proportion="1" id="record-race-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Record the race for ghost replay"/>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <div width="95%" height="50%" align="center">
+                <div width="95%" height="40%" align="center">
                     <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
                         <icon-button id="start" width="128" height="128"
                                      icon="gui/icons/green_check.png"

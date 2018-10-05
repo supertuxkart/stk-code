@@ -67,7 +67,7 @@
                 The actual turn radius is piece-wise linearly interpolated. This
                 allows for tighter turning at lower speeds, and also avoids that
                 the kart becomes too hard to control at high speed (speeds of
-                higher than 23 can only be reached with powerups).
+                higher than 25 can only be reached with powerups).
             time-full-steer: This is the amount of change in steering depending
                 on current steering. So if the steering is between 0 and 0.5,
                 the time-for-steering-change is 0.15. If the current steering is

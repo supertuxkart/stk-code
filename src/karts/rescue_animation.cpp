@@ -40,7 +40,8 @@
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
  */
-RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
+RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue,
+                                 bool from_state)
                : AbstractKartAnimation(kart, "RescueAnimation")
 {
     btTransform prev_trans = kart->getTrans();
@@ -89,8 +90,11 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     }
 
     // Clear powerups when rescue in CTF
-    addNetworkAnimationChecker(race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+    if (!from_state)
+    {
+        addNetworkAnimationChecker(race_manager->getMajorMode() ==
+            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+    }
 }   // RescueAnimation
 
 //-----------------------------------------------------------------------------

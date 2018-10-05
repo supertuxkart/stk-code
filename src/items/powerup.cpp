@@ -563,7 +563,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
                                                     random_number);
     // FIXME Disable switch and bubblegum for now in network
     if (NetworkConfig::get()->isNetworking() &&
-        (new_powerup == PowerupManager::POWERUP_BUBBLEGUM ||
+       (new_powerup == PowerupManager::POWERUP_BUBBLEGUM ||
         new_powerup == PowerupManager::POWERUP_SWITCH))
         new_powerup = PowerupManager::POWERUP_BOWLING;
 

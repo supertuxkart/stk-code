@@ -21,7 +21,8 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/abstract_kart_animation.hpp"
+#include "karts/explosion_animation.hpp"
+#include "karts/rescue_animation.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
@@ -52,6 +53,7 @@ KartRewinder::KartRewinder(const std::string& ident,
  */
 void KartRewinder::reset()
 {
+    m_last_animation_end_ticks = -1;
     m_transfrom_from_network =
         btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     Kart::reset();
@@ -138,7 +140,9 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         buffer->add(trans.getOrigin());
         btQuaternion quat = trans.getRotation();
         buffer->add(quat);
-        buffer->addUInt32(ka->getEndTicks());
+        unsigned et = ka->getEndTicks() & 134217727;
+        et |= ka->getAnimationType() << 27;
+        buffer->addUInt32(et);
     }
     else
     {
@@ -207,10 +211,38 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 
     if (has_animation)
     {
-        int end_ticks = buffer->getUInt32();
-        AbstractKartAnimation* ka = getKartAnimation();
-        if (ka)
-            ka->setEndTransformTicks(m_transfrom_from_network, end_ticks);
+        unsigned et = buffer->getUInt32();
+        int end_ticks = et & 134217727;
+        KartAnimationType kat = (KartAnimationType)(et >> 27);
+        if (!getKartAnimation() && end_ticks != m_last_animation_end_ticks)
+        {
+            Log::info("KartRewinder", "Creating animation %d from state", kat);
+            switch (kat)
+            {
+            case KAT_RESCUE:
+                new RescueAnimation(this, false/*is_auto_rescue*/,
+                    true/*from_state*/);
+                break;
+            case KAT_EXPLOSION_DIRECT_HIT:
+                new ExplosionAnimation(this, getSmoothedXYZ(),
+                    true/*direct_hit*/, true/*from_state*/);
+                break;
+            case KAT_EXPLOSION:
+                new ExplosionAnimation(this, getSmoothedXYZ(),
+                    false/*direct_hit*/, true/*from_state*/);
+                break;
+            default:
+                Log::warn("KartRewinder", "Unknown animation %d from state",
+                    kat);
+                break;
+            }
+        }
+        if (getKartAnimation())
+        {
+            getKartAnimation()->setEndTransformTicks(m_transfrom_from_network,
+                end_ticks);
+        }
+        m_last_animation_end_ticks = end_ticks;
     }
 
     Vec3 lv = buffer->getVec3();

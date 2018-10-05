@@ -587,6 +587,9 @@ void World::onGo()
  */
 void World::terminateRace()
 {
+    // In case the user opened paused dialog in network
+    GUIEngine::ModalDialog::dismiss();
+
     m_schedule_pause = false;
     m_schedule_unpause = false;
 

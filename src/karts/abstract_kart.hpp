@@ -261,6 +261,8 @@ public:
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const = 0;
     // ------------------------------------------------------------------------
+    virtual float getGraphicalViewBlockedByPlunger() const = 0;
+    // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
     virtual void blockViewWithPlunger() = 0;

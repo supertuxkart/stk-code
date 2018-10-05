@@ -143,9 +143,19 @@ void AbstractKartAnimation::addNetworkAnimationChecker(bool reset_powerup)
     {
         // Prevent access to deleted kart animation object
         std::weak_ptr<int> cct = m_check_created_ticks;
+        Vec3 original_position;
+        AbstractKart* k = m_kart;
+        if (k)
+            original_position = k->getXYZ();
         RewindManager::get()->addRewindInfoEventFunction(new
             RewindInfoEventFunction(m_created_ticks,
-            [](){},
+            /*undo_function*/[cct, k, original_position]()
+            {
+                auto cct_sp = cct.lock();
+                if (!cct_sp || !k)
+                    return;
+                k->setXYZ(original_position);
+            },
             /*replay_function*/[p]()
             {
                 if (p)

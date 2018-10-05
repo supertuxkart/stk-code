@@ -213,7 +213,13 @@ namespace Online
             me->m_current_request->execute();
             // This test is necessary in case that execute() was aborted
             // (otherwise the assert in addResult will be triggered).
-            if (!me->getAbort()) me->addResult(me->m_current_request);
+            if (!me->getAbort())
+                me->addResult(me->m_current_request);
+            else if (me->m_current_request->manageMemory())
+            {
+                delete me->m_current_request;
+                me->m_current_request = NULL;
+            }
             me->m_request_queue.lock();
         } // while handle all requests
 

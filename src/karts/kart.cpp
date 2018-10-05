@@ -185,7 +185,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_terrain_sound          = NULL;
     m_last_sound_material    = NULL;
     m_previous_terrain_sound = NULL;
-
+    m_graphical_view_blocked_by_plunger = 0.0f;
 }   // Kart
 
 // -----------------------------------------------------------------------------
@@ -370,6 +370,7 @@ void Kart::reset()
     m_current_lean         = 0.0f;
     m_falling_time         = 0.0f;
     m_view_blocked_by_plunger = 0;
+    m_graphical_view_blocked_by_plunger = 0.0f;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
     m_flying               = false;
@@ -590,8 +591,15 @@ void Kart::blockViewWithPlunger()
 {
     // Avoid that a plunger extends the plunger time
     if(m_view_blocked_by_plunger<=0 && !isShielded())
+    {
         m_view_blocked_by_plunger = 
         stk_config->time2Ticks(m_kart_properties->getPlungerInFaceTime());
+        if (m_graphical_view_blocked_by_plunger == 0.0f)
+        {
+             m_graphical_view_blocked_by_plunger =
+                m_kart_properties->getPlungerInFaceTime();
+        }
+    }
     if(isShielded())
     {
         decreaseShieldTime();
@@ -875,22 +883,27 @@ float Kart::getSpeedForTurnRadius(float radius) const
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
-            turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sin( 1.0 / turn_angle_at_speed.getY(i)));
 
-    float angle = sin(m_kart_properties->getWheelBase() / radius);
+    float angle = sin(1.0 / radius);
     return turn_angle_at_speed.getReverse(angle);
 }   // getSpeedForTurnRadius
 
 // ------------------------------------------------------------------------
-/** Returns the maximum steering angle (depending on speed). */
+/** Returns the maximum steering angle (depending on speed).
+    This is proportional to kart length because physics reverse this effect,
+    the results of this function should not be used to determine the
+    real raw steer angle. */
 float Kart::getMaxSteerAngle(float speed) const
 {
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
+    // We multiply by wheel base to keep turn radius identical
+    // across karts of different lengths sharing the same
+    // turn radius properties
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
-            turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sin( 1.0 / turn_angle_at_speed.getY(i))
+                                    * m_kart_properties->getWheelBase());
 
     return turn_angle_at_speed.get(speed);
 }   // getMaxSteerAngle
@@ -946,10 +959,16 @@ void Kart::finishedRace(float time, bool from_server)
                     World::getWorld()->getTicksSinceStart(),
                     /*undo_function*/[old_controller, this]()
                     {
+                        if (m_network_finish_check_ticks == -1)
+                            return;
+
                         m_controller = old_controller;
                     },
                     /*replay_function*/[ec, old_controller, this]()
                     {
+                        if (m_network_finish_check_ticks == -1)
+                            return;
+
                         m_saved_controller = old_controller;
                         ec->reset();
                         m_controller = ec;
@@ -1059,9 +1078,8 @@ void Kart::setRaceResult()
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
     {
-        // the top kart wins
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
-        m_race_result = ffa->getKartAtPosition(1) == this;
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
     {
@@ -1314,13 +1332,13 @@ void Kart::eliminate()
  */
 void Kart::update(int ticks)
 {
-    if (m_network_finish_check_ticks != 0 &&
+    if (m_network_finish_check_ticks > 0 &&
         World::getWorld()->getTicksSinceStart() >
         m_network_finish_check_ticks &&
         !m_finished_race && m_saved_controller != NULL)
     {
         Log::warn("Kart", "Missing finish race from server.");
-        m_network_finish_check_ticks = 0;
+        m_network_finish_check_ticks = -1;
         delete m_controller;
         m_controller = m_saved_controller;
         m_saved_controller = NULL;
@@ -1423,7 +1441,10 @@ void Kart::update(int ticks)
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= ticks;
     //unblock the view if kart just became shielded
     if(isShielded())
+    {
         m_view_blocked_by_plunger = 0;
+        m_graphical_view_blocked_by_plunger = 0.0f;
+    }
     // Decrease remaining invulnerability time
     if(m_invulnerable_ticks>0)
     {
@@ -1532,7 +1553,7 @@ void Kart::update(int ticks)
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
         "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
         "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d heading(43) %f "
-        "noderot(45) %f suslen %f",
+        "bubticks(45) %d bubtor(47) %f",
         getIdent().c_str(),
         World::getWorld()->getTime(), World::getWorld()->getTicksSinceStart(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1553,8 +1574,8 @@ void Kart::update(int ticks)
         m_brake_ticks, //39
         m_controls.getButtonsCompressed(),  //41
         getHeading(),  //43
-        m_node->getAbsoluteTransformation().getRotationDegrees().Y,  //45
-        m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
+        m_bubblegum_ticks, // 45
+        m_bubblegum_torque // 47
     );
 #endif
     // After the physics step was done, the position of the wheels (as stored
@@ -1663,6 +1684,7 @@ void Kart::update(int ticks)
     if (emergency)
     {
         m_view_blocked_by_plunger = 0;
+        m_graphical_view_blocked_by_plunger = 0.0f;
         if (m_flying)
         {
             stopFlying();
@@ -3039,6 +3061,10 @@ void Kart::updateGraphics(float dt)
             unsetSquash();
         }
     }   // if squashed
+    if (m_graphical_view_blocked_by_plunger > 0.0f)
+        m_graphical_view_blocked_by_plunger -= dt;
+    if (m_graphical_view_blocked_by_plunger < 0.0f)
+        m_graphical_view_blocked_by_plunger = 0.0f;
 #endif
 
     for (int i = 0; i < EMITTER_COUNT; i++)

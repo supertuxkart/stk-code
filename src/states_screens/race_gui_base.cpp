@@ -670,8 +670,8 @@ void RaceGUIBase::drawGlobalReadySetGo()
 }   // drawGlobalReadySetGo
 
 //-----------------------------------------------------------------------------
-/** Draw players icons and their times (if defined in the current mode).
- *  Also takes care of icon looking different due to plumber, squashing, ...
+/** Draw players icons and, depending on the current mode, their time
+ *  or their score (battle lives, egg collected, etc.).
  */
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
@@ -1138,3 +1138,5 @@ void RaceGUIBase::removeReferee()
         m_referee->removeFromSceneGraph();
     }
 }   // removeReferee
+
+

@@ -223,6 +223,9 @@ protected:
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     int16_t       m_view_blocked_by_plunger;
+
+    float         m_graphical_view_blocked_by_plunger;
+
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
 
@@ -393,6 +396,9 @@ public:
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const OVERRIDE
                                          { return m_view_blocked_by_plunger; }
+    // ------------------------------------------------------------------------
+    virtual float getGraphicalViewBlockedByPlunger() const OVERRIDE
+                               { return m_graphical_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */

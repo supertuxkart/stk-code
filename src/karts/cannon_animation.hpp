@@ -81,6 +81,8 @@ public:
              virtual ~CannonAnimation();
     virtual void  update(int ticks);
     // ------------------------------------------------------------------------
-    virtual bool usePredefinedEndTransform() const { return false; }
+    virtual bool usePredefinedEndTransform() const            { return false; }
+    // ------------------------------------------------------------------------
+    virtual KartAnimationType getAnimationType() const   { return KAT_CANNON; }
 };   // CannonAnimation
 #endif

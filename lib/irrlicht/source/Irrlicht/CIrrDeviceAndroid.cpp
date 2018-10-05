@@ -186,6 +186,9 @@ void CIrrDeviceAndroid::createVideoModeList()
         
     int width = ANativeWindow_getWidth(Android->window);
     int height = ANativeWindow_getHeight(Android->window);
+
+    os::Printer::log("Window width:", core::stringc(width).c_str(), ELL_DEBUG);
+    os::Printer::log("Window height:", core::stringc(height).c_str(), ELL_DEBUG);
     
     if (width > 0 && height > 0)
     {

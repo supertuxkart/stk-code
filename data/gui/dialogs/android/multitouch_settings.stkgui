@@ -27,7 +27,7 @@
             <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Buttons scale"/>
             <div proportion="1" align="center" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="10" />
-                <gauge id="scale" proportion="1" min_value="50" max_value="150"/>
+                <gauge id="scale" proportion="1" min_value="80" max_value="160"/>
             </div>
         </div>
 

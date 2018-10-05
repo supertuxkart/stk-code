@@ -226,13 +226,15 @@ unsigned int ItemManager::insertItem(Item *item)
     // previously deleted entry, otherwise at the end.
     int index = -1;
     for(index=(int)m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
-
-    if(index==-1) index = (int)m_all_items.size();
-
-    if(index<(int)m_all_items.size())
-        m_all_items[index] = item;
-    else
+    if (index == -1)
+    {
+        index = (int)m_all_items.size();
         m_all_items.push_back(item);
+    }
+    else
+    {
+        m_all_items[index] = item;
+    }
     item->setItemId(index);
 
     // Now insert into the appropriate quad list, if there is a quad list
@@ -286,9 +288,7 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
     }
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type]);
-
-    if(kart != NULL) item->setParent(kart);
+                          m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
     insertItem(item);
     if(m_switch_ticks>=0)
     {
@@ -318,7 +318,7 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type]);
+                          m_item_lowres_mesh[mesh_type], /*prev_owner*/NULL);
 
     insertItem(item);
     if (m_switch_ticks >= 0)
@@ -354,7 +354,7 @@ Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void ItemManager::collectedItem(Item *item, AbstractKart *kart)
+void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
 {
     assert(item);
     // Spare tire karts don't collect items

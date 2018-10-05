@@ -1936,8 +1936,11 @@ int main(int argc, char *argv[] )
         }
         else if (CommandLine::has("--lan-server", &s))
         {
-            ProfileWorld::disableGraphics();
-            UserConfigParams::m_enable_sound = false;
+            if (no_graphics)
+            {
+                ProfileWorld::disableGraphics();
+                UserConfigParams::m_enable_sound = false;
+            }
             NetworkConfig::get()->setIsServer(true);
             ServerConfig::m_server_name = s;
             ServerConfig::m_wan_server = false;
@@ -2354,7 +2357,8 @@ static void cleanSuperTuxKart()
 #ifndef SERVER_ONLY
     if (!ProfileWorld::isNoGraphics())
     {
-        if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+        if (UserConfigParams::m_internet_status == Online::RequestManager::
+            IPERM_ALLOWED && !NewsManager::get()->waitForReadyToDeleted(2.0f))
         {
             Log::info("Thread", "News manager not stopping, exiting anyway.");
         }

@@ -56,13 +56,13 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 
     m_device = input_manager->getDeviceManager()->getMultitouchDevice();
 
-    if (UserConfigParams::m_multitouch_scale > 1.5f)
+    if (UserConfigParams::m_multitouch_scale > 1.6f)
     {
-        UserConfigParams::m_multitouch_scale = 1.5f;
+        UserConfigParams::m_multitouch_scale = 1.6f;
     }
-    else if (UserConfigParams::m_multitouch_scale < 0.5f)
+    else if (UserConfigParams::m_multitouch_scale < 0.8f)
     {
-        UserConfigParams::m_multitouch_scale = 0.5f;
+        UserConfigParams::m_multitouch_scale = 0.8f;
     }
 
     init();
@@ -340,6 +340,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
                      kart->getPowerup()->getNum() > 1 && 
+                     !kart->hasFinishedRace() &&
                      m_gui_action == false)
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();

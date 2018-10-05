@@ -286,7 +286,8 @@ private:
 public:
 
     TrackObjectPresentationSound(const XMLNode& xml_node,
-                                 scene::ISceneNode* parent);
+                                 scene::ISceneNode* parent,
+                                 bool disable_for_multiplayer);
     virtual ~TrackObjectPresentationSound();
     virtual void onTriggerItemApproached() OVERRIDE;
     virtual void update(float dt) OVERRIDE;
