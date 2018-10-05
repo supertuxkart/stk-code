@@ -118,13 +118,16 @@ private:
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawSpeedEnergyRank   (const AbstractKart* kart,
+    void drawSpeedEnergy       (const AbstractKart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling, float dt);
     void drawLap               (const AbstractKart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawRank              (const AbstractKart *kart,
+                                const core::recti &viewport,
+                                const core::vector2df &scaling, float dt);
+    void drawMiscInfo          (const AbstractKart *kart,
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
