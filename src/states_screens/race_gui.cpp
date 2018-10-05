@@ -549,13 +549,14 @@ void RaceGUI::drawGlobalMiniMap()
 
     track->drawMiniMap(dest);
 
-    World *world = World::getWorld();
+    World* world = World::getWorld();
+    CaptureTheFlag *ctf_world = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
 
-    CaptureTheFlag *ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
-    if (ctf)
+    if (ctf_world)
     {
         Vec3 draw_at;
-        if (!ctf->isRedFlagInBase())
+        if (!ctf_world->isRedFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getRedFlag().getOrigin(),
                 &draw_at);
@@ -567,7 +568,7 @@ void RaceGUI::drawGlobalMiniMap()
             draw2DImage(m_red_flag, rp, rs, NULL, NULL, true, true);
         }
 
-        track->mapPoint2MiniMap(ctf->getRedFlag(), &draw_at);
+        track->mapPoint2MiniMap(ctf_world->getRedFlag(), &draw_at);
         core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
         core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -575,7 +576,7 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(m_red_flag, rp, rs, NULL, NULL, true);
 
-        if (!ctf->isBlueFlagInBase())
+        if (!ctf_world->isBlueFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getBlueFlag().getOrigin(),
                 &draw_at);
@@ -587,7 +588,7 @@ void RaceGUI::drawGlobalMiniMap()
             draw2DImage(m_blue_flag, rp, rs, NULL, NULL, true, true);
         }
 
-        track->mapPoint2MiniMap(ctf->getBlueFlag(), &draw_at);
+        track->mapPoint2MiniMap(ctf_world->getBlueFlag(), &draw_at);
         core::rect<s32> bs(core::position2di(0, 0), m_blue_flag->getSize());
         core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -623,15 +624,30 @@ void RaceGUI::drawGlobalMiniMap()
                                  m_map_left+(int)(draw_at.getX()+marker_half_size),
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
+        bool has_teams = (ctf_world || soccer_world);
+        
         // Highlight the player icons with some backgorund image.
-        if (kart->getController()->isLocalPlayerController() &&
+        if ((has_teams || kart->getController()->isLocalPlayerController()) &&
             m_icons_frame != NULL)
         {
-            video::SColor colors[4];
-            for (unsigned int i=0;i<4;i++)
+            video::SColor color = kart->getKartProperties()->getColor();
+            
+            if (has_teams)
             {
-                colors[i]=kart->getKartProperties()->getColor();
+                KartTeam team = world->getKartTeam(kart->getWorldKartId());
+                
+                if (team == KART_TEAM_RED)
+                {
+                    color = video::SColor(255, 200, 0, 0);
+                }
+                else if (team == KART_TEAM_BLUE)
+                {
+                    color = video::SColor(255, 0, 0, 200);
+                }
             }
+                                  
+            video::SColor colors[4] = {color, color, color, color};
+
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                                         m_icons_frame->getSize());
 
@@ -642,11 +658,10 @@ void RaceGUI::drawGlobalMiniMap()
 
     }   // for i<getNumKarts
 
-    SoccerWorld *sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-    if (sw)
+    if (soccer_world)
     {
         Vec3 draw_at;
-        track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
+        track->mapPoint2MiniMap(soccer_world->getBallPosition(), &draw_at);
 
         core::rect<s32> source(core::position2di(0, 0), m_soccer_ball->getSize());
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
