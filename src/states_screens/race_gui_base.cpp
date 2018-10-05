@@ -670,8 +670,8 @@ void RaceGUIBase::drawGlobalReadySetGo()
 }   // drawGlobalReadySetGo
 
 //-----------------------------------------------------------------------------
-/** Draw players icons and their times (if defined in the current mode).
- *  Also takes care of icon looking different due to plumber, squashing, ...
+/** Draw players icons and, depending on the current mode, their time
+ *  or their score (battle lives, egg collected, etc.).
  */
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
@@ -717,7 +717,6 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int ICON_WIDTH = ICON_PLAYER_WIDTH * 5 / 6;
 
     WorldWithRank* world = dynamic_cast<WorldWithRank*>(World::getWorld());
-    CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
 
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
@@ -865,162 +864,172 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                        true /* ignore RTL */);
         }
 
-        // draw icon
-        video::ITexture *icon =
-        kart->getKartProperties()->getIconMaterial()->getTexture();
         int w = kart->getController()
                     ->isLocalPlayerController() ? ICON_PLAYER_WIDTH
                                                 : ICON_WIDTH;
-
-        // CTF
-        if (ctf)
-        {
-            if (ctf->getRedHolder() == (int)kart_id)
-            {
-                video::ITexture* red =
-                    irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
-                const core::rect<s32> rect(core::position2d<s32>(0, 0),
-                    red->getSize());
-                const core::rect<s32> pos1
-                    (x - 20, y - 10, x + w - 20, y + w - 30);
-                draw2DImage(red, pos1, rect, NULL, NULL, true);
-            }
-            else if (ctf->getBlueHolder() == (int)kart_id)
-            {
-                video::ITexture* blue =
-                    irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
-                const core::rect<s32> rect(core::position2d<s32>(0, 0),
-                    blue->getSize());
-                const core::rect<s32> pos1
-                    (x - 20, y - 10, x + w - 20, y + w - 30);
-                draw2DImage(blue, pos1, rect, NULL, NULL, true);
-            }
-        }
-
-        const core::rect<s32> pos(x, y, x+w, y+w);
-
-        //to bring to light the player's icon: add a background
-        if (kart->getController()->isLocalPlayerController() &&
-            m_icons_frame != NULL)
-        {
-            video::SColor colors[4];
-            for (unsigned int i=0;i<4;i++)
-            {
-                colors[i]=kart->getKartProperties()->getColor();
-                colors[i].setAlpha(
-                                   100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
-            }
-            const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       m_icons_frame->getSize());
-            draw2DImage(m_icons_frame, pos, rect,NULL, colors, true);
-        }
-
-        // Fixes crash bug, why are certain icons not showing up?
-        if (icon  && !kart->getKartAnimation() && !kart->isSquashed())
-        {
-            const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       icon->getSize());
-            draw2DImage(icon, pos, rect, NULL, NULL, true, kart->isGhostKart());
-        }
-
-        //draw status info - icon fade out in case of rescue/explode
-
-        if (icon  && dynamic_cast<RescueAnimation*>(kart->getKartAnimation()))
-        {
-            //icon fades to the left
-            float t = kart->getKartAnimation()->getAnimationTimer();
-            float t_anim=100*sin(0.5f*M_PI*t);
-            const core::rect<s32> rect1(core::position2d<s32>(0,0),
-                                        icon->getSize());
-            const core::rect<s32> pos1((int)(x-t_anim), y,
-                                       (int)(x+w-t_anim), y+w);
-            draw2DImage(icon, pos1, rect1,
-                                                      NULL, NULL, true);
-        }
-
-        if (icon  && !kart->getKartAnimation() && kart->isSquashed() )
-        {
-            //syncs icon squash with kart squash
-            const core::rect<s32> destRect(core::position2d<s32>(x,y+w/4),
-                                           core::position2d<s32>(x+w,y+w*3/4));
-            const core::rect<s32> sourceRect(core::position2d<s32>(0,0),
-                                             icon->getSize());
-            draw2DImage(icon, destRect,
-                                                      sourceRect, NULL, NULL,
-                                                      true);
-        }
-
-        if (icon  &&
-            dynamic_cast<ExplosionAnimation*>(kart->getKartAnimation()) )
-        {
-            //exploses into 4 parts
-            float t = kart->getKartAnimation()->getAnimationTimer();
-            float t_anim=50.0f*sin(0.5f*M_PI*t);
-            u16 icon_size_x=icon->getSize().Width;
-            u16 icon_size_y=icon->getSize().Height;
-
-            const core::rect<s32> rect1(0, 0, icon_size_x/2,icon_size_y/2);
-            const core::rect<s32> pos1((int)(x-t_anim), (int)(y-t_anim),
-                                       (int)(x+w/2-t_anim),
-                                       (int)(y+w/2-t_anim));
-            draw2DImage(icon, pos1, rect1,
-                                                      NULL, NULL, true);
-
-            const core::rect<s32> rect2(icon_size_x/2,0,
-                                        icon_size_x,icon_size_y/2);
-            const core::rect<s32> pos2((int)(x+w/2+t_anim),
-                                       (int)(y-t_anim),
-                                       (int)(x+w+t_anim),
-                                       (int)(y+w/2-t_anim));
-            draw2DImage(icon, pos2, rect2,
-                                                      NULL, NULL, true);
-
-            const core::rect<s32> rect3(0, icon_size_y/2, icon_size_x/2,icon_size_y);
-            const core::rect<s32> pos3((int)(x-t_anim), (int)(y+w/2+t_anim),
-                                       (int)(x+w/2-t_anim), (int)(y+w+t_anim));
-            draw2DImage(icon, pos3, rect3, NULL, NULL, true);
-
-            const core::rect<s32> rect4(icon_size_x/2,icon_size_y/2,icon_size_x,icon_size_y);
-            const core::rect<s32> pos4((int)(x+w/2+t_anim), (int)(y+w/2+t_anim),
-                                       (int)(x+w+t_anim), (int)(y+w+t_anim));
-            draw2DImage(icon, pos4, rect4, NULL, NULL, true);
-        }
-
-        //Plunger
-        if (kart->getGraphicalViewBlockedByPlunger() > 0.0f)
-        {
-            video::ITexture *icon_plunger =
-            powerup_manager->getIcon(PowerupManager::POWERUP_PLUNGER)->getTexture();
-            if (icon_plunger != NULL)
-            {
-                const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           icon_plunger->getSize());
-                const core::rect<s32> pos1(x+10, y-10, x+w+10, y+w-10);
-                draw2DImage(icon_plunger, pos1,
-                                                          rect, NULL, NULL,
-                                                          true);
-            }
-        }
-        //attachment
-        if (kart->getAttachment()->getType() != Attachment::ATTACH_NOTHING)
-        {
-            video::ITexture *icon_attachment =
-            attachment_manager->getIcon(kart->getAttachment()->getType())
-            ->getTexture();
-            if (icon_attachment != NULL)
-            {
-                const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           icon_attachment->getSize());
-                const core::rect<s32> pos1(x-20, y-10, x+w-20, y+w-10);
-                draw2DImage(icon_attachment,
-                                                          pos1, rect, NULL,
-                                                          NULL, true);
-            }
-        }
-
+        drawPlayerIcon(kart, x, y, w);
     } //next position
 #endif
 }   // drawGlobalPlayerIcons
+
+//-----------------------------------------------------------------------------
+/** Draw one player icon
+ *  Takes care of icon looking different due to plumber, squashing, ...
+ */
+void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
+{
+    video::ITexture *icon =
+    kart->getKartProperties()->getIconMaterial()->getTexture();
+
+    CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    unsigned int kart_id = kart->getWorldKartId();
+
+    // CTF
+    if (ctf)
+    {
+        if (ctf->getRedHolder() == (int)kart_id)
+        {
+            video::ITexture* red =
+                irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
+            const core::rect<s32> rect(core::position2d<s32>(0, 0),
+                red->getSize());
+            const core::rect<s32> pos1
+                (x - 20, y - 10, x + w - 20, y + w - 30);
+            draw2DImage(red, pos1, rect, NULL, NULL, true);
+        }
+        else if (ctf->getBlueHolder() == (int)kart_id)
+        {
+            video::ITexture* blue =
+                irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
+            const core::rect<s32> rect(core::position2d<s32>(0, 0),
+                blue->getSize());
+            const core::rect<s32> pos1
+                (x - 20, y - 10, x + w - 20, y + w - 30);
+            draw2DImage(blue, pos1, rect, NULL, NULL, true);
+        }
+    }
+
+    const core::rect<s32> pos(x, y, x+w, y+w);
+
+    //to bring to light the player's icon: add a background
+    if (kart->getController()->isLocalPlayerController() &&
+        m_icons_frame != NULL)
+    {
+        video::SColor colors[4];
+        for (unsigned int i=0;i<4;i++)
+        {
+            colors[i]=kart->getKartProperties()->getColor();
+            colors[i].setAlpha(
+                               100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
+        }
+        const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                   m_icons_frame->getSize());
+        draw2DImage(m_icons_frame, pos, rect,NULL, colors, true);
+    }
+
+    // Fixes crash bug, why are certain icons not showing up?
+    if (icon  && !kart->getKartAnimation() && !kart->isSquashed())
+    {
+        const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                   icon->getSize());
+        draw2DImage(icon, pos, rect, NULL, NULL, true, kart->isGhostKart());
+    }
+
+    //draw status info - icon fade out in case of rescue/explode
+
+    if (icon  && dynamic_cast<RescueAnimation*>(kart->getKartAnimation()))
+    {
+        //icon fades to the left
+        float t = kart->getKartAnimation()->getAnimationTimer();
+        float t_anim=100*sin(0.5f*M_PI*t);
+        const core::rect<s32> rect1(core::position2d<s32>(0,0),
+                                    icon->getSize());
+        const core::rect<s32> pos1((int)(x-t_anim), y,
+                                   (int)(x+w-t_anim), y+w);
+        draw2DImage(icon, pos1, rect1,
+                                                  NULL, NULL, true);
+    }
+
+    if (icon  && !kart->getKartAnimation() && kart->isSquashed() )
+    {
+        //syncs icon squash with kart squash
+        const core::rect<s32> destRect(core::position2d<s32>(x,y+w/4),
+                                       core::position2d<s32>(x+w,y+w*3/4));
+        const core::rect<s32> sourceRect(core::position2d<s32>(0,0),
+                                         icon->getSize());
+        draw2DImage(icon, destRect,
+                                                  sourceRect, NULL, NULL,
+                                                  true);
+    }
+
+    if (icon  &&
+        dynamic_cast<ExplosionAnimation*>(kart->getKartAnimation()) )
+    {
+        //exploses into 4 parts
+        float t = kart->getKartAnimation()->getAnimationTimer();
+        float t_anim=50.0f*sin(0.5f*M_PI*t);
+        u16 icon_size_x=icon->getSize().Width;
+        u16 icon_size_y=icon->getSize().Height;
+
+        const core::rect<s32> rect1(0, 0, icon_size_x/2,icon_size_y/2);
+        const core::rect<s32> pos1((int)(x-t_anim), (int)(y-t_anim),
+                                   (int)(x+w/2-t_anim),
+                                   (int)(y+w/2-t_anim));
+        draw2DImage(icon, pos1, rect1,
+                                                  NULL, NULL, true);
+
+        const core::rect<s32> rect2(icon_size_x/2,0,
+                                    icon_size_x,icon_size_y/2);
+        const core::rect<s32> pos2((int)(x+w/2+t_anim),
+                                   (int)(y-t_anim),
+                                   (int)(x+w+t_anim),
+                                   (int)(y+w/2-t_anim));
+        draw2DImage(icon, pos2, rect2,
+                                                  NULL, NULL, true);
+
+        const core::rect<s32> rect3(0, icon_size_y/2, icon_size_x/2,icon_size_y);
+        const core::rect<s32> pos3((int)(x-t_anim), (int)(y+w/2+t_anim),
+                                   (int)(x+w/2-t_anim), (int)(y+w+t_anim));
+        draw2DImage(icon, pos3, rect3, NULL, NULL, true);
+
+        const core::rect<s32> rect4(icon_size_x/2,icon_size_y/2,icon_size_x,icon_size_y);
+        const core::rect<s32> pos4((int)(x+w/2+t_anim), (int)(y+w/2+t_anim),
+                                   (int)(x+w+t_anim), (int)(y+w+t_anim));
+        draw2DImage(icon, pos4, rect4, NULL, NULL, true);
+    }
+
+    //Plunger
+    if (kart->getBlockedByPlungerTicks()>0)
+    {
+        video::ITexture *icon_plunger =
+        powerup_manager->getIcon(PowerupManager::POWERUP_PLUNGER)->getTexture();
+        if (icon_plunger != NULL)
+        {
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                       icon_plunger->getSize());
+            const core::rect<s32> pos1(x+10, y-10, x+w+10, y+w-10);
+            draw2DImage(icon_plunger, pos1,
+                                                      rect, NULL, NULL,
+                                                      true);
+        }
+    }
+    //attachment
+    if (kart->getAttachment()->getType() != Attachment::ATTACH_NOTHING)
+    {
+        video::ITexture *icon_attachment =
+        attachment_manager->getIcon(kart->getAttachment()->getType())
+        ->getTexture();
+        if (icon_attachment != NULL)
+        {
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                       icon_attachment->getSize());
+            const core::rect<s32> pos1(x-20, y-10, x+w-20, y+w-10);
+            draw2DImage(icon_attachment,
+                                                      pos1, rect, NULL,
+                                                      NULL, true);
+        }
+    }
+}   // drawPlayerIcon
 
 // ----------------------------------------------------------------------------
 
@@ -1031,7 +1040,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
 #ifndef SERVER_ONLY
     const AbstractKart *kart = camera->getKart();
-    if (kart->getGraphicalViewBlockedByPlunger() <= 0.0f)
+    if (kart->getBlockedByPlungerTicks()<=0)
     {
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
@@ -1056,7 +1065,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
         {
             const float fast_time = 0.3f;
-            if (kart->getGraphicalViewBlockedByPlunger() < fast_time)
+            if(kart->getBlockedByPlungerTicks()<stk_config->time2Ticks(fast_time))
             {
                 // First time we reach faste state: select random target point
                 // at top of screen and set speed accordingly
@@ -1129,3 +1138,4 @@ void RaceGUIBase::removeReferee()
         m_referee->removeFromSceneGraph();
     }
 }   // removeReferee
+
