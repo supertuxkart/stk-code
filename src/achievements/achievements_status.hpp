@@ -213,7 +213,6 @@ private:
 
     void setEnumToString();
     void updateAchievementsProgress(UpdateType type, unsigned int enum_id);
-    void updateAllAchievementsProgress();
 
 public :
     AchievementsStatus();
@@ -230,6 +229,7 @@ public :
     void trackEvent(std::string track_ident, AchievementsStatus::TrackData event);
     void resetKartHits(int num_karts);
     void addKartHit(int kart_id);
+    void updateAllAchievementsProgress();
     // ------------------------------------------------------------------------
     std::map<uint32_t, Achievement *>& getAllAchievements()
     {
