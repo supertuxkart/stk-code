@@ -450,8 +450,6 @@ void AchievementsStatus::increaseDataVar(unsigned int achieve_data_id, int incre
     if (achieve_data_id<ACHIEVE_DATA_NUM)
     {
         m_variables[achieve_data_id].counter += increase;
-        if (m_variables[achieve_data_id].counter > 10000000)
-            m_variables[achieve_data_id].counter = 10000000;
 
         updateAchievementsProgress(UP_ACHIEVEMENT_DATA, achieve_data_id);
     }

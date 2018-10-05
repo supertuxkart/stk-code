@@ -105,20 +105,20 @@ void Achievement::setGoalValue(std::string &goal_string, int value)
     if(m_achieved) // This should not happen, but it costs little to double-check
         return;
 
-    bool AO = true;
-    bool SAAO = true;
+    bool and_or = true;
+    bool sum_andatonce = true;
     if (goal_string.compare(0 /*start of sub-string*/,5/*length*/,"LOGC-") == 0)
     {
-        AO = false;
+        and_or = false;
         goal_string = goal_string.substr(5,999);
     }
     else if (goal_string.compare(0 /*start of sub-string*/,5/*length*/,"LOGM-") == 0)
     {
-        SAAO = false;
+        sum_andatonce = false;
         goal_string = goal_string.substr(5,999);
     }
 
-    bool found = recursiveSetGoalValue(m_progress_goal_tree, goal_string, value, AO, SAAO);
+    bool found = recursiveSetGoalValue(m_progress_goal_tree, goal_string, value, and_or, sum_andatonce);
 
     // If a value has been updated, check for completion
     if (found && recursiveCompletionCheck(m_progress_goal_tree, m_achievement_info->m_goal_tree))
