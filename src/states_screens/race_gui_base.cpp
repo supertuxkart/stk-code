@@ -878,6 +878,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
  */
 void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
 {
+#ifndef SERVER_ONLY
     video::ITexture *icon =
     kart->getKartProperties()->getIconMaterial()->getTexture();
 
@@ -1029,6 +1030,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
                                                       NULL, true);
         }
     }
+#endif
 }   // drawPlayerIcon
 
 // ----------------------------------------------------------------------------
