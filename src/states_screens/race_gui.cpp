@@ -371,7 +371,9 @@ void RaceGUI::drawScores()
                         position.LowerRightCorner.X,
                         position.LowerRightCorner.Y + string_height);
 
+        font->setBlackBorder(true);
         font->draw(score.c_str(),pos,color);
+        font->setBlackBorder(false);
 
         if (i == 1)
         {
@@ -451,8 +453,10 @@ void RaceGUI::drawGlobalTimer()
     if (use_digit_font)
         font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
+    font->setBlackBorder(true);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
                true /* ignore RTL */);
+    font->setBlackBorder(false);
 
 }   // drawGlobalTimer
 
@@ -515,9 +519,10 @@ void RaceGUI::drawLiveDifference()
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
+    font->setBlackBorder(true);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
                true /* ignore RTL */);
-
+    font->setBlackBorder(false);
 }   // drawLiveDifference
 
 //-----------------------------------------------------------------------------
@@ -804,7 +809,9 @@ void RaceGUI::drawRank(const AbstractKart *kart,
         pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
                                             int(offset.Y - 0.49f*meter_height));
 
+        font->setBlackBorder(true);
         font->draw(oss.str().c_str(), pos, color, true, true);
+        font->setBlackBorder(false);
         font->setScale(1.0f);
         return;
     }
@@ -874,7 +881,9 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
                                           int(offset.Y - 0.49f*meter_height));
 
+    font->setBlackBorder(true);
     font->draw(oss.str().c_str(), pos, color, true, true);
+    font->setBlackBorder(false);
     font->setScale(1.0f);
 }   // drawRank
 
@@ -1164,6 +1173,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     if (ctf)
     {
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        font->setBlackBorder(true);
         font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
         core::stringw text = StringUtils::toWString(ctf->getRedScore());
         font->draw(text, pos, video::SColor(255, 255, 0, 0));
@@ -1176,6 +1186,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         text = StringUtils::toWString(ctf->getBlueScore());
         font->draw(text, pos, video::SColor(255, 0, 0, 255));
         font->setScale(1.0f);
+        font->setBlackBorder(false);
         return;
     }
 
@@ -1206,7 +1217,9 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     out << lap + 1 << "/" << race_manager->getNumLaps();
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    font->setBlackBorder(true);
     font->draw(out.str().c_str(), pos, color);
+    font->setBlackBorder(false);
     font->setScale(1.0f);
 #endif
 } // drawLap
