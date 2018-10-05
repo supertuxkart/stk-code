@@ -35,6 +35,11 @@ private:
     /** True if black border will be drawn when rendering. */
     bool m_black_border;
 
+    /** True if a custom colored border will be drawn when rendering.
+      * If both a black border and a colored border are set to be used,
+      * the colored border will take priority. */
+    bool m_colored_border;
+
     /** If true, characters will have right alignment when rendering, for RTL
      *  language. */
     bool m_rtl;
@@ -48,20 +53,26 @@ private:
     /** Save the color of shadow when rendering. */
     video::SColor m_shadow_color;
 
+    /** Used when m_colored_border is true */
+    video::SColor m_border_color;
+
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
     /** Constructor. It will initialize all members with default values if no
      *  parameter is given. */
-    FontSettings(bool black_border = false, bool rtl = false,
-                 float scale = 1.0f, bool shadow = false,
-                 const video::SColor& color = video::SColor(0, 0, 0, 0))
+    FontSettings(bool black_border = false, bool colored_border = false,
+                 bool rtl = false, float scale = 1.0f, bool shadow = false,
+                 const video::SColor& shadow_color = video::SColor(0, 0, 0, 0),
+                 const video::SColor& border_color = video::SColor(0, 0, 0, 0))
     {
         m_black_border = black_border;
+        m_colored_border = colored_border;
         m_rtl = rtl;
         m_scale = scale;
         m_shadow = shadow;
-        m_shadow_color = color;
+        m_shadow_color = shadow_color;
+        m_border_color = border_color;
     }
     // ------------------------------------------------------------------------
     /** Set the scaling.
@@ -89,8 +100,22 @@ public:
      *  \param border If it's enabled. */
     void setBlackBorder(bool border)               { m_black_border = border; }
     // ------------------------------------------------------------------------
+    /** Set whether a custom colored border is enabled.
+     *  \param border If it's enabled. */
+    void setColoredBorder(bool border )          { m_colored_border = border; }
+    // ------------------------------------------------------------------------
+    /** Set the color of border (used when a non-black border is requested).
+     *  \param col The color of border to be set. */
+    void setBorderColor(const video::SColor &col)     { m_border_color = col; }
+    // ------------------------------------------------------------------------
+    /** Return the color of the border.. */
+    const video::SColor& getBorderColor() const      { return m_border_color; }
+    // ------------------------------------------------------------------------
     /** Return if black border is enabled. */
     bool useBlackBorder() const                      { return m_black_border; }
+    // ------------------------------------------------------------------------
+    /** Return if black border is enabled. */
+    bool useColoredBorder() const                  { return m_colored_border; }
     // ------------------------------------------------------------------------
     /** Set right text alignment for RTL language.
      *  \param rtl If it's enabled. */

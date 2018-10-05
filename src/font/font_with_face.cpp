@@ -516,6 +516,8 @@ void FontWithFace::render(const core::stringw& text,
 
     const bool black_border = font_settings ?
         font_settings->useBlackBorder() : false;
+    const bool colored_border = font_settings ?
+        font_settings->useColoredBorder() : false;
     const bool rtl = font_settings ? font_settings->isRTL() : false;
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
     const float shadow = font_settings ? font_settings->useShadow() : false;
@@ -639,11 +641,14 @@ void FontWithFace::render(const core::stringw& text,
 
     const int sprite_amount = sprites.size();
 
-    if ((black_border || isBold()) && char_collector == NULL)
+    if ((black_border || colored_border || isBold()) && char_collector == NULL)
     {
         // Draw black border first, to make it behind the real character
         // which make script language display better
+        video::SColor custom_color = font_settings->getBorderColor();
         video::SColor black(color.getAlpha(),0,0,0);
+        video::SColor border_color = (colored_border) ? custom_color : black;
+
         for (int n = 0; n < indice_amount; n++)
         {
             const int sprite_id = indices[n];
@@ -678,7 +683,7 @@ void FontWithFace::render(const core::stringw& text,
                     if (x_delta == 0 || y_delta == 0) continue;
                     draw2DImage(texture, dest + core::position2d<float>
                         (float(x_delta), float(y_delta)), source, clip,
-                        black, true);
+                        border_color, true);
                 }
             }
         }
