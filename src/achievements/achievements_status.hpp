@@ -55,61 +55,71 @@ public :
            // 1. Ignore races with not enough AIs for incrementation
            // 2. Reset the counter in case of loss against any number of AIs
            CONS_WON_RACES                = 4,
+           CONS_WON_RACES_MAX            = 5,
            // Won races in (at least) hard requires at least 5 AI opponents
-           CONS_WON_RACES_HARD           = 5,
+           CONS_WON_RACES_HARD           = 6,
+           CONS_WON_RACES_HARD_MAX       = 7,
            // Count how many normal, TT & FTL races were started and finished by difficulty
-           EASY_STARTED                  = 6,
-           EASY_FINISHED                 = 7,
-           MEDIUM_STARTED                = 8,
-           MEDIUM_FINISHED               = 9,
-           HARD_STARTED                  = 10,
-           HARD_FINISHED                 = 11,
-           BEST_STARTED                  = 12,
-           BEST_FINISHED                 = 13,
+           EASY_STARTED                  = 8,
+           EASY_FINISHED                 = 9,
+           MEDIUM_STARTED                = 10,
+           MEDIUM_FINISHED               = 11,
+           HARD_STARTED                  = 12,
+           HARD_FINISHED                 = 13,
+           BEST_STARTED                  = 14,
+           BEST_FINISHED                 = 15,
            // Count how many time a race/match was started and finished by game mode.
            // Races with ghost replays technically belong to TT or egg hunt race mode,
            // they increment both the with_ghost counter and the relevant mode counter.
-           NORMAL_STARTED                = 14,
-           NORMAL_FINISHED               = 15,
-           TT_STARTED                    = 16,
-           TT_FINISHED                   = 17,
-           FTL_STARTED                   = 18,
-           FTL_FINISHED                  = 19,
-           THREE_STRIKES_STARTED         = 20,
-           THREE_STRIKES_FINISHED        = 21,
-           SOCCER_STARTED                = 22,
-           SOCCER_FINISHED               = 23,
-           EGG_HUNT_STARTED              = 24,
-           EGG_HUNT_FINISHED             = 25,
-           WITH_GHOST_STARTED            = 26,
-           WITH_GHOST_FINISHED           = 27,
-           CTF_STARTED                   = 28,
-           CTF_FINISHED                  = 29,
-           FFA_STARTED                   = 30,
-           FFA_FINISHED                  = 31,
+           NORMAL_STARTED                = 16,
+           NORMAL_FINISHED               = 17,
+           TT_STARTED                    = 18,
+           TT_FINISHED                   = 19,
+           FTL_STARTED                   = 20,
+           FTL_FINISHED                  = 21,
+           THREE_STRIKES_STARTED         = 22,
+           THREE_STRIKES_FINISHED        = 23,
+           SOCCER_STARTED                = 24,
+           SOCCER_FINISHED               = 25,
+           EGG_HUNT_STARTED              = 26,
+           EGG_HUNT_FINISHED             = 27,
+           WITH_GHOST_STARTED            = 28,
+           WITH_GHOST_FINISHED           = 29,
+           CTF_STARTED                   = 30,
+           CTF_FINISHED                  = 31,
+           FFA_STARTED                   = 32,
+           FFA_FINISHED                  = 33,
 
            // Count the number of powerups used by the player.
-           POWERUP_USED                  = 32,
-           POWERUP_USED_1RACE            = 33,
+           POWERUP_USED                  = 34,
+           POWERUP_USED_1RACE            = 35,
+           POWERUP_USED_1RACE_MAX        = 36,
            // Count how many times a bowling ball from the player hit a kart
-           BOWLING_HIT                   = 34,
-           BOWLING_HIT_1RACE             = 35,
+           BOWLING_HIT                   = 37,
+           BOWLING_HIT_1RACE             = 38,
+           BOWLING_HIT_1RACE_MAX         = 39,
            // Count how many times a swatter from the player hit a kart
-           SWATTER_HIT                   = 36,
-           SWATTER_HIT_1RACE             = 37,
+           SWATTER_HIT                   = 40,
+           SWATTER_HIT_1RACE             = 41,
+           SWATTER_HIT_1RACE_MAX         = 42,
            // Count how many times a swatter, bowling ball or cake from
            // the player hit a kart (excluding the player's own kart)
-           ALL_HITS                      = 38,
-           ALL_HITS_1RACE                = 39,
+           ALL_HITS                      = 43,
+           ALL_HITS_1RACE                = 44,
+           ALL_HITS_1RACE_MAX            = 45,
            // Count the number of bananas hit
-           BANANA                        = 40,
-           BANANA_1RACE                  = 41,
+           BANANA                        = 46,
+           BANANA_1RACE                  = 47,
+           BANANA_1RACE_MAX              = 48,
            // Count how many times the player skidded
-           SKIDDING_1LAP                 = 42,
-           SKIDDING_1RACE                = 43,
-           SKIDDING                      = 44,
+           SKIDDING                      = 49,
+           SKIDDING_1RACE                = 50,
+           SKIDDING_1RACE_MAX            = 51,
+           SKIDDING_1LAP                 = 52,
+           SKIDDING_1LAP_MAX             = 53,
 
-           ACHIEVE_DATA_NUM              = 45
+
+           ACHIEVE_DATA_NUM              = 54
     };
 
 private:
@@ -126,50 +136,54 @@ private:
         int counter;
     };
 
-    const int DATA_VERSION = 3;
+    const int DATA_VERSION = 4;
 
     // The tracked values are defined at compile time
     AchievementVariable m_variables[ACHIEVE_DATA_NUM];
 
-    // To keep track of track-specific data without hardcoding
-    // a list of tracks, we use a special structure.
-    struct TrackStats
-    {
-        std::string ident;
-        // counters for standard, TT & FTL races
-        int race_started; 
-        int race_finished;
-        int race_won; // doesn't count race without any other AI/player
-        int race_finished_reverse;
-        int race_finished_alone; // races against replays are counted, too
-        // counters for standard & TT races, apply to finished races only,
-        // lap number compared to track default.
-        int less_laps;
-        int more_laps;
-        int min_twice_laps; // at least twice the track's default lap count
-        // counters for egg hunts
-        int egg_hunt_started;
-        int egg_hunt_finished;
-    };
+    // We store the enum name and matching goalTree type
+    // in this table for faster lookup.
+    std::string m_ach_enum_to_xml[ACHIEVE_DATA_NUM];
 
 // Switching a few times from public to private
 // helps here to keep related things next to each other
 public:
     enum TrackData {
+        // counters for standard, TT & FTL races
         TR_STARTED           = 0,
         TR_FINISHED          = 1,
+        // doesn't count race without any other AI/player
         TR_WON               = 2,
         TR_FINISHED_REVERSE  = 3,
-        TR_LESS_LAPS         = 4,
-        TR_MORE_LAPS         = 5,
-        TR_MIN_TWICE_LAPS    = 6,
-        TR_FINISHED_ALONE    = 7,
+        // races against replays are counted, too
+        TR_FINISHED_ALONE    = 4,
+        // counters for standard & TT races, apply to finished races only,
+        // lap number compared to track default.
+        TR_LESS_LAPS         = 5,
+        TR_MORE_LAPS         = 6,
+        TR_MIN_TWICE_LAPS    = 7, // at least twice the track's default lap count
+        // counters for egg hunts
         TR_EGG_HUNT_STARTED  = 8,
-        TR_EGG_HUNT_FINISHED = 9
+        TR_EGG_HUNT_FINISHED = 9,
+
+        TR_DATA_NUM          = 10
     };    
 
 private:
+    // To keep track of track-specific data without hardcoding
+    // a list of tracks, we use a special structure.
+    struct TrackStats
+    {
+        std::string ident;
+        int track_data[TR_DATA_NUM];
+    };
+
     std::vector<TrackStats> m_track_stats;
+
+    // We store the enum name and matching goalTree type
+    // in this table for faster lookup.
+    // Each track data value matches 2 xml command
+    std::string m_tr_enum_to_xml[2*TR_DATA_NUM];
 
     // TODO : keep track of battle/soccer arenas
 
@@ -197,6 +211,10 @@ private:
         SyncAchievementsRequest() : Online::XMLRequest(true) {}
     };
 
+    void setEnumToString();
+    void updateAchievementsProgress(UpdateType type, unsigned int enum_id);
+    void updateAllAchievementsProgress();
+
 public :
     AchievementsStatus();
     ~AchievementsStatus();
@@ -205,7 +223,6 @@ public :
     void save(UTFWriter &out);
     void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
-    void updateAchievementsProgress(UpdateType type, unsigned int enum_id);
     void increaseDataVar(unsigned int achieve_data_id, int increase);
     void resetDataVar(unsigned int achieve_data_id);
     void onRaceEnd(bool aborted=false);
@@ -214,7 +231,7 @@ public :
     void resetKartHits(int num_karts);
     void addKartHit(int kart_id);
     // ------------------------------------------------------------------------
-    const std::map<uint32_t, Achievement *>& getAllAchievements()
+    std::map<uint32_t, Achievement *>& getAllAchievements()
     {
         return m_achievements;
     }

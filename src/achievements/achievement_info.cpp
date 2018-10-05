@@ -49,59 +49,124 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
 
     input->get("secret", &m_is_secret);
 
+    m_goal_tree.type      = "AND";
+    m_goal_tree.value     = -1;
+    m_goal_tree.operation = OP_NONE;
+
+    parseGoals(input, m_goal_tree);
+}   // AchievementInfo
+
+// ----------------------------------------------------------------------------
+/** Parses recursively the list of goals, to construct the tree of goals */
+void AchievementInfo::parseGoals(const XMLNode * input, goalTree &parent)
+{
     // Now load the goal nodes
     for (unsigned int n = 0; n < input->getNumNodes(); n++)
     {
         const XMLNode *node = input->getNode(n);
-        std::string key = node->getName();
-        int goal = 0;
-        node->get("goal", &goal);
-        m_goal_values[key] = goal;
+        if (node->getName() != "goal")
+            continue; // ignore incorrect node
+
+        std::string type;
+        if(!node->get("type", &type))
+            continue; // missing type, ignore node
+
+        int value;
+        if (!node->get("value", &value))
+            value = -1;
+
+        std::string operation;
+        if (!node->get("operation", &operation))
+            operation = "none";
+
+        goalTree child;
+        child.type = type;
+        child.value = value;
+        if (operation == "none")
+            child.operation = OP_NONE;
+        else if (operation == "+")
+            child.operation = OP_ADD;
+        else if (operation == "-")
+            child.operation = OP_SUBSTRACT;
+        else
+            continue; // incorrect operation type, ignore node
+
+        if (type=="AND" || type=="AND-AT-ONCE" || type=="OR" || type=="SUM")
+        {
+            if (type == "SUM")
+            {
+                if (value <= 0)
+                    continue; // SUM nodes need a strictly positive value
+            }
+            else
+            {
+                // Logical operators don't have a value or operation defined
+                if (value != -1)
+                    continue;
+                if (child.operation != OP_NONE)
+                    continue;
+                if (parent.type == "SUM")
+                    continue;
+            }
+
+            parseGoals(node, child);
+
+            if (child.children.size() == 0)
+                continue;
+        }
+        else
+        {
+            if (value <= 0)
+                continue; // Leaf nodes need a strictly positive value
+
+            if (parent.type == "SUM" && child.operation == OP_NONE)
+                continue; // Leaf nodes of a SUM node need an operator
+        }
+
+        parent.children.push_back(child);
     }
-    if (m_goal_values.size() != input->getNumNodes())
-        Log::fatal("AchievementInfo",
-                  "Duplicate keys for the entries of a MapAchievement found.");
-}   // AchievementInfo
+    if (parent.children.size() != input->getNumNodes())
+        Log::error("AchievementInfo",
+                  "Incorrect goals for the entries of achievement \"%s\".", m_name.c_str());
+} // parseGoals
+
+// ----------------------------------------------------------------------------
+/** Copy a goal tree to an EMPTY goal tree by recursion. */
+void AchievementInfo::copyGoalTree(goalTree &copy, goalTree &model, bool set_values_to_zero)
+{
+    copy.type = model.type;
+    copy.value = (set_values_to_zero) ? 0 : model.value;
+    copy.operation = model.operation;
+
+    for (unsigned int i=0;i<model.children.size();i++)
+    {
+        goalTree copy_child;
+        copyGoalTree(copy_child, model.children[i],set_values_to_zero);
+        copy.children.push_back(copy_child);
+    }
+} // copyGoalTree
 
 // ----------------------------------------------------------------------------
 /** Returns a string with a numerical value to display the progress of
- *  this achievement. It adds up all the goal values
+ *  this achievement.
+ *  If it has multiple goal, it returns the number of goals. If it has
+ *  only one (it can be a sum), it returns the required value for that goal.
+ * FIXME : don't work well for "all tracks" goals.
  */
-irr::core::stringw AchievementInfo::toString() const
+irr::core::stringw AchievementInfo::toString()
 {
-    int count = 0;
-    std::map<std::string, int>::const_iterator iter;
-
-    // If all values need to be reached, add up all goal values
-    for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
-    {
-        count += iter->second;
-    }
-
-    return StringUtils::toWString(count);
-
+    return StringUtils::toWString(recursiveGoalCount(m_goal_tree));
 }   // toString
 
 // ----------------------------------------------------------------------------
-bool AchievementInfo::checkCompletion(Achievement * achievement) const
+int AchievementInfo::recursiveGoalCount(goalTree &parent)
 {
-    std::map<std::string, int>::const_iterator iter;
-
-    for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
-    {
-        if (achievement->getValue(iter->first) < iter->second)
-            return false;
-    }
-    return true;
-}
-// ----------------------------------------------------------------------------
-int AchievementInfo::getGoalValue(const std::string &key) const
-{
-    std::map<std::string, int>::const_iterator it;
-    it = m_goal_values.find(key);
-    if (it != m_goal_values.end())
-        return it->second;
+    if (parent.children.size() != 1)
+        return m_goal_tree.children.size();
+    else if (parent.children[0].type == "AND" ||
+             parent.children[0].type == "AND-AT-ONCE" || 
+             parent.children[0].type == "OR")
+        return recursiveGoalCount(parent.children[0]);
     else
-        return 0;
-}   // getGoalValue
-// ----------------------------------------------------------------------------
+        return parent.children[0].value;
+} // recursiveGoalCount

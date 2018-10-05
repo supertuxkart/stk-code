@@ -98,14 +98,14 @@ void BaseOnlineProfileAchievements::init()
         // No need to wait for results, since they are local anyway
         m_waiting_for_achievements = false;
         m_achievements_list_widget->clear();
-        const std::map<uint32_t, Achievement *> & all_achievements =
+        std::map<uint32_t, Achievement *> & all_achievements =
             PlayerManager::getCurrentPlayer()->getAchievementsStatus()
                                                     ->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
         for (it = all_achievements.begin(); it != all_achievements.end(); ++it)
         {
             std::vector<ListWidget::ListCell> row;
-            const Achievement *a = it->second;
+            Achievement *a = it->second;
             if(a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
             ListWidget::ListCell title(translations->fribidize(a->getInfo()->getName()), -1, 2);
