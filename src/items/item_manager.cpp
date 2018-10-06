@@ -536,8 +536,8 @@ void ItemManager::switchItems()
  */
 void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
 {
-    for(AllItemTypes::iterator i = m_all_items.begin();
-        i != m_all_items.end();  i++)
+    for(AllItemTypes::iterator i  = all_items.begin();
+                               i != all_items.end();  i++)
     {
         if(!*i) continue;
 
@@ -559,7 +559,7 @@ void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
                            m_item_lowres_mesh[(int)new_type]);
         else
             (*i)->switchBack();
-    }   // for m_all_items
+    }   // for all_items
 
     // if the items are already switched (m_switch_ticks >=0)
     // then switch back, and set m_switch_ticks to -1 to indicate
