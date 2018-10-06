@@ -17,8 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "achievements/achievement.hpp"
 #include "achievements/achievement_info.hpp"
+
+#include "achievements/achievement.hpp"
+#include "achievements/achievements_status.hpp"
+#include "config/player_manager.hpp"
 #include "utils/log.hpp"
 
 #include <sstream>
@@ -147,26 +150,75 @@ void AchievementInfo::copyGoalTree(goalTree &copy, goalTree &model, bool set_val
 } // copyGoalTree
 
 // ----------------------------------------------------------------------------
-/** Returns a string with a numerical value to display the progress of
- *  this achievement.
- *  If it has multiple goal, it returns the number of goals. If it has
- *  only one (it can be a sum), it returns the required value for that goal.
- * FIXME : don't work well for "all tracks" goals.
+/** Returns a string with the number of goals to fullfil to
+ *  get this achievements.
  */
-irr::core::stringw AchievementInfo::toString()
+irr::core::stringw AchievementInfo::goalString()
 {
     return StringUtils::toWString(recursiveGoalCount(m_goal_tree));
-}   // toString
+}   // goalString
 
 // ----------------------------------------------------------------------------
 int AchievementInfo::recursiveGoalCount(goalTree &parent)
 {
     if (parent.children.size() != 1)
-        return m_goal_tree.children.size();
+    {
+        if (parent.children[0].type == "OR")
+            return 1;
+        else
+            return m_goal_tree.children.size();
+    }
     else if (parent.children[0].type == "AND" ||
              parent.children[0].type == "AND-AT-ONCE" || 
              parent.children[0].type == "OR")
+    {
         return recursiveGoalCount(parent.children[0]);
+    }
     else
-        return parent.children[0].value;
+        return 1;
 } // recursiveGoalCount
+
+// ----------------------------------------------------------------------------
+/** Returns a string with the target of the goal if the
+ *  achievement has only one goal (a sum counts as one goal).
+ */
+irr::core::stringw AchievementInfo::progressString()
+{
+    return StringUtils::toWString(recursiveProgressCount(m_goal_tree));
+}   // progressString
+
+// ----------------------------------------------------------------------------
+int AchievementInfo::recursiveProgressCount(goalTree &parent)
+{
+    if (parent.children.size() != 1)
+    {
+        return -1; // signal that this is invalid.
+    }
+    else if (parent.children[0].type == "AND" ||
+             parent.children[0].type == "AND-AT-ONCE" || 
+             parent.children[0].type == "OR")
+    {
+        return recursiveGoalCount(parent.children[0]);
+    }
+    else
+    {
+        //TODO : find a more automatic way
+        if (parent.children[0].type == "race-started-all" ||
+            parent.children[0].type == "race-finished-all" ||
+            parent.children[0].type == "race-won-all" ||
+            parent.children[0].type == "race-finished-reverse-all" ||
+            parent.children[0].type == "race-finished-alone-all" ||
+            parent.children[0].type == "less-laps-all" ||
+            parent.children[0].type == "more-laps-all" ||
+            parent.children[0].type == "twice-laps-all" ||
+            parent.children[0].type == "egg-hunt-started-all" ||
+            parent.children[0].type == "egg-hunt-finished-all")
+        {
+            return PlayerManager::getCurrentAchievementsStatus()->getNumAchieveTracks();
+        }
+        else
+        {
+            return parent.children[0].value;
+        }
+    }
+} // recursiveProgressCount

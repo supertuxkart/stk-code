@@ -374,6 +374,63 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
     }
 }   // sync
 
+// ----------------------------------------------------------------------------
+/* This function returns for how many tracks the requested goal type
+ * is matched or exceeded. Addons tracks are ignored.
+ * It returns -1 if the goal type is invalid.
+ * \param value - the value to match or exceed
+ * \param goal_string - the identifier of the value to check. */
+int AchievementsStatus::getNumTracksAboveValue(int value, std::string goal_string)
+{
+    int counter = 0;
+    int enum_id = -1;
+
+    for (int i=0;i<2*(int)TR_DATA_NUM;i++)
+    {
+        if (m_tr_enum_to_xml[i] == goal_string)
+            enum_id = i%(int)TR_DATA_NUM;
+    }
+
+    if (enum_id == -1)
+    {
+        Log::warn("AchievementsStatus",
+            "Number of matching tracks requested for a non-existent "
+            "data value.");
+        return -1;
+    }
+
+    for (unsigned int i=0;i<m_track_stats.size();i++)
+    {
+        // ignore addons tracks (compare returns 0 when the values are equal)
+        // Note: non-official tracks installed directly in the tracks folder
+        // are considered as officials by this method.
+        if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
+            continue;
+
+        if (m_track_stats[i].track_data[enum_id] >= value)
+            counter++;
+    }
+    return counter;
+} // getNumTracksAboveValue
+
+// ----------------------------------------------------------------------------
+/* This function returns the number of tracks valid for by-track achievements. */
+int AchievementsStatus::getNumAchieveTracks()
+{
+    int num_tracks = 0;
+    for (unsigned int i=0;i<m_track_stats.size();i++)
+    {
+        // TODO : have a generic function to call instead
+        // ignore addons tracks (compare returns 0 when the values are equal)
+        if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
+            continue;
+
+        num_tracks++;
+    }
+    return num_tracks;
+} //getNumAchieveTracks
+
+// ----------------------------------------------------------------------------
 /* This function checks over achievements to update their goals
  * \param type - the data type triggering the update, used to know
  *               to what enum the enum_id refers to.
