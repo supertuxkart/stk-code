@@ -307,23 +307,13 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
     }   // for i in m_all_items
 
-    // Reset a predicted switch time: if the items are currently
-    // predicted to be switched, but not switched at the confirmed
-    // state time or vice versa, we need to switch them back. This
-    // is tested by seeing if the signs of the switch_ticks and
-    // confirmed switch_ticks are opposite:
-    if(m_switch_ticks * m_confirmed_switch_ticks < 0)
-    {
-        switchItemsInternal(m_all_items);
-    }
-    m_switch_ticks = m_confirmed_switch_ticks;
-
-
     // 2) Apply all events to current confirmed state:
     // -----------------------------------------------
     World *world = World::getWorld();
     int current_time = m_confirmed_state_time;
     bool has_state = count > 0;
+
+    m_switch_ticks = m_confirmed_switch_ticks;
 
     // Note that the actual ItemManager states must NOT be changed here, only
     // the confirmed states in the Network manager are allowed to be modified.
@@ -338,7 +328,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         //      the time to the time of this event:
         // ----------------------------------------------
         int dt = iei.getTicks() - current_time;
-        // Skip an event that is 'in the past' (i.e. have been sent again by
+        // Skip an event that are 'in the past' (i.e. have been sent again by
         // the server because it has not yet received confirmation from all
         // clients).
         if(dt<0) continue;
@@ -403,9 +393,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         else if(iei.isSwitch())
         {
             // Reset current switch ticks
-            m_switch_ticks = -1;
             ItemManager::switchItemsInternal(m_confirmed_state);
-            m_confirmed_switch_ticks = m_switch_ticks;
         }
         else
         {
@@ -425,8 +413,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             gp->sendItemEventConfirmation(world->getTicksSinceStart());
     }
 
-    m_switch_ticks = m_confirmed_switch_ticks;
-
+    
     // Forward the confirmed item state to the world time:
     int dt = world->getTicksSinceStart() - current_time;
     if(dt>0) forwardTime(dt);
