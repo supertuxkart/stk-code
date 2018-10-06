@@ -380,7 +380,7 @@ public:
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  collected(const AbstractKart *kart) OVERRIDE;
     void          reset();
-    void          switchTo(ItemType type, scene::IMesh *mesh,
+    virtual void  switchTo(ItemType type, scene::IMesh *mesh,
                            scene::IMesh *lowmesh);
     virtual bool  switchBack() OVERRIDE;
 
