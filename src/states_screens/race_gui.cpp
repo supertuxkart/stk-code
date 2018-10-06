@@ -596,14 +596,27 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
-
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    
+    // Move AI/remote players to the beginning, so that local players icons
+    // are drawn above them
+    World::KartList karts = world->getKarts();
+    std::sort(karts.begin(), karts.end(), []
+        (const std::shared_ptr<AbstractKart> a,
+         const std::shared_ptr<AbstractKart> b)->bool
     {
-        const AbstractKart *kart = world->getKart(i);
+        return !a->getController()->isLocalPlayerController();
+    });
+
+    for (unsigned int i = 0; i < karts.size(); i++)
+    {
+        const AbstractKart *kart = karts[i].get();
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
+            
         // don't draw eliminated kart
-        if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
+        if (kart->isEliminated() && !(sta && sta->isMoving())) 
+            continue;
+            
         const Vec3& xyz = kart->getSmoothedTrans().getOrigin();
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
