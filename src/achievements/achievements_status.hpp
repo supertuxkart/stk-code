@@ -230,6 +230,8 @@ public :
     void resetKartHits(int num_karts);
     void addKartHit(int kart_id);
     void updateAllAchievementsProgress();
+    int getNumTracksAboveValue(int value, std::string goal_string);
+    int getNumAchieveTracks();
     // ------------------------------------------------------------------------
     std::map<uint32_t, Achievement *>& getAllAchievements()
     {

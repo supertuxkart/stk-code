@@ -74,6 +74,7 @@ void BaseOnlineProfileAchievements::beforeAddingWidget()
     // = NULL) user achievement progress will  also be displayed
     if(!m_visiting_profile || m_visiting_profile->isCurrentUser())
     {
+        m_achievements_list_widget->addColumn( _("Goals"), 1 );
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
     }
 }   // beforeAddingWidget
@@ -109,8 +110,10 @@ void BaseOnlineProfileAchievements::init()
             if(a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
             ListWidget::ListCell title(translations->fribidize(a->getInfo()->getName()), -1, 2);
+            ListWidget::ListCell goals(a->getGoalProgressAsString(), -1, 1);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
+            row.push_back(goals);
             row.push_back(progress);
             const std::string id = StringUtils::toString(a->getInfo()->getID());
             m_achievements_list_widget->addItem(id, row);

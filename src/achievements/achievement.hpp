@@ -57,6 +57,9 @@ private:
     bool recursiveSetGoalValue(AchievementInfo::goalTree &tree, const std::string &goal_string, int value,
                                bool and_or, bool sum_andatonce);
     bool recursiveCompletionCheck(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
+
+    int computeFullfiledGoals(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
+    int computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
 public:
 
              Achievement(AchievementInfo * info);
@@ -65,6 +68,7 @@ public:
     virtual void saveProgress(UTFWriter &out);
 
     virtual irr::core::stringw getProgressAsString();
+    virtual irr::core::stringw getGoalProgressAsString();
 
     uint32_t          getID()   const { return m_achievement_info->getID(); }
     AchievementInfo * getInfo() { return m_achievement_info; }

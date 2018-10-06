@@ -19,8 +19,10 @@
 
 
 #include "achievements/achievement.hpp"
+
 #include "achievements/achievements_manager.hpp"
 #include "achievements/achievement_info.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/utf_writer.hpp"
 #include "config/player_manager.hpp"
@@ -65,23 +67,132 @@ void Achievement::saveProgress(UTFWriter &out)
 }   // save
 
 // ----------------------------------------------------------------------------
-/** Returns how much of an achievement has been achieved in the form n/m.
- *  The AchievementInfo adds up the number of goals if there are several,
- *  or take the target value of the goal if there is only one.
- *  This do the same, but with achieved value or fullfilled goals.
+/** Returns how many goals of an achievement have been achieved,
+ *  in the form n/m.
  */
-irr::core::stringw Achievement::getProgressAsString()
+irr::core::stringw Achievement::getGoalProgressAsString()
 {
-    //TODO : add a progress computation function.
-    int progress = 0;
-    irr::core::stringw target = getInfo()->toString();
+    irr::core::stringw target = getInfo()->goalString();
 
-    // For now return N/N in case of an achieved achievement.
+    // Return N/N in case of an achieved achievement.
     if (m_achieved)
         return target + "/" + target;
 
+    int fullfiled_goals = computeFullfiledGoals(m_progress_goal_tree, m_achievement_info->m_goal_tree);
+
+    return StringUtils::toWString(fullfiled_goals) + "/" + target;
+} // getGoalProgressAsString
+
+// ----------------------------------------------------------------------------
+int Achievement::computeFullfiledGoals(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference)
+{
+
+    if (progress.children.size() != 1)
+    {
+        // This always returns 0 if the achievement has not been completed
+        if (progress.children[0].type == "OR")
+        {
+            bool completed = false;
+            for (unsigned int i=0;i<progress.children.size();i++)
+            {
+                if (recursiveCompletionCheck(progress.children[i], reference.children[i]))
+                {
+                    completed = true;
+                    break;
+                }
+            }
+            return (completed) ? 1 : 0;
+        }
+        else
+        {
+            int goals_completed = 0;
+            for (unsigned int i=0;i<progress.children.size();i++)
+            {
+                if (recursiveCompletionCheck(progress.children[i], reference.children[i]))
+                    goals_completed++;
+            }
+            return goals_completed;
+        }
+    }
+    else if (progress.children[0].type == "AND" ||
+             progress.children[0].type == "AND-AT-ONCE" || 
+             progress.children[0].type == "OR")
+    {
+        return computeFullfiledGoals(progress.children[0], reference.children[0]);
+    }
+    else
+    {
+        return (recursiveCompletionCheck(progress.children[0], reference.children[0])) ? 1 : 0;
+    }
+} // recursiveGoalCount
+
+// ----------------------------------------------------------------------------
+/** Returns how much of an achievement has been achieved in the form n/m.
+ *  ONLY applicable for single goal achievements. Returns a string with a single
+ *  space if there are multiple goals.
+ */
+irr::core::stringw Achievement::getProgressAsString()
+{
+    irr::core::stringw target = getInfo()->progressString();
+    irr::core::stringw empty = " ";// See issue #3081
+
+    if (target == "-1")
+        return empty;
+
+    // Return N/N in case of an achieved achievement.
+    if (m_achieved)
+        return target + "/" + target;
+
+    int progress = computeGoalProgress(m_progress_goal_tree, m_achievement_info->m_goal_tree);
+
     return StringUtils::toWString(progress) + "/" + target;
 }   // getProgressAsString
+
+// ----------------------------------------------------------------------------
+/** Should ONLY be called if the achievement has one goal (a sum counts as one goal).
+  * Returning an error code with a number is not full-proof because a sum goal can
+  * legitimately be negative (a counter can be chosen to count against the
+  * achievement's fullfilment). */
+int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference)
+{
+    if (progress.children.size() != 1)
+    {
+        // This should NOT happen
+        assert(false);
+        return 0;
+    }
+    else if (progress.children[0].type == "AND" ||
+             progress.children[0].type == "AND-AT-ONCE" || 
+             progress.children[0].type == "OR")
+    {
+        return computeGoalProgress(progress.children[0], reference.children[0]);
+    }
+
+    else
+    {
+        //TODO : find a more automatic way
+        if (progress.children[0].type == "race-started-all" ||
+            progress.children[0].type == "race-finished-all" ||
+            progress.children[0].type == "race-won-all" ||
+            progress.children[0].type == "race-finished-reverse-all" ||
+            progress.children[0].type == "race-finished-alone-all" ||
+            progress.children[0].type == "less-laps-all" ||
+            progress.children[0].type == "more-laps-all" ||
+            progress.children[0].type == "twice-laps-all" ||
+            progress.children[0].type == "egg-hunt-started-all" ||
+            progress.children[0].type == "egg-hunt-finished-all")
+        {
+            // Compare against the target value (in the reference tree) !
+            // Progress is only shown for the current local accuont, so we can use the current achievements status
+            return PlayerManager::getCurrentAchievementsStatus()
+                       ->getNumTracksAboveValue(reference.children[0].value, reference.children[0].type);
+        }
+        else
+        {
+            return progress.children[0].value;
+        }
+    }
+} // computeGoalProgress
 
 // ----------------------------------------------------------------------------
 /** Set any leaf of the progress goal tree whose type matches the
