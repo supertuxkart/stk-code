@@ -25,7 +25,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "online/online_profile.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/achievement_progress_dialog.hpp"
 #include "states_screens/dialogs/player_rankings_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -152,8 +152,21 @@ void BaseOnlineProfileAchievements::eventCallback(Widget* widget,
         // is no error, show the achievement (it can happen that the
         // string is "" if no achievement exists)
         if(StringUtils::fromString(achievement, id))
-            new MessageDialog(AchievementsManager::get()
-                                   ->getAchievementInfo(id)->getDescription());
+        {
+            std::map<uint32_t, Achievement *> & all_achievements =
+                PlayerManager::getCurrentPlayer()->getAchievementsStatus()
+                                                    ->getAllAchievements();
+            std::map<uint32_t, Achievement *>::const_iterator it;
+            for (it = all_achievements.begin(); it != all_achievements.end(); ++it)
+            {
+                Achievement *a = it->second;
+                if (a->getInfo()->getID() == (unsigned int) id)
+                {
+                    new AchievementProgressDialog(a);
+                    break;
+                }
+            }
+        }
     }
     if (name == "rankings")
     {

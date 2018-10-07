@@ -150,6 +150,33 @@ void AchievementInfo::copyGoalTree(goalTree &copy, goalTree &model, bool set_val
 } // copyGoalTree
 
 // ----------------------------------------------------------------------------
+/** Returns the goal tree's depth. If an AND/OR/ANT-AT-ONCE contains only
+  * one element, it is ignored (this is useful because the root is always
+  * AND ; so for e.g. an OR achievement, we prefer to not display it).  */
+int AchievementInfo::getRecursiveDepth(goalTree &parent)
+{
+    if (parent.children.size() != 1)
+    {
+        int max = 0;
+        for (unsigned int i=0;i<parent.children.size();i++)
+        {
+            int depth = getRecursiveDepth(parent.children[i]);
+            if (depth > max);
+                max = depth;
+        }
+        return max+1;
+    }
+    else if (parent.children[0].type == "AND" ||
+             parent.children[0].type == "AND-AT-ONCE" || 
+             parent.children[0].type == "OR")
+    {
+        return getRecursiveDepth(parent.children[0]);
+    }
+    else
+        return 1;
+} // getRecursiveDepth
+
+// ----------------------------------------------------------------------------
 /** Returns a string with the number of goals to fullfil to
  *  get this achievements.
  */

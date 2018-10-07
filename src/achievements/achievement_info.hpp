@@ -73,8 +73,10 @@ private:
     void parseGoals(const XMLNode * input, goalTree &parent);
     int  recursiveGoalCount(goalTree &parent);
     int  recursiveProgressCount(goalTree &parent);
+    int  getRecursiveDepth(goalTree &parent);
 protected:
     friend class Achievement;
+    friend class AchievementProgressDialog;
     /** The tree storing all goals */
     goalTree           m_goal_tree;
 
@@ -85,6 +87,7 @@ public:
     virtual irr::core::stringw goalString();
     virtual irr::core::stringw progressString();
 
+    int                getDepth()             { return getRecursiveDepth(m_goal_tree); }
     uint32_t           getID()          const { return m_id; }
     irr::core::stringw getDescription() const { return _(m_description.c_str()); }
     irr::core::stringw getName()        const { return _LTR(m_name.c_str()); }

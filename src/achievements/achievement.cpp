@@ -153,13 +153,40 @@ irr::core::stringw Achievement::getProgressAsString()
   * Returning an error code with a number is not full-proof because a sum goal can
   * legitimately be negative (a counter can be chosen to count against the
   * achievement's fullfilment). */
-int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference)
+int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference, bool same_tree)
 {
-    if (progress.children.size() != 1)
+    if (progress.children.size() >= 2)
     {
         // This should NOT happen
         assert(false);
         return 0;
+    }
+    // Can happen when showing the progress status of all parts of the goal tree
+    else if (progress.children.size() == 0)
+    {
+        //TODO : find a more automatic way ; clean up repetition
+        if (progress.type == "race-started-all" ||
+            progress.type == "race-finished-all" ||
+            progress.type == "race-won-all" ||
+            progress.type == "race-finished-reverse-all" ||
+            progress.type == "race-finished-alone-all" ||
+            progress.type == "less-laps-all" ||
+            progress.type == "more-laps-all" ||
+            progress.type == "twice-laps-all" ||
+            progress.type == "egg-hunt-started-all" ||
+            progress.type == "egg-hunt-finished-all")
+        {
+            if (same_tree)
+            {
+                return PlayerManager::getCurrentAchievementsStatus()
+                    ->getNumTracksAboveValue(0, reference.type);
+            }
+            // Compare against the target value (in the reference tree) !
+            // Progress is only shown for the current local accuont, so we can use the current achievements status
+            return PlayerManager::getCurrentAchievementsStatus()
+                       ->getNumTracksAboveValue(reference.value, reference.type);
+        }
+        return progress.value;
     }
     else if (progress.children[0].type == "AND" ||
              progress.children[0].type == "AND-AT-ONCE" || 
@@ -167,7 +194,6 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
     {
         return computeGoalProgress(progress.children[0], reference.children[0]);
     }
-
     else
     {
         //TODO : find a more automatic way

@@ -44,6 +44,14 @@ private:
     /** True if this achievement has been achieved. */
     bool                      m_achieved;
 
+    void onCompletion();
+    bool recursiveSetGoalValue(AchievementInfo::goalTree &tree, const std::string &goal_string, int value,
+                               bool and_or, bool sum_andatonce);
+    bool recursiveCompletionCheck(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
+protected:
+    friend class AchievementProgressDialog;
+
+
     /** The tree of goals. It is identical to the
       * goal tree of the matching AchievementInfo,
       * except that the stored values represent the
@@ -53,13 +61,8 @@ private:
     /** A pointer to the corresponding AchievementInfo instance. */
     AchievementInfo    *m_achievement_info;
 
-    void onCompletion();
-    bool recursiveSetGoalValue(AchievementInfo::goalTree &tree, const std::string &goal_string, int value,
-                               bool and_or, bool sum_andatonce);
-    bool recursiveCompletionCheck(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
-
     int computeFullfiledGoals(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
-    int computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference);
+    int computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference, bool same_tree=false);
 public:
 
              Achievement(AchievementInfo * info);
