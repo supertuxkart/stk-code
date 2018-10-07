@@ -161,7 +161,7 @@ int AchievementInfo::getRecursiveDepth(goalTree &parent)
         for (unsigned int i=0;i<parent.children.size();i++)
         {
             int depth = getRecursiveDepth(parent.children[i]);
-            if (depth > max);
+            if (depth > max)
                 max = depth;
         }
         return max+1;
