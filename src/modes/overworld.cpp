@@ -255,7 +255,14 @@ void OverWorld::onFirePressed(Controller* who)
                 }
 
                 const unsigned int val = challenge->getNumTrophies();
-                bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+// Android may have less challenges available than the main version
+#ifdef ANDROID
+                bool enough_challenges = true;
+#else
+                const unsigned int val2 = challenge->getNumChallenges();
+                bool enough_challenges = (PlayerManager::getCurrentPlayer()->getNumCompletedChallenges() >= val2);
+#endif
+                bool unlocked = enough_challenges && (PlayerManager::getCurrentPlayer()->getPoints() >= val);
                 
                 if (UserConfigParams::m_everything_unlocked)
                     unlocked = true;

@@ -122,6 +122,9 @@ private:
 
     /** Number of trophies required to access this challenge */
     int m_num_trophies;
+    /** Number of completed challenges required to access this challenge
+      * (esp. useful for the final challenge) */
+    int m_num_completed_challenges;
 
 public:
                  ChallengeData(const std::string& filename);
@@ -191,6 +194,9 @@ public:
     // ------------------------------------------------------------------------
     /** Get number of required trophies to start this challenge */
     int getNumTrophies() const { return m_num_trophies; }
+    // ------------------------------------------------------------------------
+    /** Get number of required completed challenges to start this challenge */
+    int getNumChallenges() const { return m_num_completed_challenges; }
     // ------------------------------------------------------------------------
     /** Returns if this challenge is a grand prix. */
     bool isGrandPrix() const { return m_mode == CM_GRAND_PRIX; }

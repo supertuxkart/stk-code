@@ -44,6 +44,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_gp_id        = "";
     m_version      = 0;
     m_num_trophies = 0;
+    m_num_completed_challenges = 0;
     m_is_unlock_list  = false;
     m_is_ghost_replay = false;
 
@@ -119,6 +120,8 @@ ChallengeData::ChallengeData(const std::string& filename)
                                  " has no <requirements> node!");
     }
     requirements_node->get("trophies", &m_num_trophies);
+
+    requirements_node->get("challenges", &m_num_completed_challenges);
 
     //Don't check further if this is an unlock list
     if(m_is_unlock_list)
