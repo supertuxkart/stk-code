@@ -1309,6 +1309,11 @@ void Kart::eliminate()
         m_attachment->clear();
     }
 
+    if (m_slipstream)
+    {
+        m_slipstream->reset();
+    }
+
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
     if (m_engine_sound)
