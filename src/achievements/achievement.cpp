@@ -38,6 +38,7 @@ Achievement::Achievement(AchievementInfo * info)
            : m_achievement_info(info)
 {
     m_achieved = false;
+    m_id = m_achievement_info->getID();
     m_achievement_info->copyGoalTree(m_progress_goal_tree, m_achievement_info->m_goal_tree, true /*set values to 0*/);
 }   // Achievement
 

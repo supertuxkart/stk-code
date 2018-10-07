@@ -44,6 +44,13 @@ private:
     /** True if this achievement has been achieved. */
     bool                      m_achieved;
 
+    /* When quitting the game, the achievement info is deleted before
+     * the achievement's status is saved. We need to store the id here 
+     * to prevent saving junk data.
+     * FIXME: an achievement info should not be removed until all references
+     *        to it have been too.*/
+    int                       m_id;
+
     void onCompletion();
     bool recursiveSetGoalValue(AchievementInfo::goalTree &tree, const std::string &goal_string, int value,
                                bool and_or, bool sum_andatonce);
@@ -73,7 +80,7 @@ public:
     virtual irr::core::stringw getProgressAsString();
     virtual irr::core::stringw getGoalProgressAsString();
 
-    uint32_t          getID()   const { return m_achievement_info->getID(); }
+    uint32_t          getID()   const { return m_id; }
     AchievementInfo * getInfo() { return m_achievement_info; }
 
     void setAchieved() { m_achieved = true; };
