@@ -441,7 +441,7 @@ void AchievementsStatus::updateAchievementsProgress(UpdateType type, unsigned in
     std::string goal_string[2];
     int max_across_tracks = -1;
     int min_across_tracks = -1;
-    int max_kart_hits = -1;
+    int max_kart_hits = 0;
     if (type == UP_ACHIEVEMENT_DATA)
     {
         goal_string[0] = m_ach_enum_to_xml[(int)enum_id];
