@@ -115,9 +115,10 @@ int Achievement::computeFullfiledGoals(AchievementInfo::goalTree &progress, Achi
             return goals_completed;
         }
     }
-    else if (progress.children[0].type == "AND" ||
-             progress.children[0].type == "AND-AT-ONCE" || 
-             progress.children[0].type == "OR")
+    else if (progress.children.size() == 1 &&
+             (progress.children[0].type == "AND" ||
+              progress.children[0].type == "AND-AT-ONCE" || 
+              progress.children[0].type == "OR"))
     {
         return computeFullfiledGoals(progress.children[0], reference.children[0]);
     }
@@ -125,7 +126,7 @@ int Achievement::computeFullfiledGoals(AchievementInfo::goalTree &progress, Achi
     {
         return (recursiveCompletionCheck(progress.children[0], reference.children[0])) ? 1 : 0;
     }
-} // recursiveGoalCount
+} // computeFullfiledGoals
 
 // ----------------------------------------------------------------------------
 /** Returns how much of an achievement has been achieved in the form n/m.
@@ -189,9 +190,10 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
         }
         return progress.value;
     }
-    else if (progress.children[0].type == "AND" ||
-             progress.children[0].type == "AND-AT-ONCE" || 
-             progress.children[0].type == "OR")
+    else if (progress.children.size() == 1 &&
+             (progress.children[0].type == "AND" ||
+              progress.children[0].type == "AND-AT-ONCE" || 
+              progress.children[0].type == "OR"))
     {
         return computeGoalProgress(progress.children[0], reference.children[0]);
     }
