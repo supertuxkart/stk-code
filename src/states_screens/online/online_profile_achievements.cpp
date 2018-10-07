@@ -74,7 +74,9 @@ void BaseOnlineProfileAchievements::beforeAddingWidget()
     // = NULL) user achievement progress will  also be displayed
     if(!m_visiting_profile || m_visiting_profile->isCurrentUser())
     {
+        // I18N: Goals in achievement
         m_achievements_list_widget->addColumn( _("Goals"), 1 );
+        // I18N: Progress in achievement
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
     }
 }   // beforeAddingWidget

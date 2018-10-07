@@ -127,147 +127,167 @@ void AchievementProgressDialog::recursiveFillTable(AchievementInfo::goalTree &pr
 core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
 {
     core::stringw nice_name;
-    // I18N : For achievements, a parent goal linking logically several subgoals
+    // I18N: For achievements, a parent goal linking logically several subgoals
     if(internal_name=="AND") nice_name = _("Fulfill all the subogals");
-    // I18N : For achievements, a parent goal linking logically several subgoals
+    // I18N: For achievements, a parent goal linking logically several subgoals
     if(internal_name=="AND-AT-ONCE") nice_name = _("Fulfill all the subgoals at the same time");
-    // I18N : For achievements, a parent goal linking logically several subgoals
+    // I18N: For achievements, a parent goal linking logically several subgoals
     if(internal_name=="OR") nice_name = _("Fulfill at least one subgoal");
-    // I18N : For achievements, a parent goal linking logically several subgoals
+    // I18N: For achievements, a parent goal linking logically several subgoals
     if(internal_name=="SUM") nice_name = _("The sum of the subgoals must reach the indicated value");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="won-races") nice_name = _("Races won");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="won-normal-races") nice_name = _("Normal races won");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="won-tt-races") nice_name = _("Time-trial races won");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="won-ftl-races") nice_name = _("Follow-the-Leader races won");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="cons-won-races") nice_name = _("Consecutive won races");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="cons-won-races-hard") nice_name = _("Consecutive won races in Expert or SuperTux");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="easy-started") nice_name = _("Novice races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="easy-finished") nice_name = _("Novice races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="medium-started") nice_name = _("Intermediate races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="medium-finished") nice_name = _("Intermediate races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="hard-started") nice_name = _("Expert races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="hard-finished") nice_name = _("Expert races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="best-started") nice_name = _("SuperTux races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="best-finished") nice_name = _("SuperTux races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="normal-started") nice_name = _("Normal races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="normal-finished") nice_name = _("Normal races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="tt-started") nice_name = _("Time-trial races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="tt-finished") nice_name = _("Time-trial races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ftl-started") nice_name = _("Follow-the-Leader races started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ftl-finished") nice_name = _("Follow-the-Leader races finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="three-strikes-started") nice_name = _("3 Strikes battle started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="three-strikes-finished") nice_name = _("3 Strikes battle finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="soccer-started") nice_name = _("Soccer matches started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="soccer-finished") nice_name = _("Soccer matches finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="egg-hunt-started") nice_name = _("Egg Hunts started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="egg-hunt-finished") nice_name = _("Egg Hunts finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="with-ghost-started") nice_name = _("Races started with a ghost replay");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="with-ghost-finished") nice_name = _("Races finished with a ghost replay");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ctf-started") nice_name = _("Capture-the-Flag matches started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ctf-finished") nice_name = _("Capture-the-Flag matches finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ffa-started") nice_name = _("Free-for-All matches started");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ffa-finished") nice_name = _("Free-for-All matches finished");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="powerup-used") nice_name = _("Powerups used");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="powerup-used-1race") { nice_name = _("Powerups used"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="bowling-hit") nice_name = _("Bowling ball hits");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="bowling-hit-1race") { nice_name = _("Bowling ball hits"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="swatter-hit") nice_name = _("Swatter hits");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="swatter-hit-1race") { nice_name = _("Swatter hits"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="all-hits") nice_name = _("All hits");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="all-hits-1race") { nice_name = _("All Hits"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if(internal_name=="all-hits-1race") { nice_name = _("All hits"); nice_name += _(" (1 race)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="hit-same-kart-1race") { nice_name = _("Hits against the same kart"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="banana") nice_name = _("Bananas collected");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="banana-1race") { nice_name = _("Bananas collected"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="skidding") nice_name = _("Skidding");
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="skidding-1race") { nice_name = _("Skidding"); nice_name += _(" (1 race)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="skidding-1lap") { nice_name = _("Skidding"); nice_name += _(" (1 lap)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name=="skidding-1race")
+    {
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name = _("Skidding");
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name += _(" (1 race)");
+    }
+    if (internal_name=="skidding-1lap")
+    {
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name = _("Skidding");
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name += _(" (1 lap)");
+    }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-started") { nice_name =_("Races started"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished") { nice_name =_("Races finished"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-won") { nice_name =_("Races won"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-reverse") { nice_name =_("Reverse direction races finished"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-alone") { nice_name =_("Races finished alone"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="less-laps") { nice_name =_("Races with less than the default lap number"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="more-laps") { nice_name =_("Races with more than the default lap number"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="twice-laps") { nice_name =_("Races with at least twice as much as the default lap number"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="egg-hunt-started") { nice_name =_("Egg hunts started"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="egg-hunt-finished") { nice_name =_("Egg hunts finished"); nice_name += _(" (maximum on one official track)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name=="egg-hunt-finished")
+    {
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name =_("Egg hunts finished");
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name += _(" (maximum on one official track)");
+    }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-started-all") { nice_name =_("Races started"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-all") { nice_name =_("Races finished"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-won-all") { nice_name =_("Races won"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-reverse-all") { nice_name =_("Reverse direction races finished"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-alone-all") { nice_name =_("Races finished alone"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="less-laps-all") { nice_name =_("Races with less than the default lap number"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="more-laps-all") { nice_name =_("Races with more than the default lap number"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="twice-laps-all") { nice_name =_("Races with at least twice as much as the default lap number"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="egg-hunt-started-all") { nice_name =_("Egg hunts started"); nice_name += _(" (official tracks matching the goal)"); } 
-    // I18N : A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="egg-hunt-finished-all") { nice_name =_("Egg hunts finished"); nice_name += _(" (official tracks matching the goal)"); }
-    
+    if(internal_name=="egg-hunt-finished-all")
+    {
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name =_("Egg hunts finished");
+        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+        nice_name += _(" (official tracks matching the goal)");
+    }
+
     return nice_name;
 } // niceGoalName
 
