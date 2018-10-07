@@ -161,8 +161,8 @@
     <achievement id="7" name="Powerup Love" description="Use 10 or more powerups in a race.">
         <goal type="powerup-used-1race" value="10"/>
     </achievement>
-    <achievement id="8" name="Beyond Luck" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
-        <goal type="cons-won-races" value="5"/>
+    <achievement id="8" name="Unstoppable" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
+        <goal type="cons-won-races-hard" value="10"/>
     </achievement>
     <achievement id="9" name="Banana Lover" description="Collect at least 5 bananas in one race.">
         <goal type="banana-1race" value="5"/>
@@ -172,7 +172,7 @@
     <achievement id="11" name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race.">
         <goal type="swatter-hit-1race" value="5"/>
     </achievement>
-    <achievement id="12" name="Unstoppable" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
-        <goal type="cons-won-races-hard" value="10"/>
+    <achievement id="12" name="Beyond Luck" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
+        <goal type="cons-won-races" value="5"/>
     </achievement>
 </achievements>
