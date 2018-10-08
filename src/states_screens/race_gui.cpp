@@ -601,10 +601,14 @@ void RaceGUI::drawGlobalMiniMap()
     // are drawn above them
     World::KartList karts = world->getKarts();
     std::sort(karts.begin(), karts.end(), []
-        (const std::shared_ptr<AbstractKart> a,
-         const std::shared_ptr<AbstractKart> b)->bool
+        (const std::shared_ptr<AbstractKart>& a,
+         const std::shared_ptr<AbstractKart>& b)->bool
     {
-        return !a->getController()->isLocalPlayerController();
+        bool aIsLocalPlayer = a->getController()->isLocalPlayerController();
+        bool bIsLocalPlayer = b->getController()->isLocalPlayerController();
+
+        // strictly greater than, so return false if equal
+        return !aIsLocalPlayer && aIsLocalPlayer != bIsLocalPlayer;
     });
 
     for (unsigned int i = 0; i < karts.size(); i++)
