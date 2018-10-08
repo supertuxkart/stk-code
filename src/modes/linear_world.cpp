@@ -375,7 +375,8 @@ void LinearWorld::newLap(unsigned int kart_index)
         if (lap_count > 1)
         {
             m_race_gui->addMessage(_("Final lap!"), kart,
-                               3.0f, GUIEngine::getSkin()->getColor("font::normal"), true);
+                               3.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
+                               true /* big font */, true /* outline */);
         }
         if(!m_last_lap_sfx_played && lap_count > 1)
         {
