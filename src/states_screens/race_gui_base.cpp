@@ -248,7 +248,8 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     }
 
     // First line of text somewhat under the top of the viewport.
-    y = viewport.getCenter().Y;
+    y = viewport.UpperLeftCorner.Y +
+        (viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y)/4;
 
     gui::ScalableFont* font = GUIEngine::getFont();
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
