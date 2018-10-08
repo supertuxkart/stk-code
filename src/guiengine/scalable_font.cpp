@@ -69,6 +69,11 @@ void ScalableFont::setColoredBorder(const irr::video::SColor &col)
     m_font_settings->setBorderColor(col);
 }   // setColoredBorder
 // ----------------------------------------------------------------------------
+void ScalableFont::setThinBorder(bool thin)
+{
+    m_font_settings->setThinBorder(thin);
+}   // setThinBorder
+// ----------------------------------------------------------------------------
 void ScalableFont::disableColoredBorder()
 {
     m_font_settings->setColoredBorder(false);

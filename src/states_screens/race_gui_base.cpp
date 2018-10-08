@@ -683,7 +683,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         return;
 
     int x_base = 10;
-    int y_base = 20;
+    int y_base = 25;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getIfEmptyScreenSpaceExists())
@@ -835,7 +835,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             pos_top.LowerRightCorner   = pos_top.UpperLeftCorner;
 
             //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
+            font->setBlackBorder(true);
+            font->setThinBorder(true);
             font->draw(_("Top %i", position-1 ), pos_top, color);
+            font->setThinBorder(false);
+            font->setBlackBorder(false);
 
             break;
         }
@@ -851,8 +855,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             }
             else
             {
+                font->setBlackBorder(true);
+                font->setThinBorder(true);
                 font->draw(info.m_text, pos, info.m_color, false, false, NULL,
                     true/*ignore RTL*/);
+                font->setThinBorder(false);
+                font->setBlackBorder(false);
             }
         }
 
@@ -861,8 +869,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5,
                                 x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s(info.special_title.c_str());
+            font->setBlackBorder(true);
+            font->setThinBorder(true);
             font->draw(s.c_str(), pos, info.m_color, false, false, NULL,
                        true /* ignore RTL */);
+            font->setThinBorder(false);
+            font->setBlackBorder(false);
         }
 
         int w = kart->getController()

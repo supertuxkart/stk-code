@@ -676,9 +676,14 @@ void FontWithFace::render(const core::stringw& text,
                 m_fallback_font->m_spritebank->getTexture(tex_id) :
                 m_spritebank->getTexture(tex_id));
 
-            for (int x_delta = -2; x_delta <= 2; x_delta++)
+            const bool thin_border = font_settings ?
+                font_settings->useThinBorder() : false;
+
+            int thickness = (thin_border) ? 1 : 2;
+
+            for (int x_delta = -thickness; x_delta <= thickness; x_delta++)
             {
-                for (int y_delta = -2; y_delta <= 2; y_delta++)
+                for (int y_delta = -thickness; y_delta <= thickness; y_delta++)
                 {
                     if (x_delta == 0 || y_delta == 0) continue;
                     draw2DImage(texture, dest + core::position2d<float>

@@ -40,6 +40,9 @@ private:
       * the colored border will take priority. */
     bool m_colored_border;
 
+    /* True if the border to draw should be thin */
+    bool m_thin_border;
+
     /** If true, characters will have right alignment when rendering, for RTL
      *  language. */
     bool m_rtl;
@@ -62,12 +65,14 @@ public:
     /** Constructor. It will initialize all members with default values if no
      *  parameter is given. */
     FontSettings(bool black_border = false, bool colored_border = false,
+                 bool thin_border = false,
                  bool rtl = false, float scale = 1.0f, bool shadow = false,
                  const video::SColor& shadow_color = video::SColor(0, 0, 0, 0),
                  const video::SColor& border_color = video::SColor(0, 0, 0, 0))
     {
         m_black_border = black_border;
         m_colored_border = colored_border;
+        m_thin_border = thin_border;
         m_rtl = rtl;
         m_scale = scale;
         m_shadow = shadow;
@@ -104,6 +109,9 @@ public:
      *  \param border If it's enabled. */
     void setColoredBorder(bool border )          { m_colored_border = border; }
     // ------------------------------------------------------------------------
+    /** Set whether the text outline should be thin or not. */
+    void setThinBorder(bool thin)                     { m_thin_border = thin; }
+    // ------------------------------------------------------------------------
     /** Set the color of border (used when a non-black border is requested).
      *  \param col The color of border to be set. */
     void setBorderColor(const video::SColor &col)     { m_border_color = col; }
@@ -116,6 +124,9 @@ public:
     // ------------------------------------------------------------------------
     /** Return if black border is enabled. */
     bool useColoredBorder() const                  { return m_colored_border; }
+    // ------------------------------------------------------------------------
+    /** Return if the border should be thin or not. */
+    bool useThinBorder() const                        { return m_thin_border; }
     // ------------------------------------------------------------------------
     /** Set right text alignment for RTL language.
      *  \param rtl If it's enabled. */
