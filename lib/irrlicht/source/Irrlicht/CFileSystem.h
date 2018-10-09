@@ -121,6 +121,10 @@ public:
 	//! and returns it.
 	virtual IFileList* createFileList();
 
+	//! Creates a list of files and directories in specified directory
+	//! and returns it.
+	virtual IFileList* createFileList(const io::path& directory);
+
 	//! Creates an empty filelist
 	virtual IFileList* createEmptyFileList(const io::path& path, bool ignoreCase, bool ignorePaths);
 
