@@ -795,7 +795,7 @@ path CFileSystem::getRelativeFilename(const path& filename, const path& director
 }
 
 
-//! Sets the current file systen type
+//! Sets the current file system type
 EFileSystemType CFileSystem::setFileListSystem(EFileSystemType listType)
 {
 	EFileSystemType current = FileSystemType;
@@ -803,14 +803,14 @@ EFileSystemType CFileSystem::setFileListSystem(EFileSystemType listType)
 	return current;
 }
 
-//! Creates a list of files and directories in specified directory
+//! Creates a list of files and directories in the current working directory
 IFileList* CFileSystem::createFileList()
 {
 	io::path Path = getWorkingDirectory();
 	return createFileList(Path);
 }
 
-//! Creates a list of files and directories in the current working directory
+//! Creates a list of files and directories in specified directory
 IFileList* CFileSystem::createFileList(const io::path& directory)
 {
 	CFileList* r = 0;
