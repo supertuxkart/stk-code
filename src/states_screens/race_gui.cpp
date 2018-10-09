@@ -126,7 +126,8 @@ RaceGUI::RaceGUI()
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
     {
-        const float map_bottom = (float)(m_multitouch_gui->getMinimapBottom());
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+                                         m_multitouch_gui->getHeight());
         
         if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
         {
@@ -288,12 +289,20 @@ void RaceGUI::renderGlobal(float dt)
 
     if (!m_is_tutorial)
     {
-        if(UserConfigParams::m_minimap_display == 0 || /*map in the bottom-left*/
-           (UserConfigParams::m_minimap_display == 1 &&
-            race_manager->getNumLocalPlayers() >= 2))
+        if (m_multitouch_gui != NULL)
+        {
+            drawGlobalPlayerIcons(m_multitouch_gui->getHeight());
+        }
+        else if (UserConfigParams::m_minimap_display == 0 || /*map in the bottom-left*/
+                (UserConfigParams::m_minimap_display == 1 &&
+                race_manager->getNumLocalPlayers() >= 2))
+        {
             drawGlobalPlayerIcons(m_map_height + m_map_bottom);
+        }
         else // map hidden or on the right side
+        {
             drawGlobalPlayerIcons(0);
+        }
     }
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         drawScores();

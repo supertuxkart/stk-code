@@ -99,7 +99,8 @@ RaceGUIOverworld::RaceGUIOverworld()
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
     {
-        const float map_bottom = (float)(m_multitouch_gui->getMinimapBottom());
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+                                         m_multitouch_gui->getHeight());
         
         if ((map_size + 20.0f) * scaling > map_bottom)
         {

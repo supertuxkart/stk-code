@@ -750,10 +750,6 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
     }
-    else if (m_multitouch_gui != NULL)
-    {
-        y_icons_limit = irr_driver->getActualScreenSize().Height / 2;
-    }
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 

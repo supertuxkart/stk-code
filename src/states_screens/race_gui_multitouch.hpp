@@ -36,7 +36,7 @@ private:
     MultitouchDevice* m_device;
     
     bool m_gui_action;
-    unsigned int m_minimap_bottom;
+    unsigned int m_height;
     
     video::ITexture* m_steering_wheel_tex;
     video::ITexture* m_up_down_tex;
@@ -60,7 +60,7 @@ public:
     void draw(const AbstractKart* kart, const core::recti &viewport,
               const core::vector2df &scaling);
                                 
-    unsigned int getMinimapBottom() {return m_minimap_bottom;}
+    unsigned int getHeight() {return m_height;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
     void reset();
                                  

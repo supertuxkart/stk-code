@@ -40,7 +40,7 @@ using namespace irr;
 RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 {
     m_race_gui = race_gui;
-    m_minimap_bottom = 0;
+    m_height = 0;
     m_gui_action = false;
     m_steering_wheel_tex = NULL;
     m_up_down_tex = NULL;
@@ -153,7 +153,7 @@ void RaceGUIMultitouch::init()
         steering_accel_x = w - btn2_size / 2 - steering_accel_margin;
     }
 
-    m_minimap_bottom = (unsigned int)(h - 2 * col_size);
+    m_height = (unsigned int)(2 * col_size + margin / 2);
     
     if (m_device->isAccelerometerActive())
     {
