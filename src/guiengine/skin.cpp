@@ -1522,7 +1522,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
 
-    if (icon_widget->hasTooltip() > 0)
+    if (icon_widget->hasTooltip())
     {
         const core::position2di mouse_position =
             irr_driver->getDevice()->getCursorControl()->getPosition();

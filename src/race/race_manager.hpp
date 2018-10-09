@@ -647,7 +647,7 @@ public:
         return m_kart_status[kart].m_difficulty;
     }   // getPlayerDifficulty
     // ------------------------------------------------------------------------
-    float hasBoostedAI(int kart) const
+    bool hasBoostedAI(int kart) const
     {
         return m_kart_status[kart].m_boosted_ai;
     }   // getKartRaceTime
