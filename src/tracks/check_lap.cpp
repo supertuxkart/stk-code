@@ -69,6 +69,11 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     // has check defined.
     if(!lin_world)
         return false;
+
+    // Cannot cross lap when off-road, since we are not sure where the kart is
+    if (!lin_world->isOnRoad(kart_index))
+        return false;
+
     float current_distance = lin_world->getDistanceDownTrackForKart(kart_index, false);
     bool result = (m_previous_distance[kart_index]>0.95f*track_length &&
                   current_distance<7.0f);
