@@ -161,6 +161,9 @@ public:
     const ReplayData&  getReplayData(unsigned int n) const
                                           { return m_replay_file_list.at(n); }
     // ------------------------------------------------------------------------
+    const ReplayData&  getCurrentReplayData() const
+                           { return m_replay_file_list.at(m_current_replay_file); }
+    // ------------------------------------------------------------------------
     const unsigned int getNumReplayFile() const
                            { return (unsigned int)m_replay_file_list.size(); }
     // ------------------------------------------------------------------------

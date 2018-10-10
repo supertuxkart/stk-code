@@ -301,6 +301,14 @@ void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
  */
 void StoryModeStatus::raceFinished()
 {
+    if(m_current_challenge                                            &&
+        race_manager->getDifficulty() != RaceManager::DIFFICULTY_BEST &&
+        m_current_challenge->getData()->isChallengeFulfilled(true /*best*/))
+    {
+        ChallengeStatus* c = const_cast<ChallengeStatus*>(m_current_challenge);
+        c->setMaxReqInLowerDiff();
+    }
+
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
         m_current_challenge->getData()->isChallengeFulfilled()           )

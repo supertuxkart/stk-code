@@ -135,7 +135,7 @@ public:
     void         setRace(RaceManager::Difficulty d) const;
 
     virtual void check() const;
-    virtual bool isChallengeFulfilled() const;
+    virtual bool isChallengeFulfilled(bool check_best=false) const;
     virtual GPLevel isGPFulfilled() const;
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name,
@@ -238,10 +238,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the maximum time in which the kart must finish.
      */
-    float getTime(RaceManager::Difficulty difficulty) const
+    float getTimeRequirement(RaceManager::Difficulty difficulty) const
     {
         return m_time[difficulty];
-    }   // getTime
+    }   // getTimeRequirement
     // ------------------------------------------------------------------------
     /** Return the energy that a kart must at least have at the end of a race.
      */

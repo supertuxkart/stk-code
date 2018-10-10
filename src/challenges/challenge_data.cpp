@@ -457,8 +457,12 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
 
 // ----------------------------------------------------------------------------
 /** Returns true if this (non-GP) challenge is fulfilled.
+ *  \param check_best : if true, check if the requirement
+ *         for the best difficulty are met at a lower one.
+ *         (requires SuperTux challenges to have a time
+ ù          requirement to make sense)
  */
-bool ChallengeData::isChallengeFulfilled() const
+bool ChallengeData::isChallengeFulfilled(bool check_best) const
 {
     // GP's use the grandPrixFinished() function,
     // so they can't be fulfilled here.
@@ -469,15 +473,16 @@ bool ChallengeData::isChallengeFulfilled() const
     World *world = World::getWorld();
     std::string track_name = Track::getCurrentTrack()->getIdent();
 
-    int d = race_manager->getDifficulty();
+    int d = (check_best) ? RaceManager::DIFFICULTY_BEST :
+                           race_manager->getDifficulty();
 
     AbstractKart* kart = world->getPlayerKart(0);
 
-    if (kart->isEliminated()                                    ) return false;
-    if (track_name != m_track_id                                ) return false;
-    if ((int)world->getNumKarts() < m_default_num_karts[d]      ) return false;
-    if (m_energy[d] > 0   && kart->getEnergy() < m_energy[d]    ) return false;
-    if (m_position[d] > 0 && kart->getPosition() > m_position[d]) return false;
+    if (kart->isEliminated()                                               ) return false;
+    if (track_name != m_track_id                                           ) return false;
+    if (((int)world->getNumKarts() < m_default_num_karts[d]) && !check_best) return false;
+    if (m_energy[d] > 0   && kart->getEnergy() < m_energy[d]               ) return false;
+    if (m_position[d] > 0 && kart->getPosition() > m_position[d]           ) return false;
 
     // Follow the leader
     // -----------------
@@ -500,6 +505,17 @@ bool ChallengeData::isChallengeFulfilled() const
     }
     // too slow
     if (m_time[d] > 0.0f && kart->getFinishTime() > m_time[d]) return false;
+
+    // too slow
+    if (m_is_ghost_replay)
+    {
+        ReplayPlay::get()->addReplayFile(file_manager
+            ->getAsset(FileManager::REPLAY, m_replay_files[d]),
+            true/*custom_replay*/);
+        const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getCurrentReplayData();
+        if (kart->getFinishTime() > rd.m_min_time)
+            return false;
+    }
 
     if (m_ai_superpower[d] != RaceManager::SUPERPOWER_NONE &&
         race_manager->getAISuperPower() != m_ai_superpower[d])
