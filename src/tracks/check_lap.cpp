@@ -70,13 +70,9 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     if(!lin_world)
         return false;
 
-    // Cannot cross lap when off-road, since we are not sure where the kart is
-    if (!lin_world->isOnRoad(kart_index))
-        return false;
-
     float current_distance = lin_world->getDistanceDownTrackForKart(kart_index, false);
-    bool result = (m_previous_distance[kart_index]>0.95f*track_length &&
-                  current_distance<7.0f);
+    float threshold = 0.33f * track_length;
+    bool result = current_distance < threshold && lin_world->isOnRoad(kart_index);
 
     if (UserConfigParams::m_check_debug && result)
     {
@@ -85,7 +81,9 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
             m_previous_distance[kart_index], current_distance);
     }
 
-    m_previous_distance[kart_index] = current_distance;
+    // Cannot cross lap when off-road, since we are not sure where the kart is
+    if (lin_world->isOnRoad(kart_index))
+        m_previous_distance[kart_index] = current_distance;
 
     if (result)
         lin_world->setLastTriggeredCheckline(kart_index, m_index);
