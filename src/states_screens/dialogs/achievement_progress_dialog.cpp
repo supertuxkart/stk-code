@@ -128,7 +128,7 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
 {
     core::stringw nice_name;
     // I18N: For achievements, a parent goal linking logically several subgoals
-    if(internal_name=="AND") nice_name = _("Fulfill all the subogals");
+    if(internal_name=="AND") nice_name = _("Fulfill all the subgoals");
     // I18N: For achievements, a parent goal linking logically several subgoals
     if(internal_name=="AND-AT-ONCE") nice_name = _("Fulfill all the subgoals at the same time");
     // I18N: For achievements, a parent goal linking logically several subgoals
