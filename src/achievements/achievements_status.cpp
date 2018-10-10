@@ -607,6 +607,12 @@ void AchievementsStatus::trackEvent(std::string track_ident, AchievementsStatus:
         }
     }
 
+    // This can happen for e.g. cutscenes.
+    // In this case, don't try to update the track data
+    // TODO : Update the track list upon addon installation
+    if (track_id == -1)
+        return;
+
     m_track_stats[track_id].track_data[(int)event]++;
     updateAchievementsProgress(UP_TRACK_DATA, (int)event);
 } // trackEvent
