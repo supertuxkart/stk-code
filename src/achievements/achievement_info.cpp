@@ -189,12 +189,10 @@ irr::core::stringw AchievementInfo::goalString()
 // ----------------------------------------------------------------------------
 int AchievementInfo::recursiveGoalCount(goalTree &parent)
 {
-    if (parent.children.size() != 1)
+    if (parent.children.size() >= 2 &&
+        parent.type != "OR")
     {
-        if (parent.children[0].type == "OR")
-            return 1;
-        else
-            return m_goal_tree.children.size();
+        return parent.children.size();
     }
     else if (parent.children.size() == 1 &&
              (parent.children[0].type == "AND" ||
