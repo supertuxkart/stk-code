@@ -85,6 +85,9 @@ void AchievementProgressDialog::recursiveFillTable(AchievementInfo::goalTree &pr
             target = m_achievement->computeGoalProgress(reference, reference, true);
         }
 
+        if (m_achievement->isAchieved() || goal > target)
+            goal = target;
+
         std::vector<ListWidget::ListCell> row;
         for (int i=0;i<m_depth;i++)
         {
