@@ -276,7 +276,10 @@ void LinearWorld::updateGraphics(float dt)
         m_last_lap_sfx_playing = false;
     }
 
-    if (!GUIEngine::ModalDialog::isADialogActive())
+    const GUIEngine::GameState gamestate = StateManager::get()->getGameState();
+    
+    if (gamestate == GUIEngine::GAME && 
+        !GUIEngine::ModalDialog::isADialogActive())
     {
         const unsigned int kart_amount = getNumKarts();
         for (unsigned int i = 0; i<kart_amount; i++)
