@@ -371,7 +371,14 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     if (type == "animation" || xml_node.hasChildNamed("curve"))
     {
-        m_animator = new ThreeDAnimation(xml_node, this);
+        try
+        {
+            m_animator = new ThreeDAnimation(xml_node, this);
+        }
+        catch (std::exception& e)
+        {
+            Log::debug("TrackObject", e.what());
+        }
     }
 
     reset();
