@@ -356,14 +356,6 @@ Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
 {
     assert(item);
-    // Spare tire karts don't collect items
-    if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
-    if( (item->getType() == ItemState::ITEM_BUBBLEGUM ||
-         item->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
-    {
-        // shielded karts can simply drive over bubble gums without any effect.
-        return;
-    }
     item->collected(kart);
     // Inform the world - used for Easter egg hunt
     World::getWorld()->collectedItem(kart, item);
@@ -389,10 +381,23 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     /** Disable item collection detection for debug purposes. */
     if(m_disable_item_collection) return;
 
+    // Spare tire karts don't collect items
+    if ( dynamic_cast<SpareTireAI*>(kart->getController()) ) return;
+
     for(AllItemTypes::iterator i =m_all_items.begin();
                                i!=m_all_items.end();  i++)
     {
-        if((!*i) || !(*i)->isAvailable()) continue;
+        // Ignore items that have been collected or are not available atm
+        if ((!*i) || !(*i)->isAvailable()) continue;
+
+        // Shielded karts can simply drive over bubble gums without any effect
+        if ( kart->isShielded() &&
+             ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM      ||
+               (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK  ) )
+        {
+            continue;
+        }
+
 
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.
