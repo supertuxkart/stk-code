@@ -274,7 +274,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 10,
                         irr_driver->getActualScreenSize().Width                  , 50);
 
-    gui::ScalableFont* font = GUIEngine::getFont();
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
 
     bool vcenter = true;
 
@@ -282,8 +282,6 @@ void RaceGUIOverworld::drawTrophyPoints()
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
                          size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy[3]->getSize());
-
-    font->setShadow(video::SColor(255,0,0,0));
 
     // Draw trophies icon and the number of trophy obtained by type
     for (unsigned int i=0;i<4;i++)
@@ -302,7 +300,9 @@ void RaceGUIOverworld::drawTrophyPoints()
                                (i==2) ? StringUtils::toString(player->getNumHardTrophies())   :
                                         StringUtils::toString(player->getNumBestTrophies());
         core::stringw trophiesW(trophies.c_str());
+        font->setBlackBorder(true);
         font->draw(trophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+        font->setBlackBorder(false);
 
         dest += core::position2di(size*2, 0);
     }
@@ -329,7 +329,9 @@ void RaceGUIOverworld::drawTrophyPoints()
     pos.LowerRightCorner.Y = int(dest.LowerRightCorner.Y + 1.5f*size);
     pos.UpperLeftCorner.X -= int(0.5f*size + number_width*0.5f);
 
+    font->setBlackBorder(true);
     font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
+    font->setBlackBorder(false);
 
     pos.UpperLeftCorner.X += int(0.5f*size + number_width*0.5f);
 
@@ -349,10 +351,10 @@ void RaceGUIOverworld::drawTrophyPoints()
 
         pos.UpperLeftCorner.X -= int(2*size + number_width*0.5f);
 
+        font->setBlackBorder(true);
         font->draw(swg.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
+        font->setBlackBorder(false);
     }
-
-    font->disableShadow();
 #endif
 }   // drawTrophyPoints
 
