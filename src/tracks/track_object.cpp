@@ -530,6 +530,7 @@ void TrackObject::updateGraphics(float dt)
 {
     if (m_presentation) m_presentation->updateGraphics(dt);
     if (m_physical_object) m_physical_object->updateGraphics(dt);
+    if (m_animator) m_animator->updateWithWorldTicks(false/*has_physics*/);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -540,7 +541,7 @@ void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
     if (m_physical_object) m_physical_object->update(dt);
-    if (m_animator) m_animator->updateWithWorldTicks();
+    if (m_animator) m_animator->updateWithWorldTicks(true/*has_physics*/);
 }   // update
 
 // ----------------------------------------------------------------------------
