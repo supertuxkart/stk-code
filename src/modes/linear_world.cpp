@@ -406,9 +406,9 @@ void LinearWorld::newLap(unsigned int kart_index)
     else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
              kart_info.m_finished_laps+1 < lap_count)
     {
-        m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1),
-                               kart, 3.0f, GUIEngine::getSkin()->getColor("font::normal"),
-                               true);
+        m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1), kart,
+                               2.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
+                               true /* big font */, true /* outline */);
     }
 
     // The race positions must be updated here: consider the situation where
@@ -499,10 +499,10 @@ void LinearWorld::newLap(unsigned int kart_index)
             _C("fastest_lap", "%s by %s", s.c_str(), kart_name);
 
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
-                               3.0f, video::SColor(255, 255, 255, 255), false);
+                               4.0f, video::SColor(255, 255, 255, 255), false);
 
         m_race_gui->addMessage(_("New fastest lap"), NULL,
-                               3.0f, video::SColor(255, 255, 255, 255), false);
+                               4.0f, video::SColor(255, 255, 255, 255), false);
 
     } // end if new fastest lap
 
