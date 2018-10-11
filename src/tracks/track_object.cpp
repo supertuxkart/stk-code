@@ -528,6 +528,7 @@ void TrackObject::resetEnabled()
  */
 void TrackObject::updateGraphics(float dt)
 {
+    if (m_presentation) m_presentation->updateGraphics(dt);
     if (m_physical_object) m_physical_object->updateGraphics(dt);
 }   // update
 
