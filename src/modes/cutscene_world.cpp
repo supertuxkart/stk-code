@@ -206,6 +206,8 @@ void CutsceneWorld::update(int ticks)
     {
         //printf("INITIAL TIME for CutsceneWorld\n");
 
+        music_manager->startMusic();
+
         PtrVector<TrackObject>& objects = Track::getCurrentTrack()
                                         ->getTrackObjectManager()->getObjects();
         TrackObject* curr;
