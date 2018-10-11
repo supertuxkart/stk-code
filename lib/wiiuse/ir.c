@@ -709,7 +709,7 @@ static float ir_distance(struct ir_dot_t* dot) {
 	xd = dot[i2].x - dot[i1].x;
 	yd = dot[i2].y - dot[i1].y;
 
-	return sqrtf(xd * xd + yd * yd);
+	return sqrtf((float)(xd * xd + yd * yd));
 }
 
 

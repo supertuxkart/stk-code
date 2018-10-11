@@ -1779,13 +1779,12 @@ void SkiddingAI::handleSwitch(int item_skill, const std::vector<const Item *> &i
     else if(item_skill == 5)
     {  
        //First step : identify the best available item
-       int i;
        int bad = 0;
        int good = 0;
 
        //Good will store 1 for nitro, big or small, 2 for item box
        //Big nitro are usually hard to take for the AI
-       for(i=items_to_collect.size()-1; i>=0; i--)
+       for(int i=(int)items_to_collect.size()-1; i>=0; i--)
        {
            if (items_to_collect[i]->getType() == Item::ITEM_BONUS_BOX)
            {
@@ -1800,7 +1799,7 @@ void SkiddingAI::handleSwitch(int item_skill, const std::vector<const Item *> &i
        }
            
        //Bad will store 2 for bananas, 3 for bubble gum
-       for(i=items_to_avoid.size()-1; i>=0; i--)
+       for(int i=(int)items_to_avoid.size()-1; i>=0; i--)
        {
            if (items_to_avoid[i]->getType() == Item::ITEM_BUBBLEGUM)
            {
@@ -2215,7 +2214,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     // just keep enough to help accelerating after an accident
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
-        energy_reserve = std::min<int>(2, energy_reserve);
+        energy_reserve = std::min(2.0f, energy_reserve);
     }
    
     // Don't use nitro or zipper if we are braking

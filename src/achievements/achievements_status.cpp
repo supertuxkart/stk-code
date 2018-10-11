@@ -49,7 +49,8 @@ AchievementsStatus::AchievementsStatus()
     }
 
     // Create one TrackStats instance for all existing tracks
-    const unsigned int track_amount = track_manager->getNumberOfTracks();
+    const unsigned int track_amount =
+        (unsigned int)track_manager->getNumberOfTracks();
 
     for (unsigned int n = 0; n < track_amount; n++)
     {

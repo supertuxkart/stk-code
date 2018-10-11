@@ -512,10 +512,10 @@ void RaceManager::startNextRace()
     }   // not first race
 
     // set boosted AI status for AI karts
-    int boosted_ai_count = std::min<int>(m_ai_kart_list.size(),
-                                         (m_kart_status.size()-2)/4 + 1);
+    int boosted_ai_count = std::min<int>((int)m_ai_kart_list.size(),
+                                         ((int)(m_kart_status.size())-2)/4 + 1);
     if (boosted_ai_count > 4) boosted_ai_count = 4;
-    int ai_count = m_ai_kart_list.size();
+    int ai_count = (int)m_ai_kart_list.size();
 
     for (unsigned int i=0;i<m_kart_status.size();i++)
     {
@@ -1023,7 +1023,7 @@ void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
             { return m_tracks; }
         virtual unsigned int
             getNumberOfTracks(const bool includeLocked=false) const
-            { return m_tracks.size(); }
+            { return (unsigned int)m_tracks.size(); }
         void addNetworkTrack(const std::string& t) { m_tracks.push_back(t); }
     };
 

@@ -315,7 +315,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     // The last kart always uses the data for the last section
     if (rank == (int)m_num_karts)
     {
-        *prev = *next = m_weights_for_section.size() - 1;
+        *prev = *next = (int)m_weights_for_section.size() - 1;
         *weight = 1.0f;
         return;
     }
@@ -343,7 +343,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     // and the last to the last kart, leaving two inner points defining
     // 3 sections, i.e. number_of_points - 3 + 1
     // In both cases the number of sections is:
-    int num_sections = (m_weights_for_section.size() - first_section_index);
+    int num_sections = ((int)m_weights_for_section.size() - first_section_index);
     float karts_per_fraction = (m_num_karts - first_section_index)
                              / float(num_sections);
 
@@ -407,7 +407,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
-        rank = m_summed_weights_for_rank.size()-1;
+        rank = (int)m_summed_weights_for_rank.size()-1;
     else if (rank<0) rank = 0;  // E.g. battle mode, which has rank -1
     const std::vector<unsigned> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
