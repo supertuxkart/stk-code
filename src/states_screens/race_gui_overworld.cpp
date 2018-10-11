@@ -81,10 +81,10 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
-    m_trophy1 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
-    m_trophy2 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_silver.png");
-    m_trophy3 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
-    m_trophy4 = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
+    m_trophy[0] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
+    m_trophy[1] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_silver.png");
+    m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
+    m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
     float scaling = irr_driver->getFrameSize().Height / 420.0f;
     const float map_size = 250.0f;
@@ -160,10 +160,10 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     m_icons[0] = m_lock;
     m_icons[1] = m_open_challenge;
-    m_icons[2] = m_trophy1;
-    m_icons[3] = m_trophy2;
-    m_icons[4] = m_trophy3;
-    m_icons[5] = m_trophy4;
+    m_icons[2] = m_trophy[0];
+    m_icons[3] = m_trophy[1];
+    m_icons[4] = m_trophy[2];
+    m_icons[5] = m_trophy[3];
     m_icons[6] = m_locked_bonus;
 }   // RaceGUIOverworld
 
@@ -281,64 +281,30 @@ void RaceGUIOverworld::drawTrophyPoints()
     const int size = irr_driver->getActualScreenSize().Width/20;
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
                          size*2, pos.UpperLeftCorner.Y + size);
-    core::rect<s32> source(core::position2di(0, 0), m_trophy4->getSize());
+    core::rect<s32> source(core::position2di(0, 0), m_trophy[3]->getSize());
 
     font->setShadow(video::SColor(255,0,0,0));
 
-    if (!m_close_to_a_challenge)
+    // Draw trophies icon and the number of trophy obtained by type
+    for (unsigned int i=0;i<4;i++)
     {
-        draw2DImage(m_trophy1, dest, source, NULL,
-                                                  NULL, true /* alpha */);
-    }
+        if (m_close_to_a_challenge)
+            break;
 
-    dest += core::position2di((int)(size*1.5f), 0);
-    std::string easyTrophies = StringUtils::toString(player->getNumEasyTrophies());
-    core::stringw easyTrophiesW(easyTrophies.c_str());
-    if (!m_close_to_a_challenge)
-    {
-        font->draw(easyTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
-    }
+        if (i==3 && PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+            break;
 
-    dest += core::position2di(size*2, 0);
-    if (!m_close_to_a_challenge)
-    {
-        draw2DImage(m_trophy2, dest, source, NULL,
-                                                  NULL, true /* alpha */);
-    }
+        draw2DImage(m_trophy[i], dest, source, NULL, NULL, true /* alpha */);
 
-    dest += core::position2di((int)(size*1.5f), 0);
-    std::string mediumTrophies = StringUtils::toString(player->getNumMediumTrophies());
-    core::stringw mediumTrophiesW(mediumTrophies.c_str());
-    if (!m_close_to_a_challenge)
-    {
-        font->draw(mediumTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
-    }
+        dest += core::position2di((int)(size*1.5f), 0);
+        std::string trophies = (i==0) ? StringUtils::toString(player->getNumEasyTrophies())   :
+                               (i==1) ? StringUtils::toString(player->getNumMediumTrophies()) :
+                               (i==2) ? StringUtils::toString(player->getNumHardTrophies())   :
+                                        StringUtils::toString(player->getNumBestTrophies());
+        core::stringw trophiesW(trophies.c_str());
+        font->draw(trophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
 
-    dest += core::position2di(size*2, 0);
-    if (!m_close_to_a_challenge)
-    {
-        draw2DImage(m_trophy3, dest, source, NULL,
-                                                  NULL, true /* alpha */);
-    }
-    dest += core::position2di((int)(size*1.5f), 0);
-    std::string hardTrophies = StringUtils::toString(player->getNumHardTrophies());
-    core::stringw hardTrophiesW(hardTrophies.c_str());
-    if (!m_close_to_a_challenge)
-    {
-        font->draw(hardTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
-    }
-
-    dest += core::position2di(size*2, 0);
-    if (!m_close_to_a_challenge && !PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-    {
-        draw2DImage(m_trophy4, dest, source, NULL, NULL, true /* alpha */);
-    }
-    dest += core::position2di((int)(size*1.5f), 0);
-    std::string bestTrophies = StringUtils::toString(player->getNumBestTrophies());
-    core::stringw bestTrophiesW(bestTrophies.c_str());
-    if (!m_close_to_a_challenge && !PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-    {
-        font->draw(bestTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
+        dest += core::position2di(size*2, 0);
     }
 
     dest = core::rect<s32>(pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y,
