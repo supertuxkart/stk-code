@@ -70,8 +70,12 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     if(!lin_world)
         return false;
 
+    // the lapline is considered crossed if the kart is on the road (off-road is not accepted)
+    // near the beginning of the track while the lapline is active (meaning the proper
+    // checklines were activated). "Near the beginning of the track" is arbitrarily
+    // defined to be the first 1/10th of the track.
     float current_distance = lin_world->getDistanceDownTrackForKart(kart_index, false);
-    float threshold = 0.33f * track_length;
+    float threshold = 0.1f * track_length;
     bool result = current_distance < threshold && lin_world->isOnRoad(kart_index);
 
     if (UserConfigParams::m_check_debug && result)
