@@ -49,9 +49,17 @@ std::string StkTime::toString(const TimeType &tt)
     //I18N: Format for dates (%d = day, %m = month, %Y = year). See http://www.cplusplus.com/reference/ctime/strftime/ for more info about date formats.
     core::stringw w_date_format = translations->w_gettext(N_("%d/%m/%Y"));
     core::stringc c_date_format(w_date_format.c_str());
+    std::string date_format(c_date_format.c_str());
+    if (date_format.find("%d", 0) == std::string::npos || // substring not found
+        date_format.find("%m", 0) == std::string::npos ||
+        date_format.find("%Y", 0) == std::string::npos)
+    {
+        Log::warn("Time", "Incorrect date format in translation, using default format.");
+        date_format = "%d/%m/%Y";
+    }
 
     char s[64];
-    strftime(s, 64, c_date_format.c_str(), t);
+    strftime(s, 64, date_format.c_str(), t);
     return s;
 }   // toString
 
