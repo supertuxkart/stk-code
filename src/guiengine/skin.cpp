@@ -1316,9 +1316,13 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     if(q->getUseBackgroundColor())
     {
         int player_id=q->getSpinnerWidgetPlayerID();
+
+        std::string spinner = "spinner::deactivated";
         
-        params = &SkinConfig::m_render_params[
-            "spinner::deactivated"];
+        if (player_id <= 4)
+            spinner = "spinner" + StringUtils::toString(player_id+1) + "::neutral";
+
+        params = &SkinConfig::m_render_params[spinner];
 
         color_rgb = getPlayerColor(player_id);
 
@@ -1336,14 +1340,22 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         params=&SkinConfig::m_render_params["spinner::neutral"];
     }
-    widget->m_skin_r = short(color_rgb.r * 255.0f);
-    widget->m_skin_g = short(color_rgb.g * 255.0f);
-    widget->m_skin_b = short(color_rgb.b * 255.0f);
 
     for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
     {
         if (widget->isFocusedForPlayer(i - 1))
         {
+            if (i<=5)
+            {
+                texture = "squareFocusHalo" + StringUtils::toString(i) + "::neutral";
+            }
+            else
+            {
+                widget->m_skin_r = short(color_rgb.r * 255.0f);
+                widget->m_skin_g = short(color_rgb.g * 255.0f);
+                widget->m_skin_b = short(color_rgb.b * 255.0f);
+            }
+
             core::recti rect2 = rect;
             rect2.UpperLeftCorner.X += 2;
             rect2.UpperLeftCorner.Y -= 3;
