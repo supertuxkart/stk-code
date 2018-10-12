@@ -63,6 +63,8 @@ public:
 
     bool isLeader(int kart_id) { return (kart_id == 0); }
     void leaderHit();
+    // For now, use a similar countdown change as with leaderHit
+    void leaderRescued() { leaderHit(); }
 };   // FollowTheLeader
 
 
