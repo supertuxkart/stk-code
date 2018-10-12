@@ -54,6 +54,7 @@ public:
     virtual void init() OVERRIDE;
     virtual void terminateRace() OVERRIDE;
     virtual bool isRaceOver() OVERRIDE;
+    virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this type of race has laps. */
     virtual bool raceHasLaps() OVERRIDE { return false; }

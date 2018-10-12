@@ -222,6 +222,20 @@ bool FollowTheLeaderRace::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
+/** If the leader kart is hit, increase the delay to the next elimination */
+bool FollowTheLeaderRace::kartHit(int kart_id, int hitter)
+{
+    if (kart_id == 0)
+    {
+        int countdown = getTimeTicks();
+        countdown += stk_config->time2Ticks(5.0f);
+        setTicks(countdown);
+    }
+
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 /** Called at the end of a race. Updates highscores, pauses the game, and
  *  informs the unlock manager about the finished race. This function must
  *  be called after all other stats were updated from the different game
