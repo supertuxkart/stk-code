@@ -82,7 +82,7 @@ namespace Scripting
             asIScriptEngine* engine = ctx->GetEngine();
             asITypeInfo* t = engine->GetTypeInfoByDecl("array<Track::TrackObject@>");
             CScriptArray* script_array = CScriptArray::Create(t, tl.size());
-            for (uint i = 0; i < tl.size(); ++i)
+            for (unsigned int i = 0; i < tl.size(); ++i)
                 script_array->SetValue(i, &tl[i]);
 
             return script_array;
@@ -325,7 +325,7 @@ namespace Scripting
                         ((scene::IAnimatedMeshSceneNode*)(memory));
                     core::array<u32>& f = node->getAnimationSetFrames();
                     CScriptArray* script_array = CScriptArray::Create(t, f.size());
-                    for (uint i = 0; i < f.size(); ++i)
+                    for (unsigned int i = 0; i < f.size(); ++i)
                         script_array->SetValue(i, &f[i]);
 
                     return script_array;
