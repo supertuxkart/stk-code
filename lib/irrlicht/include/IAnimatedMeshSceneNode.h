@@ -183,6 +183,7 @@ namespace scene
 		virtual void addAnimationSet(u32 start, u32 end) = 0;
 		virtual void useAnimationSet(u32 set_num) = 0;
 		virtual void removeAllAnimationSet() = 0;
+		virtual core::array<u32>& getAnimationSetFrames() = 0;
 	};
 
 } // end namespace scene
