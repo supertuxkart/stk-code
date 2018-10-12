@@ -20,6 +20,9 @@
         min-height: Unused mostly, but defines implicitly
                     the starting height (as average of
                     max and min height).
+        fast-ping-distance: When the ball is closer than 
+                    this to the target, it will bounce
+                    low and at a high rate.
         target-distance: When the ball is closer than 
                     this to the target, it will aim
                     directly at the target.
