@@ -1192,7 +1192,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     return;
 
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                    SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+                    SkinConfig::m_render_params["squareFocusHalo1::neutral"]);
                 nPlayersOnThisItem++;
             }
         } // end if mark_focused
@@ -1209,11 +1209,24 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 short green_previous = parentRibbonWidget->m_skin_g;
                 short blue_previous = parentRibbonWidget->m_skin_b;
 
-                SColorf color_rgb = getPlayerColor(i);
+                if (i>=4)
+                {
+                    SColorf color_rgb = getPlayerColor(i);
 
-                parentRibbonWidget->m_skin_r = short(color_rgb.r * 255.0f);
-                parentRibbonWidget->m_skin_g = short(color_rgb.g * 255.0f);
-                parentRibbonWidget->m_skin_b = short(color_rgb.b * 255.0f);
+                    parentRibbonWidget->m_skin_r = short(color_rgb.r * 255.0f);
+                    parentRibbonWidget->m_skin_g = short(color_rgb.g * 255.0f);
+                    parentRibbonWidget->m_skin_b = short(color_rgb.b * 255.0f);
+                }
+
+                std::string square_focus;
+
+                // 1 = player n°2
+                // TODO : current skins support 5 custom colors before using the coloring
+                //        but dynamic detection of the number of colors supported would be better
+                if (i>=5)
+                    square_focus = "squareFocusHaloBW::neutral";
+                else
+                    square_focus = "squareFocusHalo" + StringUtils::toString(i+1) + "::neutral";
 
                 if (nPlayersOnThisItem > 0)
                 {
@@ -1225,16 +1238,19 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     rect2.LowerRightCorner.Y += enlarge;
 
                     drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
-                        SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
+                        SkinConfig::m_render_params[square_focus.c_str()]);
                 }
                 else
                 {
                     drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                        SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
+                        SkinConfig::m_render_params[square_focus.c_str()]);
                 }
-                parentRibbonWidget->m_skin_r = red_previous;
-                parentRibbonWidget->m_skin_g = green_previous;
-                parentRibbonWidget->m_skin_b = blue_previous;
+                if (i>=5)
+                {
+                    parentRibbonWidget->m_skin_r = red_previous;
+                    parentRibbonWidget->m_skin_g = green_previous;
+                    parentRibbonWidget->m_skin_b = blue_previous;
+                }
                 nPlayersOnThisItem++;
             }
         }
@@ -1295,7 +1311,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 
     BoxRenderParams* params;
     SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
-    std::string texture = "squareFocusHalo::neutral";
+    std::string texture = "squareFocusHalo1::neutral";
     SColorf color_rgb = { 1,1,1,1 };
     if(q->getUseBackgroundColor())
     {
