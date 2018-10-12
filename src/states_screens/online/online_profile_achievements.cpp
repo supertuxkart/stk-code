@@ -120,7 +120,7 @@ void BaseOnlineProfileAchievements::init()
             const std::string id = StringUtils::toString(a->getInfo()->getID());
             m_achievements_list_widget->addItem(id, row);
             if (a->isAchieved())
-                m_achievements_list_widget->markItemBlue(id);
+                m_achievements_list_widget->emphasisItem(id);
         }
     }
     else

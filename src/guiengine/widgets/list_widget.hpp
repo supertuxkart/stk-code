@@ -223,6 +223,7 @@ namespace GUIEngine
           */
         void markItemRed(const int id, bool red=true);
         void markItemBlue(const int id, bool blue=true);
+        void emphasisItem(const int id, bool enable=true);
         
         /**
           * \brief Make an item red to mark an error, for instance
@@ -240,6 +241,13 @@ namespace GUIEngine
             const int id = getItemID(internalName);
             assert(id != -1);
             markItemBlue( id, blue );
+        }
+
+        void emphasisItem(const std::string &internalName, bool enable=true)
+        {
+            const int id = getItemID(internalName);
+            assert(id != -1);
+            emphasisItem(id, enable);
         }
 
         /** Override callback from Widget */
