@@ -54,13 +54,15 @@ public:
     virtual void init() OVERRIDE;
     virtual void terminateRace() OVERRIDE;
     virtual bool isRaceOver() OVERRIDE;
-    virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this type of race has laps. */
     virtual bool raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     /** Returns if faster music should be used at the end. */
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+
+    bool isLeader(int kart_id) { return (kart_id == 0); }
+    void leaderHit();
 };   // FollowTheLeader
 
 

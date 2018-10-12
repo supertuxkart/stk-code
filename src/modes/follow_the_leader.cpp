@@ -223,17 +223,12 @@ bool FollowTheLeaderRace::isRaceOver()
 
 //-----------------------------------------------------------------------------
 /** If the leader kart is hit, increase the delay to the next elimination */
-bool FollowTheLeaderRace::kartHit(int kart_id, int hitter)
+void FollowTheLeaderRace::leaderHit()
 {
-    if (kart_id == 0)
-    {
-        int countdown = getTimeTicks();
-        countdown += stk_config->time2Ticks(5.0f);
-        setTicks(countdown);
-    }
-
-    return false;
-}
+    int countdown = getTimeTicks();
+    countdown += stk_config->time2Ticks(5.0f);
+    setTicks(countdown);
+} // leaderHit
 
 //-----------------------------------------------------------------------------
 /** Called at the end of a race. Updates highscores, pauses the game, and
