@@ -124,7 +124,11 @@ void OnlineProfileFriends::onColumnClicked(int column_id, bool sort_desc, bool s
     m_sort_column = column_id;
     m_sort_desc = sort_desc;
     m_sort_default = sort_default;
-    displayResults();
+    
+    if (!m_waiting_for_friends)
+    {
+        displayResults();
+    }
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
