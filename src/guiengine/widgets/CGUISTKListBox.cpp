@@ -531,24 +531,21 @@ void CGUISTKListBox::draw()
                         iconPos.Y += textRect.getHeight() / 2;
                         iconPos.X += ItemsIconWidth/2;
 
+
+                        EGUI_LISTBOX_COLOR icon_color = EGUI_LBC_ICON;
+                        bool highlight=false;
                         if ( i==Selected && hl )
                         {
-                            IconBank->draw2DSprite(
-                                (u32)Items[i].m_contents[x].m_icon,
-                                iconPos, &clientClip,
-                                hasItemOverrideColor(i, EGUI_LBC_ICON_HIGHLIGHT) ?
-                                getItemOverrideColor(i, EGUI_LBC_ICON_HIGHLIGHT) : getItemDefaultColor(EGUI_LBC_ICON_HIGHLIGHT),
-                                selectTime, (u32)StkTime::getTimeSinceEpoch(), false, true);
+                            icon_color = EGUI_LBC_ICON_HIGHLIGHT;
+                            highlight=true;
                         }
-                        else
-                        {
-                            IconBank->draw2DSprite(
-                                (u32)Items[i].m_contents[x].m_icon,
-                                iconPos,
-                                &clientClip,
-                                hasItemOverrideColor(i, EGUI_LBC_ICON) ? getItemOverrideColor(i, EGUI_LBC_ICON) : getItemDefaultColor(EGUI_LBC_ICON),
-                                0 , (i==Selected) ? (u32)StkTime::getTimeSinceEpoch() : 0, false, true);
-                        }
+
+                        IconBank->draw2DSprite(
+                            (u32)Items[i].m_contents[x].m_icon,
+                            iconPos, &clientClip,
+                            hasItemOverrideColor(i, icon_color) ? getItemOverrideColor(i, icon_color) : getItemDefaultColor(icon_color),
+                            (highlight) ? selectTime : 0, (i==Selected) ? (u32)StkTime::getTimeSinceEpoch() : 0, false, true);
+
                         textRect.UpperLeftCorner.X += ItemsIconWidth;
                     }
 
