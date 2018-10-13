@@ -3182,7 +3182,9 @@ void Kart::updateGraphics(float dt)
 #ifndef SERVER_ONLY
     // draw skidmarks if relevant (we force pink skidmarks on when hitting
     // a bubblegum)
-    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
+    if (World::getWorld()->getPhase() !=
+        WorldStatus::IN_GAME_MENU_PHASE &&
+        m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
         m_skidmarks->update(dt,
             m_bubblegum_ticks > 0,
