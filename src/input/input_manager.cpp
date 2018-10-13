@@ -42,9 +42,9 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
-#include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/options/options_screen_device.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
@@ -729,10 +729,15 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 {
                     device = m_device_manager->getGamePadFromIrrID(deviceID);
                 }
-                if (device && (action == PA_FIRE || action == PA_MENU_SELECT))
+                if (device && (action == PA_FIRE || action == PA_MENU_SELECT) &&
+                    !GUIEngine::ModalDialog::isADialogActive())
                 {
-                    if (!GUIEngine::ModalDialog::isADialogActive())
-                        new SplitscreenPlayerDialog(device);
+                    GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
+                    NetworkingLobby* lobby = dynamic_cast<NetworkingLobby*>(screen);
+                    if (lobby!=NULL)
+                    {
+                        lobby->openSplitscreenDialog(device);
+                    }
                     return;
                 }
             }

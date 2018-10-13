@@ -40,6 +40,7 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
 #include "utils/translation.hpp"
@@ -499,6 +500,12 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
     }
     updatePlayerPings();
 }   // updatePlayers
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::openSplitscreenDialog(InputDevice* device)
+{
+    new SplitscreenPlayerDialog(device);
+}   // openSplitscreenDialog
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addSplitscreenPlayer(irr::core::stringw name)
