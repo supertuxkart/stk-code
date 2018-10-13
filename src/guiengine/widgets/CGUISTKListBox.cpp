@@ -554,23 +554,16 @@ void CGUISTKListBox::draw()
 
                     textRect.UpperLeftCorner.X += 3;
 
+                    EGUI_LISTBOX_COLOR font_color = EGUI_LBC_TEXT;
                     if ( i==Selected && hl )
-                    {
-                        Font->draw(
-                            Items[i].m_contents[x].m_text.c_str(),
-                            textRect,
-                            hasItemOverrideColor(i, EGUI_LBC_TEXT_HIGHLIGHT) ?
-                            getItemOverrideColor(i, EGUI_LBC_TEXT_HIGHLIGHT) : getItemDefaultColor(EGUI_LBC_TEXT_HIGHLIGHT),
-                            Items[i].m_contents[x].m_center, true, &clientClip);
-                    }
-                    else
-                    {
-                        Font->draw(
-                            Items[i].m_contents[x].m_text.c_str(),
-                            textRect,
-                            hasItemOverrideColor(i, EGUI_LBC_TEXT) ? getItemOverrideColor(i, EGUI_LBC_TEXT) : getItemDefaultColor(EGUI_LBC_TEXT),
-                            Items[i].m_contents[x].m_center, true, &clientClip);
-                    }
+                        font_color = EGUI_LBC_TEXT_HIGHLIGHT;
+
+                    Font->draw(
+                        Items[i].m_contents[x].m_text.c_str(),
+                        textRect,
+                        hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
+                        Items[i].m_contents[x].m_center, true, &clientClip);
+
                     //Position back to inital pos
                     if (IconBank && (Items[i].m_contents[x].m_icon > -1))
                         textRect.UpperLeftCorner.X -= ItemsIconWidth;
