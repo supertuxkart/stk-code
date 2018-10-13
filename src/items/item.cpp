@@ -156,7 +156,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
-    m_is_predicted      = is_predicted;
     initItem(type, xyz);
 
     m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
@@ -208,7 +207,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     : ItemState(ITEM_TRIGGER)
 {
-    m_is_predicted      = false;
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
     m_original_rotation = btQuaternion(0, 0, 0, 1);

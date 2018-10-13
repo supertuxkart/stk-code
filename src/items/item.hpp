@@ -176,18 +176,14 @@ public:
         Log::fatal("ItemState", "hitKart() called for ItemState.");
         return false;
     }   // hitKart
-    // -----------------------------------------------------------------------
-    virtual bool isPredicted() const
-    { 
-        Log::fatal("ItemState", "isPredicted() called for ItemState.");
-        return false;
-    }   // isPredicted
+
     // -----------------------------------------------------------------------
     virtual int getGraphNode() const 
     {
         Log::fatal("ItemState", "getGraphNode() called for ItemState.");
         return 0;
     }   // getGraphNode
+
     // -----------------------------------------------------------------------
     virtual const Vec3 *getAvoidancePoint(bool left) const
     {
@@ -195,6 +191,7 @@ public:
         // Return doesn't matter, fatal aborts
         return &m_xyz;
     }   // getAvoidancePoint
+
     // -----------------------------------------------------------------------
     virtual float getDistanceFromCenter() const
     {
@@ -202,6 +199,7 @@ public:
                    "getDistanceFromCentre() called for ItemState.");
         return 0;
     }   // getDistanceFromCentre
+
     // -----------------------------------------------------------------------
     /** Resets an item to its start state. */
     void reset()
@@ -362,9 +360,6 @@ private:
      *  would not be collected. Used by the AI to avoid items. */
     Vec3 *m_avoidance_points[2];
 
-    /** True if this item is predicted to exists. Used in networking only. */
-    bool m_is_predicted;
-
     void          setType(ItemType type) OVERRIDE;
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
@@ -403,12 +398,6 @@ public:
     }   // hitKart
 
 public:
-    // ------------------------------------------------------------------------
-    /** Sets if this is a predicted item or not. */
-    void setPredicted(bool p) { m_is_predicted = p; }
-    // ------------------------------------------------------------------------
-    /** Returns if this item is predicted or not. */
-    virtual bool isPredicted() const OVERRIDE { return m_is_predicted; }
     // ------------------------------------------------------------------------
     /** Returns the index of the graph node this item is on. */
     virtual int getGraphNode() const OVERRIDE { return m_graph_node; }
