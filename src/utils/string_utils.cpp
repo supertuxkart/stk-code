@@ -1002,7 +1002,8 @@ namespace StringUtils
 
             // Step 7
             push_text:
-            std::wstring text_line = work_copy.substr(0,break_index);
+            // To include the char at break_index, we need a length of break_index+1
+            std::wstring text_line = work_copy.substr(0,break_index+1);
             output.push_back(text_line);
 
             // If the line break was the last char of the input string
