@@ -556,23 +556,28 @@ void CGUISTKListBox::draw()
                     if ( i==Selected && hl )
                         font_color = EGUI_LBC_TEXT_HIGHLIGHT;
 
-                    std::wstring cell_text = Items[i].m_contents[x].m_text.c_str();
-                    std::vector<std::wstring> cell_text_lines;
-                    if (Items[i].m_word_wrap)
+                    if (!Items[i].m_contents[x].m_broken_text)
                     {
-                        StringUtils::breakText(cell_text, cell_text_lines, 300, Font);
-                    }
-                    else
-                    {
-                        cell_text_lines.push_back(cell_text);
+                        std::wstring cell_text = Items[i].m_contents[x].m_text.c_str();
+                        std::vector<std::wstring> cell_text_lines;
+                        if (Items[i].m_word_wrap)
+                            StringUtils::breakText(cell_text, cell_text_lines, 300, Font);
+                        else
+                            cell_text_lines.push_back(cell_text);
+
+                        for (unsigned int j=0; j<cell_text_lines.size(); j++)
+                        {
+                            irr::core::stringw text_line = cell_text_lines[j].c_str();
+                            Items[i].m_contents[x].m_text_lines.push_back(text_line);
+                        }
+                        Items[i].m_contents[x].m_broken_text = true;
                     }
 
                     core::rect<s32> lineRect = textRect;
-                    for (unsigned int i=0; i<cell_text_lines.size(); i++)
+                    for (unsigned int j=0; j<Items[i].m_contents[x].m_text_lines.size(); j++)
                     {
-                        irr::core::stringw text_line = cell_text_lines[i].c_str();
                         Font->draw(
-                            text_line,
+                            Items[i].m_contents[x].m_text_lines[j],
                             lineRect,
                             hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
                             Items[i].m_contents[x].m_center, true, &clientClip);
