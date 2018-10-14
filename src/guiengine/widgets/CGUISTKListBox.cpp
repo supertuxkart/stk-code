@@ -574,6 +574,10 @@ void CGUISTKListBox::draw()
                     }
 
                     core::rect<s32> lineRect = textRect;
+                    int line_height = Font->getDimension(L"A").Height;
+                    int supp_lines = Items[i].m_contents[x].m_text_lines.size() - 1;
+                    lineRect.UpperLeftCorner.Y -= (line_height*supp_lines)/2;
+                    lineRect.LowerRightCorner.Y -= (line_height*supp_lines)/2;
                     for (unsigned int j=0; j<Items[i].m_contents[x].m_text_lines.size(); j++)
                     {
                         Font->draw(
@@ -582,8 +586,8 @@ void CGUISTKListBox::draw()
                             hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
                             Items[i].m_contents[x].m_center, true, &clientClip);
 
-                        lineRect.UpperLeftCorner.Y += 30;
-                        lineRect.LowerRightCorner.Y += 30;
+                        lineRect.UpperLeftCorner.Y += line_height;
+                        lineRect.LowerRightCorner.Y += line_height;
                     }
 
                     //Position back to inital pos
