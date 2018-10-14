@@ -248,7 +248,7 @@ namespace StringUtils
     std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
     std::string removeWhitespaces(const std::string& input);
     void breakText(const std::wstring& input, std::vector<std::wstring> &output,
-                   unsigned int max_width, irr::gui::IGUIFont* font);
+                   unsigned int max_width, irr::gui::IGUIFont* font, bool right_to_left=false);
     bool breakable (wchar_t c);
     bool partOfLongUnicodeChar (wchar_t c);
 

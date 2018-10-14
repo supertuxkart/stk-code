@@ -912,12 +912,20 @@ namespace StringUtils
     /** Breaks the text so that each line is smaller than max_width with the current settings.
       * The result is put into output, a vector of strings, with each line having its own string */
     // TODO : try to get rid of the complications induced by wchar
-    void breakText(const std::wstring& input, std::vector<std::wstring> &output, unsigned int max_width, irr::gui::IGUIFont* font)
+    void breakText(const std::wstring& input, std::vector<std::wstring> &output,
+                   unsigned int max_width, irr::gui::IGUIFont* font, bool right_to_left)
     {
         output.clear();
 
         // We need to use a wstring to get wchar_t later
         std::wstring work_copy = input;
+
+        // For right to left, we reverse the order of the wchars.
+        // Then, we apply the same operation at the end on the line strings.
+        // As we don't break on multi-wchar symbols,
+        // the second reverse step will put them back in the correct order.
+        if (right_to_left)
+            std::reverse(work_copy.begin(), work_copy.end());
 
         wchar_t c;
         unsigned int index       = 0;
@@ -1022,6 +1030,13 @@ namespace StringUtils
                 index = 0;
             }
         } // While(true) - active until the whole string has been broken and copied
+        if (right_to_left)
+        {
+            for (unsigned int i=0;i<output.size();i++)
+            {
+                std::reverse(output[i].begin(), output[i].end());
+            }
+        }
     } // breakText
 
     /* This function checks if a char is suitable to break lines.
