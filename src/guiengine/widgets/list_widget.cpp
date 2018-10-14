@@ -239,6 +239,7 @@ void ListWidget::addItem(   const std::string& internal_name,
     ListItem newItem;
     newItem.m_internal_name = internal_name;
     newItem.m_contents.push_back(cell);
+    newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -266,6 +267,7 @@ void ListWidget::addItem(const std::string& internal_name,
     {
         newItem.m_contents.push_back(contents[i]);
     }
+    newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);

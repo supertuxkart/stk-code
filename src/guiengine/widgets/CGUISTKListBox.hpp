@@ -49,6 +49,8 @@ namespace irr
                 std::string m_internal_name;
                 int m_current_id;
 
+                bool m_word_wrap = false;
+
                 // A multicolor extension
                 struct ListItemOverrideColor
                 {

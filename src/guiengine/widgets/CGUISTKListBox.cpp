@@ -11,6 +11,7 @@
 #include "IGUIFont.h"
 #include "IGUISpriteBank.h"
 #include "IGUIScrollBar.h"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 
 
@@ -555,11 +556,30 @@ void CGUISTKListBox::draw()
                     if ( i==Selected && hl )
                         font_color = EGUI_LBC_TEXT_HIGHLIGHT;
 
-                    Font->draw(
-                        Items[i].m_contents[x].m_text.c_str(),
-                        textRect,
-                        hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
-                        Items[i].m_contents[x].m_center, true, &clientClip);
+                    std::wstring cell_text = Items[i].m_contents[x].m_text.c_str();
+                    std::vector<std::wstring> cell_text_lines;
+                    if (Items[i].m_word_wrap)
+                    {
+                        StringUtils::breakText(cell_text, cell_text_lines, 300, Font);
+                    }
+                    else
+                    {
+                        cell_text_lines.push_back(cell_text);
+                    }
+
+                    core::rect<s32> lineRect = textRect;
+                    for (unsigned int i=0; i<cell_text_lines.size(); i++)
+                    {
+                        irr::core::stringw text_line = cell_text_lines[i].c_str();
+                        Font->draw(
+                            text_line,
+                            lineRect,
+                            hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
+                            Items[i].m_contents[x].m_center, true, &clientClip);
+
+                        lineRect.UpperLeftCorner.Y += 30;
+                        lineRect.LowerRightCorner.Y += 30;
+                    }
 
                     //Position back to inital pos
                     if (IconBank && (Items[i].m_contents[x].m_icon > -1))
