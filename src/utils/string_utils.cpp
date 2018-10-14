@@ -945,10 +945,10 @@ namespace StringUtils
         {
             // We have reached the end of the string, we just need to push back the current content
             // Step 1
-            if (index >= work_copy.size());
+            if (index >= work_copy.size())
             {
                 break_index = index-1;
-                goto push_text; // Avoid complicating things with stupid checks
+                goto push_text; // Avoid complicating things with checks on every single step
             }
 
             // Step 2
@@ -957,6 +957,12 @@ namespace StringUtils
             // Step 3
             if (c == L'\r' || c == L'\n')
             {
+                if (index == 0)
+                {
+                    work_copy.erase(0);
+                    continue;
+                }
+
                 break_index = index;
                 if (c == L'\r' && index+1 < work_copy.size() && work_copy[index+1] == L'\n') // Windows breaks
                     work_copy.erase(index+1);
