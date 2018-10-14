@@ -2006,9 +2006,9 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
         }
         if (ServerConfig::m_time_limit_threshold_ctf > 0.0f)
         {
-            time_limit = fmaxf(2.0f, num_karts *
+            time_limit = fmaxf(3.0f, num_karts *
                 (ServerConfig::m_time_limit_threshold_ctf +
-                ServerConfig::m_flag_return_timemout / 60.f) * 60.0f);
+                ServerConfig::m_flag_return_timemout / 60.f)) * 60.0f;
         }
     }
     else
