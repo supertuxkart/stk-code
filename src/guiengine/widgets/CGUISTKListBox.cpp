@@ -558,10 +558,11 @@ void CGUISTKListBox::draw()
 
                     if (!Items[i].m_contents[x].m_broken_text)
                     {
+                        int text_width = (textRect.LowerRightCorner.X - textRect.UpperLeftCorner.X);
                         std::wstring cell_text = Items[i].m_contents[x].m_text.c_str();
                         std::vector<std::wstring> cell_text_lines;
                         if (Items[i].m_word_wrap)
-                            StringUtils::breakText(cell_text, cell_text_lines, 300, Font);
+                            StringUtils::breakText(cell_text, cell_text_lines, text_width, Font);
                         else
                             cell_text_lines.push_back(cell_text);
 
