@@ -926,6 +926,7 @@ namespace StringUtils
         irr::core::dimension2du area;
         // Algorithm :
         // 1)If the index exceed the work_copy string size, go to step 7a)
+        //   unless it is 0, in which case there is nothing to copy at all and it exits immediately.
         // 2)We look at the character at the index
         // 3)We check if the current character is a linebreak. If yes, go to step 7a)
         // 4)We check if it is part of a multi-wchar unicode character.
@@ -947,6 +948,9 @@ namespace StringUtils
             // Step 1
             if (index >= work_copy.size())
             {
+                if (index==0)
+                    break;
+
                 break_index = index-1;
                 goto push_text; // Avoid complicating things with checks on every single step
             }
