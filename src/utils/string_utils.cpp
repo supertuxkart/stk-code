@@ -912,7 +912,7 @@ namespace StringUtils
     /** Breaks the text so that each line is smaller than max_width with the current settings.
       * The result is put into output, a vector of strings, with each line having its own string */
     // TODO : try to get rid of the complications induced by wchar
-    void breakText(std::wstring& input, std::vector<std::wstring> &output, unsigned int max_width, irr::gui::IGUIFont* font)
+    void breakText(const std::wstring& input, std::vector<std::wstring> &output, unsigned int max_width, irr::gui::IGUIFont* font)
     {
         output.clear();
 
@@ -1034,7 +1034,7 @@ namespace StringUtils
 	    	return true;
 	    return false;
 #else
-        return false; //A wchar_t in linux or max uses 32 bits
+        return false; //A wchar_t in Linux or Mac uses 32 bits
 #endif
     } // partOfLongUnicodeChar
 
