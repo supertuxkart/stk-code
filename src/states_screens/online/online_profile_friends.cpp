@@ -152,14 +152,34 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
     {
         OnlineProfile::RelationInfo *r1 = p1->getRelationInfo();
         OnlineProfile::RelationInfo *r2 = p2->getRelationInfo();
-        // In case of same online status, sort by name
-        if (r1->isOnline() == r2->isOnline())
+        
+        if (r1->isPending() && r2->isPending())
         {
-            return p1->getUserName().lower_ignore_case(p2->getUserName());
+            // In case of same online status, sort by name
+            if (r1->isAsker() == r2->isAsker())
+            {
+                return p1->getUserName().lower_ignore_case(p2->getUserName());
+            }
+            else
+            {
+                return r1->isAsker() > r2->isAsker();
+            }
+        }
+        else if (r1->isPending() != r2->isPending())
+        {
+            return r1->isPending() > r2->isPending();
         }
         else
         {
-            return r1->isOnline() < r2->isOnline();
+            // In case of same online status, sort by name
+            if (r1->isOnline() == r2->isOnline())
+            {
+                return p1->getUserName().lower_ignore_case(p2->getUserName());
+            }
+            else
+            {
+                return r1->isOnline() > r2->isOnline();
+            }
         }
     }
     default:
