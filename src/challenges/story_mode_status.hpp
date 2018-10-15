@@ -103,6 +103,9 @@ public:
     int        getNumCompletedChallenges  () const { return (m_easy_challenges + m_medium_challenges +
                                                              m_hard_challenges + m_best_challenges); }
     // ------------------------------------------------------------------------
+    /** Returns the number of challenges with the superTux time beaten in a lower difficulty. */
+    int        getNumReqMetInLowerDiff  () const;
+    // ------------------------------------------------------------------------
     /** Returns the number of points accumulated. */
     int        getPoints          () const { return m_points; }
     // ------------------------------------------------------------------------

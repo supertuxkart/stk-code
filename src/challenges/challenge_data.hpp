@@ -84,6 +84,13 @@ public:
         CM_ANY
     };
 
+    /** The type of value stored by m_unlock_special_value */
+    enum SpecialUnlockType
+    {
+        SPECIAL_NONE,
+        SPECIAL_MAX_REQ_IN_LOWER_DIFF
+    };
+
 
 private:
 
@@ -125,6 +132,10 @@ private:
     /** Number of completed challenges required to access this challenge
       * (esp. useful for the final challenge) */
     int m_num_completed_challenges;
+
+    /** Variables only used by unlock lists */
+    SpecialUnlockType m_unlock_special_type;
+    int               m_unlock_special_value;
 
 public:
                  ChallengeData(const std::string& filename);
@@ -209,6 +220,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this challenge is an unlock list. */
     bool isUnlockList() const { return m_is_unlock_list; }
+    // ------------------------------------------------------------------------
+    /** Returns the special unlock list value */
+    SpecialUnlockType getSpecialType() const { return m_unlock_special_type; }
+    // ------------------------------------------------------------------------
+    /** Returns the special unlock list value */
+    int getSpecialValue() const { return m_unlock_special_value; }
     // ------------------------------------------------------------------------
     /** Returns the challenge mode of this challenge. */
     ChallengeModeType getMode() const { return m_mode; }
