@@ -693,6 +693,8 @@ void CGUISTKListBox::setCell(u32 row_num, u32 col_num, const wchar_t* text, s32 
 
     Items[row_num].m_contents[col_num].m_text = text;
     Items[row_num].m_contents[col_num].m_icon = icon;
+    Items[row_num].m_contents[col_num].m_broken_text = false;
+    Items[row_num].m_contents[col_num].m_text_lines.clear();
 
     recalculateItemHeight();
     recalculateIconWidth();
