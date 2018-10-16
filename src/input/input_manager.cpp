@@ -82,7 +82,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_timer_in_use = false;
     m_master_player_only = false;
     m_timer = 0;
-	m_timer_use_count = 0;
+    m_timer_use_count = 0;
 
 }
 // -----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void InputManager::handleStaticAction(int key, int value)
 
     // When no players... a cutscene
     if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
-        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
+        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN ||
         key == IRR_KEY_BUTTON_A))
     {
         world->onFirePressed(NULL);
@@ -856,9 +856,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 {
                     m_timer_in_use = true;
 
-					// After three iterations of the timer, pick up the scrolling pace
-					m_timer_use_count++;
-					m_timer = m_timer_use_count > 3 ? 0.05 : 0.25;
+                    // After three iterations of the timer, pick up the scrolling pace
+                    m_timer_use_count++;
+                    m_timer = m_timer_use_count > 3 ? 0.05 : 0.25;
                 }
 
                 // player may be NULL in early menus, before player setup has
@@ -884,15 +884,15 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 GUIEngine::EventHandler::get()
                     ->processGUIAction(action, deviceID, abs(value), type,
                                        playerID);
-			}
+            }
 
-			// reset timer when released
-			if (abs(value) == 0)
-			{
-				m_timer_in_use = false;
-				m_timer = 0;
-				m_timer_use_count = 0;
-			}
+            // reset timer when released
+            if (abs(value) == 0)
+            {
+                m_timer_in_use = false;
+                m_timer = 0;
+                m_timer_use_count = 0;
+            }
         }
     }
     else if (type == Input::IT_KEYBOARD)
@@ -1035,7 +1035,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE ||
                     key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
@@ -1068,7 +1068,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE ||
                     key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
