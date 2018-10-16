@@ -82,6 +82,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_timer_in_use = false;
     m_master_player_only = false;
     m_timer = 0;
+	m_timer_use_count = 0;
 
 }
 // -----------------------------------------------------------------------------
@@ -823,12 +824,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // ... when in menus
         else
         {
-            // reset timer when released
-            if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
-            {
-                m_timer_in_use = false;
-                m_timer = 0;
-            }
 
             // When in master-only mode, we can safely assume that players
             // are set up, contrarly to early menus where we accept every
@@ -860,7 +855,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 if (abs(value) > Input::MAX_VALUE*2/3)
                 {
                     m_timer_in_use = true;
-                    m_timer = 0.25;
+
+					// After three iterations of the timer, pick up the scrolling pace
+					m_timer_use_count++;
+					m_timer = m_timer_use_count > 3 ? 0.05 : 0.25;
                 }
 
                 // player may be NULL in early menus, before player setup has
@@ -886,7 +884,15 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 GUIEngine::EventHandler::get()
                     ->processGUIAction(action, deviceID, abs(value), type,
                                        playerID);
-            }
+			}
+
+			// reset timer when released
+			if (abs(value) == 0)
+			{
+				m_timer_in_use = false;
+				m_timer = 0;
+				m_timer_use_count = 0;
+			}
         }
     }
     else if (type == Input::IT_KEYBOARD)
