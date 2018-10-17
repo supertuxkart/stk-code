@@ -39,7 +39,6 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_scroll_offset        = 0;
     m_needed_cols          = 0;
     m_col_amount           = 0;
-    m_previous_item_count  = 0;
     m_max_label_length     = 0;
     m_multi_row            = multi_row;
     m_combo                = combo;
@@ -537,7 +536,6 @@ void DynamicRibbonWidget::clearItems()
 void DynamicRibbonWidget::elementRemoved()
 {
     Widget::elementRemoved();
-    m_previous_item_count = 0;
     m_rows.clearWithoutDeleting();
     m_left_widget = NULL;
     m_right_widget = NULL;
@@ -890,12 +888,8 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 
 void DynamicRibbonWidget::updateItemDisplay()
 {
-    // ---- Check if we need to update the number of icons in the ribbon
-    if ((int)m_items.size() != m_previous_item_count)
-    {
-        buildInternalStructure();
-        m_previous_item_count = (int)m_items.size();
-    }
+
+    buildInternalStructure();
 
     // ---- some variables
     int icon_id = 0;
