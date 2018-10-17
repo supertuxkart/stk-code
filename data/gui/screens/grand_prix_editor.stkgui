@@ -24,7 +24,7 @@
             <label id="gpname" text_align="center" width="100%" text="" />
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
                 label_location="each" align="left" max_rows="1"
-                child_width="160" child_height="120" />
+                child_width="160" child_height="120" word_wrap="true" />
         </box>
 
         <spacer height="20" />

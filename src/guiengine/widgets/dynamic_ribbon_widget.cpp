@@ -418,7 +418,16 @@ void DynamicRibbonWidget::buildInternalStructure()
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
             icon->m_w = atoi(icon->m_properties[PROP_WIDTH].c_str());
             icon->m_h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
-            icon->setLabelFont(m_font);
+
+            if (m_properties[PROP_WORD_WRAP] == "true")
+            {
+                icon->m_properties[PROP_WORD_WRAP] = "true";
+            }
+            else
+            {
+
+                icon->setLabelFont(m_font);
+            }
 
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)
