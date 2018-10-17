@@ -1351,8 +1351,8 @@ void Kart::update(int ticks)
 
     m_powerup->update(ticks);
 
-    // Reset any instand speed increase in the bullet kart
-    m_vehicle->setMinSpeed(0);
+    // Reset any instant speed increase in the bullet kart
+    m_vehicle->resetMaxSpeed();
 
     if (m_bubblegum_ticks > 0)
     {

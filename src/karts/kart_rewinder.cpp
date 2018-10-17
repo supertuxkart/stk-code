@@ -263,8 +263,10 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         setTrans(m_transfrom_from_network);
     }
 
-    m_vehicle->setMinSpeed(buffer->getFloat());
+    //m_vehicle->setMinSpeed(buffer->getFloat());
+    // Unused now
     float time_rot = buffer->getFloat();
+    time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
     m_vehicle->setCushioningDisableTime(buffer->getUInt8());
