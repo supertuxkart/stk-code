@@ -91,27 +91,6 @@ void OnlineScreen::init()
     RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    bool is_logged_in = false;
-    if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
-        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
-    {
-        is_logged_in = true;
-    }
-
-    IconButtonWidget* wan = getWidget<IconButtonWidget>("wan");
-    if (wan)
-    {
-        wan->setActive(is_logged_in);
-        if (!is_logged_in)
-        {
-            //I18N: Shown to players when he is not is not logged in
-            wan->setTooltip(_("You must be logged in to play Global "
-                "networking. Click your username above."));
-        }
-        else
-            wan->setTooltip("");
-    }
-
     // Pre-add a default single player profile in network
     if (!m_enable_splitscreen->getState() &&
         NetworkConfig::get()->getNetworkPlayers().empty())
@@ -209,7 +188,14 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "wan")
     {
-        OnlineProfileServers::getInstance()->push();
+        if (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
+        {
+            //I18N: Shown to players when he is not is not logged in
+            new MessageDialog(_("You must be logged in to play Global "
+                "networking. Click your username above."));
+        }
+        else
+            OnlineProfileServers::getInstance()->push();
     }
     else if (selection == "online")
     {
