@@ -21,7 +21,7 @@
                 <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
                         I18N="Tab in help menu" text="Kart classes"/>
                 <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
-                        I18N="Tab in help menu" text="Multi-player"/>
+                        I18N="Tab in help menu" text="Multiplayer"/>
             </vertical-tabs>
 
             <spacer width="2%" height="100%"/>
@@ -35,12 +35,12 @@
                 </div>
                 <spacer width="5" height="1%"/>
 
-                <div width="100%" proportion="5" layout="horizontal-row">
+                <div width="100%" proportion="4" layout="horizontal-row">
                     <icon align="center" width="64" height="64" icon="gui/icons/gift.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="7" height="100%" word_wrap="true"
                             I18N="In the help menu"
-                            text="Collect blue gift boxes, they will give you powerups."/>
+                            text="Collect gift boxes, they will give you powerups."/>
                     <spacer width="25" height="25"/>
                     <icon align="center" width="64" height="64" icon="gui/icons/banana.png"/>
                     <spacer width="25" height="25"/>
@@ -54,28 +54,28 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="3" height="100%" word_wrap="true"
                             I18N="In the help menu"
-                            text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key or button. You can see your current level of nitro in the gauge at the bottom-right of the race screen."/>
-                    </div>
+                            text="Collecting nitro allows you to use small speed boosts by pressing the assigned key or button*. You can see your current level of nitro in the gauge at the bottom-right of the race screen."/>
+                </div>
+                
+                <div width="100%" proportion="7" layout="horizontal-row">
+                    <icon align="center" width="64" height="64" icon="gui/icons/android/drift.png"/>
+                    <spacer width="25" height="25"/>
+                    <bubble proportion="2" height="100%" word_wrap="true"
+                            I18N="In the help menu"
+                            text="You can skid by pressing the assigned key or button*. Successive short skids help to take sharp turns; while medium to long skids will give you a small or medium boost, depending on the length of the skid. You can't stop turning while skidding, so orient your kart carefully before!"/>
+                </div>
 
                 <div width="100%" proportion="4" layout="horizontal-row">
                     <icon align="center" width="64" height="64" icon="gui/icons/gui_lock.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="2" height="100%" word_wrap="true"
                             I18N="In the help menu"
-                            text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
-                </div>
-
-                <div width="100%" proportion="6" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/android/drift.png"/>
-                    <spacer width="25" height="25"/>
-                    <bubble proportion="2" height="100%" word_wrap="true"
-                            I18N="In the help menu"
-                            text="You can skid by pressing a special key or button. Successive short skids help to take sharp turns; while medium skids will boost your speed, long skids more so. You can't stop turning while skidding, so orient your kart carefully before!"/>
+                            text="If you see a button with a lock like this one, you need to complete a challenge in Story Mode to unlock it."/>
                 </div>
 
                 <spacer height="3%" width="10"/>
 
-                <label align="center" word_wrap="true" I18N="in the help screen" text="* Current key bindings can be seen/changed in menu Options"/>
+                <label align="center" word_wrap="true" I18N="in the help screen" text="*Current key bindings can be seen/changed in the Options menu."/>
                 <spacer height="1%" width="10"/>
 
             </box>
