@@ -98,6 +98,8 @@ namespace GUIEngine
           */
         bool m_scrolling_enabled;
 
+        /** Used to keep track of item count changes */
+        int m_previous_item_count;
 
         /** List of items in the ribbon */
         std::vector<ItemDescription> m_items;

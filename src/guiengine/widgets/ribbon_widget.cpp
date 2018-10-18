@@ -396,9 +396,8 @@ void RibbonWidget::add()
                 has_label = false;
             }
 
-            const int font_size = m_active_children[i].m_properties[PROP_WORD_WRAP] == "true" ? GUIEngine::getFontHeight() * 2 : GUIEngine::getFontHeight();
             const int needed_space_under_button = has_label
-                                                ? font_size
+                                                ? GUIEngine::getFontHeight()
                                                 : 10;
 
             float imageRatio =
