@@ -39,7 +39,6 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_scroll_offset        = 0;
     m_needed_cols          = 0;
     m_col_amount           = 0;
-    m_previous_item_count  = 0;
     m_max_label_length     = 0;
     m_multi_row            = multi_row;
     m_combo                = combo;
@@ -419,7 +418,16 @@ void DynamicRibbonWidget::buildInternalStructure()
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
             icon->m_w = atoi(icon->m_properties[PROP_WIDTH].c_str());
             icon->m_h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
-            icon->setLabelFont(m_font);
+
+            if (m_properties[PROP_WORD_WRAP] == "true")
+            {
+                icon->m_properties[PROP_WORD_WRAP] = "true";
+            }
+            else
+            {
+
+                icon->setLabelFont(m_font);
+            }
 
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)
@@ -537,7 +545,6 @@ void DynamicRibbonWidget::clearItems()
 void DynamicRibbonWidget::elementRemoved()
 {
     Widget::elementRemoved();
-    m_previous_item_count = 0;
     m_rows.clearWithoutDeleting();
     m_left_widget = NULL;
     m_right_widget = NULL;
@@ -890,12 +897,8 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 
 void DynamicRibbonWidget::updateItemDisplay()
 {
-    // ---- Check if we need to update the number of icons in the ribbon
-    if ((int)m_items.size() != m_previous_item_count)
-    {
-        buildInternalStructure();
-        m_previous_item_count = (int)m_items.size();
-    }
+
+    buildInternalStructure();
 
     // ---- some variables
     int icon_id = 0;
