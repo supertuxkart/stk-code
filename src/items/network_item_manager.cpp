@@ -26,6 +26,8 @@
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 
+bool NetworkItemManager::m_network_item_debugging = false;
+
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */
 void NetworkItemManager::create()
@@ -99,6 +101,11 @@ void NetworkItemManager::initClientConfirmState()
  */
 void NetworkItemManager::collectedItem(ItemState *item, AbstractKart *kart)
 {
+    if (m_network_item_debugging)
+        Log::info("NIM", "collectedItem at %d index %d type %d ttr %d",
+                  World::getWorld()->getTicksSinceStart(),
+                  item->getItemId(), item->getType(), item->getTicksTillReturn());
+
     if(NetworkConfig::get()->isServer())
     {
         ItemManager::collectedItem(item, kart);
@@ -146,6 +153,7 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
                                       const AbstractKart *kart, const Vec3 *xyz)
 {
     Item *item = ItemManager::dropNewItem(type, kart, xyz);
+
     if(!item) return NULL;
 
     // Nothing else to do for client
@@ -156,7 +164,7 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
     m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
                                          type, item->getItemId(),
                                          kart->getWorldKartId(),
-                                         kart->getXYZ() );
+                                         xyz ? *xyz : kart->getXYZ() );
     m_item_events.unlock();
     return item;
 }   // dropNewItem
@@ -357,7 +365,13 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         // 1.1) Decode the event in the message
         // ------------------------------------
         ItemEventInfo iei(buffer, &count);
-
+        if(m_network_item_debugging)
+            Log::info("NIM", "Rewindto %d current %d iei.index %d iei tick %d iei.coll %d iei.new %d iei.ttr %d confirmed %lx",
+                      rewind_to_time, current_time,
+                      iei.getIndex(),
+                      iei.getTicks(), iei.isItemCollection(), iei.isNewItem(),
+                      iei.getTicksTillReturn(),
+                      iei.getIndex() < m_confirmed_state.size() ? m_confirmed_state[iei.getIndex()] : NULL);
         // 1.2) If the event needs to be applied, forward
         //      the time to the time of this event:
         // ----------------------------------------------

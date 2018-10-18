@@ -66,6 +66,9 @@ private:
     NetworkItemManager();
 
 public:
+
+    static bool m_network_item_debugging;
+
     static void create();
     virtual ~NetworkItemManager();
 
