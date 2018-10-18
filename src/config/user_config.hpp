@@ -352,6 +352,14 @@ enum GeometryLevel
     GEOLEVEL_2    = 2
 };
 
+enum MultitouchControls
+{
+    MULTITOUCH_CONTROLS_UNDEFINED = 0,
+    MULTITOUCH_CONTROLS_STEERING_WHEEL = 1,
+    MULTITOUCH_CONTROLS_ACCELEROMETER = 2,
+    MULTITOUCH_CONTROLS_GYROSCOPE = 3,
+};
+
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
  *  when you want to add a new parameter, just add one signle line below and

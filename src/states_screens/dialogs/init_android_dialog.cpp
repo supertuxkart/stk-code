@@ -83,9 +83,9 @@ void InitAndroidDialog::beforeAddingWidgets()
         Widget* accelerometer = &control_type->getChildren()[index];
         accelerometer->setActive(false);
         
-        if (UserConfigParams::m_multitouch_controls == 2)
+        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
         {
-            UserConfigParams::m_multitouch_controls = 1;
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
         }
     }
 
@@ -98,9 +98,9 @@ void InitAndroidDialog::beforeAddingWidgets()
         Widget* gyroscope = &control_type->getChildren()[index];
         gyroscope->setActive(false);
         
-        if (UserConfigParams::m_multitouch_controls == 3)
+        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
         {
-            UserConfigParams::m_multitouch_controls = 1;
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
         }
     }
 
@@ -127,15 +127,15 @@ GUIEngine::EventPropagation InitAndroidDialog::processEvent(
         
         if (selected == "steering_wheel")
         {
-            UserConfigParams::m_multitouch_controls = 1;
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
         }
         else if (selected == "accelerometer")
         {
-            UserConfigParams::m_multitouch_controls = 2;
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_ACCELEROMETER;
         }
         else if (selected == "gyroscope")
         {
-            UserConfigParams::m_multitouch_controls = 3;
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
         }
         
         user_config->saveConfig();
@@ -154,12 +154,12 @@ void InitAndroidDialog::updateValues()
     RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
     assert(control_type != NULL);
     
-    if (UserConfigParams::m_multitouch_controls == 2)
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         int id = control_type->findItemNamed("accelerometer");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
     }
-    else if (UserConfigParams::m_multitouch_controls == 3)
+    else if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
         int id = control_type->findItemNamed("gyroscope");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
@@ -175,7 +175,7 @@ void InitAndroidDialog::updateValues()
 
 bool InitAndroidDialog::onEscapePressed()
 {
-    UserConfigParams::m_multitouch_controls = 1;
+    UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
     user_config->saveConfig();
     ModalDialog::dismiss();
     return true;

@@ -116,7 +116,7 @@ void RaceGUIMultitouch::init()
     if (m_device == NULL)
         return;
         
-    if (UserConfigParams::m_multitouch_controls == 2)
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         m_device->activateAccelerometer();
     }
