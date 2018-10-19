@@ -484,6 +484,8 @@ void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
  */
 void MultitouchDevice::updateOrientationFromGyroscope(float z)
 {
+    const float GYRO_SPEED_THRESHOLD = 0.005f;
+
     double now = StkTime::getRealTime();
     float timedelta = now - m_gyro_time;
     m_gyro_time = now;
@@ -492,15 +494,12 @@ void MultitouchDevice::updateOrientationFromGyroscope(float z)
         timedelta = 0.1f;
     }
 
-    m_gyro_filter.collectNoiseData(z);
-
-    if (z > m_gyro_filter.filterMin && z < m_gyro_filter.filterMax)
-    {
-        return;
-    }
-    z -= m_gyro_filter.filterCenter;
-
     float angular_speed = -z;
+
+    if (fabsf(angular_speed) < GYRO_SPEED_THRESHOLD)
+    {
+        angular_speed = 0.0f;
+    }
 
     m_orientation += angular_speed * timedelta;
     if (m_orientation > (M_PI / 2.0))
@@ -590,145 +589,3 @@ void MultitouchDevice::updateController()
 }
 
 // ----------------------------------------------------------------------------
-
-MultitouchDevice::GyroscopeFilterData::GyroscopeFilterData()
-{
-	// Noise filter with sane initial values, so user will be able
-	// to move gyroscope during the first 10 seconds, while the noise is measured.
-	// After that the values are replaced by noiseMin/noiseMax.
-	filterMin = -0.05f;
-	filterMax = 0.05f;
-	filterCenter = 0.0f;
-
-	// The noise levels we're measuring.
-	// Large initial values, they will decrease, but never increase.
-	noiseMin = -1.0f;
-	noiseMax = 1.0f;
-
-	// The gyro data buffer, from which we care calculating min/max noise values.
-	// The bigger it is, the more precise the calclations, and the longer it takes to converge.
-	for (int i = 0; i < NOISE_DATA_SIZE; i++)
-	{
-		noiseData[i] = 0.0f;
-	}
-	noiseDataIdx = 0;
-
-	// When we detect movement, we remove last few values of the measured data.
-	// The movement is detected by comparing values to noiseMin/noiseMax of the previous iteration.
-	movementBackoff = 0;
-
-	// Difference between min/max in the previous measurement iteration,
-	// used to determine when we should stop measuring, when the change becomes negligilbe.
-	measuredNoiseRange = -1.0f;
-
-	// How long the algorithm is running, to stop it when measurements are finished.
-	measurementIteration = 0;
-}
-
-/** Collect gyroscope measurements and calculate noise min/max values */
-void MultitouchDevice::GyroscopeFilterData::collectNoiseData(float data)
-{
-	if (measurementIteration >= MAX_ITERATIONS)
-	{
-		return;
-	}
-
-	if (data < noiseMin || data > noiseMax)
-	{
-		// Movement detected, this can converge our min/max too early, so we're discarding last few values
-		if (movementBackoff < 0)
-		{
-			int discard = 10;
-			if (-movementBackoff < discard)
-				discard = -movementBackoff;
-			noiseDataIdx -= discard;
-			if (noiseDataIdx < 0)
-				noiseDataIdx = 0;
-		}
-		movementBackoff = 10;
-		return;
-	}
-	noiseData[noiseDataIdx] = data;
-
-	movementBackoff--;
-	if (movementBackoff >= 0)
-	{
-		return; // Also discard several values after the movement stopped
-	}
-	noiseDataIdx++;
-
-	if (noiseDataIdx < NOISE_DATA_SIZE)
-	{
-		return;
-	}
-
-	measurementIteration++;
-	Log::info("GyroscopeFilterData", "Measuring in progress, iteration %d / %d", measurementIteration, MAX_ITERATIONS);
-	if (measurementIteration >= MAX_ITERATIONS / 3)
-	{
-		// We've collected enough data to use our noise min/max values as a new filter
-		filterMin = noiseMin;
-		filterMax = noiseMax;
-		filterCenter = (filterMin + filterMax) / 2.0f;
-	}
-	if (measurementIteration >= MAX_ITERATIONS)
-	{
-		Log::info("GyroscopeFilterData", "Measuring done! Maximum number of iterations reached: %d", measurementIteration);
-		return;
-	}
-
-	noiseDataIdx = 0;
-	bool changed = false;
-	float min = 1.0f;
-	float max = -1.0f;
-	for (int i = 0; i < NOISE_DATA_SIZE; i++)
-	{
-		if( min > noiseData[i] )
-			min = noiseData[i];
-		if( max < noiseData[i] )
-			max = noiseData[i];
-	}
-	// Increase the range a bit, for safe conservative filtering
-	float middle = (min + max) / 2.0f;
-	min += (min - middle) * 0.2f;
-	max += (max - middle) * 0.2f;
-	// Check if range between min/max is less then the current range, as a safety measure,
-	// and min/max range is not jumping outside of previously measured range
-	if (max - min < noiseMax - noiseMin && min >= noiseMin && max <= noiseMax)
-	{
-		// Move old min/max closer to the measured min/max, but do not replace the values altogether
-		noiseMin = (noiseMin + min * 4.0f) / 5.0f;
-		noiseMax = (noiseMax + max * 4.0f) / 5.0f;
-		changed = true;
-	}
-
-	Log::info("GyroscopeFilterData", "Measured noise min: %03.5f max: %03.5f", noiseMin, noiseMax);
-
-	if( !changed )
-		return;
-
-	// Determine when to stop measuring - check that the previous min/max range is close enough to the current one
-
-	float range = noiseMax - noiseMin;
-
-	Log::info("GyroscopeFilterData", "Measured noise range: %03.5f old range: %03.5f", range, measuredNoiseRange);
-
-	if (measuredNoiseRange < 0.0f)
-	{
-		measuredNoiseRange = range;
-		return; // First iteration, skip further checks
-	}
-
-	if( measuredNoiseRange / range > 1.2f )
-	{
-		measuredNoiseRange = range;
-		return;
-	}
-
-	// We converged to the final min/max filter values, stop measuring
-	Log::info("GyroscopeFilterData", "Measuring done! Range converged on iteration %d", measurementIteration);
-	filterMin = noiseMin;
-	filterMax = noiseMax;
-	filterCenter = (filterMin + filterMax) / 2.0f;
-	measurementIteration = MAX_ITERATIONS;
-}
