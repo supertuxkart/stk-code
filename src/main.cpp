@@ -2083,7 +2083,7 @@ int main(int argc, char *argv[] )
             }
             
             #ifdef ANDROID
-            if (UserConfigParams::m_multitouch_controls == 0)
+            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {
                 int32_t touch = AConfiguration_getTouchscreen(
                                                     global_android_app->config);

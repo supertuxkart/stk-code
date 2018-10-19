@@ -135,7 +135,7 @@ void CameraEnd::update(float dt)
 
             positionCamera(dt, /*above_kart*/0.75f,
                            cam_angle, /*side_way*/0,
-                           2.0f*getDistanceToKart(), /*smoothing*/false);
+                           2.0f*getDistanceToKart(), /*smoothing*/false, 0.0f);
             break;
         }
     default: break;

@@ -170,6 +170,13 @@ msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
+#. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Gyroscope"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/android/init_android.stkgui
+#. I18N: Control type
 msgid "Steering wheel"
 msgstr ""
 

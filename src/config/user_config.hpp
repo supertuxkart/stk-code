@@ -352,6 +352,14 @@ enum GeometryLevel
     GEOLEVEL_2    = 2
 };
 
+enum MultitouchControls
+{
+    MULTITOUCH_CONTROLS_UNDEFINED = 0,
+    MULTITOUCH_CONTROLS_STEERING_WHEEL = 1,
+    MULTITOUCH_CONTROLS_ACCELEROMETER = 2,
+    MULTITOUCH_CONTROLS_GYROSCOPE = 3,
+};
+
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
  *  when you want to add a new parameter, just add one signle line below and
@@ -488,7 +496,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_multitouch_controls
             PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_controls",
             &m_multitouch_group,
-            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer"));
+            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope"));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",

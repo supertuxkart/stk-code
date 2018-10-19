@@ -20,6 +20,10 @@
 #include "graphics/camera_normal.hpp"
 
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
+#include "input/multitouch_device.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
@@ -175,10 +179,11 @@ void CameraNormal::snapToPosition()
  *  \param cam_angle  Angle above the kart plane for the camera.
  *  \param sideway Sideway movement of the camera.
  *  \param distance Distance from kart.
+ *  \param cam_roll_angle Roll camera for gyroscope steering effect.
  */
 void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                                      float *sideway, float *distance,
-                                     bool *smoothing)
+                                     bool *smoothing, float *cam_roll_angle)
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
@@ -197,6 +202,15 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
             *smoothing           = true;
+            *cam_roll_angle      = 0.0f;
+            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+            {
+                MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
+                if (device)
+                {
+                    *cam_roll_angle = -device->getOrientation();
+                }
+            }
             break;
         }   // CM_FALLING
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
@@ -206,6 +220,15 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             *sideway    = 0;
             *distance   = 2.0f*m_distance;
             *smoothing  = false;
+            *cam_roll_angle = 0.0f;
+            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+            {
+                MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
+                if (device)
+                {
+                    *cam_roll_angle = device->getOrientation();
+                }
+            }
             break;
         }
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
@@ -217,6 +240,15 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                         * m_kart->getSkidding()->getSkidFactor();
             *distance   = -0.5f*m_distance;
             *smoothing  = false;
+            *cam_roll_angle = 0.0f;
+            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+            {
+                MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
+                if (device)
+                {
+                    *cam_roll_angle = -device->getOrientation();
+                }
+            }
             break;
         }
     case CM_LEADER_MODE:
@@ -226,6 +258,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             *sideway    = 0;
             *distance   = 2.0f*m_distance;
             *smoothing  = true;
+            *cam_roll_angle = 0.0f;
             break;
         }
     case CM_SIMPLE_REPLAY:
@@ -252,10 +285,10 @@ void CameraNormal::update(float dt)
         dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation());
     if (ea && !ea->hasResetAlready())
     {
-        float above_kart, cam_angle, side_way, distance;
+        float above_kart, cam_angle, side_way, distance, cam_roll_angle;
         bool  smoothing;
 
-        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
+        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing, &cam_roll_angle);
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame
 
@@ -269,10 +302,10 @@ void CameraNormal::update(float dt)
     }
     else // no kart animation
     {
-        float above_kart, cam_angle, side_way, distance;
+        float above_kart, cam_angle, side_way, distance, cam_roll_angle;
         bool  smoothing;
-        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
-        positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
+        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing, &cam_roll_angle);
+        positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing, cam_roll_angle);
     }
 }   // update
 
@@ -283,9 +316,11 @@ void CameraNormal::update(float dt)
  *  \param cam_angle  Angle above the kart plane for the camera.
  *  \param sideway Sideway movement of the camera.
  *  \param distance Distance from kart.
+ *  \param cam_roll_angle Roll camera for gyroscope steering effect.
 */
 void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
-                           float side_way, float distance, float smoothing)
+                           float side_way, float distance, float smoothing,
+                           float cam_roll_angle)
 {
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getSmoothedTrans()(Vec3(0, above_kart, 0));
@@ -334,4 +369,11 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
     }   // kart && !flying
     else
         m_camera->setUpVector(core::vector3df(0, 1, 0));
+
+    if (cam_roll_angle != 0.0f)
+    {
+        irr::core::vector3df up(0, 1, 0);
+        up.rotateXYBy(cam_roll_angle * (180.0f / M_PI));
+        m_camera->setUpVector(up);
+    }
 }   // positionCamera
