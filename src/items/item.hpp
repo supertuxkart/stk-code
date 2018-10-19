@@ -376,7 +376,7 @@ public:
     virtual void  collected(const AbstractKart *kart) OVERRIDE;
     void          reset();
     virtual void  switchTo(ItemType type, scene::IMesh *mesh,
-                           scene::IMesh *lowmesh);
+                           scene::IMesh *lowmesh) OVERRIDE;
     virtual bool  switchBack() OVERRIDE;
 
     // ------------------------------------------------------------------------
@@ -388,6 +388,7 @@ public:
      *         kart.hpp does not need to be included here).
      */
     virtual bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
+        OVERRIDE
     {
         if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
             return false;
