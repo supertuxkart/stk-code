@@ -239,15 +239,20 @@ void Physics::update(int ticks)
             else if (obj->isExplodeKartObject())
             {
                 ExplosionAnimation::create(kart);
+                if (kart->getKartAnimation() != NULL)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
             }
             else if (obj->isFlattenKartObject())
             {
                 const KartProperties *kp = kart->getKartProperties();
+                // Count squash only once from original state
+                bool was_squashed = kart->isSquashed();
                 if (kart->setSquash(kp->getSwatterSquashDuration(),
-                    kp->getSwatterSquashSlowdown()))
+                    kp->getSwatterSquashSlowdown()) && !was_squashed)
                 {
-                    World::getWorld()->kartHit(kart->getWorldKartId(),
-                        kart->getWorldKartId());
+                    World::getWorld()->kartHit(kart->getWorldKartId());
                 }
             }
             else if(obj->isSoccerBall() && 
@@ -272,13 +277,24 @@ void Physics::update(int ticks)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
+                if (kart->getKartAnimation() != NULL)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
             }
             else if (anim->isFlattenKartObject())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties *kp = kart->getKartProperties();
-                kart->setSquash(kp->getSwatterSquashDuration(),
-                    kp->getSwatterSquashSlowdown());
+
+                // Count squash only once from original state
+                bool was_squashed = kart->isSquashed();
+                if (kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown()) && !was_squashed)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
+
             }
             continue;
 
