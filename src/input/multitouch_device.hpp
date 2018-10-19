@@ -90,6 +90,44 @@ private:
     float m_orientation;
     double m_gyro_time;
 
+	class GyroscopeFilterData
+	{
+		public:
+		GyroscopeFilterData();
+		void collectNoiseData(float data);
+
+		// Noise filter with sane initial values, so user will be able
+		// to move gyroscope during the first 10 seconds, while the noise is measured.
+		// After that the values are replaced by noiseMin/noiseMax.
+		float filterMin;
+		float filterMax;
+		float filterCenter;
+
+		// The noise levels we're measuring.
+		// Large initial values, they will decrease, but never increase.
+		float noiseMin;
+		float noiseMax;
+
+		// The gyro data buffer, from which we care calculating min/max noise values.
+		// The bigger it is, the more precise the calclations, and the longer it takes to converge.
+		enum { NOISE_DATA_SIZE = 200, MAX_ITERATIONS = 15 };
+		float noiseData[NOISE_DATA_SIZE];
+		int noiseDataIdx = 0;
+
+		// When we detect movement, we remove last few values of the measured data.
+		// The movement is detected by comparing values to noiseMin/noiseMax of the previous iteration.
+		int movementBackoff = 0;
+
+		// Difference between min/max in the previous measurement iteration,
+		// used to determine when we should stop measuring, when the change becomes negligilbe.
+		float measuredNoiseRange = -1.0f;
+
+		// How long the algorithm is running, to stop it when measurements are finished.
+		int measurementIteration = 0;
+	};
+
+	GyroscopeFilterData m_gyro_filter;
+
 #ifdef ANDROID
     /** Pointer to the Android irrlicht device */
     CIrrDeviceAndroid* m_android_device;
