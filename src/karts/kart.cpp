@@ -1357,6 +1357,11 @@ void Kart::update(int ticks)
             m_bubblegum_torque = 0;
         }
     }
+    else
+    {
+        // Not strictly necessary, but makes sure torque has expected values
+        m_bubblegum_torque = 0;
+    }
 
     // This is to avoid a rescue immediately after an explosion
     const bool has_animation_before = m_kart_animation != NULL;
