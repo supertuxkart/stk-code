@@ -371,7 +371,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                       iei.getIndex(),
                       iei.getTicks(), iei.isItemCollection(), iei.isNewItem(),
                       iei.getTicksTillReturn(),
-                      iei.getIndex() < m_confirmed_state.size() ? m_confirmed_state[iei.getIndex()] : NULL);
+                      iei.getIndex() < (int)m_confirmed_state.size() ? m_confirmed_state[iei.getIndex()] : NULL);
         // 1.2) If the event needs to be applied, forward
         //      the time to the time of this event:
         // ----------------------------------------------
