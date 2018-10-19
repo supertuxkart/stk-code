@@ -882,7 +882,10 @@ void IrrDriver::changeResolution(const int w, const int h,
     // is actually called from the gui, i.e. the event loop, i.e. while the
     // old device is active - so we can't delete this device (which we must
     // do in applyResolutionSettings
-    m_resolution_changing = RES_CHANGE_YES;
+    if (w < 1024 || h < 720)
+        m_resolution_changing = RES_CHANGE_YES_WARN;
+    else
+        m_resolution_changing = RES_CHANGE_YES;
 }   // changeResolution
 
 //-----------------------------------------------------------------------------
@@ -1859,7 +1862,9 @@ void IrrDriver::update(float dt)
     {
         applyResolutionSettings();
         if(m_resolution_changing==RES_CHANGE_YES)
-        new ConfirmResolutionDialog();
+            new ConfirmResolutionDialog(false);
+        else if(m_resolution_changing==RES_CHANGE_YES_WARN)
+            new ConfirmResolutionDialog(true);
         m_resolution_changing = RES_CHANGE_NONE;
     }
 

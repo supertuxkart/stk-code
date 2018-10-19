@@ -195,6 +195,8 @@ protected:
                                         {return getTime(); }
     /** Set the team arrow on karts if necessary*/
     void initTeamArrows();
+    void updateAchievementDataEndRace();
+    void updateAchievementModeCounters(bool start);
 
 public:
                     World();
@@ -256,7 +258,7 @@ public:
     virtual void    init();
     virtual void    updateGraphics(float dt);
     virtual void    terminateRace() OVERRIDE;
-    virtual void    reset() OVERRIDE;
+    virtual void    reset(bool restart=false) OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type,

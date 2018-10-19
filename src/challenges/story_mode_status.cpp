@@ -223,6 +223,7 @@ void StoryModeStatus::unlockFeatureByList()
                 continue;
 
             bool newly_solved = unlock_manager->unlockByPoints(m_points,i->second);
+            newly_solved = newly_solved || unlock_manager->unlockSpecial(i->second, getNumReqMetInLowerDiff());
 
             // Add to list of recently unlocked features
             if(newly_solved)
@@ -301,6 +302,14 @@ void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
  */
 void StoryModeStatus::raceFinished()
 {
+    if(m_current_challenge                                            &&
+        race_manager->getDifficulty() != RaceManager::DIFFICULTY_BEST &&
+        m_current_challenge->getData()->isChallengeFulfilled(true /*best*/))
+    {
+        ChallengeStatus* c = const_cast<ChallengeStatus*>(m_current_challenge);
+        c->setMaxReqInLowerDiff();
+    }
+
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
         m_current_challenge->getData()->isChallengeFulfilled()           )
@@ -372,3 +381,15 @@ void StoryModeStatus::save(UTFWriter &out)
     }
     out << "      </story-mode>\n";
 }  // save
+
+int StoryModeStatus::getNumReqMetInLowerDiff() const
+{
+    int counter = 0;
+    for ( const auto &c : m_challenges_state)
+    {
+        counter += (c.second->areMaxReqMetInLowerDiff()) ? 1 : 0;
+    }
+    return counter;
+}  // getNumReqMetInLowerDiff
+
+/* EOF */

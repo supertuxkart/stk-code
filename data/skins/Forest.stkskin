@@ -147,7 +147,7 @@ when the border that intersect at this corner are enabled.
 <element type="squareFocusHaloBW" image="common/glass_square_focused_bw.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo" image="common/glass_square_focused_green.png"
+<element type="squareFocusHalo1" image="common/glass_square_focused_green.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
 <element type="squareFocusHalo2" image="common/glass_square_focused_yellow.png"
@@ -157,6 +157,9 @@ when the border that intersect at this corner are enabled.
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
 <element type="squareFocusHalo4" image="common/glass_square_focused_cyan.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo5" image="common/glass_square_focused_pink.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
       
@@ -187,6 +190,9 @@ when the border that intersect at this corner are enabled.
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 <element type="spinner4" state="neutral" image="common/glass_square_cyan.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner5" state="neutral" image="common/glass_square_pink.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
@@ -268,6 +274,14 @@ when the border that intersect at this corner are enabled.
 
 <!-- Color used in the credits -->
 <color type="credits_text" state="neutral" r="0" g="55" b="0" />
+
+<!-- Color used for emphasized items in e.g. lists -->
+<color type="emphasis_text" state="neutral" r="0" g="0" b="180" />
+<color type="emphasis_text" state="focused" r="0" g="0" b="160" />
+
+<!-- Color used for blue items in list (e.g. player team color in networking) -->
+<color type="list_blue" state="neutral" r="0" g="0" b="255" />
+<color type="list_blue" state="focused" r="0" g="0" b="255" />
 
 <!-- Color used to fade out background when a dialog is shown -->
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />

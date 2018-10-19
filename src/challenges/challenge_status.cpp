@@ -73,7 +73,8 @@ void ChallengeStatus::load(const XMLNode* challenges_node)
             m_state[3] = CH_SOLVED;
         }
     }   // if has 'solved' attribute
-
+    if (!node->get("best_while_slower", &m_max_req_in_lower_diff))
+        m_max_req_in_lower_diff = false;
 }   // load
 
 //-----------------------------------------------------------------------------
@@ -106,13 +107,15 @@ void ChallengeStatus::save(UTFWriter& writer)
 {
     writer << "        <" << m_data->getChallengeId();
     if (isSolved(RaceManager::DIFFICULTY_BEST))
-        writer << " solved=\"best\"/>\n";
+        writer << " solved=\"best\"";
     else if (isSolved(RaceManager::DIFFICULTY_HARD))
-        writer << " solved=\"hard\"/>\n";
+        writer << " solved=\"hard\"";
     else if (isSolved(RaceManager::DIFFICULTY_MEDIUM))
-        writer << " solved=\"medium\"/>\n";
+        writer << " solved=\"medium\"";
     else if (isSolved(RaceManager::DIFFICULTY_EASY))
-        writer << " solved=\"easy\"/>\n";
+        writer << " solved=\"easy\"";
     else
-        writer << " solved=\"none\"/>\n";
+        writer << " solved=\"none\"";
+
+    writer << " best_while_slower=\"" << m_max_req_in_lower_diff << "\"/>\n";
 }   // save

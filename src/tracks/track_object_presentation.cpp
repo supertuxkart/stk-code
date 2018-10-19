@@ -719,7 +719,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
 }   // TrackObjectPresentationSound
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationSound::update(float dt)
+void TrackObjectPresentationSound::updateGraphics(float dt)
 {
     if (m_sound != NULL && m_enabled)
     {
@@ -820,7 +820,7 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
 }   // TrackObjectPresentationBillboard
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationBillboard::update(float dt)
+void TrackObjectPresentationBillboard::updateGraphics(float dt)
 {
     if (ProfileWorld::isNoGraphics()) return;
 #ifndef SERVER_ONLY
@@ -934,7 +934,7 @@ TrackObjectPresentationParticles::~TrackObjectPresentationParticles()
 }   // ~TrackObjectPresentationParticles
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationParticles::update(float dt)
+void TrackObjectPresentationParticles::updateGraphics(float dt)
 {
     if (m_emitter != NULL)
     {

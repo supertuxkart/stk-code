@@ -229,6 +229,9 @@ void BaseUserScreen::selectUser(int index)
         // Delete a password that might have been typed for another user
         m_password_tb->setText("");
     }
+    
+    getWidget<CheckBoxWidget>("remember-user")->setState(
+        profile->rememberPassword());
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
@@ -243,8 +246,6 @@ void BaseUserScreen::selectUser(int index)
     // Now last use was with online --> Display the saved data
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
-    getWidget<CheckBoxWidget>("remember-user")->setState(
-        profile->rememberPassword());
     m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
     // And make the password invisible if the session is saved (i.e

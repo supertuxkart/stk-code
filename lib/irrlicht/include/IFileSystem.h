@@ -304,6 +304,10 @@ public:
 	See IReferenceCounted::drop() for more information. */
 	virtual IFileList* createFileList() =0;
 
+	//! Creates a list of files and directories in specified directory
+	//! and returns it.
+	virtual IFileList* createFileList(const io::path& directory) =0;
+
 	//! Creates an empty filelist
 	/** \return a Pointer to the created IFileList is returned. After the list has been used
 	it has to be deleted using its IFileList::drop() method.

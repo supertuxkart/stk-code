@@ -106,9 +106,9 @@ void CaptureTheFlag::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void CaptureTheFlag::reset()
+void CaptureTheFlag::reset(bool restart)
 {
-    FreeForAll::reset();
+    FreeForAll::reset(restart);
     m_red_trans = m_orig_red_trans;
     m_blue_trans = m_orig_blue_trans;
     m_red_return_ticks = m_blue_return_ticks = m_red_scores =

@@ -1324,25 +1324,17 @@ void FileManager::listFiles(std::set<std::string>& result,
 {
     result.clear();
 
-    if(!isDirectory(dir))
+    if (!isDirectory(dir))
         return;
 
-    io::path previous_cwd = m_file_system->getWorkingDirectory();
+    irr::io::IFileList* files = m_file_system->createFileList(dir.c_str());
 
-    if(!m_file_system->changeWorkingDirectoryTo( dir.c_str() ))
+    for (int n = 0; n < (int)files->getFileCount(); n++)
     {
-        Log::error("FileManager", "listFiles : Could not change CWD!\n");
-        return;
-    }
-    irr::io::IFileList* files = m_file_system->createFileList();
-
-    for(int n=0; n<(int)files->getFileCount(); n++)
-    {
-        result.insert(make_full_path ? dir+"/"+ files->getFileName(n).c_str()
-                                     : files->getFileName(n).c_str()         );
+        result.insert(make_full_path ? dir + "/" + files->getFileName(n).c_str()
+                                     : files->getFileName(n).c_str());
     }
 
-    m_file_system->changeWorkingDirectoryTo( previous_cwd );
     files->drop();
 }   // listFiles
 

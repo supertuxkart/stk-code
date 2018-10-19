@@ -60,6 +60,10 @@ private:
 
     m_state[RaceManager::DIFFICULTY_COUNT];
 
+    // If the challenge's SuperTux time requirement has been beaten
+    // in a (s)lower difficulty.
+    bool m_max_req_in_lower_diff;
+
     /** Pointer to the original challenge data. */
     const ChallengeData* m_data;
 
@@ -71,6 +75,7 @@ public:
         m_state[RaceManager::DIFFICULTY_MEDIUM] = CH_INACTIVE;
         m_state[RaceManager::DIFFICULTY_HARD]   = CH_INACTIVE;
         m_state[RaceManager::DIFFICULTY_BEST]   = CH_INACTIVE;
+        m_max_req_in_lower_diff = false;
     }
     virtual ~ChallengeStatus() {};
     void load(const XMLNode* config);
@@ -113,6 +118,21 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this challenge is a grand prix */
     bool isGrandPrix();
+    // ------------------------------------------------------------------------
+    /** Used when a challenge's requirement in the hardest difficulty are
+      * matched in a lower difficulty. Don't apply to GP */
+    void setMaxReqInLowerDiff()
+    {
+        if (!isGrandPrix() && !isUnlockList())
+            m_max_req_in_lower_diff = true;
+    }   // setMaxReqInLowerDiff
+    // ------------------------------------------------------------------------
+    /** Returns if the hardest difficulty requirements have been met in a lower
+      * difficulty. */
+    bool areMaxReqMetInLowerDiff() const
+    {
+        return m_max_req_in_lower_diff;
+    }   // areMaxReqMetInLowerDiff
     // ------------------------------------------------------------------------
     /** Returns a pointer to the actual Challenge data.
      */

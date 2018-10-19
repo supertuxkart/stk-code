@@ -23,8 +23,10 @@
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/follow_the_leader.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 /** A static create function that does only create an explosion if
@@ -49,6 +51,14 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
     {
         kart->decreaseShieldTime();
         return NULL;
+    }
+
+    if (race_manager->isFollowMode())
+    {
+        FollowTheLeaderRace *ftl_world =
+            dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
+        if(ftl_world->isLeader(kart->getWorldKartId()))
+            ftl_world->leaderHit();
     }
 
     return new ExplosionAnimation(kart, pos, direct_hit);

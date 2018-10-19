@@ -172,9 +172,9 @@ CutsceneWorld::~CutsceneWorld()
 {
 }   // ~CutsceneWorld
 //-----------------------------------------------------------------------------
-void CutsceneWorld::reset()
+void CutsceneWorld::reset(bool restart)
 {
-    World::reset();
+    World::reset(restart);
     m_phase = RACE_PHASE;
 }
 //-----------------------------------------------------------------------------
@@ -205,6 +205,8 @@ void CutsceneWorld::update(int ticks)
     if (m_time < 0.0001f)
     {
         //printf("INITIAL TIME for CutsceneWorld\n");
+
+        music_manager->startMusic();
 
         PtrVector<TrackObject>& objects = Track::getCurrentTrack()
                                         ->getTrackObjectManager()->getObjects();

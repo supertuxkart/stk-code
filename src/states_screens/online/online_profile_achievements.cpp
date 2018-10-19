@@ -25,7 +25,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "online/online_profile.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/achievement_progress_dialog.hpp"
 #include "states_screens/dialogs/player_rankings_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -74,6 +74,9 @@ void BaseOnlineProfileAchievements::beforeAddingWidget()
     // = NULL) user achievement progress will  also be displayed
     if(!m_visiting_profile || m_visiting_profile->isCurrentUser())
     {
+        // I18N: Goals in achievement
+        m_achievements_list_widget->addColumn( _("Goals"), 1 );
+        // I18N: Progress in achievement
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
     }
 }   // beforeAddingWidget
@@ -98,24 +101,26 @@ void BaseOnlineProfileAchievements::init()
         // No need to wait for results, since they are local anyway
         m_waiting_for_achievements = false;
         m_achievements_list_widget->clear();
-        const std::map<uint32_t, Achievement *> & all_achievements =
+        std::map<uint32_t, Achievement *> & all_achievements =
             PlayerManager::getCurrentPlayer()->getAchievementsStatus()
                                                     ->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
         for (it = all_achievements.begin(); it != all_achievements.end(); ++it)
         {
             std::vector<ListWidget::ListCell> row;
-            const Achievement *a = it->second;
+            Achievement *a = it->second;
             if(a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
             ListWidget::ListCell title(translations->fribidize(a->getInfo()->getName()), -1, 2);
+            ListWidget::ListCell goals(a->getGoalProgressAsString(), -1, 1);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
+            row.push_back(goals);
             row.push_back(progress);
             const std::string id = StringUtils::toString(a->getInfo()->getID());
             m_achievements_list_widget->addItem(id, row);
             if (a->isAchieved())
-                m_achievements_list_widget->markItemBlue(id);
+                m_achievements_list_widget->emphasisItem(id);
         }
     }
     else
@@ -149,8 +154,21 @@ void BaseOnlineProfileAchievements::eventCallback(Widget* widget,
         // is no error, show the achievement (it can happen that the
         // string is "" if no achievement exists)
         if(StringUtils::fromString(achievement, id))
-            new MessageDialog(AchievementsManager::get()
-                                   ->getAchievementInfo(id)->getDescription());
+        {
+            std::map<uint32_t, Achievement *> & all_achievements =
+                PlayerManager::getCurrentPlayer()->getAchievementsStatus()
+                                                    ->getAllAchievements();
+            std::map<uint32_t, Achievement *>::const_iterator it;
+            for (it = all_achievements.begin(); it != all_achievements.end(); ++it)
+            {
+                Achievement *a = it->second;
+                if (a->getInfo()->getID() == (unsigned int) id)
+                {
+                    new AchievementProgressDialog(a);
+                    break;
+                }
+            }
+        }
     }
     if (name == "rankings")
     {

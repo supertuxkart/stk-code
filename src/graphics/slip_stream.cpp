@@ -363,7 +363,7 @@ SP::SPMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
 //----------------------------------------------------------------------------- */
 void SlipStream::updateSlipstreamingTextures(float f, const AbstractKart *kart)
 {
-    if (!kart || !m_node || !m_node_fast)
+    if (!kart || kart->isEliminated() || !m_node || !m_node_fast)
     {
         if (m_node)
         {

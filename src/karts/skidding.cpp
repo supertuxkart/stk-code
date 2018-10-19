@@ -21,7 +21,7 @@
 #ifdef SKID_DEBUG
 #  include "graphics/show_curve.hpp"
 #endif
-#include "achievements/achievement_info.hpp"
+#include "achievements/achievements_status.hpp"
 #include "config/player_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
@@ -516,7 +516,11 @@ void Skidding::update(int ticks, bool is_on_ground,
                     if (m_kart->getController()->canGetAchievements())
                     {
                         PlayerManager::increaseAchievement(
-                                AchievementInfo::ACHIEVE_SKIDDING, "skidding");
+                                AchievementsStatus::SKIDDING_1LAP, 1);
+                        PlayerManager::increaseAchievement(
+                                AchievementsStatus::SKIDDING_1RACE, 1);
+                        PlayerManager::increaseAchievement(
+                                AchievementsStatus::SKIDDING, 1);
                     }
                 }
                 else {

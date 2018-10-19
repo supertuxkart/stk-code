@@ -18,7 +18,6 @@
 
 #include "physics/physics.hpp"
 
-#include "achievements/achievement_info.hpp"
 #include "animations/three_d_animation.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
@@ -331,15 +330,10 @@ void Physics::update(int ticks)
                 // only the current player can get achievements.
                 if (target_kart != kart && lpc && lpc->canGetAchievements())
                 {
-                    // Compare the current value of hits with the 'hit' goal value
-                    // (otherwise it would be compared with the kart id goal value,
-                    // which doesn't exist.
-                    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
-                                                       target_kart->getIdent(), 1, "hit");
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE,
-                                                          "ball", 1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT, 1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT_1RACE, 1);
                     }   // is bowling ball
                 }   // if target_kart != kart && is a player kart and is current player
             }

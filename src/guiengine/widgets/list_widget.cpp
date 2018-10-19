@@ -239,6 +239,7 @@ void ListWidget::addItem(   const std::string& internal_name,
     ListItem newItem;
     newItem.m_internal_name = internal_name;
     newItem.m_contents.push_back(cell);
+    newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -266,6 +267,7 @@ void ListWidget::addItem(const std::string& internal_name,
     {
         newItem.m_contents.push_back(contents[i]);
     }
+    newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -431,8 +433,8 @@ void ListWidget::markItemRed(const int id, bool red)
     }
     else
     {
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,0,0,0) );
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("text::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("text::focused"));
     }
 }
 
@@ -447,15 +449,36 @@ void ListWidget::markItemBlue(const int id, bool blue)
 
     if (blue)
     {
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,0,0,255) );
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,0,0,255) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("list_blue::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("list_blue::focused"));
     }
     else
     {
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,0,0,0) );
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("text::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("text::focused"));
     }
 }
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::emphasisItem(const int id, bool enable)
+{
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+
+    CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
+
+    if (enable)
+    {
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("emphasis_text::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("emphasis_text::focused"));
+    }
+    else
+    {
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("text::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("text::focused"));
+    }
+} // emphasisItem
 
 // -----------------------------------------------------------------------------
 

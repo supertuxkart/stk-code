@@ -87,6 +87,7 @@ public:
     {
         Log::warn("TrackObjectPresentation", "setEnable unimplemented for this presentation type");
     }
+    virtual void updateGraphics(float dt) {}
     virtual void update(float dt) {}
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) {}
@@ -290,7 +291,7 @@ public:
                                  bool disable_for_multiplayer);
     virtual ~TrackObjectPresentationSound();
     virtual void onTriggerItemApproached() OVERRIDE;
-    virtual void update(float dt) OVERRIDE;
+    virtual void updateGraphics(float dt) OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
     void triggerSound(bool loop);
@@ -320,7 +321,7 @@ public:
     TrackObjectPresentationBillboard(const XMLNode& xml_node,
                                      scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationBillboard();
-    virtual void update(float dt) OVERRIDE;
+    virtual void updateGraphics(float dt) OVERRIDE;
 };   // TrackObjectPresentationBillboard
 
 
@@ -342,7 +343,7 @@ public:
                                      scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationParticles();
 
-    virtual void update(float dt) OVERRIDE;
+    virtual void updateGraphics(float dt) OVERRIDE;
     void triggerParticles();
     void stop();
     void stopIn(double delay);

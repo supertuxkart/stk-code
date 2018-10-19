@@ -69,6 +69,7 @@ public:
                                    std::vector<std::string>& karts,
                                    std::vector<const ChallengeData*>& unlocked);
     bool       unlockByPoints(int points, ChallengeStatus* unlock_list);
+    bool       unlockSpecial(ChallengeStatus* unlock_list, int max_req_in_lower_diff);
 
     StoryModeStatus *createStoryModeStatus(const XMLNode *node=NULL);
 

@@ -228,6 +228,8 @@ public:
      *  fulfilled). */
     void grandPrixFinished() { m_story_mode_status->grandPrixFinished(); }
     // ------------------------------------------------------------------------
+    unsigned int getNumCompletedChallenges() const { return m_story_mode_status->getNumCompletedChallenges(); }
+    // ------------------------------------------------------------------------
     unsigned int getPoints() const { return m_story_mode_status->getPoints(); }
     // ------------------------------------------------------------------------
     unsigned int getPointsBefore() const { return m_story_mode_status->getPointsBefore(); }

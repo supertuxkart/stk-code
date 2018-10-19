@@ -514,6 +514,8 @@ public:
      *  AI karts. */
     unsigned int getNumberOfKarts() const {return m_num_karts; }
     // ------------------------------------------------------------------------
+    unsigned int getNumberOfAIKarts() const {return m_ai_kart_list.size(); }
+    // ------------------------------------------------------------------------
     unsigned int getNumNonGhostKarts() const { return m_num_karts - m_num_ghost_karts; }
     // ------------------------------------------------------------------------
     MajorRaceModeType getMajorMode() const { return m_major_mode; }
@@ -645,7 +647,7 @@ public:
         return m_kart_status[kart].m_difficulty;
     }   // getPlayerDifficulty
     // ------------------------------------------------------------------------
-    float hasBoostedAI(int kart) const
+    bool hasBoostedAI(int kart) const
     {
         return m_kart_status[kart].m_boosted_ai;
     }   // getKartRaceTime

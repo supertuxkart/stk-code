@@ -19,7 +19,7 @@
 #include "items/attachment.hpp"
 
 #include <algorithm>
-#include "achievements/achievement_info.hpp"
+#include "achievements/achievements_status.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
@@ -329,8 +329,8 @@ void Attachment::hitBanana(ItemState *item_state)
 {
     if (m_kart->getController()->canGetAchievements())
     {
-        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,
-                                           "banana", 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::BANANA, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||

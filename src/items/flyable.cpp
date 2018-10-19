@@ -26,6 +26,8 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 
+#include "achievements/achievements_status.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -34,6 +36,7 @@
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "network/compress_network_body.hpp"
@@ -562,6 +565,14 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             {
                 world->kartHit(kart->getWorldKartId(),
                     m_owner->getWorldKartId());
+
+                if (m_owner->getController()->canGetAchievements())
+                {
+                    if (m_owner->getWorldKartId() != kart->getWorldKartId())
+                        PlayerManager::addKartHit(kart->getWorldKartId());
+                    PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
+                    PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+                }
             }
         }
     }

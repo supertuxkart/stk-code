@@ -39,10 +39,11 @@ TrackSector::TrackSector()
 // ----------------------------------------------------------------------------
 void TrackSector::reset()
 {
-    m_current_graph_node       = Graph::UNKNOWN_SECTOR;
-    m_last_valid_graph_node    = Graph::UNKNOWN_SECTOR;
-    m_on_road                  = false;
-    m_last_triggered_checkline = -1;
+    m_current_graph_node         = Graph::UNKNOWN_SECTOR;
+    m_last_valid_graph_node      = Graph::UNKNOWN_SECTOR;
+    m_estimated_valid_graph_node = Graph::UNKNOWN_SECTOR;
+    m_on_road                    = false;
+    m_last_triggered_checkline   = -1;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -84,12 +85,15 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
     }
 
     // keep the current quad as the latest valid one IF the player has one
-    // of the required checklines
+    // of the required checklines AND is on road
+    // The on-road condition isn't required for the estimated valid node
+    // used for distances.
     const DriveNode* dn = DriveGraph::get()->getNode(m_current_graph_node);
     const std::vector<int>& checkline_requirements = dn->getChecklineRequirements();
 
     if (checkline_requirements.size() == 0)
     {
+        m_estimated_valid_graph_node = m_current_graph_node;
         if (m_on_road)
             m_last_valid_graph_node = m_current_graph_node;
     }
@@ -97,16 +101,22 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
     {
         for (unsigned int i=0; i<checkline_requirements.size(); i++)
         {
-            if (m_last_triggered_checkline == checkline_requirements[i])
+            // If a checkline is validated while off-road and rescue is then
+            // used ; checking for > is required to have the rescue position
+            // correctly updating until the checkline is crossed again.
+            // This requires an ordering of checklines such that
+            // if checkline N is validated, all checklines for n<N are too.
+            if (m_last_triggered_checkline >= checkline_requirements[i])
             {
                 //has_prerequisite = true;
+                m_estimated_valid_graph_node = m_current_graph_node;
                 if (m_on_road)
                     m_last_valid_graph_node = m_current_graph_node;
                 break;
             }
         }
 
-        // TODO: show a message when we detect a user cheated.
+        // TODO: show a message when we detect a user missed a checkline.
 
     }
 
@@ -119,6 +129,12 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
     {
         DriveGraph::get()->spatialToTrack(&m_latest_valid_track_coords, xyz,
             m_last_valid_graph_node);
+    }
+
+    if (m_estimated_valid_graph_node != Graph::UNKNOWN_SECTOR)
+    {
+        DriveGraph::get()->spatialToTrack(&m_estimated_valid_track_coords, xyz,
+            m_estimated_valid_graph_node);
     }
 }   // update
 
@@ -139,6 +155,7 @@ void TrackSector::rescue()
                                             ->getPredecessor(0);
     m_last_valid_graph_node = DriveGraph::get()->getNode(m_current_graph_node)
                                                ->getPredecessor(0);
+    m_estimated_valid_graph_node = m_current_graph_node;
 }    // rescue
 
 // ----------------------------------------------------------------------------

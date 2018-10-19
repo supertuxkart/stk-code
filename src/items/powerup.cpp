@@ -18,11 +18,9 @@
 
 #include "items/powerup.hpp"
 
-#include "achievements/achievement_info.hpp"
-#include "config/player_manager.hpp"
-
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
@@ -254,7 +252,8 @@ void Powerup::use()
     if (m_type != PowerupManager::POWERUP_NOTHING      &&
         m_kart->getController()->canGetAchievements()    )
     {
-        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
+        PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED, 1);
+        PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED_1RACE, 1);
     }
 
     // Play custom kart sound when collectible is used //TODO: what about the bubble gum?

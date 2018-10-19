@@ -41,9 +41,10 @@ AnimationBase::AnimationBase(const XMLNode &node)
     m_playing   = true;
     m_anim_type = ATT_CYCLIC;
 
-    if (m_all_ipos.size() == 0) // this will happen for some separate but non-animated objects
+    if (m_all_ipos.size() == 0)
     {
-        m_playing = false;
+        // Throw to avoid construction completely
+        throw std::runtime_error("Empty IPO, discard.");
     }
     reset();
     calculateAnimationDuration();

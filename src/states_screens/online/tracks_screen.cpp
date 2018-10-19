@@ -197,8 +197,14 @@ void TracksScreen::beforeAddingWidget()
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
-
-    const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
+    
+    RaceManager::MinorRaceModeType minor_mode = race_manager->getMinorMode();
+    bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
+    bool is_arena = is_soccer || minor_mode == RaceManager::MINOR_MODE_BATTLE;
+    
+    const std::vector<std::string>& groups = 
+                        is_arena ? track_manager->getAllArenaGroups(is_soccer)
+                                 : track_manager->getAllTrackGroups();
     const int group_amount = (int)groups.size();
 
     if (group_amount > 1)

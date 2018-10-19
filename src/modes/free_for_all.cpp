@@ -58,9 +58,9 @@ void FreeForAll::init()
 // ----------------------------------------------------------------------------
 /** Called when a battle is restarted.
  */
-void FreeForAll::reset()
+void FreeForAll::reset(bool restart)
 {
-    WorldWithRank::reset();
+    WorldWithRank::reset(restart);
     if (race_manager->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,

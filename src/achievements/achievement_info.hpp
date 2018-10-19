@@ -20,7 +20,6 @@
 #ifndef HEADER_ACHIEVEMENT_INFO_HPP
 #define HEADER_ACHIEVEMENT_INFO_HPP
 
-#include "achievements/achievement.hpp"
 #include "io/xml_node.hpp"
 #include "utils/translation.hpp"
 #include "utils/types.hpp"
@@ -32,47 +31,30 @@
 
 class Achievement;
 
-/** This is the base class for storing the definition of an achievement, e.g.
- *  title, description (which is common for all achievements), but also how
- *  to achieve this achievement.
+/** This class stores an achievement definition from the xml file, including
+ *  title, description, but also how to achieve this achievement.
+ *  Contrast with the Achievement class, which is a player-specific instance
+ *  tracking the progress of the achievement.
  * \ingroup achievements
  */
 class AchievementInfo
 {
 public:
-    /** Some handy names for the various achievements. */
-    enum { ACHIEVE_COLUMBUS      = 1,
-           ACHIEVE_FIRST         = ACHIEVE_COLUMBUS,
-           ACHIEVE_STRIKE        = 2,
-           ACHIEVE_ARCH_ENEMY    = 3,
-           ACHIEVE_MARATHONER    = 4,
-           ACHIEVE_SKIDDING      = 5,
-           ACHIEVE_GOLD_DRIVER   = 6,
-           ACHIEVE_POWERUP_LOVER = 7,
-           ACHIEVE_UNSTOPPABLE   = 8,
-           ACHIEVE_BANANA        = 9,
-           ACHIEVE_MOSQUITO      = 11
+    // The operations supported for a goal
+    enum operationType {
+        OP_NONE      = 0,
+        OP_ADD       = 1,
+        OP_SUBSTRACT = 2,
     };
 
-    /** Achievement check type:
-     *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
-     *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
-     */
-    enum AchievementCheckType
-    {
-        AC_ALL_AT_LEAST,
-        AC_ONE_AT_LEAST
-    };
-    /** Achievement reset type:
-     *  AFTER_LAP:  Achievement needs to be reset after each lap.
-     *  AFTER_RACE: Achievement needs to be reset after each race.
-     *  NEVER:      Achievement does not need to be reset
-     */
-    enum ResetType
-    {
-        AFTER_LAP  = 1,
-        AFTER_RACE = 2,
-        NEVER      = 3
+    // We store goals in a recursive tree.
+    // This structure matching the algorithms
+    // we use to manipulate it simplify code.
+    struct goalTree {
+        std::string           type;
+        int                   value;
+        operationType         operation;
+        std::vector<goalTree> children;      
     };
 
 private:
@@ -85,46 +67,34 @@ private:
     /** The description of this achievement. */
     irr::core::stringw m_description;
 
-    /** Determines how this achievement is checked if it is successful. */
-    AchievementCheckType  m_check_type;
-
-    /** The target values needed to be reached. */
-    std::map<std::string, int> m_goal_values;
-
-    /** Determines when the achievement needs to be reset */
-    ResetType m_reset_type;
-
     /** A secret achievement has its progress not shown. */
     bool m_is_secret;
+
+    void parseGoals(const XMLNode * input, goalTree &parent);
+    int  recursiveGoalCount(goalTree &parent);
+    int  recursiveProgressCount(goalTree &parent);
+    int  getRecursiveDepth(goalTree &parent);
+protected:
+    friend class Achievement;
+    friend class AchievementProgressDialog;
+    /** The tree storing all goals */
+    goalTree           m_goal_tree;
 
 public:
              AchievementInfo(const XMLNode * input);
     virtual ~AchievementInfo() {};
 
-    virtual irr::core::stringw toString() const;
-    virtual bool checkCompletion(Achievement * achievement) const;
-    int getGoalValue(const std::string &key) const;
+    virtual irr::core::stringw goalString();
+    virtual irr::core::stringw progressString();
 
-    // ------------------------------------------------------------------------
-    /** Returns the id of this achievement. */
-    uint32_t getID() const { return m_id; }
-    // ------------------------------------------------------------------------
-    /** Returns the description of this achievement. */
+    int                getDepth()             { return getRecursiveDepth(m_goal_tree); }
+    uint32_t           getID()          const { return m_id; }
     irr::core::stringw getDescription() const { return _(m_description.c_str()); }
-    // ------------------------------------------------------------------------
-    /** Returns the name of this achievement. */
-    irr::core::stringw getName() const { return _LTR(m_name.c_str()); }
-    // ------------------------------------------------------------------------
-    bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
-    // ------------------------------------------------------------------------
-    bool needsResetAfterLap() const { return m_reset_type == AFTER_LAP; }
-    // ------------------------------------------------------------------------
-    /** Returns the check type for this achievement. */
-    AchievementCheckType getCheckType() const { return m_check_type; }
-    // ------------------------------------------------------------------------
-    /** Returns if this achievement is a secret achievement. */
-    bool isSecret() const { return m_is_secret; }
-    // ------------------------------------------------------------------------
+    irr::core::stringw getName()        const { return _LTR(m_name.c_str()); }
+    bool               isSecret()       const { return m_is_secret; }
+
+    // This function should not be called if copy already has children
+    void copyGoalTree(goalTree &copy, goalTree &model, bool set_values_to_zero);
 };   // class AchievementInfo
 
 
