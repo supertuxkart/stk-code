@@ -255,7 +255,7 @@ BareNetworkString* NetworkItemManager::saveState(std::vector<std::string>* ru)
 void NetworkItemManager::forwardTime(int ticks)
 {
     int new_ticks = World::getWorld()->getTicksSinceStart() + ticks;
-    World::getWorld()->setTicks(new_ticks);
+    World::getWorld()->setTicksForRewind(new_ticks);
 
     for(auto &i : m_confirmed_state)
     {
