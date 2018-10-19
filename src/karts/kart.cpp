@@ -1814,7 +1814,7 @@ void Kart::showZipperFire()
  */
 bool Kart::setSquash(float time, float slowdown)
 {
-    if (isInvulnerable()) return false;
+    if (isInvulnerable() || getKartAnimation()) return false;
 
     if (isShielded())
     {
@@ -1858,6 +1858,7 @@ bool Kart::setSquash(float time, float slowdown)
     return true;
 }   // setSquash
 
+//-----------------------------------------------------------------------------
 void Kart::unsetSquash()
 {
 #ifndef SERVER_ONLY
@@ -1881,7 +1882,7 @@ void Kart::unsetSquash()
         }
     }
 #endif
-}
+}   // unsetSquash
 
 //-----------------------------------------------------------------------------
 /** Returns if the kart is currently being squashed

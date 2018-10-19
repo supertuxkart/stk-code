@@ -243,8 +243,12 @@ void Physics::update(int ticks)
             else if (obj->isFlattenKartObject())
             {
                 const KartProperties *kp = kart->getKartProperties();
-                kart->setSquash(kp->getSwatterSquashDuration(),
-                    kp->getSwatterSquashSlowdown());
+                if (kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown()))
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId(),
+                        kart->getWorldKartId());
+                }
             }
             else if(obj->isSoccerBall() && 
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
