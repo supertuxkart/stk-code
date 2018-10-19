@@ -937,6 +937,7 @@ bool InputManager::masterPlayerOnly() const
  */
 EventPropagation InputManager::input(const SEvent& event)
 {
+    const float ORIENTATION_MULTIPLIER = 10.0f;
     if (event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Axes - FIXME, instead of checking all of them, ask the bindings
@@ -1238,7 +1239,29 @@ EventPropagation InputManager::input(const SEvent& event)
             
             float factor = UserConfigParams::m_multitouch_tilt_factor;
             factor = std::max(factor, 0.1f);
-            device->updateAxisX(float(event.AccelerometerEvent.Y) / factor);
+            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+            {
+                device->updateOrientationFromAccelerometer(event.AccelerometerEvent.X, event.AccelerometerEvent.Y);
+                device->updateAxisX(device->getOrientation() * ORIENTATION_MULTIPLIER / factor);
+            }
+            else
+            {
+                device->updateAxisX(float(event.AccelerometerEvent.Y) / factor);
+            }
+        }
+    }
+    else if (event.EventType == EET_GYROSCOPE_EVENT)
+    {
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+
+        if (device && device->isGyroscopeActive())
+        {
+            m_device_manager->updateMultitouchDevice();
+
+            float factor = UserConfigParams::m_multitouch_tilt_factor;
+            factor = std::max(factor, 0.1f);
+            device->updateOrientationFromGyroscope(event.GyroscopeEvent.Z);
+            device->updateAxisX(device->getOrientation() * ORIENTATION_MULTIPLIER / factor);
         }
     }
 
