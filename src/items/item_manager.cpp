@@ -271,14 +271,29 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
                                                         &hit_point,
                                                         &material_hit,
                                                         &normal);
-    // This can happen if the kart is 'over nothing' when dropping
-    // the bubble gum
-    if (!material_hit) return NULL;
 
-    normal.normalize();
+    // We will get no material if the kart is 'over nothing' when dropping
+    // the bubble gum. In most cases this means that the item does not need
+    // to be created (and we just return NULL). Only exception: if the server
+    // has sent a 'new item' event (which means its raycast found terrain),
+    // but the client does not have found a terrain (e.g. differences in
+    // position or more likely floating point differences). In this case, we
+    // must use the server position. In this and only this case xyz is not
+    // NULL (and then contains the server's position for the item).    
+    if (!material_hit && !xyz) return NULL;
 
-    pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
-
+    if (!material_hit)
+    {
+        // We are on a client which has received a new item event. Still
+        // create this item
+        normal.setValue(0, 1, 0);  // Arbitrary, we don't have a normal
+        pos = *xyz;
+    }
+    else
+    {
+        normal.normalize();
+        pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
+    }
 
     ItemState::ItemType mesh_type = type;
     if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
