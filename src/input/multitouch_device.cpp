@@ -424,6 +424,8 @@ void MultitouchDevice::updateAxisY(float value)
 
 // ----------------------------------------------------------------------------
 
+/** Returns device orientation Z angle, in radians, where 0 is landscape orientation parallel to the floor.
+ */
 float MultitouchDevice::getOrientation()
 {
     return m_orientation;
@@ -431,6 +433,11 @@ float MultitouchDevice::getOrientation()
 
 // ----------------------------------------------------------------------------
 
+/** Update device orientation from the accelerometer measurements.
+ *  Accelerometer is shaky, so it adjusts the orientation angle slowly.
+ *  \param x Accelerometer X axis
+ *  \param y Accelerometer Y axis
+ */
 void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
 {
     const float ACCEL_DISCARD_THRESHOLD = 4.0f;
@@ -471,6 +478,10 @@ void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
 
 // ----------------------------------------------------------------------------
 
+/** Update device orientation from the gyroscope measurements.
+ *  Gyroscope is not shaky and very sensitive, but drifts over time.
+ *  \param x Gyroscope Z axis
+ */
 void MultitouchDevice::updateOrientationFromGyroscope(float z)
 {
     const float GYRO_SPEED_THRESHOLD = 0.005f;
