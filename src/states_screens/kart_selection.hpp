@@ -128,6 +128,9 @@ protected:
 
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;
+private:
+    PtrVector<const KartProperties, REF> getUsableKarts(
+        const std::string& selected_kart_group);
 public:
     /** Returns the current instance */
     static KartSelectionScreen* getRunningInstance();

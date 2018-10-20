@@ -1460,6 +1460,24 @@ void KartSelectionScreen::renumberKarts()
 }   // renumberKarts
 
 // ----------------------------------------------------------------------------
+PtrVector<const KartProperties, REF> KartSelectionScreen::getUsableKarts(
+    const std::string& selected_kart_group)
+{
+    PtrVector<const KartProperties, REF> karts;
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        // Ignore karts that are not in the selected group
+        if((selected_kart_group != ALL_KART_GROUPS_ID &&
+            !prop->isInGroup(selected_kart_group)) || isIgnored(prop->getIdent()))
+            continue;
+        karts.push_back(prop);
+    }
+    karts.insertionSort();
+    return karts;
+}   // getUsableKarts
+
+// ----------------------------------------------------------------------------
 
 void KartSelectionScreen::setKartsFromCurrentGroup()
 {
@@ -1484,18 +1502,16 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     w->clearItems();
 
     int usable_kart_count = 0;
-    PtrVector<const KartProperties, REF> karts;
+    PtrVector<const KartProperties, REF> karts = getUsableKarts(selected_kart_group);
 
-    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    if (karts.empty())
     {
-        const KartProperties* prop = kart_properties_manager->getKartById(i);
-        // Ignore karts that are not in the selected group
-        if((selected_kart_group != ALL_KART_GROUPS_ID &&
-            !prop->isInGroup(selected_kart_group)) || isIgnored(prop->getIdent()))
-            continue;
-        karts.push_back(prop);
+        // In network this will happen if no addons kart on server
+        PtrVector<const KartProperties, REF> new_karts =
+            getUsableKarts(DEFAULT_GROUP_NAME);
+        std::swap(karts.m_contents_vector, new_karts.m_contents_vector);
+        tabs->select(DEFAULT_GROUP_NAME, PLAYER_ID_GAME_MASTER);
     }
-    karts.insertionSort();
 
     for(unsigned int i=0; i<karts.size(); i++)
     {
