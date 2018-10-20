@@ -23,7 +23,7 @@ export KARTS="all"
 export TRACKS="abyss arena_candela_city battleisland cave cornfield_crossing   \
                endcutscene featunlocked fortmagma gplose gpwin hacienda        \
                icy_soccer_field introcutscene introcutscene2 lasdunasarena     \
-               lasdunasscoccer lighthouse mines olivermath overworld sandtrack \
+               lasdunassoccer lighthouse mines olivermath overworld sandtrack  \
                scotland snowmountain snowtuxpeak soccer_field stadium temple   \
                tutorial zengarden"
 
