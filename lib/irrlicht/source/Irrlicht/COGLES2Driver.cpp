@@ -86,6 +86,9 @@ namespace video
 		egl_params.platform = CEGL_PLATFORM_DEFAULT;
 		egl_params.window = ((struct android_app *)(params.PrivateData))->window;
 		egl_params.display = NULL;
+#elif defined(__EMSCRIPTEN__)
+		egl_params.platform = CEGL_PLATFORM_DEFAULT;
+		egl_params.display = NULL;
 #endif
 		
 		EglContext->init(egl_params);
@@ -2888,7 +2891,8 @@ namespace irr
 namespace video
 {
 
-#if !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
+// #if defined(__EMSCRIPTEN__) || !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
+#ifdef __EMSCRIPTEN__
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io)
 	{

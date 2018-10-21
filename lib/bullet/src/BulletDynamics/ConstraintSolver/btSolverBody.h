@@ -25,11 +25,12 @@ class	btRigidBody;
 
 ///Until we get other contributions, only use SIMD on Windows, when using Visual Studio 2008 or later, and not double precision
 #ifdef BT_USE_SSE
-#define USE_SIMD 1
+/* #define USE_SIMD 1 */
 #endif //
+/* #undefine USE_SIMD */
 
 
-#ifdef USE_SIMD
+#ifdef FUCKJAD_USE_SIMD
 
 struct	btSimdScalar
 {

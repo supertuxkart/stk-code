@@ -39,6 +39,8 @@ private:
 
     bool m_frame_before_loading_world;
 
+    float m_left_over_time;
+
     Synchronised<int> m_ticks_adjustment;
 
     uint64_t m_curr_time;
@@ -50,6 +52,7 @@ public:
          MainLoop(unsigned parent_pid);
         ~MainLoop();
     void run();
+    void tick_loop();
     /** Set the abort flag, causing the mainloop to be left. */
     void abort() { m_abort = true; }
     void requestAbort() { m_request_abort = true; }

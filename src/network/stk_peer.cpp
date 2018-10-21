@@ -102,9 +102,9 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
         return;
 
     ENetPacket* packet = NULL;
-    if (m_crypto && encrypted)
+    if (true && encrypted)
     {
-        packet = m_crypto->encryptSend(*data, reliable);
+      // packet = m_crypto->encryptSend(*data, reliable);
     }
     else
     {
@@ -184,5 +184,5 @@ uint32_t STKPeer::getPing()
 //-----------------------------------------------------------------------------
 void STKPeer::setCrypto(std::unique_ptr<Crypto>&& c)
 {
-    m_crypto = std::move(c);
+  // m_crypto = std::move(c);
 }   // setCrypto

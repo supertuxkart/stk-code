@@ -314,8 +314,8 @@ endif()
 
 # Freetype
 if (NOT SERVER_ONLY)
-    find_package(Freetype)
-    if(FREETYPE_FOUND)
+    #find_package(Freetype)
+    if(1 OR FREETYPE_FOUND)
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
         message(FATAL_ERROR "Freetype not found. "
@@ -435,8 +435,8 @@ else()
     elseif(MINGW)
         set(PTHREAD_NAMES "winpthread-1" "libwinpthread-1" "pthreadGC2")
     endif()
-    find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib)
-    mark_as_advanced(PTHREAD_LIBRARY)
+    #find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib)
+    #mark_as_advanced(PTHREAD_LIBRARY)
 
     # Set data dir (absolute or relative to CMAKE_INSTALL_PREFIX)
     if(NOT STK_INSTALL_DATA_DIR_ABSOLUTE)
@@ -452,7 +452,7 @@ else()
 
     # Build the final executable
     add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
-    target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
+    #target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
 # CURL and OpenSSL or Nettle
@@ -467,33 +467,30 @@ elseif(MINGW)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libeay32.dll)
 else()
-    find_package(CURL REQUIRED)
-    include_directories(${CURL_INCLUDE_DIRS})
+    # find_package(CURL REQUIRED)
+    # include_directories(${CURL_INCLUDE_DIRS})
 
     find_path(NETTLE_INCLUDE_DIRS nettle/gcm.h nettle/sha.h nettle/base64.h nettle/version.h nettle/yarrow.h)
     find_library(NETTLE_LIBRARY NAMES nettle libnettle)
 
-    if (NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL)
+    if (NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL AND 0)
         set(USE_CRYPTO_OPENSSL ON)
-        find_package(OpenSSL REQUIRED)
+        # find_package(OpenSSL REQUIRED)
 
-        if(${OPENSSL_VERSION} VERSION_LESS ${OPENSSL_MINIMUM_VERSION} OR
-            (${OPENSSL_VERSION} VERSION_EQUAL ${OPENSSL_MINIMUM_VERSION} AND ${OPENSSL_VERSION} STRLESS ${OPENSSL_MINIMUM_VERSION}))
-            message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
-        endif()
-        include_directories(${OpenSSL_INCLUDE_DIRS})
     else()
         set(USE_CRYPTO_OPENSSL OFF)
-        include_directories(${NETTLE_INCLUDE_DIRS})
+        # include_directories(${NETTLE_INCLUDE_DIRS})
     endif()
 endif()
+
+set(USE_CRYPTO_OPENSSL OFF)
 
 if (USE_CRYPTO_OPENSSL)
     message(STATUS "OpenSSL will be used for cryptography in STK.")
     add_definitions(-DENABLE_CRYPTO_OPENSSL)
 else()
-    message(STATUS "Nettle will be used for cryptography in STK.")
-    add_definitions(-DENABLE_CRYPTO_NETTLE)
+    #message(STATUS "Nettle will be used for cryptography in STK.")
+    #add_definitions(-DENABLE_CRYPTO_NETTLE)
 endif()
 
 # Common library dependencies
@@ -504,13 +501,13 @@ target_link_libraries(supertuxkart
     ${ENET_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
-    ${CURL_LIBRARIES}
+    # ${CURL_LIBRARIES}
     )
 
 if (USE_CRYPTO_OPENSSL)
     target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})
 else()
-    target_link_libraries(supertuxkart ${NETTLE_LIBRARY})
+    #target_link_libraries(supertuxkart ${NETTLE_LIBRARY})
 endif()
 
 if(NOT SERVER_ONLY)

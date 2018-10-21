@@ -398,10 +398,10 @@ void ClientLobby::finalizeConnectionRequest(NetworkString* header,
 {
     if (encrypt)
     {
-        auto crypto = Crypto::getClientCrypto();
-        Crypto::resetClientAES();
+      //auto crypto = Crypto::getClientCrypto();
+      //Crypto::resetClientAES();
         BareNetworkString* result = new BareNetworkString();
-        if (!crypto->encryptConnectionRequest(*rest))
+        if (true)
         {
             // Failed
             result->addUInt32(0);
@@ -421,8 +421,8 @@ void ClientLobby::finalizeConnectionRequest(NetworkString* header,
         delete header;
         if (encrypt)
         {
-            STKHost::get()->getServerPeerForClient()
-                ->setCrypto(std::move(crypto));
+            // STKHost::get()->getServerPeerForClient()
+            //     ->setCrypto(std::move(crypto));
         }
     }
     else

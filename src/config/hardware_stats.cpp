@@ -376,8 +376,9 @@ void reportHardwareStats()
                 Log::error("HW report", "Error uploading the HW report.");
                 if(hadDownloadError())
                     Log::error("HW report", "%s", getDownloadErrorMessage());
-                else
-                    Log::error("HW report", "%s", getData().c_str());
+                else {
+                    // Log::error("HW report", "%s", getData().c_str());
+		}
             }
             else
             {

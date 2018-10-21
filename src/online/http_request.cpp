@@ -25,7 +25,7 @@
 #  include <winsock2.h>
 #endif
 
-#include <curl/curl.h>
+// #include <curl/curl.h>
 #include <assert.h>
 
 namespace Online
@@ -93,12 +93,12 @@ namespace Online
         m_string_buffer = "";
         m_filename      = "";
         m_parameters    = "";
-        m_curl_code     = CURLE_OK;
+        m_curl_code     = 200; // 200;
         m_progress.setAtomic(0);
         if (m_http_header == NULL)
         {
-            m_http_header = curl_slist_append(m_http_header,
-                "Host: addons.supertuxkart.net");
+            // m_http_header = curl_slist_append(m_http_header,
+            //     "Host: addons.supertuxkart.net");
         }
         m_disable_sending_log = false;
     }   // init
@@ -160,48 +160,48 @@ namespace Online
      */
     void HTTPRequest::prepareOperation()
     {
-        m_curl_session = curl_easy_init();
-        if (!m_curl_session)
-        {
-            Log::error("HTTPRequest::prepareOperation",
-                       "LibCurl session not initialized.");
-            return;
-        }
+        // m_curl_session = curl_easy_init();
+//         if (!m_curl_session)
+//         {
+//             Log::error("HTTPRequest::prepareOperation",
+//                        "LibCurl session not initialized.");
+//             return;
+//         }
 
-        curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.c_str());
-        curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
-        curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
-        curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, this);
-        curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSFUNCTION,
-                                         &HTTPRequest::progressDownload);
-        curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
-        curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
-        curl_easy_setopt(m_curl_session, CURLOPT_NOSIGNAL, 1);
-        //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
-        if (m_url.substr(0, 8) == "https://")
-        {
-            // https, load certificate info
-            assert(m_http_header != NULL);
-            curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER,
-                m_http_header);
-            const std::string& ci = file_manager->getCertLocation();
-            CURLcode error = curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
-                ci.c_str());
-            if (error != CURLE_OK)
-            {
-                Log::error("HTTPRequest", "Error setting CAINFO to '%s'",
-                    ci.c_str());
-                Log::error("HTTPRequest", "Error: '%s'.", error,
-                    curl_easy_strerror(error));
-            }
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
-#ifdef __APPLE__
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
-#else
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 1L);
-#endif
-        }
+//         // curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.c_str());
+//         // curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, this);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSFUNCTION,
+//                                          &HTTPRequest::progressDownload);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
+//         // curl_easy_setopt(m_curl_session, CURLOPT_NOSIGNAL, 1);
+//         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
+//         if (m_url.substr(0, 8) == "https://")
+//         {
+//             // https, load certificate info
+//             assert(m_http_header != NULL);
+//             // curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER,
+//                 m_http_header);
+//             const std::string& ci = file_manager->getCertLocation();
+//             CURLcode error = // curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
+//                 ci.c_str());
+//             if (error != 200)
+//             {
+//                 Log::error("HTTPRequest", "Error setting CAINFO to '%s'",
+//                     ci.c_str());
+//                 Log::error("HTTPRequest", "Error: '%s'.", error,
+//                     curl_easy_strerror(error));
+//             }
+//             // curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
+// #ifdef __APPLE__
+//             // curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
+// #else
+//             // curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 1L);
+// #endif
+//         }
     }   // prepareOperation
 
     // ------------------------------------------------------------------------
@@ -224,15 +224,15 @@ namespace Online
                            (m_filename+".part").c_str());
                 return;
             }
-            curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
-            curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
+            // // curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
+            // // curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
         }
         else
         {
-            curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA,
-                             &m_string_buffer);
-            curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION,
-                             &HTTPRequest::writeCallback);
+            // // curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA,
+            //                  &m_string_buffer);
+            // // curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION,
+            //                  &HTTPRequest::writeCallback);
         }
 
         // All parameters added have a '&' added
@@ -275,17 +275,17 @@ namespace Online
             Log::info("HTTPRequest", "Sending %s to %s", param.c_str(), m_url.c_str());
         } // end log http request
 
-        curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
+        // // curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
         const std::string& uagent = StringUtils::getUserAgentString();
-        curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
+        // curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
 
-        m_curl_code = curl_easy_perform(m_curl_session);
+        m_curl_code = 200; // curl_easy_perform(m_curl_session);
         Request::operation();
 
         if (fout)
         {
             fclose(fout);
-            if (m_curl_code == CURLE_OK)
+            if (m_curl_code == 200)
             {
                 if(UserConfigParams::logAddons())
                     Log::info("HTTPRequest", "Download successful.");
@@ -297,7 +297,7 @@ namespace Online
                 {
                     Log::error("addons",
                                "Could not removed existing addons.xml file.");
-                    m_curl_code = CURLE_WRITE_ERROR;
+                    //m_curl_code = CURLE_WRITE_ERROR;
                 }
                 int ret = rename((m_filename+".part").c_str(),
                                  m_filename.c_str()           );
@@ -307,9 +307,9 @@ namespace Online
                 {
                     Log::error("addons",
                                "Could not rename downloaded addons.xml file!");
-                    m_curl_code = CURLE_WRITE_ERROR;
+                    //m_curl_code = CURLE_WRITE_ERROR;
                 }
-            }   // m_curl_code ==CURLE_OK
+            }   // m_curl_code ==200
         }   // if fout
     }   // operation
 
@@ -320,7 +320,7 @@ namespace Online
      */
     void HTTPRequest::afterOperation()
     {
-        if (m_curl_code == CURLE_OK)
+        if (m_curl_code == 200)
             setProgress(1.0f);
         else
             setProgress(-1.0f);
@@ -328,7 +328,7 @@ namespace Online
         Request::afterOperation();
         if (m_curl_session)
         {
-            curl_easy_cleanup(m_curl_session);
+	  // curl_easy_cleanup(m_curl_session);
             m_curl_session = NULL;
         }
     }   // afterOperation

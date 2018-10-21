@@ -39,6 +39,8 @@ inline int	btGetVersion()
 #define BT_DEBUG
 #endif
 
+// #undefine GAY_ENABLE_SSE
+
 
 #ifdef _WIN32
 
@@ -54,7 +56,7 @@ inline int	btGetVersion()
 //			#pragma warning(disable:4530) // Disable the exception disable but used in MSCV Stl warning.
 //			#pragma warning(disable:4996) //Turn off warnings about deprecated C routines
 //			#pragma warning(disable:4786) // Disable the "debug name too long" warning
-#ifdef ENABLE_SSE
+#ifdef GAY_ENABLE_SSE
 			#define SIMD_FORCE_INLINE __forceinline
 			#define ATTRIBUTE_ALIGNED16(a) __declspec(align(16)) a
 			#define ATTRIBUTE_ALIGNED64(a) __declspec(align(64)) a
@@ -74,9 +76,9 @@ inline int	btGetVersion()
  			#define btFsel(a,b,c) __fsel((a),(b),(c))
 		#else
 
-#if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION)) && defined (ENABLE_SSE)
-			#define BT_USE_SSE
-			#include <emmintrin.h>
+#if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION)) && defined (GAY_ENABLE_SSE)
+			// #define BT_USE_SSE
+			// #include <emmintrin.h>
 #endif
 
 		#endif//_XBOX
@@ -125,7 +127,9 @@ inline int	btGetVersion()
 
 #else
 
-#ifdef USE_LIBSPE2
+// #undefine GAY_USE_LIBSPE2
+
+#ifdef GAY_USE_LIBSPE2
 
 		#define SIMD_FORCE_INLINE __inline
 		#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
@@ -150,9 +154,9 @@ inline int	btGetVersion()
 #else
 	//non-windows systems
 
-#if (defined (__APPLE__) && defined (__i386__) && (!defined (BT_USE_DOUBLE_PRECISION)))
-	#define BT_USE_SSE
-	#include <emmintrin.h>
+#if (defined (__APPLE__) && defined (__i386__) && (!defined (BT_USE_DOUBLE_PRECISION)) && false)
+	// #define BT_USE_SSE
+	// #include <emmintrin.h>
 
 	#define SIMD_FORCE_INLINE inline
 ///@todo: check out alignment methods for other platforms/compilers
@@ -205,6 +209,7 @@ inline int	btGetVersion()
 #endif	//__CELLOS_LV2__
 #endif
 
+// #undefine BT_USE_DOUBLE_PRECISION
 
 ///The btScalar type abstracts floating point numbers, to easily switch between double and single floating point precision.
 #if defined(BT_USE_DOUBLE_PRECISION)

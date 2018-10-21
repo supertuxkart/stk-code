@@ -27,6 +27,7 @@
 #endif
 
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+#error "WHAT."
 #include "CIrrDeviceLinux.h"
 #endif
 

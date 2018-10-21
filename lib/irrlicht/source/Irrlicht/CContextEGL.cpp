@@ -145,7 +145,7 @@ bool ContextManagerEGL::init(const ContextEGLParams& params)
         return false;
     }
 
-    eglSwapInterval(m_egl_display, m_creation_params.vsync_enabled ? 1 : 0);
+    // eglSwapInterval(m_egl_display, m_creation_params.vsync_enabled ? 1 : 0);
 
     m_initialized = true;
     return true;
@@ -392,11 +392,16 @@ bool ContextManagerEGL::createSurface()
 
 bool ContextManagerEGL::createContext()
 {
+    #ifdef __EMSCRIPTEN__
+    m_is_legacy_device = true;
+    #else
     m_is_legacy_device = false;
+    #endif
+
 
     if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES)
     {
-        if (!m_creation_params.force_legacy_device)
+        if (!m_creation_params.force_legacy_device && !m_is_legacy_device)
         {
             if (m_egl_context == EGL_NO_CONTEXT)
             {

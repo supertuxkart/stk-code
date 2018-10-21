@@ -227,7 +227,7 @@ private:
                              SFXManager();
     virtual                 ~SFXManager();
 
-    static void* mainLoop(void *obj);
+    
     void deleteSFX(SFXBase *sfx);
     void queueCommand(SFXCommand *command);
     void reallyPositionListenerNow();
@@ -235,6 +235,7 @@ private:
 public:
     static void create();
     static void destroy();
+    static void* mainLoop(void *obj);
     void queue(SFXCommands command, SFXBase *sfx=NULL);
     void queue(SFXCommands command, SFXBase *sfx, float f);
     void queue(SFXCommands command, SFXBase *sfx, const Vec3 &p);

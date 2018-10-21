@@ -5,6 +5,11 @@
 #include "CWriteFile.h"
 #include <stdio.h>
 
+
+#if defined(__EMSCRIPTEN__) && !defined(_STK_NO_IDBFS)
+#include <emscripten.h>
+#endif
+
 namespace irr
 {
 namespace io
@@ -46,8 +51,18 @@ s32 CWriteFile::write(const void* buffer, u32 sizeToWrite)
 	if (!isOpen())
 		return 0;
 
-	return (s32)fwrite(buffer, 1, sizeToWrite, File);
+	s32 written = fwrite(buffer, 1, sizeToWrite, File);
+
+#if defined(__EMSCRIPTEN__) && !defined(_STK_NO_IDBFS)
+	// No point waiting on our sync job
+	EM_ASM(
+	       window.userDataSync();
+	);
+#endif
+	return written;
 }
+
+
 
 
 

@@ -32,6 +32,8 @@ extern bool GLContextDebugBit;
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #include <GL/gl.h>
 #ifdef _IRR_OPENGL_USE_EXTPOINTER_
+#define _IRR_OPENGL_USE_EXTPOINTER_ 1
+#error "dab"
 #define GLX_GLXEXT_PROTOTYPES
 #include "glxext.h"
 #endif
@@ -2680,7 +2682,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		returnInfo.Axes = info.axes;
 		returnInfo.Buttons = info.buttons;
 
-#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__) && !defined(__EMSCRIPTEN__)
 		char name[80];
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;

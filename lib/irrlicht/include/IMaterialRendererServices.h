@@ -39,6 +39,8 @@ public:
 		bool resetAllRenderstates) = 0;
 	
 	#ifdef _IRR_COMPILE_WITH_OGLES2_	
+  // #define _IRR_COMPILE_WITH_OGLES2_ 666
+  // #error "nani this should never happen"
 	//! Return an index constant for the vertex shader based on a name.
 	virtual s32 getVertexShaderConstantID(const c8* name) = 0;
 	#endif

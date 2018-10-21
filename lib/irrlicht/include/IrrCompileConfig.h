@@ -44,7 +44,8 @@
 
 
 //! Uncomment this line to compile with the SDL device
-//#define _IRR_COMPILE_WITH_SDL_DEVICE_
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
+#define NO_IRR_COMPILE_WITH_X11_
 #ifdef NO_IRR_COMPILE_WITH_SDL_DEVICE_
 #undef _IRR_COMPILE_WITH_SDL_DEVICE_
 #endif
@@ -116,7 +117,7 @@
 #define _IRR_LINUX_PLATFORM_
 #endif
 #define _IRR_POSIX_API_
-#define _IRR_COMPILE_WITH_X11_DEVICE_
+/* #define _IRR_COMPILE_WITH_X11_DEVICE_ */
 //#define _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #endif
 
@@ -172,12 +173,17 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 //! Define _IRR_COMPILE_WITH_OPENGL_ to compile the Irrlicht engine with OpenGL.
 /** If you do not wish the engine to be compiled with OpenGL, comment this
 define out. */
-#if !defined(_IRR_IPHONE_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
-#define _IRR_COMPILE_WITH_OPENGL_
-#endif
-#ifdef NO_IRR_COMPILE_WITH_OPENGL_
-#undef _IRR_COMPILE_WITH_OPENGL_
-#endif
+/* #if !defined(_IRR_IPHONE_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_) */
+/* #define _IRR_COMPILE_WITH_OPENGL_ */
+/* #endif */
+/* #define NO_IRR_COMPILE_WITH_OPENGL_ */
+
+/* #ifdef NO_IRR_COMPILE_WITH_OPENGL_ */
+/* #error "nani" */
+/* #undef _IRR_COMPILE_WITH_OPENGL_ */
+/* #endif */
+
+/* #define _IRR_COMPILE_WITH_OPENGL_ */
 
 //! Define _IRR_COMPILE_WITH_OGLES2_ to compile the Irrlicht engine with OpenGL-ES 2.x.
 /** If you do not wish the engine to be compiled with OpenGL-ES 2.x, comment
@@ -186,10 +192,10 @@ define out. */
  it should be usually the only HW accelerated one. OpenGL is currently disabled
  if using this driver, to avoid problems with the ogl-es emulators.
  */
-// #define _IRR_COMPILE_WITH_OGLES2_
-#ifdef NO_IRR_COMPILE_WITH_OGLES2_
-#undef _IRR_COMPILE_WITH_OGLES2_
-#endif
+#define _IRR_COMPILE_WITH_OGLES2_
+/* #ifdef NO_IRR_COMPILE_WITH_OGLES2_ */
+/* #undef _IRR_COMPILE_WITH_OGLES2_ */
+/* #endif */
 #ifndef IRR_OGLES2_SHADER_PATH
 #ifdef _IRR_COMPILE_WITH_IPHONE_DEVICE_
 #define IRR_OGLES2_SHADER_PATH ""
@@ -204,7 +210,7 @@ define out. */
 /** If you do not wish the engine to be compiled with X11, comment this
 define out. */
 // Only used in LinuxDevice.
-#define _IRR_COMPILE_WITH_X11_
+#undef _IRR_COMPILE_WITH_X11_
 #ifdef NO_IRR_COMPILE_WITH_X11_
 #undef _IRR_COMPILE_WITH_X11_
 #endif
@@ -212,8 +218,9 @@ define out. */
 //! Define _IRR_OPENGL_USE_EXTPOINTER_ if the OpenGL renderer should use OpenGL extensions via function pointers.
 /** On some systems there is no support for the dynamic extension of OpenGL
 	via function pointers such that this has to be undef'ed. */
+
 #ifdef _IRR_COMPILE_WITH_OPENGL_
-#if !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_SOLARIS_PLATFORM_)
+#if !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_SOLARIS_PLATFORM_) && !defined(__EMSCRIPTEN__)
 #define _IRR_OPENGL_USE_EXTPOINTER_
 #endif
 #endif

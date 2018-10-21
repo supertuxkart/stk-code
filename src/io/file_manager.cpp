@@ -33,6 +33,10 @@
 #include "io/assets_android.hpp"
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include <irrlicht.h>
 
 #include <stdio.h>
@@ -41,6 +45,7 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <string>
+
 
 namespace irr {
     namespace io
@@ -118,6 +123,7 @@ FileManager* file_manager = 0;
  *  config file is read. This is necessary since part of discoverPaths 
  *  depend on artist debug mode.
  */
+
 FileManager::FileManager()
 {
     m_subdir_name.resize(ASSET_COUNT);
@@ -793,6 +799,13 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 #else
     bool error = mkdir(path.c_str(), 0755) != 0;
 #endif
+#if defined(__EMSCRIPTEN__) && !defined(_STK_NO_IDBFS)
+	// No point waiting on our sync job
+	EM_ASM(
+	       window.userDataSync();
+	);
+#endif
+
     return !error;
 }   // checkAndCreateDirectory
 
@@ -1414,10 +1427,19 @@ bool FileManager::removeDirectory(const std::string &name) const
     }
     
 #if defined(WIN32)
-    return RemoveDirectory(name.c_str())==TRUE;
+    bool removed = RemoveDirectory(name.c_str())==TRUE;
 #else
-    return remove(name.c_str())==0;
+    bool removed = remove(name.c_str())==0;
 #endif
+
+    #if defined(__EMSCRIPTEN__) && !defined(_STK_NO_IDBFS)
+    // No point waiting on our sync job
+    EM_ASM(
+	window.userDataSync();
+    );
+    #endif
+    
+    return removed;
 }   // remove directory
 
 // ----------------------------------------------------------------------------
@@ -1464,6 +1486,13 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
     delete[] buffer;
     fclose(f_source);
     fclose(f_dest);
+#if defined(__EMSCRIPTEN__) && !defined(_STK_NO_IDBFS)
+    // No point waiting on our sync job
+    EM_ASM(
+	window.userDataSync();
+    );
+#endif
+
     return true;
 }   // copyFile
 // ----------------------------------------------------------------------------

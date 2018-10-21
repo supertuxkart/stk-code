@@ -2190,17 +2190,17 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
     BareNetworkString& data, const std::string& key, const std::string& iv,
     uint32_t online_id, const core::stringw& online_name)
 {
-    auto crypto = std::unique_ptr<Crypto>(new Crypto(
-        Crypto::decode64(key), Crypto::decode64(iv)));
-    if (crypto->decryptConnectionRequest(data))
+  //auto crypto = std::unique_ptr<Crypto>(new Crypto(
+  //					     Crypto::decode64(key), Crypto::decode64(iv)));
+    if (false)
     {
-        peer->setCrypto(std::move(crypto));
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
-        Log::info("ServerLobby", "%s validated",
-            StringUtils::wideToUtf8(online_name).c_str());
-        handleUnencryptedConnection(peer, data, online_id,
-            online_name);
-        return true;
+        // peer->setCrypto(std::move(crypto));
+        // std::lock_guard<std::mutex> lock(m_connection_mutex);
+        // Log::info("ServerLobby", "%s validated",
+        //     StringUtils::wideToUtf8(online_name).c_str());
+        // handleUnencryptedConnection(peer, data, online_id,
+        //     online_name);
+        // return true;
     }
     return false;
 }   // decryptConnectionRequest

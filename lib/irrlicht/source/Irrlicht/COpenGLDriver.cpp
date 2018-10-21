@@ -14,6 +14,7 @@ extern bool GLContextDebugBit;
 #include "COpenGLMaterialRenderer.h"
 #include "COpenGLShaderMaterialRenderer.h"
 #include "COpenGLSLMaterialRenderer.h"
+// #error "Included COpenGLSLMaterialRenderer.h"
 #include "COpenGLNormalMapRenderer.h"
 #include "COpenGLParallaxMapRenderer.h"
 #include "os.h"

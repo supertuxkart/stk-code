@@ -77,7 +77,8 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
         }
         if (m_peer->getCrypto() && event->channelID == EVENT_CHANNEL_NORMAL)
         {
-            m_data = m_peer->getCrypto()->decryptRecieve(event->packet);
+	  m_data = NULL;
+	  // m_data = m_peer->getCrypto()->decryptRecieve(event->packet);
         }
         else
         {

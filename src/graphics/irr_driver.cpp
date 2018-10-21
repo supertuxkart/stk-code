@@ -82,6 +82,22 @@
  * Should help prevent distros building against an incompatible library.
  */
 
+#define _IRR_COMPILE_WITH_OPENGL_ 1
+
+#if ( !defined(_IRR_COMPILE_WITH_OPENGL_) &&         \
+        !defined(SERVER_ONLY)               &&         \
+        !defined(_IRR_COMPILE_WITH_OGLES2_)       )
+#error "bad libs"
+#endif
+
+#if !defined(_IRR_COMPILE_WITH_OPENGL_)
+#error "dude."
+#endif
+
+#if !defined(_IRR_COMPILE_WITH_B3D_LOADER_)
+#error "no b3d loader"
+#endif
+
 #if (  IRRLICHT_VERSION_MAJOR < 1                   || \
        IRRLICHT_VERSION_MINOR < 7                   || \
       _IRR_MATERIAL_MAX_TEXTURES_ < 8               || \
@@ -437,13 +453,15 @@ void IrrDriver::initDevice()
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {
-            if(UserConfigParams::logMisc())
-                Log::verbose("irr_driver", "Trying to create device with "
-                             "%i bits\n", bits);
+            // if(UserConfigParams::logMisc())
+	  Log::verbose("irr_driver", "Trying to create device with "
+		       "%i bits\n", bits);
 
 #if defined(USE_GLES2)
+	  Log::verbose("irr_driver", "Using OGLES2");
             params.DriverType    = video::EDT_OGLES2;
 #else
+	  Log::verbose("irr_driver", "Using OGL");
             params.DriverType    = video::EDT_OPENGL;
 #endif
 #if defined(ANDROID)

@@ -24,6 +24,9 @@
 #pragma comment(lib, "SDL.lib")
 #endif // _MSC_VER
 
+
+
+
 namespace irr
 {
 	namespace video
@@ -43,6 +46,11 @@ namespace irr
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceSDL* device);
 		#endif
+	  
+	        #ifdef _IRR_COMPILE_WITH_OGLES2_
+		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+			video::SExposedVideoData& data, io::IFileSystem* io);
+                #endif
 	} // end namespace video
 
 } // end namespace irr
@@ -65,6 +73,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 	// Initialize SDL... Timer for sleep, video for the obvious, and
 	// noparachute prevents SDL from catching fatal errors.
+	os::Printer::log("Init-ing SDL");
 	if (SDL_Init( SDL_INIT_TIMER|SDL_INIT_VIDEO|
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 				SDL_INIT_JOYSTICK|
@@ -74,6 +83,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		os::Printer::log( "Unable to initialize SDL!", SDL_GetError());
 		Close = true;
 	}
+	os::Printer::log("Init'd SDL");
 
 #if defined(_IRR_WINDOWS_)
 	SDL_putenv("SDL_VIDEODRIVER=directx");
@@ -86,7 +96,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 	SDL_VERSION(&Info.version);
 
-	SDL_GetWMInfo(&Info);
+	// SDL_GetWMInfo(&Info);
 	core::stringc sdlversion = "SDL Version ";
 	sdlversion += Info.version.major;
 	sdlversion += ".";
@@ -106,7 +116,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 	if ( CreationParams.Fullscreen )
 		SDL_Flags |= SDL_FULLSCREEN;
-	if (CreationParams.DriverType == video::EDT_OPENGL)
+	if (CreationParams.DriverType == video::EDT_OPENGL || CreationParams.DriverType == video::EDT_OGLES2)
 		SDL_Flags |= SDL_OPENGL;
 	else if (CreationParams.Doublebuffer)
 		SDL_Flags |= SDL_DOUBLEBUF;
@@ -171,6 +181,7 @@ bool CIrrDeviceSDL::createWindow()
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, CreationParams.AntiAlias );
 		}
+		
 		if ( !Screen )
 			Screen = SDL_SetVideoMode( Width, Height, CreationParams.Bits, SDL_Flags );
 		if ( !Screen && CreationParams.AntiAlias>1)
@@ -216,6 +227,7 @@ bool CIrrDeviceSDL::createWindow()
 //! create the driver
 void CIrrDeviceSDL::createDriver()
 {
+  // CreationParams.DriverType = video::EDT_OPENGL;
 	switch(CreationParams.DriverType)
 	{
 	case video::EDT_DIRECT3D8:
@@ -261,6 +273,21 @@ void CIrrDeviceSDL::createDriver()
 		os::Printer::log("Burning's video driver was not compiled in.", ELL_ERROR);
 		#endif
 		break;
+
+	case video::EDT_OGLES2: {
+		#ifdef _IRR_COMPILE_WITH_OGLES2_
+
+                video::SExposedVideoData data;
+
+		data.OpenGLLinux.X11Window = NULL;
+		data.OpenGLLinux.X11Display = NULL;
+	  
+                VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+		#else
+		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
+		#endif
+		break;
+	}
 
 	case video::EDT_OPENGL:
 		#ifdef _IRR_COMPILE_WITH_OPENGL_
@@ -884,43 +911,43 @@ void CIrrDeviceSDL::createKeyMap()
 	KeyMap.push_back(SKeyMap(SDLK_DELETE, IRR_KEY_DELETE));
 	KeyMap.push_back(SKeyMap(SDLK_HELP, IRR_KEY_HELP));
 
-	KeyMap.push_back(SKeyMap(SDLK_0, IRR_KEY_IRR_KEY_0));
-	KeyMap.push_back(SKeyMap(SDLK_1, IRR_KEY_IRR_KEY_1));
-	KeyMap.push_back(SKeyMap(SDLK_2, IRR_KEY_IRR_KEY_2));
-	KeyMap.push_back(SKeyMap(SDLK_3, IRR_KEY_IRR_KEY_3));
-	KeyMap.push_back(SKeyMap(SDLK_4, IRR_KEY_IRR_KEY_4));
-	KeyMap.push_back(SKeyMap(SDLK_5, IRR_KEY_IRR_KEY_5));
-	KeyMap.push_back(SKeyMap(SDLK_6, IRR_KEY_IRR_KEY_6));
-	KeyMap.push_back(SKeyMap(SDLK_7, IRR_KEY_IRR_KEY_7));
-	KeyMap.push_back(SKeyMap(SDLK_8, IRR_KEY_IRR_KEY_8));
-	KeyMap.push_back(SKeyMap(SDLK_9, IRR_KEY_IRR_KEY_9));
+	KeyMap.push_back(SKeyMap(SDLK_0, IRR_KEY_0));
+	KeyMap.push_back(SKeyMap(SDLK_1, IRR_KEY_1));
+	KeyMap.push_back(SKeyMap(SDLK_2, IRR_KEY_2));
+	KeyMap.push_back(SKeyMap(SDLK_3, IRR_KEY_3));
+	KeyMap.push_back(SKeyMap(SDLK_4, IRR_KEY_4));
+	KeyMap.push_back(SKeyMap(SDLK_5, IRR_KEY_5));
+	KeyMap.push_back(SKeyMap(SDLK_6, IRR_KEY_6));
+	KeyMap.push_back(SKeyMap(SDLK_7, IRR_KEY_7));
+	KeyMap.push_back(SKeyMap(SDLK_8, IRR_KEY_8));
+	KeyMap.push_back(SKeyMap(SDLK_9, IRR_KEY_9));
 
-	KeyMap.push_back(SKeyMap(SDLK_a, IRR_KEY_IRR_KEY_A));
-	KeyMap.push_back(SKeyMap(SDLK_b, IRR_KEY_IRR_KEY_B));
-	KeyMap.push_back(SKeyMap(SDLK_c, IRR_KEY_IRR_KEY_C));
-	KeyMap.push_back(SKeyMap(SDLK_d, IRR_KEY_IRR_KEY_D));
-	KeyMap.push_back(SKeyMap(SDLK_e, IRR_KEY_IRR_KEY_E));
-	KeyMap.push_back(SKeyMap(SDLK_f, IRR_KEY_IRR_KEY_F));
-	KeyMap.push_back(SKeyMap(SDLK_g, IRR_KEY_IRR_KEY_G));
-	KeyMap.push_back(SKeyMap(SDLK_h, IRR_KEY_IRR_KEY_H));
-	KeyMap.push_back(SKeyMap(SDLK_i, IRR_KEY_IRR_KEY_I));
-	KeyMap.push_back(SKeyMap(SDLK_j, IRR_KEY_IRR_KEY_J));
-	KeyMap.push_back(SKeyMap(SDLK_k, IRR_KEY_IRR_KEY_K));
-	KeyMap.push_back(SKeyMap(SDLK_l, IRR_KEY_IRR_KEY_L));
-	KeyMap.push_back(SKeyMap(SDLK_m, IRR_KEY_IRR_KEY_M));
-	KeyMap.push_back(SKeyMap(SDLK_n, IRR_KEY_IRR_KEY_N));
-	KeyMap.push_back(SKeyMap(SDLK_o, IRR_KEY_IRR_KEY_O));
-	KeyMap.push_back(SKeyMap(SDLK_p, IRR_KEY_IRR_KEY_P));
-	KeyMap.push_back(SKeyMap(SDLK_q, IRR_KEY_IRR_KEY_Q));
-	KeyMap.push_back(SKeyMap(SDLK_r, IRR_KEY_IRR_KEY_R));
-	KeyMap.push_back(SKeyMap(SDLK_s, IRR_KEY_IRR_KEY_S));
-	KeyMap.push_back(SKeyMap(SDLK_t, IRR_KEY_IRR_KEY_T));
-	KeyMap.push_back(SKeyMap(SDLK_u, IRR_KEY_IRR_KEY_U));
-	KeyMap.push_back(SKeyMap(SDLK_v, IRR_KEY_IRR_KEY_V));
-	KeyMap.push_back(SKeyMap(SDLK_w, IRR_KEY_IRR_KEY_W));
-	KeyMap.push_back(SKeyMap(SDLK_x, IRR_KEY_IRR_KEY_X));
-	KeyMap.push_back(SKeyMap(SDLK_y, IRR_KEY_IRR_KEY_Y));
-	KeyMap.push_back(SKeyMap(SDLK_z, IRR_KEY_IRR_KEY_Z));
+	KeyMap.push_back(SKeyMap(SDLK_a, IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(SDLK_b, IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(SDLK_c, IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(SDLK_d, IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(SDLK_e, IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(SDLK_f, IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(SDLK_g, IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(SDLK_h, IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(SDLK_i, IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(SDLK_j, IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(SDLK_k, IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(SDLK_l, IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(SDLK_m, IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(SDLK_n, IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(SDLK_o, IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(SDLK_p, IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(SDLK_q, IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(SDLK_r, IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(SDLK_s, IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(SDLK_t, IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(SDLK_u, IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(SDLK_v, IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(SDLK_w, IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(SDLK_x, IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(SDLK_y, IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(SDLK_z, IRR_KEY_Z));
 
 	KeyMap.push_back(SKeyMap(SDLK_LSUPER, IRR_KEY_LWIN));
 	KeyMap.push_back(SKeyMap(SDLK_RSUPER, IRR_KEY_RWIN));

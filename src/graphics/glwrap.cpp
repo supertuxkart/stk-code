@@ -705,7 +705,8 @@ else \
         } while (false)
         SDL_SysWMinfo wminfo;
         SDL_VERSION(&wminfo.version);
-        if (SDL_GetWMInfo(&wminfo) && wminfo.subsystem == SDL_SYSWM_X11)
+	// SDL_GetWMInfo(&wminfo)
+        if (false && wminfo.subsystem == SDL_SYSWM_X11)
         {
             Display* dpy = wminfo.info.x11.gfxdisplay;
             int scrnum = DefaultScreen(dpy);

@@ -591,6 +591,8 @@ namespace video
 		#endif
 		#endif
 		#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+#define _IRR_COMPILE_WITH_X11_DEVICE_ 1
+	  #error "dude what the fuck"
 			GLXDrawable Drawable;
 			Display* X11Display;
 			CIrrDeviceLinux *X11Device;
