@@ -195,9 +195,18 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
 void OnlineProfileFriends::displayResults()
 {
     m_friends_list_widget->clear();
+    
     OnlineProfile::IDList friends = m_visiting_profile->getFriends();
-    (m_sort_desc && !m_sort_default) ? std::sort(friends.rbegin(), friends.rend(), compareFriends)
-                                     : std::sort(friends.begin(), friends.end(), compareFriends);
+    
+    if (m_sort_desc && !m_sort_default)
+    {
+        std::sort(friends.rbegin(), friends.rend(), compareFriends);
+    }
+    else
+    {
+        std::sort(friends.begin(), friends.end(), compareFriends);
+    }
+                                     
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;
@@ -245,8 +254,17 @@ void OnlineProfileFriends::onUpdate(float delta)
 {
     if(m_waiting_for_friends)
     {
-        if(m_visiting_profile->hasFetchedFriends())
+        if (m_visiting_profile->hasFetchedFriends())
         {
+            // When browsing other users friends there is no Since/Status 
+            // columns, so force sorting by name
+            if (!m_visiting_profile->isCurrentUser() && m_sort_column != 0)
+            {
+                m_sort_column = 0;
+                m_sort_desc = false;
+                m_sort_default = true;
+            }
+            
             displayResults();
         }
         else

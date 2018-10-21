@@ -285,7 +285,7 @@ void Swatter::chooseTarget()
     {
         AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
-        if(kart->isEliminated() || kart==m_kart)
+        if(kart->isEliminated() || kart==m_kart || kart->getKartAnimation())
             continue;
         // don't squash an already hurt kart
         if (kart->isInvulnerable() || kart->isSquashed())
@@ -348,10 +348,13 @@ void Swatter::squashThingsAround()
     // The squash attempt may fail because of invulnerability, shield, etc.
     // Making a bomb explode counts as a success
     bool success = closest_kart->setSquash(duration, slowdown);
+    const bool has_created_explosion_animation =
+        success && closest_kart->getKartAnimation() != NULL;
 
     // Locally add a event to replay the squash during rewind
     if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
+        NetworkConfig::get()->isClient() &&
+        closest_kart->getKartAnimation() == NULL)
     {
         RewindManager::get()->addRewindInfoEventFunction(new
             RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
@@ -378,15 +381,12 @@ void Swatter::squashThingsAround()
         }
     }
 
-    //FIXME : setSquash also do a bomb check
-    if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
-    {   // make bomb explode
-        m_closest_kart->getAttachment()->update(10000);
+    if (has_created_explosion_animation)
+    {
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
         if(m_kart->getController()->isLocalPlayerController())
             he->setLocalPlayerKartHit();
         projectile_manager->addHitEffect(he);
-        ExplosionAnimation::create(m_closest_kart);
     }   // if kart has bomb attached
 
     // TODO: squash items

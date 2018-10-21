@@ -14,6 +14,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 
+#include <cstdlib>
 
 namespace irr
 {
@@ -385,7 +386,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                     }
 
                     if (Selecting &&
-                        fabs(event.MouseInput.Y - MousePosY) > ItemHeight/3)
+                        std::abs(event.MouseInput.Y - MousePosY) > ItemHeight/3)
                     {
                         Moving = true;
                         Selecting = false;

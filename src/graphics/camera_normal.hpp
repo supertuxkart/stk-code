@@ -55,10 +55,11 @@ private:
     void handleEndCamera(float dt);
     void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
-                           bool *smoothing);
+                           bool *smoothing, float *cam_roll_angle);
     
     void positionCamera(float dt, float above_kart, float cam_angle,
-                        float side_way, float distance, float smoothing);
+                        float side_way, float distance, float smoothing,
+                        float cam_roll_angle);
 
     btVector3 m_kart_position;
     btQuaternion m_kart_rotation;

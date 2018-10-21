@@ -34,18 +34,26 @@ ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
     m_ticks_till_return = 0;
     m_type    = (EventType)buffer->getUInt8();
     m_ticks   = buffer->getTime();
-    m_kart_id = buffer->getInt8();
-    m_index   = buffer->getUInt16();
-    *count -= 8;
-    if (m_type == IEI_NEW)
+    *count   -= 5;
+    if (m_type != IEI_SWITCH)
     {
-        m_xyz = buffer->getVec3();
-        *count -= 12;
-    }
-    else if (m_type == IEI_COLLECT)
+        m_kart_id = buffer->getInt8();
+        m_index = buffer->getUInt16();
+        *count -= 3;
+        if (m_type == IEI_NEW)
+        {
+            m_xyz = buffer->getVec3();
+            *count -= 12;
+        }
+        else   // IEI_COLLECT
+        {
+            m_ticks_till_return = buffer->getUInt16();
+            *count -= 2;
+        }
+    }   // is not switch
+    else   // switch
     {
-        m_ticks_till_return = buffer->getUInt16();
-        *count -= 2;
+        m_kart_id = -1;
     }
 }   // ItemEventInfo(BareNetworkString, int *count)
 
@@ -56,10 +64,14 @@ ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
 void ItemEventInfo::saveState(BareNetworkString *buffer)
 {
     assert(NetworkConfig::get()->isServer());
-    buffer->addUInt8(m_type).addTime(m_ticks).addUInt8(m_kart_id)
-           .addUInt16(m_index);
-    if(m_type == IEI_NEW)
-        buffer->add(m_xyz);
-    else if (m_type == IEI_COLLECT)
-        buffer->addUInt16(m_ticks_till_return);
+    buffer->addUInt8(m_type).addTime(m_ticks);
+    if (m_type != IEI_SWITCH)
+    {
+        // Only new item and collecting items need the index and kart id:
+        buffer->addUInt8(m_kart_id).addUInt16(m_index);
+        if (m_type == IEI_NEW)
+            buffer->add(m_xyz);
+        else if (m_type == IEI_COLLECT)
+            buffer->addUInt16(m_ticks_till_return);
+    }
 }   // saveState

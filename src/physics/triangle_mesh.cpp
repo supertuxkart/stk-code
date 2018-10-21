@@ -379,6 +379,7 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
     if(ray_callback.hasHit())
     {
         *xyz      = ray_callback.m_hitPointWorld;
+        xyz->setW(0.0f);
         *material = m_triangleIndex2Material[index];
 
         if(normal)

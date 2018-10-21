@@ -1138,7 +1138,15 @@ void ServerLobby::computeNewRankings()
         new_scores.push_back(m_scores.at(id));
         new_scores[i] += distributeBasePoints(id);
     }
+ 
+    // First, update the number of ranked races
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+         m_num_ranked_races.at(id)++;
+    }
 
+    // Now compute points exchanges
     for (unsigned i = 0; i < players.size(); i++)
     {
         scores_change.push_back(0.0);
@@ -1227,7 +1235,6 @@ void ServerLobby::computeNewRankings()
         m_scores.at(id) =  new_scores[i];
         if (m_scores.at(id) > m_max_scores.at(id))
             m_max_scores.at(id) = m_scores.at(id);
-        m_num_ranked_races.at(id)++;
     }
 }   // computeNewRankings
 
@@ -1303,7 +1310,7 @@ double ServerLobby::scalingValueForTime(double time)
 double ServerLobby::distributeBasePoints(uint32_t online_id)
 {
     unsigned num_races  = m_num_ranked_races.at(online_id);
-    if (num_races < 45)
+    if (num_races <= 45)
     {
         return BASE_RANKING_POINTS / 2000.0 * std::max((45u - num_races), 4u);
     }
