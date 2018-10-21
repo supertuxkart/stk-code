@@ -829,13 +829,8 @@ IFileList* CFileSystem::createFileList(const io::path& directory)
 
 		r = new CFileList(Path, true, false);
 
-		// TODO: Should be unified once mingw adapts the proper types
-#if defined(__GNUC__)
-		long hFile; //mingw return type declaration
-#else
-		intptr_t hFile;
-#endif
 
+		intptr_t hFile;
 		io::path searchPath = Path;
 		searchPath.append('*');
 		struct _tfinddata_t c_file;
