@@ -58,12 +58,6 @@ void EditGPScreen::loadedFromFile()
 {
     if (m_icon_bank == NULL)
         m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
-
-    m_list = getWidget<ListWidget>("tracks");
-    assert(m_list != NULL);
-    m_list->addColumn(_("Track"), 3);
-    m_list->addColumn(_("Laps"), 1);
-    m_list->addColumn(_("Reversed"), 1);
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -146,6 +140,17 @@ void EditGPScreen::eventCallback(GUIEngine::Widget* widget,
         }
     }
 }   // eventCallback
+
+// -----------------------------------------------------------------------------
+void EditGPScreen::beforeAddingWidget()
+{
+    m_list = getWidget<ListWidget>("tracks");
+    assert(m_list != NULL);
+    m_list->clearColumns();
+    m_list->addColumn(_("Track"), 3);
+    m_list->addColumn(_("Laps"), 1);
+    m_list->addColumn(_("Reversed"), 1);
+}
 
 // -----------------------------------------------------------------------------
 void EditGPScreen::init()
