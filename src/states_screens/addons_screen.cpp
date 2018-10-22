@@ -62,8 +62,6 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
     m_date_filters.push_back(filter_9m);
     m_date_filters.push_back(filter_1y);
     m_date_filters.push_back(filter_2y);
-
-    m_show_tips = true;
 }   // AddonsScreen
 
 // ----------------------------------------------------------------------------
@@ -94,11 +92,6 @@ void AddonsScreen::loadedFromFile()
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setColumnListener(this);
-
-    GUIEngine::LabelWidget* w_tips =
-        getWidget<GUIEngine::LabelWidget>("tips_label");
-    w_tips->setScrollSpeed(15);
-
 }   // loadedFromFile
 
 
@@ -158,21 +151,6 @@ void AddonsScreen::init()
     m_type = "kart";
 
     bool ip = UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
-    //TODO : determine if the tips scrolling could be used
-    //       to display other useful messages or if it should be removed
-    if(true)
-    {
-        // Nothing to show in the tips label, disable it.
-
-        GUIEngine::LabelWidget *w_tips =
-            getWidget<GUIEngine::LabelWidget>("tips_label");
-
-        w_tips->setVisible(false);
-        w_tips->m_properties[GUIEngine::PROP_HEIGHT] = "0";
-        calculateLayout();
-        m_show_tips = false;
-    } // ip
-
     getWidget<GUIEngine::IconButtonWidget>("reload")->setActive(ip);
 
     // Reset filter.
@@ -528,23 +506,6 @@ void AddonsScreen::onUpdate(float dt)
         else
         {
             // Addons manager is still initialising/downloading.
-        }
-    }
-
-
-    if(m_show_tips)
-    {
-        GUIEngine::LabelWidget *w_tips =
-            getWidget<GUIEngine::LabelWidget>("tips_label");
-    
-        w_tips->update(dt);
-        if(w_tips->scrolledOff())
-        {
-            // Tips have been shown once. Disable tips_label.
-            w_tips->setVisible(false);
-            w_tips->m_properties[GUIEngine::PROP_HEIGHT] = "0";
-            calculateLayout();
-            m_show_tips = false;
         }
     }
 #endif

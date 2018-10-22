@@ -76,8 +76,6 @@ private:
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;
 
-    bool             m_show_tips;
-
 public:
 
     /** Load the addons into the main list.*/
