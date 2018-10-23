@@ -118,7 +118,10 @@ using namespace gui;
         virtual irr::gui::IGUIFont* getOverrideFont() const { return NULL; }
         virtual irr::gui::IGUIFont* getActiveFont() const { return NULL; }
         virtual void setDrawBackground(bool) { }
-
+        
+        bool shouldUseScreenKeyboard();
+        void openScreenKeyboard();
+        
     protected:
         //! Breaks the single text line.
         void breakText();
