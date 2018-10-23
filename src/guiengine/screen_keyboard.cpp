@@ -83,6 +83,7 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
     m_edit_box        = edit_box;
     m_back_button     = NULL;
     m_repeat_time     = 0;
+    m_back_button_pressed = false;
     
     init();
 }   // ScreenKeyboard
@@ -264,7 +265,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
 
 void ScreenKeyboard::onUpdate(float dt)
 {
-    if (m_back_button->isPressed())
+    if (m_back_button->isPressed() || m_back_button_pressed)
     {
         const unsigned int repeat_rate = 40;
         const unsigned int repeat_delay = 400;
@@ -290,8 +291,10 @@ void ScreenKeyboard::onUpdate(float dt)
         
         m_repeat_time += (unsigned int)(dt * 1000);
     }
-    else
+    
+    if (!m_back_button->isPressed())  
     {
+        m_back_button_pressed = false;
         m_repeat_time = 0;
     }
 }
@@ -348,6 +351,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     else if (eventSource == "Back")
     {
         send_event = false;
+        m_back_button_pressed = true;
     }
     else if (eventSource == "Space")
     {
