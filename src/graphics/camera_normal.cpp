@@ -226,7 +226,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                 MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
                 if (device)
                 {
-                    *cam_roll_angle = device->getOrientation();
+                    *cam_roll_angle = -device->getOrientation();
                 }
             }
             break;
@@ -373,7 +373,12 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
     if (cam_roll_angle != 0.0f)
     {
         irr::core::vector3df up(0, 1, 0);
+        irr::core::vector3df forward = m_camera->getTarget() - m_camera->getPosition();
+        float direction = atan2f(forward.Z, forward.X) - 90.0f;
+        if (direction < -180.0f)
+            direction += 360.0f;
         up.rotateXYBy(cam_roll_angle * (180.0f / M_PI));
+        up.rotateXZBy(direction * (180.0f / M_PI));
         m_camera->setUpVector(up);
     }
 }   // positionCamera
