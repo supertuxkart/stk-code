@@ -28,6 +28,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "input/input_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
@@ -339,7 +340,7 @@ void MainLoop::run()
         {
             bool exist_host = STKHost::existHost();
             core::stringw msg = _("Server connection timed out.");
-            
+
             if (!m_request_abort)
             {
                 if (!ProfileWorld::isNoGraphics())
@@ -351,7 +352,7 @@ void MainLoop::run()
                     }
                 }
             }
-         
+
             if (exist_host == true)
             {
                 STKHost::get()->shutdown();
@@ -368,16 +369,17 @@ void MainLoop::run()
                     irr_driver->getActualScreenSize().Height);
             }
 #endif
-            
+
             // In case the user opened a race pause dialog
             GUIEngine::ModalDialog::dismiss();
-    
+            GUIEngine::ScreenKeyboard::dismiss();
+
             if (World::getWorld())
             {
                 race_manager->clearNetworkGrandPrixResult();
                 race_manager->exitRace();
             }
-            
+
             if (exist_host == true)
             {
                 if (!ProfileWorld::isNoGraphics())
@@ -389,7 +391,7 @@ void MainLoop::run()
                 
                 NetworkConfig::get()->unsetNetworking();
             }
-            
+
             if (m_request_abort)
             {
                 m_abort = true;
