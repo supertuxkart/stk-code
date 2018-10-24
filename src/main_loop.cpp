@@ -159,7 +159,8 @@ float MainLoop::getLimitedDt()
         // when the computer can't keep it up, slow down the shown time instead
         // But this can not be done in networking, otherwise the game time on
         // client and server will not be in synch anymore
-        if(!NetworkConfig::get()->isNetworking())
+        if (!NetworkConfig::get()->isNetworking() ||
+           !World::getWorld())
         {
             /* time 3 internal substeps take */
             const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
