@@ -111,7 +111,7 @@ void GameSetup::update(bool remove_disconnected_players)
             continue;
         }
         AbstractKart* k = World::getWorld()->getKart(i);
-        if (!k->isEliminated())
+        if (!k->isEliminated() && !k->hasFinishedRace())
         {
             CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
                 (World::getWorld());
@@ -122,7 +122,7 @@ void GameSetup::update(bool remove_disconnected_players)
                 false/*notify_of_elimination*/);
             k->setPosition(
                 World::getWorld()->getCurrentNumKarts() + 1);
-            k->finishedRace(World::getWorld()->getTime());
+            k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
             NetworkString p(PROTOCOL_GAME_EVENTS);
             p.setSynchronous(true);
             p.addUInt8(GameEventsProtocol::GE_PLAYER_DISCONNECT).addUInt8(i);

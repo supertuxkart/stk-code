@@ -21,6 +21,8 @@ public:
         GE_STARTUP_BOOST = 8,
     };   // GameEventType
 private:
+    int m_last_finished_position;
+
     void eliminatePlayer(const NetworkString &ns);
 
 public:

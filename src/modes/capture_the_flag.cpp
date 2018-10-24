@@ -511,7 +511,7 @@ bool CaptureTheFlag::isRaceOver()
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
-void CaptureTheFlag::loseFlagForKart(unsigned int kart_id)
+void CaptureTheFlag::loseFlagForKart(int kart_id)
 {
     if (!(m_red_holder == kart_id || m_blue_holder == kart_id))
         return;

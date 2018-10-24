@@ -130,7 +130,7 @@ public:
     // ------------------------------------------------------------------------
     const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
     // ------------------------------------------------------------------------
-    void loseFlagForKart(unsigned int kart_id);
+    void loseFlagForKart(int kart_id);
 
 };   // CaptureTheFlag
 
