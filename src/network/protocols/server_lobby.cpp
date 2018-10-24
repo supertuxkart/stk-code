@@ -1151,6 +1151,8 @@ void ServerLobby::computeNewRankings()
     {
         scores_change.push_back(0.0);
 
+        World* w = World::getWorld();
+        assert(w);
         double player1_scores = new_scores[i];
         // If the player has quitted before the race end,
         // the value will be incorrect, but it will not be used
@@ -1169,7 +1171,8 @@ void ServerLobby::computeNewRankings()
             double ranking_importance = 0.0;
 
             // No change between two quitting players
-            if (!players[i] && !players[j])
+            if (w->getKart(i)->isEliminated() &&
+                w->getKart(j)->isEliminated())
                 continue;
 
             double player2_scores = new_scores[j];
@@ -1187,13 +1190,13 @@ void ServerLobby::computeNewRankings()
 
             double mode_factor = getModeFactor();
 
-            if (!players[i])
+            if (w->getKart(i)->isEliminated())
             {
                 result = 0.0;
                 ranking_importance = mode_factor *
                     scalingValueForTime(MAX_SCALING_TIME) * player_factors;
             }
-            else if (!players[j])
+            else if (w->getKart(j)->isEliminated())
             {
                 result = 1.0;
                 ranking_importance = mode_factor *
