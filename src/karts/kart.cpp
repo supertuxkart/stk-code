@@ -1463,6 +1463,7 @@ void Kart::update(int ticks)
 
     if (!RewindManager::get()->isRewinding())
         m_slipstream->update(ticks);
+    m_slipstream->updateSpeedIncrease();
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less

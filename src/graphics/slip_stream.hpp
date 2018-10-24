@@ -94,7 +94,8 @@ private:
 
     int          m_current_target_id;
     int          m_previous_target_id;
-
+    int          m_speed_increase_ticks;
+    int          m_speed_increase_duration;
 
     /** Slipstream mode: either nothing happening, or the kart is collecting
      *  'slipstream credits'. Credits can be accumulated while the bonus is used */
@@ -121,11 +122,11 @@ private:
     void         updateBonusTexture();
 public:
                  SlipStream  (AbstractKart* kart);
-    virtual     ~SlipStream  ();
+                 ~SlipStream  ();
     void         reset();
-    virtual void update(int ticks);
+    void         update(int ticks);
     bool         isSlipstreamReady() const;
-
+    void         updateSpeedIncrease();
     // ------------------------------------------------------------------------
     /** Returns the quad in which slipstreaming is effective for
      *  this kart. */
