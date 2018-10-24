@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-20 10:40+0800\n"
-"PO-Revision-Date: 2018-10-20 07:41+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2018-10-24 17:54+0000\n"
+"Last-Translator: Jeff Huang <s8321414@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/supertuxkart/supertuxkart/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1172,7 +1172,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr ""
+msgstr "您可以按下特殊的按鍵或按鈕來甩尾。成功的甩尾可以協助過角度較大的彎，中等的甩尾可以加速，較長的甩尾則會有更多的加速。您不能在甩尾的時候變換方向，所以要看好你的卡丁車的方向！"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
@@ -4109,7 +4109,7 @@ msgstr[0] "於 %i 秒內確認畫面解析度是否合適"
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr ""
+msgstr "不支援小於 1024x768 或 1280x720 的解析度。部份介面可能無法正常運作。"
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;

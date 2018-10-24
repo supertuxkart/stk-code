@@ -3,8 +3,8 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Christian Elbrianno Yoga, 2017
-# Christian Elbrianno Yoga, 2017
+# Christian Elbrianno, 2017
+# Christian Elbrianno, 2017
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Icho Yulian Chandra <icho.yulian@gmail.com>, 2016
 # Iwan Rahardi Putra <iwan.rahardi.putra@gmail.com>, 2017
@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-20 10:40+0800\n"
-"PO-Revision-Date: 2018-10-20 07:41+0000\n"
+"PO-Revision-Date: 2018-10-24 17:54+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Indonesian (http://www.transifex.com/supertuxkart/supertuxkart/language/id/)\n"
 "MIME-Version: 1.0\n"

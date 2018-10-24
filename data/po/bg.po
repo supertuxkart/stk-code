@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-20 10:40+0800\n"
-"PO-Revision-Date: 2018-10-20 07:41+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2018-10-24 17:54+0000\n"
+"Last-Translator: Любомир Василев\n"
 "Language-Team: Bulgarian (http://www.transifex.com/supertuxkart/supertuxkart/language/bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -176,7 +176,7 @@ msgstr "Акселерометър"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Gyroscope"
-msgstr ""
+msgstr "Жироскоп"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -1167,7 +1167,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr ""
+msgstr "Можеш да караш количката на поднася, използвайки специалния клавиш или бутон.. Кратките последователни поднасяния може да ти помогнат при вземането на остри завои. Средно дългите поднасяния ще ти дадат ускорение, а дългите – още по-голямо такова. Количката не може да завива докато поднася, така че я насочи правилно предварително!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
@@ -3635,7 +3635,7 @@ msgstr "Напредък"
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:134
 msgid "Fulfill all the subgoals"
-msgstr ""
+msgstr "Изпълни всички под-цели"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:136
@@ -4110,7 +4110,7 @@ msgstr[1] "Потвърждаване на разделителната спос
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr ""
+msgstr "Не се поддържат резолюции, по-малки от 1024x768 или 1280x720. Някои части от потребителския интерфейс може да не работят правилно."
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
@@ -4517,7 +4517,7 @@ msgstr "Ти завърши предизвикателство!"
 
 #: src/states_screens/grand_prix_win.cpp:320
 msgid "You won the Grand Prix!"
-msgstr ""
+msgstr "Ти спечели Голямата награда!"
 
 #: src/states_screens/grand_prix_win.cpp:321
 msgid "You completed the Grand Prix!"
