@@ -46,6 +46,9 @@ public:
         BOOTSTRAP
     };
 
+    // to put a delay before a new gamepad axis move is considered in menu
+    bool m_timer_in_use;
+    float m_timer;
 
 private:
 
@@ -64,11 +67,6 @@ private:
     * makes the mouse behave like an analog axis on a gamepad/joystick.
     */
     int m_mouse_val_x, m_mouse_val_y;
-
-    // to put a delay before a new gamepad axis move is considered in menu
-    bool m_timer_in_use;
-    int m_timer_use_count;
-    float m_timer;
 
     void   dispatchInput(Input::InputType, int deviceID, int btnID,
                          Input::AxisDirection direction, int value,
