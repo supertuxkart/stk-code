@@ -24,6 +24,7 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/CGUIEditBox.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
@@ -184,6 +185,9 @@ void ScreenKeyboard::createButtons()
 
     LayoutManager::calculateLayout(m_widgets, this);
     addWidgetsRecursively(m_widgets);
+    
+    assert(m_buttons.size() > 0);
+    m_buttons[0]->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // createButtons
 
 // ----------------------------------------------------------------------------
