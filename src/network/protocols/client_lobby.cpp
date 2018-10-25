@@ -542,11 +542,16 @@ void ClientLobby::connectionAccepted(Event* event)
     // ========
     Log::info("ClientLobby", "The server accepted the connection.");
 
-    // I18N: Message shown in network lobby to tell user that
-    // player name is clickable
-    core::stringw msg = _("Press player name in the list for player management"
-        " and ranking information.");
-    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+    static bool shown_msg = false;
+    if (!shown_msg)
+    {
+        shown_msg = true;
+        // I18N: Message shown in network lobby to tell user that
+        // player name is clickable
+        core::stringw msg = _("Press player name in the list for player"
+            " management and ranking information.");
+        MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+    }
 
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
