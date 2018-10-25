@@ -842,11 +842,14 @@ void ServerLobby::startSelection(const Event *event)
             red_blue.first + red_blue.second != 1)
         {
             Log::warn("ServerLobby", "Bad team choosing.");
-            NetworkString* bt = getNetworkString();
-            bt->setSynchronous(true);
-            bt->addUInt8(LE_BAD_TEAM);
-            sendMessageToPeers(bt, true/*reliable*/);
-            delete bt;
+            if (event)
+            {
+                NetworkString* bt = getNetworkString();
+                bt->setSynchronous(true);
+                bt->addUInt8(LE_BAD_TEAM);
+                event->getPeer()->sendPacket(bt, true/*reliable*/);
+                delete bt;
+            }
             return;
         }
     }
