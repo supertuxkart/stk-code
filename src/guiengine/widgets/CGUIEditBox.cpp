@@ -1291,7 +1291,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             {
                 return false;
             }
-            else if (shouldUseScreenKeyboard())
+            else if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
                 openScreenKeyboard();
                 return true;
@@ -1752,24 +1752,6 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
             (EGUI_ALIGNMENT) in->getAttributeAsEnumeration("VTextAlign", GUIAlignmentNames));
 
     // setOverrideFont(in->getAttributeAsFont("OverrideFont"));
-}
-
-
-bool CGUIEditBox::shouldUseScreenKeyboard()
-{
-    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard > 1;
-    
-    #ifdef ANDROID
-    if (UserConfigParams::m_screen_keyboard == 1)
-    {
-        int32_t keyboard = AConfiguration_getKeyboard(
-                                            global_android_app->config);
-        
-        use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
-    }
-    #endif
-    
-    return use_screen_keyboard;
 }
 
 void CGUIEditBox::openScreenKeyboard()

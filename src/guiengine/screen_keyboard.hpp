@@ -118,6 +118,8 @@ namespace GUIEngine
         /** Returns true if keyboard is created */
         static bool isActive() {return m_screen_keyboard != NULL;}
 
+        static bool shouldUseScreenKeyboard();
+
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);
         

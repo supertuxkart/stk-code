@@ -27,6 +27,10 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
+
 #include <algorithm>
 #include <string>
 
@@ -407,3 +411,21 @@ bool ScreenKeyboard::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
+/** A function that determines if screen keyboard should be activated
+ */
+bool ScreenKeyboard::shouldUseScreenKeyboard()
+{
+    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard > 1;
+    
+    #ifdef ANDROID
+    if (UserConfigParams::m_screen_keyboard == 1)
+    {
+        int32_t keyboard = AConfiguration_getKeyboard(
+                                            global_android_app->config);
+        
+        use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
+    }
+    #endif
+    
+    return use_screen_keyboard;
+}

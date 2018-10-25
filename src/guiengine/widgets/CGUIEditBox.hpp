@@ -119,7 +119,6 @@ using namespace gui;
         virtual irr::gui::IGUIFont* getActiveFont() const { return NULL; }
         virtual void setDrawBackground(bool) { }
         
-        bool shouldUseScreenKeyboard();
         void openScreenKeyboard();
         
     protected:

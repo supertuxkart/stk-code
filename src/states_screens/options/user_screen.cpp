@@ -22,6 +22,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -192,7 +193,7 @@ EventPropagation BaseUserScreen::filterActions(PlayerAction action,
     Input::InputType type,
     int playerId)
 {
-    if (action == PA_MENU_SELECT)
+    if (action == PA_MENU_SELECT && !ScreenKeyboard::shouldUseScreenKeyboard())
     {
         if ((m_username_tb != NULL && m_username_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))

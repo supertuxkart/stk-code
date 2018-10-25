@@ -200,7 +200,7 @@ void TextBoxWidget::setActive(bool active)
 
 EventPropagation TextBoxWidget::onActivationInput(const int playerID)
 {
-    if (((MyCGUIEditBox*)m_element)->shouldUseScreenKeyboard())
+    if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
     {
         ((MyCGUIEditBox*)m_element)->openScreenKeyboard();
     }
