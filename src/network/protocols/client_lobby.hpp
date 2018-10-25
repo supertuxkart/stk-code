@@ -87,6 +87,8 @@ private:
 
     std::map<PeerDisconnectInfo, irr::core::stringw> m_disconnected_msg;
 
+    irr::core::stringw m_total_players;
+
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
