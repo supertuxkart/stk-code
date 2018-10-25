@@ -816,16 +816,14 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        Log::verbose("[FileManager]", "Checking for: '%s",
-                    current_path.c_str());
-        if (!m_file_system->existFile(io::path(current_path.c_str())))
+        //Log::verbose("[FileManager]", "Checking for: '%s",
+        //            current_path.c_str());
+        
+        if (!checkAndCreateDirectory(current_path))
         {
-            if (!checkAndCreateDirectory(current_path))
-            {
-                Log::error("[FileManager]", "Can't create dir '%s'",
-                        current_path.c_str());
-                break;
-            }
+            Log::error("[FileManager]", "Can't create dir '%s'",
+                    current_path.c_str());
+            break;
         }
     }
     bool error = checkAndCreateDirectory(path);

@@ -607,7 +607,7 @@ fi
 
 # Generate directories list
 echo "Generate directories list"
-find assets/* -type d > assets/directories.txt
+find assets/* -type d | sort > assets/directories.txt
 sed -i s/'.\/assets\/'// assets/directories.txt
 sed -i s/'assets\/'// assets/directories.txt
 

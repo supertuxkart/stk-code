@@ -368,7 +368,14 @@ bool AssetsAndroid::extractDir(std::string dir_name)
         return true;
     }
 
-    if (!m_file_manager->checkAndCreateDirectoryP(output_dir))
+    bool dir_created = m_file_manager->checkAndCreateDirectory(output_dir);
+    
+    if (!dir_created)
+    {
+        dir_created = m_file_manager->checkAndCreateDirectoryP(output_dir);
+    }
+    
+    if (!dir_created)
     {
         Log::warn("AssetsAndroid", "Couldn't create %s directory",
                   output_dir.c_str());
