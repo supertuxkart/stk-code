@@ -361,7 +361,6 @@ void Kart::reset()
     m_invulnerable_ticks   = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
-    m_squash_time          = std::numeric_limits<float>::max();
     m_collected_energy     = 0;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
@@ -1832,32 +1831,34 @@ bool Kart::setSquash(float time, float slowdown)
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
                              stk_config->time2Ticks(0.1f), 
                              stk_config->time2Ticks(time));
-
-#ifndef SERVER_ONLY
-    if (m_squash_time == std::numeric_limits<float>::max())
-    {
-        m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-        if (m_vehicle->getNumWheels() > 0)
-        {
-            if (!m_wheel_box)
-            {
-                m_wheel_box = irr_driver->getSceneManager()
-                    ->addDummyTransformationSceneNode(m_node);
-            }
-            scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
-            for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
-            {
-                if (wheels[i])
-                    wheels[i]->setParent(m_wheel_box);
-            }
-            m_wheel_box->getRelativeTransformationMatrix()
-                .setScale(core::vector3df(1.0f, 2.0f, 1.0f));
-        }
-        m_squash_time = time;
-    }
-#endif
     return true;
 }   // setSquash
+
+//-----------------------------------------------------------------------------
+void Kart::setSquashGraphics()
+{
+#ifndef SERVER_ONLY
+    if (isGhostKart()) return;
+
+    m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
+    if (m_vehicle->getNumWheels() > 0)
+    {
+        if (!m_wheel_box)
+        {
+            m_wheel_box = irr_driver->getSceneManager()
+                ->addDummyTransformationSceneNode(m_node);
+        }
+        scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
+        for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
+        {
+            if (wheels[i])
+                wheels[i]->setParent(m_wheel_box);
+        }
+        m_wheel_box->getRelativeTransformationMatrix()
+            .setScale(core::vector3df(1.0f, 2.0f, 1.0f));
+    }
+#endif
+}   // setSquashGraphics
 
 //-----------------------------------------------------------------------------
 void Kart::unsetSquash()
@@ -1865,15 +1866,13 @@ void Kart::unsetSquash()
 #ifndef SERVER_ONLY
     if (isGhostKart()) return;
 
-    m_squash_time = std::numeric_limits<float>::max();
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-        
     if (m_vehicle && m_vehicle->getNumWheels() > 0)
     {
         scene::ISceneNode** wheels = m_kart_model->getWheelNodes();
         scene::ISceneNode* node = m_kart_model->getAnimatedNode() ?
                                   m_kart_model->getAnimatedNode() : m_node;
-        
+
         for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
         {
             if (wheels[i])
@@ -3068,15 +3067,13 @@ void Kart::updateGraphics(float dt)
     }
      */
 #ifndef SERVER_ONLY
-    if (m_squash_time != std::numeric_limits<float>::max())
-    {
-        m_squash_time -= dt;
-        // If squasing time ends, reset the model
-        if (m_squash_time <= 0.0f || !isSquashed())
-        {
-            unsetSquash();
-        }
-    }   // if squashed
+    if (isSquashed() &&
+        m_node->getScale() != core::vector3df(1.0f, 0.5f, 1.0f))
+        setSquashGraphics();
+    else if (!isSquashed() &&
+        m_node->getScale() != core::vector3df(1.0f, 1.0f, 1.0f))
+        unsetSquash();
+
     if (m_graphical_view_blocked_by_plunger > 0.0f)
         m_graphical_view_blocked_by_plunger -= dt;
     if (m_graphical_view_blocked_by_plunger < 0.0f)
