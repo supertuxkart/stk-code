@@ -52,8 +52,6 @@ private:
     void handleBadConnection();
     void becomingServerOwner();
 
-    void clearPlayers();
-
     TransportAddress m_server_address;
 
     std::shared_ptr<Server> m_server;
@@ -113,7 +111,7 @@ public:
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoLap() const                  { return m_server_auto_lap; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-
+    void clearPlayers();
 };
 
 #endif // CLIENT_LOBBY_HPP

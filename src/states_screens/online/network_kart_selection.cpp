@@ -91,8 +91,6 @@ void NetworkKartSelectionScreen::allPlayersDone()
 
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-    // Remove kart screen
-    StateManager::get()->popMenu();
     TracksScreen::getInstance()->setNetworkTracks();
     TracksScreen::getInstance()->push();
 

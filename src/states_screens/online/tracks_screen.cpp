@@ -122,20 +122,17 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 bool TracksScreen::onEscapePressed()
 {
-    if (m_network_tracks)
-    {
-        // Remove this screen
-        StateManager::get()->popMenu();
-        STKHost::get()->shutdown();
-    }
-    return true; // remove the screen
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl)
+        cl->clearPlayers();
+    // remove the screen
+    return true;
 }   // onEscapePressed
 
 // -----------------------------------------------------------------------------
 void TracksScreen::tearDown()
 {
     m_network_tracks = false;
-    m_vote_timeout = std::numeric_limits<uint64_t>::max();
     m_selected_track = NULL;
 }   // tearDown
 
@@ -225,17 +222,8 @@ void TracksScreen::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void TracksScreen::init()
 {
-    // change the back button image (because it makes the game quit)
-    if (m_network_tracks)
-    {
-        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
-        back_button->setImage("gui/icons/main_quit.png");
-    }
-    else
-    {
-        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
-        back_button->setImage("gui/icons/back.png");
-    }
+    if (!m_network_tracks)
+        m_vote_timeout = std::numeric_limits<uint64_t>::max();
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
