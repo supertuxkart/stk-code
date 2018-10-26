@@ -875,6 +875,7 @@ void ClientLobby::startSelection(Event* event)
                 ->createActivePlayer(std::get<1>(p), std::get<0>(p));
         }
         input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        TracksScreen::getInstance()->setQuitServer();
         TracksScreen::getInstance()->setNetworkTracks();
         TracksScreen::getInstance()->push();
     }

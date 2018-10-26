@@ -122,9 +122,18 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 bool TracksScreen::onEscapePressed()
 {
-    auto cl = LobbyProtocol::get<ClientLobby>();
-    if (cl)
-        cl->clearPlayers();
+    if (m_quit_server)
+    {
+        // Remove this screen
+        StateManager::get()->popMenu();
+        STKHost::get()->shutdown();
+    }
+    else
+    {
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (cl)
+            cl->clearPlayers();
+    }
     // remove the screen
     return true;
 }   // onEscapePressed
@@ -134,6 +143,7 @@ void TracksScreen::tearDown()
 {
     m_network_tracks = false;
     m_selected_track = NULL;
+    m_quit_server = false;
 }   // tearDown
 
 // -----------------------------------------------------------------------------
@@ -227,6 +237,17 @@ void TracksScreen::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void TracksScreen::init()
 {
+    // change the back button image (because it makes the game quit)
+    if (m_quit_server)
+    {
+        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
+        back_button->setImage("gui/icons/main_quit.png");
+    }
+    else
+    {
+        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
+        back_button->setImage("gui/icons/back.png");
+    }
     if (!m_network_tracks)
         m_vote_timeout = std::numeric_limits<uint64_t>::max();
 
