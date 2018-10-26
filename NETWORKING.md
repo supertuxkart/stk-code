@@ -21,7 +21,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="1" >
+<server-config version="3" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -72,7 +72,7 @@ The current server configuration xml looks like this:
     <owner-less value="false" />
 
     <!-- Time to wait before entering kart selection screen if satisfied min-start-game-players below for owner less or ranked server. -->
-    <start-game-counter value="30" />
+    <start-game-counter value="60" />
 
     <!-- Only auto start kart selection when number of connected player is larger than or equals this value, for owner less or ranked server, after start-game-counter reaches 0. -->
     <min-start-game-players value="2" />
@@ -83,14 +83,17 @@ The current server configuration xml looks like this:
     <!-- Enable team choosing in lobby in team game (soccer and CTF). If owner-less is enabled, than this option is always disabled. -->
     <team-choosing value="true" />
 
-    <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end and owner-less will be turned on. -->
+    <!-- If strict-players is on, no duplicated online id or split screen players are allowed, which can prevent someone using more than 1 network AI with this server. -->
+    <strict-players value="false" />
+
+    <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end, strict-player and owner-less will be turned on. -->
     <ranked value="false" />
 
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
     <flag-return-timemout value="20" />
 
-    <!-- Value used to calculate hit limit in free for all, which is min(number of players * hit-limit-threshold, 40), negative value to disable hit limit. -->
-    <hit-limit-threshold value="5" />
+    <!-- Value used to calculate hit limit in free for all, which is min(number of players * hit-limit-threshold, 30), negative value to disable hit limit. -->
+    <hit-limit-threshold value="3" />
 
     <!-- Value used to calculate time limit in free for all, which is max(number of players * time-limit-threshold-ffa, 3.0) * 60, negative value to disable time limit. -->
     <time-limit-threshold-ffa value="0.7" />
@@ -113,12 +116,12 @@ The current server configuration xml looks like this:
     <!-- Kick players whose ping is above max-ping. -->
     <kick-high-ping-players value="false" />
 
-    <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, if -1 (uint32_t max) than a permanent ban. -->
+    <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
     <server-ip-ban-list>
         <ban ip="0.0.0.0/0" expired-time="0"/>
     </server-ip-ban-list>
 
-    <!-- online-id: online id for banning, expired-time: unix timestamp to expire, if -1 (uint32_t max) than a permanent ban. -->
+    <!-- online-id: online id for banning, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
     <server-online-id-ban-list>
         <ban online-id="0" expired-time="0"/>
     </server-online-id-ban-list>
@@ -168,4 +171,4 @@ Tested on a Raspberry Pi 3 Model B+, if you have 8 players connected to a server
 
 For bad network simulation, we recommend `network traffic control` by linux kernel, see [here](https://wiki.linuxfoundation.org/networking/netem) for details.
 
-You have the best gaming experience when choosing server less than 100ms ping with no packet loss.
+You have the best gaming experience when choosing server having all players less than 100ms ping with no packet loss.
