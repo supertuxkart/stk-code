@@ -3076,7 +3076,8 @@ void Kart::updateGraphics(float dt)
 
     if (m_graphical_view_blocked_by_plunger > 0.0f)
         m_graphical_view_blocked_by_plunger -= dt;
-    if (m_graphical_view_blocked_by_plunger < 0.0f)
+    if (m_graphical_view_blocked_by_plunger < 0.0f ||
+        m_view_blocked_by_plunger == 0)
         m_graphical_view_blocked_by_plunger = 0.0f;
 #endif
 
