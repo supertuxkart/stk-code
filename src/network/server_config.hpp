@@ -192,11 +192,18 @@ namespace ServerConfig
         "Enable team choosing in lobby in team game (soccer and CTF). "
         "If owner-less is enabled, than this option is always disabled."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "strict-players",
+        "If strict-players is on, no duplicated online id or split screen "
+        "players are allowed, which can prevent someone using more than 1 "
+        "network AI with this server."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_ranked
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ranked",
         "Server will submit ranking to stk addons server "
         "for linear race games, you require permission for that. "
-        "validating-player, auto-end and owner-less will be turned on."));
+        "validating-player, auto-end, strict-player and owner-less will be "
+        "turned on."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
@@ -255,7 +262,7 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
         "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "
         "specific ip, expired-time: unix timestamp to expire, "
-        "if -1 (uint32_t max) than a permanent ban.",
+        "-1 (uint32_t max) for a permanent ban.",
         {{ "ban", "ip", "expired-time" }},
         { { "0.0.0.0/0", 0u } }));
 
@@ -263,7 +270,7 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(UIntToUIntServerConfigParam(
         "server-online-id-ban-list",
         "online-id: online id for banning, expired-time: unix timestamp to "
-        "expire, if -1 (uint32_t max) than a permanent ban.",
+        "expire, -1 (uint32_t max) for a permanent ban.",
         {{ "ban", "online-id", "expired-time" }},
         { { 0u, 0u } }));
 

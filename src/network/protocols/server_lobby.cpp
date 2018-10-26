@@ -1536,7 +1536,7 @@ void ServerLobby::connectionRequested(Event* event)
         peer->getAddress().isLAN()) &&
         NetworkConfig::get()->isWAN() &&
         ServerConfig::m_validating_player) ||
-        (ServerConfig::m_ranked &&
+        (ServerConfig::m_strict_players &&
         (player_count != 1 || online_id == 0 || duplicated_ranked_player)))
     {
         NetworkString* message = getNetworkString(2);
