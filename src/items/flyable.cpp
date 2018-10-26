@@ -609,16 +609,31 @@ void Flyable::moveToInfinity()
 // ----------------------------------------------------------------------------
 BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
 {
+    if (m_has_hit_something)
+        return NULL;
+
     ru->push_back(getUniqueIdentity());
     BareNetworkString *buffer = new BareNetworkString();
     CompressNetworkBody::compress(m_body->getWorldTransform(),
         m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer,
         m_body, m_motion_state);
-    uint16_t hit_and_ticks = (m_has_hit_something ? 1 << 15 : 0) |
-        m_ticks_since_thrown;
-    buffer->addUInt16(hit_and_ticks);
+    buffer->addUInt16(m_ticks_since_thrown);
     return buffer;
 }   // saveState
+
+// ----------------------------------------------------------------------------
+std::function<void()> Flyable::getLocalStateRestoreFunction()
+{
+    // Avoid circular reference
+    std::weak_ptr<Flyable> fw = getShared<Flyable>();
+    return [fw]()
+        {
+            std::shared_ptr<Flyable> f = fw.lock();
+            if (!f || f->m_has_undone_destruction)
+                return;
+            f->m_has_server_state = false;
+        };
+}   // getLocalStateRestoreFunction
 
 // ----------------------------------------------------------------------------
 void Flyable::restoreState(BareNetworkString *buffer, int count)
@@ -639,10 +654,9 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
         setTrans(t);
     }
     uint16_t hit_and_ticks = buffer->getUInt16();
-    m_has_hit_something = (hit_and_ticks >> 15) == 1;
+    // Next network version remove ~(1 << 15)
     m_ticks_since_thrown = hit_and_ticks & ~(1 << 15);
-    if (!m_has_server_state)
-        m_has_server_state = true;
+    m_has_server_state = true;
 }   // restoreState
 
 // ----------------------------------------------------------------------------
@@ -721,10 +735,12 @@ void Flyable::handleUndoDestruction()
     RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
         /*undo_function*/[f, uid]()
         {
+            f->m_has_hit_something = false;
             projectile_manager->addByUID(uid, f);
         },
         /*replay_function*/[f, uid]()
         {
+            f->m_has_hit_something = true;
             projectile_manager->removeByUID(uid);
             f->moveToInfinity();
         }));
@@ -738,8 +754,8 @@ void Flyable::computeError()
         World::getWorld()->getTicksSinceStart() > m_check_created_ticks)
     {
         const std::string& uid = getUniqueIdentity();
-        Log::warn("Flyable", "Item %s failed to be created on server, "
-            "remove it locally", uid.c_str());
+        Log::warn("Flyable", "Item %s doesn't exist on server, "
+            "remove it locally.", uid.c_str());
         projectile_manager->removeByUID(uid);
     }
 }   // computeError

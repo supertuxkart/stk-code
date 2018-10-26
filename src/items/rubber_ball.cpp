@@ -793,6 +793,9 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 BareNetworkString* RubberBall::saveState(std::vector<std::string>* ru)
 {
     BareNetworkString* buffer = Flyable::saveState(ru);
+    if (!buffer)
+        return NULL;
+
     buffer->addUInt32(m_last_aimed_graph_node);
     buffer->add(m_control_points[0]);
     buffer->add(m_control_points[1]);

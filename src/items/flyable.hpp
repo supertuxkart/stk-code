@@ -256,6 +256,8 @@ public:
     // ------------------------------------------------------------------------
     virtual void addRewindInfoEventFunctionAfterFiring();
     // ------------------------------------------------------------------------
+    virtual std::function<void()> getLocalStateRestoreFunction() OVERRIDE;
+    // ------------------------------------------------------------------------
     bool isUndoCreation() const                     { return m_undo_creation; }
     // ------------------------------------------------------------------------
     bool hasUndoneDestruction() const      { return m_has_undone_destruction; }
