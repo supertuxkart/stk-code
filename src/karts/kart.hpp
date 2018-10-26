@@ -555,6 +555,9 @@ public:
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool isVisible() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual Stars* getStarsEffect() const OVERRIDE { return m_stars_effect; }
+
 };   // Kart
 
 

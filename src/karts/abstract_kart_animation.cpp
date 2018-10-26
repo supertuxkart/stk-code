@@ -19,8 +19,10 @@
 #include "karts/abstract_kart_animation.hpp"
 
 #include "graphics/slip_stream.hpp"
+#include "graphics/stars.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -183,6 +185,8 @@ void AbstractKartAnimation::
         m_timer = -1;
         m_end_transform = fallback_trans;
         m_ignore_undo = true;
+        if (dynamic_cast<ExplosionAnimation*>(this) && m_kart)
+            m_kart->getStarsEffect()->reset();
     }
 }   // checkNetworkAnimationCreationSucceed
 

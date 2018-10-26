@@ -50,6 +50,7 @@ class RenderInfo;
 class SFXBuffer;
 class Skidding;
 class SlipStream;
+class Stars;
 class TerrainInfo;
 
 
@@ -523,6 +524,8 @@ public:
     virtual float getStartupBoost() const = 0;
     // ------------------------------------------------------------------------
     virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
+    // ------------------------------------------------------------------------
+    virtual Stars* getStarsEffect() const = 0;
 };   // AbstractKart
 
 
