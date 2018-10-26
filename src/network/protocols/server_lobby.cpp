@@ -2029,7 +2029,7 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
         if (ServerConfig::m_hit_limit_threshold > 0.0f)
         {
             float val = fminf(num_karts *
-                ServerConfig::m_hit_limit_threshold, 40.0f);
+                ServerConfig::m_hit_limit_threshold, 30.0f);
             hit_capture_limit = (int)val;
             if (hit_capture_limit == 0)
                 hit_capture_limit = 1;

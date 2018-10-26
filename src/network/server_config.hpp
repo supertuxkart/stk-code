@@ -171,7 +171,7 @@ namespace ServerConfig
         "kick any players."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_start_game_counter
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "start-game-counter",
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(60.0f, "start-game-counter",
         "Time to wait before entering kart selection screen "
         "if satisfied min-start-game-players below for owner less or ranked "
         "server."));
@@ -211,9 +211,9 @@ namespace ServerConfig
         "returning to its own base."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_hit_limit_threshold
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(5.0f, "hit-limit-threshold",
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(3.0f, "hit-limit-threshold",
         "Value used to calculate hit limit in free for all, which "
-        "is min(number of players * hit-limit-threshold, 40), "
+        "is min(number of players * hit-limit-threshold, 30), "
         "negative value to disable hit limit."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_time_limit_threshold_ffa
