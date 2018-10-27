@@ -25,6 +25,7 @@
  * Contains generic utility classes for file I/O (especially XML handling).
  */
 
+#include <mutex>
 #include <string>
 #include <vector>
 #include <set>
@@ -66,6 +67,7 @@ public:
                     ASSET_COUNT};
 
 private:
+    mutable std::mutex m_file_system_lock;
 
     /** The names of the various subdirectories of the asset types. */
     std::vector< std::string > m_subdir_name;
