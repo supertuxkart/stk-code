@@ -144,8 +144,8 @@ void NetworkingLobby::init()
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
     m_ping_update_timer = 0.0f;
-    m_cur_starting_timer = m_start_timeout =
-        m_server_max_player = std::numeric_limits<float>::max();
+    m_start_timeout = std::numeric_limits<float>::max();
+    m_cur_starting_timer = std::numeric_limits<int64_t>::max();
     m_min_start_game_players = 0;
     m_timeout_message->setVisible(false);
 
@@ -247,7 +247,7 @@ void NetworkingLobby::onUpdate(float delta)
             total_msg += L"\n";
         }
         m_text_bubble->setText(total_msg, true);
-        m_cur_starting_timer = std::numeric_limits<float>::max();
+        m_cur_starting_timer = std::numeric_limits<int64_t>::max();
         return;
     }
 
@@ -256,13 +256,14 @@ void NetworkingLobby::onUpdate(float delta)
         m_timeout_message->setVisible(true);
         unsigned cur_player = m_player_list->getItemCount();
         if (cur_player >= m_min_start_game_players &&
-            m_cur_starting_timer == std::numeric_limits<float>::max())
+            m_cur_starting_timer == std::numeric_limits<int64_t>::max())
         {
-            m_cur_starting_timer = m_start_timeout;
+            m_cur_starting_timer = (int64_t)StkTime::getRealTimeMs() +
+                (int64_t)(m_start_timeout * 1000.0);
         }
         else if (cur_player < m_min_start_game_players)
         {
-            m_cur_starting_timer = std::numeric_limits<float>::max();
+            m_cur_starting_timer = std::numeric_limits<int64_t>::max();
             //I18N: In the networking lobby, display the number of players
             //required to start a game for owner-less server
             core::stringw msg =
@@ -272,15 +273,16 @@ void NetworkingLobby::onUpdate(float delta)
             m_timeout_message->setText(msg, true);
         }
 
-        if (m_cur_starting_timer != std::numeric_limits<float>::max())
+        if (m_cur_starting_timer != std::numeric_limits<int64_t>::max())
         {
-            m_cur_starting_timer -= delta;
-            if (m_cur_starting_timer < 0.0f)
-                m_cur_starting_timer = 0.0f;
+            int64_t remain = (m_cur_starting_timer -
+                (int64_t)StkTime::getRealTimeMs()) / 1000;
+            if (remain < 0)
+                remain = 0;
             //I18N: In the networking lobby, display the starting timeout
             //for owner-less server
             core::stringw msg = _P("Game will start after %d second.",
-               "Game will start after %d seconds.", (int)m_cur_starting_timer);
+               "Game will start after %d seconds.", (int)remain);
             m_timeout_message->setText(msg, true);
         }
     }
@@ -554,5 +556,11 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
     m_has_auto_start_in_server = true;
     m_min_start_game_players = grand_prix_started ? 0 : min_players;
     m_start_timeout = start_timeout;
-    m_server_max_player = (float)server_max_player;
 }   // initAutoStartTimer
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::setStartingTimerTo(float t)
+{
+    m_cur_starting_timer =
+        (int64_t)StkTime::getRealTimeMs() + (int64_t)(t * 1000.0f);
+}   // setStartingTimerTo
