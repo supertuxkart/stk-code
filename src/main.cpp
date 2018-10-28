@@ -1562,12 +1562,12 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     
     if(CommandLine::has("--unlock-all"))
     {
-        UserConfigParams::m_everything_unlocked = true;
+        UserConfigParams::m_everything_unlocked = 2;
     } // --unlock-all
     
     if(CommandLine::has("--no-unlock-all"))
     {
-        UserConfigParams::m_everything_unlocked = false;
+        UserConfigParams::m_everything_unlocked = 0;
     } // --no-unlock-all
     
     if(CommandLine::has("--profile-time",  &n))

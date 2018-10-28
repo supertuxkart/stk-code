@@ -70,7 +70,7 @@ void StoryModeStatus::addStatus(ChallengeStatus *cs)
 //-----------------------------------------------------------------------------
 bool StoryModeStatus::isLocked(const std::string& feature)
 {
-    if (UserConfigParams::m_everything_unlocked)
+    if (UserConfigParams::m_everything_unlocked > 0)
         return false;
 
     return m_locked_features.find(feature)!=m_locked_features.end();
