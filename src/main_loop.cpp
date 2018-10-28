@@ -72,6 +72,7 @@ MainLoop::MainLoop(unsigned parent_pid)
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
+    m_allow_large_dt  = false;
     m_frame_before_loading_world = false;
 #ifdef WIN32
     if (parent_pid != 0)
@@ -159,8 +160,8 @@ float MainLoop::getLimitedDt()
         // when the computer can't keep it up, slow down the shown time instead
         // But this can not be done in networking, otherwise the game time on
         // client and server will not be in synch anymore
-        if (!NetworkConfig::get()->isNetworking() ||
-           !World::getWorld())
+        if ((!NetworkConfig::get()->isNetworking() || !World::getWorld()) &&
+            !m_allow_large_dt)
         {
             /* time 3 internal substeps take */
             const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
@@ -327,6 +328,7 @@ void MainLoop::run()
             m_request_abort = true;
         }
 #endif
+
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
