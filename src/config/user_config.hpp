@@ -1032,8 +1032,8 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "debug_hide_gui",
             "Whether to hide the GUI (artist debug mode)"));
 
-    PARAM_PREFIX IntUserConfigParam        m_everything_unlocked
-            PARAM_DEFAULT( IntUserConfigParam(0, "everything_unlocked",
+    PARAM_PREFIX IntUserConfigParam        m_unlock_everything
+            PARAM_DEFAULT( IntUserConfigParam(0, "unlock_everything",
                         "Enable all karts and tracks: 0 = disabled, "
                         "1 = everything except final race, 2 = everything") );
                                
