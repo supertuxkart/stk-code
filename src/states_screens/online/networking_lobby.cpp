@@ -168,17 +168,27 @@ void NetworkingLobby::init()
     {
         m_state = LS_ADD_PLAYERS;
     }
-    else if (NetworkConfig::get()->isClient() &&
-        UserConfigParams::m_lobby_chat)
+    else if (NetworkConfig::get()->isClient())
     {
         m_chat_box->clearListeners();
-        m_chat_box->addListener(this);
-        getWidget("chat")->setVisible(true);
-        getWidget("chat")->setActive(true);
-        getWidget("send")->setVisible(true);
-        getWidget("send")->setActive(true);
+        if (UserConfigParams::m_lobby_chat)
+        {
+            m_chat_box->addListener(this);
+            getWidget("chat")->setVisible(true);
+            getWidget("chat")->setActive(true);
+            getWidget("send")->setVisible(true);
+            getWidget("send")->setActive(true);
+        }
+        else
+        {
+            m_chat_box->setText(
+                _("Chat is disabled, enable in options menu."));
+            getWidget("chat")->setVisible(true);
+            getWidget("chat")->setActive(false);
+            getWidget("send")->setVisible(true);
+            getWidget("send")->setActive(false);
+        }
     }
-
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -524,14 +534,22 @@ void NetworkingLobby::finishAddingPlayers()
     m_state = LS_CONNECTING;
     std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
     m_start_button->setVisible(false);
+    m_chat_box->clearListeners();
     if (UserConfigParams::m_lobby_chat)
     {
-        m_chat_box->clearListeners();
         m_chat_box->addListener(this);
         getWidget("chat")->setVisible(true);
         getWidget("chat")->setActive(true);
         getWidget("send")->setVisible(true);
         getWidget("send")->setActive(true);
+    }
+    else
+    {
+        m_chat_box->setText(_("Chat is disabled, enable in options menu."));
+        getWidget("chat")->setVisible(true);
+        getWidget("chat")->setActive(false);
+        getWidget("send")->setVisible(true);
+        getWidget("send")->setActive(false);
     }
 }   // finishAddingPlayers
 
