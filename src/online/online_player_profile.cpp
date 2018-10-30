@@ -537,6 +537,8 @@ namespace Online
 
             MessageQueue::add(MessageQueue::MT_FRIEND, message);
             OnlineProfileFriends::getInstance()->refreshFriendsList();
+            PlayerManager::getCurrentPlayer()->getProfile()
+                ->unsetHasFetchedFriends();
         }
     }   // PollRequest::callback
 
