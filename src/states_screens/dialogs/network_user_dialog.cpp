@@ -88,8 +88,6 @@ void NetworkUserDialog::beforeAddingWidgets()
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
-    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
 
     m_change_team_widget = NULL;
     if (m_allow_change_team && m_host_id == STKHost::get()->getMyHostId())
@@ -106,6 +104,13 @@ void NetworkUserDialog::beforeAddingWidgets()
     getWidget<IconButtonWidget>("remove")->setVisible(false);
     getWidget<IconButtonWidget>("enter")->setVisible(false);
 }   // beforeAddingWidgets
+
+// -----------------------------------------------------------------------------
+void NetworkUserDialog::init()
+{
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
+}   // init
 
 // -----------------------------------------------------------------------------
 void NetworkUserDialog::onUpdate(float dt)
