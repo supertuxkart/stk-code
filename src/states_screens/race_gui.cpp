@@ -1086,10 +1086,14 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     irr_driver->getVideoDriver()->setMaterial(m);
     glEnable(GL_BLEND);
+    glDisable(GL_CULL_FACE);
+
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     draw2DVertexPrimitiveList(m.getTexture(0), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
     glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+
 #endif
 }   // drawMeterTexture
 
