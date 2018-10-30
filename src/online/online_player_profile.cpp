@@ -483,9 +483,10 @@ namespace Online
                     break;
                 uint32_t uid = p.first;
                 const core::stringw& server_name = p.second;
-                if (cur_friend_server_map.find(uid) ==
+                if ((cur_friend_server_map.find(uid) ==
                     cur_friend_server_map.end() ||
-                    cur_friend_server_map.at(uid) != server_name)
+                    cur_friend_server_map.at(uid) != server_name) &&
+                    ProfileManager::get()->getProfileByID(uid) != NULL)
                 {
                     friend_server_notify.emplace_back(ProfileManager::get()
                         ->getProfileByID(uid)->getUserName(), server_name);
