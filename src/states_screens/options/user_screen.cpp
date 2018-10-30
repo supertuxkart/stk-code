@@ -100,8 +100,10 @@ void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
 // ----------------------------------------------------------------------------
 void BaseUserScreen::beforeAddingWidget()
 {
+#ifndef SERVER_ONLY
     getWidget<IconButtonWidget>("default_kart_color")
         ->setVisible(CVS->isGLSL());
+#endif
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
