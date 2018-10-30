@@ -35,7 +35,8 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class BaseOnlineProfileAchievements : public OnlineProfileBase
+class BaseOnlineProfileAchievements : public OnlineProfileBase,
+                                      public GUIEngine::IListWidgetHeaderListener
 {
 private:
 
@@ -43,6 +44,15 @@ private:
 
     int                         m_selected_achievement_index;
     bool                        m_waiting_for_achievements;
+
+    /** Which column to use for sorting. */
+    int m_sort_column;
+
+    bool m_sort_desc;
+
+    bool m_sort_default;
+
+    void displayResults();
 
 protected:
     BaseOnlineProfileAchievements(const std::string &filename);
@@ -62,6 +72,7 @@ public:
     virtual void onUpdate(float delta) OVERRIDE;
 
     virtual void beforeAddingWidget() OVERRIDE;
+    virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) OVERRIDE;
 
     // ------------------------------------------------------------------------
     virtual void refreshAchievementsList()
