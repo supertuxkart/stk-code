@@ -22,6 +22,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -97,6 +98,13 @@ void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
 }   // setOnline
 
 // ----------------------------------------------------------------------------
+void BaseUserScreen::beforeAddingWidget()
+{
+    getWidget<IconButtonWidget>("default_kart_color")
+        ->setVisible(CVS->isGLSL());
+}   // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
 /** Initialises the user screen. Searches for all players to fill the 
  *  list of users with their icons, and initialises all widgets for the
  *  current user (e.g. the online flag etc).
@@ -156,7 +164,8 @@ void BaseUserScreen::init()
     getWidget<IconButtonWidget>("new_user")->setActive(!in_game);
     getWidget<IconButtonWidget>("rename")->setActive(!in_game);
     getWidget<IconButtonWidget>("delete")->setActive(!in_game);
-    getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
+    if (getWidget<IconButtonWidget>("default_kart_color")->isVisible())
+        getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
 
     m_new_registered_data = false;
     if (m_auto_login)
