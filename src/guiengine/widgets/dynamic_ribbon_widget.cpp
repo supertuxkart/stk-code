@@ -343,8 +343,12 @@ void DynamicRibbonWidget::buildInternalStructure()
 
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
-    float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
-    m_col_amount = (int)roundf( m_w / ( m_child_width*ratio_zoom ) );
+    float col_width = (float)(row_height * m_child_width / m_child_height);
+    
+    // Give some margin for columns for better readability
+    col_width *= 1.2f;
+    
+    m_col_amount = (int)floor( m_w / col_width );
 
     // ajust column amount to not add more item slots than we actually need
     const int item_count = (int) m_items.size();
