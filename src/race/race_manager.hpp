@@ -514,9 +514,11 @@ public:
      *  AI karts. */
     unsigned int getNumberOfKarts() const {return m_num_karts; }
     // ------------------------------------------------------------------------
-    unsigned int getNumberOfAIKarts() const {return m_ai_kart_list.size(); }
+    unsigned int getNumberOfAIKarts() const
+                                    { return (unsigned)m_ai_kart_list.size(); }
     // ------------------------------------------------------------------------
-    unsigned int getNumNonGhostKarts() const { return m_num_karts - m_num_ghost_karts; }
+    unsigned int getNumNonGhostKarts() const
+                                    { return m_num_karts - m_num_ghost_karts; }
     // ------------------------------------------------------------------------
     MajorRaceModeType getMajorMode() const { return m_major_mode; }
     // ------------------------------------------------------------------------
