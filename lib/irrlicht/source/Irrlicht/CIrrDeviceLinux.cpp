@@ -26,8 +26,11 @@ extern bool GLContextDebugBit;
 #include "CColorConverter.h"
 #include "SIrrCreationParameters.h"
 #include "IGUISpriteBank.h"
+
+#ifdef _IRR_COMPILE_WITH_X11_
 #include <X11/XKBlib.h>
 #include <X11/Xatom.h>
+#endif
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #include <GL/gl.h>
@@ -1545,6 +1548,7 @@ int CIrrDeviceLinux::getNumlockMask(Display* display)
 EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 {
 	int keyCode = 0;
+#ifdef _IRR_COMPILE_WITH_X11_
 	SKeyMap mp;
 	
 	// First check for numpad keys
@@ -1584,6 +1588,7 @@ EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 		
 		os::Printer::log("EKEY_CODE is 0, fallback keycode", core::stringc(keyCode).c_str(), ELL_INFORMATION);
 	}
+#endif
 	return (EKEY_CODE)keyCode;
 }
 #endif
@@ -2321,9 +2326,9 @@ Returns the parent window of "window" (i.e. the ancestor of window
 that is a direct child of the root, or window itself if it is a direct child).
 If window is the root window, returns window.
 */
+#ifdef _IRR_COMPILE_WITH_X11_
 bool get_toplevel_parent(Display* display, Window window, Window* tp_window)
 {
-#ifdef _IRR_COMPILE_WITH_X11_
 	Window current_window = window;
 	Window parent;
 	Window root;
@@ -2356,10 +2361,9 @@ bool get_toplevel_parent(Display* display, Window window, Window* tp_window)
 			current_window = parent;
 		}
 	}
-#endif
-
 	return false;
 }
+#endif
 
 
 //! Move window to requested position
