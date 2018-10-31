@@ -171,6 +171,9 @@ void MultitouchDevice::reset()
         event.x = 0;
         event.y = 0;
     }
+
+    m_orientation = 0.0f;
+    m_gyro_time = 0.0;
 } // reset
 
 // ----------------------------------------------------------------------------
@@ -207,6 +210,45 @@ bool MultitouchDevice::isAccelerometerActive()
 {
 #ifdef ANDROID
     return m_android_device->isAccelerometerActive();
+#endif
+
+    return false;
+}
+
+// ----------------------------------------------------------------------------
+/** Activates gyroscope
+ */
+void MultitouchDevice::activateGyroscope()
+{
+#ifdef ANDROID
+    if (!m_android_device->isGyroscopeActive())
+    {
+        m_android_device->activateGyroscope(1.0f / 60); // Assume 60 FPS, some phones can do 90 and 120 FPS but we won't handle them now
+    }
+#endif
+}
+
+// ----------------------------------------------------------------------------
+/** Deativates gyroscope
+ */
+void MultitouchDevice::deactivateGyroscope()
+{
+#ifdef ANDROID
+    if (m_android_device->isGyroscopeActive())
+    {
+        m_android_device->deactivateGyroscope();
+    }
+#endif
+}
+
+// ----------------------------------------------------------------------------
+/** Get gyroscope state
+ *  \return true if gyroscope is active
+ */
+bool MultitouchDevice::isGyroscopeActive()
+{
+#ifdef ANDROID
+    return m_android_device->isGyroscopeActive();
 #endif
 
     return false;
@@ -378,6 +420,98 @@ void MultitouchDevice::updateAxisY(float value)
         m_controller->action(PA_BRAKE, 0);
         m_controller->action(PA_ACCEL, 0);
     }
+}
+
+// ----------------------------------------------------------------------------
+
+/** Returns device orientation Z angle, in radians, where 0 is landscape orientation parallel to the floor.
+ */
+float MultitouchDevice::getOrientation()
+{
+    return m_orientation;
+}
+
+// ----------------------------------------------------------------------------
+
+/** Update device orientation from the accelerometer measurements.
+ *  Accelerometer is shaky, so it adjusts the orientation angle slowly.
+ *  \param x Accelerometer X axis
+ *  \param y Accelerometer Y axis
+ */
+void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
+{
+    const float ACCEL_DISCARD_THRESHOLD = 4.0f;
+    const float ACCEL_MULTIPLIER = 0.05f; // Slowly adjust the angle over time, this prevents shaking
+    const float ACCEL_CHANGE_THRESHOLD = 0.01f; // ~0.5 degrees
+
+    if (fabsf(x) + fabsf(y) < ACCEL_DISCARD_THRESHOLD)
+    {
+        // The device is flat on the table, cannot reliably determine the orientation
+        return;
+    }
+
+    float angle = atan2f(y, x);
+    if (angle > (M_PI / 2.0))
+    {
+        angle = (M_PI / 2.0);
+    }
+    if (angle < -(M_PI / 2.0))
+    {
+        angle = -(M_PI / 2.0);
+    }
+
+    float delta = angle - m_orientation;
+    delta *= ACCEL_MULTIPLIER;
+    if (delta > ACCEL_CHANGE_THRESHOLD)
+    {
+        delta = ACCEL_CHANGE_THRESHOLD;
+    }
+    if (delta < -ACCEL_CHANGE_THRESHOLD)
+    {
+        delta = -ACCEL_CHANGE_THRESHOLD;
+    }
+
+    m_orientation += delta;
+
+    //Log::warn("Accel", "X %03.4f Y %03.4f angle %03.4f delta %03.4f orientation %03.4f", x, y, angle, delta, m_orientation);
+}
+
+// ----------------------------------------------------------------------------
+
+/** Update device orientation from the gyroscope measurements.
+ *  Gyroscope is not shaky and very sensitive, but drifts over time.
+ *  \param x Gyroscope Z axis
+ */
+void MultitouchDevice::updateOrientationFromGyroscope(float z)
+{
+    const float GYRO_SPEED_THRESHOLD = 0.005f;
+
+    double now = StkTime::getRealTime();
+    float timedelta = now - m_gyro_time;
+    m_gyro_time = now;
+    if (timedelta > 0.5f)
+    {
+        timedelta = 0.1f;
+    }
+
+    float angular_speed = -z;
+
+    if (fabsf(angular_speed) < GYRO_SPEED_THRESHOLD)
+    {
+        angular_speed = 0.0f;
+    }
+
+    m_orientation += angular_speed * timedelta;
+    if (m_orientation > (M_PI / 2.0))
+    {
+        m_orientation = (M_PI / 2.0);
+    }
+    if (m_orientation < -(M_PI / 2.0))
+    {
+        m_orientation = -(M_PI / 2.0);
+    }
+
+    //Log::warn("Gyro", "Z %03.4f angular_speed %03.4f delta %03.4f orientation %03.4f", z, angular_speed, angular_speed * timedelta, m_orientation);
 }
 
 // ----------------------------------------------------------------------------

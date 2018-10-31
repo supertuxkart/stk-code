@@ -70,7 +70,7 @@ void StoryModeStatus::addStatus(ChallengeStatus *cs)
 //-----------------------------------------------------------------------------
 bool StoryModeStatus::isLocked(const std::string& feature)
 {
-    if (UserConfigParams::m_everything_unlocked)
+    if (UserConfigParams::m_unlock_everything > 0)
         return false;
 
     return m_locked_features.find(feature)!=m_locked_features.end();
@@ -223,6 +223,7 @@ void StoryModeStatus::unlockFeatureByList()
                 continue;
 
             bool newly_solved = unlock_manager->unlockByPoints(m_points,i->second);
+            newly_solved = newly_solved || unlock_manager->unlockSpecial(i->second, getNumReqMetInLowerDiff());
 
             // Add to list of recently unlocked features
             if(newly_solved)
@@ -380,3 +381,15 @@ void StoryModeStatus::save(UTFWriter &out)
     }
     out << "      </story-mode>\n";
 }  // save
+
+int StoryModeStatus::getNumReqMetInLowerDiff() const
+{
+    int counter = 0;
+    for ( const auto &c : m_challenges_state)
+    {
+        counter += (c.second->areMaxReqMetInLowerDiff()) ? 1 : 0;
+    }
+    return counter;
+}  // getNumReqMetInLowerDiff
+
+/* EOF */

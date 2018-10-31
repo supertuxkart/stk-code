@@ -511,44 +511,51 @@ bool CaptureTheFlag::isRaceOver()
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
+void CaptureTheFlag::loseFlagForKart(int kart_id)
+{
+    if (!(m_red_holder == kart_id || m_blue_holder == kart_id))
+        return;
+
+    bool reset_red_flag = m_red_holder == kart_id;
+    btTransform dropped_trans = reset_red_flag ?
+        m_orig_red_trans : m_orig_blue_trans;
+    bool succeed = getDroppedFlagTrans(getKart(kart_id)->getTrans(),
+        &dropped_trans);
+    NetworkString p(PROTOCOL_GAME_EVENTS);
+    p.setSynchronous(true);
+    // If reset red flag
+    uint8_t reset_info = reset_red_flag ? 1 : 0;
+    reset_info <<= 1;
+    // With custom transform
+    if (succeed)
+        reset_info |= 1;
+    p.addUInt8(GameEventsProtocol::GE_CTF_RESET).addUInt8(reset_info)
+        .addUInt8(((int8_t)-1));
+    if (succeed)
+    {
+        p.add(Vec3(dropped_trans.getOrigin()))
+            .add(dropped_trans.getRotation());
+    }
+    STKHost::get()->sendPacketToAllPeers(&p, true);
+    if (reset_red_flag)
+    {
+        m_red_holder = -1;
+        m_red_trans = dropped_trans;
+    }
+    else
+    {
+        m_blue_holder = -1;
+        m_blue_trans = dropped_trans;
+    }
+}   // loseFlagForKart
+
+// ----------------------------------------------------------------------------
 bool CaptureTheFlag::kartHit(int kart_id, int hitter)
 {
     if (!FreeForAll::kartHit(kart_id, hitter))
         return false;
-    if (m_red_holder == kart_id || m_blue_holder == kart_id)
-    {
-        bool reset_red_flag = m_red_holder == kart_id;
-        btTransform dropped_trans = reset_red_flag ?
-            m_orig_red_trans : m_orig_blue_trans;
-        bool succeed = getDroppedFlagTrans(
-            getKart(kart_id)->getTrans(), &dropped_trans);
-        NetworkString p(PROTOCOL_GAME_EVENTS);
-        p.setSynchronous(true);
-        // If reset red flag
-        uint8_t reset_info = reset_red_flag ? 1 : 0;
-        reset_info <<= 1;
-        // With custom transform
-        if (succeed)
-            reset_info |= 1;
-        p.addUInt8(GameEventsProtocol::GE_CTF_RESET).addUInt8(reset_info)
-            .addUInt8(((int8_t)-1));
-        if (succeed)
-        {
-            p.add(Vec3(dropped_trans.getOrigin()))
-                .add(dropped_trans.getRotation());
-        }
-        STKHost::get()->sendPacketToAllPeers(&p, true);
-        if (reset_red_flag)
-        {
-            m_red_holder = -1;
-            m_red_trans = dropped_trans;
-        }
-        else
-        {
-            m_blue_holder = -1;
-            m_blue_trans = dropped_trans;
-        }
-    }
+
+    loseFlagForKart(kart_id);
     return true;
 }   // kartHit
 

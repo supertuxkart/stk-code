@@ -203,6 +203,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
+#include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/combined_characteristic.hpp"
@@ -599,6 +600,7 @@ void cmdLineHelp()
     // "
     // "    --disable-item-collection Disable item collection. Useful for\n"
     // "                          debugging client/server item management.\n"
+    // "    --network-item-debugging Print item handling debug information.\n"
     "       --server-config=file Specify the server_config.xml for server hosting, it will create\n"
     "                            one if not found.\n"
     "       --network-console  Enable network console.\n"
@@ -1189,6 +1191,9 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     if (CommandLine::has("--disable-item-collection"))
         ItemManager::disableItemCollection();
 
+    if (CommandLine::has("--network-item-debugging"))
+        NetworkItemManager::m_network_item_debugging = true;
+    
     std::string server_password;
     if (CommandLine::has("--server-password", &s))
     {
@@ -1557,12 +1562,12 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     
     if(CommandLine::has("--unlock-all"))
     {
-        UserConfigParams::m_everything_unlocked = true;
+        UserConfigParams::m_unlock_everything = 2;
     } // --unlock-all
     
     if(CommandLine::has("--no-unlock-all"))
     {
-        UserConfigParams::m_everything_unlocked = false;
+        UserConfigParams::m_unlock_everything = 0;
     } // --no-unlock-all
     
     if(CommandLine::has("--profile-time",  &n))
@@ -2078,7 +2083,7 @@ int main(int argc, char *argv[] )
             }
             
             #ifdef ANDROID
-            if (UserConfigParams::m_multitouch_controls == 0)
+            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {
                 int32_t touch = AConfiguration_getTouchscreen(
                                                     global_android_app->config);

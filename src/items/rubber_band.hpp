@@ -22,6 +22,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <cinttypes>
 #include <memory>
 
 namespace SP

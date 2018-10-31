@@ -371,7 +371,14 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     if (type == "animation" || xml_node.hasChildNamed("curve"))
     {
-        m_animator = new ThreeDAnimation(xml_node, this);
+        try
+        {
+            m_animator = new ThreeDAnimation(xml_node, this);
+        }
+        catch (std::exception& e)
+        {
+            Log::debug("TrackObject", e.what());
+        }
     }
 
     reset();
@@ -528,7 +535,9 @@ void TrackObject::resetEnabled()
  */
 void TrackObject::updateGraphics(float dt)
 {
+    if (m_presentation) m_presentation->updateGraphics(dt);
     if (m_physical_object) m_physical_object->updateGraphics(dt);
+    if (m_animator) m_animator->updateWithWorldTicks(false/*has_physics*/);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -539,7 +548,7 @@ void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
     if (m_physical_object) m_physical_object->update(dt);
-    if (m_animator) m_animator->updateWithWorldTicks();
+    if (m_animator) m_animator->updateWithWorldTicks(true/*has_physics*/);
 }   // update
 
 // ----------------------------------------------------------------------------

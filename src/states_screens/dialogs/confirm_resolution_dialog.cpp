@@ -31,10 +31,13 @@ using namespace irr::core;
 
 // ------------------------------------------------------------------------------------------------------
 
-ConfirmResolutionDialog::ConfirmResolutionDialog() : ModalDialog(0.7f, 0.7f)
+ConfirmResolutionDialog::ConfirmResolutionDialog(bool unsupported_res) : ModalDialog(0.7f, 0.7f)
 {
     loadFromFile("confirm_resolution_dialog.stkgui");
     m_remaining_time = 10.99f;
+    m_unsupported_resolution = unsupported_res;
+    if (m_unsupported_resolution)
+        m_remaining_time += 10.0f;
 
     updateMessage();
 }
@@ -82,6 +85,13 @@ void ConfirmResolutionDialog::updateMessage()
     stringw msg = _P("Confirm resolution within %i second",
         "Confirm resolution within %i seconds",
         (int)m_remaining_time);
+
+    if (m_unsupported_resolution)
+    {
+        msg += L"\n\n";
+        msg += _("Resolutions smaller than 1024x768 or 1280x720 are unsupported. "
+                                   "Some parts of the UI may not work correctly.");
+    }
 
     LabelWidget* countdown_message = getWidget<LabelWidget>("title");
     countdown_message->setText( msg.c_str(), false );

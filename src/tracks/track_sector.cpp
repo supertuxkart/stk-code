@@ -101,6 +101,11 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
     {
         for (unsigned int i=0; i<checkline_requirements.size(); i++)
         {
+            // If a checkline is validated while off-road and rescue is then
+            // used ; checking for > is required to have the rescue position
+            // correctly updating until the checkline is crossed again.
+            // This requires an ordering of checklines such that
+            // if checkline N is validated, all checklines for n<N are too.
             if (m_last_triggered_checkline >= checkline_requirements[i])
             {
                 //has_prerequisite = true;

@@ -48,6 +48,9 @@ private:
     {
         m_network_tracks = false;
         m_reverse_checked = false;
+        m_quit_server = false;
+        m_bottom_box_height = -1;
+        m_vote_timeout = std::numeric_limits<uint64_t>::max();
     }
 
     Track* m_selected_track = NULL;
@@ -55,11 +58,11 @@ private:
     GUIEngine::SpinnerWidget* m_laps;
     GUIEngine::LabelWidget* m_votes;
 
-    bool m_network_tracks, m_reverse_checked;
+    bool m_network_tracks, m_reverse_checked, m_quit_server;
 
-    int m_bottom_box_height = -1;
+    int m_bottom_box_height;
 
-    uint64_t m_vote_timeout = std::numeric_limits<uint64_t>::max();
+    uint64_t m_vote_timeout;
 
     std::map<std::string, core::stringw> m_vote_messages;
 
@@ -98,6 +101,8 @@ public:
     void setFocusOnTrack(const std::string& trackName);
 
     void setNetworkTracks() { m_network_tracks = true; }
+
+    void setQuitServer() { m_quit_server = true; }
 
     void resetVote()
     {

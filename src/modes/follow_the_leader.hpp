@@ -60,6 +60,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if faster music should be used at the end. */
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+
+    bool isLeader(int kart_id) { return (kart_id == 0); }
+    void leaderHit();
+    // For now, use a similar countdown change as with leaderHit
+    void leaderRescued() { leaderHit(); }
 };   // FollowTheLeader
 
 

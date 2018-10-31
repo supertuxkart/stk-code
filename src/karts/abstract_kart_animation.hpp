@@ -108,6 +108,10 @@ public:
     int getEndTicks() const { return m_end_ticks; }
     // ------------------------------------------------------------------------
     virtual KartAnimationType getAnimationType() const = 0;
+    // ------------------------------------------------------------------------
+    /* Remove the timer changes by checkNetworkAnimationCreationSucceed if
+     * m_kart has been eliminated by network. */
+    void handleResetRace()                                  { m_timer = 9999; }
 };   // AbstractKartAnimation
 
 #endif

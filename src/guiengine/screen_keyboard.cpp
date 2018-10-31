@@ -24,7 +24,12 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/CGUIEditBox.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
+
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
 
 #include <algorithm>
 #include <string>
@@ -83,6 +88,7 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
     m_edit_box        = edit_box;
     m_back_button     = NULL;
     m_repeat_time     = 0;
+    m_back_button_pressed = false;
     
     init();
 }   // ScreenKeyboard
@@ -183,6 +189,9 @@ void ScreenKeyboard::createButtons()
 
     LayoutManager::calculateLayout(m_widgets, this);
     addWidgetsRecursively(m_widgets);
+    
+    assert(m_buttons.size() > 0);
+    m_buttons[0]->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // createButtons
 
 // ----------------------------------------------------------------------------
@@ -264,7 +273,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
 
 void ScreenKeyboard::onUpdate(float dt)
 {
-    if (m_back_button->isPressed())
+    if (m_back_button->isPressed() || m_back_button_pressed)
     {
         const unsigned int repeat_rate = 40;
         const unsigned int repeat_delay = 400;
@@ -290,8 +299,10 @@ void ScreenKeyboard::onUpdate(float dt)
         
         m_repeat_time += (unsigned int)(dt * 1000);
     }
-    else
+    
+    if (!m_back_button->isPressed())  
     {
+        m_back_button_pressed = false;
         m_repeat_time = 0;
     }
 }
@@ -348,6 +359,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     else if (eventSource == "Back")
     {
         send_event = false;
+        m_back_button_pressed = true;
     }
     else if (eventSource == "Space")
     {
@@ -399,3 +411,21 @@ bool ScreenKeyboard::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
+/** A function that determines if screen keyboard should be activated
+ */
+bool ScreenKeyboard::shouldUseScreenKeyboard()
+{
+    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard > 1;
+    
+    #ifdef ANDROID
+    if (UserConfigParams::m_screen_keyboard == 1)
+    {
+        int32_t keyboard = AConfiguration_getKeyboard(
+                                            global_android_app->config);
+        
+        use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
+    }
+    #endif
+    
+    return use_screen_keyboard;
+}

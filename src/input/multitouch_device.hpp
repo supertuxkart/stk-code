@@ -87,6 +87,9 @@ private:
      *  at the edge of button */
     float m_deadzone_edge;
 
+    float m_orientation;
+    double m_gyro_time;
+
 #ifdef ANDROID
     /** Pointer to the Android irrlicht device */
     CIrrDeviceAndroid* m_android_device;
@@ -125,9 +128,16 @@ public:
     void activateAccelerometer();
     void deactivateAccelerometer();
     bool isAccelerometerActive();
-    
+
+    void activateGyroscope();
+    void deactivateGyroscope();
+    bool isGyroscopeActive();
+
     void updateAxisX(float value);
     void updateAxisY(float value);
+    float getOrientation();
+    void updateOrientationFromAccelerometer(float x, float y);
+    void updateOrientationFromGyroscope(float z);
     void updateDeviceState(unsigned int event_id);
     void updateController();
     void updateConfigParams();

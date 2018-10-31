@@ -71,7 +71,6 @@ private:
 
 public:
     UserInfoDialog(uint32_t showing_id, const core::stringw info = "", bool error = false, bool from_queue = false);
-    ~UserInfoDialog();
 
     virtual void beforeAddingWidgets();
     virtual void load();
@@ -81,6 +80,7 @@ public:
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
+    virtual void init();
 };
 
 #endif

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-07 13:11+0800\n"
+"POT-Creation-Date: 2018-10-20 10:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -166,6 +166,13 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Accelerometer"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/android/init_android.stkgui
+#. I18N: Control type
+#. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Gyroscope"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
@@ -836,7 +843,7 @@ msgstr ""
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:333
 #: src/states_screens/kart_selection.cpp:282
-#: src/states_screens/online/tracks_screen.cpp:207
+#: src/states_screens/online/tracks_screen.cpp:213
 #: src/states_screens/tracks_and_gp_screen.cpp:135
 msgid "All"
 msgstr ""
@@ -957,7 +964,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/challenges/challenge_data.cpp:295
+#: src/challenges/challenge_data.cpp:309
 msgid "Reverse"
 msgstr ""
 
@@ -1149,9 +1156,10 @@ msgstr ""
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid ""
-"You can skid by pressing a special key or button. Short skids help to take "
-"sharp turns. If you skid long enough, you will get a boost. You can't stop "
-"turning while skidding, so orient your kart carefully before!"
+"You can skid by pressing a special key or button. Successive short skids "
+"help to take sharp turns; while medium skids will boost your speed, long "
+"skids more so. You can't stop turning while skidding, so orient your kart "
+"carefully before!"
 msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
@@ -1445,7 +1453,7 @@ msgstr ""
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online/online_profile_friends.cpp:206
+#: src/states_screens/online/online_profile_friends.cpp:239
 msgid "Online"
 msgstr ""
 
@@ -1456,7 +1464,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:583
+#: src/states_screens/race_gui_overworld.cpp:552
 msgid "Tutorial"
 msgstr ""
 
@@ -1568,7 +1576,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:152
+#: src/states_screens/online/networking_lobby.cpp:153
 msgid "Lobby"
 msgstr ""
 
@@ -2019,14 +2027,14 @@ msgstr ""
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:287
+#: src/states_screens/online/tracks_screen.cpp:293
 msgid "Number of goals to win"
 msgstr ""
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:295
+#: src/states_screens/online/tracks_screen.cpp:301
 msgid "Maximum time (min.)"
 msgstr ""
 
@@ -2053,7 +2061,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:320
+#: src/states_screens/online/tracks_screen.cpp:326
 msgid "Number of laps"
 msgstr ""
 
@@ -2311,7 +2319,7 @@ msgstr ""
 msgid "Zen Garden"
 msgstr ""
 
-#: src/achievements/achievement.cpp:374
+#: src/achievements/achievement.cpp:377
 #, c-format
 msgid "Completed achievement \"%s\"."
 msgstr ""
@@ -2326,37 +2334,37 @@ msgid "Error downloading news: '%s'."
 msgstr ""
 
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:285
+#: src/challenges/challenge_data.cpp:299
 #: src/states_screens/race_result_gui.cpp:1632
 #, c-format
 msgid "Laps: %i"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:291
+#: src/challenges/challenge_data.cpp:305
 msgid "Follow the leader"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:557
+#: src/challenges/challenge_data.cpp:587
 #, c-format
 msgid "New track '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:561
+#: src/challenges/challenge_data.cpp:591
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:571
+#: src/challenges/challenge_data.cpp:601
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:575
+#: src/challenges/challenge_data.cpp:605
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:585
+#: src/challenges/challenge_data.cpp:615
 #, c-format
 msgid "New kart '%s' now available"
 msgstr ""
@@ -2401,7 +2409,7 @@ msgstr ""
 msgid "Encoding progress:"
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1778 src/graphics/irr_driver.cpp:1783
+#: src/graphics/irr_driver.cpp:1781 src/graphics/irr_driver.cpp:1786
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr ""
@@ -2930,11 +2938,11 @@ msgid "Mouse axis %d %s"
 msgstr ""
 
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:575
+#: src/input/device_manager.cpp:576
 msgid "Please re-configure your key bindings."
 msgstr ""
 
-#: src/input/device_manager.cpp:576
+#: src/input/device_manager.cpp:577
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
 
@@ -3074,7 +3082,7 @@ msgstr ""
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr ""
 
-#: src/input/input_manager.cpp:875
+#: src/input/input_manager.cpp:878
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
@@ -3125,7 +3133,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/main.cpp:1812
+#: src/main.cpp:1817
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3135,16 +3143,16 @@ msgid ""
 "edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:2072
+#: src/main.cpp:2077
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:2101
+#: src/main.cpp:2106
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:2119
+#: src/main.cpp:2124
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
@@ -3192,30 +3200,30 @@ msgstr ""
 msgid "Eggs: %d / %d"
 msgstr ""
 
-#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:287
+#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:296
 msgid "Leader"
 msgstr ""
 
-#: src/modes/linear_world.cpp:377
+#: src/modes/linear_world.cpp:383
 msgid "Final lap!"
 msgstr ""
 
-#: src/modes/linear_world.cpp:405
+#: src/modes/linear_world.cpp:412
 #, c-format
 msgid "Lap %i"
 msgstr ""
 
-#: src/modes/linear_world.cpp:495
+#: src/modes/linear_world.cpp:502
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr ""
 
-#: src/modes/linear_world.cpp:500
+#: src/modes/linear_world.cpp:507
 msgid "New fastest lap"
 msgstr ""
 
-#: src/modes/linear_world.cpp:1028
+#: src/modes/linear_world.cpp:1035
 msgid "WRONG WAY!"
 msgstr ""
 
@@ -3399,7 +3407,7 @@ msgid "No quick play server available."
 msgstr ""
 
 #: src/network/protocols/connect_to_server.cpp:281
-#: src/states_screens/online/online_screen.cpp:273
+#: src/states_screens/online/online_screen.cpp:259
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr ""
@@ -3615,326 +3623,326 @@ msgid "Progress"
 msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:131
-msgid "Fulfill all the subogals"
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:134
+msgid "Fulfill all the subgoals"
 msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:133
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:136
 msgid "Fulfill all the subgoals at the same time"
 msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:135
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:138
 msgid "Fulfill at least one subgoal"
 msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:137
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:140
 msgid "The sum of the subgoals must reach the indicated value"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:139
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:245
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:270
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:142
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
 msgid "Races won"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:141
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:144
 msgid "Normal races won"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:143
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:146
 msgid "Time-trial races won"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:145
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:148
 msgid "Follow-the-Leader races won"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:147
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:150
 msgid "Consecutive won races"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:149
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:152
 msgid "Consecutive won races in Expert or SuperTux"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:151
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:154
 msgid "Novice races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:153
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:156
 msgid "Novice races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:155
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:158
 msgid "Intermediate races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:157
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:160
 msgid "Intermediate races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:159
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:162
 msgid "Expert races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:161
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:164
 msgid "Expert races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:163
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:166
 msgid "SuperTux races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:165
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:168
 msgid "SuperTux races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:167
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:170
 msgid "Normal races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:169
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:172
 msgid "Normal races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:171
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:174
 msgid "Time-trial races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:173
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
 msgid "Time-trial races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:175
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:178
 msgid "Follow-the-Leader races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:177
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:180
 msgid "Follow-the-Leader races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:179
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:182
 msgid "3 Strikes battle started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:181
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:184
 msgid "3 Strikes battle finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:183
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:186
 msgid "Soccer matches started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:185
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:188
 msgid "Soccer matches finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:187
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:190
 msgid "Egg Hunts started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:189
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:192
 msgid "Egg Hunts finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:191
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:194
 msgid "Races started with a ghost replay"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:193
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:196
 msgid "Races finished with a ghost replay"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:195
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:198
 msgid "Capture-the-Flag matches started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:197
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:200
 msgid "Capture-the-Flag matches finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:199
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:202
 msgid "Free-for-All matches started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:201
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:204
 msgid "Free-for-All matches finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:203
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:205
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
 msgid "Powerups used"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:205
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:209
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:213
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:217
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:219
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:223
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:231
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:234
 msgid " (1 race)"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:207
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:209
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
 msgid "Bowling ball hits"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:211
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:213
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:214
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
 msgid "Swatter hits"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:215
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:217
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:218
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
 msgid "All hits"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:219
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
 msgid "Hits against the same kart"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:221
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:223
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:224
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
 msgid "Bananas collected"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
 #. I18N: Key binding name
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:225
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:229
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:236
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:239
 #: src/states_screens/options/options_screen_device.cpp:279
 msgid "Skidding"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:238
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:241
 msgid " (1 lap)"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:241
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:266
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
 msgid "Races started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:241
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:243
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:245
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:247
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:249
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:251
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:253
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:255
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:257
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:263
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:246
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:258
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:266
 msgid " (maximum on one official track)"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:243
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:268
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:246
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
 msgid "Races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:247
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
 msgid "Reverse direction races finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:249
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:277
 msgid "Races finished alone"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:251
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:279
 msgid "Races with less than the default lap number"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:253
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
 msgid "Races with more than the default lap number"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:255
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:258
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
 msgid "Races with at least twice as much as the default lap number"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:257
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:282
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
 msgid "Egg hunts started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:261
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:286
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:264
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:289
 msgid "Egg hunts finished"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:266
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:268
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:270
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:282
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:277
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:279
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:291
 msgid " (official tracks matching the goal)"
 msgstr ""
 
@@ -4033,12 +4041,18 @@ msgid "Validating info"
 msgstr ""
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:82
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:85
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
+msgid ""
+"Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of "
+"the UI may not work correctly."
+msgstr ""
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
@@ -4211,7 +4225,7 @@ msgid "Ghost replay race"
 msgstr ""
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:99
-#: src/states_screens/race_gui_overworld.cpp:147
+#: src/states_screens/race_gui_overworld.cpp:148
 msgid "Rank"
 msgstr ""
 
@@ -4238,7 +4252,7 @@ msgid "Input device already exists."
 msgstr ""
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
-#: src/states_screens/online/online_screen.cpp:240
+#: src/states_screens/online/online_screen.cpp:226
 msgid "No player available for connecting to server."
 msgstr ""
 
@@ -4298,7 +4312,7 @@ msgid "Performing vote"
 msgstr ""
 
 #: src/states_screens/easter_egg_screen.cpp:269
-#: src/states_screens/online/tracks_screen.cpp:411
+#: src/states_screens/online/tracks_screen.cpp:417
 #: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
 msgstr ""
@@ -4438,12 +4452,16 @@ msgstr ""
 msgid "Better luck next time!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:162
+#: src/states_screens/grand_prix_win.cpp:163
 #: src/states_screens/race_result_gui.cpp:186
 msgid "You completed a challenge!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:319
+#: src/states_screens/grand_prix_win.cpp:320
+msgid "You won the Grand Prix!"
+msgstr ""
+
+#: src/states_screens/grand_prix_win.cpp:321
 msgid "You completed the Grand Prix!"
 msgstr ""
 
@@ -4457,14 +4475,14 @@ msgid "Locked"
 msgstr ""
 
 #: src/states_screens/kart_selection.cpp:982
-#: src/states_screens/online/networking_lobby.cpp:293
+#: src/states_screens/online/networking_lobby.cpp:294
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online/online_screen.cpp:218
+#: src/states_screens/online/online_screen.cpp:204
 msgid ""
 "You can not play online without internet access. If you want to play online, "
 "go to options, select  tab 'User Interface', and edit \"Connect to the "
@@ -4527,18 +4545,18 @@ msgstr ""
 msgid "Incorrect characters in password!"
 msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:230
+#: src/states_screens/online/networking_lobby.cpp:231
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr ""
 
 #. I18N: In the networking lobby, show when player is required to wait
 #. before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:240
+#: src/states_screens/online/networking_lobby.cpp:241
 msgid "Please wait for current game to end."
 msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:268
+#: src/states_screens/online/networking_lobby.cpp:269
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4547,19 +4565,19 @@ msgstr[1] ""
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server
-#: src/states_screens/online/networking_lobby.cpp:281
+#: src/states_screens/online/networking_lobby.cpp:282
 #, c-format
 msgid "Game will start after %d second."
 msgid_plural "Game will start after %d seconds."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/states_screens/online/networking_lobby.cpp:313
+#: src/states_screens/online/networking_lobby.cpp:314
 #, c-format
 msgid "Connecting to server %s"
 msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:318
+#: src/states_screens/online/networking_lobby.cpp:319
 msgid "Finding a quick play server"
 msgstr ""
 
@@ -4592,34 +4610,34 @@ msgid "Status"
 msgstr ""
 
 #: src/states_screens/online/online_profile_friends.cpp:93
-#: src/states_screens/online/online_profile_friends.cpp:231
+#: src/states_screens/online/online_profile_friends.cpp:273
 msgid "Fetching friends"
 msgstr ""
 
-#: src/states_screens/online/online_profile_friends.cpp:202
+#: src/states_screens/online/online_profile_friends.cpp:235
 msgid "New Request"
 msgstr ""
 
-#: src/states_screens/online/online_profile_friends.cpp:203
+#: src/states_screens/online/online_profile_friends.cpp:236
 msgid "Pending"
 msgstr ""
 
-#: src/states_screens/online/online_profile_friends.cpp:207
+#: src/states_screens/online/online_profile_friends.cpp:240
 msgid "Offline"
 msgstr ""
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online/online_screen.cpp:108
+#: src/states_screens/online/online_screen.cpp:194
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr ""
 
-#: src/states_screens/online/online_screen.cpp:245
+#: src/states_screens/online/online_screen.cpp:231
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
 msgstr ""
 
-#: src/states_screens/online/online_screen.cpp:256
+#: src/states_screens/online/online_screen.cpp:242
 #, c-format
 msgid "Invalid server address: %s."
 msgstr ""
@@ -4707,26 +4725,26 @@ msgstr ""
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:266
-#: src/states_screens/online/tracks_screen.cpp:302
+#: src/states_screens/online/tracks_screen.cpp:272
+#: src/states_screens/online/tracks_screen.cpp:308
 #: src/states_screens/track_info_screen.cpp:219
 msgid "Random item location"
 msgstr ""
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:328
+#: src/states_screens/online/tracks_screen.cpp:334
 #: src/states_screens/track_info_screen.cpp:214
 msgid "Drive in reverse"
 msgstr ""
 
-#: src/states_screens/online/tracks_screen.cpp:397
+#: src/states_screens/online/tracks_screen.cpp:403
 #: src/states_screens/tracks_and_gp_screen.cpp:275
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr ""
 
 #. I18N: In tracks screen, about voting of tracks in network
-#: src/states_screens/online/tracks_screen.cpp:492
+#: src/states_screens/online/tracks_screen.cpp:498
 #, c-format
 msgid "Remaining time: %d"
 msgstr ""
@@ -4982,30 +5000,30 @@ msgstr ""
 msgid "Rendered image quality: %s"
 msgstr ""
 
-#: src/states_screens/options/user_screen.cpp:344
+#: src/states_screens/options/user_screen.cpp:345
 msgid "Internet access is disabled. Do you want to enable it?"
 msgstr ""
 
-#: src/states_screens/options/user_screen.cpp:537
+#: src/states_screens/options/user_screen.cpp:538
 msgid "You need to enter a password."
-msgstr ""
-
-#: src/states_screens/options/user_screen.cpp:558
-#, c-format
-msgid "Logging out '%s'"
 msgstr ""
 
 #: src/states_screens/options/user_screen.cpp:559
 #, c-format
+msgid "Logging out '%s'"
+msgstr ""
+
+#: src/states_screens/options/user_screen.cpp:560
+#, c-format
 msgid "Logging in '%s'"
 msgstr ""
 
-#: src/states_screens/options/user_screen.cpp:640
+#: src/states_screens/options/user_screen.cpp:641
 msgid "You can't delete the only player."
 msgstr ""
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:648
+#: src/states_screens/options/user_screen.cpp:649
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr ""
@@ -5038,42 +5056,41 @@ msgid "Waiting for others"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:555
+#: src/states_screens/race_gui_base.cpp:556
 msgid "by"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:660
+#: src/states_screens/race_gui_base.cpp:661
 msgid "Collect nitro!"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:662
+#: src/states_screens/race_gui_base.cpp:663
 msgid "Follow the leader!"
 msgstr ""
 
-#. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:837
+#: src/states_screens/race_gui_base.cpp:836
 #, c-format
 msgid "Top %i"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:431 src/states_screens/race_gui.cpp:433
+#: src/states_screens/race_gui.cpp:440 src/states_screens/race_gui.cpp:442
 msgid "Challenge Failed"
 msgstr ""
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui_overworld.cpp:146
+#: src/states_screens/race_gui_overworld.cpp:147
 msgid "Lap"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:590
+#: src/states_screens/race_gui_overworld.cpp:559
 msgid "Press fire to start the tutorial"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:629
+#: src/states_screens/race_gui_overworld.cpp:598
 msgid "Type: Grand Prix"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:666
+#: src/states_screens/race_gui_overworld.cpp:635
 msgid "Press fire to start the challenge"
 msgstr ""
 

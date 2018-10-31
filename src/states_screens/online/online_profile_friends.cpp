@@ -124,7 +124,11 @@ void OnlineProfileFriends::onColumnClicked(int column_id, bool sort_desc, bool s
     m_sort_column = column_id;
     m_sort_desc = sort_desc;
     m_sort_default = sort_default;
-    displayResults();
+    
+    if (!m_waiting_for_friends)
+    {
+        displayResults();
+    }
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
@@ -148,14 +152,34 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
     {
         OnlineProfile::RelationInfo *r1 = p1->getRelationInfo();
         OnlineProfile::RelationInfo *r2 = p2->getRelationInfo();
-        // In case of same online status, sort by name
-        if (r1->isOnline() == r2->isOnline())
+        
+        if (r1->isPending() && r2->isPending())
         {
-            return p1->getUserName().lower_ignore_case(p2->getUserName());
+            // In case of same online status, sort by name
+            if (r1->isAsker() == r2->isAsker())
+            {
+                return p1->getUserName().lower_ignore_case(p2->getUserName());
+            }
+            else
+            {
+                return r1->isAsker() > r2->isAsker();
+            }
+        }
+        else if (r1->isPending() != r2->isPending())
+        {
+            return r1->isPending() > r2->isPending();
         }
         else
         {
-            return r1->isOnline() < r2->isOnline();
+            // In case of same online status, sort by name
+            if (r1->isOnline() == r2->isOnline())
+            {
+                return p1->getUserName().lower_ignore_case(p2->getUserName());
+            }
+            else
+            {
+                return r1->isOnline() > r2->isOnline();
+            }
         }
     }
     default:
@@ -171,9 +195,18 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
 void OnlineProfileFriends::displayResults()
 {
     m_friends_list_widget->clear();
+    
     OnlineProfile::IDList friends = m_visiting_profile->getFriends();
-    (m_sort_desc && !m_sort_default) ? std::sort(friends.rbegin(), friends.rend(), compareFriends)
-                                     : std::sort(friends.begin(), friends.end(), compareFriends);
+    
+    if (m_sort_desc && !m_sort_default)
+    {
+        std::sort(friends.rbegin(), friends.rend(), compareFriends);
+    }
+    else
+    {
+        std::sort(friends.begin(), friends.end(), compareFriends);
+    }
+                                     
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;
@@ -221,8 +254,17 @@ void OnlineProfileFriends::onUpdate(float delta)
 {
     if(m_waiting_for_friends)
     {
-        if(m_visiting_profile->hasFetchedFriends())
+        if (m_visiting_profile->hasFetchedFriends())
         {
+            // When browsing other users friends there is no Since/Status 
+            // columns, so force sorting by name
+            if (!m_visiting_profile->isCurrentUser() && m_sort_column != 0)
+            {
+                m_sort_column = 0;
+                m_sort_desc = false;
+                m_sort_default = true;
+            }
+            
             displayResults();
         }
         else

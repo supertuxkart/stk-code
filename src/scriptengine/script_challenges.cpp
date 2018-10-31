@@ -61,7 +61,7 @@ namespace Scripting
         /** Get number of challenges that were completed at any difficulty */
         int getCompletedChallengesCount()
         {
-            if (UserConfigParams::m_everything_unlocked)
+            if (UserConfigParams::m_unlock_everything > 1)
                 return getChallengeCount();
 
             return ::Track::getCurrentTrack()->getNumOfCompletedChallenges();
@@ -86,7 +86,7 @@ namespace Scripting
         // --------------------------------------------------------------------
         bool isChallengeUnlocked(std::string* challenge_name)
         {
-            if (UserConfigParams::m_everything_unlocked)
+            if (UserConfigParams::m_unlock_everything > 0)
                 return true;
 
             const ChallengeData* challenge =

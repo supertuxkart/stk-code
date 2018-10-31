@@ -79,6 +79,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
+                               
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;

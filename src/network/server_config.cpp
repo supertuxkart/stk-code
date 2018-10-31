@@ -277,6 +277,7 @@ void loadServerLobbyFromConfig()
         m_validating_player = true;
         m_auto_end = true;
         m_owner_less = true;
+        m_strict_players = true;
     }
     if (m_owner_less)
     {

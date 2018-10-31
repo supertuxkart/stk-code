@@ -156,7 +156,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
-    m_is_predicted      = is_predicted;
     initItem(type, xyz);
 
     m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
@@ -208,7 +207,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     : ItemState(ITEM_TRIGGER)
 {
-    m_is_predicted      = false;
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
     m_original_rotation = btQuaternion(0, 0, 0, 1);
@@ -290,18 +288,21 @@ void Item::setType(ItemType type)
 void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
     setMesh(mesh, lowmesh);
-    ItemState::switchTo(type);
+    ItemState::switchTo(type, mesh, lowmesh);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
-/** Switch  backs to the original item.
+/** Switch  backs to the original item. Returns true if the item wa snot
+ *  actually switched (e.g. trigger, or bubblegum dropped during switch
+ *  time). The return value is not actually used, but necessary in order
+ *  to overwrite ItemState::switchBack()
  */
-void Item::switchBack()
+bool Item::switchBack()
 {
     setMesh(m_original_mesh, m_original_lowmesh);
     
     if (ItemState::switchBack()) 
-        return;
+        return true;
 
     if (m_node != NULL)
     {
@@ -309,6 +310,7 @@ void Item::switchBack()
         hpr.setHPR(m_original_rotation);
         m_node->setRotation(hpr.toIrrHPR());
     }
+    return false;
 }   // switchBack
 
 //-----------------------------------------------------------------------------

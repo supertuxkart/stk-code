@@ -4,5 +4,6 @@
     <!-- This is the  point equivalent of finishing the
          story mode with all gold except 14 silver challenges -->
     <requirements trophies="250"/>
+    <alt_requirements max-req-in-lower-diff="5"/>
     <unlock difficulty="difficulty_best"/>
 </challenge>

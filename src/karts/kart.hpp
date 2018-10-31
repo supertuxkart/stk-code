@@ -161,10 +161,6 @@ protected:
     /** Time a kart is invulnerable. */
     int16_t      m_invulnerable_ticks;
 
-    /** How long a kart is being squashed. If this is >0
-     *  the kart is squashed. */
-    float        m_squash_time;
-
     /** Current leaning of the kart. */
     float        m_current_lean;
 
@@ -316,6 +312,7 @@ public:
     virtual void   handleZipper     (const Material *m=NULL,
                                      bool play_sound=false) OVERRIDE;
     virtual bool   setSquash        (float time, float slowdown) OVERRIDE;
+            void   setSquashGraphics();
     virtual void   unsetSquash      () OVERRIDE;
 
     virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
@@ -558,6 +555,9 @@ public:
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool isVisible() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual Stars* getStarsEffect() const OVERRIDE { return m_stars_effect; }
+
 };   // Kart
 
 

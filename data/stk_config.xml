@@ -11,7 +11,7 @@
 
   <!-- Minimum and maxium server versions that be be read by this binary.
        Older versions will be ignored. -->
-  <server-version min="2" max="2"/>
+  <server-version min="3" max="3"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -147,7 +147,7 @@
         delta-steering If the steering angle difference exceeds this delta,
                 new transform event is generated before maximum time. -->
   <replay max-frames="12000" delta-t="0.200"  delta-speed="0.6"
-          delta-steering="0.35" />
+          delta-steering="0.26" />
 
   <!--  Determines the minimap related values.
         size: The size of the minimap (scaled afterwards) 480 = full screen height)

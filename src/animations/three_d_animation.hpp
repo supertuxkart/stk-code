@@ -68,13 +68,12 @@ private:
       */
     bool                  m_important_animation;
 
-
 public:
                  ThreeDAnimation(const XMLNode &node, TrackObject* object);
     virtual     ~ThreeDAnimation();
     virtual void update(float dt) {}
     // ------------------------------------------------------------------------
-    void updateWithWorldTicks();
+    void updateWithWorldTicks(bool with_physics);
     // ------------------------------------------------------------------------
     /** Returns true if a collision with this object should
      * trigger a rescue. */

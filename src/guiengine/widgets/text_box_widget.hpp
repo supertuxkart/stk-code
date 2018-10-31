@@ -75,6 +75,8 @@ namespace GUIEngine
 
         /** Override method from base class Widget */
         virtual void setActive(bool active=true);
+        
+        virtual EventPropagation onActivationInput(const int playerID);
     };
 }
 

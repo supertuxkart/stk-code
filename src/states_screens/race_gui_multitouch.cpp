@@ -104,6 +104,11 @@ void RaceGUIMultitouch::close()
     {
         m_device->deactivateAccelerometer();
     }
+
+    if (m_device->isGyroscopeActive())
+    {
+        m_device->deactivateGyroscope();
+    }
 }   // close
 
 
@@ -116,9 +121,14 @@ void RaceGUIMultitouch::init()
     if (m_device == NULL)
         return;
         
-    if (UserConfigParams::m_multitouch_controls == 2)
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         m_device->activateAccelerometer();
+    }
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+    {
+        m_device->activateAccelerometer();
+        m_device->activateGyroscope();
     }
 
     const float scale = UserConfigParams::m_multitouch_scale;
@@ -155,7 +165,7 @@ void RaceGUIMultitouch::init()
 
     m_height = (unsigned int)(2 * col_size + margin / 2);
     
-    if (m_device->isAccelerometerActive())
+    if (m_device->isAccelerometerActive() || m_device->isGyroscopeActive())
     {
         m_device->addButton(BUTTON_UP_DOWN,
                     int(steering_accel_x), int(steering_accel_y),

@@ -25,6 +25,7 @@
 #include <tuple>
 #include <utility>
 
+class InputDevice;
 class Server;
 enum KartTeam : int8_t;
 
@@ -71,8 +72,8 @@ private:
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
 
-    float m_cur_starting_timer, m_start_timeout,
-        m_server_max_player;
+    float m_start_timeout;
+    int64_t m_cur_starting_timer;
     unsigned m_min_start_game_players;
 
     bool m_allow_change_team, m_has_auto_start_in_server;
@@ -136,11 +137,12 @@ public:
                        uint32_t/*online id*/, uint32_t/*local player id*/,
                        core::stringw/*player name*/, int/*icon id*/,
                        KartTeam> >& p);
+    void openSplitscreenDialog(InputDevice* device);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
     void initAutoStartTimer(bool grand_prix_started, unsigned min_players,
                             float start_timeout, unsigned server_max_player);
-    void setStartingTimerTo(float t)             { m_cur_starting_timer = t; }
+    void setStartingTimerTo(float t);
 
 };   // class NetworkingLobby
 

@@ -71,6 +71,9 @@ namespace GUIEngine
         /** A time for repeat key feature */
         unsigned int m_repeat_time;
         
+        /** True if backspace button was pressed */
+        bool m_back_button_pressed;
+        
         /** The edit box that is assigned to the keyboard */
         CGUIEditBox* m_edit_box;
         
@@ -114,6 +117,8 @@ namespace GUIEngine
         
         /** Returns true if keyboard is created */
         static bool isActive() {return m_screen_keyboard != NULL;}
+
+        static bool shouldUseScreenKeyboard();
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);

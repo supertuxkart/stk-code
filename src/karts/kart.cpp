@@ -361,7 +361,6 @@ void Kart::reset()
     m_invulnerable_ticks   = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
-    m_squash_time          = std::numeric_limits<float>::max();
     m_collected_energy     = 0;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
@@ -1351,8 +1350,8 @@ void Kart::update(int ticks)
 
     m_powerup->update(ticks);
 
-    // Reset any instand speed increase in the bullet kart
-    m_vehicle->setMinSpeed(0);
+    // Reset any instant speed increase in the bullet kart
+    m_vehicle->resetMaxSpeed();
 
     if (m_bubblegum_ticks > 0)
     {
@@ -1361,6 +1360,11 @@ void Kart::update(int ticks)
         {
             m_bubblegum_torque = 0;
         }
+    }
+    else
+    {
+        // Not strictly necessary, but makes sure torque has expected values
+        m_bubblegum_torque = 0;
     }
 
     // This is to avoid a rescue immediately after an explosion
@@ -1458,6 +1462,7 @@ void Kart::update(int ticks)
 
     if (!RewindManager::get()->isRewinding())
         m_slipstream->update(ticks);
+    m_slipstream->updateSpeedIncrease();
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
@@ -1490,24 +1495,47 @@ void Kart::update(int ticks)
 
     m_attachment->update(ticks);
 
-
-    PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
-    updatePhysics(ticks);
-    PROFILER_POP_CPU_MARKER();
-
-    if(!m_controls.getFire()) m_fire_clicked = 0;
-
-    if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
+    // Make sure that the ray doesn't hit the kart. This is done by
+    // resetting the collision filter group, so that this collision
+    // object is ignored during raycasting.
+    short int old_group = 0;
+    if (m_body->getBroadphaseHandle())
     {
-        if (m_powerup->getType() != PowerupManager::POWERUP_NOTHING)
-        {
-            setLastUsedPowerup(m_powerup->getType());
-        }
-        // use() needs to be called even if there currently is no collecteable
-        // since use() can test if something needs to be switched on/off.
-        m_powerup->use() ;
-        World::getWorld()->onFirePressed(getController());
-        m_fire_clicked = 1;
+        old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
+        m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    }
+
+    // After the physics step was done, the position of the wheels (as stored
+    // in wheelInfo) is actually outdated, since the chassis was moved
+    // according to the force acting from the wheels. So the center of the
+    // chassis is not at the center of the wheels anymore, it is somewhat
+    // moved forward (depending on speed and fps). In very extreme cases
+    // (see bug 2246) the center of the chassis can actually be ahead of the
+    // front wheels. So if we do a raycast to detect the terrain from the
+    // current chassis, that raycast might be ahead of the wheels - which
+    // results in incorrect rescues (the wheels are still on the ground,
+    // but the raycast happens ahead of the front wheels and are over
+    // a rescue texture).
+    // To avoid this problem, we do the raycast for terrain detection from
+    // the center of the 4 wheel positions (in world coordinates).
+
+    Vec3 from(0.0f, 0.0f, 0.0f);
+    for (unsigned int i = 0; i < 4; i++)
+        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
+
+    // Add a certain epsilon (0.3) to the height of the kart. This avoids
+    // problems of the ray being cast from under the track (which happened
+    // e.g. on tux tollway when jumping down from the ramp, when the chassis
+    // partly tunnels through the track). While tunneling should not be
+    // happening (since Z velocity is clamped), the epsilon is left in place
+    // just to be on the safe side (it will not hit the chassis itself).
+    from = from/4 + (getTrans().getBasis() * Vec3(0.0f, 0.3f, 0.0f));
+
+    m_terrain_info->update(getTrans().getBasis(), from);
+
+    if (m_body->getBroadphaseHandle())
+    {
+        m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
 
     // Check if a kart is (nearly) upside down and not moving much -->
@@ -1543,15 +1571,26 @@ void Kart::update(int ticks)
         }
     }
 
-    // Make sure that the ray doesn't hit the kart. This is done by
-    // resetting the collision filter group, so that this collision
-    // object is ignored during raycasting.
-    short int old_group = 0;
-    if(m_body->getBroadphaseHandle())
+    // Update physics from newly updated material
+    PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
+    updatePhysics(ticks);
+    PROFILER_POP_CPU_MARKER();
+
+    if(!m_controls.getFire()) m_fire_clicked = 0;
+
+    if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
     {
-        old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
-        m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+        if (m_powerup->getType() != PowerupManager::POWERUP_NOTHING)
+        {
+            setLastUsedPowerup(m_powerup->getType());
+        }
+        // use() needs to be called even if there currently is no collecteable
+        // since use() can test if something needs to be switched on/off.
+        m_powerup->use() ;
+        World::getWorld()->onFirePressed(getController());
+        m_fire_clicked = 1;
     }
+
 #undef XX
 #ifdef XX
     Log::verbose("physicsafter", "%s t %f %d xyz(9-11) %f %f %f %f %f %f "
@@ -1583,38 +1622,6 @@ void Kart::update(int ticks)
         m_bubblegum_torque // 47
     );
 #endif
-    // After the physics step was done, the position of the wheels (as stored
-    // in wheelInfo) is actually outdated, since the chassis was moved
-    // according to the force acting from the wheels. So the center of the
-    // chassis is not at the center of the wheels anymore, it is somewhat
-    // moved forward (depending on speed and fps). In very extreme cases
-    // (see bug 2246) the center of the chassis can actually be ahead of the
-    // front wheels. So if we do a raycast to detect the terrain from the
-    // current chassis, that raycast might be ahead of the wheels - which
-    // results in incorrect rescues (the wheels are still on the ground,
-    // but the raycast happens ahead of the front wheels and are over
-    // a rescue texture).
-    // To avoid this problem, we do the raycast for terrain detection from
-    // the center of the 4 wheel positions (in world coordinates).
-
-    Vec3 from(0, 0, 0);
-    for (unsigned int i = 0; i < 4; i++)
-        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
-
-    // Add a certain epsilon (0.3) to the height of the kart. This avoids
-    // problems of the ray being cast from under the track (which happened
-    // e.g. on tux tollway when jumping down from the ramp, when the chassis
-    // partly tunnels through the track). While tunneling should not be
-    // happening (since Z velocity is clamped), the epsilon is left in place
-    // just to be on the safe side (it will not hit the chassis itself).
-    from = from/4 + (getTrans().getBasis() * Vec3(0,0.3f,0));
-
-    m_terrain_info->update(getTrans().getBasis(), from);
-
-    if(m_body->getBroadphaseHandle())
-    {
-        m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
-    }
 
     PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
     const Material* material=m_terrain_info->getMaterial();
@@ -1807,7 +1814,7 @@ void Kart::showZipperFire()
  */
 bool Kart::setSquash(float time, float slowdown)
 {
-    if (isInvulnerable()) return false;
+    if (isInvulnerable() || getKartAnimation()) return false;
 
     if (isShielded())
     {
@@ -1824,47 +1831,48 @@ bool Kart::setSquash(float time, float slowdown)
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
                              stk_config->time2Ticks(0.1f), 
                              stk_config->time2Ticks(time));
-
-#ifndef SERVER_ONLY
-    if (m_squash_time == std::numeric_limits<float>::max())
-    {
-        m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-        if (m_vehicle->getNumWheels() > 0)
-        {
-            if (!m_wheel_box)
-            {
-                m_wheel_box = irr_driver->getSceneManager()
-                    ->addDummyTransformationSceneNode(m_node);
-            }
-            scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
-            for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
-            {
-                if (wheels[i])
-                    wheels[i]->setParent(m_wheel_box);
-            }
-            m_wheel_box->getRelativeTransformationMatrix()
-                .setScale(core::vector3df(1.0f, 2.0f, 1.0f));
-        }
-        m_squash_time = time;
-    }
-#endif
     return true;
 }   // setSquash
 
+//-----------------------------------------------------------------------------
+void Kart::setSquashGraphics()
+{
+#ifndef SERVER_ONLY
+    if (isGhostKart()) return;
+
+    m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
+    if (m_vehicle->getNumWheels() > 0)
+    {
+        if (!m_wheel_box)
+        {
+            m_wheel_box = irr_driver->getSceneManager()
+                ->addDummyTransformationSceneNode(m_node);
+        }
+        scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
+        for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
+        {
+            if (wheels[i])
+                wheels[i]->setParent(m_wheel_box);
+        }
+        m_wheel_box->getRelativeTransformationMatrix()
+            .setScale(core::vector3df(1.0f, 2.0f, 1.0f));
+    }
+#endif
+}   // setSquashGraphics
+
+//-----------------------------------------------------------------------------
 void Kart::unsetSquash()
 {
 #ifndef SERVER_ONLY
     if (isGhostKart()) return;
 
-    m_squash_time = std::numeric_limits<float>::max();
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-        
     if (m_vehicle && m_vehicle->getNumWheels() > 0)
     {
         scene::ISceneNode** wheels = m_kart_model->getWheelNodes();
         scene::ISceneNode* node = m_kart_model->getAnimatedNode() ?
                                   m_kart_model->getAnimatedNode() : m_node;
-        
+
         for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); i++)
         {
             if (wheels[i])
@@ -1874,7 +1882,7 @@ void Kart::unsetSquash()
         }
     }
 #endif
-}
+}   // unsetSquash
 
 //-----------------------------------------------------------------------------
 /** Returns if the kart is currently being squashed
@@ -3059,18 +3067,17 @@ void Kart::updateGraphics(float dt)
     }
      */
 #ifndef SERVER_ONLY
-    if (m_squash_time != std::numeric_limits<float>::max())
-    {
-        m_squash_time -= dt;
-        // If squasing time ends, reset the model
-        if (m_squash_time <= 0.0f || !isSquashed())
-        {
-            unsetSquash();
-        }
-    }   // if squashed
+    if (isSquashed() &&
+        m_node->getScale() != core::vector3df(1.0f, 0.5f, 1.0f))
+        setSquashGraphics();
+    else if (!isSquashed() &&
+        m_node->getScale() != core::vector3df(1.0f, 1.0f, 1.0f))
+        unsetSquash();
+
     if (m_graphical_view_blocked_by_plunger > 0.0f)
         m_graphical_view_blocked_by_plunger -= dt;
-    if (m_graphical_view_blocked_by_plunger < 0.0f)
+    if (m_graphical_view_blocked_by_plunger < 0.0f ||
+        m_view_blocked_by_plunger == 0)
         m_graphical_view_blocked_by_plunger = 0.0f;
 #endif
 
@@ -3182,7 +3189,9 @@ void Kart::updateGraphics(float dt)
 #ifndef SERVER_ONLY
     // draw skidmarks if relevant (we force pink skidmarks on when hitting
     // a bubblegum)
-    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
+    if (World::getWorld()->getPhase() !=
+        WorldStatus::IN_GAME_MENU_PHASE &&
+        m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
         m_skidmarks->update(dt,
             m_bubblegum_ticks > 0,

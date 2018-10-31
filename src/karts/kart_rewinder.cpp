@@ -154,7 +154,6 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
-    buffer->addFloat(m_vehicle->getMinSpeed());
     buffer->addFloat(m_vehicle->getTimedRotationTime());
     buffer->add(m_vehicle->getTimedRotation());
     buffer->addUInt8(m_vehicle->getCushioningDisableTime());
@@ -263,7 +262,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         setTrans(m_transfrom_from_network);
     }
 
-    m_vehicle->setMinSpeed(buffer->getFloat());
     float time_rot = buffer->getFloat();
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());

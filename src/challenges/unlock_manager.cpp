@@ -297,7 +297,6 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
  */
 bool UnlockManager::unlockByPoints(int points, ChallengeStatus* unlock_list)
 {
-    //TODO : add support for other conditions (achievements...) for alternative unlock paths
     if( unlock_list!=NULL && unlock_list->getData()->getNumTrophies() <= points)
     {
         unlock_list->setSolved(RaceManager::DIFFICULTY_BEST);
@@ -305,5 +304,25 @@ bool UnlockManager::unlockByPoints(int points, ChallengeStatus* unlock_list)
     }
     return false;
 } // unlockByPoints
+
+//-----------------------------------------------------------------------------
+/** This functions sets as completed the "challenges" requiring some special conditions
+ *  Returns true if the challenge has been completed
+ */
+bool UnlockManager::unlockSpecial(ChallengeStatus* unlock_list, int max_req_in_lower_diff)
+{
+    if ( unlock_list!=NULL && unlock_list->getData()->getSpecialType() != ChallengeData::SPECIAL_NONE)
+    {
+        if (unlock_list->getData()->getSpecialType() == ChallengeData::SPECIAL_MAX_REQ_IN_LOWER_DIFF)
+        {
+            if (max_req_in_lower_diff >= unlock_list->getData()->getSpecialValue())
+            {
+                unlock_list->setSolved(RaceManager::DIFFICULTY_BEST);
+                return true;
+            }
+        }
+    }
+    return false;
+} // unlockSpecial
 
 /* EOF */

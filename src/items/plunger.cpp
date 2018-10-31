@@ -254,6 +254,9 @@ void Plunger::hideNodeWhenUndoDestruction()
 BareNetworkString* Plunger::saveState(std::vector<std::string>* ru)
 {
     BareNetworkString* buffer = Flyable::saveState(ru);
+    if (!buffer)
+        return NULL;
+
     buffer->addUInt16(m_keep_alive).addUInt8(m_moved_to_infinity ? 1 : 0);
     if (m_rubber_band)
         buffer->addUInt8(m_rubber_band->get8BitState());

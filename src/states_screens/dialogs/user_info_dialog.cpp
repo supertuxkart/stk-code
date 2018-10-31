@@ -124,9 +124,11 @@ void UserInfoDialog::beforeAddingWidgets()
 }   // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
-UserInfoDialog::~UserInfoDialog()
+void UserInfoDialog::init()
 {
-}   // ~UserInfoDialog
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
+}   // init
 
 // -----------------------------------------------------------------------------
 /** Sends a friend request to the server. When the request is finished, it

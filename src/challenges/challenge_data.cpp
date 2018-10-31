@@ -47,6 +47,8 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_num_completed_challenges = 0;
     m_is_unlock_list  = false;
     m_is_ghost_replay = false;
+    m_unlock_special_type = SPECIAL_NONE;
+    m_unlock_special_value = -1;
 
     for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
@@ -122,6 +124,16 @@ ChallengeData::ChallengeData(const std::string& filename)
     requirements_node->get("trophies", &m_num_trophies);
 
     requirements_node->get("challenges", &m_num_completed_challenges);
+
+    if (m_is_unlock_list)
+    {
+        requirements_node = root->getNode("alt_requirements");
+        if (requirements_node != NULL)
+        {
+            if(requirements_node->get("max-req-in-lower-diff", &m_unlock_special_value))
+                m_unlock_special_type = SPECIAL_MAX_REQ_IN_LOWER_DIFF;
+        }
+    }
 
     //Don't check further if this is an unlock list
     if(m_is_unlock_list)
@@ -271,7 +283,6 @@ ChallengeData::ChallengeData(const std::string& filename)
         // This is optional
         int energy = -1;
         if (requirements_node->get("energy", &energy)) m_energy[d] = energy;
-
     }
 }   // ChallengeData
 
