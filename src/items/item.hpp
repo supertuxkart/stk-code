@@ -219,11 +219,8 @@ public:
     /** Switches an item to be of a different type. Used for the switch
      *  powerup.
      *  \param type New type for this item.
-     *  \param mesh Ignored.
-     *  \param lowmesh Ignored.
      */
-    virtual void switchTo(ItemType type, scene::IMesh *mesh,
-                          scene::IMesh *lowmesh)
+    virtual void switchTo(ItemType type)
     {
         // triggers and easter eggs should not be switched
         if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
@@ -356,7 +353,6 @@ private:
      *  would not be collected. Used by the AI to avoid items. */
     Vec3 *m_avoidance_points[2];
 
-    void          setType(ItemType type) OVERRIDE;
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
     void          handleNewMesh(ItemType type);
@@ -370,12 +366,31 @@ public:
                        TriggerItemListener* trigger);
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
-    virtual void  collected(const AbstractKart *kart) OVERRIDE;
     virtual void  reset() OVERRIDE;
-    virtual void  switchTo(ItemType type, scene::IMesh *mesh,
-                           scene::IMesh *lowmesh) OVERRIDE;
-    virtual bool  switchBack() OVERRIDE;
 
+    //-------------------------------------------------------------------------
+    /** Is called when the item is hit by a kart.  It sets the flag that the
+     *  item has been collected, and the time to return to the parameter.
+     *  \param kart The kart that collected the item.
+     */
+    virtual void collected(const AbstractKart *kart)  OVERRIDE
+    {
+        ItemState::collected(kart);
+        if (m_listener != NULL)
+            m_listener->onTriggerItemApproached();
+    }   // isCollected
+    //-------------------------------------------------------------------------
+    /** Switch backs to the original item. Returns true if the item was not
+     *  actually switched (e.g. trigger, or bubblegum dropped during switch
+     *  time). The return value is not actually used, but necessary in order
+     *  to overwrite ItemState::switchBack()
+     */
+    virtual bool switchBack() OVERRIDE
+    {
+        if (ItemState::switchBack())
+            return true;
+        return false;
+    }   // switchBack
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is
      *  not deactivated anymore, and it wasn't placed by this kart (this is

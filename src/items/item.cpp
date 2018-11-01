@@ -182,6 +182,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     }
     m_node              = lodnode;
     setType(type);
+    handleNewMesh(getType());
 
 #ifdef DEBUG
     std::string debug_name("item: ");
@@ -254,39 +255,6 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
 }   // initItem
 
 //-----------------------------------------------------------------------------
-/** Sets the type of the item (and also derived attributes lile m_rotate
- *  \param type Type of the item.
- */
-void Item::setType(ItemType type)
-{
-    ItemState::setType(type);
-}   // setType
-
-//-----------------------------------------------------------------------------
-/** Changes this item to be a new type for a certain amount of time.
- *  \param type New type of this item.
- *  \param mesh Mesh to use to display this item.
- */
-void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
-{
-    ItemState::switchTo(type, mesh, lowmesh);
-}   // switchTo
-
-//-----------------------------------------------------------------------------
-/** Switch  backs to the original item. Returns true if the item wa snot
- *  actually switched (e.g. trigger, or bubblegum dropped during switch
- *  time). The return value is not actually used, but necessary in order
- *  to overwrite ItemState::switchBack()
- */
-bool Item::switchBack()
-{
-    if (ItemState::switchBack())
-        return true;
-
-    return false;
-}   // switchBack
-
-//-----------------------------------------------------------------------------
 void Item::setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh)
 {
 #ifndef SERVER_ONLY
@@ -344,12 +312,13 @@ void Item::reset()
         m_node->setScale(core::vector3df(1,1,1));
         m_node->setVisible(true);
     }
-    handleNewMesh(getType());
+
 }   // reset
 
 // ----------------------------------------------------------------------------
 void Item::handleNewMesh(ItemType type)
 {
+#ifndef SERVER_ONLY
     if (m_node == NULL)
         return;
     setMesh(ItemManager::get()->getItemModel(type),
@@ -363,6 +332,8 @@ void Item::handleNewMesh(ItemType type)
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());
+    m_rotation_angle = 0.0f;
+#endif
 }   // handleNewMesh
 
 // ----------------------------------------------------------------------------
@@ -418,20 +389,3 @@ void Item::updateGraphics(float dt)
     }   // if item is available
     m_was_available_previously = isAvailable();
 }   // updateGraphics
-
-//-----------------------------------------------------------------------------
-/** Is called when the item is hit by a kart.  It sets the flag that the item
- *  has been collected, and the time to return to the parameter.
- *  \param kart The kart that collected the item.
- */
-void Item::collected(const AbstractKart *kart)
-{
-    ItemState::collected(kart);
-
-    if (m_listener != NULL)
-    {
-        m_listener->onTriggerItemApproached();
-    }
-
-}   // isCollected
-

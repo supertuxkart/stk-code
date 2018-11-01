@@ -307,8 +307,7 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type],
-                       m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type);
     }
     return item;
 }   // dropNewItem
@@ -338,8 +337,7 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     if (m_switch_ticks >= 0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type],
-                       m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type);
     }
     return item;
 }   // placeItem
@@ -575,8 +573,7 @@ void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
         if (new_type == (*i)->getType())
             continue;
         if(m_switch_ticks<0)
-            (*i)->switchTo(new_type, m_item_mesh[(int)new_type],
-                           m_item_lowres_mesh[(int)new_type]);
+            (*i)->switchTo(new_type);
         else
             (*i)->switchBack();
     }   // for all_items
