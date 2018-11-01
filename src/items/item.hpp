@@ -202,7 +202,7 @@ public:
 
     // -----------------------------------------------------------------------
     /** Resets an item to its start state. */
-    void reset()
+    virtual void reset()
     {
         m_deactive_ticks    = 0;
         m_ticks_till_return = 0;
@@ -332,12 +332,8 @@ private:
     /** Scene node of this item. */
     LODNode *m_node;
 
-    /** Stores the original mesh in order to reset it. */
-    scene::IMesh *m_original_mesh;
-    scene::IMesh *m_original_lowmesh;
-
-    /** Set to false if item should not rotate. */
-    bool m_rotate;
+    /** Graphical type of the mesh. */
+    ItemType m_graphical_type;
 
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;
@@ -363,6 +359,7 @@ private:
     void          setType(ItemType type) OVERRIDE;
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
+    void          handleNewMesh(ItemType type);
 
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
@@ -374,7 +371,7 @@ public:
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  collected(const AbstractKart *kart) OVERRIDE;
-    void          reset();
+    virtual void  reset() OVERRIDE;
     virtual void  switchTo(ItemType type, scene::IMesh *mesh,
                            scene::IMesh *lowmesh) OVERRIDE;
     virtual bool  switchBack() OVERRIDE;
@@ -397,6 +394,9 @@ public:
         lc.setY(lc.getY() / 2.0f);
         return lc.length2() < m_distance_2;
     }   // hitKart
+    // ------------------------------------------------------------------------
+    bool rotating() const
+           { return getType() != ITEM_BUBBLEGUM && getType() != ITEM_TRIGGER; }
 
 public:
     // ------------------------------------------------------------------------

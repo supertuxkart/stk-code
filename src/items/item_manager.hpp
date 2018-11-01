@@ -84,6 +84,10 @@ public:
     static scene::IMesh* getItemModel(ItemState::ItemType type)
                                       { return m_item_mesh[type]; }
     // ------------------------------------------------------------------------
+    /** Returns the low resolution mesh for a certain item. */
+    static scene::IMesh* getItemLowResolutionModel(ItemState::ItemType type)
+                                      { return m_item_lowres_mesh[type]; }
+    // ------------------------------------------------------------------------
     /** Returns the glow color for an item. */
     static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
@@ -101,7 +105,6 @@ protected:
     /** The vector of all items of the current track. */
     typedef std::vector<ItemState*> AllItemTypes;
     AllItemTypes m_all_items;
-
 private:
     /** Stores which items are on which quad. m_items_in_quads[#quads]
      *  contains all items that are not on a quad. Note that this
