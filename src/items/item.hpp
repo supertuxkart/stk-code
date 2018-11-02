@@ -323,9 +323,6 @@ private:
      *  rotation). */
     btQuaternion m_original_rotation;
 
-    /** Used when rotating the item */
-    float m_rotation_angle;
-
     /** Scene node of this item. */
     LODNode *m_node;
 

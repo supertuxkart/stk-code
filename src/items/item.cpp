@@ -159,7 +159,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     initItem(type, xyz);
     m_graphical_type    = type;
     m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
-    m_rotation_angle    = 0.0f;
     m_listener          = NULL;
 
     LODNode* lodnode =
@@ -210,7 +209,6 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     initItem(ITEM_TRIGGER, xyz);
     m_graphical_type    = ITEM_TRIGGER;
     m_original_rotation = btQuaternion(0, 0, 0, 1);
-    m_rotation_angle    = 0.0f;
     m_node              = NULL;
     m_listener          = trigger;
     m_was_available_previously = true;
@@ -332,7 +330,6 @@ void Item::handleNewMesh(ItemType type)
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());
-    m_rotation_angle = 0.0f;
 #endif
 }   // handleNewMesh
 
@@ -369,18 +366,32 @@ void Item::updateGraphics(float dt)
     if (!isAvailable() && time_till_return <= 1.0f)
     {
         // Make it visible by scaling it from 0 to 1:
+        if (rotating())
+        {
+            float angle =
+                fmodf((float)(World::getWorld()->getTicksSinceStart() +
+                getTicksTillReturn()) / 40.0f, M_PI * 2);
+            btMatrix3x3 m;
+            m.setRotation(m_original_rotation);
+            btQuaternion r = btQuaternion(m.getColumn(1), angle) *
+                            m_original_rotation;
+            Vec3 hpr;
+            hpr.setHPR(r);
+            m_node->setRotation(hpr.toIrrHPR());
+        }
         m_node->setVisible(true);
         m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
     }
     if (isAvailable() && rotating())
     {
         // have it rotate
-        m_rotation_angle += dt * M_PI;
-        if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
+        float angle =
+            fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+            M_PI * 2);
 
         btMatrix3x3 m;
         m.setRotation(m_original_rotation);
-        btQuaternion r = btQuaternion(m.getColumn(1), m_rotation_angle) *
+        btQuaternion r = btQuaternion(m.getColumn(1), angle) *
                          m_original_rotation;
 
         Vec3 hpr;

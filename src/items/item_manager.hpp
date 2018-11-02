@@ -56,12 +56,6 @@ protected:
     /** The instance of ItemManager while a race is on. */
     static std::shared_ptr<ItemManager> m_item_manager;
 
-    /** Stores all item models. */
-    static std::vector<scene::IMesh *> m_item_mesh;
-
-    /** Stores all low-resolution item models. */
-    static std::vector<scene::IMesh *> m_item_lowres_mesh;
-
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
@@ -115,6 +109,12 @@ private:
      *  contains all items that are not on a quad. Note that this
      *  field is undefined if no Graph exist, e.g. arena without navmesh. */
     std::vector< AllItemTypes > *m_items_in_quads;
+
+    /** Stores all item models. */
+    static std::vector<scene::IMesh *> m_item_mesh;
+
+    /** Stores all low-resolution item models. */
+    static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
 protected:
     /** Remaining time that items should remain switched. If the
