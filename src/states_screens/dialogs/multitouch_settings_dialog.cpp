@@ -95,15 +95,20 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         assert(scale != NULL);
         UserConfigParams::m_multitouch_scale = (float)scale->getValue() / 100.0f;
 
-        SpinnerWidget* deadzone_edge = getWidget<SpinnerWidget>("deadzone_edge");
-        assert(deadzone_edge != NULL);
-        UserConfigParams::m_multitouch_deadzone_edge =
-                                    (float)deadzone_edge->getValue() / 100.0f;
+        SpinnerWidget* sensitivity_x = getWidget<SpinnerWidget>("sensitivity_x");
+        assert(sensitivity_x != NULL);
+        UserConfigParams::m_multitouch_sensitivity_x =
+                                    (float)sensitivity_x->getValue() / 100.0f;
+                                    
+        SpinnerWidget* sensitivity_y = getWidget<SpinnerWidget>("sensitivity_y");
+        assert(sensitivity_y != NULL);
+        UserConfigParams::m_multitouch_sensitivity_y =
+                                    (float)sensitivity_y->getValue() / 100.0f;
 
-        SpinnerWidget* deadzone_center = getWidget<SpinnerWidget>("deadzone_center");
-        assert(deadzone_center != NULL);
-        UserConfigParams::m_multitouch_deadzone_center =
-                                    (float)deadzone_center->getValue() / 100.0f;
+        SpinnerWidget* deadzone = getWidget<SpinnerWidget>("deadzone");
+        assert(deadzone != NULL);
+        UserConfigParams::m_multitouch_deadzone =
+                                    (float)deadzone->getValue() / 100.0f;
 
         CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
         assert(buttons_en != NULL);
@@ -146,8 +151,9 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
     }
     else if (eventSource == "restore")
     {
-        UserConfigParams::m_multitouch_deadzone_edge.revertToDefaults();
-        UserConfigParams::m_multitouch_deadzone_center.revertToDefaults();
+        UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
+        UserConfigParams::m_multitouch_sensitivity_y.revertToDefaults();
+        UserConfigParams::m_multitouch_deadzone.revertToDefaults();
         UserConfigParams::m_multitouch_mode.revertToDefaults();
         UserConfigParams::m_multitouch_inverted.revertToDefaults();
         UserConfigParams::m_multitouch_controls.revertToDefaults();
@@ -204,15 +210,20 @@ void MultitouchSettingsDialog::updateValues()
     assert(scale != NULL);
     scale->setValue((int)(UserConfigParams::m_multitouch_scale * 100.0f));
 
-    SpinnerWidget* deadzone_edge = getWidget<SpinnerWidget>("deadzone_edge");
-    assert(deadzone_edge != NULL);
-    deadzone_edge->setValue(
-                (int)(UserConfigParams::m_multitouch_deadzone_edge * 100.0f));
+    SpinnerWidget* sensitivity_x = getWidget<SpinnerWidget>("sensitivity_x");
+    assert(sensitivity_x != NULL);
+    sensitivity_x->setValue(
+                (int)(UserConfigParams::m_multitouch_sensitivity_x * 100.0f));
+                
+    SpinnerWidget* sensitivity_y = getWidget<SpinnerWidget>("sensitivity_y");
+    assert(sensitivity_y != NULL);
+    sensitivity_y->setValue(
+                (int)(UserConfigParams::m_multitouch_sensitivity_y * 100.0f));
 
-    SpinnerWidget* deadzone_center = getWidget<SpinnerWidget>("deadzone_center");
-    assert(deadzone_center != NULL);
-    deadzone_center->setValue(
-                (int)(UserConfigParams::m_multitouch_deadzone_center * 100.0f));
+    SpinnerWidget* deadzone = getWidget<SpinnerWidget>("deadzone");
+    assert(deadzone != NULL);
+    deadzone->setValue(
+                (int)(UserConfigParams::m_multitouch_deadzone * 100.0f));
 
     CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
     assert(buttons_en != NULL);

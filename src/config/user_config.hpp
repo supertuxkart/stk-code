@@ -498,17 +498,23 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope"));
 
-    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
-            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone",
             &m_multitouch_group,
             "A parameter in range [0, 0.5] that determines the zone that is "
             "considered as centered in steering button."));
 
-    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
-            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_x
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_sensitivity_x",
             &m_multitouch_group,
-            "A parameter in range [0, 0.5] that determines the zone that is "
-            "considered as max value in steering button."));
+            "A parameter in range [0, 0.5] that determines the zone for y axis "
+            "that is considered as max value in steering button."));
+            
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_y
+            PARAM_DEFAULT( FloatUserConfigParam(0.5f, "multitouch_sensitivity_y",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone for y axis "
+            "that is considered as max value in steering button."));
             
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
             PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",

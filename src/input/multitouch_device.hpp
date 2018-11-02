@@ -81,11 +81,15 @@ private:
 
     /** The parameter that is used for steering button and determines dead area
      *  in a center of button */
-    float m_deadzone_center;
+    float m_deadzone;
 
-    /** The parameter that is used for steering button and determines dead area
-     *  at the edge of button */
-    float m_deadzone_edge;
+    /** A parameter that determines the zone for x axis that is considered as 
+     *  max value in steering button. */
+    float m_sensitivity_x;
+    
+    /** A parameter that determines the zone for y axis that is considered as 
+     *  max value in steering button. */
+    float m_sensitivity_y;
 
     float m_orientation;
     double m_gyro_time;
@@ -95,7 +99,7 @@ private:
     CIrrDeviceAndroid* m_android_device;
 #endif
 
-    float getSteeringFactor(float value);
+    float getSteeringFactor(float value, float sensitivity);
     void handleControls(MultitouchButton* button);
     bool isGameRunning();
 
