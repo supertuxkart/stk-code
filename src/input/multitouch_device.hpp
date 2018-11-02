@@ -83,12 +83,10 @@ private:
      *  in a center of button */
     float m_deadzone;
 
-    /** A parameter that determines the zone for x axis that is considered as 
-     *  max value in steering button. */
+    /** A parameter in range that determines the sensitivity for x axis. */
     float m_sensitivity_x;
     
-    /** A parameter that determines the zone for y axis that is considered as 
-     *  max value in steering button. */
+    /** A parameter in range that determines the sensitivity for y axis. */
     float m_sensitivity_y;
 
     float m_orientation;

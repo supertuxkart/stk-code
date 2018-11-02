@@ -507,14 +507,12 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_x
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_sensitivity_x",
             &m_multitouch_group,
-            "A parameter in range [0, 0.5] that determines the zone for y axis "
-            "that is considered as max value in steering button."));
+            "A parameter in range [0, 1.0] that determines the sensitivity for x axis."));
             
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_y
-            PARAM_DEFAULT( FloatUserConfigParam(0.5f, "multitouch_sensitivity_y",
+            PARAM_DEFAULT( FloatUserConfigParam(0.65f, "multitouch_sensitivity_y",
             &m_multitouch_group,
-            "A parameter in range [0, 0.5] that determines the zone for y axis "
-            "that is considered as max value in steering button."));
+            "A parameter in range [0, 1.0] that determines the sensitivity for y axis."));
             
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
             PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",

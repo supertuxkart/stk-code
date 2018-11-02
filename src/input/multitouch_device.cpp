@@ -356,26 +356,29 @@ void MultitouchDevice::updateConfigParams()
     m_deadzone = std::min(std::max(m_deadzone, 0.0f), 0.5f);
 
     m_sensitivity_x = UserConfigParams::m_multitouch_sensitivity_x;
-    m_sensitivity_x = std::min(std::max(m_sensitivity_x, 0.0f), 0.5f);
+    m_sensitivity_x = std::min(std::max(m_sensitivity_x, 0.0f), 1.0f);
     
     m_sensitivity_y = UserConfigParams::m_multitouch_sensitivity_y;
-    m_sensitivity_y = std::min(std::max(m_sensitivity_y, 0.0f), 0.5f);
+    m_sensitivity_y = std::min(std::max(m_sensitivity_y, 0.0f), 1.0f);
 } // updateConfigParams
 
 // ----------------------------------------------------------------------------
 /** Helper function that returns a steering factor for steering button.
  *  \param value The axis value from 0 to 1.
- *  \param sensitivity Value from 0 to 0.5.
+ *  \param sensitivity Value from 0 to 1.0.
  */
 float MultitouchDevice::getSteeringFactor(float value, float sensitivity)
 {
-    if (sensitivity + m_deadzone >= 1.0f)
+    if (m_deadzone >= 1.0f)
+        return 0.0f;
+        
+    if (sensitivity >= 1.0f)
         return 1.0f;
 
-    assert(sensitivity + m_deadzone != 1.0f);
-
-    return std::min((value - m_deadzone) / (1.0f - sensitivity -
-                    m_deadzone), 1.0f);
+    float factor = (value - m_deadzone) / (1.0f - m_deadzone);
+    factor *= 1.0f / (1.0f - sensitivity);
+    
+    return std::min(factor, 1.0f);
 }
 
 // ----------------------------------------------------------------------------
