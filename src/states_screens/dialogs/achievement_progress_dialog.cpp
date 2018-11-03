@@ -315,7 +315,7 @@ void AchievementProgressDialog::init()
     LabelWidget* description = getWidget<LabelWidget>("description");
     assert(description != NULL);
     core::stringw description_text = m_achievement->getInfo()->getDescription();
-    description->setText(description_text, true /* expand as needed */);
+    description->setText(description_text, false);
 }   // init
 
 // -----------------------------------------------------------------------------
