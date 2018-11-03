@@ -2330,9 +2330,9 @@ void ServerLobby::configPeersStartTime()
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
     }
-    // Start up time will be after 2000ms, so even if this packet is sent late
+    // Start up time will be after 2500ms, so even if this packet is sent late
     // (due to packet loss), the start time will still ahead of current time
-    uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2000;
+    uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2500;
     NetworkString* ns = getNetworkString(10);
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
     sendMessageToPeers(ns, /*reliable*/true);
@@ -2347,6 +2347,7 @@ void ServerLobby::configPeersStartTime()
     delete ns;
     m_state = WAIT_FOR_RACE_STARTED;
 
+    World::getWorld()->setPhase(WorldStatus::SERVER_READY_PHASE);
     joinStartGameThread();
     m_start_game_thread = std::thread([start_time, this]()
         {

@@ -43,6 +43,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -434,7 +435,15 @@ void RaceGUIBase::update(float dt)
             m_referee_height += dt*5.0f;
             m_referee->selectReadySetGo(2);
         }
-        else if(world->getPhase()==World::TRACK_INTRO_PHASE)
+        else if (world->getPhase()==World::WAIT_FOR_SERVER_PHASE ||
+            (NetworkConfig::get()->isNetworking() &&
+            world->getPhase()==World::TRACK_INTRO_PHASE))
+        {
+        }
+        else if ((!NetworkConfig::get()->isNetworking() &&
+            world->getPhase()==World::TRACK_INTRO_PHASE) ||
+            (NetworkConfig::get()->isNetworking() &&
+            world->getPhase()==World::SERVER_READY_PHASE))
         {
             m_referee->selectReadySetGo(0);   // set red color
             m_referee_height -= dt*5.0f;
