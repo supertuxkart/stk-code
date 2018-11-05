@@ -100,6 +100,7 @@ RaceGUIBase::RaceGUIBase()
     m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full_bright.png"));
     m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_empty.png"));
     m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_goal.png" ));
+    m_lap_flag              = irr_driver->getTexture(FileManager::GUI_ICON, "lap_flag.png");
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 
@@ -1048,6 +1049,18 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
                                                       NULL, true);
         }
     }
+
+	//lap flag for finished karts
+    if (kart->hasFinishedRace())
+	{
+        if (m_lap_flag != NULL)
+		{
+            const core::rect<s32> rect(core::position2d<s32>(0, 0),
+                m_lap_flag->getSize());
+            const core::rect<s32> pos1(x - 20, y - 10, x + w - 20, y + w - 10);
+            draw2DImage(m_lap_flag, pos1, rect, NULL, NULL, true);
+		}
+	}
 #endif
 }   // drawPlayerIcon
 

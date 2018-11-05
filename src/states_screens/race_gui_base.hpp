@@ -186,6 +186,9 @@ protected:
 
     /** The frame around player karts in the mini map. */
     video::ITexture* m_icons_frame;
+
+    /** Texture for the lap icon*/
+    video::ITexture* m_lap_flag;
     
     RaceGUIMultitouch* m_multitouch_gui;
 
