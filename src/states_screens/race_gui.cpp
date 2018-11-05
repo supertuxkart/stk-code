@@ -191,7 +191,6 @@ RaceGUI::RaceGUI()
     //createMarkerTexture();
 
     // Load icon textures for later reuse
-    m_lap_flag = irr_driver->getTexture(FileManager::GUI_ICON, "lap_flag.png");
     m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
     m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
     m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
