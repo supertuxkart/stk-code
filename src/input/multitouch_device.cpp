@@ -173,7 +173,7 @@ void MultitouchDevice::reset()
     }
 
     m_orientation = 0.0f;
-    m_gyro_time = 0.0;
+    m_gyro_time = 0;
 } // reset
 
 // ----------------------------------------------------------------------------
@@ -498,9 +498,10 @@ void MultitouchDevice::updateOrientationFromGyroscope(float z)
 {
     const float GYRO_SPEED_THRESHOLD = 0.005f;
 
-    double now = StkTime::getRealTime();
-    float timedelta = now - m_gyro_time;
+    uint64_t now = StkTime::getRealTimeMs();
+    uint64_t delta = now - m_gyro_time;
     m_gyro_time = now;
+    float timedelta = (float)delta / 1000.f;
     if (timedelta > 0.5f)
     {
         timedelta = 0.1f;

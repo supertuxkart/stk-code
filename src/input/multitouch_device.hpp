@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "input/input_device.hpp"
+#include "utils/types.hpp"
 #include "IEventReceiver.h"
 
 #ifdef ANDROID
@@ -90,7 +91,7 @@ private:
     float m_sensitivity_y;
 
     float m_orientation;
-    double m_gyro_time;
+    uint64_t m_gyro_time;
 
 #ifdef ANDROID
     /** Pointer to the Android irrlicht device */
