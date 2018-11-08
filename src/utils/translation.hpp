@@ -21,6 +21,7 @@
 
 #include <irrString.h>
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include <utility>
@@ -60,6 +61,7 @@ private:
 
     std::string m_current_language_name;
     std::string m_current_language_name_code;
+    std::mutex m_fribidized_mutex, m_gettext_mutex, m_ngettext_mutex;
 #endif
 
 public:
