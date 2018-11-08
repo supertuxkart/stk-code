@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits>
 #include <math.h>
 
 #ifdef ENABLE_SOUND
@@ -88,7 +89,7 @@ SFXManager::SFXManager()
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
     m_master_gain = UserConfigParams::m_sfx_volume;
-    m_last_update_time = -1;
+    m_last_update_time = std::numeric_limits<uint64_t>::max();
     // Init position, since it can be used before positionListener is called.
     // No need to use lock here, since the thread will be created later.
     m_listener_position.getData() = Vec3(0, 0, 0);
@@ -833,8 +834,8 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
 #ifdef ENABLE_SOUND
     if (!UserConfigParams::m_enable_sound)
         return;
-        
-    if (m_last_update_time < 0)
+
+    if (m_last_update_time == std::numeric_limits<uint64_t>::max())
     {
         // first time
         m_last_update_time = StkTime::getRealTimeMs();
