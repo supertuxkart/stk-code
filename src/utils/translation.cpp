@@ -544,18 +544,6 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     const std::string& original_t = (context == NULL ?
                                      m_dictionary.translate(original) :
                                      m_dictionary.translate_ctxt(context, original));
-
-    if (original_t == original)
-    {
-        static irr::core::stringw converted_string;
-        converted_string = StringUtils::utf8ToWide(original);
-
-#if TRANSLATE_VERBOSE
-        std::wcout << L"  translation : " << converted_string << std::endl;
-#endif
-        return converted_string.c_str();
-    }
-
     // print
     //for (int n=0;; n+=4)
     std::lock_guard<std::mutex> lock(m_gettext_mutex);
