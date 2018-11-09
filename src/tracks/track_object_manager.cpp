@@ -20,9 +20,11 @@
 
 #include "animations/ipo.hpp"
 #include "animations/three_d_animation.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/xml_node.hpp"
+#include "network/network_config.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/log.hpp"
@@ -66,14 +68,37 @@ void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
  */
 void TrackObjectManager::init()
 {
-    for_var_in(TrackObject*, curr, m_all_objects)
+    int moveable_objects = 0;
+    bool warned = false;
+    for (unsigned i = 0; i < m_all_objects.m_contents_vector.size(); i++)
     {
+        TrackObject* curr = m_all_objects.m_contents_vector[i];
         curr->onWorldReady();
 
+        if (moveable_objects > stk_config->m_max_moveable_objects)
+        {
+            if (!warned)
+            {
+                Log::warn("TrackObjectManager",
+                    "Too many moveable objects (>%d) in networking.",
+                    stk_config->m_max_moveable_objects);
+                warned = true;
+            }
+            curr->setInitiallyVisible(false);
+            curr->setEnabled(false);
+            continue;
+        }
+
         // onWorldReady will hide some track objects using scripting
-        if (curr->isEnabled() && curr->getPhysicalObject() &&
+        if (NetworkConfig::get()->isNetworking() &&
+            curr->isEnabled() && curr->getPhysicalObject() &&
             curr->getPhysicalObject()->isDynamic())
+        {
+            curr->getPhysicalObject()->getBody()
+                ->setActivationState(DISABLE_DEACTIVATION);
             curr->getPhysicalObject()->addForRewind();
+            moveable_objects++;
+        }
     }
 }   // init
 

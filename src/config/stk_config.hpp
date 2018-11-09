@@ -89,6 +89,9 @@ public:
     /** How many state updates per second the server will send. */
     int m_network_state_frequeny;
 
+    /** Maximum number of moveable objects in a track when networking is on. */
+    int m_max_moveable_objects;
+
     /** In case of a network race, remote karts will get their steering somewhat
      *  reduced each frame. This reduces stutter when a kart only does small
      *  steering adjustments. */
