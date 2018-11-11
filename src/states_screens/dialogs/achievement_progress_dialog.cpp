@@ -43,6 +43,7 @@ AchievementProgressDialog::AchievementProgressDialog(Achievement *achievement)
     loadFromFile("online/achievement_progress_dialog.stkgui");
     
     m_depth = m_achievement->getInfo()->getDepth();
+    assert (m_depth < 3);
 
     m_progress_table = getWidget<ListWidget>("progress-tree");
     assert(m_progress_table != NULL);
