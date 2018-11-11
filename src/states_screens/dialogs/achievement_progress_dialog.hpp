@@ -48,6 +48,8 @@ private:
     int m_row_counter;//Used in the recurisve table filling
 
     GUIEngine::ListWidget* m_progress_table;
+    GUIEngine::LabelWidget* m_main_goal_description;
+    GUIEngine::LabelWidget* m_main_goal_progress;
 
     GUIEngine::RibbonWidget* m_options_widget;
 
