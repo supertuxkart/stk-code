@@ -12,7 +12,7 @@
                 <div width="66%" height="100%" layout="vertical-row">
                     <spacer width="20" proportion="1"/>
                     <label width="100%" align="center"
-                           text_align="center" text="Goal"/>
+                           text_align="center" I18N="Objective shown in achievement dialog" text="Goal"/>
                     <spacer width="20" proportion="1"/>
                     <label id="main-goal-description" width="100%" align="center"
                            text_align="center" word_wrap="true" text=""/>
@@ -21,7 +21,7 @@
                 <div width="33%" height="100%" layout="vertical-row">
                     <spacer width="20" proportion="1"/>
                     <label width="100%" align="center"
-                           text_align="center" text="Progress"/>
+                           text_align="center" I18N="Progress shown in achievement dialog" text="Progress"/>
                     <spacer width="20" proportion="1"/>
                     <label id="main-goal-progress" width="100%" align="center"
                            text_align="center" word_wrap="true" text=""/>
