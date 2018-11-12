@@ -26,7 +26,6 @@ class PlayerProfile;
 namespace GUIEngine
 {
     class CheckBoxWidget;
-    class LabelWidget;
     class ModelViewWidget;
     class SpinnerWidget;
 }
@@ -39,15 +38,11 @@ class KartColorSliderDialog : public GUIEngine::ModalDialog
 private:
     PlayerProfile* m_player_profile;
 
-    GUIEngine::CheckBoxWidget* m_toggle_slider;
-
-    GUIEngine::LabelWidget* m_toggle_text;
+    GUIEngine::SpinnerWidget* m_toggle_slider;
 
     GUIEngine::ModelViewWidget* m_model_view;
 
     GUIEngine::SpinnerWidget* m_color_slider;
-
-    core::stringw m_original_color, m_choose_color;
 
     void toggleSlider();
 public:
