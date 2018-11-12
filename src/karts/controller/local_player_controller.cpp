@@ -307,7 +307,7 @@ void LocalPlayerController::displayPenaltyWarning()
         m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
                       GUIEngine::getSkin()->getColor("font::top"), true /* important */,
             false /*  big font */, true /* outline */);
-        m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
+        m->addMessage(_("Don't accelerate before 'Set!'"), m_kart, 2.0f,
             GUIEngine::getSkin()->getColor("font::normal"), true /* important */,
             false /*  big font */, true /* outline */);
     }
