@@ -206,6 +206,11 @@ public:
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;
 
+    /** Configurable values used in SmoothNetworkBody class. */
+    float m_snb_min_adjust_length, m_snb_max_adjust_length,
+        m_snb_min_adjust_speed, m_snb_max_adjust_time,
+        m_snb_adjust_length_threshold;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid

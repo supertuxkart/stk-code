@@ -548,4 +548,12 @@
   -->
   <network-ports server-discovery-port="2757" client-port="2758" server-port="2759"/>
 
+  <!-- Configurable values used in SmoothNetworkBody class.
+  -->
+  <network-smoothing min-adjust-length="0.1"
+                     max-adjust-length="4.0"
+                     min-adjust-speed="0.3"
+                     max-adjust-time="2.0"
+                     adjust-length-threshold="2.0"/>
+
 </config>

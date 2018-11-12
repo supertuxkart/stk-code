@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/smooth_network_body.hpp"
+#include "config/stk_config.hpp"
 
 #include <algorithm>
 
@@ -27,11 +28,11 @@ SmoothNetworkBody::SmoothNetworkBody(bool enable)
     m_enabled = enable;
     m_smooth_rotation = true;
     m_adjust_vertical_offset = true;
-    m_min_adjust_length = 0.1f;
-    m_max_adjust_length = 4.0f;
-    m_min_adjust_speed = 0.3f;
-    m_max_adjust_time = 2.0f;
-    m_adjust_length_threshold = 2.0f;
+    m_min_adjust_length = stk_config->m_snb_min_adjust_length;
+    m_max_adjust_length = stk_config->m_snb_max_adjust_length;
+    m_min_adjust_speed = stk_config->m_snb_min_adjust_speed;
+    m_max_adjust_time = stk_config->m_snb_max_adjust_time;
+    m_adjust_length_threshold = stk_config->m_snb_adjust_length_threshold;
 }   // SmoothNetworkBody
 
 // ----------------------------------------------------------------------------

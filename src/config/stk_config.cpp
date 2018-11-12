@@ -157,6 +157,11 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
     CHECK_NEG(m_solver_iterations,         "physics: solver-iterations"       );
     CHECK_NEG(m_solver_split_impulse_thresh,"physics: solver-split-impulse-threshold");
+    CHECK_NEG(m_snb_min_adjust_length, "network smoothing: min-adjust-length");
+    CHECK_NEG(m_snb_max_adjust_length, "network smoothing: max-adjust-length");
+    CHECK_NEG(m_snb_min_adjust_speed, "network smoothing: min-adjust-speed");
+    CHECK_NEG(m_snb_max_adjust_time, "network smoothing: max-adjust-time");
+    CHECK_NEG(m_snb_adjust_length_threshold, "network smoothing: adjust-length-threshold");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_default_kart_properties->checkAllSet(filename);
@@ -217,6 +222,9 @@ void STKConfig::init_defaults()
     m_server_discovery_port      = 2757;
     m_client_port                = 2758;
     m_server_port                = 2759;
+    m_snb_min_adjust_length = m_snb_max_adjust_length =
+        m_snb_min_adjust_speed = m_snb_max_adjust_time =
+        m_snb_adjust_length_threshold = UNDEFINED;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -490,6 +498,15 @@ void STKConfig::getAllData(const XMLNode * root)
         m_server_discovery_port = (uint16_t)server_discovery_port;
         m_client_port = (uint16_t)client_port;
         m_server_port = (uint16_t)server_port;
+    }
+
+    if (const XMLNode *ns = root->getNode("network-smoothing"))
+    {
+        ns->get("min-adjust-length", &m_snb_min_adjust_length);
+        ns->get("max-adjust-length", &m_snb_max_adjust_length);
+        ns->get("min-adjust-speed", &m_snb_min_adjust_speed);
+        ns->get("max-adjust-time", &m_snb_max_adjust_time);
+        ns->get("adjust-length-threshold", &m_snb_adjust_length_threshold);
     }
 
     // Get the default KartProperties
