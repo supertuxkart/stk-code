@@ -554,6 +554,6 @@
                      max-adjust-length="4.0"
                      min-adjust-speed="0.3"
                      max-adjust-time="2.0"
-                     adjust-length-threshold="2.0"/>
+                     adjust-length-threshold="4.0"/>
 
 </config>
