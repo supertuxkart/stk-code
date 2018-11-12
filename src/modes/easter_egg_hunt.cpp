@@ -159,7 +159,8 @@ const std::string& EasterEggHunt::getIdent() const
 /** Called when a kart has collected an egg.
  *  \param kart The kart that collected an egg.
  */
-void EasterEggHunt::collectedItem(const AbstractKart *kart, const Item *item)
+void EasterEggHunt::collectedItem(const AbstractKart *kart,
+                                  const ItemState *item    )
 {
     if(item->getType() != ItemState::ITEM_EASTER_EGG) return;
 
@@ -211,15 +212,16 @@ bool EasterEggHunt::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-/** Called then a battle is restarted.
+/** Called when an egg hunt is restarted.
  */
-void EasterEggHunt::reset()
+void EasterEggHunt::reset(bool restart)
 {
-    LinearWorld::reset();
+    LinearWorld::reset(restart);
 
     for(unsigned int i=0; i<m_eggs_collected.size(); i++)
         m_eggs_collected[i] = 0;
     m_eggs_found = 0;
+    m_finish_time = 0;
 }   // reset
 
 //-----------------------------------------------------------------------------

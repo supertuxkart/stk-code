@@ -24,6 +24,7 @@
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_mesh.hpp"
@@ -197,6 +198,9 @@ void FeatureUnlockedCutScene::
                findWhatWasUnlocked(RaceManager::Difficulty difficulty,
                                    std::vector<const ChallengeData*>& unlocked)
 {
+    if (UserConfigParams::m_unlock_everything > 0)
+        return;
+
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
 
     // The number of points is updated before this function is called

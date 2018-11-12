@@ -1286,34 +1286,14 @@ bool CGUIEditBox::processMouse(const SEvent& event)
         }
         else if (!m_rtl)
         {
-            bool use_screen_keyboard = UserConfigParams::m_screen_keyboard > 1;
-            
-            #ifdef ANDROID
-            if (UserConfigParams::m_screen_keyboard == 1)
-            {
-                int32_t keyboard = AConfiguration_getKeyboard(
-                                                    global_android_app->config);
-                
-                use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
-            }
-            #endif
-            
             if (!AbsoluteClippingRect.isPointInside(
                 core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))
             {
                 return false;
             }
-            else if (use_screen_keyboard)
+            else if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
-                CursorPos = Text.size();
-                setTextMarkers(CursorPos, CursorPos);
-                calculateScrollPos();
-
-                if (GUIEngine::ScreenKeyboard::getCurrent() == NULL)
-                {
-                    new GUIEngine::ScreenKeyboard(0.98f, 0.30f, this);
-                }
-
+                openScreenKeyboard();
                 return true;
             }
             else
@@ -1772,5 +1752,17 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
             (EGUI_ALIGNMENT) in->getAttributeAsEnumeration("VTextAlign", GUIAlignmentNames));
 
     // setOverrideFont(in->getAttributeAsFont("OverrideFont"));
+}
+
+void CGUIEditBox::openScreenKeyboard()
+{
+    if (GUIEngine::ScreenKeyboard::getCurrent() != NULL)
+        return;
+        
+    CursorPos = Text.size();
+    setTextMarkers(CursorPos, CursorPos);
+    calculateScrollPos();
+
+    new GUIEngine::ScreenKeyboard(0.98f, 0.30f, this);
 }
 

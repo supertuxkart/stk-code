@@ -52,8 +52,6 @@ private:
     void handleBadConnection();
     void becomingServerOwner();
 
-    void clearPlayers();
-
     TransportAddress m_server_address;
 
     std::shared_ptr<Server> m_server;
@@ -89,6 +87,8 @@ private:
 
     std::map<PeerDisconnectInfo, irr::core::stringw> m_disconnected_msg;
 
+    irr::core::stringw m_total_players;
+
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
@@ -113,7 +113,7 @@ public:
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoLap() const                  { return m_server_auto_lap; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-
+    void clearPlayers();
 };
 
 #endif // CLIENT_LOBBY_HPP

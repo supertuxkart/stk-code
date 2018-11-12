@@ -40,7 +40,7 @@ using namespace irr;
 RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 {
     m_race_gui = race_gui;
-    m_minimap_bottom = 0;
+    m_height = 0;
     m_gui_action = false;
     m_steering_wheel_tex = NULL;
     m_up_down_tex = NULL;
@@ -56,13 +56,13 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 
     m_device = input_manager->getDeviceManager()->getMultitouchDevice();
 
-    if (UserConfigParams::m_multitouch_scale > 1.5f)
+    if (UserConfigParams::m_multitouch_scale > 1.6f)
     {
-        UserConfigParams::m_multitouch_scale = 1.5f;
+        UserConfigParams::m_multitouch_scale = 1.6f;
     }
-    else if (UserConfigParams::m_multitouch_scale < 0.5f)
+    else if (UserConfigParams::m_multitouch_scale < 0.8f)
     {
-        UserConfigParams::m_multitouch_scale = 0.5f;
+        UserConfigParams::m_multitouch_scale = 0.8f;
     }
 
     init();
@@ -104,6 +104,11 @@ void RaceGUIMultitouch::close()
     {
         m_device->deactivateAccelerometer();
     }
+
+    if (m_device->isGyroscopeActive())
+    {
+        m_device->deactivateGyroscope();
+    }
 }   // close
 
 
@@ -116,9 +121,14 @@ void RaceGUIMultitouch::init()
     if (m_device == NULL)
         return;
         
-    if (UserConfigParams::m_multitouch_controls == 2)
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         m_device->activateAccelerometer();
+    }
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+    {
+        m_device->activateAccelerometer();
+        m_device->activateGyroscope();
     }
 
     const float scale = UserConfigParams::m_multitouch_scale;
@@ -153,9 +163,9 @@ void RaceGUIMultitouch::init()
         steering_accel_x = w - btn2_size / 2 - steering_accel_margin;
     }
 
-    m_minimap_bottom = (unsigned int)(h - 2 * col_size);
+    m_height = (unsigned int)(2 * col_size + margin / 2);
     
-    if (m_device->isAccelerometerActive())
+    if (m_device->isAccelerometerActive() || m_device->isGyroscopeActive())
     {
         m_device->addButton(BUTTON_UP_DOWN,
                     int(steering_accel_x), int(steering_accel_y),
@@ -340,6 +350,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
                      kart->getPowerup()->getNum() > 1 && 
+                     !kart->hasFinishedRace() &&
                      m_gui_action == false)
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();

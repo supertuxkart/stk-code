@@ -50,6 +50,7 @@ class RenderInfo;
 class SFXBuffer;
 class Skidding;
 class SlipStream;
+class Stars;
 class TerrainInfo;
 
 
@@ -261,6 +262,8 @@ public:
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const = 0;
     // ------------------------------------------------------------------------
+    virtual float getGraphicalViewBlockedByPlunger() const = 0;
+    // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
     virtual void blockViewWithPlunger() = 0;
@@ -270,9 +273,10 @@ public:
     // ------------------------------------------------------------------------
     /** Squashes this kart: it will scale the kart in up direction, and causes
      *  a slowdown while this kart is squashed.
+     *  Returns true if the squash is successful, false otherwise.
      *  \param time How long the kart will be squashed.
      *  \param slowdown Reduction of max speed.    */
-    virtual void setSquash(float time, float slowdown) = 0;
+    virtual bool setSquash(float time, float slowdown) = 0;
     // ------------------------------------------------------------------------
     /** Makes the kart unsquashed again. */
     virtual void unsetSquash() = 0;
@@ -520,6 +524,8 @@ public:
     virtual float getStartupBoost() const = 0;
     // ------------------------------------------------------------------------
     virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
+    // ------------------------------------------------------------------------
+    virtual Stars* getStarsEffect() const = 0;
 };   // AbstractKart
 
 

@@ -93,7 +93,6 @@ private:
 
     /** Icon textures (stored as variables to not look up
         their location on every frame) */
-    irr::video::ITexture *m_lap_flag;
     irr::video::ITexture *m_red_team;
     irr::video::ITexture *m_blue_team;
     irr::video::ITexture *m_red_flag;

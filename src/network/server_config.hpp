@@ -171,7 +171,7 @@ namespace ServerConfig
         "kick any players."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_start_game_counter
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "start-game-counter",
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(60.0f, "start-game-counter",
         "Time to wait before entering kart selection screen "
         "if satisfied min-start-game-players below for owner less or ranked "
         "server."));
@@ -192,11 +192,18 @@ namespace ServerConfig
         "Enable team choosing in lobby in team game (soccer and CTF). "
         "If owner-less is enabled, than this option is always disabled."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "strict-players",
+        "If strict-players is on, no duplicated online id or split screen "
+        "players are allowed, which can prevent someone using more than 1 "
+        "network AI with this server."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_ranked
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ranked",
         "Server will submit ranking to stk addons server "
         "for linear race games, you require permission for that. "
-        "validating-player, auto-end and owner-less will be turned on."));
+        "validating-player, auto-end, strict-player and owner-less will be "
+        "turned on."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
@@ -204,9 +211,9 @@ namespace ServerConfig
         "returning to its own base."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_hit_limit_threshold
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(5.0f, "hit-limit-threshold",
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(3.0f, "hit-limit-threshold",
         "Value used to calculate hit limit in free for all, which "
-        "is min(number of players * hit-limit-threshold, 40), "
+        "is min(number of players * hit-limit-threshold, 30), "
         "negative value to disable hit limit."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_time_limit_threshold_ffa
@@ -255,7 +262,7 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
         "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "
         "specific ip, expired-time: unix timestamp to expire, "
-        "if -1 (uint32_t max) than a permanent ban.",
+        "-1 (uint32_t max) for a permanent ban.",
         {{ "ban", "ip", "expired-time" }},
         { { "0.0.0.0/0", 0u } }));
 
@@ -263,13 +270,13 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(UIntToUIntServerConfigParam(
         "server-online-id-ban-list",
         "online-id: online id for banning, expired-time: unix timestamp to "
-        "expire, if -1 (uint32_t max) than a permanent ban.",
+        "expire, -1 (uint32_t max) for a permanent ban.",
         {{ "ban", "online-id", "expired-time" }},
         { { 0u, 0u } }));
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
-    static const uint32_t m_server_version = 1;
+    static const uint32_t m_server_version = 3;
     // ========================================================================
     void loadServerConfig(const std::string& path = "");
     // ------------------------------------------------------------------------

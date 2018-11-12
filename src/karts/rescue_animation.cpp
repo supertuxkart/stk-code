@@ -23,10 +23,12 @@
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/follow_the_leader.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_config.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/quad.hpp"
 #include "tracks/track.hpp"
@@ -40,11 +42,12 @@
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
  */
-RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
+RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue,
+                                 bool from_state)
                : AbstractKartAnimation(kart, "RescueAnimation")
 {
     btTransform prev_trans = kart->getTrans();
-    // Get the required final physicial transform for network, then reset back
+    // Get the required final physical transform for network, then reset back
     // to the original transform
     World::getWorld()->moveKartAfterRescue(kart);
 
@@ -88,9 +91,21 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
         }
     }
 
+    // Allow FTL mode to apply special action when the leader is rescued
+    if (race_manager->isFollowMode())
+    {
+        FollowTheLeaderRace *ftl_world =
+            dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
+        if(ftl_world->isLeader(kart->getWorldKartId()))
+            ftl_world->leaderRescued();
+    }
+
     // Clear powerups when rescue in CTF
-    addNetworkAnimationChecker(race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+    if (!from_state)
+    {
+        addNetworkAnimationChecker(race_manager->getMajorMode() ==
+            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+    }
 }   // RescueAnimation
 
 //-----------------------------------------------------------------------------

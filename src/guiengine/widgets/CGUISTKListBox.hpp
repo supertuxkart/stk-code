@@ -12,6 +12,7 @@
 #include "IGUIElement.h"
 #include "irrArray.h"
 #include <string>
+#include <vector>
 
 namespace irr
 {
@@ -30,6 +31,8 @@ namespace irr
                 struct ListCell
                 {
                     irr::core::stringw m_text;
+                    bool m_broken_text;
+                    std::vector<irr::core::stringw> m_text_lines;
                     int m_proportion;
                     s32 m_icon;
                     bool m_center;
@@ -40,6 +43,8 @@ namespace irr
                         m_proportion = proportion;
                         m_icon = icon;
                         m_center = center;
+                        m_broken_text = false;
+                        m_text_lines.clear();
                     }
                 };
 
@@ -48,6 +53,8 @@ namespace irr
                 // Actually only used in list_widget -- still refactoring FIXME
                 std::string m_internal_name;
                 int m_current_id;
+
+                bool m_word_wrap = false;
 
                 // A multicolor extension
                 struct ListItemOverrideColor

@@ -73,7 +73,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
@@ -129,6 +129,8 @@ public:
     const Vec3& getRedFlag() const   { return (Vec3&)m_red_trans.getOrigin(); }
     // ------------------------------------------------------------------------
     const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
+    // ------------------------------------------------------------------------
+    void loseFlagForKart(int kart_id);
 
 };   // CaptureTheFlag
 

@@ -153,7 +153,7 @@ public:
     virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     virtual btTransform getRescueTransform(unsigned int index) const OVERRIDE;
-    virtual void  reset() OVERRIDE;
+    virtual void  reset(bool restart=false) OVERRIDE;
     virtual void  newLap(unsigned int kart_index) OVERRIDE;
 
     // ------------------------------------------------------------------------

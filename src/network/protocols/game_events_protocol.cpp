@@ -11,6 +11,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "race/race_manager.hpp"
 
 #include <stdint.h>
 
@@ -26,6 +27,7 @@
  */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 {
+    m_last_finished_position = 1;
 }   // GameEventsProtocol
 
 // ----------------------------------------------------------------------------
@@ -147,7 +149,7 @@ void GameEventsProtocol::eliminatePlayer(const NetworkString &data)
     World::getWorld()->getKart(kartid)->setPosition(
         World::getWorld()->getCurrentNumKarts() + 1);
     World::getWorld()->getKart(kartid)->finishedRace(
-        World::getWorld()->getTime());
+        World::getWorld()->getTime(), true/*from_server*/);
 }   // eliminatePlayer
 
 // ----------------------------------------------------------------------------
@@ -181,6 +183,11 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 
     uint8_t kart_id = ns.getUInt8();
     float time      = ns.getFloat();
+    if (race_manager->modeHasLaps())
+    {
+        World::getWorld()->getKart(kart_id)
+            ->setPosition(m_last_finished_position++);
+    }
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace

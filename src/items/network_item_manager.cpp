@@ -26,6 +26,8 @@
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 
+bool NetworkItemManager::m_network_item_debugging = false;
+
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */
 void NetworkItemManager::create()
@@ -42,6 +44,7 @@ void NetworkItemManager::create()
 NetworkItemManager::NetworkItemManager()
                   : Rewinder("N"), ItemManager()
 {
+    m_confirmed_switch_ticks = -1;
     m_last_confirmed_item_ticks.clear();
 
     if (NetworkConfig::get()->isServer())
@@ -71,6 +74,7 @@ NetworkItemManager::~NetworkItemManager()
 //-----------------------------------------------------------------------------
 void NetworkItemManager::reset()
 {
+    m_confirmed_switch_ticks = -1;
     ItemManager::reset();
 }   // reset
 
@@ -95,17 +99,23 @@ void NetworkItemManager::initClientConfirmState()
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
+void NetworkItemManager::collectedItem(ItemState *item, AbstractKart *kart)
 {
+    if (m_network_item_debugging)
+        Log::info("NIM", "collectedItem at %d index %d type %d ttr %d",
+                  World::getWorld()->getTicksSinceStart(),
+                  item->getItemId(), item->getType(), item->getTicksTillReturn());
+
     if(NetworkConfig::get()->isServer())
     {
+        ItemManager::collectedItem(item, kart);
         // The server saves the collected item as item event info
         m_item_events.lock();
         m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
-            item->getItemId(),
-            kart->getWorldKartId());
+                                             item->getItemId(),
+                                             kart->getWorldKartId(),
+                                             item->getTicksTillReturn());
         m_item_events.unlock();
-        ItemManager::collectedItem(item, kart);
     }
     else
     {
@@ -113,6 +123,25 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
         ItemManager::collectedItem(item, kart);
     }
 }   // collectedItem
+
+// ----------------------------------------------------------------------------
+/** Called when a switch is activated. On the server adds this information to
+ *  the item state so it can be sent to all clients.
+ */
+void NetworkItemManager::switchItems()
+{
+    if (NetworkConfig::get()->isServer())
+    {
+        // The server saves the collected item as item event info
+        m_item_events.lock();
+        // Create a switch event - the constructor called determines
+        // the type of the event automatically.
+        m_item_events.getData()
+                     .emplace_back(World::getWorld()->getTicksSinceStart());
+        m_item_events.unlock();
+    }
+    ItemManager::switchItems();
+}   // switchItems
 
 // ----------------------------------------------------------------------------
 /** Called when a new item is created, e.g. bubble gum.
@@ -124,25 +153,21 @@ Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
                                       const AbstractKart *kart, const Vec3 *xyz)
 {
     Item *item = ItemManager::dropNewItem(type, kart, xyz);
+
     if(!item) return NULL;
 
-    if (NetworkConfig::get()->isClient())
-    {
-        // If this is called when replaying a server event, the calling
-        // function restoreState will set the item to be not-predicted.
-        item->setPredicted(true);
-        return item;
-    }
+    // Nothing else to do for client
+    if (NetworkConfig::get()->isClient()) return item;
 
     // Server: store the data for this event:
     m_item_events.lock();
     m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
                                          type, item->getItemId(),
                                          kart->getWorldKartId(),
-                                         kart->getXYZ() );
+                                         xyz ? *xyz : kart->getXYZ() );
     m_item_events.unlock();
     return item;
-}   // newItem
+}   // dropNewItem
 
 // ----------------------------------------------------------------------------
 /** Called by the GameProtocol when a confirmation for an item event is
@@ -229,81 +254,150 @@ BareNetworkString* NetworkItemManager::saveState(std::vector<std::string>* ru)
  */
 void NetworkItemManager::forwardTime(int ticks)
 {
+    int new_ticks = World::getWorld()->getTicksSinceStart() + ticks;
+    World::getWorld()->setTicksForRewind(new_ticks);
+
     for(auto &i : m_confirmed_state)
     {
         if (i) i->update(ticks);
     }   // for m_all_items
+    if(m_switch_ticks>ticks)
+        m_switch_ticks -= ticks;
+    else if (m_switch_ticks >= 0)
+    {
+        switchItemsInternal(m_confirmed_state);
+        m_switch_ticks = -1;
+    }
 }   // forwardTime
 
 //-----------------------------------------------------------------------------
 /** Restores the state of the items to the current world time. It takes the
- *  last saved
-
- *  using exactly 'count' bytes of the message.
+ *  last saved confirmed state, applies any updates from the server, and
+ *  then syncs up the confirmed state to the in-race items.
+ *  It uses exactly 'count' bytes of the message.
  *  \param buffer the state content.
  *  \param count Number of bytes used for this state.
  */
 void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 {
     assert(NetworkConfig::get()->isClient());
-    // The state at World::getTicksSinceStart() needs to be restored. The confirmed
-    // state in this instance was taken at m_confirmed_state_time. First
-    // forward this confirmed state to the current time (i.e. world time).
-    // This is done in several steps:
-    // 1) First remove all client-side predicted items from the list of all
-    //    items. Predicted item only happen between m_confirmed_state_time
-    //    and 'now'.
-    // 2) Apply all events included in this state to the confirmed state.
+    // The state at World::getTicksSinceStart() needs to be restored. The
+    // confirmed state saved here was taken at m_confirmed_state_time
+    // (which is before getTicksSinceStart()). So first forward the confirmed
+    // state to the time we need to rewind to (i.e. getTicksSinceStart()).
+    // Then copy the new confirmed state to the current items. Any new
+    // items (dropped bubblegums) that have been predicted on a client
+    // and not been confirmed by the server data will be removed automatically
+    // at this stage. In more detail:
+    //
+    // 1) Apply all events included in this state to the confirmed state.
+    //    It is possible that the server inludes events that have happened
+    //    before the confirmed time on this client (the server keeps on 
+    //    sending all event updates till all clients have confirmed that
+    //    that they have received them!!) - which will simply be ignored/
+    //    This phase will only act on the confirmed ItemState in the
+    //    NetworkItemManager, nothing in the ItemManager will be changed.
     //    a) When a collection event is found, adjust the confirmed item state
-    //       only (this state will later be copied to the current item state).
-    //    b) When a new item is created, search in the item cache to see
-    //       if a predicted item for this slot already exists to speed up
-    //       item creation (if not, create a new item). Put this new item
-    //       into the current item state as well as in the confirmed state
-    //       (in the same index position).
+    //       only (this state will later be copied to the current items).
+    //       It still call collected() in the item, which will update e.g.
+    //       the previous owner, use up counter etc. for that item.
+    //    b) When a new item is created, create an ItemState instance for
+    //       this item, and put it in the confirmed state. Make sure the
+    //       same index position is used.
+    //    c) If a switch is used, this will be recorded in
+    //       m_confirmed_switch_ticks.
+    //
+    // 2) Inform the server that those item events have been received.
+    //    Once the server has received confirmation from all clients 
+    //    for events, they will not be resent anymore.
+    // 
     // 3) Once all new events have been applied to the confirmed state the
     //    time must be <= world time. Forward the confirmed state to 
-    //    world time, and update m_confirmed_state_time to the world time.
+    //    world time (i.e. all confirmed items will get their ticksTillReturn
+    //    value updated), and update m_confirmed_state_time to the world time.
+    //
+    // 4) Finally update the ItemManager state from the confirmed state:
+    //    Any items that exist in both data structures will be updated.
+    //    If an item exist in the ItemManager but not in the confirmed state
+    //    of the NetworkItemManager, the item in the item manager will be 
+    //    delete - it was a predict item, which has not been confirmed by
+    //    the server (e.g. a kart drops a bubble gum, and either the server
+    //    has not received that event yet to confirm it, or perhaps the
+    //    server detects that the kart did not even have a bubble gum).
+    //    Similary, if an item is not in the confirmed state anymore,
+    //    but in the ItemManager, it can mean that an item was collected
+    //    on the server, which was not predicted. The item in the ItemManager
+    //    will be deleted (if a kart has collected this item, the kart state
+    //    will include the changed state information for the kart, so no need
+    //    to update the kart for this).
+    //
     // From here the replay can happen.
 
-    // 1) Remove predicted items:
-    for (unsigned int i=0; i<m_all_items.size(); i++)
-    {
-        Item *item = m_all_items[i];
-        if(item && item->isPredicted())
-        {
-            deleteItem(item);
-        }
-    }
 
-    // 2) Apply all events to current confirmed state:
+    // 1) Apply all events to current confirmed state:
+    // -----------------------------------------------
+	World *world = World::getWorld();
+
+	// The world clock was set by the RewindManager to be the time
+	// of the state we are rewinding to. But the confirmed state of
+    // the network manager is before this (we are replaying item events
+    // since the last confirmed state in order to get a new confirmed state).
+	// So we need to reset the clock to the time of the confirmed state,
+    // and then forward this time accordingly. Getting the world time right
+    // during forwarding the item state is important since e.g. the bubble
+    // gum torque depends on the time. If the world time would be incorrect
+    // at the time the collection event happens, the torque would be
+    // predicted incorrectly, resulting in stuttering.
+
     int current_time = m_confirmed_state_time;
-    bool has_state = count > 0;
+    // Reset the ItemManager's switch ticks to the value it had a the
+    // confirmed time:
+    m_switch_ticks     = m_confirmed_switch_ticks;
+    int rewind_to_time = world->getTicksSinceStart();   // Save time we rewind to
+    world->setTicksForRewind(current_time);
+    bool has_state     = count > 0;
+
+    // Note that the actual ItemManager states must NOT be changed here, only
+    // the confirmed states in the Network manager are allowed to be modified.
+    // They will all be copied to the ItemManager states after the loop.
     while(count > 0)
     {
-        // 1) Decode the event in the message
-        // ----------------------------------
+        // 1.1) Decode the event in the message
+        // ------------------------------------
         ItemEventInfo iei(buffer, &count);
-
-        // 2) If the event needs to be applied, forward
-        //    the time to the time of this event:
-        // --------------------------------------------
+        if(m_network_item_debugging)
+            Log::info("NIM", "Rewindto %d current %d iei.index %d iei tick %d iei.coll %d iei.new %d iei.ttr %d confirmed %lx",
+                      rewind_to_time, current_time,
+                      iei.getIndex(),
+                      iei.getTicks(), iei.isItemCollection(), iei.isNewItem(),
+                      iei.getTicksTillReturn(),
+                      iei.getIndex() < (int)m_confirmed_state.size() && iei.getIndex() != -1 ?
+                      m_confirmed_state[iei.getIndex()] : NULL);
+        // 1.2) If the event needs to be applied, forward
+        //      the time to the time of this event:
+        // ----------------------------------------------
         int dt = iei.getTicks() - current_time;
-        // Skip an event that are 'in the past' (i.e. have been sent again by
+
+        // Skip any events that are 'in the past' (i.e. have been sent again by
         // the server because it has not yet received confirmation from all
-        // clients.
+        // clients).
         if(dt<0) continue;
 
         // Forward the saved state:
         if (dt>0) forwardTime(dt);
 
-        // TODO: apply the various events types, atm only collection is supported:
         if(iei.isItemCollection())
         {
             int index = iei.getIndex();
             // An item on the track was collected:
-            AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
-            m_confirmed_state[index]->collected(kart);
+            AbstractKart *kart = world->getKart(iei.getKartId());
+
+            assert(m_confirmed_state[index] != NULL);
+            m_confirmed_state[index]->collected(kart); // Collect item
+            // Reset till ticks return from state (required for eating banana with bomb)
+            int ttr = iei.getTicksTillReturn();
+            m_confirmed_state[index]->setTicksTillReturn(ttr);
+
             if (m_confirmed_state[index]->isUsedUp())
             {
                 delete m_confirmed_state[index];
@@ -312,62 +406,123 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
         else if(iei.isNewItem())
         {
-            AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
-            ItemState *is = new ItemState(iei.getNewItemType(), iei.getIndex(),
-                                          kart);
+            AbstractKart *kart = world->getKart(iei.getKartId());
+            ItemState *is = new ItemState(iei.getNewItemType(), kart,
+                                          iei.getIndex()             );
             is->initItem(iei.getNewItemType(), iei.getXYZ());
+            if (m_switch_ticks >= 0)
+            {
+                ItemState::ItemType new_type = m_switch_to[is->getType()];
+                is->switchTo(new_type);
+            }
+
+            // A new confirmed item must either be inserted at the end of all
+            // items, or in an existing unused entry.
             if (m_confirmed_state.size() <= is->getItemId())
             {
+                // In case that the server should send items in the wrong
+                // order, e.g. it sends an item for index n+2, then the item
+                // for index n -> we might need to add NULL item states
+                // into the state array to make sure the indices are correct.
+                while(m_confirmed_state.size()<is->getItemId())
+                    m_confirmed_state.push_back(NULL);
                 m_confirmed_state.push_back(is);
             }
             else
             {
-                if (m_confirmed_state[is->getItemId()] == NULL)
-                    m_confirmed_state[is->getItemId()] = is;
-                else
-                    *m_confirmed_state[is->getItemId()] = *is;
+                // If the new item has an already existing index,
+                // the slot in the confirmed state array must be free
+                assert(m_confirmed_state[is->getItemId()] == NULL);
+                m_confirmed_state[is->getItemId()] = is;
             }
+        }
+        else if(iei.isSwitch())
+        {
+            // Switch all confirmed items:
+            ItemManager::switchItemsInternal(m_confirmed_state);
+        }
+        else
+        {
+            Log::error("NetworkItemManager",
+                       "Received unknown event type at %d",
+                       iei.getTicks());
         }
         current_time = iei.getTicks();
     }   // while count >0
 
-    // Inform the server which events have been received.
+
+    // 2. Update Server 
+    // ================
+    // Inform the server which events have been received (if there has
+    // been any updates - no need to send messages if nothing has changed)
+
     if (has_state)
     {
         if (auto gp = GameProtocol::lock())
-            gp->sendItemEventConfirmation(World::getWorld()->getTicksSinceStart());
+            gp->sendItemEventConfirmation(world->getTicksSinceStart());
     }
 
-    // Forward the confirmed item state to the world time:
-    int dt = World::getWorld()->getTicksSinceStart() - current_time;
+    // 3. Forward the confirmed item state to the world time
+    // =====================================================
+    int dt = rewind_to_time - current_time;
     if(dt>0) forwardTime(dt);
 
-    // Restore the state to the current world time:
-    // ============================================
+    // 4. Copy the confirmed state to the current item state
+    // ======================================================
+    
+    // We need to test all items - and confirmed or all_items could
+    // be the larger group (confirmed: when a new item was dropped
+    // by a remote kart; all_items: if an item is predicted on
+    // the client, but not yet confirmed). So 
+    unsigned int max_index = std::max(m_confirmed_state.size(),
+                                      m_all_items.size()        );
 
-    for(unsigned int i=0; i<m_confirmed_state.size(); i++)
+    for(unsigned int i=0; i<max_index; i++)
     {
-        Item *item = m_all_items[i];
-        const ItemState *is = m_confirmed_state[i];
+        ItemState *item     = i < m_all_items.size() ?  m_all_items[i] : NULL;
+        const ItemState *is = i < m_confirmed_state.size() 
+                            ? m_confirmed_state[i] : NULL;
         if (is && item)
+        {
             *(ItemState*)item = *is;
+        }
         else if (is && !item)
         {
+            // A new item was dropped according to the server that is not
+            // yet part of the current state --> create new item
             Vec3 xyz = is->getXYZ();
             Item *item_new = dropNewItem(is->getType(), is->getPreviousOwner(),
                                          &xyz);
-            item_new->setPredicted(false);
-            item_new->setItemId(i);
-            m_all_items[i] = item_new;
+            if (i != item_new->getItemId())
+            {
+                // The newly created item on the client has been given a 
+                // different index than the one given by the server. This
+                // indicates that this client has either a different item
+                // at the index that the server sent (i.e. client predicted
+                // an item, which the server has not confirmed), or the
+                // client found an empty slot that the server did not have
+                // (so an earlier index was found).
+                if(i < m_all_items.size() && m_all_items[i])
+                    deleteItem(m_all_items[i]);
+                // Move item_new from its position to the index given
+                // by the server
+                m_all_items[item_new->getItemId()] = NULL;
+                m_all_items[i] = item_new;
+                item_new->setItemId(i);
+            }
+            item_new->setDeactivatedTicks(is->getDeactivatedTicks());
             *((ItemState*)m_all_items[i]) = *is;
         }
         else if (!is && item)
         {
             deleteItem(m_all_items[i]);
         }
-    }
+    }   // for i < max_index
 
-    // Now we save the current local
-    m_confirmed_state_time = World::getWorld()->getTicksSinceStart();
+    // Now set the clock back to the 'rewindto' time:
+    world->setTicksForRewind(rewind_to_time);
+
+    // Save the current local time as confirmed time
+    m_confirmed_state_time   = world->getTicksSinceStart();
+    m_confirmed_switch_ticks = m_switch_ticks;
 }   // restoreState
-

@@ -2492,6 +2492,10 @@ Vec3 Track::flagCommand(const XMLNode *node)
     }
 #endif
 
+    m_track_object_manager->castRay
+        (loc, loc + (-10000 * quad_normal), &hit_point, &m, &normal,
+         /*interpolate*/false);
+
     const std::string &name = node->getName();
     if (name == "red-flag")
     {

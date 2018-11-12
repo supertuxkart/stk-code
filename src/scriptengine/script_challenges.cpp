@@ -61,7 +61,7 @@ namespace Scripting
         /** Get number of challenges that were completed at any difficulty */
         int getCompletedChallengesCount()
         {
-            if (UserConfigParams::m_everything_unlocked)
+            if (UserConfigParams::m_unlock_everything > 1)
                 return getChallengeCount();
 
             return ::Track::getCurrentTrack()->getNumOfCompletedChallenges();
@@ -86,7 +86,7 @@ namespace Scripting
         // --------------------------------------------------------------------
         bool isChallengeUnlocked(std::string* challenge_name)
         {
-            if (UserConfigParams::m_everything_unlocked)
+            if (UserConfigParams::m_unlock_everything > 0)
                 return true;
 
             const ChallengeData* challenge =
@@ -100,8 +100,15 @@ namespace Scripting
             }
 
             const unsigned int val = challenge->getNumTrophies();
-            bool shown = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
-            return shown;
+// Android may have less challenges available than the main version
+#ifdef ANDROID
+                bool enough_challenges = true;
+#else
+                const unsigned int val2 = challenge->getNumChallenges();
+                bool enough_challenges = (PlayerManager::getCurrentPlayer()->getNumCompletedChallenges() >= val2);
+#endif
+            bool unlocked = enough_challenges && (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+            return unlocked;
         }   // isChallengeUnlocked
 
         // --------------------------------------------------------------------

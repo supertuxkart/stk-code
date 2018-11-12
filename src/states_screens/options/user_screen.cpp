@@ -22,6 +22,8 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -96,6 +98,15 @@ void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
 }   // setOnline
 
 // ----------------------------------------------------------------------------
+void BaseUserScreen::beforeAddingWidget()
+{
+#ifndef SERVER_ONLY
+    getWidget<IconButtonWidget>("default_kart_color")
+        ->setVisible(CVS->isGLSL());
+#endif
+}   // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
 /** Initialises the user screen. Searches for all players to fill the 
  *  list of users with their icons, and initialises all widgets for the
  *  current user (e.g. the online flag etc).
@@ -155,7 +166,8 @@ void BaseUserScreen::init()
     getWidget<IconButtonWidget>("new_user")->setActive(!in_game);
     getWidget<IconButtonWidget>("rename")->setActive(!in_game);
     getWidget<IconButtonWidget>("delete")->setActive(!in_game);
-    getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
+    if (getWidget<IconButtonWidget>("default_kart_color")->isVisible())
+        getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
 
     m_new_registered_data = false;
     if (m_auto_login)
@@ -192,7 +204,7 @@ EventPropagation BaseUserScreen::filterActions(PlayerAction action,
     Input::InputType type,
     int playerId)
 {
-    if (action == PA_MENU_SELECT)
+    if (action == PA_MENU_SELECT && !ScreenKeyboard::shouldUseScreenKeyboard())
     {
         if ((m_username_tb != NULL && m_username_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
@@ -229,6 +241,9 @@ void BaseUserScreen::selectUser(int index)
         // Delete a password that might have been typed for another user
         m_password_tb->setText("");
     }
+    
+    getWidget<CheckBoxWidget>("remember-user")->setState(
+        profile->rememberPassword());
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
@@ -243,8 +258,6 @@ void BaseUserScreen::selectUser(int index)
     // Now last use was with online --> Display the saved data
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
-    getWidget<CheckBoxWidget>("remember-user")->setState(
-        profile->rememberPassword());
     m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
     // And make the password invisible if the session is saved (i.e

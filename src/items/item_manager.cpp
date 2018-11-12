@@ -192,9 +192,8 @@ ItemManager::ItemManager()
 void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
 {
     for(unsigned int i=ItemState::ITEM_FIRST; i<ItemState::ITEM_COUNT; i++)
-        m_switch_to[i]=(ItemState::ItemType)stk_config->m_switch_items[i];
+        m_switch_to[i]=(ItemState::ItemType)switch_items[i];
 }   // setSwitchItems
-
 
 //-----------------------------------------------------------------------------
 /** Destructor. Cleans up all items and meshes stored.
@@ -226,13 +225,15 @@ unsigned int ItemManager::insertItem(Item *item)
     // previously deleted entry, otherwise at the end.
     int index = -1;
     for(index=(int)m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
-
-    if(index==-1) index = (int)m_all_items.size();
-
-    if(index<(int)m_all_items.size())
-        m_all_items[index] = item;
-    else
+    if (index == -1)
+    {
+        index = (int)m_all_items.size();
         m_all_items.push_back(item);
+    }
+    else
+    {
+        m_all_items[index] = item;
+    }
     item->setItemId(index);
 
     // Now insert into the appropriate quad list, if there is a quad list
@@ -270,14 +271,29 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
                                                         &hit_point,
                                                         &material_hit,
                                                         &normal);
-    // This can happen if the kart is 'over nothing' when dropping
-    // the bubble gum
-    if (!material_hit) return NULL;
 
-    normal.normalize();
+    // We will get no material if the kart is 'over nothing' when dropping
+    // the bubble gum. In most cases this means that the item does not need
+    // to be created (and we just return NULL). Only exception: if the server
+    // has sent a 'new item' event (which means its raycast found terrain),
+    // but the client does not have found a terrain (e.g. differences in
+    // position or more likely floating point differences). In this case, we
+    // must use the server position. In this and only this case xyz is not
+    // NULL (and then contains the server's position for the item).    
+    if (!material_hit && !xyz) return NULL;
 
-    pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
-
+    if (!material_hit)
+    {
+        // We are on a client which has received a new item event. Still
+        // create this item
+        normal.setValue(0, 1, 0);  // Arbitrary, we don't have a normal
+        pos = *xyz;
+    }
+    else
+    {
+        normal.normalize();
+        pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
+    }
 
     ItemState::ItemType mesh_type = type;
     if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
@@ -286,15 +302,12 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
     }
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type]);
-
-    if(kart != NULL) item->setParent(kart);
+                          m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
     insertItem(item);
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type],
-                       m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type);
     }
     return item;
 }   // dropNewItem
@@ -318,14 +331,13 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type]);
+                          m_item_lowres_mesh[mesh_type], /*prev_owner*/NULL);
 
     insertItem(item);
     if (m_switch_ticks >= 0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type],
-                       m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type);
     }
     return item;
 }   // placeItem
@@ -354,17 +366,9 @@ Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void ItemManager::collectedItem(Item *item, AbstractKart *kart)
+void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
 {
     assert(item);
-    // Spare tire karts don't collect items
-    if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
-    if( (item->getType() == ItemState::ITEM_BUBBLEGUM ||
-         item->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
-    {
-        // shielded karts can simply drive over bubble gums without any effect.
-        return;
-    }
     item->collected(kart);
     // Inform the world - used for Easter egg hunt
     World::getWorld()->collectedItem(kart, item);
@@ -390,10 +394,23 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     /** Disable item collection detection for debug purposes. */
     if(m_disable_item_collection) return;
 
+    // Spare tire karts don't collect items
+    if ( dynamic_cast<SpareTireAI*>(kart->getController()) ) return;
+
     for(AllItemTypes::iterator i =m_all_items.begin();
                                i!=m_all_items.end();  i++)
     {
-        if((!*i) || !(*i)->isAvailable()) continue;
+        // Ignore items that have been collected or are not available atm
+        if ((!*i) || !(*i)->isAvailable() || (*i)->isUsedUp()) continue;
+
+        // Shielded karts can simply drive over bubble gums without any effect
+        if ( kart->isShielded() &&
+             ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM      ||
+               (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK  ) )
+        {
+            continue;
+        }
+
 
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.
@@ -461,8 +478,8 @@ void ItemManager::update(int ticks)
         m_switch_ticks -= ticks;
         if(m_switch_ticks<0)
         {
-            for(AllItemTypes::iterator i =m_all_items.begin();
-                i!=m_all_items.end();  i++)
+            for(AllItemTypes::iterator i = m_all_items.begin();
+                                       i!= m_all_items.end();  i++)
             {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
@@ -502,7 +519,7 @@ void ItemManager::updateGraphics(float dt)
  *  items, and then frees the item itself.
  *  \param The item to delete.
  */
-void ItemManager::deleteItem(Item *item)
+void ItemManager::deleteItem(ItemState *item)
 {
     // First check if the item needs to be removed from the items-in-quad list
     if(m_items_in_quads)
@@ -524,12 +541,21 @@ void ItemManager::deleteItem(Item *item)
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain
- *  amount of time (as defined in stk_config.xml.
+ *  amount of time (as defined in stk_config.xml).
  */
 void ItemManager::switchItems()
 {
-    for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+    switchItemsInternal(m_all_items);
+}  // switchItems
+
+//-----------------------------------------------------------------------------
+/** Switches all items: boxes become bananas and vice versa for a certain
+ *  amount of time (as defined in stk_config.xml).
+ */
+void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
+{
+    for(AllItemTypes::iterator i  = all_items.begin();
+                               i != all_items.end();  i++)
     {
         if(!*i) continue;
 
@@ -547,10 +573,10 @@ void ItemManager::switchItems()
         if (new_type == (*i)->getType())
             continue;
         if(m_switch_ticks<0)
-            (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
+            (*i)->switchTo(new_type);
         else
             (*i)->switchBack();
-    }   // for m_all_items
+    }   // for all_items
 
     // if the items are already switched (m_switch_ticks >=0)
     // then switch back, and set m_switch_ticks to -1 to indicate

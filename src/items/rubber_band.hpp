@@ -22,6 +22,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <cinttypes>
 #include <memory>
 
 namespace SP
@@ -73,8 +74,8 @@ public:
     void updateGraphics(float dt);
     void update(int ticks);
     void hit(AbstractKart *kart_hit, const Vec3 *track_xyz=NULL);
-    RubberBandTo getRubberBandTo() const { return m_attached_state; }
-    void setRubberBandTo(RubberBandTo rbt) { m_attached_state = rbt; }
+    uint8_t get8BitState() const;
+    void set8BitState(uint8_t bit_state);
     void remove();
 };   // RubberBand
 #endif

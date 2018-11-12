@@ -249,6 +249,10 @@ void CAnimatedMeshSceneNode::OnAnimate(u32 timeMs)
 	LastTimeMs = timeMs;
 
 	IAnimatedMeshSceneNode::OnAnimate(timeMs);
+
+	// For up-to-date current frame bone-child attachment
+	for (u32 n=0;n<JointChildSceneNodes.size();++n)
+		JointChildSceneNodes[n]->recursiveUpdateAbsolutePosition();
 }
 
 

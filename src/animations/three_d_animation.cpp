@@ -70,8 +70,15 @@ ThreeDAnimation::~ThreeDAnimation()
 // ----------------------------------------------------------------------------
 /** Updates position and rotation of this model. Called once per time step.
  */
-void ThreeDAnimation::updateWithWorldTicks()
+void ThreeDAnimation::updateWithWorldTicks(bool has_physics)
 {
+    const bool track_object_with_physics =
+        m_object->getPhysicalObject() != nullptr;
+
+    if ((has_physics && !track_object_with_physics) ||
+        (!has_physics && track_object_with_physics))
+        return;
+
     Vec3 xyz   = m_object->getPosition();
     Vec3 scale = m_object->getScale();
 

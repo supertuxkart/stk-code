@@ -542,11 +542,16 @@ void ClientLobby::connectionAccepted(Event* event)
     // ========
     Log::info("ClientLobby", "The server accepted the connection.");
 
-    // I18N: Message shown in network lobby to tell user that
-    // player name is clickable
-    core::stringw msg = _("Press player name in the list for player management"
-        " and ranking information.");
-    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+    static bool shown_msg = false;
+    if (!shown_msg)
+    {
+        shown_msg = true;
+        // I18N: Message shown in network lobby to tell user that
+        // player name is clickable
+        core::stringw msg = _("Press player name in the list for player"
+            " management and ranking information.");
+        MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+    }
 
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
@@ -671,6 +676,7 @@ void ClientLobby::updatePlayerList(Event* event)
     unsigned player_count = data.getUInt8();
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
         int, KartTeam> > players;
+    core::stringw total_players;
     for (unsigned i = 0; i < player_count; i++)
     {
         std::tuple<uint32_t, uint32_t, uint32_t, core::stringw, int,
@@ -679,6 +685,7 @@ void ClientLobby::updatePlayerList(Event* event)
         std::get<1>(pl) = data.getUInt32();
         std::get<2>(pl) = data.getUInt8();
         data.decodeStringW(&std::get<3>(pl));
+        total_players += std::get<3>(pl);
         bool is_peer_waiting_for_game = data.getUInt8() == 1;
         bool is_peer_server_owner = data.getUInt8() == 1;
         // icon to be used, see NetworkingLobby::loadedFromFile
@@ -692,6 +699,13 @@ void ClientLobby::updatePlayerList(Event* event)
         std::get<5>(pl) = (KartTeam)data.getUInt8();
         players.push_back(pl);
     }
+
+    // Notification sound for new player
+    if (!m_total_players.empty() &&
+        total_players.size() > m_total_players.size())
+        SFXManager::get()->quickSound("energy_bar_full");
+    m_total_players = total_players;
+
     NetworkingLobby::getInstance()->updatePlayers(players);
 }   // updatePlayerList
 
@@ -794,6 +808,7 @@ void ClientLobby::connectionRefused(Event* event)
  */
 void ClientLobby::startGame(Event* event)
 {
+    World::getWorld()->setPhase(WorldStatus::SERVER_READY_PHASE);
     uint64_t start_time = event->data().getUInt64();
     joinStartGameThread();
     m_start_game_thread = std::thread([start_time, this]()
@@ -861,6 +876,7 @@ void ClientLobby::startSelection(Event* event)
                 ->createActivePlayer(std::get<1>(p), std::get<0>(p));
         }
         input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        TracksScreen::getInstance()->setQuitServer();
         TracksScreen::getInstance()->setNetworkTracks();
         TracksScreen::getInstance()->push();
     }

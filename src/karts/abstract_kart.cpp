@@ -72,8 +72,11 @@ AbstractKart::AbstractKart(const std::string& ident,
 AbstractKart::~AbstractKart()
 {
     delete m_kart_model;
-    if(m_kart_animation)
+    if (m_kart_animation)
+    {
+        m_kart_animation->handleResetRace();
         delete m_kart_animation;
+    }
 }   // ~AbstractKart
 
 // ----------------------------------------------------------------------------
@@ -82,8 +85,9 @@ void AbstractKart::reset()
     // important to delete animations before calling reset, as some animations
     // set the kart velocity in their destructor (e.g. cannon) which "reset"
     // can then cancel. See #2738
-    if(m_kart_animation)
+    if (m_kart_animation)
     {
+        m_kart_animation->handleResetRace();
         delete m_kart_animation;
         m_kart_animation = NULL;
     }

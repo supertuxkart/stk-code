@@ -326,7 +326,11 @@ namespace Online
             setProgress(-1.0f);
 
         Request::afterOperation();
-        curl_easy_cleanup(m_curl_session);
+        if (m_curl_session)
+        {
+            curl_easy_cleanup(m_curl_session);
+            m_curl_session = NULL;
+        }
     }   // afterOperation
 
     // ------------------------------------------------------------------------

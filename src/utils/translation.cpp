@@ -35,7 +35,7 @@
 #include <cwchar>
 #include <fstream>
 #include <iostream>
-#include <vector>
+#include <thread>
 
 #if ENABLE_BIDI
 #  include <fribidi/fribidi.h>
@@ -443,6 +443,7 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 #else
     if (isRTLText(in_ptr))
     {
+        std::lock_guard<std::mutex> lock(m_fribidized_mutex);
         // Test if this string was already fribidized
         std::map<const irr::core::stringw, const irr::core::stringw>::const_iterator
             found = m_fribidized_strings.find(in_ptr);
@@ -543,25 +544,14 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     const std::string& original_t = (context == NULL ?
                                      m_dictionary.translate(original) :
                                      m_dictionary.translate_ctxt(context, original));
-
-    if (original_t == original)
-    {
-        static irr::core::stringw converted_string;
-        converted_string = StringUtils::utf8ToWide(original);
-
-#if TRANSLATE_VERBOSE
-        std::wcout << L"  translation : " << converted_string << std::endl;
-#endif
-        return converted_string.c_str();
-    }
-
     // print
     //for (int n=0;; n+=4)
+    std::lock_guard<std::mutex> lock(m_gettext_mutex);
 
-    static core::stringw original_tw;
-    original_tw = StringUtils::utf8ToWide(original_t);
+    static std::map<std::thread::id, core::stringw> original_tw;
+    original_tw[std::this_thread::get_id()] = StringUtils::utf8ToWide(original_t);
 
-    const wchar_t* out_ptr = original_tw.c_str();
+    const wchar_t* out_ptr = original_tw.at(std::this_thread::get_id()).c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
@@ -595,9 +585,8 @@ const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* 
  */
 const wchar_t* Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
 {
-    static core::stringw str_buffer;
-
 #ifdef SERVER_ONLY
+    static core::stringw str_buffer;
     str_buffer = StringUtils::utf8ToWide(singular);
     return str_buffer.c_str();
 
@@ -607,8 +596,12 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    str_buffer = StringUtils::utf8ToWide(res);
-    const wchar_t* out_ptr = str_buffer.c_str();
+    std::lock_guard<std::mutex> lock(m_ngettext_mutex);
+
+    static std::map<std::thread::id, core::stringw> str_buffer;
+    str_buffer[std::this_thread::get_id()] = StringUtils::utf8ToWide(res);
+
+    const wchar_t* out_ptr = str_buffer.at(std::this_thread::get_id()).c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE

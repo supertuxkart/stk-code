@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row">
+        <!-- The achievement's name is filled in the header at runtime -->
+        <header id="title" width="100%" align="center" text_align="center"/>
+
+        <label id="description" width="100%" proportion="2" align="center"
+               text_align="center" word_wrap="true" text=""/>
+
+        <div width="100%" proportion="2" layout="vertical-row">
+            <div width="100%" height="100%" layout="horizontal-row">
+                <div width="66%" height="100%" layout="vertical-row">
+                    <spacer width="20" proportion="1"/>
+                    <label width="100%" align="center"
+                           text_align="center" I18N="Objective shown in achievement dialog" text="Goal"/>
+                    <spacer width="20" proportion="1"/>
+                    <label id="main-goal-description" width="100%" align="center"
+                           text_align="center" word_wrap="true" text=""/>
+                    <spacer width="20" proportion="2"/>
+                </div>
+                <div width="33%" height="100%" layout="vertical-row">
+                    <spacer width="20" proportion="1"/>
+                    <label width="100%" align="center"
+                           text_align="center" I18N="Progress shown in achievement dialog" text="Progress"/>
+                    <spacer width="20" proportion="1"/>
+                    <label id="main-goal-progress" width="100%" align="center"
+                           text_align="center" word_wrap="true" text=""/>
+                    <spacer width="20" proportion="2"/>
+                </div>
+            </div>
+        </div>
+
+        <box width="100%" proportion="3" align="center" layout="vertical-row">
+            <list id="progress-tree" x="0" y="0" width="100%" height="100%" word_wrap="true"/>
+        </box>
+
+        <buttonbar id="options" width="100%" height="14%" align="center">
+            <icon-button id="ok" width="128" height="128"
+                         icon="gui/icons/green_check.png" text="OK"
+                         label_location="bottom"/>
+        </buttonbar>
+        <spacer width="20" height="3%" />
+    </div>
+</stkgui>

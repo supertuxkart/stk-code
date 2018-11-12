@@ -91,9 +91,9 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 //-----------------------------------------------------------------------------
 /** Called when a battle is restarted.
  */
-void ThreeStrikesBattle::reset()
+void ThreeStrikesBattle::reset(bool restart)
 {
-    WorldWithRank::reset();
+    WorldWithRank::reset(restart);
 
     float next_spawn_time =
         race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :

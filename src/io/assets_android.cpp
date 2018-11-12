@@ -368,7 +368,14 @@ bool AssetsAndroid::extractDir(std::string dir_name)
         return true;
     }
 
-    if (!m_file_manager->checkAndCreateDirectoryP(output_dir))
+    bool dir_created = m_file_manager->checkAndCreateDirectory(output_dir);
+    
+    if (!dir_created)
+    {
+        dir_created = m_file_manager->checkAndCreateDirectoryP(output_dir);
+    }
+    
+    if (!dir_created)
     {
         Log::warn("AssetsAndroid", "Couldn't create %s directory",
                   output_dir.c_str());
@@ -627,6 +634,29 @@ std::string AssetsAndroid::getDataPath()
     }
     
     return data_path;
+#endif
+
+    return "";
+}
+
+//-----------------------------------------------------------------------------
+/** Get a path for internal lib directory
+ *  \return Path for internal lib directory or empty string when failed
+ */
+std::string AssetsAndroid::getLibPath()
+{
+#ifdef ANDROID
+    AndroidApplicationInfo application_info = 
+        CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+
+    std::string lib_path = application_info.native_lib_dir;
+
+    if (access(lib_path.c_str(), R_OK) != 0)
+    {
+        lib_path = "";
+    }
+
+    return lib_path;
 #endif
 
     return "";

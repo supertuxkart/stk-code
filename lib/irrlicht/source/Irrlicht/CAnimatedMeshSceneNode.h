@@ -170,6 +170,7 @@ namespace scene
 		virtual void removeAllAnimationSet() { m_animation_set.clear(); }
 		virtual void useAnimationSet(u32 set_num);
 		virtual void setFrameLoopOnce(s32 begin, s32 end);
+		virtual core::array<u32>& getAnimationSetFrames() { return m_animation_set; }
 	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh

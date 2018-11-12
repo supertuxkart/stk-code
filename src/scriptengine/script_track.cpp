@@ -31,6 +31,7 @@
 #include "modes/world.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "scriptengine/aswrappedcall.hpp"
+#include "scriptengine/scriptarray.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
@@ -71,6 +72,20 @@ namespace Scripting
         {
             return ::Track::getCurrentTrack()->getTrackObjectManager()
                           ->getTrackObject(*libraryInstance, *objID);
+        }
+
+        CScriptArray* getTrackObjectList()
+        {
+            std::vector<TrackObject*>& tl = ::Track::getCurrentTrack()
+                ->getTrackObjectManager()->getObjects().m_contents_vector;
+            asIScriptContext* ctx = asGetActiveContext();
+            asIScriptEngine* engine = ctx->GetEngine();
+            asITypeInfo* t = engine->GetTypeInfoByDecl("array<Track::TrackObject@>");
+            CScriptArray* script_array = CScriptArray::Create(t, tl.size());
+            for (unsigned int i = 0; i < tl.size(); ++i)
+                script_array->SetValue(i, &tl[i]);
+
+            return script_array;
         }
 
         /** Creates a trigger at the specified location */
@@ -288,12 +303,41 @@ namespace Scripting
                 return -1;
             }
 
-            /** Gets the animation set for a skeletal animation */
+            /** Gets the animation set id for a skeletal animation */
             int getAnimationSet(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
             {
                 if (memory)
                 {
                     return ((scene::IAnimatedMeshSceneNode*)(memory))->getAnimationSet();
+                }
+                return -1;
+            }
+
+            /** Gets the animation set frames for a skeletal animation */
+            CScriptArray* getAnimationSetFrames(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                asIScriptContext* ctx = asGetActiveContext();
+                asIScriptEngine* engine = ctx->GetEngine();
+                asITypeInfo* t = engine->GetTypeInfoByDecl("array<uint>");
+                if (memory)
+                {
+                    scene::IAnimatedMeshSceneNode* node =
+                        ((scene::IAnimatedMeshSceneNode*)(memory));
+                    core::array<u32>& f = node->getAnimationSetFrames();
+                    CScriptArray* script_array = CScriptArray::Create(t, f.size());
+                    for (unsigned int i = 0; i < f.size(); ++i)
+                        script_array->SetValue(i, &f[i]);
+
+                    return script_array;
+                }
+                return CScriptArray::Create(t, (unsigned)0);
+            }
+            /** Gets the animation set count for a skeletal animation */
+            int getAnimationSetNum(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    return ((scene::IAnimatedMeshSceneNode*)(memory))->getAnimationSetNum();
                 }
                 return -1;
             }
@@ -498,7 +542,11 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", 
                                                mp ? WRAP_FN(getTrackObject) : asFUNCTION(getTrackObject), 
                                                call_conv); assert(r >= 0);
-                                               
+
+            r = engine->RegisterGlobalFunction("array<TrackObject@>@ getTrackObjectList()",
+                                               mp ? WRAP_FN(getTrackObjectList) : asFUNCTION(getTrackObjectList),
+                                               call_conv); assert(r >= 0);
+
             r = engine->RegisterGlobalFunction("void exitRace()", 
                                                mp ? WRAP_FN(exitRace) : asFUNCTION(exitRace), 
                                                call_conv); assert(r >= 0);
@@ -584,6 +632,10 @@ namespace Scripting
                                              mp ? WRAP_MFN(::TrackObject, getName) : asMETHOD(::TrackObject, getName), 
                                              call_conv_thiscall); assert(r >= 0);
 
+            r = engine->RegisterObjectMethod("TrackObject", "string getID()",
+                                             mp ? WRAP_MFN(::TrackObject, getID) : asMETHOD(::TrackObject, getID),
+                                             call_conv_thiscall); assert(r >= 0);
+
             // PhysicalObject
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattenKartObject()", 
                                              mp ? WRAP_MFN(PhysicalObject, isFlattenKartObject) : asMETHOD(PhysicalObject, 
@@ -613,7 +665,15 @@ namespace Scripting
             r = engine->RegisterObjectMethod("Mesh", "int getAnimationSet()", 
                                              mp ? WRAP_OBJ_LAST(Mesh::getAnimationSet) : asFUNCTION(Mesh::getAnimationSet), 
                                              call_conv_objlast); assert(r >= 0);
-                                             
+
+            r = engine->RegisterObjectMethod("Mesh", "array<uint>@ getAnimationSetFrames()",
+                                             mp ? WRAP_OBJ_LAST(Mesh::getAnimationSetFrames) : asFUNCTION(Mesh::getAnimationSetFrames),
+                                             call_conv_objlast); assert(r >= 0);
+
+            r = engine->RegisterObjectMethod("Mesh", "int getAnimationSetNum()",
+                                             mp ? WRAP_OBJ_LAST(Mesh::getAnimationSetNum) : asFUNCTION(Mesh::getAnimationSetNum),
+                                             call_conv_objlast); assert(r >= 0);
+
             r = engine->RegisterObjectMethod("Mesh", "void useAnimationSet(int set_num)", 
                                              mp ? WRAP_OBJ_LAST(Mesh::useAnimationSet) : asFUNCTION(Mesh::useAnimationSet), 
                                              call_conv_objlast); assert(r >= 0);

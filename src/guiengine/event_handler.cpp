@@ -202,7 +202,8 @@ bool EventHandler::OnEvent (const SEvent &event)
              event.EventType == EET_TOUCH_INPUT_EVENT ||
              event.EventType == EET_KEY_INPUT_EVENT   ||
              event.EventType == EET_JOYSTICK_INPUT_EVENT ||
-             event.EventType == EET_ACCELEROMETER_EVENT)
+             event.EventType == EET_ACCELEROMETER_EVENT ||
+             event.EventType == EET_GYROSCOPE_EVENT)
     {
         // Remember the mouse position
         if (event.EventType == EET_MOUSE_INPUT_EVENT &&
@@ -351,7 +352,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
         case PA_FIRE:
         case PA_MENU_SELECT:
-            if (pressedDown && !isWithinATextBox())
+            if (pressedDown)
             {
                 Widget* w = GUIEngine::getFocusForPlayer(playerID);
                 if (w == NULL) break;

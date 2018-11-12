@@ -201,7 +201,8 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
  *  \param type The type of projectile checked
 */
 int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
-                                         float radius, PowerupManager::PowerupType type)
+                                         float radius, PowerupManager::PowerupType type,
+                                         bool exclude_owned)
 {
     float r2 = radius * radius;
     int projectile_count = 0;
@@ -212,6 +213,9 @@ int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
             continue;
         if (i->second->getType() == type)
         {
+            if (exclude_owned && (i->second->getOwner() == kart))
+                continue;
+
             float dist2 = i->second->getXYZ().distance2(kart->getXYZ());
             if (dist2 < r2)
             {
@@ -310,3 +314,4 @@ std::shared_ptr<Rewinder>
             return nullptr;
     }
 }   // addProjectileFromNetworkState
+

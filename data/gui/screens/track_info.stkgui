@@ -81,7 +81,7 @@
                                      wrap_around="true" />
                         </div>
                         <spacer width="3%"/>
-                        <label id="lap-text" proportion="4" I18N="In the track info screen" text="Number of laps" text_align="left"/>
+                        <label id="lap-text" proportion="3" I18N="In the track info screen" text="Number of laps" text_align="left"/>
                     </div>
                     <spacer width="1" height="2%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
@@ -90,7 +90,7 @@
                                      wrap_around="true" />
                         </div>
                         <spacer width="3%"/>
-                        <label id="ai-text" proportion="4" I18N="In the track info screen" text="Number of AI karts" text_align="left"/>
+                        <label id="ai-text" proportion="3" I18N="In the track info screen" text="Number of AI karts" text_align="left"/>
                     </div>
                     <spacer width="1" height="2%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
@@ -100,7 +100,7 @@
                             </div>
                         </div>
                         <spacer width="3%"/>
-                        <label id="option-text" proportion="4" I18N="In the track info screen" text_align="left"/>
+                        <label id="option-text" proportion="3" I18N="In the track info screen" text_align="left"/>
                     </div>
                     <spacer width="1" height="2%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
@@ -110,7 +110,7 @@
                             </div>
                         </div>
                         <spacer width="3%"/>
-                        <label id="record-race-text" proportion="4" I18N="In the track info screen" text="Record the race for ghost replay" text_align="left"/>
+                        <label id="record-race-text" proportion="3" I18N="In the track info screen" text="Record the race for ghost replay" text_align="left"/>
                     </div>
                 </box><!-- Race options box -->
             </div>

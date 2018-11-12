@@ -24,6 +24,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/cannon_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -91,9 +92,9 @@ LinearWorld::~LinearWorld()
  *  structures that keep track of position and distance long track of
  *  all karts.
  */
-void LinearWorld::reset()
+void LinearWorld::reset(bool restart)
 {
-    WorldWithRank::reset();
+    WorldWithRank::reset(restart);
     m_finish_timeout = std::numeric_limits<float>::max();
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
@@ -240,7 +241,9 @@ void LinearWorld::updateTrackSectors()
 
         // Nothing to do for karts that are currently being
         // rescued or eliminated
-        if(kart->getKartAnimation()) continue;
+        if(kart->getKartAnimation() &&
+           !dynamic_cast<CannonAnimation*>(kart->getKartAnimation()))
+            continue;
         // If the kart is off road, and 'flying' over a reset plane
         // don't adjust the distance of the kart, to avoid a jump
         // in the position of the kart (e.g. while falling the kart
@@ -273,7 +276,10 @@ void LinearWorld::updateGraphics(float dt)
         m_last_lap_sfx_playing = false;
     }
 
-    if (!GUIEngine::ModalDialog::isADialogActive())
+    const GUIEngine::GameState gamestate = StateManager::get()->getGameState();
+    
+    if (gamestate == GUIEngine::GAME && 
+        !GUIEngine::ModalDialog::isADialogActive())
     {
         const unsigned int kart_amount = getNumKarts();
         for (unsigned int i = 0; i<kart_amount; i++)
@@ -375,7 +381,8 @@ void LinearWorld::newLap(unsigned int kart_index)
         if (lap_count > 1)
         {
             m_race_gui->addMessage(_("Final lap!"), kart,
-                               3.0f, GUIEngine::getSkin()->getColor("font::normal"), true);
+                               3.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
+                               true /* big font */, true /* outline */);
         }
         if(!m_last_lap_sfx_played && lap_count > 1)
         {
@@ -402,9 +409,9 @@ void LinearWorld::newLap(unsigned int kart_index)
     else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
              kart_info.m_finished_laps+1 < lap_count)
     {
-        m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1),
-                               kart, 3.0f, GUIEngine::getSkin()->getColor("font::normal"),
-                               true);
+        m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1), kart,
+                               2.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
+                               true /* big font */, true /* outline */);
     }
 
     // The race positions must be updated here: consider the situation where
@@ -495,10 +502,10 @@ void LinearWorld::newLap(unsigned int kart_index)
             _C("fastest_lap", "%s by %s", s.c_str(), kart_name);
 
         m_race_gui->addMessage(m_fastest_lap_message, NULL,
-                               3.0f, video::SColor(255, 255, 255, 255), false);
+                               4.0f, video::SColor(255, 255, 255, 255), false);
 
         m_race_gui->addMessage(_("New fastest lap"), NULL,
-                               3.0f, video::SColor(255, 255, 255, 255), false);
+                               4.0f, video::SColor(255, 255, 255, 255), false);
 
     } // end if new fastest lap
 

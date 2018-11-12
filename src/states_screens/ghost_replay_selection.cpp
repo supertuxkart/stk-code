@@ -52,9 +52,15 @@ GhostReplaySelection::~GhostReplaySelection()
 void GhostReplaySelection::tearDown()
 {
     m_replay_list_widget->setIcons(NULL);
+}
+
+// ----------------------------------------------------------------------------
+void GhostReplaySelection::unloaded()
+{
     delete m_icon_bank;
     m_icon_bank = NULL;
-}
+}   // unloaded
+
 
 // ----------------------------------------------------------------------------
 /** Triggers a refresh of the replay file list.
@@ -117,6 +123,24 @@ void GhostReplaySelection::loadedFromFile()
     m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
     m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
     m_active_mode_is_linear = true;
+    
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
+
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+    }
+
+    video::ITexture* kart_not_found = irr_driver->getTexture(
+                file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
+
+    m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
+
+    video::ITexture* lock = irr_driver->getTexture( file_manager->getAsset(
+                                        FileManager::GUI_ICON, "gui_lock.png"));
+
+    m_icon_lock = m_icon_bank->addTextureAsSprite(lock);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -147,24 +171,6 @@ void GhostReplaySelection::init()
 {
     Screen::init();
     m_cur_difficulty = race_manager->getDifficulty();
-
-    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
-
-    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
-    {
-        const KartProperties* prop = kart_properties_manager->getKartById(i);
-        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
-    }
-
-    video::ITexture* kart_not_found = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
-                                                              "main_help.png"         ));
-
-    m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
-
-    video::ITexture* lock = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
-                                                              "gui_lock.png"         ));
-
-    m_icon_lock = m_icon_bank->addTextureAsSprite(lock);
 
     int icon_height = getHeight()/24;
     // 128 is the height of the image file

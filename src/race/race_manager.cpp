@@ -782,6 +782,7 @@ void RaceManager::exitRace(bool delete_world)
         }
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
 
+        bool some_human_player_well_ranked = false;
         bool some_human_player_won = false;
         const unsigned int kart_status_count = (unsigned int)m_kart_status.size();
 
@@ -805,7 +806,9 @@ void RaceManager::exitRace(bool delete_world)
                 if (m_kart_status[i].m_kart_type == KT_PLAYER ||
                     m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
                 {
-                    some_human_player_won = true;
+                    some_human_player_well_ranked = true;
+                    if (rank == 0)
+                        some_human_player_won = true;
                 }
             }
             else if (rank >= loserThreshold)
@@ -830,13 +833,14 @@ void RaceManager::exitRace(bool delete_world)
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
 
-        if (some_human_player_won)
+        if (some_human_player_well_ranked)
         {
             race_manager->startSingleRace("gpwin", 999,
                                   race_manager->raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
             scene->setKarts(winners);
+            scene->setPlayerWon(some_human_player_won);
         }
         else
         {
@@ -919,7 +923,7 @@ void RaceManager::rerunRace()
         m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
     }
-    World::getWorld()->reset();
+    World::getWorld()->reset(true /* restart */);
 }   // rerunRace
 
 //-----------------------------------------------------------------------------

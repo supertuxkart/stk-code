@@ -1,69 +1,178 @@
 <?xml version="1.0"?>
+<!-- List of counters the achievements can query.
+     The format to use is <goal type="name_of_the_counter" value="X"/>
+     where X is the desired value of the counter ;e.g. <won_races value="10"/>
+
+     WARNING!  If a goal node is malformed, it is ignored.
+    ___________________________________________________________________________
+
+    S - Logical relations and subgoals
+
+        When you define multiple goals, the achievement will be completed
+        if they are all met, but they don't need to be met at once.
+        To have more possibilities, you can define subgoals and the
+        logical relationship they need to meet.
+
+        The available relations are :
+
+        AND // The subgoals have to be met, but not necessarily at once
+        AND-AT-ONCE // The subgoals have to be met at the same time.
+        OR // One of the subgoal has to be met
+        SUM // The subgoals sum must reach a certain (positive !) number.
+
+        The format to use for AND, AND-AT-ONCE and OR is :
+        <goal type="AND">
+            <goal type="name_of_counter" value="X"/>
+            <goal type="name_of_counter" value="Y"/>
+        </goal>
+
+        For SUM, it is :
+        <goal type="SUM" value="X">
+            <goal type="name_of_counter" operation="+"/>
+            <goal type="name_of_counter" operation="-"/>
+        </goal>
+        With the value of operation (+ or -) defining if the subgoal is added
+        or substracted from the total.
+
+        Sub-goals can also have their own sub-goals,
+        however a AND, AND-AT-ONCE or OR can't have a SUM goal for parent.
+    ___________________________________________________________________________
+
+    I - Won races (normal, time-trial, FTL) counters.
+        Require to beat at least 3 AIs in any difficulty.
+
+        won-races : total number of races won
+        won-normal-races
+        won-tt-races
+        won-ftl-races
+
+    II - Consecutive won races counters.
+        These counters are reset if a race is restarted,
+        or if a race is lost even if the AI count to increment
+        is not met.
+
+        cons-won-races
+        cons-won-races-hard // This requires 5+ AIs and expert+ difficulty
+
+    III - Race started and finished counters, by difficulty (linear races only)
+        easy-started
+        easy-finished
+        medium-started
+        medium-finished
+        hard-started
+        hard-finished
+        best-started
+        best-finished
+
+    IV - Race started and finished counters, by game mode.
+        Races against a ghost are counted both in the base mode counter,
+        either time-trial or egg hunt, and in their own specific counter.
+
+        normal-started
+        normal-finished
+        tt-started
+        tt-finished
+        ftl-started
+        ftl-finished
+        three-strikes-started
+        three-strikes-finished
+        soccer-started
+        soccer-finished
+        egg-hunt-started
+        egg-hunt-finished
+        with-ghost-started
+        with-ghost-finished
+        ctf-started
+        ctf-finished
+        ffa-started
+        ffa-finished
+        
+    IV - Counters related to powerup use. The hit counters reference how many
+        times the player kart has hit other karts, not how often it was hit.
+
+        powerup-used
+        powerup-used-1race
+        bowling-hit
+        bowling-hit-1race
+        swatter-hit
+        swatter-hit-1race
+        all-hits // hits from bowling ball, cake and swatter
+        all-hits-1race
+        hit-same-kart-1race
+
+    V - Counters related to other race events.
+
+        banana // counts how many banana the player's kart has hit
+        banana-1race
+        skidding
+        skidding-1race
+        skidding-1lap
+
+    VI - Per-track counters (at least one track reach the value)
+
+        race-started
+        race-finished
+        race-won
+        race-finished-reverse
+        race-finished-alone
+        less-laps
+        more-laps
+        twice-laps
+        egg-hunt-started
+        egg-hunt-finished
+
+    VII - Per-track counters (all non-addon tracks reach the value)
+
+        race-started-all
+        race-finished-all
+        race-won-all
+        race-finished-reverse-all
+        race-finished-alone-all
+        less-laps-all
+        more-laps-all
+        twice-laps-all
+
+        // For egg hunts, all non-addon tracks with egg hunt support
+        // must reach the value
+        egg-hunt-started-all
+        egg-hunt-finished-all    
+        -->
 <achievements>
-  <achievement id="1" check-type="all-at-least" reset-type="never"
-               name="Christoffel Columbus" description="Play every official track at least once." >
-      <candela_city goal="1"/>
-      <cocoa_temple goal="1"/>
-      <cornfield_crossing goal="1"/>
-      <fortmagma goal="1"/>
-      <gran_paradiso_island goal="1"/>
-      <greenvalley goal="1"/>
-      <hacienda goal="1"/>
-      <lighthouse goal="1"/>
-      <mansion goal="1"/>
-      <mines goal="1"/>
-      <minigolf goal="1"/>
-      <olivermath goal="1"/>
-      <sandtrack goal="1"/>
-      <scotland goal="1"/>
-      <snowmountain goal="1"/>
-      <snowtuxpeak goal="1"/>
-      <stk_enterprise goal="1"/>
-      <abyss goal="1"/>
-      <xr591 goal="1"/>
-      <zengarden goal="1"/>      
-      <volcano_island goal="1"/>
-  </achievement>
-  <achievement id="2" check-type="all-at-least" reset-type="never"
-               name="Strike!" description="Hit 10 karts with a bowling-ball.">
-    <ball goal="10"/>
-  </achievement>
-  <achievement id="3" check-type="one-at-least" reset-type="race"
-               name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
-    <hit goal="5"/>
-  </achievement>
-  <achievement id="4" check-type="all-at-least" reset-type="race"
-               name="Marathoner" description="Make a race with 5 laps or more.">
-    <laps goal="5"/>
-  </achievement>
-  <achievement id="5" check-type="all-at-least" reset-type="lap"
-               name="Skid-row" description="Make 5 skidding in a single lap.">
-    <skidding goal="5"/>
-  </achievement>
-  <achievement id="6" check-type="all-at-least" reset-type="never"
-               name="Gold driver" description="Win against at least 3 opponents in all single player modes.">
-    <standard goal="1"/>
-    <std_timetrial goal="1"/>
-    <follow_leader goal="1"/>
-    <opponents goal="3"/>
-  </achievement>
-  <achievement id="7" check-type="all-at-least" reset-type="race"
-               name="Powerup Love" description="Use 10 or more powerups in a race.">
-    <poweruplover goal="10"/>
-  </achievement>
-  <achievement id="8" check-type="all-at-least" reset-type="never"
-               name="Unstoppable" description="Win 5 single races in a row.">
-    <wins goal="5"/>
-  </achievement>
-  <achievement id="9" check-type="all-at-least" reset-type="race"
-               name="Banana Lover" description="Collect at least 5 bananas in one race.">
-    <banana goal="5"/>
-  </achievement>
-  <achievement id="10" secret="yes" check-type="all-at-least" reset-type="race"
-               name="It's secret" description="Really ... a secret.">
-  </achievement>
-  <achievement id="11" check-type="all-at-least" reset-type="race"
-               name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race.">
-    <swatter goal="5"/>
-  </achievement>
+    <achievement id="1" name="Christoffel Columbus" description="Play every official track at least once." >
+        <goal type="race-finished-all" value="1"/>
+    </achievement>
+    <achievement id="2" name="Strike!" description="Hit 10 karts with a bowling-ball.">
+        <goal type="bowling-hit" value="10"/>
+    </achievement>
+    <achievement id="3" name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
+        <goal type="hit-same-kart-1race" value="5"/>
+    </achievement>
+    <achievement id="4" name="Marathoner" description="Finish a race with at least twice the track's default lap number.">
+        <goal type="twice-laps" value="1"/>
+    </achievement>
+    <achievement id="5" name="Skid-row" description="Make 5 skidding in a single lap.">
+        <goal type="skidding-1lap" value="5"/>
+    </achievement>
+    <achievement id="6" name="Gold driver" description="Win against at least 3 AIs in normal race, time-trial, and follow the leader.">
+        <goal type="won-normal-races" value="1"/>
+        <goal type="won-tt-races" value="1"/>
+        <goal type="won-ftl-races" value="1"/>
+    </achievement>
+    <achievement id="7" name="Powerup Love" description="Use 10 or more powerups in a race.">
+        <goal type="powerup-used-1race" value="10"/>
+    </achievement>
+    <achievement id="8" name="Unstoppable" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
+        <goal type="cons-won-races" value="5"/>
+    </achievement>
+    <achievement id="9" name="Banana Lover" description="Collect at least 5 bananas in one race.">
+        <goal type="banana-1race" value="5"/>
+    </achievement>
+    <achievement id="10" name="It's secret" description="Really ... a secret." secret="yes">
+    </achievement>
+    <achievement id="11" name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race.">
+        <goal type="swatter-hit-1race" value="5"/>
+    </achievement>
+    <achievement id="12" name="Beyond Luck" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
+        <goal type="cons-won-races-hard" value="10"/>
+    </achievement>
 </achievements>

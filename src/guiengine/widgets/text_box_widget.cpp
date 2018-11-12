@@ -17,8 +17,8 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
@@ -197,3 +197,15 @@ void TextBoxWidget::setActive(bool active)
 }   // setActive
 
 // -----------------------------------------------------------------------------
+
+EventPropagation TextBoxWidget::onActivationInput(const int playerID)
+{
+    if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
+    {
+        ((MyCGUIEditBox*)m_element)->openScreenKeyboard();
+    }
+
+    // The onWidgetActivated() wasn't used at all before, so always block
+    // event to avoid breaking something
+    return EVENT_BLOCK;
+}

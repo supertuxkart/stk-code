@@ -58,9 +58,9 @@ void FreeForAll::init()
 // ----------------------------------------------------------------------------
 /** Called when a battle is restarted.
  */
-void FreeForAll::reset()
+void FreeForAll::reset(bool restart)
 {
-    WorldWithRank::reset();
+    WorldWithRank::reset(restart);
     if (race_manager->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
@@ -196,3 +196,14 @@ video::SColor FreeForAll::getColor(unsigned int kart_id) const
 {
     return GUIEngine::getSkin()->getColor("font::normal");
 }   // getColor
+
+// ----------------------------------------------------------------------------
+bool FreeForAll::getKartFFAResult(int kart_id) const
+{
+    // the kart(s) which has the top score wins
+    AbstractKart* k = getKartAtPosition(1);
+    if (!k)
+        return false;
+    int top_score = getKartScore(k->getWorldKartId());
+    return getKartScore(kart_id) == top_score;
+}   // getKartFFAResult

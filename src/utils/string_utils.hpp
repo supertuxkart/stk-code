@@ -26,6 +26,7 @@
 #include <vector>
 #include <sstream>
 #include <irrString.h>
+#include <IGUIFont.h>
 #include "utils/constants.hpp"
 #include "utils/types.hpp"
 #include "utils/log.hpp"
@@ -246,6 +247,11 @@ namespace StringUtils
     std::string wideToUtf8(const irr::core::stringw& input);
     std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
     std::string removeWhitespaces(const std::string& input);
+    void breakText(const std::wstring& input, std::vector<std::wstring> &output,
+                   unsigned int max_width, irr::gui::IGUIFont* font, bool right_to_left=false);
+    bool breakable (wchar_t c);
+    bool partOfLongUnicodeChar (wchar_t c);
+
     inline std::string getUserAgentString()
     {
         std::string uagent(std::string("SuperTuxKart/") + STK_VERSION);

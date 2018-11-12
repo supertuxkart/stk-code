@@ -60,7 +60,7 @@ ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
 ConnectToServer::~ConnectToServer()
 {
     auto cl = LobbyProtocol::get<ClientLobby>();
-    if (!cl && m_server->supportsEncryption())
+    if (!cl && m_server && m_server->supportsEncryption())
     {
         Online::XMLRequest* request =
             new Online::XMLRequest(true/*manager_memory*/);

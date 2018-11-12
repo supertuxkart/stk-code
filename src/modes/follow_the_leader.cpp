@@ -75,9 +75,9 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 //-----------------------------------------------------------------------------
 /** Called just before a race is started.
  */
-void FollowTheLeaderRace::reset()
+void FollowTheLeaderRace::reset(bool restart)
 {
-    LinearWorld::reset();
+    LinearWorld::reset(restart);
     m_last_eliminated_time = 0.0f;
     m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
@@ -220,6 +220,15 @@ bool FollowTheLeaderRace::isRaceOver()
         return false;
     }
 }   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** If the leader kart is hit, increase the delay to the next elimination */
+void FollowTheLeaderRace::leaderHit()
+{
+    int countdown = getTimeTicks();
+    countdown += stk_config->time2Ticks(5.0f);
+    setTicks(countdown);
+} // leaderHit
 
 //-----------------------------------------------------------------------------
 /** Called at the end of a race. Updates highscores, pauses the game, and

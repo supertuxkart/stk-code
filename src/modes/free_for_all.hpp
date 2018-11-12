@@ -46,7 +46,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
@@ -66,6 +66,8 @@ public:
     void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const        { return m_scores.at(kart_id); }
+    // ------------------------------------------------------------------------
+    bool getKartFFAResult(int kart_id) const;
 };   // FreeForAll
 
 

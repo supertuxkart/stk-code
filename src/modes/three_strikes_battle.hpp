@@ -102,7 +102,7 @@ public:
     virtual void terminateRace() OVERRIDE;
     // ------------------------------------------------------------------------
     // overriding World methods
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;

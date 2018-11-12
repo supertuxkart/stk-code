@@ -75,6 +75,8 @@ private:
 
     float m_smoothing_dt;
 
+    int m_skid_bonus_end_ticks;
+
 public:
     /** SKID_NONE: Kart is currently not skidding.
      *  SKID_ACCUMULATE_LEFT: Kart is skidding to the left and accumulating

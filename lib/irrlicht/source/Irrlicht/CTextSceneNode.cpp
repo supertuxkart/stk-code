@@ -333,6 +333,11 @@ void CBillboardTextSceneNode::OnRegisterSceneNode()
 //! render
 void CBillboardTextSceneNode::render()
 {
+// FIXME: Billboard text is broken with GLES 2.0.
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+	return;
+#endif
+
 	if ( !Mesh )
 		return;
 

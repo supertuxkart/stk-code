@@ -18,6 +18,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "achievements/achievement_info.hpp"
+
+#include "achievements/achievement.hpp"
+#include "achievements/achievements_status.hpp"
+#include "config/player_manager.hpp"
 #include "utils/log.hpp"
 
 #include <sstream>
@@ -29,7 +33,6 @@
  */
 AchievementInfo::AchievementInfo(const XMLNode * input)
 {
-    m_reset_type       = NEVER;
     m_id               = 0;
     m_name            = "";
     m_description      = "";
@@ -47,121 +50,203 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
                                                         m_description.c_str());
     }
 
-    // Load the reset-type
-    std::string s;
-    input->get("reset-type", &s);
-    if (s == "race")
-        m_reset_type = AFTER_RACE;
-    else if (s == "lap")
-        m_reset_type = AFTER_LAP;
-    else if (s != "never")
-        Log::warn("AchievementInfo", "Achievement check type '%s' unknown.",
-            s.c_str());
-
-    // Load check-type
-    m_check_type = AC_ALL_AT_LEAST;
-    input->get("check-type", &s);
-    if (s == "all-at-least")
-        m_check_type = AC_ALL_AT_LEAST;
-    else if (s == "one-at-least")
-        m_check_type = AC_ONE_AT_LEAST;
-    else
-        Log::warn("AchievementInfo", "Achievement check type '%s' unknown.",
-                  s.c_str());
     input->get("secret", &m_is_secret);
 
+    m_goal_tree.type      = "AND";
+    m_goal_tree.value     = -1;
+    m_goal_tree.operation = OP_NONE;
+
+    parseGoals(input, m_goal_tree);
+}   // AchievementInfo
+
+// ----------------------------------------------------------------------------
+/** Parses recursively the list of goals, to construct the tree of goals */
+void AchievementInfo::parseGoals(const XMLNode * input, goalTree &parent)
+{
     // Now load the goal nodes
     for (unsigned int n = 0; n < input->getNumNodes(); n++)
     {
         const XMLNode *node = input->getNode(n);
-        std::string key = node->getName();
-        int goal = 0;
-        node->get("goal", &goal);
-        m_goal_values[key] = goal;
-    }
-    if (m_goal_values.size() != input->getNumNodes())
-        Log::fatal("AchievementInfo",
-                  "Duplicate keys for the entries of a MapAchievement found.");
+        if (node->getName() != "goal")
+            continue; // ignore incorrect node
 
-    if (m_check_type == AC_ONE_AT_LEAST)
-    {
-        if (m_goal_values.size() != 1)
-            Log::fatal("AchievementInfo",
-                     "A one-at-least achievement must have exactly one goal.");
+        std::string type;
+        if(!node->get("type", &type))
+            continue; // missing type, ignore node
+
+        int value;
+        if (!node->get("value", &value))
+            value = -1;
+
+        std::string operation;
+        if (!node->get("operation", &operation))
+            operation = "none";
+
+        goalTree child;
+        child.type = type;
+        child.value = value;
+        if (operation == "none")
+            child.operation = OP_NONE;
+        else if (operation == "+")
+            child.operation = OP_ADD;
+        else if (operation == "-")
+            child.operation = OP_SUBSTRACT;
+        else
+            continue; // incorrect operation type, ignore node
+
+        if (type=="AND" || type=="AND-AT-ONCE" || type=="OR" || type=="SUM")
+        {
+            if (type == "SUM")
+            {
+                if (value <= 0)
+                    continue; // SUM nodes need a strictly positive value
+            }
+            else
+            {
+                // Logical operators don't have a value or operation defined
+                if (value != -1)
+                    continue;
+                if (child.operation != OP_NONE)
+                    continue;
+                if (parent.type == "SUM")
+                    continue;
+            }
+
+            parseGoals(node, child);
+
+            if (child.children.size() == 0)
+                continue;
+        }
+        else
+        {
+            if (value <= 0)
+                continue; // Leaf nodes need a strictly positive value
+
+            if (parent.type == "SUM" && child.operation == OP_NONE)
+                continue; // Leaf nodes of a SUM node need an operator
+        }
+
+        parent.children.push_back(child);
     }
-}   // AchievementInfo
+    if (parent.children.size() != input->getNumNodes())
+        Log::error("AchievementInfo",
+                  "Incorrect goals for the entries of achievement \"%s\".", m_name.c_str());
+} // parseGoals
 
 // ----------------------------------------------------------------------------
-/** Returns a string with a numerical value to display the progress of
- *  this achievement. It adds up all the goal values
- */
-irr::core::stringw AchievementInfo::toString() const
+/** Copy a goal tree to an EMPTY goal tree by recursion. */
+void AchievementInfo::copyGoalTree(goalTree &copy, goalTree &model, bool set_values_to_zero)
 {
-    int count = 0;
-    std::map<std::string, int>::const_iterator iter;
-    switch (m_check_type)
-    {
-    case AC_ALL_AT_LEAST:
-        // If all values need to be reached, add up all goal values
-        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
-        {
-            count += iter->second;
-        }
-        break;
-    case AC_ONE_AT_LEAST:
-        // Only one goal is defined for a one-at-least
-        count = m_goal_values.begin()->second;
-        break;
-    default:
-        Log::fatal("AchievementInfo", "Missing toString for type %d.",
-                   m_check_type);
-    }
-    return StringUtils::toWString(count);
+    copy.type = model.type;
+    copy.value = (set_values_to_zero) ? 0 : model.value;
+    copy.operation = model.operation;
 
-}   // toString
+    for (unsigned int i=0;i<model.children.size();i++)
+    {
+        goalTree copy_child;
+        copyGoalTree(copy_child, model.children[i],set_values_to_zero);
+        copy.children.push_back(copy_child);
+    }
+} // copyGoalTree
 
 // ----------------------------------------------------------------------------
-bool AchievementInfo::checkCompletion(Achievement * achievement) const
+/** Returns the goal tree's depth. If an AND/OR/ANT-AT-ONCE contains only
+  * one element, it is ignored (this is useful because the root is always
+  * AND ; so for e.g. an OR achievement, we prefer to not display it).  */
+int AchievementInfo::getRecursiveDepth(goalTree &parent)
 {
-    std::map<std::string, int>::const_iterator iter;
-
-    switch (m_check_type)
+    if (parent.children.size() != 1)
     {
-    case AC_ALL_AT_LEAST:
-        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+        int max = 0;
+        for (unsigned int i=0;i<parent.children.size();i++)
         {
-            if (achievement->getValue(iter->first) < iter->second)
-                return false;
+            int depth = getRecursiveDepth(parent.children[i]);
+            if (depth > max)
+                max = depth;
         }
-        return true;
-    case AC_ONE_AT_LEAST:
-    {
-        // Test all progress values the kart has.
-        const std::map<std::string, int> &progress = achievement->getProgress();
-        for (iter = progress.begin(); iter != progress.end(); iter++)
-        {
-            // A one-at-least achievement has only one goal, so use it
-            if (iter->second >= m_goal_values.begin()->second)
-                return true;
-        }
-        return false;
+        return max+1;
     }
-    default:
-        Log::fatal("AchievementInfo", "Missing check for type %d.",
-                   m_check_type);
-    }   // switch
-
-    // Avoid compiler warning
-    return false;
-}
-// ----------------------------------------------------------------------------
-int AchievementInfo::getGoalValue(const std::string &key) const
-{
-    std::map<std::string, int>::const_iterator it;
-    it = m_goal_values.find(key);
-    if (it != m_goal_values.end())
-        return it->second;
+    else if (parent.children.size() == 1 &&
+             (parent.children[0].type == "AND" ||
+              parent.children[0].type == "AND-AT-ONCE" || 
+              parent.children[0].type == "OR"))
+    {
+        return getRecursiveDepth(parent.children[0]);
+    }
     else
-        return 0;
-}   // getGoalValue
+        return 1;
+} // getRecursiveDepth
+
 // ----------------------------------------------------------------------------
+/** Returns a string with the number of goals to fullfil to
+ *  get this achievements.
+ */
+irr::core::stringw AchievementInfo::goalString()
+{
+    return StringUtils::toWString(recursiveGoalCount(m_goal_tree));
+}   // goalString
+
+// ----------------------------------------------------------------------------
+int AchievementInfo::recursiveGoalCount(goalTree &parent)
+{
+    if (parent.children.size() >= 2 &&
+        parent.type != "OR")
+    {
+        return parent.children.size();
+    }
+    else if (parent.children.size() == 1 &&
+             (parent.children[0].type == "AND" ||
+              parent.children[0].type == "AND-AT-ONCE" || 
+              parent.children[0].type == "OR"))
+    {
+        return recursiveGoalCount(parent.children[0]);
+    }
+    else
+        return 1;
+} // recursiveGoalCount
+
+// ----------------------------------------------------------------------------
+/** Returns a string with the target of the goal if the
+ *  achievement has only one goal (a sum counts as one goal).
+ */
+irr::core::stringw AchievementInfo::progressString()
+{
+    return StringUtils::toWString(recursiveProgressCount(m_goal_tree));
+}   // progressString
+
+// ----------------------------------------------------------------------------
+int AchievementInfo::recursiveProgressCount(goalTree &parent)
+{
+    if (parent.children.size() != 1)
+    {
+        return -1; // signal that this is invalid.
+    }
+    else if (parent.children.size() == 1 &&
+             (parent.children[0].type == "AND" ||
+              parent.children[0].type == "AND-AT-ONCE" || 
+              parent.children[0].type == "OR"))
+    {
+        return recursiveGoalCount(parent.children[0]);
+    }
+    else
+    {
+        //TODO : find a more automatic way
+        if (parent.children[0].type == "race-started-all" ||
+            parent.children[0].type == "race-finished-all" ||
+            parent.children[0].type == "race-won-all" ||
+            parent.children[0].type == "race-finished-reverse-all" ||
+            parent.children[0].type == "race-finished-alone-all" ||
+            parent.children[0].type == "less-laps-all" ||
+            parent.children[0].type == "more-laps-all" ||
+            parent.children[0].type == "twice-laps-all" ||
+            parent.children[0].type == "egg-hunt-started-all" ||
+            parent.children[0].type == "egg-hunt-finished-all")
+        {
+            return PlayerManager::getCurrentAchievementsStatus()->getNumAchieveTracks();
+        }
+        else
+        {
+            return parent.children[0].value;
+        }
+    }
+} // recursiveProgressCount

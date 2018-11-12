@@ -10,6 +10,8 @@
             <ribbon id="control_type" proportion="1" width="100%" align="center">
                 <icon-button id="accelerometer" width="fit" height="fit" icon="gui/icons/difficulty_medium.png"
                         I18N="Control type" text="Accelerometer"/>
+                <icon-button id="gyroscope" width="fit" height="fit" icon="gui/icons/difficulty_best.png"
+                        I18N="Control type" text="Gyroscope"/>
                 <icon-button id="steering_wheel" width="fit" height="fit" icon="gui/icons/difficulty_hard.png"
                         I18N="Control type"  text="Steering wheel"/>
             </ribbon>

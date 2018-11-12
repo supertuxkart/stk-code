@@ -274,7 +274,6 @@ void OptionsScreenVideo::init()
             }
         }
 
-#ifndef ANDROID
         if (!found_config_res)
         {
             r.width  = UserConfigParams::m_width;
@@ -291,6 +290,7 @@ void OptionsScreenVideo::init()
             }
         } // next found resolution
 
+#ifndef ANDROID
         // Add default resolutions that were not found by irrlicht
         if (!found_1024_768)
         {

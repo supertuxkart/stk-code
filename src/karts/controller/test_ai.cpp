@@ -631,8 +631,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
 
     int node = m_track_node;
     float distance = 0;
-    std::vector<const Item *> items_to_collect;
-    std::vector<const Item *> items_to_avoid;
+    std::vector<const ItemState *> items_to_collect;
+    std::vector<const ItemState *> items_to_avoid;
 
     // 1) Filter and sort all items close by
     // -------------------------------------
@@ -640,7 +640,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     while(distance < max_item_lookahead_distance)
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
-        const std::vector<Item *> &items_ahead =
+        const std::vector<ItemState *> &items_ahead =
             ItemManager::get()->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
@@ -753,7 +753,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     // ----------------------------------
     if(items_to_collect.size()>0)
     {
-        const Item *item_to_collect = items_to_collect[0];
+        const ItemState *item_to_collect = items_to_collect[0];
         // Test if we would hit a bad item when aiming at this good item.
         // If so, don't change the aim. In this case it has already been
         // ensured that we won't hit the bad item (otherwise steerToAvoid
@@ -823,8 +823,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
  *        to be avoided.
  *  \return True if it would hit any of the bad items.
 */
-bool SkiddingAI::hitBadItemWhenAimAt(const Item *item,
-                              const std::vector<const Item *> &items_to_avoid)
+bool SkiddingAI::hitBadItemWhenAimAt(const ItemState *item,
+                          const std::vector<const ItemState *> &items_to_avoid)
 {
     core::line3df to_item(m_kart->getXYZ().toIrrVector(),
                           item->getXYZ().toIrrVector());
@@ -883,7 +883,7 @@ bool SkiddingAI::handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point)
  *         into account).
  *  \return True if steering is necessary to avoid an item.
  */
-bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
+bool SkiddingAI::steerToAvoid(const std::vector<const ItemState *> &items_to_avoid,
                               const core::line3df &line_to_target,
                               Vec3 *aim_point)
 {
@@ -1036,9 +1036,9 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
  *         (NULL if no item was avoided so far).
  *  \param item_to_collect A pointer to a previously selected item to collect.
  */
-void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
-                               std::vector<const Item *> *items_to_avoid,
-                               std::vector<const Item *> *items_to_collect)
+void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
+                               std::vector<const ItemState *> *items_to_avoid,
+                               std::vector<const ItemState *> *items_to_collect)
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
@@ -1110,7 +1110,7 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
 
     // Now insert the item into the sorted list of items to avoid
     // (or to collect). The lists are (for now) sorted by distance
-    std::vector<const Item*> *list;
+    std::vector<const ItemState*> *list;
     if(avoid)
         list = items_to_avoid;
     else

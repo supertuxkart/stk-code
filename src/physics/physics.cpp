@@ -18,10 +18,10 @@
 
 #include "physics/physics.hpp"
 
-#include "achievements/achievement_info.hpp"
 #include "animations/three_d_animation.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
@@ -165,8 +165,17 @@ void Physics::update(int ticks)
     // Since the world update (which calls physics update) is called at the
     // fixed frequency necessary for the physics update, we need to do exactly
     // one physic step only.
+    double start;
+    if(UserConfigParams::m_physics_debug) start = StkTime::getRealTime();
+
     m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
                                      stk_config->ticks2Time(1)      );
+    if (UserConfigParams::m_physics_debug)
+    {
+        Log::verbose("Physics", "At %d physics duration %12.8f",
+                     World::getWorld()->getTicksSinceStart(),
+                     StkTime::getRealTime() - start);
+    }
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one
@@ -230,12 +239,21 @@ void Physics::update(int ticks)
             else if (obj->isExplodeKartObject())
             {
                 ExplosionAnimation::create(kart);
+                if (kart->getKartAnimation() != NULL)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
             }
             else if (obj->isFlattenKartObject())
             {
                 const KartProperties *kp = kart->getKartProperties();
-                kart->setSquash(kp->getSwatterSquashDuration(),
-                    kp->getSwatterSquashSlowdown());
+                // Count squash only once from original state
+                bool was_squashed = kart->isSquashed();
+                if (kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown()) && !was_squashed)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
             }
             else if(obj->isSoccerBall() && 
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
@@ -259,13 +277,24 @@ void Physics::update(int ticks)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
+                if (kart->getKartAnimation() != NULL)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
             }
             else if (anim->isFlattenKartObject())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties *kp = kart->getKartProperties();
-                kart->setSquash(kp->getSwatterSquashDuration(),
-                    kp->getSwatterSquashSlowdown());
+
+                // Count squash only once from original state
+                bool was_squashed = kart->isSquashed();
+                if (kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown()) && !was_squashed)
+                {
+                    World::getWorld()->kartHit(kart->getWorldKartId());
+                }
+
             }
             continue;
 
@@ -331,15 +360,10 @@ void Physics::update(int ticks)
                 // only the current player can get achievements.
                 if (target_kart != kart && lpc && lpc->canGetAchievements())
                 {
-                    // Compare the current value of hits with the 'hit' goal value
-                    // (otherwise it would be compared with the kart id goal value,
-                    // which doesn't exist.
-                    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
-                                                       target_kart->getIdent(), 1, "hit");
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE,
-                                                          "ball", 1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT, 1);
+                        PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT_1RACE, 1);
                     }   // is bowling ball
                 }   // if target_kart != kart && is a player kart and is current player
             }

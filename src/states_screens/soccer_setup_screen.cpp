@@ -23,7 +23,6 @@
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -90,8 +89,8 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if(name == "time_enabled")
     {
-        CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
-        bool timed = timeEnabled->getState();
+        SpinnerWidget* timeEnabled = dynamic_cast<SpinnerWidget*>(widget);
+        bool timed = timeEnabled->getValue() == 0;
         UserConfigParams::m_soccer_use_time_limit = timed;
         getWidget<SpinnerWidget>("goalamount")->setActive(!timed);
         getWidget<SpinnerWidget>("timeamount")->setActive(timed);
@@ -226,8 +225,11 @@ void SoccerSetupScreen::init()
     timeAmount->setValue(UserConfigParams::m_soccer_time_limit);
     timeAmount->setActive(UserConfigParams::m_soccer_use_time_limit);
 
-    CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
-    timeEnabled->setState(UserConfigParams::m_soccer_use_time_limit);
+    SpinnerWidget* timeEnabled = getWidget<SpinnerWidget>("time_enabled");
+    timeEnabled->clearLabels();
+    timeEnabled->addLabel(_("Time limit"));
+    timeEnabled->addLabel(_("Goals limit"));
+    timeEnabled->setValue(UserConfigParams::m_soccer_use_time_limit ? 0 : 1);
 
     // Set focus on "continue"
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");

@@ -45,14 +45,8 @@ class ItemManager : public NoCopy
 {
     // Some static data and functions to initialise it:
 private:
-    /** Stores all item models. */
-    static std::vector<scene::IMesh *> m_item_mesh;
-
     /** Stores the glow color for all items. */
     static std::vector<video::SColorf> m_glow_color;
-
-    /** Stores all low-resolution item models. */
-    static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
     /** Disable item collection (for debugging purposes). */
     static bool m_disable_item_collection;
@@ -61,6 +55,7 @@ private:
 protected:
     /** The instance of ItemManager while a race is on. */
     static std::shared_ptr<ItemManager> m_item_manager;
+
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
@@ -84,6 +79,10 @@ public:
     static scene::IMesh* getItemModel(ItemState::ItemType type)
                                       { return m_item_mesh[type]; }
     // ------------------------------------------------------------------------
+    /** Returns the low resolution mesh for a certain item. */
+    static scene::IMesh* getItemLowResolutionModel(ItemState::ItemType type)
+                                      { return m_item_lowres_mesh[type]; }
+    // ------------------------------------------------------------------------
     /** Returns the glow color for an item. */
     static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
@@ -99,8 +98,11 @@ public:
     // ========================================================================
 protected:
     /** The vector of all items of the current track. */
-    typedef std::vector<Item*> AllItemTypes;
+    typedef std::vector<ItemState*> AllItemTypes;
     AllItemTypes m_all_items;
+
+    /** What item this item is switched to. */
+    std::vector<ItemState::ItemType> m_switch_to;
 
 private:
     /** Stores which items are on which quad. m_items_in_quads[#quads]
@@ -108,17 +110,22 @@ private:
      *  field is undefined if no Graph exist, e.g. arena without navmesh. */
     std::vector< AllItemTypes > *m_items_in_quads;
 
-    /** What item this item is switched to. */
-    std::vector<ItemState::ItemType> m_switch_to;
+    /** Stores all item models. */
+    static std::vector<scene::IMesh *> m_item_mesh;
 
+    /** Stores all low-resolution item models. */
+    static std::vector<scene::IMesh *> m_item_lowres_mesh;
+
+protected:
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
     int m_switch_ticks;
 
-protected:
-    void deleteItem(Item *item);
+    void deleteItem(ItemState *item);
     virtual unsigned int insertItem(Item *item);
+    void switchItemsInternal(std::vector < ItemState*> &all_items);
     void setSwitchItems(const std::vector<int> &switch_items);
+
              ItemManager();
 public:
     virtual ~ItemManager();
@@ -133,10 +140,13 @@ public:
     void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
-    virtual void   collectedItem   (Item *item, AbstractKart *kart);
-    void           switchItems     ();
-    bool           areItemSwitched() { return (m_switch_ticks > 0); }
+    virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
+    virtual void   switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
+
+    // ------------------------------------------------------------------------
+    /** Returns true if the items are switched atm. */
+    bool           areItemsSwitched() { return (m_switch_ticks > 0); }
     // ------------------------------------------------------------------------
     /** Only used in the NetworkItemManager. */
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
@@ -152,10 +162,16 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
-    const Item*   getItem(unsigned int n) const { return m_all_items[n]; };
+    const ItemState* getItem(unsigned int n) const
+    { 
+        return dynamic_cast<Item*>(m_all_items[n]);
+    };
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
-    Item* getItem(unsigned int n)  { return m_all_items[n]; };
+    ItemState* getItem(unsigned int n)
+    {
+        return dynamic_cast<Item*>(m_all_items[n]);
+    }
     // ------------------------------------------------------------------------
     /** Returns a reference to the array of all items on the specified quad.
      */
@@ -172,8 +188,9 @@ public:
     {
         assert(m_items_in_quads);
         assert(n < m_items_in_quads->size());
-        return ((*m_items_in_quads)[n]).empty() ? NULL :
-            (*m_items_in_quads)[n].front();
+        return ((*m_items_in_quads)[n]).empty()
+              ? NULL 
+             : dynamic_cast<Item*>((*m_items_in_quads)[n].front());
     }   // getFirstItemInQuad
 };   // ItemManager
 

@@ -25,7 +25,8 @@
 // TODO: move some constants to KartProperties, use all constants from KartProperties
 
 #include "items/swatter.hpp"
-#include "achievements/achievement_info.hpp"
+
+#include "achievements/achievements_status.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
@@ -161,20 +162,20 @@ void Swatter::updateGrahpics(float dt)
 /** Updates an armed swatter: it checks for any karts that are close enough
  *  and not invulnerable, it swats the kart.
  *  \param dt Time step size.
- *  \return True if the attachment should be discarded.
+ *  \return World ticks to discard the swatter.
  */
-bool Swatter::updateAndTestFinished(int ticks)
+int Swatter::updateAndTestFinished(int ticks)
 {
     const int ticks_start = World::getWorld()->getTicksSinceStart();
     if (m_removed_bomb_ticks != std::numeric_limits<int>::max())
     {
         if (ticks_start >= m_removed_bomb_ticks)
-            return true;
-        return false;
+            return m_removed_bomb_ticks;
+        return -1;
     }   // if removing bomb
 
     if (RewindManager::get()->isRewinding())
-        return false;
+        return -1;
 
     if (!m_discard_now)
     {
@@ -186,7 +187,7 @@ bool Swatter::updateAndTestFinished(int ticks)
                 // to make sure all clients know the existence of swatter each other
                 if (ticks_start - m_swatter_start_ticks < 60 ||
                     m_swatter_end_ticks - ticks_start < 60)
-                    return false;
+                    return -1;
 
                 chooseTarget();
                 pointToTarget();
@@ -258,15 +259,15 @@ bool Swatter::updateAndTestFinished(int ticks)
 
     if (m_discard_now)
     {
-        return ticks_start > m_end_swat_ticks;
+        return m_end_swat_ticks;
     }
     else if (ticks_start > m_end_swat_ticks)
     {
         m_animation_phase = SWATTER_AIMING;
         m_end_swat_ticks = std::numeric_limits<int>::max();
-        return false;
+        return -1;
     }
-    return false;
+    return -1;
 }   // updateAndTestFinished
 
 // ----------------------------------------------------------------------------
@@ -284,7 +285,7 @@ void Swatter::chooseTarget()
     {
         AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
-        if(kart->isEliminated() || kart==m_kart)
+        if(kart->isEliminated() || kart==m_kart || kart->getKartAnimation())
             continue;
         // don't squash an already hurt kart
         if (kart->isInvulnerable() || kart->isSquashed())
@@ -344,11 +345,16 @@ void Swatter::squashThingsAround()
     AbstractKart* closest_kart = m_closest_kart;
     float duration = kp->getSwatterSquashDuration();
     float slowdown =  kp->getSwatterSquashSlowdown();
-    closest_kart->setSquash(duration, slowdown);
+    // The squash attempt may fail because of invulnerability, shield, etc.
+    // Making a bomb explode counts as a success
+    bool success = closest_kart->setSquash(duration, slowdown);
+    const bool has_created_explosion_animation =
+        success && closest_kart->getKartAnimation() != NULL;
 
     // Locally add a event to replay the squash during rewind
     if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
+        NetworkConfig::get()->isClient() &&
+        closest_kart->getKartAnimation() == NULL)
     {
         RewindManager::get()->addRewindInfoEventFunction(new
             RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
@@ -359,28 +365,29 @@ void Swatter::squashThingsAround()
             }));
     }
 
-    // Handle achievement if the swatter is used by the current player
-    if (m_kart->getController()->canGetAchievements())
+    if (success)
     {
-        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
-                                           "swatter", 1);
+        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
+            m_kart->getWorldKartId());
+
+        // Handle achievement if the swatter is used by the current player
+        if (m_kart->getController()->canGetAchievements())
+        {
+            PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
+            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+        }
     }
 
-    if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
-    {   // make bomb explode
-        m_closest_kart->getAttachment()->update(10000);
+    if (has_created_explosion_animation)
+    {
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
         if(m_kart->getController()->isLocalPlayerController())
             he->setLocalPlayerKartHit();
         projectile_manager->addHitEffect(he);
-        ExplosionAnimation::create(m_closest_kart);
     }   // if kart has bomb attached
-    if (m_closest_kart->isSquashed())
-    {
-        // The kart may not be squashed if it was protected by a bubblegum shield
-        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
-            m_kart->getWorldKartId());
-    }
 
     // TODO: squash items
 }   // squashThingsAround

@@ -28,6 +28,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "input/input_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
@@ -71,6 +72,7 @@ MainLoop::MainLoop(unsigned parent_pid)
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
+    m_allow_large_dt  = false;
     m_frame_before_loading_world = false;
 #ifdef WIN32
     if (parent_pid != 0)
@@ -158,7 +160,8 @@ float MainLoop::getLimitedDt()
         // when the computer can't keep it up, slow down the shown time instead
         // But this can not be done in networking, otherwise the game time on
         // client and server will not be in synch anymore
-        if(!NetworkConfig::get()->isNetworking())
+        if ((!NetworkConfig::get()->isNetworking() || !World::getWorld()) &&
+            !m_allow_large_dt)
         {
             /* time 3 internal substeps take */
             const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
@@ -325,6 +328,7 @@ void MainLoop::run()
             m_request_abort = true;
         }
 #endif
+
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
@@ -339,7 +343,7 @@ void MainLoop::run()
         {
             bool exist_host = STKHost::existHost();
             core::stringw msg = _("Server connection timed out.");
-            
+
             if (!m_request_abort)
             {
                 if (!ProfileWorld::isNoGraphics())
@@ -351,7 +355,7 @@ void MainLoop::run()
                     }
                 }
             }
-         
+
             if (exist_host == true)
             {
                 STKHost::get()->shutdown();
@@ -368,16 +372,17 @@ void MainLoop::run()
                     irr_driver->getActualScreenSize().Height);
             }
 #endif
-            
+
             // In case the user opened a race pause dialog
             GUIEngine::ModalDialog::dismiss();
-    
+            GUIEngine::ScreenKeyboard::dismiss();
+
             if (World::getWorld())
             {
                 race_manager->clearNetworkGrandPrixResult();
                 race_manager->exitRace();
             }
-            
+
             if (exist_host == true)
             {
                 if (!ProfileWorld::isNoGraphics())
@@ -389,7 +394,7 @@ void MainLoop::run()
                 
                 NetworkConfig::get()->unsetNetworking();
             }
-            
+
             if (m_request_abort)
             {
                 m_abort = true;

@@ -2,7 +2,7 @@
 <challenge version="3">
     <unlock_list list="false"/>
     <grandprix id="3_tothemoonandback"/>
-    <mode major="grandprix" minor="quickrace"/>
+    <mode major="grandprix" minor="timetrial"/>
     <requirements trophies="120"/>
     
     <best>

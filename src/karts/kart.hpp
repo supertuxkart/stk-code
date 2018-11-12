@@ -161,10 +161,6 @@ protected:
     /** Time a kart is invulnerable. */
     int16_t      m_invulnerable_ticks;
 
-    /** How long a kart is being squashed. If this is >0
-     *  the kart is squashed. */
-    float        m_squash_time;
-
     /** Current leaning of the kart. */
     float        m_current_lean;
 
@@ -223,6 +219,9 @@ protected:
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     int16_t       m_view_blocked_by_plunger;
+
+    float         m_graphical_view_blocked_by_plunger;
+
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
 
@@ -313,7 +312,8 @@ public:
     virtual void   reset            () OVERRIDE;
     virtual void   handleZipper     (const Material *m=NULL,
                                      bool play_sound=false) OVERRIDE;
-    virtual void   setSquash        (float time, float slowdown) OVERRIDE;
+    virtual bool   setSquash        (float time, float slowdown) OVERRIDE;
+            void   setSquashGraphics();
     virtual void   unsetSquash      () OVERRIDE;
 
     virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
@@ -394,6 +394,9 @@ public:
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const OVERRIDE
                                          { return m_view_blocked_by_plunger; }
+    // ------------------------------------------------------------------------
+    virtual float getGraphicalViewBlockedByPlunger() const OVERRIDE
+                               { return m_graphical_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
@@ -553,6 +556,9 @@ public:
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool isVisible() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual Stars* getStarsEffect() const OVERRIDE { return m_stars_effect; }
+
 };   // Kart
 
 

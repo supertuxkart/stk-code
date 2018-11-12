@@ -59,7 +59,7 @@ WorldStatus::WorldStatus()
 //-----------------------------------------------------------------------------
 /** Resets all status information, used when starting a new race.
  */
-void WorldStatus::reset()
+void WorldStatus::reset(bool restart)
 {
     m_time            = 0.0f;
     m_time_ticks      = 0;
@@ -184,7 +184,7 @@ void WorldStatus::update(int ticks)
  */
 void WorldStatus::updateTime(int ticks)
 {
-    switch (m_phase)
+    switch (m_phase.load())
     {
         // Note: setup phase must be a separate phase, since the race_manager
         // checks the phase when updating the camera: in the very first time
@@ -265,6 +265,10 @@ void WorldStatus::updateTime(int ticks)
             }
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
+        {
+            return;   // Don't increase time
+        }
+        case SERVER_READY_PHASE:
         {
             auto lobby = LobbyProtocol::get<LobbyProtocol>();
             if (lobby && lobby->isRacing())

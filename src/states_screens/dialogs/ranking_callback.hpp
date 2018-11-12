@@ -65,7 +65,7 @@ protected:
                     {
                         // I18N: In the network player dialog show rank and
                         // score of a player
-                        result = _("%s has a rank of %d with score %f.",
+                        result = _("%s is number %d in the rankings with a score of %f.",
                             m_name, rank, score);
                     }
                 }

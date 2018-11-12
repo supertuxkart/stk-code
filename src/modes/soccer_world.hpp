@@ -312,7 +312,7 @@ public:
     virtual void terminateRace() OVERRIDE;
 
     // overriding World methods
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
 
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     virtual btTransform getRescueTransform(unsigned int rescue_pos) const

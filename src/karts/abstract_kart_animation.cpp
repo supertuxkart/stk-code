@@ -19,8 +19,10 @@
 #include "karts/abstract_kart_animation.hpp"
 
 #include "graphics/slip_stream.hpp"
+#include "graphics/stars.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -143,9 +145,19 @@ void AbstractKartAnimation::addNetworkAnimationChecker(bool reset_powerup)
     {
         // Prevent access to deleted kart animation object
         std::weak_ptr<int> cct = m_check_created_ticks;
+        Vec3 original_position;
+        AbstractKart* k = m_kart;
+        if (k)
+            original_position = k->getXYZ();
         RewindManager::get()->addRewindInfoEventFunction(new
             RewindInfoEventFunction(m_created_ticks,
-            [](){},
+            /*undo_function*/[cct, k, original_position]()
+            {
+                auto cct_sp = cct.lock();
+                if (!cct_sp || !k)
+                    return;
+                k->setXYZ(original_position);
+            },
             /*replay_function*/[p]()
             {
                 if (p)
@@ -173,6 +185,8 @@ void AbstractKartAnimation::
         m_timer = -1;
         m_end_transform = fallback_trans;
         m_ignore_undo = true;
+        if (dynamic_cast<ExplosionAnimation*>(this) && m_kart)
+            m_kart->getStarsEffect()->reset();
     }
 }   // checkNetworkAnimationCreationSucceed
 

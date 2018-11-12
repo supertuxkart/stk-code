@@ -122,21 +122,28 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 bool TracksScreen::onEscapePressed()
 {
-    if (m_network_tracks)
+    if (m_quit_server)
     {
         // Remove this screen
         StateManager::get()->popMenu();
         STKHost::get()->shutdown();
     }
-    return true; // remove the screen
+    else
+    {
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (cl)
+            cl->clearPlayers();
+    }
+    // remove the screen
+    return true;
 }   // onEscapePressed
 
 // -----------------------------------------------------------------------------
 void TracksScreen::tearDown()
 {
     m_network_tracks = false;
-    m_vote_timeout = std::numeric_limits<uint64_t>::max();
     m_selected_track = NULL;
+    m_quit_server = false;
 }   // tearDown
 
 // -----------------------------------------------------------------------------
@@ -173,10 +180,15 @@ void TracksScreen::beforeAddingWidget()
         getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
         getWidget("vote")->setVisible(true);
         calculateLayout();
-        //I18N: In track screen for networking, clarify voting phase
-        core::stringw msg = _("If a majority of players all select the same"
-            " track and race settings, voting will end early.");
-        MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+        static bool shown_msg = false;
+        if (!shown_msg)
+        {
+            shown_msg = true;
+            //I18N: In track screen for networking, clarify voting phase
+            core::stringw msg = _("If a majority of players all select the"
+                " same track and race settings, voting will end early.");
+            MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+        }
     }
     else
     {
@@ -197,8 +209,14 @@ void TracksScreen::beforeAddingWidget()
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
-
-    const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
+    
+    RaceManager::MinorRaceModeType minor_mode = race_manager->getMinorMode();
+    bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
+    bool is_arena = is_soccer || minor_mode == RaceManager::MINOR_MODE_BATTLE;
+    
+    const std::vector<std::string>& groups = 
+                        is_arena ? track_manager->getAllArenaGroups(is_soccer)
+                                 : track_manager->getAllTrackGroups();
     const int group_amount = (int)groups.size();
 
     if (group_amount > 1)
@@ -220,7 +238,7 @@ void TracksScreen::beforeAddingWidget()
 void TracksScreen::init()
 {
     // change the back button image (because it makes the game quit)
-    if (m_network_tracks)
+    if (m_quit_server)
     {
         IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
         back_button->setImage("gui/icons/main_quit.png");
@@ -230,6 +248,8 @@ void TracksScreen::init()
         IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
         back_button->setImage("gui/icons/back.png");
     }
+    if (!m_network_tracks)
+        m_vote_timeout = std::numeric_limits<uint64_t>::max();
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);

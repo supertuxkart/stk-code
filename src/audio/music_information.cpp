@@ -123,6 +123,7 @@ MusicInformation::MusicInformation(const XMLNode *root,
 
 MusicInformation::~MusicInformation()
 {
+    std::lock_guard<std::mutex> lock(m_music_mutex);
     if(m_normal_music) delete m_normal_music;
     if(m_fast_music)   delete m_fast_music;
 }   // ~MusicInformation
@@ -146,6 +147,7 @@ void MusicInformation::startMusic()
     m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
 
+    std::unique_lock<std::mutex> lock(m_music_mutex);
     if (m_normal_music)
     {
         delete m_normal_music;
@@ -180,9 +182,11 @@ void MusicInformation::startMusic()
     {
         m_normal_music = new MusicDummy();
     }
+    lock.unlock();
 
     if (m_normal_music->load(m_normal_filename) == false)
     {
+        lock.lock();
         delete m_normal_music;
         m_normal_music = NULL;
         Log::warn("MusicInformation", "Unable to load music %s, "
@@ -206,6 +210,7 @@ void MusicInformation::startMusic()
         return;
     }
 
+    lock.lock();
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
@@ -216,9 +221,11 @@ void MusicInformation::startMusic()
     {
         m_fast_music = new MusicDummy();
     }
+    lock.unlock();
 
     if (m_fast_music->load(m_fast_filename) == false)
     {
+        lock.lock();
         delete m_fast_music;
         m_fast_music = NULL;
         Log::warn("MusicInformation", "Unabled to load fast music %s, not "
@@ -281,6 +288,7 @@ void MusicInformation::update(float dt)
 //-----------------------------------------------------------------------------
 void MusicInformation::stopMusic()
 {
+    std::lock_guard<std::mutex> lock(m_music_mutex);
     if (m_normal_music != NULL)
     {
         m_normal_music->stopMusic();
@@ -357,6 +365,7 @@ void MusicInformation::switchToFastMusic()
 
 bool MusicInformation::isPlaying() const
 {
+    std::lock_guard<std::mutex> lock(m_music_mutex);
     return (m_normal_music != NULL && m_normal_music->isPlaying())  ||
            (m_fast_music   != NULL && m_fast_music->isPlaying());
 }

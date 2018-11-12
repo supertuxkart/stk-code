@@ -78,7 +78,7 @@ void override_default_params()
     
     // Make sure that user can play every track even if there are installed
     // only few tracks and it's impossible to finish overworld challenges
-    UserConfigParams::m_everything_unlocked = true;
+    UserConfigParams::m_unlock_everything = 1;
     
     // Create default user istead of showing login screen to make life easier
     UserConfigParams::m_enforce_current_player = true;

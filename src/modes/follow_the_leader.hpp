@@ -46,7 +46,7 @@ public:
     virtual int  getScoreForPosition(int p) OVERRIDE;
 
     // overriding World methods
-    virtual void reset() OVERRIDE;
+    virtual void reset(bool restart=false) OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
     virtual const btTransform &getStartTransform(int index) OVERRIDE;
     virtual void getKartsDisplayInfo(
@@ -60,6 +60,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if faster music should be used at the end. */
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+
+    bool isLeader(int kart_id) { return (kart_id == 0); }
+    void leaderHit();
+    // For now, use a similar countdown change as with leaderHit
+    void leaderRescued() { leaderHit(); }
 };   // FollowTheLeader
 
 

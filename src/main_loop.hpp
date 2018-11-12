@@ -36,6 +36,9 @@ private:
 
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
+    
+    /** True if dt is not decreased for low fps */
+    bool m_allow_large_dt;
 
     bool m_frame_before_loading_world;
 
@@ -54,6 +57,7 @@ public:
     void abort() { m_abort = true; }
     void requestAbort() { m_request_abort = true; }
     void setThrottleFPS(bool throttle) { m_throttle_fps = throttle; }
+    void setAllowLargeDt(bool enable) { m_allow_large_dt = enable; }
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }

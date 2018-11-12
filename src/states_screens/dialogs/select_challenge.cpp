@@ -51,11 +51,11 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         if (label.size() > 0) label.append(L"\n");
         label.append( _("Required Rank: %i", r) );
     }
-    if (c->getTime(difficulty) > 0)
+    if (c->getTimeRequirement(difficulty) > 0)
     {
         if (label.size() > 0) label.append(L"\n");
         label.append( _("Required Time: %i",
-                        StringUtils::timeToString(c->getTime(difficulty)).c_str()) );
+                        StringUtils::timeToString(c->getTimeRequirement(difficulty)).c_str()) );
     }
     if (c->getEnergy(difficulty) > 0)
     {

@@ -23,8 +23,10 @@
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/follow_the_leader.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 /** A static create function that does only create an explosion if
@@ -51,6 +53,14 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
         return NULL;
     }
 
+    if (race_manager->isFollowMode())
+    {
+        FollowTheLeaderRace *ftl_world =
+            dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
+        if(ftl_world->isLeader(kart->getWorldKartId()))
+            ftl_world->leaderHit();
+    }
+
     return new ExplosionAnimation(kart, pos, direct_hit);
 }   // create
 
@@ -72,7 +82,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 // ----------------------------------------------------------------------------
 ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                                        const Vec3 &explosion_position,
-                                       bool direct_hit)
+                                       bool direct_hit, bool from_state)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
     m_direct_hit = direct_hit;
@@ -148,7 +158,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
 
     m_kart->getAttachment()->clear();
     // Clear powerups when direct hit in CTF
-    addNetworkAnimationChecker(m_reset_ticks != -1);
+    if (!from_state)
+        addNetworkAnimationChecker(m_reset_ticks != -1);
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------

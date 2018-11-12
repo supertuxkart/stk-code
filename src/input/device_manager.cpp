@@ -129,6 +129,7 @@ bool DeviceManager::initialize()
         // Some systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
         if (name == "applesmc") continue;
+        if (name.find("VirtualBox") == 0) continue;
 
         if(m_irrlicht_gamepads[id].HasGenericName)
         {
