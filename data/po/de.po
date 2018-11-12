@@ -3370,7 +3370,7 @@ msgstr "Servername: %s"
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
 msgid "Difficulty: %s"
-msgstr "Schwierigkeitsgrad: %s"
+msgstr "Schwierigkeit: %s"
 
 #. I18N: In the networking lobby
 #: src/network/protocols/client_lobby.cpp:593
@@ -4987,7 +4987,7 @@ msgstr "Systemsprache"
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:118
 msgid "In the bottom-left"
-msgstr "Unten rechts"
+msgstr "Unten links"
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:120
