@@ -21,6 +21,20 @@
 #include <algorithm>
 
 // ----------------------------------------------------------------------------
+SmoothNetworkBody::SmoothNetworkBody(bool enable)
+{
+    reset();
+    m_enabled = enable;
+    m_smooth_rotation = true;
+    m_adjust_vertical_offset = true;
+    m_min_adjust_length = 0.1f;
+    m_max_adjust_length = 4.0f;
+    m_min_adjust_speed = 0.3f;
+    m_max_adjust_time = 2.0f;
+    m_adjust_length_threshold = 2.0f;
+}   // SmoothNetworkBody
+
+// ----------------------------------------------------------------------------
 void SmoothNetworkBody::prepareSmoothing(const btTransform& current_transform,
                                          const Vec3& current_velocity)
 {
@@ -58,7 +72,7 @@ void SmoothNetworkBody::checkSmoothing(const btTransform& current_transform,
     if (speed < m_min_adjust_speed)
         return;
 
-    float adjust_time = (adjust_length * 2.0f) / speed;
+    float adjust_time = (adjust_length * m_adjust_length_threshold) / speed;
     if (adjust_time > m_max_adjust_time)
         return;
 
