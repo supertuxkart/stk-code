@@ -5,8 +5,10 @@
             <model id="model" width="100%" layout="horizontal-row" height="100%">
             </model>
         </div>
-        <div width="40%" height="fit" text-align="left" layout="horizontal-row" >
-            <spinner id="toggle-slider" width="100%" min_value="0" max_value="1" wrap_around="true"/>
+        <div width="100%" height="fit" text-align="left" layout="horizontal-row" >
+            <spacer height="30" width="15%"/>
+            <spinner id="toggle-slider" width="70%" min_value="0" max_value="1" wrap_around="true"/>
+            <spacer height="30" width="15%"/>
         </div>
         <spacer height="30" width="10"/>
         <div height="fit" width="100%" layout="horizontal-row">
