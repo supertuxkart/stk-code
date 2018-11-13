@@ -426,11 +426,16 @@ void IconButtonWidget::setLabelFont()
 }
 
 // -----------------------------------------------------------------------------
-
 void IconButtonWidget::setVisible(bool visible)
 {
     Widget::setVisible(visible);
 
     if (m_label != NULL)
         m_label->setVisible(visible);
+}
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::setText(const wchar_t *s)
+{
+    m_label->setText(s);
 }

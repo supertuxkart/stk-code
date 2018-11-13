@@ -152,6 +152,7 @@ void NetworkingLobby::init()
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
+    m_start_button->setText(_("Start race"));
     m_start_button->setVisible(false);
     m_state = LS_CONNECTING;
     getWidget("chat")->setVisible(false);
@@ -290,9 +291,11 @@ void NetworkingLobby::onUpdate(float delta)
             if (remain < 0)
                 remain = 0;
             //I18N: In the networking lobby, display the starting timeout
-            //for owner-less server
-            core::stringw msg = _P("Game will start after %d second.",
-               "Game will start after %d seconds.", (int)remain);
+            //for owner-less server to begin a game
+            core::stringw msg = _P("Starting after %d second "
+                "or everyone pressed 'Ready' button.",
+                "Starting after %d seconds "
+                "or everyone pressed 'Ready' button.", (int)remain);
             m_timeout_message->setText(msg, true);
         }
     }
@@ -344,7 +347,9 @@ void NetworkingLobby::onUpdate(float delta)
         m_text_bubble->setText(total_msg, true);
     }
 
-    if (STKHost::get()->isAuthorisedToControl())
+    if (STKHost::get()->isAuthorisedToControl() ||
+        (m_has_auto_start_in_server &&
+        m_cur_starting_timer != std::numeric_limits<int64_t>::max()))
     {
         m_start_button->setVisible(true);
     }
@@ -571,6 +576,9 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
     if (min_players == 0 || start_timeout == 0.0f)
         return;
 
+    //I18N: In the networking lobby, ready button is to allow player to tell
+    //server that he is ready for next game for owner less server
+    m_start_button->setText(_("Ready"));
     m_has_auto_start_in_server = true;
     m_min_start_game_players = grand_prix_started ? 0 : min_players;
     m_start_timeout = start_timeout;
