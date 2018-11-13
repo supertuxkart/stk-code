@@ -6,15 +6,15 @@
     <requirements trophies="35"/>
     
     <best>
-        <karts number="3"/>
-        <requirements position="1"/>
+        <karts number="5"/>
+        <requirements position="1" time="102"/>
     </best>
     <hard>
-        <karts number="2"/>
+        <karts number="4"/>
         <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="2"/>
+        <karts number="3"/>
         <requirements position="1"/>
     </medium>
     <easy>
