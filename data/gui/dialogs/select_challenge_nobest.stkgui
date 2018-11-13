@@ -2,7 +2,13 @@
 <stkgui>
     <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
 
-        <header id="title" width="100%" text="Race Setup" align="center" text_align="center" />
+        <div width="100%" layout="horizontal-row" height="12%">
+            <icon-button id="back" width="12%" align="left" icon="gui/icons/back.png"/>
+
+            <header id="title" width="80%" text="Race Setup" align="center" text_align="center" />
+
+            <spacer height="1" width="12%"/>
+        </div>
 
         <spacer height="2%" width="1"/>
 
