@@ -77,10 +77,6 @@ void SmoothNetworkBody::checkSmoothing(const btTransform& current_transform,
     if (adjust_time > m_max_adjust_time)
         return;
 
-    m_smoothing = SS_TO_ADJUST;
-    m_adjust_time_dt = 0.0f;
-    m_adjust_time = adjust_time;
-
     m_start_smoothing_postion.first = m_smoothing == SS_NONE ?
         m_prev_position_data.first.getOrigin() :
         m_smoothed_transform.getOrigin();
@@ -88,6 +84,10 @@ void SmoothNetworkBody::checkSmoothing(const btTransform& current_transform,
         m_prev_position_data.first.getRotation() :
         m_smoothed_transform.getRotation();
     m_start_smoothing_postion.second.normalize();
+
+    m_smoothing = SS_TO_ADJUST;
+    m_adjust_time_dt = 0.0f;
+    m_adjust_time = adjust_time;
 
     m_adjust_control_point = m_start_smoothing_postion.first +
         m_prev_position_data.second * m_adjust_time;
