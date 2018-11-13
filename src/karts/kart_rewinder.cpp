@@ -154,13 +154,13 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
-    buffer->addFloat(m_vehicle->getTimedRotationTime());
+    buffer->addUInt16(m_vehicle->getTimedRotationTicks());
     buffer->add(m_vehicle->getTimedRotation());
     buffer->addUInt8(m_vehicle->getCushioningDisableTime());
 
     // For collision rewind
     buffer->addUInt16(m_bounce_back_ticks);
-    buffer->addFloat(m_vehicle->getCentralImpulseTime());
+    buffer->addUInt16(m_vehicle->getCentralImpulseTicks());
     buffer->add(m_vehicle->getAdditionalImpulse());
 
     // 3) Steering and other player controls
@@ -262,16 +262,17 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         setTrans(m_transfrom_from_network);
     }
 
-    float time_rot = buffer->getFloat();
+    uint16_t time_rot = buffer->getUInt16();
     // Set timed rotation divides by time_rot
-    m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
+    m_vehicle->setTimedRotation(time_rot,
+        stk_config->ticks2Time(time_rot) * buffer->getVec3());
     m_vehicle->setCushioningDisableTime(buffer->getUInt8());
 
     // Collision rewind
     m_bounce_back_ticks = buffer->getUInt16();
-    float central_impulse_time = buffer->getFloat();
+    uint16_t central_impulse_ticks = buffer->getUInt16();
     Vec3 additional_impulse = buffer->getVec3();
-    m_vehicle->setTimedCentralImpulse(central_impulse_time,
+    m_vehicle->setTimedCentralImpulse(central_impulse_ticks,
         additional_impulse, true/*rewind*/);
 
     // For the raycast to determine the current material under the kart
