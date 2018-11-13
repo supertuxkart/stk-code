@@ -555,7 +555,7 @@
        max-adjust-time: Maximum time spent in each smoothing stage.
        adjust-length-threshold: The higher this value, the larger the correction curve.
   -->
-  <network-smoothing min-adjust-length="0.1"
+  <network-smoothing min-adjust-length="0.05"
                      max-adjust-length="4.0"
                      min-adjust-speed="0.3"
                      max-adjust-time="2.0"
