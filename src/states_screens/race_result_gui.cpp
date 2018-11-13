@@ -1645,12 +1645,17 @@ void RaceResultGUI::displayCTFResults()
             if (race_manager->modeHasLaps())
             {
                 float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
-                core::stringw best_lap_string = _("Best lap time: %s",
-                    StringUtils::timeToString(best_lap_time, time_precision).c_str());
-                current_y += int(m_distance_between_rows * 0.8f);
-                GUIEngine::getFont()->draw(best_lap_string,
-                    core::recti(x, current_y, 0, 0), white_color, false, false,
-                    nullptr, true);
+                // The fastest lap ticks is set to INT_MAX, so the best_lap_time will be
+                // very high when none has been set yet.
+                if (best_lap_time <= 3600.0)
+                {
+                    core::stringw best_lap_string = _("Best lap time: %s",
+                        StringUtils::timeToString(best_lap_time, time_precision).c_str());
+                    current_y += int(m_distance_between_rows * 0.8f);
+                    GUIEngine::getFont()->draw(best_lap_string,
+                        core::recti(x, current_y, 0, 0), white_color, false, false,
+                        nullptr, true);
+                }
             }   // if mode has laps
         }   // if not soccer mode
 #endif
