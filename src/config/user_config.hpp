@@ -394,11 +394,11 @@ namespace UserConfigParams
             &m_audio_group,
             "Whether musics are enabled or not (true or false)") );
     PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.6f, "sfx_volume",
             &m_audio_group, "Volume for sound effects, see openal AL_GAIN "
                             "for interpretation") );
     PARAM_PREFIX FloatUserConfigParam       m_music_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.5f, "music_volume",
             &m_audio_group, "Music volume from 0.0 to 1.0") );
 
     // ---- Race setup
