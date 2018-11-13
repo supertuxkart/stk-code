@@ -282,6 +282,15 @@ int MaxSpeed::getSpeedIncreaseTicksLeft(unsigned int category)
 }   // getSpeedIncreaseTimeLeft
 
 // ----------------------------------------------------------------------------
+/** Returns if increased speed is active in the given category.
+ *  \param category Which category to report on.
+ */
+int MaxSpeed::isSpeedIncreaseActive(unsigned int category)
+{
+    return m_speed_increase[category].isActive();
+}   // isSpeedIncreaseActive
+
+// ----------------------------------------------------------------------------
 /** Returns if decreased speed is active in the given category.
  *  \param category Which category to report on.
  */

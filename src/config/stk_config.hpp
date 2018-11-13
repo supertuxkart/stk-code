@@ -89,6 +89,9 @@ public:
     /** How many state updates per second the server will send. */
     int m_network_state_frequeny;
 
+    /** Maximum number of moveable objects in a track when networking is on. */
+    int m_max_moveable_objects;
+
     /** In case of a network race, remote karts will get their steering somewhat
      *  reduced each frame. This reduces stutter when a kart only does small
      *  steering adjustments. */
@@ -202,6 +205,11 @@ public:
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;
+
+    /** Configurable values used in SmoothNetworkBody class. */
+    float m_snb_min_adjust_length, m_snb_max_adjust_length,
+        m_snb_min_adjust_speed, m_snb_max_adjust_time,
+        m_snb_adjust_length_threshold;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the

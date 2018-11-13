@@ -20,6 +20,7 @@
 
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/drive_graph.hpp"
 
 #include "ICameraSceneNode.h"
@@ -57,6 +58,8 @@ void CameraEnd::clearEndCameras()
 void CameraEnd::readEndCamera(const XMLNode &root)
 {
     m_end_cameras.clear();
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+        return;
     for(unsigned int i=0; i<root.getNumNodes(); i++)
     {
         unsigned int index = i;

@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "input/input_device.hpp"
+#include "utils/types.hpp"
 #include "IEventReceiver.h"
 
 #ifdef ANDROID
@@ -81,21 +82,23 @@ private:
 
     /** The parameter that is used for steering button and determines dead area
      *  in a center of button */
-    float m_deadzone_center;
+    float m_deadzone;
 
-    /** The parameter that is used for steering button and determines dead area
-     *  at the edge of button */
-    float m_deadzone_edge;
+    /** A parameter in range that determines the sensitivity for x axis. */
+    float m_sensitivity_x;
+    
+    /** A parameter in range that determines the sensitivity for y axis. */
+    float m_sensitivity_y;
 
     float m_orientation;
-    double m_gyro_time;
+    uint64_t m_gyro_time;
 
 #ifdef ANDROID
     /** Pointer to the Android irrlicht device */
     CIrrDeviceAndroid* m_android_device;
 #endif
 
-    float getSteeringFactor(float value);
+    float getSteeringFactor(float value, float sensitivity);
     void handleControls(MultitouchButton* button);
     bool isGameRunning();
 

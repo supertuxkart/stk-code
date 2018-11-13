@@ -38,7 +38,7 @@ MusicOggStream::MusicOggStream(float loop_start)
     m_soundBuffers[0] = m_soundBuffers[1]= 0;
     m_soundSource     = -1;
     m_pausedMusic     = true;
-    m_playing         = false;
+    m_playing.store(false);
     m_loop_start      = loop_start;
 }   // MusicOggStream
 
@@ -168,7 +168,7 @@ bool MusicOggStream::release()
     if(!m_error) ov_clear(&m_oggStream);
 
     m_soundSource = -1;
-    m_playing = false;
+    m_playing.store(false);
 
     return true;
 }   // release
@@ -189,7 +189,7 @@ bool MusicOggStream::playMusic()
 
     alSourcePlay(m_soundSource);
     m_pausedMusic = false;
-    m_playing = true;
+    m_playing.store(true);
     check("playMusic");
     return true;
 }   // playMusic
@@ -197,7 +197,7 @@ bool MusicOggStream::playMusic()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::isPlaying()
 {
-    return m_playing;
+    return m_playing.load();
 
     /*
     if (m_soundSource == -1) return false;
@@ -212,14 +212,14 @@ bool MusicOggStream::isPlaying()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::stopMusic()
 {
-    m_playing = false;
+    m_playing.store(false);
     return (release());
 }   // stopMusic
 
 //-----------------------------------------------------------------------------
 bool MusicOggStream::pauseMusic()
 {
-    m_playing = false;
+    m_playing.store(false);
     if (m_fileName == "")
     {
         // nothing is loaded
@@ -234,7 +234,7 @@ bool MusicOggStream::pauseMusic()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::resumeMusic()
 {
-    m_playing = true;
+    m_playing.store(true);
 
     if (m_fileName == "")
     {

@@ -371,7 +371,8 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                       iei.getIndex(),
                       iei.getTicks(), iei.isItemCollection(), iei.isNewItem(),
                       iei.getTicksTillReturn(),
-                      iei.getIndex() < (int)m_confirmed_state.size() ? m_confirmed_state[iei.getIndex()] : NULL);
+                      iei.getIndex() < (int)m_confirmed_state.size() && iei.getIndex() != -1 ?
+                      m_confirmed_state[iei.getIndex()] : NULL);
         // 1.2) If the event needs to be applied, forward
         //      the time to the time of this event:
         // ----------------------------------------------
@@ -409,6 +410,11 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             ItemState *is = new ItemState(iei.getNewItemType(), kart,
                                           iei.getIndex()             );
             is->initItem(iei.getNewItemType(), iei.getXYZ());
+            if (m_switch_ticks >= 0)
+            {
+                ItemState::ItemType new_type = m_switch_to[is->getType()];
+                is->switchTo(new_type);
+            }
 
             // A new confirmed item must either be inserted at the end of all
             // items, or in an existing unused entry.
@@ -478,8 +484,6 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
                             ? m_confirmed_state[i] : NULL;
         if (is && item)
         {
-            // TODO: Check that the item has the right model, otherwise it
-            // might be an incorrectly predicted item.
             *(ItemState*)item = *is;
         }
         else if (is && !item)

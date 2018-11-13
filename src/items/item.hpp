@@ -202,7 +202,7 @@ public:
 
     // -----------------------------------------------------------------------
     /** Resets an item to its start state. */
-    void reset()
+    virtual void reset()
     {
         m_deactive_ticks    = 0;
         m_ticks_till_return = 0;
@@ -219,11 +219,8 @@ public:
     /** Switches an item to be of a different type. Used for the switch
      *  powerup.
      *  \param type New type for this item.
-     *  \param mesh Ignored.
-     *  \param lowmesh Ignored.
      */
-    virtual void switchTo(ItemType type, scene::IMesh *mesh,
-                          scene::IMesh *lowmesh)
+    virtual void switchTo(ItemType type)
     {
         // triggers and easter eggs should not be switched
         if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
@@ -326,18 +323,11 @@ private:
      *  rotation). */
     btQuaternion m_original_rotation;
 
-    /** Used when rotating the item */
-    float m_rotation_angle;
-
     /** Scene node of this item. */
     LODNode *m_node;
 
-    /** Stores the original mesh in order to reset it. */
-    scene::IMesh *m_original_mesh;
-    scene::IMesh *m_original_lowmesh;
-
-    /** Set to false if item should not rotate. */
-    bool m_rotate;
+    /** Graphical type of the mesh. */
+    ItemType m_graphical_type;
 
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;
@@ -360,9 +350,9 @@ private:
      *  would not be collected. Used by the AI to avoid items. */
     Vec3 *m_avoidance_points[2];
 
-    void          setType(ItemType type) OVERRIDE;
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
+    void          handleNewMesh(ItemType type);
 
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
@@ -373,12 +363,31 @@ public:
                        TriggerItemListener* trigger);
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
-    virtual void  collected(const AbstractKart *kart) OVERRIDE;
-    void          reset();
-    virtual void  switchTo(ItemType type, scene::IMesh *mesh,
-                           scene::IMesh *lowmesh) OVERRIDE;
-    virtual bool  switchBack() OVERRIDE;
+    virtual void  reset() OVERRIDE;
 
+    //-------------------------------------------------------------------------
+    /** Is called when the item is hit by a kart.  It sets the flag that the
+     *  item has been collected, and the time to return to the parameter.
+     *  \param kart The kart that collected the item.
+     */
+    virtual void collected(const AbstractKart *kart)  OVERRIDE
+    {
+        ItemState::collected(kart);
+        if (m_listener != NULL)
+            m_listener->onTriggerItemApproached();
+    }   // isCollected
+    //-------------------------------------------------------------------------
+    /** Switch backs to the original item. Returns true if the item was not
+     *  actually switched (e.g. trigger, or bubblegum dropped during switch
+     *  time). The return value is not actually used, but necessary in order
+     *  to overwrite ItemState::switchBack()
+     */
+    virtual bool switchBack() OVERRIDE
+    {
+        if (ItemState::switchBack())
+            return true;
+        return false;
+    }   // switchBack
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is
      *  not deactivated anymore, and it wasn't placed by this kart (this is
@@ -397,6 +406,9 @@ public:
         lc.setY(lc.getY() / 2.0f);
         return lc.length2() < m_distance_2;
     }   // hitKart
+    // ------------------------------------------------------------------------
+    bool rotating() const
+           { return getType() != ITEM_BUBBLEGUM && getType() != ITEM_TRIGGER; }
 
 public:
     // ------------------------------------------------------------------------

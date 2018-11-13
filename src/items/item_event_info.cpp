@@ -53,6 +53,7 @@ ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
     }   // is not switch
     else   // switch
     {
+        m_index = -1;
         m_kart_id = -1;
     }
 }   // ItemEventInfo(BareNetworkString, int *count)

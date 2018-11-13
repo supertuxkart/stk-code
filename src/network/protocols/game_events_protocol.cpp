@@ -183,13 +183,13 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 
     uint8_t kart_id = ns.getUInt8();
     float time      = ns.getFloat();
-    World::getWorld()->getKart(kart_id)->finishedRace(time,
-                                                      /*from_server*/true);
     if (race_manager->modeHasLaps())
     {
         World::getWorld()->getKart(kart_id)
             ->setPosition(m_last_finished_position++);
     }
+    World::getWorld()->getKart(kart_id)->finishedRace(time,
+                                                      /*from_server*/true);
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------

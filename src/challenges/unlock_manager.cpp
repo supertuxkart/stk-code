@@ -253,6 +253,9 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& karts,
                                         std::vector<const ChallengeData*>& unlocked)
 {
+    if (UserConfigParams::m_unlock_everything > 0)
+        return;
+
     ChallengeData* c = NULL;
 
     for (AllChallengesType::iterator it = m_all_challenges.begin();

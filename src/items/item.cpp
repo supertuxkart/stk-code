@@ -70,7 +70,7 @@ void ItemState::setDisappearCounter()
         m_used_up_counter = -1;
     }   // switch
 }   // setDisappearCounter
-    
+
 // -----------------------------------------------------------------------
 /** Initialises an item.
  *  \param type Type for this item.
@@ -157,24 +157,21 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
     initItem(type, xyz);
-
+    m_graphical_type    = type;
     m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
-    m_rotation_angle    = 0.0f;
-    m_original_mesh     = mesh;
-    m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
 
-    LODNode* lodnode = 
+    LODNode* lodnode =
         new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
                     irr_driver->getSceneManager());
-    scene::ISceneNode* meshnode = 
+    scene::ISceneNode* meshnode =
         irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
-        scene::ISceneNode* meshnode = 
-            irr_driver->addMesh(lowres_mesh, 
+        scene::ISceneNode* meshnode =
+            irr_driver->addMesh(lowres_mesh,
                                 StringUtils::insertValues("item_lo_%i", (int)type));
         lodnode->add(100, meshnode, true);
     }
@@ -184,6 +181,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     }
     m_node              = lodnode;
     setType(type);
+    handleNewMesh(getType());
 
 #ifdef DEBUG
     std::string debug_name("item: ");
@@ -209,10 +207,8 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 {
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
+    m_graphical_type    = ITEM_TRIGGER;
     m_original_rotation = btQuaternion(0, 0, 0, 1);
-    m_rotation_angle    = 0.0f;
-    m_original_mesh     = NULL;
-    m_original_lowmesh  = NULL;
     m_node              = NULL;
     m_listener          = trigger;
     m_was_available_previously = true;
@@ -226,8 +222,6 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 void Item::initItem(ItemType type, const Vec3 &xyz)
 {
     ItemState::initItem(type, xyz);
-    m_rotate            = (getType()!=ITEM_BUBBLEGUM) && 
-                          (getType()!=ITEM_TRIGGER    );
     // Now determine in which quad this item is, and its distance
     // from the center within this quad.
     m_graph_node = Graph::UNKNOWN_SECTOR;
@@ -259,67 +253,12 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
 }   // initItem
 
 //-----------------------------------------------------------------------------
-/** Sets the type of the item (and also derived attributes lile m_rotate
- *  \param type Type of the item.
- */
-void Item::setType(ItemType type)
-{
-    ItemState::setType(type);
-    m_rotate = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
-    
-    if (m_node != NULL)
-    {
-        for (auto* node : m_node->getAllNodes())
-        {
-            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
-            if (spmn)
-            {
-                spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
-            }
-        }
-    }
-}   // setType
-
-//-----------------------------------------------------------------------------
-/** Changes this item to be a new type for a certain amount of time.
- *  \param type New type of this item.
- *  \param mesh Mesh to use to display this item.
- */
-void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
-{
-    setMesh(mesh, lowmesh);
-    ItemState::switchTo(type, mesh, lowmesh);
-}   // switchTo
-
-//-----------------------------------------------------------------------------
-/** Switch  backs to the original item. Returns true if the item wa snot
- *  actually switched (e.g. trigger, or bubblegum dropped during switch
- *  time). The return value is not actually used, but necessary in order
- *  to overwrite ItemState::switchBack()
- */
-bool Item::switchBack()
-{
-    setMesh(m_original_mesh, m_original_lowmesh);
-    
-    if (ItemState::switchBack()) 
-        return true;
-
-    if (m_node != NULL)
-    {
-        Vec3 hpr;
-        hpr.setHPR(m_original_rotation);
-        m_node->setRotation(hpr.toIrrHPR());
-    }
-    return false;
-}   // switchBack
-
-//-----------------------------------------------------------------------------
 void Item::setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh)
 {
 #ifndef SERVER_ONLY
     if (m_node == NULL)
         return;
-        
+
     unsigned i = 0;
     for (auto* node : m_node->getAllNodes())
     {
@@ -365,13 +304,34 @@ void Item::reset()
 {
     m_was_available_previously = true;
     ItemState::reset();
-    
+
     if (m_node != NULL)
     {
         m_node->setScale(core::vector3df(1,1,1));
         m_node->setVisible(true);
     }
+
 }   // reset
+
+// ----------------------------------------------------------------------------
+void Item::handleNewMesh(ItemType type)
+{
+#ifndef SERVER_ONLY
+    if (m_node == NULL)
+        return;
+    setMesh(ItemManager::get()->getItemModel(type),
+        ItemManager::get()->getItemLowResolutionModel(type));
+    for (auto* node : m_node->getAllNodes())
+    {
+        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+        if (spmn)
+            spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+    }
+    Vec3 hpr;
+    hpr.setHPR(m_original_rotation);
+    m_node->setRotation(hpr.toIrrHPR());
+#endif
+}   // handleNewMesh
 
 // ----------------------------------------------------------------------------
 /** Updated the item - rotates it, takes care of items coming back into
@@ -383,9 +343,15 @@ void Item::updateGraphics(float dt)
     if (m_node == NULL)
         return;
 
+    if (m_graphical_type != getType())
+    {
+        handleNewMesh(getType());
+        m_graphical_type = getType();
+    }
+
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
-    bool is_visible = isAvailable() || time_till_return <= 1.0f || 
-                      (getType() == ITEM_BUBBLEGUM && 
+    bool is_visible = isAvailable() || time_till_return <= 1.0f ||
+                      (getType() == ITEM_BUBBLEGUM &&
                        getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
@@ -400,18 +366,32 @@ void Item::updateGraphics(float dt)
     if (!isAvailable() && time_till_return <= 1.0f)
     {
         // Make it visible by scaling it from 0 to 1:
+        if (rotating())
+        {
+            float angle =
+                fmodf((float)(World::getWorld()->getTicksSinceStart() +
+                getTicksTillReturn()) / 40.0f, M_PI * 2);
+            btMatrix3x3 m;
+            m.setRotation(m_original_rotation);
+            btQuaternion r = btQuaternion(m.getColumn(1), angle) *
+                            m_original_rotation;
+            Vec3 hpr;
+            hpr.setHPR(r);
+            m_node->setRotation(hpr.toIrrHPR());
+        }
         m_node->setVisible(true);
         m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
     }
-    if (isAvailable() && m_rotate)
+    if (isAvailable() && rotating())
     {
         // have it rotate
-        m_rotation_angle += dt * M_PI;
-        if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
+        float angle =
+            fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+            M_PI * 2);
 
         btMatrix3x3 m;
         m.setRotation(m_original_rotation);
-        btQuaternion r = btQuaternion(m.getColumn(1), m_rotation_angle) *
+        btQuaternion r = btQuaternion(m.getColumn(1), angle) *
                          m_original_rotation;
 
         Vec3 hpr;
@@ -419,21 +399,4 @@ void Item::updateGraphics(float dt)
         m_node->setRotation(hpr.toIrrHPR());
     }   // if item is available
     m_was_available_previously = isAvailable();
-}   // update
-
-//-----------------------------------------------------------------------------
-/** Is called when the item is hit by a kart.  It sets the flag that the item
- *  has been collected, and the time to return to the parameter.
- *  \param kart The kart that collected the item.
- */
-void Item::collected(const AbstractKart *kart)
-{
-    ItemState::collected(kart);
-    
-    if (m_listener != NULL)
-    {
-        m_listener->onTriggerItemApproached();
-    }
-
-}   // isCollected
-
+}   // updateGraphics

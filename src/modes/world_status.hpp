@@ -19,6 +19,7 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
+#include <atomic>
 
 class SFXBase;
 
@@ -48,6 +49,9 @@ public:
         // Used in network games only: wait for the server to broadcast
         // 'start'. This happens on a network client only
         WAIT_FOR_SERVER_PHASE,
+
+        // Used in network games only: server is ready
+        SERVER_READY_PHASE,
 
         // 'Ready' is displayed
         READY_PHASE,
@@ -111,7 +115,7 @@ private:
 protected:
     bool            m_play_track_intro_sound;
     bool            m_play_ready_set_go_sounds;
-    Phase           m_phase;
+    std::atomic<Phase> m_phase;
 
 private:
 

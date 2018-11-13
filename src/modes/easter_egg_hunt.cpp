@@ -221,6 +221,7 @@ void EasterEggHunt::reset(bool restart)
     for(unsigned int i=0; i<m_eggs_collected.size(); i++)
         m_eggs_collected[i] = 0;
     m_eggs_found = 0;
+    m_finish_time = 0;
 }   // reset
 
 //-----------------------------------------------------------------------------

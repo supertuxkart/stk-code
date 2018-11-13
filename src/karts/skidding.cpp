@@ -82,6 +82,7 @@ void Skidding::reset()
     m_graphical_remaining_jump_time = 0.0f;
     m_smoothing_time = 0.0f;
     m_smoothing_dt = -1.0f;
+    m_skid_bonus_end_ticks = -1;
 
     btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost
@@ -255,6 +256,54 @@ float Skidding::getSteeringWhenSkidding(float steering) const
  */
 float Skidding::updateGraphics(float dt)
 {
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    m_kart->getKartGFX()->updateSkidLight(0);
+
+    float bonus_time, bonus_speed, bonus_force;
+    unsigned int level = getSkidBonus(&bonus_time, &bonus_speed, &bonus_force);
+    if (m_kart->m_max_speed
+        ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_SKIDDING) &&
+        m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
+    {
+        level = 1;
+    }
+    else if (m_kart->m_max_speed
+        ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_RED_SKIDDING) &&
+        m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
+    {
+        level = 2;
+    }
+
+    if (level == 0 && m_graphical_remaining_jump_time <= 0.0f &&
+        m_skid_state != SKID_NONE)
+    {
+        // Show tiny sparks if bonus not yet reached
+        m_kart->getKartGFX()->setSkidLevel(level);
+    }
+    else if (level >= 1)
+    {
+        // If at least level 1 bonus is reached, show appropriate gfx
+        m_kart->getKartGFX()->setSkidLevel(level);
+        m_kart->getKartGFX()->updateSkidLight(level);
+    }
+
+    if (bonus_time > 0 || level == 1 || level == 2)
+    {
+        m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDL,
+            1.0f);
+        m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDR,
+            1.0f);
+    }
+    else if (m_skid_state == SKID_BREAK || m_skid_state == SKID_SHOW_GFX_LEFT
+        || m_skid_state == SKID_SHOW_GFX_RIGHT)
+    {
+        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL,
+            0.0f);
+        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR,
+            0.0f);
+    }
+
     if (m_smoothing_dt >= 0.0f)
     {
         m_smoothing_dt += dt / m_smoothing_time;
@@ -321,8 +370,6 @@ void Skidding::update(int ticks, bool is_on_ground,
        m_skid_state != SKID_NONE && m_skid_state != SKID_BREAK)
     {
         m_skid_state = SKID_BREAK;
-        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
-        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
     }
 
     m_skid_bonus_ready = false;
@@ -473,15 +520,9 @@ void Skidding::update(int ticks, bool is_on_ground,
             unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
                                               &bonus_force);
 
-            // Show tiny sparks if bonus not yet reached
-            if (level == 0 && m_remaining_jump_time <= 0.0f)
-                m_kart->getKartGFX()->setSkidLevel(level);
-            // If at least level 1 bonus is reached, show appropriate gfx
-            else if (level>=1)
+            if (level >= 1 && !(level == 0 && m_remaining_jump_time <= 0.0f))
             {
                 m_skid_bonus_ready = true;
-                m_kart->getKartGFX()->setSkidLevel(level);
-                m_kart->getKartGFX()->updateSkidLight(level);
             }
             // If player stops skidding, trigger bonus, and change state to
             // SKID_SHOW_GFX_*
@@ -500,10 +541,6 @@ void Skidding::update(int ticks, bool is_on_ground,
                 m_skid_time = stk_config->time2Ticks(t);
                 if(bonus_time>0)
                 {
-                    m_kart->getKartGFX()
-                          ->setCreationRateRelative(KartGFX::KGFX_SKIDL, 1.0f);
-                    m_kart->getKartGFX()
-                          ->setCreationRateRelative(KartGFX::KGFX_SKIDR, 1.0f);
                     unsigned int bonus_cat = (level == 1) ? MaxSpeed::MS_INCREASE_SKIDDING :
                                                             MaxSpeed::MS_INCREASE_RED_SKIDDING;
                     m_kart->m_max_speed->
@@ -512,6 +549,9 @@ void Skidding::update(int ticks, bool is_on_ground,
                                bonus_force,
                                stk_config->time2Ticks(bonus_time),
                                /*fade-out-time*/ stk_config->time2Ticks(1.0f));
+
+                    m_skid_bonus_end_ticks = World::getWorld()->getTicksSinceStart() +
+                        stk_config->time2Ticks(1.0f);
 
                     if (m_kart->getController()->canGetAchievements())
                     {
@@ -523,12 +563,10 @@ void Skidding::update(int ticks, bool is_on_ground,
                                 AchievementsStatus::SKIDDING, 1);
                     }
                 }
-                else {
-                    m_kart->getKartGFX()
-                          ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
-                    m_kart->getKartGFX()
-                          ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
-            }
+                else
+                {
+                    m_skid_bonus_end_ticks = -1;
+                }
             }
             break;
         }   // case
@@ -538,11 +576,6 @@ void Skidding::update(int ticks, bool is_on_ground,
             m_skid_time -= ticks;
         if (m_skid_time == 0)
         {
-            m_kart->getKartGFX()
-                  ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
-            m_kart->getKartGFX()
-                  ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
-            m_kart->getKartGFX()->updateSkidLight(0);
             m_skid_state = SKID_NONE;
         }
     }   // switch

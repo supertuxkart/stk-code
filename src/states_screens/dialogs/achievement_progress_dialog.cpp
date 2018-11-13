@@ -37,29 +37,41 @@ using namespace Online;
 
 // ----------------------------------------------------------------------------
 AchievementProgressDialog::AchievementProgressDialog(Achievement *achievement)
-                    : ModalDialog(0.9f,0.9f), m_achievement(achievement),
+                    : ModalDialog(0.95f,0.92f), m_achievement(achievement),
                       m_self_destroy(false)
 {
     loadFromFile("online/achievement_progress_dialog.stkgui");
+    
+    m_depth = m_achievement->getInfo()->getDepth();
+    assert (m_depth < 3);
+
     m_progress_table = getWidget<ListWidget>("progress-tree");
     assert(m_progress_table != NULL);
-
-    m_depth = m_achievement->getInfo()->getDepth();
-
     m_progress_table->clear();
-
-    std::vector<ListWidget::ListCell> row;
-    for (int i=0;i<m_depth;i++)
+    
+    m_main_goal_description = getWidget<LabelWidget>("main-goal-description");
+    assert(m_main_goal_description != NULL);
+    
+    m_main_goal_progress = getWidget<LabelWidget>("main-goal-progress");
+    assert(m_main_goal_progress != NULL);
+     
+    if (m_depth > 1)
     {
-        row.push_back(ListWidget::ListCell
-            (_C("achievement_info", "Goal"), -1, 2, true));
-        row.push_back(ListWidget::ListCell
-            (_C("achievement_info", "Progress"), -1, 1, true));
+        std::vector<ListWidget::ListCell> row;
+        for (int i = 1; i < m_depth; i++)
+        {
+            row.push_back(ListWidget::ListCell
+                (_C("achievement_info", "Subgoals"), -1, 2, true));
+            row.push_back(ListWidget::ListCell
+                (_C("achievement_info", "Progress"), -1, 1, true));
+        }
+    
+        m_progress_table->addItem(StringUtils::toString(0), row);        
     }
-
-    m_progress_table->addItem(StringUtils::toString(0), row);
+    
     m_row_counter = 1;
-    recursiveFillTable(m_achievement->m_progress_goal_tree, m_achievement->m_achievement_info->m_goal_tree, 0);
+    recursiveFillTable(m_achievement->m_progress_goal_tree, 
+                       m_achievement->m_achievement_info->m_goal_tree, 0);
 }   // AchievementProgressDialog
 
 // -----------------------------------------------------------------------------
@@ -86,35 +98,50 @@ void AchievementProgressDialog::recursiveFillTable(AchievementInfo::goalTree &pr
         }
 
         if (m_achievement->isAchieved() || goal > target)
-            goal = target;
-
-        std::vector<ListWidget::ListCell> row;
-        for (int i=0;i<m_depth;i++)
         {
-            //TODO : for sum, indicate if a subgoal counts towards or against it
-            if (i==depth)
-            {
-                std::string temp = StringUtils::toString(goal) + "/" +
-                                   StringUtils::toString(target);
-                core::stringw progress_string(temp.c_str());
-                core::stringw goal_name = niceGoalName(progress.type);
-                row.push_back(ListWidget::ListCell
-                    (goal_name, -1, 2, true));
-                row.push_back(ListWidget::ListCell
-                    (progress_string, -1, 1, true));
-            }
-            else
-            {
-                row.push_back(ListWidget::ListCell
-                    (" ", -1, 2, true));
-                row.push_back(ListWidget::ListCell
-                    (" ", -1, 1, true));
-            }
+            goal = target;
         }
-        m_progress_table->addItem(StringUtils::toString(m_row_counter), row);
-        m_row_counter++;
+            
+        if (depth == 0)
+        {
+            std::string temp = StringUtils::toString(goal) + "/" +
+                               StringUtils::toString(target);
+            core::stringw progress_string(temp.c_str());
+            core::stringw goal_name = niceGoalName(progress.type);
+                
+            m_main_goal_description->setText(goal_name, false);
+            m_main_goal_progress->setText(progress_string, false);
+        }
+        else
+        {
+            std::vector<ListWidget::ListCell> row;
+            for (int i = 1; i < m_depth; i++)
+            {
+                //TODO : for sum, indicate if a subgoal counts towards or against it
+                if (i == depth)
+                {
+                    std::string temp = StringUtils::toString(goal) + "/" +
+                                       StringUtils::toString(target);
+                    core::stringw progress_string(temp.c_str());
+                    core::stringw goal_name = niceGoalName(progress.type);
+                    row.push_back(ListWidget::ListCell
+                        (goal_name, -1, 2, true));
+                    row.push_back(ListWidget::ListCell
+                        (progress_string, -1, 1, true));
+                }
+                else
+                {
+                    row.push_back(ListWidget::ListCell
+                        (" ", -1, 2, true));
+                    row.push_back(ListWidget::ListCell
+                        (" ", -1, 1, true));
+                }
+            }
+            m_progress_table->addItem(StringUtils::toString(m_row_counter), row);
+            m_row_counter++;
+        }
 
-        for (unsigned int i=0;i<progress.children.size();i++)
+        for (unsigned int i = 0; i < progress.children.size(); i++)
         {
             recursiveFillTable(progress.children[i],reference.children[i],depth+1);
         }
@@ -315,7 +342,7 @@ void AchievementProgressDialog::init()
     LabelWidget* description = getWidget<LabelWidget>("description");
     assert(description != NULL);
     core::stringw description_text = m_achievement->getInfo()->getDescription();
-    description->setText(description_text, true /* expand as needed */);
+    description->setText(description_text, false);
 }   // init
 
 // -----------------------------------------------------------------------------

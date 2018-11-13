@@ -43,6 +43,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -95,10 +96,11 @@ RaceGUIBase::RaceGUIBase()
                    "Can't find 'icons-frame.png' texture, aborting.");
     }
 
-    m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full.png"));
-    m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_full_bright.png"));
-    m_gauge_empty           = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_empty.png"));
-    m_gauge_goal            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gauge_goal.png" ));
+    m_gauge_full            = irr_driver->getTexture(FileManager::GUI_ICON, "gauge_full.png");
+    m_gauge_full_bright     = irr_driver->getTexture(FileManager::GUI_ICON, "gauge_full_bright.png");
+    m_gauge_empty           = irr_driver->getTexture(FileManager::GUI_ICON, "gauge_empty.png");
+    m_gauge_goal            = irr_driver->getTexture(FileManager::GUI_ICON, "gauge_goal.png");
+    m_lap_flag              = irr_driver->getTexture(FileManager::GUI_ICON, "lap_flag.png");
     m_dist_show_overlap     = 2;
     m_icons_inertia         = 2;
 
@@ -434,7 +436,15 @@ void RaceGUIBase::update(float dt)
             m_referee_height += dt*5.0f;
             m_referee->selectReadySetGo(2);
         }
-        else if(world->getPhase()==World::TRACK_INTRO_PHASE)
+        else if (world->getPhase()==World::WAIT_FOR_SERVER_PHASE ||
+            (NetworkConfig::get()->isNetworking() &&
+            world->getPhase()==World::TRACK_INTRO_PHASE))
+        {
+        }
+        else if ((!NetworkConfig::get()->isNetworking() &&
+            world->getPhase()==World::TRACK_INTRO_PHASE) ||
+            (NetworkConfig::get()->isNetworking() &&
+            world->getPhase()==World::SERVER_READY_PHASE))
         {
             m_referee->selectReadySetGo(0);   // set red color
             m_referee_height -= dt*5.0f;
@@ -1039,6 +1049,18 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
                                                       NULL, true);
         }
     }
+
+	//lap flag for finished karts
+    if (kart->hasFinishedRace())
+	{
+        if (m_lap_flag != NULL)
+		{
+            const core::rect<s32> rect(core::position2d<s32>(0, 0),
+                m_lap_flag->getSize());
+            const core::rect<s32> pos1(x - 20, y - 10, x + w - 20, y + w - 10);
+            draw2DImage(m_lap_flag, pos1, rect, NULL, NULL, true);
+		}
+	}
 #endif
 }   // drawPlayerIcon
 

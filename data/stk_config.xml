@@ -188,9 +188,9 @@
   <powerup collect-mode="new"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
-             Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, trigger,
-                    nolok-bubble-gum, easter egg -->
-  <switch time="5"  items="1 0 4 4 2 5 2 7"/>
+             Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
+                    easter egg, trigger-->
+  <switch time="5"  items="1 0 4 4 2 2 6 7"/>
 
   <!-- disappear-counter: How often bubblegum gets driven over before it disappears.
        shield-time: How long the bubblegum shield lasts
@@ -206,8 +206,13 @@
        steering-reduction: Reduce a remote kart's steering by this factor
            each frame. This helps reduces oversteering by high latency
            clients when they only do minor steering adjustments.
+       max-moveable-objects: Maximum number of moveable objects in a track
+           when networking is on. Objects will be hidden if total count is
+           larger than this value.
   -->
-  <networking state-frequency="10" steering-reduction="1.0"/>
+  <networking state-frequency="10"
+              steering-reduction="1.0"
+              max-moveable-objects="15"/>
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
@@ -541,6 +546,14 @@
   <!-- List of default ports used, by default STK use random ports for client.
        The server discovery port has to be the same across all clients and servers.
   -->
-  <network server-discovery-port="2757" client-port="2758" server-port="2759"/>
+  <network-ports server-discovery-port="2757" client-port="2758" server-port="2759"/>
+
+  <!-- Configurable values used in SmoothNetworkBody class.
+  -->
+  <network-smoothing min-adjust-length="0.1"
+                     max-adjust-length="4.0"
+                     min-adjust-speed="0.3"
+                     max-adjust-time="2.0"
+                     adjust-length-threshold="4.0"/>
 
 </config>

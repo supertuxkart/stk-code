@@ -808,6 +808,7 @@ void ClientLobby::connectionRefused(Event* event)
  */
 void ClientLobby::startGame(Event* event)
 {
+    World::getWorld()->setPhase(WorldStatus::SERVER_READY_PHASE);
     uint64_t start_time = event->data().getUInt64();
     joinStartGameThread();
     m_start_game_thread = std::thread([start_time, this]()

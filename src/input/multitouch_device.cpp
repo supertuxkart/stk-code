@@ -173,7 +173,7 @@ void MultitouchDevice::reset()
     }
 
     m_orientation = 0.0f;
-    m_gyro_time = 0.0;
+    m_gyro_time = 0;
 } // reset
 
 // ----------------------------------------------------------------------------
@@ -223,7 +223,9 @@ void MultitouchDevice::activateGyroscope()
 #ifdef ANDROID
     if (!m_android_device->isGyroscopeActive())
     {
-        m_android_device->activateGyroscope(1.0f / 60); // Assume 60 FPS, some phones can do 90 and 120 FPS but we won't handle them now
+        // Assume 60 FPS, some phones can do 90 and 120 FPS but we won't handle 
+        // them now
+        m_android_device->activateGyroscope(1.0f / 60); 
     }
 #endif
 }
@@ -350,26 +352,33 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
  */
 void MultitouchDevice::updateConfigParams()
 {
-    m_deadzone_center = UserConfigParams::m_multitouch_deadzone_center;
-    m_deadzone_center = std::min(std::max(m_deadzone_center, 0.0f), 0.5f);
+    m_deadzone = UserConfigParams::m_multitouch_deadzone;
+    m_deadzone = std::min(std::max(m_deadzone, 0.0f), 0.5f);
 
-    m_deadzone_edge = UserConfigParams::m_multitouch_deadzone_edge;
-    m_deadzone_edge = std::min(std::max(m_deadzone_edge, 0.0f), 0.5f);
+    m_sensitivity_x = UserConfigParams::m_multitouch_sensitivity_x;
+    m_sensitivity_x = std::min(std::max(m_sensitivity_x, 0.0f), 1.0f);
+    
+    m_sensitivity_y = UserConfigParams::m_multitouch_sensitivity_y;
+    m_sensitivity_y = std::min(std::max(m_sensitivity_y, 0.0f), 1.0f);
 } // updateConfigParams
 
 // ----------------------------------------------------------------------------
 /** Helper function that returns a steering factor for steering button.
  *  \param value The axis value from 0 to 1.
+ *  \param sensitivity Value from 0 to 1.0.
  */
-float MultitouchDevice::getSteeringFactor(float value)
+float MultitouchDevice::getSteeringFactor(float value, float sensitivity)
 {
-    if (m_deadzone_edge + m_deadzone_center >= 1.0f)
+    if (m_deadzone >= 1.0f)
+        return 0.0f;
+        
+    if (sensitivity >= 1.0f)
         return 1.0f;
 
-    assert(m_deadzone_edge + m_deadzone_center != 1.0f);
-
-    return std::min((value - m_deadzone_center) / (1.0f - m_deadzone_edge -
-                    m_deadzone_center), 1.0f);
+    float factor = (value - m_deadzone) / (1.0f - m_deadzone);
+    factor *= 1.0f / (1.0f - sensitivity);
+    
+    return std::min(factor, 1.0f);
 }
 
 // ----------------------------------------------------------------------------
@@ -379,15 +388,15 @@ void MultitouchDevice::updateAxisX(float value)
     if (m_controller == NULL)
         return;
         
-    if (value < -m_deadzone_center)
+    if (value < -m_deadzone)
     {
-        float factor = getSteeringFactor(std::abs(value));
+        float factor = getSteeringFactor(std::abs(value), m_sensitivity_x);
         m_controller->action(PA_STEER_RIGHT, 0);
         m_controller->action(PA_STEER_LEFT, int(factor * Input::MAX_VALUE));
     }
-    else if (value > m_deadzone_center)
+    else if (value > m_deadzone)
     {
-        float factor = getSteeringFactor(std::abs(value));
+        float factor = getSteeringFactor(std::abs(value), m_sensitivity_x);
         m_controller->action(PA_STEER_LEFT, 0);
         m_controller->action(PA_STEER_RIGHT, int(factor * Input::MAX_VALUE));
     }
@@ -405,14 +414,14 @@ void MultitouchDevice::updateAxisY(float value)
     if (m_controller == NULL)
         return;
         
-    if (value < -m_deadzone_center)
+    if (value < -m_deadzone)
     {
-        float factor = getSteeringFactor(std::abs(value));
+        float factor = getSteeringFactor(std::abs(value), m_sensitivity_y);
         m_controller->action(PA_ACCEL, int(factor * Input::MAX_VALUE));
     }
-    else if (value > m_deadzone_center)
+    else if (value > m_deadzone)
     {
-        float factor = getSteeringFactor(std::abs(value));
+        float factor = getSteeringFactor(std::abs(value), m_sensitivity_y);
         m_controller->action(PA_BRAKE, int(factor * Input::MAX_VALUE));
     }
     else
@@ -420,11 +429,13 @@ void MultitouchDevice::updateAxisY(float value)
         m_controller->action(PA_BRAKE, 0);
         m_controller->action(PA_ACCEL, 0);
     }
+    
 }
 
 // ----------------------------------------------------------------------------
 
-/** Returns device orientation Z angle, in radians, where 0 is landscape orientation parallel to the floor.
+/** Returns device orientation Z angle, in radians, where 0 is landscape 
+ *  orientation parallel to the floor.
  */
 float MultitouchDevice::getOrientation()
 {
@@ -441,14 +452,14 @@ float MultitouchDevice::getOrientation()
 void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
 {
     const float ACCEL_DISCARD_THRESHOLD = 4.0f;
-    const float ACCEL_MULTIPLIER = 0.05f; // Slowly adjust the angle over time, this prevents shaking
+    const float ACCEL_MULTIPLIER = 0.05f; // Slowly adjust the angle over time, 
+                                          // this prevents shaking
     const float ACCEL_CHANGE_THRESHOLD = 0.01f; // ~0.5 degrees
 
+    // The device is flat on the table, cannot reliably determine the 
+    // orientation
     if (fabsf(x) + fabsf(y) < ACCEL_DISCARD_THRESHOLD)
-    {
-        // The device is flat on the table, cannot reliably determine the orientation
         return;
-    }
 
     float angle = atan2f(y, x);
     if (angle > (M_PI / 2.0))
@@ -473,7 +484,8 @@ void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
 
     m_orientation += delta;
 
-    //Log::warn("Accel", "X %03.4f Y %03.4f angle %03.4f delta %03.4f orientation %03.4f", x, y, angle, delta, m_orientation);
+    //Log::warn("Accel", "X %03.4f Y %03.4f angle %03.4f delta %03.4f "
+    //          "orientation %03.4f", x, y, angle, delta, m_orientation);
 }
 
 // ----------------------------------------------------------------------------
@@ -486,9 +498,10 @@ void MultitouchDevice::updateOrientationFromGyroscope(float z)
 {
     const float GYRO_SPEED_THRESHOLD = 0.005f;
 
-    double now = StkTime::getRealTime();
-    float timedelta = now - m_gyro_time;
+    uint64_t now = StkTime::getRealTimeMs();
+    uint64_t delta = now - m_gyro_time;
     m_gyro_time = now;
+    float timedelta = (float)delta / 1000.f;
     if (timedelta > 0.5f)
     {
         timedelta = 0.1f;
@@ -511,7 +524,9 @@ void MultitouchDevice::updateOrientationFromGyroscope(float z)
         m_orientation = -(M_PI / 2.0);
     }
 
-    //Log::warn("Gyro", "Z %03.4f angular_speed %03.4f delta %03.4f orientation %03.4f", z, angular_speed, angular_speed * timedelta, m_orientation);
+    //Log::warn("Gyro", "Z %03.4f angular_speed %03.4f delta %03.4f "
+    //          "orientation %03.4f", z, angular_speed, 
+    //          angular_speed * timedelta, m_orientation);
 }
 
 // ----------------------------------------------------------------------------

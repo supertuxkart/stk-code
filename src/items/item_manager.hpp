@@ -45,14 +45,8 @@ class ItemManager : public NoCopy
 {
     // Some static data and functions to initialise it:
 private:
-    /** Stores all item models. */
-    static std::vector<scene::IMesh *> m_item_mesh;
-
     /** Stores the glow color for all items. */
     static std::vector<video::SColorf> m_glow_color;
-
-    /** Stores all low-resolution item models. */
-    static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
     /** Disable item collection (for debugging purposes). */
     static bool m_disable_item_collection;
@@ -61,6 +55,7 @@ private:
 protected:
     /** The instance of ItemManager while a race is on. */
     static std::shared_ptr<ItemManager> m_item_manager;
+
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
@@ -84,6 +79,10 @@ public:
     static scene::IMesh* getItemModel(ItemState::ItemType type)
                                       { return m_item_mesh[type]; }
     // ------------------------------------------------------------------------
+    /** Returns the low resolution mesh for a certain item. */
+    static scene::IMesh* getItemLowResolutionModel(ItemState::ItemType type)
+                                      { return m_item_lowres_mesh[type]; }
+    // ------------------------------------------------------------------------
     /** Returns the glow color for an item. */
     static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
@@ -102,14 +101,20 @@ protected:
     typedef std::vector<ItemState*> AllItemTypes;
     AllItemTypes m_all_items;
 
+    /** What item this item is switched to. */
+    std::vector<ItemState::ItemType> m_switch_to;
+
 private:
     /** Stores which items are on which quad. m_items_in_quads[#quads]
      *  contains all items that are not on a quad. Note that this
      *  field is undefined if no Graph exist, e.g. arena without navmesh. */
     std::vector< AllItemTypes > *m_items_in_quads;
 
-    /** What item this item is switched to. */
-    std::vector<ItemState::ItemType> m_switch_to;
+    /** Stores all item models. */
+    static std::vector<scene::IMesh *> m_item_mesh;
+
+    /** Stores all low-resolution item models. */
+    static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
 protected:
     /** Remaining time that items should remain switched. If the
