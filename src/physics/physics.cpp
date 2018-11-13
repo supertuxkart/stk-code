@@ -496,27 +496,29 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     // First push one kart to the left (if there is not already
     // an impulse happening - one collision might cause more
     // than one impulse otherwise)
-    if(right_kart->getVehicle()->getCentralImpulseTime()<=0)
+    if(right_kart->getVehicle()->getCentralImpulseTicks()<=0)
     {
         const KartProperties *kp = left_kart->getKartProperties();
         Vec3 impulse(kp->getCollisionImpulse()*f_right, 0, 0);
         impulse = right_kart->getTrans().getBasis() * impulse;
         right_kart->getVehicle()
-                 ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
-                                          impulse);
+            ->setTimedCentralImpulse(
+            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime()),
+            impulse);
         right_kart ->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
 
     // Then push the other kart to the right (if there is no
     // impulse happening atm).
-    if(left_kart->getVehicle()->getCentralImpulseTime()<=0)
+    if(left_kart->getVehicle()->getCentralImpulseTicks()<=0)
     {
         const KartProperties *kp = right_kart->getKartProperties();
         Vec3 impulse = Vec3(-kp->getCollisionImpulse()*f_left, 0, 0);
         impulse = left_kart->getTrans().getBasis() * impulse;
         left_kart->getVehicle()
-                  ->setTimedCentralImpulse(kp->getCollisionImpulseTime(),
-                                           impulse);
+            ->setTimedCentralImpulse(
+            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime()),
+            impulse);
         left_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
 

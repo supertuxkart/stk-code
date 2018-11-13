@@ -536,7 +536,8 @@ void Skidding::update(int ticks, bool is_on_ground,
                 t       = std::min(t,           kp->getSkidRevertVisualTime());
 
                 btVector3 rot(0, m_visual_rotation * kp->getSkidPostSkidRotateFactor(), 0);
-                m_kart->getVehicle()->setTimedRotation(t, rot);
+                m_kart->getVehicle()->setTimedRotation(
+                    (uint16_t)stk_config->time2Ticks(t), rot);
                 // skid_time is used to count backwards for the GFX
                 m_skid_time = stk_config->time2Ticks(t);
                 if(bonus_time>0)

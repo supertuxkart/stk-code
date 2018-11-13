@@ -120,9 +120,9 @@ void btKart::reset()
     m_allow_sliding              = false;
     m_num_wheels_on_ground       = 0;
     m_additional_impulse         = btVector3(0,0,0);
-    m_time_additional_impulse    = 0;
+    m_ticks_additional_impulse   = 0;
     m_additional_rotation        = btVector3(0,0,0);
-    m_time_additional_rotation   = 0;
+    m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
 
@@ -507,23 +507,21 @@ void btKart::updateVehicle( btScalar step )
 
     // Apply additional impulse set by supertuxkart
     // --------------------------------------------
-    if(m_time_additional_impulse>0)
+    if(m_ticks_additional_impulse>0)
     {
-        float dt = step > m_time_additional_impulse
-                 ? m_time_additional_impulse
-                 : step;
+        // We have fixed timestep
+        float dt = stk_config->ticks2Time(1);
         m_chassisBody->applyCentralImpulse(m_additional_impulse*dt);
-        m_time_additional_impulse -= dt;
+        m_ticks_additional_impulse--;
     }
 
     // Apply additional rotation set by supertuxkart
     // ---------------------------------------------
-    if(m_time_additional_rotation>0)
+    if(m_ticks_additional_rotation>0)
     {
         btTransform &t = m_chassisBody->getWorldTransform();
-        float dt = step > m_time_additional_rotation
-                 ? m_time_additional_rotation
-                 : step;
+        // We have fixed timestep
+        float dt = stk_config->ticks2Time(1);
         btQuaternion add_rot(m_additional_rotation.getY()*dt,
                              m_additional_rotation.getX()*dt,
                              m_additional_rotation.getZ()*dt);
@@ -537,7 +535,7 @@ void btKart::updateVehicle( btScalar step )
         // kart, or a strongly 'visual jolt' of the kart
         btTransform &iwt=m_chassisBody->getInterpolationWorldTransform();
         iwt.setRotation(iwt.getRotation()*add_rot);
-        m_time_additional_rotation -= dt;
+        m_ticks_additional_rotation--;
     }
     adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
@@ -792,7 +790,7 @@ void btKart::updateFriction(btScalar timeStep)
 
         m_forwardImpulse[wheel] = rollingFriction;
 
-        if(m_time_additional_impulse>0)
+        if(m_ticks_additional_impulse>0)
         {
             sliding = true;
             m_wheelInfo[wheel].m_skidInfo = 0.0f;
@@ -822,7 +820,7 @@ void btKart::updateFriction(btScalar timeStep)
     // Note: don't reset zipper speed, or the kart rewinder will
     // get incorrect zipper information.
 
-    if (sliding && (m_allow_sliding || m_time_additional_impulse>0) )
+    if (sliding && (m_allow_sliding || m_ticks_additional_impulse>0) )
     {
         for (int wheel = 0; wheel < getNumWheels(); wheel++)
         {

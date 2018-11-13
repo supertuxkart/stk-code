@@ -19,6 +19,8 @@ class btDynamicsWorld;
 #include "BulletDynamics/Vehicle/btWheelInfo.h"
 #include "BulletDynamics/Dynamics/btActionInterface.h"
 
+#include "config/stk_config.hpp"
+
 class btVehicleTuning;
 class Kart;
 struct btWheelContactPoint;
@@ -79,13 +81,13 @@ private:
     btVector3           m_additional_impulse;
 
     /** The time the additional impulse should be applied. */
-    float               m_time_additional_impulse;
+    uint16_t            m_ticks_additional_impulse;
 
     /** Additional rotation that is applied over a certain amount of time. */
     btVector3           m_additional_rotation;
 
     /** Duration over which the additional rotation is applied. */
-    float               m_time_additional_rotation;
+    uint16_t            m_ticks_additional_rotation;
 
     /** The rigid body that is the chassis of the kart. */
     btRigidBody        *m_chassisBody;
@@ -218,36 +220,37 @@ public:
     unsigned int getNumWheelsOnGround() const {return m_num_wheels_on_ground;}
     // ------------------------------------------------------------------------
     /** Sets an impulse that is applied for a certain amount of time.
-     *  \param t Time for the impulse to be active.
+     *  \param t Ticks for the impulse to be active.
      *  \param imp The impulse to apply.  */
-    void setTimedCentralImpulse(float t, const btVector3 &imp,
+    void setTimedCentralImpulse(uint16_t t, const btVector3 &imp,
                                 bool rewind = false)
     {
         // Only add impulse if no other impulse is active.
-        if (m_time_additional_impulse > 0 && !rewind) return;
+        if (m_ticks_additional_impulse > 0 && !rewind) return;
         m_additional_impulse      = imp;
-        m_time_additional_impulse = t;
+        m_ticks_additional_impulse = t;
     }   // setTimedImpulse
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
-    float getCentralImpulseTime() const { return m_time_additional_impulse; }
+    uint16_t getCentralImpulseTicks() const
+                                         { return m_ticks_additional_impulse; }
     // ------------------------------------------------------------------------
     const btVector3& getAdditionalImpulse() const
                                              { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).
-     *  \param t Time for the rotation to be applied.
+     *  \param t Ticks for the rotation to be applied.
      *  \param torque The rotation to apply.  */
-    void setTimedRotation(float t, const btVector3 &rot)
+    void setTimedRotation(uint16_t t, const btVector3 &rot)
     {
-        if(t>0) m_additional_rotation = rot/t;
-        m_time_additional_rotation = t;
+        if(t>0) m_additional_rotation = rot / (stk_config->ticks2Time(t));
+        m_ticks_additional_rotation = t;
     }   // setTimedTorque
     // ------------------------------------------------------------------------
     const btVector3& getTimedRotation() const { return m_additional_rotation;  }
     // ------------------------------------------------------------------------
-    float getTimedRotationTime() const { return m_time_additional_rotation;  }
+    uint16_t getTimedRotationTicks() const { return m_ticks_additional_rotation;  }
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 

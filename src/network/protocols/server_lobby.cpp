@@ -446,6 +446,7 @@ void ServerLobby::asynchronousUpdate()
     {
         if (ServerConfig::m_owner_less)
         {
+            m_game_setup->update(true/*remove_disconnected_players*/);
             int player_size = m_game_setup->getPlayerCount();
             if ((player_size >= ServerConfig::m_min_start_game_players ||
                 m_game_setup->isGrandPrixStarted()) &&
@@ -458,10 +459,14 @@ void ServerLobby::asynchronousUpdate()
             else if (player_size < ServerConfig::m_min_start_game_players &&
                 !m_game_setup->isGrandPrixStarted())
             {
+                resetPeersReady();
                 m_timeout.store(std::numeric_limits<int64_t>::max());
             }
-            if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs())
+            if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs() ||
+                (checkPeersReady() &&
+                player_size >= ServerConfig::m_min_start_game_players))
             {
+                resetPeersReady();
                 startSelection();
                 return;
             }
@@ -824,6 +829,11 @@ void ServerLobby::startSelection(const Event *event)
             Log::warn("ServerLobby",
                 "Received startSelection while being in state %d",
                 m_state.load());
+            return;
+        }
+        if (ServerConfig::m_owner_less)
+        {
+            m_peers_ready.at(event->getPeerSP()) = true;
             return;
         }
         if (event->getPeerSP() != m_server_owner.lock())

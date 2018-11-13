@@ -2291,7 +2291,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
     if(m_kart_properties->getTerrainImpulseType()
                              ==KartProperties::IMPULSE_NORMAL &&
-        m_vehicle->getCentralImpulseTime()<=0                     )
+        m_vehicle->getCentralImpulseTicks()<=0                     )
     {
         // Restrict impule to plane defined by gravity (i.e. X/Z plane).
         // This avoids the problem that karts can be pushed up, e.g. above
@@ -2312,7 +2312,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         m_bounce_back_ticks = 0;
         impulse = Vec3(0, 0, 0);
         //m_vehicle->setTimedCentralImpulse(0.1f, impulse);
-        m_vehicle->setTimedCentralImpulse(0.0, impulse);
+        m_vehicle->setTimedCentralImpulse(0, impulse);
     }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the
@@ -2320,7 +2320,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     // would be pushed forward).
     else if(m_kart_properties->getTerrainImpulseType()
                                  ==KartProperties::IMPULSE_TO_DRIVELINE &&
-            lw && m_vehicle->getCentralImpulseTime()<=0 &&
+            lw && m_vehicle->getCentralImpulseTicks()<=0 &&
             Track::getCurrentTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
@@ -2338,7 +2338,8 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                 impulse = Vec3(0, 0, -1); // Arbitrary
             impulse *= m_kart_properties->getCollisionTerrainImpulse();
             m_bounce_back_ticks = stk_config->time2Ticks(0.2f);
-            m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+            m_vehicle->setTimedCentralImpulse(
+                (uint16_t)stk_config->time2Ticks(0.1f), impulse);
         }
 
     }
