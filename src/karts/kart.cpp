@@ -2651,6 +2651,54 @@ void Kart::updateEngineSFX(float dt)
       }
 }   // updateEngineSFX
 
+
+
+//-----------------------------------------------------------------------------
+/** Reduces the engine power according to speed
+ *  
+ *  TODO : find where the physics already apply a linear force decrease
+ *  TODO : While this work fine, it should ideally be in physics
+ *         However, the function use some kart properties and parachute
+ *         effect needs to be applied, so keep both working if moving
+ *  \param engine_power : the engine power on which to apply the decrease
+ */
+float Kart::applyAirFriction(float engine_power)
+{
+    //The physics already do that a certain amount of engine force is needed to keep going
+    //at a given speed (~39,33 engine force = 1 speed for a mass of 350)
+    //But it's either too slow to accelerate to a target speed or makes it
+    //too easy to accelerate farther.
+    //Instead of making increasing gears have enormous power gaps, apply friction
+
+    float mass_factor = m_kart_properties->getMass()/350.0f;
+    float compense_linear_slowdown = 39.33f*getSpeed()*mass_factor;
+
+    engine_power += compense_linear_slowdown;
+
+    // The result will always be a positive number
+    float friction_intensity = fabsf(getSpeed());
+
+    // Not a pure quadratic evolution as it would be too brutal
+    friction_intensity *= sqrt(friction_intensity)*5;
+
+    // Apply parachute physics
+    // Currently, all karts have the same base friction
+    // If this is changed, a compensation needs to be added here
+    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
+        friction_intensity *= m_kart_properties->getParachuteFriction();
+
+    if (friction_intensity < 0.0f) friction_intensity = 0.0f;
+
+    // We substract the friction from the engine power
+    // 1)This is the logical behavior
+    // 2)That way, engine boosts remain useful at high speed
+    // 3)It helps heavier karts, who have an higher engine power
+
+    engine_power-=friction_intensity;
+
+    return engine_power;
+} //applyAirFriction
+
 //-----------------------------------------------------------------------------
 /** Sets the engine power. It considers the engine specs, items that influence
  *  the available power, and braking/steering.
@@ -2661,9 +2709,11 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     updateNitro(ticks);
     float engine_power = getActualWheelForce();
 
-    // apply parachute physics if relevant
-    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
-        engine_power*=0.2f;
+    // apply nitro boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0)
+    {
+        engine_power*= m_kart_properties->getNitroEngineMult();
+    }
 
     // apply bubblegum physics if relevant
     if (m_bubblegum_ticks > 0)
@@ -2689,6 +2739,9 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             m_kart_properties->getSkidVisualTime() == 0)
             engine_power *= 0.5f;
 
+        // This also applies parachute physics if relevant
+        engine_power = applyAirFriction(engine_power);
+
         applyEngineForce(engine_power*m_controls.getAccel());
 
         // Either all or no brake is set, so test only one to avoid
@@ -2698,14 +2751,20 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             m_vehicle->setAllBrakes(0);
         m_brake_ticks = 0;
     }
-    else
-    {   // not accelerating
+    else // not accelerating
+    {
+        //The engine power is still guaranteed >= 0 at this point
+        float braking_power = engine_power;
+
+        // This also applies parachute physics if relevant
+        engine_power = applyAirFriction(engine_power);
+       
         if(m_controls.getBrake())
         {   // check if the player is currently only slowing down
             // or moving backwards
             if(m_speed > 0.0f)
             {   // Still going forward while braking
-                applyEngineForce(-engine_power*2.5f);
+                applyEngineForce(engine_power-braking_power*3);
                 m_brake_ticks += ticks;
                 // Apply the brakes - include the time dependent brake increase
                 float f = 1.0f + stk_config->ticks2Time(m_brake_ticks)
@@ -2723,7 +2782,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
                     // The backwards acceleration is artificially increased to
                     // allow players to get "unstuck" quicker if they hit e.g.
                     // a wall.
-                    applyEngineForce(-engine_power*2.5f);
+                    applyEngineForce(engine_power-braking_power*3);
                 }
                 else  // -m_speed >= max speed on this terrain
                 {
@@ -2732,13 +2791,13 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
 
             }   // m_speed <00
         }
-        else   // !m_brake
+        else   // no braking and no acceleration
         {
             m_brake_ticks = 0;
-            // lift the foot from throttle, brakes with 10% engine_power
+            // lift the foot from throttle, let friction slow it down
             assert(!std::isnan(m_controls.getAccel()));
             assert(!std::isnan(engine_power));
-            applyEngineForce(-m_controls.getAccel()*engine_power*0.1f);
+            applyEngineForce(engine_power-braking_power);
 
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people
@@ -2746,7 +2805,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
                 m_vehicle->setAllBrakes(20.0f);
             else
                 m_vehicle->setAllBrakes(0);
-        }   // !m_brake
+        }   // no braking and no acceleration
     }   // not accelerating
 }   // updateEnginePowerAndBrakes
 

@@ -545,7 +545,7 @@ void Skidding::update(int ticks, bool is_on_ground,
                                                             MaxSpeed::MS_INCREASE_RED_SKIDDING;
                     m_kart->m_max_speed->
                         instantSpeedIncrease(bonus_cat,
-                               bonus_speed, bonus_speed,
+                               bonus_speed, bonus_speed/2,
                                bonus_force,
                                stk_config->time2Ticks(bonus_time),
                                /*fade-out-time*/ stk_config->time2Ticks(1.0f));

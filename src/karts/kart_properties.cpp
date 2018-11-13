@@ -1018,6 +1018,12 @@ float KartProperties::getNitroEngineForce() const
 }  // getNitroEngineForce
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitroEngineMult() const
+{
+    return m_cached_characteristic->getNitroEngineMult();
+}  // getNitroEngineMult
+
+// ----------------------------------------------------------------------------
 float KartProperties::getNitroConsumption() const
 {
     return m_cached_characteristic->getNitroConsumption();
