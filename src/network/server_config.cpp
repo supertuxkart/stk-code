@@ -136,18 +136,6 @@ void loadServerConfigXML(const XMLNode* root)
         return;
     }
 
-    /*int config_file_version = -1;
-    if (root->get("version", &config_file_version) < 1 ||
-        config_file_version < stk_config->m_min_server_version ||
-        config_file_version > stk_config->m_max_server_version)
-    {
-        Log::info("ServerConfig", "Your config file was not compatible, "
-            "so it was deleted and a new one will be created.");
-        delete root;
-        writeServerConfigToDisk();
-        return;
-    }*/
-
     for (unsigned i = 0; i < g_server_params.size(); i++)
         g_server_params[i]->findYourDataInAChildOf(root);
 

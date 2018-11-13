@@ -35,7 +35,7 @@
                 for details.
             max-force: Maximum suspension force -->
         <suspension stiffness="280" rest="0.3" travel="0.29"
-            exp-spring-response="false" max-force="12000" />
+            exp-spring-response="false" max-force="32000" />
 
         <!-- Values related to stability of the chassis: damping, and reduced
                 impact of roll.
@@ -117,7 +117,7 @@
                 position of the physics raycast wheels relative to the center of
                 gravity. Default is to use the corners of the chassis to attach
                 the wheels to. -->
-        <wheels damping-relaxation="35"  damping-compression="5">
+        <wheels damping-relaxation="35"  damping-compression="15">
             <front-right position="0.38 0 0.6"   />
             <front-left  position="-0.38 0 0.6"  />
             <rear-right  position="0.38 0 -0.6"  />
