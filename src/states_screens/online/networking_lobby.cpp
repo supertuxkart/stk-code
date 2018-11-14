@@ -308,7 +308,7 @@ void NetworkingLobby::onUpdate(float delta)
     if (m_state == LS_ADD_PLAYERS)
     {
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
-                                          "join the game"), true);
+                                          "join the game"), false);
         m_start_button->setVisible(false);
         m_exit_widget->setVisible(false);
         if (!GUIEngine::ModalDialog::isADialogActive())
@@ -334,7 +334,7 @@ void NetworkingLobby::onUpdate(float delta)
             connect_msg =
                 StringUtils::loadingDots(_("Finding a quick play server"));
         }
-        m_text_bubble->setText(connect_msg, true);
+        m_text_bubble->setText(connect_msg, false);
         m_start_button->setVisible(false);
     }
     else
