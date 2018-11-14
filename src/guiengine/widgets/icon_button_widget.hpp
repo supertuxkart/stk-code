@@ -170,8 +170,6 @@ namespace GUIEngine
             Widget::elementRemoved();
             m_label = NULL;
         }
-        // --------------------------------------------------------------------
-        virtual void setText(const wchar_t *s) OVERRIDE;
     };
 }
 

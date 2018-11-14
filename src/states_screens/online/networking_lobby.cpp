@@ -152,7 +152,7 @@ void NetworkingLobby::init()
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
-    m_start_button->setText(_("Start race"));
+    m_start_button->setLabel(_("Start race"));
     m_start_button->setVisible(false);
     m_state = LS_CONNECTING;
     getWidget("chat")->setVisible(false);
@@ -578,7 +578,7 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
 
     //I18N: In the networking lobby, ready button is to allow player to tell
     //server that he is ready for next game for owner less server
-    m_start_button->setText(_("Ready"));
+    m_start_button->setLabel(_("Ready"));
     m_has_auto_start_in_server = true;
     m_min_start_game_players = grand_prix_started ? 0 : min_players;
     m_start_timeout = start_timeout;
