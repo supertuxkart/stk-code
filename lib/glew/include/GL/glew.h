@@ -93,7 +93,7 @@
 #if defined(__REGAL_H__)
 #error Regal.h included before glew.h
 #endif
-#if defined(__glext_h_) || defined(__GLEXT_H_)
+#if defined(__glext_h_) || defined(__GLEXT_H_) || defined(__gl_glext_h_)
 #error glext.h included before glew.h
 #endif
 #if defined(__gl_ATI_h_)
@@ -109,6 +109,7 @@
 #define __X_GL_H
 #define __glext_h_
 #define __GLEXT_H_
+#define __gl_glext_h_
 #define __gl_ATI_h_
 
 #if defined(_WIN32)
