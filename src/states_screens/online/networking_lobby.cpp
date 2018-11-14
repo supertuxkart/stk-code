@@ -250,7 +250,7 @@ void NetworkingLobby::onUpdate(float delta)
         //I18N: In the networking lobby, show when player is required to wait
         //before the current game finish
         core::stringw msg = _("Please wait for current game to end.");
-        m_timeout_message->setText(msg, true);
+        m_timeout_message->setText(msg, false);
         core::stringw total_msg;
         for (auto& string : m_server_info)
         {
@@ -281,7 +281,7 @@ void NetworkingLobby::onUpdate(float delta)
                 _P("Game will start if there is more than %d player.",
                "Game will start if there are more than %d players.",
                (int)(m_min_start_game_players - 1));
-            m_timeout_message->setText(msg, true);
+            m_timeout_message->setText(msg, false);
         }
 
         if (m_cur_starting_timer != std::numeric_limits<int64_t>::max())
@@ -292,11 +292,12 @@ void NetworkingLobby::onUpdate(float delta)
                 remain = 0;
             //I18N: In the networking lobby, display the starting timeout
             //for owner-less server to begin a game
-            core::stringw msg = _P("Starting after %d second "
-                "or everyone pressed 'Ready' button.",
-                "Starting after %d seconds "
-                "or everyone pressed 'Ready' button.", (int)remain);
-            m_timeout_message->setText(msg, true);
+            core::stringw msg = _P("Starting after %d second, "
+                "or once everyone has pressed the 'Ready' button.",
+                "Starting after %d seconds, "
+                "or once everyone has pressed the 'Ready' button.",
+                (int)remain);
+            m_timeout_message->setText(msg, false);
         }
     }
     else
