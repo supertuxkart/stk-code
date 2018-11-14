@@ -83,8 +83,8 @@ private:
     /** The time the additional impulse should be applied. */
     uint16_t            m_ticks_additional_impulse;
 
-    /** Additional rotation that is applied over a certain amount of time. */
-    btVector3           m_additional_rotation;
+    /** Additional rotation in y-axis that is applied over a certain amount of time. */
+    float               m_additional_rotation;
 
     /** Duration over which the additional rotation is applied. */
     uint16_t            m_ticks_additional_rotation;
@@ -236,21 +236,26 @@ public:
                                          { return m_ticks_additional_impulse; }
     // ------------------------------------------------------------------------
     const btVector3& getAdditionalImpulse() const
-                                             { return m_additional_impulse; }
+                                               { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).
      *  \param t Ticks for the rotation to be applied.
-     *  \param torque The rotation to apply.  */
-    void setTimedRotation(uint16_t t, const btVector3 &rot)
+     *  \param rot_in_y_axis The rotation in y-axis to apply.  */
+    void setTimedRotation(uint16_t t, float rot_in_y_axis)
     {
-        if(t>0) m_additional_rotation = rot / (stk_config->ticks2Time(t));
+        if (t > 0)
+        {
+            m_additional_rotation =
+                rot_in_y_axis / (stk_config->ticks2Time(t));
+        }
         m_ticks_additional_rotation = t;
     }   // setTimedTorque
     // ------------------------------------------------------------------------
-    const btVector3& getTimedRotation() const { return m_additional_rotation;  }
+    float getTimedRotation() const            { return m_additional_rotation; }
     // ------------------------------------------------------------------------
-    uint16_t getTimedRotationTicks() const { return m_ticks_additional_rotation;  }
+    uint16_t getTimedRotationTicks() const
+                                        { return m_ticks_additional_rotation; }
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 
