@@ -496,8 +496,10 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         {
             // A new item was dropped according to the server that is not
             // yet part of the current state --> create new item
+            Vec3 xyz = is->getXYZ();
+            Vec3 normal = is->getNormal();
             Item *item_new = dropNewItem(is->getType(), is->getPreviousOwner(),
-                                         &(is->getXYZ()), &(is->getNormal()) );
+                                         &xyz, &normal );
             if (i != item_new->getItemId())
             {
                 // The newly created item on the client has been given a 
