@@ -148,23 +148,29 @@ void NetworkItemManager::switchItems()
  *  \param type Type of the item.
  *  \param kart In case of a dropped item used to avoid that a kart
  *         is affected by its own items.
+ *  \param server_xyz In case of rewind the server's position of this item.
+ *  \param server_normal In case of rewind the server's normal of this item.
  */
 Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
-                                      const AbstractKart *kart, const Vec3 *xyz)
+                                      const AbstractKart *kart,
+                                      const Vec3 *server_xyz,
+                                      const Vec3 *server_normal)
 {
-    Item *item = ItemManager::dropNewItem(type, kart, xyz);
+    Item *item = ItemManager::dropNewItem(type, kart, server_xyz, server_normal);
 
     if(!item) return NULL;
 
     // Nothing else to do for client
     if (NetworkConfig::get()->isClient()) return item;
 
+    assert(!server_xyz);
     // Server: store the data for this event:
     m_item_events.lock();
     m_item_events.getData().emplace_back(World::getWorld()->getTicksSinceStart(),
                                          type, item->getItemId(),
                                          kart->getWorldKartId(),
-                                         xyz ? *xyz : kart->getXYZ() );
+                                         item->getXYZ(),
+                                         item->getNormal());
     m_item_events.unlock();
     return item;
 }   // dropNewItem
@@ -409,7 +415,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             AbstractKart *kart = world->getKart(iei.getKartId());
             ItemState *is = new ItemState(iei.getNewItemType(), kart,
                                           iei.getIndex()             );
-            is->initItem(iei.getNewItemType(), iei.getXYZ());
+            is->initItem(iei.getNewItemType(), iei.getXYZ(), iei.getNormal());
             if (m_switch_ticks >= 0)
             {
                 ItemState::ItemType new_type = m_switch_to[is->getType()];
@@ -491,8 +497,9 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             // A new item was dropped according to the server that is not
             // yet part of the current state --> create new item
             Vec3 xyz = is->getXYZ();
+            Vec3 normal = is->getNormal();
             Item *item_new = dropNewItem(is->getType(), is->getPreviousOwner(),
-                                         &xyz);
+                                         &xyz, &normal );
             if (i != item_new->getItemId())
             {
                 // The newly created item on the client has been given a 
