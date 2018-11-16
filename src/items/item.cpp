@@ -136,6 +136,16 @@ void ItemState::collected(const AbstractKart *kart)
     }
 }   // collected
 
+// ----------------------------------------------------------------------------
+/** Returns the graphical type of this item should be using (takes nolok into
+ *  account). */
+Item::ItemType ItemState::getGrahpicalType() const
+{
+    return m_previous_owner && m_previous_owner->getIdent() == "nolok" &&
+        getType() == ITEM_BUBBLEGUM ?
+        ITEM_BUBBLEGUM_NOLOK : getType();
+}   // getGrahpicalType
+
 // ============================================================================
 /** Constructor for an item.
  *  \param type Type of the item.
@@ -184,7 +194,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     }
     m_node              = lodnode;
     setType(type);
-    handleNewMesh(getType());
+    handleNewMesh(getGrahpicalType());
 
 #ifdef DEBUG
     std::string debug_name("item: ");
@@ -350,7 +360,7 @@ void Item::updateGraphics(float dt)
 
     if (m_graphical_type != getType())
     {
-        handleNewMesh(getType());
+        handleNewMesh(getGrahpicalType());
         m_graphical_type = getType();
     }
 

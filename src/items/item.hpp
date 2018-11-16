@@ -280,6 +280,8 @@ public:
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
     // ------------------------------------------------------------------------
+    ItemType getGrahpicalType() const;
+    // ------------------------------------------------------------------------
     /** Returns the original type of this item. */
     ItemType getOriginalType() const { return m_original_type; }
     // ------------------------------------------------------------------------
