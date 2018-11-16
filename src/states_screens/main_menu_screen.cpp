@@ -47,7 +47,7 @@
 #include "states_screens/online/online_profile_achievements.hpp"
 #include "states_screens/online/online_profile_servers.hpp"
 #include "states_screens/online/online_screen.hpp"
-#include "states_screens/options/options_screen_video.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
 #if DEBUG_MENU_ITEM
@@ -401,7 +401,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "options")
     {
-        OptionsScreenVideo::getInstance()->push();
+        OptionsScreenGeneral::getInstance()->push();
     }
     else if (selection == "quit")
     {

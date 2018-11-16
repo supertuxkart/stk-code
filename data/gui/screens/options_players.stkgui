@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header width="80%" height="7%" align="center" text="SuperTuxKart Options" text_align="center"/>
+        <spacer width="100%" height="1%"/>
 
-        <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
-        <spacer height="15" width="10"/>
+        <div width="100%" height="92%" layout="horizontal-row" >
 
-        <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%" align="center">
-            <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"/>
-            <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"/>
-            <icon-button id="tab_ui" width="128" height="128" icon="gui/icons/options_ui.png"/>
-            <icon-button id="tab_players" width="128" height="128" icon="gui/icons/options_players.png"
-                    I18N="Section in the settings menu" text="Players"/>
-            <icon-button id="tab_controls" width="128" height="128" icon="gui/icons/options_input.png"/>
-        </tabs>
+            <vertical-tabs id="options_choice" height="100%" width="18%">
+                <icon-button id="tab_general" width="128" height="128" icon="gui/icons/options_general.png"
+                        I18N="Section in the settings menu" text="General"/>
+                <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
+                        I18N="Section in the settings menu" text="Graphics"/>
+                <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
+                        I18N="Section in the settings menu" text="Audio"/>
+                <icon-button id="tab_ui" width="128" height="128" icon="gui/icons/options_ui.png"
+                        I18N="Section in the settings menu" text="User Interface"/>
+                <icon-button id="tab_players" width="128" height="128" icon="gui/icons/options_players.png"
+                        I18N="Section in the settings menu" text="Players"/>
+                <icon-button id="tab_controls" width="128" height="128" icon="gui/icons/options_input.png"
+                        I18N="Section in the settings menu" text="Controls"/>
+                <icon-button id="tab_language" width="128" height="128" icon="gui/icons/options_language.png"
+                        I18N="Section in the settings menu" text="Language"/>
+            </vertical-tabs>
 
         <box proportion="1" width="100%" layout="vertical-row">
 
@@ -46,6 +56,4 @@
             <spacer width="20" height="15"/>
         </box>
     </div>
-
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
 </stkgui>
