@@ -82,7 +82,6 @@ private:
     GUIEngine::LabelWidget* m_header;
     GUIEngine::LabelWidget* m_text_bubble;
     GUIEngine::LabelWidget* m_timeout_message;
-    GUIEngine::IconButtonWidget* m_exit_widget;
     GUIEngine::IconButtonWidget* m_start_button;
     GUIEngine::ListWidget* m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;

@@ -28,8 +28,8 @@
             <spacer width="3%"/>
             <icon-button id="start" proportion="1" width="64" height="64" icon="gui/icons/green_check.png" align="top"
                 I18N="In the network lobby" text="Start race"/>
-            <icon-button id="exit" proportion="1" width="64" height="64" icon="gui/icons/main_quit.png" align="top"
-                I18N="In the network lobby" text="Exit"/>
+            <icon-button id="config" proportion="1" width="64" height="64" icon="gui/icons/main_options.png" align="top"
+                I18N="In the network lobby" text="Server Configuration"/>
         </div>
         <spacer height="1%"/>
     </div>

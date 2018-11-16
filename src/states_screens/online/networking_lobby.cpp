@@ -70,7 +70,6 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_header = NULL;
     m_text_bubble = NULL;
     m_timeout_message = NULL;
-    m_exit_widget = NULL;
     m_start_button = NULL;
     m_player_list = NULL;
     m_chat_box = NULL;
@@ -106,9 +105,6 @@ void NetworkingLobby::loadedFromFile()
     m_player_list = getWidget<ListWidget>("players");
     assert(m_player_list!= NULL);
 
-    m_exit_widget = getWidget<IconButtonWidget>("exit");
-    assert(m_exit_widget != NULL);
-
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
@@ -140,6 +136,7 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    getWidget("config")->setVisible(false);
     m_player_names.clear();
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
@@ -245,7 +242,6 @@ void NetworkingLobby::onUpdate(float delta)
     if (cl && cl->isWaitingForGame())
     {
         m_start_button->setVisible(false);
-        m_exit_widget->setVisible(true);
         m_timeout_message->setVisible(true);
         //I18N: In the networking lobby, show when player is required to wait
         //before the current game finish
@@ -310,7 +306,6 @@ void NetworkingLobby::onUpdate(float delta)
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
                                           "join the game"), false);
         m_start_button->setVisible(false);
-        m_exit_widget->setVisible(false);
         if (!GUIEngine::ModalDialog::isADialogActive())
         {
             input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
@@ -320,7 +315,6 @@ void NetworkingLobby::onUpdate(float delta)
     }
 
     m_start_button->setVisible(false);
-    m_exit_widget->setVisible(true);
     if (!cl || !cl->isLobbyReady())
     {
         core::stringw connect_msg;
@@ -437,10 +431,6 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         sendChat(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
-    else if (name == m_exit_widget->m_properties[PROP_ID])
-    {
-        StateManager::get()->escapePressed();
-    }
     else if (name == m_start_button->m_properties[PROP_ID])
     {
         // Send a message to the server to start
