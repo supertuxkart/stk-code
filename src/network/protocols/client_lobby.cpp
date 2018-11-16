@@ -440,8 +440,7 @@ void ClientLobby::displayPlayerVote(Event* event)
     if (!checkDataSize(event, 4)) return;
     // Get the player name who voted
     NetworkString& data = event->data();
-    float timeout = data.getFloat();
-    TracksScreen::getInstance()->setVoteTimeout(timeout);
+
     std::string player_name;
     data.decodeString(&player_name);
     uint32_t host_id = data.getUInt32();
@@ -840,6 +839,7 @@ void ClientLobby::startSelection(Event* event)
 {
     SFXManager::get()->quickSound("wee");
     const NetworkString& data = event->data();
+    startVotingPeriod(data.getFloat());
     bool skip_kart_screen = data.getUInt8() == 1;
     m_server_auto_lap = data.getUInt8() == 1;
     const unsigned kart_num = data.getUInt16();

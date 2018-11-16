@@ -30,6 +30,7 @@
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/time.hpp"
 
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 
@@ -37,6 +38,7 @@ LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
     m_game_setup = new GameSetup();
+    m_end_voting_period.store(0);
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
@@ -140,3 +142,29 @@ void LobbyProtocol::setup()
 {
     m_game_setup->reset();
 }   // setupNewGame
+
+//-----------------------------------------------------------------------------
+/** Starts the voting period time with the specified maximum time.
+ *  \param max_time Maximum voting time in seconds
+ */
+void LobbyProtocol::startVotingPeriod(float max_time)
+{
+    m_max_voting_time = uint64_t(max_time*1000);
+    m_end_voting_period.store(StkTime::getRealTimeMs() + m_max_voting_time);
+}   // startVotingPeriod
+
+//-----------------------------------------------------------------------------
+/** Returns the remaining voting time in seconds. */
+int LobbyProtocol::getRemainingVotingTime()
+{
+    uint64_t t = m_end_voting_period.load()- StkTime::getRealTimeMs();
+    return int(t/1000);
+}   // getRemainingVotingTime
+
+//-----------------------------------------------------------------------------
+/** Returns if the voting period is over. */
+bool LobbyProtocol::isVotingOver()
+{
+    return m_end_voting_period.load() < StkTime::getRealTimeMs();
+}   // isVotingOver
+

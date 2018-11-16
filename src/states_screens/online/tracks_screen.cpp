@@ -248,8 +248,6 @@ void TracksScreen::init()
         IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
         back_button->setImage("gui/icons/back.png");
     }
-    if (!m_network_tracks)
-        m_vote_timeout = std::numeric_limits<uint64_t>::max();
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
@@ -447,14 +445,6 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 }   // setFocusOnTrack
 
 // -----------------------------------------------------------------------------
-void TracksScreen::setVoteTimeout(float timeout)
-{
-    if (m_vote_timeout != std::numeric_limits<uint64_t>::max())
-        return;
-    m_vote_timeout = StkTime::getRealTimeMs() + (uint64_t)(timeout * 1000.0f);
-}   // setVoteTimeout
-
-// -----------------------------------------------------------------------------
 void TracksScreen::voteForPlayer()
 {
     assert(STKHost::existHost());
@@ -497,17 +487,13 @@ void TracksScreen::voteForPlayer()
 void TracksScreen::onUpdate(float dt)
 {
     assert(m_votes);
-    if (m_vote_timeout == std::numeric_limits<uint64_t>::max())
-    {
-        m_votes->setText(L"", false);
-        return;
-    }
 
     m_votes->setVisible(true);
-    int remaining_time = (int)
-        ((int64_t)m_vote_timeout - (int64_t)StkTime::getRealTimeMs()) / 1000;
-    if (remaining_time < 0)
-        remaining_time = 0;
+    auto cl = LobbyProtocol::get<LobbyProtocol>();
+
+    int remaining_time = cl->getRemainingVotingTime();
+    if (remaining_time < 0) remaining_time = 0;
+
     //I18N: In tracks screen, about voting of tracks in network
     core::stringw message = _("Remaining time: %d", remaining_time);
     message += L"\n";

@@ -97,21 +97,18 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
-
+    // ------------------------------------------------------------------------
     void setFocusOnTrack(const std::string& trackName);
-
+    // ------------------------------------------------------------------------
     void setNetworkTracks() { m_network_tracks = true; }
-
+    // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }
-
+    // ------------------------------------------------------------------------
     void resetVote()
     {
         m_vote_messages.clear();
-        m_vote_timeout = std::numeric_limits<uint64_t>::max();
     }
-
-    void setVoteTimeout(float timeout);
-
+    // ------------------------------------------------------------------------
     void addVoteMessage(const std::string& user,
                         const irr::core::stringw& message)
     {

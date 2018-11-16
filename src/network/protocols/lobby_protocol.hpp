@@ -24,6 +24,7 @@
 class GameSetup;
 class NetworkPlayerProfile;
 
+#include <atomic>
 #include <cassert>
 #include <memory>
 #include <thread>
@@ -74,6 +75,12 @@ public:
         RR_TOO_MANY_PLAYERS = 4,
         RR_INVALID_PLAYER = 5
     };
+
+    /** Timer user for voting periods in both lobbies. */
+    std::atomic_uint64_t m_end_voting_period;
+
+    /** The maximum voting time. */
+    uint64_t m_max_voting_time;
 
 protected:
     std::thread m_start_game_thread;
@@ -127,6 +134,12 @@ public:
     virtual void loadWorld();
     virtual bool allPlayersReady() const = 0;
     virtual bool isRacing() const = 0;
+    void startVotingPeriod(float max_time);
+    int getRemainingVotingTime();
+    bool isVotingOver();
+    // ------------------------------------------------------------------------
+    float getMaxVotingTime() { return m_max_voting_time * 1000.0f; }
+    // ------------------------------------------------------------------------
     GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol
