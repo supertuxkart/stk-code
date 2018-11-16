@@ -460,6 +460,8 @@ void ServerLobby::asynchronousUpdate()
                 !m_game_setup->isGrandPrixStarted())
             {
                 resetPeersReady();
+                if (m_timeout.load() != std::numeric_limits<int64_t>::max())
+                    updatePlayerList();
                 m_timeout.store(std::numeric_limits<int64_t>::max());
             }
             if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs() ||
@@ -833,7 +835,9 @@ void ServerLobby::startSelection(const Event *event)
         }
         if (ServerConfig::m_owner_less)
         {
-            m_peers_ready.at(event->getPeerSP()) = true;
+            m_peers_ready.at(event->getPeerSP()) =
+                !m_peers_ready.at(event->getPeerSP());
+            updatePlayerList();
             return;
         }
         if (event->getPeerSP() != m_server_owner.lock())
@@ -1744,6 +1748,11 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
+        std::shared_ptr<STKPeer> p = profile->getPeer();
+        uint8_t ready = (!game_started &&
+            m_peers_ready.find(p) != m_peers_ready.end() &&
+            m_peers_ready.at(p)) ? 1 : 0;
+        pl->addUInt8(ready);
     }
 
     // Don't send this message to in-game players
@@ -2445,6 +2454,7 @@ void ServerLobby::addWaitingPlayersToGame()
 void ServerLobby::resetServer()
 {
     addWaitingPlayersToGame();
+    resetPeersReady();
     m_state = NetworkConfig::get()->isLAN() ?
         WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
     updatePlayerList(true/*update_when_reset_server*/);

@@ -697,6 +697,9 @@ void ClientLobby::updatePlayerList(Event* event)
         if (d == PLAYER_DIFFICULTY_HANDICAP)
             std::get<3>(pl) = _("%s (handicapped)", std::get<3>(pl));
         std::get<5>(pl) = (KartTeam)data.getUInt8();
+        bool ready = data.getUInt8() == 1;
+        if (ready)
+            std::get<4>(pl) = 4;
         players.push_back(pl);
     }
 

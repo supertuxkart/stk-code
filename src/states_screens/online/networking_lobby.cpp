@@ -114,10 +114,13 @@ void NetworkingLobby::loadedFromFile()
         (file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
     video::ITexture* icon_4 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
+    video::ITexture* icon_5 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
     m_icon_bank->addTextureAsSprite(icon_4);
+    m_icon_bank->addTextureAsSprite(icon_5);
     const int screen_width = irr_driver->getFrameSize().Width;
     m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
 }   // loadedFromFile
