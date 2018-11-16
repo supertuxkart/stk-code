@@ -11,11 +11,11 @@
 
         <spacer height="1%" width="25"/>
 
-        <div layout="horizontal-row" width="40%" height="fit" align="left">
+        <div layout="horizontal-row" width="100%" height="fit" align="left">
             <bright width="fit" height="100%"
                     I18N="In soccer setup screen" text="Soccer game type" text_align="left" />
             <spacer width="2%" height="25"/>
-            <spinner id="time_enabled" proportion="1" wrap_around="true"/>
+            <spinner id="time_enabled" width="30%" wrap_around="true"/>
         </div>
 
         <div layout="horizontal-row" width="100%" height="fit" align="left">

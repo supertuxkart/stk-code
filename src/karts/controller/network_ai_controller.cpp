@@ -81,15 +81,15 @@ void NetworkAIController::convertAIToPlayerActions()
     if (m_ai_controls->getSteer() < 0.0f)
     {
         all_actions.emplace_back(PA_STEER_LEFT,
-            fabsf(m_ai_controls->getSteer()) * 32768);
+            int(fabsf(m_ai_controls->getSteer()) * 32768));
     }
     else
     {
         all_actions.emplace_back(PA_STEER_RIGHT,
-            fabsf(m_ai_controls->getSteer()) * 32768);
+            int(fabsf(m_ai_controls->getSteer()) * 32768));
     }
     all_actions.emplace_back(PA_ACCEL,
-        m_ai_controls->getAccel() * 32768);
+        int(m_ai_controls->getAccel() * 32768));
     all_actions.emplace_back(PA_BRAKE,
         m_ai_controls->getBrake() ? 32768 : 0);
     all_actions.emplace_back(PA_FIRE,
