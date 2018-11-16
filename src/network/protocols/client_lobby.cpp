@@ -75,7 +75,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
            : LobbyProtocol(NULL)
 {
     m_waiting_for_game = false;
-    m_server_auto_lap = false;
+    m_server_auto_game_time = false;
     m_received_server_result = false;
     m_state.store(NONE);
     m_server_address = a;
@@ -844,7 +844,7 @@ void ClientLobby::startSelection(Event* event)
     SFXManager::get()->quickSound("wee");
     const NetworkString& data = event->data();
     bool skip_kart_screen = data.getUInt8() == 1;
-    m_server_auto_lap = data.getUInt8() == 1;
+    m_server_auto_game_time = data.getUInt8() == 1;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
     m_available_karts.clear();

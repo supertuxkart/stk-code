@@ -883,7 +883,7 @@ void ServerLobby::startSelection(const Event *event)
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION).addUInt8(
         m_game_setup->isGrandPrixStarted() ? 1 : 0)
-        .addUInt8(ServerConfig::m_auto_lap_ratio > 0.0f ? 1 : 0);
+        .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0);
 
     // Remove karts / tracks from server that are not supported on all clients
     std::set<std::string> karts_erase, tracks_erase;
@@ -1885,14 +1885,14 @@ void ServerLobby::playerVote(Event* event)
 
     if (race_manager->modeHasLaps())
     {
-        if (ServerConfig::m_auto_lap_ratio > 0.0f)
+        if (ServerConfig::m_auto_game_time_ratio > 0.0f)
         {
             Track* t = track_manager->getTrack(track_name);
             if (t)
             {
                 lap = (uint8_t)(fmaxf(1.0f,
                     (float)t->getDefaultNumberOfLaps() *
-                    ServerConfig::m_auto_lap_ratio));
+                    ServerConfig::m_auto_game_time_ratio));
             }
             else
             {
@@ -1903,6 +1903,20 @@ void ServerLobby::playerVote(Event* event)
         }
         else if (lap == 0)
             lap = (uint8_t)3;
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER &&
+        ServerConfig::m_auto_game_time_ratio > 0.0f)
+    {
+        if (m_game_setup->isSoccerGoalTarget())
+        {
+            lap = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                UserConfigParams::m_num_goals);
+        }
+        else
+        {
+            lap = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                UserConfigParams::m_soccer_time_limit);
+        }
     }
 
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
