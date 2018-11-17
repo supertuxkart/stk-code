@@ -505,9 +505,11 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
             // have their own path when they move
             // and that they won't end offscreen in usual situations
 
-            // Put the trophy in center
-            float pos_value = (n == 0) ? unlockedStuffCount/2.0f :
-                              (n == unlockedStuffCount/2) ? 0 : n;
+            // Put the trophy (item 0 in the unlocked stuff) in center
+            // For this, we exchange the position of the trophy with
+            // the item in the middle of the unlocked array.
+            int pos_value = (n == 0) ? unlockedStuffCount/2 :
+                            (n == unlockedStuffCount/2) ? 0 : n;
             float offset = (float) pos_value - unlockedStuffCount/2.0f + 0.5f;
             offset *= (unlockedStuffCount <= 3) ? 1.4f :
                       (unlockedStuffCount <= 5) ? 1.2f : 1.0f;
