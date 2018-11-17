@@ -743,8 +743,9 @@ const std::string& PlayerKartWidget::getKartInternalName() const
 /** \brief Event callback from ISpinnerConfirmListener */
 EventPropagation PlayerKartWidget::onSpinnerConfirmed()
 {
-    KartSelectionScreen::getRunningInstance()->playerConfirm(m_player_id);
-    return EVENT_BLOCK;
+    //KartSelectionScreen::getRunningInstance()->playerConfirm(m_player_id);
+    //return EVENT_BLOCK;
+    return EVENT_LET;
 }   // onSpinnerConfirmed
 
 // -------------------------------------------------------------------------
