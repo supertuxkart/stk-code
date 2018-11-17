@@ -751,7 +751,6 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         {
             return EVENT_BLOCK;
         }
-        if (w->m_event_handler == NULL) return EVENT_LET;
     }
 
     //Log::info("EventHandler", "Widget activated: %s", w->m_properties[PROP_ID].c_str());
@@ -761,6 +760,12 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     {
         SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(w);
         spinner->activateSelectedButton();
+    }
+    
+    //FIXME: that early return may be not needed
+    if (ModalDialog::isADialogActive() && (parent == NULL || parent->m_type != GUIEngine::WTYPE_RIBBON))
+    {
+        if (w->m_event_handler == NULL) return EVENT_LET;
     }
 
     if (w->m_event_handler != NULL)
