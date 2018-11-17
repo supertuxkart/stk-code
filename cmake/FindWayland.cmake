@@ -9,6 +9,20 @@
 # WAYLAND_LIBRARIES
 #     Wayland library list
 
+find_package(PkgConfig REQUIRED)
+
+if(NOT PKGCONFIG_FOUND)
+    message(FATAL_ERROR "Pkg-config not found.")
+endif()
+
+pkg_check_modules(PKG_WAYLAND QUIET wayland-client)
+
+if(PKG_WAYLAND_FOUND)
+    set(WAYLAND_VERSION ${PKG_WAYLAND_VERSION})
+else()
+    set(WAYLAND_VERSION 0)
+endif()
+
 find_path(WAYLAND_CLIENT_INCLUDE_DIR wayland-client.h)
 find_path(WAYLAND_CURSOR_INCLUDE_DIR wayland-cursor.h)
 find_path(WAYLAND_EGL_INCLUDE_DIR wayland-egl.h)
