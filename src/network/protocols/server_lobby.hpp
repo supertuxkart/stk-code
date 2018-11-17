@@ -238,8 +238,8 @@ private:
                                   const std::string& iv,
                                   uint32_t online_id,
                                   const irr::core::stringw& online_name);
-    std::tuple<bool> handleVote(std::string *track_name,
-                                int *num_laps, bool *reverse);
+    bool handleAllVotes(std::string *track_name, int *num_laps,
+                        bool *reverse);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();

@@ -492,12 +492,8 @@ void ServerLobby::asynchronousUpdate()
         std::string track_name;
         int num_laps;
         bool reverse;
-        auto result = handleVote(&track_name, &num_laps, &reverse);
-        if (isVotingOver() ||
-            (std::get<0>(result) &&
-            m_timeout.load() -
-            (int64_t)(ServerConfig::m_voting_timeout / 2.0f * 1000.0f) <
-            (int64_t)StkTime::getRealTimeMs()))
+        bool all_votes_in = handleAllVotes(&track_name, &num_laps, &reverse);
+        if (isVotingOver() || all_votes_in)
         {
             m_game_setup->setRace(track_name, num_laps, reverse);
             // Remove disconnected player (if any) one last time
@@ -1895,13 +1891,14 @@ void ServerLobby::playerVote(Event* event)
 }   // playerVote
 
 // ----------------------------------------------------------------------------
-/** Returns the information about a current vote.
+/** Select the track to be used based on all votes being received.
  *  \param track_name Name of the track voted for.
  *  \param num_laps Number of laps.
  *  \param reverse If reverse track is to be used.
+ *  \result True if a vote from each player has been received, false otherwise.
  */
-std::tuple<bool> ServerLobby::handleVote(std::string *track_name,
-                                         int *num_laps, bool *reverse)
+bool ServerLobby::handleAllVotes(std::string *track_name, int *num_laps,
+                                 bool *reverse)
 {
     // Default settings if no votes at all
     RandomGenerator rg;
@@ -1912,19 +1909,15 @@ std::tuple<bool> ServerLobby::handleVote(std::string *track_name,
     *reverse    = track_name->size() % 2 == 0;
 
 
-    float cur_players = 0.0f;
+    int cur_players = 0;
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
     {
         if (peer->hasPlayerProfiles() && !peer->isWaitingForGame())
-            cur_players += 1.0f;
+            cur_players ++;
     }
-    if (cur_players == 0.0f)
-        return std::make_tuple(false);
+    if (cur_players == 0) return false;
 
-    float tracks_rate   = 0.0f;
-    float laps_rate     = 0.0f;
-    float reverses_rate = 0.0f;
     std::map<std::string, unsigned> tracks;
     std::map<unsigned, unsigned> laps;
     std::map<bool, unsigned> reverses;
@@ -1963,7 +1956,6 @@ std::tuple<bool> ServerLobby::handleVote(std::string *track_name,
     if (track_vote != tracks.end())
     {
         *track_name = track_vote->first;
-        tracks_rate = float(track_vote->second) / cur_players;
     }
 
     vote = 0;
@@ -1979,7 +1971,6 @@ std::tuple<bool> ServerLobby::handleVote(std::string *track_name,
     if (lap_vote != laps.end())
     {
         *num_laps = lap_vote->first;
-        laps_rate = float(lap_vote->second) / cur_players;
     }
 
     vote = 0;
@@ -1995,12 +1986,10 @@ std::tuple<bool> ServerLobby::handleVote(std::string *track_name,
     if (reverse_vote != reverses.end())
     {
         *reverse = reverse_vote->first;
-        reverses_rate = float(reverse_vote->second) / cur_players;
     }
 
-    return std::make_tuple(tracks_rate > 0.5f && 
-                           laps_rate > 0.5f   && reverses_rate > 0.5f );
-}   // handleVote
+    return m_peers_votes.size() == cur_players;
+}   // handleAllVotes
 
 // ----------------------------------------------------------------------------
 std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
