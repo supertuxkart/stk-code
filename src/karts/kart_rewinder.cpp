@@ -155,7 +155,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
     buffer->addUInt16(m_vehicle->getTimedRotationTicks());
-    buffer->add(m_vehicle->getTimedRotation());
+    buffer->addFloat(m_vehicle->getTimedRotation());
 
     // For collision rewind
     buffer->addUInt16(m_bounce_back_ticks);
@@ -262,10 +262,10 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     }
 
     uint16_t time_rot = buffer->getUInt16();
+    float timed_rotation_y = buffer->getFloat();
     // Set timed rotation divides by time_rot
     m_vehicle->setTimedRotation(time_rot,
-                                stk_config->ticks2Time(time_rot) 
-                                * buffer->getVec3());
+        stk_config->ticks2Time(time_rot) * timed_rotation_y);
 
     // Collision rewind
     m_bounce_back_ticks = buffer->getUInt16();

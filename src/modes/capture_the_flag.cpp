@@ -35,7 +35,7 @@
 #include <algorithm>
 
 const Vec3 g_kart_flag_offset(0.0, 0.2f, -0.5f);
-const float g_capture_length = 2.0f;
+const float g_capture_length = 3.0f;
 const int g_captured_score = 10;
 
 // ----------------------------------------------------------------------------

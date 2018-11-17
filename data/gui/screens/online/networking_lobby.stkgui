@@ -15,21 +15,21 @@
             </div>
         </div>
         <spacer height="2%"/>
-        <div x="2%" width="96%" height="fit" layout="horizontal-row">
-            <box proportion="4" height="fit" layout="vertical-row">
+        <div x="2%" width="96%" height="18%" layout="horizontal-row">
+            <box proportion="4" height="100%" layout="vertical-row">
                 <textbox id="chat" width="100%"/>
-                <spacer height="10"/>
+                <spacer height="20%"/>
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <button id="send" width="20%" height="fit" I18N="In the network lobby" text="Send" />
-                    <spacer width="1%"/>
-                    <label id="timeout-message" width="79%" height="fit"/>
+                    <button id="send" width="20%" height="fit" I18N="In the network lobby" text="Send"/>
+                    <spacer width="3%"/>
+                    <label id="timeout-message" width="79%" height="fit" text="" word_wrap="true" align="center"/>
                 </div>
             </box>
             <spacer width="3%"/>
             <icon-button id="start" proportion="1" width="64" height="64" icon="gui/icons/green_check.png" align="top"
                 I18N="In the network lobby" text="Start race"/>
-            <icon-button id="exit" proportion="1" width="64" height="64" icon="gui/icons/main_quit.png" align="top"
-                I18N="In the network lobby" text="Exit"/>
+            <icon-button id="config" proportion="1" width="64" height="64" icon="gui/icons/main_options.png" align="top"
+                I18N="In the network lobby" text="Server Configuration"/>
         </div>
         <spacer height="1%"/>
     </div>

@@ -197,6 +197,7 @@ RaceGUI::RaceGUI()
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
+    m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "gp_new.png");
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -307,8 +308,6 @@ void RaceGUI::renderGlobal(float dt)
             drawGlobalPlayerIcons(0);
         }
     }
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-        drawScores();
 #endif
 }   // renderGlobal
 
@@ -353,55 +352,6 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
 }   // renderPlayerView
-
-
-//-----------------------------------------------------------------------------
-/** Shows the current soccer result.
- */
-void RaceGUI::drawScores()
-{
-#ifndef SERVER_ONLY
-    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-    int offset_y = 5;
-    int offset_x = 5;
-    gui::ScalableFont* font = GUIEngine::getTitleFont();
-    static video::SColor color = video::SColor(255,255,255,255);
-
-    //Draw two teams score
-    irr::video::ITexture *team_icon = m_red_team;
-
-    for(unsigned int i=0; i<2; i++)
-    {
-        core::recti position(offset_x, offset_y,
-            offset_x + 2*m_minimap_player_size, offset_y + 2*m_minimap_player_size);
-
-        core::stringw score = StringUtils::toWString(sw->getScore((KartTeam)i));
-        int string_height =
-            GUIEngine::getFont()->getDimension(score.c_str()).Height;
-        core::recti pos(position.UpperLeftCorner.X + 5,
-                        position.LowerRightCorner.Y + offset_y,
-                        position.LowerRightCorner.X,
-                        position.LowerRightCorner.Y + string_height);
-
-        font->setBlackBorder(true);
-        font->draw(score.c_str(),pos,color);
-        font->setBlackBorder(false);
-
-        if (i == 1)
-        {
-            team_icon = m_blue_team;
-        }
-        core::rect<s32> indicator_pos(offset_x, offset_y,
-                                     offset_x + (int)(m_minimap_player_size*2),
-                                     offset_y + (int)(m_minimap_player_size*2));
-        core::rect<s32> source_rect(core::position2d<s32>(0,0),
-                                                   team_icon->getSize());
-        draw2DImage(team_icon,indicator_pos,source_rect,
-            NULL,NULL,true);
-        offset_x += position.LowerRightCorner.X + 30;
-    }
-#endif
-}   // drawScores
 
 //-----------------------------------------------------------------------------
 /** Displays the racing time on the screen.
@@ -843,29 +793,6 @@ void RaceGUI::drawRank(const AbstractKart *kart,
                       int meter_height, float dt)
 {
     static video::SColor color = video::SColor(255, 255, 255, 255);
-    // Draw hit or capture limit in network game
-    if ((race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL ||
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG) &&
-        race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max())
-    {
-        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-        font->setScale(min_ratio * 1.0f);
-        font->setShadow(video::SColor(255, 128, 0, 0));
-        std::ostringstream oss;
-        oss << race_manager->getHitCaptureLimit();
-
-        core::recti pos;
-        pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
-                                            int(offset.Y - 0.49f*meter_height));
-        pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
-                                            int(offset.Y - 0.49f*meter_height));
-
-        font->setBlackBorder(true);
-        font->draw(oss.str().c_str(), pos, color, true, true);
-        font->setBlackBorder(false);
-        font->setScale(1.0f);
-        return;
-    }
 
     // Draw rank
     WorldWithRank *world = dynamic_cast<WorldWithRank*>(World::getWorld());
@@ -1223,14 +1150,50 @@ void RaceGUI::drawLap(const AbstractKart* kart,
                             - m_lap_width - 10;
     pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
 
-    // Draw CTF scores with red score - blue score
+    // Draw CTF / soccer scores with red score - blue score (score limit)
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
-    if (ctf)
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    int hit_capture_limit =
+        race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max()
+        ? race_manager->getHitCaptureLimit() : -1;
+    int score_limit = sw && !race_manager->hasTimeTarget() ?
+        race_manager->getMaxGoal() : ctf ? hit_capture_limit : -1;
+    if (!ctf && ffa && hit_capture_limit != -1)
     {
+        int icon_width = irr_driver->getActualScreenSize().Height/19;
+        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
+                                    pos.UpperLeftCorner.Y,
+                                    viewport.LowerRightCorner.X - 10,
+                                    pos.UpperLeftCorner.Y + icon_width);
+        core::rect<s32> source_rect(core::position2d<s32>(0,0),
+                                                m_champion->getSize());
+        draw2DImage(m_champion, indicator_pos, source_rect,
+            NULL, NULL, true);
+
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        font->setBlackBorder(true);
+        pos.UpperLeftCorner.X += 30;
+        font->draw(StringUtils::toWString(hit_capture_limit).c_str(), pos, color);
+        font->setBlackBorder(false);
+        font->setScale(1.0f);
+        return;
+    }
+
+    if (ctf || sw)
+    {
+        if (score_limit != -1)
+            pos.UpperLeftCorner.X -= 80;
+
+        int red_score = ctf ? ctf->getRedScore() : sw->getScore(KART_TEAM_RED);
+        int blue_score = ctf ? ctf->getBlueScore() : sw->getScore(KART_TEAM_BLUE);
+
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         font->setBlackBorder(true);
         font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
-        core::stringw text = StringUtils::toWString(ctf->getRedScore());
+        core::stringw text = StringUtils::toWString(red_score);
         font->draw(text, pos, video::SColor(255, 255, 0, 0));
         core::dimension2du d = font->getDimension(text.c_str());
         pos += core::position2di(d.Width, 0);
@@ -1238,9 +1201,17 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         font->draw(text, pos, video::SColor(255, 255, 255, 255));
         d = font->getDimension(text.c_str());
         pos += core::position2di(d.Width, 0);
-        text = StringUtils::toWString(ctf->getBlueScore());
+        text = StringUtils::toWString(blue_score);
         font->draw(text, pos, video::SColor(255, 0, 0, 255));
         font->setScale(1.0f);
+        pos += core::position2di(d.Width, 0);
+        if (score_limit != -1)
+        {
+            text = L" (";
+            text += StringUtils::toWString(score_limit);
+            text += L")";
+            font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        }
         font->setBlackBorder(false);
         return;
     }
@@ -1267,7 +1238,6 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     pos.UpperLeftCorner.X -= icon_width;
     pos.LowerRightCorner.X -= icon_width;
 
-    static video::SColor color = video::SColor(255, 255, 255, 255);
     std::ostringstream out;
     out << lap + 1 << "/" << race_manager->getNumLaps();
 

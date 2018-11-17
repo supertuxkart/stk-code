@@ -119,9 +119,16 @@ private:
      *  will always reappear after a while. */
     int m_used_up_counter;
 
-    /** The original position - saves calls to m_node->getPosition()
-    * and then converting this value to a Vec3. */
+    /** The position of this ItemState. */
     Vec3 m_xyz;
+
+    /** The original rotation of the item. While this is technically a visual
+     *  only value (atm, it could be used for collision detection), it is
+     *  required to make sure a client can display items with the right normal
+     *  (in case that a client would get a different (or no) normal from a
+     *  raycast).
+     */
+    Vec3 m_normal;
 
     /** The 'owner' of the item, i.e. the kart that dropped this item.
     *  Is NULL if the item is part of the track. */
@@ -154,7 +161,7 @@ protected:
 
 public:
          ItemState(ItemType type, const AbstractKart *owner=NULL, int id = -1);
-    void initItem(ItemType type, const Vec3& xyz);
+    void initItem(ItemType type, const Vec3& xyz, const Vec3& normal);
     void update(int ticks);
     void setDisappearCounter();
     virtual void collected(const AbstractKart *kart);
@@ -273,6 +280,8 @@ public:
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
     // ------------------------------------------------------------------------
+    ItemType getGrahpicalType() const;
+    // ------------------------------------------------------------------------
     /** Returns the original type of this item. */
     ItemType getOriginalType() const { return m_original_type; }
     // ------------------------------------------------------------------------
@@ -305,6 +314,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the XYZ position of the item. */
     const Vec3& getXYZ() const { return m_xyz; }
+    // ------------------------------------------------------------------------
+    /** Returns the normal of the ItemState. */
+    const Vec3 getNormal() const
+    {
+        return m_normal;
+    }
 };   // class ItemState
 
 // ============================================================================
@@ -350,7 +365,7 @@ private:
      *  would not be collected. Used by the AI to avoid items. */
     Vec3 *m_avoidance_points[2];
 
-    void          initItem(ItemType type, const Vec3 &xyz);
+    void          initItem(ItemType type, const Vec3 &xyz, const Vec3 &normal);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
     void          handleNewMesh(ItemType type);
 
@@ -432,6 +447,12 @@ public:
         return m_avoidance_points[1];
     }   // getAvoidancePoint
 
+    // ------------------------------------------------------------------------
+    /** Returns the normal of the item. */
+    const Vec3 getNormal() const
+    {
+        return quatRotate(m_original_rotation, Vec3(0,1,0));
+    }
     // ------------------------------------------------------------------------
     scene::ISceneNode *getSceneNode()
     {

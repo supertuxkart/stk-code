@@ -238,12 +238,17 @@ namespace ServerConfig
         "(time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
         " negative value to disable time limit."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_auto_lap_ratio
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(-1.0f, "auto-lap-ratio",
-        "Value used by server to automatically calculate "
-        "lap of each race in network game, if more than 0.0f, the number of "
-        "lap of each track vote in linear race will be determined by "
-        "max(1.0f, auto-lap-ratio * default lap of that track)."));
+    SERVER_CFG_PREFIX FloatServerConfigParam m_auto_game_time_ratio
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(-1.0f, "auto-game-time-ratio",
+        "Value used by server to automatically estimate each game time. "
+        "For races, it decides the lap of each race in network game, "
+        "if more than 0.0f, the number of lap of each track vote in "
+        "linear race will be determined by "
+        "max(1.0f, auto-game-time-ratio * default lap of that track). "
+        "For soccer if more than 0.0f, for time limit game it will be "
+        "auto-game-time-ratio * soccer-time-limit in UserConfig, for goal "
+        "limit game it will be auto-game-time-ratio * numgoals "
+        "in UserConfig, -1 to disable for all."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_max_ping
         SERVER_CFG_DEFAULT(IntServerConfigParam(300, "max-ping",

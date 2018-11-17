@@ -77,6 +77,9 @@ namespace GUIEngine
         virtual void setActive(bool active=true);
         
         virtual EventPropagation onActivationInput(const int playerID);
+        virtual EventPropagation rightPressed(const int playerID);
+        virtual EventPropagation leftPressed (const int playerID);
+
     };
 }
 

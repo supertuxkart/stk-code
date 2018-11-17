@@ -627,6 +627,10 @@ void LinearWorld::getKartsDisplayInfo(
             }
             rank_info.m_text = irr::core::stringw(str.c_str());
         }
+        else if (kart->hasFinishedRace())
+        {
+            rank_info.m_text = kart->getController()->getName();
+        }
         else
         {
             rank_info.m_text = "";

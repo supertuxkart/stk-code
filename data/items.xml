@@ -8,7 +8,7 @@
        isn't an item, it is internally 
        handled as one, so list it here    -->
   <bubblegum   model="bubblegum.spm"       lowmodel="bubblegum-low.spm"       glow="246 150 209"/>
-  <bubblegum-nolok   model="bubblegum-nolok.spm" lowmodel="bubblegum-nolok-low.spm"/>
+  <bubblegum-nolok   model="bubblegum-nolok.spm" lowmodel="bubblegum-nolok-low.spm" glow="20 190 0"/>
   <easter-egg  model="easter_egg.spm" glow="0 60 120" />
 </items>
 

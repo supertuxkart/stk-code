@@ -434,8 +434,3 @@ void IconButtonWidget::setVisible(bool visible)
         m_label->setVisible(visible);
 }
 
-// -----------------------------------------------------------------------------
-void IconButtonWidget::setText(const wchar_t *s)
-{
-    m_label->setText(s);
-}

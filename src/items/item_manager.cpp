@@ -257,42 +257,44 @@ unsigned int ItemManager::insertItem(Item *item)
  *  bubblegum).
  *  \param type Type of the item.
  *  \param kart The kart that drops the new item.
- *  \param xyz Can be used to overwrite the item location (used in networking).
+ *  \param server_xyz Can be used to overwrite the item location.
+ *  \param server_normal The normal as seen on the server.
  */
 Item* ItemManager::dropNewItem(ItemState::ItemType type,
-                               const AbstractKart *kart, const Vec3 *xyz)
+                               const AbstractKart *kart, 
+                               const Vec3 *server_xyz,
+                               const Vec3 *server_normal)
 {
-    Vec3 hit_point;
-    Vec3 normal;
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() && !server_xyz) return NULL;
+    Vec3 normal, pos;
     const Material* material_hit;
-    Vec3 pos = xyz ? *xyz : kart->getXYZ();
-    Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
-    Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
-                                                        &hit_point,
-                                                        &material_hit,
-                                                        &normal);
-
-    // We will get no material if the kart is 'over nothing' when dropping
-    // the bubble gum. In most cases this means that the item does not need
-    // to be created (and we just return NULL). Only exception: if the server
-    // has sent a 'new item' event (which means its raycast found terrain),
-    // but the client does not have found a terrain (e.g. differences in
-    // position or more likely floating point differences). In this case, we
-    // must use the server position. In this and only this case xyz is not
-    // NULL (and then contains the server's position for the item).    
-    if (!material_hit && !xyz) return NULL;
-
-    if (!material_hit)
+    if (!server_xyz)
     {
-        // We are on a client which has received a new item event. Still
-        // create this item
-        normal.setValue(0, 1, 0);  // Arbitrary, we don't have a normal
-        pos = *xyz;
+        // We are doing a new drop locally, i.e. not based on
+        // server data. So we need a raycast to find the correct
+        // location and normal of the item:
+        pos = server_xyz ? *server_xyz : kart->getXYZ();
+        Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
+        Vec3 hit_point;
+        Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
+                                                            &hit_point,
+                                                            &material_hit,
+                                                            &normal);
+
+        // We will get no material if the kart is 'over nothing' when dropping
+        // the bubble gum. In most cases this means that the item does not need
+        // to be created (and we just return NULL). 
+        if (!material_hit) return NULL;
+        normal.normalize();
+        pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
     }
     else
     {
-        normal.normalize();
-        pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
+        // We are on a client which has received a new item event from the
+        // server. So use the server's data for the new item:
+        normal = *server_normal;
+        pos    = *server_xyz;
     }
 
     ItemState::ItemType mesh_type = type;

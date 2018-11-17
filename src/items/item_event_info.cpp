@@ -43,7 +43,8 @@ ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
         if (m_type == IEI_NEW)
         {
             m_xyz = buffer->getVec3();
-            *count -= 12;
+            m_normal = buffer->getVec3();
+            *count -= 24;
         }
         else   // IEI_COLLECT
         {
@@ -71,7 +72,10 @@ void ItemEventInfo::saveState(BareNetworkString *buffer)
         // Only new item and collecting items need the index and kart id:
         buffer->addUInt8(m_kart_id).addUInt16(m_index);
         if (m_type == IEI_NEW)
+        {
             buffer->add(m_xyz);
+            buffer->add(m_normal);
+        }
         else if (m_type == IEI_COLLECT)
             buffer->addUInt16(m_ticks_till_return);
     }

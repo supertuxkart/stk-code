@@ -121,7 +121,7 @@ void btKart::reset()
     m_num_wheels_on_ground       = 0;
     m_additional_impulse         = btVector3(0,0,0);
     m_ticks_additional_impulse   = 0;
-    m_additional_rotation        = btVector3(0,0,0);
+    m_additional_rotation        = 0;
     m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
@@ -522,9 +522,9 @@ void btKart::updateVehicle( btScalar step )
         btTransform &t = m_chassisBody->getWorldTransform();
         // We have fixed timestep
         float dt = stk_config->ticks2Time(1);
-        btQuaternion add_rot(m_additional_rotation.getY()*dt,
-                             m_additional_rotation.getX()*dt,
-                             m_additional_rotation.getZ()*dt);
+        btQuaternion add_rot(m_additional_rotation * dt,
+                             0.0f,
+                             0.0f);
         t.setRotation(t.getRotation()*add_rot);
         m_chassisBody->setWorldTransform(t);
         // Also apply the rotation to the interpolated world transform.

@@ -133,7 +133,9 @@ public:
     virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
                                     const Vec3 &normal);
     virtual Item*  dropNewItem     (ItemState::ItemType type,
-                                    const AbstractKart* parent, const Vec3 *xyz=NULL);
+                                    const AbstractKart* parent,
+                                    const Vec3 *server_xyz = NULL,
+                                    const Vec3 *normal = NULL);
     virtual Item* placeTrigger     (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
     void           update          (int ticks);

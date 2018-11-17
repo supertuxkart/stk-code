@@ -99,6 +99,8 @@ private:
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;
     irr::video::ITexture *m_heart_icon;
+    /** Texture for the hit limit icon*/
+    irr::video::ITexture* m_champion;
 
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
@@ -140,8 +142,6 @@ private:
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
     void drawLiveDifference    ();
-    void drawScores();
-
 
 public:
 

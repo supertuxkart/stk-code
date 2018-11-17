@@ -74,10 +74,13 @@ void ItemState::setDisappearCounter()
 // -----------------------------------------------------------------------
 /** Initialises an item.
  *  \param type Type for this item.
+ *  \param xyz The position for this item.
+ *  \param normal The normal for this item.
  */
-void ItemState::initItem(ItemType type, const Vec3& xyz)
+void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 {
     m_xyz               = xyz;
+    m_normal            = normal;
     m_original_type     = ITEM_NONE;
     m_ticks_till_return = 0;
     setDisappearCounter();
@@ -133,6 +136,16 @@ void ItemState::collected(const AbstractKart *kart)
     }
 }   // collected
 
+// ----------------------------------------------------------------------------
+/** Returns the graphical type of this item should be using (takes nolok into
+ *  account). */
+Item::ItemType ItemState::getGrahpicalType() const
+{
+    return m_previous_owner && m_previous_owner->getIdent() == "nolok" &&
+        getType() == ITEM_BUBBLEGUM ?
+        ITEM_BUBBLEGUM_NOLOK : getType();
+}   // getGrahpicalType
+
 // ============================================================================
 /** Constructor for an item.
  *  \param type Type of the item.
@@ -156,7 +169,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
-    initItem(type, xyz);
+    initItem(type, xyz, normal);
     m_graphical_type    = type;
     m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
     m_listener          = NULL;
@@ -181,7 +194,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     }
     m_node              = lodnode;
     setType(type);
-    handleNewMesh(getType());
+    handleNewMesh(getGrahpicalType());
 
 #ifdef DEBUG
     std::string debug_name("item: ");
@@ -206,7 +219,7 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     : ItemState(ITEM_TRIGGER)
 {
     m_distance_2        = distance*distance;
-    initItem(ITEM_TRIGGER, xyz);
+    initItem(ITEM_TRIGGER, xyz, /*normal not required*/Vec3(0,0,0));
     m_graphical_type    = ITEM_TRIGGER;
     m_original_rotation = btQuaternion(0, 0, 0, 1);
     m_node              = NULL;
@@ -218,10 +231,12 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 /** Initialises the item. Note that m_distance_2 must be defined before calling
  *  this function, since it pre-computes some values based on this.
  *  \param type Type of the item.
+ *  \param xyz Position of this item.
+ *  \param normal Normal for this item.
  */
-void Item::initItem(ItemType type, const Vec3 &xyz)
+void Item::initItem(ItemType type, const Vec3 &xyz, const Vec3&normal)
 {
-    ItemState::initItem(type, xyz);
+    ItemState::initItem(type, xyz, normal);
     // Now determine in which quad this item is, and its distance
     // from the center within this quad.
     m_graph_node = Graph::UNKNOWN_SECTOR;
@@ -345,7 +360,7 @@ void Item::updateGraphics(float dt)
 
     if (m_graphical_type != getType())
     {
-        handleNewMesh(getType());
+        handleNewMesh(getGrahpicalType());
         m_graphical_type = getType();
     }
 

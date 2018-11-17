@@ -87,7 +87,7 @@ void Skidding::reset()
     btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost
     if (!m_kart->isGhostKart())
-        m_kart->getVehicle()->setTimedRotation(0, rot);
+        m_kart->getVehicle()->setTimedRotation(0, 0);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -535,9 +535,9 @@ void Skidding::update(int ticks, bool is_on_ground,
                 float t = std::min(skid_time_float, kp->getSkidVisualTime());
                 t       = std::min(t,           kp->getSkidRevertVisualTime());
 
-                btVector3 rot(0, m_visual_rotation * kp->getSkidPostSkidRotateFactor(), 0);
                 m_kart->getVehicle()->setTimedRotation(
-                    (uint16_t)stk_config->time2Ticks(t), rot);
+                    (uint16_t)stk_config->time2Ticks(t),
+                    m_visual_rotation * kp->getSkidPostSkidRotateFactor());
                 // skid_time is used to count backwards for the GFX
                 m_skid_time = stk_config->time2Ticks(t);
                 if(bonus_time>0)

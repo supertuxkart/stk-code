@@ -2672,7 +2672,7 @@ float Kart::applyAirFriction(float engine_power)
     //Instead of making increasing gears have enormous power gaps, apply friction
 
     float mass_factor = m_kart_properties->getMass()/350.0f;
-    float compense_linear_slowdown = 39.33f*getSpeed()*mass_factor;
+    float compense_linear_slowdown = 39.33f*fabsf(getSpeed())*mass_factor;
 
     engine_power += compense_linear_slowdown;
 

@@ -273,6 +273,8 @@ void TracksScreen::init()
     {
         // Notice: for arena (battle / soccer) lap and reverse will be mapped to
         // goals / time limit and random item location
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        assert(cl);
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
@@ -297,25 +299,34 @@ void TracksScreen::init()
         }
         else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
-            m_laps->setVisible(true);
-            getWidget("lap-text")->setVisible(true);
-            auto cl = LobbyProtocol::get<ClientLobby>();
-            assert(cl);
-            if (cl->getGameSetup()->isSoccerGoalTarget())
+            if (cl->isServerAutoGameTime())
             {
-                //I18N: In track screen
-                getWidget<LabelWidget>("lap-text")->setText(_("Number of goals to win"), false);
-                m_laps->setValue(UserConfigParams::m_num_goals);
-                m_laps->setMin(1);
-                m_laps->setMax(10);
+                getWidget("lap-text")->setVisible(false);
+                m_laps->setVisible(false);
+                m_laps->setValue(0);
             }
             else
             {
-                //I18N: In track screen
-                getWidget<LabelWidget>("lap-text")->setText(_("Maximum time (min.)"), false);
-                m_laps->setValue(UserConfigParams::m_soccer_time_limit);
-                m_laps->setMin(1);
-                m_laps->setMax(15);
+                m_laps->setVisible(true);
+                getWidget("lap-text")->setVisible(true);
+                auto cl = LobbyProtocol::get<ClientLobby>();
+                assert(cl);
+                if (cl->getGameSetup()->isSoccerGoalTarget())
+                {
+                    //I18N: In track screen
+                    getWidget<LabelWidget>("lap-text")->setText(_("Number of goals to win"), false);
+                    m_laps->setValue(UserConfigParams::m_num_goals);
+                    m_laps->setMin(1);
+                    m_laps->setMax(10);
+                }
+                else
+                {
+                    //I18N: In track screen
+                    getWidget<LabelWidget>("lap-text")->setText(_("Maximum time (min.)"), false);
+                    m_laps->setValue(UserConfigParams::m_soccer_time_limit);
+                    m_laps->setMin(1);
+                    m_laps->setMax(15);
+                }
             }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
@@ -325,9 +336,7 @@ void TracksScreen::init()
         }
         else
         {
-            auto cl = LobbyProtocol::get<ClientLobby>();
-            assert(cl);
-            if (cl->isServerAutoLap())
+            if (cl->isServerAutoGameTime())
             {
                 getWidget("lap-text")->setVisible(false);
                 m_laps->setVisible(false);

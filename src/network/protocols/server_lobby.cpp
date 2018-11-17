@@ -460,6 +460,8 @@ void ServerLobby::asynchronousUpdate()
                 !m_game_setup->isGrandPrixStarted())
             {
                 resetPeersReady();
+                if (m_timeout.load() != std::numeric_limits<int64_t>::max())
+                    updatePlayerList();
                 m_timeout.store(std::numeric_limits<int64_t>::max());
             }
             if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs() ||
@@ -833,7 +835,9 @@ void ServerLobby::startSelection(const Event *event)
         }
         if (ServerConfig::m_owner_less)
         {
-            m_peers_ready.at(event->getPeerSP()) = true;
+            m_peers_ready.at(event->getPeerSP()) =
+                !m_peers_ready.at(event->getPeerSP());
+            updatePlayerList();
             return;
         }
         if (event->getPeerSP() != m_server_owner.lock())
@@ -879,7 +883,7 @@ void ServerLobby::startSelection(const Event *event)
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION).addUInt8(
         m_game_setup->isGrandPrixStarted() ? 1 : 0)
-        .addUInt8(ServerConfig::m_auto_lap_ratio > 0.0f ? 1 : 0);
+        .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0);
 
     // Remove karts / tracks from server that are not supported on all clients
     std::set<std::string> karts_erase, tracks_erase;
@@ -1744,6 +1748,11 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
+        std::shared_ptr<STKPeer> p = profile->getPeer();
+        uint8_t ready = (!game_started &&
+            m_peers_ready.find(p) != m_peers_ready.end() &&
+            m_peers_ready.at(p)) ? 1 : 0;
+        pl->addUInt8(ready);
     }
 
     // Don't send this message to in-game players
@@ -1876,14 +1885,14 @@ void ServerLobby::playerVote(Event* event)
 
     if (race_manager->modeHasLaps())
     {
-        if (ServerConfig::m_auto_lap_ratio > 0.0f)
+        if (ServerConfig::m_auto_game_time_ratio > 0.0f)
         {
             Track* t = track_manager->getTrack(track_name);
             if (t)
             {
                 lap = (uint8_t)(fmaxf(1.0f,
                     (float)t->getDefaultNumberOfLaps() *
-                    ServerConfig::m_auto_lap_ratio));
+                    ServerConfig::m_auto_game_time_ratio));
             }
             else
             {
@@ -1894,6 +1903,20 @@ void ServerLobby::playerVote(Event* event)
         }
         else if (lap == 0)
             lap = (uint8_t)3;
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER &&
+        ServerConfig::m_auto_game_time_ratio > 0.0f)
+    {
+        if (m_game_setup->isSoccerGoalTarget())
+        {
+            lap = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                UserConfigParams::m_num_goals);
+        }
+        else
+        {
+            lap = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                UserConfigParams::m_soccer_time_limit);
+        }
     }
 
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
@@ -2445,6 +2468,7 @@ void ServerLobby::addWaitingPlayersToGame()
 void ServerLobby::resetServer()
 {
     addWaitingPlayersToGame();
+    resetPeersReady();
     m_state = NetworkConfig::get()->isLAN() ?
         WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
     updatePlayerList(true/*update_when_reset_server*/);
