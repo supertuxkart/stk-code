@@ -2798,11 +2798,12 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             // lift the foot from throttle, let friction slow it down
             assert(!std::isnan(m_controls.getAccel()));
             assert(!std::isnan(engine_power));
-            applyEngineForce(engine_power-braking_power);
+            // Engine must be 0, otherwise braking is not used at all
+            applyEngineForce(0);
 
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people
-            if(std::abs(m_speed) < 5.0f)
+            if (std::abs(m_speed) < 5.0f)
                 m_vehicle->setAllBrakes(20.0f);
             else
                 m_vehicle->setAllBrakes(0);
