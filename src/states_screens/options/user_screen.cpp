@@ -36,6 +36,7 @@
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
@@ -748,6 +749,8 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_general")
+            screen = OptionsScreenGeneral::getInstance();
         else if (selection == "tab_language")
             screen = OptionsScreenLanguage::getInstance();
         if(screen)

@@ -7,15 +7,15 @@
     
     <best>
         <karts number="1"/>
-        <requirements energy="20" time="135"/>
+        <requirements energy="20" time="128"/>
     </best>
     <hard>
         <karts number="1"/>
-        <requirements energy="18" time="165"/>
+        <requirements energy="18" time="155"/>
     </hard>
     <medium>
         <karts number="1"/>
-        <requirements energy="15" time="195"/>
+        <requirements energy="15" time="190"/>
     </medium>
     <easy>
         <karts number="1"/>

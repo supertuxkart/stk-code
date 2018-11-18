@@ -988,22 +988,24 @@ void Kart::finishedRace(float time, bool from_server)
     // If this is spare tire kart, end now
     if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
-    if (is_linear_race && m_controller->isPlayerController())
+    if (is_linear_race && m_controller->isPlayerController() && !m_eliminated)
     {
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
         {
-            if (race_manager->
-                getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-                getPosition() == 2)
-                m->addMessage(_("You won the race!"), this, 2.0f);
-            else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
-            {
-                m->addMessage((getPosition() == 1 ?
-                _("You won the race!") : _("You finished the race!")) ,
-                this, 2.0f);
-            }
+            bool won_the_race = false;
+            unsigned int win_position = 1;
+
+            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+                win_position = 2;
+
+            if (getPosition() == (int)win_position &&
+                World::getWorld()->getNumKarts() > win_position)
+                won_the_race = true;
+
+            m->addMessage((won_the_race ?
+            _("You won the race!") : _("You finished the race!")) ,
+            this, 2.0f, video::SColor(255, 255, 255, 255), true, true, true);
         }
     }
 

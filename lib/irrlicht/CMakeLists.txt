@@ -52,7 +52,7 @@ if(NOT SERVER_ONLY)
     if(ENABLE_WAYLAND_DEVICE)
         find_package(Wayland)
         
-        if(WAYLAND_FOUND)
+        if(WAYLAND_FOUND AND NOT (WAYLAND_VERSION VERSION_LESS "1.14"))
             include_directories(${WAYLAND_INCLUDE_DIR})
             add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
         else()

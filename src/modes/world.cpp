@@ -1160,6 +1160,7 @@ void World::updateHighscores(int* best_highscore_rank)
         if(!m_karts[index[pos]]->getController()->isLocalPlayerController())
             continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
+        if (m_karts[index[pos]]->isEliminated()) continue;
 
         assert(index[pos] < m_karts.size());
         Kart *k = (Kart*)m_karts[index[pos]].get();

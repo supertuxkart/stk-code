@@ -174,11 +174,28 @@ void SelectChallengeDialog::updateSolvedIcon(const ChallengeStatus* c, RaceManag
     }
 } //updateSolvedIcon
 
+// -----------------------------------------------------------------------------
+void SelectChallengeDialog::onUpdate(float dt)
+{
+    if (m_self_destroy)
+    {
+        ModalDialog::clearWindow();
+        ModalDialog::dismiss();
+        return;
+    }
+}   // onUpdate
+
 // ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSourceParam)
 {
     std::string eventSource = eventSourceParam;
+    if (eventSource == "back")
+    {
+        m_self_destroy = true;
+        return GUIEngine::EVENT_BLOCK;
+    }
+
     if (eventSource == "novice" || eventSource == "intermediate" ||
         eventSource == "expert" || eventSource == "supertux")
     {
