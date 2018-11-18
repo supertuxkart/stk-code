@@ -988,7 +988,7 @@ void Kart::finishedRace(float time, bool from_server)
     // If this is spare tire kart, end now
     if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
-    if (is_linear_race && m_controller->isPlayerController())
+    if (is_linear_race && m_controller->isPlayerController() && !m_eliminated)
     {
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
