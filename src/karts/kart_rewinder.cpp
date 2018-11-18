@@ -122,13 +122,16 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     // 1) Firing and related handling
     // -----------
     buffer->addUInt16(m_bubblegum_ticks);
-    buffer->addUInt16(m_view_blocked_by_plunger);
+    bool plunger_on = m_view_blocked_by_plunger != 0;
     // m_invulnerable_ticks will not be negative
     AbstractKartAnimation* ka = getKartAnimation();
     bool has_animation = ka != NULL && ka->usePredefinedEndTransform();
     uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
-        (has_animation ? 1 << 14 : 0) | m_invulnerable_ticks;
+        (has_animation ? 1 << 14 : 0) | (plunger_on ? 1 << 13 : 0) |
+        m_invulnerable_ticks;
     buffer->addUInt16(fire_and_invulnerable);
+    if (plunger_on)
+        buffer->addUInt16(m_view_blocked_by_plunger);
 
     // 2) Kart animation status (tells the end transformation) or
     // physics values (transform and velocities)
@@ -196,11 +199,16 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     // 1) Firing and related handling
     // -----------
     m_bubblegum_ticks = buffer->getUInt16();
-    m_view_blocked_by_plunger = buffer->getUInt16();
     uint16_t fire_and_invulnerable = buffer->getUInt16();
     m_fire_clicked = ((fire_and_invulnerable >> 15) & 1) == 1;
     bool has_animation = ((fire_and_invulnerable >> 14) & 1) == 1;
-    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 14);
+    bool has_plunger = ((fire_and_invulnerable >> 13) & 1) == 1;
+    if (has_plunger)
+        m_view_blocked_by_plunger = buffer->getUInt16();
+    else
+        m_view_blocked_by_plunger = 0;
+
+    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 13);
 
     // 2) Kart animation status or transform and velocities
     // -----------
