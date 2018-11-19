@@ -75,6 +75,10 @@ private:
 
     bool m_received_server_result;
 
+    bool m_auto_started;
+
+    uint64_t m_auto_back_to_lobby_time;
+
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
 

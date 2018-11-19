@@ -110,9 +110,6 @@ RaceGUI::RaceGUI()
         else
             map_size_splitscreen = 0.5f;
     }
-    
-    World* world = World::getWorld();
-    assert(world != NULL);
 
     // Originally m_map_height was 100, and we take 480 as minimum res
     float scaling = irr_driver->getFrameSize().Height / 480.0f;

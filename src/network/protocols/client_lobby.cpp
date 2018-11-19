@@ -74,6 +74,7 @@ engine.
 ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
            : LobbyProtocol(NULL)
 {
+    m_auto_started = false;
     m_waiting_for_game = false;
     m_server_auto_game_time = false;
     m_received_server_result = false;
@@ -120,6 +121,7 @@ void ClientLobby::clearPlayers()
 void ClientLobby::setup()
 {
     clearPlayers();
+    m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
     m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
@@ -362,12 +364,19 @@ void ClientLobby::update(int ticks)
         if (!m_received_server_result)
         {
             m_received_server_result = true;
+            m_auto_back_to_lobby_time = StkTime::getRealTimeMs() + 5000;
             // In case someone opened paused race dialog or menu in network game
             GUIEngine::ModalDialog::dismiss();
             GUIEngine::ScreenKeyboard::dismiss();
             if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
                 StateManager::get()->enterGameState();
             World::getWorld()->enterRaceOverState();
+        }
+        if (NetworkConfig::get()->isAutoConnect() &&
+            StkTime::getRealTimeMs() > m_auto_back_to_lobby_time)
+        {
+            m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
+            doneWithResults();
         }
         break;
     case DONE:
@@ -376,10 +385,10 @@ void ClientLobby::update(int ticks)
         break;
     case REQUESTING_CONNECTION:
     case CONNECTED:
-        if (STKHost::get()->isAuthorisedToControl() &&
-            NetworkConfig::get()->isAutoConnect())
+        if (NetworkConfig::get()->isAutoConnect() && !m_auto_started)
         {
             // Send a message to the server to start
+            m_auto_started = true;
             NetworkString start(PROTOCOL_LOBBY_ROOM);
             start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
             STKHost::get()->sendToServer(&start, true);
@@ -558,6 +567,7 @@ void ClientLobby::connectionAccepted(Event* event)
     uint32_t server_version = data.getUInt32();
     NetworkConfig::get()->setJoinedServerVersion(server_version);
     assert(server_version != 0);
+    m_auto_started = false;
     m_state.store(CONNECTED);
     float auto_start_timer = data.getFloat();
     if (auto_start_timer != std::numeric_limits<float>::max())
@@ -936,8 +946,9 @@ void ClientLobby::exitResultScreen(Event *event)
     // In case the user opened a user info dialog
     GUIEngine::ModalDialog::dismiss();
     GUIEngine::ScreenKeyboard::dismiss();
-    
+
     setup();
+    m_auto_started = false;
     m_state.store(CONNECTED);
     RaceResultGUI::getInstance()->backToLobby();
 }   // exitResultScreen
