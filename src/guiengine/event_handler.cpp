@@ -400,9 +400,19 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
     if (w == NULL)
     {
         Widget* defaultWidget = NULL;
-        Screen* screen = GUIEngine::getCurrentScreen();
-        if (screen == NULL) return;
-        defaultWidget = screen->getFirstWidget();
+        
+        if (ScreenKeyboard::isActive())
+        {
+            defaultWidget = ScreenKeyboard::getCurrent()->getFirstWidget();
+        }
+        else if (ModalDialog::isADialogActive())
+        {
+            defaultWidget = ModalDialog::getCurrent()->getFirstWidget();
+        }
+        else if (GUIEngine::getCurrentScreen() != NULL)
+        {
+            defaultWidget = GUIEngine::getCurrentScreen()->getFirstWidget();
+        }
 
         if (defaultWidget != NULL)
         {
