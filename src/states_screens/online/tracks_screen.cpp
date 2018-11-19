@@ -486,6 +486,9 @@ void TracksScreen::voteForPlayer()
 // -----------------------------------------------------------------------------
 void TracksScreen::onUpdate(float dt)
 {
+    // The following code
+    if(!m_network_tracks) return;
+
     assert(m_votes);
 
     m_votes->setVisible(true);
