@@ -135,10 +135,11 @@ public:
     virtual bool allPlayersReady() const = 0;
     virtual bool isRacing() const = 0;
     void startVotingPeriod(float max_time);
-    int getRemainingVotingTime();
+    float getRemainingVotingTime();
     bool isVotingOver();
     // ------------------------------------------------------------------------
-    float getMaxVotingTime() { return m_max_voting_time * 1000.0f; }
+    /** Returns the maximum floating time in seconds. */
+    float getMaxVotingTime() { return m_max_voting_time / 1000.0f; }
     // ------------------------------------------------------------------------
     GameSetup* getGameSetup() const { return m_game_setup; }
 

@@ -67,8 +67,13 @@ namespace GUIEngine
 
         void add();
 
+        // --------------------------------------------------------------------
         /** Get the current value of the widget. */
         int getValue() {return m_value; };
+        // --------------------------------------------------------------------
+        /** Sets if the current fraction is shown as a percentage value
+         *  in the progress bar. */
+        void showLabel(bool show_label) { m_show_label = show_label; }
 
     };
 }

@@ -18,6 +18,7 @@
 #include "states_screens/online/network_kart_selection.hpp"
 
 #include "config/user_config.hpp"
+#include "guiengine/widgets/progress_bar_widget.hpp"
 #include "input/device_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/lobby_protocol.hpp"
@@ -33,6 +34,12 @@ void NetworkKartSelectionScreen::init()
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::init();
+
+    m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
+    m_timer->showLabel(false);
+    // I18N: Time in seconds (before the voting period in network ends).
+    // I18N: %s specifes where the number is placed
+    core::stringw seconds = _("%s seconds", "%d");
 
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
@@ -56,6 +63,19 @@ void NetworkKartSelectionScreen::init()
         }
     }
 }   // init
+
+// ----------------------------------------------------------------------------
+/** Called once per frame. Updates the timer display.
+ *  \param dt Time step size.
+ */
+void NetworkKartSelectionScreen::onUpdate(float dt)
+{
+    KartSelectionScreen::onUpdate(dt);
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+    float new_value = lp->getRemainingVotingTime() / lp->getMaxVotingTime();
+    if(new_value < 0) new_value = 0;
+    m_timer->moveValue(int(new_value*100));
+}   // onUpdate
 
 // ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::allPlayersDone()
