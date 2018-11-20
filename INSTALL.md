@@ -20,6 +20,7 @@ To build SuperTuxKart from source, you'll need to install the following packages
   * Freetype (libfreetype6-dev)
   * libcurl (libcurl-devel)
   * libbluetooth (bluez-devel)
+  * libnettle (nettle-dev)
   * libpng (libpng-devel)
   * zlib (zlib-devel)
   * jpeg (libjpeg-turbo-devel)
@@ -30,7 +31,7 @@ Ubuntu command:
 sudo apt-get install build-essential cmake libbluetooth-dev \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
 libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev libxrandr-dev libx11-dev pkg-config zlib1g-dev
+libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
 ```
 Fedora command:
 
@@ -38,7 +39,7 @@ Fedora command:
 sudo dnf install @development-tools cmake bluez-libs-devel \
 openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
-libvorbis-devel libXrandr-devel libGLEW pkgconf zlib-devel
+libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
 ```
 ### In-game recorder
 
@@ -195,6 +196,7 @@ brew install libvorbis
 brew install openal-soft
 brew install freetype
 brew install curl
+brew install nettle
 brew install openssl@1.1
 brew install fribidi
 brew install glew
