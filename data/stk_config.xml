@@ -177,7 +177,7 @@
 
   <!-- time is the time till a bomb explodes. time-increase is the time added
        to timer when bomb is passed on. -->
-  <bomb time="30.0" time-increase="-5.0"/>
+  <bomb time="30.0" time-increase="0.0"/>
 
   <!-- Powerup collect-mode decides what is collected if a kart has already an
        powerup: same: get one more item of the same type.
