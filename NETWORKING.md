@@ -21,7 +21,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="3" >
+<server-config version="4" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -104,8 +104,8 @@ The current server configuration xml looks like this:
     <!-- Value used to calculate time limit in CTF, which is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0, negative value to disable time limit. -->
     <time-limit-threshold-ctf value="0.9" />
 
-    <!-- Value used by server to automatically calculate lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-lap-ratio * default lap of that track). -->
-    <auto-lap-ratio value="-1" />
+    <!-- Value used by server to automatically estimate each game time. For races, it decides the lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-game-time-ratio * default lap of that track). For soccer if more than 0.0f, for time limit game it will be auto-game-time-ratio * soccer-time-limit in UserConfig, for goal limit game it will be auto-game-time-ratio * numgoals in UserConfig, -1 to disable for all. -->
+    <auto-game-time-ratio value="-1" />
 
     <!-- Maximum ping allowed for a player (in ms). -->
     <max-ping value="300" />
@@ -163,7 +163,7 @@ x.x.x.x:y is your server ip address with its port, id is the id field of server-
 
 You can see STK server xml list [here](https://addons.supertuxkart.net/api/v2/server/get-all).
 
-The server you want to test must be able to be connected without NAT penetration. You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
+You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
 
 With the network AI tester, it's easier to for example simulate high-loaded servers or bad (high ping with packet loss) network.
 
