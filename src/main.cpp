@@ -1310,7 +1310,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--connect-now", &s))
     {
-        NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
         if (CommandLine::has("--network-ai", &n))
         {
@@ -1330,34 +1329,20 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         }
         TransportAddress server_addr(s);
-        auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
-            !server_password.empty(), false);
+        auto server = std::make_shared<Server>(0,
+            StringUtils::utf8ToWide(server_addr.toString()), 0, 0, 0, 0,
+            server_addr, !server_password.empty(), false);
         NetworkConfig::get()->doneAddingNetworkPlayers();
-        STKHost::create();
-        auto cts = std::make_shared<ConnectToServer>(server);
-        cts->setup();
         if (server_id != 0)
         {
+            NetworkConfig::get()->setIsWAN();
             server->setServerId(server_id);
             server->setSupportsEncryption(true);
-            cts->registerWithSTKServer();
-        }
-        Log::info("main", "Trying to connect to server '%s'.",
-            server_addr.toString().c_str());
-        if (!cts->tryConnect(2000, 15))
-        {
-            Log::error("main", "Timeout trying to connect to server '%s'.",
-                server_addr.toString().c_str());
-            STKHost::get()->shutdown();
-            exit(0);
         }
         else
-        {
-            server_addr =
-                STKHost::get()->getServerPeerForClient()->getAddress();
-            auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
-            cl->requestStart();
-        }
+            NetworkConfig::get()->setIsLAN();
+        STKHost::create();
+        NetworkingLobby::getInstance()->setJoinedServer(server);
     }
 
     if (NetworkConfig::get()->isServer())
