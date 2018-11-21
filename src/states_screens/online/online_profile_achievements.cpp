@@ -206,7 +206,7 @@ void BaseOnlineProfileAchievements::displayResults()
                 // Sort by goals
                 return a->getInfo()->goalString().lower_ignore_case(b->getInfo()->goalString());
             }
-            else if (m_sort_column == 2)
+            else
             {
                 // Sort by progress
                 return a->getProgressAsString().lower_ignore_case(b->getProgressAsString());
