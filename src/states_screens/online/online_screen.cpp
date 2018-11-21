@@ -27,8 +27,8 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/client_lobby.hpp"
+#include "network/event.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
@@ -130,9 +130,14 @@ void OnlineScreen::onUpdate(float delta)
     m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
                                                            : m_login_string);
     // In case for entering server address finished
-    if (auto lb = LobbyProtocol::get<LobbyProtocol>())
+    if (m_entered_server)
     {
-        NetworkingLobby::getInstance()->setJoinedServer(nullptr);
+        NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setIsServer(false);
+        ServerConfig::m_private_server_password = "";
+        STKHost::create();
+        NetworkingLobby::getInstance()->setJoinedServer(m_entered_server);
+        m_entered_server = nullptr;
         StateManager::get()->resetAndSetStack(
             NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
     }
@@ -220,6 +225,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "enter-address")
     {
+        m_entered_server = nullptr;
         if (NetworkConfig::get()->isAddingNetworkPlayers())
         {
             core::stringw msg =
@@ -244,31 +250,44 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                     lw->setText(err, true);
                     return false;
                 }
-                NetworkConfig::get()->setIsWAN();
-                NetworkConfig::get()->setIsServer(false);
-                ServerConfig::m_private_server_password = "";
-                auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0,
-                    server_addr, false, false);
-                STKHost::create();
-                auto cts = std::make_shared<ConnectToServer>(server);
-                cts->setup();
-                Log::info("OnlineScreen", "Trying to connect to server '%s'.",
-                    server_addr.toString().c_str());
-                if (!cts->tryConnect(2000, 15))
+                if (server_addr.getPort() == 0)
                 {
-                    core::stringw err = _("Cannot connect to server %s.",
-                        server_addr.toString().c_str());
-                    STKHost::get()->shutdown();
-                    NetworkConfig::get()->unsetNetworking();
-                    lw->setText(err, true);
-                    return false;
+                    ENetAddress ea;
+                    ea.host = STKHost::HOST_ANY;
+                    ea.port = STKHost::PORT_ANY;
+                    Network* nw = new Network(/*peer_count*/1,
+                        /*channel_limit*/EVENT_CHANNEL_COUNT,
+                        /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
+                        true/*change_port_if_bound*/);
+                    BareNetworkString s(std::string("stk-server-port"));
+                    TransportAddress address(server_addr.getIP(),
+                        stk_config->m_server_discovery_port);
+                    nw->sendRawPacket(s, address);
+                    TransportAddress sender;
+                    const int LEN = 2048;
+                    char buffer[LEN];
+                    int len = nw->receiveRawPacket(buffer, LEN, &sender, 2000);
+                    if (len != 2)
+                    {
+                        //I18N: In enter server ip address dialog
+                        core::stringw err = _("Failed to detect port number.");
+                        lw->setText(err, true);
+                        delete nw;
+                        return false;
+                    }
+                    BareNetworkString server_port(buffer, len);
+                    uint16_t port = server_port.getUInt16();
+                    server_addr.setPort(port);
+                    Log::info("OnlineScreen",
+                        "Detected port %d for server address: %s.",
+                        port, server_addr.toString(false).c_str());
+                    delete nw;
                 }
-
-                m_entered_server_address = 
-                    STKHost::get()->getServerPeerForClient()->getAddress();
-                auto cl = LobbyProtocol::create<ClientLobby>
-                    (m_entered_server_address, server);
-                cl->requestStart();
+                auto server = std::make_shared<Server>(0,
+                    StringUtils::utf8ToWide(server_addr.toString()), 0, 0, 0, 0,
+                    server_addr, false, false);
+                m_entered_server = server;
+                m_entered_server_address = server_addr;
                 return true;
             });
         if (!m_entered_server_address.isUnset())
