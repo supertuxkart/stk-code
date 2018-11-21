@@ -47,6 +47,7 @@ bool ConnectToServer::m_done_intecept = false;
 ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
+    m_quick_play_err_msg = _("No quick play server available.");
     if (server)
     {
         m_server         = server;
@@ -192,8 +193,7 @@ void ConnectToServer::asynchronousUpdate()
                 else
                 {
                     // Shutdown STKHost (go back to online menu too)
-                    STKHost::get()->setErrorMessage(
-                        _("No quick play server available."));
+                    STKHost::get()->setErrorMessage(m_quick_play_err_msg);
                     STKHost::get()->requestShutdown();
                     m_state = EXITING;
                     return;
@@ -336,30 +336,6 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port)
         /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
         true/*change_port_if_bound*/) : STKHost::get()->getNetwork();
     assert(nw);
-
-    if (m_server_address.getPort() == 0)
-    {
-        // Get the server port of server from (common) server discovery port
-        Log::info("ConnectToServer", "Detect port for server address.");
-        BareNetworkString s(std::string("stk-server-port"));
-        TransportAddress address(m_server_address.getIP(),
-            stk_config->m_server_discovery_port);
-        nw->sendRawPacket(s, address);
-        TransportAddress sender;
-        const int LEN = 2048;
-        char buffer[LEN];
-        int len = nw->receiveRawPacket(buffer, LEN, &sender, 2000);
-        if (len != 2)
-        {
-            Log::error("ConnectToServer", "Invalid port number");
-            if (another_port)
-                delete nw;
-            return false;
-        }
-        BareNetworkString server_port(buffer, len);
-        uint16_t port = server_port.getUInt16();
-        m_server_address.setPort(port);
-    }
 
     m_done_intecept = false;
     nw->getENetHost()->intercept = ConnectToServer::interceptCallback;
