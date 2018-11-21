@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2018 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TRACKS_SCREEN_HPP
-#define HEADER_TRACKS_SCREEN_HPP
+#ifndef HEADER_VOTE_OVERVIEW_HPP
+#define HEADER_VOTE_OVERVIEW_HPP
 
 #include "guiengine/screen.hpp"
 #include "utils/synchronised.hpp"
@@ -24,8 +24,6 @@
 #include <limits>
 #include <map>
 #include <string>
-
-class Track;
 
 namespace GUIEngine
 {
@@ -38,22 +36,18 @@ namespace GUIEngine
   * \brief screen where the user can select a track
   * \ingroup states_screens
   */
-class TracksScreen : public GUIEngine::Screen,
-                     public GUIEngine::ScreenSingleton<TracksScreen>
+class VoteOverview: public GUIEngine::Screen,
+                    public GUIEngine::ScreenSingleton<VoteOverview>
 {
-    friend class GUIEngine::ScreenSingleton<TracksScreen>;
+    friend class GUIEngine::ScreenSingleton<VoteOverview>;
 
 private:
-
-    Track* m_selected_track = NULL;
-    GUIEngine::CheckBoxWidget* m_reversed;
-    GUIEngine::SpinnerWidget* m_laps;
 
     /** Pointer to progress bar widget which is used as a timer
     *  (going backwards). */
     GUIEngine::ProgressBarWidget *m_timer;
 
-    bool m_network_tracks, m_reverse_checked, m_quit_server;
+    bool m_reverse_checked, m_quit_server;
 
     int m_bottom_box_height;
 
@@ -61,14 +55,8 @@ private:
 
     std::deque<std::string> m_random_track_list;
 
-    /** adds the tracks from the current track group into the tracks ribbon */
-    void buildTrackList();
-
-    void voteForPlayer();
-
-    TracksScreen() : Screen("tracks.stkgui")
+    VoteOverview() : Screen("online/vote_overview.stkgui")
     {
-        m_network_tracks = false;
         m_reverse_checked = false;
         m_quit_server = false;
         m_bottom_box_height = -1;
@@ -98,10 +86,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
-    // ------------------------------------------------------------------------
-    void setFocusOnTrack(const std::string& trackName);
-    // ------------------------------------------------------------------------
-    void setNetworkTracks() { m_network_tracks = true; }
     // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }
     // ------------------------------------------------------------------------

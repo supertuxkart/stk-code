@@ -28,12 +28,14 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/progress_bar_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "network/game_setup.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/online/vote_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "tracks/track.hpp"
@@ -58,6 +60,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         STKHost::existHost() && m_selected_track != NULL)
     {
         voteForPlayer();
+    }
+    else if (name == "submit")
+    {
+        VoteOverview::getInstance()->push();
     }
     else if (name == "tracks")
     {
@@ -150,14 +156,16 @@ void TracksScreen::tearDown()
 void TracksScreen::loadedFromFile()
 {
     m_reversed = NULL;
-    m_laps = NULL;
-    m_votes = NULL;
+    m_laps     = NULL;
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
+
+    m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
+    m_timer->showLabel(false);
 
     Widget* rect_box = getWidget("rect-box");
 
@@ -177,18 +185,7 @@ void TracksScreen::beforeAddingWidget()
         assert(m_reversed != NULL);
         m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
         m_reversed->setVisible(true);
-        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
-        getWidget("vote")->setVisible(true);
         calculateLayout();
-        static bool shown_msg = false;
-        if (!shown_msg)
-        {
-            shown_msg = true;
-            //I18N: In track screen for networking, clarify voting phase
-            core::stringw msg = _("If a majority of players all select the"
-                " same track and race settings, voting will end early.");
-            MessageQueue::add(MessageQueue::MT_GENERIC, msg);
-        }
     }
     else
     {
@@ -200,12 +197,8 @@ void TracksScreen::beforeAddingWidget()
         getWidget("lap-spinner")->setVisible(false);
         getWidget("reverse-text")->setVisible(false);
         getWidget("reverse")->setVisible(false);
-        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "98%";
-        getWidget("vote")->setVisible(false);
         calculateLayout();
     }
-    m_votes = getWidget<LabelWidget>("vote-text");
-    m_votes->setVisible(false);
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
@@ -489,27 +482,9 @@ void TracksScreen::onUpdate(float dt)
     // The following code
     if(!m_network_tracks) return;
 
-    assert(m_votes);
-
-    m_votes->setVisible(true);
-    auto cl = LobbyProtocol::get<LobbyProtocol>();
-
-    int remaining_time = cl->getRemainingVotingTime();
-    if (remaining_time < 0) remaining_time = 0;
-
-    //I18N: In tracks screen, about voting of tracks in network
-    core::stringw message = _("Remaining time: %d", remaining_time);
-    message += L"\n";
-    unsigned height = GUIEngine::getFont()->getDimension(L"X").Height;
-    const unsigned total_height = m_votes->getDimension().Height;
-    for (auto& p : m_vote_messages)
-    {
-        height += GUIEngine::getFont()->getDimension(L"X").Height * 2;
-        if (height > total_height)
-            break;
-        message += p.second;
-        message += L"\n";
-    }
-    m_votes->setText(message, true);
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+    float new_value = lp->getRemainingVotingTime() / lp->getMaxVotingTime();
+    if (new_value < 0) new_value = 0;
+    m_timer->moveValue(int(new_value * 100));
 
 }   // onUpdate
