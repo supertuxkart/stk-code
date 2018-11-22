@@ -54,7 +54,7 @@ private:
     bool m_sort_default;
 
     void displayResults();
-    // True if a > b
+    // True if a < b
     bool goalSort(Achievement *a, Achievement *b);
     bool progressSort(Achievement *a, Achievement *b);
 

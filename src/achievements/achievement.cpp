@@ -171,7 +171,7 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
         assert(false);
         return 0;
     }
-    // Can happen when showing the progress status of all parts fof the goal tree
+    // Can happen when showing the progress status of all parts of the goal tree
     else if (progress.children.size() == 0)
     {
         //TODO : find a more automatic way ; clean up repetition
