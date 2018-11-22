@@ -458,6 +458,7 @@ void NetworkingLobby::tearDown()
     if (!NetworkConfig::get()->isClient())
         return;
     input_manager->getDeviceManager()->mapFireToSelect(false);
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
 }   // tearDown
 
 // ----------------------------------------------------------------------------
