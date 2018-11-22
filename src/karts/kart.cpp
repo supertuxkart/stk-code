@@ -3307,7 +3307,7 @@ void Kart::setOnScreenText(const wchar_t *text)
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
-            core::vector3df(1.0f, 1.0f, 1.0f));
+            core::vector3df(0.35f, 0.35f, 0.35f));
         tb->init(text, bold_face);
         tb->drop();
     }
