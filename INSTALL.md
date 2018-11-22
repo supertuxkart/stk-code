@@ -49,14 +49,23 @@ Compilation instruction is explained there. If you don't need this feature, pass
 
 ### Compiling
 
-To compile SuperTuxKart, run the following commands inside `stk-code` directory:
-
+To compile SuperTuxKart, run the following commands inside `stk-code` directory
+ 
 ```bash
+# go into the stk-code directory
+cd stk-code
+ 
+# create and enter the cmake_build directory
 mkdir cmake_build
 cd cmake_build
+ 
+# run cmake to generate the makefile
 cmake ..
+ 
+# compile
 make -j4
 ```
+
 STK can then be run from the build directory with `bin/supertuxkart`
 
 #### Keeping your build up to date
