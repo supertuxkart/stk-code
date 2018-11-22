@@ -317,39 +317,39 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     m_st_early_target_factor        =  1.0f;
 
     if(!node.get("interval", &m_st_interval))
-        Log::warn("powerup", "No interval specified for rubber ball.");
+        Log::warn("powerup", "No interval specified for basket ball.");
     if(!node.get("squash-duration", &m_st_squash_duration))
         Log::warn("powerup",
-                  "No squash-duration specified for rubber ball.");
+                  "No squash-duration specified for basket ball.");
     if(!node.get("squash-slowdown", &m_st_squash_slowdown))
-        Log::warn("powerup", "No squash-slowdown specified for rubber ball.");
+        Log::warn("powerup", "No squash-slowdown specified for basket ball.");
     if(!node.get("min-interpolation-distance",
                  &m_st_min_interpolation_distance))
         Log::warn("powerup", "No min-interpolation-distance specified "
-                             "for rubber ball.");
+                             "for basket ball.");
     if(!node.get("target-distance", &m_st_target_distance))
         Log::warn("powerup",
-                  "No target-distance specified for rubber ball.");
+                  "No target-distance specified for basket ball.");
     float f;
     if(!node.get("delete-time", &f))
-        Log::warn("powerup", "No delete-time specified for rubber ball.");
+        Log::warn("powerup", "No delete-time specified for basket ball.");
     m_st_delete_ticks = stk_config->time2Ticks(f);
     if(!node.get("target-max-angle", &m_st_target_max_angle))
-        Log::warn("powerup", "No target-max-angle specified for rubber ball.");
+        Log::warn("powerup", "No target-max-angle specified for basket ball.");
     m_st_target_max_angle *= DEGREE_TO_RAD;
     if(!node.get("max-height-difference", &m_st_max_height_difference))
         Log::warn("powerup",
-                  "No max-height-difference specified for rubber ball.");
+                  "No max-height-difference specified for basket ball.");
     if(!node.get("fast-ping-distance", &m_st_fast_ping_distance))
         Log::warn("powerup",
-                  "No fast-ping-distance specified for rubber ball.");
+                  "No fast-ping-distance specified for basket ball.");
     if(m_st_fast_ping_distance < m_st_target_distance)
         Log::warn("powerup",
                    "Ping-distance is smaller than target distance.\n"
                    "That should not happen, but is ignored for now.");
     if(!node.get("early-target-factor", &m_st_early_target_factor))
         Log::warn("powerup",
-                  "No early-target-factor specified for rubber ball.");
+                  "No early-target-factor specified for basket ball.");
     Flyable::init(node, rubberball, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
@@ -415,7 +415,7 @@ bool RubberBall::updateAndDelete(int ticks)
     float vertical_offset = close_to_ground ? 4.0f : 2.0f;
 
     // Update height of terrain (which isn't done as part of
-    // Flyable::update for rubber balls.
+    // Flyable::update for basket balls.
     TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
 
     m_height_timer += stk_config->ticks2Time(ticks);
