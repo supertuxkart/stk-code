@@ -195,22 +195,17 @@ void BaseOnlineProfileAchievements::displayResults()
             all_achievements_list.push_back(it->second);
         }
 
-        auto compAchievement = [=](Achievement *a, Achievement *b) {
+        auto compAchievement = [=](Achievement *a, Achievement *b)
+        {
+            // Sort by name
             if (m_sort_column == 0)
-            {
-                // Sort by name
                 return a->getInfo()->getName().lower_ignore_case(b->getInfo()->getName());
-            }
+            // Sort by goals
             else if (m_sort_column == 1)
-            {
-                // Sort by goals
-                return a->getInfo()->goalString().lower_ignore_case(b->getInfo()->goalString());
-            }
+                return goalSort(a, b);
+            // Sort by progress
             else
-            {
-                // Sort by progress
-                return a->getProgressAsString().lower_ignore_case(b->getProgressAsString());
-            }
+                return progressSort(a, b);
         };
 
         if (m_sort_desc && !m_sort_default)
@@ -270,6 +265,39 @@ void BaseOnlineProfileAchievements::displayResults()
         }
     }
 }   // displayResults
+
+// ----------------------------------------------------------------------------
+/** True if a's goal progression is <= to b's.
+ *  If they are equal, goalSort(a,b) != goalSort(b,a),
+ ù  as the bool can't handle the 3 values required to avoid this
+ */
+bool BaseOnlineProfileAchievements::goalSort(Achievement *a, Achievement *b)
+{
+    float goals_a = ((float) a->getFullfiledGoals()) / a->getInfo()->getGoalCount();
+    float goals_b = ((float) b->getFullfiledGoals()) / b->getInfo()->getGoalCount();
+    if (goals_a == goals_b)
+        return (a->getInfo()->getGoalCount() < b->getInfo()->getGoalCount());
+    else
+        return (goals_a < goals_b);
+} // goalSort
+
+// ----------------------------------------------------------------------------
+/** True if a's single-goal progress is <= to b's.
+ */
+bool BaseOnlineProfileAchievements::progressSort(Achievement *a, Achievement *b)
+{
+    if (a->getInfo()->getGoalCount() >= 2)
+        return true;
+    else if (b->getInfo()->getGoalCount() >= 2)
+        return false;
+
+    float progress_a = ((float) a->getProgress()) / a->getInfo()->getProgressTarget();
+    float progress_b = ((float) b->getProgress()) / b->getInfo()->getProgressTarget();
+    if (progress_a == progress_b)
+        return (a->getInfo()->getProgressTarget() < b->getInfo()->getProgressTarget());
+    else
+        return (progress_a < progress_b);
+} // progressSort
 
 // ----------------------------------------------------------------------------
 /** Called every frame. It will check if results from an achievement request

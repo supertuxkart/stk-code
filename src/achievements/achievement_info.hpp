@@ -87,6 +87,8 @@ public:
     virtual irr::core::stringw goalString();
     virtual irr::core::stringw progressString();
 
+    int                getProgressTarget()    { return recursiveProgressCount(m_goal_tree); }
+    int                getGoalCount()         { return recursiveGoalCount(m_goal_tree); }
     int                getDepth()             { return getRecursiveDepth(m_goal_tree); }
     uint32_t           getID()          const { return m_id; }
     irr::core::stringw getDescription() const { return _(m_description.c_str()); }

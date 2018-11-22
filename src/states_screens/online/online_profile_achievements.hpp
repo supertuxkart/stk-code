@@ -22,6 +22,7 @@
 #include <string>
 #include <irrString.h>
 
+#include "achievements/achievement.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 #include "states_screens/online/online_profile_base.hpp"
@@ -53,6 +54,9 @@ private:
     bool m_sort_default;
 
     void displayResults();
+    // True if a > b
+    bool goalSort(Achievement *a, Achievement *b);
+    bool progressSort(Achievement *a, Achievement *b);
 
 protected:
     BaseOnlineProfileAchievements(const std::string &filename);
