@@ -1986,7 +1986,8 @@ std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
     auto track_vote = tracks.begin();
     for (auto c_vote = tracks.begin(); c_vote != tracks.end(); c_vote++)
     {
-        if (c_vote->second > vote)
+        if (c_vote->second > vote ||
+            (c_vote->second >= vote && rg.get(2) == 0))
         {
             vote = c_vote->second;
             track_vote = c_vote;
@@ -2002,7 +2003,8 @@ std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
     auto lap_vote = laps.begin();
     for (auto c_vote = laps.begin(); c_vote != laps.end(); c_vote++)
     {
-        if (c_vote->second > vote)
+        if (c_vote->second > vote ||
+            (c_vote->second >= vote && rg.get(2) == 0))
         {
             vote = c_vote->second;
             lap_vote = c_vote;
@@ -2018,7 +2020,8 @@ std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
     auto reverse_vote = reverses.begin();
     for (auto c_vote = reverses.begin(); c_vote != reverses.end(); c_vote++)
     {
-        if (c_vote->second > vote)
+        if (c_vote->second > vote ||
+            (c_vote->second >= vote && rg.get(2) == 0))
         {
             vote = c_vote->second;
             reverse_vote = c_vote;
