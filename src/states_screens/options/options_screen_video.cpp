@@ -26,6 +26,7 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
@@ -227,11 +228,18 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
     assert( full != NULL );
     full->setState( UserConfigParams::m_fullscreen );
+    
+    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
+    assert( full_text != NULL );
 
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
+    assert( rememberWinpos != NULL );
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
-
     rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
+    
+    LabelWidget* rememberWinposText = 
+                                   getWidget<LabelWidget>("rememberWinposText");
+    assert( rememberWinposText != NULL );
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -372,6 +380,14 @@ void OptionsScreenVideo::init()
     applyBtn->setActive(!in_game);
     gfx->setActive(!in_game);
     getWidget<ButtonWidget>("custom")->setActive(!in_game);
+    
+#if defined(ANDROID)
+    applyBtn->setVisible(false);
+    full->setVisible(false);
+    full_text->setVisible(false);
+    rememberWinpos->setVisible(false);
+    rememberWinposText->setVisible(false);
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------
