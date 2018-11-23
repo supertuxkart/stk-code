@@ -515,17 +515,17 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     std::string class_name="";
     switch (race_manager->getMinorMode())
     {
-    case RaceManager::MINOR_MODE_TIME_TRIAL:     /* fall through */
-    case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";     break;
-    case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";      break;
-    case RaceManager::MINOR_MODE_3_STRIKES:      class_name="battle";   break;
-    case RaceManager::MINOR_MODE_FREE_FOR_ALL:   class_name="battle";   break;
+    case RaceManager::MINOR_MODE_TIME_TRIAL:       /* fall through */
+    case RaceManager::MINOR_MODE_NORMAL_RACE:      class_name="race";     break;
+    case RaceManager::MINOR_MODE_FOLLOW_LEADER:    class_name="ftl";      break;
+    case RaceManager::MINOR_MODE_3_STRIKES:        class_name="battle";   break;
+    case RaceManager::MINOR_MODE_FREE_FOR_ALL:     class_name="battle";   break;
     case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG: class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TUTORIAL:       class_name="tutorial"; break;
-    case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
+    case RaceManager::MINOR_MODE_TUTORIAL:         class_name="tutorial"; break;
+    case RaceManager::MINOR_MODE_EASTER_EGG:       /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:
     case RaceManager::MINOR_MODE_CUTSCENE:
-    case RaceManager::MINOR_MODE_SOCCER:         class_name="soccer";   break;
+    case RaceManager::MINOR_MODE_SOCCER:           class_name="soccer";   break;
     default:
         Log::fatal("PowerupManager", "Invalid minor mode %d - aborting.",
                     race_manager->getMinorMode());

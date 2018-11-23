@@ -466,21 +466,19 @@ void ClientLobby::displayPlayerVote(Event* event)
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
     core::stringw vote_msg;
-    if (race_manager->isBattleMode() &&
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         //I18N: Vote message in network game from a player
         vote_msg = _("Track: %s,\nrandom item location: %s",
             track_readable, rev == 1 ? yes : no);
     }
-    else if (race_manager->isBattleMode() &&
-        race_manager->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    else if (race_manager->getMinorMode() ==
+             RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         //I18N: Vote message in network game from a player
         vote_msg = _("Track: %s", track_readable);
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    else if (race_manager->isSoccerMode())
     {
         if (m_game_setup->isSoccerGoalTarget())
         {

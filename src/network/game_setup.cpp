@@ -146,7 +146,7 @@ void GameSetup::loadWorld()
     if (PlayerManager::getCurrentPlayer())
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
+    if (race_manager->isSoccerMode() ||
         race_manager->isBattleMode())
     {
         const bool is_ctf = race_manager->getMinorMode() ==
@@ -158,7 +158,7 @@ void GameSetup::loadWorld()
             UserConfigParams::m_random_arena_item = m_reverse;
 
         race_manager->setReverseTrack(false);
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        if (race_manager->isSoccerMode())
         {
             if (isSoccerGoalTarget())
                 race_manager->setMaxGoal(m_laps);

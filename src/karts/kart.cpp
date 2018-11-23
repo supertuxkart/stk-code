@@ -1002,12 +1002,8 @@ void Kart::finishedRace(float time, bool from_server)
         }
     }
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE   ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL    ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->isBattleMode() ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER        ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    if (race_manager->isLinearRaceMode() || race_manager->isBattleMode() ||
+        race_manager->isSoccerMode()     || race_manager->isEggHuntMode())
     {
         // Save for music handling in race result gui
         setRaceResult();

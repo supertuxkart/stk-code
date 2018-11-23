@@ -107,22 +107,22 @@ public:
      *  Make sure to use the 'LINEAR_RACE/BATTLE_ARENA' macros. */
     enum MinorRaceModeType
     {
-        MINOR_MODE_NONE          = -1,
+        MINOR_MODE_NONE             = -1,
 
-        MINOR_MODE_NORMAL_RACE   = LINEAR_RACE(0, true),
-        MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
-        MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
+        MINOR_MODE_NORMAL_RACE      = LINEAR_RACE(0, true),
+        MINOR_MODE_TIME_TRIAL       = LINEAR_RACE(1, true),
+        MINOR_MODE_FOLLOW_LEADER    = LINEAR_RACE(2, false),
 
-        MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0),
-        MINOR_MODE_FREE_FOR_ALL  = BATTLE_ARENA(1),
+        MINOR_MODE_3_STRIKES        = BATTLE_ARENA(0),
+        MINOR_MODE_FREE_FOR_ALL     = BATTLE_ARENA(1),
         MINOR_MODE_CAPTURE_THE_FLAG = BATTLE_ARENA(2),
-        MINOR_MODE_SOCCER        = BATTLE_ARENA(3),
+        MINOR_MODE_SOCCER           = BATTLE_ARENA(3),
 
-        MINOR_MODE_EASTER_EGG    = EASTER_EGG(0),
+        MINOR_MODE_EASTER_EGG       = EASTER_EGG(0),
 
-        MINOR_MODE_OVERWORLD     = MISC(0),
-        MINOR_MODE_TUTORIAL      = MISC(1),
-        MINOR_MODE_CUTSCENE      = MISC(2)
+        MINOR_MODE_OVERWORLD        = MISC(0),
+        MINOR_MODE_TUTORIAL         = MISC(1),
+        MINOR_MODE_CUTSCENE         = MISC(2)
     };
 
     // ------------------------------------------------------------------------
@@ -571,12 +571,10 @@ public:
      */
     int getNumLaps() const
     {
-        if(isBattleMode()      ||
-            m_minor_mode==MINOR_MODE_FOLLOW_LEADER ||
-            m_minor_mode==MINOR_MODE_SOCCER        ||
-            m_minor_mode==MINOR_MODE_EASTER_EGG  )
-            return 9999;
-        return m_num_laps[m_track_number];
+        if(modeHasLaps())
+            return m_num_laps[m_track_number];
+        // else
+        return 9999;
     }   // getNumLaps
     // ------------------------------------------------------------------------
     /** \return whether the track should be reversed */
@@ -691,7 +689,7 @@ public:
     // ------------------------------------------------------------------------
     /** \brief get information about current mode (returns true if 'mode' is of
     *  linear races type) */
-    bool isLinearRaceMode()
+    bool isLinearRaceMode() const
     {
         const int id = (int)m_minor_mode;
         // info is stored in its ID for conveniance, see the macros LINEAR_RACE
@@ -703,7 +701,7 @@ public:
     // ------------------------------------------------------------------------
     /** \brief get information about given mode (returns true if 'mode' is of
     *  linear races type) */
-    bool isLinearRaceMode(const MinorRaceModeType mode)
+    bool isLinearRaceMode(const MinorRaceModeType mode) const
     {
         const int id = (int)mode;
         // info is stored in its ID for conveniance, see the macros LINEAR_RACE
@@ -735,31 +733,31 @@ public:
     }   // isSoccerMode
 
     // ------------------------------------------------------------------------
-    bool isTutorialMode()
+    bool isTutorialMode() const
     {
         return m_minor_mode == MINOR_MODE_TUTORIAL;
     }   // isTutorialMode
 
     // ------------------------------------------------------------------------
-    bool isFollowMode()
+    bool isFollowMode() const
     {
         return m_minor_mode == MINOR_MODE_FOLLOW_LEADER;
     }
  
     // ------------------------------------------------------------------------
-    bool isEggHuntMode()
+    bool isEggHuntMode() const
     {
         return m_minor_mode == MINOR_MODE_EASTER_EGG;
     }   //  isEggHuntMode
 
     // ------------------------------------------------------------------------
-    bool isTimeTrialMode()
+    bool isTimeTrialMode() const
     {
         return m_minor_mode == MINOR_MODE_TIME_TRIAL;
     }   //  isTimeTrialMode
     // ------------------------------------------------------------------------
      /** \brief Returns the number of second's decimals to display */
-    int currentModeTimePrecision()
+    int currentModeTimePrecision() const
     {
         if (isEggHuntMode() || isTimeTrialMode())
             return 3;//display milliseconds
@@ -768,9 +766,9 @@ public:
     }   // currentModeTimePrecision
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */
-    bool modeHasLaps()
+    bool modeHasLaps() const
     {
-        if (isBattleMode() || isSoccerMode() || isEggHuntMode()) return false;
+        if (!isLinearRaceMode()) return false;
         const int id = (int)m_minor_mode;
         // See meaning of IDs above
         const int answer = (id-1000)/100;
