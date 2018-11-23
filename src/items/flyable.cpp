@@ -571,7 +571,8 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                     if (m_owner->getWorldKartId() != kart->getWorldKartId())
                         PlayerManager::addKartHit(kart->getWorldKartId());
                     PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-                    PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+                    if (race_manager->isLinearRaceMode())
+                        PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
                 }
             }
         }

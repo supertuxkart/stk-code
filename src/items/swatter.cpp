@@ -375,9 +375,12 @@ void Swatter::squashThingsAround()
         {
             PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
             PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
-            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
             PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+            if (race_manager->isLinearRaceMode())
+            {
+                PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
+                PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+            }
         }
     }
 
