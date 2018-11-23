@@ -102,6 +102,7 @@ public:
 #define LINEAR_RACE(ID, COUNT_LAPSES) (1000+ID+100*COUNT_LAPSES)
 #define BATTLE_ARENA(ID) (2000+ID)
 #define EASTER_EGG(ID)   (3000+ID)
+#define MISC(ID)         (4000+ID)
 
     // ------------------------------------------------------------------------
     /** Minor variants to the major types of race.
@@ -113,13 +114,15 @@ public:
         MINOR_MODE_NORMAL_RACE   = LINEAR_RACE(0, true),
         MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
         MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
-        MINOR_MODE_OVERWORLD     = LINEAR_RACE(3, false),
-        MINOR_MODE_TUTORIAL      = LINEAR_RACE(4, false),
 
         MINOR_MODE_BATTLE        = BATTLE_ARENA(0),
         MINOR_MODE_SOCCER        = BATTLE_ARENA(1),
-        MINOR_MODE_CUTSCENE      = BATTLE_ARENA(2),
-        MINOR_MODE_EASTER_EGG    = EASTER_EGG(0)
+
+        MINOR_MODE_EASTER_EGG    = EASTER_EGG(0),
+
+        MINOR_MODE_OVERWORLD     = MISC(0),
+        MINOR_MODE_TUTORIAL      = MISC(1),
+        MINOR_MODE_CUTSCENE      = MISC(2)
     };
 
     // ------------------------------------------------------------------------
@@ -230,6 +233,7 @@ public:
 
 #undef LINEAR_RACE
 #undef BATTLE_ARENA
+#undef MISC
 
     /** Game difficulty. */
     enum Difficulty     { DIFFICULTY_EASY = 0,
