@@ -212,7 +212,7 @@ void TracksScreen::beforeAddingWidget()
     
     RaceManager::MinorRaceModeType minor_mode = race_manager->getMinorMode();
     bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
-    bool is_arena = is_soccer || minor_mode == RaceManager::MINOR_MODE_BATTLE;
+    bool is_arena = is_soccer || race_manager->isBattleMode();
     
     const std::vector<std::string>& groups = 
                         is_arena ? track_manager->getAllArenaGroups(is_soccer)
@@ -278,8 +278,7 @@ void TracksScreen::init()
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-            race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setVisible(false);
@@ -289,8 +288,7 @@ void TracksScreen::init()
             m_reversed->setVisible(true);
             m_reversed->setState(UserConfigParams::m_random_arena_item);
         }
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-            race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setVisible(false);
@@ -471,7 +469,7 @@ void TracksScreen::voteForPlayer()
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_BATTLE &&
+    if (!race_manager->isBattleMode() &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
     {
         UserConfigParams::m_num_laps = m_laps->getValue();
@@ -482,13 +480,13 @@ void TracksScreen::voteForPlayer()
 
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         vote.encodeString(m_selected_track->getIdent())
             .addUInt8(0).addUInt8(m_reversed->getState() ? 1 : 0);
     }
-    else if (race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    else if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         vote.encodeString(m_selected_track->getIdent())
             .addUInt8(0).addUInt8(0);

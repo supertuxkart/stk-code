@@ -175,14 +175,15 @@ void ServerLobby::setup()
             }
             break;
         }
-        case RaceManager::MINOR_MODE_BATTLE:
+        case RaceManager::MINOR_MODE_FREE_FOR_ALL:
+        case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())
             {
                 Track* t =  track_manager->getTrack(*it);
-                if (race_manager->getMajorMode() ==
-                    RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+                if (race_manager->getMinorMode() ==
+                    RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
                 {
                     if (!t->isCTF() || t->isInternal())
                     {
@@ -541,7 +542,7 @@ void ServerLobby::asynchronousUpdate()
             uint32_t random_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(random_seed);
             load_world->addUInt32(random_seed);
-            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+            if (race_manager->isBattleMode())
             {
                 auto hcl = getHitCaptureLimit((float)players.size());
                 load_world->addUInt32(hcl.first).addFloat(hcl.second);
@@ -904,8 +905,7 @@ void ServerLobby::startSelection(const Event *event)
         m_available_kts.second.erase(track_erase);
     }
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         auto it = m_available_kts.second.begin();
         while (it != m_available_kts.second.end())
@@ -2044,8 +2044,8 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
     // Read user_config.hpp for formula
     int hit_capture_limit = std::numeric_limits<int>::max();
     float time_limit = 0.0f;
-    if (race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         if (ServerConfig::m_capture_limit_threshold > 0.0f)
         {

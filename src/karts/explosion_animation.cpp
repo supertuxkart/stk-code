@@ -99,8 +99,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     }
 
     // Put the kart back to its own flag base like rescue if direct hit in CTF
-    if (race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
+    if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
     {
         m_reset_ticks = stk_config->time2Ticks(timer * 0.2f);
     }

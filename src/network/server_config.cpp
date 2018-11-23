@@ -204,11 +204,11 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
             return { RaceManager::MINOR_MODE_SOCCER,
                 RaceManager::MAJOR_MODE_SINGLE };
         case 7:
-            return { RaceManager::MINOR_MODE_BATTLE,
-                RaceManager::MAJOR_MODE_FREE_FOR_ALL };
+            return { RaceManager::MINOR_MODE_FREE_FOR_ALL,
+                RaceManager::MAJOR_MODE_SINGLE };
         case 8:
-            return { RaceManager::MINOR_MODE_BATTLE,
-                RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG };
+            return { RaceManager::MINOR_MODE_CAPTURE_THE_FLAG,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }
@@ -278,8 +278,7 @@ void loadServerLobbyFromConfig()
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const bool is_gp =
         race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
-    const bool is_battle =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE;
+    const bool is_battle = race_manager->isBattleMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;
     server_lobby = STKHost::create();

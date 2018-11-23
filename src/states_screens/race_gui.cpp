@@ -85,7 +85,7 @@ RaceGUI::RaceGUI()
     m_negative_timer_additional_width = area.Width;
 
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE     ||
+        race_manager->isBattleMode()     ||
         race_manager->getNumLaps() > 9)
         m_lap_width = font->getDimension(L"99/99").Width;
     else
@@ -370,8 +370,8 @@ void RaceGUI::drawGlobalTimer()
     float elapsed_time = World::getWorld()->getTime();
     if (!race_manager->hasTimeTarget() ||
         race_manager ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER ||
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL ||
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         sw = core::stringw (
             StringUtils::timeToString(elapsed_time).c_str() );

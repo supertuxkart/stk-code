@@ -238,8 +238,7 @@ int Swatter::updateAndTestFinished(int ticks)
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
                     const int end_ticks = ticks_start + 60;
-                    if (race_manager
-                        ->getMinorMode()==RaceManager::MINOR_MODE_BATTLE ||
+                    if (race_manager->isBattleMode() ||
                         race_manager
                         ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
                     {

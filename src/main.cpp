@@ -997,7 +997,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         if (!CommandLine::has("--track", &track))
             track = "temple";
         UserConfigParams::m_arena_ai_stats=true;
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         std::vector<std::string> l;
         for (int i = 0; i < 8; i++)
             l.push_back("tux");
@@ -1113,7 +1113,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         case 2:
         {
             ServerConfig::m_server_mode = 7;
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
             break;
         }
         case 3:
@@ -1134,8 +1134,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    const bool is_battle =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE;
+    const bool is_battle = race_manager->isBattleMode();
 
     if (!has_server_config)
     {
@@ -1453,7 +1452,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
             race_manager->setNumKarts(1);
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         }
         else if (t->isSoccer())
         {

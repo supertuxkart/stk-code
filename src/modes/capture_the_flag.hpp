@@ -87,6 +87,8 @@ public:
     // ------------------------------------------------------------------------
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     // ------------------------------------------------------------------------
+    virtual const std::string& getIdent() const OVERRIDE;
+    // ------------------------------------------------------------------------
     void attachFlag(NetworkString& ns);
     // ------------------------------------------------------------------------
     void resetFlag(NetworkString& ns);

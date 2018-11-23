@@ -699,8 +699,8 @@ void RaceResultGUI::displayCTFResults()
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
-            else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL ||
-                race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+            else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+                race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
             {
                 assert(ffa);
                 ri->m_finish_time_string =
@@ -978,8 +978,8 @@ void RaceResultGUI::displayCTFResults()
         {
             displaySoccerResults();
         }
-        else if (race_manager->getMajorMode() ==
-            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (race_manager->getMinorMode() ==
+            RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             displayCTFResults();
         }

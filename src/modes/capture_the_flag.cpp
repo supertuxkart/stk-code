@@ -564,3 +564,11 @@ unsigned int CaptureTheFlag::getRescuePositionIndex(AbstractKart *kart)
 {
     return m_kart_position_map.at(kart->getWorldKartId());
 }   // getRescuePositionIndex
+
+// ----------------------------------------------------------------------------
+/** Returns the internal identifier for this race.
+ */
+const std::string& CaptureTheFlag::getIdent() const
+{
+    return IDENT_CTF;
+}   // getIdent

@@ -123,7 +123,7 @@ void FreeForAll::setKartScoreFromServer(NetworkString& ns)
  */
 const std::string& FreeForAll::getIdent() const
 {
-    return IDENT_STRIKES;
+    return IDENT_FFA;
 }   // getIdent
 
 // ------------------------------------------------------------------------

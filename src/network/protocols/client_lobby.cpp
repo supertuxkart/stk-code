@@ -275,7 +275,7 @@ void ClientLobby::addAllPlayers(Event* event)
     }
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+    if (race_manager->isBattleMode())
     {
         int hit_capture_limit = data.getUInt32();
         float time_limit = data.getFloat();
@@ -466,16 +466,16 @@ void ClientLobby::displayPlayerVote(Event* event)
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
     core::stringw vote_msg;
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    if (race_manager->isBattleMode() &&
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         //I18N: Vote message in network game from a player
         vote_msg = _("Track: %s,\nrandom item location: %s",
             track_readable, rev == 1 ? yes : no);
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-        race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    else if (race_manager->isBattleMode() &&
+        race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         //I18N: Vote message in network game from a player
         vote_msg = _("Track: %s", track_readable);
@@ -607,13 +607,8 @@ void ClientLobby::handleServerInfo(Event* event)
     ServerConfig::m_server_mode = u_data;
     auto game_mode = ServerConfig::getLocalGameMode();
     race_manager->setMinorMode(game_mode.first);
-    if (game_mode.first == RaceManager::MINOR_MODE_BATTLE)
-        race_manager->setMajorMode(game_mode.second);
-    else
-    {
-        // We use single mode in network even it's grand prix
-        race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
-    }
+    // We use single mode in network even it's grand prix
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     //I18N: In the networking lobby
     core::stringw mode_name = ServerConfig::getModeName(u_data);

@@ -1828,7 +1828,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // map to.
     // Load the un-raycasted flag position first (for minimap)
     if (m_is_ctf &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -2100,7 +2100,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }   // for i<root->getNumNodes()
     }
     if (m_is_ctf &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -2127,7 +2127,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
     if (CheckManager::get()->getCheckStructureCount()==0  &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_BATTLE && !m_is_cutscene)
+        !race_manager->isBattleMode() && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
                   m_ident.c_str());
@@ -2183,8 +2183,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
     unsigned int start_position_counter = 0;
 
     unsigned int node_count = root->getNumNodes();
-    const bool is_mode_ctf = m_is_ctf && race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+    const bool is_mode_ctf = m_is_ctf && race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
 
     for (unsigned int i = 0; i < node_count; i++)
     {
@@ -2522,7 +2522,7 @@ void Track::itemCommand(const XMLNode *node)
     const std::string &name = node->getName();
 
     const bool is_mode_ctf = m_is_ctf &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
     bool ctf = false;
     node->get("ctf", &ctf);
     if ((is_mode_ctf && !ctf) || (!is_mode_ctf && ctf))

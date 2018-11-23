@@ -147,10 +147,10 @@ void GameSetup::loadWorld()
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+        race_manager->isBattleMode())
     {
-        const bool is_ctf = race_manager->getMajorMode() ==
-            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG;
+        const bool is_ctf = race_manager->getMinorMode() ==
+            RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
         bool prev_val = UserConfigParams::m_random_arena_item;
         if (is_ctf)
             UserConfigParams::m_random_arena_item = false;

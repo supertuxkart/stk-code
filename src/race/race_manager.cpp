@@ -551,13 +551,13 @@ void RaceManager::startNextRace()
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_TUTORIAL)
         World::setWorld(new TutorialWorld());
-    else if(m_minor_mode==MINOR_MODE_BATTLE)
+    else if (isBattleMode())
     {
-        if (m_major_mode == MAJOR_MODE_3_STRIKES)
+        if (m_minor_mode == MINOR_MODE_3_STRIKES)
             World::setWorld(new ThreeStrikesBattle());
-        else if (m_major_mode == MAJOR_MODE_FREE_FOR_ALL)
+        else if (m_minor_mode == MINOR_MODE_FREE_FOR_ALL)
             World::setWorld(new FreeForAll());
-        else if (m_major_mode == MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
@@ -959,8 +959,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     if (num_laps != -1) setNumLaps( num_laps );
 
-    if (m_minor_mode != MINOR_MODE_BATTLE)
-        setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
 

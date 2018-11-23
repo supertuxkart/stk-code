@@ -345,7 +345,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+    if (race_manager->isBattleMode())
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         if (m_kart->getKartAnimation() == NULL)

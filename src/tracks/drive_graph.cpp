@@ -730,8 +730,8 @@ DriveNode* DriveGraph::getNode(unsigned int j) const
 bool DriveGraph::hasLapLine() const
 {
     if (Track::getCurrentTrack()->isCTF() &&
-        race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         return false;
     return true;
 }   // hasLapLine

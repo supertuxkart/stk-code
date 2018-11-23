@@ -423,7 +423,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
 
     // Adjust bounding boxes for flags in CTF
     if (Track::getCurrentTrack()->isCTF() &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         Vec3 red_flag = Track::getCurrentTrack()->getRedFlag().getOrigin();
         Vec3 blue_flag = Track::getCurrentTrack()->getBlueFlag().getOrigin();

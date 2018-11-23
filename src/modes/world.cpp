@@ -469,7 +469,7 @@ Controller* World::loadAIController(AbstractKart* kart)
     Controller *controller;
     int turn=0;
 
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
         turn=1;
     else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;
@@ -1678,15 +1678,13 @@ void World::updateAchievementModeCounters(bool start)
         PlayerManager::increaseAchievement(start ? ACS::EGG_HUNT_STARTED : ACS::EGG_HUNT_FINISHED,1);
     else if (race_manager->isSoccerMode())
         PlayerManager::increaseAchievement(start ? ACS::SOCCER_STARTED : ACS::SOCCER_FINISHED,1);
-    // FIXME : that the specific battle modes are defined as major modes
-    //         is completely illogical !
     else if (race_manager->isBattleMode())
     {
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_3_STRIKES)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
             PlayerManager::increaseAchievement(start ? ACS::THREE_STRIKES_STARTED : ACS::THREE_STRIKES_FINISHED,1);
-        else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
             PlayerManager::increaseAchievement(start ? ACS::CTF_STARTED : ACS::CTF_FINISHED,1);
-        else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
             PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED,1);
     }
     else // normal races
