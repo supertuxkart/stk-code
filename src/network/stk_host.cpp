@@ -109,7 +109,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  server, which is regularly polled by the client. On detecting a new
  *  connection request the server will try to send a message to the client.
  *  This allows connections between server and client even if they are 
- *  sitting behind a NAT translating firewall. The following tables on
+ *  sitting behind a NAT firewall. The following tables on
  *  the stk server are used:
  *  client_sessions: It stores the list of all online users (so loging in
  *         means to insert a row in this table), including their token
@@ -119,64 +119,52 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  servers: Registers all servers and gives them a unique id, together
  *         with the user id (which is stored as host_id in this table).
  *  server_conn: This table stores connection requests from clients to
- *         servers. A 'request' bit is set to 1 if the request has not
- *         been handled, and is reset to 0 the moment the server receives
- *         the information about the client request.
+ *         servers. It has the aes_key and aes_iv which are used to validate
+ *         clients if it's the same online user id joining a server,
+ *         ip and port for NAT penetration and a connected_since which
+ *         stores the timestamp the user joined this server to know the time
+ *         playing spent playing on it.
  *
  *  The following outlines the protocol happening in order to connect a
  *  client to a server in more details:
  *
+ *  First it calls setPublicAddress() here to discover the public ip address
+ *  and port number of this host,
  *  Server:
  *
  *    1. ServerLobby:
- *       Spawns the following sub-protocols:
- *       1. GetPublicAddress: Use STUN to discover the public ip address
- *          and port number of this host.
- *       2. Register this server with stk server (i.e. publish its public
- *          ip address and port number) - 'start' request. This enters the
- *          public information into the 'client_sessions' table, and then
- *          the server into the 'servers' table. This server can now
+ *       1. Register this server with stk server (i.e. publish its public
+ *          ip address, port number and game info) - 'create' request. This
+ *          enters the server into the 'servers' table. This server can now
  *          be detected by other clients, so they can request a connection.
- *       3. The server lobby now polls the stk server for client connection
- *          requests using the 'poll-connection-requests', which queries the
- *          servers table to get the server id (based on address and user id),
- *          and then the server_conn table. The rows in this table are updated
- *          by setting the 'request' bit to 0 (i.e. connection request was
- *          send to server).
- *      
+ *       2. The server lobby now polls the stk server for client connection
+ *          requests using the 'poll-connection-requests' each 5 seconds, which
+ *          queries the servers table to get the server id (based on address
+ *          and user id), and then the server_conn table. The server will map
+ *          each joined AES key within 45 seconds to each connected client to
+ *          handle validation.
  *  Client:
  *
  *    The GUI queries the stk server to get a list of available servers
  *    ('get-all' request, submitted from ServersManager to query the 'servers'
  *    table). The user picks one (or in case of quick play one is picked
  *    randomly), and then instantiates STKHost with the id of this server.
- *    STKHost then triggers ConnectToServer, which starts the following
- *    protocols:
- *       1. GetPublicAddress: Use STUN to discover the public ip address
- *          and port number of this host.
- *       2. Register the client with the STK host ('set' command, into the
- *          table 'client_sessions'). Its public ip address and port will
- *          be registerd.
- *       3. GetPeerAddress. Submits a 'get' request to the STK server to get
- *          the ip address and port for the selected server from
- *          'client_sessions'. 
- *          If the ip address of the server is the same as this client, they
- *          will connect using the LAN connection.
- *       4. RequestConnection will do a 'request-connection' to the stk server.
- *          The user id and server id are stored in server_conn. This is the
- *          request that the server will detect using polling.
+ *    STKHost then triggers ConnectToServer, which do the following:
+ *       1. Register the client with the STK host ('join-server-key' command,
+ *          into the table 'server_conn'). Its public ip address and port will
+ *          be registerd with a AES key and iv set by client.
+ *       2. Run ConnectToServer::tryConnect for 30 seconds to connect to server,
+ *          It will auto change to a correct server port in case the server is
+ *          behind a strong firewall, see intercept below.
  *
  * Server:
  *
- *   The ServerLobbyProtocol (SLP) will then detect the above client
- *   requests, and start a ConnectToPeer protocol for each incoming client.
- *   The ConnectToPeer protocol uses:
- *         1. GetPeerAddress to get the ip address and port of the client.
- *            Once this is received, it will start the:
- *         2. PingProtocol
- *            This sends a raw packet (i.e. no enet header) to the
- *            destination (unless if it is a LAN connection, then UDP
- *            broadcasts will be used). 
+ *  The ServerLobbyProtocol (SLP) will then detect the above client
+ *  requests, and start a ConnectToPeer protocol for each incoming client.
+ *  The ConnectToPeer protocol send client a raw packet with
+ *  "0xffff" and "aloha-stk", so the client can use the intercept in enet for
+ *  advanced NAT penetration, see ConnectToServer::interceptCallback for
+ *  details.
  *
  *  Each client will run a ClientLobbyProtocol (CLP) to handle the further
  *  interaction with the server. The client will first request a connection
@@ -195,9 +183,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *
  *  The server will reply with either a reject message (e.g. too many clients
  *  already connected), or an accept message. The accept message will contain
- *  the global player id of the client, and a unique (random) token used to
- *  authenticate all further messages from the server: each message from the
- *  client to the server and vice versa will contain this token. The message
+ *  the global player id of the client. The message
  *  also contains the global ids and names of all currently connected
  *  clients for the new client. The server then informs all existing clients
  *  about the newly connected client, and its global player id.
@@ -231,12 +217,12 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *
  *  --> Server and all clients have identical information about all votes
  *  stored in RaceConfig of GameSetup.
- * 
+ *
  *  The server will detect when the track votes from each client have been
  *  received and will inform all clients to load the world (playerTrackVote).
  *  Then (state LOAD_GAME) the server will load the world and wait for all
  *  clients to finish loading (WAIT_FOR_WORLD_LOADED).
- *  
+ *
  *  In LR::loadWorld all ActivePlayers for all non-local players are created.
  *  (on a server all karts are non-local). On a client, the ActivePlayer
  *  objects for each local players have been created (to store the device
