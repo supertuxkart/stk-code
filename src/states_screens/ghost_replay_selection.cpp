@@ -174,9 +174,8 @@ void GhostReplaySelection::init()
 
     int icon_height = getHeight()/24;
     // 128 is the height of the image file
-    //FIXME : this isn't guaranteed
-    // Amanda's icon is 300x300
     m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
     m_replay_list_widget->setIcons(m_icon_bank, (int)icon_height);
 
     refresh(/*reload replay files*/ false, /* update columns */ true);
