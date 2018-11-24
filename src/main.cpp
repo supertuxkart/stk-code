@@ -2356,11 +2356,14 @@ static void cleanSuperTuxKart()
     }
 #endif
 
-    if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
+    if (Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
     {
-        Log::info("Thread", "Request Manager not aborting in time, aborting.");
+        Online::RequestManager::deallocate();
     }
-    Online::RequestManager::deallocate();
+    else
+    {
+        Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
+    }
 
     if (!SFXManager::get()->waitForReadyToDeleted(2.0f))
     {

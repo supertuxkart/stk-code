@@ -165,7 +165,8 @@ namespace Online
      */
     void RequestManager::addRequest(Request *request)
     {
-        if (UserConfigParams::m_internet_status == RequestManager::IPERM_NOT_ALLOWED)
+        if (UserConfigParams::m_internet_status == RequestManager::IPERM_NOT_ALLOWED
+            && request->getType() != Request::RT_QUIT)
         {
             Log::error("RequestManager", "addRequest called, but internet connections are forbidden");
             return;
