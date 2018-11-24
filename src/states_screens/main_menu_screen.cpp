@@ -490,9 +490,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
         {
             new MessageDialog(_("You can not play online without internet access. "
-                                "If you want to play online, go to options, select "
-                                " tab 'User Interface', and edit "
-                                "\"Connect to the Internet\"."));
+                                "If you want to play online, go in the options menu, "
+                                "and check \"Connect to the Internet\"."));
             return;
         }
         OnlineScreen::getInstance()->push();
@@ -506,18 +505,16 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             if (!addons_manager->anyAddonsInstalled())
             {
                 new MessageDialog(_("You can not download addons without internet access. "
-                                    "If you want to download addons, go to options, select "
-                                    "the 'User Interface' tab, and check "
-                                    "\"Connect to the Internet\"."));
+                                    "If you want to download addons, go in the options menu, "
+                                    "and check \"Connect to the Internet\"."));
                 return;
             }
             else
             {
                 AddonsScreen::getInstance()->push();
                 new MessageDialog(_("You can not download addons without internet access. "
-                                    "If you want to download addons, go to options, select "
-                                    "the 'User Interface' tab, and check "
-                                    "\"Connect to the Internet\".\n\n"
+                                    "If you want to download addons, go in the options menu, "
+                                    "and check \"Connect to the Internet\".\n\n"
                                     "You can however delete already downloaded addons."));
                 return;
             }
