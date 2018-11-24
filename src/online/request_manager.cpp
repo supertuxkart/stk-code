@@ -122,7 +122,8 @@ namespace Online
         // current player would not be defined at this stage.
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
         if (player && player->wasOnlineLastTime() &&
-            !UserConfigParams::m_always_show_login_screen)
+            !UserConfigParams::m_always_show_login_screen &&
+            UserConfigParams::m_internet_status != RequestManager::IPERM_NOT_ALLOWED)
         {
             PlayerManager::resumeSavedSession();
         }
@@ -164,6 +165,13 @@ namespace Online
      */
     void RequestManager::addRequest(Request *request)
     {
+        if (UserConfigParams::m_internet_status == RequestManager::IPERM_NOT_ALLOWED
+            && request->getType() != Request::RT_QUIT)
+        {
+            Log::error("RequestManager", "addRequest called, but internet connections are forbidden");
+            return;
+        }
+
         assert(request->isPreparing());
         request->setBusy();
         m_request_queue.lock();

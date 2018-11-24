@@ -152,9 +152,17 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
     {
         CheckBoxWidget* internet = getWidget<CheckBoxWidget>("enable-internet");
         assert( internet != NULL );
-        UserConfigParams::m_internet_status =
-            internet->getState() ? RequestManager::IPERM_ALLOWED
-                                 : RequestManager::IPERM_NOT_ALLOWED;
+
+        // If internet is being activated, enable immediately. If it's being disabled,
+        // we'll disable later after logout.
+        if (internet->getState())
+        {
+            UserConfigParams::m_internet_status = RequestManager::IPERM_ALLOWED;
+
+            if (!RequestManager::isRunning())
+                RequestManager::get()->startNetworkThread();
+        }
+
         // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
@@ -182,6 +190,10 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
             if (profile != NULL && profile->isLoggedIn())
                 profile->requestSignOut();
         }
+
+        // Deactivate internet after 'requestSignOut' so that the sign out request is allowed
+        if (!internet->getState())
+            UserConfigParams::m_internet_status = RequestManager::IPERM_NOT_ALLOWED;
     }
     else if (name=="enable-hw-report")
     {

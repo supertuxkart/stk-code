@@ -257,7 +257,11 @@ void BaseUserScreen::selectUser(int index)
     }
 
     // Now last use was with online --> Display the saved data
-    m_online_cb->setState(true);
+    if (UserConfigParams::m_internet_status == Online::RequestManager::IPERM_NOT_ALLOWED)
+        m_online_cb->setState(false);
+    else
+        m_online_cb->setState(true);
+
     makeEntryFieldsVisible();
     m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
