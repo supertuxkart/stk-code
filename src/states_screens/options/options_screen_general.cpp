@@ -193,10 +193,7 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
 
         // Deactivate internet after 'requestSignOut' so that the sign out request is allowed
         if (!internet->getState())
-        {
             UserConfigParams::m_internet_status = RequestManager::IPERM_NOT_ALLOWED;
-            RequestManager::get()->stopNetworkThread();
-        }
     }
     else if (name=="enable-hw-report")
     {
