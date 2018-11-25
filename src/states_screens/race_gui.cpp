@@ -1180,18 +1180,33 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     if (ctf || sw)
     {
-        if (score_limit != -1)
-            pos.UpperLeftCorner.X -= 80;
-
         int red_score = ctf ? ctf->getRedScore() : sw->getScore(KART_TEAM_RED);
         int blue_score = ctf ? ctf->getBlueScore() : sw->getScore(KART_TEAM_BLUE);
-
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         font->setBlackBorder(true);
-        font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
+        font->setScale(1.0f);
+        core::dimension2du d;
+        if (score_limit != -1)
+        {
+             d = font->getDimension(
+                (StringUtils::toWString(red_score) + L"-"
+                + StringUtils::toWString(blue_score) + L"     "
+                + StringUtils::toWString(score_limit)).c_str());
+            pos.UpperLeftCorner.X -= d.Width / 2;
+            int icon_width = irr_driver->getActualScreenSize().Height/19;
+            core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width+10),
+                                        pos.UpperLeftCorner.Y,
+                                        viewport.LowerRightCorner.X - 10,
+                                        pos.UpperLeftCorner.Y + icon_width);
+            core::rect<s32> source_rect(core::position2d<s32>(0,0),
+                                                    m_champion->getSize());
+            draw2DImage(m_champion, indicator_pos, source_rect,
+                NULL, NULL, true);
+        }
+
         core::stringw text = StringUtils::toWString(red_score);
         font->draw(text, pos, video::SColor(255, 255, 0, 0));
-        core::dimension2du d = font->getDimension(text.c_str());
+        d = font->getDimension(text.c_str());
         pos += core::position2di(d.Width, 0);
         text = L"-";
         font->draw(text, pos, video::SColor(255, 255, 255, 255));
@@ -1199,13 +1214,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         pos += core::position2di(d.Width, 0);
         text = StringUtils::toWString(blue_score);
         font->draw(text, pos, video::SColor(255, 0, 0, 255));
-        font->setScale(1.0f);
         pos += core::position2di(d.Width, 0);
         if (score_limit != -1)
         {
-            text = L" (";
+            text = L"     ";
             text += StringUtils::toWString(score_limit);
-            text += L")";
             font->draw(text, pos, video::SColor(255, 255, 255, 255));
         }
         font->setBlackBorder(false);
