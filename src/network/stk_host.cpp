@@ -25,6 +25,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/network_string.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/connect_to_peer.hpp"
@@ -1248,3 +1249,20 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
 }   // replaceNetwork
+
+// ----------------------------------------------------------------------------
+std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
+{
+    int red_count = 0;
+    int blue_count = 0;
+    auto pp = getAllPlayerProfiles();
+    for (auto& player : pp)
+    {
+        if (player->getTeam() == KART_TEAM_RED)
+            red_count++;
+        else if (player->getTeam() == KART_TEAM_BLUE)
+            blue_count++;
+    }
+    return std::make_pair(red_count, blue_count);
+
+}   // getAllPlayersTeamInfo

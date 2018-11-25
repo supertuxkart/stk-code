@@ -337,6 +337,9 @@ public:
     // ------------------------------------------------------------------------
     void setNetworkTimer(uint64_t ticks)
                    { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
+    // ------------------------------------------------------------------------
+    std::pair<int, int> getAllPlayersTeamInfo() const;
+
 };   // class STKHost
 
 #endif // STK_HOST_HPP

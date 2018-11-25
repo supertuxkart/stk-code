@@ -1618,7 +1618,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     unsigned player_count = data.getUInt8();
-    auto red_blue = m_game_setup->getPlayerTeamInfo();
+    auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
     for (unsigned i = 0; i < player_count; i++)
     {
         core::stringw name;
