@@ -2,10 +2,12 @@
 <stkgui>
     <div x="1%" y="1%" width="98%" height="99%" layout="vertical-row" >
 
-        <header width="80%"
+        <header width="80%" height="7%"
                I18N="In the kart selection (player setup) screen"
                text="Choose a Kart"
                align="center" text_align="center" />
+
+        <spacer height="1%" width="25"/>
 
         <placeholder id="playerskarts" width="100%" align="center" proportion="4">
             <!-- Contents is added programatically -->
