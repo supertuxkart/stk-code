@@ -95,6 +95,7 @@ public:
         // Engine
         ENGINE_POWER,
         ENGINE_MAX_SPEED,
+        ENGINE_GENERIC_MAX_SPEED,
         ENGINE_BRAKE_FACTOR,
         ENGINE_BRAKE_TIME_INCREASE,
         ENGINE_MAX_SPEED_REVERSE_RATIO,
@@ -282,6 +283,7 @@ public:
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;
+    float getEngineGenericMaxSpeed() const;
     float getEngineBrakeFactor() const;
     float getEngineBrakeTimeIncrease() const;
     float getEngineMaxSpeedReverseRatio() const;

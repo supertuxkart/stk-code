@@ -89,6 +89,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case ENGINE_MAX_SPEED:
         return TYPE_FLOAT;
+    case ENGINE_GENERIC_MAX_SPEED:
+        return TYPE_FLOAT;
     case ENGINE_BRAKE_FACTOR:
         return TYPE_FLOAT;
     case ENGINE_BRAKE_TIME_INCREASE:
@@ -726,6 +728,18 @@ float AbstractCharacteristic::getEngineMaxSpeed() const
                     getName(ENGINE_MAX_SPEED).c_str());
     return result;
 }  // getEngineMaxSpeed
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getEngineGenericMaxSpeed() const
+{
+    float result;
+    bool is_set = false;
+    process(ENGINE_GENERIC_MAX_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ENGINE_GENERIC_MAX_SPEED).c_str());
+    return result;
+}  // getEngineGenericMaxSpeed
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getEngineBrakeFactor() const

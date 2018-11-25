@@ -396,6 +396,7 @@ public:
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;
+    float getEngineGenericMaxSpeed() const;
     float getEngineBrakeFactor() const;
     float getEngineBrakeTimeIncrease() const;
     float getEngineMaxSpeedReverseRatio() const;

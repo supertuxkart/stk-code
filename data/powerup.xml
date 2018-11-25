@@ -16,6 +16,22 @@
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
   <!--  interval: How long a single bounce takes.
+        min-speed-offset: The speed of the ball is calculated
+                    by adding the speed-offset to the difficulty's
+                    max-speed. min-speed-offset is used when the
+                    ball is closer than min-offset-distance
+                    to the target.
+        max-speed-offset: The additional speed of the ball when
+                    farther than max-offset-distance.
+        speed : defines the initial speed. Mainly kept for
+                    compatibility with flyable class
+        min-offset-distance: The distance under which the ball is
+                    at minimal speed.
+        max-offset-distance: The distance over which the ball is
+                    at maximal speed. If it is not equal to
+                    min-offset-distance, the ball speeds between
+                    both is a weighted average of the min and
+                    max speed.
         max-height: The maximum height of a bounce.
         min-height: Unused mostly, but defines implicitly
                     the starting height (as average of
@@ -57,7 +73,12 @@
                     tunneling.
    -->
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
-        model="rubber_ball.spm" speed="35.0"
+        model="rubber_ball.spm"
+        speed="40.0"
+        min-speed-offset="9.0"
+        max-speed-offset="29.0"
+        min-offset-distance="50.0"
+        max-offset-distance="250.0"
         interval="1"
         max-height="4.0"      min-height="0"
         fast-ping-distance="50" 

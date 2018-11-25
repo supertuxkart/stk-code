@@ -680,6 +680,12 @@ float KartProperties::getEngineMaxSpeed() const
 }  // getEngineMaxSpeed
 
 // ----------------------------------------------------------------------------
+float KartProperties::getEngineGenericMaxSpeed() const
+{
+    return m_cached_characteristic->getEngineGenericMaxSpeed();
+}  // getEngineMaxSpeed
+
+// ----------------------------------------------------------------------------
 float KartProperties::getEngineBrakeFactor() const
 {
     return m_cached_characteristic->getEngineBrakeFactor();

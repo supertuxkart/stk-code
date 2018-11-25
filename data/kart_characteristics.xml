@@ -87,6 +87,9 @@
             power: The power of the kart (the engine power needed to accelerate
                    at a given pace is proportional to mass)
             max-speed: The base maximum speed of the kart in m/s
+            generic-max-speed: Must have the same value as max-speed. This
+                       is the max speed independently of kart type and
+                       of handicap, which is used by basket balls.
             brake-factor: Value used when braking.
             brake-time-increase: The brake force is multiplied by
                 (1 + brake_time) * brake_time_increase - i.e. the longer the
@@ -94,7 +97,7 @@
             max-speed-reverse-ratio is the percentage of max speed for reverse
                 gear.
           -->
-        <engine power="950" max-speed="25" brake-factor="15"
+        <engine power="950" max-speed="25" generic-max-speed="25" brake-factor="15"
                 brake-time-increase="6" max-speed-reverse-ratio="0.65" />
 
         <!-- Simulated gears
@@ -342,15 +345,15 @@
     <!-- The different difficulties (like easy, medium, hard) -->
     <difficulties>
         <characteristic name="easy">
-            <engine power="*0.7" max-speed="*0.6" />
+            <engine power="*0.7" max-speed="*0.6" generic-max-speed="*0.6" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="medium">
-            <engine power="*0.83" max-speed="*0.8" />
+            <engine power="*0.83" max-speed="*0.8" generic-max-speed="*0.8" />
             <plunger in-face-time="4" />
         </characteristic>
         <characteristic name="hard">
-            <engine power="*0.92" max-speed="*0.92" />
+            <engine power="*0.92" max-speed="*0.92" generic-max-speed="*0.92" />
         </characteristic>
         <!-- This doesn't need to be changed because the most fast/heavy/extreme
             values should also be the default ones. -->

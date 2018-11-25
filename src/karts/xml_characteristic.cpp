@@ -365,6 +365,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ENGINE_POWER]);
         sub_node->get("max-speed",
             &m_values[ENGINE_MAX_SPEED]);
+        sub_node->get("generic-max-speed",
+            &m_values[ENGINE_GENERIC_MAX_SPEED]);
         sub_node->get("brake-factor",
             &m_values[ENGINE_BRAKE_FACTOR]);
         sub_node->get("brake-time-increase",

@@ -26,6 +26,7 @@
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_info.hpp"
@@ -49,6 +50,10 @@ int   RubberBall::m_st_delete_ticks;
 float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
+float RubberBall::m_st_min_speed_offset;
+float RubberBall::m_st_max_speed_offset;
+float RubberBall::m_st_min_offset_distance;
+float RubberBall::m_st_max_offset_distance;
 int   RubberBall::m_next_id = 0;
 
 
@@ -305,16 +310,21 @@ void RubberBall::getNextControlPoint()
  */
 void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
 {
-    m_st_interval                   =  1.0f;
-    m_st_squash_duration            =  3.0f;
-    m_st_squash_slowdown            =  0.5f;
-    m_st_min_interpolation_distance = 30.0f;
-    m_st_target_distance            = 50.0f;
-    m_st_target_max_angle           = 25.0f;
+    m_st_interval                   =   1.0f;
+    m_st_squash_duration            =   3.0f;
+    m_st_squash_slowdown            =   0.5f;
+    m_st_min_interpolation_distance =  30.0f;
+    m_st_target_distance            =  50.0f;
+    m_st_target_max_angle           =  25.0f;
     m_st_delete_ticks               = stk_config->time2Ticks(10.0f);
-    m_st_max_height_difference      = 10.0f;
-    m_st_fast_ping_distance         = 50.0f;
-    m_st_early_target_factor        =  1.0f;
+    m_st_max_height_difference      =  10.0f;
+    m_st_fast_ping_distance         =  50.0f;
+    m_st_early_target_factor        =   1.0f;
+    m_st_min_speed_offset           =   8.0f;
+    m_st_max_speed_offset           =  28.0f;
+    m_st_min_offset_distance        =  50.0f;
+    m_st_max_offset_distance        = 250.0f;
+
 
     if(!node.get("interval", &m_st_interval))
         Log::warn("powerup", "No interval specified for basket ball.");
@@ -350,6 +360,28 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     if(!node.get("early-target-factor", &m_st_early_target_factor))
         Log::warn("powerup",
                   "No early-target-factor specified for basket ball.");
+    if(!node.get("min-speed-offset", &m_st_min_speed_offset))
+        Log::warn("powerup", "No min-speed-offset specified for basket ball.");
+    if(!node.get("max-speed-offset", &m_st_max_speed_offset))
+        Log::warn("powerup", "No max-speed-offset specified for basket ball.");
+    if(!node.get("min-offset-distance", &m_st_min_offset_distance))
+        Log::warn("powerup", "No min-offset-distance specified for basket ball.");
+    if(!node.get("max-offset-distance", &m_st_max_offset_distance))
+        Log::warn("powerup", "No max-offset-distance specified for basket ball.");
+
+
+    //sanity checks
+    if (m_st_min_speed_offset < 10.0f)
+        m_st_min_speed_offset = 10.0f;
+    if (m_st_min_speed_offset > m_st_max_speed_offset)
+    {
+        m_st_max_speed_offset = m_st_min_speed_offset;
+    }
+    if (m_st_max_offset_distance <= (m_st_min_offset_distance + 10.0f))
+    {
+        m_st_max_offset_distance = m_st_min_offset_distance + 10.0f;
+    }
+
     Flyable::init(node, rubberball, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
@@ -394,6 +426,9 @@ bool RubberBall::updateAndDelete(int ticks)
     // finished the race).
     computeTarget();
     updateDistanceToTarget();
+
+    //Update the speed
+    updateWeightedSpeed(ticks);
 
     // Determine the new position. This new position is only temporary,
     // since it still needs to be adjusted for the height of the terrain.
@@ -506,6 +541,67 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, int ticks)
     assert(!std::isnan((*next_xyz)[2]));
 
 }   // moveTowardsTarget
+
+// ----------------------------------------------------------------------------
+/** Calculates the current speed of the basket ball.
+ *  The base basket ball speed is the target's normal max speed.
+ *  Then an offset is applied.
+ *  If closer than m_st_min_offset_distance ; it is m_st_min_speed_offset
+ *  If farther than m_st_max_offset_distance ; it is m_st_max_speed_offset
+ *  Else, it is a weighted average.
+ *  It takes up to 5 seconds to fully change its speed
+ *  (to avoid sudden big speed changes when the distance change suddenly
+ *  at ball throwing, because of paths, shortcuts, etc.)
+ *  If there is no target, it will keep its current speed
+ */
+void RubberBall::updateWeightedSpeed(int ticks)
+{
+    // Don't change the speed if there is no target
+    if (m_delete_ticks >= 10)
+    {
+        return;
+    }
+    const KartProperties *kp = m_target->getKartProperties();
+    // Get the speed depending on difficulty but not on kart type/handicap
+    float targeted_speed = kp->getEngineGenericMaxSpeed();
+
+    float dt = stk_config->ticks2Time(ticks);
+
+    //Calculate the targeted weighted speed
+    if (m_distance_to_target <= m_st_min_offset_distance)
+    {
+        targeted_speed += m_st_min_speed_offset;
+    }
+    else if (m_distance_to_target > m_st_max_offset_distance)
+    {
+        targeted_speed += m_st_max_speed_offset;
+    }
+    else
+    {
+        float weight = 1.0f;
+        float offset = 0.0f;
+        weight = (m_st_max_offset_distance - m_distance_to_target)
+                /(m_st_max_offset_distance - m_st_min_offset_distance);
+        offset = weight * m_st_min_speed_offset  + (1-weight) * m_st_max_speed_offset;
+        targeted_speed += offset;
+    }
+    //Update the real speed
+    //Always >= 0
+    float max_change = (m_st_max_speed_offset - m_st_min_speed_offset)*dt/(5.0f);
+    if (m_speed-targeted_speed <= max_change && m_speed-targeted_speed >= -max_change)
+    {
+        m_speed = targeted_speed;
+    }
+    else if (m_speed < targeted_speed)
+    {
+        m_speed += max_change;
+    }
+    else
+    {
+        m_speed -= max_change;
+    }
+}   // updateWeightedSpeed
+
 
 // ----------------------------------------------------------------------------
 /** Uses Hermite splines (Catmull-Rom) to interpolate the position of the
