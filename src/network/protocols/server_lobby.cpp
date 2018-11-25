@@ -509,7 +509,7 @@ void ServerLobby::asynchronousUpdate()
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
-            m_game_setup->sortPlayersForTeamGame();
+            m_game_setup->sortPlayersForGame();
             auto players = m_game_setup->getConnectedPlayers();
             for (auto& player : players)
                 player->getPeer()->clearAvailableKartIDs();
