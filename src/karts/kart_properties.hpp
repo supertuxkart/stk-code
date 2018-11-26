@@ -149,6 +149,8 @@ private:
      */
     int8_t m_nitro_min_consumption;
 
+    bool m_is_addon;
+
     /** Type of the kart (for the properties) */
     std::string m_kart_type;
 
@@ -513,6 +515,8 @@ public:
     */
     int8_t getNitroMinConsumptionTicks() const
                                             { return m_nitro_min_consumption; }
+    // ------------------------------------------------------------------------
+    bool isAddon() const                                 { return m_is_addon; }
 
     /* <characteristics-end kpdefs> */
     

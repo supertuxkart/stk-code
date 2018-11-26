@@ -66,6 +66,7 @@ std::string KartProperties::getPerPlayerDifficultyAsString(PerPlayerDifficulty d
  */
 KartProperties::KartProperties(const std::string &filename)
 {
+    m_is_addon = false;
     m_icon_material = NULL;
     m_minimap_icon  = NULL;
     m_name          = "NONAME";
@@ -212,7 +213,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // case that an addon kart has the same directory name (and therefore
     // identifier) as an included kart.
     if(Addon::isAddon(filename))
+    {
         m_ident = Addon::createAddonId(m_ident);
+        m_is_addon = true;
+    }
+
     try
     {
         if(!root || root->getName()!="kart")

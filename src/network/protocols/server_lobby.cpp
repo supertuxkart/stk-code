@@ -23,6 +23,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -94,6 +95,30 @@
  */
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
+    std::vector<int> all_k =
+        kart_properties_manager->getKartsInGroup("standard");
+    std::vector<int> all_t =
+        track_manager->getTracksInGroup("standard");
+    std::vector<int> all_arenas =
+        track_manager->getArenasInGroup("standard", false);
+    std::vector<int> all_soccers =
+        track_manager->getArenasInGroup("standard", true);
+    all_t.insert(all_t.end(), all_arenas.begin(), all_arenas.end());
+    all_t.insert(all_t.end(), all_soccers.begin(), all_soccers.end());
+
+    for (int kart : all_k)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(kart);
+        if (!kp->isAddon())
+            m_official_kts.first.insert(kp->getIdent());
+    }
+    for (int track : all_t)
+    {
+        Track* t = track_manager->getTrack(track);
+        if (!t->isAddon())
+            m_official_kts.second.insert(t->getIdent());
+    }
+
     m_last_success_poll_time.store(StkTime::getRealTimeMs() + 30000);
     m_waiting_players_counts.store(0);
     m_server_owner_id.store(-1);
@@ -1459,6 +1484,23 @@ void ServerLobby::connectionRequested(Event* event)
 
     // Drop this player if he doesn't have at least 1 kart / track the same
     // as server
+    float okt = 0.0f;
+    float ott = 0.0f;
+    for (auto& client_kart : client_karts)
+    {
+        if (m_official_kts.first.find(client_kart) !=
+            m_official_kts.first.end())
+            okt += 1.0f;
+    }
+    okt = okt / (float)m_official_kts.first.size();
+    for (auto& client_track : client_tracks)
+    {
+        if (m_official_kts.second.find(client_track) !=
+            m_official_kts.second.end())
+            ott += 1.0f;
+    }
+    ott = ott / (float)m_official_kts.second.size();
+
     std::set<std::string> karts_erase, tracks_erase;
     for (const std::string& server_kart : m_available_kts.first)
     {
@@ -1476,7 +1518,9 @@ void ServerLobby::connectionRequested(Event* event)
     }
 
     if (karts_erase.size() == m_available_kts.first.size() ||
-        tracks_erase.size() == m_available_kts.second.size())
+        tracks_erase.size() == m_available_kts.second.size() ||
+        okt < ServerConfig::m_official_karts_threshold ||
+        ott < ServerConfig::m_official_tracks_threshold)
     {
         NetworkString *message = getNetworkString(2);
         message->setSynchronous(true);

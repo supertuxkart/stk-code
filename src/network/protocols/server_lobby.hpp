@@ -75,6 +75,9 @@ private:
 
     std::atomic<uint32_t> m_server_owner_id;
 
+    /** Official karts and tracks available in server. */
+    std::pair<std::set<std::string>, std::set<std::string> > m_official_kts;
+
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;

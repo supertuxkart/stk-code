@@ -334,6 +334,8 @@ private:
     /** True if this track supports using smoothed normals. */
     bool                m_smooth_normals;
 
+    bool                m_is_addon;
+
     float               m_fog_max;
     float               m_fog_start;
     float               m_fog_end;
@@ -691,7 +693,8 @@ public:
     const btTransform& getRedFlag() const                { return m_red_flag; }
     // ------------------------------------------------------------------------
     const btTransform& getBlueFlag() const              { return m_blue_flag; }
-
+    // ------------------------------------------------------------------------
+    bool isAddon() const                                 { return m_is_addon; }
 };   // class Track
 
 #endif

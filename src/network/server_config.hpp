@@ -176,6 +176,22 @@ namespace ServerConfig
         "if satisfied min-start-game-players below for owner less or ranked "
         "server."));
 
+    SERVER_CFG_PREFIX FloatServerConfigParam m_official_karts_threshold
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(1.0f,
+        "official-karts-threshold",
+        "Clients below this value will be rejected from joining this server. "
+        "It's determined by number of official karts in client / number of "
+        "official karts in server"));
+
+    SERVER_CFG_PREFIX FloatServerConfigParam m_official_tracks_threshold
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(0.7f,
+        "official-tracks-threshold",
+        "Clients below this value will be rejected from joining this server. "
+        "It's determined by number of official tracks in client / number of "
+        "official tracks in server, setting this value too high will prevent "
+        "android players from joining this server, because STK android apk "
+        "has some official tracks removed."));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_min_start_game_players
         SERVER_CFG_DEFAULT(IntServerConfigParam(2, "min-start-game-players",
         "Only auto start kart selection when number of "

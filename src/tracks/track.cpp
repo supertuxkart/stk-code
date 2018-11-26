@@ -116,7 +116,12 @@ Track::Track(const std::string &filename)
     // case that an addon track has the same directory name (and therefore
     // identifier) as an included track.
     if(Addon::isAddon(filename))
+    {
         m_ident = Addon::createAddonId(m_ident);
+        m_is_addon = true;
+    }
+    else
+        m_is_addon = false;
 
     // The directory should always have a '/' at the end, but getBasename
     // above returns "" if a "/" is at the end, so we add the "/" here.
