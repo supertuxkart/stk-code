@@ -19,11 +19,13 @@
 #ifndef HEADER_POWERUPMANAGER_HPP
 #define HEADER_POWERUPMANAGER_HPP
 
-#include "utils/no_copy.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/types.hpp"
 
 #include "btBulletDynamicsCommon.h"
 
+#include <atomic>
 #include <map>
 #include <string>
 #include <vector>
@@ -151,6 +153,11 @@ private:
     WeightsData m_current_item_weights;
 
     PowerupType   getPowerupType(const std::string &name) const;
+
+    /** Seed for random powerup, for local game it will use a random number,
+     *  for network games it will use the start time from server. */
+    std::atomic<uint64_t> m_random_seed;
+
 public:
     static void unitTesting();
 
@@ -171,6 +178,11 @@ public:
     /** Returns the mesh for a certain powerup.
      *  \param type Mesh type for which the model is returned. */
     irr::scene::IMesh *getMesh(int type) const {return m_all_meshes[type];}
+    // ------------------------------------------------------------------------
+    uint64_t getRandomSeed() const { return m_random_seed.load(); }
+    // ------------------------------------------------------------------------
+    void setRandomSeed(uint64_t seed) { m_random_seed.store(seed); }
+
 };   // class PowerupManager
 
 extern PowerupManager* powerup_manager;

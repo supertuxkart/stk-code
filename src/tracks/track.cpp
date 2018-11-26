@@ -53,6 +53,7 @@
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
 #include "items/network_item_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
@@ -1855,8 +1856,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     else
     {
         // Seed random engine locally
-        ItemManager::updateRandomSeed((uint32_t)StkTime::getTimeSinceEpoch());
+        uint32_t seed = (uint32_t)StkTime::getTimeSinceEpoch();
+        ItemManager::updateRandomSeed(seed);
         ItemManager::create();
+        powerup_manager->setRandomSeed(seed);
     }
 
     // Set the default start positions. Node that later the default

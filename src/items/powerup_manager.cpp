@@ -43,6 +43,7 @@ PowerupManager* powerup_manager=0;
 /** The constructor initialises everything to zero. */
 PowerupManager::PowerupManager()
 {
+    m_random_seed.store(0);
     for(int i=0; i<POWERUP_MAX; i++)
     {
         m_all_meshes[i] = NULL;

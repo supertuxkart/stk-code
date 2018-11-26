@@ -26,6 +26,7 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -816,6 +817,7 @@ void ClientLobby::startGame(Event* event)
 {
     World::getWorld()->setPhase(WorldStatus::SERVER_READY_PHASE);
     uint64_t start_time = event->data().getUInt64();
+    powerup_manager->setRandomSeed(start_time);
     joinStartGameThread();
     m_start_game_thread = std::thread([start_time, this]()
         {
