@@ -1,0 +1,42 @@
+# Small script to stamp the JtTk license key on an executable
+#
+# Original Author:
+# 2009-2010 Ryan Pavlik <rpavlik@iastate.edu> <abiryan@ryand.net>
+# http://academic.cleardefinition.com
+# Iowa State University HCI Graduate Program/VRAC
+
+set(ENV{JTTK_DEV_PLATFORM} @BITS@)
+set(ENV{JTTK_DEV_PATH} @JTTK_DEV_PATH@)
+set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:@JTTK_LIBRARY_DIR@")
+set(ENV{PATH} "$ENV{PATH}:@JTTK_DEV_PATH@/../bin/")
+
+message(STATUS "The stamp commands are being run with these environment variables:")
+execute_process(COMMAND	${CMAKE_COMMAND} -E environment)
+
+set(JTTK_KEYS @JTTK_KEYS@)
+foreach(_key ${JTTK_KEYS})
+	execute_process(COMMAND	${_command} @JTTK_STAMP_COMMAND@ ${_key} @_binary@
+		RESULT_VARIABLE	_result)
+
+	if(NOT "${_result}" EQUAL "0")
+		message(STATUS "Failed (error ${_result}) running stamp command:
+@JTTK_STAMP_COMMAND@ ${_key} @_binary@")
+
+	else()
+		message(STATUS "Succeeded running stamp command:
+@JTTK_STAMP_COMMAND@ ${_key} @_binary@")
+	endif()
+
+	execute_process(COMMAND	@JTTK_STAMP_PLATFORM_COMMAND@ ${_key} @_binary@
+		RESULT_VARIABLE	_result)
+
+	if(NOT "${_result}" EQUAL "0")
+		message(STATUS "Failed (error ${_result}) running stamp command:
+@JTTK_STAMP_PLATFORM_COMMAND@ ${_key} @_binary@")
+
+	else()
+		message(STATUS "Succeeded running stamp command:
+@JTTK_STAMP_PLATFORM_COMMAND@ ${_key} @_binary@")
+	endif()
+
+endforeach()
