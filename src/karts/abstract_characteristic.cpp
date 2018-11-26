@@ -513,6 +513,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_REDUCE_TURN_MAX";
     case SKID_ENABLED:
         return "SKID_ENABLED";
+    case ENGINE_GENERIC_MAX_SPEED:
+        return "ENGINE_GENERIC_MAX_SPEED";
 
     /* <characteristics-end getName> */
     }   // switch (type)
