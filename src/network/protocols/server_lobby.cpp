@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -2369,6 +2370,7 @@ void ServerLobby::configPeersStartTime()
     // Start up time will be after 2500ms, so even if this packet is sent late
     // (due to packet loss), the start time will still ahead of current time
     uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2500;
+    powerup_manager->setRandomSeed(start_time);
     NetworkString* ns = getNetworkString(10);
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
     sendMessageToPeers(ns, /*reliable*/true);
