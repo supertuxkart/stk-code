@@ -54,6 +54,8 @@ private:
 
     int m_red_return_ticks, m_blue_return_ticks;
 
+    std::map<int, int> m_swatter_reset_kart_ticks;
+
     // ------------------------------------------------------------------------
     void updateFlagNodes();
     // ------------------------------------------------------------------------
@@ -133,7 +135,9 @@ public:
     const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
     // ------------------------------------------------------------------------
     void loseFlagForKart(int kart_id);
-
+    // ------------------------------------------------------------------------
+    void resetKartForSwatterHit(int kart_id, int at_world_ticks)
+                      { m_swatter_reset_kart_ticks[kart_id] = at_world_ticks; }
 };   // CaptureTheFlag
 
 #endif

@@ -18,6 +18,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "audio/sfx_base.hpp"
 #include "io/file_manager.hpp"
+#include "items/powerup.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -115,6 +116,7 @@ void CaptureTheFlag::reset(bool restart)
         m_blue_scores = 0;
     m_red_holder = m_blue_holder = -1;
     updateFlagNodes();
+    m_swatter_reset_kart_ticks.clear();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -156,6 +158,36 @@ void CaptureTheFlag::update(int ticks)
         Log::fatal("CaptureTheFlag", "Flag management messed up, abort.");
 
     FreeForAll::update(ticks);
+
+    for (auto it = m_swatter_reset_kart_ticks.begin();
+         it != m_swatter_reset_kart_ticks.end();)
+    {
+        if (it->second < getTicksSinceStart() - 1000)
+        {
+            it = m_swatter_reset_kart_ticks.erase(it);
+        }
+        else
+        {
+            if (it->second == getTicksSinceStart())
+            {
+                AbstractKart* kart = m_karts[it->first].get();
+                if (kart->isEliminated() || !kart->isSquashed())
+                {
+                    it++;
+                    continue;
+                }
+                unsigned int index = getRescuePositionIndex(kart);
+                btTransform t = getRescueTransform(index);
+                t.setOrigin(t.getOrigin() + t.getBasis().getColumn(1) * 3.0f);
+                kart->getBody()->setLinearVelocity(Vec3(0.0f));
+                kart->getBody()->setAngularVelocity(Vec3(0.0f));
+                kart->getBody()->proceedToTransform(t);
+                kart->setTrans(t);
+                kart->getPowerup()->reset();
+            }
+            it++;
+        }
+    }
 
     if (!NetworkConfig::get()->isNetworking() ||
         NetworkConfig::get()->isClient())

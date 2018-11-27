@@ -39,7 +39,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
@@ -369,6 +369,13 @@ void Swatter::squashThingsAround()
         World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
             m_kart->getWorldKartId());
 
+        CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+        if (ctf)
+        {
+            int reset_ticks = (ctf->getTicksSinceStart() / 10) * 10 + 80;
+            ctf->resetKartForSwatterHit(m_closest_kart->getWorldKartId(),
+                reset_ticks);
+        }
         // Handle achievement if the swatter is used by the current player
         if (m_kart->getController()->canGetAchievements())
         {
