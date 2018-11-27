@@ -44,6 +44,7 @@
 #include "network/stk_peer.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/network_kart_selection.hpp"
+#include "states_screens/online/vote_overview.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/tracks_screen.hpp"
@@ -121,7 +122,7 @@ void ClientLobby::setup()
 {
     clearPlayers();
     m_received_server_result = false;
-    TracksScreen::getInstance()->resetVote();
+    VoteOverview::getInstance()->resetVote();
     LobbyProtocol::setup();
     m_state.store(NONE);
 }   // setup
@@ -162,7 +163,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_SERVER_INFO:           handleServerInfo(event);    break;
         case LE_PLAYER_DISCONNECTED :  disconnectedPlayer(event);  break;
         case LE_CONNECTION_REFUSED:    connectionRefused(event);   break;
-        case LE_VOTE:                  displayPlayerVote(event);   break;
+        case LE_VOTE:                  receivePlayerVote(event);   break;
         case LE_SERVER_OWNERSHIP:      becomingServerOwner();      break;
         case LE_BAD_TEAM:              handleBadTeam();            break;
         case LE_BAD_CONNECTION:        handleBadConnection();      break;
@@ -435,68 +436,32 @@ void ClientLobby::finalizeConnectionRequest(NetworkString* header,
 }   // finalizeConnectionRequest
 
 //-----------------------------------------------------------------------------
-void ClientLobby::displayPlayerVote(Event* event)
+void ClientLobby::receivePlayerVote(Event* event)
 {
     if (!checkDataSize(event, 4)) return;
     // Get the player name who voted
     NetworkString& data = event->data();
 
+
+    uint32_t host_id2 = data.getUInt32();
+    std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByHostId(host_id2);
+
     std::string player_name;
     data.decodeString(&player_name);
+//    if (host_id2 != STKHost::get()->getMyHostId())
+    {
+ //       std::string local_name = StringUtils::wideToUtf8(peer->getPlayerProfiles()[0]->getName());
+    }
+
     uint32_t host_id = data.getUInt32();
     player_name += ": ";
-    std::string track_name;
-    data.decodeString(&track_name);
-    Track* track = track_manager->getTrack(track_name);
+    PeerVote vote(data);
+    m_peers_votes[event->getPeer()->getHostId()] = vote;
+    Track* track = track_manager->getTrack(vote.m_track_name);
     if (!track)
-        Log::fatal("ClientLobby", "Missing track %s", track_name.c_str());
-    core::stringw track_readable = track->getName();
-    int lap = data.getUInt8();
-    int rev = data.getUInt8();
-    core::stringw yes = _("Yes");
-    core::stringw no = _("No");
-    core::stringw vote_msg;
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
-    {
-        //I18N: Vote message in network game from a player
-        vote_msg = _("Track: %s,\nrandom item location: %s",
-            track_readable, rev == 1 ? yes : no);
-    }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE &&
-        race_manager->getMajorMode() ==
-        RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
-    {
-        //I18N: Vote message in network game from a player
-        vote_msg = _("Track: %s", track_readable);
-    }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-    {
-        if (m_game_setup->isSoccerGoalTarget())
-        {
-            //I18N: Vote message in network game from a player
-            vote_msg = _("Track: %s,\n"
-                "number of goals to win: %d,\nrandom item location: %s",
-                track_readable, lap, rev == 1 ? yes : no);
-        }
-        else
-        {
-            //I18N: Vote message in network game from a player
-            vote_msg = _("Track: %s,\n"
-                "maximum time: %d,\nrandom item location: %s",
-                track_readable, lap, rev == 1 ? yes : no);
-        }
-    }
-    else
-    {
-        //I18N: Vote message in network game from a player
-        vote_msg = _("Track: %s,\nlaps: %d, reversed: %s",
-            track_readable, lap, rev == 1 ? yes : no);
-    }
-    vote_msg = StringUtils::utf8ToWide(player_name) + vote_msg;
-    TracksScreen::getInstance()->addVoteMessage(player_name +
-        StringUtils::toString(host_id), vote_msg);
-}   // displayPlayerVote
+        Log::fatal("ClientLobby", "Missing track %s", vote.m_track_name.c_str());
+
+}   // receivePlayerVote
 
 //-----------------------------------------------------------------------------
 /*! \brief Called when a new player is disconnected

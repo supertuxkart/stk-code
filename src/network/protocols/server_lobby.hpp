@@ -86,10 +86,6 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
-    /** Vote from each peer. */
-    std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
-        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
-
     bool m_has_created_server_id_file;
 
     /** It indicates if this server is unregistered with the stk server. */
@@ -166,7 +162,7 @@ private:
     // kart selection
     void kartSelectionRequested(Event* event);
     // Track(s) votes
-    void playerVote(Event *event);
+    void handlePlayerVote(Event *event);
     void playerFinishedResult(Event *event);
     bool registerServer(bool now);
     void finishedLoadingWorldClient(Event *event);
@@ -238,8 +234,7 @@ private:
                                   const std::string& iv,
                                   uint32_t online_id,
                                   const irr::core::stringw& online_name);
-    bool handleAllVotes(std::string *track_name, int *num_laps,
-                        bool *reverse);
+    bool handleAllVotes(PeerVote *winner);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();

@@ -21,11 +21,14 @@
 
 #include "network/protocol.hpp"
 
+#include "network/network_string.hpp"
+
 class GameSetup;
 class NetworkPlayerProfile;
 
 #include <atomic>
 #include <cassert>
+#include <map>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -83,6 +86,43 @@ public:
     uint64_t m_max_voting_time;
 
 protected:
+    /** A simple structure to store a vote from a client:
+     *  track name, number of laps and reverse or not. */
+    class PeerVote
+    {
+    public:
+        std::string m_track_name;
+        uint8_t     m_num_laps;
+        bool        m_reverse;
+
+        // ------------------------------------------------------
+        PeerVote() : m_track_name(""), m_num_laps(1),
+                     m_reverse(false)
+        {}
+        // ------------------------------------------------------
+        /** Initialised this object from a data in a network string. */
+        PeerVote(NetworkString &ns)
+        {
+            ns.decodeString(&m_track_name);
+            m_num_laps = ns.getUInt8();
+            m_reverse  = ns.getUInt8();
+
+        }   // PeerVote
+        // ------------------------------------------------------
+        /** Encodes this vote object into a network string. */
+        void encode(NetworkString *ns)
+        {
+            ns->encodeString(m_track_name)
+               .addUInt8(m_num_laps)
+               .addUInt8(m_reverse);
+        }   // encode
+    };   // class PeerVote
+
+    /** Vote from each peer. The host id is used as a key. Note that
+     *  host ids can be non-consecutive, so we cannot use std::vector. */
+    std::map<int, PeerVote> m_peers_votes;
+    
+
     std::thread m_start_game_thread;
 
     static std::weak_ptr<LobbyProtocol> m_lobby;

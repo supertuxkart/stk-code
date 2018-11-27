@@ -57,8 +57,6 @@ private:
 
     int m_bottom_box_height;
 
-    std::map<std::string, core::stringw> m_vote_messages;
-
     std::deque<std::string> m_random_track_list;
 
     /** adds the tracks from the current track group into the tracks ribbon */
@@ -104,17 +102,6 @@ public:
     void setNetworkTracks() { m_network_tracks = true; }
     // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }
-    // ------------------------------------------------------------------------
-    void resetVote()
-    {
-        m_vote_messages.clear();
-    }
-    // ------------------------------------------------------------------------
-    void addVoteMessage(const std::string& user,
-                        const irr::core::stringw& message)
-    {
-        m_vote_messages[user] = message;
-    }
 
 };
 

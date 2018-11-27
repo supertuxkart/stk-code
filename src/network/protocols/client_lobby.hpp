@@ -44,7 +44,7 @@ private:
     void raceFinished(Event* event);
     void exitResultScreen(Event *event);
     // race votes
-    void displayPlayerVote(Event* event);
+    void receivePlayerVote(Event* event);
     void updatePlayerList(Event* event);
     void handleChat(Event* event);
     void handleServerInfo(Event* event);

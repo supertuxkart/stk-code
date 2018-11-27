@@ -334,7 +334,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
-        case LE_VOTE: playerVote(event);                          break;
+        case LE_VOTE: handlePlayerVote(event);                    break;
         case LE_KICK_HOST: kickHost(event);                       break;
         case LE_CHANGE_TEAM: changeTeam(event);                   break;
         case LE_REQUEST_BEGIN: startSelection(event);             break;
@@ -489,13 +489,12 @@ void ServerLobby::asynchronousUpdate()
     }
     case SELECTING:
     {
-        std::string track_name;
-        int num_laps;
-        bool reverse;
-        bool all_votes_in = handleAllVotes(&track_name, &num_laps, &reverse);
+        PeerVote winner;
+        bool all_votes_in = handleAllVotes(&winner);
         if (isVotingOver() || all_votes_in)
         {
-            m_game_setup->setRace(track_name, num_laps, reverse);
+            m_game_setup->setRace(winner.m_track_name, winner.m_num_laps,
+                                  winner.m_reverse                       );
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
@@ -505,9 +504,10 @@ void ServerLobby::asynchronousUpdate()
                 player->getPeer()->clearAvailableKartIDs();
             NetworkString* load_world = getNetworkString();
             load_world->setSynchronous(true);
-            load_world->addUInt8(LE_LOAD_WORLD).encodeString(track_name)
-                .addUInt8(num_laps).addUInt8(reverse)
-                .addUInt8((uint8_t)players.size());
+            load_world->addUInt8(LE_LOAD_WORLD)
+                       .encodeString(winner.m_track_name)
+                       .addUInt8(winner.m_num_laps).addUInt8(winner.m_reverse)
+                       .addUInt8((uint8_t)players.size());
             for (unsigned i = 0; i < players.size(); i++)
             {
                 std::shared_ptr<NetworkPlayerProfile>& player = players[i];
@@ -1832,7 +1832,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
 /*! \brief Called when a player votes for track(s).
  *  \param event : Event providing the information.
  */
-void ServerLobby::playerVote(Event* event)
+void ServerLobby::handlePlayerVote(Event* event)
 {
     if (m_state != SELECTING)
     {
@@ -1849,145 +1849,97 @@ void ServerLobby::playerVote(Event* event)
     if (isVotingOver())  return;
 
     NetworkString& data = event->data();
-    std::string track_name;
-    data.decodeString(&track_name);
-    uint8_t lap = data.getUInt8();
-    uint8_t reverse = data.getUInt8();
+    PeerVote vote(data);
 
     if (race_manager->modeHasLaps())
     {
         if (ServerConfig::m_auto_lap_ratio > 0.0f)
         {
-            Track* t = track_manager->getTrack(track_name);
+            Track* t = track_manager->getTrack(vote.m_track_name);
             if (t)
             {
-                lap = (uint8_t)(fmaxf(1.0f,
-                    (float)t->getDefaultNumberOfLaps() *
-                    ServerConfig::m_auto_lap_ratio));
+                vote.m_num_laps =
+                    (uint8_t)(fmaxf(1.0f,
+                                    (float)t->getDefaultNumberOfLaps() 
+                                    *ServerConfig::m_auto_lap_ratio   ) );
             }
             else
             {
                 // Prevent someone send invalid vote
-                track_name = *m_available_kts.second.begin();
-                lap = (uint8_t)3;
+                vote.m_track_name = *m_available_kts.second.begin();
+                vote.m_num_laps = (uint8_t)3;
             }
         }
-        else if (lap == 0)
-            lap = (uint8_t)3;
+        else if (vote.m_num_laps == 0)
+            vote.m_num_laps = (uint8_t)3;
     }
 
-    NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
-    std::string name = StringUtils::wideToUtf8(event->getPeer()
-        ->getPlayerProfiles()[0]->getName());
-    other.setSynchronous(true);
-    other.addUInt8(LE_VOTE)
-        .encodeString(name).addUInt32(event->getPeer()->getHostId())
-        .encodeString(track_name).addUInt8(lap).addUInt8(reverse);
+    // Store vote:
+    m_peers_votes[event->getPeer()->getHostId()] = vote;
 
-    m_peers_votes[event->getPeerSP()] =
-        std::make_tuple(track_name, lap, reverse == 1);
+    // Now inform all clients about the vote
+    NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
+    
+    std::string name = 
+        StringUtils::wideToUtf8(event->getPeer()
+                                     ->getPlayerProfiles()[0]->getName());
+    other.setSynchronous(true);
+    other.addUInt8(LE_VOTE);
+    
+    other.addUInt32(event->getPeer()->getHostId())  .encodeString(name)
+         .addUInt32(event->getPeer()->getHostId());
+    vote.encode(&other);
+
     sendMessageToPeers(&other);
 
-}   // playerVote
+}   // handlePlayerVote
 
 // ----------------------------------------------------------------------------
 /** Select the track to be used based on all votes being received.
- *  \param track_name Name of the track voted for.
- *  \param num_laps Number of laps.
- *  \param reverse If reverse track is to be used.
- *  \result True if a vote from each player has been received, false otherwise.
+ * \param winner The PeerVote that was picked.
  */
-bool ServerLobby::handleAllVotes(std::string *track_name, int *num_laps,
-                                 bool *reverse)
+bool ServerLobby::handleAllVotes(PeerVote *winner)
 {
-    // Default settings if no votes at all
-    RandomGenerator rg;
-    std::set<std::string>::iterator it = m_available_kts.second.begin();
-    std::advance(it, rg.get((int)m_available_kts.second.size()));
-    *track_name = *it;
-    *num_laps   = UserConfigParams::m_num_laps;
-    *reverse    = track_name->size() % 2 == 0;
+    // First remove all votes from disconnected hosts
+    auto it = m_peers_votes.begin();
+    while (it != m_peers_votes.end())
+    {
+        auto peer = STKHost::get()->findPeerByHostId(it->first);
+        if (peer == nullptr)
+        {
+            it = m_peers_votes.erase(it);
+        }
+        else
+            it++;
+    }
 
-
-    int cur_players = 0;
+    // Count number of players 
+    unsigned int cur_players = 0;
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
     {
         if (peer->hasPlayerProfiles() && !peer->isWaitingForGame())
             cur_players ++;
     }
-    if (cur_players == 0) return false;
-
-    std::map<std::string, unsigned> tracks;
-    std::map<unsigned, unsigned> laps;
-    std::map<bool, unsigned> reverses;
-
-    for (auto p : m_peers_votes)
+    if (cur_players == 0 || m_peers_votes.size() < cur_players)
     {
-        if (p.first.expired())
-            continue;
-        auto track_vote = tracks.find(std::get<0>(p.second));
-        if (track_vote == tracks.end())
-            tracks[std::get<0>(p.second)] = 1;
-        else
-            track_vote->second++;
-        auto lap_vote = laps.find(std::get<1>(p.second));
-        if (lap_vote == laps.end())
-            laps[std::get<1>(p.second)] = 1;
-        else
-            lap_vote->second++;
-        auto reverse_vote = reverses.find(std::get<2>(p.second));
-        if (reverse_vote == reverses.end())
-            reverses[std::get<2>(p.second)] = 1;
-        else
-            reverse_vote->second++;
-    }   // for p in m_peers_votes
-
-    unsigned vote = 0;
-    auto track_vote = tracks.begin();
-    for (auto c_vote = tracks.begin(); c_vote != tracks.end(); c_vote++)
-    {
-        if (c_vote->second > vote)
-        {
-            vote = c_vote->second;
-            track_vote = c_vote;
-        }
-    }
-    if (track_vote != tracks.end())
-    {
-        *track_name = track_vote->first;
+        // Default settings if no votes at all
+        RandomGenerator rg;
+        std::set<std::string>::iterator it = m_available_kts.second.begin();
+        std::advance(it, rg.get((int)m_available_kts.second.size()));
+        winner->m_track_name = *it;
+        winner->m_num_laps = UserConfigParams::m_num_laps;
+        winner->m_reverse = winner->m_track_name.size() % 2 == 0;
+        return false;
     }
 
-    vote = 0;
-    auto lap_vote = laps.begin();
-    for (auto c_vote = laps.begin(); c_vote != laps.end(); c_vote++)
-    {
-        if (c_vote->second > vote)
-        {
-            vote = c_vote->second;
-            lap_vote = c_vote;
-        }
-    }
-    if (lap_vote != laps.end())
-    {
-        *num_laps = lap_vote->first;
-    }
+    RandomGenerator r;
+    auto vote = m_peers_votes.begin();
+    std::advance(vote, r.get(m_peers_votes.size()) );
 
-    vote = 0;
-    auto reverse_vote = reverses.begin();
-    for (auto c_vote = reverses.begin(); c_vote != reverses.end(); c_vote++)
-    {
-        if (c_vote->second > vote)
-        {
-            vote = c_vote->second;
-            reverse_vote = c_vote;
-        }
-    }
-    if (reverse_vote != reverses.end())
-    {
-        *reverse = reverse_vote->first;
-    }
+    *winner = vote->second;
 
+    return false;
     return m_peers_votes.size() == cur_players;
 }   // handleAllVotes
 

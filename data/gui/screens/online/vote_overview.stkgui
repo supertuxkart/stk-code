@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+
+    <div id="all-track" x="1%" y="1%" width="98%" height="96%" layout="vertical-row" >
+        <header width="80%" I18N="In the track selection screen" text="Votes"
+                align="center" text_align="center" />
+
+        <div id="rect-box" width="100%" height="80%" padding="15" layout="vertical-row">
+            <div proportion="1" width="100%" layout="horizontal-row" padding="1">
+                <box id="rect-box0" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+                <box id="rect-box1" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+                <box id="rect-box2" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+                <box id="rect-box3" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+            </div>
+
+            <div proportion="1" width="100%" layout="horizontal-row" padding="1">
+                <box id="rect-box4" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+                <box id="rect-box5" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+                <box id="rect-box6" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+                <box id="rect-box7" width="24%" height="100%" padding="15" layout="vertical-row">
+                </box>
+            </div>
+            <progressbar id="timer" height="4%" width="100%"></progressbar>
+        </div>
+    </div>
+</stkgui>
