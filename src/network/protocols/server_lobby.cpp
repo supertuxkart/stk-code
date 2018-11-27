@@ -1933,13 +1933,14 @@ bool ServerLobby::handleAllVotes(PeerVote *winner)
         return false;
     }
 
+    // Otherwise if we have all votes, randomly select the vote
+    // to use in the next race.
     RandomGenerator r;
     auto vote = m_peers_votes.begin();
     std::advance(vote, r.get(m_peers_votes.size()) );
 
     *winner = vote->second;
 
-    return false;
     return m_peers_votes.size() == cur_players;
 }   // handleAllVotes
 
