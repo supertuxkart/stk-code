@@ -297,7 +297,7 @@
                 after being hit by an explosion.
             radius: Kart closer to this value will be affected by
                 an explosion as well.  -->
-        <explosion duration="2" radius="6"
+        <explosion duration="1.5" radius="6"
                    invulnerability-time="7" />
 
         <!-- Nitro
