@@ -265,19 +265,25 @@ void GameSetup::sortPlayersForGrandPrix()
 }   // sortPlayersForGrandPrix
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForTeamGame()
+void GameSetup::sortPlayersForGame()
 {
+    std::lock_guard<std::mutex> lock(m_players_mutex);
+    if (!isGrandPrix())
+    {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_players.begin(), m_players.end(), g);
+    }
     if (!race_manager->teamEnabled() ||
         ServerConfig::m_team_choosing)
         return;
-    std::lock_guard<std::mutex> lock(m_players_mutex);
     for (unsigned i = 0; i < m_players.size(); i++)
     {
         auto player = m_players[i].lock();
         assert(player);
         player->setTeam((KartTeam)(i % 2));
     }
-}   // sortPlayersForTeamGame
+}   // sortPlayersForGame
 
 // ----------------------------------------------------------------------------
 std::pair<int, int> GameSetup::getPlayerTeamInfo() const

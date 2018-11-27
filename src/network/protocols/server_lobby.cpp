@@ -535,7 +535,7 @@ void ServerLobby::asynchronousUpdate()
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
-            m_game_setup->sortPlayersForTeamGame();
+            m_game_setup->sortPlayersForGame();
             auto players = m_game_setup->getConnectedPlayers();
             for (auto& player : players)
                 player->getPeer()->clearAvailableKartIDs();
@@ -1663,7 +1663,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     unsigned player_count = data.getUInt8();
-    auto red_blue = m_game_setup->getPlayerTeamInfo();
+    auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
     for (unsigned i = 0; i < player_count; i++)
     {
         core::stringw name;
