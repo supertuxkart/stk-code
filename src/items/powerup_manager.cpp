@@ -602,6 +602,13 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     }
     else
         *n=1;
+
+    // Prevents early explosive items
+    if (stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) < 15.)
+    {
+        if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL)
+            powerup = POWERUP_BOWLING;
+    }
     return (PowerupType)powerup;
 }   // getRandomPowerup
 
