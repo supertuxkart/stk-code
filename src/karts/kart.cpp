@@ -1576,7 +1576,13 @@ void Kart::update(int ticks)
         }
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
-        m_powerup->use() ;
+        if (!World::getWorld()->isStartPhase())
+            m_powerup->use();
+        else
+        {
+            if(!getKartAnimation())
+                beep();
+        }
         World::getWorld()->onFirePressed(getController());
         m_fire_clicked = 1;
     }
