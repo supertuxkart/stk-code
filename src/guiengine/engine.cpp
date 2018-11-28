@@ -1183,17 +1183,25 @@ namespace GUIEngine
         // ---- some menus may need updating
         if (gamestate != GAME)
         {
+            bool dialog_opened = false;
+            
             if (ScreenKeyboard::isActive())
             {
                 ScreenKeyboard::getCurrent()->onUpdate(dt);
+                dialog_opened = true;
             }
             else if (ModalDialog::isADialogActive())
             {
                 ModalDialog::getCurrent()->onUpdate(dt);
+                dialog_opened = true;
             }
-            else
+            
+            Screen* screen = getCurrentScreen();
+
+            if (screen != NULL && 
+                (!dialog_opened || screen->getUpdateInBackground()))
             {
-                getCurrentScreen()->onUpdate(elapsed_time);
+                screen->onUpdate(elapsed_time);
             }
         }
         else
