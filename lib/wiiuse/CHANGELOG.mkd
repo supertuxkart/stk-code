@@ -1,13 +1,35 @@
 WiiUse Changelog
 ================
 
-Fork, located at <http://github.com/wiiuse/wiiuse>
+De-facto official fork, located at <http://github.com/wiiuse/wiiuse>
 
-Original project:
+Original project (0.12 and earlier):
 
-- <http://wiiuse.net/>
-- <http://wiiuse.sourceforge.net/>
 - <http://sourceforge.net/projects/wiiuse/>
+- Now-defunct web sites:
+  - wiiuse.net:
+    most recent archive from 2011
+    <https://web.archive.org/web/20110107085956/http://wiiuse.net/>
+  - wiiuse.sourceforge.net:
+    most recent archive from 2010 (looks identical on homepage to 2011 snapshot above)
+    <https://web.archive.org/web/20100216015311/http://wiiuse.sourceforge.net/>
+
+v0.15.4 -- 28-Nov-2018
+--------------------
+
+Fixed:
+
+- Windows build - verified to work on VS Community 2017 from fresh install.
+
+Changed:
+
+- Removed `WCONST` macro of questionable value -
+  it made some struct members "const" for consuming software,
+  but non-const within the library.
+  Made it too complex to maintain.
+  Shouldn't really affect usage (doesn't change layout, etc.),
+  but noted separately because it is technically a (very minor) API change.
+- Removed broken links to old project web sites.
 
 v0.15.3 -- 25-Nov-2018
 --------------------
@@ -16,7 +38,6 @@ Fixed:
 
 - Fixed forgotten version number
 - Fixed library installation prefix on 64bit systems
-
 
 v0.15.2 -- 25-Nov-2018
 --------------------

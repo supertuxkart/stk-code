@@ -108,8 +108,6 @@ extern FILE *logtarget[];
 #define absf(x) ((x >= 0) ? (x) : (x * -1.0f))
 #define diff_f(x, y) ((x >= y) ? (absf(x - y)) : (absf(y - x)))
 
-#define WCONST
-
 /** @} */
 
 #endif /* DEFINITIONS_H_INCLUDED */

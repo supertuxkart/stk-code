@@ -58,7 +58,7 @@
  *  intended to be the new "upstream" of the project. The new homepage is
  *  on GitHub, where the source is maintained:
  *
- *    - http://github.com/rpavlik/wiiuse
+ *    - http://github.com/wiiuse/wiiuse
  *
  *  Contributions (under the GPL 3+) are welcome and encouraged!
  *
@@ -73,7 +73,7 @@
 
 #define WIIUSE_MAJOR 0
 #define WIIUSE_MINOR 15
-#define WIIUSE_MICRO 3
+#define WIIUSE_MICRO 4
 
 #define WIIUSE_VERSION_TRANSFORM(MAJ, MIN, MICRO) (MAJ * 1000000 + MIN * 1000 + MICRO)
 #define WIIUSE_HAS_VERSION(MAJ, MIN, MICRO)    \
@@ -107,11 +107,7 @@
 #include <bluetooth/bluetooth.h>
 #endif
 
-#ifndef WCONST
-#define WCONST const
-#endif
-
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER < 1700
 /* MS compilers of pre-VC2010 versions don't have stdint.h
  * and I can't get VC2010's stdint.h to compile nicely in
  * WiiUse
@@ -733,89 +729,89 @@ typedef enum WIIUSE_WIIMOTE_TYPE {
  */
 typedef struct wiimote_t
 {
-    WCONST int unid; /**< user specified id						*/
+    int unid; /**< user specified id						*/
 
 #ifdef WIIUSE_BLUEZ
     /** @name Linux-specific (BlueZ) members */
     /** @{ */
-    WCONST char bdaddr_str[18]; /**< readable bt address					*/
-    WCONST bdaddr_t bdaddr;     /**< bt address								*/
-    WCONST int out_sock;        /**< output socket							*/
-    WCONST int in_sock;         /**< input socket 							*/
+    char bdaddr_str[18]; /**< readable bt address					*/
+    bdaddr_t bdaddr;     /**< bt address								*/
+    int out_sock;        /**< output socket							*/
+    int in_sock;         /**< input socket 							*/
                                 /** @} */
 #endif
 
 #ifdef WIIUSE_WIN32
     /** @name Windows-specific members */
     /** @{ */
-    WCONST HANDLE dev_handle;         /**< HID handle								*/
-    WCONST OVERLAPPED hid_overlap;    /**< overlap handle							*/
-    WCONST enum win_bt_stack_t stack; /**< type of bluetooth stack to use			*/
-    WCONST int timeout;               /**< read timeout							*/
-    WCONST byte normal_timeout;       /**< normal timeout							*/
-    WCONST byte exp_timeout;          /**< timeout for expansion handshake		*/
+    HANDLE dev_handle;         /**< HID handle								*/
+    OVERLAPPED hid_overlap;    /**< overlap handle							*/
+    enum win_bt_stack_t stack; /**< type of bluetooth stack to use			*/
+    int timeout;               /**< read timeout							*/
+    byte normal_timeout;       /**< normal timeout							*/
+    byte exp_timeout;          /**< timeout for expansion handshake		*/
                                       /** @} */
 #endif
 
 #ifdef WIIUSE_MAC
     /** @name Mac OS X-specific members */
     /** @{ */
-    WCONST void *objc_wm; /**  WiiuseWiimote* as opaque pointer       */
+    void *objc_wm; /**  WiiuseWiimote* as opaque pointer       */
                           /** @} */
 #endif
 
-    WCONST int state;           /**< various state flags					*/
-    WCONST byte leds;           /**< currently lit leds						*/
-    WCONST float battery_level; /**< battery level							*/
+    int state;           /**< various state flags					*/
+    byte leds;           /**< currently lit leds						*/
+    float battery_level; /**< battery level							*/
 
-    WCONST int flags; /**< options flag							*/
+    int flags; /**< options flag							*/
 
 #ifndef WIIUSE_SYNC_HANDSHAKE
-    WCONST byte handshake_state; /**< the state of the connection handshake	*/
+    byte handshake_state; /**< the state of the connection handshake	*/
 #endif
-    WCONST byte expansion_state;        /**< the state of the expansion handshake	*/
-    WCONST struct data_req_t *data_req; /**< list of data read requests				*/
+    byte expansion_state;        /**< the state of the expansion handshake	*/
+    struct data_req_t *data_req; /**< list of data read requests				*/
 
-    WCONST struct read_req_t *read_req; /**< list of data read requests				*/
-    WCONST struct accel_t accel_calib;  /**< wiimote accelerometer calibration		*/
-    WCONST struct expansion_t exp;      /**< wiimote expansion device				*/
+    struct read_req_t *read_req; /**< list of data read requests				*/
+    struct accel_t accel_calib;  /**< wiimote accelerometer calibration		*/
+    struct expansion_t exp;      /**< wiimote expansion device				*/
 
-    WCONST struct vec3b_t accel;   /**< current raw acceleration data			*/
-    WCONST struct orient_t orient; /**< current orientation on each axis		*/
-    WCONST struct gforce_t gforce; /**< current gravity forces on each axis	*/
+    struct vec3b_t accel;   /**< current raw acceleration data			*/
+    struct orient_t orient; /**< current orientation on each axis		*/
+    struct gforce_t gforce; /**< current gravity forces on each axis	*/
 
-    WCONST struct ir_t ir; /**< IR data								*/
+    struct ir_t ir; /**< IR data								*/
 
-    WCONST uint16_t btns;          /**< what buttons have just been pressed	*/
-    WCONST uint16_t btns_held;     /**< what buttons are being held down		*/
-    WCONST uint16_t btns_released; /**< what buttons were just released this	*/
+    uint16_t btns;          /**< what buttons have just been pressed	*/
+    uint16_t btns_held;     /**< what buttons are being held down		*/
+    uint16_t btns_released; /**< what buttons were just released this	*/
 
-    WCONST float orient_threshold;  /**< threshold for orient to generate an event */
-    WCONST int32_t accel_threshold; /**< threshold for accel to generate an event */
+    float orient_threshold;  /**< threshold for orient to generate an event */
+    int32_t accel_threshold; /**< threshold for accel to generate an event */
 
-    WCONST struct wiimote_state_t lstate; /**< last saved state						*/
+    struct wiimote_state_t lstate; /**< last saved state						*/
 
-    WCONST WIIUSE_EVENT_TYPE event; /**< type of event that occurred				*/
-    WCONST byte motion_plus_id[6];
-    WCONST WIIUSE_WIIMOTE_TYPE type;
+    WIIUSE_EVENT_TYPE event; /**< type of event that occurred				*/
+    byte motion_plus_id[6];
+    WIIUSE_WIIMOTE_TYPE type;
 } wiimote;
 
 /** @brief Data passed to a callback during wiiuse_update() */
 typedef struct wiimote_callback_data_t
 {
-    WCONST int uid;
-    WCONST byte leds;
-    WCONST float battery_level;
-    WCONST struct vec3b_t accel;
-    WCONST struct orient_t orient;
-    WCONST struct gforce_t gforce;
-    WCONST struct ir_t ir;
-    WCONST uint16_t buttons;
-    WCONST uint16_t buttons_held;
-    WCONST uint16_t buttons_released;
-    WCONST WIIUSE_EVENT_TYPE event;
-    WCONST int state;
-    WCONST struct expansion_t expansion;
+    int uid;
+    byte leds;
+    float battery_level;
+    struct vec3b_t accel;
+    struct orient_t orient;
+    struct gforce_t gforce;
+    struct ir_t ir;
+    uint16_t buttons;
+    uint16_t buttons_held;
+    uint16_t buttons_released;
+    WIIUSE_EVENT_TYPE event;
+    int state;
+    struct expansion_t expansion;
 } wiimote_callback_data_t;
 
 /** @brief Callback type */

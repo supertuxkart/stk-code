@@ -37,15 +37,7 @@
 #ifndef EVENTS_H_INCLUDED
 #define EVENTS_H_INCLUDED
 
-#if defined(_MSC_VER)
-/* MS compilers of pre-VC2010 versions don't have stdint.h
- * and I can't get VC2010's stdint.h to compile nicely in
- * WiiUse
- */
-#include "wiiuse_msvcstdint.h"
-#else
-#include <stdint.h>
-#endif
+#include "wiiuse.h"
 
 /** @defgroup internal_events Internal: Event Utilities */
 /** @{ */

@@ -50,7 +50,7 @@ Original Author: Michael Laforest < para > < thepara (--AT--) g m a i l [--DOT--
 
 Additional Contributors:
 
-- Jan Ciger - Reviatech SAS <https://github.com/janoc> <jan.ciger@reviatech.com>
+- Jan Ciger - Reviatech SAS <https://github.com/janoc> <jan.ciger@reviatech.com> (effective co-maintainer)
 - dhewg
 - Christopher Sawczuk @ TU-Delft (initial Balance Board support)
 - Paul Burton <https://github.com/paulburton/wiiuse>
@@ -120,16 +120,14 @@ Wiiuse currently operates on Linux, Windows and Mac. You will need:
 
 ### For Linux
 
-- The kernel must support bluetooth
-- The BlueZ bluetooth drivers must be installed
+- The kernel must support Bluetooth
+- The BlueZ Bluetooth drivers must be installed
 - If compiling, you'll need the BlueZ dev files (Debian/Ubuntu package
   `libbluetooth-dev`)
 
 ### For Windows
 
-- Bluetooth driver (tested with Microsoft's stack with Windows XP SP2)
-
-- If compiling, Microsoft Windows Driver Development Kit (DDK)
+- Bluetooth driver (tested with Microsoft's stack with Windows XP SP2 thru Windows 10)
 
 ### For Mac
 
@@ -179,6 +177,10 @@ You may need to install the Windows SDK (in recent versions) or
 DDK (driver development kit - for old Windows SDK only) to compile
 wiiuse.
 
+With Visual Studio Community 2017, this is very easy to build now:
+if you have chosen to install the "desktop C++" tools,
+you'll automatically have what you need.
+
 ## Using the Library
 
 To use the library in your own program you must first compile wiiuse as
@@ -227,7 +229,7 @@ Nintendo
 
 BlueZ
 
-> Easy and intuitive bluetooth stack for Linux.
+> Easy and intuitive Bluetooth stack for Linux.
 
 Thanks to Brent for letting me borrow his Guitar Hero 3 controller.
 
@@ -260,30 +262,26 @@ greatly appreciated.
   - Created an 0.13 version with some very preliminary MotionPlus support.
   - Integrated into branch `fwiine-motionplus`, not yet merged pending
     alternate MotionPlus merge from WiiC by Jan Ciger.
-- [DolphinEmu](http://code.google.com/p/dolphin-emu/source/checkout)
-  - Embedded, converted to C++, drastically changed over time and
-    mostly unrecognizable now.
+- [DolphinEmu](https://github.com/dolphin-emu/dolphin)
+  - used to have a WiiUse fork labeled version 0.13.0 (no relation to 0.13 in this current project)
+  - Embedded, converted to C++, drastically changed over time,
+    mostly unrecognizable, and then removed before 3.0.
+  - Added Mac support.
+  - Added code to handle finding and pairing wiimotes on windows.
   - A mostly intact version is here:
-    <http://code.google.com/p/dolphin-emu/source/browse/?name=2.0#git%2FExternals%2FWiiUseSrc%2FSrc>
-  - Added Mac support
-  - Added code to handle finding and pairing wiimotes on windows, see:
-    <http://code.google.com/p/dolphin-emu/source/browse/Source/Core/Core/Src/HW/WiimoteReal/IOWin.cpp>
-  - Fully modified version of the IO code is here:
-    <http://code.google.com/p/dolphin-emu/source/browse/#git%2FSource%2FCore%2FCore%2FSrc%2FHW%2FWiimoteReal>
+    <https://github.com/dolphin-emu/dolphin/tree/2.0/Externals/WiiUseSrc>
+  - Last code state before removal is here:
+    <https://github.com/dolphin-emu/dolphin/tree/b038df64bfad478c4e2605985809f58f351ec11c/Source/Core/wiiuse>
+  - Their new replacement is <https://github.com/dolphin-emu/dolphin/tree/master/Source/Core/Core/HW/WiimoteReal>
 - [paulburton on github](https://github.com/paulburton/wiiuse)
   - Added balance board support - skipped in favor of the TU Delft version.
   - Added static library support - not yet added to the mainline.
 - [KzMz on github)](https://github.com/KzMz/wiiuse_fork)
   - Started work on speaker support.
-- [WiiC](http://wiic.sourceforge.net/)
+- [WiiC](https://github.com/grandelli/WiiC)
   - Dramatically changed, C++ API added.
   - MotionPlus support added.
   - Added Mac support.
-- DolphinEmu PPA: used to have a WiiUse 0.13
-  - Added Mac support.
-  - Unknown other changes - not yet investigated.
-  - Source package zipped up and available here:
-    <https://github.com/wiiuse/wiiuse/downloads>
 
 ## Other Links
 
@@ -291,9 +289,13 @@ greatly appreciated.
 - Possible alternative using the Linux kernel support for the Wiimote
   and the standard Linux input system: <https://github.com/dvdhrm/xwiimote>
 
-Original project:
+Original project (0.12 and earlier):
 
-- SourceForge page: <http://sourceforge.net/projects/wiiuse/>
-- Archived pages of the original project:
-  - <http://web.archive.org/web/*/http://wiiuse.net/>
-  - <http://web.archive.org/web/*/http://wiiuse.sourceforge.net/>
+- <http://sourceforge.net/projects/wiiuse/>
+- Now-defunct web sites:
+  - wiiuse.net:
+    most recent archive from 2011
+    <https://web.archive.org/web/20110107085956/http://wiiuse.net/>
+  - wiiuse.sourceforge.net:
+    most recent archive from 2010 (looks identical on homepage to 2011 snapshot above)
+    <https://web.archive.org/web/20100216015311/http://wiiuse.sourceforge.net/>

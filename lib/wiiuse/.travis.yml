@@ -1,0 +1,15 @@
+os:
+    - linux
+    - osx
+
+language: c
+
+compiler:
+    - clang
+    - gcc
+
+sudo: required
+dist: trusty
+
+install: . scripts/ci/$TRAVIS_OS_NAME/install.sh
+script: . scripts/ci/common/script.sh

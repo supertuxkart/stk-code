@@ -117,12 +117,15 @@ struct wiimote_t **wiiuse_init(int wiimotes)
      *
      *	This banner is only displayed once so that if you need
      *	to call this function again it won't be intrusive.
+     *
+     *	2018: Replaced wiiuse.net with sourceforge project, since
+     *	wiiuse.net is now abandoned and "parked".
      */
     if (!g_banner)
     {
         printf("wiiuse v" WIIUSE_VERSION " loaded.\n"
-               "  Fork at http://github.com/rpavlik/wiiuse\n"
-               "  Original By: Michael Laforest <thepara[at]gmail{dot}com> http://wiiuse.net\n");
+               "  De-facto official fork at http://github.com/wiiuse/wiiuse\n"
+               "  Original By: Michael Laforest <thepara[at]gmail{dot}com> <https://sourceforge.net/projects/wiiuse/>\n");
         g_banner = 1;
     }
 
