@@ -329,8 +329,7 @@ void PlayerController::update(int ticks)
     if (World::getWorld()->isStartPhase())
     {
         if ((m_controls->getAccel() || m_controls->getBrake()||
-            m_controls->getFire() || m_controls->getNitro()) &&
-            !NetworkConfig::get()->isNetworking())
+            m_controls->getNitro()) && !NetworkConfig::get()->isNetworking())
         {
             // Only give penalty time in READY_PHASE.
             // Penalty time check makes sure it doesn't get rendered on every
