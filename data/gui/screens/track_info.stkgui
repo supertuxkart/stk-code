@@ -112,6 +112,12 @@
                         <spacer width="3%"/>
                         <label id="record-race-text" proportion="3" I18N="In the track info screen" text="Record the race for ghost replay" text_align="left"/>
                     </div>
+					<div width="100%" height="fit" layout="horizontal-row" >
+                        <div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="three_strikes_or_ffa" width="100%" align="center"
+                                     wrap_around="true" />
+                        </div>
+                    </div>
                 </box><!-- Race options box -->
             </div>
         </div>

@@ -66,6 +66,7 @@ void TrackInfoScreen::loadedFromFile()
     m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
     m_option          = getWidget<CheckBoxWidget>("option");
+	m_three_strikes_or_ffa = getWidget<SpinnerWidget>("three_strikes_or_ffa");
     m_record_race     = getWidget<CheckBoxWidget>("record");
     m_option->setState(false);
     m_record_race->setState(false);
@@ -230,6 +231,16 @@ void TrackInfoScreen::init()
     else
         m_option->setState(false);
 
+	bool show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES && race_manager->getNumLocalPlayers() > 1;
+	m_three_strikes_or_ffa->setVisible(show_ffa_spinner);
+	if (show_ffa_spinner)
+	{
+		m_three_strikes_or_ffa->clearLabels();
+		m_three_strikes_or_ffa->addLabel("Three Strikes Battle");
+		m_three_strikes_or_ffa->addLabel("Free-For-All");
+		m_three_strikes_or_ffa->setValue(0);
+	}
+
     // Record race or not
     // -------------
     const bool record_available = race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL;
@@ -373,6 +384,12 @@ void TrackInfoScreen::onEnterPressedInternal()
     if (has_AI)
        num_ai = m_ai_kart_spinner->getValue();
 
+	bool enable_ffa = m_three_strikes_or_ffa->getValue() != 0;
+
+	if (enable_ffa)
+	{
+		race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
+	}
 
     if (UserConfigParams::m_num_karts_per_gamemode
         [race_manager->getMinorMode()] != unsigned(local_players + num_ai))
