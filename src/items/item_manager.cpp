@@ -265,8 +265,6 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
                                const Vec3 *server_xyz,
                                const Vec3 *server_normal)
 {
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient() && !server_xyz) return NULL;
     Vec3 normal, pos;
     const Material* material_hit;
     if (!server_xyz)

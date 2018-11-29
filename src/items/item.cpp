@@ -80,7 +80,7 @@ void ItemState::setDisappearCounter()
 void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 {
     m_xyz               = xyz;
-    m_normal            = normal;
+    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
     m_original_type     = ITEM_NONE;
     m_ticks_till_return = 0;
     setDisappearCounter();
@@ -171,7 +171,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
     m_graphical_type    = type;
-    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
     m_listener          = NULL;
 
     LODNode* lodnode =
@@ -204,7 +203,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
-    hpr.setHPR(m_original_rotation);
+    hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
@@ -219,9 +218,8 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     : ItemState(ITEM_TRIGGER)
 {
     m_distance_2        = distance*distance;
-    initItem(ITEM_TRIGGER, xyz, /*normal not required*/Vec3(0,0,0));
+    initItem(ITEM_TRIGGER, xyz, /*normal not required*/Vec3(0,1,0));
     m_graphical_type    = ITEM_TRIGGER;
-    m_original_rotation = btQuaternion(0, 0, 0, 1);
     m_node              = NULL;
     m_listener          = trigger;
     m_was_available_previously = true;
@@ -343,7 +341,7 @@ void Item::handleNewMesh(ItemType type)
             spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
     }
     Vec3 hpr;
-    hpr.setHPR(m_original_rotation);
+    hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
 #endif
 }   // handleNewMesh
@@ -370,8 +368,9 @@ void Item::updateGraphics(float dt)
                        getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
+    m_node->setPosition(getXYZ().toIrrVector());
 
-    if (!m_was_available_previously && isAvailable() )
+    if (!m_was_available_previously && isAvailable())
     {
         // This item is now available again - make sure it is not
         // scaled anymore.
@@ -387,9 +386,9 @@ void Item::updateGraphics(float dt)
                 fmodf((float)(World::getWorld()->getTicksSinceStart() +
                 getTicksTillReturn()) / 40.0f, M_PI * 2);
             btMatrix3x3 m;
-            m.setRotation(m_original_rotation);
+            m.setRotation(getOriginalRotation());
             btQuaternion r = btQuaternion(m.getColumn(1), angle) *
-                            m_original_rotation;
+                getOriginalRotation();
             Vec3 hpr;
             hpr.setHPR(r);
             m_node->setRotation(hpr.toIrrHPR());
@@ -397,20 +396,24 @@ void Item::updateGraphics(float dt)
         m_node->setVisible(true);
         m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
     }
-    if (isAvailable() && rotating())
+    if (isAvailable())
     {
-        // have it rotate
-        float angle =
-            fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
-            M_PI * 2);
-
-        btMatrix3x3 m;
-        m.setRotation(m_original_rotation);
-        btQuaternion r = btQuaternion(m.getColumn(1), angle) *
-                         m_original_rotation;
-
         Vec3 hpr;
-        hpr.setHPR(r);
+        if (rotating())
+        {
+            // have it rotate
+            float angle =
+                fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+                M_PI * 2);
+
+            btMatrix3x3 m;
+            m.setRotation(getOriginalRotation());
+            btQuaternion r = btQuaternion(m.getColumn(1), angle) *
+                getOriginalRotation();
+            hpr.setHPR(r);
+        }
+        else
+            hpr.setHPR(getOriginalRotation());
         m_node->setRotation(hpr.toIrrHPR());
     }   // if item is available
     m_was_available_previously = isAvailable();
