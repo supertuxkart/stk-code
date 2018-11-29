@@ -388,7 +388,9 @@ void TrackInfoScreen::onEnterPressedInternal()
 
 	if (enable_ffa)
 	{
+		num_ai = 0;
 		race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
+		race_manager->setTimeTarget((float)2 * 60);
 	}
 
     if (UserConfigParams::m_num_karts_per_gamemode
