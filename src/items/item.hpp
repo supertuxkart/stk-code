@@ -128,7 +128,7 @@ private:
      *  (in case that a client would get a different (or no) normal from a
      *  raycast).
      */
-    Vec3 m_normal;
+    btQuaternion m_original_rotation;
 
     /** The 'owner' of the item, i.e. the kart that dropped this item.
     *  Is NULL if the item is part of the track. */
@@ -318,8 +318,15 @@ public:
     /** Returns the normal of the ItemState. */
     const Vec3 getNormal() const
     {
-        return m_normal;
+        return quatRotate(m_original_rotation, Vec3(0.0f, 1.0f, 0.0f));
     }
+    // ------------------------------------------------------------------------
+    /** Returns the original rotation of the item. */
+    const btQuaternion& getOriginalRotation() const
+    {
+        return m_original_rotation;
+    }
+
 };   // class ItemState
 
 // ============================================================================
@@ -330,14 +337,6 @@ class Item : public ItemState, public NoCopy
 {
 
 private:
-
-    /** Stores the original rotation of an item. This is used in
-     *  case of a switch to restore the rotation of a bubble gum
-     *  (bubble gums don't rotate, but it will be replaced with
-     *  a nitro which rotates, and so overwrites the original
-     *  rotation). */
-    btQuaternion m_original_rotation;
-
     /** Scene node of this item. */
     LODNode *m_node;
 
@@ -416,7 +415,7 @@ public:
     {
         if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
             return false;
-        Vec3 lc = quatRotate(m_original_rotation, xyz - getXYZ());
+        Vec3 lc = quatRotate(getOriginalRotation(), xyz - getXYZ());
         // Don't be too strict if the kart is a bit above the item
         lc.setY(lc.getY() / 2.0f);
         return lc.length2() < m_distance_2;
@@ -446,13 +445,6 @@ public:
         if(left) return m_avoidance_points[0];
         return m_avoidance_points[1];
     }   // getAvoidancePoint
-
-    // ------------------------------------------------------------------------
-    /** Returns the normal of the item. */
-    const Vec3 getNormal() const
-    {
-        return quatRotate(m_original_rotation, Vec3(0,1,0));
-    }
     // ------------------------------------------------------------------------
     scene::ISceneNode *getSceneNode()
     {

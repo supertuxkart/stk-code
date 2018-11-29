@@ -75,6 +75,9 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_chat_box = NULL;
     m_send_button = NULL;
     m_icon_bank = NULL;
+
+    // Allows to update chat and counter even if dialog window is opened
+    setUpdateInBackground(true);
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
