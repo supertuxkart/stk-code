@@ -415,7 +415,7 @@ bool ScreenKeyboard::onEscapePressed()
  */
 bool ScreenKeyboard::shouldUseScreenKeyboard()
 {
-    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard > 1;
+    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard == 2;
     
     #ifdef ANDROID
     if (UserConfigParams::m_screen_keyboard == 1)

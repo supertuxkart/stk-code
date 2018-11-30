@@ -1320,6 +1320,82 @@ void CIrrDeviceAndroid::hideNavBar(ANativeActivity* activity)
     }
 }
 
+void CIrrDeviceAndroid::showKeyboard(bool show) 
+{
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = Android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot show keyboard.", ELL_DEBUG);
+        return;
+    }
+    
+    jobject activity_obj = Android->activity->clazz;
+    jclass activity_class = env->GetObjectClass(activity_obj);
+    
+    jclass context = env->FindClass("android/content/Context");
+    jfieldID im_service_field = env->GetStaticFieldID(context, 
+                                  "INPUT_METHOD_SERVICE", "Ljava/lang/String;");
+    jobject im_service_obj = env->GetStaticObjectField(context, 
+                                                       im_service_field);
+
+    jclass im_manager = env->FindClass(
+                                 "android/view/inputmethod/InputMethodManager");
+    jmethodID get_system_service = env->GetMethodID( activity_class, 
+                  "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+    jobject im_manager_obj = env->CallObjectMethod(activity_obj, 
+                                            get_system_service, im_service_obj);
+
+    jmethodID get_window = env->GetMethodID(activity_class, "getWindow",
+                                            "()Landroid/view/Window;");
+    jobject window_obj = env->CallObjectMethod(activity_obj, get_window);
+    jclass window = env->FindClass("android/view/Window");
+    jmethodID get_decor_view = env->GetMethodID(window, "getDecorView", 
+                                                "()Landroid/view/View;");
+    jobject decor_view_obj = env->CallObjectMethod(window_obj, get_decor_view);
+
+    if (show) 
+    {
+        jmethodID show_soft_input = env->GetMethodID(im_manager, 
+                                    "showSoftInput", "(Landroid/view/View;I)Z");
+        jint flags = 0;
+        jboolean result = env->CallBooleanMethod(im_manager_obj, 
+                                        show_soft_input, decor_view_obj, flags);
+    } 
+    else 
+    {
+        jclass view = env->FindClass("android/view/View");
+        jmethodID get_window_token = env->GetMethodID(view, "getWindowToken", 
+                                                      "()Landroid/os/IBinder;");
+        jobject token = env->CallObjectMethod(decor_view_obj, get_window_token);
+
+        jmethodID hide_soft_input = env->GetMethodID(im_manager, 
+                        "hideSoftInputFromWindow", "(Landroid/os/IBinder;I)Z");
+        jint flags = 0;
+        jboolean result = env->CallBooleanMethod(im_manager_obj, 
+                                                 hide_soft_input, token, flags);
+    }
+
+    if (was_detached)
+    {
+        Android->activity->vm->DetachCurrentThread();
+    }
+}
+
 int CIrrDeviceAndroid::getRotation()
 {
     bool was_detached = false;

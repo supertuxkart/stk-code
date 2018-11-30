@@ -609,6 +609,15 @@ bool CGUIEditBox::processKey(const SEvent& event)
         }
         else
         {
+#ifdef ANDROID
+            if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID &&
+                UserConfigParams::m_screen_keyboard == 3)
+            {
+                CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                   irr_driver->getDevice());
+                dl->showKeyboard(false);
+            }
+#endif
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
         break;
@@ -1296,6 +1305,17 @@ bool CGUIEditBox::processMouse(const SEvent& event)
                 openScreenKeyboard();
                 return true;
             }
+#ifdef ANDROID
+            else if (UserConfigParams::m_screen_keyboard == 3)
+            {
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->showKeyboard(true);
+                }
+            }
+#endif
             else
             {
                 // move cursor
@@ -1756,9 +1776,12 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
 
 void CGUIEditBox::openScreenKeyboard()
 {
+    if (UserConfigParams::m_screen_keyboard == 3)
+        return;
+    
     if (GUIEngine::ScreenKeyboard::getCurrent() != NULL)
         return;
-        
+    
     CursorPos = Text.size();
     setTextMarkers(CursorPos, CursorPos);
     calculateScrollPos();
