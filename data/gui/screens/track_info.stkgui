@@ -75,6 +75,28 @@
                 <spacer width="1" height="2%"/>
                 <!-- Race options box -->
                 <box width="100%" height="43%" layout="vertical-row">
+				
+					<div id="targetoptionsdiv" layout="horizontal-row" width="100%" height="fit" align="left">
+						<label width="fit" height="100%"
+								I18N="In the track info screen" text="Soccer game type" text_align="left" />
+						<spacer width="2%" height="25"/>
+						<spinner id="targetoptions" width="30%" wrap_around="true"/>
+					</div>
+
+					<div id="pointamountdiv" layout="horizontal-row" width="100%" height="fit" align="left">
+						<label width="fit" height="100%"
+								I18N="In the track info screen" text="Number of goals to win" text_align="left" />
+						<spacer width="2%" height="25"/>
+						<spinner id="pointamount" width="15%" min_value="1" max_value="10"/>
+					</div>
+
+					<div id="timeamountdiv" layout="horizontal-row" width="100%" height="fit" align="left">
+						<label width="fit" height="100%"
+								I18N="In the track info screen" text="Maximum time (min.)" text_align="left" />
+						<spacer width="2%" height="25"/>
+						<spinner id="timeamount" width="15%" min_value="1" max_value="15"/>
+					</div>
+				
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <div proportion="1" height="fit" layout="horizontal-row">
                             <spinner id="lap-spinner" width="100%" min_value="1" max_value="20" align="center"

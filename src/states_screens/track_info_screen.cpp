@@ -67,6 +67,12 @@ void TrackInfoScreen::loadedFromFile()
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
     m_option          = getWidget<CheckBoxWidget>("option");
     m_record_race     = getWidget<CheckBoxWidget>("record");
+    m_targetoptions_div = getWidget<Widget>("targetoptionsdiv");
+    m_targetoptions_spinner = getWidget<SpinnerWidget>("targetoptions");
+    m_pointamount_div = getWidget<Widget>("pointamountdiv");
+    m_pointamount_spinner = getWidget<SpinnerWidget>("pointamount");
+    m_timeamount_div = getWidget<Widget>("timeamountdiv");
+    m_timeamount_spinner = getWidget<SpinnerWidget>("timeamount");
     m_option->setState(false);
     m_record_race->setState(false);
 
@@ -254,6 +260,31 @@ void TrackInfoScreen::init()
         m_record_race->setState(false);
     }
 
+    bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    if (is_soccer)
+    {
+        if (UserConfigParams::m_num_goals <= 0)
+            UserConfigParams::m_num_goals = 3;
+
+        if (UserConfigParams::m_soccer_time_limit <= 0)
+            UserConfigParams::m_soccer_time_limit = 3;
+
+        m_targetoptions_spinner->clearLabels();
+        m_targetoptions_spinner->addLabel(_("Time limit"));
+        m_targetoptions_spinner->addLabel(_("Goals limit"));
+        m_targetoptions_spinner->setValue(UserConfigParams::m_soccer_use_time_limit ? 0 : 1);
+        m_pointamount_spinner->setActive(!UserConfigParams::m_soccer_use_time_limit);
+        m_pointamount_spinner->setValue(UserConfigParams::m_num_goals);
+        m_timeamount_spinner->setActive(UserConfigParams::m_soccer_use_time_limit);
+        m_timeamount_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+    }
+    else
+    {
+        m_targetoptions_div->setVisible(true);
+        m_pointamount_div->setVisible(false);
+        m_timeamount_div->setVisible(false);
+    }
+
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
 
@@ -381,6 +412,12 @@ void TrackInfoScreen::onEnterPressedInternal()
         UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
     }
 
+    int selected_targetoption = m_targetoptions_spinner->getValue();
+    if (selected_targetoption == 0)
+        race_manager->setTimeTarget((float)m_timeamount_spinner->getValue() * 60);
+    else
+        race_manager->setMaxGoal(m_pointamount_spinner->getValue());
+
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
@@ -403,6 +440,16 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if (name == "targetoptions")
+    {
+        bool timed = m_targetoptions_spinner->getValue() == 0;
+        UserConfigParams::m_soccer_use_time_limit = timed;
+        m_pointamount_spinner->setActive(!timed);
+        m_timeamount_spinner->setActive(timed);
+
+        UserConfigParams::m_num_goals = m_pointamount_spinner->getValue();
+        UserConfigParams::m_soccer_time_limit = m_timeamount_spinner->getValue();
     }
     else if (name == "option")
     {
