@@ -180,8 +180,10 @@ void VoteOverview::showVote(int host_id)
 
     s = StringUtils::insertValues("reverse-%d", index);
     LabelWidget *reverse_widget = getWidget<LabelWidget>(s.c_str());
-    reverse_widget->setText(_("Reverse: %s", vote->m_reverse ? _("yes")
-                                                             : _("no")), true);
+    core::stringw yes = _("yes");
+    core::stringw no  = _("no");
+    reverse_widget->setText(_("Reverse: %s", vote->m_reverse ? yes : no), 
+                            true);
 
 }   // addVote
 
