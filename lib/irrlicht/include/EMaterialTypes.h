@@ -192,6 +192,9 @@ namespace video
 		/** Using only first texture. Generic blending method. */
 		EMT_ONETEXTURE_BLEND,
 
+		//! Alphatest material for grass without using vertex color in stk. */
+		EMT_STK_GRASS,
+
 		//! This value is not used. It only forces this enumeration to compile to 32 bit.
 		EMT_FORCE_32BIT = 0x7fffffff
 	};
