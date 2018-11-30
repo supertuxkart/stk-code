@@ -3299,35 +3299,18 @@ void Kart::setOnScreenText(const wchar_t *text)
         return;
         
     BoldFace* bold_face = font_manager->getFont<BoldFace>();
-    core::dimension2d<u32> textsize = bold_face->getDimension(text);
-
+    STKTextBillboard* tb =
+        new STKTextBillboard(
+        GUIEngine::getSkin()->getColor("font::bottom"),
+        GUIEngine::getSkin()->getColor("font::top"),
+        getNode(), irr_driver->getSceneManager(), -1,
+        core::vector3df(0.0f, 1.5f, 0.0f),
+        core::vector3df(0.35f, 0.35f, 0.35f));
     if (CVS->isGLSL())
-    {
-        STKTextBillboard* tb =
-            new STKTextBillboard(
-            GUIEngine::getSkin()->getColor("font::bottom"),
-            GUIEngine::getSkin()->getColor("font::top"),
-            getNode(), irr_driver->getSceneManager(), -1,
-            core::vector3df(0.0f, 1.5f, 0.0f),
-            core::vector3df(0.35f, 0.35f, 0.35f));
         tb->init(text, bold_face);
-        tb->drop();
-    }
     else
-    {
-        scene::ISceneManager* sm = irr_driver->getSceneManager();
-        sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
-                                                           : GUIEngine::getTitleFont(),
-            text,
-            getNode(),
-            core::dimension2df(textsize.Width/55.0f,
-            textsize.Height/55.0f),
-            core::vector3df(0.0f, 1.5f, 0.0f),
-            -1, // id
-            GUIEngine::getSkin()->getColor("font::bottom"),
-            GUIEngine::getSkin()->getColor("font::top"));
-    }
-
+        tb->initLegacy(text, bold_face);
+    tb->drop();
     // No need to store the reference to the billboard scene node:
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
