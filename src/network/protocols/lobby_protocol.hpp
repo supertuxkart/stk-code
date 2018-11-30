@@ -80,7 +80,7 @@ public:
     };
 
     /** Timer user for voting periods in both lobbies. */
-    std::atomic_uint64_t m_end_voting_period;
+    std::atomic<uint64_t> m_end_voting_period;
 
     /** The maximum voting time. */
     uint64_t m_max_voting_time;
