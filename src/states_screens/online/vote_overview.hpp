@@ -28,6 +28,7 @@ namespace GUIEngine
 {
     class CheckBoxWidget;
     class LabelWidget;
+    class ProgressBarWidget;
     class SpinnerWidget;
 }
 
