@@ -996,6 +996,8 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
 {
 #ifndef SERVER_ONLY
     //Should be greater or equal than the greatest vertices_count used by the meter functions
+    if (count < 2)
+        return;
     short int index[12];
     for(unsigned int i=0; i<count; i++)
     {
