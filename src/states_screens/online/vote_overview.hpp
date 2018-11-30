@@ -20,10 +20,9 @@
 
 #include "guiengine/screen.hpp"
 #include "utils/synchronised.hpp"
-#include <deque>
-#include <limits>
-#include <map>
+
 #include <string>
+#include <vector>
 
 namespace GUIEngine
 {
@@ -47,20 +46,15 @@ private:
     *  (going backwards). */
     GUIEngine::ProgressBarWidget *m_timer;
 
-    bool m_reverse_checked, m_quit_server;
-
     int m_bottom_box_height;
 
-    std::map<std::string, core::stringw> m_vote_messages;
+    /** This stores which vote (hostid) is shown at which index in
+     *  the result gui. */
+    std::vector<int> m_index_to_hostid;
 
-    std::deque<std::string> m_random_track_list;
+    bool m_quit_server;
 
-    VoteOverview() : Screen("online/vote_overview.stkgui")
-    {
-        m_reverse_checked = false;
-        m_quit_server = false;
-        m_bottom_box_height = -1;
-    }
+    VoteOverview();
 
 public:
 
@@ -86,18 +80,21 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
+
+    void addVote(int host_id);
+    void showVote(int host_id);
+
     // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }
     // ------------------------------------------------------------------------
     void resetVote()
     {
-        m_vote_messages.clear();
+        m_index_to_hostid.clear();
     }
     // ------------------------------------------------------------------------
     void addVoteMessage(const std::string& user,
                         const irr::core::stringw& message)
     {
-        m_vote_messages[user] = message;
     }
 
 };

@@ -1850,6 +1850,8 @@ void ServerLobby::handlePlayerVote(Event* event)
 
     NetworkString& data = event->data();
     PeerVote vote(data);
+    Log::verbose("SL", "vote from server: host %d track %s reverse %d",
+                 event->getPeer()->getHostId(), vote.m_track_name.c_str(), vote.m_reverse);
 
     if (race_manager->modeHasLaps())
     {
@@ -1875,7 +1877,7 @@ void ServerLobby::handlePlayerVote(Event* event)
     }
 
     // Store vote:
-    m_peers_votes[event->getPeer()->getHostId()] = vote;
+    addVote(event->getPeer()->getHostId(), vote);
 
     // Now inform all clients about the vote
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
@@ -1940,6 +1942,9 @@ bool ServerLobby::handleAllVotes(PeerVote *winner)
     std::advance(vote, r.get(m_peers_votes.size()) );
 
     *winner = vote->second;
+
+    // DEBUG ONLY TO SHOW VOTING RESULT 
+    return false;
 
     return m_peers_votes.size() == cur_players;
 }   // handleAllVotes

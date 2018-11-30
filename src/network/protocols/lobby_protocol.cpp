@@ -34,6 +34,16 @@
 
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 
+
+void LobbyProtocol::addVote(int host_id, const PeerVote &vote)
+{
+    Log::verbose("LP", "host %d vote track %s reverse %d",
+                 host_id, vote.m_track_name.c_str(), vote.m_reverse);
+    m_peers_votes[host_id] = vote;
+}   // addVote
+
+
+
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {

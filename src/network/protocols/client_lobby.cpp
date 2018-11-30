@@ -456,10 +456,15 @@ void ClientLobby::receivePlayerVote(Event* event)
     uint32_t host_id = data.getUInt32();
     player_name += ": ";
     PeerVote vote(data);
-    m_peers_votes[event->getPeer()->getHostId()] = vote;
+    Log::verbose("CL", "vote from server: host %d track %s reverse %d",
+                 host_id, vote.m_track_name.c_str(), vote.m_reverse);
+    addVote(host_id, vote);
     Track* track = track_manager->getTrack(vote.m_track_name);
     if (!track)
         Log::fatal("ClientLobby", "Missing track %s", vote.m_track_name.c_str());
+
+    VoteOverview *overview = VoteOverview::getInstance();
+    overview->addVote(host_id2);
 
 }   // receivePlayerVote
 
@@ -850,6 +855,8 @@ void ClientLobby::startSelection(Event* event)
         screen->push();
     }
 
+    VoteOverview *overview = VoteOverview::getInstance();
+    overview->resetVote();
     m_state.store(SELECTING_ASSETS);
     Log::info("ClientLobby", "Selection starts now");
 }   // startSelection

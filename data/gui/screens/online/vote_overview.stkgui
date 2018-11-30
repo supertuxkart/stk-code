@@ -9,23 +9,55 @@
         <div id="rect-box" width="100%" height="80%" padding="15" layout="vertical-row">
             <div proportion="1" width="100%" layout="horizontal-row" padding="1">
                 <box id="rect-box0" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-0" width="100%" height="10%"/>
+                    <icon-button id="track-0" width="100%" height="40%"/>
+                    <label id="numlaps-0" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-0" width="5%" height="10%"/>
                 </box>
                 <box id="rect-box1" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-1" width="100%" height="10%"/>
+                    <icon-button id="track-1" width="100%" height="40%"/>
+                    <label id="numlaps-1" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-1" width="5%" height="10%"/>
                 </box>
                 <box id="rect-box2" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-2" width="100%" height="10%"/>
+                    <icon-button id="track-2" width="100%" height="40%"/>
+                    <label id="numlaps-2" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-2" width="5%" height="10%"/>
                 </box>
                 <box id="rect-box3" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-3" width="100%" height="10%"/>
+                    <icon-button id="track-3" width="100%" height="40%"/>
+                    <label id="numlaps-3" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-3" width="5%" height="10%"/>
                 </box>
             </div>
 
             <div proportion="1" width="100%" layout="horizontal-row" padding="1">
                 <box id="rect-box4" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-4" width="100%" height="10%"/>
+                    <icon-button id="track-4" width="100%" height="40%"/>
+                    <label id="numlaps-4" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-4" width="5%" height="10%"/>
                 </box>
                 <box id="rect-box5" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-5" width="100%" height="10%"/>
+                    <icon-button id="track-5" width="100%" height="40%"/>
+                    <label id="numlaps-5" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-5" width="5%" height="10%"/>
                 </box>
                 <box id="rect-box6" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-6" width="100%" height="10%"/>
+                    <icon-button id="track-6" width="100%" height="40%"/>
+                    <label id="numlaps-6" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-6" width="5%" height="10%"/>
                 </box>
                 <box id="rect-box7" width="24%" height="100%" padding="15" layout="vertical-row">
+                    <label id="name-7" width="100%" height="10%"/>
+                    <icon-button id="track-7" width="100%" height="40%"/>
+                    <label id="numlaps-7" proportion="1" width="100%" height="10%" text=""></label>
+                    <label id="reverse-7" width="5%" height="10%"/>
                 </box>
             </div>
             <progressbar id="timer" height="4%" width="100%"></progressbar>

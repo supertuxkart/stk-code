@@ -85,24 +85,34 @@ public:
     /** The maximum voting time. */
     uint64_t m_max_voting_time;
 
-protected:
+public:
     /** A simple structure to store a vote from a client:
      *  track name, number of laps and reverse or not. */
     class PeerVote
     {
     public:
-        std::string m_track_name;
-        uint8_t     m_num_laps;
-        bool        m_reverse;
+        core::stringw m_player_name;
+        std::string   m_track_name;
+        uint8_t       m_num_laps;
+        bool          m_reverse;
 
         // ------------------------------------------------------
-        PeerVote() : m_track_name(""), m_num_laps(1),
-                     m_reverse(false)
+        PeerVote() : m_player_name(""), m_track_name(""),
+                     m_num_laps(1), m_reverse(false)
+        {}
+        // ------------------------------------------------------
+        PeerVote(const core::stringw &name,
+                 const std::string track,
+                 int laps, bool reverse) : m_player_name(name),
+                                           m_track_name(track),
+                                           m_num_laps(laps),
+                                           m_reverse(reverse)
         {}
         // ------------------------------------------------------
         /** Initialised this object from a data in a network string. */
         PeerVote(NetworkString &ns)
         {
+            ns.decodeStringW(&m_player_name);
             ns.decodeString(&m_track_name);
             m_num_laps = ns.getUInt8();
             m_reverse  = ns.getUInt8();
@@ -112,12 +122,14 @@ protected:
         /** Encodes this vote object into a network string. */
         void encode(NetworkString *ns)
         {
-            ns->encodeString(m_track_name)
+            ns->encodeString(m_player_name)
+               .encodeString(m_track_name)
                .addUInt8(m_num_laps)
                .addUInt8(m_reverse);
         }   // encode
     };   // class PeerVote
 
+protected:
     /** Vote from each peer. The host id is used as a key. Note that
      *  host ids can be non-consecutive, so we cannot use std::vector. */
     std::map<int, PeerVote> m_peers_votes;
@@ -181,8 +193,29 @@ public:
     /** Returns the maximum floating time in seconds. */
     float getMaxVotingTime() { return m_max_voting_time / 1000.0f; }
     // ------------------------------------------------------------------------
+    /** Returns the game setup data structure. */
     GameSetup* getGameSetup() const { return m_game_setup; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the number of votes received so far. */
+    int getNumberOfVotes() const { return m_peers_votes.size(); }
+    // -----------------------------------------------------------------------
+    /** Adds a vote.
+     *  \param host_id Host id of this vote.
+     *  \param vote The vote to add. */
+    void addVote(int host_id, const PeerVote &vote)
+   ; //{
+    //    m_peers_votes[host_id] = vote;
+    //}   // addVote
+    // -----------------------------------------------------------------------
+    /** Returns the voting data for one host. Returns NULL if the vote from
+     *  the given host id has not yet arrived (or if it is an invalid host id).
+     */
+    const PeerVote* getVote(int host_id)
+    {
+        auto it = m_peers_votes.find(host_id);
+        if (it == m_peers_votes.end()) return NULL;
+        return &(it->second);
+    }
 };   // class LobbyProtocol
 
 #endif // LOBBY_PROTOCOL_HPP

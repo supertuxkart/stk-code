@@ -338,7 +338,19 @@ void TracksScreen::init()
             //I18N: In track screen
             getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
             m_reversed->setVisible(true);
-            m_reversed->setState(m_reverse_checked);
+
+            auto lp = LobbyProtocol::get<LobbyProtocol>();
+            const LobbyProtocol::PeerVote *vote = 
+                lp ->getVote(STKHost::get()->getMyHostId());
+            if(vote)
+            {
+                m_reverse_checked = vote->m_reverse;
+                m_selected_track = track_manager->getTrack(vote->m_track_name);
+            }
+            else
+            {
+                m_reversed->setState(m_reverse_checked);
+            }
         }
     }
     if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
@@ -445,6 +457,8 @@ void TracksScreen::voteForPlayer()
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
+    const core::stringw &player_name =
+        PlayerManager::getCurrentPlayer()->getName();
     if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_BATTLE &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
     {
@@ -469,9 +483,15 @@ void TracksScreen::voteForPlayer()
     }
     else
     {
-        vote.encodeString(m_selected_track->getIdent())
-            .addUInt8(m_laps->getValue())
-            .addUInt8(m_reversed->getState() ? 1 : 0);
+        LobbyProtocol::PeerVote pvote(player_name,
+                                      m_selected_track->getIdent(),
+                                      m_laps->getValue(),
+                                      m_reversed->getState()       );
+        pvote.encode(&vote);
+        auto lp = LobbyProtocol::get<LobbyProtocol>();
+        
+        // The vote will be sent to
+        lp->addVote(STKHost::get()->getMyHostId(), pvote);
     }
     STKHost::get()->sendToServer(&vote, true);
 }   // voteForPlayer
