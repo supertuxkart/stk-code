@@ -43,6 +43,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 
@@ -204,6 +205,7 @@ void VoteOverview::onUpdate(float dt)
 
     std::string s = StringUtils::insertValues("name-%d", index);
     LabelWidget *name_widget = getWidget<LabelWidget>(s.c_str());
+
     name_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     name_widget->setErrorColor();
 
@@ -211,7 +213,6 @@ void VoteOverview::onUpdate(float dt)
     name_widget = getWidget<LabelWidget>(s.c_str());
     name_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     name_widget->setDefaultColor();
-
 
 #ifdef XX
 
