@@ -17,13 +17,13 @@
         <spacer height="2%"/>
         <div x="2%" width="96%" height="20%" layout="horizontal-row">
             <box proportion="4" height="100%" layout="vertical-row">
-                <textbox id="chat" width="100%"/>
-                <spacer height="5%"/>
-                <div width="100%" proportion="1" layout="horizontal-row">
-                    <button id="send" width="20%" height="fit" align="center" I18N="In the network lobby" text="Send"/>
+                <div x="1%" width="98%" height="fit" layout="horizontal-row">
+                    <textbox id="chat" width="77%"/>
                     <spacer width="3%" height="10"/>
-                    <label id="timeout-message" width="77%" height="fit" text="" word_wrap="true" align="center"/>
+                    <button id="send" width="20%" height="fit" align="center" I18N="In the network lobby" text="Send"/>
                 </div>
+                <spacer height="5%" width="10"/>
+                <label id="timeout-message" x="1%" width="98%" proportion="1" text="" word_wrap="true" align="center"/>
             </box>
             <spacer width="3%"/>
             <icon-button id="start" proportion="1" height="60%" icon="gui/icons/green_check.png" align="top"
