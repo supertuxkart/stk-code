@@ -529,7 +529,7 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_mode",
             &m_multitouch_group,
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
-            "keyboard, 2 = always enabled") );
+            "keyboard, 2 = always enabled, 3 = android keyboard (experimental)") );
             
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
