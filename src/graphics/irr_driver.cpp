@@ -934,6 +934,7 @@ void IrrDriver::applyResolutionSettings()
     // initDevice will drop the current device.
     delete m_renderer;
     SharedGPUObjects::reset();
+    SP::setMaxTextureSize();
     initDevice();
 
 #ifndef SERVER_ONLY
