@@ -454,16 +454,38 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (timed)
         {
-            UserConfigParams::m_num_goals = m_target_value_spinner->getValue();
             m_target_value_label->setText(_("Maximum time (min.)"), false);
             m_target_value_spinner->setValue(UserConfigParams::m_soccer_time_limit);
         }
         else
         {
-            UserConfigParams::m_soccer_time_limit = m_target_value_spinner->getValue();
             m_target_value_label->setText(_("Number of goals to win"), false);
             m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
 
+        }
+    }
+    else if (name == "target-value-spinner")
+    {
+        bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+        if (is_soccer)
+        {
+            bool timed = m_target_type_spinner->getValue() == 0;
+            if (timed)
+            {
+                UserConfigParams::m_soccer_time_limit = m_target_value_spinner->getValue();
+            }
+            else
+            {
+                UserConfigParams::m_num_goals = m_target_value_spinner->getValue();
+            }
+        }
+        else
+        {
+            assert(race_manager->modeHasLaps());
+            const int num_laps = m_target_value_spinner->getValue();
+            race_manager->setNumLaps(num_laps);
+            UserConfigParams::m_num_laps = num_laps;
+            updateHighScores();
         }
     }
     else if (name == "option")
@@ -495,18 +517,6 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             m_ai_kart_spinner->setActive(true);
-        }
-    }
-    else if (name == "target-value-spinner")
-    {
-        bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-        if (!is_soccer)
-        {
-            assert(race_manager->modeHasLaps());
-            const int num_laps = m_target_value_spinner->getValue();
-            race_manager->setNumLaps(num_laps);
-            UserConfigParams::m_num_laps = num_laps;
-            updateHighScores();
         }
     }
     else if (name=="ai-spinner")
