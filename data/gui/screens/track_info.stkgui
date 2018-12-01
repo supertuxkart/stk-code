@@ -74,8 +74,7 @@
 
                 <spacer width="1" height="2%"/>
                 <!-- Race options box -->
-                <box width="100%" height="43%" layout="vertical-row">
-                
+                <box width="100%" height="43%" layout="vertical-row">            
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <div proportion="1" height="fit" layout="horizontal-row">
                             <spinner id="target-type-spinner" width="100%" min_value="1" max_value="10" align="center"
