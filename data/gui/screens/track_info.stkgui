@@ -76,27 +76,24 @@
                 <!-- Race options box -->
                 <box width="100%" height="43%" layout="vertical-row">
 				
-					<div id="targetoptionsdiv" layout="horizontal-row" width="100%" height="fit" align="left">
-						<label width="fit" height="100%"
-								I18N="In the track info screen" text="Soccer game type" text_align="left" />
-						<spacer width="2%" height="25"/>
-						<spinner id="targetoptions" width="30%" wrap_around="true"/>
+					<div id="targetoptionsdiv" width="100%" height="fit" layout="horizontal-row" >
+						<div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="targetoptions" width="100%" min_value="1" max_value="10" align="center"
+                                     wrap_around="true" />
+                        </div>
+						<spacer width="3%"/>
+						<label proportion="3" I18N="In the track info screen" text="Soccer game type" text_align="left" />
 					</div>
-
-					<div id="pointamountdiv" layout="horizontal-row" width="100%" height="fit" align="left">
-						<label width="fit" height="100%"
-								I18N="In the track info screen" text="Number of goals to win" text_align="left" />
-						<spacer width="2%" height="25"/>
-						<spinner id="pointamount" width="15%" min_value="1" max_value="10"/>
+					<spacer width="1" height="2%"/>
+					<div id="pointamountdiv" width="100%" height="fit" layout="horizontal-row" >
+						<div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="pointamount" width="100%" min_value="1" max_value="10" align="center"
+                                     wrap_around="true" />
+                        </div>
+						<spacer width="3%"/>
+						<label id="pointamountlabel" proportion="3" I18N="In the track info screen" text="Number of goals to win" text_align="left" />
 					</div>
-
-					<div id="timeamountdiv" layout="horizontal-row" width="100%" height="fit" align="left">
-						<label width="fit" height="100%"
-								I18N="In the track info screen" text="Maximum time (min.)" text_align="left" />
-						<spacer width="2%" height="25"/>
-						<spinner id="timeamount" width="15%" min_value="1" max_value="15"/>
-					</div>
-				
+					<spacer width="1" height="2%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <div proportion="1" height="fit" layout="horizontal-row">
                             <spinner id="lap-spinner" width="100%" min_value="1" max_value="20" align="center"

@@ -68,15 +68,13 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Spinner for target options. */
     GUIEngine::SpinnerWidget* m_targetoptions_spinner;
 
+    /** The actual highscore text values shown. */
+    GUIEngine::LabelWidget* m_pointamount_label;
+
     GUIEngine::Widget* m_pointamount_div;
 
     /** Spinner for number of laps. */
     GUIEngine::SpinnerWidget* m_pointamount_spinner;
-
-    GUIEngine::Widget* m_timeamount_div;
-
-    /** Spinner for number of laps. */
-    GUIEngine::SpinnerWidget* m_timeamount_spinner;
 
     /** The icons for the highscore list. */
     GUIEngine::IconButtonWidget* m_kart_icons[HIGHSCORE_COUNT];

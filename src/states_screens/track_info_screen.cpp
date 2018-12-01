@@ -71,8 +71,7 @@ void TrackInfoScreen::loadedFromFile()
     m_targetoptions_spinner = getWidget<SpinnerWidget>("targetoptions");
     m_pointamount_div = getWidget<Widget>("pointamountdiv");
     m_pointamount_spinner = getWidget<SpinnerWidget>("pointamount");
-    m_timeamount_div = getWidget<Widget>("timeamountdiv");
-    m_timeamount_spinner = getWidget<SpinnerWidget>("timeamount");
+    m_pointamount_label = getWidget<LabelWidget>("pointamountlabel");
     m_option->setState(false);
     m_record_race->setState(false);
 
@@ -273,16 +272,22 @@ void TrackInfoScreen::init()
         m_targetoptions_spinner->addLabel(_("Time limit"));
         m_targetoptions_spinner->addLabel(_("Goals limit"));
         m_targetoptions_spinner->setValue(UserConfigParams::m_soccer_use_time_limit ? 0 : 1);
-        m_pointamount_spinner->setActive(!UserConfigParams::m_soccer_use_time_limit);
-        m_pointamount_spinner->setValue(UserConfigParams::m_num_goals);
-        m_timeamount_spinner->setActive(UserConfigParams::m_soccer_use_time_limit);
-        m_timeamount_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+
+        if (UserConfigParams::m_soccer_use_time_limit)
+        {
+            m_pointamount_label->setText(_("Maximum time (min.)"), false);
+            m_pointamount_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+        }
+        else
+        {
+            m_pointamount_label->setText(_("Number of goals to win"), false);
+            m_pointamount_spinner->setValue(UserConfigParams::m_num_goals);
+        }
     }
     else
     {
-        m_targetoptions_div->setVisible(true);
+        m_targetoptions_div->setVisible(false);
         m_pointamount_div->setVisible(false);
-        m_timeamount_div->setVisible(false);
     }
 
     // ---- High Scores
@@ -414,7 +419,7 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     int selected_targetoption = m_targetoptions_spinner->getValue();
     if (selected_targetoption == 0)
-        race_manager->setTimeTarget((float)m_timeamount_spinner->getValue() * 60);
+        race_manager->setTimeTarget((float)m_pointamount_spinner->getValue() * 60);
     else
         race_manager->setMaxGoal(m_pointamount_spinner->getValue());
 
@@ -445,11 +450,20 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     {
         bool timed = m_targetoptions_spinner->getValue() == 0;
         UserConfigParams::m_soccer_use_time_limit = timed;
-        m_pointamount_spinner->setActive(!timed);
-        m_timeamount_spinner->setActive(timed);
 
-        UserConfigParams::m_num_goals = m_pointamount_spinner->getValue();
-        UserConfigParams::m_soccer_time_limit = m_timeamount_spinner->getValue();
+        if (timed)
+        {
+            UserConfigParams::m_num_goals = m_pointamount_spinner->getValue();
+            m_pointamount_label->setText(_("Maximum time (min.)"), false);
+            m_pointamount_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+        }
+        else
+        {
+            UserConfigParams::m_soccer_time_limit = m_pointamount_spinner->getValue();
+            m_pointamount_label->setText(_("Number of goals to win"), false);
+            m_pointamount_spinner->setValue(UserConfigParams::m_num_goals);
+
+        }
     }
     else if (name == "option")
     {
