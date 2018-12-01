@@ -48,8 +48,18 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
+        
+    /** Spinner for target types. */
+    GUIEngine::SpinnerWidget* m_target_type_spinner;
+
+    /** The label besides the target types spinner. */
+    GUIEngine::LabelWidget* m_target_type_label;
+
     /** Spinner for number of laps. */
-    GUIEngine::SpinnerWidget* m_lap_spinner;
+    GUIEngine::SpinnerWidget* m_target_value_spinner;
+
+    /** The label besides the lap spinner. */
+    GUIEngine::LabelWidget* m_target_value_label;
 
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
@@ -62,19 +72,6 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
-
-    GUIEngine::Widget* m_targetoptions_div;
-
-    /** Spinner for target options. */
-    GUIEngine::SpinnerWidget* m_targetoptions_spinner;
-
-    /** The actual highscore text values shown. */
-    GUIEngine::LabelWidget* m_pointamount_label;
-
-    GUIEngine::Widget* m_pointamount_div;
-
-    /** Spinner for number of laps. */
-    GUIEngine::SpinnerWidget* m_pointamount_spinner;
 
     /** The icons for the highscore list. */
     GUIEngine::IconButtonWidget* m_kart_icons[HIGHSCORE_COUNT];
