@@ -55,10 +55,10 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** The label besides the target types spinner. */
     GUIEngine::LabelWidget* m_target_type_label;
 
-    /** Spinner for number of laps. */
+    /** Spinner for target value e.g. number of laps or goals to score. */
     GUIEngine::SpinnerWidget* m_target_value_spinner;
 
-    /** The label besides the lap spinner. */
+    /** The label besides the target value spinner. */
     GUIEngine::LabelWidget* m_target_value_label;
 
     /** Spinner for number of AI karts. */
