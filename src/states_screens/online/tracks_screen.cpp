@@ -103,6 +103,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if (STKHost::existHost())
             {
+                w2->setBadge(selection, OK_BADGE);
                 voteForPlayer();
             }
             else
@@ -342,10 +343,12 @@ void TracksScreen::init()
             auto lp = LobbyProtocol::get<LobbyProtocol>();
             const LobbyProtocol::PeerVote *vote = 
                 lp ->getVote(STKHost::get()->getMyHostId());
+            DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("tracks");
             if(vote)
             {
                 m_reverse_checked = vote->m_reverse;
                 m_selected_track = track_manager->getTrack(vote->m_track_name);
+                w2->setBadge(vote->m_track_name, OK_BADGE);
             }
             else
             {

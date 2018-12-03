@@ -158,7 +158,7 @@ void VoteOverview::showVote(int host_id)
                         host_id);
     assert(it!=m_index_to_hostid.end());
 
-    int index = *it;
+    int index = it - m_index_to_hostid.begin();
 
     auto lp = LobbyProtocol::get<LobbyProtocol>();
     const LobbyProtocol::PeerVote *vote = lp->getVote(host_id);
