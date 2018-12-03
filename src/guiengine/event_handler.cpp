@@ -397,6 +397,19 @@ void EventHandler::deallocate()
 void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int playerID)
 {
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
+    
+    if (ScreenKeyboard::isActive() && 
+        !ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
+    {
+        w = NULL;
+    }
+    
+    if (ModalDialog::isADialogActive() && 
+        !ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
+    {
+        w = NULL;
+    }
+    
     if (w == NULL)
     {
         Widget* defaultWidget = NULL;
