@@ -344,6 +344,10 @@ namespace GUIEngine
          */
         virtual void setVisible(bool visible);
 
+        virtual bool collapse();
+
+        virtual void setCollapsed(bool collapsed);
+
         /** Returns if the element is visible. */
         bool isVisible() const;
 
