@@ -1235,7 +1235,8 @@ EventPropagation InputManager::input(const SEvent& event)
             factor = std::max(factor, 0.1f);
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {
-                device->updateOrientationFromAccelerometer(event.AccelerometerEvent.X, event.AccelerometerEvent.Y);
+                device->updateOrientationFromAccelerometer((float)event.AccelerometerEvent.X,
+                                                           (float)event.AccelerometerEvent.Y);
                 device->updateAxisX(device->getOrientation() * ORIENTATION_MULTIPLIER / factor);
             }
             else
@@ -1254,7 +1255,7 @@ EventPropagation InputManager::input(const SEvent& event)
 
             float factor = UserConfigParams::m_multitouch_tilt_factor;
             factor = std::max(factor, 0.1f);
-            device->updateOrientationFromGyroscope(event.GyroscopeEvent.Z);
+            device->updateOrientationFromGyroscope((float)event.GyroscopeEvent.Z);
             device->updateAxisX(device->getOrientation() * ORIENTATION_MULTIPLIER / factor);
         }
     }
