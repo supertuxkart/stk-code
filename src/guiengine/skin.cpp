@@ -1786,7 +1786,9 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                                      widget.m_x + widget.m_w,
                                      widget.m_y + widget.m_h );
                     drawBoxFromStretchableTexture(&widget, rect,
-                              SkinConfig::m_render_params["section::neutral"]);
+                           widget.isSelected(0)
+                           ? SkinConfig::m_render_params["section::selected"]
+                           : SkinConfig::m_render_params["section::neutral"]);
                 }
 
                 renderSections( &widget.m_children );
