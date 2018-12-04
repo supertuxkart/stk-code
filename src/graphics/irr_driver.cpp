@@ -1853,8 +1853,10 @@ void IrrDriver::doScreenShot()
 // ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
+ *  \param is_loading True if the rendering is called during loading of world,
+ *         in which case world, physics etc must not be accessed/
  */
-void IrrDriver::update(float dt)
+void IrrDriver::update(float dt, bool is_loading)
 {
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
@@ -1882,15 +1884,15 @@ void IrrDriver::update(float dt)
     if (world)
     {
 #ifndef SERVER_ONLY
-        m_renderer->render(dt);
+        m_renderer->render(dt, is_loading);
 
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
-            GUIEngine::render(dt);
+            GUIEngine::render(dt, is_loading);
         }
 
-        if (Physics::getInstance())
+        if (!is_loading && Physics::getInstance())
         {
             IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
@@ -1905,7 +1907,7 @@ void IrrDriver::update(float dt)
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-        GUIEngine::render(dt);
+        GUIEngine::render(dt, is_loading);
 
         m_video_driver->endScene();
     }

@@ -700,7 +700,7 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 }
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::render(float dt)
+void ShaderBasedRenderer::render(float dt, bool is_loading)
 {
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
@@ -802,7 +802,7 @@ void ShaderBasedRenderer::render(float dt)
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GUI));
         PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
         // Either render the gui, or the global elements of the race gui.
-        GUIEngine::render(dt);
+        GUIEngine::render(dt, is_loading);
         PROFILER_POP_CPU_MARKER();
     }
 

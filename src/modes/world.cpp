@@ -49,6 +49,7 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_rewinder.hpp"
+#include "main_loop.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
@@ -168,9 +169,9 @@ void World::init()
     // mode class, which would not have been constructed at the time that this
     // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
-
+    main_loop->renderGUI();
     RewindManager::create();
-
+    main_loop->renderGUI();
     // Grab the track file
     Track *track = track_manager->getTrack(race_manager->getTrackName());
     Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
@@ -184,10 +185,10 @@ void World::init()
 
     std::string script_path = track->getTrackFile("scripting.as");
     Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
-
+    main_loop->renderGUI();
     // Create the physics
     Physics::getInstance<Physics>();
-
+    main_loop->renderGUI();
     unsigned int num_karts = race_manager->getNumberOfKarts();
     //assert(num_karts > 0);
 
@@ -232,14 +233,15 @@ void World::init()
         m_karts.push_back(new_kart);
     }  // for i
 
+    main_loop->renderGUI();
     // Load other custom models if needed
     loadCustomModels();
-
+    main_loop->renderGUI();
     // Must be called after all karts are created
     m_race_gui->init();
 
     powerup_manager->computeWeightsForRace(race_manager->getNumberOfKarts());
-
+    main_loop->renderGUI();
     if (UserConfigParams::m_particles_effects > 1)
     {
         Weather::getInstance<Weather>();   // create Weather instance
@@ -258,6 +260,7 @@ void World::init()
         }   // if server with graphics of is watching replay
     } // if getNumCameras()==0
     initTeamArrows();
+    main_loop->renderGUI();
 }   // init
 
 //-----------------------------------------------------------------------------

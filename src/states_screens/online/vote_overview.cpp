@@ -199,11 +199,14 @@ void VoteOverview::onUpdate(float dt)
     if(m_index_to_hostid.size()==0) return;
 
     static float xx = 0.0f;
-    xx += dt;
+    xx += 2*dt;
     int index = int(xx) % m_index_to_hostid.size();
-    std::string box_name = StringUtils::insertValues("rect-box%d", index);    
-    Widget *box = getWidget(box_name.c_str());
-    box->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    for (unsigned int i = 0; i < 8; i++)
+    {
+        std::string box_name = StringUtils::insertValues("rect-box%d", i);
+        Widget *box = getWidget(box_name.c_str());
+        box->setSelected(PLAYER_ID_GAME_MASTER, i==index);
+    }
 
     std::string s = StringUtils::insertValues("name-%d", index);
     LabelWidget *name_widget = getWidget<LabelWidget>(s.c_str());
@@ -215,29 +218,6 @@ void VoteOverview::onUpdate(float dt)
     name_widget = getWidget<LabelWidget>(s.c_str());
     name_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     name_widget->setDefaultColor();
-
-#ifdef XX
-
-
-    std::string s = StringUtils::insertValues("box-%d", index);
-    LabelWidget *name_widget = getWidget<>(s.c_str());
-
-        //assert(box);
-        std::string num_laps = StringUtils::insertValues("numlaps-%d", i);
-        LabelWidget *laps_widget = getWidget<LabelWidget>(num_laps.c_str());
-        core::stringw laps = _("Laps: %d", vote->m_num_laps);
-        laps_widget->setText(laps, true);
-        std::string track_widget_name = StringUtils::insertValues("track-%d", i);
-        IconButtonWidget *track_widget =
-            getWidget<IconButtonWidget>(track_widget_name.c_str());
-
-        Track *track = track_manager->getTrack(vote->m_track_name);
-
-        track_widget->setImage(track->getScreenshotFile());
-
-    }
-    calculateLayout();
-#endif
 }   // onUpdate
 
 // -----------------------------------------------------------------------------

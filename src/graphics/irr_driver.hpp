@@ -266,7 +266,7 @@ public:
     Camera               *addCamera(unsigned int index, AbstractKart *kart);
     void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
     void                  removeCamera(Camera *camera);
-    void                  update(float dt);
+    void                  update(float dt, bool loading=false);
     /** Call to change resolution */
     void                  changeResolution(const int w, const int h, const bool fullscreen);
   /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */

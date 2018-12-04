@@ -280,8 +280,11 @@ void ClientLobby::addAllPlayers(Event* event)
         float time_limit = data.getFloat();
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
     }
+
     configRemoteKart(players);
     loadWorld();
+    StateManager::get()->enterGameState();
+
     // Switch to assign mode in case a player hasn't chosen any karts
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 }   // addAllPlayers

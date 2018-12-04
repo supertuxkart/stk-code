@@ -32,6 +32,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "main_loop.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
@@ -56,6 +57,7 @@
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/online/vote_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
@@ -470,14 +472,16 @@ void RaceManager::startNew(bool from_overworld)
  */
 void RaceManager::startNextRace()
 {
+
+    main_loop->renderGUI();
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
     IrrlichtDevice* device = irr_driver->getDevice();
-    GUIEngine::renderLoading();
-    device->getVideoDriver()->endScene();
-    device->getVideoDriver()->beginScene(true, true,
-                                         video::SColor(255,100,101,140));
+    //GUIEngine::renderLoading();
+    //device->getVideoDriver()->endScene();
+    //device->getVideoDriver()->beginScene(true, true,
+    //                                     video::SColor(255,100,101,140));
 
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -536,6 +540,8 @@ void RaceManager::startNextRace()
         }
     }
 
+    main_loop->renderGUI();
+
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
@@ -573,19 +579,21 @@ void RaceManager::startNextRace()
         Log::error("RaceManager", "Could not create given race mode.");
         assert(0);
     }
+    main_loop->renderGUI();
 
     // A second constructor phase is necessary in order to be able to
     // call functions which are overwritten (otherwise polymorphism
     // will fail and the results will be incorrect). Also in init() functions
     // can be called that use World::getWorld().
     World::getWorld()->init();
-
+    main_loop->renderGUI();
     // Now initialise all values that need to be reset from race to race
     // Calling this here reduces code duplication in init and restartRace()
     // functions.
     World::getWorld()->reset();
 
     irr_driver->onLoadWorld();
+    main_loop->renderGUI();
 
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
@@ -597,6 +605,7 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
     }
+    main_loop->renderGUI();
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
@@ -955,6 +964,16 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 {
     assert(!m_watching_replay);
     StateManager::get()->enterGameState();
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient()        )
+    {
+        VoteOverview *overview = VoteOverview::getInstance();
+        if (GUIEngine::getCurrentScreen() != overview)
+            overview->push();
+    }
+
+
     setTrack(track_ident);
 
     if (num_laps != -1) setNumLaps( num_laps );
@@ -1011,7 +1030,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
 
     m_track_number = 0;
     startNextRace();
-}   // startSingleRace
+}   // startWatchingReplay
 
 //-----------------------------------------------------------------------------
 void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)

@@ -530,4 +530,18 @@ void MainLoop::run()
 
 }   // run
 
+// ----------------------------------------------------------------------------
+void MainLoop::renderGUI()
+{
+    uint64_t now = StkTime::getRealTimeMs();
+    float dt = (now - m_curr_time)/1000.0f;
+    m_curr_time = now;
+
+    Log::verbose("mainloop", "Rendergui t %llu dt %f",
+                 now, dt);
+
+    irr_driver->update(dt, /*is_loading*/true);
+    input_manager->update(dt);
+    GUIEngine::update(dt);
+}   // renderGUI
 /* EOF */
