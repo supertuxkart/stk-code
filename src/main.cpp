@@ -1954,6 +1954,7 @@ int main(int argc, char *argv[] )
         {
             main_loop = new MainLoop(parent_pid);
             has_parent_process = true;
+            ServerConfig::m_server_configurable = true;
         }
         else
             main_loop = new MainLoop(0/*parent_pid*/);

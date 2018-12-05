@@ -1047,8 +1047,8 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
             sl->getWaitingPlayersCount()));
         s.addUInt16(m_private_port);
-        s.addUInt8((uint8_t)ServerConfig::m_server_difficulty);
-        s.addUInt8((uint8_t)ServerConfig::m_server_mode);
+        s.addUInt8((uint8_t)sl->getDifficulty());
+        s.addUInt8((uint8_t)sl->getGameMode());
         s.addUInt8(!pw.empty());
         s.addUInt8((uint8_t)
             (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?

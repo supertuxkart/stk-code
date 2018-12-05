@@ -221,6 +221,13 @@ namespace ServerConfig
         "validating-player, auto-end, strict-player and owner-less will be "
         "turned on."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_server_configurable
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-configurable",
+        "If true, the server owner can config the game mode and difficulty in "
+        "the GUI of lobby. This option cannot be used with owner-less or "
+        "grand prix server, and will be automatically turned on if the server "
+        "was created using the in-game GUI."));
+
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
         "Time in seconds when a flag is dropped a by player in CTF "
@@ -315,7 +322,10 @@ namespace ServerConfig
     void writeServerConfigToDisk();
     // ------------------------------------------------------------------------
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-        getLocalGameMode();
+        getLocalGameModeFromConfig();
+    // ------------------------------------------------------------------------
+    std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+        getLocalGameMode(int mode);
     // ------------------------------------------------------------------------
     core::stringw getModeName(unsigned id);
     // ------------------------------------------------------------------------

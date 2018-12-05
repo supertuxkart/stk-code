@@ -153,11 +153,15 @@ private:
 
     std::atomic<uint32_t> m_waiting_players_counts;
 
+    std::atomic<uint32_t> m_server_id_online;
+
+    std::atomic<int> m_difficulty;
+
+    std::atomic<int> m_game_mode;
+
     std::atomic<uint64_t> m_last_success_poll_time;
 
     uint64_t m_server_started_at, m_server_delay;
-
-    std::atomic<uint32_t> m_server_id_online;
 
     bool m_registered_for_once_only;
 
@@ -180,6 +184,8 @@ private:
     void createServerIdFile();
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
+    void handleServerConfiguration(Event* event);
+    void updateTracksForMode();
     bool checkPeersReady() const
     {
         bool all_ready = true;
@@ -284,6 +290,8 @@ public:
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
+    int getDifficulty() const                   { return m_difficulty.load(); }
+    int getGameMode() const                      { return m_game_mode.load(); }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

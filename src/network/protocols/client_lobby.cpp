@@ -603,8 +603,7 @@ void ClientLobby::handleServerInfo(Event* event)
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     u_data = data.getUInt8();
-    ServerConfig::m_server_mode = u_data;
-    auto game_mode = ServerConfig::getLocalGameMode();
+    auto game_mode = ServerConfig::getLocalGameMode(u_data);
     race_manager->setMinorMode(game_mode.first);
     // We use single mode in network even it's grand prix
     race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
@@ -660,6 +659,8 @@ void ClientLobby::handleServerInfo(Event* event)
         for (const core::stringw& motd : motd_line)
             NetworkingLobby::getInstance()->addMoreServerInfo(motd);
     }
+    bool server_config = data.getUInt8() == 1;
+    NetworkingLobby::getInstance()->toggleServerConfigButton(server_config);
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------

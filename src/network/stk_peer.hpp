@@ -172,6 +172,9 @@ public:
         }
     }
     // ------------------------------------------------------------------------
+    std::pair<std::set<std::string>, std::set<std::string> >
+                            getClientAssets() const { return m_available_kts; }
+    // ------------------------------------------------------------------------
     void setPingInterval(uint32_t interval)
                             { enet_peer_ping_interval(m_enet_peer, interval); }
     // ------------------------------------------------------------------------

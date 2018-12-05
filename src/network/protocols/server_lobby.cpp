@@ -138,6 +138,8 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_result_ns->setSynchronous(true);
     m_waiting_for_reset = false;
     m_server_id_online.store(0);
+    m_difficulty.store(ServerConfig::m_server_difficulty);
+    m_game_mode.store(ServerConfig::m_server_mode);
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -156,32 +158,14 @@ ServerLobby::~ServerLobby()
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
-void ServerLobby::setup()
+void ServerLobby::updateTracksForMode()
 {
-    LobbyProtocol::setup();
-    auto players = m_game_setup->getConnectedPlayers();
-    if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
-    {
-        for (auto player : players)
-            player->resetGrandPrixData();
-    }
-    if (!m_game_setup->isGrandPrix() || !m_game_setup->isGrandPrixStarted())
-    {
-        for (auto player : players)
-            player->setKartName("");
-    }
-
-    StateManager::get()->resetActivePlayers();
-    // We use maximum 16bit unsigned limit
-    auto all_k = kart_properties_manager->getAllAvailableKarts();
     auto all_t = track_manager->getAllTrackIdentifiers();
-    if (all_k.size() >= 65536)
-        all_k.resize(65535);
     if (all_t.size() >= 65536)
         all_t.resize(65535);
-    m_available_kts.first = { all_k.begin(), all_k.end() };
     m_available_kts.second = { all_t.begin(), all_t.end() };
-    RaceManager::MinorRaceModeType m = ServerConfig::getLocalGameMode().first;
+    RaceManager::MinorRaceModeType m =
+        ServerConfig::getLocalGameMode(m_game_mode.load()).first;
     switch (m)
     {
         case RaceManager::MINOR_MODE_NORMAL_RACE:
@@ -249,6 +233,32 @@ void ServerLobby::setup()
             assert(false);
             break;
     }
+
+}   // updateTracksForMode
+
+//-----------------------------------------------------------------------------
+void ServerLobby::setup()
+{
+    LobbyProtocol::setup();
+    auto players = m_game_setup->getConnectedPlayers();
+    if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
+    {
+        for (auto player : players)
+            player->resetGrandPrixData();
+    }
+    if (!m_game_setup->isGrandPrix() || !m_game_setup->isGrandPrixStarted())
+    {
+        for (auto player : players)
+            player->setKartName("");
+    }
+
+    StateManager::get()->resetActivePlayers();
+    // We use maximum 16bit unsigned limit
+    auto all_k = kart_properties_manager->getAllAvailableKarts();
+    if (all_k.size() >= 65536)
+        all_k.resize(65535);
+    m_available_kts.first = { all_k.begin(), all_k.end() };
+    updateTracksForMode();
 
     m_server_has_loaded_world.store(false);
 
@@ -366,6 +376,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CHANGE_TEAM: changeTeam(event);                   break;
         case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_CHAT: handleChat(event);                          break;
+        case LE_CONFIG_SERVER: handleServerConfiguration(event);  break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -554,7 +565,8 @@ void ServerLobby::asynchronousUpdate()
                     .addUInt32(player->getOnlineId())
                     .addUInt8(player->getPerPlayerDifficulty())
                     .addUInt8(player->getLocalPlayerId())
-                    .addUInt8(player->getTeam());
+                    .addUInt8(race_manager->teamEnabled() ?
+                    player->getTeam() : KART_TEAM_NONE);
                 if (player->getKartName().empty())
                 {
                     RandomGenerator rg;
@@ -866,7 +878,7 @@ void ServerLobby::startSelection(const Event *event)
         if (m_state != WAITING_FOR_START_GAME)
         {
             Log::warn("ServerLobby",
-                "Received startSelection while being in state %d",
+                "Received startSelection while being in state %d.",
                 m_state.load());
             return;
         }
@@ -1540,7 +1552,7 @@ void ServerLobby::connectionRequested(Event* event)
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
         delete message;
-        Log::verbose("ServerLobby", "Player has incompatible karts / tracks");
+        Log::verbose("ServerLobby", "Player has incompatible karts / tracks.");
         return;
     }
 
@@ -1685,8 +1697,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
             per_player_difficulty, (uint8_t)i, KART_TEAM_NONE);
-        if (ServerConfig::m_team_choosing &&
-            race_manager->teamEnabled())
+        if (ServerConfig::m_team_choosing)
         {
             KartTeam cur_team = KART_TEAM_NONE;
             if (red_blue.first > red_blue.second)
@@ -2600,3 +2611,93 @@ float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
     k->setStartupBoost(f);
     return f;
 }   // getStartupBoostOrPenaltyForKart
+
+//-----------------------------------------------------------------------------
+/*! \brief Called when the server owner request to change game mode or
+ *         difficulty.
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0            1            2
+ *       -----------------------------------------------
+ *  Size |     1      |     1     |         1          |
+ *  Data | difficulty | game mode | soccer goal target |
+ *       -----------------------------------------------
+ */
+void ServerLobby::handleServerConfiguration(Event* event)
+{
+    if (m_state != WAITING_FOR_START_GAME)
+    {
+        Log::warn("ServerLobby",
+            "Received handleServerConfiguration while being in state %d.",
+            m_state.load());
+        return;
+    }
+    if (!ServerConfig::m_server_configurable)
+    {
+        Log::warn("ServerLobby", "server-configurable is not enabled.");
+        return;
+    }
+    if (event->getPeerSP() != m_server_owner.lock())
+    {
+        Log::warn("ServerLobby",
+            "Client %d is not authorised to config server.",
+            event->getPeer()->getHostId());
+        return;
+    }
+    NetworkString& data = event->data();
+    uint8_t new_difficulty = data.getUInt8();
+    uint8_t new_game_mode = data.getUInt8();
+    bool new_soccer_goal_target = data.getUInt8() == 1;
+    auto modes = ServerConfig::getLocalGameMode(new_game_mode);
+    if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        Log::warn("ServerLobby", "Grand prix is used for new mode.");
+        return;
+    }
+
+    race_manager->setMinorMode(modes.first);
+    race_manager->setMajorMode(modes.second);
+    race_manager->setDifficulty(RaceManager::Difficulty(new_difficulty));
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        m_game_setup->setSoccerGoalTarget(new_soccer_goal_target);
+    m_difficulty.store(new_difficulty);
+    m_game_mode.store(new_game_mode);
+    updateTracksForMode();
+
+    auto peers = STKHost::get()->getPeers();
+    for (auto& peer : peers)
+    {
+        auto assets = peer->getClientAssets();
+        if (!peer->isValidated() || assets.second.empty())
+            continue;
+        std::set<std::string> tracks_erase;
+        for (const std::string& server_track : m_available_kts.second)
+        {
+            if (assets.second.find(server_track) == assets.second.end())
+            {
+                tracks_erase.insert(server_track);
+            }
+        }
+        if (tracks_erase.size() == m_available_kts.second.size())
+        {
+            NetworkString *message = getNetworkString(2);
+            message->setSynchronous(true);
+            message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_INCOMPATIBLE_DATA);
+            peer->cleanPlayerProfiles();
+            peer->sendPacket(message, true/*reliable*/);
+            peer->reset();
+            delete message;
+            Log::verbose("ServerLobby",
+                "Player has incompatible tracks for new game mode.");
+        }
+    }
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    sendMessageToPeers(server_info);
+    delete server_info;
+    updatePlayerList();
+}   // handleServerConfiguration

@@ -76,13 +76,15 @@ private:
     int64_t m_cur_starting_timer;
     unsigned m_min_start_game_players;
 
-    bool m_allow_change_team, m_has_auto_start_in_server;
+    bool m_allow_change_team, m_has_auto_start_in_server,
+        m_server_configurable;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
     GUIEngine::LabelWidget* m_text_bubble;
     GUIEngine::LabelWidget* m_timeout_message;
     GUIEngine::IconButtonWidget* m_start_button;
+    GUIEngine::IconButtonWidget* m_config_button;
     GUIEngine::ListWidget* m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
     GUIEngine::ButtonWidget* m_send_button;
@@ -142,7 +144,7 @@ public:
     void initAutoStartTimer(bool grand_prix_started, unsigned min_players,
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t);
-
+    void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
 };   // class NetworkingLobby
 
 #endif

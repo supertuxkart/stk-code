@@ -93,6 +93,9 @@ void NetworkingLobby::loadedFromFile()
     m_start_button = getWidget<IconButtonWidget>("start");
     assert(m_start_button!= NULL);
 
+    m_config_button = getWidget<IconButtonWidget>("config");
+    assert(m_config_button!= NULL);
+
     m_text_bubble = getWidget<LabelWidget>("text");
     assert(m_text_bubble != NULL);
 
@@ -142,7 +145,7 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
-    getWidget("config")->setVisible(false);
+    m_server_configurable = false;
     m_player_names.clear();
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
@@ -157,6 +160,7 @@ void NetworkingLobby::init()
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setLabel(_("Start race"));
     m_start_button->setVisible(false);
+    m_config_button->setVisible(false);
     m_state = LS_CONNECTING;
     getWidget("chat")->setVisible(false);
     getWidget("chat")->setActive(false);
@@ -347,6 +351,9 @@ void NetworkingLobby::onUpdate(float delta)
         }
         m_text_bubble->setText(total_msg, true);
     }
+
+    m_config_button->setVisible(STKHost::get()->isAuthorisedToControl() &&
+        m_server_configurable);
 
     if (STKHost::get()->isAuthorisedToControl() ||
         (m_has_auto_start_in_server &&

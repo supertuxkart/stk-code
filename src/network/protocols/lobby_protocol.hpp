@@ -62,7 +62,8 @@ public:
         LE_KICK_HOST,
         LE_CHANGE_TEAM,
         LE_BAD_TEAM,
-        LE_BAD_CONNECTION
+        LE_BAD_CONNECTION,
+        LE_CONFIG_SERVER
     };
 
     enum RejectReason : uint8_t
