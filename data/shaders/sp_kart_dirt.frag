@@ -49,6 +49,7 @@ void main()
     dirtMask *= clamp(dirt_factor, 0.0, 1.0);
     nitroMask *= clamp(dirt_factor, 0.0, 1.0);
     vec3 final_color = col.xyz * color.xyz;
+    //dirtMask = step(dirtMask,dirt_factor - 0.5);
     final_color = mix(final_color, dirt, dirtMask);
 
     final_color = mix(final_color, vec3(0, 0.415, 0.639), nitroMask); 

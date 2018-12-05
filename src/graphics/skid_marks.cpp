@@ -46,8 +46,8 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
 {
     m_width = width;
     m_material = material_manager->getMaterialSPM("skidmarks.png", "",
-        "alphablend");
-    m_shader = SP::SPShaderManager::get()->getSPShader("alphablend");
+        "alphatest");
+    m_shader = SP::SPShaderManager::get()->getSPShader("alphatest");
     assert(m_shader);
     auto texture = SP::SPTextureManager::get()->getTexture(
         m_material->getSamplerPath(0), m_material,

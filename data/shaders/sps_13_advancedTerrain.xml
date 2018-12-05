@@ -1,0 +1,13 @@
+<spshader>
+    <shader-info name="advancedTerrain" fallback-shader="solid" use-tangents="Y" srgb="Y Y N N Y N"/>
+    <first-pass vertex-shader="sp_pass.vert"
+        fragment-shader="sp_advanced_terrain.frag">
+    </first-pass>
+    <shadow-pass vertex-shader="sp_shadow.vert"
+        fragment-shader="white.frag">
+    </shadow-pass>
+    <uniform-assigners>
+        <uniform-assigner name="layer"
+        function="shadowCascadeUniformAssigner"/>
+    </uniform-assigners>
+</spshader>
