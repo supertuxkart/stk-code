@@ -169,9 +169,9 @@ void World::init()
     // mode class, which would not have been constructed at the time that this
     // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
-    main_loop->renderGUI();
+    main_loop->renderGUI(1000);
     RewindManager::create();
-    main_loop->renderGUI();
+    main_loop->renderGUI(1100);
     // Grab the track file
     Track *track = track_manager->getTrack(race_manager->getTrackName());
     Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
@@ -185,10 +185,10 @@ void World::init()
 
     std::string script_path = track->getTrackFile("scripting.as");
     Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
-    main_loop->renderGUI();
+    main_loop->renderGUI(1200);
     // Create the physics
     Physics::getInstance<Physics>();
-    main_loop->renderGUI();
+    main_loop->renderGUI(1300);
     unsigned int num_karts = race_manager->getNumberOfKarts();
     //assert(num_karts > 0);
 
@@ -197,12 +197,14 @@ void World::init()
     // This also defines the static Track::getCurrentTrack function.
     track->loadTrackModel(race_manager->getReverseTrack());
 
+    main_loop->renderGUI(6998);
     if (gk > 0)
     {
         ReplayPlay::get()->load();
         for (unsigned int k = 0; k < gk; k++)
             m_karts.push_back(ReplayPlay::get()->getGhostKart(k));
     }
+    main_loop->renderGUI(6999);
 
     // Assign team of AIs for team mode before createKart
     if (hasTeam())
@@ -210,6 +212,7 @@ void World::init()
 
     for(unsigned int i=0; i<num_karts; i++)
     {
+        main_loop->renderGUI(7000, i, num_karts);
         if (race_manager->getKartType(i) == RaceManager::KT_GHOST) continue;
         std::string kart_ident = history->replayHistory()
                                ? history->getKartIdent(i)
@@ -233,15 +236,15 @@ void World::init()
         m_karts.push_back(new_kart);
     }  // for i
 
-    main_loop->renderGUI();
+    main_loop->renderGUI(7050);
     // Load other custom models if needed
     loadCustomModels();
-    main_loop->renderGUI();
+    main_loop->renderGUI(7100);
     // Must be called after all karts are created
     m_race_gui->init();
 
     powerup_manager->computeWeightsForRace(race_manager->getNumberOfKarts());
-    main_loop->renderGUI();
+    main_loop->renderGUI(7200);
     if (UserConfigParams::m_particles_effects > 1)
     {
         Weather::getInstance<Weather>();   // create Weather instance
@@ -260,7 +263,7 @@ void World::init()
         }   // if server with graphics of is watching replay
     } // if getNumCameras()==0
     initTeamArrows();
-    main_loop->renderGUI();
+    main_loop->renderGUI(7300);
 }   // init
 
 //-----------------------------------------------------------------------------

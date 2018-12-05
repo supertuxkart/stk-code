@@ -473,7 +473,7 @@ void RaceManager::startNew(bool from_overworld)
 void RaceManager::startNextRace()
 {
 
-    main_loop->renderGUI();
+    main_loop->renderGUI(0);
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
@@ -540,7 +540,7 @@ void RaceManager::startNextRace()
         }
     }
 
-    main_loop->renderGUI();
+    main_loop->renderGUI(100);
 
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
@@ -579,21 +579,21 @@ void RaceManager::startNextRace()
         Log::error("RaceManager", "Could not create given race mode.");
         assert(0);
     }
-    main_loop->renderGUI();
+    main_loop->renderGUI(200);
 
     // A second constructor phase is necessary in order to be able to
     // call functions which are overwritten (otherwise polymorphism
     // will fail and the results will be incorrect). Also in init() functions
     // can be called that use World::getWorld().
     World::getWorld()->init();
-    main_loop->renderGUI();
+    main_loop->renderGUI(8000);
     // Now initialise all values that need to be reset from race to race
     // Calling this here reduces code duplication in init and restartRace()
     // functions.
     World::getWorld()->reset();
 
     irr_driver->onLoadWorld();
-    main_loop->renderGUI();
+    main_loop->renderGUI(8100);
 
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
@@ -605,7 +605,7 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
     }
-    main_loop->renderGUI();
+    main_loop->renderGUI(8200);
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
