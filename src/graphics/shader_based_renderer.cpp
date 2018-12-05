@@ -761,7 +761,7 @@ void ShaderBasedRenderer::render(float dt, bool is_loading)
 
         debugPhysics();
         
-        if (CVS->isDeferredEnabled())
+        if (CVS->isDeferredEnabled() && !is_loading)
         {
             renderPostProcessing(camera, cam == 0);
         }
