@@ -610,7 +610,8 @@ void ServerLobby::asynchronousUpdate()
 void ServerLobby::update(int ticks)
 {
     int sec = ServerConfig::m_kick_idle_player_seconds;
-    if (sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
+    if (NetworkConfig::get()->isWAN() &&
+        sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
         m_state.load() <= RACING && m_server_has_loaded_world.load() == true)
     {
         auto players = m_game_setup->getConnectedPlayers(true/*same_offset*/);

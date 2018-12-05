@@ -291,7 +291,8 @@ namespace ServerConfig
         "kick-idle-player-seconds",
         "Kick idle player which has no network activity to server for more "
         "than some seconds during game, unless he has finished the race. "
-        "Negative value to disable."));
+        "Negative value to disable, and this option will always be disabled "
+        "for LAN server."));
 
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
