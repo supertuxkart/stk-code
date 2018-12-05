@@ -54,6 +54,8 @@ STKPeer::~STKPeer()
 //-----------------------------------------------------------------------------
 void STKPeer::disconnect()
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
@@ -67,6 +69,8 @@ void STKPeer::disconnect()
  */
 void STKPeer::kick()
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
@@ -80,6 +84,8 @@ void STKPeer::kick()
  */
 void STKPeer::reset()
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
@@ -96,6 +102,8 @@ void STKPeer::reset()
  */
 void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     // Enet will reuse a disconnected peer so we check here to avoid sending
     // to wrong peer
