@@ -758,18 +758,33 @@ void STKHost::mainLoop()
                         p.second->getPing();
                     const unsigned ap = p.second->getAveragePing();
                     const unsigned max_ping = ServerConfig::m_max_ping;
-                    if (ServerConfig::m_kick_high_ping_players &&
-                        p.second->isValidated() &&
+                    if (p.second->isValidated() &&
                         p.second->getConnectedTime() > 5.0f && ap > max_ping)
                     {
-                        Log::info("STKHost", "%s with ping %d is higher than"
-                            " %d ms, kick.",
-                            p.second->getAddress().toString().c_str(),
-                            ap, max_ping);
-                        std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
-                        m_enet_cmd.emplace_back(p.second->getENetPeer(),
-                            (ENetPacket*)NULL, PDI_BAD_CONNECTION,
-                            ECT_DISCONNECT);
+                        if (ServerConfig::m_kick_high_ping_players &&
+                            !p.second->isDisconnected())
+                        {
+                            Log::info("STKHost", "%s with ping %d is higher"
+                                " than %d ms, kick.",
+                                p.second->getAddress().toString().c_str(),
+                                ap, max_ping);
+                            std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
+                            m_enet_cmd.emplace_back(p.second->getENetPeer(),
+                                (ENetPacket*)NULL, PDI_BAD_CONNECTION,
+                                ECT_DISCONNECT);
+                        }
+                        else if (!p.second->hasWarnedForHighPing())
+                        {
+                            Log::info("STKHost", "%s with ping %d is higher"
+                                " than %d ms.",
+                                p.second->getAddress().toString().c_str(),
+                                ap, max_ping);
+                            p.second->setWarnedForHighPing(true);
+                            NetworkString msg(PROTOCOL_LOBBY_ROOM);
+                            msg.setSynchronous(true);
+                            msg.addUInt8(LobbyProtocol::LE_BAD_CONNECTION);
+                            p.second->sendPacket(&msg, /*reliable*/true);
+                        }
                     }
                 }
                 BareNetworkString ping_packet;

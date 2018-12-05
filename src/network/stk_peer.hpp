@@ -70,6 +70,8 @@ protected:
 
     std::atomic_bool m_disconnected;
 
+    std::atomic_bool m_warned_for_high_ping;
+
     /** Host id of this peer. */
     uint32_t m_host_id;
 
@@ -187,7 +189,11 @@ public:
     // ------------------------------------------------------------------------
     bool isDisconnected() const               { return m_disconnected.load(); }
     // ------------------------------------------------------------------------
-    void clearAvailableKartIDs() { m_available_kart_ids.clear(); }
+    bool hasWarnedForHighPing() const { return m_warned_for_high_ping.load(); }
+    // ------------------------------------------------------------------------
+    void setWarnedForHighPing(bool val)  { m_warned_for_high_ping.store(val); }
+    // ------------------------------------------------------------------------
+    void clearAvailableKartIDs()              { m_available_kart_ids.clear(); }
     // ------------------------------------------------------------------------
     void addAvailableKartID(unsigned id)   { m_available_kart_ids.insert(id); }
     // ------------------------------------------------------------------------

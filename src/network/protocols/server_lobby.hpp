@@ -252,7 +252,6 @@ private:
     double getModeSpread();
     double scalingValueForTime(double time);
     void checkRaceFinished();
-    void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
     std::pair<int, float> getHitCaptureLimit(float num_karts);
     void configPeersStartTime();
     void updateWaitingPlayers();

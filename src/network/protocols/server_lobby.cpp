@@ -591,19 +591,6 @@ void ServerLobby::asynchronousUpdate()
 }   // asynchronousUpdate
 
 //-----------------------------------------------------------------------------
-void ServerLobby::sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p)
-{
-    const unsigned max_ping = ServerConfig::m_max_ping;
-    Log::warn("ServerLobby", "Peer %s cannot catch up with max ping %d.",
-        p->getAddress().toString().c_str(), max_ping);
-    NetworkString* msg = getNetworkString();
-    msg->setSynchronous(true);
-    msg->addUInt8(LE_BAD_CONNECTION);
-    p->sendPacket(msg, /*reliable*/true);
-    delete msg;
-}   // sendBadConnectionMessageToPeer
-
-//-----------------------------------------------------------------------------
 /** Simple finite state machine.  Once this
  *  is known, register the server and its address with the stk server so that
  *  client can find it.
@@ -2406,7 +2393,9 @@ void ServerLobby::configPeersStartTime()
             continue;
         if (peer->getAveragePing() > max_ping_from_peers)
         {
-            sendBadConnectionMessageToPeer(peer);
+            Log::warn("ServerLobby",
+                "Peer %s cannot catch up with max ping %d.",
+                peer->getAddress().toString().c_str(), max_ping);
             continue;
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
