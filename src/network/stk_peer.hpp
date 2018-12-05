@@ -83,6 +83,8 @@ protected:
 
     uint64_t m_connected_time;
 
+    std::atomic<int64_t> m_last_activity;
+
     /** Available karts and tracks from this peer */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
@@ -189,6 +191,8 @@ public:
     // ------------------------------------------------------------------------
     bool isDisconnected() const               { return m_disconnected.load(); }
     // ------------------------------------------------------------------------
+    void setDisconnected(bool val)        { return m_disconnected.store(val); }
+    // ------------------------------------------------------------------------
     bool hasWarnedForHighPing() const { return m_warned_for_high_ping.load(); }
     // ------------------------------------------------------------------------
     void setWarnedForHighPing(bool val)  { m_warned_for_high_ping.store(val); }
@@ -203,7 +207,18 @@ public:
     void setUserVersion(const std::string& uv)         { m_user_version = uv; }
     // ------------------------------------------------------------------------
     const std::string& getUserVersion() const        { return m_user_version; }
-
+    // ------------------------------------------------------------------------
+    void updateLastActivity()
+                  { m_last_activity.store((int64_t)StkTime::getRealTimeMs()); }
+    // ------------------------------------------------------------------------
+    int idleForSeconds() const
+    {
+        int64_t diff =
+            (int64_t)StkTime::getRealTimeMs() - m_last_activity.load();
+        if (diff < 0)
+            return 0;
+        return (int)(diff / 1000);
+    }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

@@ -597,6 +597,29 @@ void ServerLobby::asynchronousUpdate()
  */
 void ServerLobby::update(int ticks)
 {
+    int sec = ServerConfig::m_kick_idle_player_seconds;
+    if (sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
+        m_state.load() <= RACING && m_server_has_loaded_world.load() == true)
+    {
+        auto players = m_game_setup->getConnectedPlayers(true/*same_offset*/);
+        World* w = World::getWorld();
+        for (unsigned i = 0; i < players.size(); i++)
+        {
+            if (!players[i])
+                continue;
+            auto peer = players[i]->getPeer();
+            if (peer->idleForSeconds() > sec && !peer->isDisconnected())
+            {
+                if (w && w->getKart(i)->hasFinishedRace())
+                    continue;
+                Log::info("ServerLobby", "%s has been idle for more than"
+                    " %d seconds, kick.",
+                    peer->getAddress().toString().c_str(), sec);
+                peer->kick();
+            }
+        }
+    }
+
     // Reset server to initial state if no more connected players
     if (m_waiting_for_reset)
     {
@@ -2117,6 +2140,11 @@ std::pair<int, float> ServerLobby::getHitCaptureLimit(float num_karts)
  */
 void ServerLobby::finishedLoadingWorld()
 {
+    for (auto p : m_peers_ready)
+    {
+        if (auto peer = p.first.lock())
+            peer->updateLastActivity();
+    }
     m_server_has_loaded_world.store(true);
 }   // finishedLoadingWorld;
 
@@ -2127,6 +2155,7 @@ void ServerLobby::finishedLoadingWorld()
 void ServerLobby::finishedLoadingWorldClient(Event *event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
+    peer->updateLastActivity();
     m_peers_ready.at(peer) = true;
     Log::info("ServerLobby", "Peer %d has finished loading world at %lf",
         peer->getHostId(), StkTime::getRealTime());

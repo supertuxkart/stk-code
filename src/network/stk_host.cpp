@@ -768,6 +768,7 @@ void STKHost::mainLoop()
                                 " than %d ms, kick.",
                                 p.second->getAddress().toString().c_str(),
                                 ap, max_ping);
+                            p.second->setDisconnected(true);
                             std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
                             m_enet_cmd.emplace_back(p.second->getENetPeer(),
                                 (ENetPacket*)NULL, PDI_BAD_CONNECTION,

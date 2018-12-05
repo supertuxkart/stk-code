@@ -279,6 +279,13 @@ namespace ServerConfig
         "kick-high-ping-players",
         "Kick players whose ping is above max-ping."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_kick_idle_player_seconds
+        SERVER_CFG_DEFAULT(IntServerConfigParam(60,
+        "kick-idle-player-seconds",
+        "Kick idle player which has no network activity to server for more "
+        "than some seconds during game, unless he has finished the race. "
+        "Negative value to disable."));
+
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
         "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "
