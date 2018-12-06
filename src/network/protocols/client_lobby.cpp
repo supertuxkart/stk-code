@@ -88,6 +88,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_KICK] = _("You were kicked from the server.");
     m_disconnected_msg[PDI_BAD_CONNECTION] =
         _("Bad network connection is detected.");
+    m_first_connect = true;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -582,6 +583,13 @@ void ClientLobby::handleServerInfo(Event* event)
     // At least 6 bytes should remain now
     if (!checkDataSize(event, 6)) return;
 
+    if (!m_first_connect)
+    {
+        NetworkingLobby::getInstance()
+            ->addMoreServerInfo(L"--------------------");
+    }
+    m_first_connect = false;
+
     NetworkString &data = event->data();
     // Add server info
     core::stringw str, each_line;
@@ -676,8 +684,6 @@ void ClientLobby::updatePlayerList(Event* event)
     if (m_waiting_for_game && !waiting)
     {
         // The waiting game finished
-        NetworkingLobby::getInstance()
-            ->addMoreServerInfo(L"--------------------");
         SFXManager::get()->quickSound("wee");
     }
 

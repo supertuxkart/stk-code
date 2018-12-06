@@ -35,14 +35,16 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
+#include "states_screens/dialogs/server_configuration_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <utfwrapping.h>
@@ -450,6 +452,16 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         NetworkString start(PROTOCOL_LOBBY_ROOM);
         start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendToServer(&start, true);
+    }
+    else if (name == m_config_button->m_properties[PROP_ID])
+    {
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (cl)
+        {
+            new ServerConfigurationDialog(
+                race_manager->isSoccerMode() &&
+                cl->getGameSetup()->isSoccerGoalTarget());
+        }
     }
 }   // eventCallback
 

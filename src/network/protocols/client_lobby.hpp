@@ -77,6 +77,8 @@ private:
 
     bool m_auto_started;
 
+    bool m_first_connect;
+
     uint64_t m_auto_back_to_lobby_time;
 
     /** The state of the finite state machine. */
