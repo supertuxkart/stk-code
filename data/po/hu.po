@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-11-23 23:45+0800\n"
-"PO-Revision-Date: 2018-11-27 17:42+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2018-12-06 16:58+0000\n"
+"Last-Translator: Balázs Úr <ur.balazs@fsf.hu>\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1636,7 +1636,7 @@ msgstr "Verseny indítása"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 msgid "Server Configuration"
-msgstr ""
+msgstr "Kiszolgáló beállításai"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -1951,7 +1951,7 @@ msgstr "Vissza az eszközlistához"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr ""
+msgstr "Internetbeállítások"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -1976,7 +1976,7 @@ msgstr "Csevegés engedélyezése a hálózati váróban"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Miscellaneous options"
-msgstr ""
+msgstr "Egyéb beállítások"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -3168,7 +3168,7 @@ msgstr "Büntető idő!"
 
 #: src/karts/controller/local_player_controller.cpp:310
 msgid "Don't accelerate before 'Set!'"
-msgstr ""
+msgstr "Ne gyorsíts a „Kész!” előtt."
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
@@ -4672,8 +4672,8 @@ msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
 msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
+msgstr[1] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
 
 #: src/states_screens/online/networking_lobby.cpp:327
 #, c-format
@@ -4688,7 +4688,7 @@ msgstr "Gyors játékú kiszolgáló keresése"
 #. server that he is ready for next game for owner less server
 #: src/states_screens/online/networking_lobby.cpp:577
 msgid "Ready"
-msgstr ""
+msgstr "Kész"
 
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:82
@@ -4749,7 +4749,7 @@ msgstr "Érvénytelen kiszolgálócím: %s."
 #. I18N: In enter server ip address dialog
 #: src/states_screens/online/online_screen.cpp:273
 msgid "Failed to detect port number."
-msgstr ""
+msgstr "Nem sikerült felismerni a portszámot."
 
 #: src/states_screens/online/online_user_search.cpp:210
 #: src/states_screens/online/online_user_search.cpp:274

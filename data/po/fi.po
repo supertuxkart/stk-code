@@ -5,13 +5,14 @@
 # Translators:
 # Jaakoppi Horila <supermariojaska5@gmail.com>, 2018
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2015-2018
+# Kristian Laakkonen, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-11-23 23:45+0800\n"
-"PO-Revision-Date: 2018-11-27 17:42+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2018-12-06 16:58+0000\n"
+"Last-Translator: Kristian Laakkonen\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,7 +50,7 @@ msgstr "Maratoonari"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr ""
+msgstr "Suorita kilpailu ajaen vähintään kaksinkertainen määrä kierroksia oletuskierroksiin nähden."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -67,7 +68,7 @@ msgstr "Kultakuski"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr ""
+msgstr "Voita vähintään kolmea tietokonepelaajaa vastaan normaalissa kisassa, aika-ajokisassa ja seuraa johtajaa -kisassa."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -85,7 +86,7 @@ msgstr "Pysäyttämätön"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr ""
+msgstr "Voita 5 yksittäistä kisaa peräkkäin vähintään kolmea tietokonepelaajaa vastaan. Huomaa, että kisan käynnistäminen uudelleen lasketaan häviöksi."
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -111,7 +112,7 @@ msgstr "Itikan metsästäjä!"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr ""
+msgstr "Mäiski vastustajiasi kuin itikoita! Litistä vähintään 5 vastustajaa kärpäslätkällä kisan aikana."
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
@@ -121,7 +122,7 @@ msgstr "Enemmän kuin tuuria"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr ""
+msgstr "Voita 10 yksittäistä Kokenut- tai SuperTux-tason kisaa peräkkäin vähintään viittä tietokonepelaajaa vastaan. Huomaa, että kisan käynnistäminen uudelleen lasketaan häviöksi."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -462,7 +463,7 @@ msgstr "Poista"
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Objective shown in achievement dialog
 msgid "Goal"
-msgstr ""
+msgstr "Tavoite"
 
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Progress shown in achievement dialog
@@ -1183,7 +1184,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr ""
+msgstr "Nitroa keräämällä voit lisätä nopeuttasi milloin haluat painamalla siihen tarkoitettua näppäintä tai nappia. Näet nykyisen nitron määrän ruudun oikeassa alareunassa olevasta mittarista."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1199,7 +1200,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr ""
+msgstr "Voit saada autosi luisuun painamalla tähän tarkoitettua näppäintä tai nappia. Peräkkäiset lyhyet luisut auttavat tiukoissa mutkissa, kun taas keskipitkät ja pitkät luisut lisäävät vauhtiasi. Et pysty kääntämään autoasi luisun aikana, joten suuntaa autosi oikein sitä ennen!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
@@ -1214,7 +1215,7 @@ msgstr "SuperTuxKart sisältää lukuisia eri pelitiloja:"
 #. I18N: In the help menu
 msgid ""
 "Regular Race: All blows allowed, so collect powerups and use them smartly!"
-msgstr ""
+msgstr "Normaali kilpailu: Kaikki keinot sallittuja, joten poimi esineitä ja käytä niitä järkevästi!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1237,7 +1238,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr ""
+msgstr "Taistelumuotoja on kolme erilaista: Kolmen iskun taistelussa toiset kilpailijat yritetään saada menettämään kaikki elämänsä osumalla heihin aseilla. Vapaa kaikille -kisassa voittaa pelaaja, joka osuu toisiin eniten tietyn aikarajan tai osumamäärärajan sisällä. Kaappaa lippu -kisassa joukkueesi täytyy tuoda toisen joukkueen lippu omaan tukikohtaanne sekä välttää oman lippunne kaappaus."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1254,7 +1255,7 @@ msgstr "Munajahti: Löydä kaikki radoille piilotetut munat."
 msgid ""
 "Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and"
 " record your own!"
-msgstr ""
+msgstr "Haamu-uusinta: Kisaa haamu-uusintoja vastaan aika-ajossa tai munajahdissa ja nauhoita oma uusintasi!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1308,7 +1309,7 @@ msgstr "Laskuvarjo - hidastaa kaikkia edelläsi olevia kilpailijoita."
 msgid ""
 "Swapper - gift boxes are transformed into bananas, nitro cans into "
 "bubblegums, and vice versa for a short time."
-msgstr ""
+msgstr "Vaihtaja - lahjapaketit muutetaan banaaneiksi, nitropullot purukumeiksi ja päinvastoin lyhyeksi aikaa."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1358,7 +1359,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr ""
+msgstr "Tämä kuva pienoiskartalla osoittaa haasteet, joita et ole vielä suorittanut. Se myös kertoo ruudun oikeassa ylänurkassa, kuinka monta pistettä sinulla tällä hetkellä on. Suorita mahdollisimman monta haastetta, niin Nolok hyväksyy haasteen kisata sinua vastaan. Voita hänet vapauttaaksesi Gnun!"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1633,7 +1634,7 @@ msgstr "Aloita kisa"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 msgid "Server Configuration"
-msgstr ""
+msgstr "Palvelinasetukset"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -1948,7 +1949,7 @@ msgstr "Takaisin laitelistaan"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr ""
+msgstr "Internet-valinnat"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -1973,7 +1974,7 @@ msgstr "Mahdollista keskustelu verkkopelin aulassa"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Miscellaneous options"
-msgstr ""
+msgstr "Muut valinnat"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -3165,7 +3166,7 @@ msgstr "Sakkoaika!"
 
 #: src/karts/controller/local_player_controller.cpp:310
 msgid "Don't accelerate before 'Set!'"
-msgstr ""
+msgstr "Älä kiihdytä ennen \"Valmiit!\"-vaihetta"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
@@ -4669,8 +4670,8 @@ msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
 msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Alkaa %d sekunnin kuluttua, tai kun kaikki ovat painaneet \"Valmis\"-painiketta."
+msgstr[1] "Alkaa %d sekunnin kuluttua, tai kun kaikki ovat painaneet \"Valmis\"-painiketta."
 
 #: src/states_screens/online/networking_lobby.cpp:327
 #, c-format
@@ -4685,7 +4686,7 @@ msgstr "Etsitään pikapelipalvelin"
 #. server that he is ready for next game for owner less server
 #: src/states_screens/online/networking_lobby.cpp:577
 msgid "Ready"
-msgstr ""
+msgstr "Valmis"
 
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:82
@@ -4746,7 +4747,7 @@ msgstr "Virheellinen palvelimen osoite: %s."
 #. I18N: In enter server ip address dialog
 #: src/states_screens/online/online_screen.cpp:273
 msgid "Failed to detect port number."
-msgstr ""
+msgstr "Porttinumeron havaitseminen epäonnistui."
 
 #: src/states_screens/online/online_user_search.cpp:210
 #: src/states_screens/online/online_user_search.cpp:274

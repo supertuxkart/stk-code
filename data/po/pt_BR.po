@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-11-23 23:45+0800\n"
-"PO-Revision-Date: 2018-11-27 17:42+0000\n"
+"PO-Revision-Date: 2018-12-06 16:58+0000\n"
 "Last-Translator: Adevair Junior <adevairhpj@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/supertuxkart/supertuxkart/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "Faça 5 derrapadas em uma única volta."
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
-msgstr "Coletor de ouro"
+msgstr "Corredor de ouro"
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -102,7 +102,7 @@ msgstr "Colete no mínimo 5 bananas em uma corrida."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "É um segundo"
+msgstr "É um segredo"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
@@ -1363,7 +1363,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr "Este ícone no mini-mapa mostra os desafios disponíveis que você não completou. No canto superior direito da tela, também mostra os pontos que você tem atualmente. Complete os desafios o quanto possível, e Nolok aceitará correr contra você. Ganhe para liberar Gnu!"
+msgstr "Este ícone no mini-mapa mostra os desafios disponíveis que você não completou. No canto superior direito da tela, também mostra os pontos que você tem atualmente. Complete os desafios o quanto possível, e Nolok aceitará correr contra você. Ganhe para libertar Gnu!"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
