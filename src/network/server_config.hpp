@@ -223,10 +223,11 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_server_configurable
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-configurable",
-        "If true, the server owner can config the game mode and difficulty in "
+        "If true, the server owner can config the difficulty and game mode in "
         "the GUI of lobby. This option cannot be used with owner-less or "
         "grand prix server, and will be automatically turned on if the server "
-        "was created using the in-game GUI."));
+        "was created using the in-game GUI. The changed difficulty and game "
+        "mode will not be saved in this config file."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
