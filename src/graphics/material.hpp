@@ -277,6 +277,10 @@ public:
           getTexFullPath     () const { return m_full_path;          }
 
     // ------------------------------------------------------------------------
+    const std::string&
+        getMatName           () const { return m_matname;            }
+
+    // ------------------------------------------------------------------------
     bool  isTransparent      () const
     {
         return m_shader_name == "additive" || m_shader_name == "alphablend" ||

@@ -131,10 +131,23 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
                     tex_name_1 = full_path;
                 }
             }
-            sp_mat_map[id] =
-                std::make_tuple(
-                material_manager->getMaterialSPM(tex_name_1, tex_name_2),
-                !tex_name_1.empty(), !tex_name_2.empty());
+
+			// If we detect a material we look for the name rather than the texture
+            if (tex_name_1.find(".mat") != -1)
+            {
+                Log::info("SPM material found", tex_name_1.c_str());
+				sp_mat_map[id] =
+				std::make_tuple(
+					material_manager->getMaterialSPMByName(tex_name_1),
+					!tex_name_1.empty(), !tex_name_2.empty());
+            }
+			else
+			{
+				sp_mat_map[id] =
+				std::make_tuple(
+					material_manager->getMaterialSPM(tex_name_1, tex_name_2),
+					!tex_name_1.empty(), !tex_name_2.empty());
+			}
         }
         else
         {

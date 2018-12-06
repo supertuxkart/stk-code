@@ -86,6 +86,24 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 }
 
 //-----------------------------------------------------------------------------
+Material* MaterialManager::getMaterialSPMByName(std::string mat_name)
+{
+    // Search backward so that temporary (track) textures are found first
+    for (int i = (int)m_materials.size() - 1; i >= 0; i--)
+    {
+        Log::info("SPM material name", m_materials[i]->getMatName().c_str());
+        if (m_materials[i]->getMatName() == mat_name)
+        {
+            return m_materials[i];
+        }
+
+        printf("We use the default material -\n\n");
+        // If no material is found we use a default texture
+        return getMaterialSPM("stk_missingmat.png", "");
+    }
+}
+
+//-----------------------------------------------------------------------------
 Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
                                           std::string lay_two_tex_lc,
                                           const std::string& def_shader_name)
