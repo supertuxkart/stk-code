@@ -20,32 +20,18 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/stk_tex_manager.hpp"
-#include "guiengine/message_queue.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
-#include "io/file_manager.hpp"
-#include "network/game_setup.hpp"
-#include "network/protocols/client_lobby.hpp"
 #include "network/protocols/lobby_protocol.hpp"
-#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-//##include "states_screens/track_info_screen.hpp"
 #include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
-#include "utils/translation.hpp"
-
-#include <iostream>
 
 using namespace GUIEngine;
 using namespace irr::core;

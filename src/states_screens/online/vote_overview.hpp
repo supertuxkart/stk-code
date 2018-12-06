@@ -19,17 +19,13 @@
 #define HEADER_VOTE_OVERVIEW_HPP
 
 #include "guiengine/screen.hpp"
-#include "utils/synchronised.hpp"
 
 #include <string>
 #include <vector>
 
 namespace GUIEngine
 {
-    class CheckBoxWidget;
-    class LabelWidget;
     class ProgressBarWidget;
-    class SpinnerWidget;
 }
 
 /**
@@ -91,11 +87,6 @@ public:
     void resetVote()
     {
         m_index_to_hostid.clear();
-    }
-    // ------------------------------------------------------------------------
-    void addVoteMessage(const std::string& user,
-                        const irr::core::stringw& message)
-    {
     }
 
 };
