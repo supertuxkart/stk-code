@@ -79,6 +79,9 @@ Material::Material(const XMLNode *node, bool deprecated)
         }
     }
 
+    Log::warn("Material", "debug name: =========== %s",
+    m_matname.c_str());
+
     const std::string& relative_path = file_manager->searchTexture(m_texname);
     if (relative_path.empty())
     {
