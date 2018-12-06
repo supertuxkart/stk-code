@@ -112,10 +112,14 @@ public:
 
     void setVoteTimeout(float timeout);
 
-    void addVoteMessage(const std::string& user,
+    void addVoteMessage(const std::string& user_host_id,
                         const irr::core::stringw& message)
     {
-        m_vote_messages[user] = message;
+        m_vote_messages[user_host_id] = message;
+    }
+    void removeVote(const std::string& user_host_id)
+    {
+        m_vote_messages.erase(user_host_id);
     }
 
 };

@@ -1406,7 +1406,7 @@ void ServerLobby::clientDisconnected(Event* event)
     for (auto p : players_on_peer)
     {
         std::string name = StringUtils::wideToUtf8(p->getName());
-        msg->encodeString(name);
+        msg->encodeString(name).addUInt32(event->getPeer()->getHostId());
         Log::info("ServerLobby", "%s disconnected", name.c_str());
     }
 

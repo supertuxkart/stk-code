@@ -455,7 +455,6 @@ void ClientLobby::displayPlayerVote(Event* event)
     std::string player_name;
     data.decodeString(&player_name);
     uint32_t host_id = data.getUInt32();
-    player_name += ": ";
     std::string track_name;
     data.decodeString(&track_name);
     Track* track = track_manager->getTrack(track_name);
@@ -502,7 +501,7 @@ void ClientLobby::displayPlayerVote(Event* event)
         vote_msg = _("Track: %s,\nlaps: %d, reversed: %s",
             track_readable, lap, rev == 1 ? yes : no);
     }
-    vote_msg = StringUtils::utf8ToWide(player_name) + vote_msg;
+    vote_msg = StringUtils::utf8ToWide(player_name) + L": " + vote_msg;
     TracksScreen::getInstance()->addVoteMessage(player_name +
         StringUtils::toString(host_id), vote_msg);
 }   // displayPlayerVote
@@ -527,11 +526,15 @@ void ClientLobby::disconnectedPlayer(Event* event)
     unsigned disconnected_player_count = data.getUInt8();
     for (unsigned i = 0; i < disconnected_player_count; i++)
     {
-        core::stringw player_name;
-        data.decodeStringW(&player_name);
+        std::string name;
+        data.decodeString(&name);
+        core::stringw player_name = StringUtils::utf8ToWide(name);
         core::stringw msg = _("%s disconnected.", player_name);
+        uint32_t host_id = data.getUInt32();
         // Use the friend icon to avoid an error-like message
         MessageQueue::add(MessageQueue::MT_FRIEND, msg);
+        TracksScreen::getInstance()->removeVote(
+            name + StringUtils::toString(host_id));
     }
 
 }   // disconnectedPlayer
