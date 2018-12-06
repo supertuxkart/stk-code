@@ -816,8 +816,10 @@ bool ServerLobby::registerServer(bool now)
     const std::string& server_name = ServerConfig::m_server_name;
     request->addParameter("name", server_name);
     request->addParameter("max_players", ServerConfig::m_server_max_players);
-    request->addParameter("difficulty", ServerConfig::m_server_difficulty);
-    request->addParameter("game_mode", ServerConfig::m_server_mode);
+    int difficulty = m_difficulty.load();
+    request->addParameter("difficulty", difficulty);
+    int game_mode = m_game_mode.load();
+    request->addParameter("game_mode", game_mode);
     const std::string& pw = ServerConfig::m_private_server_password;
     request->addParameter("password", (unsigned)(!pw.empty()));
     request->addParameter("version", (unsigned)ServerConfig::m_server_version);
@@ -2647,8 +2649,8 @@ void ServerLobby::handleServerConfiguration(Event* event)
         return;
     }
     NetworkString& data = event->data();
-    uint8_t new_difficulty = data.getUInt8();
-    uint8_t new_game_mode = data.getUInt8();
+    int new_difficulty = data.getUInt8();
+    int new_game_mode = data.getUInt8();
     bool new_soccer_goal_target = data.getUInt8() == 1;
     auto modes = ServerConfig::getLocalGameMode(new_game_mode);
     if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -2663,6 +2665,23 @@ void ServerLobby::handleServerConfiguration(Event* event)
     m_game_setup->resetExtraServerInfo();
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         m_game_setup->setSoccerGoalTarget(new_soccer_goal_target);
+
+    if (NetworkConfig::get()->isWAN() &&
+        (m_difficulty.load() != new_difficulty ||
+        m_game_mode.load() != new_game_mode))
+    {
+        Log::info("ServerLobby", "Updating server info with new "
+            "difficulty: %d, game mode: %d to stk-addons.", new_difficulty,
+            new_game_mode);
+        Online::XMLRequest* request =
+            new Online::XMLRequest(true/*manage_memory*/);
+        NetworkConfig::get()->setServerDetails(request, "update-config");
+        request->addParameter("address", m_server_address.getIP());
+        request->addParameter("port", m_server_address.getPort());
+        request->addParameter("new-difficulty", new_difficulty);
+        request->addParameter("new-game-mode", new_game_mode);
+        request->queue();
+    }
     m_difficulty.store(new_difficulty);
     m_game_mode.store(new_game_mode);
     updateTracksForMode();
