@@ -60,11 +60,23 @@ Material::Material(const XMLNode *node, bool deprecated)
     m_installed = false;
 
     m_sampler_path[0] = "unicolor_white";
-    node->get("name",      &m_texname);
+    node->get("name",      &m_matname);
+    if (m_matname=="")
+    {
+        throw std::runtime_error("[Material] No material name specified "
+                                 "in file\n");
+    }
+
+    node->get("tex-layer-0",      &m_texname);
     if (m_texname=="")
     {
-        throw std::runtime_error("[Material] No texture name specified "
-                                 "in file\n");
+        // We fallback to using the name as the slot 0 texture
+        node->get("name",      &m_texname);
+        if (m_texname=="")
+        {
+            throw std::runtime_error("[Material] No material name specified "
+                                     "in file\n");
+        }
     }
 
     const std::string& relative_path = file_manager->searchTexture(m_texname);

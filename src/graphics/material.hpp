@@ -67,6 +67,9 @@ private:
     /** Pointer to the texture. */
     video::ITexture *m_texture;
 
+    /** Name of the material */
+    std::string      m_matname;
+
     /** Name of the texture. */
     std::string      m_texname;
 
