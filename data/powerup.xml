@@ -171,26 +171,26 @@
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="130     80   260    75      230      60     165     0     0     0"
               multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="150    135   240   125      140      50     135     0     0     0"
+      <weight single  ="150    135   240   125      145      45     135     0     0     0"
               multi   ="  0      0    25     0        0       0       0     0     0     0" />
-      <weight single  ="150    135   225   135      135      45     135    15     0     0"
+      <weight single  ="150    135   225   144      135      36     135    15     0     0"
               multi   ="  0      0    25     0        0       0       0     0     0     0" />
-      <weight single  ="160    120   140   190      110      35     100    80    30     0"
+      <weight single  ="160    120   140   205      110      30     100    70    30     0"
               multi   ="  0      0    35     0        0       0       0     0     0     0" />
-      <weight single  ="140    105    45   225        0      30       0    50    90     0"
-              multi   =" 40      0    80   175       20       0       0     0     0     0" />
+      <weight single  ="145    105    45   240        0      24       0    40    80     0"
+              multi   =" 40      0    80   175       26       0       0     0     0     0" />
     </weights>
     <weights num-karts="9">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
       <weight single  ="120     60   290    50      270      40     170     0     0     0"
               multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="145    150   225   120      160      35     135     0     0     0"
+      <weight single  ="145    150   230   120      160      30     135     0     0     0"
               multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="150    130   205   140      130      30     130    50     0     0"
+      <weight single  ="150    130   205   152      130      24     130    44     0     0"
               multi   ="  0      0    35     0        0       0       0     0     0     0" />
-      <weight single  ="165    115   130   225       70      25      80    60    40     0"
-              multi   ="  0      0    60     0       30       0       0     0     0     0" />
-      <weight single  ="100     80    35   185        0      15       0    20    75     0"
+      <weight single  ="165    115   130   245       70      18      84    50    30     0"
+              multi   ="  0      0    60     0       33       0       0     0     0     0" />
+      <weight single  ="100     80    35   200        0      12       0    16    67     0"
               multi   =" 90      0    90   290       20       0       0     0     0     0" />
     </weights>
     <weights num-karts="14">
@@ -199,9 +199,9 @@
               multi   ="  0      0     0     0        0       0       0     0     0     0" />
       <weight single  ="140    155   240   110      170      20     135     0     0     0"
               multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="150    125   210   145      145      15     120    50     0     0"
+      <weight single  ="150    125   210   159      145      15     120    36     0     0"
               multi   ="  0      0    40     0        0       0       0     0     0     0" />
-      <weight single  ="135    105   115   220       60      15      70    40    30     0"
+      <weight single  ="135    105   115   234       60      12      70    35    24     0"
               multi   =" 40      0    80    40       50       0       0     0     0     0" />
       <weight single  =" 90     70    15   175        0       0       0     0    50     0"
               multi   ="120      0   125   325       30       0       0     0     0     0" />
@@ -212,9 +212,9 @@
               multi   ="  0      0     0     0        0       0       0     0     0     0" />
       <weight single  ="135    160   240   100      185      15     135     0     0     0"
               multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="150    120   200   150      140      10     105    50     0     0"
+      <weight single  ="150    120   200   165      148      10     105    27     0     0"
               multi   ="  0      0    50     0       25       0       0     0     0     0" />
-      <weight single  ="125     90   100   250       50      10      50    30    15     0"
+      <weight single  ="125     90   100   262       50       8      50    20    15     0"
               multi   =" 50      0   100    50       80       0       0     0     0     0" />
       <weight single  =" 75     60     0   125        0       0       0     0    35     0"
               multi   ="150      0   155   400        0       0       0     0     0     0" />
@@ -266,3 +266,4 @@
 
     
 </powerup>
+
