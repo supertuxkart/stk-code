@@ -52,13 +52,15 @@ private:
 
     unsigned m_laps;
 
-    bool m_reverse;
-
     int m_extra_server_info;
 
     int m_hit_capture_limit;
 
     float m_battle_time_limit;
+
+    bool m_reverse;
+
+    std::atomic_bool m_is_grand_prix;
 
     std::atomic<uint32_t> m_connected_players_count;
 
@@ -123,13 +125,23 @@ public:
         m_battle_time_limit = 0.0f;
     }
     // ------------------------------------------------------------------------
-    void setGrandPrixTrack(int tracks_no)  { m_extra_server_info = tracks_no; }
+    void resetExtraServerInfo()
+    {
+        m_is_grand_prix.store(false);
+        m_extra_server_info = -1;
+    }
+    // ------------------------------------------------------------------------
+    void setGrandPrixTrack(int tracks_no)
+    {
+        m_is_grand_prix.store(true);
+        m_extra_server_info = tracks_no;
+    }
     // ------------------------------------------------------------------------
     void addServerInfo(NetworkString* ns);
     // ------------------------------------------------------------------------
     void loadWorld();
     // ------------------------------------------------------------------------
-    bool isGrandPrix() const;
+    bool isGrandPrix() const                 { return m_is_grand_prix.load(); }
     // ------------------------------------------------------------------------
     bool hasExtraSeverInfo() const        { return m_extra_server_info != -1; }
     // ------------------------------------------------------------------------

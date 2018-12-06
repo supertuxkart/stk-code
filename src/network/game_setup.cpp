@@ -63,6 +63,7 @@ GameSetup::GameSetup()
         (StringUtils::xmlDecode(server_name));
     m_connected_players_count.store(0);
     m_extra_server_info = -1;
+    m_is_grand_prix.store(false);
     reset();
 }   // GameSetup
 
@@ -182,14 +183,6 @@ void GameSetup::loadWorld()
             false/*from_overworld*/);
     }
 }   // loadWorld
-
-//-----------------------------------------------------------------------------
-bool GameSetup::isGrandPrix() const
-{
-    return m_extra_server_info != -1 &&
-        ServerConfig::getLocalGameModeFromConfig().second ==
-        RaceManager::MAJOR_MODE_GRAND_PRIX;
-}   // isGrandPrix
 
 //-----------------------------------------------------------------------------
 void GameSetup::addServerInfo(NetworkString* ns)

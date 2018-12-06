@@ -615,6 +615,7 @@ void ClientLobby::handleServerInfo(Event* event)
 
     uint8_t extra_server_info = data.getUInt8();
     bool grand_prix_started = false;
+    m_game_setup->resetExtraServerInfo();
     switch (extra_server_info)
     {
         case 0:

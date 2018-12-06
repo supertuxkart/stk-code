@@ -2660,6 +2660,7 @@ void ServerLobby::handleServerConfiguration(Event* event)
     race_manager->setMinorMode(modes.first);
     race_manager->setMajorMode(modes.second);
     race_manager->setDifficulty(RaceManager::Difficulty(new_difficulty));
+    m_game_setup->resetExtraServerInfo();
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         m_game_setup->setSoccerGoalTarget(new_soccer_goal_target);
     m_difficulty.store(new_difficulty);
