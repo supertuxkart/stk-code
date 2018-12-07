@@ -32,7 +32,7 @@
                     <icon-button id="start" proportion="1" height="60%" icon="gui/icons/green_check.png" align="top"
                         I18N="In the network lobby" text="Start race"/>
                     <icon-button id="config" proportion="1" height="60%" icon="gui/icons/main_options.png" align="top"
-                        I18N="In the network lobby" text="Server Configuration"/>
+                        I18N="In the network lobby" text="Configuration"/>
                 </div>
             </div>
         </div>
