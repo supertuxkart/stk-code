@@ -89,10 +89,15 @@ void VoteOverview::init()
 
     for (unsigned int i = 0; i < 8; i++)
     {
+        // Make sure all track images are invisible
         std::string s  = StringUtils::insertValues("track-%d", i);
         IconButtonWidget *track_widget = getWidget<IconButtonWidget>(s.c_str());
         track_widget->setVisible(false);
-
+        //
+        s = StringUtils::insertValues("rect-box%d", i);
+        Widget *box = getWidget(box_name.c_str());
+        box->setSelected(PLAYER_ID_GAME_MASTER, false);
+        box->setVisible(true);
     }
     for(auto host_id: m_index_to_hostid)
         showVote(host_id);
