@@ -451,7 +451,15 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 void TracksScreen::voteForPlayer()
 {
     assert(STKHost::existHost());
-    assert(m_selected_track);
+
+    // If submit is clicked without a vote, select a random track.
+    if(!m_selected_track)
+    {
+        std::string track_name = m_random_track_list.front();
+        m_selected_track = track_manager->getTrack(track_name);
+        m_random_track_list.pop_front();
+        m_random_track_list.push_back(track_name);
+    }
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
