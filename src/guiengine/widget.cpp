@@ -176,22 +176,6 @@ bool Widget::deleteChild(const char* id)
     return false;
 }
 
-bool Widget::collapse()
-{
-    //const int count = m_children.size();
-    //for (int n = 0; n < count; n++)
-    //{
-    //    m_children.erase(n);
-    //}
-    //m_element = NULL;
-
-    auto parent = m_element->getParent();
-
-    parent->removeChild(m_element);
-
-    return true;
-}
-
 // -----------------------------------------------------------------------------
 namespace GUIEngine
 {
@@ -357,18 +341,6 @@ void Widget::setVisible(bool visible)
         m_children[n].setVisible(visible);
     }
 }
-
-// -----------------------------------------------------------------------------
-
-void Widget::setCollapsed(bool collapsed)
-{
-    if (m_element != NULL)
-    {
-        m_element->setEnabled(!collapsed);
-    }
-    //m_is_visible = collapsed;
-}
-
 
 // -----------------------------------------------------------------------------
 

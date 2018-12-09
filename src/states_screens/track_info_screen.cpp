@@ -175,11 +175,6 @@ void TrackInfoScreen::init()
             m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
         }
     }
-    //else
-   /* {
-        m_target_type_spinner->collapse();
-        m_target_type_label->collapse();
-    }*/
 
     // Lap count m_lap_spinner
     // -----------------------
