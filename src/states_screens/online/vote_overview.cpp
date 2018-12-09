@@ -25,6 +25,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
+#include "network/game_setup.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
@@ -87,17 +88,23 @@ void VoteOverview::init()
         back_button->setImage("gui/icons/back.png");
     }
 
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+
     for (unsigned int i = 0; i < 8; i++)
     {
-        // Make sure all track images are invisible
-        std::string s  = StringUtils::insertValues("track-%d", i);
-        IconButtonWidget *track_widget = getWidget<IconButtonWidget>(s.c_str());
-        track_widget->setVisible(false);
-        //
-        s = StringUtils::insertValues("rect-box%d", i);
-        Widget *box = getWidget(box_name.c_str());
+        // Make all boxes visible (in case a previous voting screen
+        // has made some invisible).
+        std::string s = StringUtils::insertValues("rect-box%d", i);
+        Widget *box = getWidget(s.c_str());
         box->setSelected(PLAYER_ID_GAME_MASTER, false);
         box->setVisible(true);
+        // TODO: Doesn't work, player count appears to be 0
+        // box->setVisible(i < lp->getGameSetup()->getPlayerCount());
+
+        // Make sure all track images are invisible
+        s = StringUtils::insertValues("track-%d", i);
+        IconButtonWidget *track_widget = getWidget<IconButtonWidget>(s.c_str());
+        track_widget->setVisible(false);
     }
     for(auto host_id: m_index_to_hostid)
         showVote(host_id);
