@@ -1941,7 +1941,7 @@ bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
     std::advance(vote, r.get(m_peers_votes.size()) );
 
     *winner_vote = vote->second;
-    return false;
+
     return m_peers_votes.size() == cur_players;
 }   // handleAllVotes
 
