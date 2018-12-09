@@ -56,7 +56,7 @@ public:
         ns.decodeStringW(&m_player_name);
         ns.decodeString(&m_track_name);
         m_num_laps = ns.getUInt8();
-        m_reverse = ns.getUInt8();
+        m_reverse = ns.getUInt8()!=0;
 
     }   // PeerVote(NetworkString &)
 

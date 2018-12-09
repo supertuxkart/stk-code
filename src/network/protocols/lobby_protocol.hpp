@@ -154,7 +154,7 @@ public:
     GameSetup* getGameSetup() const { return m_game_setup; }
     // ------------------------------------------------------------------------
     /** Returns the number of votes received so far. */
-    int getNumberOfVotes() const { return m_peers_votes.size(); }
+    int getNumberOfVotes() const { return (int)m_peers_votes.size(); }
     // -----------------------------------------------------------------------
     /** Adds a vote.
      *  \param host_id Host id of this vote.
