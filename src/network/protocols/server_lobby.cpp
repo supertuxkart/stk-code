@@ -489,12 +489,11 @@ void ServerLobby::asynchronousUpdate()
     }
     case SELECTING:
     {
-        PeerVote winner;
-        bool all_votes_in = handleAllVotes(&winner);
+        PeerVote winner_vote;
+        bool all_votes_in = handleAllVotes(&winner_vote);
         if (isVotingOver() || all_votes_in)
         {
-            m_game_setup->setRace(winner.m_track_name, winner.m_num_laps,
-                                  winner.m_reverse                       );
+            m_game_setup->setRace(winner_vote);
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
@@ -502,17 +501,17 @@ void ServerLobby::asynchronousUpdate()
             auto players = m_game_setup->getConnectedPlayers();
             for (auto& player : players)
                 player->getPeer()->clearAvailableKartIDs();
-            NetworkString* load_world = getNetworkString();
-            load_world->setSynchronous(true);
-            load_world->addUInt8(LE_LOAD_WORLD)
-                       .encodeString(winner.m_track_name)
-                       .addUInt8(winner.m_num_laps).addUInt8(winner.m_reverse)
-                       .addUInt8((uint8_t)players.size());
+
+            NetworkString* load_world_message = getNetworkString();
+            load_world_message->setSynchronous(true);
+            load_world_message->addUInt8(LE_LOAD_WORLD);
+            winner_vote.encode(load_world_message);
+            load_world_message->addUInt8((uint8_t)players.size());
             for (unsigned i = 0; i < players.size(); i++)
             {
                 std::shared_ptr<NetworkPlayerProfile>& player = players[i];
                 player->getPeer()->addAvailableKartID(i);
-                load_world->encodeString(player->getName())
+                load_world_message->encodeString(player->getName())
                     .addUInt32(player->getHostId())
                     .addFloat(player->getDefaultKartColor())
                     .addUInt32(player->getOnlineId())
@@ -527,15 +526,15 @@ void ServerLobby::asynchronousUpdate()
                     std::advance(it, rg.get((int)m_available_kts.first.size()));
                     player->setKartName(*it);
                 }
-                load_world->encodeString(player->getKartName());
+                load_world_message->encodeString(player->getKartName());
             }
             uint32_t random_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(random_seed);
-            load_world->addUInt32(random_seed);
+            load_world_message->addUInt32(random_seed);
             if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
             {
                 auto hcl = getHitCaptureLimit((float)players.size());
-                load_world->addUInt32(hcl.first).addFloat(hcl.second);
+                load_world_message->addUInt32(hcl.first).addFloat(hcl.second);
                 m_game_setup->setHitCaptureTime(hcl.first, hcl.second);
             }
             configRemoteKart(players);
@@ -543,8 +542,8 @@ void ServerLobby::asynchronousUpdate()
             // Reset for next state usage
             resetPeersReady();
             m_state = LOAD_WORLD;
-            sendMessageToPeers(load_world);
-            delete load_world;
+            sendMessageToPeers(load_world_message);
+            delete load_world_message;
         }
         break;
     }
@@ -1898,9 +1897,9 @@ void ServerLobby::handlePlayerVote(Event* event)
 
 // ----------------------------------------------------------------------------
 /** Select the track to be used based on all votes being received.
- * \param winner The PeerVote that was picked.
+ * \param winner_vote The PeerVote that was picked.
  */
-bool ServerLobby::handleAllVotes(PeerVote *winner)
+bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
 {
     // First remove all votes from disconnected hosts
     auto it = m_peers_votes.begin();
@@ -1929,9 +1928,9 @@ bool ServerLobby::handleAllVotes(PeerVote *winner)
         RandomGenerator rg;
         std::set<std::string>::iterator it = m_available_kts.second.begin();
         std::advance(it, rg.get((int)m_available_kts.second.size()));
-        winner->m_track_name = *it;
-        winner->m_num_laps = UserConfigParams::m_num_laps;
-        winner->m_reverse = winner->m_track_name.size() % 2 == 0;
+        winner_vote->m_track_name = *it;
+        winner_vote->m_num_laps = UserConfigParams::m_num_laps;
+        winner_vote->m_reverse = winner_vote->m_track_name.size() % 2 == 0;
         return false;
     }
 
@@ -1941,7 +1940,7 @@ bool ServerLobby::handleAllVotes(PeerVote *winner)
     auto vote = m_peers_votes.begin();
     std::advance(vote, r.get(m_peers_votes.size()) );
 
-    *winner = vote->second;
+    *winner_vote = vote->second;
     return false;
     return m_peers_votes.size() == cur_players;
 }   // handleAllVotes

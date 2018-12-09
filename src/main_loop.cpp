@@ -42,6 +42,7 @@
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/online/vote_overview.hpp"
 #include "utils/profiler.hpp"
 #include "utils/time.hpp"
 
@@ -542,6 +543,14 @@ void MainLoop::run()
  */
 void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 {
+#ifdef SERVER_ONLY
+    return;
+#else
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer()         )
+    {
+        return;
+    }
     // TODO: Rendering past 7000 causes the minimap to not work
     // on higher graphical settings
     //if(phase>7000) return;
@@ -554,7 +563,10 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 
     m_curr_time = now;
 
-
+    if (NetworkConfig::get()->isNetworking() && phase >= 5000)
+    {
+        VoteOverview::getInstance()->showVoteResult();
+    }
     // TODO: remove debug output
     Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",
                  now, dt, phase, loop_index, loop_size);
@@ -564,5 +576,6 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
     //TODO: remove debug output
     uint64_t now2 = StkTime::getRealTimeMs();
     Log::verbose("mainloop", "  duration t %llu dt %llu", now, now2-now);
+#endif
 }   // renderGUI
 /* EOF */

@@ -20,6 +20,8 @@
 
 #include "guiengine/screen.hpp"
 
+#include "network/peer_vote.hpp"
+
 #include <string>
 #include <vector>
 
@@ -43,13 +45,17 @@ private:
     *  (going backwards). */
     GUIEngine::ProgressBarWidget *m_timer;
 
-    int m_bottom_box_height;
-
     /** This stores which vote (hostid) is shown at which index in
      *  the result gui. */
     std::vector<int> m_index_to_hostid;
 
+    /** Index of the winning vote. */
+    int m_winning_index;
+
     bool m_quit_server;
+
+    /* A timer used to randomly select tracks. */
+    float m_random_anim_timer;
 
     VoteOverview();
 
@@ -80,6 +86,8 @@ public:
 
     void addVote(int host_id);
     void showVote(int host_id);
+    void showVoteResult();
+    void setResult(const PeerVote &winner_vote);
 
     // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }

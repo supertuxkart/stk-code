@@ -241,11 +241,10 @@ void ClientLobby::addAllPlayers(Event* event)
     }
 
     NetworkString& data = event->data();
-    std::string track_name;
-    data.decodeString(&track_name);
-    uint8_t lap = data.getUInt8();
-    uint8_t reverse = data.getUInt8();
-    m_game_setup->setRace(track_name, lap, reverse == 1);
+    PeerVote winner_vote(data);
+
+    m_game_setup->setRace(winner_vote);
+    VoteOverview::getInstance()->setResult(winner_vote);
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();

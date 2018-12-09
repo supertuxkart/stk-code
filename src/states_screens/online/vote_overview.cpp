@@ -41,7 +41,6 @@ using namespace irr::video;
 VoteOverview::VoteOverview() : Screen("online/vote_overview.stkgui")
 {
     m_quit_server       = false;
-    m_bottom_box_height = -1;
 }   // VoteOverview
 
 // -----------------------------------------------------------------------------
@@ -59,11 +58,8 @@ void VoteOverview::beforeAddingWidget()
 
     Widget* rect_box = getWidget("rect-box");
 
-    if (m_bottom_box_height == -1)
-        m_bottom_box_height = rect_box->m_h;
-
     rect_box->setVisible(true);
-    rect_box->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_bottom_box_height);
+    rect_box->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(rect_box->m_h);
 
     calculateLayout();
     
@@ -77,6 +73,8 @@ void VoteOverview::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void VoteOverview::init()
 {
+    m_timer->setVisible(true);
+    m_random_anim_timer = 0.0f;
     // change the back button image (because it makes the game quit)
     if (m_quit_server)
     {
@@ -147,7 +145,7 @@ void VoteOverview::showVote(int host_id)
     int index = it - m_index_to_hostid.begin();
 
     auto lp = LobbyProtocol::get<LobbyProtocol>();
-    const LobbyProtocol::PeerVote *vote = lp->getVote(host_id);
+    const PeerVote *vote = lp->getVote(host_id);
     assert(vote);
 
     std::string s = StringUtils::insertValues("name-%d", index);
@@ -184,27 +182,83 @@ void VoteOverview::onUpdate(float dt)
 
     if(m_index_to_hostid.size()==0) return;
 
-    static float xx = 0.0f;
-    xx += 2*dt;
-    int index = int(xx) % m_index_to_hostid.size();
+    // First make sure the old grid is set back to normal:
+    int old_index = int(m_random_anim_timer) % m_index_to_hostid.size();
+    std::string box_name = StringUtils::insertValues("rect-box%d", old_index);
+    Widget *box = getWidget(box_name.c_str());
+    box->setSelected(PLAYER_ID_GAME_MASTER, false);
+
+    // Increase timer, and determine next index to show
+    m_random_anim_timer += 2*dt;
+    int new_index = int(m_random_anim_timer) % m_index_to_hostid.size();
+    box_name = StringUtils::insertValues("rect-box%d", new_index);
+    box = getWidget(box_name.c_str());
+    box->setSelected(PLAYER_ID_GAME_MASTER, true);
+}   // onUpdate
+
+// -----------------------------------------------------------------------------
+/** Received the winning vote. i.e. the data about the track to play (including
+ *  #laps etc).
+ */
+void VoteOverview::setResult(const PeerVote &winner_vote)
+{
+    m_timer->setVisible(false);
+    // Note that the votes on the server might have a different order from
+    // the votes here on the client. Potentially there could also be a missing
+    // vote(??)
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+    m_winning_index = -1;
+    for (unsigned int i=0; i<m_index_to_hostid.size(); i++)
+    {
+        const PeerVote *vote = lp->getVote(m_index_to_hostid[i]);
+        if(!vote) continue;
+        if(vote->m_track_name == winner_vote.m_track_name && 
+           vote->m_num_laps == winner_vote.m_num_laps &&
+           vote->m_reverse == winner_vote.m_reverse      )
+        {
+            m_winning_index = i;
+            break;
+        }
+        // Try to prepare a fallback in case that the right vote is not here.
+        if (vote->m_track_name == winner_vote.m_track_name)
+        {
+            m_winning_index = i;
+        }
+    }   // for i in m_index_to_hostid
+
+    if(m_winning_index == -1)
+    {
+        // We don't have the right vote. Assume that a message got lost,
+        // In this case, change one non-local vote:
+        for(unsigned int i=0; i<m_index_to_hostid.size(); i++)
+        {
+            if(m_index_to_hostid[i] != STKHost::get()->getMyHostId())
+            {
+                lp->addVote(m_index_to_hostid[i], winner_vote);
+                m_winning_index = i;
+                break;
+            }
+        }
+    }   // winnind==-1
+}   // setResult
+
+// -----------------------------------------------------------------------------
+/** Called when the final 'random picking' animation is finished so that only
+ *  the result is shown: all boxes except the winner is set to be invisible.
+ */
+void VoteOverview::showVoteResult()
+{
     for (unsigned int i = 0; i < 8; i++)
     {
         std::string box_name = StringUtils::insertValues("rect-box%d", i);
         Widget *box = getWidget(box_name.c_str());
-        box->setSelected(PLAYER_ID_GAME_MASTER, i==index);
+        if(i!=m_winning_index)
+            box->setVisible(false);
+        else
+            box->setSelected(PLAYER_ID_GAME_MASTER, true);
     }
 
-    std::string s = StringUtils::insertValues("name-%d", index);
-    LabelWidget *name_widget = getWidget<LabelWidget>(s.c_str());
-
-    name_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    name_widget->setErrorColor();
-
-    s = StringUtils::insertValues("name-%d", 1-index);
-    name_widget = getWidget<LabelWidget>(s.c_str());
-    name_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    name_widget->setDefaultColor();
-}   // onUpdate
+}   // showVoteResult
 
 // -----------------------------------------------------------------------------
 /** Called on any event, e.g. user input.

@@ -24,6 +24,8 @@
 
 #include "network/remote_kart_info.hpp"
 
+#include "network/peer_vote.hpp"
+
 #include <atomic>
 #include <cassert>
 #include <memory>
@@ -106,12 +108,12 @@ public:
     /** Returns the number of connected players. */
     unsigned getPlayerCount()      { return m_connected_players_count.load(); }
     // ------------------------------------------------------------------------
-    void setRace(const std::string& track, unsigned laps, bool reverse)
+    void setRace(const PeerVote &vote)
     {
-        m_tracks.push_back(track);
-        m_laps = laps;
-        m_reverse = reverse;
-    }
+        m_tracks.push_back(vote.m_track_name);
+        m_laps = vote.m_num_laps;
+        m_reverse = vote.m_reverse;
+    }   // setRace
     // ------------------------------------------------------------------------
     void reset()
     {

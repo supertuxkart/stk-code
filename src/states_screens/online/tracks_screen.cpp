@@ -329,7 +329,8 @@ void TracksScreen::init()
             {
                 getWidget("lap-text")->setVisible(true);
                 //I18N: In track screen
-                getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
+                getWidget<LabelWidget>("lap-text")
+                         ->setText(_("Number of laps"), false);
                 m_laps->setVisible(true);
                 m_laps->setMin(1);
                 m_laps->setMax(20);
@@ -337,12 +338,12 @@ void TracksScreen::init()
             }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
-            getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
+            getWidget<LabelWidget>("reverse-text")
+                     ->setText(_("Drive in reverse"), false);
             m_reversed->setVisible(true);
 
             auto lp = LobbyProtocol::get<LobbyProtocol>();
-            const LobbyProtocol::PeerVote *vote = 
-                lp ->getVote(STKHost::get()->getMyHostId());
+            const PeerVote *vote = lp ->getVote(STKHost::get()->getMyHostId());
             DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("tracks");
             if(vote)
             {
@@ -486,10 +487,8 @@ void TracksScreen::voteForPlayer()
     }
     else
     {
-        LobbyProtocol::PeerVote pvote(player_name,
-                                      m_selected_track->getIdent(),
-                                      m_laps->getValue(),
-                                      m_reversed->getState()       );
+        PeerVote pvote(player_name, m_selected_track->getIdent(),
+                       m_laps->getValue(), m_reversed->getState()  );
         pvote.encode(&vote);
         auto lp = LobbyProtocol::get<LobbyProtocol>();
         
