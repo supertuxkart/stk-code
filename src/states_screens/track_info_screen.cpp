@@ -86,6 +86,24 @@ void TrackInfoScreen::loadedFromFile()
     screenshot->m_tab_stop = false;
 }   // loadedFromFile
 
+void TrackInfoScreen::beforeAddingWidget()
+{
+    const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    if (!is_soccer)
+    {
+        m_target_type_spinner->setVisible(false);
+        m_target_type_label->setVisible(false);
+        getWidget<Widget>("target-type-spinner-div")->setVisible(false);
+        getWidget<Widget>("target-type-div")->setVisible(false);
+
+        getWidget<Widget>("target-type-spinner-div")->deleteChild("target-type-spinner");
+        getWidget<Widget>("target-type-div")->deleteChild("target-type-spinner-div");
+        getWidget<Widget>("target-type-div")->deleteChild("target-type-text");
+        getWidget<Widget>("race-options-box")->deleteChild("target-type-div");
+    }
+}
+
+
 // ----------------------------------------------------------------------------
 void TrackInfoScreen::setTrack(Track *track)
 {
@@ -138,8 +156,6 @@ void TrackInfoScreen::init()
     if (image != NULL)
         screenshot->setImage(image);
 
-    m_target_type_spinner->setVisible(false);
-    m_target_type_label->setVisible(false);
     m_target_value_spinner->setVisible(false);
     m_target_value_label->setVisible(false);
 
@@ -148,8 +164,6 @@ void TrackInfoScreen::init()
     const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     if (is_soccer)
     {
-        m_target_type_spinner->setVisible(true);
-        m_target_type_label->setVisible(true);
         m_target_value_spinner->setVisible(true);
         m_target_value_label->setVisible(true);
 
