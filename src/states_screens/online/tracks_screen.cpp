@@ -55,14 +55,9 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
-    // -- track selection screen
-    if ((name == "lap-spinner" || name == "reverse") &&
-        STKHost::existHost() && m_selected_track != NULL)
+    if (name == "submit")
     {
         voteForPlayer();
-    }
-    else if (name == "submit")
-    {
         VoteOverview::getInstance()->push();
     }
     else if (name == "tracks")
@@ -104,7 +99,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (STKHost::existHost())
             {
                 w2->setBadge(selection, OK_BADGE);
-                voteForPlayer();
             }
             else
             {
