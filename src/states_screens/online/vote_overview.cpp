@@ -41,7 +41,8 @@ using namespace irr::video;
 // -----------------------------------------------------------------------------
 VoteOverview::VoteOverview() : Screen("online/vote_overview.stkgui")
 {
-    m_quit_server       = false;
+    m_quit_server = false;
+    m_timer       = NULL;
 }   // VoteOverview
 
 // -----------------------------------------------------------------------------
@@ -214,7 +215,9 @@ void VoteOverview::onUpdate(float dt)
  */
 void VoteOverview::setResult(const PeerVote &winner_vote)
 {
-    m_timer->setVisible(false);
+    // If the GUI is forced from the server lobby, m_timer is not defined
+    if(m_timer) m_timer->setVisible(false);
+
     // Note that the votes on the server might have a different order from
     // the votes here on the client. Potentially there could also be a missing
     // vote(??)
