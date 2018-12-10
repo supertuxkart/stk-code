@@ -34,6 +34,6 @@
                 <label id="reverse-text" width="78%" I18N="In the track screen" text_align="left"/>
             </div>
         </box>
-        <progressbar id="timer" height="4%" width="100%"></progressbar>
+        <progressbar x="1%" id="timer" height="4%" width="98%"></progressbar>
     </div>
 </stkgui>
