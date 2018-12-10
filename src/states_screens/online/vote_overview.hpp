@@ -52,6 +52,9 @@ private:
     /** Index of the winning vote. */
     int m_winning_index;
 
+    /** Maximum number of votes, as sent by the server. */
+    unsigned int m_max_num_votes;
+
     bool m_quit_server;
 
     /* A timer used to randomly select tracks. */
@@ -88,6 +91,7 @@ public:
     void showVote(int host_id);
     void showVoteResult();
     void setResult(const PeerVote &winner_vote);
+    void updateNumPlayers(int n);
 
     // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }

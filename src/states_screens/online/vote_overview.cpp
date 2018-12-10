@@ -41,8 +41,9 @@ using namespace irr::video;
 // -----------------------------------------------------------------------------
 VoteOverview::VoteOverview() : Screen("online/vote_overview.stkgui")
 {
-    m_quit_server = false;
-    m_timer       = NULL;
+    m_quit_server   = false;
+    m_timer         = NULL;
+    m_max_num_votes = 0;
 }   // VoteOverview
 
 // -----------------------------------------------------------------------------
@@ -98,11 +99,10 @@ void VoteOverview::init()
         std::string s = StringUtils::insertValues("rect-box%d", i);
         Widget *box = getWidget(s.c_str());
         box->setSelected(PLAYER_ID_GAME_MASTER, false);
-        box->setVisible(true);
-        // TODO: Doesn't work, player count appears to be 0
-        // box->setVisible(i < lp->getGameSetup()->getPlayerCount());
+        box->setVisible(i < m_max_num_votes);
 
-        // Make sure all track images are invisible
+        // Make sure all track images are invisible initially (till we
+        // receive a vote), otherwise a "?" is shown
         s = StringUtils::insertValues("track-%d", i);
         IconButtonWidget *track_widget = getWidget<IconButtonWidget>(s.c_str());
         track_widget->setVisible(false);
@@ -116,6 +116,13 @@ void VoteOverview::tearDown()
 {
     m_quit_server = false;
 }   // tearDown
+
+// -----------------------------------------------------------------------------
+void VoteOverview::updateNumPlayers(int n)
+{
+    m_max_num_votes = n;
+
+}   //updateNumPlayers
 
 // -----------------------------------------------------------------------------
 /** Selects in which part of the grid the new host is being shown and stores

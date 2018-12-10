@@ -678,6 +678,7 @@ void ClientLobby::updatePlayerList(Event* event)
     m_total_players = total_players;
 
     NetworkingLobby::getInstance()->updatePlayers(players);
+    VoteOverview::getInstance()->updateNumPlayers(players.size());
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------
