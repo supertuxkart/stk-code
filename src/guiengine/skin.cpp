@@ -817,20 +817,20 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     {
         ProgressBarWidget * progress = (ProgressBarWidget*)w;
         drawProgressBarInScreen(w, rect, progress->getValue(),
-            w->m_deactivated);
+                                w->m_deactivated);
     }
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
 void Skin::drawProgressBarInScreen(SkinWidgetContainer* swc,
-                                   const core::rect< s32 > &rect, int progress,
-                                   bool deactivated)
+                                   const core::rect< s32 > &rect,
+                                   float progress, bool deactivated)
 {
     drawBoxFromStretchableTexture(swc, rect,
         SkinConfig::m_render_params["progress::neutral"], deactivated);
     core::recti rect2 = rect;
     rect2.LowerRightCorner.X -= (rect.getWidth())
-                              - progress * rect.getWidth() / 100;
+                              - int(progress * rect.getWidth());
     drawBoxFromStretchableTexture(swc, rect2,
         SkinConfig::m_render_params["progress::fill"], deactivated);
 }   // drawProgress

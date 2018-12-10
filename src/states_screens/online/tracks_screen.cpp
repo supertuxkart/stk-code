@@ -509,6 +509,6 @@ void TracksScreen::onUpdate(float dt)
     auto lp = LobbyProtocol::get<LobbyProtocol>();
     float new_value = lp->getRemainingVotingTime() / lp->getMaxVotingTime();
     if (new_value < 0) new_value = 0;
-    m_timer->moveValue(int(new_value * 100));
+    m_timer->setValue(new_value * 100.0f);
 
 }   // onUpdate
