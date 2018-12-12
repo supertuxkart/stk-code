@@ -553,12 +553,16 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
     }
     // Rendering past phase 7000 causes the minimap to not work
     // on higher graphical settings
-    if(phase>7000) return;
+    if (phase > 7000)
+    {
+        m_request_abort = !irr_driver->getDevice()->run();
+        return;
+    }
 
     uint64_t now = StkTime::getRealTimeMs();
     float dt = (now - m_curr_time)/1000.0f;
     
-    if(dt<1.0/30.0f) return;
+    if (dt < 1.0 / 30.0f) return;
 
     m_curr_time = now;
 
@@ -572,6 +576,8 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 
     irr_driver->update(dt, /*is_loading*/true);
     GUIEngine::update(dt);
+    m_request_abort = !irr_driver->getDevice()->run();
+    
     //TODO: remove debug output
     // uint64_t now2 = StkTime::getRealTimeMs();
     // Log::verbose("mainloop", "  duration t %llu dt %llu", now, now2-now);
