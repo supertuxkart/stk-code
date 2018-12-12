@@ -19,6 +19,7 @@
 #include "network/network_config.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "input/device_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/transport_address.hpp"
 #include "online/xml_request.hpp"
@@ -27,6 +28,7 @@
 #include "states_screens/online/online_lan.hpp"
 #include "states_screens/online/online_profile_servers.hpp"
 #include "states_screens/online/online_screen.hpp"
+#include "states_screens/state_manager.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
 
@@ -139,3 +141,20 @@ std::vector<GUIEngine::Screen*>
         }
     }
 }   // getResetScreens
+
+// ----------------------------------------------------------------------------
+/** Called before (re)starting network race, must be used before adding
+ *  split screen players. */
+void NetworkConfig::clearActivePlayersForClient() const
+{
+    if (!isClient())
+        return;
+    StateManager::get()->resetActivePlayers();
+    if (input_manager)
+    {
+        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+        input_manager->getDeviceManager()->setSinglePlayer(NULL);
+        input_manager->setMasterPlayerOnly(false);
+        input_manager->getDeviceManager()->clearLatestUsedDevice();
+    }
+}   // clearActivePlayersForClient

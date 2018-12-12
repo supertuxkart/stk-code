@@ -220,6 +220,8 @@ public:
     void setJoinedServerVersion(uint32_t v)    { m_joined_server_version = v; }
     // ------------------------------------------------------------------------
     uint32_t getJoinedServerVersion() const { return m_joined_server_version; }
+    // ------------------------------------------------------------------------
+    void clearActivePlayersForClient() const;
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

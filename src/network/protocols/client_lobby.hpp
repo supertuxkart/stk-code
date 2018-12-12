@@ -119,7 +119,6 @@ public:
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-    void clearPlayers();
 };
 
 #endif // CLIENT_LOBBY_HPP

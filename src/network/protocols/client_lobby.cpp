@@ -46,7 +46,6 @@
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -94,7 +93,6 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
 //-----------------------------------------------------------------------------
 ClientLobby::~ClientLobby()
 {
-    clearPlayers();
     if (m_server->supportsEncryption())
     {
         Online::XMLRequest* request =
@@ -107,22 +105,8 @@ ClientLobby::~ClientLobby()
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
-void ClientLobby::clearPlayers()
-{
-    StateManager::get()->resetActivePlayers();
-    if (input_manager)
-    {
-        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
-        input_manager->getDeviceManager()->setSinglePlayer(NULL);
-        input_manager->setMasterPlayerOnly(false);
-        input_manager->getDeviceManager()->clearLatestUsedDevice();
-    }
-}   // clearPlayers
-
-//-----------------------------------------------------------------------------
 void ClientLobby::setup()
 {
-    clearPlayers();
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
     m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
@@ -953,6 +937,7 @@ void ClientLobby::exitResultScreen(Event *event)
     GUIEngine::ModalDialog::dismiss();
     GUIEngine::ScreenKeyboard::dismiss();
 
+    NetworkConfig::get()->clearActivePlayersForClient();
     setup();
     m_auto_started = false;
     m_state.store(CONNECTED);

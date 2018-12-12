@@ -130,9 +130,7 @@ bool TracksScreen::onEscapePressed()
     }
     else
     {
-        auto cl = LobbyProtocol::get<ClientLobby>();
-        if (cl)
-            cl->clearPlayers();
+        NetworkConfig::get()->clearActivePlayersForClient();
     }
     // remove the screen
     return true;

@@ -326,6 +326,7 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
+    NetworkConfig::get()->clearActivePlayersForClient();
     requestShutdown();
     if (m_network_console.joinable())
         m_network_console.join();
