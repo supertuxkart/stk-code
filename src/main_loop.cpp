@@ -567,8 +567,8 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
         VoteOverview::getInstance()->showVoteResult();
     }
     // TODO: remove debug output
-    Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",
-                 now, dt, phase, loop_index, loop_size);
+    //Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",
+    //             now, dt, phase, loop_index, loop_size);
 
     irr_driver->update(dt, /*is_loading*/true);
     GUIEngine::update(dt);
