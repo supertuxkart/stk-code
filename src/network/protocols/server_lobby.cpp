@@ -549,7 +549,11 @@ void ServerLobby::asynchronousUpdate()
             m_game_setup->sortPlayersForGame();
             auto players = m_game_setup->getConnectedPlayers();
             for (auto& player : players)
-                player->getPeer()->clearAvailableKartIDs();
+            {
+                std::shared_ptr<STKPeer> peer = player->getPeer();
+                if (peer)
+                    peer->clearAvailableKartIDs();
+            }
             NetworkString* load_world = getNetworkString();
             load_world->setSynchronous(true);
             load_world->addUInt8(LE_LOAD_WORLD).encodeString(std::get<0>(result))
@@ -558,7 +562,9 @@ void ServerLobby::asynchronousUpdate()
             for (unsigned i = 0; i < players.size(); i++)
             {
                 std::shared_ptr<NetworkPlayerProfile>& player = players[i];
-                player->getPeer()->addAvailableKartID(i);
+                std::shared_ptr<STKPeer> peer = player->getPeer();
+                if (peer)
+                    peer->addAvailableKartID(i);
                 load_world->encodeString(player->getName())
                     .addUInt32(player->getHostId())
                     .addFloat(player->getDefaultKartColor())
@@ -621,7 +627,8 @@ void ServerLobby::update(int ticks)
             if (!players[i])
                 continue;
             auto peer = players[i]->getPeer();
-            if (peer->idleForSeconds() > sec && !peer->isDisconnected())
+            if (peer && peer->idleForSeconds() > sec &&
+                !peer->isDisconnected())
             {
                 if (w && w->getKart(i)->hasFinishedRace())
                     continue;
@@ -1805,10 +1812,11 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
             .addUInt8(profile->getLocalPlayerId())
             .encodeString(profile->getName());
+        std::shared_ptr<STKPeer> p = profile->getPeer();
         pl->addUInt8((uint8_t)
-            (profile->getPeer()->isWaitingForGame() ? 1 : 0));
+            (p && p->isWaitingForGame() ? 1 : 0));
         uint8_t server_owner = 0;
-        if (m_server_owner_id.load() == profile->getPeer()->getHostId())
+        if (p && m_server_owner_id.load() == p->getHostId())
             server_owner = 1;
         pl->addUInt8(server_owner);
         pl->addUInt8(profile->getPerPlayerDifficulty());
@@ -1817,7 +1825,6 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
-        std::shared_ptr<STKPeer> p = profile->getPeer();
         uint8_t ready = (!game_started &&
             m_peers_ready.find(p) != m_peers_ready.end() &&
             m_peers_ready.at(p)) ? 1 : 0;
@@ -2508,7 +2515,8 @@ void ServerLobby::addWaitingPlayersToGame()
         if (!npp)
             continue;
         auto peer = npp->getPeer();
-        assert(peer);
+        if (!peer)
+            continue;
         uint32_t online_id = npp->getOnlineId();
         if (ServerConfig::m_ranked)
         {
