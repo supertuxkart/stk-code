@@ -377,6 +377,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_CHAT: handleChat(event);                          break;
         case LE_CONFIG_SERVER: handleServerConfiguration(event);  break;
+        case LE_CHANGE_HANDICAP: changeHandicap(event);           break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -2730,3 +2731,36 @@ void ServerLobby::handleServerConfiguration(Event* event)
     delete server_info;
     updatePlayerList();
 }   // handleServerConfiguration
+
+//-----------------------------------------------------------------------------
+/*! \brief Called when a player want to change his handicap
+ *  \param event : Event providing the information.
+ *
+ *  Format of the data :
+ *  Byte 0                 1
+ *       ----------------------------------
+ *  Size |       1         |       1      |
+ *  Data | local player id | new handicap |
+ *       ----------------------------------
+ */
+void ServerLobby::changeHandicap(Event* event)
+{
+    NetworkString& data = event->data();
+    if (m_state.load() != WAITING_FOR_START_GAME &&
+        !event->getPeer()->isWaitingForGame())
+    {
+        Log::warn("ServerLobby", "Set handicap at wrong time.");
+        return;
+    }
+    uint8_t local_id = data.getUInt8();
+    auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
+    uint8_t difficulty_id = data.getUInt8();
+    if (difficulty_id >= PLAYER_DIFFICULTY_COUNT)
+    {
+        Log::warn("ServerLobby", "Wrong handicap %d.", difficulty_id);
+        return;
+    }
+    PerPlayerDifficulty d = (PerPlayerDifficulty)difficulty_id;
+    player->setPerPlayerDifficulty(d);
+    updatePlayerList();
+}   // changeHandicap

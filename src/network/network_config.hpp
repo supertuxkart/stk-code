@@ -143,9 +143,9 @@ public:
     // ------------------------------------------------------------------------
     void unsetNetworking();
     // ------------------------------------------------------------------------
-    const std::vector<std::tuple<InputDevice*, PlayerProfile*,
+    std::vector<std::tuple<InputDevice*, PlayerProfile*,
                                  PerPlayerDifficulty> >&
-                        getNetworkPlayers() const { return m_network_players; }
+                        getNetworkPlayers()       { return m_network_players; }
     // ------------------------------------------------------------------------
     bool isAddingNetworkPlayers() const
                                      { return !m_done_adding_network_players; }

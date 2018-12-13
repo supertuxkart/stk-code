@@ -439,7 +439,9 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             host_online_local_ids[1], host_online_local_ids[2],
             std::get<0>(m_player_names.at(
             m_player_list->getSelectionInternalName())),
-            m_allow_change_team);
+            m_allow_change_team,
+            std::get<3>(m_player_names.at(
+            m_player_list->getSelectionInternalName())));
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
@@ -498,7 +500,7 @@ bool NetworkingLobby::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
                                     uint32_t, uint32_t, core::stringw,
-                                    int, KartTeam> >& p)
+                                    int, KartTeam, PerPlayerDifficulty> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
@@ -531,7 +533,8 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
         else if (cur_team == KART_TEAM_BLUE)
             m_player_list->markItemBlue(i);
         m_player_names[internal_name] =
-            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team);
+            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team,
+            std::get<6>(q));
     }
     updatePlayerPings();
 }   // updatePlayers

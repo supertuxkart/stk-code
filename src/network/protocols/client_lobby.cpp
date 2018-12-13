@@ -674,15 +674,18 @@ void ClientLobby::updatePlayerList(Event* event)
     m_waiting_for_game = waiting;
     unsigned player_count = data.getUInt8();
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
-        int, KartTeam> > players;
+        int, KartTeam, PerPlayerDifficulty> > players;
     core::stringw total_players;
     for (unsigned i = 0; i < player_count; i++)
     {
         std::tuple<uint32_t, uint32_t, uint32_t, core::stringw, int,
-            KartTeam> pl;
-        std::get<0>(pl) = data.getUInt32();
-        std::get<1>(pl) = data.getUInt32();
-        std::get<2>(pl) = data.getUInt8();
+            KartTeam, PerPlayerDifficulty> pl;
+        uint32_t host_id = data.getUInt32();
+        uint32_t online_id = data.getUInt32();
+        uint8_t local_id = data.getUInt8();
+        std::get<0>(pl) = host_id;
+        std::get<1>(pl) = online_id;
+        std::get<2>(pl) = local_id;
         data.decodeStringW(&std::get<3>(pl));
         total_players += std::get<3>(pl);
         bool is_peer_waiting_for_game = data.getUInt8() == 1;
@@ -693,12 +696,18 @@ void ClientLobby::updatePlayerList(Event* event)
         if (waiting && !is_peer_waiting_for_game)
             std::get<4>(pl) = 3;
         PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
+        std::get<6>(pl) = d;
         if (d == PLAYER_DIFFICULTY_HANDICAP)
             std::get<3>(pl) = _("%s (handicapped)", std::get<3>(pl));
         std::get<5>(pl) = (KartTeam)data.getUInt8();
         bool ready = data.getUInt8() == 1;
         if (ready)
             std::get<4>(pl) = 4;
+        if (host_id == STKHost::get()->getMyHostId())
+        {
+            auto& local_players = NetworkConfig::get()->getNetworkPlayers();
+            std::get<2>(local_players.at(local_id)) = d;
+        }
         players.push_back(pl);
     }
 

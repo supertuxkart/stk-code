@@ -66,8 +66,8 @@ private:
     NetworkingLobby();
 
     float m_ping_update_timer;
-    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam> >
-        m_player_names;
+    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam,
+        PerPlayerDifficulty> > m_player_names;
     std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
@@ -137,7 +137,7 @@ public:
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, uint32_t/*local player id*/,
                        core::stringw/*player name*/, int/*icon id*/,
-                       KartTeam> >& p);
+                       KartTeam, PerPlayerDifficulty> >& p);
     void openSplitscreenDialog(InputDevice* device);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
