@@ -261,7 +261,7 @@ void NetworkingLobby::onUpdate(float delta)
         {
             //I18N: In the networking lobby, show when player is required to
             //wait before the current game finish with remaining time
-            msg = _("Please wait for current game to end, "
+            msg = _("Please wait for the current game's end, "
                 "estimated remaining time: %s.",
                 StringUtils::timeToString((float)progress.first).c_str());
         }
@@ -269,14 +269,14 @@ void NetworkingLobby::onUpdate(float delta)
         {
             //I18N: In the networking lobby, show when player is required to
             //wait before the current game finish with progress in percent
-            msg = _("Please wait for current game to end, "
+            msg = _("Please wait for the current game's end, "
                 "estimated progress: %d%.", progress.second);
         }
         else
         {
             //I18N: In the networking lobby, show when player is required to
             //wait before the current game finish
-            msg = _("Please wait for current game to end.");
+            msg = _("Please wait for the current game's end.");
         }
         m_timeout_message->setText(msg, false);
         core::stringw total_msg;
