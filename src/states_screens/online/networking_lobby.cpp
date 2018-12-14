@@ -255,9 +255,29 @@ void NetworkingLobby::onUpdate(float delta)
     {
         m_start_button->setVisible(false);
         m_timeout_message->setVisible(true);
-        //I18N: In the networking lobby, show when player is required to wait
-        //before the current game finish
-        core::stringw msg = _("Please wait for current game to end.");
+        auto progress = cl->getGameStartedProgress();
+        core::stringw msg;
+        if (progress.first != std::numeric_limits<uint32_t>::max())
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish with remaining time
+            msg = _("Please wait for current game to end, "
+                "estimated remaining time: %s.",
+                StringUtils::timeToString((float)progress.first).c_str());
+        }
+        else if (progress.second != std::numeric_limits<uint32_t>::max())
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish with progress in percent
+            msg = _("Please wait for current game to end, "
+                "estimated progress: %d%.", progress.second);
+        }
+        else
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish
+            msg = _("Please wait for current game to end.");
+        }
         m_timeout_message->setText(msg, false);
         core::stringw total_msg;
         for (auto& string : m_server_info)

@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <limits>
 #include <map>
 #include <memory>
 #include <vector>
@@ -359,9 +360,17 @@ public:
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
-
+    // ------------------------------------------------------------------------
     bool isNetworkWorld() const { return m_is_network_world; }
-    
+    // ------------------------------------------------------------------------
+    /** Used by server to get the current started game progress in either or
+     *  both remaining time or progress in percent. uint32_t max for either or
+     *  both if not available.  */
+    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+    {
+        return std::make_pair(std::numeric_limits<uint32_t>::max(),
+            std::numeric_limits<uint32_t>::max());
+    }
 };   // World
 
 #endif

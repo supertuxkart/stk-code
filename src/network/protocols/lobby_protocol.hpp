@@ -24,6 +24,7 @@
 class GameSetup;
 class NetworkPlayerProfile;
 
+#include <atomic>
 #include <cassert>
 #include <memory>
 #include <thread>
@@ -82,6 +83,14 @@ protected:
 
     static std::weak_ptr<LobbyProtocol> m_lobby;
 
+    /** Estimated current started game remaining time,
+     *  uint32_t max if not available. */
+    std::atomic<uint32_t> m_estimated_remaining_time;
+
+    /** Estimated current started game progress in 0-100%,
+      * uint32_t max if not available. */
+    std::atomic<uint32_t> m_estimated_progress;
+
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
@@ -130,7 +139,24 @@ public:
     virtual bool allPlayersReady() const = 0;
     virtual bool isRacing() const = 0;
     GameSetup* getGameSetup() const { return m_game_setup; }
-
+    // ------------------------------------------------------------------------
+    std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+    {
+        return std::make_pair(m_estimated_remaining_time.load(),
+            m_estimated_progress.load());
+    }
+    // ------------------------------------------------------------------------
+    void setGameStartedProgress(const std::pair<uint32_t, uint32_t>& p)
+    {
+        m_estimated_remaining_time.store(p.first);
+        m_estimated_progress.store(p.second);
+    }
+    // ------------------------------------------------------------------------
+    void resetGameStartedProgress()
+    {
+        m_estimated_remaining_time.store(std::numeric_limits<uint32_t>::max());
+        m_estimated_progress.store(std::numeric_limits<uint32_t>::max());
+    }
 };   // class LobbyProtocol
 
 #endif // LOBBY_PROTOCOL_HPP

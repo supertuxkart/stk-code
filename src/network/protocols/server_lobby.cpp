@@ -616,13 +616,13 @@ void ServerLobby::asynchronousUpdate()
  */
 void ServerLobby::update(int ticks)
 {
+    World* w = World::getWorld();
     int sec = ServerConfig::m_kick_idle_player_seconds;
     if (NetworkConfig::get()->isWAN() &&
         sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
         m_state.load() <= RACING && m_server_has_loaded_world.load() == true)
     {
         auto players = m_game_setup->getConnectedPlayers(true/*same_offset*/);
-        World* w = World::getWorld();
         for (unsigned i = 0; i < players.size(); i++)
         {
             if (!players[i])
@@ -640,6 +640,10 @@ void ServerLobby::update(int ticks)
             }
         }
     }
+    if (w)
+        setGameStartedProgress(w->getGameStartedProgress());
+    else
+        resetGameStartedProgress();
 
     // Reset server to initial state if no more connected players
     if (m_waiting_for_reset)

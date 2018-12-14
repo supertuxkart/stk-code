@@ -796,6 +796,17 @@ void STKHost::mainLoop()
                 ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
                 for (auto& p : m_peer_pings.getData())
                     ping_packet.addUInt32(p.first).addUInt32(p.second);
+                if (sl)
+                {
+                    auto progress = sl->getGameStartedProgress();
+                    ping_packet.addUInt32(progress.first)
+                        .addUInt32(progress.second);
+                }
+                else
+                {
+                    ping_packet.addUInt32(std::numeric_limits<uint32_t>::max())
+                        .addUInt32(std::numeric_limits<uint32_t>::max());
+                }
                 ping_packet.getBuffer().insert(
                     ping_packet.getBuffer().begin(), g_ping_packet.begin(),
                     g_ping_packet.end());
@@ -866,12 +877,12 @@ void STKHost::mainLoop()
         bool need_ping_update = false;
         while (enet_host_service(host, &event, 10) != 0)
         {
+            auto lp = LobbyProtocol::get<LobbyProtocol>();
             if (!is_server &&
                 last_ping_time_update_for_client < StkTime::getRealTimeMs())
             {
                 last_ping_time_update_for_client =
                     StkTime::getRealTimeMs() + 2000;
-                auto lp = LobbyProtocol::get<LobbyProtocol>();
                 if (lp && lp->isRacing())
                 {
                     auto p = getServerPeerForClient();
@@ -950,7 +961,20 @@ void STKHost::mainLoop()
                         const uint32_t client_ping =
                             peer_pings.find(m_host_id) != peer_pings.end() ?
                             peer_pings.at(m_host_id) : 0;
-
+                        uint32_t remaining_time =
+                            std::numeric_limits<uint32_t>::max();
+                        uint32_t progress =
+                            std::numeric_limits<uint32_t>::max();
+                        try
+                        {
+                            remaining_time = ping_packet.getUInt32();
+                            progress = ping_packet.getUInt32();
+                        }
+                        catch (std::exception& e)
+                        {
+                            // For old server
+                            Log::debug("STKHost", "%s", e.what());
+                        }
                         if (client_ping > 0)
                         {
                             assert(m_nts);
@@ -963,6 +987,11 @@ void STKHost::mainLoop()
                             m_peer_pings.unlock();
                             m_client_ping.store(client_ping,
                                 std::memory_order_relaxed);
+                            if (lp)
+                            {
+                                lp->setGameStartedProgress(
+                                    std::make_pair(remaining_time, progress));
+                            }
                         }
                     }
                     enet_packet_destroy(event.packet);

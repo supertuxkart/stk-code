@@ -36,6 +36,7 @@ std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
+    resetGameStartedProgress();
     m_game_setup = new GameSetup();
 }   // LobbyProtocol
 
