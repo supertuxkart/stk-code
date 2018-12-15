@@ -35,7 +35,6 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/online/vote_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "tracks/track.hpp"
@@ -55,11 +54,12 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
-    if (name == "submit")
+    if ((name == "lap-spinner" || name == "reverse") &&
+         STKHost::existHost() && m_selected_track != NULL)
     {
         voteForPlayer();
-        VoteOverview::getInstance()->push();
     }
+
     else if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
@@ -90,8 +90,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             selection = m_random_track_list.front();
             m_random_track_list.pop_front();
             m_random_track_list.push_back(selection);
-
         }   // selection=="random_track"
+
         m_selected_track = track_manager->getTrack(selection);
 
         if (m_selected_track)
@@ -99,6 +99,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (STKHost::existHost())
             {
                 w2->setBadge(selection, OK_BADGE);
+                voteForPlayer();
             }
             else
             {
@@ -512,3 +513,153 @@ void TracksScreen::onUpdate(float dt)
     m_timer->setValue(new_value * 100.0f);
 
 }   // onUpdate
+
+// ----------------------------------------------------------------------------
+/** Called when the final 'random picking' animation is finished so that only
+ *  the result is shown : all votes except the winner is set to be invisible.
+ */
+void TracksScreen::showVoteResult()
+{
+    Log::info("TracksScreen", "showVoteResult: winning index %d",
+              m_winning_index);
+    // TODO: Make all listed votes except the winner invisible: something
+    // like this:
+    //for (unsigned int i = 0; i < 8; i++)
+    //{
+    //   std::string box_name = StringUtils::insertValues("rect-box%d", i);
+    //    Widget *box = getWidget(box_name.c_str());
+    //    if (i != m_winning_index)
+    //        box->setVisible(false);
+    //    else
+    //        box->setSelected(PLAYER_ID_GAME_MASTER, true);
+    //}
+}   // showVoteResult
+
+// ----------------------------------------------------------------------------
+/** Stores the number of players. This can be used to determine how many
+ *  slotes for votes are required. This function is called from ClientLobby
+ *  upon an update from the server.
+ *  \param n New number of players that can vote.
+ */
+void TracksScreen::updateNumPlayers(int n)
+{
+    m_max_num_votes = n;
+}   //updateNumPlayers
+
+// -----------------------------------------------------------------------------
+/** Selects in which part of the vote list the new host is being shown and
+ *  stores this information in the m_index_to_hostid mapping. If the host_id is
+ *  already mapped, this is ignored (this can happen in case one host changes
+ *  its vote.
+ *  \param host_id Index of the host that is voting.
+ */
+void TracksScreen::addVote(int host_id)
+{
+    auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
+                        host_id);
+
+    Log::verbose("TracksScreen", "addVote: hostid %d is new %d",
+                 host_id, it == m_index_to_hostid.end());
+
+    // Add a new index if this is the first vote for the host/
+    if (it == m_index_to_hostid.end())
+    {
+        m_index_to_hostid.push_back(host_id);
+    }
+
+    // If the screen is already shown, update the voting display
+    if (GUIEngine::getCurrentScreen() == this)
+        showVote(host_id);
+}   // addVote
+
+// ----------------------------------------------------------------------------
+/** Populates one entry in the voting list with the vote from the
+ *  corresponding host. A mapping of host_id to index MUST exist for this
+ *  host when this function is called.
+ *  \param host_id Host id from hich a new vote was received.
+ */
+void TracksScreen::showVote(int host_id)
+{
+    auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
+                        host_id);
+    assert(it != m_index_to_hostid.end());
+
+    int index = it - m_index_to_hostid.begin();
+
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+    const PeerVote *vote = lp->getVote(host_id);
+    assert(vote);
+
+    // This is the old code that needs to be updated for the new list display
+#ifdef OLD_DISPLAY
+    std::string s = StringUtils::insertValues("name-%d", index);
+    LabelWidget *name_widget = getWidget<LabelWidget>(s.c_str());
+    name_widget->setText(_("Name: %s", vote->m_player_name), true);
+
+    s = StringUtils::insertValues("track-%d", index);
+    IconButtonWidget *track_widget = getWidget<IconButtonWidget>(s.c_str());
+    Track *track = track_manager->getTrack(vote->m_track_name);
+    track_widget->setVisible(true);
+    track_widget->setImage(track->getScreenshotFile());
+
+    s = StringUtils::insertValues("numlaps-%d", index);
+    LabelWidget *laps_widget = getWidget<LabelWidget>(s.c_str());
+    laps_widget->setText(_("Laps: %d", vote->m_num_laps), true);
+
+    s = StringUtils::insertValues("reverse-%d", index);
+    LabelWidget *reverse_widget = getWidget<LabelWidget>(s.c_str());
+    core::stringw yes = _("yes");
+    core::stringw no = _("no");
+    reverse_widget->setText(_("Reverse: %s", vote->m_reverse ? yes : no),
+                            true);
+#endif
+}   // addVote
+
+// -----------------------------------------------------------------------------
+/** Received the winning vote. i.e. the data about the track to play (including
+ *  #laps etc).
+ */
+void TracksScreen::setResult(const PeerVote &winner_vote)
+{
+    // If the GUI is forced from the server lobby, m_timer is not defined
+    if (m_timer) m_timer->setVisible(false);
+
+    // Note that the votes on the server might have a different order from
+    // the votes here on the client. Potentially there could also be a missing
+    // vote(??)
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+    m_winning_index = -1;
+    for (unsigned int i = 0; i < m_index_to_hostid.size(); i++)
+    {
+        const PeerVote *vote = lp->getVote(m_index_to_hostid[i]);
+        if (!vote) continue;
+        if (vote->m_track_name == winner_vote.m_track_name &&
+            vote->m_num_laps == winner_vote.m_num_laps &&
+            vote->m_reverse == winner_vote.m_reverse)
+        {
+            m_winning_index = i;
+            break;
+        }
+        // Try to prepare a fallback in case that the right vote is not here.
+        if (vote->m_track_name == winner_vote.m_track_name)
+        {
+            m_winning_index = i;
+        }
+    }   // for i in m_index_to_hostid
+
+    if (m_winning_index == -1)
+    {
+        // We don't have the right vote. Assume that a message got lost,
+        // In this case, change one non-local vote:
+        for (unsigned int i = 0; i < m_index_to_hostid.size(); i++)
+        {
+            if (m_index_to_hostid[i] != STKHost::get()->getMyHostId())
+            {
+                lp->addVote(m_index_to_hostid[i], winner_vote);
+                m_winning_index = i;
+                break;
+            }
+        }
+    }   // wim_winning_index == -1
+
+}   // setResult

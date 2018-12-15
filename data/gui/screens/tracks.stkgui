@@ -23,7 +23,6 @@
                          wrap_around="true" />
                 <spacer width="2%"/>
                 <label id="lap-text" width="48%" I18N="In the track screen" text_align="left"/>
-                <button id ="submit" width="20%" I18N="In the track screen" text="Submit" />
             </div>
             <spacer height="10"/>
             <div width="100%" height="fit" layout="horizontal-row" >

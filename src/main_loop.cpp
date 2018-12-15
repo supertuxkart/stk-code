@@ -42,7 +42,7 @@
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/online/vote_overview.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "utils/profiler.hpp"
 #include "utils/time.hpp"
 
@@ -568,7 +568,7 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 
     if (NetworkConfig::get()->isNetworking() && phase >= 5000)
     {
-        VoteOverview::getInstance()->showVoteResult();
+        TracksScreen::getInstance()->showVoteResult();
     }
     // TODO: remove debug output
     //Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",

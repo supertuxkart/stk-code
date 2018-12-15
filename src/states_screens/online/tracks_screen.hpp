@@ -20,15 +20,17 @@
 
 #include "guiengine/screen.hpp"
 #include "utils/synchronised.hpp"
-#include <deque>
-#include <limits>
-#include <map>
-#include <string>
 
+#include <deque>
+#include <string>
+#include <vector>
+
+class PeerVote;
 class Track;
 
 namespace GUIEngine
 {
+    class CheckBoxWidget;
     class CheckBoxWidget;
     class LabelWidget;
     class SpinnerWidget;
@@ -54,9 +56,19 @@ private:
     *  (going backwards). */
     GUIEngine::ProgressBarWidget *m_timer;
 
+    /** Maximum number of votes, as sent by the server. */
+    unsigned int m_max_num_votes;
+
     bool m_network_tracks, m_reverse_checked, m_quit_server;
 
     int m_bottom_box_height;
+
+    /** Index of the winning vote. */
+    int m_winning_index;
+
+    /** This stores which vote (hostid) is shown at which index in
+     *  the vote overview list. */
+    std::vector<int> m_index_to_hostid;
 
     std::deque<std::string> m_random_track_list;
 
@@ -74,6 +86,12 @@ private:
     }
 
 public:
+
+    void addVote(int host_id);
+    void showVote(int host_id);
+    void setResult(const PeerVote &winner_vote);
+    void showVoteResult();
+    void updateNumPlayers(int n);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -103,6 +121,13 @@ public:
     void setNetworkTracks() { m_network_tracks = true; }
     // ------------------------------------------------------------------------
     void setQuitServer() { m_quit_server = true; }
+    // ------------------------------------------------------------------------
+    /** Called at the beginning of the voting process to reset any previous
+     *  data fields. */
+    void resetVote()
+    {
+        m_index_to_hostid.clear();
+    }
 
 };
 

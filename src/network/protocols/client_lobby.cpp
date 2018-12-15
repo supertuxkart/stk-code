@@ -44,7 +44,6 @@
 #include "network/stk_peer.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/network_kart_selection.hpp"
-#include "states_screens/online/vote_overview.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/tracks_screen.hpp"
@@ -122,7 +121,7 @@ void ClientLobby::setup()
 {
     clearPlayers();
     m_received_server_result = false;
-    VoteOverview::getInstance()->resetVote();
+    TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
     m_state.store(NONE);
 }   // setup
@@ -244,7 +243,7 @@ void ClientLobby::addAllPlayers(Event* event)
     PeerVote winner_vote(data);
 
     m_game_setup->setRace(winner_vote);
-    VoteOverview::getInstance()->setResult(winner_vote);
+    TracksScreen::getInstance()->setResult(winner_vote);
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
@@ -465,8 +464,8 @@ void ClientLobby::receivePlayerVote(Event* event)
     if (!track)
         Log::fatal("ClientLobby", "Missing track %s", vote.m_track_name.c_str());
 
-    VoteOverview *overview = VoteOverview::getInstance();
-    overview->addVote(host_id2);
+    TracksScreen *ts = TracksScreen::getInstance();
+    ts->addVote(host_id2);
 
 }   // receivePlayerVote
 
@@ -678,7 +677,7 @@ void ClientLobby::updatePlayerList(Event* event)
     m_total_players = total_players;
 
     NetworkingLobby::getInstance()->updatePlayers(players);
-    VoteOverview::getInstance()->updateNumPlayers(players.size());
+    TracksScreen::getInstance()->updateNumPlayers(players.size());
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------
@@ -858,8 +857,8 @@ void ClientLobby::startSelection(Event* event)
         screen->push();
     }
 
-    VoteOverview *overview = VoteOverview::getInstance();
-    overview->resetVote();
+    TracksScreen *ts = TracksScreen::getInstance();
+    ts->resetVote();
     m_state.store(SELECTING_ASSETS);
     Log::info("ClientLobby", "Selection starts now");
 }   // startSelection
