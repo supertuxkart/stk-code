@@ -45,7 +45,6 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sort_col = 0;
     m_sortable = true;
     m_header_created = false;
-    m_alternating_darkness = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -111,7 +110,7 @@ void ListWidget::add()
         true,
         false);
 
-    list_box->setAlternatingDarkness(m_alternating_darkness);
+    list_box->setAlternatingDarkness(m_properties[PROP_ALTERNATE_BG] == "true");
     if (current_skin && current_skin->getSpriteBank())
     {
             list_box->setSpriteBank(current_skin->getSpriteBank());
@@ -228,7 +227,7 @@ void ListWidget::clearColumns()
 } //clearColumns
 
 // -----------------------------------------------------------------------------
-
+//FIXME : remove the code duplication of the two addItem functions
 void ListWidget::addItem(   const std::string& internal_name,
                             const irr::core::stringw &name,
                             const int icon,
@@ -242,6 +241,10 @@ void ListWidget::addItem(   const std::string& internal_name,
     newItem.m_internal_name = internal_name;
     newItem.m_contents.push_back(cell);
     newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+    newItem.m_line_height_scale = m_properties[PROP_LINE_HEIGHT] == "small"  ? 0.75f :
+                                  m_properties[PROP_LINE_HEIGHT] == "normal" ? 1.0f  :
+                                  m_properties[PROP_LINE_HEIGHT] == "big"    ? 1.25f : 1.0f;
+
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -270,6 +273,9 @@ void ListWidget::addItem(const std::string& internal_name,
         newItem.m_contents.push_back(contents[i]);
     }
     newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+    newItem.m_line_height_scale = m_properties[PROP_LINE_HEIGHT] == "small"  ? 0.75f :
+                                  m_properties[PROP_LINE_HEIGHT] == "normal" ? 1.0f  :
+                                  m_properties[PROP_LINE_HEIGHT] == "big"    ? 1.25f : 1.0f;
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);

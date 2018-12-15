@@ -91,8 +91,6 @@ namespace GUIEngine
 
         bool m_header_created;
 
-        bool m_alternating_darkness;
-
     public:
         typedef irr::gui::CGUISTKListBox::ListItem ListItem;
         typedef ListItem::ListCell ListCell;
@@ -278,8 +276,6 @@ namespace GUIEngine
         void addColumn(irr::core::stringw col, int proportion=1) { m_header.push_back( Column(col, proportion) ); }
 
         void setSortable(bool sortable) { m_sortable = sortable; }
-
-        void setAlternatingDarkness(bool val) { m_alternating_darkness = val; }
     };
 }
 

@@ -586,7 +586,7 @@ void CGUISTKListBox::draw()
                     }
 
                     core::rect<s32> lineRect = textRect;
-                    int line_height = Font->getDimension(L"A").Height;
+                    int line_height = Font->getDimension(L"A").Height*Items[i].m_line_height_scale;
                     int supp_lines = Items[i].m_contents[x].m_text_lines.size() - 1;
                     lineRect.UpperLeftCorner.Y -= (line_height*supp_lines)/2;
                     lineRect.LowerRightCorner.Y -= (line_height*supp_lines)/2;

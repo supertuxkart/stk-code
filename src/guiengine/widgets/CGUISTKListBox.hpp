@@ -55,6 +55,7 @@ namespace irr
                 int m_current_id;
 
                 bool m_word_wrap = false;
+                float m_line_height_scale = 0.0f;
 
                 // A multicolor extension
                 struct ListItemOverrideColor
