@@ -57,7 +57,7 @@
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/online/vote_overview.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
@@ -965,12 +965,21 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     assert(!m_watching_replay);
     StateManager::get()->enterGameState();
 
+    // In networking, make sure that the tracks screen is shown. This will
+    // allow for a 'randomly pick track' animation to be shown while
+    // world is loaded.
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient()        )
     {
-        VoteOverview *overview = VoteOverview::getInstance();
-        if (GUIEngine::getCurrentScreen() != overview)
-            overview->push();
+        // TODO: The enterGameState() call above deleted all GUIs, which
+        // means even if the tracks screen is shown, it need to be recreated.
+        // And we have to make sure that it is recreated as network version.
+        TracksScreen *ts = TracksScreen::getInstance();
+        if (GUIEngine::getCurrentScreen() != ts)
+        {
+            ts->setNetworkTracks();
+            ts->push();
+        }
     }
 
 
