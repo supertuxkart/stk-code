@@ -176,6 +176,22 @@ namespace ServerConfig
         "if satisfied min-start-game-players below for owner less or ranked "
         "server."));
 
+    SERVER_CFG_PREFIX FloatServerConfigParam m_official_karts_threshold
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(1.0f,
+        "official-karts-threshold",
+        "Clients below this value will be rejected from joining this server. "
+        "It's determined by number of official karts in client / number of "
+        "official karts in server"));
+
+    SERVER_CFG_PREFIX FloatServerConfigParam m_official_tracks_threshold
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(0.7f,
+        "official-tracks-threshold",
+        "Clients below this value will be rejected from joining this server. "
+        "It's determined by number of official tracks in client / number of "
+        "official tracks in server, setting this value too high will prevent "
+        "android players from joining this server, because STK android apk "
+        "has some official tracks removed."));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_min_start_game_players
         SERVER_CFG_DEFAULT(IntServerConfigParam(2, "min-start-game-players",
         "Only auto start kart selection when number of "
@@ -204,6 +220,14 @@ namespace ServerConfig
         "for linear race games, you require permission for that. "
         "validating-player, auto-end, strict-player and owner-less will be "
         "turned on."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_server_configurable
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-configurable",
+        "If true, the server owner can config the difficulty and game mode in "
+        "the GUI of lobby. This option cannot be used with owner-less or "
+        "grand prix server, and will be automatically turned on if the server "
+        "was created using the in-game GUI. The changed difficulty and game "
+        "mode will not be saved in this config file."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
@@ -238,12 +262,17 @@ namespace ServerConfig
         "(time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
         " negative value to disable time limit."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_auto_lap_ratio
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(-1.0f, "auto-lap-ratio",
-        "Value used by server to automatically calculate "
-        "lap of each race in network game, if more than 0.0f, the number of "
-        "lap of each track vote in linear race will be determined by "
-        "max(1.0f, auto-lap-ratio * default lap of that track)."));
+    SERVER_CFG_PREFIX FloatServerConfigParam m_auto_game_time_ratio
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(-1.0f, "auto-game-time-ratio",
+        "Value used by server to automatically estimate each game time. "
+        "For races, it decides the lap of each race in network game, "
+        "if more than 0.0f, the number of lap of each track vote in "
+        "linear race will be determined by "
+        "max(1.0f, auto-game-time-ratio * default lap of that track). "
+        "For soccer if more than 0.0f, for time limit game it will be "
+        "auto-game-time-ratio * soccer-time-limit in UserConfig, for goal "
+        "limit game it will be auto-game-time-ratio * numgoals "
+        "in UserConfig, -1 to disable for all."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_max_ping
         SERVER_CFG_DEFAULT(IntServerConfigParam(300, "max-ping",
@@ -257,6 +286,14 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false,
         "kick-high-ping-players",
         "Kick players whose ping is above max-ping."));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_kick_idle_player_seconds
+        SERVER_CFG_DEFAULT(IntServerConfigParam(60,
+        "kick-idle-player-seconds",
+        "Kick idle player which has no network activity to server for more "
+        "than some seconds during game, unless he has finished the race. "
+        "Negative value to disable, and this option will always be disabled "
+        "for LAN server."));
 
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
@@ -287,7 +324,10 @@ namespace ServerConfig
     void writeServerConfigToDisk();
     // ------------------------------------------------------------------------
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-        getLocalGameMode();
+        getLocalGameModeFromConfig();
+    // ------------------------------------------------------------------------
+    std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+        getLocalGameMode(int mode);
     // ------------------------------------------------------------------------
     core::stringw getModeName(unsigned id);
     // ------------------------------------------------------------------------

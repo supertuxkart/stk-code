@@ -21,7 +21,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="3" >
+<server-config version="4" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -74,6 +74,12 @@ The current server configuration xml looks like this:
     <!-- Time to wait before entering kart selection screen if satisfied min-start-game-players below for owner less or ranked server. -->
     <start-game-counter value="60" />
 
+    <!-- Clients below this value will be rejected from joining this server. It's determined by number of official karts in client / number of official karts in server -->
+    <official-karts-threshold value="1" />
+
+    <!-- Clients below this value will be rejected from joining this server. It's determined by number of official tracks in client / number of official tracks in server, setting this value too high will prevent android players from joining this server, because STK android apk has some official tracks removed. -->
+    <official-tracks-threshold value="0.7" />
+
     <!-- Only auto start kart selection when number of connected player is larger than or equals this value, for owner less or ranked server, after start-game-counter reaches 0. -->
     <min-start-game-players value="2" />
 
@@ -88,6 +94,9 @@ The current server configuration xml looks like this:
 
     <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end, strict-player and owner-less will be turned on. -->
     <ranked value="false" />
+
+    <!-- If true, the server owner can config the difficulty and game mode in the GUI of lobby. This option cannot be used with owner-less or grand prix server, and will be automatically turned on if the server was created using the in-game GUI. The changed difficulty and game mode will not be saved in this config file. -->
+    <server-configurable value="false" />
 
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
     <flag-return-timemout value="20" />
@@ -104,8 +113,8 @@ The current server configuration xml looks like this:
     <!-- Value used to calculate time limit in CTF, which is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0, negative value to disable time limit. -->
     <time-limit-threshold-ctf value="0.9" />
 
-    <!-- Value used by server to automatically calculate lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-lap-ratio * default lap of that track). -->
-    <auto-lap-ratio value="-1" />
+    <!-- Value used by server to automatically estimate each game time. For races, it decides the lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-game-time-ratio * default lap of that track). For soccer if more than 0.0f, for time limit game it will be auto-game-time-ratio * soccer-time-limit in UserConfig, for goal limit game it will be auto-game-time-ratio * numgoals in UserConfig, -1 to disable for all. -->
+    <auto-game-time-ratio value="-1" />
 
     <!-- Maximum ping allowed for a player (in ms). -->
     <max-ping value="300" />
@@ -115,6 +124,9 @@ The current server configuration xml looks like this:
 
     <!-- Kick players whose ping is above max-ping. -->
     <kick-high-ping-players value="false" />
+
+    <!-- Kick idle player which has no network activity to server for more than some seconds during game, unless he has finished the race. Negative value to disable, and this option will always be disabled for LAN server. -->
+    <kick-idle-player-seconds value="60" />
 
     <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
     <server-ip-ban-list>
@@ -163,7 +175,7 @@ x.x.x.x:y is your server ip address with its port, id is the id field of server-
 
 You can see STK server xml list [here](https://addons.supertuxkart.net/api/v2/server/get-all).
 
-The server you want to test must be able to be connected without NAT penetration. You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
+You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
 
 With the network AI tester, it's easier to for example simulate high-loaded servers or bad (high ping with packet loss) network.
 

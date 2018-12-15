@@ -10,7 +10,7 @@
 
         <!-- This is filled in programmatically -->
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
-            <list id="replay_list" x="0" y="0" width="100%" height="100%"/>
+            <list id="replay_list" x="0" y="0" width="100%" height="100%" alternate_bg="true"/>
         </box>
 
         <tabs id="race_mode" height="6%" max_height="110" x="1%" width="98%" align="center">

@@ -79,6 +79,8 @@ private:
     std::unordered_map<video::ITexture*, std::pair<GLuint, GLuint> >
         m_vao_vbos;
 
+    std::unordered_map<video::ITexture*, IMeshBuffer*> m_gl_mb;
+
     core::aabbox3df m_bbox;
 
 public:
@@ -102,6 +104,11 @@ public:
             glDeleteBuffers(1, &p.second.second);
         }
         m_vao_vbos.clear();
+        for (auto& p : m_gl_mb)
+        {
+            p.second->drop();
+        }
+        m_gl_mb.clear();
 #endif
     }
     // ------------------------------------------------------------------------
@@ -112,11 +119,15 @@ public:
     // ------------------------------------------------------------------------
     virtual void updateAbsolutePosition();
     // ------------------------------------------------------------------------
-    virtual void render() {}
+    virtual void OnRegisterSceneNode();
+    // ------------------------------------------------------------------------
+    virtual void render();
     // ------------------------------------------------------------------------
     virtual const core::aabbox3df& getBoundingBox() const    { return m_bbox; }
     // ------------------------------------------------------------------------
     void init(core::stringw text, FontWithFace* face);
+    // ------------------------------------------------------------------------
+    void initLegacy(core::stringw text, FontWithFace* face);
     // ------------------------------------------------------------------------
     void draw(video::ITexture* tex) const
     {

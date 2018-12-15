@@ -1557,7 +1557,7 @@ EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 	{
 		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 1);
 		
-		if (mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9)
+		if ((mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9 ) || mp.X11Key == XK_KP_Decimal)
 			is_numpad_key = true;
 	}
 	

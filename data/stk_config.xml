@@ -146,7 +146,7 @@
                 new transform event is generated before maximum time.
         delta-steering If the steering angle difference exceeds this delta,
                 new transform event is generated before maximum time. -->
-  <replay max-frames="12000" delta-t="0.200"  delta-speed="0.6"
+  <replay max-frames="12000" delta-t="0.100"  delta-speed="0.6"
           delta-steering="0.26" />
 
   <!--  Determines the minimap related values.
@@ -177,7 +177,7 @@
 
   <!-- time is the time till a bomb explodes. time-increase is the time added
        to timer when bomb is passed on. -->
-  <bomb time="30.0" time-increase="-5.0"/>
+  <bomb time="30.0" time-increase="0.0"/>
 
   <!-- Powerup collect-mode decides what is collected if a kart has already an
        powerup: same: get one more item of the same type.

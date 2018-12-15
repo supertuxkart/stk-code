@@ -143,9 +143,9 @@ public:
     // ------------------------------------------------------------------------
     void unsetNetworking();
     // ------------------------------------------------------------------------
-    const std::vector<std::tuple<InputDevice*, PlayerProfile*,
+    std::vector<std::tuple<InputDevice*, PlayerProfile*,
                                  PerPlayerDifficulty> >&
-                        getNetworkPlayers() const { return m_network_players; }
+                        getNetworkPlayers()       { return m_network_players; }
     // ------------------------------------------------------------------------
     bool isAddingNetworkPlayers() const
                                      { return !m_done_adding_network_players; }
@@ -220,6 +220,8 @@ public:
     void setJoinedServerVersion(uint32_t v)    { m_joined_server_version = v; }
     // ------------------------------------------------------------------------
     uint32_t getJoinedServerVersion() const { return m_joined_server_version; }
+    // ------------------------------------------------------------------------
+    void clearActivePlayersForClient() const;
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

@@ -770,7 +770,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         if (kart->getPosition() == -1)//if position is not set
         {
             //we use karts ordered by id only
-            //(needed for beginning of MINOR_MODE_BATTLE)
+            //(needed for beginning of battle mode)
             kart= world->getKart(position-1);
         }
 
@@ -782,7 +782,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         int lap = info.lap;
 
         // In battle mode mode there is no distance along track etc.
-        if( minor_mode==RaceManager::MINOR_MODE_BATTLE ||
+        if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
+            minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
             minor_mode==RaceManager::MINOR_MODE_EASTER_EGG)
         {
             x = x_base;

@@ -21,6 +21,9 @@
 #include "guiengine/screen.hpp"
 #include "network/transport_address.hpp"
 
+#include <memory>
+
+class Server;
 
 namespace GUIEngine { class CheckBoxWidget; class ListWidget;
                       class ButtonWidget; class IconButtonWidget; }
@@ -45,6 +48,8 @@ private:
     GUIEngine::IconButtonWidget* m_online;
 
     GUIEngine::CheckBoxWidget* m_enable_splitscreen;
+
+    std::shared_ptr<Server> m_entered_server;
 
     TransportAddress m_entered_server_address;
 

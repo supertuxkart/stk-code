@@ -35,7 +35,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_setup_screen.hpp"
-#include "states_screens/options/options_screen_video.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -174,7 +174,7 @@ GUIEngine::EventPropagation
         else if (selection == "options")
         {
             dismiss();
-            OptionsScreenVideo::getInstance()->push();
+            OptionsScreenGeneral::getInstance()->push();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "restart")

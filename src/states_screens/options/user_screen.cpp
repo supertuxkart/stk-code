@@ -36,6 +36,7 @@
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
@@ -100,10 +101,6 @@ void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
 // ----------------------------------------------------------------------------
 void BaseUserScreen::beforeAddingWidget()
 {
-#ifndef SERVER_ONLY
-    getWidget<IconButtonWidget>("default_kart_color")
-        ->setVisible(CVS->isGLSL());
-#endif
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -113,6 +110,11 @@ void BaseUserScreen::beforeAddingWidget()
  */
 void BaseUserScreen::init()
 {
+#ifndef SERVER_ONLY
+    getWidget<IconButtonWidget>("default_kart_color")
+        ->setVisible(CVS->isGLSL());
+#endif
+
     m_password_tb->setPasswordBox(true, L'*');
 
     // The behaviour of the screen is slightly different at startup, i.e.
@@ -256,7 +258,11 @@ void BaseUserScreen::selectUser(int index)
     }
 
     // Now last use was with online --> Display the saved data
-    m_online_cb->setState(true);
+    if (UserConfigParams::m_internet_status == Online::RequestManager::IPERM_NOT_ALLOWED)
+        m_online_cb->setState(false);
+    else
+        m_online_cb->setState(true);
+
     makeEntryFieldsVisible();
     m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
@@ -748,6 +754,8 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_general")
+            screen = OptionsScreenGeneral::getInstance();
         else if (selection == "tab_language")
             screen = OptionsScreenLanguage::getInstance();
         if(screen)

@@ -59,7 +59,7 @@ AbstractKart::AbstractKart(const std::string& ident,
     // Technically the mesh in m_kart_model needs to be grab'ed and
     // released when the kart is deleted, but since the original
     // kart_model is stored in the kart_properties all the time,
-    // there is no risk of a mesh being deleted to early.
+    // there is no risk of a mesh being deleted too early.
     m_kart_model  = m_kart_properties->getKartModelCopy(ri);
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();

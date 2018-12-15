@@ -185,7 +185,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_terrain_sound          = NULL;
     m_last_sound_material    = NULL;
     m_previous_terrain_sound = NULL;
-    m_graphical_view_blocked_by_plunger = 0.0f;
 }   // Kart
 
 // -----------------------------------------------------------------------------
@@ -369,7 +368,6 @@ void Kart::reset()
     m_current_lean         = 0.0f;
     m_falling_time         = 0.0f;
     m_view_blocked_by_plunger = 0;
-    m_graphical_view_blocked_by_plunger = 0.0f;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
     m_flying               = false;
@@ -591,13 +589,8 @@ void Kart::blockViewWithPlunger()
     // Avoid that a plunger extends the plunger time
     if(m_view_blocked_by_plunger<=0 && !isShielded())
     {
-        m_view_blocked_by_plunger = 
-        stk_config->time2Ticks(m_kart_properties->getPlungerInFaceTime());
-        if (m_graphical_view_blocked_by_plunger == 0.0f)
-        {
-             m_graphical_view_blocked_by_plunger =
-                m_kart_properties->getPlungerInFaceTime();
-        }
+        m_view_blocked_by_plunger = (int16_t)
+            stk_config->time2Ticks(m_kart_properties->getPlungerInFaceTime());
     }
     if(isShielded())
     {
@@ -988,7 +981,7 @@ void Kart::finishedRace(float time, bool from_server)
     // If this is spare tire kart, end now
     if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
-    if (is_linear_race && m_controller->isPlayerController())
+    if (is_linear_race && m_controller->isPlayerController() && !m_eliminated)
     {
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
@@ -1009,12 +1002,8 @@ void Kart::finishedRace(float time, bool from_server)
         }
     }
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE   ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL    ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE     ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER        ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    if (race_manager->isLinearRaceMode() || race_manager->isBattleMode() ||
+        race_manager->isSoccerMode()     || race_manager->isEggHuntMode())
     {
         // Save for music handling in race result gui
         setRaceResult();
@@ -1072,17 +1061,17 @@ void Kart::setRaceResult()
         }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-             race_manager->getMajorMode() == RaceManager::MAJOR_MODE_3_STRIKES)
+             race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
         m_race_result = !this->isEliminated();
     }
-    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL)
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
-    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
         m_race_result = ctf->getKartCTFResult(getWorldKartId());
@@ -1454,7 +1443,6 @@ void Kart::update(int ticks)
     if(isShielded())
     {
         m_view_blocked_by_plunger = 0;
-        m_graphical_view_blocked_by_plunger = 0.0f;
     }
     // Decrease remaining invulnerability time
     if(m_invulnerable_ticks>0)
@@ -1588,7 +1576,13 @@ void Kart::update(int ticks)
         }
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
-        m_powerup->use() ;
+        if (!World::getWorld()->isStartPhase())
+            m_powerup->use();
+        else
+        {
+            if(!getKartAnimation())
+                beep();
+        }
         World::getWorld()->onFirePressed(getController());
         m_fire_clicked = 1;
     }
@@ -1698,7 +1692,6 @@ void Kart::update(int ticks)
     if (emergency)
     {
         m_view_blocked_by_plunger = 0;
-        m_graphical_view_blocked_by_plunger = 0.0f;
         if (m_flying)
         {
             stopFlying();
@@ -2293,7 +2286,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
     if(m_kart_properties->getTerrainImpulseType()
                              ==KartProperties::IMPULSE_NORMAL &&
-        m_vehicle->getCentralImpulseTime()<=0                     )
+        m_vehicle->getCentralImpulseTicks()<=0                     )
     {
         // Restrict impule to plane defined by gravity (i.e. X/Z plane).
         // This avoids the problem that karts can be pushed up, e.g. above
@@ -2314,7 +2307,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         m_bounce_back_ticks = 0;
         impulse = Vec3(0, 0, 0);
         //m_vehicle->setTimedCentralImpulse(0.1f, impulse);
-        m_vehicle->setTimedCentralImpulse(0.0, impulse);
+        m_vehicle->setTimedCentralImpulse(0, impulse);
     }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the
@@ -2322,7 +2315,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     // would be pushed forward).
     else if(m_kart_properties->getTerrainImpulseType()
                                  ==KartProperties::IMPULSE_TO_DRIVELINE &&
-            lw && m_vehicle->getCentralImpulseTime()<=0 &&
+            lw && m_vehicle->getCentralImpulseTicks()<=0 &&
             Track::getCurrentTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
@@ -2340,7 +2333,8 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                 impulse = Vec3(0, 0, -1); // Arbitrary
             impulse *= m_kart_properties->getCollisionTerrainImpulse();
             m_bounce_back_ticks = stk_config->time2Ticks(0.2f);
-            m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+            m_vehicle->setTimedCentralImpulse(
+                (uint16_t)stk_config->time2Ticks(0.1f), impulse);
         }
 
     }
@@ -2653,6 +2647,54 @@ void Kart::updateEngineSFX(float dt)
       }
 }   // updateEngineSFX
 
+
+
+//-----------------------------------------------------------------------------
+/** Reduces the engine power according to speed
+ *  
+ *  TODO : find where the physics already apply a linear force decrease
+ *  TODO : While this work fine, it should ideally be in physics
+ *         However, the function use some kart properties and parachute
+ *         effect needs to be applied, so keep both working if moving
+ *  \param engine_power : the engine power on which to apply the decrease
+ */
+float Kart::applyAirFriction(float engine_power)
+{
+    //The physics already do that a certain amount of engine force is needed to keep going
+    //at a given speed (~39,33 engine force = 1 speed for a mass of 350)
+    //But it's either too slow to accelerate to a target speed or makes it
+    //too easy to accelerate farther.
+    //Instead of making increasing gears have enormous power gaps, apply friction
+
+    float mass_factor = m_kart_properties->getMass()/350.0f;
+    float compense_linear_slowdown = 39.33f*fabsf(getSpeed())*mass_factor;
+
+    engine_power += compense_linear_slowdown;
+
+    // The result will always be a positive number
+    float friction_intensity = fabsf(getSpeed());
+
+    // Not a pure quadratic evolution as it would be too brutal
+    friction_intensity *= sqrt(friction_intensity)*5;
+
+    // Apply parachute physics
+    // Currently, all karts have the same base friction
+    // If this is changed, a compensation needs to be added here
+    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
+        friction_intensity *= m_kart_properties->getParachuteFriction();
+
+    if (friction_intensity < 0.0f) friction_intensity = 0.0f;
+
+    // We substract the friction from the engine power
+    // 1)This is the logical behavior
+    // 2)That way, engine boosts remain useful at high speed
+    // 3)It helps heavier karts, who have an higher engine power
+
+    engine_power-=friction_intensity;
+
+    return engine_power;
+} //applyAirFriction
+
 //-----------------------------------------------------------------------------
 /** Sets the engine power. It considers the engine specs, items that influence
  *  the available power, and braking/steering.
@@ -2663,9 +2705,11 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     updateNitro(ticks);
     float engine_power = getActualWheelForce();
 
-    // apply parachute physics if relevant
-    if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
-        engine_power*=0.2f;
+    // apply nitro boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0)
+    {
+        engine_power*= m_kart_properties->getNitroEngineMult();
+    }
 
     // apply bubblegum physics if relevant
     if (m_bubblegum_ticks > 0)
@@ -2691,6 +2735,9 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             m_kart_properties->getSkidVisualTime() == 0)
             engine_power *= 0.5f;
 
+        // This also applies parachute physics if relevant
+        engine_power = applyAirFriction(engine_power);
+
         applyEngineForce(engine_power*m_controls.getAccel());
 
         // Either all or no brake is set, so test only one to avoid
@@ -2700,14 +2747,20 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             m_vehicle->setAllBrakes(0);
         m_brake_ticks = 0;
     }
-    else
-    {   // not accelerating
+    else // not accelerating
+    {
+        //The engine power is still guaranteed >= 0 at this point
+        float braking_power = engine_power;
+
+        // This also applies parachute physics if relevant
+        engine_power = applyAirFriction(engine_power);
+       
         if(m_controls.getBrake())
         {   // check if the player is currently only slowing down
             // or moving backwards
             if(m_speed > 0.0f)
             {   // Still going forward while braking
-                applyEngineForce(-engine_power*2.5f);
+                applyEngineForce(engine_power-braking_power*3);
                 m_brake_ticks += ticks;
                 // Apply the brakes - include the time dependent brake increase
                 float f = 1.0f + stk_config->ticks2Time(m_brake_ticks)
@@ -2725,7 +2778,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
                     // The backwards acceleration is artificially increased to
                     // allow players to get "unstuck" quicker if they hit e.g.
                     // a wall.
-                    applyEngineForce(-engine_power*2.5f);
+                    applyEngineForce(engine_power-braking_power*3);
                 }
                 else  // -m_speed >= max speed on this terrain
                 {
@@ -2734,21 +2787,29 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
 
             }   // m_speed <00
         }
-        else   // !m_brake
+        else   // no braking and no acceleration
         {
             m_brake_ticks = 0;
-            // lift the foot from throttle, brakes with 10% engine_power
+            // lift the foot from throttle, let friction slow it down
             assert(!std::isnan(m_controls.getAccel()));
             assert(!std::isnan(engine_power));
-            applyEngineForce(-m_controls.getAccel()*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people
-            if(std::abs(m_speed) < 5.0f)
+            if (std::abs(m_speed) < 5.0f)
+            {
+                // Engine must be 0, otherwise braking is not used at all
+                applyEngineForce(0);
                 m_vehicle->setAllBrakes(20.0f);
+            }
             else
+            {
+                // This ensure that parachute and air friction are applied
+                // and that the kart gracefully slows down
+                applyEngineForce(engine_power-braking_power);
                 m_vehicle->setAllBrakes(0);
-        }   // !m_brake
+            }
+        }   // no braking and no acceleration
     }   // not accelerating
 }   // updateEnginePowerAndBrakes
 
@@ -3075,12 +3136,6 @@ void Kart::updateGraphics(float dt)
     else if (!isSquashed() &&
         m_node->getScale() != core::vector3df(1.0f, 1.0f, 1.0f))
         unsetSquash();
-
-    if (m_graphical_view_blocked_by_plunger > 0.0f)
-        m_graphical_view_blocked_by_plunger -= dt;
-    if (m_graphical_view_blocked_by_plunger < 0.0f ||
-        m_view_blocked_by_plunger == 0)
-        m_graphical_view_blocked_by_plunger = 0.0f;
 #endif
 
     for (int i = 0; i < EMITTER_COUNT; i++)
@@ -3244,35 +3299,18 @@ void Kart::setOnScreenText(const wchar_t *text)
         return;
         
     BoldFace* bold_face = font_manager->getFont<BoldFace>();
-    core::dimension2d<u32> textsize = bold_face->getDimension(text);
-
+    STKTextBillboard* tb =
+        new STKTextBillboard(
+        GUIEngine::getSkin()->getColor("font::bottom"),
+        GUIEngine::getSkin()->getColor("font::top"),
+        getNode(), irr_driver->getSceneManager(), -1,
+        core::vector3df(0.0f, 1.5f, 0.0f),
+        core::vector3df(0.35f, 0.35f, 0.35f));
     if (CVS->isGLSL())
-    {
-        STKTextBillboard* tb =
-            new STKTextBillboard(
-            GUIEngine::getSkin()->getColor("font::bottom"),
-            GUIEngine::getSkin()->getColor("font::top"),
-            getNode(), irr_driver->getSceneManager(), -1,
-            core::vector3df(0.0f, 1.5f, 0.0f),
-            core::vector3df(1.0f, 1.0f, 1.0f));
         tb->init(text, bold_face);
-        tb->drop();
-    }
     else
-    {
-        scene::ISceneManager* sm = irr_driver->getSceneManager();
-        sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
-                                                           : GUIEngine::getTitleFont(),
-            text,
-            getNode(),
-            core::dimension2df(textsize.Width/55.0f,
-            textsize.Height/55.0f),
-            core::vector3df(0.0f, 1.5f, 0.0f),
-            -1, // id
-            GUIEngine::getSkin()->getColor("font::bottom"),
-            GUIEngine::getSkin()->getColor("font::top"));
-    }
-
+        tb->initLegacy(text, bold_face);
+    tb->drop();
     // No need to store the reference to the billboard scene node:
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.

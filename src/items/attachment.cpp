@@ -330,7 +330,8 @@ void Attachment::hitBanana(ItemState *item_state)
     if (m_kart->getController()->canGetAchievements())
     {
         PlayerManager::increaseAchievement(AchievementsStatus::BANANA, 1);
-        PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
+        if (race_manager->isLinearRaceMode())
+            PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
@@ -344,7 +345,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+    if (race_manager->isBattleMode())
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         if (m_kart->getKartAnimation() == NULL)

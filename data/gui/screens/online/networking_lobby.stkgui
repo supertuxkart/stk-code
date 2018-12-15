@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
-        <header id="lobby-text" text_align="center" width="80%" align="center" I18N="In networking lobby" text="Lobby"/>
-        <spacer height="1%" width="10"/>
+        <header id="lobby-text" text_align="center" width="80%" height="7%" align="center" I18N="In networking lobby" text="Lobby"/>
+        <spacer height="2%" width="10"/>
         <div proportion="9" x="2%" width="96%" layout="vertical-row">
             <div width="100%" proportion="2" layout="horizontal-row">
                 <box id="info" proportion="2" height="100%" layout="vertical-row">
                     <label word_wrap="true" id="text" proportion="3" width="100%" height="100%" text_valign="top"/>
                 </box>
-                <spacer width="3%" height="20"/>
+                <spacer width="3%" height="10"/>
                 <box proportion="1" height="100%" layout="vertical-row">
                     <list id="players" width="100%" height="100%"/>
                 </box>
             </div>
         </div>
         <spacer height="2%"/>
-        <div x="2%" width="96%" height="fit" layout="horizontal-row">
-            <box proportion="4" height="fit" layout="vertical-row">
-                <textbox id="chat" width="100%"/>
-                <spacer height="10"/>
-                <div width="100%" height="fit" layout="horizontal-row">
-                    <button id="send" width="20%" height="fit" I18N="In the network lobby" text="Send" />
-                    <spacer width="1%"/>
-                    <label id="timeout-message" width="79%" height="fit"/>
+        <div x="2%" width="96%" height="20%" layout="horizontal-row">
+            <box proportion="2" height="100%" layout="vertical-row">
+                <div x="1%" width="98%" height="fit" layout="horizontal-row">
+                    <textbox id="chat" proportion="1"/>
+                    <spacer width="3%" height="10"/>
+                    <button id="send" width="20%" height="fit" align="center" I18N="In the network lobby" text="Send"/>
                 </div>
+                <spacer height="5%" width="10"/>
+                <label id="timeout-message" x="1%" width="98%" proportion="1" text="" word_wrap="true" align="center"/>
             </box>
             <spacer width="3%"/>
-            <icon-button id="start" proportion="1" width="64" height="64" icon="gui/icons/green_check.png" align="top"
-                I18N="In the network lobby" text="Start race"/>
-            <icon-button id="exit" proportion="1" width="64" height="64" icon="gui/icons/main_quit.png" align="top"
-                I18N="In the network lobby" text="Exit"/>
+            <div proportion="1" height="100%" layout="vertical-row">
+                <spacer height="20%" width="10"/>
+                <div width="100%" proportion="1" layout="horizontal-row">
+                    <icon-button id="start" proportion="1" height="60%" icon="gui/icons/green_check.png" align="top"
+                        I18N="In the network lobby" text="Start race"/>
+                    <icon-button id="config" proportion="1" height="60%" icon="gui/icons/main_options.png" align="top"
+                        I18N="In the network lobby" text="Configuration"/>
+                </div>
+            </div>
         </div>
-        <spacer height="1%"/>
+        <spacer height="2%"/>
     </div>
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
 </stkgui>

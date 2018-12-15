@@ -74,10 +74,13 @@ void ItemState::setDisappearCounter()
 // -----------------------------------------------------------------------
 /** Initialises an item.
  *  \param type Type for this item.
+ *  \param xyz The position for this item.
+ *  \param normal The normal for this item.
  */
-void ItemState::initItem(ItemType type, const Vec3& xyz)
+void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 {
     m_xyz               = xyz;
+    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
     m_original_type     = ITEM_NONE;
     m_ticks_till_return = 0;
     setDisappearCounter();
@@ -105,7 +108,6 @@ void ItemState::update(int ticks)
  */
 void ItemState::collected(const AbstractKart *kart)
 {
-    m_previous_owner = kart;
     if (m_type == ITEM_EASTER_EGG)
     {
         // They will disappear 'forever'
@@ -127,11 +129,21 @@ void ItemState::collected(const AbstractKart *kart)
         m_ticks_till_return = stk_config->time2Ticks(2.0f);
     }
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE)
+    if (race_manager->isBattleMode())
     {
         m_ticks_till_return *= 3;
     }
 }   // collected
+
+// ----------------------------------------------------------------------------
+/** Returns the graphical type of this item should be using (takes nolok into
+ *  account). */
+Item::ItemType ItemState::getGrahpicalType() const
+{
+    return m_previous_owner && m_previous_owner->getIdent() == "nolok" &&
+        getType() == ITEM_BUBBLEGUM ?
+        ITEM_BUBBLEGUM_NOLOK : getType();
+}   // getGrahpicalType
 
 // ============================================================================
 /** Constructor for an item.
@@ -156,9 +168,8 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
-    initItem(type, xyz);
-    m_graphical_type    = type;
-    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
+    initItem(type, xyz, normal);
+    m_graphical_type    = getGrahpicalType();
     m_listener          = NULL;
 
     LODNode* lodnode =
@@ -181,7 +192,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     }
     m_node              = lodnode;
     setType(type);
-    handleNewMesh(getType());
+    handleNewMesh(getGrahpicalType());
 
 #ifdef DEBUG
     std::string debug_name("item: ");
@@ -191,7 +202,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
-    hpr.setHPR(m_original_rotation);
+    hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
@@ -206,9 +217,8 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
     : ItemState(ITEM_TRIGGER)
 {
     m_distance_2        = distance*distance;
-    initItem(ITEM_TRIGGER, xyz);
+    initItem(ITEM_TRIGGER, xyz, /*normal not required*/Vec3(0,1,0));
     m_graphical_type    = ITEM_TRIGGER;
-    m_original_rotation = btQuaternion(0, 0, 0, 1);
     m_node              = NULL;
     m_listener          = trigger;
     m_was_available_previously = true;
@@ -218,10 +228,12 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 /** Initialises the item. Note that m_distance_2 must be defined before calling
  *  this function, since it pre-computes some values based on this.
  *  \param type Type of the item.
+ *  \param xyz Position of this item.
+ *  \param normal Normal for this item.
  */
-void Item::initItem(ItemType type, const Vec3 &xyz)
+void Item::initItem(ItemType type, const Vec3 &xyz, const Vec3&normal)
 {
-    ItemState::initItem(type, xyz);
+    ItemState::initItem(type, xyz, normal);
     // Now determine in which quad this item is, and its distance
     // from the center within this quad.
     m_graph_node = Graph::UNKNOWN_SECTOR;
@@ -328,7 +340,7 @@ void Item::handleNewMesh(ItemType type)
             spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
     }
     Vec3 hpr;
-    hpr.setHPR(m_original_rotation);
+    hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
 #endif
 }   // handleNewMesh
@@ -343,10 +355,10 @@ void Item::updateGraphics(float dt)
     if (m_node == NULL)
         return;
 
-    if (m_graphical_type != getType())
+    if (m_graphical_type != getGrahpicalType())
     {
-        handleNewMesh(getType());
-        m_graphical_type = getType();
+        handleNewMesh(getGrahpicalType());
+        m_graphical_type = getGrahpicalType();
     }
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
@@ -355,8 +367,9 @@ void Item::updateGraphics(float dt)
                        getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
+    m_node->setPosition(getXYZ().toIrrVector());
 
-    if (!m_was_available_previously && isAvailable() )
+    if (!m_was_available_previously && isAvailable())
     {
         // This item is now available again - make sure it is not
         // scaled anymore.
@@ -372,9 +385,9 @@ void Item::updateGraphics(float dt)
                 fmodf((float)(World::getWorld()->getTicksSinceStart() +
                 getTicksTillReturn()) / 40.0f, M_PI * 2);
             btMatrix3x3 m;
-            m.setRotation(m_original_rotation);
+            m.setRotation(getOriginalRotation());
             btQuaternion r = btQuaternion(m.getColumn(1), angle) *
-                            m_original_rotation;
+                getOriginalRotation();
             Vec3 hpr;
             hpr.setHPR(r);
             m_node->setRotation(hpr.toIrrHPR());
@@ -382,20 +395,24 @@ void Item::updateGraphics(float dt)
         m_node->setVisible(true);
         m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
     }
-    if (isAvailable() && rotating())
+    if (isAvailable())
     {
-        // have it rotate
-        float angle =
-            fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
-            M_PI * 2);
-
-        btMatrix3x3 m;
-        m.setRotation(m_original_rotation);
-        btQuaternion r = btQuaternion(m.getColumn(1), angle) *
-                         m_original_rotation;
-
         Vec3 hpr;
-        hpr.setHPR(r);
+        if (rotating())
+        {
+            // have it rotate
+            float angle =
+                fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+                M_PI * 2);
+
+            btMatrix3x3 m;
+            m.setRotation(getOriginalRotation());
+            btQuaternion r = btQuaternion(m.getColumn(1), angle) *
+                getOriginalRotation();
+            hpr.setHPR(r);
+        }
+        else
+            hpr.setHPR(getOriginalRotation());
         m_node->setRotation(hpr.toIrrHPR());
     }   // if item is available
     m_was_available_previously = isAvailable();

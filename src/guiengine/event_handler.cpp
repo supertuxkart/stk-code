@@ -397,12 +397,35 @@ void EventHandler::deallocate()
 void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int playerID)
 {
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
+    
+    if (ScreenKeyboard::isActive() && 
+        !ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
+    {
+        w = NULL;
+    }
+    
+    if (ModalDialog::isADialogActive() && 
+        !ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
+    {
+        w = NULL;
+    }
+    
     if (w == NULL)
     {
         Widget* defaultWidget = NULL;
-        Screen* screen = GUIEngine::getCurrentScreen();
-        if (screen == NULL) return;
-        defaultWidget = screen->getFirstWidget();
+        
+        if (ScreenKeyboard::isActive())
+        {
+            defaultWidget = ScreenKeyboard::getCurrent()->getFirstWidget();
+        }
+        else if (ModalDialog::isADialogActive())
+        {
+            defaultWidget = ModalDialog::getCurrent()->getFirstWidget();
+        }
+        else if (GUIEngine::getCurrentScreen() != NULL)
+        {
+            defaultWidget = GUIEngine::getCurrentScreen()->getFirstWidget();
+        }
 
         if (defaultWidget != NULL)
         {
@@ -751,7 +774,6 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         {
             return EVENT_BLOCK;
         }
-        if (w->m_event_handler == NULL) return EVENT_LET;
     }
 
     //Log::info("EventHandler", "Widget activated: %s", w->m_properties[PROP_ID].c_str());

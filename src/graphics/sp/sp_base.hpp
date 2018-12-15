@@ -26,6 +26,7 @@
 #include "vector3d.h"
 
 #include <array>
+#include <atomic>
 #include <cmath>
 #include <functional>
 #include <ostream>
@@ -88,6 +89,7 @@ class SPMeshBuffer;
 extern GLuint sp_mat_ubo[MAX_PLAYER_COUNT][3];
 extern GLuint sp_fog_ubo;
 extern std::array<GLuint, 1> sp_prefilled_tex;
+extern std::atomic<uint32_t> sp_max_texture_size;
 extern unsigned sp_solid_poly_count;
 extern unsigned sp_shadow_poly_count;
 extern int sp_cur_shadow_cascade;
@@ -138,6 +140,14 @@ SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
                            const irr::video::SColor* color = NULL);
 // ----------------------------------------------------------------------------
 void uploadSPM(irr::scene::IMesh* mesh);
+// ----------------------------------------------------------------------------
+#ifdef SERVER_ONLY
+inline void setMaxTextureSize() {}
+#else
+void setMaxTextureSize();
+#endif
+// ----------------------------------------------------------------------------
+inline void unsetMaxTextureSize()          { sp_max_texture_size.store(2048); }
 // ----------------------------------------------------------------------------
 inline uint8_t srgbToLinear(float color_srgb)
 {

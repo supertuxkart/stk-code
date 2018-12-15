@@ -71,9 +71,15 @@ private:
 
     bool m_waiting_for_game;
 
-    bool m_server_auto_lap;
+    bool m_server_auto_game_time;
 
     bool m_received_server_result;
+
+    bool m_auto_started;
+
+    bool m_first_connect;
+
+    uint64_t m_auto_back_to_lobby_time;
 
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
@@ -111,9 +117,8 @@ public:
                             { return m_state.load() == REQUESTING_CONNECTION; }
     bool isLobbyReady() const           { return m_state.load() == CONNECTED; }
     bool isWaitingForGame() const                { return m_waiting_for_game; }
-    bool isServerAutoLap() const                  { return m_server_auto_lap; }
+    bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-    void clearPlayers();
 };
 
 #endif // CLIENT_LOBBY_HPP

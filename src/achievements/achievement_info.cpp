@@ -192,7 +192,7 @@ int AchievementInfo::recursiveGoalCount(goalTree &parent)
     if (parent.children.size() >= 2 &&
         parent.type != "OR")
     {
-        return parent.children.size();
+        return (int)parent.children.size();
     }
     else if (parent.children.size() == 1 &&
              (parent.children[0].type == "AND" ||

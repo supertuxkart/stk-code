@@ -113,6 +113,11 @@ namespace GUIEngine
         /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
 
+        /** When set to true it updates the screen even if modal dialog is 
+         *  opened
+         */
+        bool m_update_in_background;
+
     protected:
         bool m_throttle_FPS;
 
@@ -155,6 +160,12 @@ namespace GUIEngine
         void manualAddWidget(Widget* w);
 
         void manualRemoveWidget(Widget* w);
+        
+        /** When set to true it updates the screen even if modal dialog is 
+         *  opened
+         */
+        void setUpdateInBackground(bool value) {m_update_in_background = value;}
+        bool getUpdateInBackground() {return m_update_in_background;}
 
         /** \return the name of this menu (which is the name of the file) */
         const std::string& getName() const { return m_filename; }

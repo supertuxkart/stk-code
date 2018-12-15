@@ -209,3 +209,22 @@ EventPropagation TextBoxWidget::onActivationInput(const int playerID)
     // event to avoid breaking something
     return EVENT_BLOCK;
 }
+
+// -----------------------------------------------------------------------------
+EventPropagation TextBoxWidget::rightPressed(const int playerID)
+{
+    if (((MyCGUIEditBox*)m_element)->getTextCount() ==
+        ((MyCGUIEditBox*)m_element)->getCursorPosInBox())
+        return EVENT_BLOCK;
+
+    return EVENT_LET;
+}   // rightPressed
+
+// -----------------------------------------------------------------------------
+EventPropagation TextBoxWidget::leftPressed (const int playerID)
+{
+    if (((MyCGUIEditBox*)m_element)->getCursorPosInBox() == 0)
+        return EVENT_BLOCK;
+
+    return EVENT_LET;
+}   // leftPressed

@@ -78,7 +78,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue,
     m_velocity = max_height / timer;
 
     // Add a hit unless it was auto-rescue
-    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_BATTLE &&
+    if (race_manager->isBattleMode() &&
         !is_auto_rescue)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
@@ -103,8 +103,8 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue,
     // Clear powerups when rescue in CTF
     if (!from_state)
     {
-        addNetworkAnimationChecker(race_manager->getMajorMode() ==
-            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG);
+        addNetworkAnimationChecker(race_manager->getMinorMode() ==
+            RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
     }
 }   // RescueAnimation
 

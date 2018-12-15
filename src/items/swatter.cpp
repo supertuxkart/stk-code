@@ -39,7 +39,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
@@ -238,8 +238,7 @@ int Swatter::updateAndTestFinished(int ticks)
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
                     const int end_ticks = ticks_start + 60;
-                    if (race_manager
-                        ->getMinorMode()==RaceManager::MINOR_MODE_BATTLE ||
+                    if (race_manager->isBattleMode() ||
                         race_manager
                         ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
                     {
@@ -370,14 +369,24 @@ void Swatter::squashThingsAround()
         World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
             m_kart->getWorldKartId());
 
+        CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+        if (ctf)
+        {
+            int reset_ticks = (ctf->getTicksSinceStart() / 10) * 10 + 80;
+            ctf->resetKartForSwatterHit(m_closest_kart->getWorldKartId(),
+                reset_ticks);
+        }
         // Handle achievement if the swatter is used by the current player
         if (m_kart->getController()->canGetAchievements())
         {
             PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
             PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
-            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
             PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+            if (race_manager->isLinearRaceMode())
+            {
+                PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
+                PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+            }
         }
     }
 

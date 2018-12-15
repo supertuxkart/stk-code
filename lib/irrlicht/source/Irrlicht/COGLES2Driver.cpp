@@ -435,7 +435,7 @@ namespace video
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA, this));
 
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_ONETEXTURE_BLEND, this));
-		
+		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_STK_GRASS, this));
 		delete[] FPVSData;
 		delete[] FPFSData;
 		delete[] NMVSData;
@@ -825,6 +825,16 @@ namespace video
 		drawVertexPrimitiveList2d3d(vertices, vertexCount, (const u16*)indexList, primitiveCount, vType, pType, iType);
 	}
 
+	void COGLES2Driver::draw2DVertexPrimitiveList(const void* vertices,
+		u32 vertexCount, const void* indexList, u32 primitiveCount,
+		E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, E_INDEX_TYPE iType)
+    {
+		testGLError();
+		if (!checkPrimitiveCount(primitiveCount))
+			return;
+		setRenderStates2DMode(Material.MaterialType==EMT_TRANSPARENT_VERTEX_ALPHA, (Material.getTexture(0) != 0), Material.MaterialType==EMT_TRANSPARENT_ALPHA_CHANNEL);
+		drawVertexPrimitiveList2d3d(vertices, vertexCount, (const u16*)indexList, primitiveCount, vType, pType, iType, false);
+    }
 
 	void COGLES2Driver::drawVertexPrimitiveList2d3d(const void* vertices, u32 vertexCount,
 			const void* indexList, u32 primitiveCount,

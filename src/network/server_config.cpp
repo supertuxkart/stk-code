@@ -136,18 +136,6 @@ void loadServerConfigXML(const XMLNode* root)
         return;
     }
 
-    /*int config_file_version = -1;
-    if (root->get("version", &config_file_version) < 1 ||
-        config_file_version < stk_config->m_min_server_version ||
-        config_file_version > stk_config->m_max_server_version)
-    {
-        Log::info("ServerConfig", "Your config file was not compatible, "
-            "so it was deleted and a new one will be created.");
-        delete root;
-        writeServerConfigToDisk();
-        return;
-    }*/
-
     for (unsigned i = 0; i < g_server_params.size(); i++)
         g_server_params[i]->findYourDataInAChildOf(root);
 
@@ -190,9 +178,9 @@ void writeServerConfigToDisk()
 // ----------------------------------------------------------------------------
 /** Returns the minor and majar game mode from server database id. */
 std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-    getLocalGameMode()
+    getLocalGameMode(int mode)
 {
-    switch (m_server_mode)
+    switch (mode)
     {
         case 0:
             return { RaceManager::MINOR_MODE_NORMAL_RACE,
@@ -216,11 +204,11 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
             return { RaceManager::MINOR_MODE_SOCCER,
                 RaceManager::MAJOR_MODE_SINGLE };
         case 7:
-            return { RaceManager::MINOR_MODE_BATTLE,
-                RaceManager::MAJOR_MODE_FREE_FOR_ALL };
+            return { RaceManager::MINOR_MODE_FREE_FOR_ALL,
+                RaceManager::MAJOR_MODE_SINGLE };
         case 8:
-            return { RaceManager::MINOR_MODE_BATTLE,
-                RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG };
+            return { RaceManager::MINOR_MODE_CAPTURE_THE_FLAG,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }
@@ -228,6 +216,13 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         RaceManager::MAJOR_MODE_SINGLE };
 
 }   // getLocalGameMode
+
+// ----------------------------------------------------------------------------
+std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+    getLocalGameModeFromConfig()
+{
+    return getLocalGameMode(m_server_mode);
+}   // getLocalGameModeFromConfig
 
 // ----------------------------------------------------------------------------
 core::stringw getModeName(unsigned id)
@@ -266,7 +261,12 @@ void loadServerLobbyFromConfig()
     if (m_server_mode > 8)
         m_server_mode = 3;
 
-    auto modes = getLocalGameMode();
+    if (m_official_karts_threshold > 1.0f)
+        m_official_karts_threshold = 1.0f;
+    if (m_official_tracks_threshold > 1.0f)
+        m_official_tracks_threshold = 1.0f;
+
+    auto modes = getLocalGameModeFromConfig();
     race_manager->setMinorMode(modes.first);
     race_manager->setMajorMode(modes.second);
     unsigned difficulty = m_server_difficulty;
@@ -284,14 +284,16 @@ void loadServerLobbyFromConfig()
         if (m_min_start_game_players > m_server_max_players)
             m_min_start_game_players = 1;
         m_team_choosing = false;
+        m_server_configurable = false;
     }
+    if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        m_server_configurable = false;
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const bool is_gp =
         race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
-    const bool is_battle =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE;
+    const bool is_battle = race_manager->isBattleMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;
     server_lobby = STKHost::create();

@@ -129,6 +129,7 @@ public:
         m_index_to_hostid.clear();
     }
 
+    void setVoteTimeout(float timeout);
 };
 
 #endif

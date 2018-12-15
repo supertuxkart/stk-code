@@ -997,7 +997,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         if (!CommandLine::has("--track", &track))
             track = "temple";
         UserConfigParams::m_arena_ai_stats=true;
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         std::vector<std::string> l;
         for (int i = 0; i < 8; i++)
             l.push_back("tux");
@@ -1113,7 +1113,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         case 2:
         {
             ServerConfig::m_server_mode = 7;
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
             break;
         }
         case 3:
@@ -1134,8 +1134,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    const bool is_battle =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_BATTLE;
+    const bool is_battle = race_manager->isBattleMode();
 
     if (!has_server_config)
     {
@@ -1252,6 +1251,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     {
         NetworkConfig::get()->setServerIdFile(
             file_manager->getUserConfigFile(s));
+        ServerConfig::m_server_configurable = true;
     }
     if (CommandLine::has("--disable-polling"))
     {
@@ -1310,7 +1310,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--connect-now", &s))
     {
-        NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
         if (CommandLine::has("--network-ai", &n))
         {
@@ -1330,34 +1329,20 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         }
         TransportAddress server_addr(s);
-        auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
-            !server_password.empty(), false);
+        auto server = std::make_shared<Server>(0,
+            StringUtils::utf8ToWide(server_addr.toString()), 0, 0, 0, 0,
+            server_addr, !server_password.empty(), false);
         NetworkConfig::get()->doneAddingNetworkPlayers();
-        STKHost::create();
-        auto cts = std::make_shared<ConnectToServer>(server);
-        cts->setup();
         if (server_id != 0)
         {
+            NetworkConfig::get()->setIsWAN();
             server->setServerId(server_id);
             server->setSupportsEncryption(true);
-            cts->registerWithSTKServer();
-        }
-        Log::info("main", "Trying to connect to server '%s'.",
-            server_addr.toString().c_str());
-        if (!cts->tryConnect(2000, 15))
-        {
-            Log::error("main", "Timeout trying to connect to server '%s'.",
-                server_addr.toString().c_str());
-            STKHost::get()->shutdown();
-            exit(0);
         }
         else
-        {
-            server_addr =
-                STKHost::get()->getServerPeerForClient()->getAddress();
-            auto cl = LobbyProtocol::create<ClientLobby>(server_addr, server);
-            cl->requestStart();
-        }
+            NetworkConfig::get()->setIsLAN();
+        STKHost::create();
+        NetworkingLobby::getInstance()->setJoinedServer(server);
     }
 
     if (NetworkConfig::get()->isServer())
@@ -1468,7 +1453,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
             race_manager->setNumKarts(1);
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_BATTLE);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         }
         else if (t->isSoccer())
         {
@@ -1670,14 +1655,14 @@ void initUserConfig()
 //=============================================================================
 void initRest()
 {
-
+    SP::setMaxTextureSize();
     irr_driver = new IrrDriver();
-    
+
     if (irr_driver->getDevice() == NULL)
     {
         Log::fatal("main", "Couldn't initialise irrlicht device. Quitting.\n");
     }
-    
+
     StkTime::init();   // grabs the timer object from the irrlicht device
 
     // Now create the actual non-null device in the irrlicht driver
@@ -2371,11 +2356,14 @@ static void cleanSuperTuxKart()
     }
 #endif
 
-    if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
+    if (Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
     {
-        Log::info("Thread", "Request Manager not aborting in time, aborting.");
+        Online::RequestManager::deallocate();
     }
-    Online::RequestManager::deallocate();
+    else
+    {
+        Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
+    }
 
     if (!SFXManager::get()->waitForReadyToDeleted(2.0f))
     {

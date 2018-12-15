@@ -140,8 +140,18 @@ void AddonsManager::init(const XMLNode *xml,
     }
     else
         Log::info("addons", "Using cached addons.xml.");
-        
-    const XMLNode *xml_addons = new XMLNode(filename);
+
+    const XMLNode* xml_addons = NULL;
+    try
+    {
+        xml_addons = new XMLNode(filename);
+    }
+    catch (std::exception& e)
+    {
+        Log::error("addons", "Error %s", e.what());
+    }
+    if (!xml_addons)
+        return;
     addons_manager->initAddons(xml_addons);   // will free xml_addons
     if(UserConfigParams::logAddons())
         Log::info("addons", "Addons manager list downloaded.");

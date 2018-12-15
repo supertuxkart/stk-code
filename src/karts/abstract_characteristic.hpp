@@ -95,6 +95,7 @@ public:
         // Engine
         ENGINE_POWER,
         ENGINE_MAX_SPEED,
+        ENGINE_GENERIC_MAX_SPEED,
         ENGINE_BRAKE_FACTOR,
         ENGINE_BRAKE_TIME_INCREASE,
         ENGINE_MAX_SPEED_REVERSE_RATIO,
@@ -185,6 +186,7 @@ public:
         // Nitro
         NITRO_DURATION,
         NITRO_ENGINE_FORCE,
+        NITRO_ENGINE_MULT,
         NITRO_CONSUMPTION,
         NITRO_SMALL_CONTAINER,
         NITRO_BIG_CONTAINER,
@@ -281,6 +283,7 @@ public:
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;
+    float getEngineGenericMaxSpeed() const;
     float getEngineBrakeFactor() const;
     float getEngineBrakeTimeIncrease() const;
     float getEngineMaxSpeedReverseRatio() const;
@@ -354,6 +357,7 @@ public:
 
     float getNitroDuration() const;
     float getNitroEngineForce() const;
+    float getNitroEngineMult() const;
     float getNitroConsumption() const;
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;

@@ -67,7 +67,9 @@ public:
         LE_KICK_HOST,
         LE_CHANGE_TEAM,
         LE_BAD_TEAM,
-        LE_BAD_CONNECTION
+        LE_BAD_CONNECTION,
+        LE_CONFIG_SERVER,
+        LE_CHANGE_HANDICAP
     };
 
     enum RejectReason : uint8_t
@@ -95,6 +97,14 @@ protected:
     std::thread m_start_game_thread;
 
     static std::weak_ptr<LobbyProtocol> m_lobby;
+
+    /** Estimated current started game remaining time,
+     *  uint32_t max if not available. */
+    std::atomic<uint32_t> m_estimated_remaining_time;
+
+    /** Estimated current started game progress in 0-100%,
+      * uint32_t max if not available. */
+    std::atomic<uint32_t> m_estimated_progress;
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
@@ -160,9 +170,9 @@ public:
      *  \param host_id Host id of this vote.
      *  \param vote The vote to add. */
     void addVote(int host_id, const PeerVote &vote)
-   ; //{
-    //    m_peers_votes[host_id] = vote;
-    //}   // addVote
+    {
+        m_peers_votes[host_id] = vote;
+    }   // addVote
     // -----------------------------------------------------------------------
     /** Returns the voting data for one host. Returns NULL if the vote from
      *  the given host id has not yet arrived (or if it is an invalid host id).
@@ -172,6 +182,24 @@ public:
         auto it = m_peers_votes.find(host_id);
         if (it == m_peers_votes.end()) return NULL;
         return &(it->second);
+    }
+    // -----------------------------------------------------------------------
+    std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+    {
+        return std::make_pair(m_estimated_remaining_time.load(),
+            m_estimated_progress.load());
+    }
+    // ------------------------------------------------------------------------
+    void setGameStartedProgress(const std::pair<uint32_t, uint32_t>& p)
+    {
+        m_estimated_remaining_time.store(p.first);
+        m_estimated_progress.store(p.second);
+    }
+    // ------------------------------------------------------------------------
+    void resetGameStartedProgress()
+    {
+        m_estimated_remaining_time.store(std::numeric_limits<uint32_t>::max());
+        m_estimated_progress.store(std::numeric_limits<uint32_t>::max());
     }
 };   // class LobbyProtocol
 

@@ -105,6 +105,7 @@ void android_main(struct android_app* app)
     // its state is remembered when the window is restored. We will use exit
     // call to make sure that all variables are cleared until a proper fix will 
     // be done.
+    fflush(NULL);
     _exit(0);
 }
 

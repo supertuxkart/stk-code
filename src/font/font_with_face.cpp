@@ -350,9 +350,9 @@ void FontWithFace::dumpGlyphPage()
  */
 void FontWithFace::setDPI()
 {
-    const int screen_width = irr_driver->getFrameSize().Width;
-    const int screen_height = irr_driver->getFrameSize().Height;
-    
+    const int screen_width = irr_driver->getActualScreenSize().Width;
+    const int screen_height = irr_driver->getActualScreenSize().Height;
+
     if (UserConfigParams::m_hidpi_enabled)
     {
         float scale = screen_height / 480.0f;

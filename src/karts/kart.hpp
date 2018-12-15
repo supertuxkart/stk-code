@@ -220,8 +220,6 @@ protected:
      *  > 0 the number it contains is the time left before removing plunger. */
     int16_t       m_view_blocked_by_plunger;
 
-    float         m_graphical_view_blocked_by_plunger;
-
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
 
@@ -264,6 +262,7 @@ protected:
     void          updateEngineSFX(float dt);
     void          updateSpeed();
     void          updateNitro(int ticks);
+    float         applyAirFriction (float engine_power);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
@@ -394,9 +393,6 @@ public:
     virtual int getBlockedByPlungerTicks() const OVERRIDE
                                          { return m_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
-    virtual float getGraphicalViewBlockedByPlunger() const OVERRIDE
-                               { return m_graphical_view_blocked_by_plunger; }
-    // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
     virtual void   blockViewWithPlunger() OVERRIDE;
@@ -474,10 +470,10 @@ public:
     /** Makes a kart invulnerable for a certain amount of time. */
     virtual void setInvulnerableTicks(int ticks) OVERRIDE
     {
-        // The rest 2 bits are saving fire clicked and animation status for
-        // rewind
-        if (ticks > 16383)
-            ticks = 16383;
+        // The last 3 bits are saving fire clicked, kart animation status and
+        // plunger state for rewind
+        if (ticks > 8191)
+            ticks = 8191;
         m_invulnerable_ticks = ticks;
     }   // setInvulnerableTicks
     // ------------------------------------------------------------------------

@@ -74,6 +74,7 @@ namespace irr
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
         virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
+        virtual void showKeyboard(bool show);
         
         class CCursorControl : public gui::ICursorControl
         {

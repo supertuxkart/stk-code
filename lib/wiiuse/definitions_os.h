@@ -42,8 +42,14 @@
 #ifdef _MSC_VER
 	#include <float.h>
 	/* windows with visual c */
-	#define isnan(x)		(_isnan(x))
-	#define isinf(x)		(!_finite(x))
+    #include <math.h>   // For isnan etc, otherwise we get duplicated defines
+
+#ifndef isnan
+	   #define isnan(x)	 (_isnan(x))
+#endif
+#ifndef isinf
+       #define isinf(x)	 (!_finite(x))
+#endif
 	/* disable warnings I don't care about */
 	/*#pragma warning(disable:4273)	*/	/* inconsistent dll linkage			*/
 #endif

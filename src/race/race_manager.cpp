@@ -516,10 +516,10 @@ void RaceManager::startNextRace()
     }   // not first race
 
     // set boosted AI status for AI karts
-    int boosted_ai_count = std::min<int>(m_ai_kart_list.size(),
-                                         (m_kart_status.size()-2)/4 + 1);
+    int boosted_ai_count = std::min<int>((int)m_ai_kart_list.size(),
+                                         ((int)(m_kart_status.size())-2)/4 + 1);
     if (boosted_ai_count > 4) boosted_ai_count = 4;
-    int ai_count = m_ai_kart_list.size();
+    int ai_count = (int)m_ai_kart_list.size();
 
     for (unsigned int i=0;i<m_kart_status.size();i++)
     {
@@ -557,13 +557,13 @@ void RaceManager::startNextRace()
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_TUTORIAL)
         World::setWorld(new TutorialWorld());
-    else if(m_minor_mode==MINOR_MODE_BATTLE)
+    else if (isBattleMode())
     {
-        if (m_major_mode == MAJOR_MODE_3_STRIKES)
+        if (m_minor_mode == MINOR_MODE_3_STRIKES)
             World::setWorld(new ThreeStrikesBattle());
-        else if (m_major_mode == MAJOR_MODE_FREE_FOR_ALL)
+        else if (m_minor_mode == MINOR_MODE_FREE_FOR_ALL)
             World::setWorld(new FreeForAll());
-        else if (m_major_mode == MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
@@ -987,8 +987,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     if (num_laps != -1) setNumLaps( num_laps );
 
-    if (m_minor_mode != MINOR_MODE_BATTLE)
-        setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
 
@@ -1055,7 +1054,7 @@ void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
             { return m_tracks; }
         virtual unsigned int
             getNumberOfTracks(const bool includeLocked=false) const
-            { return m_tracks.size(); }
+            { return (unsigned int)m_tracks.size(); }
         void addNetworkTrack(const std::string& t) { m_tracks.push_back(t); }
     };
 

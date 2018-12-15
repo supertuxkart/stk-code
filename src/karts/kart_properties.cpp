@@ -66,6 +66,7 @@ std::string KartProperties::getPerPlayerDifficultyAsString(PerPlayerDifficulty d
  */
 KartProperties::KartProperties(const std::string &filename)
 {
+    m_is_addon = false;
     m_icon_material = NULL;
     m_minimap_icon  = NULL;
     m_name          = "NONAME";
@@ -212,7 +213,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // case that an addon kart has the same directory name (and therefore
     // identifier) as an included kart.
     if(Addon::isAddon(filename))
+    {
         m_ident = Addon::createAddonId(m_ident);
+        m_is_addon = true;
+    }
+
     try
     {
         if(!root || root->getName()!="kart")
@@ -680,6 +685,12 @@ float KartProperties::getEngineMaxSpeed() const
 }  // getEngineMaxSpeed
 
 // ----------------------------------------------------------------------------
+float KartProperties::getEngineGenericMaxSpeed() const
+{
+    return m_cached_characteristic->getEngineGenericMaxSpeed();
+}  // getEngineMaxSpeed
+
+// ----------------------------------------------------------------------------
 float KartProperties::getEngineBrakeFactor() const
 {
     return m_cached_characteristic->getEngineBrakeFactor();
@@ -1016,6 +1027,12 @@ float KartProperties::getNitroEngineForce() const
 {
     return m_cached_characteristic->getNitroEngineForce();
 }  // getNitroEngineForce
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitroEngineMult() const
+{
+    return m_cached_characteristic->getNitroEngineMult();
+}  // getNitroEngineMult
 
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroConsumption() const

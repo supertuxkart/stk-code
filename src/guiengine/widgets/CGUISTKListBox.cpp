@@ -5,6 +5,7 @@
 
 #include "guiengine/widgets/CGUISTKListBox.hpp"
 
+#include "graphics/2dutils.hpp"
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
@@ -32,6 +33,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
     DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true),
     HighlightWhenNotFocused(true)
 {
+    m_alternating_darkness = false;
     #ifdef _DEBUG
     setDebugName("CGUISTKListBox");
     #endif
@@ -507,6 +509,14 @@ void CGUISTKListBox::draw()
         if (frameRect.LowerRightCorner.Y >= AbsoluteRect.UpperLeftCorner.Y &&
             frameRect.UpperLeftCorner.Y <= AbsoluteRect.LowerRightCorner.Y)
         {
+#ifndef SERVER_ONLY
+            if (m_alternating_darkness && i % 2 != 0)
+            {
+                video::SColor color(0);
+                color.setAlpha(30);
+                GL32_draw2DRectangle(color, frameRect, &clientClip);
+            }
+#endif
             if (i == Selected && hl)
                 skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), frameRect, &clientClip);
 
@@ -576,7 +586,7 @@ void CGUISTKListBox::draw()
                     }
 
                     core::rect<s32> lineRect = textRect;
-                    int line_height = Font->getDimension(L"A").Height;
+                    int line_height = Font->getDimension(L"A").Height*Items[i].m_line_height_scale;
                     int supp_lines = Items[i].m_contents[x].m_text_lines.size() - 1;
                     lineRect.UpperLeftCorner.Y -= (line_height*supp_lines)/2;
                     lineRect.LowerRightCorner.Y -= (line_height*supp_lines)/2;

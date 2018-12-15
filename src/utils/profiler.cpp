@@ -524,9 +524,9 @@ void Profiler::drawBackground()
 
     core::rect<s32>background_rect(
         (int)(MARGIN_X                      * screen_size.Width),
-        (int)((MARGIN_Y + 0.25f)             * screen_size.Height),
+        (int)((MARGIN_Y + 1.75f*LINE_HEIGHT) * screen_size.Height),
         (int)((1.0-MARGIN_X)                * screen_size.Width),
-        (int)((MARGIN_Y + 1.75f*LINE_HEIGHT) * screen_size.Height)  );
+        (int)((MARGIN_Y + 0.25f)             * screen_size.Height));
 
     video::SColor   color(0x88, 0xFF, 0xFF, 0xFF);
     GL32_draw2DRectangle(color, background_rect);

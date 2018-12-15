@@ -627,6 +627,10 @@ void LinearWorld::getKartsDisplayInfo(
             }
             rank_info.m_text = irr::core::stringw(str.c_str());
         }
+        else if (kart->hasFinishedRace())
+        {
+            rank_info.m_text = kart->getController()->getName();
+        }
         else
         {
             rank_info.m_text = "";
@@ -1047,3 +1051,27 @@ void LinearWorld::setLastTriggeredCheckline(unsigned int kart_index, int index)
     if (m_kart_info.size() == 0) return;
     getTrackSector(kart_index)->setLastTriggeredCheckline(index);
 }   // setLastTriggeredCheckline
+
+//-----------------------------------------------------------------------------
+std::pair<uint32_t, uint32_t> LinearWorld::getGameStartedProgress() const
+{
+    std::pair<uint32_t, uint32_t> progress(
+        std::numeric_limits<uint32_t>::max(),
+        std::numeric_limits<uint32_t>::max());
+    AbstractKart* slowest_kart = NULL;
+    for (unsigned i = m_karts.size(); i > 0; i--)
+    {
+        slowest_kart = getKartAtPosition(i);
+        if (slowest_kart && !slowest_kart->isEliminated())
+            break;
+    }
+    if (slowest_kart &&
+        getFinishedLapsOfKart(slowest_kart->getWorldKartId()) != -1)
+    {
+        progress.second = (uint32_t)(
+            getOverallDistance(slowest_kart->getWorldKartId()) /
+            (Track::getCurrentTrack()->getTrackLength() *
+            (float)race_manager->getNumLaps()) * 100.0f);
+    }
+    return progress;
+}   // getGameStartedProgress

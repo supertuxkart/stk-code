@@ -23,9 +23,10 @@ export KARTS="all"
 export TRACKS="abyss arena_candela_city battleisland cave cornfield_crossing   \
                endcutscene featunlocked fortmagma gplose gpwin hacienda        \
                icy_soccer_field introcutscene introcutscene2 lasdunasarena     \
-               lasdunassoccer lighthouse mines olivermath overworld sandtrack  \
-               scotland snowmountain snowtuxpeak soccer_field stadium temple   \
-               tutorial zengarden"
+               lasdunassoccer lighthouse mines minigolf olivermath overworld   \
+               sandtrack scotland snowmountain snowtuxpeak soccer_field        \
+               stadium stk_enterprise temple tutorial volcano_island xr591     \
+               zengarden"
 
 export ASSETS_PATHS="../data                    \
                      ../../stk-assets           \

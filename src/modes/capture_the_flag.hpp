@@ -54,6 +54,8 @@ private:
 
     int m_red_return_ticks, m_blue_return_ticks;
 
+    std::map<int, int> m_swatter_reset_kart_ticks;
+
     // ------------------------------------------------------------------------
     void updateFlagNodes();
     // ------------------------------------------------------------------------
@@ -86,6 +88,8 @@ public:
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
     void attachFlag(NetworkString& ns);
     // ------------------------------------------------------------------------
@@ -131,7 +135,32 @@ public:
     const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
     // ------------------------------------------------------------------------
     void loseFlagForKart(int kart_id);
-
+    // ------------------------------------------------------------------------
+    void resetKartForSwatterHit(int kart_id, int at_world_ticks)
+                      { m_swatter_reset_kart_ticks[kart_id] = at_world_ticks; }
+    // ------------------------------------------------------------------------
+    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+        OVERRIDE
+    {
+        std::pair<uint32_t, uint32_t> progress(
+            std::numeric_limits<uint32_t>::max(),
+            std::numeric_limits<uint32_t>::max());
+        if (race_manager->hasTimeTarget())
+        {
+            progress.first = (uint32_t)m_time;
+        }
+        if (m_red_scores > m_blue_scores)
+        {
+            progress.second = (uint32_t)((float)m_red_scores /
+                (float)race_manager->getHitCaptureLimit() * 100.0f);
+        }
+        else
+        {
+            progress.second = (uint32_t)((float)m_blue_scores /
+                (float)race_manager->getHitCaptureLimit() * 100.0f);
+        }
+        return progress;
+    }
 };   // CaptureTheFlag
 
 #endif

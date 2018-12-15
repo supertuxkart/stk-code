@@ -75,23 +75,26 @@ irr::core::stringw Achievement::getGoalProgressAsString()
 {
     irr::core::stringw target = getInfo()->goalString();
 
-    // Return N/N in case of an achieved achievement.
-    if (m_achieved)
-        return target + "/" + target;
-
-    int fullfiled_goals = computeFullfiledGoals(m_progress_goal_tree, m_achievement_info->m_goal_tree);
-
-    return StringUtils::toWString(fullfiled_goals) + "/" + target;
+    return StringUtils::toWString(getFullfiledGoals()) + "/" + target;
 } // getGoalProgressAsString
+
+// ----------------------------------------------------------------------------
+/** Returns how many goals of an achievement have been achieved.
+ */
+int Achievement::getFullfiledGoals()
+{
+    int fullfiled_goals = (m_achieved) ? getInfo()->getGoalCount() :
+                          computeFullfiledGoals(m_progress_goal_tree, m_achievement_info->m_goal_tree);
+    return fullfiled_goals;
+} // getFullfiledGoals
 
 // ----------------------------------------------------------------------------
 int Achievement::computeFullfiledGoals(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference)
 {
-
     if (progress.children.size() != 1)
     {
         // This always returns 0 if the achievement has not been completed
-        if (progress.children[0].type == "OR")
+        if (progress.children.size() != 0 && progress.children[0].type == "OR")
         {
             bool completed = false;
             for (unsigned int i=0;i<progress.children.size();i++)
@@ -141,14 +144,19 @@ irr::core::stringw Achievement::getProgressAsString()
     if (target == "-1")
         return empty;
 
-    // Return N/N in case of an achieved achievement.
-    if (m_achieved)
-        return target + "/" + target;
-
-    int progress = computeGoalProgress(m_progress_goal_tree, m_achievement_info->m_goal_tree);
-
-    return StringUtils::toWString(progress) + "/" + target;
+    return StringUtils::toWString(getProgress()) + "/" + target;
 }   // getProgressAsString
+
+// ----------------------------------------------------------------------------
+/** Returns how many goals of an achievement have been achieved.
+ */
+int Achievement::getProgress()
+{
+    int progress = (m_achieved) ? getInfo()->getProgressTarget() :
+                                  computeGoalProgress(m_progress_goal_tree, m_achievement_info->m_goal_tree);
+    return progress;
+} // getProgress
+
 
 // ----------------------------------------------------------------------------
 /** Should ONLY be called if the achievement has one goal (a sum counts as one goal).

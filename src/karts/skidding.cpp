@@ -87,7 +87,7 @@ void Skidding::reset()
     btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost
     if (!m_kart->isGhostKart())
-        m_kart->getVehicle()->setTimedRotation(0, rot);
+        m_kart->getVehicle()->setTimedRotation(0, 0);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -535,8 +535,9 @@ void Skidding::update(int ticks, bool is_on_ground,
                 float t = std::min(skid_time_float, kp->getSkidVisualTime());
                 t       = std::min(t,           kp->getSkidRevertVisualTime());
 
-                btVector3 rot(0, m_visual_rotation * kp->getSkidPostSkidRotateFactor(), 0);
-                m_kart->getVehicle()->setTimedRotation(t, rot);
+                m_kart->getVehicle()->setTimedRotation(
+                    (uint16_t)stk_config->time2Ticks(t),
+                    m_visual_rotation * kp->getSkidPostSkidRotateFactor());
                 // skid_time is used to count backwards for the GFX
                 m_skid_time = stk_config->time2Ticks(t);
                 if(bonus_time>0)
@@ -545,7 +546,7 @@ void Skidding::update(int ticks, bool is_on_ground,
                                                             MaxSpeed::MS_INCREASE_RED_SKIDDING;
                     m_kart->m_max_speed->
                         instantSpeedIncrease(bonus_cat,
-                               bonus_speed, bonus_speed,
+                               bonus_speed, bonus_speed/2,
                                bonus_force,
                                stk_config->time2Ticks(bonus_time),
                                /*fade-out-time*/ stk_config->time2Ticks(1.0f));
@@ -555,10 +556,13 @@ void Skidding::update(int ticks, bool is_on_ground,
 
                     if (m_kart->getController()->canGetAchievements())
                     {
-                        PlayerManager::increaseAchievement(
-                                AchievementsStatus::SKIDDING_1LAP, 1);
-                        PlayerManager::increaseAchievement(
-                                AchievementsStatus::SKIDDING_1RACE, 1);
+                        if (race_manager->isLinearRaceMode())
+                        {
+                            PlayerManager::increaseAchievement(
+                                    AchievementsStatus::SKIDDING_1LAP, 1);
+                            PlayerManager::increaseAchievement(
+                                    AchievementsStatus::SKIDDING_1RACE, 1);
+                        }
                         PlayerManager::increaseAchievement(
                                 AchievementsStatus::SKIDDING, 1);
                     }

@@ -227,6 +227,7 @@ void GameProtocol::handleControllerAction(Event *event)
     {
         // Send update to all clients except the original sender if the event
         // is after the server time
+        event->getPeer()->updateLastActivity();
         if (!will_trigger_rewind)
             STKHost::get()->sendPacketExcept(event->getPeer(), &data, false);
 

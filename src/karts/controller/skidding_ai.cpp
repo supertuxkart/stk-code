@@ -1238,10 +1238,12 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
         } // POWERUP_SWITCH
 
     case PowerupManager::POWERUP_PARACHUTE:
+        {
         // Wait one second more than a previous parachute
-        if(m_time_since_last_shot > m_kart->getKartProperties()->getParachuteDurationOther() + 1.0f)
+        if(m_time_since_last_shot > stk_config->ticks2Time(m_kart->getKartProperties()->getParachuteDurationOther()) + 1.0f)
             m_controls->setFire(true);
-        break;   // POWERUP_PARACHUTE
+        break;
+        }// POWERUP_PARACHUTE
 
     case PowerupManager::POWERUP_SWATTER:
         {
@@ -1781,13 +1783,12 @@ void SkiddingAI::handleSwitch(int item_skill,
     else if(item_skill == 5)
     {  
        //First step : identify the best available item
-       int i;
        int bad = 0;
        int good = 0;
 
        //Good will store 1 for nitro, big or small, 2 for item box
        //Big nitro are usually hard to take for the AI
-       for(i=items_to_collect.size()-1; i>=0; i--)
+       for(int i=(int)items_to_collect.size()-1; i>=0; i--)
        {
            if (items_to_collect[i]->getType() == Item::ITEM_BONUS_BOX)
            {
@@ -1802,7 +1803,7 @@ void SkiddingAI::handleSwitch(int item_skill,
        }
            
        //Bad will store 2 for bananas, 3 for bubble gum
-       for(i=items_to_avoid.size()-1; i>=0; i--)
+       for(int i=(int)items_to_avoid.size()-1; i>=0; i--)
        {
            if (items_to_avoid[i]->getType() == Item::ITEM_BUBBLEGUM)
            {

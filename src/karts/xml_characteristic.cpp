@@ -365,6 +365,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ENGINE_POWER]);
         sub_node->get("max-speed",
             &m_values[ENGINE_MAX_SPEED]);
+        sub_node->get("generic-max-speed",
+            &m_values[ENGINE_GENERIC_MAX_SPEED]);
         sub_node->get("brake-factor",
             &m_values[ENGINE_BRAKE_FACTOR]);
         sub_node->get("brake-time-increase",
@@ -545,6 +547,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[NITRO_DURATION]);
         sub_node->get("engine-force",
             &m_values[NITRO_ENGINE_FORCE]);
+        sub_node->get("engine-mult",
+            &m_values[NITRO_ENGINE_MULT]);
         sub_node->get("consumption",
             &m_values[NITRO_CONSUMPTION]);
         sub_node->get("small-container",

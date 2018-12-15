@@ -25,6 +25,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/network_string.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/connect_to_peer.hpp"
@@ -109,7 +110,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  server, which is regularly polled by the client. On detecting a new
  *  connection request the server will try to send a message to the client.
  *  This allows connections between server and client even if they are 
- *  sitting behind a NAT translating firewall. The following tables on
+ *  sitting behind a NAT firewall. The following tables on
  *  the stk server are used:
  *  client_sessions: It stores the list of all online users (so loging in
  *         means to insert a row in this table), including their token
@@ -119,64 +120,52 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  servers: Registers all servers and gives them a unique id, together
  *         with the user id (which is stored as host_id in this table).
  *  server_conn: This table stores connection requests from clients to
- *         servers. A 'request' bit is set to 1 if the request has not
- *         been handled, and is reset to 0 the moment the server receives
- *         the information about the client request.
+ *         servers. It has the aes_key and aes_iv which are used to validate
+ *         clients if it's the same online user id joining a server,
+ *         ip and port for NAT penetration and a connected_since which
+ *         stores the timestamp the user joined this server to know the time
+ *         playing spent playing on it.
  *
  *  The following outlines the protocol happening in order to connect a
  *  client to a server in more details:
  *
+ *  First it calls setPublicAddress() here to discover the public ip address
+ *  and port number of this host,
  *  Server:
  *
  *    1. ServerLobby:
- *       Spawns the following sub-protocols:
- *       1. GetPublicAddress: Use STUN to discover the public ip address
- *          and port number of this host.
- *       2. Register this server with stk server (i.e. publish its public
- *          ip address and port number) - 'start' request. This enters the
- *          public information into the 'client_sessions' table, and then
- *          the server into the 'servers' table. This server can now
+ *       1. Register this server with stk server (i.e. publish its public
+ *          ip address, port number and game info) - 'create' request. This
+ *          enters the server into the 'servers' table. This server can now
  *          be detected by other clients, so they can request a connection.
- *       3. The server lobby now polls the stk server for client connection
- *          requests using the 'poll-connection-requests', which queries the
- *          servers table to get the server id (based on address and user id),
- *          and then the server_conn table. The rows in this table are updated
- *          by setting the 'request' bit to 0 (i.e. connection request was
- *          send to server).
- *      
+ *       2. The server lobby now polls the stk server for client connection
+ *          requests using the 'poll-connection-requests' each 5 seconds, which
+ *          queries the servers table to get the server id (based on address
+ *          and user id), and then the server_conn table. The server will map
+ *          each joined AES key within 45 seconds to each connected client to
+ *          handle validation.
  *  Client:
  *
  *    The GUI queries the stk server to get a list of available servers
  *    ('get-all' request, submitted from ServersManager to query the 'servers'
  *    table). The user picks one (or in case of quick play one is picked
  *    randomly), and then instantiates STKHost with the id of this server.
- *    STKHost then triggers ConnectToServer, which starts the following
- *    protocols:
- *       1. GetPublicAddress: Use STUN to discover the public ip address
- *          and port number of this host.
- *       2. Register the client with the STK host ('set' command, into the
- *          table 'client_sessions'). Its public ip address and port will
- *          be registerd.
- *       3. GetPeerAddress. Submits a 'get' request to the STK server to get
- *          the ip address and port for the selected server from
- *          'client_sessions'. 
- *          If the ip address of the server is the same as this client, they
- *          will connect using the LAN connection.
- *       4. RequestConnection will do a 'request-connection' to the stk server.
- *          The user id and server id are stored in server_conn. This is the
- *          request that the server will detect using polling.
+ *    STKHost then triggers ConnectToServer, which do the following:
+ *       1. Register the client with the STK host ('join-server-key' command,
+ *          into the table 'server_conn'). Its public ip address and port will
+ *          be registerd with a AES key and iv set by client.
+ *       2. Run ConnectToServer::tryConnect for 30 seconds to connect to server,
+ *          It will auto change to a correct server port in case the server is
+ *          behind a strong firewall, see intercept below.
  *
  * Server:
  *
- *   The ServerLobbyProtocol (SLP) will then detect the above client
- *   requests, and start a ConnectToPeer protocol for each incoming client.
- *   The ConnectToPeer protocol uses:
- *         1. GetPeerAddress to get the ip address and port of the client.
- *            Once this is received, it will start the:
- *         2. PingProtocol
- *            This sends a raw packet (i.e. no enet header) to the
- *            destination (unless if it is a LAN connection, then UDP
- *            broadcasts will be used). 
+ *  The ServerLobbyProtocol (SLP) will then detect the above client
+ *  requests, and start a ConnectToPeer protocol for each incoming client.
+ *  The ConnectToPeer protocol send client a raw packet with
+ *  "0xffff" and "aloha-stk", so the client can use the intercept in enet for
+ *  advanced NAT penetration, see ConnectToServer::interceptCallback for
+ *  details.
  *
  *  Each client will run a ClientLobbyProtocol (CLP) to handle the further
  *  interaction with the server. The client will first request a connection
@@ -195,9 +184,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *
  *  The server will reply with either a reject message (e.g. too many clients
  *  already connected), or an accept message. The accept message will contain
- *  the global player id of the client, and a unique (random) token used to
- *  authenticate all further messages from the server: each message from the
- *  client to the server and vice versa will contain this token. The message
+ *  the global player id of the client. The message
  *  also contains the global ids and names of all currently connected
  *  clients for the new client. The server then informs all existing clients
  *  about the newly connected client, and its global player id.
@@ -231,12 +218,12 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *
  *  --> Server and all clients have identical information about all votes
  *  stored in RaceConfig of GameSetup.
- * 
+ *
  *  The server will detect when the track votes from each client have been
  *  received and will inform all clients to load the world (playerTrackVote).
  *  Then (state LOAD_GAME) the server will load the world and wait for all
  *  clients to finish loading (WAIT_FOR_WORLD_LOADED).
- *  
+ *
  *  In LR::loadWorld all ActivePlayers for all non-local players are created.
  *  (on a server all karts are non-local). On a client, the ActivePlayer
  *  objects for each local players have been created (to store the device
@@ -339,6 +326,7 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
+    NetworkConfig::get()->clearActivePlayersForClient();
     requestShutdown();
     if (m_network_console.joinable())
         m_network_console.join();
@@ -771,18 +759,35 @@ void STKHost::mainLoop()
                         p.second->getPing();
                     const unsigned ap = p.second->getAveragePing();
                     const unsigned max_ping = ServerConfig::m_max_ping;
-                    if (ServerConfig::m_kick_high_ping_players &&
-                        p.second->isValidated() &&
+                    if (p.second->isValidated() &&
                         p.second->getConnectedTime() > 5.0f && ap > max_ping)
                     {
-                        Log::info("STKHost", "%s with ping %d is higher than"
-                            " %d ms, kick.",
-                            p.second->getAddress().toString().c_str(),
-                            ap, max_ping);
-                        std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
-                        m_enet_cmd.emplace_back(p.second->getENetPeer(),
-                            (ENetPacket*)NULL, PDI_BAD_CONNECTION,
-                            ECT_DISCONNECT);
+                        if (ServerConfig::m_kick_high_ping_players &&
+                            !p.second->isDisconnected())
+                        {
+                            Log::info("STKHost", "%s with ping %d is higher"
+                                " than %d ms, kick.",
+                                p.second->getAddress().toString().c_str(),
+                                ap, max_ping);
+                            p.second->setWarnedForHighPing(true);
+                            p.second->setDisconnected(true);
+                            std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
+                            m_enet_cmd.emplace_back(p.second->getENetPeer(),
+                                (ENetPacket*)NULL, PDI_BAD_CONNECTION,
+                                ECT_DISCONNECT);
+                        }
+                        else if (!p.second->hasWarnedForHighPing())
+                        {
+                            Log::info("STKHost", "%s with ping %d is higher"
+                                " than %d ms.",
+                                p.second->getAddress().toString().c_str(),
+                                ap, max_ping);
+                            p.second->setWarnedForHighPing(true);
+                            NetworkString msg(PROTOCOL_LOBBY_ROOM);
+                            msg.setSynchronous(true);
+                            msg.addUInt8(LobbyProtocol::LE_BAD_CONNECTION);
+                            p.second->sendPacket(&msg, /*reliable*/true);
+                        }
                     }
                 }
                 BareNetworkString ping_packet;
@@ -791,6 +796,17 @@ void STKHost::mainLoop()
                 ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
                 for (auto& p : m_peer_pings.getData())
                     ping_packet.addUInt32(p.first).addUInt32(p.second);
+                if (sl)
+                {
+                    auto progress = sl->getGameStartedProgress();
+                    ping_packet.addUInt32(progress.first)
+                        .addUInt32(progress.second);
+                }
+                else
+                {
+                    ping_packet.addUInt32(std::numeric_limits<uint32_t>::max())
+                        .addUInt32(std::numeric_limits<uint32_t>::max());
+                }
                 ping_packet.getBuffer().insert(
                     ping_packet.getBuffer().begin(), g_ping_packet.begin(),
                     g_ping_packet.end());
@@ -861,12 +877,12 @@ void STKHost::mainLoop()
         bool need_ping_update = false;
         while (enet_host_service(host, &event, 10) != 0)
         {
+            auto lp = LobbyProtocol::get<LobbyProtocol>();
             if (!is_server &&
                 last_ping_time_update_for_client < StkTime::getRealTimeMs())
             {
                 last_ping_time_update_for_client =
                     StkTime::getRealTimeMs() + 2000;
-                auto lp = LobbyProtocol::get<LobbyProtocol>();
                 if (lp && lp->isRacing())
                 {
                     auto p = getServerPeerForClient();
@@ -945,7 +961,20 @@ void STKHost::mainLoop()
                         const uint32_t client_ping =
                             peer_pings.find(m_host_id) != peer_pings.end() ?
                             peer_pings.at(m_host_id) : 0;
-
+                        uint32_t remaining_time =
+                            std::numeric_limits<uint32_t>::max();
+                        uint32_t progress =
+                            std::numeric_limits<uint32_t>::max();
+                        try
+                        {
+                            remaining_time = ping_packet.getUInt32();
+                            progress = ping_packet.getUInt32();
+                        }
+                        catch (std::exception& e)
+                        {
+                            // For old server
+                            Log::debug("STKHost", "%s", e.what());
+                        }
                         if (client_ping > 0)
                         {
                             assert(m_nts);
@@ -958,6 +987,11 @@ void STKHost::mainLoop()
                             m_peer_pings.unlock();
                             m_client_ping.store(client_ping,
                                 std::memory_order_relaxed);
+                            if (lp)
+                            {
+                                lp->setGameStartedProgress(
+                                    std::make_pair(remaining_time, progress));
+                            }
                         }
                     }
                     enet_packet_destroy(event.packet);
@@ -1044,8 +1078,8 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
             sl->getWaitingPlayersCount()));
         s.addUInt16(m_private_port);
-        s.addUInt8((uint8_t)ServerConfig::m_server_difficulty);
-        s.addUInt8((uint8_t)ServerConfig::m_server_mode);
+        s.addUInt8((uint8_t)sl->getDifficulty());
+        s.addUInt8((uint8_t)sl->getGameMode());
         s.addUInt8(!pw.empty());
         s.addUInt8((uint8_t)
             (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?
@@ -1262,3 +1296,20 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
 }   // replaceNetwork
+
+// ----------------------------------------------------------------------------
+std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
+{
+    int red_count = 0;
+    int blue_count = 0;
+    auto pp = getAllPlayerProfiles();
+    for (auto& player : pp)
+    {
+        if (player->getTeam() == KART_TEAM_RED)
+            red_count++;
+        else if (player->getTeam() == KART_TEAM_BLUE)
+            blue_count++;
+    }
+    return std::make_pair(red_count, blue_count);
+
+}   // getAllPlayersTeamInfo

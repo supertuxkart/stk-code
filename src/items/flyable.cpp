@@ -571,7 +571,8 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                     if (m_owner->getWorldKartId() != kart->getWorldKartId())
                         PlayerManager::addKartHit(kart->getWorldKartId());
                     PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-                    PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+                    if (race_manager->isLinearRaceMode())
+                        PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
                 }
             }
         }
@@ -653,9 +654,7 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
         m_body->setInterpolationAngularVelocity(av);
         setTrans(t);
     }
-    uint16_t hit_and_ticks = buffer->getUInt16();
-    // Next network version remove ~(1 << 15)
-    m_ticks_since_thrown = hit_and_ticks & ~(1 << 15);
+    m_ticks_since_thrown = buffer->getUInt16();
     m_has_server_state = true;
 }   // restoreState
 

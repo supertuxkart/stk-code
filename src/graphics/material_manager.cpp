@@ -90,16 +90,17 @@ Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
                                           std::string lay_two_tex_lc,
                                           const std::string& def_shader_name)
 {
-    std::string orignal_layer_one = lay_one_tex_lc;
+    std::string original_layer_one = lay_one_tex_lc;
     core::stringc lc(lay_one_tex_lc.c_str());
     lc.make_lower();
     lay_one_tex_lc = lc.c_str();
     lc = lay_two_tex_lc.c_str();
     lc.make_lower();
     lay_two_tex_lc = lc.c_str();
-    if (!lay_one_tex_lc.empty() &&
+    const bool is_full_path = !lay_one_tex_lc.empty() &&
         (lay_one_tex_lc.find('/') != std::string::npos ||
-        lay_one_tex_lc.find('\\') != std::string::npos))
+        lay_one_tex_lc.find('\\') != std::string::npos);
+    if (is_full_path)
     {
         // Search backward so that temporary (track) textures are found first
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
@@ -143,7 +144,9 @@ Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
         }   // for i
     }
     return getDefaultSPMaterial(def_shader_name,
-        StringUtils::getBasename(orignal_layer_one));
+        is_full_path ?
+        original_layer_one : StringUtils::getBasename(original_layer_one),
+        is_full_path);
 }
 
 //-----------------------------------------------------------------------------
@@ -211,7 +214,8 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
 
 //-----------------------------------------------------------------------------
 Material* MaterialManager::getDefaultSPMaterial(const std::string& shader_name,
-                                                const std::string& l1_lc)
+                                                const std::string& l1_lc,
+                                                bool full_path)
 {
     core::stringc lc(l1_lc.c_str());
     lc.make_lower();
@@ -222,7 +226,7 @@ Material* MaterialManager::getDefaultSPMaterial(const std::string& shader_name,
         return ret->second;
     }
     Material* m = new Material(l1_lc.empty() ? "unicolor_white" :
-        l1_lc, false, false, false, shader_name);
+        l1_lc, full_path, false, false, shader_name);
     m_default_sp_materials[key] = m;
     return m;
 }   // getDefaultSPMaterial

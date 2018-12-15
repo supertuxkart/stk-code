@@ -35,14 +35,16 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
+#include "states_screens/dialogs/server_configuration_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <utfwrapping.h>
@@ -70,12 +72,14 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_header = NULL;
     m_text_bubble = NULL;
     m_timeout_message = NULL;
-    m_exit_widget = NULL;
     m_start_button = NULL;
     m_player_list = NULL;
     m_chat_box = NULL;
     m_send_button = NULL;
     m_icon_bank = NULL;
+
+    // Allows to update chat and counter even if dialog window is opened
+    setUpdateInBackground(true);
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -90,6 +94,9 @@ void NetworkingLobby::loadedFromFile()
 
     m_start_button = getWidget<IconButtonWidget>("start");
     assert(m_start_button!= NULL);
+
+    m_config_button = getWidget<IconButtonWidget>("config");
+    assert(m_config_button!= NULL);
 
     m_text_bubble = getWidget<LabelWidget>("text");
     assert(m_text_bubble != NULL);
@@ -106,9 +113,6 @@ void NetworkingLobby::loadedFromFile()
     m_player_list = getWidget<ListWidget>("players");
     assert(m_player_list!= NULL);
 
-    m_exit_widget = getWidget<IconButtonWidget>("exit");
-    assert(m_exit_widget != NULL);
-
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
@@ -118,10 +122,13 @@ void NetworkingLobby::loadedFromFile()
         (file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
     video::ITexture* icon_4 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
+    video::ITexture* icon_5 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
     m_icon_bank->addTextureAsSprite(icon_4);
+    m_icon_bank->addTextureAsSprite(icon_5);
     const int screen_width = irr_driver->getFrameSize().Width;
     m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
 }   // loadedFromFile
@@ -140,6 +147,7 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    m_server_configurable = false;
     m_player_names.clear();
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
@@ -152,7 +160,9 @@ void NetworkingLobby::init()
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
+    m_start_button->setLabel(_("Start race"));
     m_start_button->setVisible(false);
+    m_config_button->setVisible(false);
     m_state = LS_CONNECTING;
     getWidget("chat")->setVisible(false);
     getWidget("chat")->setActive(false);
@@ -244,12 +254,31 @@ void NetworkingLobby::onUpdate(float delta)
     if (cl && cl->isWaitingForGame())
     {
         m_start_button->setVisible(false);
-        m_exit_widget->setVisible(true);
         m_timeout_message->setVisible(true);
-        //I18N: In the networking lobby, show when player is required to wait
-        //before the current game finish
-        core::stringw msg = _("Please wait for current game to end.");
-        m_timeout_message->setText(msg, true);
+        auto progress = cl->getGameStartedProgress();
+        core::stringw msg;
+        if (progress.first != std::numeric_limits<uint32_t>::max())
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish with remaining time
+            msg = _("Please wait for the current game's end, "
+                "estimated remaining time: %s.",
+                StringUtils::timeToString((float)progress.first).c_str());
+        }
+        else if (progress.second != std::numeric_limits<uint32_t>::max())
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish with progress in percent
+            msg = _("Please wait for the current game's end, "
+                "estimated progress: %d%.", progress.second);
+        }
+        else
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish
+            msg = _("Please wait for the current game's end.");
+        }
+        m_timeout_message->setText(msg, false);
         core::stringw total_msg;
         for (auto& string : m_server_info)
         {
@@ -280,7 +309,7 @@ void NetworkingLobby::onUpdate(float delta)
                 _P("Game will start if there is more than %d player.",
                "Game will start if there are more than %d players.",
                (int)(m_min_start_game_players - 1));
-            m_timeout_message->setText(msg, true);
+            m_timeout_message->setText(msg, false);
         }
 
         if (m_cur_starting_timer != std::numeric_limits<int64_t>::max())
@@ -290,10 +319,13 @@ void NetworkingLobby::onUpdate(float delta)
             if (remain < 0)
                 remain = 0;
             //I18N: In the networking lobby, display the starting timeout
-            //for owner-less server
-            core::stringw msg = _P("Game will start after %d second.",
-               "Game will start after %d seconds.", (int)remain);
-            m_timeout_message->setText(msg, true);
+            //for owner-less server to begin a game
+            core::stringw msg = _P("Starting after %d second, "
+                "or once everyone has pressed the 'Ready' button.",
+                "Starting after %d seconds, "
+                "or once everyone has pressed the 'Ready' button.",
+                (int)remain);
+            m_timeout_message->setText(msg, false);
         }
     }
     else
@@ -304,9 +336,8 @@ void NetworkingLobby::onUpdate(float delta)
     if (m_state == LS_ADD_PLAYERS)
     {
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
-                                          "join the game"), true);
+                                          "join the game"), false);
         m_start_button->setVisible(false);
-        m_exit_widget->setVisible(false);
         if (!GUIEngine::ModalDialog::isADialogActive())
         {
             input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
@@ -316,7 +347,6 @@ void NetworkingLobby::onUpdate(float delta)
     }
 
     m_start_button->setVisible(false);
-    m_exit_widget->setVisible(true);
     if (!cl || !cl->isLobbyReady())
     {
         core::stringw connect_msg;
@@ -330,7 +360,7 @@ void NetworkingLobby::onUpdate(float delta)
             connect_msg =
                 StringUtils::loadingDots(_("Finding a quick play server"));
         }
-        m_text_bubble->setText(connect_msg, true);
+        m_text_bubble->setText(connect_msg, false);
         m_start_button->setVisible(false);
     }
     else
@@ -344,7 +374,12 @@ void NetworkingLobby::onUpdate(float delta)
         m_text_bubble->setText(total_msg, true);
     }
 
-    if (STKHost::get()->isAuthorisedToControl())
+    m_config_button->setVisible(STKHost::get()->isAuthorisedToControl() &&
+        m_server_configurable);
+
+    if (STKHost::get()->isAuthorisedToControl() ||
+        (m_has_auto_start_in_server &&
+        m_cur_starting_timer != std::numeric_limits<int64_t>::max()))
     {
         m_start_button->setVisible(true);
     }
@@ -424,23 +459,31 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             host_online_local_ids[1], host_online_local_ids[2],
             std::get<0>(m_player_names.at(
             m_player_list->getSelectionInternalName())),
-            m_allow_change_team);
+            m_allow_change_team,
+            std::get<3>(m_player_names.at(
+            m_player_list->getSelectionInternalName())));
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
         sendChat(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
-    else if (name == m_exit_widget->m_properties[PROP_ID])
-    {
-        StateManager::get()->escapePressed();
-    }
     else if (name == m_start_button->m_properties[PROP_ID])
     {
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
         start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendToServer(&start, true);
+    }
+    else if (name == m_config_button->m_properties[PROP_ID])
+    {
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (cl)
+        {
+            new ServerConfigurationDialog(
+                race_manager->isSoccerMode() &&
+                cl->getGameSetup()->isSoccerGoalTarget());
+        }
     }
 }   // eventCallback
 
@@ -459,6 +502,7 @@ void NetworkingLobby::tearDown()
     if (!NetworkConfig::get()->isClient())
         return;
     input_manager->getDeviceManager()->mapFireToSelect(false);
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -468,6 +512,7 @@ bool NetworkingLobby::onEscapePressed()
         NetworkConfig::get()->cleanNetworkPlayers();
     m_joined_server.reset();
     input_manager->getDeviceManager()->mapFireToSelect(false);
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     STKHost::get()->shutdown();
     return true; // close the screen
 }   // onEscapePressed
@@ -475,7 +520,7 @@ bool NetworkingLobby::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
                                     uint32_t, uint32_t, core::stringw,
-                                    int, KartTeam> >& p)
+                                    int, KartTeam, PerPlayerDifficulty> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
@@ -508,7 +553,8 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
         else if (cur_team == KART_TEAM_BLUE)
             m_player_list->markItemBlue(i);
         m_player_names[internal_name] =
-            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team);
+            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team,
+            std::get<6>(q));
     }
     updatePlayerPings();
 }   // updatePlayers
@@ -571,6 +617,9 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
     if (min_players == 0 || start_timeout == 0.0f)
         return;
 
+    //I18N: In the networking lobby, ready button is to allow player to tell
+    //server that he is ready for next game for owner less server
+    m_start_button->setLabel(_("Ready"));
     m_has_auto_start_in_server = true;
     m_min_start_game_players = grand_prix_started ? 0 : min_players;
     m_start_timeout = start_timeout;
