@@ -45,6 +45,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sort_col = 0;
     m_sortable = true;
     m_header_created = false;
+    m_alternating_darkness = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -110,6 +111,7 @@ void ListWidget::add()
         true,
         false);
 
+    list_box->setAlternatingDarkness(m_alternating_darkness);
     if (current_skin && current_skin->getSpriteBank())
     {
             list_box->setSpriteBank(current_skin->getSpriteBank());

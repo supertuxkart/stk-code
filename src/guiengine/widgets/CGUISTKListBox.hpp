@@ -170,6 +170,7 @@ namespace irr
             //! Sets whether to draw the background
             virtual void setDrawBackground(bool draw);
 
+            void setAlternatingDarkness(bool val) { m_alternating_darkness = val; }
     private:
 
             void recalculateItemHeight();
@@ -197,6 +198,7 @@ namespace irr
             bool MoveOverSelect;
             bool AutoScroll;
             bool HighlightWhenNotFocused;
+            bool m_alternating_darkness;
     };
 
 

@@ -115,6 +115,7 @@ void ServerSelection::loadedFromFile()
  */
 void ServerSelection::beforeAddingWidget()
 {
+    m_server_list_widget->setAlternatingDarkness(true);
     m_server_list_widget->clearColumns();
     m_server_list_widget->addColumn( _C("column_name", "Name"), 3);
     m_server_list_widget->addColumn( _C("column_name", "Players"), 1);
