@@ -1942,7 +1942,12 @@ bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
 
     *winner_vote = vote->second;
 
-    return m_peers_votes.size() == cur_players;
+    // For now: don't trigger start of race if all votes
+    // have been received. Use:
+    // return m_peers_votes.size() == cur_players;
+    // to start the race when all votes have been received.
+    return false;
+    
 }   // handleAllVotes
 
 // ----------------------------------------------------------------------------
