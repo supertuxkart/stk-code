@@ -578,6 +578,25 @@ void TracksScreen::addVote(int host_id)
 }   // addVote
 
 // ----------------------------------------------------------------------------
+/** Removes a vote, which is triggered when a client disconnects.
+ *  \param host_id Host id of the disconnected client.
+ */
+void TracksScreen::removeVote(int host_id)
+{
+    auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
+                        host_id);
+
+    Log::verbose("TracksScreen", "removeVote: hostid %d found %d",
+                 host_id, it != m_index_to_hostid.end());
+
+    // Add a new index if this is the first vote for the host/
+    if (it != m_index_to_hostid.end())
+    {
+        m_index_to_hostid.erase(it);
+    }
+}   //removeVote
+
+// ----------------------------------------------------------------------------
 /** Populates one entry in the voting list with the vote from the
  *  corresponding host. A mapping of host_id to index MUST exist for this
  *  host when this function is called.

@@ -486,8 +486,7 @@ void ClientLobby::disconnectedPlayer(Event* event)
         uint32_t host_id = data.getUInt32();
         // Use the friend icon to avoid an error-like message
         MessageQueue::add(MessageQueue::MT_FRIEND, msg);
-        TracksScreen::getInstance()->removeVote(
-            name + StringUtils::toString(host_id));
+        TracksScreen::getInstance()->removeVote(host_id);
     }
 
 }   // disconnectedPlayer

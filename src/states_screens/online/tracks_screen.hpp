@@ -88,6 +88,7 @@ private:
 public:
 
     void addVote(int host_id);
+    void removeVote(int host_id);
     void showVote(int host_id);
     void setResult(const PeerVote &winner_vote);
     void showVoteResult();
