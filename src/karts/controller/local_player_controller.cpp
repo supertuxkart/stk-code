@@ -178,10 +178,22 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         }
     }
 
+    // Check if skid key is pressed and if turn button is in disagreement
+    // with the current steering dominant, ignore the skid key press, see #3168
+    if (action == PA_DRIFT && value != 0)
+    {
+        if ((!PlayerController::action(PA_STEER_LEFT, 0, /*dry_run*/true) &&
+            m_controls->getSteer() < 0.0f) ||
+            (!PlayerController::action(PA_STEER_RIGHT, 0, /*dry_run*/true) &&
+            m_controls->getSteer() > 0.0f))
+            return false;
+    }
+
     // If this event does not change the control state (e.g.
     // it's a (auto) repeat event), do nothing. This especially
     // optimises traffic to the server and other clients.
-    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
+    if (!PlayerController::action(action, value, /*dry_run*/true))
+        return false;
 
     // Register event with history
     if(!history->replayHistory())
