@@ -222,15 +222,21 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         break;
     case PA_DRIFT:
         if (value == 0)
+        {
             SET_OR_TEST_GETTER(SkidControl, KartControl::SC_NONE);
-        else
+        }
+        else if (m_controls->getSkidControl() == KartControl::SC_NONE)
         {
             if (m_steer_val == 0)
+            {
                 SET_OR_TEST_GETTER(SkidControl, KartControl::SC_NO_DIRECTION);
+            }
             else
+            {
                 SET_OR_TEST_GETTER(SkidControl, m_steer_val<0
                                                 ? KartControl::SC_RIGHT
                                                 : KartControl::SC_LEFT  );
+            }
         }
         break;
     case PA_PAUSE_RACE:
