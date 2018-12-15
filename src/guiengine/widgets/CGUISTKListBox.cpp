@@ -509,12 +509,14 @@ void CGUISTKListBox::draw()
         if (frameRect.LowerRightCorner.Y >= AbsoluteRect.UpperLeftCorner.Y &&
             frameRect.UpperLeftCorner.Y <= AbsoluteRect.LowerRightCorner.Y)
         {
+#ifndef SERVER_ONLY
             if (m_alternating_darkness && i % 2 != 0)
             {
                 video::SColor color(0);
                 color.setAlpha(30);
                 GL32_draw2DRectangle(color, frameRect, &clientClip);
             }
+#endif
             if (i == Selected && hl)
                 skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), frameRect, &clientClip);
 
