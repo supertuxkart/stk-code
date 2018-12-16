@@ -28,7 +28,7 @@ To build SuperTuxKart from source, you'll need to install the following packages
 Ubuntu command:
 
 ```bash
-sudo apt-get install build-essential cmake libbluetooth-dev \
+sudo apt install build-essential cmake libbluetooth-dev \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
 libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
 libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
