@@ -129,8 +129,17 @@ void NetworkingLobby::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon_3);
     m_icon_bank->addTextureAsSprite(icon_4);
     m_icon_bank->addTextureAsSprite(icon_5);
-    const int screen_width = irr_driver->getFrameSize().Width;
-    m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
+    
+
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        m_icon_bank->setScale(getHeight() / 15.0f / 128.0f);
+    }
+    else
+    {
+        const int screen_width = irr_driver->getFrameSize().Width;
+        m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
+    }
 }   // loadedFromFile
 
 // ---------------------------------------------------------------------------
