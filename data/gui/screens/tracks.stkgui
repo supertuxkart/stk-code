@@ -2,7 +2,7 @@
 <stkgui>
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
 
-    <div id="all-track" x="1%" y="1%" width="98%" height="96%" layout="vertical-row" >
+    <div id="all-track" x="1%" y="1%" width="60%" height="88%" layout="vertical-row" >
         <header width="80%" I18N="In the track selection screen" text="All Tracks"
                 align="center" text_align="center" />
 
@@ -22,7 +22,7 @@
                 <spinner id="lap-spinner" width="20%" min_value="1" max_value="20" align="center"
                          wrap_around="true" />
                 <spacer width="2%"/>
-                <label id="lap-text" width="48%" I18N="In the track screen" text_align="left"/>
+                <label id="lap-text" width="78%" I18N="In the track screen" text_align="left"/>
             </div>
             <spacer height="10"/>
             <div width="100%" height="fit" layout="horizontal-row" >
@@ -33,6 +33,13 @@
                 <label id="reverse-text" width="78%" I18N="In the track screen" text_align="left"/>
             </div>
         </box>
-        <progressbar x="1%" id="timer" height="4%" width="98%"></progressbar>
     </div>
+    <div id="vote" x="63%" y="1%" width="37%" height="88%" layout="vertical-row">
+        <div width="95%" proportion="2" layout="horizontal-row">
+            <box proportion="2" height="100%" layout="vertical-row">
+                <list id="vote-list" width="100%" height="100%" word_wrap="true"/>
+            </box>
+        </div>
+    </div>
+    <progressbar x="2%" y="93%" id="timer" height="4%" width="96%"></progressbar>
 </stkgui>

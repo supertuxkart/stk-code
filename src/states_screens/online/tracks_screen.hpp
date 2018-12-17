@@ -19,7 +19,6 @@
 #define HEADER_TRACKS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "utils/synchronised.hpp"
 
 #include <deque>
 #include <string>
@@ -32,7 +31,7 @@ namespace GUIEngine
 {
     class CheckBoxWidget;
     class CheckBoxWidget;
-    class LabelWidget;
+    class ListWidget;
     class SpinnerWidget;
     class ProgressBarWidget;
 }
@@ -51,6 +50,7 @@ private:
     Track* m_selected_track = NULL;
     GUIEngine::CheckBoxWidget* m_reversed;
     GUIEngine::SpinnerWidget* m_laps;
+    GUIEngine::ListWidget* m_vote_list;
 
     /** Pointer to progress bar widget which is used as a timer
     *  (going backwards). */

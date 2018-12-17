@@ -20,6 +20,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -27,7 +28,7 @@
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
@@ -167,6 +168,7 @@ void TracksScreen::beforeAddingWidget()
 
     if (m_bottom_box_height == -1)
         m_bottom_box_height = rect_box->m_h;
+    m_vote_list = getWidget<ListWidget>("vote-list");
 
     if (m_network_tracks)
     {
@@ -181,10 +183,78 @@ void TracksScreen::beforeAddingWidget()
         assert(m_reversed != NULL);
         m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
         m_reversed->setVisible(true);
+        m_timer->setVisible(true);
+        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
+        getWidget("vote")->setVisible(true);
+        m_vote_list->setVisible(true);
+        m_vote_list->clearColumns();
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        assert(cl);
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        {
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "difficulty_medium.png")), 5);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "track_random.png")), 2);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::MODEL,
+                "swap-icon.png")), 1);
+        }
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        {
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "difficulty_medium.png")), 6);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "track_random.png")), 2);
+        }
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "difficulty_medium.png")), 4);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "track_random.png")), 2);
+            if (cl->getGameSetup()->isSoccerGoalTarget())
+            {
+                m_vote_list->addColumn(irr_driver->getTexture
+                    (file_manager->getAsset(FileManager::GUI_ICON,
+                    "soccer_ball_normal.png")), 1);
+            }
+            else
+            {
+                m_vote_list->addColumn(irr_driver->getTexture
+                    (file_manager->getAsset(FileManager::GUI_ICON,
+                    "loading.png")), 1);
+            }
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::MODEL,
+                "swap-icon.png")), 1);
+        }
+        else
+        {
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "difficulty_medium.png")), 4);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "track_random.png")), 2);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "lap_flag.png")), 1);
+            m_vote_list->addColumn(irr_driver->getTexture
+                (file_manager->getAsset(FileManager::GUI_ICON,
+                "restart.png")), 1);
+        }
         calculateLayout();
     }
     else
     {
+        m_timer->setVisible(false);
         rect_box->setVisible(false);
         rect_box->m_properties[GUIEngine::PROP_HEIGHT] = "0";
         m_laps = NULL;
@@ -193,6 +263,10 @@ void TracksScreen::beforeAddingWidget()
         getWidget("lap-spinner")->setVisible(false);
         getWidget("reverse-text")->setVisible(false);
         getWidget("reverse")->setVisible(false);
+        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "98%";
+        getWidget("vote")->setVisible(false);
+        m_vote_list->setVisible(false);
+        m_vote_list->clearColumns();
         calculateLayout();
     }
 
