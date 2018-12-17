@@ -52,5 +52,26 @@ script:
   - mkdir "build"
   - cd "build"
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
-  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
   - make VERBOSE=1 -j3
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$CC" == "gcc" ] && [ "$BUILD_TYPE" == "Release" ] && [ "$SERVER_ONLY" == "OFF" ] ; then
+      make DESTDIR=appdir -j$(nproc) install ; find appdir/
+      wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+      chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+      unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+      export VERSION=$(git rev-parse --short HEAD) # linuxdeployqt uses this for naming the file
+      wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64" -O appdir/AppRun && chmod +x appdir/AppRun
+      ( cd appdir/ ; ln -s usr/share/supertuxkart/data . )
+      svn co https://svn.code.sf.net/p/supertuxkart/code/stk-assets ./appdir/usr/share/supertuxkart/data/
+      ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
+      find appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+      # curl --upload-file SuperTuxKart*.AppImage https://transfer.sh/SuperTuxKart-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+      wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+      bash upload.sh SuperTuxKart*.AppImage*
+    fi
+
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
