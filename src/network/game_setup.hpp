@@ -24,8 +24,6 @@
 
 #include "network/remote_kart_info.hpp"
 
-#include "network/peer_vote.hpp"
-
 #include <atomic>
 #include <cassert>
 #include <memory>
@@ -36,6 +34,7 @@
 
 class NetworkPlayerProfile;
 class NetworkString;
+class PeerVote;
 
 // ============================================================================
 /*! \class GameSetup
@@ -110,12 +109,7 @@ public:
     /** Returns the number of connected players. */
     unsigned getPlayerCount()      { return m_connected_players_count.load(); }
     // ------------------------------------------------------------------------
-    void setRace(const PeerVote &vote)
-    {
-        m_tracks.push_back(vote.m_track_name);
-        m_laps = vote.m_num_laps;
-        m_reverse = vote.m_reverse;
-    }   // setRace
+    void setRace(const PeerVote &vote);
     // ------------------------------------------------------------------------
     void reset()
     {

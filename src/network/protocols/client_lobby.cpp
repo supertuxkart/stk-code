@@ -35,6 +35,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/network_timer_synchronizer.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -437,26 +438,20 @@ void ClientLobby::receivePlayerVote(Event* event)
     if (!checkDataSize(event, 4)) return;
     // Get the player name who voted
     NetworkString& data = event->data();
-
-    uint32_t host_id2 = data.getUInt32();
-    std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByHostId(host_id2);
-
-    std::string player_name;
-    data.decodeString(&player_name);
-
     uint32_t host_id = data.getUInt32();
-    player_name += ": ";
     PeerVote vote(data);
-    Log::verbose("CL", "vote from server: host %d track %s reverse %d",
-                 host_id, vote.m_track_name.c_str(), vote.m_reverse);
-    addVote(host_id, vote);
+    Log::debug("ClientLobby",
+        "Vote from server: host %d, track %s, laps %d, reverse %d.",
+        host_id, vote.m_track_name.c_str(), vote.m_num_laps, vote.m_reverse);
+
     Track* track = track_manager->getTrack(vote.m_track_name);
     if (!track)
-        Log::fatal("ClientLobby", "Missing track %s", vote.m_track_name.c_str());
-
-    TracksScreen *ts = TracksScreen::getInstance();
-    ts->addVote(host_id2);
-
+    {
+        Log::fatal("ClientLobby", "Missing track %s",
+            vote.m_track_name.c_str());
+    }
+    addVote(host_id, vote);
+    TracksScreen::getInstance()->updatePlayerVotes();
 }   // receivePlayerVote
 
 //-----------------------------------------------------------------------------
@@ -477,18 +472,18 @@ void ClientLobby::disconnectedPlayer(Event* event)
     NetworkString &data = event->data();
     SFXManager::get()->quickSound("appear");
     unsigned disconnected_player_count = data.getUInt8();
+    uint32_t host_id = data.getUInt32();
+    m_peers_votes.erase(host_id);
     for (unsigned i = 0; i < disconnected_player_count; i++)
     {
         std::string name;
         data.decodeString(&name);
         core::stringw player_name = StringUtils::utf8ToWide(name);
         core::stringw msg = _("%s disconnected.", player_name);
-        uint32_t host_id = data.getUInt32();
         // Use the friend icon to avoid an error-like message
         MessageQueue::add(MessageQueue::MT_FRIEND, msg);
-        TracksScreen::getInstance()->removeVote(host_id);
     }
-
+    TracksScreen::getInstance()->updatePlayerVotes();
 }   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------

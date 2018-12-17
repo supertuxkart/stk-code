@@ -59,7 +59,7 @@ private:
     /** Maximum number of votes, as sent by the server. */
     unsigned int m_max_num_votes;
 
-    bool m_network_tracks, m_reverse_checked, m_quit_server;
+    bool m_network_tracks, m_quit_server;
 
     int m_bottom_box_height;
 
@@ -80,7 +80,6 @@ private:
     TracksScreen() : Screen("tracks.stkgui")
     {
         m_network_tracks = false;
-        m_reverse_checked = false;
         m_quit_server = false;
         m_bottom_box_height = -1;
     }
@@ -129,8 +128,10 @@ public:
     {
         m_index_to_hostid.clear();
     }
-
+    // ------------------------------------------------------------------------
     void setVoteTimeout(float timeout);
+    // ------------------------------------------------------------------------
+    void updatePlayerVotes();
 };
 
 #endif

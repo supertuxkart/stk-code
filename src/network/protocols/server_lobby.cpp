@@ -31,6 +31,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/game_protocol.hpp"
@@ -265,7 +266,6 @@ void ServerLobby::setup()
     // Initialise the data structures to detect if all clients and 
     // the server are ready:
     resetPeersReady();
-    m_peers_votes.clear();
     m_timeout.store(std::numeric_limits<int64_t>::max());
     m_waiting_for_reset = false;
     m_server_started_at = m_server_delay = 0;
@@ -1416,11 +1416,12 @@ void ServerLobby::clientDisconnected(Event* event)
         event->getPeer()->isWaitingForGame();
     msg->setSynchronous(true);
     msg->addUInt8(LE_PLAYER_DISCONNECTED);
-    msg->addUInt8((uint8_t)players_on_peer.size());
+    msg->addUInt8((uint8_t)players_on_peer.size())
+        .addUInt32(event->getPeer()->getHostId());
     for (auto p : players_on_peer)
     {
         std::string name = StringUtils::wideToUtf8(p->getName());
-        msg->encodeString(name).addUInt32(event->getPeer()->getHostId());
+        msg->encodeString(name);
         Log::info("ServerLobby", "%s disconnected", name.c_str());
     }
 
@@ -1928,7 +1929,8 @@ void ServerLobby::kartSelectionRequested(Event* event)
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
-/*! \brief Called when a player votes for track(s).
+/*! \brief Called when a player votes for track(s), it will auto correct client
+ *         data if it sends some invalid data.
  *  \param event : Event providing the information.
  */
 void ServerLobby::handlePlayerVote(Event* event)
@@ -1949,62 +1951,64 @@ void ServerLobby::handlePlayerVote(Event* event)
 
     NetworkString& data = event->data();
     PeerVote vote(data);
-    Log::verbose("SL", "vote from server: host %d track %s reverse %d",
-                 event->getPeer()->getHostId(), vote.m_track_name.c_str(), vote.m_reverse);
+    Log::debug("ServerLobby",
+        "Vote from client: host %d, track %s, laps %d, reverse %d.",
+        event->getPeer()->getHostId(), vote.m_track_name.c_str(),
+        vote.m_num_laps, vote.m_reverse);
+
+    Track* t = track_manager->getTrack(vote.m_track_name);
+    if (!t)
+    {
+        vote.m_track_name = *m_available_kts.second.begin();
+        t = track_manager->getTrack(vote.m_track_name);
+        assert(t);
+    }
 
     if (race_manager->modeHasLaps())
     {
         if (ServerConfig::m_auto_game_time_ratio > 0.0f)
         {
-            Track* t = track_manager->getTrack(vote.m_track_name);
-            if (t)
-            {
-                vote.m_num_laps =
-                    (uint8_t)(fmaxf(1.0f,
-                                    (float)t->getDefaultNumberOfLaps() 
-                                    *ServerConfig::m_auto_game_time_ratio   ) );
-            }
-            else
-            {
-                // Prevent someone send invalid vote
-                vote.m_track_name = *m_available_kts.second.begin();
-                vote.m_num_laps = (uint8_t)3;
-            }
+            vote.m_num_laps =
+                (uint8_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
+                ServerConfig::m_auto_game_time_ratio));
         }
-        else if (vote.m_num_laps == 0)
+        else if (vote.m_num_laps == 0 || vote.m_num_laps > 20)
             vote.m_num_laps = (uint8_t)3;
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER &&
-             ServerConfig::m_auto_game_time_ratio > 0.0f                      )
+    else if (race_manager->isSoccerMode())
     {
         if (m_game_setup->isSoccerGoalTarget())
         {
-            vote.m_num_laps = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
-                                        UserConfigParams::m_num_goals);
+            if (ServerConfig::m_auto_game_time_ratio > 0.0f)
+            {
+                vote.m_num_laps = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                                            UserConfigParams::m_num_goals);
+            }
+            else if (vote.m_num_laps > 10)
+                vote.m_num_laps = (uint8_t)5;
         }
         else
         {
-            vote.m_num_laps = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
-                                        UserConfigParams::m_soccer_time_limit);
+            if (ServerConfig::m_auto_game_time_ratio > 0.0f)
+            {
+                vote.m_num_laps = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                                            UserConfigParams::m_soccer_time_limit);
+            }
+            else if (vote.m_num_laps > 15)
+                vote.m_num_laps = (uint8_t)7;
         }
     }
 
     // Store vote:
+    vote.m_player_name = event->getPeer()->getPlayerProfiles()[0]->getName();
     addVote(event->getPeer()->getHostId(), vote);
 
     // Now inform all clients about the vote
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
-    
-    std::string name = 
-        StringUtils::wideToUtf8(event->getPeer()
-                                     ->getPlayerProfiles()[0]->getName());
     other.setSynchronous(true);
     other.addUInt8(LE_VOTE);
-    
-    other.addUInt32(event->getPeer()->getHostId())  .encodeString(name)
-         .addUInt32(event->getPeer()->getHostId());
+    other.addUInt32(event->getPeer()->getHostId());
     vote.encode(&other);
-
     sendMessageToPeers(&other);
 
 }   // handlePlayerVote
@@ -2034,7 +2038,7 @@ bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
     for (auto peer : peers)
     {
         if (peer->hasPlayerProfiles() && !peer->isWaitingForGame())
-            cur_players ++;
+            cur_players++;
     }
     if (cur_players == 0 || m_peers_votes.size() < cur_players)
     {

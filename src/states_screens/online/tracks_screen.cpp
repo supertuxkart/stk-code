@@ -32,6 +32,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "network/game_setup.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
@@ -158,6 +159,7 @@ void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
 
+    m_selected_track = NULL;
     m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
     m_timer->showLabel(false);
 
@@ -260,6 +262,14 @@ void TracksScreen::init()
         // goals / time limit and random item location
         auto cl = LobbyProtocol::get<ClientLobby>();
         assert(cl);
+        const PeerVote* vote = cl->getVote(STKHost::get()->getMyHostId());
+        if (vote)
+        {
+            DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("tracks");
+            m_selected_track = track_manager->getTrack(vote->m_track_name);
+            w2->setBadge(vote->m_track_name, OK_BADGE);
+        }
+
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
@@ -272,6 +282,8 @@ void TracksScreen::init()
             getWidget<LabelWidget>("reverse-text")->setText(_("Random item location"), false);
             m_reversed->setVisible(true);
             m_reversed->setState(UserConfigParams::m_random_arena_item);
+            if (vote)
+                m_reversed->setState(vote->m_reverse);
         }
         else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
@@ -292,8 +304,6 @@ void TracksScreen::init()
             {
                 m_laps->setVisible(true);
                 getWidget("lap-text")->setVisible(true);
-                auto cl = LobbyProtocol::get<ClientLobby>();
-                assert(cl);
                 if (cl->getGameSetup()->isSoccerGoalTarget())
                 {
                     //I18N: In track screen
@@ -310,12 +320,16 @@ void TracksScreen::init()
                     m_laps->setMin(1);
                     m_laps->setMax(15);
                 }
+                if (vote)
+                    m_laps->setValue(vote->m_num_laps);
             }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
             getWidget<LabelWidget>("reverse-text")->setText(_("Random item location"), false);
             m_reversed->setVisible(true);
             m_reversed->setState(UserConfigParams::m_random_arena_item);
+            if (vote)
+                m_reversed->setState(vote->m_reverse);
         }
         else
         {
@@ -335,26 +349,16 @@ void TracksScreen::init()
                 m_laps->setMin(1);
                 m_laps->setMax(20);
                 m_laps->setValue(UserConfigParams::m_num_laps);
+                if (vote)
+                    m_laps->setValue(vote->m_num_laps);
             }
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
             getWidget<LabelWidget>("reverse-text")
                      ->setText(_("Drive in reverse"), false);
             m_reversed->setVisible(true);
-
-            auto lp = LobbyProtocol::get<LobbyProtocol>();
-            const PeerVote *vote = lp ->getVote(STKHost::get()->getMyHostId());
-            DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("tracks");
-            if(vote)
-            {
-                m_reverse_checked = vote->m_reverse;
-                m_selected_track = track_manager->getTrack(vote->m_track_name);
-                w2->setBadge(vote->m_track_name, OK_BADGE);
-            }
-            else
-            {
-                m_reversed->setState(m_reverse_checked);
-            }
+            if (vote)
+                m_reversed->setState(vote->m_reverse);
         }
     }
     if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
@@ -365,6 +369,7 @@ void TracksScreen::init()
         vote.encodeString(m_random_track_list[0]).addUInt8(1).addUInt8(0);
         STKHost::get()->sendToServer(&vote, true);
     }
+    updatePlayerVotes();
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -458,30 +463,22 @@ void TracksScreen::voteForPlayer()
 {
     assert(STKHost::existHost());
 
-    // If submit is clicked without a vote, select a random track.
-    if(!m_selected_track)
-    {
-        std::string track_name = m_random_track_list.front();
-        m_selected_track = track_manager->getTrack(track_name);
-        m_random_track_list.pop_front();
-        m_random_track_list.push_back(track_name);
-    }
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
-    const core::stringw &player_name =
-        PlayerManager::getCurrentPlayer()->getName();
     if (!race_manager->isBattleMode() &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
     {
         UserConfigParams::m_num_laps = m_laps->getValue();
-        m_reverse_checked = m_reversed->getState();
     }
     else
         UserConfigParams::m_random_arena_item = m_reversed->getState();
 
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
+    const core::stringw &player_name =
+        PlayerManager::getCurrentPlayer()->getName();
+    vote.encodeString(player_name);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         vote.encodeString(m_selected_track->getIdent())
@@ -495,12 +492,15 @@ void TracksScreen::voteForPlayer()
     }
     else
     {
-        PeerVote pvote(player_name, m_selected_track->getIdent(),
-                       m_laps->getValue(), m_reversed->getState()  );
-        pvote.encode(&vote);
-        auto lp = LobbyProtocol::get<LobbyProtocol>();
-        
-        // The vote will be sent to
+        vote.encodeString(m_selected_track->getIdent())
+            .addUInt8(m_laps->getValue())
+            .addUInt8(m_reversed->getState() ? 1 : 0);
+    }
+    if (auto lp = LobbyProtocol::get<LobbyProtocol>())
+    {
+        vote.reset();
+        vote.skip(2);
+        PeerVote pvote(vote);
         lp->addVote(STKHost::get()->getMyHostId(), pvote);
     }
     STKHost::get()->sendToServer(&vote, true);
@@ -687,3 +687,11 @@ void TracksScreen::setResult(const PeerVote &winner_vote)
     }   // wim_winning_index == -1
 
 }   // setResult
+
+// -----------------------------------------------------------------------------
+/* Update player votes whenever vote is recieved from any players or
+ * player disconnected, or when this screen is pushed.
+ */
+void TracksScreen::updatePlayerVotes()
+{
+}   // updatePlayerVotes

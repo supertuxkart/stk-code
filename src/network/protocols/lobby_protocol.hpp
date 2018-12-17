@@ -21,11 +21,9 @@
 
 #include "network/protocol.hpp"
 
-#include "network/network_string.hpp"
-#include "network/peer_vote.hpp"
-
 class GameSetup;
 class NetworkPlayerProfile;
+class PeerVote;
 
 #include <atomic>
 #include <cassert>
@@ -82,17 +80,16 @@ public:
         RR_INVALID_PLAYER = 5
     };
 
+protected:
+    /** Vote from each peer. The host id is used as a key. Note that
+     *  host ids can be non-consecutive, so we cannot use std::vector. */
+    std::map<uint32_t, PeerVote> m_peers_votes;
+
     /** Timer user for voting periods in both lobbies. */
     std::atomic<uint64_t> m_end_voting_period;
 
     /** The maximum voting time. */
     uint64_t m_max_voting_time;
-
-protected:
-    /** Vote from each peer. The host id is used as a key. Note that
-     *  host ids can be non-consecutive, so we cannot use std::vector. */
-    std::map<int, PeerVote> m_peers_votes;
-    
 
     std::thread m_start_game_thread;
 
@@ -166,23 +163,15 @@ public:
     /** Returns the number of votes received so far. */
     int getNumberOfVotes() const { return (int)m_peers_votes.size(); }
     // -----------------------------------------------------------------------
-    /** Adds a vote.
-     *  \param host_id Host id of this vote.
-     *  \param vote The vote to add. */
-    void addVote(int host_id, const PeerVote &vote)
-    {
-        m_peers_votes[host_id] = vote;
-    }   // addVote
+    void addVote(uint32_t host_id, const PeerVote &vote);
     // -----------------------------------------------------------------------
-    /** Returns the voting data for one host. Returns NULL if the vote from
-     *  the given host id has not yet arrived (or if it is an invalid host id).
-     */
-    const PeerVote* getVote(int host_id)
-    {
-        auto it = m_peers_votes.find(host_id);
-        if (it == m_peers_votes.end()) return NULL;
-        return &(it->second);
-    }
+    const PeerVote* getVote(uint32_t host_id) const;
+    // -----------------------------------------------------------------------
+    void resetVotingTime()                   { m_end_voting_period.store(0); }
+    // -----------------------------------------------------------------------
+    /** Returns all voting data.*/
+    const std::map<uint32_t, PeerVote>& getAllVotes() const
+                                                     { return m_peers_votes; }
     // -----------------------------------------------------------------------
     std::pair<uint32_t, uint32_t> getGameStartedProgress() const
     {

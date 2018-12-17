@@ -25,6 +25,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
@@ -141,6 +142,8 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
+    resetVotingTime();
+    m_peers_votes.clear();
     m_game_setup->reset();
 }   // setupNewGame
 
@@ -158,6 +161,8 @@ void LobbyProtocol::startVotingPeriod(float max_time)
 /** Returns the remaining voting time in seconds. */
 float LobbyProtocol::getRemainingVotingTime()
 {
+    if (m_end_voting_period.load() == 0)
+        return 0.0f;
     uint64_t t = m_end_voting_period.load()- StkTime::getRealTimeMs();
     return t/1000.0f;
 }   // getRemainingVotingTime
@@ -166,6 +171,26 @@ float LobbyProtocol::getRemainingVotingTime()
 /** Returns if the voting period is over. */
 bool LobbyProtocol::isVotingOver()
 {
-    return m_end_voting_period.load() < StkTime::getRealTimeMs();
+    return m_end_voting_period.load() != 0 &&
+        m_end_voting_period.load() < StkTime::getRealTimeMs();
 }   // isVotingOver
 
+//-----------------------------------------------------------------------------
+/** Adds a vote.
+ *  \param host_id Host id of this vote.
+ *  \param vote The vote to add. */
+void LobbyProtocol::addVote(uint32_t host_id, const PeerVote &vote)
+{
+    m_peers_votes[host_id] = vote;
+}   // addVote
+
+//-----------------------------------------------------------------------------
+/** Returns the voting data for one host. Returns NULL if the vote from
+ *  the given host id has not yet arrived (or if it is an invalid host id).
+ */
+const PeerVote* LobbyProtocol::getVote(uint32_t host_id) const
+{
+    auto it = m_peers_votes.find(host_id);
+    if (it == m_peers_votes.end()) return NULL;
+    return &(it->second);
+}   // getVote

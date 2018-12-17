@@ -24,6 +24,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
@@ -300,3 +301,11 @@ std::pair<int, int> GameSetup::getPlayerTeamInfo() const
     }
     return std::make_pair(red_count, blue_count);
 }   // getPlayerTeamInfo
+
+// ----------------------------------------------------------------------------
+void GameSetup::setRace(const PeerVote &vote)
+{
+    m_tracks.push_back(vote.m_track_name);
+    m_laps = vote.m_num_laps;
+    m_reverse = vote.m_reverse;
+}   // setRace
