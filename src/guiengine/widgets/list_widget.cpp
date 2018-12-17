@@ -17,6 +17,8 @@
 
 #include "guiengine/widgets/list_widget.hpp"
 
+#include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
@@ -158,8 +160,21 @@ void ListWidget::createHeader()
             name << "_column_";
             name << n;
 
-            ButtonWidget* header = new ButtonWidget();
-
+            Widget* header = NULL;
+            if (n == m_header.size() || m_header[n].m_texture == NULL)
+            {
+                ButtonWidget* button = new ButtonWidget();
+                if (n < m_header.size())
+                    button->setText(m_header[n].m_text);
+                header = button;
+            }
+            else
+            {
+                IconButtonWidget* icon = new IconButtonWidget(
+                    IconButtonWidget::SCALE_MODE_LIST_WIDGET, true, false);
+                icon->setImage(m_header[n].m_texture);
+                header = icon;
+            }
             header->m_reserved_id = getNewNoFocusID();
 
             header->m_y = m_y;
@@ -180,8 +195,6 @@ void ListWidget::createHeader()
 
             x += header->m_w;
 
-            if (n < m_header.size())
-                header->setText( m_header[n].m_text );
             header->m_properties[PROP_ID] = name.str();
 
             header->add();

@@ -123,7 +123,8 @@ void IconButtonWidget::add()
         m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
     }
 
-    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
+    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO ||
+        m_scale_mode == SCALE_MODE_LIST_WIDGET)
     {
         assert(m_texture->getOriginalSize().Height > 0);
         useAspectRatio = (float)m_texture->getOriginalSize().Width / 
@@ -143,13 +144,23 @@ void IconButtonWidget::add()
         suggested_w = (int)(suggested_w*needed_scale_factor);
         suggested_h = (int)(suggested_h*needed_scale_factor);
     }
-    const int x_from = m_x + (m_w - suggested_w)/2; // center horizontally
-    const int y_from = m_y + (m_h - suggested_h)/2; // center vertically
+    const int x_from = m_x + (float)(m_w - suggested_w)/2; // center horizontally
+    const int y_from = m_y + (float)(m_h - suggested_h)/2; // center vertically
 
     rect<s32> widget_size = rect<s32>(x_from,
                                       y_from,
                                       x_from + suggested_w,
                                       y_from + suggested_h);
+
+    if (m_scale_mode == SCALE_MODE_LIST_WIDGET)
+    {
+        m_list_header_icon_rect = widget_size;
+        m_list_header_icon_rect.UpperLeftCorner.X = m_list_header_icon_rect.UpperLeftCorner.X + 4;
+        m_list_header_icon_rect.UpperLeftCorner.Y = m_list_header_icon_rect.UpperLeftCorner.Y + 4;
+        m_list_header_icon_rect.LowerRightCorner.X = m_list_header_icon_rect.LowerRightCorner.X - 4;
+        m_list_header_icon_rect.LowerRightCorner.Y = m_list_header_icon_rect.LowerRightCorner.Y - 4;
+        widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    }
 
     IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size,
                                                         m_parent,
