@@ -451,6 +451,7 @@ void ClientLobby::receivePlayerVote(Event* event)
             vote.m_track_name.c_str());
     }
     addVote(host_id, vote);
+    TracksScreen::getInstance()->addVote(host_id);
     TracksScreen::getInstance()->updatePlayerVotes();
 }   // receivePlayerVote
 
@@ -483,6 +484,7 @@ void ClientLobby::disconnectedPlayer(Event* event)
         // Use the friend icon to avoid an error-like message
         MessageQueue::add(MessageQueue::MT_FRIEND, msg);
     }
+    TracksScreen::getInstance()->removeVote(host_id);
     TracksScreen::getInstance()->updatePlayerVotes();
 }   // disconnectedPlayer
 
@@ -680,7 +682,6 @@ void ClientLobby::updatePlayerList(Event* event)
     m_total_players = total_players;
 
     NetworkingLobby::getInstance()->updatePlayers(players);
-    TracksScreen::getInstance()->updateNumPlayers(players.size());
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------

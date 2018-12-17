@@ -36,6 +36,14 @@ namespace GUIEngine
     class ProgressBarWidget;
 }
 
+namespace irr
+{
+    namespace gui
+    {
+        class STKModifiedSpriteBank;
+    }
+}
+
 /**
   * \brief screen where the user can select a track
   * \ingroup states_screens
@@ -56,8 +64,7 @@ private:
     *  (going backwards). */
     GUIEngine::ProgressBarWidget *m_timer;
 
-    /** Maximum number of votes, as sent by the server. */
-    unsigned int m_max_num_votes;
+    irr::gui::STKModifiedSpriteBank* m_track_icons;
 
     bool m_network_tracks, m_quit_server;
 
@@ -68,7 +75,7 @@ private:
 
     /** This stores which vote (hostid) is shown at which index in
      *  the vote overview list. */
-    std::vector<int> m_index_to_hostid;
+    std::vector<uint32_t> m_index_to_hostid;
 
     std::deque<std::string> m_random_track_list;
 
@@ -86,9 +93,8 @@ private:
 
 public:
 
-    void addVote(int host_id);
-    void removeVote(int host_id);
-    void showVote(int host_id);
+    void addVote(uint32_t host_id);
+    void removeVote(uint32_t host_id);
     void setResult(const PeerVote &winner_vote);
     void showVoteResult();
     void updateNumPlayers(int n);
@@ -115,6 +121,9 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void unloaded() OVERRIDE;
     // ------------------------------------------------------------------------
     void setFocusOnTrack(const std::string& trackName);
     // ------------------------------------------------------------------------

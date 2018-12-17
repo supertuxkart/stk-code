@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
@@ -153,7 +154,15 @@ void TracksScreen::loadedFromFile()
 {
     m_reversed = NULL;
     m_laps     = NULL;
+    m_track_icons = new gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
 }   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+void TracksScreen::unloaded()
+{
+    delete m_track_icons;
+    m_track_icons = NULL;
+}   // unloaded
 
 // -----------------------------------------------------------------------------
 void TracksScreen::beforeAddingWidget()
@@ -170,6 +179,7 @@ void TracksScreen::beforeAddingWidget()
         m_bottom_box_height = rect_box->m_h;
     m_vote_list = getWidget<ListWidget>("vote-list");
 
+    m_track_icons->clear();
     if (m_network_tracks)
     {
         rect_box->setVisible(true);
@@ -319,7 +329,6 @@ void TracksScreen::init()
     tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
 
     buildTrackList();
-
     // select old track for the game master (if found)
     STKTexManager::getInstance()->setTextureErrorMessage(
               "While loading screenshot in track screen for last track '%s':",
@@ -336,6 +345,30 @@ void TracksScreen::init()
         // goals / time limit and random item location
         auto cl = LobbyProtocol::get<ClientLobby>();
         assert(cl);
+        for (const std::string& track : cl->getAvailableTracks())
+        {
+            Track* t = track_manager->getTrack(track);
+            if (!t)
+            {
+                Log::fatal("TracksScreen", "Missing network track %s",
+                    track.c_str());
+            }
+            video::ITexture* tex =
+                irr_driver->getTexture(t->getScreenshotFile());
+            if (!tex)
+            {
+                tex = irr_driver->getTexture(file_manager
+                    ->getAsset(FileManager::GUI_ICON, "main_help.png"));
+            }
+            assert(tex);
+            m_track_icons->addTextureAsSprite(tex);
+        }
+
+        int icon_height = getHeight() / 13;
+        m_track_icons->setScale(icon_height / 256.0f);
+        m_track_icons->setTargetIconSize(256, 256);
+        m_vote_list->setIcons(m_track_icons, (int)icon_height);
+
         const PeerVote* vote = cl->getVote(STKHost::get()->getMyHostId());
         if (vote)
         {
@@ -614,17 +647,6 @@ void TracksScreen::showVoteResult()
     //}
 }   // showVoteResult
 
-// ----------------------------------------------------------------------------
-/** Stores the number of players. This can be used to determine how many
- *  slotes for votes are required. This function is called from ClientLobby
- *  upon an update from the server.
- *  \param n New number of players that can vote.
- */
-void TracksScreen::updateNumPlayers(int n)
-{
-    m_max_num_votes = n;
-}   //updateNumPlayers
-
 // -----------------------------------------------------------------------------
 /** Selects in which part of the vote list the new host is being shown and
  *  stores this information in the m_index_to_hostid mapping. If the host_id is
@@ -632,12 +654,12 @@ void TracksScreen::updateNumPlayers(int n)
  *  its vote.
  *  \param host_id Index of the host that is voting.
  */
-void TracksScreen::addVote(int host_id)
+void TracksScreen::addVote(uint32_t host_id)
 {
     auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
                         host_id);
 
-    Log::verbose("TracksScreen", "addVote: hostid %d is new %d",
+    Log::debug("TracksScreen", "addVote: hostid %d is new %d",
                  host_id, it == m_index_to_hostid.end());
 
     // Add a new index if this is the first vote for the host/
@@ -645,22 +667,18 @@ void TracksScreen::addVote(int host_id)
     {
         m_index_to_hostid.push_back(host_id);
     }
-
-    // If the screen is already shown, update the voting display
-    if (GUIEngine::getCurrentScreen() == this)
-        showVote(host_id);
 }   // addVote
 
 // ----------------------------------------------------------------------------
 /** Removes a vote, which is triggered when a client disconnects.
  *  \param host_id Host id of the disconnected client.
  */
-void TracksScreen::removeVote(int host_id)
+void TracksScreen::removeVote(uint32_t host_id)
 {
     auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
                         host_id);
 
-    Log::verbose("TracksScreen", "removeVote: hostid %d found %d",
+    Log::debug("TracksScreen", "removeVote: hostid %d found %d",
                  host_id, it != m_index_to_hostid.end());
 
     // Add a new index if this is the first vote for the host/
@@ -669,49 +687,6 @@ void TracksScreen::removeVote(int host_id)
         m_index_to_hostid.erase(it);
     }
 }   //removeVote
-
-// ----------------------------------------------------------------------------
-/** Populates one entry in the voting list with the vote from the
- *  corresponding host. A mapping of host_id to index MUST exist for this
- *  host when this function is called.
- *  \param host_id Host id from hich a new vote was received.
- */
-void TracksScreen::showVote(int host_id)
-{
-    auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
-                        host_id);
-    assert(it != m_index_to_hostid.end());
-
-    int index = it - m_index_to_hostid.begin();
-
-    auto lp = LobbyProtocol::get<LobbyProtocol>();
-    const PeerVote *vote = lp->getVote(host_id);
-    assert(vote);
-
-    // This is the old code that needs to be updated for the new list display
-#ifdef OLD_DISPLAY
-    std::string s = StringUtils::insertValues("name-%d", index);
-    LabelWidget *name_widget = getWidget<LabelWidget>(s.c_str());
-    name_widget->setText(_("Name: %s", vote->m_player_name), true);
-
-    s = StringUtils::insertValues("track-%d", index);
-    IconButtonWidget *track_widget = getWidget<IconButtonWidget>(s.c_str());
-    Track *track = track_manager->getTrack(vote->m_track_name);
-    track_widget->setVisible(true);
-    track_widget->setImage(track->getScreenshotFile());
-
-    s = StringUtils::insertValues("numlaps-%d", index);
-    LabelWidget *laps_widget = getWidget<LabelWidget>(s.c_str());
-    laps_widget->setText(_("Laps: %d", vote->m_num_laps), true);
-
-    s = StringUtils::insertValues("reverse-%d", index);
-    LabelWidget *reverse_widget = getWidget<LabelWidget>(s.c_str());
-    core::stringw yes = _("yes");
-    core::stringw no = _("no");
-    reverse_widget->setText(_("Reverse: %s", vote->m_reverse ? yes : no),
-                            true);
-#endif
-}   // addVote
 
 // -----------------------------------------------------------------------------
 /** Received the winning vote. i.e. the data about the track to play (including
@@ -768,4 +743,69 @@ void TracksScreen::setResult(const PeerVote &winner_vote)
  */
 void TracksScreen::updatePlayerVotes()
 {
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (GUIEngine::getCurrentScreen() != this || !cl)
+        return;
+    m_vote_list->clear();
+    for (unsigned i = 0; i < m_index_to_hostid.size(); i++)
+    {
+        const PeerVote* p = cl->getVote(m_index_to_hostid[i]);
+        assert(p);
+        std::vector<GUIEngine::ListWidget::ListCell> row;
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        {
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (p->m_player_name , -1, 5));
+            int icon = -1;
+            const auto& tracks = cl->getAvailableTracks();
+            auto it = tracks.find(p->m_track_name);
+            if (it != tracks.end())
+            {
+                icon = (int)std::distance(tracks.begin(), it);
+            }
+            row.push_back(GUIEngine::ListWidget::ListCell
+                ("" , icon, 2));
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (p->m_reverse ? _("Yes") : _("No") , -1, 1));
+            m_vote_list->addItem(
+                StringUtils::toString(m_index_to_hostid[i]), row);
+        }
+        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        {
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (p->m_player_name , -1, 6));
+            int icon = -1;
+            const auto& tracks = cl->getAvailableTracks();
+            auto it = tracks.find(p->m_track_name);
+            if (it != tracks.end())
+            {
+                icon = (int)std::distance(tracks.begin(), it);
+            }
+            row.push_back(GUIEngine::ListWidget::ListCell
+                ("" , icon, 2));
+            m_vote_list->addItem(
+                StringUtils::toString(m_index_to_hostid[i]), row);
+        }
+        else
+        {
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (p->m_player_name , -1, 4));
+            int icon = -1;
+            const auto& tracks = cl->getAvailableTracks();
+            auto it = tracks.find(p->m_track_name);
+            if (it != tracks.end())
+            {
+                icon = (int)std::distance(tracks.begin(), it);
+            }
+            row.push_back(GUIEngine::ListWidget::ListCell
+                ("" , icon, 2));
+            int laps = p->m_num_laps;
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (StringUtils::toWString(laps) , -1, 1));
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (p->m_reverse ? _("Yes") : _("No") , -1, 1));
+            m_vote_list->addItem(
+                StringUtils::toString(m_index_to_hostid[i]), row);
+        }
+    }
 }   // updatePlayerVotes
