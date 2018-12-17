@@ -65,6 +65,8 @@ void ProgressBarWidget::add()
      \brief animate the element and its children.
      */
     GUIEngine::needsUpdate.push_back(this);
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }    // add
 
 // -----------------------------------------------------------------------------
