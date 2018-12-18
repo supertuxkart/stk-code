@@ -544,7 +544,15 @@ void CGUISTKListBox::draw()
                     {
                         core::position2di iconPos = textRect.UpperLeftCorner;
                         iconPos.Y += textRect.getHeight() / 2;
-                        iconPos.X += ItemsIconWidth/2;
+                        
+                        if (Items[i].m_contents[x].m_center)
+                        {
+                            iconPos.X += part_size/2;
+                        }
+                        else
+                        {
+                            iconPos.X += ItemsIconWidth/2;
+                        }
 
                         EGUI_LISTBOX_COLOR icon_color = EGUI_LBC_ICON;
                         bool highlight=false;
