@@ -789,7 +789,7 @@ void TracksScreen::updatePlayerVotes()
         else
         {
             row.push_back(GUIEngine::ListWidget::ListCell
-                (p->m_player_name , -1, 4));
+                (p->m_player_name , -1, 4, 0));
             int icon = -1;
             const auto& tracks = cl->getAvailableTracks();
             auto it = tracks.find(p->m_track_name);
@@ -798,12 +798,12 @@ void TracksScreen::updatePlayerVotes()
                 icon = (int)std::distance(tracks.begin(), it);
             }
             row.push_back(GUIEngine::ListWidget::ListCell
-                ("" , icon, 2));
+                ("" , icon, 2, 1));
             int laps = p->m_num_laps;
             row.push_back(GUIEngine::ListWidget::ListCell
-                (StringUtils::toWString(laps) , -1, 1));
+                (StringUtils::toWString(laps) , -1, 1, 1));
             row.push_back(GUIEngine::ListWidget::ListCell
-                (p->m_reverse ? _("Yes") : _("No") , -1, 1));
+                (p->m_reverse ? _("Yes") : _("No") , -1, 1, 1));
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
