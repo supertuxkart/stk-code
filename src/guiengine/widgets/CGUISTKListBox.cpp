@@ -547,7 +547,7 @@ void CGUISTKListBox::draw()
                         
                         if (Items[i].m_contents[x].m_center)
                         {
-                            iconPos.X += part_size/2;
+                            iconPos.X += part_size/2 - 3;
                         }
                         else
                         {
