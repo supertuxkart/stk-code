@@ -480,7 +480,6 @@ void CGUISTKListBox::draw()
 
     core::rect<s32> clientClip(AbsoluteRect);
     clientClip.UpperLeftCorner.Y += 1;
-    clientClip.UpperLeftCorner.X += 1;
     if (ScrollBar->isVisible())
         clientClip.LowerRightCorner.X = AbsoluteRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
     clientClip.LowerRightCorner.Y -= 1;
@@ -493,7 +492,6 @@ void CGUISTKListBox::draw()
         clientClip.clipAgainst(*clipRect);
 
     frameRect = AbsoluteRect;
-    frameRect.UpperLeftCorner.X += 1;
     if (ScrollBar->isVisible())
         frameRect.LowerRightCorner.X = AbsoluteRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
 
@@ -521,6 +519,9 @@ void CGUISTKListBox::draw()
                 skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), frameRect, &clientClip);
 
             core::rect<s32> textRect = frameRect;
+            
+            if (!ScrollBar->isVisible())
+                textRect.LowerRightCorner.X = textRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
 
             if (Font)
             {
@@ -529,12 +530,14 @@ void CGUISTKListBox::draw()
                 {
                     total_proportion += Items[i].m_contents[x].m_proportion;
                 }
-                int part_size = (int)(textRect.getWidth() / float(total_proportion));
 
+                int total_width = textRect.getWidth();
+                
                 for(unsigned int x = 0; x < Items[i].m_contents.size(); ++x)
                 {
-                    textRect.LowerRightCorner.X = textRect.UpperLeftCorner.X +
-                                                  (Items[i].m_contents[x].m_proportion * part_size);
+                    int part_size = total_width * Items[i].m_contents[x].m_proportion / total_proportion;
+                    
+                    textRect.LowerRightCorner.X = textRect.UpperLeftCorner.X + part_size;
                     textRect.UpperLeftCorner.X += 3;
 
                     if (IconBank && (Items[i].m_contents[x].m_icon > -1))
@@ -542,7 +545,6 @@ void CGUISTKListBox::draw()
                         core::position2di iconPos = textRect.UpperLeftCorner;
                         iconPos.Y += textRect.getHeight() / 2;
                         iconPos.X += ItemsIconWidth/2;
-
 
                         EGUI_LISTBOX_COLOR icon_color = EGUI_LBC_ICON;
                         bool highlight=false;
@@ -609,7 +611,7 @@ void CGUISTKListBox::draw()
                     textRect.UpperLeftCorner.X -= 6;
 
                     //Calculate new beginning
-                    textRect.UpperLeftCorner.X += Items[i].m_contents[x].m_proportion * part_size;
+                    textRect.UpperLeftCorner.X += part_size;
                 }
             }
         }
