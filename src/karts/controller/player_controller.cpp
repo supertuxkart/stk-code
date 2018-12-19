@@ -285,19 +285,13 @@ void PlayerController::steer(int ticks, int steer_val)
                      : dt/m_kart->getTimeFullSteer(fabsf(steer));
     if (steer_val < 0)
     {
-        // If we got analog values do not cumulate.
-        if (steer_val > -32767)
-            steer = -steer_val/32767.0f;
-        else
-            steer += STEER_CHANGE;
+        steer += STEER_CHANGE;
+        steer = std::min(steer, -steer_val/32767.0f);
     }
     else if(steer_val > 0)
     {
-        // If we got analog values do not cumulate.
-        if (steer_val < 32767)
-            steer = -steer_val/32767.0f;
-        else
-            steer -= STEER_CHANGE;
+        steer -= STEER_CHANGE;
+        steer = std::max(steer, -steer_val/32767.0f);
     }
     else
     {   // no key is pressed
