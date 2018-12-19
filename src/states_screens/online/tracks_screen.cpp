@@ -764,9 +764,9 @@ void TracksScreen::updatePlayerVotes()
                 icon = (int)std::distance(tracks.begin(), it);
             }
             row.push_back(GUIEngine::ListWidget::ListCell
-                ("" , icon, 2));
+                ("" , icon, 2, true/*center*/));
             row.push_back(GUIEngine::ListWidget::ListCell
-                (p->m_reverse ? _("Yes") : _("No") , -1, 1));
+                (p->m_reverse ? _("Yes") : _("No") , -1, 1, true/*center*/));
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
@@ -782,7 +782,7 @@ void TracksScreen::updatePlayerVotes()
                 icon = (int)std::distance(tracks.begin(), it);
             }
             row.push_back(GUIEngine::ListWidget::ListCell
-                ("" , icon, 2));
+                ("" , icon, 2, true/*center*/));
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
@@ -798,12 +798,12 @@ void TracksScreen::updatePlayerVotes()
                 icon = (int)std::distance(tracks.begin(), it);
             }
             row.push_back(GUIEngine::ListWidget::ListCell
-                ("" , icon, 2, 1));
+                ("" , icon, 2, true/*center*/));
             int laps = p->m_num_laps;
             row.push_back(GUIEngine::ListWidget::ListCell
-                (StringUtils::toWString(laps) , -1, 1, 1));
+                (StringUtils::toWString(laps) , -1, 1, true/*center*/));
             row.push_back(GUIEngine::ListWidget::ListCell
-                (p->m_reverse ? _("Yes") : _("No") , -1, 1, 1));
+                (p->m_reverse ? _("Yes") : _("No") , -1, 1, true/*center*/));
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
