@@ -64,6 +64,34 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         voteForPlayer();
     }
 
+    else if (name == "vote-list")
+    {
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        ListWidget* list = dynamic_cast<ListWidget*>(widget);
+        DynamicRibbonWidget* tracks_widget =
+            getWidget<DynamicRibbonWidget>("tracks");
+
+        if (!list || !cl || !tracks_widget || !m_laps || !m_reversed)
+            return;
+        // Vote to agree with selection of host id
+        uint32_t host_id = -1;
+        if (StringUtils::fromString(list->getSelectionInternalName(),
+            host_id) && host_id != STKHost::get()->getMyHostId())
+        {
+            const PeerVote* host_vote = cl->getVote(host_id);
+            if (host_vote)
+            {
+                m_selected_track = track_manager->getTrack(
+                    host_vote->m_track_name);
+                if (!m_selected_track)
+                    return;
+                tracks_widget->setBadge(host_vote->m_track_name, OK_BADGE);
+                m_laps->setValue(host_vote->m_num_laps);
+                m_reversed->setState(host_vote->m_reverse);
+                voteForPlayer();
+            }
+        }
+    }
     else if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
@@ -384,6 +412,7 @@ void TracksScreen::init()
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             getWidget("lap-text")->setVisible(false);
+            m_laps->setValue(0);
             m_laps->setVisible(false);
             getWidget("reverse-text")->setVisible(true);
             //I18N: In track screen
@@ -396,8 +425,10 @@ void TracksScreen::init()
         else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             getWidget("lap-text")->setVisible(false);
+            m_laps->setValue(0);
             m_laps->setVisible(false);
             getWidget("reverse-text")->setVisible(false);
+            m_reversed->setState(false);
             m_reversed->setVisible(false);
         }
         else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
@@ -465,6 +496,7 @@ void TracksScreen::init()
             getWidget<LabelWidget>("reverse-text")
                      ->setText(_("Drive in reverse"), false);
             m_reversed->setVisible(true);
+            m_reversed->setState(false);
             if (vote)
                 m_reversed->setState(vote->m_reverse);
         }
@@ -530,7 +562,8 @@ void TracksScreen::buildTrackList()
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
         Track *curr = tracks.get(i);
-        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
+        if (PlayerManager::getCurrentPlayer() &&
+            PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
             race_manager->getNumLocalPlayers() == 1 && !is_network)
         {
             tracks_widget->addItem(
@@ -584,8 +617,9 @@ void TracksScreen::voteForPlayer()
 
     NetworkString vote(PROTOCOL_LOBBY_ROOM);
     vote.addUInt8(LobbyProtocol::LE_VOTE);
-    const core::stringw &player_name =
-        PlayerManager::getCurrentPlayer()->getName();
+    core::stringw player_name;
+    if (PlayerManager::getCurrentPlayer())
+        player_name = PlayerManager::getCurrentPlayer()->getName();
     vote.encodeString(player_name);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
@@ -663,7 +697,7 @@ void TracksScreen::addVote(uint32_t host_id)
     Log::debug("TracksScreen", "addVote: hostid %d is new %d",
                  host_id, it == m_index_to_hostid.end());
 
-    // Add a new index if this is the first vote for the host/
+    // Add a new index if this is the first vote for the host
     if (it == m_index_to_hostid.end())
     {
         // Sound effect like lobby chat
@@ -685,7 +719,7 @@ void TracksScreen::removeVote(uint32_t host_id)
     Log::debug("TracksScreen", "removeVote: hostid %d found %d",
                  host_id, it != m_index_to_hostid.end());
 
-    // Add a new index if this is the first vote for the host/
+    // Add a new index if this is the first vote for the host
     if (it != m_index_to_hostid.end())
     {
         m_index_to_hostid.erase(it);
