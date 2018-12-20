@@ -163,6 +163,9 @@ private:
 
     bool m_save_server_config;
 
+    // Default game settings if no one has ever vote
+    PeerVote* m_default_vote;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -243,7 +246,7 @@ private:
                                   const std::string& iv,
                                   uint32_t online_id,
                                   const irr::core::stringw& online_name);
-    bool handleAllVotes(PeerVote *winner);
+    bool handleAllVotes(PeerVote* winner, uint32_t* winner_peer_id);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();

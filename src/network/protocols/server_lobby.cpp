@@ -141,6 +141,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_server_id_online.store(0);
     m_difficulty.store(ServerConfig::m_server_difficulty);
     m_game_mode.store(ServerConfig::m_server_mode);
+    m_default_vote = new PeerVote();
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -156,9 +157,12 @@ ServerLobby::~ServerLobby()
     delete m_result_ns;
     if (m_save_server_config)
         ServerConfig::writeServerConfigToDisk();
+    delete m_default_vote;
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
+/** Called whenever server is reset or game mode is changed.
+ */
 void ServerLobby::updateTracksForMode()
 {
     auto all_t = track_manager->getAllTrackIdentifiers();
@@ -536,7 +540,8 @@ void ServerLobby::asynchronousUpdate()
     case SELECTING:
     {
         PeerVote winner_vote;
-        bool all_votes_in = handleAllVotes(&winner_vote);
+        uint32_t winner_peer_id = std::numeric_limits<uint32_t>::max();
+        bool all_votes_in = handleAllVotes(&winner_vote, &winner_peer_id);
         if (isVotingOver() || all_votes_in)
         {
             m_game_setup->setRace(winner_vote);
@@ -930,25 +935,6 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    if (!allowJoinedPlayersWaiting())
-    {
-        ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
-        if (NetworkConfig::get()->isWAN())
-        {
-            unregisterServer(false/*now*/);
-        }
-    }
-
-    startVotingPeriod(ServerConfig::m_voting_timeout);
-    NetworkString *ns = getNetworkString(1);
-    // Start selection - must be synchronous since the receiver pushes
-    // a new screen, which must be done from the main thread.
-    ns->setSynchronous(true);
-    ns->addUInt8(LE_START_SELECTION)
-       .addFloat(ServerConfig::m_voting_timeout)
-       .addUInt8(m_game_setup->isGrandPrixStarted() ? 1 : 0)
-       .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0);
-
     // Remove karts / tracks from server that are not supported on all clients
     std::set<std::string> karts_erase, tracks_erase;
     auto peers = STKHost::get()->getPeers();
@@ -982,6 +968,77 @@ void ServerLobby::startSelection(const Event *event)
                 it++;
         }
     }
+    // Default vote use only official tracks to prevent network AI cannot
+    // finish some bad wip / addons tracks
+    std::set<std::string> official_tracks = m_official_kts.second;
+    std::set<std::string>::iterator it = official_tracks.begin();
+    while (it != official_tracks.end())
+    {
+        if (m_available_kts.second.find(*it) == m_available_kts.second.end())
+        {
+            it = official_tracks.erase(it);
+        }
+        else
+            it++;
+    }
+    if (official_tracks.empty())
+    {
+        Log::error("ServerLobby", "No official tracks for playing!");
+        return;
+    }
+    RandomGenerator rg;
+    it = official_tracks.begin();
+    std::advance(it, rg.get((int)official_tracks.size()));
+    m_default_vote->m_track_name = *it;
+    switch (race_manager->getMinorMode())
+    {
+        case RaceManager::MINOR_MODE_NORMAL_RACE:
+        case RaceManager::MINOR_MODE_TIME_TRIAL:
+        case RaceManager::MINOR_MODE_FOLLOW_LEADER:
+        {
+            Track* t = track_manager->getTrack(*it);
+            assert(t);
+            m_default_vote->m_num_laps = t->getDefaultNumberOfLaps();
+            m_default_vote->m_reverse =
+                m_default_vote->m_track_name.size() % 2 == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_FREE_FOR_ALL:
+        case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_SOCCER:
+        {
+            m_default_vote->m_num_laps = 3;
+            m_default_vote->m_reverse = 0;
+            break;
+        }
+        default:
+            assert(false);
+            break;
+    }
+
+    if (!allowJoinedPlayersWaiting())
+    {
+        ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
+        if (NetworkConfig::get()->isWAN())
+        {
+            unregisterServer(false/*now*/);
+        }
+    }
+
+    startVotingPeriod(ServerConfig::m_voting_timeout);
+    NetworkString *ns = getNetworkString(1);
+    // Start selection - must be synchronous since the receiver pushes
+    // a new screen, which must be done from the main thread.
+    ns->setSynchronous(true);
+    ns->addUInt8(LE_START_SELECTION)
+       .addFloat(ServerConfig::m_voting_timeout)
+       .addUInt8(m_game_setup->isGrandPrixStarted() ? 1 : 0)
+       .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0);
 
     const auto& all_k = m_available_kts.first;
     const auto& all_t = m_available_kts.second;
@@ -2028,8 +2085,10 @@ void ServerLobby::handlePlayerVote(Event* event)
 // ----------------------------------------------------------------------------
 /** Select the track to be used based on all votes being received.
  * \param winner_vote The PeerVote that was picked.
+ * \param winner_peer_id The host id of winner (unchanged if no vote).
  */
-bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
+bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
+                                 uint32_t* winner_peer_id)
 {
     // First remove all votes from disconnected hosts
     auto it = m_peers_votes.begin();
@@ -2055,12 +2114,7 @@ bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
     if (cur_players == 0 || m_peers_votes.size() < cur_players)
     {
         // Default settings if no votes at all
-        RandomGenerator rg;
-        std::set<std::string>::iterator it = m_available_kts.second.begin();
-        std::advance(it, rg.get((int)m_available_kts.second.size()));
-        winner_vote->m_track_name = *it;
-        winner_vote->m_num_laps = UserConfigParams::m_num_laps;
-        winner_vote->m_reverse = winner_vote->m_track_name.size() % 2 == 0;
+        *winner_vote = *m_default_vote;
         return false;
     }
 
@@ -2070,6 +2124,7 @@ bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
     auto vote = m_peers_votes.begin();
     std::advance(vote, r.get(m_peers_votes.size()) );
 
+    *winner_peer_id = vote->first;
     *winner_vote = vote->second;
 
     // For now: don't trigger start of race if all votes
@@ -2077,7 +2132,7 @@ bool ServerLobby::handleAllVotes(PeerVote *winner_vote)
     // return m_peers_votes.size() == cur_players;
     // to start the race when all votes have been received.
     return false;
-    
+
 }   // handleAllVotes
 
 // ----------------------------------------------------------------------------
