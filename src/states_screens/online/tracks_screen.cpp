@@ -501,14 +501,6 @@ void TracksScreen::init()
                 m_reversed->setState(vote->m_reverse);
         }
     }
-    if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
-    {
-        assert(!m_random_track_list.empty());
-        NetworkString vote(PROTOCOL_LOBBY_ROOM);
-        vote.addUInt8(LobbyProtocol::LE_VOTE);
-        vote.encodeString(m_random_track_list[0]).addUInt8(1).addUInt8(0);
-        STKHost::get()->sendToServer(&vote, true);
-    }
     updatePlayerVotes();
 }   // init
 

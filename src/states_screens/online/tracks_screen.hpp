@@ -98,7 +98,6 @@ public:
     void removeVote(uint32_t host_id);
     void setResult(const PeerVote &winner_vote);
     void showVoteResult();
-    void updateNumPlayers(int n);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
