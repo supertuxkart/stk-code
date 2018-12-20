@@ -1964,6 +1964,7 @@ void ServerLobby::handlePlayerVote(Event* event)
         assert(t);
     }
 
+    // Remove / adjust any invalid settings
     if (race_manager->modeHasLaps())
     {
         if (ServerConfig::m_auto_game_time_ratio > 0.0f)
@@ -1997,6 +1998,17 @@ void ServerLobby::handlePlayerVote(Event* event)
             else if (vote.m_num_laps > 15)
                 vote.m_num_laps = (uint8_t)7;
         }
+    }
+    else if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    {
+        vote.m_num_laps = 0;
+    }
+    else if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    {
+        vote.m_num_laps = 0;
+        vote.m_reverse = false;
     }
 
     // Store vote:
