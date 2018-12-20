@@ -89,6 +89,7 @@ private:
         m_network_tracks = false;
         m_quit_server = false;
         m_bottom_box_height = -1;
+        m_track_icons = NULL;
     }
 
 public:
