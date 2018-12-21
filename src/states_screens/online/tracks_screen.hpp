@@ -90,6 +90,7 @@ private:
         m_quit_server = false;
         m_bottom_box_height = -1;
         m_track_icons = NULL;
+        m_timer = NULL;
     }
     // ------------------------------------------------------------------------
     void updateProgressBarText();

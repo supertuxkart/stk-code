@@ -161,10 +161,11 @@ void LobbyProtocol::startVotingPeriod(float max_time)
 /** Returns the remaining voting time in seconds. */
 float LobbyProtocol::getRemainingVotingTime()
 {
-    if (m_end_voting_period.load() == 0)
+    if (m_end_voting_period.load() == 0 ||
+        StkTime::getRealTimeMs() >= m_end_voting_period.load())
         return 0.0f;
-    uint64_t t = m_end_voting_period.load()- StkTime::getRealTimeMs();
-    return t/1000.0f;
+    uint64_t t = m_end_voting_period.load() - StkTime::getRealTimeMs();
+    return t / 1000.0f;
 }   // getRemainingVotingTime
 
 //-----------------------------------------------------------------------------

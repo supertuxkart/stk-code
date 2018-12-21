@@ -229,6 +229,7 @@ void ClientLobby::addAllPlayers(Event* event)
     }
 
     NetworkString& data = event->data();
+    uint32_t winner_peer_id = data.getUInt32();
     PeerVote winner_vote(data);
 
     m_game_setup->setRace(winner_vote);
