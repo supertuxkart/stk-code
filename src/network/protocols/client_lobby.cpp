@@ -453,7 +453,7 @@ void ClientLobby::receivePlayerVote(Event* event)
             vote.m_track_name.c_str());
     }
     addVote(host_id, vote);
-    TracksScreen::getInstance()->addVote(host_id);
+    TracksScreen::getInstance()->addVote(host_id, vote);
     TracksScreen::getInstance()->updatePlayerVotes();
 }   // receivePlayerVote
 

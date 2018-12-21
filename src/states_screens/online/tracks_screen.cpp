@@ -175,6 +175,8 @@ void TracksScreen::tearDown()
 {
     m_network_tracks = false;
     m_selected_track = NULL;
+    m_laps = NULL;
+    m_reversed = NULL;
     m_quit_server = false;
 }   // tearDown
 
@@ -678,8 +680,9 @@ void TracksScreen::onUpdate(float dt)
  *  already mapped, this is ignored (this can happen in case one host changes
  *  its vote.
  *  \param host_id Index of the host that is voting.
+ *  \param vote Vote information.
  */
-void TracksScreen::addVote(uint32_t host_id)
+void TracksScreen::addVote(uint32_t host_id, const PeerVote& vote)
 {
     auto it = std::find(m_index_to_hostid.begin(), m_index_to_hostid.end(),
                         host_id);
@@ -694,6 +697,11 @@ void TracksScreen::addVote(uint32_t host_id)
         if (GUIEngine::getCurrentScreen() == this)
             SFXManager::get()->quickSound("plopp");
         m_index_to_hostid.push_back(host_id);
+    }
+    if (host_id == STKHost::get()->getMyHostId() && m_laps && m_reversed)
+    {
+        m_laps->setValue(vote.m_num_laps);
+        m_reversed->setState(vote.m_reverse);
     }
 }   // addVote
 

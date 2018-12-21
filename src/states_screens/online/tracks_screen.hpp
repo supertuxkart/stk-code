@@ -94,13 +94,15 @@ private:
         m_timer = NULL;
         m_winning_index = std::numeric_limits<uint32_t>::max();
         m_vote_list = NULL;
+        m_reversed = NULL;
+        m_laps     = NULL;
     }
     // ------------------------------------------------------------------------
     void updateProgressBarText();
 
 public:
 
-    void addVote(uint32_t host_id);
+    void addVote(uint32_t host_id, const PeerVote& vote);
     void removeVote(uint32_t host_id);
     void setResult(uint32_t winner_host, const PeerVote& winner_vote);
 

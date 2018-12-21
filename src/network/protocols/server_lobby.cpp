@@ -2033,6 +2033,8 @@ void ServerLobby::handlePlayerVote(Event* event)
         }
         else if (vote.m_num_laps == 0 || vote.m_num_laps > 20)
             vote.m_num_laps = (uint8_t)3;
+        if (!t->reverseAvailable() && vote.m_reverse)
+            vote.m_reverse = false;
     }
     else if (race_manager->isSoccerMode())
     {
@@ -2133,6 +2135,7 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
 
     std::string top_track = m_default_vote->m_track_name;
     int top_laps = m_default_vote->m_num_laps;
+    bool top_reverse = m_default_vote->m_reverse;
 
     std::map<std::string, unsigned> tracks;
     std::map<unsigned, unsigned> laps;
@@ -2211,6 +2214,7 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
     }
     if (reverse_vote != reverses.end())
     {
+        top_reverse = reverse_vote->first;
         reverses_rate = float(reverse_vote->second) / cur_players;
     }
 
@@ -2220,7 +2224,9 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
     {
         while (it != m_peers_votes.end())
         {
-            if (it->second.m_track_name == top_track)
+            if (it->second.m_track_name == top_track &&
+                it->second.m_num_laps == top_laps &&
+                it->second.m_reverse == top_reverse)
                 break;
             else
                 it++;
