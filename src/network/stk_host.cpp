@@ -184,43 +184,30 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *
  *  The server will reply with either a reject message (e.g. too many clients
  *  already connected), or an accept message. The accept message will contain
- *  the global player id of the client. The message
- *  also contains the global ids and names of all currently connected
- *  clients for the new client. The server then informs all existing clients
- *  about the newly connected client, and its global player id.
+ *  the global player id of the client. Each time any client connect,
+ *  disconnect or change team / handicap server will send a new list of
+ *  currently available players and update them in the networking lobby.
  *
- *  --> At this stage all clients and the server know the name and global id
- *  of all connected clients. This information is stored in an array of
- *  NetworkPlayerProfile managed in GameSetup (which is stored in STKHost).
- *
- *  When the authorised clients starts the kart selection, the SLP
- *  informs all clients to start the kart selection (SLP::startSelection).
- *  This triggers the creation of the kart selection screen in 
+ *  When the authorised client or ownerless server timed up and start the kart
+ *  selection, the SLP informs all clients to start the kart selection
+ *  (SLP::startSelection). This triggers the creation of the kart selection
+ *  (if grand prix in progress then goes track screen directly) screen in
  *  CLP::startSelection / CLP::update for all clients. The clients create
  *  the ActivePlayer object (which stores which device is used by which
- *  player).  The kart selection in a client calls
- *  (NetworkKartSelection::playerConfirm) which calls CLP::requestKartSelection.
- *  This sends a message to SLP::kartSelectionRequested, which verifies the
- *  selected kart and sends this information to all clients (including the
- *  client selecting the kart in the first place). This message is handled
- *  by CLP::kartSelectionUpdate. Server and all clients store this information
- *  in the NetworkPlayerProfile for the corresponding player, so server and
- *  all clients now have identical information about global player id, player
- *  name and selected kart. The authorised client will set some default votes
- *  for game modes, number of laps etc (temporary, see
- *  NetworkKartSelection::playerSelected).
+ *  player).
  *
  *  After selecting a kart, the track selection screen is shown. On selecting
- *  a track, a vote for the track is sent to the client
- *  (TrackScreen::eventCallback, using CLP::voteTrack). The server will send
- *  all votes (track, #laps, ...) to all clients (see e.g. SLP::playerTrackVote
- *  etc), which are handled in e.g. CLP::playerTrackVote().
+ *  a track, a vote for the track, laps and reversed is sent to the client
+ *  (TrackScreen::eventCallback). The server will send
+ *  all votes (track, #laps, ...) to all clients (see e.g. SLP::handlePlayerVote
+ *  etc), which are handled in e.g. CLP::receivePlayerVote().
  *
  *  --> Server and all clients have identical information about all votes
- *  stored in RaceConfig of GameSetup.
+ *  stored in m_peers_votes in LobbyProtocol base class.
  *
- *  The server will detect when the track votes from each client have been
- *  received and will inform all clients to load the world (playerTrackVote).
+ *  The server will decide the best track vote based on the discussion from
+ *  clients, then it will inform all clients to load the world (addAllPlayers)
+ *  with the final players currently connected with team / handicap settings.
  *  Then (state LOAD_GAME) the server will load the world and wait for all
  *  clients to finish loading (WAIT_FOR_WORLD_LOADED).
  *
@@ -233,6 +220,14 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  device to each kart, achievements and highscores, so it's not needed for
  *  remote players). It will also start the RaceEventManager and then load the
  *  world.
+ *
+ *  Below you can see the definition of ping packet, it's a special packet that
+ *  will be sent to each client waiting in lobby, the 1st byte is 255 so
+ *  ProtocolManager won't handle it, after 5 bytes it comes with real data:
+ *  1. Server time in uint64_t (for synchronization)
+ *  2. Host id with ping to each client currently connected
+ *  3. If game is currently started, 2 uint32_t which tell remaining time or
+ *     progress in percent
  */
 // ============================================================================
 constexpr std::array<uint8_t, 5> g_ping_packet {{ 255, 'p', 'i', 'n', 'g' }};
