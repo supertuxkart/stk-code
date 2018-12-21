@@ -233,7 +233,7 @@ void ClientLobby::addAllPlayers(Event* event)
     PeerVote winner_vote(data);
 
     m_game_setup->setRace(winner_vote);
-    TracksScreen::getInstance()->setResult(winner_vote);
+    TracksScreen::getInstance()->setResult(winner_peer_id, winner_vote);
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();

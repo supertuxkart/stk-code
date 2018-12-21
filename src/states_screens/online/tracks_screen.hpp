@@ -21,6 +21,7 @@
 #include "guiengine/screen.hpp"
 
 #include <deque>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -70,8 +71,8 @@ private:
 
     int m_bottom_box_height;
 
-    /** Index of the winning vote. */
-    int m_winning_index;
+    /** Id of the winning peer. */
+    uint32_t m_winning_index;
 
     /** This stores which vote (hostid) is shown at which index in
      *  the vote overview list. */
@@ -91,6 +92,8 @@ private:
         m_bottom_box_height = -1;
         m_track_icons = NULL;
         m_timer = NULL;
+        m_winning_index = std::numeric_limits<uint32_t>::max();
+        m_vote_list = NULL;
     }
     // ------------------------------------------------------------------------
     void updateProgressBarText();
@@ -99,8 +102,7 @@ public:
 
     void addVote(uint32_t host_id);
     void removeVote(uint32_t host_id);
-    void setResult(const PeerVote &winner_vote);
-    void showVoteResult();
+    void setResult(uint32_t winner_host, const PeerVote& winner_vote);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -138,10 +140,9 @@ public:
      *  data fields. */
     void resetVote()
     {
+        m_winning_index = std::numeric_limits<uint32_t>::max();
         m_index_to_hostid.clear();
     }
-    // ------------------------------------------------------------------------
-    void setVoteTimeout(float timeout);
     // ------------------------------------------------------------------------
     void updatePlayerVotes();
 };

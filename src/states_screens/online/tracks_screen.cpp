@@ -658,29 +658,19 @@ void TracksScreen::onUpdate(float dt)
     if (!m_network_tracks)
         return;
 
+    if (m_winning_index != std::numeric_limits<uint32_t>::max() && m_vote_list)
+    {
+        int list_id =
+            m_vote_list->getItemID(StringUtils::toString(m_winning_index));
+        //if (StkTime::getRealTimeMs() / 1000 % 2 == 0)
+            m_vote_list->setSelectionID(list_id);
+        //else
+        //    m_vote_list->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+        return;
+    }
     updateProgressBarText();
-}   // onUpdate
 
-// ----------------------------------------------------------------------------
-/** Called when the final 'random picking' animation is finished so that only
- *  the result is shown : all votes except the winner is set to be invisible.
- */
-void TracksScreen::showVoteResult()
-{
-    Log::info("TracksScreen", "showVoteResult: winning index %d",
-              m_winning_index);
-    // TODO: Make all listed votes except the winner invisible: something
-    // like this:
-    //for (unsigned int i = 0; i < 8; i++)
-    //{
-    //   std::string box_name = StringUtils::insertValues("rect-box%d", i);
-    //    Widget *box = getWidget(box_name.c_str());
-    //    if (i != m_winning_index)
-    //        box->setVisible(false);
-    //    else
-    //        box->setSelected(PLAYER_ID_GAME_MASTER, true);
-    //}
-}   // showVoteResult
+}   // onUpdate
 
 // -----------------------------------------------------------------------------
 /** Selects in which part of the vote list the new host is being shown and
@@ -730,49 +720,21 @@ void TracksScreen::removeVote(uint32_t host_id)
 /** Received the winning vote. i.e. the data about the track to play (including
  *  #laps etc).
  */
-void TracksScreen::setResult(const PeerVote &winner_vote)
+void TracksScreen::setResult(uint32_t winner_host,
+                             const PeerVote& winner_vote)
 {
     // If the GUI is forced from the server lobby, m_timer is not defined
+    if (!m_timer || winner_host == std::numeric_limits<uint32_t>::max() ||
+        !m_vote_list)
+        return;
     if (m_timer) m_timer->setVisible(false);
 
-    // Note that the votes on the server might have a different order from
-    // the votes here on the client. Potentially there could also be a missing
-    // vote(??)
-    auto lp = LobbyProtocol::get<LobbyProtocol>();
-    m_winning_index = -1;
-    for (unsigned int i = 0; i < m_index_to_hostid.size(); i++)
+    m_winning_index = winner_host;
+    if (auto lp = LobbyProtocol::get<LobbyProtocol>())
     {
-        const PeerVote *vote = lp->getVote(m_index_to_hostid[i]);
-        if (!vote) continue;
-        if (vote->m_track_name == winner_vote.m_track_name &&
-            vote->m_num_laps == winner_vote.m_num_laps &&
-            vote->m_reverse == winner_vote.m_reverse)
-        {
-            m_winning_index = i;
-            break;
-        }
-        // Try to prepare a fallback in case that the right vote is not here.
-        if (vote->m_track_name == winner_vote.m_track_name)
-        {
-            m_winning_index = i;
-        }
-    }   // for i in m_index_to_hostid
-
-    if (m_winning_index == -1)
-    {
-        // We don't have the right vote. Assume that a message got lost,
-        // In this case, change one non-local vote:
-        for (unsigned int i = 0; i < m_index_to_hostid.size(); i++)
-        {
-            if (m_index_to_hostid[i] != STKHost::get()->getMyHostId())
-            {
-                lp->addVote(m_index_to_hostid[i], winner_vote);
-                m_winning_index = i;
-                break;
-            }
-        }
-    }   // wim_winning_index == -1
-
+        lp->addVote(winner_host, winner_vote);
+    }
+    updatePlayerVotes();
 }   // setResult
 
 // -----------------------------------------------------------------------------
@@ -782,7 +744,7 @@ void TracksScreen::setResult(const PeerVote &winner_vote)
 void TracksScreen::updatePlayerVotes()
 {
     auto cl = LobbyProtocol::get<ClientLobby>();
-    if (GUIEngine::getCurrentScreen() != this || !cl)
+    if (GUIEngine::getCurrentScreen() != this || !cl || !m_vote_list)
         return;
     m_vote_list->clear();
     for (unsigned i = 0; i < m_index_to_hostid.size(); i++)

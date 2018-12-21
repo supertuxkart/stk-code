@@ -565,11 +565,7 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
     if (dt < 1.0 / 30.0f) return;
 
     m_curr_time = now;
-
-    if (NetworkConfig::get()->isNetworking() && phase >= 5000)
-    {
-        TracksScreen::getInstance()->showVoteResult();
-    }
+    
     // TODO: remove debug output
     //Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",
     //             now, dt, phase, loop_index, loop_size);
