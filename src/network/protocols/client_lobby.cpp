@@ -268,7 +268,6 @@ void ClientLobby::addAllPlayers(Event* event)
         float time_limit = data.getFloat();
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
     }
-
     configRemoteKart(players);
     loadWorld();
     // Disable until render gui during loading is bug free
@@ -523,6 +522,8 @@ void ClientLobby::connectionAccepted(Event* event)
     m_auto_started = false;
     m_state.store(CONNECTED);
     float auto_start_timer = data.getFloat();
+    int state_frequency_in_server = data.getUInt32();
+    NetworkConfig::get()->setStateFrequency(state_frequency_in_server);
     if (auto_start_timer != std::numeric_limits<float>::max())
         NetworkingLobby::getInstance()->setStartingTimerTo(auto_start_timer);
 }   // connectionAccepted

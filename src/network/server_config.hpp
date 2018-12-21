@@ -295,6 +295,14 @@ namespace ServerConfig
         "Negative value to disable, and this option will always be disabled "
         "for LAN server."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_state_frequency
+        SERVER_CFG_DEFAULT(IntServerConfigParam(10,
+        "state-frequency",
+        "Set how many states the server will send per second, the higher this "
+        "value, the more bandwidth requires, also each client will trigger "
+        "more rewind, which clients with slow device may have problem playing "
+        "this server, use the default value is recommended."));
+
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
         "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "

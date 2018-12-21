@@ -1812,7 +1812,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (m_timeout.load() - (int64_t)StkTime::getRealTimeMs()) / 1000.0f;
     }
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
-        .addUInt32(ServerConfig::m_server_version).addFloat(auto_start_timer);
+        .addUInt32(ServerConfig::m_server_version).addFloat(auto_start_timer)
+        .addUInt32(ServerConfig::m_state_frequency);
 
     if (game_started)
     {

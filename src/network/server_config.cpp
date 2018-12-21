@@ -34,6 +34,7 @@ static std::vector<UserConfigParam*> g_server_params;
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_config.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
@@ -255,6 +256,16 @@ void loadServerLobbyFromConfig()
 {
     if (unsupportedGameMode())
         Log::fatal("ServerConfig", "Unsupported game mode");
+
+    int frequency_in_config = m_state_frequency;
+    if (frequency_in_config > stk_config->getPhysicsFPS())
+    {
+        Log::warn("ServerConfig", "Invalid %d state frequency which is larger "
+            "than physics FPS %d, use default value.",
+            frequency_in_config, stk_config->getPhysicsFPS());
+        m_state_frequency.revertToDefaults();
+    }
+    NetworkConfig::get()->setStateFrequency(m_state_frequency);
 
     if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
         m_server_difficulty = RaceManager::DIFFICULTY_LAST;

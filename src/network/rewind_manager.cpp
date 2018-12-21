@@ -80,8 +80,8 @@ void RewindManager::reset()
     m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
     m_last_saved_state = -1;  // forces initial state save
-    m_state_frequency =
-        stk_config->getPhysicsFPS() / stk_config->m_network_state_frequeny;
+    m_state_frequency = stk_config->getPhysicsFPS() /
+        NetworkConfig::get()->getStateFrequency();
 
     if (!m_enable_rewind_manager) return;
 
