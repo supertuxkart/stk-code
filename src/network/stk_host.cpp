@@ -735,11 +735,10 @@ void STKHost::mainLoop()
             if (sl && (!sl->isRacing() || sl->allowJoinedPlayersWaiting()) &&
                 last_ping_time < StkTime::getRealTimeMs())
             {
-                // If not racing, send an reliable packet at the same rate with
-                // state exchange to keep enet ping accurate
+                // If not racing, send an reliable packet at the 10 packets
+                // per second, which is for accurate ping calculation by enet
                 last_ping_time = StkTime::getRealTimeMs() +
-                    (uint64_t)((1.0f /
-                    (float)(stk_config->m_network_state_frequeny)) * 1000.0f);
+                    (uint64_t)((1.0f / 10.0f) * 1000.0f);
                 need_ping = true;
             }
 

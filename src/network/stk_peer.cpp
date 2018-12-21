@@ -178,7 +178,8 @@ uint32_t STKPeer::getPing()
     if (NetworkConfig::get()->isServer())
     {
         // Average ping in 5 seconds
-        const unsigned ap = stk_config->m_network_state_frequeny * 5;
+        // Frequency is 10 packets per second as seen in STKHost
+        const unsigned ap = 10 * 5;
         m_previous_pings.push_back(m_enet_peer->roundTripTime);
         while (m_previous_pings.size() > ap)
         {
