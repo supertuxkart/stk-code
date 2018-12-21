@@ -271,7 +271,8 @@ void ClientLobby::addAllPlayers(Event* event)
 
     configRemoteKart(players);
     loadWorld();
-    StateManager::get()->enterGameState();
+    // Disable until render gui during loading is bug free
+    //StateManager::get()->enterGameState();
 
     // Switch to assign mode in case a player hasn't chosen any karts
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);

@@ -42,7 +42,6 @@
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/online/tracks_screen.hpp"
 #include "utils/profiler.hpp"
 #include "utils/time.hpp"
 
@@ -543,6 +542,7 @@ void MainLoop::run()
  */
 void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 {
+    return;
 #ifdef SERVER_ONLY
     return;
 #else

@@ -57,7 +57,6 @@
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/online/tracks_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
@@ -478,10 +477,10 @@ void RaceManager::startNextRace()
     // sfx_manager->dump();
 
     IrrlichtDevice* device = irr_driver->getDevice();
-    //GUIEngine::renderLoading();
-    //device->getVideoDriver()->endScene();
-    //device->getVideoDriver()->beginScene(true, true,
-    //                                     video::SColor(255,100,101,140));
+    GUIEngine::renderLoading();
+    device->getVideoDriver()->endScene();
+    device->getVideoDriver()->beginScene(true, true,
+                                         video::SColor(255,100,101,140));
 
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -968,7 +967,8 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     // In networking, make sure that the tracks screen is shown. This will
     // allow for a 'randomly pick track' animation to be shown while
     // world is loaded.
-    if (NetworkConfig::get()->isNetworking() &&
+    // Disable until render gui during loading is bug free
+    /*if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient()        )
     {
         // TODO: The enterGameState() call above deleted all GUIs, which
@@ -980,7 +980,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
             ts->setNetworkTracks();
             ts->push();
         }
-    }
+    }*/
 
 
     setTrack(track_ident);
