@@ -91,6 +91,8 @@ private:
         m_bottom_box_height = -1;
         m_track_icons = NULL;
     }
+    // ------------------------------------------------------------------------
+    void updateProgressBarText();
 
 public:
 

@@ -37,9 +37,7 @@ void NetworkKartSelectionScreen::init()
 
     m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
     m_timer->showLabel(false);
-    // I18N: Time in seconds (before the voting period in network ends).
-    // I18N: %s specifes where the number is placed
-    core::stringw seconds = _("%s seconds", "%d");
+    updateProgressBarText();
 
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
@@ -71,10 +69,7 @@ void NetworkKartSelectionScreen::init()
 void NetworkKartSelectionScreen::onUpdate(float dt)
 {
     KartSelectionScreen::onUpdate(dt);
-    auto lp = LobbyProtocol::get<LobbyProtocol>();
-    float new_value = lp->getRemainingVotingTime() / lp->getMaxVotingTime();
-    if(new_value < 0) new_value = 0;
-    m_timer->setValue(new_value*100.0f);
+    updateProgressBarText();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -124,3 +119,22 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     STKHost::get()->shutdown();
     return true; // remove the screen
 }   // onEscapePressed
+
+// ----------------------------------------------------------------------------
+void NetworkKartSelectionScreen::updateProgressBarText()
+{
+    if (auto lp = LobbyProtocol::get<LobbyProtocol>())
+    {
+        float new_value =
+            lp->getRemainingVotingTime() / lp->getMaxVotingTime();
+        if (new_value < 0.0f)
+            new_value = 0.0f;
+        m_timer->setValue(new_value * 100.0f);
+        int remaining_time = (int)(lp->getRemainingVotingTime());
+        if (remaining_time < 0)
+            remaining_time = 0;
+        //I18N: In kart screen, show before the voting period in network ends.
+        core::stringw message = _("Remaining time: %d", remaining_time);
+        m_timer->setText(message);
+    }
+}   // updateProgressBarText

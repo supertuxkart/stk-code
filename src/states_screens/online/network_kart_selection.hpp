@@ -53,6 +53,8 @@ private:
     // ------------------------------------------------------------------------
     virtual bool isIgnored(const std::string& ident) const OVERRIDE
            { return m_available_karts.find(ident) == m_available_karts.end(); }
+    // ------------------------------------------------------------------------
+    void updateProgressBarText();
 
 public:
     /** \brief Implement per-frame callback. */

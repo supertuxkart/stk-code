@@ -339,6 +339,9 @@ void TracksScreen::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void TracksScreen::init()
 {
+    if (m_network_tracks)
+        updateProgressBarText();
+
     // change the back button image (because it makes the game quit)
     if (m_quit_server)
     {
@@ -643,14 +646,10 @@ void TracksScreen::voteForPlayer()
 // -----------------------------------------------------------------------------
 void TracksScreen::onUpdate(float dt)
 {
-    // The following code
-    if(!m_network_tracks) return;
+    if (!m_network_tracks)
+        return;
 
-    auto lp = LobbyProtocol::get<LobbyProtocol>();
-    float new_value = lp->getRemainingVotingTime() / lp->getMaxVotingTime();
-    if (new_value < 0) new_value = 0;
-    m_timer->setValue(new_value * 100.0f);
-
+    updateProgressBarText();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -839,3 +838,22 @@ void TracksScreen::updatePlayerVotes()
         }
     }
 }   // updatePlayerVotes
+
+// ----------------------------------------------------------------------------
+void TracksScreen::updateProgressBarText()
+{
+    if (auto lp = LobbyProtocol::get<LobbyProtocol>())
+    {
+        float new_value =
+            lp->getRemainingVotingTime() / lp->getMaxVotingTime();
+        if (new_value < 0.0f)
+            new_value = 0.0f;
+        m_timer->setValue(new_value * 100.0f);
+        int remaining_time = (int)(lp->getRemainingVotingTime());
+        if (remaining_time < 0)
+            remaining_time = 0;
+        //I18N: In kart screen, show before the voting period in network ends.
+        core::stringw message = _("Remaining time: %d", remaining_time);
+        m_timer->setText(message);
+    }
+}   // updateProgressBarText
