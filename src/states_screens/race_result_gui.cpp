@@ -1028,9 +1028,9 @@ void RaceResultGUI::displayCTFResults()
                 }
                 case RR_RESORT_TABLE:
                     x = ri->m_x_pos
-                        - ri->m_radius*sin(m_timer / m_time_rotation*M_PI);
+                        - ri->m_radius*sinf(m_timer / m_time_rotation*M_PI);
                     y = ri->m_centre_point
-                        + ri->m_radius*cos(m_timer / m_time_rotation*M_PI);
+                        + ri->m_radius*cosf(m_timer / m_time_rotation*M_PI);
                     break;
                 case RR_WAIT_TILL_END:
                     break;
