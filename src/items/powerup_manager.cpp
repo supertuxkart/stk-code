@@ -604,7 +604,8 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
         *n=1;
 
     // Prevents early explosive items
-    if (stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) < 15.)
+    if (stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
+        stk_config->m_no_explosive_items_timeout)
     {
         if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL)
             powerup = POWERUP_BOWLING;

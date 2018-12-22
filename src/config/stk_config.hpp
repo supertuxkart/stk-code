@@ -86,8 +86,8 @@ public:
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
 
-    /** How many state updates per second the server will send. */
-    int m_network_state_frequeny;
+    /** Prevent early explosive items before this world time. */
+    float m_no_explosive_items_timeout;
 
     /** Maximum number of moveable objects in a track when networking is on. */
     int m_max_moveable_objects;
