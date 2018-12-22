@@ -145,7 +145,7 @@ namespace ServerConfig
         "words here or a file.txt and let STK load it."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_voting_timeout
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "voting-timeout",
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "voting-timeout",
         "Timeout in seconds for voting tracks in server."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_validation_timeout

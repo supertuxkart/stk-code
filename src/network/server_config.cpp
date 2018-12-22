@@ -257,6 +257,10 @@ void loadServerLobbyFromConfig()
     if (unsupportedGameMode())
         Log::fatal("ServerConfig", "Unsupported game mode");
 
+    // TODO Remove when config directory changed from 0.10-git
+    if (m_voting_timeout == 20.0f)
+        m_voting_timeout = 30.0f;
+
     int frequency_in_config = m_state_frequency;
     if (frequency_in_config <= 0 ||
         frequency_in_config > stk_config->getPhysicsFPS())
