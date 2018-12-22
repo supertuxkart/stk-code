@@ -803,6 +803,8 @@ void ShaderBasedRenderer::render(float dt, bool is_loading)
         PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
         // Either render the gui, or the global elements of the race gui.
         GUIEngine::render(dt, is_loading);
+        if (irr_driver->getRenderNetworkDebug() && !is_loading)
+            irr_driver->renderNetworkDebug();
         PROFILER_POP_CPU_MARKER();
     }
 

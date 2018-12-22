@@ -258,7 +258,8 @@ void loadServerLobbyFromConfig()
         Log::fatal("ServerConfig", "Unsupported game mode");
 
     int frequency_in_config = m_state_frequency;
-    if (frequency_in_config > stk_config->getPhysicsFPS())
+    if (frequency_in_config <= 0 ||
+        frequency_in_config > stk_config->getPhysicsFPS())
     {
         Log::warn("ServerConfig", "Invalid %d state frequency which is larger "
             "than physics FPS %d, use default value.",

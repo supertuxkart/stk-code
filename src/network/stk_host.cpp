@@ -700,6 +700,7 @@ void STKHost::mainLoop()
     }
 
     uint64_t last_ping_time = StkTime::getRealTimeMs();
+    uint64_t last_update_speed_time = StkTime::getRealTimeMs();
     uint64_t last_ping_time_update_for_client = StkTime::getRealTimeMs();
     std::map<std::string, uint64_t> ctp;
     while (m_exit_timeout.load() > StkTime::getRealTimeMs())
@@ -711,6 +712,17 @@ void STKHost::mainLoop()
                 it = ctp.erase(it);
             else
                 it++;
+        }
+
+        if (last_update_speed_time < StkTime::getRealTimeMs())
+        {
+            // Update upload / download speed per second
+            last_update_speed_time = StkTime::getRealTimeMs() + 1000;
+            m_upload_speed.store(getNetwork()->getENetHost()->totalSentData);
+            m_download_speed.store(
+                getNetwork()->getENetHost()->totalReceivedData);
+            getNetwork()->getENetHost()->totalSentData = 0;
+            getNetwork()->getENetHost()->totalReceivedData = 0;
         }
 
         auto sl = LobbyProtocol::get<ServerLobby>();

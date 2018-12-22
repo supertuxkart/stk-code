@@ -42,6 +42,7 @@ void showHelp()
     std::cout << "kickban #, kick and ban # peer of STKHost." << std::endl;
     std::cout << "listpeers, List all peers with host ID and IP." << std::endl;
     std::cout << "listban, List IP ban list of server." << std::endl;
+    std::cout << "speedstats, Show upload and download speed." << std::endl;
 }   // showHelp
 
 // ----------------------------------------------------------------------------
@@ -127,6 +128,13 @@ void mainLoop(STKHost* host)
                 std::cout << "Online id: " << ban.first << ", expire at: " <<
                     ban.second << std::endl;
             }
+        }
+        else if (str == "speedstats")
+        {
+            std::cout << "Upload speed (KBps): " <<
+                (float)host->getUploadSpeed() / 1024.0f <<
+                "   Download speed (KBps): " <<
+                (float)host->getDownloadSpeed() / 1024.0f  << std::endl;
         }
         else
         {

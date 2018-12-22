@@ -163,6 +163,7 @@ private:
     bool                 m_lightviz;
     bool                 m_boundingboxesviz;
     bool                 m_recording;
+    bool                 m_render_nw_debug;
 
     /** Background colour to reset a buffer. Can be changed by each track. */
     irr::video::SColor m_clear_color;
@@ -361,6 +362,12 @@ public:
     bool getShadowViz()           { return m_shadowviz;             }
     // ------------------------------------------------------------------------
     void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
+    // ------------------------------------------------------------------------
+    void toggleRenderNetworkDebug() { m_render_nw_debug = !m_render_nw_debug; }
+    // ------------------------------------------------------------------------
+    bool getRenderNetworkDebug() const            { return m_render_nw_debug; }
+    // ------------------------------------------------------------------------
+    void renderNetworkDebug();
     // ------------------------------------------------------------------------
     bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
     // ------------------------------------------------------------------------

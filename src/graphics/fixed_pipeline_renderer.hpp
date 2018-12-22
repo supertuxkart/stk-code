@@ -31,13 +31,13 @@ class FixedPipelineRenderer: public AbstractRenderer
 {  
 public:
     
-    void onLoadWorld()  ;
-    void onUnloadWorld();
-    
+    void onLoadWorld() OVERRIDE;
+    void onUnloadWorld() OVERRIDE;
+
     void render(float dt, bool is_loading) OVERRIDE;
-    
+
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
-                                                     const std::string &name);
+                                                     const std::string &name) OVERRIDE;
 };
 
 #endif // !SERVER_ONLY

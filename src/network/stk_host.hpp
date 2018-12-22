@@ -140,6 +140,10 @@ private:
 
     std::atomic<uint32_t> m_client_ping;
 
+    std::atomic<uint32_t> m_upload_speed;
+
+    std::atomic<uint32_t> m_download_speed;
+
     std::atomic<uint64_t> m_network_timer;
 
     std::unique_ptr<NetworkTimerSynchronizer> m_nts;
@@ -339,7 +343,12 @@ public:
                    { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
     // ------------------------------------------------------------------------
     std::pair<int, int> getAllPlayersTeamInfo() const;
-
+    // ------------------------------------------------------------------------
+    /* Return upload speed in bytes per second. */
+    unsigned getUploadSpeed() const           { return m_upload_speed.load(); }
+    // ------------------------------------------------------------------------
+    /* Return download speed in bytes per second. */
+    unsigned getDownloadSpeed() const       { return m_download_speed.load(); }
 };   // class STKHost
 
 #endif // STK_HOST_HPP

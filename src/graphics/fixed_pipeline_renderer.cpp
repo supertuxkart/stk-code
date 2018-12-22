@@ -94,6 +94,9 @@ void FixedPipelineRenderer::render(float dt, bool is_loading)
     // Either render the gui, or the global elements of the race gui.
     GUIEngine::render(dt, is_loading);
 
+    if (irr_driver->getRenderNetworkDebug() && !is_loading)
+        irr_driver->renderNetworkDebug();
+
     // Render the profiler
     if(UserConfigParams::m_profiler_enabled)
     {
