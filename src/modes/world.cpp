@@ -970,7 +970,7 @@ void World::scheduleTutorial()
 //-----------------------------------------------------------------------------
 /** This updates all only graphical elements. It is only called once per
  *  rendered frame, not once per time step.
- *  float dt Time since last rame.
+ *  float dt Time since last frame.
  */
 void World::updateGraphics(float dt)
 {
