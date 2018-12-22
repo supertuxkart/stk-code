@@ -384,9 +384,9 @@ void OptionsScreenVideo::init()
 #if defined(ANDROID)
     applyBtn->setVisible(false);
     full->setVisible(false);
-    full_text->setVisible(false);
+    getWidget<LabelWidget>("fullscreenText")->setVisible(false);
     rememberWinpos->setVisible(false);
-    rememberWinposText->setVisible(false);
+    getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
 #endif
 }   // init
 
