@@ -26,11 +26,11 @@
 #include <linux/input.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 #include <time.h>
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/joystick.h>
 #endif
