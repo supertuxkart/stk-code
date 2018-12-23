@@ -295,9 +295,9 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     const Track * const track = Track::getCurrentTrack();
     // Render discrete lights scattering
-    if (track && track->isFogEnabled())
+    if (UserConfigParams::m_light_scatter && track && track->isFogEnabled())
     {
-        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Light Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
         m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
                                               m_rtts->getFBO(FBO_HALF1),

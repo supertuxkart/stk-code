@@ -851,6 +851,10 @@ namespace UserConfigParams
             PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
+    PARAM_PREFIX BoolUserConfigParam         m_light_scatter
+            PARAM_DEFAULT(BoolUserConfigParam(true,
+                           "light_scatter", &m_graphics_quality,
+                           "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,
