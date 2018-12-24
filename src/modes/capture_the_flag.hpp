@@ -31,6 +31,8 @@ namespace irr
     }
 }
 
+class CTFFlag;
+
 class CaptureTheFlag : public FreeForAll
 {
 private:
@@ -48,16 +50,18 @@ private:
 
     SFXBase* m_scored_sound;
 
-    int m_red_scores, m_blue_scores, m_red_holder, m_blue_holder;
+    int m_red_scores, m_blue_scores;
 
-    btTransform m_red_trans, m_blue_trans, m_orig_red_trans, m_orig_blue_trans;
+    /* Save the last captured flag ticks */
+    int m_last_captured_flag_ticks;
 
-    int m_red_return_ticks, m_blue_return_ticks;
+    /* Used in updateGraphics to add race gui message for flag */
+    int m_red_flag_status, m_blue_flag_status;
 
     std::map<int, int> m_swatter_reset_kart_ticks;
 
-    // ------------------------------------------------------------------------
-    void updateFlagNodes();
+    std::shared_ptr<CTFFlag> m_red_flag, m_blue_flag;
+
     // ------------------------------------------------------------------------
     bool getDroppedFlagTrans(const btTransform& kt, btTransform* out) const;
     // ------------------------------------------------------------------------
@@ -91,10 +95,6 @@ public:
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
-    void attachFlag(NetworkString& ns);
-    // ------------------------------------------------------------------------
-    void resetFlag(NetworkString& ns);
-    // ------------------------------------------------------------------------
     bool getKartCTFResult(unsigned int kart_id) const
     {
         if (m_red_scores == m_blue_scores)
@@ -114,25 +114,19 @@ public:
     // ------------------------------------------------------------------------
     int getBlueScore() const                          { return m_blue_scores; }
     // ------------------------------------------------------------------------
-    int getRedHolder() const                           { return m_red_holder; }
+    int getRedHolder() const;
     // ------------------------------------------------------------------------
-    int getBlueHolder() const                         { return m_blue_holder; }
+    int getBlueHolder() const;
     // ------------------------------------------------------------------------
-    bool isRedFlagInBase() const
-    {
-        return m_red_holder == -1 &&
-            m_red_trans.getOrigin() == m_orig_red_trans.getOrigin();
-    }
+    bool isRedFlagInBase() const;
     // ------------------------------------------------------------------------
-    bool isBlueFlagInBase() const
-    {
-        return m_blue_holder == -1 &&
-            m_blue_trans.getOrigin() == m_orig_blue_trans.getOrigin();
-    }
+    bool isBlueFlagInBase() const;
     // ------------------------------------------------------------------------
-    const Vec3& getRedFlag() const   { return (Vec3&)m_red_trans.getOrigin(); }
+    const Vec3& getRedFlag() const;
     // ------------------------------------------------------------------------
-    const Vec3& getBlueFlag() const { return (Vec3&)m_blue_trans.getOrigin(); }
+    const Vec3& getBlueFlag() const;
+    // ------------------------------------------------------------------------
+    void ctfScored(int kart_id, bool red_team_scored, int new_score);
     // ------------------------------------------------------------------------
     void loseFlagForKart(int kart_id);
     // ------------------------------------------------------------------------

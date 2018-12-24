@@ -267,6 +267,8 @@ void ClientLobby::addAllPlayers(Event* event)
         int hit_capture_limit = data.getUInt32();
         float time_limit = data.getFloat();
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
+        uint16_t flag_return_timeout = data.getUInt16();
+        race_manager->setFlagReturnTicks(flag_return_timeout);
     }
     configRemoteKart(players);
     loadWorld();

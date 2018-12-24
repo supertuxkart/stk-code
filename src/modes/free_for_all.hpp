@@ -31,6 +31,8 @@ protected:
     bool m_count_down_reached_zero;
 
     std::vector<int> m_scores;
+    // ------------------------------------------------------------------------
+    void handleScoreInServer(int kart_id, int hitter);
 
 private:
     // ------------------------------------------------------------------------

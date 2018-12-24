@@ -16,9 +16,8 @@ public:
         GE_RESET_BALL = 3,
         GE_PLAYER_GOAL = 4,
         GE_BATTLE_KART_SCORE = 5,
-        GE_CTF_ATTACH = 6,
-        GE_CTF_RESET = 7,
-        GE_STARTUP_BOOST = 8,
+        GE_CTF_SCORED = 6,
+        GE_STARTUP_BOOST = 7,
     };   // GameEventType
 private:
     int m_last_finished_position;

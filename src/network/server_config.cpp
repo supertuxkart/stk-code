@@ -261,6 +261,15 @@ void loadServerLobbyFromConfig()
     if (m_voting_timeout == 20.0f)
         m_voting_timeout = 30.0f;
 
+    if (stk_config->time2Ticks(m_flag_return_timemout) > 65535)
+    {
+        float timeout = m_flag_return_timemout;
+        // in CTFFlag it uses 16bit unsigned integer for timeout
+        Log::warn("ServerConfig", "Invalid %f m_flag_return_timemout which "
+            "is too large, use default value.", timeout);
+        m_flag_return_timemout.revertToDefaults();
+    }
+
     int frequency_in_config = m_state_frequency;
     if (frequency_in_config <= 0 ||
         frequency_in_config > stk_config->getPhysicsFPS())

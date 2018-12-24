@@ -81,6 +81,7 @@ RaceManager::RaceManager()
     m_have_kart_last_position_on_overworld = false;
     m_num_local_players = 0;
     m_hit_capture_limit = 0;
+    m_flag_return_ticks = stk_config->time2Ticks(20.0f);
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);

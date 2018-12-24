@@ -79,18 +79,14 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         ffa->setKartScoreFromServer(data);
         break;
     }
-    case GE_CTF_ATTACH:
+    case GE_CTF_SCORED:
     {
         if (!ctf)
             throw std::invalid_argument("No CTF world");
-        ctf->attachFlag(data);
-        break;
-    }
-    case GE_CTF_RESET:
-    {
-        if (!ctf)
-            throw std::invalid_argument("No CTF world");
-        ctf->resetFlag(data);
+        uint8_t kart_id = data.getUInt8();
+        bool red_team_scored = data.getUInt8() == 1;
+        int new_score = data.getUInt32();
+        ctf->ctfScored(kart_id, red_team_scored, new_score);
         break;
     }
     case GE_STARTUP_BOOST:

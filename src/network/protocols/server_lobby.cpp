@@ -595,6 +595,10 @@ void ServerLobby::asynchronousUpdate()
                 auto hcl = getHitCaptureLimit((float)players.size());
                 load_world_message->addUInt32(hcl.first).addFloat(hcl.second);
                 m_game_setup->setHitCaptureTime(hcl.first, hcl.second);
+                uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
+                    ServerConfig::m_flag_return_timemout);
+                load_world_message->addUInt16(flag_return_time);
+                race_manager->setFlagReturnTicks(flag_return_time);
             }
             configRemoteKart(players);
 
