@@ -25,7 +25,6 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/peer_vote.hpp"
-#include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
@@ -126,10 +125,6 @@ void GameSetup::update(bool remove_disconnected_players)
             k->setPosition(
                 World::getWorld()->getCurrentNumKarts() + 1);
             k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
-            NetworkString p(PROTOCOL_GAME_EVENTS);
-            p.setSynchronous(true);
-            p.addUInt8(GameEventsProtocol::GE_PLAYER_DISCONNECT).addUInt8(i);
-            STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
     m_connected_players_count.store(total);

@@ -61,6 +61,7 @@ void KartRewinder::reset()
     SmoothNetworkBody::setEnable(true);
     SmoothNetworkBody::setSmoothRotation(true);
     SmoothNetworkBody::setAdjustVerticalOffset(true);
+    m_has_server_state = false;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -78,6 +79,7 @@ void KartRewinder::saveTransform()
     }
 
     m_prev_steering = getSteerPercent();
+    m_has_server_state = false;
 }   // saveTransform
 
 // ----------------------------------------------------------------------------
@@ -100,6 +102,16 @@ void KartRewinder::computeError()
     }
     else
         m_steering_smoothing_dt = -1.0f;
+
+    if (!m_has_server_state && !isEliminated())
+    {
+        const int kartid = getWorldKartId();
+        Log::debug("KartRewinder", "Kart id %d disconnected", kartid);
+        World::getWorld()->eliminateKart(kartid,
+            false/*notify_of_elimination*/);
+        setPosition(World::getWorld()->getCurrentNumKarts() + 1);
+        finishedRace(World::getWorld()->getTime(), true/*from_server*/);
+    }
 }   // computeError
 
 // ----------------------------------------------------------------------------
@@ -195,6 +207,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
  */
 void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 {
+    m_has_server_state = true;
 
     // 1) Firing and related handling
     // -----------

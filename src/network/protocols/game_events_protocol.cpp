@@ -56,8 +56,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     {
     case GE_KART_FINISHED_RACE:
         kartFinishedRace(data);     break;
-    case GE_PLAYER_DISCONNECT:
-        eliminatePlayer(data);      break;
     case GE_RESET_BALL:
     {
         if (!sw)
@@ -131,22 +129,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     }
     return true;
 }   // notifyEvent
-
-// ----------------------------------------------------------------------------
-void GameEventsProtocol::eliminatePlayer(const NetworkString &data)
-{
-    assert(NetworkConfig::get()->isClient());
-    if (data.size() < 1)
-    {
-        Log::warn("GameEventsProtocol", "eliminatePlayer: Too short message.");
-    }
-    int kartid = data.getUInt8();
-    World::getWorld()->eliminateKart(kartid, false/*notify_of_elimination*/);
-    World::getWorld()->getKart(kartid)->setPosition(
-        World::getWorld()->getCurrentNumKarts() + 1);
-    World::getWorld()->getKart(kartid)->finishedRace(
-        World::getWorld()->getTime(), true/*from_server*/);
-}   // eliminatePlayer
 
 // ----------------------------------------------------------------------------
 /** This function is called from the server when a kart finishes a race. It

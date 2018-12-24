@@ -12,12 +12,11 @@ public:
     enum GameEventType : uint8_t
     {
         GE_KART_FINISHED_RACE = 1,
-        GE_PLAYER_DISCONNECT = 2,
-        GE_RESET_BALL = 3,
-        GE_PLAYER_GOAL = 4,
-        GE_BATTLE_KART_SCORE = 5,
-        GE_CTF_SCORED = 6,
-        GE_STARTUP_BOOST = 7,
+        GE_STARTUP_BOOST = 2,
+        GE_CTF_SCORED = 3,
+        GE_RESET_BALL = 4,
+        GE_PLAYER_GOAL = 5,
+        GE_BATTLE_KART_SCORE = 6,
     };   // GameEventType
 private:
     int m_last_finished_position;
