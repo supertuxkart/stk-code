@@ -1233,8 +1233,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     }
 
     if (!world->raceHasLaps()) return;
-    const int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
-
+    int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
+    // Network race has larger lap than getNumLaps near finish line
+    // due to waiting for final race result from server
+    if (lap + 1> race_manager->getNumLaps())
+        lap--;
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;
 
