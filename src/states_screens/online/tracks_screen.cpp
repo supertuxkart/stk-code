@@ -760,6 +760,14 @@ void TracksScreen::updatePlayerVotes()
         const PeerVote* p = cl->getVote(m_index_to_hostid[i]);
         assert(p);
         std::vector<GUIEngine::ListWidget::ListCell> row;
+        //I18N: In track screen, show reversed / random item location status
+        //for track votes, it's recommended to keep the translated word as
+        //short as possible
+        core::stringw y = _("Y");
+        //I18N: In track screen, show reversed / random item location status
+        //for track votes, it's recommended to keep the translated word as
+        //short as possible
+        core::stringw n = _("N");
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             row.push_back(GUIEngine::ListWidget::ListCell
@@ -774,7 +782,7 @@ void TracksScreen::updatePlayerVotes()
             row.push_back(GUIEngine::ListWidget::ListCell
                 ("" , icon, 2, true/*center*/));
             row.push_back(GUIEngine::ListWidget::ListCell
-                (p->m_reverse ? _("Yes") : _("No") , -1, 1, true/*center*/));
+                (p->m_reverse ? y : n , -1, 1, true/*center*/));
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
@@ -811,7 +819,7 @@ void TracksScreen::updatePlayerVotes()
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(laps) , -1, 1, true/*center*/));
             row.push_back(GUIEngine::ListWidget::ListCell
-                (p->m_reverse ? _("Yes") : _("No") , -1, 1, true/*center*/));
+                (p->m_reverse ? y : n , -1, 1, true/*center*/));
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
