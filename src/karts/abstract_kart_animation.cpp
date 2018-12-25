@@ -51,6 +51,7 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     m_check_created_ticks = std::make_shared<int>(-1);
     m_confirmed_by_network = false;
     m_ignore_undo = false;
+    m_has_smoothing_network_body = false;
     // Remove previous animation if there is one
 #ifndef DEBUG
     // Use this code in non-debug mode to avoid a memory leak (and messed
@@ -68,6 +69,11 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     // later).
     if (kart)
     {
+        m_has_smoothing_network_body =
+            dynamic_cast<SmoothNetworkBody*>(kart)->isEnabled();
+        // Disable smoothing network body so it doesn't smooth the animation
+        if (m_has_smoothing_network_body)
+            dynamic_cast<SmoothNetworkBody*>(kart)->setEnable(false);
         kart->setKartAnimation(this);
         Physics::getInstance()->removeKart(m_kart);
         kart->getSkidding()->reset();
@@ -123,6 +129,13 @@ AbstractKartAnimation::~AbstractKartAnimation()
                     kart->setTrans(transform);
                     Physics::getInstance()->addKart(kart);
                 }));
+        }
+        if (m_has_smoothing_network_body)
+        {
+            dynamic_cast<SmoothNetworkBody*>(m_kart)->setEnable(true);
+            dynamic_cast<SmoothNetworkBody*>(m_kart)->reset();
+            dynamic_cast<SmoothNetworkBody*>(m_kart)
+                ->setSmoothedTransform(transform);
         }
     }
 }   // ~AbstractKartAnimation
