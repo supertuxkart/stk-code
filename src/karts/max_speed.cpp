@@ -96,9 +96,29 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
     // Allow fade_out_time 0 if add_speed is set to 0.
     assert(add_speed==0.0f || fade_out_time>0.01f);
     assert(category>=MS_INCREASE_MIN && category <MS_INCREASE_MAX);
+
+    int16_t fade = 0;
+    if (fade_out_time > 32767)
+    {
+        Log::warn("MaxSpeed::increaseMaxSpeed",
+            "%d fade_out_time too large.");
+        fade = (int16_t)32767;
+    }
+    else
+        fade = (int16_t)fade_out_time;
+
+    int16_t dur = 0;
+    if (duration > 32767)
+    {
+        Log::warn("MaxSpeed::increaseMaxSpeed", "%d duration too large.");
+        dur = (int16_t)32767;
+    }
+    else
+        dur = (int16_t)duration;
+
     m_speed_increase[category].m_max_add_speed   = add_speed;
-    m_speed_increase[category].m_duration        = duration;
-    m_speed_increase[category].m_fade_out_time   = fade_out_time;
+    m_speed_increase[category].m_duration        = dur;
+    m_speed_increase[category].m_fade_out_time   = fade;
     m_speed_increase[category].m_current_speedup = add_speed;
     m_speed_increase[category].m_engine_force    = engine_force;
 }   // increaseMaxSpeed
@@ -166,8 +186,8 @@ void MaxSpeed::SpeedIncrease::update(int ticks)
 void MaxSpeed::SpeedIncrease::saveState(BareNetworkString *buffer) const
 {
     buffer->addFloat(m_max_add_speed);
-    buffer->addUInt32(m_duration);
-    buffer->addUInt32(m_fade_out_time);
+    buffer->addUInt16(m_duration);
+    buffer->addUInt16(m_fade_out_time);
     buffer->addFloat(m_current_speedup);
     buffer->addFloat(m_engine_force);
 }   // saveState
@@ -179,8 +199,8 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
     if(is_active)
     {
         m_max_add_speed   = buffer->getFloat();
-        m_duration        = buffer->getUInt32();
-        m_fade_out_time   = buffer->getUInt32();
+        m_duration        = buffer->getUInt16();
+        m_fade_out_time   = buffer->getUInt16();
         m_current_speedup = buffer->getFloat();
         m_engine_force    = buffer->getFloat();
     }
@@ -204,8 +224,27 @@ void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
     m_speed_decrease[category].m_max_speed_fraction = max_speed_fraction;
-    m_speed_decrease[category].m_fade_in_ticks      = fade_in_ticks;
-    m_speed_decrease[category].m_duration           = duration;
+
+    int16_t fade = 0;
+    if (fade_in_ticks > 32767)
+    {
+        Log::warn("MaxSpeed::setSlowdown", "%d fade_in_ticks too large.");
+        fade = (int16_t)32767;
+    }
+    else
+        fade = (int16_t)fade_in_ticks;
+
+    int16_t dur = 0;
+    if (duration > 32767)
+    {
+        Log::warn("MaxSpeed::setSlowdown", "%d duration too large.");
+        dur = (int16_t)32767;
+    }
+    else
+        dur = (int16_t)duration;
+
+    m_speed_decrease[category].m_fade_in_ticks = fade;
+    m_speed_decrease[category].m_duration = dur;
 }   // setSlowdown
 
 // ----------------------------------------------------------------------------
@@ -248,9 +287,9 @@ void MaxSpeed::SpeedDecrease::update(int ticks)
 void MaxSpeed::SpeedDecrease::saveState(BareNetworkString *buffer) const
 {
     buffer->addFloat(m_max_speed_fraction);
-    buffer->addUInt32(m_fade_in_ticks);
     buffer->addFloat(m_current_fraction);
-    buffer->addUInt32(m_duration);
+    buffer->addUInt16(m_fade_in_ticks);
+    buffer->addUInt16(m_duration);
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -262,9 +301,9 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
     if(is_active)
     {
         m_max_speed_fraction = buffer->getFloat();
-        m_fade_in_ticks      = buffer->getUInt32();
         m_current_fraction   = buffer->getFloat();
-        m_duration           = buffer->getUInt32();
+        m_fade_in_ticks      = buffer->getUInt16();
+        m_duration           = buffer->getUInt16();
     }
     else   // make sure it is not active
     {
