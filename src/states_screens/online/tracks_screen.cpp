@@ -146,6 +146,18 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
         UserConfigParams::m_last_used_track_group = tabs->getSelectionIDString(0);
         buildTrackList();
+        
+        if (m_network_tracks)
+        {
+            auto cl = LobbyProtocol::get<ClientLobby>();
+    
+            const PeerVote* vote = cl->getVote(STKHost::get()->getMyHostId());
+            if (vote)
+            {
+                DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("tracks");
+                w2->setBadge(vote->m_track_name, OK_BADGE);
+            }
+        }
     }
     else if (name == "back")
     {
