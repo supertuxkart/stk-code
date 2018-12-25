@@ -168,10 +168,16 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
  */
 void MaxSpeed::SpeedIncrease::update(int ticks)
 {
+    if (m_duration == std::numeric_limits<int16_t>::min())
+    {
+        m_current_speedup = 0;
+        return;
+    }
     m_duration -= ticks;
     // End of increased max speed reached.
     if(m_duration < -m_fade_out_time)
     {
+        m_duration = std::numeric_limits<int16_t>::min();
         m_current_speedup = 0;
         return;
     }
