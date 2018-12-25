@@ -21,7 +21,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="4" >
+<server-config version="5" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -57,7 +57,7 @@ The current server configuration xml looks like this:
     <motd value="" />
 
     <!-- Timeout in seconds for voting tracks in server. -->
-    <voting-timeout value="20" />
+    <voting-timeout value="30" />
 
     <!-- Timeout in seconds for validation of clients in wan, currently stk will use the stk-addons server to share AES key between client and server. -->
     <validation-timeout value="20" />
@@ -127,6 +127,9 @@ The current server configuration xml looks like this:
 
     <!-- Kick idle player which has no network activity to server for more than some seconds during game, unless he has finished the race. Negative value to disable, and this option will always be disabled for LAN server. -->
     <kick-idle-player-seconds value="60" />
+
+    <!-- Set how many states the server will send per second, the higher this value, the more bandwidth requires, also each client will trigger more rewind, which clients with slow device may have problem playing this server, use the default value is recommended. -->
+    <state-frequency value="10" />
 
     <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
     <server-ip-ban-list>
