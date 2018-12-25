@@ -542,6 +542,18 @@ void DynamicRibbonWidget::setBadge(const std::string &name, BadgeType badge)
                 m_rows[r].m_children[c].unsetBadge(badge);
         }
     }
+    
+    for (unsigned int i = 0; i < m_items.size(); i++)
+    {
+        if (m_items[i].m_code_name == name)
+        {
+            m_items[i].m_badges |= int(badge);
+        }
+        else
+        {
+            m_items[i].m_badges &= (~int(badge));
+        }
+    }
 }   // setBadge
 
 // -----------------------------------------------------------------------------
