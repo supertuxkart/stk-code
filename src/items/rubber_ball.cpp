@@ -46,7 +46,7 @@ float RubberBall::m_st_squash_duration;
 float RubberBall::m_st_squash_slowdown;
 float RubberBall::m_st_target_distance;
 float RubberBall::m_st_target_max_angle;
-int   RubberBall::m_st_delete_ticks;
+int16_t RubberBall::m_st_delete_ticks;
 float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
@@ -316,7 +316,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     m_st_min_interpolation_distance =  30.0f;
     m_st_target_distance            =  50.0f;
     m_st_target_max_angle           =  25.0f;
-    m_st_delete_ticks               = stk_config->time2Ticks(10.0f);
+    m_st_delete_ticks               = (int16_t)stk_config->time2Ticks(10.0f);
     m_st_max_height_difference      =  10.0f;
     m_st_fast_ping_distance         =  50.0f;
     m_st_early_target_factor        =   1.0f;
@@ -892,7 +892,7 @@ BareNetworkString* RubberBall::saveState(std::vector<std::string>* ru)
     if (!buffer)
         return NULL;
 
-    buffer->addUInt32(m_last_aimed_graph_node);
+    buffer->addUInt16((int16_t)m_last_aimed_graph_node);
     buffer->add(m_control_points[0]);
     buffer->add(m_control_points[1]);
     buffer->add(m_control_points[2]);
@@ -905,7 +905,7 @@ BareNetworkString* RubberBall::saveState(std::vector<std::string>* ru)
     buffer->addFloat(m_t_increase);
     buffer->addFloat(m_interval);
     buffer->addFloat(m_height_timer);
-    buffer->addUInt32(m_delete_ticks);
+    buffer->addUInt16(m_delete_ticks);
     buffer->addFloat(m_current_max_height);
     buffer->addUInt8(m_tunnel_count | (m_aiming_at_target ? (1 << 7) : 0));
     TrackSector::saveState(buffer);
@@ -917,7 +917,8 @@ void RubberBall::restoreState(BareNetworkString *buffer, int count)
 {
     Flyable::restoreState(buffer, count);
     m_restoring_state = true;
-    m_last_aimed_graph_node = buffer->getUInt32();
+    int16_t last_aimed_graph_node = buffer->getUInt16();
+    m_last_aimed_graph_node = last_aimed_graph_node;
     m_control_points[0] = buffer->getVec3();
     m_control_points[1] = buffer->getVec3();
     m_control_points[2] = buffer->getVec3();
@@ -930,7 +931,7 @@ void RubberBall::restoreState(BareNetworkString *buffer, int count)
     m_t_increase = buffer->getFloat();
     m_interval = buffer->getFloat();
     m_height_timer = buffer->getFloat();
-    m_delete_ticks = buffer->getUInt32();
+    m_delete_ticks = buffer->getUInt16();
     m_current_max_height = buffer->getFloat();
     uint8_t tunnel_and_aiming = buffer->getUInt8();
     m_tunnel_count = tunnel_and_aiming & 127;

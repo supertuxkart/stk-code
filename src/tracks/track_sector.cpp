@@ -177,23 +177,18 @@ float TrackSector::getRelativeDistanceToCenter() const
 }   // getRelativeDistanceToCenter
 
 // ----------------------------------------------------------------------------
+/** Only basket ball is used for rewind for TrackSector so save the minimum.
+ */
 void TrackSector::saveState(BareNetworkString* buffer) const
 {
-    buffer->addUInt32(m_current_graph_node);
-    buffer->addUInt32(m_last_valid_graph_node);
-    buffer->add(m_current_track_coords);
-    buffer->add(m_latest_valid_track_coords);
-    buffer->addUInt8(m_on_road ? 1 : 0);
-    buffer->addUInt32(m_last_triggered_checkline);
+    buffer->addUInt16((int16_t)m_current_graph_node);
+    buffer->addFloat(m_current_track_coords.getZ());
 }   // saveState
 
 // ----------------------------------------------------------------------------
 void TrackSector::rewindTo(BareNetworkString* buffer)
 {
-    m_current_graph_node = buffer->getUInt32();
-    m_last_valid_graph_node = buffer->getUInt32();
-    m_current_track_coords = buffer->getVec3();
-    m_latest_valid_track_coords = buffer->getVec3();
-    m_on_road = buffer->getUInt8() == 1;
-    m_last_triggered_checkline = buffer->getUInt32();
+    int16_t node = buffer->getUInt16();
+    m_current_graph_node = node;
+    m_current_track_coords.setZ(buffer->getFloat());
 }   // rewindTo
