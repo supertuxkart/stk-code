@@ -13,10 +13,10 @@ public:
     {
         GE_KART_FINISHED_RACE = 1,
         GE_STARTUP_BOOST = 2,
-        GE_CTF_SCORED = 3,
-        GE_RESET_BALL = 4,
-        GE_PLAYER_GOAL = 5,
-        GE_BATTLE_KART_SCORE = 6,
+        GE_BATTLE_KART_SCORE = 3,
+        GE_CTF_SCORED = 4,
+        GE_RESET_BALL = 5,
+        GE_PLAYER_GOAL = 6,
     };   // GameEventType
 private:
     int m_last_finished_position;
@@ -32,10 +32,10 @@ public:
     void kartFinishedRace(const NetworkString &ns);
     void sendStartupBoost(uint8_t kart_id);
     virtual void setup() OVERRIDE {}
-    virtual void update(int ticks) OVERRIDE {};
-    virtual void asynchronousUpdate() OVERRIDE{}
+    virtual void update(int ticks) OVERRIDE {}
+    virtual void asynchronousUpdate() OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE 
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE
     {
         return false;
     }   // notifyEventAsynchronous

@@ -83,8 +83,11 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             throw std::invalid_argument("No CTF world");
         uint8_t kart_id = data.getUInt8();
         bool red_team_scored = data.getUInt8() == 1;
-        int new_score = data.getUInt32();
-        ctf->ctfScored(kart_id, red_team_scored, new_score);
+        int16_t new_kart_scores = data.getUInt16();
+        int new_red_scores = data.getUInt8();
+        int new_blue_scores = data.getUInt8();
+        ctf->ctfScored(kart_id, red_team_scored, new_kart_scores,
+            new_red_scores, new_blue_scores);
         break;
     }
     case GE_STARTUP_BOOST:

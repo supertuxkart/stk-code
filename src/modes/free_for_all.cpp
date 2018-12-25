@@ -123,9 +123,9 @@ void FreeForAll::handleScoreInServer(int kart_id, int hitter)
         p.setSynchronous(true);
         p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
         if (kart_id == hitter || hitter == -1)
-            p.addUInt8((uint8_t)kart_id).addUInt32(new_score);
+            p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)new_score);
         else
-            p.addUInt8((uint8_t)hitter).addUInt32(new_score);
+            p.addUInt8((uint8_t)hitter).addUInt16((int16_t)new_score);
         STKHost::get()->sendPacketToAllPeers(&p, true);
     }
 }   // handleScoreInServer
@@ -134,7 +134,7 @@ void FreeForAll::handleScoreInServer(int kart_id, int hitter)
 void FreeForAll::setKartScoreFromServer(NetworkString& ns)
 {
     int kart_id = ns.getUInt8();
-    int score = ns.getUInt32();
+    int16_t score = ns.getUInt16();
     m_scores.at(kart_id) = score;
 }   // setKartScoreFromServer
 

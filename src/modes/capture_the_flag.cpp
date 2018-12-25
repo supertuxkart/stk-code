@@ -243,8 +243,9 @@ void CaptureTheFlag::update(int ticks)
             NetworkConfig::get()->isServer())
         {
             int red_holder = m_red_flag->getHolder();
-            int new_score = m_scores.at(red_holder) + g_captured_score;
-            m_scores.at(red_holder) = new_score;
+            int new_kart_scores = m_scores.at(red_holder) + g_captured_score;
+            int new_blue_scores = m_blue_scores + 1;
+            m_scores.at(red_holder) = new_kart_scores;
             if (NetworkConfig::get()->isServer())
             {
                 NetworkString p(PROTOCOL_GAME_EVENTS);
@@ -252,10 +253,13 @@ void CaptureTheFlag::update(int ticks)
                 p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
                     .addUInt8((int8_t)red_holder)
                     .addUInt8(0/*red_team_scored*/)
-                    .addUInt32(new_score);
+                    .addUInt16((int16_t)new_kart_scores)
+                    .addUInt8((uint8_t)m_red_scores)
+                    .addUInt8((uint8_t)new_blue_scores);
                 STKHost::get()->sendPacketToAllPeers(&p, true);
             }
-            ctfScored(red_holder, false/*red_team_scored*/, new_score);
+            ctfScored(red_holder, false/*red_team_scored*/, new_kart_scores,
+                m_red_scores, new_blue_scores);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
         m_red_flag->resetToBase();
@@ -269,8 +273,9 @@ void CaptureTheFlag::update(int ticks)
             NetworkConfig::get()->isServer())
         {
             int blue_holder = m_blue_flag->getHolder();
-            int new_score = m_scores.at(blue_holder) + g_captured_score;
-            m_scores.at(blue_holder) = new_score;
+            int new_kart_scores = m_scores.at(blue_holder) + g_captured_score;
+            int new_red_scores = m_red_scores + 1;
+            m_scores.at(blue_holder) = new_kart_scores;
             if (NetworkConfig::get()->isServer())
             {
                 NetworkString p(PROTOCOL_GAME_EVENTS);
@@ -278,10 +283,13 @@ void CaptureTheFlag::update(int ticks)
                 p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
                     .addUInt8((int8_t)blue_holder)
                     .addUInt8(1/*red_team_scored*/)
-                    .addUInt32(new_score);
+                    .addUInt16((int16_t)new_kart_scores)
+                    .addUInt8((uint8_t)new_red_scores)
+                    .addUInt8((uint8_t)m_blue_scores);
                 STKHost::get()->sendPacketToAllPeers(&p, true);
             }
-            ctfScored(blue_holder, true/*red_team_scored*/, new_score);
+            ctfScored(blue_holder, true/*red_team_scored*/, new_kart_scores,
+                new_red_scores, m_blue_scores);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
         m_blue_flag->resetToBase();
@@ -372,21 +380,22 @@ const Vec3& CaptureTheFlag::getBlueFlag() const
 
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
-                               int new_score)
+                               int new_kart_score, int new_red_score,
+                               int new_blue_score)
 {
-    m_scores.at(kart_id) = new_score;
+    m_scores.at(kart_id) = new_kart_score;
     AbstractKart* kart = getKart(kart_id);
     core::stringw scored_msg;
     const core::stringw& name = kart->getController()->getName();
+    m_red_scores = new_red_score;
+    m_blue_scores = new_blue_score;
     if (red_team_scored)
     {
         scored_msg = _("%s captured the blue flag!", name);
-        m_red_scores++;
     }
     else
     {
         scored_msg = _("%s captured the red flag!", name);
-        m_blue_scores++;
     }
 #ifndef SERVER_ONLY
     m_race_gui->addMessage(scored_msg, NULL, 3.0f);
