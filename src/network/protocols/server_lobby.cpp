@@ -2606,6 +2606,12 @@ void ServerLobby::configPeersStartTime()
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
     }
+    if (race_manager->supportsLiveJoining())
+    {
+        Log::info("ServerLobby", "Max ping to ServerConfig::m_max_ping for "
+            "live joining.");
+        max_ping = ServerConfig::m_max_ping;
+    }
     // Start up time will be after 2500ms, so even if this packet is sent late
     // (due to packet loss), the start time will still ahead of current time
     uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2500;
