@@ -505,7 +505,7 @@ namespace UserConfigParams
             "considered as centered in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_x
-            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_sensitivity_x",
+            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_sensitivity_x",
             &m_multitouch_group,
             "A parameter in range [0, 1.0] that determines the sensitivity for x axis."));
             
