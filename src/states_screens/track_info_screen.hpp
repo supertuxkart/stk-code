@@ -86,6 +86,7 @@ public:
     virtual ~TrackInfoScreen();
 
     virtual void init();
+    virtual void beforeAddingWidget() OVERRIDE;
     virtual void loadedFromFile();
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
                                const int player_id);
