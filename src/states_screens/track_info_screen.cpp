@@ -95,11 +95,6 @@ void TrackInfoScreen::beforeAddingWidget()
         m_target_type_label->setVisible(false);
         getWidget<Widget>("target-type-spinner-div")->setVisible(false);
         getWidget<Widget>("target-type-div")->setVisible(false);
-
-        getWidget<Widget>("target-type-spinner-div")->deleteChild("target-type-spinner");
-        getWidget<Widget>("target-type-div")->deleteChild("target-type-spinner-div");
-        getWidget<Widget>("target-type-div")->deleteChild("target-type-text");
-        getWidget<Widget>("race-options-box")->deleteChild("target-type-div");
     }
 }
 
