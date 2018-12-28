@@ -696,10 +696,13 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
         if(mi)
             m_music.push_back(mi);
         else
-            Log::warn("track",
-                      "Music information file '%s' not found for track '%s' - ignored.\n",
-                      filenames[i].c_str(), m_name.c_str());
+        {
+            m_music.push_back(stk_config->m_default_music);
 
+            Log::warn("track",
+                "Music information file '%s' not found for track '%s' - replaced by default track.\n",
+                filenames[i].c_str(), m_name.c_str());
+        }
     }   // for i in filenames
 
 }   // getMusicInformation
