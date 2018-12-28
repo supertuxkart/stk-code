@@ -65,6 +65,7 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
+    m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
     m_ai_kart_spinner       = getWidget<SpinnerWidget>("ai-spinner");
@@ -88,15 +89,21 @@ void TrackInfoScreen::loadedFromFile()
 
 void TrackInfoScreen::beforeAddingWidget()
 {
+    static int target_type_div_height = m_target_type_div->m_h;
+
     const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    if (!is_soccer)
+    if (is_soccer)
     {
-        m_target_type_spinner->setVisible(false);
-        m_target_type_label->setVisible(false);
-        getWidget<Widget>("target-type-spinner-div")->setVisible(false);
-        getWidget<Widget>("target-type-div")->setVisible(false);
+        m_target_type_div->setVisible(true);
+        m_target_type_div->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(target_type_div_height);
     }
-}
+    else
+    {
+        m_target_type_div->setVisible(false);
+        m_target_type_div->m_properties[GUIEngine::PROP_HEIGHT] = "0";
+    }
+    calculateLayout();
+} // beforeAddingWidget
 
 
 // ----------------------------------------------------------------------------
@@ -151,17 +158,11 @@ void TrackInfoScreen::init()
     if (image != NULL)
         screenshot->setImage(image);
 
-    m_target_value_spinner->setVisible(false);
-    m_target_value_label->setVisible(false);
-
     // Soccer options
     // -------------
     const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     if (is_soccer)
     {
-        m_target_value_spinner->setVisible(true);
-        m_target_value_label->setVisible(true);
-
         if (UserConfigParams::m_num_goals <= 0)
             UserConfigParams::m_num_goals = UserConfigParams::m_num_goals.getDefaultValue();
 

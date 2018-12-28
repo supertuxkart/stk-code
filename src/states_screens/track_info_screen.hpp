@@ -55,6 +55,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** The label besides the target types spinner. */
     GUIEngine::LabelWidget* m_target_type_label;
 
+    /* The div that contains the target type spinner and label */
+    GUIEngine::Widget* m_target_type_div;
+
     /** Spinner for target value e.g. number of laps or goals to score. */
     GUIEngine::SpinnerWidget* m_target_value_spinner;
 
