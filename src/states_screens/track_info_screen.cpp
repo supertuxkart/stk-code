@@ -158,11 +158,17 @@ void TrackInfoScreen::init()
     if (image != NULL)
         screenshot->setImage(image);
 
+    m_target_value_spinner->setVisible(false);
+    m_target_value_label->setVisible(false);
+
     // Soccer options
     // -------------
     const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     if (is_soccer)
     {
+        m_target_value_spinner->setVisible(true);
+        m_target_value_label->setVisible(true);
+
         if (UserConfigParams::m_num_goals <= 0)
             UserConfigParams::m_num_goals = UserConfigParams::m_num_goals.getDefaultValue();
 
