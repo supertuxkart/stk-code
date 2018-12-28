@@ -17,6 +17,7 @@
 
         <activity android:name="android.app.NativeActivity"
                   android:label="@string/app_name"
+                  android:launchMode="singleTask"
                   android:configChanges="fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|uiMode"
                   android:screenOrientation="sensorLandscape">
 

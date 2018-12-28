@@ -5,6 +5,7 @@
 
 #include "guiengine/widgets/CGUISTKListBox.hpp"
 
+#include "graphics/2dutils.hpp"
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
@@ -32,6 +33,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
     DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true),
     HighlightWhenNotFocused(true)
 {
+    m_alternating_darkness = false;
     #ifdef _DEBUG
     setDebugName("CGUISTKListBox");
     #endif
@@ -478,7 +480,6 @@ void CGUISTKListBox::draw()
 
     core::rect<s32> clientClip(AbsoluteRect);
     clientClip.UpperLeftCorner.Y += 1;
-    clientClip.UpperLeftCorner.X += 1;
     if (ScrollBar->isVisible())
         clientClip.LowerRightCorner.X = AbsoluteRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
     clientClip.LowerRightCorner.Y -= 1;
@@ -491,7 +492,6 @@ void CGUISTKListBox::draw()
         clientClip.clipAgainst(*clipRect);
 
     frameRect = AbsoluteRect;
-    frameRect.UpperLeftCorner.X += 1;
     if (ScrollBar->isVisible())
         frameRect.LowerRightCorner.X = AbsoluteRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
 
@@ -507,10 +507,21 @@ void CGUISTKListBox::draw()
         if (frameRect.LowerRightCorner.Y >= AbsoluteRect.UpperLeftCorner.Y &&
             frameRect.UpperLeftCorner.Y <= AbsoluteRect.LowerRightCorner.Y)
         {
+#ifndef SERVER_ONLY
+            if (m_alternating_darkness && i % 2 != 0)
+            {
+                video::SColor color(0);
+                color.setAlpha(30);
+                GL32_draw2DRectangle(color, frameRect, &clientClip);
+            }
+#endif
             if (i == Selected && hl)
                 skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), frameRect, &clientClip);
 
             core::rect<s32> textRect = frameRect;
+            
+            if (!ScrollBar->isVisible())
+                textRect.LowerRightCorner.X = textRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
 
             if (Font)
             {
@@ -519,20 +530,29 @@ void CGUISTKListBox::draw()
                 {
                     total_proportion += Items[i].m_contents[x].m_proportion;
                 }
-                int part_size = (int)(textRect.getWidth() / float(total_proportion));
 
+                int total_width = textRect.getWidth();
+                
                 for(unsigned int x = 0; x < Items[i].m_contents.size(); ++x)
                 {
-                    textRect.LowerRightCorner.X = textRect.UpperLeftCorner.X +
-                                                  (Items[i].m_contents[x].m_proportion * part_size);
+                    int part_size = total_width * Items[i].m_contents[x].m_proportion / total_proportion;
+                    
+                    textRect.LowerRightCorner.X = textRect.UpperLeftCorner.X + part_size;
                     textRect.UpperLeftCorner.X += 3;
 
                     if (IconBank && (Items[i].m_contents[x].m_icon > -1))
                     {
                         core::position2di iconPos = textRect.UpperLeftCorner;
                         iconPos.Y += textRect.getHeight() / 2;
-                        iconPos.X += ItemsIconWidth/2;
-
+                        
+                        if (Items[i].m_contents[x].m_center)
+                        {
+                            iconPos.X += part_size/2 - 3;
+                        }
+                        else
+                        {
+                            iconPos.X += ItemsIconWidth/2;
+                        }
 
                         EGUI_LISTBOX_COLOR icon_color = EGUI_LBC_ICON;
                         bool highlight=false;
@@ -576,7 +596,7 @@ void CGUISTKListBox::draw()
                     }
 
                     core::rect<s32> lineRect = textRect;
-                    int line_height = Font->getDimension(L"A").Height;
+                    int line_height = Font->getDimension(L"A").Height*Items[i].m_line_height_scale;
                     int supp_lines = Items[i].m_contents[x].m_text_lines.size() - 1;
                     lineRect.UpperLeftCorner.Y -= (line_height*supp_lines)/2;
                     lineRect.LowerRightCorner.Y -= (line_height*supp_lines)/2;
@@ -599,7 +619,7 @@ void CGUISTKListBox::draw()
                     textRect.UpperLeftCorner.X -= 6;
 
                     //Calculate new beginning
-                    textRect.UpperLeftCorner.X += Items[i].m_contents[x].m_proportion * part_size;
+                    textRect.UpperLeftCorner.X += part_size;
                 }
             }
         }

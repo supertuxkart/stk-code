@@ -59,7 +59,9 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "physics/physics.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
@@ -142,6 +144,7 @@ const bool ALLOW_1280_X_720    = true;
  */
 IrrDriver::IrrDriver()
 {
+    m_render_nw_debug = false;
     m_resolution_changing = RES_CHANGE_NONE;
 
     struct irr::SIrrlichtCreationParameters p;
@@ -934,6 +937,7 @@ void IrrDriver::applyResolutionSettings()
     // initDevice will drop the current device.
     delete m_renderer;
     SharedGPUObjects::reset();
+    SP::setMaxTextureSize();
     initDevice();
 
 #ifndef SERVER_ONLY
@@ -1853,8 +1857,10 @@ void IrrDriver::doScreenShot()
 // ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
+ *  \param is_loading True if the rendering is called during loading of world,
+ *         in which case world, physics etc must not be accessed/
  */
-void IrrDriver::update(float dt)
+void IrrDriver::update(float dt, bool is_loading)
 {
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
@@ -1882,15 +1888,15 @@ void IrrDriver::update(float dt)
     if (world)
     {
 #ifndef SERVER_ONLY
-        m_renderer->render(dt);
+        m_renderer->render(dt, is_loading);
 
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
-            GUIEngine::render(dt);
+            GUIEngine::render(dt, is_loading);
         }
 
-        if (Physics::getInstance())
+        if (!is_loading && Physics::getInstance())
         {
             IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
@@ -1905,8 +1911,11 @@ void IrrDriver::update(float dt)
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-        GUIEngine::render(dt);
-
+        GUIEngine::render(dt, is_loading);
+        if (m_render_nw_debug && !is_loading)
+        {
+            renderNetworkDebug();
+        }
         m_video_driver->endScene();
     }
 
@@ -1928,6 +1937,59 @@ void IrrDriver::update(float dt)
     }
 #endif
 }   // update
+
+// ----------------------------------------------------------------------------
+void IrrDriver::renderNetworkDebug()
+{
+#ifndef SERVER_ONLY
+    if (!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isServer() || !STKHost::existHost())
+        return;
+
+    auto peer = STKHost::get()->getServerPeerForClient();
+    if (!peer)
+        return;
+
+    const core::dimension2d<u32>& screen_size =
+        m_video_driver->getScreenSize();
+    core::rect<s32>background_rect(
+        (int)(0.02f * screen_size.Width),
+        (int)(0.3f * screen_size.Height),
+        (int)(0.98f * screen_size.Width),
+        (int)(0.6f * screen_size.Height));
+    video::SColor color(0x80, 0xFF, 0xFF, 0xFF);
+    GL32_draw2DRectangle(color, background_rect);
+    std::string server_time = StringUtils::timeToString(
+        (float)STKHost::get()->getNetworkTimer() / 1000.0f,
+        /*precision*/2, /*display_minutes_if_zero*/true,
+        /*display_hours*/true);
+
+    gui::IGUIFont* font = GUIEngine::getFont();
+    unsigned height = font->getDimension(L"X").Height + 2;
+    background_rect.UpperLeftCorner.X += 5;
+    static video::SColor black = video::SColor(255, 0, 0, 0);
+    font->draw(StringUtils::insertValues(
+        L"Server time: %s      Server state frequency: %d",
+        server_time.c_str(), NetworkConfig::get()->getStateFrequency()),
+        background_rect, black, false);
+
+    background_rect.UpperLeftCorner.Y += height;
+    font->draw(StringUtils::insertValues(
+        L"Upload speed (KBps): %f      Download speed (KBps): %f",
+        (float)STKHost::get()->getUploadSpeed() / 1024.0f,
+        (float)STKHost::get()->getDownloadSpeed() / 1024.0f,
+        NetworkConfig::get()->getStateFrequency()), background_rect, black,
+        false);
+
+    background_rect.UpperLeftCorner.Y += height;
+    font->draw(StringUtils::insertValues(
+        L"Packet loss: %d      Packet loss variance: %d",
+        peer->getENetPeer()->packetLoss,
+        peer->getENetPeer()->packetLossVariance,
+        NetworkConfig::get()->getStateFrequency()), background_rect, black,
+        false);
+#endif
+}   // renderNetworkDebug
 
 // ----------------------------------------------------------------------------
 void IrrDriver::setRecording(bool val)

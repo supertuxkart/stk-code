@@ -21,7 +21,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="4" >
+<server-config version="5" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -57,7 +57,7 @@ The current server configuration xml looks like this:
     <motd value="" />
 
     <!-- Timeout in seconds for voting tracks in server. -->
-    <voting-timeout value="20" />
+    <voting-timeout value="30" />
 
     <!-- Timeout in seconds for validation of clients in wan, currently stk will use the stk-addons server to share AES key between client and server. -->
     <validation-timeout value="20" />
@@ -74,6 +74,12 @@ The current server configuration xml looks like this:
     <!-- Time to wait before entering kart selection screen if satisfied min-start-game-players below for owner less or ranked server. -->
     <start-game-counter value="60" />
 
+    <!-- Clients below this value will be rejected from joining this server. It's determined by number of official karts in client / number of official karts in server -->
+    <official-karts-threshold value="1" />
+
+    <!-- Clients below this value will be rejected from joining this server. It's determined by number of official tracks in client / number of official tracks in server, setting this value too high will prevent android players from joining this server, because STK android apk has some official tracks removed. -->
+    <official-tracks-threshold value="0.7" />
+
     <!-- Only auto start kart selection when number of connected player is larger than or equals this value, for owner less or ranked server, after start-game-counter reaches 0. -->
     <min-start-game-players value="2" />
 
@@ -88,6 +94,9 @@ The current server configuration xml looks like this:
 
     <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end, strict-player and owner-less will be turned on. -->
     <ranked value="false" />
+
+    <!-- If true, the server owner can config the difficulty and game mode in the GUI of lobby. This option cannot be used with owner-less or grand prix server, and will be automatically turned on if the server was created using the in-game GUI. The changed difficulty and game mode will not be saved in this config file. -->
+    <server-configurable value="false" />
 
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
     <flag-return-timemout value="20" />
@@ -115,6 +124,12 @@ The current server configuration xml looks like this:
 
     <!-- Kick players whose ping is above max-ping. -->
     <kick-high-ping-players value="false" />
+
+    <!-- Kick idle player which has no network activity to server for more than some seconds during game, unless he has finished the race. Negative value to disable, and this option will always be disabled for LAN server. -->
+    <kick-idle-player-seconds value="60" />
+
+    <!-- Set how many states the server will send per second, the higher this value, the more bandwidth requires, also each client will trigger more rewind, which clients with slow device may have problem playing this server, use the default value is recommended. -->
+    <state-frequency value="10" />
 
     <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
     <server-ip-ban-list>

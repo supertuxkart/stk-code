@@ -18,6 +18,7 @@
 #include "states_screens/online/network_kart_selection.hpp"
 
 #include "config/user_config.hpp"
+#include "guiengine/widgets/progress_bar_widget.hpp"
 #include "input/device_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/lobby_protocol.hpp"
@@ -33,6 +34,10 @@ void NetworkKartSelectionScreen::init()
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::init();
+
+    m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
+    m_timer->showLabel(false);
+    updateProgressBarText();
 
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
@@ -56,6 +61,16 @@ void NetworkKartSelectionScreen::init()
         }
     }
 }   // init
+
+// ----------------------------------------------------------------------------
+/** Called once per frame. Updates the timer display.
+ *  \param dt Time step size.
+ */
+void NetworkKartSelectionScreen::onUpdate(float dt)
+{
+    KartSelectionScreen::onUpdate(dt);
+    updateProgressBarText();
+}   // onUpdate
 
 // ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::allPlayersDone()
@@ -104,3 +119,22 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     STKHost::get()->shutdown();
     return true; // remove the screen
 }   // onEscapePressed
+
+// ----------------------------------------------------------------------------
+void NetworkKartSelectionScreen::updateProgressBarText()
+{
+    if (auto lp = LobbyProtocol::get<LobbyProtocol>())
+    {
+        float new_value =
+            lp->getRemainingVotingTime() / lp->getMaxVotingTime();
+        if (new_value < 0.0f)
+            new_value = 0.0f;
+        m_timer->setValue(new_value * 100.0f);
+        int remaining_time = (int)(lp->getRemainingVotingTime());
+        if (remaining_time < 0)
+            remaining_time = 0;
+        //I18N: In kart screen, show before the voting period in network ends.
+        core::stringw message = _("Remaining time: %d", remaining_time);
+        m_timer->setText(message);
+    }
+}   // updateProgressBarText

@@ -65,27 +65,35 @@ void ProgressBarWidget::add()
      \brief animate the element and its children.
      */
     GUIEngine::needsUpdate.push_back(this);
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }    // add
 
 // -----------------------------------------------------------------------------
 
-void ProgressBarWidget::setValue(int value)
+void ProgressBarWidget::setValue(float value)
 {
-    m_value = value;
-    m_target_value = value;
-    m_previous_value = value;
+    m_value = value/100.0f;
+    m_target_value = m_value;
+    m_previous_value = m_value;
     if (m_show_label)
-        setLabel(std::string(StringUtils::toString(value) + "%").c_str());
+    {
+        int percent = int(value);
+        setLabel(std::string(StringUtils::toString(percent) + "%").c_str());
+    }
 }   // setValue
 
 // -----------------------------------------------------------------------------
 
-void ProgressBarWidget::moveValue(int value)
+void ProgressBarWidget::moveValue(float value)
 {
     m_previous_value = m_value;
-    m_target_value = value;
+    m_target_value = value/100.0f;
     if (m_show_label)
-        setLabel(std::string(StringUtils::toString(value) + "%").c_str());
+    {
+        int percent = int(value);
+        setLabel(std::string(StringUtils::toString(percent) + "%").c_str());
+    }
 }   // moveValue
 
 // -----------------------------------------------------------------------------
@@ -95,14 +103,14 @@ void ProgressBarWidget::update(float delta)
     if (m_target_value != m_value)
     {
         // Compute current progress in the animation
-        float cur = (static_cast<float>(m_value) - m_previous_value) 
+        float cur = (m_value        - m_previous_value) 
                   / (m_target_value - m_previous_value);
         // Animation time: 1.0 seconds
         cur += delta * 10;
         if (cur > 1)
             cur = 1;
-        m_value = int(m_previous_value + 
-                      cur * (m_target_value - m_previous_value) );
+        m_value = m_previous_value 
+                + cur * (m_target_value - m_previous_value);
     }
 }   // update
 
@@ -115,4 +123,3 @@ void ProgressBarWidget::setLabel(irr::core::stringw label)
 }   // setLabel
 
 // -----------------------------------------------------------------------------
-

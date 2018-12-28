@@ -40,7 +40,7 @@ using namespace irr;
 
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
                                    bool multiplayer, bool display_icon,
-                                   const int value)
+                                   const float value)
                                   : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
@@ -147,7 +147,7 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
 // -----------------------------------------------------------------------------
 
-void SkillLevelWidget::setValue(const int value)
+void SkillLevelWidget::setValue(const float value)
 {
     m_bar->moveValue(value);
 }

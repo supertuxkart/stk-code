@@ -80,8 +80,8 @@ void RewindManager::reset()
     m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
     m_last_saved_state = -1;  // forces initial state save
-    m_state_frequency =
-        stk_config->getPhysicsFPS() / stk_config->m_network_state_frequeny;
+    m_state_frequency = stk_config->getPhysicsFPS() /
+        NetworkConfig::get()->getStateFrequency();
 
     if (!m_enable_rewind_manager) return;
 
@@ -155,26 +155,8 @@ void RewindManager::saveState()
     m_overall_state_size = 0;
     std::vector<std::string> rewinder_using;
 
-    // We must save the item state first (so that it is restored first),
-    // otherwise state updates for a kart could be overwritten by
-    // e.g. simulating the item collection later (which resets bubblegum
-    // counter).
-    BareNetworkString* buffer = NULL;
-    if(auto r = m_all_rewinder["N"].lock())
-        buffer = r->saveState(&rewinder_using);
-    if (buffer)
-    {
-        m_overall_state_size += buffer->size();
-        gp->addState(buffer);
-    }
-    delete buffer;    // buffer can be freed
-
     for (auto& p : m_all_rewinder)
     {
-        // The Network ItemManager was saved first before this loop,
-        // so skip it here.
-        if(p.first=="N") continue;
-
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
         BareNetworkString* buffer = NULL;

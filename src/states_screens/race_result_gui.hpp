@@ -127,6 +127,9 @@ private:
     /** Distance between each row of the race results */
     unsigned int               m_distance_between_rows;
 
+    /** Distance between each row of the highscore, race data, etc.*/
+    unsigned int               m_distance_between_meta_rows;
+
     /** The size of the kart icons. */
     unsigned int               m_width_icon;
 

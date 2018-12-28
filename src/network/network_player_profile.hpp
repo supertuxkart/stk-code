@@ -106,6 +106,9 @@ public:
     PerPlayerDifficulty getPerPlayerDifficulty() const
                                             { return m_per_player_difficulty; }
     // ------------------------------------------------------------------------
+    void setPerPlayerDifficulty(PerPlayerDifficulty d)
+                                               { m_per_player_difficulty = d; }
+    // ------------------------------------------------------------------------
     /** Returns the name of this player. */
     const irr::core::stringw& getName() const         { return m_player_name; }
     // ------------------------------------------------------------------------

@@ -222,15 +222,21 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         break;
     case PA_DRIFT:
         if (value == 0)
+        {
             SET_OR_TEST_GETTER(SkidControl, KartControl::SC_NONE);
-        else
+        }
+        else if (m_controls->getSkidControl() == KartControl::SC_NONE)
         {
             if (m_steer_val == 0)
+            {
                 SET_OR_TEST_GETTER(SkidControl, KartControl::SC_NO_DIRECTION);
+            }
             else
+            {
                 SET_OR_TEST_GETTER(SkidControl, m_steer_val<0
                                                 ? KartControl::SC_RIGHT
                                                 : KartControl::SC_LEFT  );
+            }
         }
         break;
     case PA_PAUSE_RACE:
@@ -279,19 +285,13 @@ void PlayerController::steer(int ticks, int steer_val)
                      : dt/m_kart->getTimeFullSteer(fabsf(steer));
     if (steer_val < 0)
     {
-        // If we got analog values do not cumulate.
-        if (steer_val > -32767)
-            steer = -steer_val/32767.0f;
-        else
-            steer += STEER_CHANGE;
+        steer += STEER_CHANGE;
+        steer = std::min(steer, -steer_val/32767.0f);
     }
     else if(steer_val > 0)
     {
-        // If we got analog values do not cumulate.
-        if (steer_val < 32767)
-            steer = -steer_val/32767.0f;
-        else
-            steer -= STEER_CHANGE;
+        steer -= STEER_CHANGE;
+        steer = std::max(steer, -steer_val/32767.0f);
     }
     else
     {   // no key is pressed

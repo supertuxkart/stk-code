@@ -99,22 +99,42 @@ bool FreeForAll::kartHit(int kart_id, int hitter)
     if (isRaceOver())
         return false;
 
-    NetworkString p(PROTOCOL_GAME_EVENTS);
-    p.setSynchronous(true);
-    p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
-    if (kart_id == hitter || hitter == -1)
-        p.addUInt8((uint8_t)kart_id).addUInt32(--m_scores[kart_id]);
-    else
-        p.addUInt8((uint8_t)hitter).addUInt32(++m_scores[hitter]);
-    STKHost::get()->sendPacketToAllPeers(&p, true);
+    handleScoreInServer(kart_id, hitter);
     return true;
 }   // kartHit
+
+// ----------------------------------------------------------------------------
+/** Called when the score of kart needs updated.
+ *  \param kart_id The world kart id of the kart that was hit.
+ *  \param hitter The world kart id of the kart who hit(-1 if none).
+ */
+void FreeForAll::handleScoreInServer(int kart_id, int hitter)
+{
+    int new_score = 0;
+    if (kart_id == hitter || hitter == -1)
+        new_score = --m_scores[kart_id];
+    else
+        new_score = ++m_scores[hitter];
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer())
+    {
+        NetworkString p(PROTOCOL_GAME_EVENTS);
+        p.setSynchronous(true);
+        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
+        if (kart_id == hitter || hitter == -1)
+            p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)new_score);
+        else
+            p.addUInt8((uint8_t)hitter).addUInt16((int16_t)new_score);
+        STKHost::get()->sendPacketToAllPeers(&p, true);
+    }
+}   // handleScoreInServer
 
 // ----------------------------------------------------------------------------
 void FreeForAll::setKartScoreFromServer(NetworkString& ns)
 {
     int kart_id = ns.getUInt8();
-    int score = ns.getUInt32();
+    int16_t score = ns.getUInt16();
     m_scores.at(kart_id) = score;
 }   // setKartScoreFromServer
 

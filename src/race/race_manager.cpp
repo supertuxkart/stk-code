@@ -32,6 +32,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "main_loop.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
@@ -80,6 +81,7 @@ RaceManager::RaceManager()
     m_have_kart_last_position_on_overworld = false;
     m_num_local_players = 0;
     m_hit_capture_limit = 0;
+    m_flag_return_ticks = stk_config->time2Ticks(20.0f);
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -470,6 +472,8 @@ void RaceManager::startNew(bool from_overworld)
  */
 void RaceManager::startNextRace()
 {
+
+    main_loop->renderGUI(0);
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
@@ -536,6 +540,8 @@ void RaceManager::startNextRace()
         }
     }
 
+    main_loop->renderGUI(100);
+
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
@@ -573,19 +579,21 @@ void RaceManager::startNextRace()
         Log::error("RaceManager", "Could not create given race mode.");
         assert(0);
     }
+    main_loop->renderGUI(200);
 
     // A second constructor phase is necessary in order to be able to
     // call functions which are overwritten (otherwise polymorphism
     // will fail and the results will be incorrect). Also in init() functions
     // can be called that use World::getWorld().
     World::getWorld()->init();
-
+    main_loop->renderGUI(8000);
     // Now initialise all values that need to be reset from race to race
     // Calling this here reduces code duplication in init and restartRace()
     // functions.
     World::getWorld()->reset();
 
     irr_driver->onLoadWorld();
+    main_loop->renderGUI(8100);
 
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
@@ -597,6 +605,7 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
     }
+    main_loop->renderGUI(8200);
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
@@ -955,6 +964,26 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 {
     assert(!m_watching_replay);
     StateManager::get()->enterGameState();
+
+    // In networking, make sure that the tracks screen is shown. This will
+    // allow for a 'randomly pick track' animation to be shown while
+    // world is loaded.
+    // Disable until render gui during loading is bug free
+    /*if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient()        )
+    {
+        // TODO: The enterGameState() call above deleted all GUIs, which
+        // means even if the tracks screen is shown, it need to be recreated.
+        // And we have to make sure that it is recreated as network version.
+        TracksScreen *ts = TracksScreen::getInstance();
+        if (GUIEngine::getCurrentScreen() != ts)
+        {
+            ts->setNetworkTracks();
+            ts->push();
+        }
+    }*/
+
+
     setTrack(track_ident);
 
     if (num_laps != -1) setNumLaps( num_laps );
@@ -1010,7 +1039,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
 
     m_track_number = 0;
     startNextRace();
-}   // startSingleRace
+}   // startWatchingReplay
 
 //-----------------------------------------------------------------------------
 void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)

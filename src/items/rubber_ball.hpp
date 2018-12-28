@@ -80,7 +80,7 @@ private:
     /** If the ball overtakes its target or starts to aim at the kart which
      *  originally shot the rubber ball, after this amount of time the
      *  ball will be deleted. */
-    static int m_st_delete_ticks;
+    static int16_t m_st_delete_ticks;
 
     /** If the ball is closer to its target than min_offset_distance, the speed
      *  in addition to the difficulty's default max speed. */
@@ -158,10 +158,6 @@ private:
     /** How long it takes from one bounce of the ball to the next. */
     float        m_interval;
 
-    /** This flag is set if the target is within the fast ping distance. It
-     *  will cause the rubber ball to decrese the jump height and intervall. */
-    bool         m_fast_ping;
-
     /** Distance to target. This is measured in terms of 'distance along
      *  track', but also takes the 3d distance and height difference into
      *  account (in case that the target is on a different part of the
@@ -172,26 +168,30 @@ private:
      *  It is always between 0 and m_interval. */
     float        m_height_timer;
 
+    /** The current maximum height of the ball. This value will be
+     *  reduced if the ball gets closer to the target. */
+    float        m_current_max_height;
+
     /** If the ball overtakes its target or starts to aim at the kart which
      *  originally shot the rubber ball, after a certain amount of time the
      *  ball will be deleted. This timer tracks this time. If it is < 0
      *  it indicates that the ball is targeting another kart atm. */
-    int          m_delete_ticks;
+    int16_t      m_delete_ticks;
 
-    /** The current maximum height of the ball. This value will be
-     *  reduced if the ball gets closer to the target. */
-    float        m_current_max_height;
+    /** This variable counts how often a ball tunneled (in consecutive
+     *  frames). If a ball tunnels a certain number of times, it is
+     *  considered stuck and will be removed. */
+    uint8_t      m_tunnel_count;
+
+    /** This flag is set if the target is within the fast ping distance. It
+     *  will cause the rubber ball to decrese the jump height and intervall. */
+    bool         m_fast_ping;
 
     /** Once the ball is close enough, it will aim for the kart. If the
      *  kart should be able to then increase the distance to the ball,
      *  the ball will be removed and the kart escapes. This boolean is
      *  used to keep track of the state of this ball. */
     bool         m_aiming_at_target;
-
-    /** This variable counts how often a ball tunneled (in consecutive
-     *  frames). If a ball tunnels a certain number of times, it is
-     *  considered stuck and will be removed. */
-    uint8_t      m_tunnel_count;
 
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;

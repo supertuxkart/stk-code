@@ -26,7 +26,7 @@
 #include "CIrrDeviceStub.h"
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
-#include "server_decoration_client_protocol.h"
+#include "xdg_decoration_unstable_v1_client_protocol.h"
 #include "xdg_shell_client_protocol.h"
 
 #include <wayland-client.h>
@@ -190,8 +190,8 @@ namespace irr
         bool m_surface_configured;
         uint32_t m_xdg_wm_base_name;
         
-        org_kde_kwin_server_decoration_manager* m_decoration_manager;
-        org_kde_kwin_server_decoration* m_decoration;
+        zxdg_decoration_manager_v1* m_decoration_manager;
+        zxdg_toplevel_decoration_v1* m_decoration;
 
         xkb_context* m_xkb_context;
         xkb_compose_table* m_xkb_compose_table;

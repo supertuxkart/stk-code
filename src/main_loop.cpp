@@ -530,4 +530,53 @@ void MainLoop::run()
 
 }   // run
 
+// ----------------------------------------------------------------------------
+/** Renders the GUI. This function is used during loading a track to get a
+ *  responsive GUI, and allow GUI animations (like a progress bar) to be
+ *  shown.
+ *  \param phase An integer indicated a phase. The maximum number of phases
+ *         is used to show a progress bar. The values are between 0 and 8200.
+ *  \param loop_index If the call is from a loop, the current loop index.
+ *  \param loop_size The number of loop iterations. Used to smooth update
+ *         e.g. a progress bar.
+ */
+void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
+{
+    return;
+#ifdef SERVER_ONLY
+    return;
+#else
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer()         )
+    {
+        return;
+    }
+    // Rendering past phase 7000 causes the minimap to not work
+    // on higher graphical settings
+    if (phase > 7000)
+    {
+        m_request_abort = !irr_driver->getDevice()->run();
+        return;
+    }
+
+    uint64_t now = StkTime::getRealTimeMs();
+    float dt = (now - m_curr_time)/1000.0f;
+    
+    if (dt < 1.0 / 30.0f) return;
+
+    m_curr_time = now;
+    
+    // TODO: remove debug output
+    //Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",
+    //             now, dt, phase, loop_index, loop_size);
+
+    irr_driver->update(dt, /*is_loading*/true);
+    GUIEngine::update(dt);
+    m_request_abort = !irr_driver->getDevice()->run();
+    
+    //TODO: remove debug output
+    // uint64_t now2 = StkTime::getRealTimeMs();
+    // Log::verbose("mainloop", "  duration t %llu dt %llu", now, now2-now);
+#endif
+}   // renderGUI
 /* EOF */

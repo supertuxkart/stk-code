@@ -270,6 +270,7 @@ void ConnectToServer::update(int ticks)
             {
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
+                NetworkConfig::get()->clearActivePlayersForClient();
                 auto cl = LobbyProtocol::create<ClientLobby>(m_server_address,
                     m_server);
                 cl->requestStart();

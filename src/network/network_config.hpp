@@ -90,6 +90,9 @@ private:
 
     uint32_t m_joined_server_version;
 
+    /** Set by client or server which is required to be the same. */
+    int m_state_frequency;
+
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -143,9 +146,9 @@ public:
     // ------------------------------------------------------------------------
     void unsetNetworking();
     // ------------------------------------------------------------------------
-    const std::vector<std::tuple<InputDevice*, PlayerProfile*,
+    std::vector<std::tuple<InputDevice*, PlayerProfile*,
                                  PerPlayerDifficulty> >&
-                        getNetworkPlayers() const { return m_network_players; }
+                        getNetworkPlayers()       { return m_network_players; }
     // ------------------------------------------------------------------------
     bool isAddingNetworkPlayers() const
                                      { return !m_done_adding_network_players; }
@@ -220,6 +223,12 @@ public:
     void setJoinedServerVersion(uint32_t v)    { m_joined_server_version = v; }
     // ------------------------------------------------------------------------
     uint32_t getJoinedServerVersion() const { return m_joined_server_version; }
+    // ------------------------------------------------------------------------
+    void clearActivePlayersForClient() const;
+    // ------------------------------------------------------------------------
+    void setStateFrequency(int frequency)    { m_state_frequency = frequency; }
+    // ------------------------------------------------------------------------
+    int getStateFrequency() const                 { return m_state_frequency; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

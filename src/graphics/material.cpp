@@ -819,6 +819,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
     else if (m_shader_name == "grass")
     {
+#ifdef USE_GLES2
+        m->MaterialType = video::EMT_STK_GRASS;
+#else
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
 
 #ifndef SERVER_ONLY
@@ -831,6 +834,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->EmissiveColor = video::SColor(255, 150, 150, 150);
             m->SpecularColor = video::SColor(255, 150, 150, 150);
         }
+#endif
+
 #endif
     }
 

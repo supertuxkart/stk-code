@@ -34,6 +34,7 @@ static std::vector<UserConfigParam*> g_server_params;
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_config.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
@@ -178,9 +179,9 @@ void writeServerConfigToDisk()
 // ----------------------------------------------------------------------------
 /** Returns the minor and majar game mode from server database id. */
 std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-    getLocalGameMode()
+    getLocalGameMode(int mode)
 {
-    switch (m_server_mode)
+    switch (mode)
     {
         case 0:
             return { RaceManager::MINOR_MODE_NORMAL_RACE,
@@ -218,6 +219,13 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
 }   // getLocalGameMode
 
 // ----------------------------------------------------------------------------
+std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+    getLocalGameModeFromConfig()
+{
+    return getLocalGameMode(m_server_mode);
+}   // getLocalGameModeFromConfig
+
+// ----------------------------------------------------------------------------
 core::stringw getModeName(unsigned id)
 {
     switch(id)
@@ -249,6 +257,30 @@ void loadServerLobbyFromConfig()
     if (unsupportedGameMode())
         Log::fatal("ServerConfig", "Unsupported game mode");
 
+    // TODO Remove when config directory changed from 0.10-git
+    if (m_voting_timeout == 20.0f)
+        m_voting_timeout = 30.0f;
+
+    if (stk_config->time2Ticks(m_flag_return_timemout) > 65535)
+    {
+        float timeout = m_flag_return_timemout;
+        // in CTFFlag it uses 16bit unsigned integer for timeout
+        Log::warn("ServerConfig", "Invalid %f m_flag_return_timemout which "
+            "is too large, use default value.", timeout);
+        m_flag_return_timemout.revertToDefaults();
+    }
+
+    int frequency_in_config = m_state_frequency;
+    if (frequency_in_config <= 0 ||
+        frequency_in_config > stk_config->getPhysicsFPS())
+    {
+        Log::warn("ServerConfig", "Invalid %d state frequency which is larger "
+            "than physics FPS %d, use default value.",
+            frequency_in_config, stk_config->getPhysicsFPS());
+        m_state_frequency.revertToDefaults();
+    }
+    NetworkConfig::get()->setStateFrequency(m_state_frequency);
+
     if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
         m_server_difficulty = RaceManager::DIFFICULTY_LAST;
     if (m_server_mode > 8)
@@ -259,7 +291,7 @@ void loadServerLobbyFromConfig()
     if (m_official_tracks_threshold > 1.0f)
         m_official_tracks_threshold = 1.0f;
 
-    auto modes = getLocalGameMode();
+    auto modes = getLocalGameModeFromConfig();
     race_manager->setMinorMode(modes.first);
     race_manager->setMajorMode(modes.second);
     unsigned difficulty = m_server_difficulty;
@@ -277,7 +309,10 @@ void loadServerLobbyFromConfig()
         if (m_min_start_game_players > m_server_max_players)
             m_min_start_game_players = 1;
         m_team_choosing = false;
+        m_server_configurable = false;
     }
+    if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        m_server_configurable = false;
 
     const bool is_soccer =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;

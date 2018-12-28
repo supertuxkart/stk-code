@@ -12,6 +12,7 @@ precision mediump float;
 #define TransparentAlphaChannelRef 7
 #define TransparentVertexAlpha 8
 #define TransparentReflection2Layer 9
+#define StkGrass 10
 
 /* Uniforms */
 
@@ -101,6 +102,16 @@ vec4 renderTransparent()
 	return Color;
 }
 
+vec4 renderTransparentVertexColor()
+{
+	vec4 Color = varVertexColor;
+
+	if(uTextureUsage0)
+		Color *= texture2D(uTextureUnit0, varTexCoord0);
+
+	return Color;
+}
+
 void main ()
 {
     if (uMaterialType == Solid)
@@ -119,11 +130,16 @@ void main ()
 		gl_FragColor = renderTransparent();
 	else if(uMaterialType == TransparentAlphaChannelRef)
 	{
-		vec4 Color = renderTransparent();
-		
+		vec4 Color = renderTransparentVertexColor();
 		if (Color.a < 0.5)
 			discard;
-		
+		gl_FragColor = Color;
+	}
+	else if(uMaterialType == StkGrass)
+	{
+		vec4 Color = renderTransparent();
+		if (Color.a < 0.5)
+			discard;
 		gl_FragColor = Color;
 	}
 	else if(uMaterialType == TransparentVertexAlpha)

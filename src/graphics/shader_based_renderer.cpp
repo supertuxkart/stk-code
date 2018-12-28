@@ -295,9 +295,9 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     const Track * const track = Track::getCurrentTrack();
     // Render discrete lights scattering
-    if (track && track->isFogEnabled())
+    if (UserConfigParams::m_light_scatter && track && track->isFogEnabled())
     {
-        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Light Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
         m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
                                               m_rtts->getFBO(FBO_HALF1),
@@ -700,7 +700,7 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 }
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::render(float dt)
+void ShaderBasedRenderer::render(float dt, bool is_loading)
 {
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
@@ -761,7 +761,7 @@ void ShaderBasedRenderer::render(float dt)
 
         debugPhysics();
         
-        if (CVS->isDeferredEnabled())
+        if (CVS->isDeferredEnabled() && !is_loading)
         {
             renderPostProcessing(camera, cam == 0);
         }
@@ -802,7 +802,9 @@ void ShaderBasedRenderer::render(float dt)
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GUI));
         PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
         // Either render the gui, or the global elements of the race gui.
-        GUIEngine::render(dt);
+        GUIEngine::render(dt, is_loading);
+        if (irr_driver->getRenderNetworkDebug() && !is_loading)
+            irr_driver->renderNetworkDebug();
         PROFILER_POP_CPU_MARKER();
     }
 

@@ -109,39 +109,20 @@ namespace Scripting
         {
             core::stringw wtext = StringUtils::utf8ToWide(*text);
             DigitFace* digit_face = font_manager->getFont<DigitFace>();
-            core::dimension2d<u32> textsize = digit_face->getDimension(wtext.c_str());
-
             core::vector3df xyz(location->getX(), location->getY(), location->getZ());
 #ifndef SERVER_ONLY
+            STKTextBillboard* tb = new STKTextBillboard(
+                GUIEngine::getSkin()->getColor("font::bottom"),
+                GUIEngine::getSkin()->getColor("font::top"),
+                irr_driver->getSceneManager()->getRootSceneNode(),
+                irr_driver->getSceneManager(), -1, xyz,
+                core::vector3df(1.5f, 1.5f, 1.5f));
             if (CVS->isGLSL())
-            {
-                STKTextBillboard* tb = new STKTextBillboard(
-                    GUIEngine::getSkin()->getColor("font::bottom"),
-                    GUIEngine::getSkin()->getColor("font::top"),
-                    irr_driver->getSceneManager()->getRootSceneNode(),
-                    irr_driver->getSceneManager(), -1, xyz,
-                    core::vector3df(1.5f, 1.5f, 1.5f));
                 tb->init(wtext.c_str(), digit_face);
-
-                ::Track::getCurrentTrack()->addNode(tb);
-                tb->drop();
-            }
             else
-            {
-                assert(GUIEngine::getHighresDigitFont() != NULL);
-                scene::ISceneManager* sm = irr_driver->getSceneManager();
-                scene::ISceneNode* sn =
-                    sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                        wtext.c_str(),
-                        NULL,
-                        core::dimension2df(textsize.Width / 35.0f,
-                            textsize.Height / 35.0f),
-                        xyz,
-                        -1, // id
-                        GUIEngine::getSkin()->getColor("font::bottom"),
-                        GUIEngine::getSkin()->getColor("font::top"));
-                ::Track::getCurrentTrack()->addNode(sn);
-            }
+                tb->initLegacy(wtext.c_str(), digit_face);
+            ::Track::getCurrentTrack()->addNode(tb);
+            tb->drop();
 #endif
         }
 

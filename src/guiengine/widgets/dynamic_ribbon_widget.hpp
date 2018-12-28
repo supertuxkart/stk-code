@@ -202,7 +202,7 @@ namespace GUIEngine
           */
         DynamicRibbonWidget(const bool combo, const bool multi_row);
 
-        /** Reference pointers only, the actual instances are owned by m_children. Used to create mtultiple-row
+        /** Reference pointers only, the actual instances are owned by m_children. Used to create multiple-row
          ribbons (what appears to be a grid of icons is actually a vector of stacked basic ribbons) */
         PtrVector<RibbonWidget, REF> m_rows;
 
@@ -238,6 +238,7 @@ namespace GUIEngine
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
         void clearItems();
+        void setBadge(const std::string &name, BadgeType badge);
 
         /** Sort the list of items with a given comparator. */
         template<typename Compare>

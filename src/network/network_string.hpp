@@ -340,13 +340,13 @@ public:
     /** Returns an unsigned 8-bit integer. */
     inline uint8_t getUInt8() const
     {
-        return m_buffer[m_current_offset++];
+        return m_buffer.at(m_current_offset++);
     }   // getUInt8
     // ------------------------------------------------------------------------
     /** Returns an unsigned 8-bit integer. */
     inline int8_t getInt8() const
     {
-        return m_buffer[m_current_offset++];
+        return m_buffer.at(m_current_offset++);
     }   // getInt8
     // ------------------------------------------------------------------------
     /** Gets a 4 byte floating point value. */

@@ -89,6 +89,8 @@ namespace GUIEngine
         PROP_CHILD_WIDTH,
         PROP_CHILD_HEIGHT,
         PROP_WORD_WRAP,
+        PROP_ALTERNATE_BG,
+        PROP_LINE_HEIGHT,
         //PROP_GROW_WITH_TEXT, // yet unused
         PROP_X,
         PROP_Y,
@@ -362,6 +364,7 @@ namespace GUIEngine
           * is kept)
           */
         bool isSelected(const int playerID) const { return m_selected[playerID]; }
+        void setSelected(const int playerID, bool state) { m_selected[playerID] = state;}
 
         bool isBottomBar() const { return m_bottom_bar; }
         bool isTopBar   () const { return m_top_bar;    }

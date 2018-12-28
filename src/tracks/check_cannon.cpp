@@ -158,10 +158,10 @@ void CheckCannon::update(float dt)
     CheckLine::update(dt);
     for (unsigned int i = 0; i < m_all_flyables.size(); i++)
     {
-        setIgnoreHeight(true);
         if (m_all_flyables[i]->hasUndoneDestruction() ||
             RewindManager::get()->isRewinding())
             continue;
+        setIgnoreHeight(true);
         bool triggered = isTriggered(m_flyable_previous_position[i],
                                      m_all_flyables[i]->getXYZ(),
                                      /*kart index - ignore*/ -1     );

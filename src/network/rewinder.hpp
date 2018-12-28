@@ -32,6 +32,15 @@ class Rewinder : public std::enable_shared_from_this<Rewinder>
 protected:
     void setUniqueIdentity(const std::string& uid)  { m_unique_identity = uid; }
 private:
+    /** Currently it has 2 usages:
+     *  1. Create the required flyable if the firing event missed using this
+     *     uid. (see RewindInfoState::restore)
+     *  2. Determine the order of restoring state for each rewinder, this is
+     *     used as a key in std::string, Rewinder map, which is less than.
+     *     So uid of "I" (item manager) is restored before "Kx" (which kart
+     *     id x) and TR / TB (the red / blue flag) is restored after karts,
+     *     because the restoreState in CTFFlag read kart transformation.
+     *  Otherwise it can be named whatever. */
     std::string m_unique_identity;
 
 public:

@@ -283,7 +283,7 @@ void AddonsLoading::onUpdate(float delta)
     if(m_progress->isVisible())
     {
         float progress = m_download_request->getProgress();
-        m_progress->setValue((int)(progress*100.0f));
+        m_progress->setValue(progress*100.0f);
         if(progress<0)
         {
             // Avoid displaying '-100%' in case of an error.

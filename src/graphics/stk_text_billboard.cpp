@@ -35,14 +35,14 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
 {
     using namespace SP;
     m_color_top = color_top;
-    if (CVS->isDeferredEnabled())
+    if (CVS->isDeferredEnabled() && CVS->isGLSL())
     {
         m_color_top.setRed(srgb255ToLinear(m_color_top.getRed()));
         m_color_top.setGreen(srgb255ToLinear(m_color_top.getGreen()));
         m_color_top.setBlue(srgb255ToLinear(m_color_top.getBlue()));
     }
     m_color_bottom = color_bottom;
-    if (CVS->isDeferredEnabled())
+    if (CVS->isDeferredEnabled() && CVS->isGLSL())
     {
         video::SColorf tmp(m_color_bottom);
         m_color_bottom.setRed(srgb255ToLinear(m_color_bottom.getRed()));
@@ -77,8 +77,11 @@ void STKTextBillboard::updateAbsolutePosition()
     core::matrix4 m;
     m.setScale(RelativeScale);
     AbsoluteTransformation *= m;
-    m_instanced_data = SP::SPInstancedData(AbsoluteTransformation, 0, 0, 0, 0);
-
+    if (CVS->isGLSL())
+    {
+        m_instanced_data =
+            SP::SPInstancedData(AbsoluteTransformation, 0, 0, 0, 0);
+    }
 }   // updateAbsolutePosition
 
 // ----------------------------------------------------------------------------
@@ -250,6 +253,173 @@ void STKTextBillboard::init(core::stringw text, FontWithFace* face)
     delete m_chars;
     updateAbsolutePosition();
 }   // init
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::initLegacy(core::stringw text, FontWithFace* face)
+{
+    m_chars = new std::vector<STKTextBillboardChar>();
+    core::dimension2du size = face->getDimension(text.c_str());
+    face->render(text, core::rect<s32>(0, 0, size.Width, size.Height),
+        video::SColor(255,255,255,255), false, false, NULL, NULL, this);
+
+    const float scale = 0.02f;
+    float max_x = 0;
+    float min_y = 0;
+    float max_y = 0;
+    for (unsigned int i = 0; i < m_chars->size(); i++)
+    {
+        float char_x = (*m_chars)[i].m_dest_rect.LowerRightCorner.X;
+        if (char_x > max_x)
+        {
+            max_x = char_x;
+        }
+
+        float char_min_y = (*m_chars)[i].m_dest_rect.UpperLeftCorner.Y;
+        float char_max_y = (*m_chars)[i].m_dest_rect.LowerRightCorner.Y;
+        if (char_min_y < min_y)
+        {
+            min_y = char_min_y;
+        }
+        if (char_max_y > min_y)
+        {
+            max_y = char_max_y;
+        }
+    }
+    float scaled_center_x = (max_x / 2.0f) * scale;
+    float scaled_y = (max_y / 2.0f) * scale;
+
+    std::unordered_map<video::ITexture*,
+        std::vector<std::array<irr::video::S3DVertex, 4> > > irr_tbs;
+    for (unsigned int i = 0; i < m_chars->size(); i++)
+    {
+        core::vector3df char_pos((*m_chars)[i].m_dest_rect.UpperLeftCorner.X,
+            (*m_chars)[i].m_dest_rect.UpperLeftCorner.Y, 0);
+        char_pos *= scale;
+
+        core::vector3df char_pos2((*m_chars)[i].m_dest_rect.LowerRightCorner.X,
+            (*m_chars)[i].m_dest_rect.LowerRightCorner.Y, 0);
+        char_pos2 *= scale;
+
+        float tex_width = (float)(*m_chars)[i].m_texture->getSize().Width;
+        float tex_height = (float)(*m_chars)[i].m_texture->getSize().Height;
+        std::array<irr::video::S3DVertex, 4> triangle =
+        {{
+            {
+                core::vector3df
+                    (char_pos.X - scaled_center_x, char_pos.Y - scaled_y, 0),
+                core::vector3df(0.0f, 1.0f, 0.0f),
+                m_color_bottom,
+                core::vector2df
+                    ((*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.X / tex_width,
+                    (*m_chars)
+                        [i].m_source_rect.LowerRightCorner.Y / tex_height)
+            },
+
+            {
+                core::vector3df
+                    (char_pos2.X - scaled_center_x, char_pos.Y - scaled_y, 0),
+                core::vector3df(0.0f, 1.0f, 0.0f),
+                m_color_bottom,
+                core::vector2df
+                    ((*m_chars)
+                        [i].m_source_rect.LowerRightCorner.X / tex_width,
+                    (*m_chars)
+                        [i].m_source_rect.LowerRightCorner.Y / tex_height)
+            },
+
+            {
+                core::vector3df
+                    (char_pos2.X - scaled_center_x, char_pos2.Y - scaled_y, 0),
+                core::vector3df(0.0f, 1.0f, 0.0f),
+
+                m_color_top,
+                core::vector2df
+                    ((*m_chars)
+                        [i].m_source_rect.LowerRightCorner.X / tex_width,
+                    (*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.Y / tex_height)
+            },
+
+            {
+                core::vector3df
+                    (char_pos.X - scaled_center_x, char_pos2.Y - scaled_y, 0),
+                core::vector3df(0.0f, 1.0f, 0.0f),
+                m_color_top,
+                core::vector2df
+                    ((*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.X / tex_width,
+                    (*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.Y / tex_height)
+            }
+        }};
+        irr_tbs[(*m_chars)[i].m_texture].push_back(triangle);
+    }
+
+    for (auto& p : irr_tbs)
+    {
+        scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
+        buffer->getMaterial().setTexture(0, p.first);
+        buffer->getMaterial().MaterialType =
+            video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        buffer->getMaterial().Lighting = false;
+
+        std::vector<uint16_t> indices;
+        for (unsigned i = 0; i < p.second.size(); i++)
+        {
+            indices.push_back(4 * i + 2);
+            indices.push_back(4 * i + 1);
+            indices.push_back(4 * i + 0);
+            indices.push_back(4 * i + 3);
+            indices.push_back(4 * i + 2);
+            indices.push_back(4 * i + 0);
+        }
+        buffer->append(p.second.data(), p.second.size() * 4,
+            indices.data(), indices.size());
+        buffer->recalculateBoundingBox();
+        m_gl_mb[p.first] = buffer;
+    }
+
+    Vec3 min = Vec3( 999999.9f);
+    Vec3 max = Vec3(-999999.9f);
+    for (auto& p : irr_tbs)
+    {
+        for (auto& q : p.second)
+        {
+            for (auto& r : q)
+            {
+                Vec3 c(r.Pos.X, r.Pos.Y, r.Pos.Z);
+                min.min(c);
+                max.max(c);
+            }
+        }
+    }
+    m_bbox.MinEdge = min.toIrrVector();
+    m_bbox.MaxEdge = max.toIrrVector();
+
+    delete m_chars;
+    updateAbsolutePosition();
+
+}   // initLegacy
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::render()
+{
+    video::IVideoDriver* driver = SceneManager->getVideoDriver();
+    driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
+    for (auto& p : m_gl_mb)
+    {
+        driver->setMaterial(p.second->getMaterial());
+        driver->drawMeshBuffer(p.second);
+    }
+}   // render
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::OnRegisterSceneNode()
+{
+    SceneManager->registerNodeForRendering(this, ESNRP_TRANSPARENT);
+    ISceneNode::OnRegisterSceneNode();
+}   // OnRegisterSceneNode
 
 // ----------------------------------------------------------------------------
 void STKTextBillboard::collectChar(video::ITexture* texture,

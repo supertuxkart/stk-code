@@ -24,7 +24,8 @@
 #include "modes/capture_the_flag.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocols/game_events_protocol.hpp"
+#include "network/peer_vote.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
@@ -62,6 +63,7 @@ GameSetup::GameSetup()
         (StringUtils::xmlDecode(server_name));
     m_connected_players_count.store(0);
     m_extra_server_info = -1;
+    m_is_grand_prix.store(false);
     reset();
 }   // GameSetup
 
@@ -123,10 +125,6 @@ void GameSetup::update(bool remove_disconnected_players)
             k->setPosition(
                 World::getWorld()->getCurrentNumKarts() + 1);
             k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
-            NetworkString p(PROTOCOL_GAME_EVENTS);
-            p.setSynchronous(true);
-            p.addUInt8(GameEventsProtocol::GE_PLAYER_DISCONNECT).addUInt8(i);
-            STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
     m_connected_players_count.store(total);
@@ -178,26 +176,20 @@ void GameSetup::loadWorld()
     {
         race_manager->setReverseTrack(m_reverse);
         race_manager->startSingleRace(m_tracks.back(), m_laps,
-            false/*from_overworld*/);
+                                      false/*from_overworld*/);
     }
 }   // loadWorld
-
-//-----------------------------------------------------------------------------
-bool GameSetup::isGrandPrix() const
-{
-    return m_extra_server_info != -1 &&
-        ServerConfig::getLocalGameMode().second ==
-        RaceManager::MAJOR_MODE_GRAND_PRIX;
-}   // isGrandPrix
 
 //-----------------------------------------------------------------------------
 void GameSetup::addServerInfo(NetworkString* ns)
 {
     assert(NetworkConfig::get()->isServer());
     ns->encodeString(m_server_name_utf8);
-    ns->addUInt8((uint8_t)ServerConfig::m_server_difficulty)
+    auto sl = LobbyProtocol::get<ServerLobby>();
+    assert(sl);
+    ns->addUInt8((uint8_t)sl->getDifficulty())
         .addUInt8((uint8_t)ServerConfig::m_server_max_players)
-        .addUInt8((uint8_t)ServerConfig::m_server_mode);
+        .addUInt8((uint8_t)sl->getGameMode());
     if (hasExtraSeverInfo())
     {
         if (isGrandPrix())
@@ -228,6 +220,7 @@ void GameSetup::addServerInfo(NetworkString* ns)
         ns->addUInt8(0).addFloat(0.0f);
 
     ns->encodeString16(m_message_of_today);
+    ns->addUInt8((uint8_t)ServerConfig::m_server_configurable);
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------
@@ -303,3 +296,11 @@ std::pair<int, int> GameSetup::getPlayerTeamInfo() const
     }
     return std::make_pair(red_count, blue_count);
 }   // getPlayerTeamInfo
+
+// ----------------------------------------------------------------------------
+void GameSetup::setRace(const PeerVote &vote)
+{
+    m_tracks.push_back(vote.m_track_name);
+    m_laps = vote.m_num_laps;
+    m_reverse = vote.m_reverse;
+}   // setRace

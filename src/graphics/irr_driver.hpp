@@ -163,6 +163,7 @@ private:
     bool                 m_lightviz;
     bool                 m_boundingboxesviz;
     bool                 m_recording;
+    bool                 m_render_nw_debug;
 
     /** Background colour to reset a buffer. Can be changed by each track. */
     irr::video::SColor m_clear_color;
@@ -266,7 +267,7 @@ public:
     Camera               *addCamera(unsigned int index, AbstractKart *kart);
     void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
     void                  removeCamera(Camera *camera);
-    void                  update(float dt);
+    void                  update(float dt, bool loading=false);
     /** Call to change resolution */
     void                  changeResolution(const int w, const int h, const bool fullscreen);
   /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
@@ -361,6 +362,12 @@ public:
     bool getShadowViz()           { return m_shadowviz;             }
     // ------------------------------------------------------------------------
     void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
+    // ------------------------------------------------------------------------
+    void toggleRenderNetworkDebug() { m_render_nw_debug = !m_render_nw_debug; }
+    // ------------------------------------------------------------------------
+    bool getRenderNetworkDebug() const            { return m_render_nw_debug; }
+    // ------------------------------------------------------------------------
+    void renderNetworkDebug();
     // ------------------------------------------------------------------------
     bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
     // ------------------------------------------------------------------------

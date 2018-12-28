@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-23 23:45+0800\n"
-"PO-Revision-Date: 2018-11-27 17:42+0000\n"
+"POT-Creation-Date: 2018-12-22 11:16+0800\n"
+"PO-Revision-Date: 2018-12-25 09:03+0000\n"
 "Last-Translator: Mensious Mensious <ektoras@tutanota.com>\n"
 "Language-Team: Greek (http://www.transifex.com/supertuxkart/supertuxkart/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -279,10 +279,11 @@ msgstr "Επαναφορά προεπιλογών"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/network/protocols/client_lobby.cpp:466
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
 #: src/states_screens/edit_gp_screen.cpp:260
-#: src/states_screens/ghost_replay_selection.cpp:386
+#: src/states_screens/ghost_replay_selection.cpp:391
+#: src/states_screens/online/tracks_screen.cpp:777
+#: src/states_screens/online/tracks_screen.cpp:814
 msgid "Yes"
 msgstr "Ναι"
 
@@ -297,6 +298,8 @@ msgstr "Ναι"
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
@@ -313,7 +316,7 @@ msgstr "Ναι"
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/dialogs/addons_loading.cpp:236
 #: src/states_screens/online/register_screen.cpp:119
-#: src/states_screens/options/user_screen.cpp:126
+#: src/states_screens/options/user_screen.cpp:127
 msgid "Cancel"
 msgstr "Άκυρο"
 
@@ -411,6 +414,8 @@ msgstr "* Επανεκκίνηση του STK για εφαρμογή νέων �
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -590,6 +595,113 @@ msgstr "Συμφωνώ με τους παραπάνω όρους και είμα
 msgid "Accept"
 msgstr "Αποδοχή"
 
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+msgid "Server Configuration"
+msgstr "Ρυθμίσεις Server"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Difficulty"
+msgstr "Δυσκολία"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:606
+msgid "Novice"
+msgstr "Αρχάριος"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:607
+msgid "Intermediate"
+msgstr "Μαθητευόμενος"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:608
+msgid "Expert"
+msgstr "Επαγγελματίας"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:609
+msgid "SuperTux"
+msgstr "SuperTux"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Game mode"
+msgstr "Κατηγορία παιχνιδιού"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:187
+msgid "Normal Race"
+msgstr "Κανονικός αγώνας"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:189
+msgid "Time Trial"
+msgstr "Δοκιμασία Χρόνου"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+msgid "Battle"
+msgstr "Μονομαχία"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:201
+msgid "Soccer"
+msgstr "Ποδόσφαιρο"
+
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -615,7 +727,6 @@ msgstr "Προσθήκη παίκτη"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: src/states_screens/online/online_profile_achievements.cpp:75
-#: src/states_screens/online/server_selection.cpp:119
 msgid "Name"
 msgstr "Όνομα"
 
@@ -757,52 +868,6 @@ msgstr "Ρύθμιση αγώνα"
 msgid "Type:"
 msgstr "Τύπος:"
 
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:590
-msgid "Novice"
-msgstr "Αρχάριος"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:591
-msgid "Intermediate"
-msgstr "Μαθητευόμενος"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:592
-msgid "Expert"
-msgstr "Επαγγελματίας"
-
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:593
-msgid "SuperTux"
-msgstr "SuperTux"
-
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
 #. I18N: ./data/gui/screens/feature_unlocked.stkgui
@@ -869,7 +934,7 @@ msgstr "Βασικές"
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:144
 #: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/kart_selection.cpp:293
 #: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "Πρόσθετα"
@@ -885,10 +950,10 @@ msgstr "Πρόσθετα"
 #: src/states_screens/arenas_screen.cpp:73
 #: src/states_screens/easter_egg_screen.cpp:136
 #: src/states_screens/edit_track_screen.cpp:145
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:73
 #: src/states_screens/grand_prix_editor_screen.cpp:333
-#: src/states_screens/kart_selection.cpp:282
-#: src/states_screens/online/tracks_screen.cpp:225
+#: src/states_screens/kart_selection.cpp:285
+#: src/states_screens/online/tracks_screen.cpp:338
 #: src/states_screens/tracks_and_gp_screen.cpp:135
 msgid "All"
 msgstr "Όλες"
@@ -1020,7 +1085,7 @@ msgstr "Ομάδα πίστας"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:144
 msgid "Continue saved GP"
 msgstr "Συνέχεια αποθηκεύμενου GP"
 
@@ -1478,6 +1543,8 @@ msgstr "Όταν φτιάξεις τις συσκευές χειρισμού, ε
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
+#. I18N: ./data/gui/screens/online/network_karts.stkgui
+#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Επίλεξτε Καρτ"
 
@@ -1558,44 +1625,6 @@ msgstr "Κωδικός για τον ιδιωτικό server (προαιρετι
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:121
-msgid "Difficulty"
-msgstr "Δυσκολία"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:122
-msgid "Game mode"
-msgstr "Κατηγορία παιχνιδιού"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:230 src/race/race_manager.hpp:180
-msgid "Normal Race"
-msgstr "Κανονικός αγώνας"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:232 src/race/race_manager.hpp:182
-msgid "Time Trial"
-msgstr "Δοκιμασία Χρόνου"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-msgid "Battle"
-msgstr "Μονομαχία"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:234 src/race/race_manager.hpp:190
-msgid "Soccer"
-msgstr "Ποδόσφαιρο"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
 msgid "Create"
 msgstr "Δημιουργία"
 
@@ -1621,7 +1650,7 @@ msgstr "Δημιουργία server"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:153
+#: src/states_screens/online/networking_lobby.cpp:170
 msgid "Lobby"
 msgstr "Δωμάτιο αναμονής"
 
@@ -1632,14 +1661,14 @@ msgstr "Αποστολή"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:155
+#: src/states_screens/online/networking_lobby.cpp:172
 msgid "Start race"
 msgstr "Εκκίνιση αγώνα"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-msgid "Server Configuration"
-msgstr "Ρυθμίσεις Server"
+msgid "Configuration"
+msgstr "Ρυθμίσεις server"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -1867,7 +1896,6 @@ msgstr "Ρυθμίσεις Χρήστη"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/online/server_selection.cpp:120
 msgid "Players"
 msgstr "Παίκτες"
 
@@ -1919,7 +1947,7 @@ msgstr "Μουσική"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/options/options_screen_video.cpp:429
+#: src/states_screens/options/options_screen_video.cpp:445
 msgid "Enabled"
 msgstr "Ενεργοποιημένο"
 
@@ -2079,6 +2107,7 @@ msgstr "Μπλε Ομάδα"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In the create server screen
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:168
 #: src/states_screens/online/create_server_screen.cpp:190
 msgid "Soccer game type"
 msgstr "Κατηγορία ποδοσφαιρικού αγώνα"
@@ -2086,14 +2115,14 @@ msgstr "Κατηγορία ποδοσφαιρικού αγώνα"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:317
+#: src/states_screens/online/tracks_screen.cpp:463
 msgid "Number of goals to win"
 msgstr "Αριθμός γκολ για νικητή"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:325
+#: src/states_screens/online/tracks_screen.cpp:471
 msgid "Maximum time (min.)"
 msgstr "Μέγιστος χρόνος (λεπ.)"
 
@@ -2108,14 +2137,13 @@ msgstr "=Υψηλότερες βαθμολογίες="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:328
+#: src/states_screens/track_info_screen.cpp:327
 msgid "(Empty)"
 msgstr "(Κενό)"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:349
+#: src/states_screens/online/tracks_screen.cpp:500
 msgid "Number of laps"
 msgstr "Αριθμός γύρων"
 
@@ -2450,25 +2478,25 @@ msgid ""
 "created."
 msgstr "Το αρχείο διαμόρφωσης ήταν πολύ παλιό, έτσι διαγράφηκε και ένα νέο θα δημιουργηθεί."
 
-#: src/graphics/irr_driver.cpp:585
+#: src/graphics/irr_driver.cpp:588
 msgid "Video recording started."
 msgstr "Άρχισε η εγγραφή βίντεο."
 
-#: src/graphics/irr_driver.cpp:591
+#: src/graphics/irr_driver.cpp:594
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Το βίντεο αποθηκεύτηκε στο \"%s\"."
 
-#: src/graphics/irr_driver.cpp:595
+#: src/graphics/irr_driver.cpp:598
 msgid "Encoding progress:"
 msgstr "Πρόοδος κωδικοποίησης:"
 
-#: src/graphics/irr_driver.cpp:1781 src/graphics/irr_driver.cpp:1786
+#: src/graphics/irr_driver.cpp:1785 src/graphics/irr_driver.cpp:1790
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#: src/guiengine/engine.cpp:1329
+#: src/guiengine/engine.cpp:1341
 msgid "Loading"
 msgstr "Φόρτωση"
 
@@ -2492,9 +2520,9 @@ msgstr "Αποδοτικότητα Nitro"
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:386
 #: src/guiengine/widgets/player_kart_widget.cpp:759
-#: src/karts/controller/local_player_controller.cpp:449
-#: src/karts/controller/player_controller.cpp:408
-#: src/network/protocols/client_lobby.cpp:708
+#: src/karts/controller/local_player_controller.cpp:437
+#: src/karts/controller/player_controller.cpp:407
+#: src/network/protocols/client_lobby.cpp:668
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3165,11 +3193,11 @@ msgstr[1] "Βρέθηκαν %d wiimote"
 msgid "Could not detect any wiimote :/"
 msgstr "Δεν ανιχνεύθηκε κάποιο wiimote :/"
 
-#: src/karts/controller/local_player_controller.cpp:307
+#: src/karts/controller/local_player_controller.cpp:295
 msgid "Penalty time!!"
 msgstr "Ποινή χρόνου!!"
 
-#: src/karts/controller/local_player_controller.cpp:310
+#: src/karts/controller/local_player_controller.cpp:298
 msgid "Don't accelerate before 'Set!'"
 msgstr "Μην επιταχύνης πριν το 'Έτοιμοι'"
 
@@ -3216,39 +3244,39 @@ msgid ""
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Η έκδοση OpenGL που έχετε φαίνεται να είναι πολύ παλιά. Παρακαλώ επιβεβαιώστε αν υπάρχει διαθέσιμη κάποια αναβάθμιση για τον οδηγό γραφικών. Το SuperTuxKart απαιτεί %s ή καλύτερο."
 
-#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:85
+#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:86
 msgid "Server connection timed out."
 msgstr "Η σύνδεση στον server δεν αποκρίνεται."
 
 #. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:366
+#: src/modes/capture_the_flag.cpp:398
 #, c-format
 msgid "%s has the red flag!"
 msgstr "%s Έχει την κόκκινη σημαία!"
 
 #. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:375
+#: src/modes/capture_the_flag.cpp:407
 #, c-format
 msgid "%s has the blue flag!"
 msgstr "%s Έχει την μπλε σημαία!"
 
 #. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:402
+#: src/modes/capture_the_flag.cpp:434
 #, c-format
 msgid "%s captured the red flag!"
 msgstr "%s Έπιασε την κόκκινη σημαία!"
 
 #. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:413
+#: src/modes/capture_the_flag.cpp:445
 #, c-format
 msgid "%s captured the blue flag!"
 msgstr "%s Έπιασε την μπλε σημαία!"
 
-#: src/modes/capture_the_flag.cpp:431
+#: src/modes/capture_the_flag.cpp:463
 msgid "The red flag has returned!"
 msgstr "Η κόκκινη σημαία επέστρεψε!"
 
-#: src/modes/capture_the_flag.cpp:447
+#: src/modes/capture_the_flag.cpp:479
 msgid "The blue flag has returned!"
 msgstr "Η μπλε σημαία επέστρεψε!"
 
@@ -3291,98 +3319,50 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i εφεδρικό λάστιχο καρτ έχει γεννηθεί!"
 msgstr[1] "%i kart με εφεδρικά λάστιχα έχουν γεννηθεί!"
 
-#: src/modes/world.cpp:1239
+#: src/modes/world.cpp:1245
 msgid "You have been eliminated!"
 msgstr "Αποκλείστικες!"
 
-#: src/modes/world.cpp:1246
+#: src/modes/world.cpp:1252
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "Ο «%s» αποκλείστηκε."
 
-#: src/network/protocols/client_lobby.cpp:86
+#: src/network/protocols/client_lobby.cpp:87
 msgid "Server has been shut down."
 msgstr "Ο Server έχει κλείσει."
 
-#: src/network/protocols/client_lobby.cpp:87
+#: src/network/protocols/client_lobby.cpp:88
 msgid "You were kicked from the server."
 msgstr "Σας διώξανε από τον server."
 
-#: src/network/protocols/client_lobby.cpp:89
-#: src/network/protocols/client_lobby.cpp:235
-#: src/network/protocols/client_lobby.cpp:739
+#: src/network/protocols/client_lobby.cpp:90
+#: src/network/protocols/client_lobby.cpp:222
+#: src/network/protocols/client_lobby.cpp:704
 msgid "Bad network connection is detected."
 msgstr "Ανιχνεύθηκε κακή σύνδεση στο internet. "
 
-#: src/network/protocols/client_lobby.cpp:467
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:260
-#: src/states_screens/ghost_replay_selection.cpp:386
-msgid "No"
-msgstr "Όχι"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:473
-#, c-format
-msgid ""
-"Track: %s,\n"
-"random item location: %s"
-msgstr "Πίστα: %s,\nτυχαία τοποθεσία αντικειμένων: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:481
-#, c-format
-msgid "Track: %s"
-msgstr "Πίστα: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:488
-#, c-format
-msgid ""
-"Track: %s,\n"
-"number of goals to win: %d,\n"
-"random item location: %s"
-msgstr "Πίστα: %s,\nαριθμός γκολ για νίκη: %d,\nτυχαία τοποθέτηση αντικειμένων: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:495
-#, c-format
-msgid ""
-"Track: %s,\n"
-"maximum time: %d,\n"
-"random item location: %s"
-msgstr "Πίστα: %s,\nμέγιστος χρόνος: %d,\nτυχαία τοποθέτηση αντικειμένων: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:503
-#, c-format
-msgid ""
-"Track: %s,\n"
-"laps: %d, reversed: %s"
-msgstr "Πίστα: %s,\nγύροι: %d, ανάποδα: %s"
-
-#: src/network/protocols/client_lobby.cpp:533
+#: src/network/protocols/client_lobby.cpp:484
 #, c-format
 msgid "%s disconnected."
 msgstr "%s Αποσυνδέθηκε"
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:560
+#: src/network/protocols/client_lobby.cpp:512
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Πατήστε ένα όνομα παίκτη απο την λίστα για τις ρυθμισείς και πληροφορίες κατάταξης."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:590
+#: src/network/protocols/client_lobby.cpp:551
 #, c-format
 msgid "Server name: %s"
 msgstr "Όνομα server: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:598
+#: src/network/protocols/client_lobby.cpp:559
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
@@ -3390,74 +3370,76 @@ msgid "Difficulty: %s"
 msgstr "Δυσκολία: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:603
+#: src/network/protocols/client_lobby.cpp:564
 #, c-format
 msgid "Max players: %d"
 msgstr "Μέγιστος αριθμός παίκτων: %d"
 
-#: src/network/protocols/client_lobby.cpp:620
+#: src/network/protocols/client_lobby.cpp:575
 #: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Κατηγορία παιχνιδιού: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:632
+#: src/network/protocols/client_lobby.cpp:588
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
 #: src/states_screens/soccer_setup_screen.cpp:230
 msgid "Time limit"
 msgstr "Όριο χρόνου"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:633
+#: src/network/protocols/client_lobby.cpp:589
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/soccer_setup_screen.cpp:231
 msgid "Goals limit"
 msgstr "Όριο Γκολ"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:637
+#: src/network/protocols/client_lobby.cpp:593
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Κατηγορία παιχνιδιού ποδοσφαίρου: %s"
 
-#: src/network/protocols/client_lobby.cpp:647
+#: src/network/protocols/client_lobby.cpp:603
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Πρόοδος Πρωταθλήματος: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:731
+#: src/network/protocols/client_lobby.cpp:696
 msgid "All players joined red or blue team."
 msgstr "Όλοι οι παίκτες μπήκανε στην κόκκινη ή την μπλε ομάδα."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:752
+#: src/network/protocols/client_lobby.cpp:717
 msgid "You are now the owner of server."
 msgstr "Είσαι πλέον ο ιδιοκτήτης του server."
 
-#: src/network/protocols/client_lobby.cpp:790
+#: src/network/protocols/client_lobby.cpp:755
 msgid "Connection refused: Server is busy."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι απασχολημένος"
 
-#: src/network/protocols/client_lobby.cpp:794
+#: src/network/protocols/client_lobby.cpp:759
 msgid "Connection refused: You are banned from the server."
 msgstr "Η σύνδεση απορρίφθηκε: Σε έχουν μπλοκάρει σε αυτόν τον server."
 
-#: src/network/protocols/client_lobby.cpp:798
+#: src/network/protocols/client_lobby.cpp:763
 msgid "Connection refused: Server password is incorrect."
 msgstr "Η σύνδεση απορρίφθηκε: Ο κωδικός του server είναι λάθος."
 
-#: src/network/protocols/client_lobby.cpp:802
+#: src/network/protocols/client_lobby.cpp:767
 msgid "Connection refused: Game data is incompatible."
 msgstr "Η σύνδεση απορρίφθηκε: Τα δεδομένα του παιχνιδιού δεν ταιριάζουν."
 
-#: src/network/protocols/client_lobby.cpp:806
+#: src/network/protocols/client_lobby.cpp:771
 msgid "Connection refused: Server is full."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι γεμάτος."
 
-#: src/network/protocols/client_lobby.cpp:810
+#: src/network/protocols/client_lobby.cpp:775
 msgid "Connection refused: Invalid player connecting."
 msgstr "Η σύνδεση απορρίφθηκε: Ο παίκτης που συνδέεται δεν είναι έγκυρος."
 
@@ -3465,27 +3447,31 @@ msgstr "Η σύνδεση απορρίφθηκε: Ο παίκτης που συ�
 msgid "No quick play server available."
 msgstr "Δεν υπάρχει server διαθέσιμος για γρήγορο παιχνίδι."
 
-#: src/network/protocols/connect_to_server.cpp:281
+#: src/network/protocols/connect_to_server.cpp:282
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Δεν είναι δυνατή η σύνδεση στον server  %s."
 
-#: src/network/server_config.cpp:226
+#: src/network/server_config.cpp:234
 msgid "Normal Race (Grand Prix)"
 msgstr "Κανονικός Αγώνας (Πρωτάθλημα)"
 
-#: src/network/server_config.cpp:228
+#: src/network/server_config.cpp:236
 msgid "Time Trial (Grand Prix)"
 msgstr "Δοκιμασία χρόνου (Πρωτάθλημα)"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:238
+#: src/network/server_config.cpp:246 src/race/race_manager.hpp:195
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:178
 msgid "Free-For-All"
 msgstr "Free-For-All"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:240
+#: src/network/server_config.cpp:248 src/race/race_manager.hpp:197
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:159
 #: src/states_screens/online/create_server_screen.cpp:180
 msgid "Capture The Flag"
 msgstr "Πιάστε Την Σημαία"
@@ -3552,17 +3538,17 @@ msgid ""
 msgstr "Το αρχείο με τις υψηλότερες βαθμολογίες ήταν πολύ παλιό,\nόλες οι υψηλότερες βαθμολογίες έχουν διαγραφεί."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:184
+#: src/race/race_manager.hpp:191
 msgid "Follow the Leader"
 msgstr "Ακολούθησε τον αρχηγό"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:186
+#: src/race/race_manager.hpp:193
 msgid "3 Strikes Battle"
 msgstr "Μονομαχία με 3 ζωές"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:188
+#: src/race/race_manager.hpp:199
 msgid "Egg Hunt"
 msgstr "Κυνήγι αυγών"
 
@@ -3616,18 +3602,18 @@ msgid "Updated date"
 msgstr "Ημερομηνία ενημέρωσης"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:297
+#: src/states_screens/addons_screen.cpp:298
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s από τον %s"
 
-#: src/states_screens/addons_screen.cpp:417
+#: src/states_screens/addons_screen.cpp:418
 msgid "Please wait while addons are updated"
 msgstr "Παρακαλώ περιμένετε καθώς ενημερώνονται τα πρόσθετα"
 
-#: src/states_screens/addons_screen.cpp:495
-#: src/states_screens/main_menu_screen.cpp:558
+#: src/states_screens/addons_screen.cpp:496
+#: src/states_screens/main_menu_screen.cpp:555
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3640,7 +3626,7 @@ msgstr "Λυπόμαστε , ένα σφάλμα συνέβη κατά την ε
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:79
 #: src/states_screens/easter_egg_screen.cpp:142
-#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/kart_selection.cpp:291
 #: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "Βασικές"
@@ -3649,8 +3635,8 @@ msgstr "Βασικές"
 #: src/states_screens/arenas_screen.cpp:325
 #: src/states_screens/easter_egg_screen.cpp:224
 #: src/states_screens/easter_egg_screen.cpp:255
-#: src/states_screens/kart_selection.cpp:886
-#: src/states_screens/kart_selection.cpp:1522
+#: src/states_screens/kart_selection.cpp:889
+#: src/states_screens/kart_selection.cpp:1525
 #: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Κλειδωμένο: λύσε ενεργές προκλήσεις για να κερδίσεις πρόσβαση σε περισσότερες!"
@@ -4167,13 +4153,13 @@ msgstr "Αναλύσεις μικρότερες από 1024x768 ή 1280x720 δε
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
 #: src/states_screens/online/create_server_screen.cpp:160
-#: src/states_screens/options/options_screen_video.cpp:432
+#: src/states_screens/options/options_screen_video.cpp:448
 msgid "Disabled"
 msgstr "Απενεργοποιημένο"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:63
-#: src/states_screens/options/options_screen_video.cpp:434
+#: src/states_screens/options/options_screen_video.cpp:450
 msgid "Important only"
 msgstr "Σημαντικά μόνο"
 
@@ -4183,7 +4169,7 @@ msgstr "Σημαντικά μόνο"
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:80
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/options/options_screen_video.cpp:441
+#: src/states_screens/options/options_screen_video.cpp:457
 msgid "Low"
 msgstr "Χαμηλή"
 
@@ -4193,58 +4179,68 @@ msgstr "Χαμηλή"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/options/options_screen_video.cpp:444
+#: src/states_screens/options/options_screen_video.cpp:460
 msgid "High"
 msgstr "Υψηλή"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
-#: src/states_screens/options/options_screen_video.cpp:438
+#: src/states_screens/options/options_screen_video.cpp:454
 msgid "Very Low"
 msgstr "Πολύ χαμηλή"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:143
-#: src/states_screens/ghost_replay_selection.cpp:153
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:154
+msgctxt "column_name"
 msgid "Reverse"
 msgstr "Ανάποδα"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
-#: src/states_screens/ghost_replay_selection.cpp:155
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:156
+#: src/states_screens/online/server_selection.cpp:122
+msgctxt "column_name"
 msgid "Difficulty"
 msgstr "Δυσκολία"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
-#: src/states_screens/ghost_replay_selection.cpp:157
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:158
+msgctxt "column_name"
 msgid "Laps"
 msgstr "Γύροι"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
-#: src/states_screens/ghost_replay_selection.cpp:158
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:159
+msgctxt "column_name"
 msgid "Time"
 msgstr "Χρόνος"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
-#: src/states_screens/ghost_replay_selection.cpp:159
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:160
+msgctxt "column_name"
 msgid "Kart"
 msgstr "Kart"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
-#: src/states_screens/ghost_replay_selection.cpp:160
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:161
+msgctxt "column_name"
 msgid "User"
 msgstr "Χρήστης"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
-#: src/states_screens/ghost_replay_selection.cpp:164
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:165
+msgctxt "column_name"
 msgid "Version"
 msgstr "Έκδοση"
+
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:391
+#: src/states_screens/online/tracks_screen.cpp:777
+#: src/states_screens/online/tracks_screen.cpp:814
+msgid "No"
+msgstr "Όχι"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:43
@@ -4257,18 +4253,28 @@ msgid "Pick a color from slider"
 msgstr "Διάλεξε χρώμα από την παλέτα χρωμάτων"
 
 #. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:82
+#: src/states_screens/dialogs/network_user_dialog.cpp:83
 msgid "Kick"
 msgstr "Διώξτον"
 
 #. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:98
+#: src/states_screens/dialogs/network_user_dialog.cpp:99
 msgid "Change team"
 msgstr "Επιλέξτε ομαδα"
 
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:114
+msgid "Enable handicap"
+msgstr "Ενεργοποίηση μειωμένης ταχύτητας"
+
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:119
+msgid "Disable handicap"
+msgstr "Απενεργοποίηση μειωμένης ταχύτητας"
+
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
-#: src/states_screens/dialogs/network_user_dialog.cpp:122
+#: src/states_screens/dialogs/network_user_dialog.cpp:143
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:140
 #, c-format
 msgid "Fetching ranking info for %s"
@@ -4329,6 +4335,12 @@ msgstr "Πρόκληση νίτρου"
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
 msgstr "Αγώνας με replay φάντασμα"
+
+#. I18N: In the create server screen, show various battle mode available
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:155
+#: src/states_screens/online/create_server_screen.cpp:174
+msgid "Battle mode"
+msgstr "Κατηγορία μάχης"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:99
 #: src/states_screens/race_gui_overworld.cpp:148
@@ -4418,13 +4430,13 @@ msgid "Performing vote"
 msgstr "Εκτέλεση ψηφοφορίας"
 
 #: src/states_screens/easter_egg_screen.cpp:269
-#: src/states_screens/online/tracks_screen.cpp:440
+#: src/states_screens/online/tracks_screen.cpp:590
 #: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
 msgstr "Τυχαία πίστα"
 
 #: src/states_screens/edit_gp_screen.cpp:116
-#: src/states_screens/ghost_replay_selection.cpp:505
+#: src/states_screens/ghost_replay_selection.cpp:510
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
@@ -4500,30 +4512,31 @@ msgstr "Ξεκλείδωσες την πίστα %0"
 msgid "You unlocked grand prix %0"
 msgstr "Ξεκλείδωσες το Πρωτάθλημα %0"
 
-#: src/states_screens/ghost_replay_selection.cpp:151
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:152
+msgctxt "column_name"
 msgid "Track"
 msgstr "Πίστα"
 
-#: src/states_screens/ghost_replay_selection.cpp:162
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:163
+#: src/states_screens/online/server_selection.cpp:121
+msgctxt "column_name"
 msgid "Players"
-msgstr "Παίκτες "
+msgstr "Παίκτες"
 
-#: src/states_screens/gp_info_screen.cpp:72
+#: src/states_screens/gp_info_screen.cpp:71
 msgid "Default"
 msgstr "Προεπιλογή"
 
-#: src/states_screens/gp_info_screen.cpp:73
+#: src/states_screens/gp_info_screen.cpp:72
 msgid "None"
 msgstr "Κανένα"
 
-#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/gp_info_screen.cpp:74
 msgid "Random"
 msgstr "Τυχαία"
 
-#: src/states_screens/gp_info_screen.cpp:152
-#: src/states_screens/gp_info_screen.cpp:177
+#: src/states_screens/gp_info_screen.cpp:151
+#: src/states_screens/gp_info_screen.cpp:176
 msgid "Reload"
 msgstr "Επαναφόρτωση"
 
@@ -4571,49 +4584,46 @@ msgstr "Νίκησες το Πρωτάθλημα!"
 msgid "You completed the Grand Prix!"
 msgstr "Ολοκλήρωσες το Πρωτάθλημα!"
 
-#: src/states_screens/kart_selection.cpp:862
-#: src/states_screens/kart_selection.cpp:1540
+#: src/states_screens/kart_selection.cpp:865
+#: src/states_screens/kart_selection.cpp:1543
 msgid "Random Kart"
 msgstr "Τυχαίο Kart"
 
-#: src/states_screens/kart_selection.cpp:881
+#: src/states_screens/kart_selection.cpp:884
 msgid "Locked"
 msgstr "Κλειδωμένο"
 
-#: src/states_screens/kart_selection.cpp:982
-#: src/states_screens/online/networking_lobby.cpp:309
+#: src/states_screens/kart_selection.cpp:985
+#: src/states_screens/online/networking_lobby.cpp:347
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Όλοι:\nΠάτησε το πλήκτρο \"Select\" για να μπείς στο παιχνίδι"
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online/online_screen.cpp:209
 msgid ""
 "You can not play online without internet access. If you want to play online,"
-" go to options, select  tab 'User Interface', and edit \"Connect to the "
-"Internet\"."
-msgstr "Δεν μπορείτε να παίξετε online χωρίς πρόσβαση στο internet. Αν θέλετε να παίξετε online, πηγαίνετε στις επιλογές, επιλέξτε την καρτέλα «Ρυθμίσεις Χρήστη» και επεξεργαστείτε το \"Σύνδεση στο Internet\"."
+" go in the options menu, and check \"Connect to the Internet\"."
+msgstr "Δεν μπορείτε να παίξετε online χωρίς πρόσβαση στο internet. Αν θέλετε να παίξετε online, πηγαίνετε στις ρυθμίσεις, επιλέξτε την καρτέλα «Ρυθμίσεις Χρήστη» και ελέγξτε το \"Σύνδεση στο Internet\". "
 
-#: src/states_screens/main_menu_screen.cpp:508
+#: src/states_screens/main_menu_screen.cpp:507
 msgid ""
 "You can not download addons without internet access. If you want to download"
-" addons, go to options, select the 'User Interface' tab, and check \"Connect"
-" to the Internet\"."
+" addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Δεν μπορείται να κατεβάσετε πρόσθετα χωρίς σύνδεση στο internet. Άμα θέλετε να κατεβάσετε πρόσθετα πηγαίνετε στις ρυθμίσεις, επιλέξτε την κατηγορία 'Ρυθμίσεις Χρήστη' και επιλέξτε \"Σύνδεση στο Internet\"."
 
-#: src/states_screens/main_menu_screen.cpp:517
+#: src/states_screens/main_menu_screen.cpp:515
 msgid ""
-"You can not download addons without internet access. If you want to download addons, go to options, select the 'User Interface' tab, and check \"Connect to the Internet\".\n"
+"You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr "Δεν μπορείται να κατεβάσετε πρόσθετα χωρίς σύνδεση στο internet. Άμα θέλετε να κατεβάσετε πρόσθετα, πηγαίνετε στις ρυθμίσεις, επιλέξτε την κατηγορία 'Ρυθμίσεις Χρήστη' και επιλέξτε \"Σύνδεση στο Internet\".\n\nΜπορείται όμως να διαγράψετε ήδη εγκατεστημένα πρόσθετα."
+msgstr "Δεν μπορείται να κατεβάσετε πρόσθετα χωρίς σύνδεση στο internet. Άμα θέλετε να κατεβάσετε πρόσθετα, πηγαίνετε στις ρυθμίσεις, επιλέξτε την καρτέλα 'Ρυθμίσεις Χρήστη' και επιλέξτε \"Σύνδεση στο Internet\".Μπορείται όμως να διαγράψετε ήδη εγκατεστημένα πρόσθετα."
 
-#: src/states_screens/main_menu_screen.cpp:553
+#: src/states_screens/main_menu_screen.cpp:550
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Τα πρόσθετα είναι προς το παρόν απενεργοποιημένα στην οθόνη Επιλογές"
 
-#: src/states_screens/main_menu_screen.cpp:565
+#: src/states_screens/main_menu_screen.cpp:562
 msgid "Please wait while the add-ons are loading"
 msgstr "Παρακαλώ περιμένετε καθώς φορτώνονται τα πρόσθετα"
 
@@ -4631,11 +4641,6 @@ msgstr "server %s"
 msgid "No. of grand prix track(s)"
 msgstr "Νουμ. αγώνα(ων) πρωταθλήματος"
 
-#. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/online/create_server_screen.cpp:174
-msgid "Battle mode"
-msgstr "Κατηγορία μάχης"
-
 #: src/states_screens/online/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "Το όνομα πρέπει να είναι μεταξύ 4 και 30 χαρακτήρων!"
@@ -4644,23 +4649,36 @@ msgstr "Το όνομα πρέπει να είναι μεταξύ 4 και 30 χ
 msgid "Incorrect characters in password!"
 msgstr "Άκυροι χαρακτήρες στον κωδικό!"
 
-#: src/states_screens/online/networking_lobby.cpp:186
-#: src/states_screens/online/networking_lobby.cpp:549
+#: src/states_screens/online/networking_lobby.cpp:204
+#: src/states_screens/online/networking_lobby.cpp:603
 msgid "Chat is disabled, enable in options menu."
 msgstr "Η συζήτηση είναι απενεργοποιημένη, ενεργοποίησέ την στις ρυθμίσεις."
 
-#: src/states_screens/online/networking_lobby.cpp:242
+#: src/states_screens/online/networking_lobby.cpp:260
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Δωμάτιο Αναμονής (ping: %dms)"
 
-#. I18N: In the networking lobby, show when player is required to wait
-#. before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:251
-msgid "Please wait for current game to end."
-msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι."
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with remaining time
+#: src/states_screens/online/networking_lobby.cpp:273
+#, c-format
+msgid "Please wait for the current game's end, estimated remaining time: %s."
+msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι, εκτμιση του χρόνου που απομένει: %s."
 
-#: src/states_screens/online/networking_lobby.cpp:280
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with progress in percent
+#: src/states_screens/online/networking_lobby.cpp:281
+msgid "Please wait for the current game's end, estimated progress: %d%."
+msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι, Εκτίμηση πρόοδου: %d%"
+
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish
+#: src/states_screens/online/networking_lobby.cpp:288
+msgid "Please wait for the current game's end."
+msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι. "
+
+#: src/states_screens/online/networking_lobby.cpp:318
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4669,7 +4687,7 @@ msgstr[1] "Το παιχνίδι θα ξεκινήσει όταν οι παίκ�
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:294
+#: src/states_screens/online/networking_lobby.cpp:332
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -4678,20 +4696,27 @@ msgid_plural ""
 msgstr[0] "Θα Ξεκινήσει μετά από %d δευτερόλεπτα, ή άμα όλοι έχουν πατίσει το κουμπί 'Έτοιμος'."
 msgstr[1] "Θα Ξεκινήσει μετά από %d δευτερόλεπτα, ή άμα όλοι έχουν πατίσει το κουμπί 'Έτοιμος'."
 
-#: src/states_screens/online/networking_lobby.cpp:327
+#: src/states_screens/online/networking_lobby.cpp:365
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Σύνδεση στον server %s"
 
-#: src/states_screens/online/networking_lobby.cpp:332
+#: src/states_screens/online/networking_lobby.cpp:370
 msgid "Finding a quick play server"
 msgstr "Αναζήτηση server για γρήγορο παιχνίδι"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:577
+#: src/states_screens/online/networking_lobby.cpp:631
 msgid "Ready"
 msgstr "Έτοιμος"
+
+#. I18N: In kart screen, show before the voting period in network ends.
+#: src/states_screens/online/network_kart_selection.cpp:137
+#: src/states_screens/online/tracks_screen.cpp:835
+#, c-format
+msgid "Remaining time: %d"
+msgstr "Υπόλοιπος χρόνος:%d"
 
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:82
@@ -4739,6 +4764,13 @@ msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Πρέπει να είσαι συνδεδεμένος για να παίξετε Παγκόσμιο. Επιλέξτε το όνομα χρήστη σου από πάνω."
 
+#: src/states_screens/online/online_screen.cpp:209
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr "Δεν μπορείτε να παίξετε online χωρίς πρόσβαση στο internet. Αν θέλετε να παίξετε online, πηγαίνετε στις επιλογές, επιλέξτε την καρτέλα «Ρυθμίσεις Χρήστη» και επεξεργαστείτε το \"Σύνδεση στο Internet\"."
+
 #: src/states_screens/online/online_screen.cpp:237
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
@@ -4760,7 +4792,7 @@ msgid "Searching"
 msgstr "Γίνεται αναζήτηση"
 
 #: src/states_screens/online/register_screen.cpp:120
-#: src/states_screens/options/user_screen.cpp:125
+#: src/states_screens/options/user_screen.cpp:126
 msgid "Exit game"
 msgstr "Έξοδος παιχνιδιού"
 
@@ -4804,32 +4836,44 @@ msgstr "Θα λάβετε ένα email με περαιτέρω οδηγίες γ
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Η πρόσβαση στο internet είναι απενεργοποιημένη, παρακαλώ ενεργοποιήστε την στις Ρυθμίσεις"
 
+#: src/states_screens/online/server_selection.cpp:119
+msgctxt "column_name"
+msgid "Name"
+msgstr "Όνομα"
+
+#: src/states_screens/online/server_selection.cpp:120
+msgctxt "column_name"
+msgid "Game mode"
+msgstr "Κατηγορία παιχνιδιού"
+
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
 #: src/states_screens/online/server_selection.cpp:127
+msgctxt "column_name"
 msgid "Owner"
 msgstr "Ιδιοκτήτης"
 
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/online/server_selection.cpp:129
+msgctxt "column_name"
 msgid "Distance (km)"
 msgstr "Απόσταση (χλμ.)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:215
+#: src/states_screens/online/server_selection.cpp:219
 msgid "Unknown"
 msgstr "Άγνωστο"
 
-#: src/states_screens/online/server_selection.cpp:323
+#: src/states_screens/online/server_selection.cpp:327
 msgid "No server is available."
 msgstr "Δεν υπάρχει διαθέσιμος server."
 
-#: src/states_screens/online/server_selection.cpp:331
+#: src/states_screens/online/server_selection.cpp:335
 msgid "Fetching servers"
 msgstr "Λήψη των server"
 
 #. I18N: In track screen for networking, clarify voting phase
-#: src/states_screens/online/tracks_screen.cpp:188
+#: src/states_screens/online/tracks_screen.cpp:300
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
@@ -4837,29 +4881,22 @@ msgstr "Άμα οι περισσότεροι παίκτες διαλέξουν �
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:288
-#: src/states_screens/online/tracks_screen.cpp:333
-#: src/states_screens/track_info_screen.cpp:219
+#: src/states_screens/online/tracks_screen.cpp:433
+#: src/states_screens/online/tracks_screen.cpp:481
+#: src/states_screens/track_info_screen.cpp:218
 msgid "Random item location"
 msgstr "Τυχαία τοποθέτηση αντικειμένων"
 
-#. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:357
-#: src/states_screens/track_info_screen.cpp:214
+#: src/states_screens/online/tracks_screen.cpp:511
+#: src/states_screens/track_info_screen.cpp:213
 msgid "Drive in reverse"
 msgstr "Οδήγηση αντίστροφα"
 
-#: src/states_screens/online/tracks_screen.cpp:426
+#: src/states_screens/online/tracks_screen.cpp:576
 #: src/states_screens/tracks_and_gp_screen.cpp:275
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Κλειδωμένο: λύσε τρέχουσες προκλήσεις για να κερδίσεις πρόσβαση σε περισσότερες!"
-
-#. I18N: In tracks screen, about voting of tracks in network
-#: src/states_screens/online/tracks_screen.cpp:521
-#, c-format
-msgid "Remaining time: %d"
-msgstr "Υπόλοιπος χρόνος:%d"
 
 #: src/states_screens/options/options_screen_device.cpp:70
 msgid "Action"
@@ -5034,109 +5071,109 @@ msgid "Hidden"
 msgstr "Κριμμένο"
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:411
+#: src/states_screens/options/options_screen_video.cpp:427
 msgid "Custom"
 msgstr "Προσαρμογή"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:447
+#: src/states_screens/options/options_screen_video.cpp:463
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Ποιότητα Εφέ: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:453
+#: src/states_screens/options/options_screen_video.cpp:469
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Κινούμενοι χαρακτήρες: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:456
+#: src/states_screens/options/options_screen_video.cpp:472
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Δυναμικός φωτισμός: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:459
+#: src/states_screens/options/options_screen_video.cpp:475
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Θόλωμα κίνησης: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:462
+#: src/states_screens/options/options_screen_video.cpp:478
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Anti-aliasing: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:465
+#: src/states_screens/options/options_screen_video.cpp:481
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Ambient occlusion: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:469
+#: src/states_screens/options/options_screen_video.cpp:485
 #, c-format
 msgid "Shadows: %s"
 msgstr "Σκιές: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:471
+#: src/states_screens/options/options_screen_video.cpp:487
 #, c-format
 msgid "Shadows: %i"
 msgstr "Σκιές: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:474
+#: src/states_screens/options/options_screen_video.cpp:490
 #, c-format
 msgid "Bloom: %s"
 msgstr "Λάμψη : %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:478
+#: src/states_screens/options/options_screen_video.cpp:494
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Λάμψη (περιγράμματων): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:482
+#: src/states_screens/options/options_screen_video.cpp:498
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Φωτεινές ακτίνες (ακτίνες Ηλίου) : %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:486
+#: src/states_screens/options/options_screen_video.cpp:502
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Βάθος πεδίου: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:491
+#: src/states_screens/options/options_screen_video.cpp:507
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Ποιότητα αποδιδόμενης εικόνας: %s"
 
-#: src/states_screens/options/user_screen.cpp:358
+#: src/states_screens/options/user_screen.cpp:363
 msgid "Internet access is disabled. Do you want to enable it?"
 msgstr "Η πρόσβαση στο internet είναι απενεργοποιημένη. Θέλετε να την ενεργοποιήσετε;"
 
-#: src/states_screens/options/user_screen.cpp:551
+#: src/states_screens/options/user_screen.cpp:556
 msgid "You need to enter a password."
 msgstr "Θα πρέπει να εισάγετε έναν κωδικό πρόσβασης."
 
-#: src/states_screens/options/user_screen.cpp:572
+#: src/states_screens/options/user_screen.cpp:577
 #, c-format
 msgid "Logging out '%s'"
 msgstr "Γίνεται αποσύνδεση του '%s'"
 
-#: src/states_screens/options/user_screen.cpp:573
+#: src/states_screens/options/user_screen.cpp:578
 #, c-format
 msgid "Logging in '%s'"
 msgstr "Γίνεται σύνδεση στο '%s'"
 
-#: src/states_screens/options/user_screen.cpp:654
+#: src/states_screens/options/user_screen.cpp:659
 msgid "You can't delete the only player."
 msgstr "Δεν μπορείς να διαγράψεις τον μοναδικό παίκτη"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:662
+#: src/states_screens/options/user_screen.cpp:667
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr "Είσαι σίγουρος οτι θέλεις να διαγράψεις τον παίκτη '%s';"
@@ -5182,7 +5219,7 @@ msgstr "Σύλλεξε νίτρο!"
 msgid "Follow the leader!"
 msgstr "Ακολούθησε τον αρχηγό!"
 
-#: src/states_screens/race_gui_base.cpp:846
+#: src/states_screens/race_gui_base.cpp:848
 #, c-format
 msgid "Top %i"
 msgstr "Καλύτεροι %i"
@@ -5244,24 +5281,24 @@ msgstr "Θέλεις πραγματικά να εγκαταλείψεις το �
 msgid "Network grand prix has been finished."
 msgstr "Το Πρωτάθλημα στο Internet ολοκληρώθηκε."
 
-#: src/states_screens/race_result_gui.cpp:497
+#: src/states_screens/race_result_gui.cpp:496
 #: src/states_screens/race_result_gui.cpp:1231
 msgid "Red Team Wins"
 msgstr "Κέρδισε η κόκκινη ομάδα"
 
-#: src/states_screens/race_result_gui.cpp:499
+#: src/states_screens/race_result_gui.cpp:498
 #: src/states_screens/race_result_gui.cpp:1235
 msgid "Blue Team Wins"
 msgstr "Κέρδισε η μπλε ομάδα"
 
-#: src/states_screens/race_result_gui.cpp:501
+#: src/states_screens/race_result_gui.cpp:500
 #: src/states_screens/race_result_gui.cpp:1240
 msgid "It's a draw"
 msgstr "Είναι ισοπαλία"
 
-#: src/states_screens/race_result_gui.cpp:563
-#: src/states_screens/race_result_gui.cpp:602
-#: src/states_screens/race_result_gui.cpp:700
+#: src/states_screens/race_result_gui.cpp:562
+#: src/states_screens/race_result_gui.cpp:601
+#: src/states_screens/race_result_gui.cpp:699
 #: src/states_screens/race_result_gui.cpp:1084
 msgid "Eliminated"
 msgstr "Αποκλείστηκε"
@@ -5321,13 +5358,13 @@ msgstr "Αγωνιστείτε ενάντια σε kart-φαντάσματα κ�
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:108
+#: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
 msgstr "Πίστα από τον %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:116
+#: src/states_screens/track_info_screen.cpp:115
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Μέγιστος αριθμός παικτών που υποστηρίζονται: %d"

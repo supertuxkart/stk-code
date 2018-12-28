@@ -229,18 +229,18 @@ void OptionsScreenVideo::init()
     assert( full != NULL );
     full->setState( UserConfigParams::m_fullscreen );
     
-    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
-    assert( full_text != NULL );
-
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     assert( rememberWinpos != NULL );
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
     rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
-    
+#ifdef DEBUG
+    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
+    assert( full_text != NULL );
+
     LabelWidget* rememberWinposText = 
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
-
+#endif
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
     {
@@ -384,9 +384,9 @@ void OptionsScreenVideo::init()
 #if defined(ANDROID)
     applyBtn->setVisible(false);
     full->setVisible(false);
-    full_text->setVisible(false);
+    getWidget<LabelWidget>("fullscreenText")->setVisible(false);
     rememberWinpos->setVisible(false);
-    rememberWinposText->setVisible(false);
+    getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
 #endif
 }   // init
 

@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/network_user_dialog.hpp"
 
 #include "config/player_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -101,7 +102,27 @@ void NetworkUserDialog::beforeAddingWidgets()
     }
     else
         getWidget<IconButtonWidget>("accept")->setVisible(false);
-    getWidget<IconButtonWidget>("remove")->setVisible(false);
+
+    m_handicap_widget = NULL;
+    if (m_host_id == STKHost::get()->getMyHostId())
+    {
+        m_handicap_widget = getWidget<IconButtonWidget>("remove");
+        m_handicap_widget->setVisible(true);
+        if (m_per_player_difficulty == PLAYER_DIFFICULTY_NORMAL)
+        {
+            //I18N: In the network user dialog
+            m_handicap_widget->setText(_("Enable handicap"));
+        }
+        else
+        {
+            //I18N: In the network user dialog
+            m_handicap_widget->setText(_("Disable handicap"));
+        }
+        m_handicap_widget->setImage(irr_driver->getTexture(FileManager::MODEL,
+            "anchor-icon.png"));
+    }
+    else
+        getWidget<IconButtonWidget>("remove")->setVisible(false);
     getWidget<IconButtonWidget>("enter")->setVisible(false);
 }   // beforeAddingWidgets
 
@@ -144,7 +165,7 @@ GUIEngine::EventPropagation
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == m_friend_widget->m_properties[PROP_ID])
+        else if (selection == m_friend_widget->m_properties[PROP_ID])
         {
             XMLRequest *request = new XMLRequest();
             PlayerManager::setUserDetails(request, "friend-request");
@@ -153,7 +174,7 @@ GUIEngine::EventPropagation
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == m_kick_widget->m_properties[PROP_ID])
+        else if (selection == m_kick_widget->m_properties[PROP_ID])
         {
             NetworkString kick(PROTOCOL_LOBBY_ROOM);
             kick.addUInt8(LobbyProtocol::LE_KICK_HOST).addUInt32(m_host_id);
@@ -161,12 +182,28 @@ GUIEngine::EventPropagation
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == m_change_team_widget->m_properties[PROP_ID])
+        else if (m_change_team_widget &&
+            selection == m_change_team_widget->m_properties[PROP_ID])
         {
             NetworkString change_team(PROTOCOL_LOBBY_ROOM);
             change_team.addUInt8(LobbyProtocol::LE_CHANGE_TEAM)
                 .addUInt8(m_local_id);
             STKHost::get()->sendToServer(&change_team, true/*reliable*/);
+            m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (m_handicap_widget &&
+            selection == m_handicap_widget->m_properties[PROP_ID])
+        {
+            PerPlayerDifficulty new_difficulty = PLAYER_DIFFICULTY_NORMAL;
+            if (m_per_player_difficulty == PLAYER_DIFFICULTY_NORMAL)
+            {
+                new_difficulty = PLAYER_DIFFICULTY_HANDICAP;
+            }
+            NetworkString change_handicap(PROTOCOL_LOBBY_ROOM);
+            change_handicap.addUInt8(LobbyProtocol::LE_CHANGE_HANDICAP)
+                .addUInt8(m_local_id).addUInt8(new_difficulty);
+            STKHost::get()->sendToServer(&change_handicap, true/*reliable*/);
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }

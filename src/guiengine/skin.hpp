@@ -338,7 +338,7 @@ namespace GUIEngine
         void drawBadgeOn(const Widget* widget, const core::rect<s32>& rect);
         void drawProgressBarInScreen(SkinWidgetContainer* swc,
                                      const core::rect< s32 > &rect,
-                                     int progress, bool deactivated = false);
+                                     float progress, bool deactivated = false);
 
         // irrlicht's callbacks
         virtual void draw2DRectangle (gui::IGUIElement *element,

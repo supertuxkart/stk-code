@@ -505,7 +505,7 @@ namespace UserConfigParams
             "considered as centered in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_x
-            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_sensitivity_x",
+            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_sensitivity_x",
             &m_multitouch_group,
             "A parameter in range [0, 1.0] that determines the sensitivity for x axis."));
             
@@ -529,7 +529,7 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_mode",
             &m_multitouch_group,
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
-            "keyboard, 2 = always enabled") );
+            "keyboard, 2 = always enabled, 3 = android keyboard (experimental)") );
             
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
@@ -851,6 +851,10 @@ namespace UserConfigParams
             PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
+    PARAM_PREFIX BoolUserConfigParam         m_light_scatter
+            PARAM_DEFAULT(BoolUserConfigParam(true,
+                           "light_scatter", &m_graphics_quality,
+                           "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,

@@ -116,17 +116,17 @@ void ServerSelection::loadedFromFile()
 void ServerSelection::beforeAddingWidget()
 {
     m_server_list_widget->clearColumns();
-    m_server_list_widget->addColumn( _("Name"), 3);
-    m_server_list_widget->addColumn( _("Players"), 1);
-    m_server_list_widget->addColumn(_("Difficulty"), 1);
-    m_server_list_widget->addColumn(_("Game mode"), 2);
+    m_server_list_widget->addColumn( _C("column_name", "Name"), 7);
+    m_server_list_widget->addColumn(_C("column_name", "Game mode"), 3);
+    m_server_list_widget->addColumn( _C("column_name", "Players"), 2);
+    m_server_list_widget->addColumn(_C("column_name", "Difficulty"), 3);
     if (NetworkConfig::get()->isWAN())
     {
         // I18N: In server selection screen, owner of server, only displayed
         // if it's localhost or friends'
-        m_server_list_widget->addColumn(_("Owner"), 1);
+        m_server_list_widget->addColumn(_C("column_name", "Owner"), 3);
         // I18N: In server selection screen, distance to server
-        m_server_list_widget->addColumn(_("Distance (km)"), 1);
+        m_server_list_widget->addColumn(_C("column_name", "Distance (km)"), 3);
     }
 }   // beforeAddingWidget
 
@@ -140,8 +140,11 @@ void ServerSelection::init()
     m_searcher->clearListeners();
     m_searcher->addListener(this);
     m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
-    m_server_list_widget->setIcons(m_icon_bank,
-                                   int(getHeight() / 12.0f));
+    
+    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12.0f
+                                                       : getHeight() / 15.0f;
+    
+    m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
     refresh(true);
@@ -166,13 +169,13 @@ void ServerSelection::loadList()
                 return c->getLowerCaseName() > d->getLowerCaseName();
                 break;
             case 1:
-                return c->getCurrentPlayers() > d->getCurrentPlayers();
+                return c->getServerMode() > d->getServerMode();
                 break;
             case 2:
-                return c->getDifficulty() > d->getDifficulty();
+                return c->getCurrentPlayers() > d->getCurrentPlayers();
                 break;
             case 3:
-                return c->getServerMode() > d->getServerMode();
+                return c->getDifficulty() > d->getDifficulty();
                 break;
             case 4:
                 return c->getServerOwnerLowerCaseName() >
@@ -194,28 +197,29 @@ void ServerSelection::loadList()
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), icon,
-            3));
-        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1,
+            7));
+
+        core::stringw mode =
+            ServerConfig::getModeName(server->getServerMode());
+        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 3, true));
+
+        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 2,
             true));
 
         core::stringw difficulty =
             race_manager->getDifficultyName(server->getDifficulty());
-        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1,
+        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 3,
             true));
-
-        core::stringw mode =
-            ServerConfig::getModeName(server->getServerMode());
-        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 2, true));
 
         if (NetworkConfig::get()->isWAN())
         {
             row.push_back(GUIEngine::ListWidget::ListCell(
-                server->getServerOwnerName(), -1, 1, true));
+                server->getServerOwnerName(), -1, 3, true));
             // I18N: In server selection screen, unknown distance to server
             core::stringw distance = _("Unknown");
             if (!(server->getDistance() < 0.0f))
                 distance = StringUtils::toWString(server->getDistance());
-            row.push_back(GUIEngine::ListWidget::ListCell(distance, -1, 1,
+            row.push_back(GUIEngine::ListWidget::ListCell(distance, -1, 3,
                 true));
         }
         m_server_list_widget->addItem("server", row);

@@ -168,7 +168,8 @@ bool Plunger::updateAndDelete(int ticks)
  */
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
-    if (isOwnerImmunity(kart) || m_moved_to_infinity) return false;
+    if (isOwnerImmunity(kart) || m_moved_to_infinity || m_undo_creation)
+        return false;
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
@@ -257,7 +258,7 @@ BareNetworkString* Plunger::saveState(std::vector<std::string>* ru)
     if (!buffer)
         return NULL;
 
-    buffer->addUInt16(m_keep_alive).addUInt8(m_moved_to_infinity ? 1 : 0);
+    buffer->addUInt16(m_keep_alive);
     if (m_rubber_band)
         buffer->addUInt8(m_rubber_band->get8BitState());
     else
@@ -270,7 +271,7 @@ void Plunger::restoreState(BareNetworkString *buffer, int count)
 {
     Flyable::restoreState(buffer, count);
     m_keep_alive = buffer->getUInt16();
-    m_moved_to_infinity = buffer->getUInt8() == 1;
+    m_moved_to_infinity = false;
     uint8_t bit_state = buffer->getUInt8();
     if (bit_state == 255 && m_rubber_band)
     {

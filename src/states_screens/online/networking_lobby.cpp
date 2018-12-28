@@ -35,14 +35,16 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
+#include "states_screens/dialogs/server_configuration_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <utfwrapping.h>
@@ -93,6 +95,9 @@ void NetworkingLobby::loadedFromFile()
     m_start_button = getWidget<IconButtonWidget>("start");
     assert(m_start_button!= NULL);
 
+    m_config_button = getWidget<IconButtonWidget>("config");
+    assert(m_config_button!= NULL);
+
     m_text_bubble = getWidget<LabelWidget>("text");
     assert(m_text_bubble != NULL);
 
@@ -124,8 +129,17 @@ void NetworkingLobby::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon_3);
     m_icon_bank->addTextureAsSprite(icon_4);
     m_icon_bank->addTextureAsSprite(icon_5);
-    const int screen_width = irr_driver->getFrameSize().Width;
-    m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
+    
+
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        m_icon_bank->setScale(getHeight() / 15.0f / 128.0f);
+    }
+    else
+    {
+        const int screen_width = irr_driver->getFrameSize().Width;
+        m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
+    }
 }   // loadedFromFile
 
 // ---------------------------------------------------------------------------
@@ -142,7 +156,7 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
-    getWidget("config")->setVisible(false);
+    m_server_configurable = false;
     m_player_names.clear();
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
@@ -157,6 +171,7 @@ void NetworkingLobby::init()
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setLabel(_("Start race"));
     m_start_button->setVisible(false);
+    m_config_button->setVisible(false);
     m_state = LS_CONNECTING;
     getWidget("chat")->setVisible(false);
     getWidget("chat")->setActive(false);
@@ -249,9 +264,29 @@ void NetworkingLobby::onUpdate(float delta)
     {
         m_start_button->setVisible(false);
         m_timeout_message->setVisible(true);
-        //I18N: In the networking lobby, show when player is required to wait
-        //before the current game finish
-        core::stringw msg = _("Please wait for current game to end.");
+        auto progress = cl->getGameStartedProgress();
+        core::stringw msg;
+        if (progress.first != std::numeric_limits<uint32_t>::max())
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish with remaining time
+            msg = _("Please wait for the current game's end, "
+                "estimated remaining time: %s.",
+                StringUtils::timeToString((float)progress.first).c_str());
+        }
+        else if (progress.second != std::numeric_limits<uint32_t>::max())
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish with progress in percent
+            msg = _("Please wait for the current game's end, "
+                "estimated progress: %d%.", progress.second);
+        }
+        else
+        {
+            //I18N: In the networking lobby, show when player is required to
+            //wait before the current game finish
+            msg = _("Please wait for the current game's end.");
+        }
         m_timeout_message->setText(msg, false);
         core::stringw total_msg;
         for (auto& string : m_server_info)
@@ -348,6 +383,9 @@ void NetworkingLobby::onUpdate(float delta)
         m_text_bubble->setText(total_msg, true);
     }
 
+    m_config_button->setVisible(STKHost::get()->isAuthorisedToControl() &&
+        m_server_configurable);
+
     if (STKHost::get()->isAuthorisedToControl() ||
         (m_has_auto_start_in_server &&
         m_cur_starting_timer != std::numeric_limits<int64_t>::max()))
@@ -430,7 +468,9 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             host_online_local_ids[1], host_online_local_ids[2],
             std::get<0>(m_player_names.at(
             m_player_list->getSelectionInternalName())),
-            m_allow_change_team);
+            m_allow_change_team,
+            std::get<3>(m_player_names.at(
+            m_player_list->getSelectionInternalName())));
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
@@ -443,6 +483,16 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         NetworkString start(PROTOCOL_LOBBY_ROOM);
         start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendToServer(&start, true);
+    }
+    else if (name == m_config_button->m_properties[PROP_ID])
+    {
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (cl)
+        {
+            new ServerConfigurationDialog(
+                race_manager->isSoccerMode() &&
+                cl->getGameSetup()->isSoccerGoalTarget());
+        }
     }
 }   // eventCallback
 
@@ -479,7 +529,7 @@ bool NetworkingLobby::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
                                     uint32_t, uint32_t, core::stringw,
-                                    int, KartTeam> >& p)
+                                    int, KartTeam, PerPlayerDifficulty> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
@@ -512,7 +562,8 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
         else if (cur_team == KART_TEAM_BLUE)
             m_player_list->markItemBlue(i);
         m_player_names[internal_name] =
-            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team);
+            std::make_tuple(std::get<3>(q), std::get<4>(q), cur_team,
+            std::get<6>(q));
     }
     updatePlayerPings();
 }   // updatePlayers

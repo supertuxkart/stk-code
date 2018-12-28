@@ -66,8 +66,8 @@ private:
     NetworkingLobby();
 
     float m_ping_update_timer;
-    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam> >
-        m_player_names;
+    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam,
+        PerPlayerDifficulty> > m_player_names;
     std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
@@ -76,13 +76,15 @@ private:
     int64_t m_cur_starting_timer;
     unsigned m_min_start_game_players;
 
-    bool m_allow_change_team, m_has_auto_start_in_server;
+    bool m_allow_change_team, m_has_auto_start_in_server,
+        m_server_configurable;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
     GUIEngine::LabelWidget* m_text_bubble;
     GUIEngine::LabelWidget* m_timeout_message;
     GUIEngine::IconButtonWidget* m_start_button;
+    GUIEngine::IconButtonWidget* m_config_button;
     GUIEngine::ListWidget* m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
     GUIEngine::ButtonWidget* m_send_button;
@@ -135,14 +137,14 @@ public:
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, uint32_t/*local player id*/,
                        core::stringw/*player name*/, int/*icon id*/,
-                       KartTeam> >& p);
+                       KartTeam, PerPlayerDifficulty> >& p);
     void openSplitscreenDialog(InputDevice* device);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
     void initAutoStartTimer(bool grand_prix_started, unsigned min_players,
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t);
-
+    void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
 };   // class NetworkingLobby
 
 #endif

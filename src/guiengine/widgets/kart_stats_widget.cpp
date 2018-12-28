@@ -103,8 +103,8 @@ void KartStatsWidget::setValues(const KartProperties* props,
     // So values should be in the 0-99 range
 
     // The base mass is of 350 ; 350/3.89 ~= 90
-    m_skills[SKILL_MASS]->setValue((int)
-    	(kp_computed.getCombinedCharacteristic()->getMass()/3.89f));
+    m_skills[SKILL_MASS]->setValue(
+    	kp_computed.getCombinedCharacteristic()->getMass()/3.89f);
     m_skills[SKILL_MASS]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI_ICON, "mass.png").c_str()));    
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
@@ -112,8 +112,8 @@ void KartStatsWidget::setValues(const KartProperties* props,
     
     // The base speed is of 25
     // Here we are not fully proportional, because small differences matter more
-    m_skills[SKILL_SPEED]->setValue((int)
-    	((kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20) * 15));
+    m_skills[SKILL_SPEED]->setValue(
+    	(kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20.0f) * 15.0f);
     m_skills[SKILL_SPEED]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI_ICON, "speed.png").c_str()));    
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
@@ -123,7 +123,7 @@ void KartStatsWidget::setValues(const KartProperties* props,
     // We call a function which gives us a single number to represent it
     // power/mass gives numbers in the 1-10 range, so we multiply it by 10.
 
-    m_skills[SKILL_ACCELERATION]->setValue((int)(kp_computed.getAccelerationEfficiency()*10));
+    m_skills[SKILL_ACCELERATION]->setValue(kp_computed.getAccelerationEfficiency()*10.0f);
     m_skills[SKILL_ACCELERATION]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI_ICON, "power.png").c_str()));    
     m_skills[SKILL_ACCELERATION]->m_properties[PROP_ID] =
@@ -133,8 +133,8 @@ void KartStatsWidget::setValues(const KartProperties* props,
     // The base nitro consumption is 1, higher for heavier karts.
     // Nitro efficiency is hence 90/nitro_consumption
 
-    m_skills[SKILL_NITRO_EFFICIENCY]->setValue((int)
-        (90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption()));
+    m_skills[SKILL_NITRO_EFFICIENCY]->setValue(
+        90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption());
     m_skills[SKILL_NITRO_EFFICIENCY]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI_ICON, "nitro.png").c_str()));    
     m_skills[SKILL_NITRO_EFFICIENCY]->m_properties[PROP_ID] =
@@ -181,7 +181,7 @@ void KartStatsWidget::move(int x, int y, int w, int h)
 // -----------------------------------------------------------------------------
 /** Set value for given type
  */
-void KartStatsWidget::setValue(Stats type, int value)
+void KartStatsWidget::setValue(Stats type, float value)
 {
     m_skills[type]->setValue(value);
 }   // setValue
@@ -189,7 +189,7 @@ void KartStatsWidget::setValue(Stats type, int value)
 // -----------------------------------------------------------------------------
 /** Get value for given type
  */
-int KartStatsWidget::getValue(Stats type)
+float KartStatsWidget::getValue(Stats type)
 {
     return m_skills[type]->getValue();
 }   // getVAlue

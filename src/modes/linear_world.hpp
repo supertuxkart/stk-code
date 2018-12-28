@@ -201,6 +201,9 @@ public:
     {
         m_fastest_lap_ticks = ticks;
     }
+    // ------------------------------------------------------------------------
+    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+        OVERRIDE;
 };   // LinearWorld
 
 #endif

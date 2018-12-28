@@ -1251,6 +1251,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     {
         NetworkConfig::get()->setServerIdFile(
             file_manager->getUserConfigFile(s));
+        ServerConfig::m_server_configurable = true;
     }
     if (CommandLine::has("--disable-polling"))
     {
@@ -1654,14 +1655,14 @@ void initUserConfig()
 //=============================================================================
 void initRest()
 {
-
+    SP::setMaxTextureSize();
     irr_driver = new IrrDriver();
-    
+
     if (irr_driver->getDevice() == NULL)
     {
         Log::fatal("main", "Couldn't initialise irrlicht device. Quitting.\n");
     }
-    
+
     StkTime::init();   // grabs the timer object from the irrlicht device
 
     // Now create the actual non-null device in the irrlicht driver

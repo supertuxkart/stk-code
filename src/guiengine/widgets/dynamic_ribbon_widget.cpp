@@ -530,6 +530,33 @@ void DynamicRibbonWidget::clearItems()
 }
 
 // -----------------------------------------------------------------------------
+void DynamicRibbonWidget::setBadge(const std::string &name, BadgeType badge)
+{
+    for (unsigned int r = 0; r < m_rows.size(); r++)
+    {
+        for (unsigned int c = 0; c < m_rows[r].m_children.size(); c++)
+        {
+            if(m_rows[r].m_children[c].m_properties[PROP_ID]==name)
+                m_rows[r].m_children[c].setBadge(badge);
+            else
+                m_rows[r].m_children[c].unsetBadge(badge);
+        }
+    }
+    
+    for (unsigned int i = 0; i < m_items.size(); i++)
+    {
+        if (m_items[i].m_code_name == name)
+        {
+            m_items[i].m_badges |= int(badge);
+        }
+        else
+        {
+            m_items[i].m_badges &= (~int(badge));
+        }
+    }
+}   // setBadge
+
+// -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
 {
     Widget::elementRemoved();
