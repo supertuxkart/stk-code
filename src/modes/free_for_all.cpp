@@ -61,6 +61,7 @@ void FreeForAll::init()
 void FreeForAll::reset(bool restart)
 {
     WorldWithRank::reset(restart);
+    m_count_down_reached_zero = false;
     if (race_manager->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
