@@ -225,8 +225,7 @@ void TracksScreen::beforeAddingWidget()
     m_track_icons->clear();
     if (m_network_tracks)
     {
-        rect_box->setVisible(true);
-        rect_box->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_bottom_box_height);
+        rect_box->setCollapsed(false, m_bottom_box_height);
         getWidget("lap-text")->setVisible(true);
         m_laps = getWidget<SpinnerWidget>("lap-spinner");
         assert(m_laps != NULL);
@@ -317,8 +316,7 @@ void TracksScreen::beforeAddingWidget()
     else
     {
         m_timer->setVisible(false);
-        rect_box->setVisible(false);
-        rect_box->m_properties[GUIEngine::PROP_HEIGHT] = "0";
+        rect_box->setCollapsed(true);
         m_laps = NULL;
         m_reversed = NULL;
         getWidget("lap-text")->setVisible(false);
