@@ -275,6 +275,10 @@ namespace GUIEngine
         bool m_has_tooltip;
         irr::core::stringw m_tooltip_text;
 
+
+        /** height of the widget before it was collapsed (only set if widget got collapsed) */
+        int m_uncollapsed_height;
+
     public:
 
         /**
@@ -345,6 +349,16 @@ namespace GUIEngine
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
         virtual void setVisible(bool visible);
+
+        /**
+         * \brief Sets the widget (and its children, if any) collapsed or not.
+         * !!! Note: this has to be called inside beforeAddingWidget() !!!
+         * This will also set the widget invisible depending of collapsed state.
+         * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
+         * undefined behavior may ensue (like invisible but clickable buttons).
+         */
+        virtual void setCollapsed(bool collapsed, Screen* calling_screen);
 
         /** Returns if the element is visible. */
         bool isVisible() const;

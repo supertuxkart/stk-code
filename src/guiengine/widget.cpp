@@ -344,6 +344,27 @@ void Widget::setVisible(bool visible)
 
 // -----------------------------------------------------------------------------
 
+void Widget::setCollapsed(bool collapsed, Screen* calling_screen)
+{
+    if (m_h != 0)
+        m_uncollapsed_height = m_h;
+
+    setVisible(!collapsed);
+
+    if (collapsed)
+    {
+        m_properties[GUIEngine::PROP_HEIGHT] = "0";
+    }
+    else
+    {
+        m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_uncollapsed_height);
+    }
+
+    calling_screen->calculateLayout();
+}
+
+// -----------------------------------------------------------------------------
+
 void Widget::moveIrrlichtElement()
 {
     if (m_element != NULL)
