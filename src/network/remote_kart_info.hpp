@@ -22,6 +22,7 @@
 #ifndef HEADER_REMOTE_KART_INFO_HPP
 #define HEADER_REMOTE_KART_INFO_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <irrString.h>
@@ -41,6 +42,8 @@ enum PerPlayerDifficulty : uint8_t
     PLAYER_DIFFICULTY_COUNT
 };
 
+class NetworkPlayerProfile;
+
 class RemoteKartInfo
 {
         std::string         m_kart_name;
@@ -53,6 +56,7 @@ class RemoteKartInfo
         PerPlayerDifficulty m_difficulty;
         float               m_default_kart_color;
         uint32_t            m_online_id;
+        std::weak_ptr<NetworkPlayerProfile> m_profile;
 public:
      RemoteKartInfo(int player_id, const std::string& kart_name,
                     const irr::core::stringw& user_name, int host_id,
@@ -99,7 +103,11 @@ public:
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
     float getDefaultKartColor() const      { return m_default_kart_color; }
     uint32_t getOnlineId() const           { return m_online_id;          }
-
+    void setNetworkPlayerProfile(
+        std::weak_ptr<NetworkPlayerProfile> npp)       { m_profile = npp; }
+    std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const
+                                                      { return m_profile; }
+    bool disconnected() const               { return m_profile.expired(); }
     bool operator<(const RemoteKartInfo& other) const
     {
         return ((m_host_id<other.m_host_id) ||

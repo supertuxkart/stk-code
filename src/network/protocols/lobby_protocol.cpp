@@ -99,7 +99,7 @@ void LobbyProtocol::configRemoteKart(
     // -------------------------------------------------
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        std::shared_ptr<NetworkPlayerProfile> profile = players[i];
+        const std::shared_ptr<NetworkPlayerProfile>& profile = players[i];
         bool is_local = profile->isLocalPlayer();
 
         // All non-local players are created here. This means all players
@@ -128,6 +128,7 @@ void LobbyProtocol::configRemoteKart(
         rki.setOnlineId(profile->getOnlineId());
         if (race_manager->teamEnabled())
             rki.setKartTeam(profile->getTeam());
+        rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players

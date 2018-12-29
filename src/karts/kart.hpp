@@ -120,17 +120,19 @@ protected:
     // Graphical effects
     // -----------------
 
+#ifndef SERVER_ONLY
     /** The shadow of a kart. */
     std::unique_ptr<Shadow> m_shadow;
+
+    /** The skidmarks object for this kart. */
+    std::unique_ptr<SkidMarks> m_skidmarks;
+#endif
 
     /** All particle effects. */
     std::unique_ptr<KartGFX> m_kart_gfx;
 
     /** Handles all slipstreaming. */
     std::unique_ptr<SlipStream> m_slipstream;
-
-    /** The skidmarks object for this kart. */
-    std::unique_ptr<SkidMarks> m_skidmarks;
 
     // Bullet physics parameters
     // -------------------------

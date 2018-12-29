@@ -1225,14 +1225,14 @@ void ServerLobby::checkRaceFinished()
             m_result_ns->encodeString(gp_track);
 
         // each kart score and total time
-        auto& players = m_game_setup->getPlayers();
-        m_result_ns->addUInt8((uint8_t)players.size());
-        for (unsigned i = 0; i < players.size(); i++)
+        m_result_ns->addUInt8((uint8_t)race_manager->getNumPlayers());
+        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
         {
             int last_score = race_manager->getKartScore(i);
             int cur_score = last_score;
             float overall_time = race_manager->getOverallTime(i);
-            if (auto player = players[i].lock())
+            if (auto player =
+                race_manager->getKartInfo(i).getNetworkPlayerProfile().lock())
             {
                 last_score = player->getScore();
                 cur_score += last_score;
@@ -1273,8 +1273,8 @@ void ServerLobby::computeNewRankings()
     std::vector<double> scores_change;
     std::vector<double> new_scores;
 
-    auto players = m_game_setup->getConnectedPlayers(true/*same_offset*/);
-    for (unsigned i = 0; i < players.size(); i++)
+    unsigned player_count = race_manager->getNumPlayers();
+    for (unsigned i = 0; i < player_count; i++)
     {
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
         new_scores.push_back(m_scores.at(id));
@@ -1282,14 +1282,14 @@ void ServerLobby::computeNewRankings()
     }
  
     // First, update the number of ranked races
-    for (unsigned i = 0; i < players.size(); i++)
+    for (unsigned i = 0; i < player_count; i++)
     {
          const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
          m_num_ranked_races.at(id)++;
     }
 
     // Now compute points exchanges
-    for (unsigned i = 0; i < players.size(); i++)
+    for (unsigned i = 0; i < player_count; i++)
     {
         scores_change.push_back(0.0);
 
@@ -1302,7 +1302,7 @@ void ServerLobby::computeNewRankings()
         double player1_factor =
             computeRankingFactor(race_manager->getKartInfo(i).getOnlineId());
 
-        for (unsigned j = 0; j < players.size(); j++)
+        for (unsigned j = 0; j < player_count; j++)
         {
             // Don't compare a player with himself
             if (i == j)
@@ -1373,7 +1373,7 @@ void ServerLobby::computeNewRankings()
     }
 
     // Don't merge it in the main loop as new_scores value are used there
-    for (unsigned i = 0; i < players.size(); i++)
+    for (unsigned i = 0; i < player_count; i++)
     {
         new_scores[i] += scores_change[i];
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
