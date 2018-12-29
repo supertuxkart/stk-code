@@ -358,7 +358,17 @@ namespace GUIEngine
          * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
-        virtual void setCollapsed(bool collapsed, Screen* calling_screen);
+        virtual void setCollapsed(bool collapsed, Screen* calling_screen = NULL);
+
+        /**
+         * \brief Sets the widget (and its children, if any) collapsed or not.
+         * !!! Note: this has to be called inside beforeAddingWidget() !!!
+         * This will also set the widget invisible depending of collapsed state.
+         * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
+         * undefined behavior may ensue (like invisible but clickable buttons).
+         */
+        virtual void setCollapsed(bool collapsed, int uncollapsed_height, Screen* calling_screen = NULL);
 
         /** Returns if the element is visible. */
         bool isVisible() const;
