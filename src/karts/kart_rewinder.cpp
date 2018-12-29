@@ -64,6 +64,8 @@ void KartRewinder::reset()
     m_has_server_state = false;
 }   // reset
 
+
+
 // ----------------------------------------------------------------------------
 /** This function is called immediately before a rewind is done and saves
  *  the current transform for the kart. The difference between this saved

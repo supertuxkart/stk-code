@@ -262,9 +262,45 @@ void World::init()
 
         }   // if server with graphics of is watching replay
     } // if getNumCameras()==0
-    initTeamArrows();
+
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
+    for (unsigned int i = 0; i < kart_amount; i++)
+        initTeamArrows(m_karts[i].get());
+
     main_loop->renderGUI(7300);
 }   // init
+
+//-----------------------------------------------------------------------------
+void World::initTeamArrows(AbstractKart* k)
+{
+    if (!hasTeam())
+        return;
+#ifndef SERVER_ONLY
+    //Loading the indicator textures
+    std::string red_path =
+            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
+    std::string blue_path =
+            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
+
+    // Assigning indicators
+    scene::ISceneNode *arrow_node = NULL;
+
+    KartModel* km = k->getKartModel();
+    // Color of karts can be changed using shaders if the model supports
+    if (km->supportColorization() && CVS->isGLSL())
+        return;
+
+    float arrow_pos_height = km->getHeight() + 0.5f;
+    KartTeam team = getKartTeam(k->getWorldKartId());
+
+    arrow_node = irr_driver->addBillboard(
+        core::dimension2d<irr::f32>(0.3f,0.3f),
+        team == KART_TEAM_BLUE ? blue_path : red_path,
+        k->getNode());
+
+    arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
+#endif
+}   // initTeamArrows
 
 //-----------------------------------------------------------------------------
 /** This function is called before a race is started (i.e. either after
@@ -1489,44 +1525,6 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
     assert(n != m_kart_team_map.end());
     return n->second;
 }   // getKartTeam
-
-
-//-----------------------------------------------------------------------------
-void World::initTeamArrows()
-{
-    if (!hasTeam())
-        return;
-#ifndef SERVER_ONLY
-    const unsigned int kart_amount = (unsigned int)m_karts.size();
-
-    //Loading the indicator textures
-    std::string red_path =
-            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
-    std::string blue_path =
-            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
-
-    //Assigning indicators
-    for(unsigned int i = 0; i < kart_amount; i++)
-    {
-        scene::ISceneNode *arrow_node = NULL;
-
-        KartModel* km = m_karts[i]->getKartModel();
-        // Color of karts can be changed using shaders if the model supports
-        if (km->supportColorization() && CVS->isGLSL()) continue;
-
-        float arrow_pos_height = km->getHeight() + 0.5f;
-        KartTeam team = getKartTeam(i);
-
-        arrow_node = irr_driver->addBillboard(
-            core::dimension2d<irr::f32>(0.3f,0.3f),
-            team == KART_TEAM_BLUE ? blue_path : red_path,
-            m_karts[i]->getNode());
-
-        arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
-    }
-#endif
-}   // initTeamArrows
-
 
 //-----------------------------------------------------------------------------
 void World::setAITeam()

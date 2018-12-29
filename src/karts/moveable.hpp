@@ -33,6 +33,7 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <memory>
 #include <string>
 
 class Material;
@@ -55,10 +56,9 @@ private:
     float                  m_roll;
 protected:
     UserPointer            m_user_pointer;
-    scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;
-    btRigidBody           *m_body;
-    KartMotionState       *m_motion_state;
+    std::unique_ptr<btRigidBody> m_body;
+    std::unique_ptr<KartMotionState> m_motion_state;
     // ------------------------------------------------------------------------
     void updateSmoothedGraphics(float dt);
     // ------------------------------------------------------------------------
@@ -119,7 +119,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void  reset();
     virtual void  update(int ticks) ;
-    btRigidBody  *getBody() const {return m_body; }
+    btRigidBody  *getBody() const {return m_body.get(); }
     void          createBody(float mass, btTransform& trans,
                              btCollisionShape *shape,
                              float restitution);

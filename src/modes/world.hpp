@@ -194,8 +194,6 @@ protected:
      */
     virtual float estimateFinishTimeForKart(AbstractKart* kart)
                                         {return getTime(); }
-    /** Set the team arrow on karts if necessary*/
-    void initTeamArrows();
     void updateAchievementDataEndRace();
     void updateAchievementModeCounters(bool start);
 
@@ -362,6 +360,9 @@ public:
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
     // ------------------------------------------------------------------------
     bool isNetworkWorld() const { return m_is_network_world; }
+    // ------------------------------------------------------------------------
+    /** Set the team arrow on karts if necessary*/
+    void initTeamArrows(AbstractKart* k);
     // ------------------------------------------------------------------------
     /** Used by server to get the current started game progress in either or
      *  both remaining time or progress in percent. uint32_t max for either or

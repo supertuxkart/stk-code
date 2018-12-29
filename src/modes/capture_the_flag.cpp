@@ -70,6 +70,8 @@ CaptureTheFlag::CaptureTheFlag() : FreeForAll()
 CaptureTheFlag::~CaptureTheFlag()
 {
 #ifndef SERVER_ONLY
+    m_red_flag_node->drop();
+    m_blue_flag_node->drop();
     irr_driver->dropAllTextures(m_red_flag_mesh);
     irr_driver->dropAllTextures(m_blue_flag_mesh);
     irr_driver->removeMeshFromCache(m_red_flag_mesh);
@@ -98,6 +100,8 @@ void CaptureTheFlag::init()
         "blue_flag");
     assert(m_red_flag_node);
     assert(m_blue_flag_node);
+    m_red_flag_node->grab();
+    m_blue_flag_node->grab();
 
     std::string red_path =
         file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
