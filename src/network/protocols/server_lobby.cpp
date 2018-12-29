@@ -629,12 +629,14 @@ void ServerLobby::update(int ticks)
         sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
         m_state.load() <= RACING && m_server_has_loaded_world.load() == true)
     {
-        auto players = m_game_setup->getConnectedPlayers(true/*same_offset*/);
-        for (unsigned i = 0; i < players.size(); i++)
+        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
         {
-            if (!players[i])
+            const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            std::shared_ptr<NetworkPlayerProfile> player =
+                rki.getNetworkPlayerProfile().lock();
+            if (!player)
                 continue;
-            auto peer = players[i]->getPeer();
+            auto peer = player->getPeer();
             if (peer && peer->idleForSeconds() > sec &&
                 !peer->isDisconnected())
             {
