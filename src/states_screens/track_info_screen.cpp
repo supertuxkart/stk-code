@@ -88,20 +88,8 @@ void TrackInfoScreen::loadedFromFile()
 
 void TrackInfoScreen::beforeAddingWidget()
 {
-    static int target_type_div_height = m_target_type_div->m_h;
-
     const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    if (is_soccer)
-    {
-        m_target_type_div->setVisible(true);
-        m_target_type_div->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(target_type_div_height);
-    }
-    else
-    {
-        m_target_type_div->setVisible(false);
-        m_target_type_div->m_properties[GUIEngine::PROP_HEIGHT] = "0";
-    }
-    calculateLayout();
+    m_target_type_div->setCollapsed(!is_soccer, this);
 } // beforeAddingWidget
 
 
