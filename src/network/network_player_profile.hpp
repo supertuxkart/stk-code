@@ -69,6 +69,27 @@ private:
     KartTeam m_team;
 
 public:
+    // ------------------------------------------------------------------------
+    static std::shared_ptr<NetworkPlayerProfile>
+        getReservedProfile(KartTeam team)
+    {
+        return std::make_shared<NetworkPlayerProfile>(team);
+    }
+    // ------------------------------------------------------------------------
+    /* Placeholder profile for reserved player in live join, which its player
+     * name is empty. */
+    NetworkPlayerProfile(KartTeam team)
+    {
+        m_kart_name             = "tux";
+        m_host_id               = -1;
+        m_default_kart_color    = 0.0f;
+        m_online_id             = 0;
+        m_per_player_difficulty = (PerPlayerDifficulty)0;
+        m_local_player_id       = 0;
+        m_team                  = team;
+        resetGrandPrixData();
+    }
+    // ------------------------------------------------------------------------
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,

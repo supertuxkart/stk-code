@@ -53,8 +53,8 @@
 #include "utils/time.hpp"
 
 #include <algorithm>
-#include <iterator>
 #include <fstream>
+#include <iterator>
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
@@ -339,10 +339,20 @@ void ServerLobby::changeTeam(Event* event)
     NetworkString& data = event->data();
     uint8_t local_id = data.getUInt8();
     auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
+    auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
+    // At most 7 players on each team (for live join)
     if (player->getTeam() == KART_TEAM_BLUE)
+    {
+        if (red_blue.first >= 7)
+            return;
         player->setTeam(KART_TEAM_RED);
+    }
     else
+    {
+        if (red_blue.second >= 7)
+            return;
         player->setTeam(KART_TEAM_BLUE);
+    }
     updatePlayerList();
 }   // changeTeam
 
@@ -555,6 +565,8 @@ void ServerLobby::asynchronousUpdate()
                 if (peer)
                     peer->clearAvailableKartIDs();
             }
+            float real_players_count = (float)players.size();
+            handleLiveJoin(players);
 
             NetworkString* load_world_message = getNetworkString();
             load_world_message->setSynchronous(true);
@@ -591,7 +603,7 @@ void ServerLobby::asynchronousUpdate()
             load_world_message->addUInt32(random_seed);
             if (race_manager->isBattleMode())
             {
-                auto hcl = getHitCaptureLimit((float)players.size());
+                auto hcl = getHitCaptureLimit(real_players_count);
                 load_world_message->addUInt32(hcl.first).addFloat(hcl.second);
                 m_game_setup->setHitCaptureTime(hcl.first, hcl.second);
                 uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
@@ -667,6 +679,7 @@ void ServerLobby::update(int ticks)
         resetServer();
     }
 
+    STKHost::get()->updateConnectedPlayersInGame();
     if ((m_state.load() > WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()) &&
         STKHost::get()->getPlayersInGame() == 0 &&
@@ -698,7 +711,6 @@ void ServerLobby::update(int ticks)
         resetServer();
     }
 
-    STKHost::get()->updateConnectedPlayersInGame();
     handlePlayerDisconnection();
 
     switch (m_state.load())
@@ -959,11 +971,12 @@ void ServerLobby::startSelection(const Event *event)
 
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
+        unsigned max_player = STKHost::get()->updateConnectedPlayersInGame();
         auto it = m_available_kts.second.begin();
         while (it != m_available_kts.second.end())
         {
             Track* t =  track_manager->getTrack(*it);
-            if (t->getMaxArenaPlayers() < STKHost::get()->getPlayersInGame())
+            if (t->getMaxArenaPlayers() < max_player)
             {
                 it = m_available_kts.second.erase(it);
             }
@@ -1667,8 +1680,8 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
-    if (STKHost::get()->getPlayersInGame() + player_count +
-        m_waiting_players_counts.load() >
+    unsigned cur_players = STKHost::get()->updateConnectedPlayersInGame();
+    if (cur_players + player_count + m_waiting_players_counts.load() >
         (unsigned)ServerConfig::m_server_max_players)
     {
         NetworkString *message = getNetworkString(2);
@@ -2941,7 +2954,9 @@ void ServerLobby::handlePlayerDisconnection() const
     unsigned total = 0;
     for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
     {
-        const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        if (rki.isReserved())
+            continue;
         bool disconnected = rki.disconnected();
         if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
             !disconnected)
@@ -2958,6 +2973,7 @@ void ServerLobby::handlePlayerDisconnection() const
         AbstractKart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated() && !k->hasFinishedRace())
         {
+            rki.makeReserved();
             CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
                 (World::getWorld());
             if (ctf)
@@ -2971,8 +2987,57 @@ void ServerLobby::handlePlayerDisconnection() const
         }
     }
 
-    if (race_manager->getNumPlayers() != 1 && World::getWorld()->hasTeam() &&
+    if (total != 1 && World::getWorld()->hasTeam() &&
         (red_count == 0 || blue_count == 0))
         World::getWorld()->setUnfairTeam(true);
 
 }   // handlePlayerDisconnection
+
+//-----------------------------------------------------------------------------
+/** Add reserved players for live join later if required.
+ */
+void ServerLobby::handleLiveJoin(
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+{
+    if (!race_manager->supportsLiveJoining())
+        return;
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    {
+        Track* t = track_manager->getTrack(m_game_setup->getCurrentTrack());
+        assert(t);
+        int max_players = std::min((int)ServerConfig::m_server_max_players,
+            (int)t->getMaxArenaPlayers());
+        int add_size = max_players - (int)players.size();
+        assert(add_size >= 0);
+        for (int i = 0; i < add_size; i++)
+        {
+            players.push_back(
+                NetworkPlayerProfile::getReservedProfile(KART_TEAM_NONE));
+        }
+    }
+    else
+    {
+        // CTF or soccer, reserve at least 7 players on each team
+        int red_count = 0;
+        int blue_count = 0;
+        for (unsigned i = 0; i < players.size(); i++)
+        {
+            if (players[i]->getTeam() == KART_TEAM_RED)
+                red_count++;
+            else
+                blue_count++;
+        }
+        red_count = red_count >= 7 ? 0 : 7 - red_count;
+        blue_count = blue_count >= 7 ? 0 : 7 - blue_count;
+        for (int i = 0; i < red_count; i++)
+        {
+            players.push_back(
+                NetworkPlayerProfile::getReservedProfile(KART_TEAM_RED));
+        }
+        for (int i = 0; i < blue_count; i++)
+        {
+            players.push_back(
+                NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
+        }
+    }
+}   // handleLiveJoin

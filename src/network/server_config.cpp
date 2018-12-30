@@ -297,6 +297,10 @@ void loadServerLobbyFromConfig()
     unsigned difficulty = m_server_difficulty;
     race_manager->setDifficulty(RaceManager::Difficulty(difficulty));
 
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL &&
+        m_server_max_players > 10)
+        m_server_max_players = 10;
+
     if (m_ranked)
     {
         m_validating_player = true;

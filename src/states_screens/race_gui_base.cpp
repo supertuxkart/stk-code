@@ -705,7 +705,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     }
 
     unsigned int sta = race_manager->getNumSpareTireKarts();
-    const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
+    unsigned int total_karts = race_manager->getNumberOfKarts() - sta;
+    unsigned int num_karts = 0;
+    if (NetworkConfig::get()->isNetworking())
+        num_karts = World::getWorld()->getCurrentNumKarts();
+    else
+        num_karts = race_manager->getNumberOfKarts() - sta;
 
     // -2 because that's the spacing further on
     int ICON_PLAYER_WIDTH = y_space / (num_karts) - 2;
@@ -732,7 +737,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
     {
-        for(unsigned int i=0; i<num_karts; i++)
+        for(unsigned int i=0; i<total_karts; i++)
         {
             const AbstractKart *kart = world->getKart(i);
             int position = kart->getPosition();

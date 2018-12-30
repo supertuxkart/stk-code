@@ -129,6 +129,8 @@ public:
     // ------------------------------------------------------------------------
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
     // ------------------------------------------------------------------------
+    const std::string& getCurrentTrack() const      { return m_tracks.back(); }
+    // ------------------------------------------------------------------------
     void sortPlayersForGrandPrix(
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     // ------------------------------------------------------------------------

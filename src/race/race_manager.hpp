@@ -504,7 +504,7 @@ public:
         m_time_target = time;
     }   // setTimeTarget
     // ------------------------------------------------------------------------
-    const RemoteKartInfo& getKartInfo(unsigned int n) const
+    RemoteKartInfo& getKartInfo(unsigned int n)
     {
         return m_player_karts[n];
     }   // getKartInfo

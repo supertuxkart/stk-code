@@ -99,7 +99,7 @@ public:
     bool  isNetworkPlayer() const            { return m_network_player;   }
     const std::string& getKartName() const   { return m_kart_name;        }
     const irr::core::stringw& getPlayerName() const { return m_user_name; }
-    KartTeam getKartTeam() const         { return m_kart_team;      }
+    KartTeam getKartTeam() const               { return m_kart_team;      }
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
     float getDefaultKartColor() const      { return m_default_kart_color; }
     uint32_t getOnlineId() const           { return m_online_id;          }
@@ -109,6 +109,7 @@ public:
                                                       { return m_profile; }
     bool disconnected() const               { return m_profile.expired(); }
     bool isReserved() const                 { return m_user_name.empty(); }
+    void makeReserved()                             {  m_user_name = L""; }
     bool operator<(const RemoteKartInfo& other) const
     {
         return ((m_host_id<other.m_host_id) ||

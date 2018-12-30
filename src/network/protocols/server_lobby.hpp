@@ -264,6 +264,8 @@ private:
     void addWaitingPlayersToGame();
     void changeHandicap(Event* event);
     void handlePlayerDisconnection() const;
+    void handleLiveJoin(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
 public:
              ServerLobby();
     virtual ~ServerLobby();
