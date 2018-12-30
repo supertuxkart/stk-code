@@ -278,7 +278,10 @@ namespace GUIEngine
 
 
         /** height of the widget before it was collapsed (only set if widget got collapsed) */
-        int m_uncollapsed_height;
+        int m_uncollapsed_height = 0;
+
+        /** A flag to indicate whether this widget got collapsed. */
+        bool m_is_collapsed = false;
 
     public:
 
@@ -354,6 +357,7 @@ namespace GUIEngine
         /**
          * \brief Sets the widget (and its children, if any) collapsed or not.
          * !!! Note: this has to be called inside beforeAddingWidget() !!!
+         * Pass in the screen to get (the necessary) calculate Layout automatically called.
          * This will also set the widget invisible depending of collapsed state.
          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
          * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
@@ -364,6 +368,7 @@ namespace GUIEngine
         /**
          * \brief Sets the widget (and its children, if any) collapsed or not.
          * !!! Note: this has to be called inside beforeAddingWidget() !!!
+         * Pass in the screen to get (the necessary) calculate Layout automatically called.
          * This will also set the widget invisible depending of collapsed state.
          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
          * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
@@ -373,6 +378,9 @@ namespace GUIEngine
 
         /** Returns if the element is visible. */
         bool isVisible() const;
+
+        /** Returns whether the element is collapsed (through setCollapsed). */
+        bool isCollapsed() const { return  m_is_collapsed; }
 
         bool isActivated() const;
 

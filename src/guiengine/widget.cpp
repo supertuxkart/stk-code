@@ -344,11 +344,12 @@ void Widget::setVisible(bool visible)
 
 // -----------------------------------------------------------------------------
 
-void Widget::setCollapsed(bool collapsed, Screen* calling_screen)
+void Widget::setCollapsed(const bool collapsed, Screen* calling_screen)
 {
     // check for height > 0 to not loose height of widget in uncollapsed state
     // if widget is set to collapse twice.
-    if (collapsed && m_h > 0)
+    // the check for m_is_collapsed allows to save a height of 0 if widget was not collapsed
+    if (collapsed && (m_h > 0 || !m_is_collapsed))
         m_uncollapsed_height = m_h;
 
     setCollapsed(collapsed, m_uncollapsed_height, calling_screen);
@@ -356,7 +357,7 @@ void Widget::setCollapsed(bool collapsed, Screen* calling_screen)
 
 // -----------------------------------------------------------------------------
 
-void Widget::setCollapsed(bool collapsed, int uncollapsed_height, Screen* calling_screen)
+void Widget::setCollapsed(const bool collapsed, const int uncollapsed_height, Screen* calling_screen)
 {
     m_uncollapsed_height = uncollapsed_height;
 
@@ -366,6 +367,8 @@ void Widget::setCollapsed(bool collapsed, int uncollapsed_height, Screen* callin
         m_properties[GUIEngine::PROP_HEIGHT] = "0";
     else
         m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_uncollapsed_height);
+
+    m_is_collapsed = collapsed;
 
     if (calling_screen != NULL)
         calling_screen->calculateLayout();
