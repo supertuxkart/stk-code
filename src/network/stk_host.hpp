@@ -146,6 +146,10 @@ private:
 
     std::atomic<uint32_t> m_players_in_game;
 
+    std::atomic<uint32_t> m_players_waiting;
+
+    std::atomic<uint32_t> m_total_players;
+
     std::atomic<uint64_t> m_network_timer;
 
     std::unique_ptr<NetworkTimerSynchronizer> m_nts;
@@ -352,9 +356,15 @@ public:
     /* Return download speed in bytes per second. */
     unsigned getDownloadSpeed() const       { return m_download_speed.load(); }
     // ------------------------------------------------------------------------
-    uint32_t updateConnectedPlayersInGame();
+    void updatePlayers(unsigned* ingame = NULL,
+                       unsigned* waiting = NULL,
+                       unsigned* total = NULL);
     // ------------------------------------------------------------------------
     uint32_t getPlayersInGame() const      { return m_players_in_game.load(); }
+    // ------------------------------------------------------------------------
+    uint32_t getWaitingPlayers() const     { return m_players_waiting.load(); }
+    // ------------------------------------------------------------------------
+    uint32_t getTotalPlayers() const         { return m_total_players.load(); }
     // ------------------------------------------------------------------------
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
         getPlayersForNewGame() const;

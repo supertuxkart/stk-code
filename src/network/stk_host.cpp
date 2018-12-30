@@ -289,6 +289,8 @@ STKHost::STKHost(bool server)
 void STKHost::init()
 {
     m_players_in_game.store(0);
+    m_players_waiting.store(0);
+    m_total_players.store(0);
     m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
@@ -1082,7 +1084,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt32(ServerConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8((uint8_t)ServerConfig::m_server_max_players);
-        s.addUInt8((uint8_t)(getPlayersInGame() + sl->getWaitingPlayersCount()));
+        s.addUInt8((uint8_t)getTotalPlayers());
         s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)sl->getDifficulty());
         s.addUInt8((uint8_t)sl->getGameMode());
@@ -1260,7 +1262,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     std::unique_lock<std::mutex> lock(m_peers_mutex);
     for (auto peer : m_peers)
     {
-        if (peer.second->isDisconnected())
+        if (peer.second->isDisconnected() || !peer.second->isValidated())
             continue;
         auto peer_profile = peer.second->getPlayerProfiles();
         p.insert(p.end(), peer_profile.begin(), peer_profile.end());
@@ -1321,7 +1323,7 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
 }   // getAllPlayersTeamInfo
 
 // ----------------------------------------------------------------------------
-/** \brief Get the players for starting a new game.
+/** Get the players for starting a new game.
  *  \return A vector containing pointers on the players profiles. */
 std::vector<std::shared_ptr<NetworkPlayerProfile> >
     STKHost::getPlayersForNewGame() const
@@ -1340,17 +1342,36 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
 }   // getPlayersForNewGame
 
 // ----------------------------------------------------------------------------
-uint32_t STKHost::updateConnectedPlayersInGame()
+/** Update players count in server
+ *  \param ingame store the in game players count now
+ *  \param waiting store the waiting players count now
+ *  \param total store the total players count now
+ */
+void STKHost::updatePlayers(unsigned* ingame, unsigned* waiting,
+                            unsigned* total)
 {
-    uint32_t total = 0;
+    uint32_t ingame_players = 0;
+    uint32_t waiting_players = 0;
+    uint32_t total_players = 0;
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto& p : m_peers)
     {
         auto& stk_peer = p.second;
-        if (stk_peer->isWaitingForGame())
+        if (!stk_peer->isValidated())
             continue;
-        total += (uint32_t)stk_peer->getPlayerProfiles().size();
+        if (stk_peer->isWaitingForGame())
+            waiting_players += (uint32_t)stk_peer->getPlayerProfiles().size();
+        else
+            ingame_players += (uint32_t)stk_peer->getPlayerProfiles().size();
+        total_players += (uint32_t)stk_peer->getPlayerProfiles().size();
     }
-    m_players_in_game.store(total);
-    return total;
-}   // updateConnectedPlayersInGame
+    m_players_in_game.store(ingame_players);
+    m_players_waiting.store(waiting_players);
+    m_total_players.store(total_players);
+    if (ingame)
+        *ingame = ingame_players;
+    if (waiting)
+        *waiting = waiting_players;
+    if (total)
+        *total = total_players;
+}   // updatePlayers

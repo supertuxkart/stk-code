@@ -145,10 +145,6 @@ private:
 
     NetworkString* m_result_ns;
 
-    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_waiting_players;
-
-    std::atomic<uint32_t> m_waiting_players_counts;
-
     std::atomic<uint32_t> m_server_id_online;
 
     std::atomic<int> m_difficulty;
@@ -259,7 +255,6 @@ private:
     void checkRaceFinished();
     std::pair<int, float> getHitCaptureLimit(float num_karts);
     void configPeersStartTime();
-    void updateWaitingPlayers();
     void resetServer();
     void addWaitingPlayersToGame();
     void changeHandicap(Event* event);
@@ -284,8 +279,6 @@ public:
     std::unique_lock<std::mutex> acquireConnectionMutex() const
                    { return std::unique_lock<std::mutex>(m_connection_mutex); }
     bool waitingForPlayers() const;
-    uint32_t getWaitingPlayersCount() const
-                                    { return m_waiting_players_counts.load(); }
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
