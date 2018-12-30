@@ -108,6 +108,7 @@ public:
     std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const
                                                       { return m_profile; }
     bool disconnected() const               { return m_profile.expired(); }
+    bool isReserved() const                 { return m_user_name.empty(); }
     bool operator<(const RemoteKartInfo& other) const
     {
         return ((m_host_id<other.m_host_id) ||

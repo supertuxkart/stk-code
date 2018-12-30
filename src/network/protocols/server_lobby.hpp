@@ -263,6 +263,7 @@ private:
     void resetServer();
     void addWaitingPlayersToGame();
     void changeHandicap(Event* event);
+    void handlePlayerDisconnection() const;
 public:
              ServerLobby();
     virtual ~ServerLobby();

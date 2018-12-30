@@ -288,6 +288,7 @@ STKHost::STKHost(bool server)
  */
 void STKHost::init()
 {
+    m_players_in_game.store(0);
     m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
@@ -1081,8 +1082,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt32(ServerConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8((uint8_t)ServerConfig::m_server_max_players);
-        s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
-            sl->getWaitingPlayersCount()));
+        s.addUInt8((uint8_t)(getPlayersInGame() + sl->getWaitingPlayersCount()));
         s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)sl->getDifficulty());
         s.addUInt8((uint8_t)sl->getGameMode());
@@ -1319,3 +1319,37 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
     return std::make_pair(red_count, blue_count);
 
 }   // getAllPlayersTeamInfo
+
+// ----------------------------------------------------------------------------
+/** \brief Get the players for starting a new game.
+ *  \return A vector containing pointers on the players profiles. */
+std::vector<std::shared_ptr<NetworkPlayerProfile> >
+    STKHost::getPlayersForNewGame() const
+{
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto& p : m_peers)
+    {
+        auto& stk_peer = p.second;
+        if (stk_peer->isWaitingForGame())
+            continue;
+        for (auto& q : stk_peer->getPlayerProfiles())
+            players.push_back(q);
+    }
+    return players;
+}   // getPlayersForNewGame
+
+// ----------------------------------------------------------------------------
+void STKHost::updateConnectedPlayersInGame()
+{
+    uint32_t total = 0;
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto& p : m_peers)
+    {
+        auto& stk_peer = p.second;
+        if (stk_peer->isWaitingForGame())
+            continue;
+        total += (uint32_t)stk_peer->getPlayerProfiles().size();
+    }
+    m_players_in_game.store(total);
+}   // updateConnectedPlayersInGame

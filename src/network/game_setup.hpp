@@ -171,9 +171,11 @@ public:
     // ------------------------------------------------------------------------
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
     // ------------------------------------------------------------------------
-    void sortPlayersForGrandPrix();
+    void sortPlayersForGrandPrix(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     // ------------------------------------------------------------------------
-    void sortPlayersForGame();
+    void sortPlayersForGame(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     // ------------------------------------------------------------------------
     void setHitCaptureTime(int hc, float time)
     {

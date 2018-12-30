@@ -224,57 +224,50 @@ void GameSetup::addServerInfo(NetworkString* ns)
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForGrandPrix()
+void GameSetup::sortPlayersForGrandPrix(
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
     if (!isGrandPrix())
         return;
-    std::lock_guard<std::mutex> lock(m_players_mutex);
 
     if (m_tracks.size() == 1)
     {
         std::random_device rd;
         std::mt19937 g(rd());
-        std::shuffle(m_players.begin(), m_players.end(), g);
+        std::shuffle(players.begin(), players.end(), g);
         return;
     }
 
-    std::sort(m_players.begin(), m_players.end(),
-        [](const std::weak_ptr<NetworkPlayerProfile>& a,
-        const std::weak_ptr<NetworkPlayerProfile>& b)
+    std::sort(players.begin(), players.end(),
+        [](const std::shared_ptr<NetworkPlayerProfile>& a,
+        const std::shared_ptr<NetworkPlayerProfile>& b)
         {
-            // They should be never expired
-            auto c = a.lock();
-            assert(c);
-            auto d = b.lock();
-            assert(d);
-            return (c->getScore() < d->getScore()) ||
-                (c->getScore() == d->getScore() &&
-                c->getOverallTime() > d->getOverallTime());
+            return (a->getScore() < b->getScore()) ||
+                (a->getScore() == b->getScore() &&
+                a->getOverallTime() > b->getOverallTime());
         });
     if (UserConfigParams::m_gp_most_points_first)
     {
-        std::reverse(m_players.begin(), m_players.end());
+        std::reverse(players.begin(), players.end());
     }
 }   // sortPlayersForGrandPrix
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForGame()
+void GameSetup::sortPlayersForGame(
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
-    std::lock_guard<std::mutex> lock(m_players_mutex);
     if (!isGrandPrix())
     {
         std::random_device rd;
         std::mt19937 g(rd());
-        std::shuffle(m_players.begin(), m_players.end(), g);
+        std::shuffle(players.begin(), players.end(), g);
     }
     if (!race_manager->teamEnabled() ||
         ServerConfig::m_team_choosing)
         return;
-    for (unsigned i = 0; i < m_players.size(); i++)
+    for (unsigned i = 0; i < players.size(); i++)
     {
-        auto player = m_players[i].lock();
-        assert(player);
-        player->setTeam((KartTeam)(i % 2));
+        players[i]->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForGame
 

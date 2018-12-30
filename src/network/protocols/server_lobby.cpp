@@ -25,6 +25,7 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
@@ -245,7 +246,7 @@ void ServerLobby::updateTracksForMode()
 void ServerLobby::setup()
 {
     LobbyProtocol::setup();
-    auto players = m_game_setup->getConnectedPlayers();
+    auto players = STKHost::get()->getPlayersForNewGame();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
         for (auto player : players)
@@ -490,7 +491,7 @@ void ServerLobby::asynchronousUpdate()
         if (ServerConfig::m_owner_less)
         {
             m_game_setup->update(true/*remove_disconnected_players*/);
-            int player_size = m_game_setup->getPlayerCount();
+            int player_size = STKHost::get()->getPlayersInGame();
             if ((player_size >= ServerConfig::m_min_start_game_players ||
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
@@ -545,11 +546,9 @@ void ServerLobby::asynchronousUpdate()
         if (go_on_race)
         {
             m_game_setup->setRace(winner_vote);
-            // Remove disconnected player (if any) one last time
-            m_game_setup->update(true);
-            m_game_setup->sortPlayersForGrandPrix();
-            m_game_setup->sortPlayersForGame();
-            auto players = m_game_setup->getConnectedPlayers();
+            auto players = STKHost::get()->getPlayersForNewGame();
+            m_game_setup->sortPlayersForGrandPrix(players);
+            m_game_setup->sortPlayersForGame(players);
             for (auto& player : players)
             {
                 std::shared_ptr<STKPeer> peer = player->getPeer();
@@ -670,7 +669,7 @@ void ServerLobby::update(int ticks)
 
     if ((m_state.load() > WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()) &&
-        m_game_setup->getPlayerCount() == 0 &&
+        STKHost::get()->getPlayersInGame() == 0 &&
         NetworkConfig::get()->getServerIdFile().empty())
     {
         if (RaceEventManager::getInstance() &&
@@ -687,7 +686,7 @@ void ServerLobby::update(int ticks)
     // Reset for ranked server if in kart / track selection has only 1 player
     if (ServerConfig::m_ranked &&
         m_state.load() == SELECTING &&
-        m_game_setup->getPlayerCount() == 1)
+        STKHost::get()->getPlayersInGame() == 1)
     {
         NetworkString* exit_result_screen = getNetworkString(1);
         exit_result_screen->setSynchronous(true);
@@ -699,12 +698,9 @@ void ServerLobby::update(int ticks)
         resetServer();
     }
 
-    if (m_game_setup)
-    {
-        // Remove disconnected players if in these two states
-        m_game_setup->update(m_state.load() == WAITING_FOR_START_GAME ||
-            m_state.load() == SELECTING);
-    }
+    STKHost::get()->updateConnectedPlayersInGame();
+    handlePlayerDisconnection();
+
     switch (m_state.load())
     {
     case SET_PUBLIC_ADDRESS:
@@ -925,7 +921,7 @@ void ServerLobby::startSelection(const Event *event)
 
     if (ServerConfig::m_team_choosing && race_manager->teamEnabled())
     {
-        auto red_blue = m_game_setup->getPlayerTeamInfo();
+        auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
         if ((red_blue.first == 0 || red_blue.second == 0) &&
             red_blue.first + red_blue.second != 1)
         {
@@ -967,7 +963,7 @@ void ServerLobby::startSelection(const Event *event)
         while (it != m_available_kts.second.end())
         {
             Track* t =  track_manager->getTrack(*it);
-            if (t->getMaxArenaPlayers() < m_game_setup->getPlayerCount())
+            if (t->getMaxArenaPlayers() < STKHost::get()->getPlayersInGame())
             {
                 it = m_available_kts.second.erase(it);
             }
@@ -1184,7 +1180,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
     request->addParameter("current-players",
-        m_game_setup->getPlayerCount() + m_waiting_players_counts.load());
+        STKHost::get()->getPlayersInGame() + m_waiting_players_counts.load());
     request->addParameter("game-started",
         m_state.load() == WAITING_FOR_START_GAME ? 0 : 1);
     request->queue();
@@ -1671,7 +1667,7 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
-    if (m_game_setup->getPlayerCount() + player_count +
+    if (STKHost::get()->getPlayersInGame() + player_count +
         m_waiting_players_counts.load() >
         (unsigned)ServerConfig::m_server_max_players)
     {
@@ -1770,6 +1766,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     {
         core::stringw name;
         data.decodeStringW(&name);
+        if (name.empty())
+            name = L"unnamed";
         float default_kart_color = data.getFloat();
         PerPlayerDifficulty per_player_difficulty =
             (PerPlayerDifficulty)data.getUInt8();
@@ -2927,3 +2925,56 @@ void ServerLobby::changeHandicap(Event* event)
     player->setPerPlayerDifficulty(d);
     updatePlayerList();
 }   // changeHandicap
+
+//-----------------------------------------------------------------------------
+/** Update and see if any player disconnects, if so eliminate the kart in
+ *  world, so this function must be called in main thread.
+ */
+void ServerLobby::handlePlayerDisconnection() const
+{
+    if (!World::getWorld() ||
+        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
+    {
+        return;
+    }
+
+    int red_count = 0;
+    int blue_count = 0;
+    unsigned total = 0;
+    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    {
+        const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        bool disconnected = rki.disconnected();
+        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
+            !disconnected)
+            red_count++;
+        else if (race_manager->getKartInfo(i).getKartTeam() ==
+            KART_TEAM_BLUE && !disconnected)
+            blue_count++;
+
+        if (!disconnected)
+        {
+            total++;
+            continue;
+        }
+        AbstractKart* k = World::getWorld()->getKart(i);
+        if (!k->isEliminated() && !k->hasFinishedRace())
+        {
+            CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
+                (World::getWorld());
+            if (ctf)
+                ctf->loseFlagForKart(k->getWorldKartId());
+
+            World::getWorld()->eliminateKart(i,
+                false/*notify_of_elimination*/);
+            k->setPosition(
+                World::getWorld()->getCurrentNumKarts() + 1);
+            k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
+        }
+    }
+
+    if (race_manager->getNumPlayers() != 1 && World::getWorld()->hasTeam() &&
+        (red_count == 0 || blue_count == 0))
+        World::getWorld()->setUnfairTeam(true);
+
+}   // handlePlayerDisconnection
