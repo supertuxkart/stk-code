@@ -36,6 +36,7 @@ namespace GUIEngine
 {
 
     class DynamicRibbonWidget;
+    class Screen;
 
     enum WidgetType
     {
