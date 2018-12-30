@@ -352,7 +352,7 @@ public:
     /* Return download speed in bytes per second. */
     unsigned getDownloadSpeed() const       { return m_download_speed.load(); }
     // ------------------------------------------------------------------------
-    void updateConnectedPlayersInGame();
+    uint32_t updateConnectedPlayersInGame();
     // ------------------------------------------------------------------------
     uint32_t getPlayersInGame() const      { return m_players_in_game.load(); }
     // ------------------------------------------------------------------------

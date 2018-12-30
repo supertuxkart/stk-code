@@ -490,8 +490,8 @@ void ServerLobby::asynchronousUpdate()
     {
         if (ServerConfig::m_owner_less)
         {
-            m_game_setup->update(true/*remove_disconnected_players*/);
-            int player_size = STKHost::get()->getPlayersInGame();
+            int player_size =
+                (int)STKHost::get()->updateConnectedPlayersInGame();
             if ((player_size >= ServerConfig::m_min_start_game_players ||
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
@@ -1835,7 +1835,6 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         for (std::shared_ptr<NetworkPlayerProfile>& npp :
             peer->getPlayerProfiles())
         {
-            m_game_setup->addPlayer(npp);
             Log::info("ServerLobby",
                 "New player %s with online id %u from %s with %s.",
                 StringUtils::wideToUtf8(npp->getName()).c_str(),
@@ -2701,7 +2700,6 @@ void ServerLobby::addWaitingPlayersToGame()
 
         peer->setWaitingForGame(false);
         m_peers_ready[peer] = false;
-        m_game_setup->addPlayer(npp);
         Log::info("ServerLobby", "New player %s with online id %u from %s.",
             StringUtils::wideToUtf8(npp->getName()).c_str(),
             npp->getOnlineId(), peer->getAddress().toString().c_str());

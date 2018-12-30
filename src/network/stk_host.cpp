@@ -1340,7 +1340,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
 }   // getPlayersForNewGame
 
 // ----------------------------------------------------------------------------
-void STKHost::updateConnectedPlayersInGame()
+uint32_t STKHost::updateConnectedPlayersInGame()
 {
     uint32_t total = 0;
     std::lock_guard<std::mutex> lock(m_peers_mutex);
@@ -1352,4 +1352,5 @@ void STKHost::updateConnectedPlayersInGame()
         total += (uint32_t)stk_peer->getPlayerProfiles().size();
     }
     m_players_in_game.store(total);
+    return total;
 }   // updateConnectedPlayersInGame

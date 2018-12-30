@@ -20,9 +20,9 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
-#include "modes/capture_the_flag.hpp"
+#ifdef DEBUG
 #include "network/network_config.hpp"
+#endif
 #include "network/network_player_profile.hpp"
 #include "network/peer_vote.hpp"
 #include "network/protocols/server_lobby.hpp"
@@ -61,78 +61,10 @@ GameSetup::GameSetup()
     const std::string& server_name = ServerConfig::m_server_name;
     m_server_name_utf8 = StringUtils::wideToUtf8
         (StringUtils::xmlDecode(server_name));
-    m_connected_players_count.store(0);
     m_extra_server_info = -1;
     m_is_grand_prix.store(false);
     reset();
 }   // GameSetup
-
-//-----------------------------------------------------------------------------
-/** Update and see if any player disconnects.
- *  \param remove_disconnected_players remove the disconnected players,
- *  otherwise eliminate the kart in world, so this function must be called
- *  in main thread.
- */
-void GameSetup::update(bool remove_disconnected_players)
-{
-    std::unique_lock<std::mutex> lock(m_players_mutex);
-    if (remove_disconnected_players)
-    {
-        m_players.erase(std::remove_if(m_players.begin(), m_players.end(), []
-            (const std::weak_ptr<NetworkPlayerProfile> npp)->bool
-            {
-                return npp.expired();
-            }), m_players.end());
-        m_connected_players_count.store((uint32_t)m_players.size());
-        return;
-    }
-    if (!World::getWorld() ||
-        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
-    {
-        m_connected_players_count.store((uint32_t)m_players.size());
-        return;
-    }
-    lock.unlock();
-
-    int red_count = 0;
-    int blue_count = 0;
-    unsigned total = 0;
-    for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
-    {
-        bool disconnected = m_players[i].expired();
-        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
-            !disconnected)
-            red_count++;
-        else if (race_manager->getKartInfo(i).getKartTeam() ==
-            KART_TEAM_BLUE && !disconnected)
-            blue_count++;
-
-        if (!disconnected)
-        {
-            total++;
-            continue;
-        }
-        AbstractKart* k = World::getWorld()->getKart(i);
-        if (!k->isEliminated() && !k->hasFinishedRace())
-        {
-            CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
-                (World::getWorld());
-            if (ctf)
-                ctf->loseFlagForKart(k->getWorldKartId());
-
-            World::getWorld()->eliminateKart(i,
-                false/*notify_of_elimination*/);
-            k->setPosition(
-                World::getWorld()->getCurrentNumKarts() + 1);
-            k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
-        }
-    }
-    m_connected_players_count.store(total);
-
-    if (m_players.size() != 1 && World::getWorld()->hasTeam() &&
-        (red_count == 0 || blue_count == 0))
-        World::getWorld()->setUnfairTeam(true);
-}   // removePlayer
 
 //-----------------------------------------------------------------------------
 void GameSetup::loadWorld()
@@ -183,7 +115,9 @@ void GameSetup::loadWorld()
 //-----------------------------------------------------------------------------
 void GameSetup::addServerInfo(NetworkString* ns)
 {
+#ifdef DEBUG
     assert(NetworkConfig::get()->isServer());
+#endif
     ns->encodeString(m_server_name_utf8);
     auto sl = LobbyProtocol::get<ServerLobby>();
     assert(sl);
@@ -270,25 +204,6 @@ void GameSetup::sortPlayersForGame(
         players[i]->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForGame
-
-// ----------------------------------------------------------------------------
-std::pair<int, int> GameSetup::getPlayerTeamInfo() const
-{
-    std::lock_guard<std::mutex> lock(m_players_mutex);
-    int red_count = 0;
-    int blue_count = 0;
-    for (auto& p : m_players)
-    {
-        auto player = p.lock();
-        if (!player)
-            continue;
-        if (player->getTeam() == KART_TEAM_RED)
-            red_count++;
-        else if (player->getTeam() == KART_TEAM_BLUE)
-            blue_count++;
-    }
-    return std::make_pair(red_count, blue_count);
-}   // getPlayerTeamInfo
 
 // ----------------------------------------------------------------------------
 void GameSetup::setRace(const PeerVote &vote)

@@ -237,7 +237,6 @@ void ClientLobby::addAllPlayers(Event* event)
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
-    m_game_setup->update(true/*remove_disconnected_players*/);
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     unsigned player_count = data.getUInt8();
 
@@ -256,8 +255,6 @@ void ClientLobby::addAllPlayers(Event* event)
         std::string kart_name;
         data.decodeString(&kart_name);
         player->setKartName(kart_name);
-        peer->addPlayer(player);
-        m_game_setup->addPlayer(player);
         players.push_back(player);
     }
     uint32_t random_seed = data.getUInt32();
