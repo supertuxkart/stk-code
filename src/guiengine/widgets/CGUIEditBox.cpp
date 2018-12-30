@@ -76,12 +76,13 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 
     Text = text;
 
+#ifndef SERVER_ONLY
     if (Environment)
         Operator = Environment->getOSOperator();
 
     if (Operator)
         Operator->grab();
-
+#endif
     // this element can be tabbed to
     setTabStop(true);
     setTabOrder(-1);
@@ -106,10 +107,9 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 //! destructor
 CGUIEditBox::~CGUIEditBox()
 {
-#ifndef SERVER_ONLY
     if (OverrideFont)
         OverrideFont->drop();
-
+#ifndef SERVER_ONLY
     if (Operator)
         Operator->drop();
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
