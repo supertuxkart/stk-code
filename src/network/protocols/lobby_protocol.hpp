@@ -23,8 +23,11 @@
 
 class GameSetup;
 class NetworkPlayerProfile;
+class PeerVote;
 
+#include <atomic>
 #include <cassert>
+#include <map>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -62,7 +65,9 @@ public:
         LE_KICK_HOST,
         LE_CHANGE_TEAM,
         LE_BAD_TEAM,
-        LE_BAD_CONNECTION
+        LE_BAD_CONNECTION,
+        LE_CONFIG_SERVER,
+        LE_CHANGE_HANDICAP
     };
 
     enum RejectReason : uint8_t
@@ -76,9 +81,27 @@ public:
     };
 
 protected:
+    /** Vote from each peer. The host id is used as a key. Note that
+     *  host ids can be non-consecutive, so we cannot use std::vector. */
+    std::map<uint32_t, PeerVote> m_peers_votes;
+
+    /** Timer user for voting periods in both lobbies. */
+    std::atomic<uint64_t> m_end_voting_period;
+
+    /** The maximum voting time. */
+    uint64_t m_max_voting_time;
+
     std::thread m_start_game_thread;
 
     static std::weak_ptr<LobbyProtocol> m_lobby;
+
+    /** Estimated current started game remaining time,
+     *  uint32_t max if not available. */
+    std::atomic<uint32_t> m_estimated_remaining_time;
+
+    /** Estimated current started game progress in 0-100%,
+      * uint32_t max if not available. */
+    std::atomic<uint32_t> m_estimated_progress;
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
@@ -127,8 +150,46 @@ public:
     virtual void loadWorld();
     virtual bool allPlayersReady() const = 0;
     virtual bool isRacing() const = 0;
+    void startVotingPeriod(float max_time);
+    float getRemainingVotingTime();
+    bool isVotingOver();
+    // ------------------------------------------------------------------------
+    /** Returns the maximum floating time in seconds. */
+    float getMaxVotingTime() { return m_max_voting_time / 1000.0f; }
+    // ------------------------------------------------------------------------
+    /** Returns the game setup data structure. */
     GameSetup* getGameSetup() const { return m_game_setup; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the number of votes received so far. */
+    int getNumberOfVotes() const { return (int)m_peers_votes.size(); }
+    // -----------------------------------------------------------------------
+    void addVote(uint32_t host_id, const PeerVote &vote);
+    // -----------------------------------------------------------------------
+    const PeerVote* getVote(uint32_t host_id) const;
+    // -----------------------------------------------------------------------
+    void resetVotingTime()                   { m_end_voting_period.store(0); }
+    // -----------------------------------------------------------------------
+    /** Returns all voting data.*/
+    const std::map<uint32_t, PeerVote>& getAllVotes() const
+                                                     { return m_peers_votes; }
+    // -----------------------------------------------------------------------
+    std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+    {
+        return std::make_pair(m_estimated_remaining_time.load(),
+            m_estimated_progress.load());
+    }
+    // ------------------------------------------------------------------------
+    void setGameStartedProgress(const std::pair<uint32_t, uint32_t>& p)
+    {
+        m_estimated_remaining_time.store(p.first);
+        m_estimated_progress.store(p.second);
+    }
+    // ------------------------------------------------------------------------
+    void resetGameStartedProgress()
+    {
+        m_estimated_remaining_time.store(std::numeric_limits<uint32_t>::max());
+        m_estimated_progress.store(std::numeric_limits<uint32_t>::max());
+    }
 };   // class LobbyProtocol
 
 #endif // LOBBY_PROTOCOL_HPP

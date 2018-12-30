@@ -222,7 +222,7 @@ namespace GUIEngine
     /**
       * \brief called on every frame to trigger the rendering of the GUI
       */
-    void render(float dt);
+    void render(float dt, bool is_loading = false);
 
     /** \brief renders a "loading" screen */
     void renderLoading(bool clearIcons = true);

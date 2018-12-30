@@ -11,7 +11,7 @@
 
   <!-- Minimum and maxium server versions that be be read by this binary.
        Older versions will be ignored. -->
-  <server-version min="4" max="4"/>
+  <server-version min="5" max="5"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -184,8 +184,10 @@
                 new:  always get a new item.
                 only-if-same: if the random item is the same one as the
                       one currently owned, increase the number, otherwise
-                      no more/new item s are given to the kart. -->
-  <powerup collect-mode="new"/>
+                      no more/new item s are given to the kart.
+       no-explosive-items-timeout determines if world time is less than this value
+       then no cake or basketball is given by bonus boxes. -->
+  <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
              Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
@@ -202,7 +204,6 @@
   <explosion impulse-objects="500.0" />
 
   <!-- Networking
-       state-frequency: how many states the server will send per second.
        steering-reduction: Reduce a remote kart's steering by this factor
            each frame. This helps reduces oversteering by high latency
            clients when they only do minor steering adjustments.
@@ -210,8 +211,7 @@
            when networking is on. Objects will be hidden if total count is
            larger than this value.
   -->
-  <networking state-frequency="10"
-              steering-reduction="1.0"
+  <networking steering-reduction="1.0"
               max-moveable-objects="15"/>
 
   <!-- The field od views for 1-4 player split screen. fov-3 is

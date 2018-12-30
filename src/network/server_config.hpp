@@ -145,7 +145,7 @@ namespace ServerConfig
         "words here or a file.txt and let STK load it."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_voting_timeout
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "voting-timeout",
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "voting-timeout",
         "Timeout in seconds for voting tracks in server."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_validation_timeout
@@ -221,6 +221,14 @@ namespace ServerConfig
         "validating-player, auto-end, strict-player and owner-less will be "
         "turned on."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_server_configurable
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-configurable",
+        "If true, the server owner can config the difficulty and game mode in "
+        "the GUI of lobby. This option cannot be used with owner-less or "
+        "grand prix server, and will be automatically turned on if the server "
+        "was created using the in-game GUI. The changed difficulty and game "
+        "mode will not be saved in this config file."));
+
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
         "Time in seconds when a flag is dropped a by player in CTF "
@@ -279,6 +287,22 @@ namespace ServerConfig
         "kick-high-ping-players",
         "Kick players whose ping is above max-ping."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_kick_idle_player_seconds
+        SERVER_CFG_DEFAULT(IntServerConfigParam(60,
+        "kick-idle-player-seconds",
+        "Kick idle player which has no network activity to server for more "
+        "than some seconds during game, unless he has finished the race. "
+        "Negative value to disable, and this option will always be disabled "
+        "for LAN server."));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_state_frequency
+        SERVER_CFG_DEFAULT(IntServerConfigParam(10,
+        "state-frequency",
+        "Set how many states the server will send per second, the higher this "
+        "value, the more bandwidth requires, also each client will trigger "
+        "more rewind, which clients with slow device may have problem playing "
+        "this server, use the default value is recommended."));
+
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
         "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "
@@ -297,7 +321,7 @@ namespace ServerConfig
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
-    static const uint32_t m_server_version = 4;
+    static const uint32_t m_server_version = 5;
     // ========================================================================
     void loadServerConfig(const std::string& path = "");
     // ------------------------------------------------------------------------
@@ -308,7 +332,10 @@ namespace ServerConfig
     void writeServerConfigToDisk();
     // ------------------------------------------------------------------------
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-        getLocalGameMode();
+        getLocalGameModeFromConfig();
+    // ------------------------------------------------------------------------
+    std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+        getLocalGameMode(int mode);
     // ------------------------------------------------------------------------
     core::stringw getModeName(unsigned id);
     // ------------------------------------------------------------------------

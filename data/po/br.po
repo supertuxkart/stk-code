@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-23 23:45+0800\n"
-"PO-Revision-Date: 2018-11-27 17:42+0000\n"
-"Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>\n"
+"POT-Creation-Date: 2018-12-22 11:16+0800\n"
+"PO-Revision-Date: 2018-12-25 09:03+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Breton (http://www.transifex.com/supertuxkart/supertuxkart/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -277,10 +277,11 @@ msgstr "Adlakaat dre-ziouer"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/network/protocols/client_lobby.cpp:466
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
 #: src/states_screens/edit_gp_screen.cpp:260
-#: src/states_screens/ghost_replay_selection.cpp:386
+#: src/states_screens/ghost_replay_selection.cpp:391
+#: src/states_screens/online/tracks_screen.cpp:777
+#: src/states_screens/online/tracks_screen.cpp:814
 msgid "Yes"
 msgstr "Ya"
 
@@ -295,6 +296,8 @@ msgstr "Ya"
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
@@ -311,7 +314,7 @@ msgstr "Ya"
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/dialogs/addons_loading.cpp:236
 #: src/states_screens/online/register_screen.cpp:119
-#: src/states_screens/options/user_screen.cpp:126
+#: src/states_screens/options/user_screen.cpp:127
 msgid "Cancel"
 msgstr "Nullañ"
 
@@ -409,6 +412,8 @@ msgstr "* Adloc'hañ STK evit arloañ an arventennoù nevez"
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -588,6 +593,113 @@ msgstr "Sevel a ran a-du gant ar termenoù amañ a-us ha 13 bloaz pe koshoc'h on
 msgid "Accept"
 msgstr "Asañtiñ"
 
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+msgid "Server Configuration"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Difficulty"
+msgstr "Diaester"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:606
+msgid "Novice"
+msgstr "Deraouad"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:607
+msgid "Intermediate"
+msgstr "Etre"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:608
+msgid "Expert"
+msgstr "Mailh"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:609
+msgid "SuperTux"
+msgstr "SuperTux"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Game mode"
+msgstr "Mod c'hoari"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:187
+msgid "Normal Race"
+msgstr "Redadeg normal"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:189
+msgid "Time Trial"
+msgstr "A-enep an amzer"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+msgid "Battle"
+msgstr "Emgann"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:201
+msgid "Soccer"
+msgstr "Mell-droad"
+
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -613,7 +725,6 @@ msgstr "Ouzhpennañ ur c'hoarier"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: src/states_screens/online/online_profile_achievements.cpp:75
-#: src/states_screens/online/server_selection.cpp:119
 msgid "Name"
 msgstr "Anv"
 
@@ -755,52 +866,6 @@ msgstr "Arventennañ ar redadeg"
 msgid "Type:"
 msgstr "Doare:"
 
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:590
-msgid "Novice"
-msgstr "Deraouad"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:591
-msgid "Intermediate"
-msgstr "Etre"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:592
-msgid "Expert"
-msgstr "Mailh"
-
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:593
-msgid "SuperTux"
-msgstr "SuperTux"
-
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
 #. I18N: ./data/gui/screens/feature_unlocked.stkgui
@@ -867,7 +932,7 @@ msgstr "Standard"
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:144
 #: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/kart_selection.cpp:293
 #: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "Lugantoù"
@@ -883,10 +948,10 @@ msgstr "Lugantoù"
 #: src/states_screens/arenas_screen.cpp:73
 #: src/states_screens/easter_egg_screen.cpp:136
 #: src/states_screens/edit_track_screen.cpp:145
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:73
 #: src/states_screens/grand_prix_editor_screen.cpp:333
-#: src/states_screens/kart_selection.cpp:282
-#: src/states_screens/online/tracks_screen.cpp:225
+#: src/states_screens/kart_selection.cpp:285
+#: src/states_screens/online/tracks_screen.cpp:338
 #: src/states_screens/tracks_and_gp_screen.cpp:135
 msgid "All"
 msgstr "An holl"
@@ -1018,7 +1083,7 @@ msgstr "Strollad roudoù"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:144
 msgid "Continue saved GP"
 msgstr "Kenderc'hel ar GP bet enrollet"
 
@@ -1476,6 +1541,8 @@ msgstr "Ur wech ma vez kefluniet an trobarzhelloù enmont, diuzit an arlun \"lie
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
+#. I18N: ./data/gui/screens/online/network_karts.stkgui
+#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Choazit ur c'hart"
 
@@ -1556,44 +1623,6 @@ msgstr "Ger-tremen evit ar servijoù prevez (diret)"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:121
-msgid "Difficulty"
-msgstr "Diaester"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:122
-msgid "Game mode"
-msgstr "Mod c'hoari"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:230 src/race/race_manager.hpp:180
-msgid "Normal Race"
-msgstr "Redadeg normal"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:232 src/race/race_manager.hpp:182
-msgid "Time Trial"
-msgstr "A-enep an amzer"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-msgid "Battle"
-msgstr "Emgann"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:234 src/race/race_manager.hpp:190
-msgid "Soccer"
-msgstr "Mell-droad"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
 msgid "Create"
 msgstr "Krouiñ"
 
@@ -1619,7 +1648,7 @@ msgstr "Krouiñ ur servijer"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:153
+#: src/states_screens/online/networking_lobby.cpp:170
 msgid "Lobby"
 msgstr "Hall"
 
@@ -1630,13 +1659,13 @@ msgstr "Kas"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:155
+#: src/states_screens/online/networking_lobby.cpp:172
 msgid "Start race"
 msgstr "Stagañ gant ar redadeg"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-msgid "Server Configuration"
+msgid "Configuration"
 msgstr ""
 
 #. I18N: ./data/gui/screens/online/online.stkgui
@@ -1865,7 +1894,6 @@ msgstr "Etrefas an implijer"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/online/server_selection.cpp:120
 msgid "Players"
 msgstr "C'hoarierien"
 
@@ -1917,7 +1945,7 @@ msgstr "Sonerezh"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/options/options_screen_video.cpp:429
+#: src/states_screens/options/options_screen_video.cpp:445
 msgid "Enabled"
 msgstr "Enaouet"
 
@@ -2077,6 +2105,7 @@ msgstr "Skipailh glas"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In the create server screen
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:168
 #: src/states_screens/online/create_server_screen.cpp:190
 msgid "Soccer game type"
 msgstr "Doare c'hoari mell-droad"
@@ -2084,14 +2113,14 @@ msgstr "Doare c'hoari mell-droad"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:317
+#: src/states_screens/online/tracks_screen.cpp:463
 msgid "Number of goals to win"
 msgstr "Niver a balioù evit gounit"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:325
+#: src/states_screens/online/tracks_screen.cpp:471
 msgid "Maximum time (min.)"
 msgstr "Amzer maksimom (mun.)"
 
@@ -2106,14 +2135,13 @@ msgstr "= Skoroù uhelañ ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:328
+#: src/states_screens/track_info_screen.cpp:327
 msgid "(Empty)"
 msgstr "(Goullo)"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:349
+#: src/states_screens/online/tracks_screen.cpp:500
 msgid "Number of laps"
 msgstr "Niver a droioù"
 
@@ -2448,25 +2476,25 @@ msgid ""
 "created."
 msgstr "Re gozh e oa ho restr gefluniañ, dilamet eo bet ha krouet e vo unan nevez a-benn neuze."
 
-#: src/graphics/irr_driver.cpp:585
+#: src/graphics/irr_driver.cpp:588
 msgid "Video recording started."
 msgstr "Enrolladur video loc'het."
 
-#: src/graphics/irr_driver.cpp:591
+#: src/graphics/irr_driver.cpp:594
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video enrollet e \"%s\"."
 
-#: src/graphics/irr_driver.cpp:595
+#: src/graphics/irr_driver.cpp:598
 msgid "Encoding progress:"
 msgstr "Araokadur an enkodañ:"
 
-#: src/graphics/irr_driver.cpp:1781 src/graphics/irr_driver.cpp:1786
+#: src/graphics/irr_driver.cpp:1785 src/graphics/irr_driver.cpp:1790
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#: src/guiengine/engine.cpp:1329
+#: src/guiengine/engine.cpp:1341
 msgid "Loading"
 msgstr "O kargañ"
 
@@ -2490,9 +2518,9 @@ msgstr "Efedusted an nitro"
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:386
 #: src/guiengine/widgets/player_kart_widget.cpp:759
-#: src/karts/controller/local_player_controller.cpp:449
-#: src/karts/controller/player_controller.cpp:408
-#: src/network/protocols/client_lobby.cpp:708
+#: src/karts/controller/local_player_controller.cpp:437
+#: src/karts/controller/player_controller.cpp:407
+#: src/network/protocols/client_lobby.cpp:668
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3166,11 +3194,11 @@ msgstr[4] "Kavet ez eus bet %d wiimote"
 msgid "Could not detect any wiimote :/"
 msgstr "N'haller ket diguzhiñ wiimote ebet :/"
 
-#: src/karts/controller/local_player_controller.cpp:307
+#: src/karts/controller/local_player_controller.cpp:295
 msgid "Penalty time!!"
 msgstr "Kastiz amzer!!"
 
-#: src/karts/controller/local_player_controller.cpp:310
+#: src/karts/controller/local_player_controller.cpp:298
 msgid "Don't accelerate before 'Set!'"
 msgstr ""
 
@@ -3217,39 +3245,39 @@ msgid ""
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Re gozh e tiskouez bezañ stumm hoc'h OpenGL. Klaskit kavout un hizivadenn evit ho stur video. SuperTuxKart a c'houlenn %s pe gwelloc'h."
 
-#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:85
+#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:86
 msgid "Server connection timed out."
 msgstr "Kevreadur ouzh ar servijer diamzeriet."
 
 #. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:366
+#: src/modes/capture_the_flag.cpp:398
 #, c-format
 msgid "%s has the red flag!"
 msgstr "%s a zo ar banniel ruz gantañ!"
 
 #. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:375
+#: src/modes/capture_the_flag.cpp:407
 #, c-format
 msgid "%s has the blue flag!"
 msgstr "%s a zo ar banniel glas gantañ!"
 
 #. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:402
+#: src/modes/capture_the_flag.cpp:434
 #, c-format
 msgid "%s captured the red flag!"
 msgstr "%s a zo bet paket ar banniel ruz gantañ!"
 
 #. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:413
+#: src/modes/capture_the_flag.cpp:445
 #, c-format
 msgid "%s captured the blue flag!"
 msgstr "%s a zo bet paket ar banniel glas gantañ!"
 
-#: src/modes/capture_the_flag.cpp:431
+#: src/modes/capture_the_flag.cpp:463
 msgid "The red flag has returned!"
 msgstr "Distroet eo ar banniel ruz!"
 
-#: src/modes/capture_the_flag.cpp:447
+#: src/modes/capture_the_flag.cpp:479
 msgid "The blue flag has returned!"
 msgstr "Distroet eo ar banniel glas!"
 
@@ -3295,98 +3323,50 @@ msgstr[2] "%i rod-sikour kart a zo deuet war-wel!"
 msgstr[3] "%i rod-sikour kart a zo deuet war-wel!"
 msgstr[4] "%i rod-sikour kart a zo deuet war-wel!"
 
-#: src/modes/world.cpp:1239
+#: src/modes/world.cpp:1245
 msgid "You have been eliminated!"
 msgstr "Skarzhet oc'h bet!"
 
-#: src/modes/world.cpp:1246
+#: src/modes/world.cpp:1252
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "Skarzhet eo bet '%s'."
 
-#: src/network/protocols/client_lobby.cpp:86
+#: src/network/protocols/client_lobby.cpp:87
 msgid "Server has been shut down."
 msgstr "Chomet eo a-sav ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:87
+#: src/network/protocols/client_lobby.cpp:88
 msgid "You were kicked from the server."
 msgstr "Forbannet oc'h bet diwar ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:89
-#: src/network/protocols/client_lobby.cpp:235
-#: src/network/protocols/client_lobby.cpp:739
+#: src/network/protocols/client_lobby.cpp:90
+#: src/network/protocols/client_lobby.cpp:222
+#: src/network/protocols/client_lobby.cpp:704
 msgid "Bad network connection is detected."
 msgstr "Kevreadur kenrouedadel fall diguzhet."
 
-#: src/network/protocols/client_lobby.cpp:467
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:260
-#: src/states_screens/ghost_replay_selection.cpp:386
-msgid "No"
-msgstr "Ket"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:473
-#, c-format
-msgid ""
-"Track: %s,\n"
-"random item location: %s"
-msgstr "Roudenn: %s,\nLec'hiadur an objedoù dre-zegouezh: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:481
-#, c-format
-msgid "Track: %s"
-msgstr "Roudenn: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:488
-#, c-format
-msgid ""
-"Track: %s,\n"
-"number of goals to win: %d,\n"
-"random item location: %s"
-msgstr "Roudenn: %s,\nniver a balioù da c'hounit: %d\nlec'hiadur an objedoù dre-zegouezh: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:495
-#, c-format
-msgid ""
-"Track: %s,\n"
-"maximum time: %d,\n"
-"random item location: %s"
-msgstr "Roudenn: %s,\namzer maksimom: %d,\nlec'hiadur an objedoù dre-zegouezh: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:503
-#, c-format
-msgid ""
-"Track: %s,\n"
-"laps: %d, reversed: %s"
-msgstr "Roudenn: %s,\ntroioù: %d, eilpennet: %s"
-
-#: src/network/protocols/client_lobby.cpp:533
+#: src/network/protocols/client_lobby.cpp:484
 #, c-format
 msgid "%s disconnected."
 msgstr "%s digevreet."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:560
+#: src/network/protocols/client_lobby.cpp:512
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Pouezit war anv ar c'hoarier el listennad evit merañ ar c'hoarier hag an titouroù renkañ."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:590
+#: src/network/protocols/client_lobby.cpp:551
 #, c-format
 msgid "Server name: %s"
 msgstr "Anv ar servijer: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:598
+#: src/network/protocols/client_lobby.cpp:559
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
@@ -3394,74 +3374,76 @@ msgid "Difficulty: %s"
 msgstr "Live diaester: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:603
+#: src/network/protocols/client_lobby.cpp:564
 #, c-format
 msgid "Max players: %d"
 msgstr "C'hoarierien maksimom: %d"
 
-#: src/network/protocols/client_lobby.cpp:620
+#: src/network/protocols/client_lobby.cpp:575
 #: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Mod c'hoari: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:632
+#: src/network/protocols/client_lobby.cpp:588
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
 #: src/states_screens/soccer_setup_screen.cpp:230
 msgid "Time limit"
 msgstr "Bevenn amzerel"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:633
+#: src/network/protocols/client_lobby.cpp:589
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/soccer_setup_screen.cpp:231
 msgid "Goals limit"
 msgstr "Bevenn palioù"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:637
+#: src/network/protocols/client_lobby.cpp:593
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Doare c'hoari mell-droad: %s"
 
-#: src/network/protocols/client_lobby.cpp:647
+#: src/network/protocols/client_lobby.cpp:603
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Araokadur ar Grand Prix: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:731
+#: src/network/protocols/client_lobby.cpp:696
 msgid "All players joined red or blue team."
 msgstr "An holl c'hoarierien a zo aet er skipailh ruz pe c'hlas."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:752
+#: src/network/protocols/client_lobby.cpp:717
 msgid "You are now the owner of server."
 msgstr "Perc'henner ar servijer emaoc'h bremañ."
 
-#: src/network/protocols/client_lobby.cpp:790
+#: src/network/protocols/client_lobby.cpp:755
 msgid "Connection refused: Server is busy."
 msgstr "Kevreadur nac'het: Ac'hubet emañ ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:794
+#: src/network/protocols/client_lobby.cpp:759
 msgid "Connection refused: You are banned from the server."
 msgstr "Kevreadur nac'het: Forbannet oc'h bet diwar ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:798
+#: src/network/protocols/client_lobby.cpp:763
 msgid "Connection refused: Server password is incorrect."
 msgstr "Kevreadur nac'het: Direizh eo ger-tremen ar servijer."
 
-#: src/network/protocols/client_lobby.cpp:802
+#: src/network/protocols/client_lobby.cpp:767
 msgid "Connection refused: Game data is incompatible."
 msgstr "Kevreadur nac'het: Ne genglot ket roadennoù ar c'hoari."
 
-#: src/network/protocols/client_lobby.cpp:806
+#: src/network/protocols/client_lobby.cpp:771
 msgid "Connection refused: Server is full."
 msgstr "Kevreadur nac'het: Ar servijer 'zo leun-kouch."
 
-#: src/network/protocols/client_lobby.cpp:810
+#: src/network/protocols/client_lobby.cpp:775
 msgid "Connection refused: Invalid player connecting."
 msgstr "Kevreadur nac'het: Direizh eo kevreadur ar c'hoarier."
 
@@ -3469,27 +3451,31 @@ msgstr "Kevreadur nac'het: Direizh eo kevreadur ar c'hoarier."
 msgid "No quick play server available."
 msgstr "Servijer lenn fonnus ebet hegerz."
 
-#: src/network/protocols/connect_to_server.cpp:281
+#: src/network/protocols/connect_to_server.cpp:282
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Dibosupl kevreañ ouzh ar servijer %s."
 
-#: src/network/server_config.cpp:226
+#: src/network/server_config.cpp:234
 msgid "Normal Race (Grand Prix)"
 msgstr "Redadeg normal (Grand Prix)"
 
-#: src/network/server_config.cpp:228
+#: src/network/server_config.cpp:236
 msgid "Time Trial (Grand Prix)"
 msgstr "A-enep an amzer (Grand Prix)"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:238
+#: src/network/server_config.cpp:246 src/race/race_manager.hpp:195
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:178
 msgid "Free-For-All"
 msgstr "Pep hini evit e sac'h"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:240
+#: src/network/server_config.cpp:248 src/race/race_manager.hpp:197
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:159
 #: src/states_screens/online/create_server_screen.cpp:180
 msgid "Capture The Flag"
 msgstr "Pakañ ar banniel"
@@ -3562,17 +3548,17 @@ msgid ""
 msgstr "Ar skoroù uhelañ a oa re gozh,\ndiverket int bet holl."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:184
+#: src/race/race_manager.hpp:191
 msgid "Follow the Leader"
 msgstr "Heuilhit an hini kentañ"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:186
+#: src/race/race_manager.hpp:193
 msgid "3 Strikes Battle"
 msgstr "Emgann dre 3 Strike"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:188
+#: src/race/race_manager.hpp:199
 msgid "Egg Hunt"
 msgstr "Kerc'hat vioù"
 
@@ -3626,18 +3612,18 @@ msgid "Updated date"
 msgstr "Deiziad hizivaet"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:297
+#: src/states_screens/addons_screen.cpp:298
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s gant %s"
 
-#: src/states_screens/addons_screen.cpp:417
+#: src/states_screens/addons_screen.cpp:418
 msgid "Please wait while addons are updated"
 msgstr "Gortozit e-pad ma vez hizivaet al lugantoù, mar plij"
 
-#: src/states_screens/addons_screen.cpp:495
-#: src/states_screens/main_menu_screen.cpp:558
+#: src/states_screens/addons_screen.cpp:496
+#: src/states_screens/main_menu_screen.cpp:555
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3650,7 +3636,7 @@ msgstr "Digarezit, degouezhet ez eus ur fazi e-pad ma oa o vont e darempred gant
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:79
 #: src/states_screens/easter_egg_screen.cpp:142
-#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/kart_selection.cpp:291
 #: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "standard"
@@ -3659,8 +3645,8 @@ msgstr "standard"
 #: src/states_screens/arenas_screen.cpp:325
 #: src/states_screens/easter_egg_screen.cpp:224
 #: src/states_screens/easter_egg_screen.cpp:255
-#: src/states_screens/kart_selection.cpp:886
-#: src/states_screens/kart_selection.cpp:1522
+#: src/states_screens/kart_selection.cpp:889
+#: src/states_screens/kart_selection.cpp:1525
 #: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Morailhet: deuit a-benn eus an daeioù oberiat evit gellout tizhout muioc'h a draoù!"
@@ -4183,13 +4169,13 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
 #: src/states_screens/online/create_server_screen.cpp:160
-#: src/states_screens/options/options_screen_video.cpp:432
+#: src/states_screens/options/options_screen_video.cpp:448
 msgid "Disabled"
 msgstr "Lazhet"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:63
-#: src/states_screens/options/options_screen_video.cpp:434
+#: src/states_screens/options/options_screen_video.cpp:450
 msgid "Important only"
 msgstr "A-bouez hepken"
 
@@ -4199,7 +4185,7 @@ msgstr "A-bouez hepken"
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:80
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/options/options_screen_video.cpp:441
+#: src/states_screens/options/options_screen_video.cpp:457
 msgid "Low"
 msgstr "Izel"
 
@@ -4209,58 +4195,68 @@ msgstr "Izel"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/options/options_screen_video.cpp:444
+#: src/states_screens/options/options_screen_video.cpp:460
 msgid "High"
 msgstr "Uhel"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
-#: src/states_screens/options/options_screen_video.cpp:438
+#: src/states_screens/options/options_screen_video.cpp:454
 msgid "Very Low"
 msgstr "Izel-kenañ"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:143
-#: src/states_screens/ghost_replay_selection.cpp:153
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:154
+msgctxt "column_name"
 msgid "Reverse"
-msgstr "Eilpennañ"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
-#: src/states_screens/ghost_replay_selection.cpp:155
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:156
+#: src/states_screens/online/server_selection.cpp:122
+msgctxt "column_name"
 msgid "Difficulty"
-msgstr "Diaested"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
-#: src/states_screens/ghost_replay_selection.cpp:157
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:158
+msgctxt "column_name"
 msgid "Laps"
-msgstr "Troioù"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
-#: src/states_screens/ghost_replay_selection.cpp:158
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:159
+msgctxt "column_name"
 msgid "Time"
-msgstr "Amzer"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
-#: src/states_screens/ghost_replay_selection.cpp:159
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:160
+msgctxt "column_name"
 msgid "Kart"
-msgstr "Kart"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
-#: src/states_screens/ghost_replay_selection.cpp:160
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:161
+msgctxt "column_name"
 msgid "User"
-msgstr "Implijer"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
-#: src/states_screens/ghost_replay_selection.cpp:164
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:165
+msgctxt "column_name"
 msgid "Version"
-msgstr "Stumm"
+msgstr ""
+
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:391
+#: src/states_screens/online/tracks_screen.cpp:777
+#: src/states_screens/online/tracks_screen.cpp:814
+msgid "No"
+msgstr "Ket"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:43
@@ -4273,18 +4269,28 @@ msgid "Pick a color from slider"
 msgstr "Dibabit ul liv diwar ar reti-dibuniñ"
 
 #. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:82
+#: src/states_screens/dialogs/network_user_dialog.cpp:83
 msgid "Kick"
 msgstr "Kick"
 
 #. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:98
+#: src/states_screens/dialogs/network_user_dialog.cpp:99
 msgid "Change team"
 msgstr "Cheñch skipailh"
 
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:114
+msgid "Enable handicap"
+msgstr ""
+
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:119
+msgid "Disable handicap"
+msgstr ""
+
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
-#: src/states_screens/dialogs/network_user_dialog.cpp:122
+#: src/states_screens/dialogs/network_user_dialog.cpp:143
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:140
 #, c-format
 msgid "Fetching ranking info for %s"
@@ -4345,6 +4351,12 @@ msgstr "Dae an Nitro"
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
 msgstr "Adlenn ar redadeg gant an tasmant"
+
+#. I18N: In the create server screen, show various battle mode available
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:155
+#: src/states_screens/online/create_server_screen.cpp:174
+msgid "Battle mode"
+msgstr "Mod emgann"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:99
 #: src/states_screens/race_gui_overworld.cpp:148
@@ -4434,13 +4446,13 @@ msgid "Performing vote"
 msgstr "O votiñ"
 
 #: src/states_screens/easter_egg_screen.cpp:269
-#: src/states_screens/online/tracks_screen.cpp:440
+#: src/states_screens/online/tracks_screen.cpp:590
 #: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
 msgstr "Roudenn dre-zegouezh"
 
 #: src/states_screens/edit_gp_screen.cpp:116
-#: src/states_screens/ghost_replay_selection.cpp:505
+#: src/states_screens/ghost_replay_selection.cpp:510
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
@@ -4516,30 +4528,31 @@ msgstr "Dibrennet ho peus ar roudenn %0"
 msgid "You unlocked grand prix %0"
 msgstr "Dibrennet ho peus ar Grand Prix %0"
 
-#: src/states_screens/ghost_replay_selection.cpp:151
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:152
+msgctxt "column_name"
 msgid "Track"
-msgstr "Roudenn"
+msgstr ""
 
-#: src/states_screens/ghost_replay_selection.cpp:162
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:163
+#: src/states_screens/online/server_selection.cpp:121
+msgctxt "column_name"
 msgid "Players"
-msgstr "C'hoarierien"
+msgstr ""
 
-#: src/states_screens/gp_info_screen.cpp:72
+#: src/states_screens/gp_info_screen.cpp:71
 msgid "Default"
 msgstr "Dre ziouer"
 
-#: src/states_screens/gp_info_screen.cpp:73
+#: src/states_screens/gp_info_screen.cpp:72
 msgid "None"
 msgstr "Tra ebet"
 
-#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/gp_info_screen.cpp:74
 msgid "Random"
 msgstr "Dre-zegouezh"
 
-#: src/states_screens/gp_info_screen.cpp:152
-#: src/states_screens/gp_info_screen.cpp:177
+#: src/states_screens/gp_info_screen.cpp:151
+#: src/states_screens/gp_info_screen.cpp:176
 msgid "Reload"
 msgstr "Adkargañ"
 
@@ -4587,49 +4600,46 @@ msgstr ""
 msgid "You completed the Grand Prix!"
 msgstr "Echuet ho peus ar Grand Prix!"
 
-#: src/states_screens/kart_selection.cpp:862
-#: src/states_screens/kart_selection.cpp:1540
+#: src/states_screens/kart_selection.cpp:865
+#: src/states_screens/kart_selection.cpp:1543
 msgid "Random Kart"
 msgstr "Kart dre-zegouezh"
 
-#: src/states_screens/kart_selection.cpp:881
+#: src/states_screens/kart_selection.cpp:884
 msgid "Locked"
 msgstr "Morailhet"
 
-#: src/states_screens/kart_selection.cpp:982
-#: src/states_screens/online/networking_lobby.cpp:309
+#: src/states_screens/kart_selection.cpp:985
+#: src/states_screens/online/networking_lobby.cpp:347
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "D'an holl dud:\nPouezit war ar bouton 'Diuzañ' evit emezelañ er c'hoari"
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online/online_screen.cpp:209
 msgid ""
 "You can not play online without internet access. If you want to play online,"
-" go to options, select  tab 'User Interface', and edit \"Connect to the "
-"Internet\"."
-msgstr "N'hallit ket c'hoari enlinenn hep ur moned ouzh internet. Mar fell deoc'h c'hoari enlinenn, kit d'an dibarzhioù, diuzit an ivinell 'Etrefas an implijer' hag aozit \"Kevreañ ouzh an internet\"."
+" go in the options menu, and check \"Connect to the Internet\"."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:508
+#: src/states_screens/main_menu_screen.cpp:507
 msgid ""
 "You can not download addons without internet access. If you want to download"
-" addons, go to options, select the 'User Interface' tab, and check \"Connect"
-" to the Internet\"."
-msgstr "N'hallit ket pellgargañ lugantoù hep moned ebet ouzh ar genrouedad. Ma fell deoc'h pellgargañ lugantoù, kit d'an dibarzhioù, diuzit an ivinell 'Etrefas an implijer', ha kochit 'Kevreañ ouzh internet'."
+" addons, go in the options menu, and check \"Connect to the Internet\"."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:517
+#: src/states_screens/main_menu_screen.cpp:515
 msgid ""
-"You can not download addons without internet access. If you want to download addons, go to options, select the 'User Interface' tab, and check \"Connect to the Internet\".\n"
+"You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr "N'hallit ket pellgargañ lugantoù hep moned ebet ouzh ar genrouedad. Ma fell deoc'h pellgargañ lugantoù, kit d'an dibarzhioù, diuzit an ivinell 'Etrefas an implijer', ha kochit 'Kevreañ ouzh internet'.\n\nGellout a rit, koulskoude dilemel al lugantoù pellgarget dija."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:553
+#: src/states_screens/main_menu_screen.cpp:550
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Lazhet eo modulenn al lugantoù er mare-mañ war skrammad an dibarzhioù"
 
-#: src/states_screens/main_menu_screen.cpp:565
+#: src/states_screens/main_menu_screen.cpp:562
 msgid "Please wait while the add-ons are loading"
 msgstr "Gortozit e-pad ma vez karget al lugantoù, mar plij"
 
@@ -4647,11 +4657,6 @@ msgstr "Servijer %s"
 msgid "No. of grand prix track(s)"
 msgstr "Nvr. a rodoù grand prix"
 
-#. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/online/create_server_screen.cpp:174
-msgid "Battle mode"
-msgstr "Mod emgann"
-
 #: src/states_screens/online/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "Etre 4 ha 30 arouezenn e rank bezañ hirder un anv!"
@@ -4660,23 +4665,36 @@ msgstr "Etre 4 ha 30 arouezenn e rank bezañ hirder un anv!"
 msgid "Incorrect characters in password!"
 msgstr "Arouezioù direizh er ger-tremen!"
 
-#: src/states_screens/online/networking_lobby.cpp:186
-#: src/states_screens/online/networking_lobby.cpp:549
+#: src/states_screens/online/networking_lobby.cpp:204
+#: src/states_screens/online/networking_lobby.cpp:603
 msgid "Chat is disabled, enable in options menu."
 msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:242
+#: src/states_screens/online/networking_lobby.cpp:260
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Hall (ping: %dms)"
 
-#. I18N: In the networking lobby, show when player is required to wait
-#. before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:251
-msgid "Please wait for current game to end."
-msgstr "Gortozit ma vefe echu gant ar c'hoariadenn war ober."
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with remaining time
+#: src/states_screens/online/networking_lobby.cpp:273
+#, c-format
+msgid "Please wait for the current game's end, estimated remaining time: %s."
+msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:280
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with progress in percent
+#: src/states_screens/online/networking_lobby.cpp:281
+msgid "Please wait for the current game's end, estimated progress: %d%."
+msgstr ""
+
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish
+#: src/states_screens/online/networking_lobby.cpp:288
+msgid "Please wait for the current game's end."
+msgstr ""
+
+#: src/states_screens/online/networking_lobby.cpp:318
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4688,7 +4706,7 @@ msgstr[4] "Stagañ a raio ar c'hoari ma vez muioc'h evit %d c'hoarier."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:294
+#: src/states_screens/online/networking_lobby.cpp:332
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -4700,20 +4718,27 @@ msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 
-#: src/states_screens/online/networking_lobby.cpp:327
+#: src/states_screens/online/networking_lobby.cpp:365
 #, c-format
 msgid "Connecting to server %s"
 msgstr "O kevreañ ouzh ar servijer %s"
 
-#: src/states_screens/online/networking_lobby.cpp:332
+#: src/states_screens/online/networking_lobby.cpp:370
 msgid "Finding a quick play server"
 msgstr "Kavout ur servijer lenn fonnus"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:577
+#: src/states_screens/online/networking_lobby.cpp:631
 msgid "Ready"
 msgstr "Prest"
+
+#. I18N: In kart screen, show before the voting period in network ends.
+#: src/states_screens/online/network_kart_selection.cpp:137
+#: src/states_screens/online/tracks_screen.cpp:835
+#, c-format
+msgid "Remaining time: %d"
+msgstr "Amzer a chom: %d"
 
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:82
@@ -4761,6 +4786,13 @@ msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Rankout a rit bezañ kevreet evit gellet c'hoari war ar genrouedad hollek. Klikit war hoc'h anv-implijer amañ a-us."
 
+#: src/states_screens/online/online_screen.cpp:209
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr "N'hallit ket c'hoari enlinenn hep ur moned ouzh internet. Mar fell deoc'h c'hoari enlinenn, kit d'an dibarzhioù, diuzit an ivinell 'Etrefas an implijer' hag aozit \"Kevreañ ouzh an internet\"."
+
 #: src/states_screens/online/online_screen.cpp:237
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
@@ -4782,7 +4814,7 @@ msgid "Searching"
 msgstr "O klask"
 
 #: src/states_screens/online/register_screen.cpp:120
-#: src/states_screens/options/user_screen.cpp:125
+#: src/states_screens/options/user_screen.cpp:126
 msgid "Exit game"
 msgstr "Kuitaat ar c'hoari"
 
@@ -4826,32 +4858,44 @@ msgstr "Ur postel a vo resevet ganeoc'h gant titouroù ouzhpenn ennañ evit gouz
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Ar moned ouzh internet a zo lazhet, enaouit ar moned en dibarzhioù, mar plij"
 
+#: src/states_screens/online/server_selection.cpp:119
+msgctxt "column_name"
+msgid "Name"
+msgstr ""
+
+#: src/states_screens/online/server_selection.cpp:120
+msgctxt "column_name"
+msgid "Game mode"
+msgstr ""
+
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
 #: src/states_screens/online/server_selection.cpp:127
+msgctxt "column_name"
 msgid "Owner"
-msgstr "Perc'henner"
+msgstr ""
 
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/online/server_selection.cpp:129
+msgctxt "column_name"
 msgid "Distance (km)"
-msgstr "Hed (km)"
+msgstr ""
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:215
+#: src/states_screens/online/server_selection.cpp:219
 msgid "Unknown"
 msgstr "Dizanv"
 
-#: src/states_screens/online/server_selection.cpp:323
+#: src/states_screens/online/server_selection.cpp:327
 msgid "No server is available."
 msgstr "N'eus servijer ebet hegerz."
 
-#: src/states_screens/online/server_selection.cpp:331
+#: src/states_screens/online/server_selection.cpp:335
 msgid "Fetching servers"
 msgstr "Oc'h adtapout servijoù"
 
 #. I18N: In track screen for networking, clarify voting phase
-#: src/states_screens/online/tracks_screen.cpp:188
+#: src/states_screens/online/tracks_screen.cpp:300
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
@@ -4859,29 +4903,22 @@ msgstr "Ma choaz darn vrasañ ar c'hoarierien ar memes arventennoù roudenn ha r
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:288
-#: src/states_screens/online/tracks_screen.cpp:333
-#: src/states_screens/track_info_screen.cpp:219
+#: src/states_screens/online/tracks_screen.cpp:433
+#: src/states_screens/online/tracks_screen.cpp:481
+#: src/states_screens/track_info_screen.cpp:218
 msgid "Random item location"
 msgstr "Lec'hioù an elfennoù dre-zegouezh"
 
-#. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:357
-#: src/states_screens/track_info_screen.cpp:214
+#: src/states_screens/online/tracks_screen.cpp:511
+#: src/states_screens/track_info_screen.cpp:213
 msgid "Drive in reverse"
 msgstr "Bleinañ dre an tu gin"
 
-#: src/states_screens/online/tracks_screen.cpp:426
+#: src/states_screens/online/tracks_screen.cpp:576
 #: src/states_screens/tracks_and_gp_screen.cpp:275
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Morailhet: deuit a-benn eus an daeioù oberiat evit gellout tizhout muioc'h a draoù!"
-
-#. I18N: In tracks screen, about voting of tracks in network
-#: src/states_screens/online/tracks_screen.cpp:521
-#, c-format
-msgid "Remaining time: %d"
-msgstr "Amzer a chom: %d"
 
 #: src/states_screens/options/options_screen_device.cpp:70
 msgid "Action"
@@ -5056,109 +5093,109 @@ msgid "Hidden"
 msgstr "Kuzhet"
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:411
+#: src/states_screens/options/options_screen_video.cpp:427
 msgid "Custom"
 msgstr "Personelaet"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:447
+#: src/states_screens/options/options_screen_video.cpp:463
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Efedoù partikulenn: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:453
+#: src/states_screens/options/options_screen_video.cpp:469
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Tudennoù bevaet: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:456
+#: src/states_screens/options/options_screen_video.cpp:472
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Gouleier luskaet: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:459
+#: src/states_screens/options/options_screen_video.cpp:475
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Dispis fiñv: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:462
+#: src/states_screens/options/options_screen_video.cpp:478
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Enepkranellañ: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:465
+#: src/states_screens/options/options_screen_video.cpp:481
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Stankadenn gouloù tro-dro: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:469
+#: src/states_screens/options/options_screen_video.cpp:485
 #, c-format
 msgid "Shadows: %s"
 msgstr "Skeudoù: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:471
+#: src/states_screens/options/options_screen_video.cpp:487
 #, c-format
 msgid "Shadows: %i"
 msgstr "Skeudoù: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:474
+#: src/states_screens/options/options_screen_video.cpp:490
 #, c-format
 msgid "Bloom: %s"
 msgstr "Bleuniadur: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:478
+#: src/states_screens/options/options_screen_video.cpp:494
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Skleur (trolinennoù): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:482
+#: src/states_screens/options/options_screen_video.cpp:498
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Puñs gouloù (bannoù-heol Doue): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:486
+#: src/states_screens/options/options_screen_video.cpp:502
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Donder an noñv: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:491
+#: src/states_screens/options/options_screen_video.cpp:507
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Kalite ar skeudenn rentet: %s"
 
-#: src/states_screens/options/user_screen.cpp:358
+#: src/states_screens/options/user_screen.cpp:363
 msgid "Internet access is disabled. Do you want to enable it?"
 msgstr "Ar moned ouzh an internet a zo lazhet. Ha c'hoant ho peus d'e enaouiñ?"
 
-#: src/states_screens/options/user_screen.cpp:551
+#: src/states_screens/options/user_screen.cpp:556
 msgid "You need to enter a password."
 msgstr "Ret eo deoc'h ebarzhiñ ur ger-tremen."
 
-#: src/states_screens/options/user_screen.cpp:572
+#: src/states_screens/options/user_screen.cpp:577
 #, c-format
 msgid "Logging out '%s'"
 msgstr "O tigevreañ diouzh '%s'"
 
-#: src/states_screens/options/user_screen.cpp:573
+#: src/states_screens/options/user_screen.cpp:578
 #, c-format
 msgid "Logging in '%s'"
 msgstr "O kevreañ ouzh '%s'"
 
-#: src/states_screens/options/user_screen.cpp:654
+#: src/states_screens/options/user_screen.cpp:659
 msgid "You can't delete the only player."
 msgstr "N'hallit ket dilemel ar c'hoarier nemetañ."
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:662
+#: src/states_screens/options/user_screen.cpp:667
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr "Ha fellout a ra deoc'h dilemel ar c'hoarier '%s'?"
@@ -5204,7 +5241,7 @@ msgstr "Dastumit nitro!"
 msgid "Follow the leader!"
 msgstr "Heuilhit ar Penn!"
 
-#: src/states_screens/race_gui_base.cpp:846
+#: src/states_screens/race_gui_base.cpp:848
 #, c-format
 msgid "Top %i"
 msgstr "Top %i"
@@ -5266,24 +5303,24 @@ msgstr "Ha fellout a ra deoc'h dilezel da vat ar Grand Prix?"
 msgid "Network grand prix has been finished."
 msgstr "Kenrouedad grand prix a zo echu."
 
-#: src/states_screens/race_result_gui.cpp:497
+#: src/states_screens/race_result_gui.cpp:496
 #: src/states_screens/race_result_gui.cpp:1231
 msgid "Red Team Wins"
 msgstr "Aet eo ar maout gant ar skipailh ruz"
 
-#: src/states_screens/race_result_gui.cpp:499
+#: src/states_screens/race_result_gui.cpp:498
 #: src/states_screens/race_result_gui.cpp:1235
 msgid "Blue Team Wins"
 msgstr "Aet eo ar maout gant ar skipailh glas"
 
-#: src/states_screens/race_result_gui.cpp:501
+#: src/states_screens/race_result_gui.cpp:500
 #: src/states_screens/race_result_gui.cpp:1240
 msgid "It's a draw"
 msgstr "Un dresadenn eo"
 
-#: src/states_screens/race_result_gui.cpp:563
-#: src/states_screens/race_result_gui.cpp:602
-#: src/states_screens/race_result_gui.cpp:700
+#: src/states_screens/race_result_gui.cpp:562
+#: src/states_screens/race_result_gui.cpp:601
+#: src/states_screens/race_result_gui.cpp:699
 #: src/states_screens/race_result_gui.cpp:1084
 msgid "Eliminated"
 msgstr "Dilamet"
@@ -5343,13 +5380,13 @@ msgstr "Redit a-enep kartoù-tasmant ha klaskit dont a-benn outo!"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:108
+#: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
 msgstr "Roudenn gant %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:116
+#: src/states_screens/track_info_screen.cpp:115
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Niver a c'hoarierien maksimom degemerus: %d"

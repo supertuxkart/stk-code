@@ -26,13 +26,17 @@
 #include <linux/input.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 #include <time.h>
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
+#ifdef __FreeBSD__
+#include <sys/joystick.h>
+#else
 #include <linux/joystick.h>
+#endif
 #endif
 
 #include "CColorConverter.h"
@@ -602,12 +606,12 @@ public:
                                            
             wl_output_add_listener(device->m_output, &output_listener, device);
         }
-        else if (interface_str == "org_kde_kwin_server_decoration_manager")
+        else if (interface_str == "zxdg_decoration_manager_v1")
         {
             device->m_decoration_manager = 
-                        static_cast<org_kde_kwin_server_decoration_manager*>(
-                        wl_registry_bind(registry, name, 
-                        &org_kde_kwin_server_decoration_manager_interface, 1));
+                                    static_cast<zxdg_decoration_manager_v1*>(
+                                    wl_registry_bind(registry, name, 
+                                    &zxdg_decoration_manager_v1_interface, 1));
         }
         else if (interface_str == "xdg_wm_base")
         {
@@ -800,10 +804,10 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
     delete m_egl_context;
     
     if (m_decoration)
-        org_kde_kwin_server_decoration_destroy(m_decoration);
+        zxdg_toplevel_decoration_v1_destroy(m_decoration);
         
     if (m_decoration_manager)
-        org_kde_kwin_server_decoration_manager_destroy(m_decoration_manager);
+        zxdg_decoration_manager_v1_destroy(m_decoration_manager);
     
     if (m_keyboard)
         wl_keyboard_destroy(m_keyboard);
@@ -1027,6 +1031,18 @@ bool CIrrDeviceWayland::createWindow()
             wl_display_dispatch(m_display);
             usleep(1000);
         }
+        
+        if (m_decoration_manager != NULL)
+        {
+            m_decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(
+                                        m_decoration_manager, m_xdg_toplevel);
+        }
+                                                       
+        if (m_decoration != NULL)
+        {
+            zxdg_toplevel_decoration_v1_set_mode(m_decoration, 
+                                ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+        }
     }
     else if (m_shell != NULL)
     {
@@ -1050,18 +1066,6 @@ bool CIrrDeviceWayland::createWindow()
     {
         os::Printer::log("Cannot create shell surface.", ELL_ERROR);
         return false;
-    }
-
-    if (m_decoration_manager != NULL)
-    {
-        m_decoration = org_kde_kwin_server_decoration_manager_create(
-                                               m_decoration_manager, m_surface);
-    }
-                                                   
-    if (m_decoration != NULL)
-    {
-        org_kde_kwin_server_decoration_request_mode(m_decoration, 
-                                    ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER);
     }
 
     wl_region* region = wl_compositor_create_region(m_compositor);

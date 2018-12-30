@@ -19,7 +19,6 @@
 #ifndef HEADER_NETWORK_TIMER_SYNCHRONIZER_HPP
 #define HEADER_NETWORK_TIMER_SYNCHRONIZER_HPP
 
-#include "config/user_config.hpp"
 #include "network/stk_host.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -70,8 +69,8 @@ public:
         const uint64_t cur_time = StkTime::getRealTimeMs();
         // Discard too close time compared to last ping
         // (due to resend when packet loss)
-        const uint64_t frequency = (uint64_t)((1.0f /
-            (float)(stk_config->m_network_state_frequeny)) * 1000.0f) / 2;
+        // 10 packets per second as seen in STKHost
+        const uint64_t frequency = (uint64_t)((1.0f / 10.0f) * 1000.0f) / 2;
         if (!m_times.empty() &&
             cur_time - std::get<2>(m_times.back()) < frequency)
             return;

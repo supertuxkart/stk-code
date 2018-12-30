@@ -21,16 +21,27 @@
 #include "states_screens/kart_selection.hpp"
 #include "guiengine/screen.hpp"
 
+namespace GUIEngine
+{
+    class ProgressBarWidget;
+}
+
 #include <set>
 
 class NetworkKartSelectionScreen : public KartSelectionScreen,
                   public GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>
 {
+private:
+    /** Pointer to progress bar widget which is used as a timer 
+     *  (going backwards). */
+    GUIEngine::ProgressBarWidget *m_timer;
+
     friend class GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>;
 
 protected:
     // ------------------------------------------------------------------------
-    NetworkKartSelectionScreen() : KartSelectionScreen("karts.stkgui") {}
+    NetworkKartSelectionScreen() 
+                        : KartSelectionScreen("online/network_karts.stkgui") {}
     // ------------------------------------------------------------------------
     ~NetworkKartSelectionScreen() {}
     // ------------------------------------------------------------------------
@@ -42,8 +53,13 @@ private:
     // ------------------------------------------------------------------------
     virtual bool isIgnored(const std::string& ident) const OVERRIDE
            { return m_available_karts.find(ident) == m_available_karts.end(); }
+    // ------------------------------------------------------------------------
+    void updateProgressBarText();
 
 public:
+    /** \brief Implement per-frame callback. */
+    virtual void onUpdate(float dt) OVERRIDE;
+
     // ------------------------------------------------------------------------
     void setAvailableKartsFromServer(const std::set<std::string>& k)
                                                      { m_available_karts = k; }

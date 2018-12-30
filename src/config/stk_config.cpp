@@ -151,7 +151,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
     CHECK_NEG(m_physics_fps,               "physics fps"                );
-    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
+    CHECK_NEG(m_no_explosive_items_timeout,"powerup no-explosive-items-timeout"    );
     CHECK_NEG(m_max_moveable_objects,      "network max-moveable-objects");
     CHECK_NEG(m_network_steering_reduction,"network steering-reduction" );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
@@ -203,7 +203,7 @@ void STKConfig::init_defaults()
     m_minimap_player_icon        = -100;
     m_donate_url                 = "";
     m_password_reset_url         = "";
-    m_network_state_frequeny     = -100;
+    m_no_explosive_items_timeout = -100.0f;
     m_max_moveable_objects       = -100;
     m_solver_iterations          = -100;
     m_solver_set_flags           = 0;
@@ -416,6 +416,8 @@ void STKConfig::getAllData(const XMLNode * root)
             Log::warn("StkConfig", "Invalid item mode '%s' - ignored.",
                     s.c_str());
         }
+        powerup_node->get("no-explosive-items-timeout",
+            &m_no_explosive_items_timeout);
     }
 
     if(const XMLNode *switch_node= root->getNode("switch"))
@@ -444,7 +446,6 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *networking_node = root->getNode("networking"))
     {
-        networking_node->get("state-frequency", &m_network_state_frequeny);
         networking_node->get("max-moveable-objects", &m_max_moveable_objects);
         networking_node->get("steering-reduction", &m_network_steering_reduction);
     }

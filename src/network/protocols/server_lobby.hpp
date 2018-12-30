@@ -89,10 +89,6 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
-    /** Vote from each peer. */
-    std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
-        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
-
     bool m_has_created_server_id_file;
 
     /** It indicates if this server is unregistered with the stk server. */
@@ -153,15 +149,22 @@ private:
 
     std::atomic<uint32_t> m_waiting_players_counts;
 
+    std::atomic<uint32_t> m_server_id_online;
+
+    std::atomic<int> m_difficulty;
+
+    std::atomic<int> m_game_mode;
+
     std::atomic<uint64_t> m_last_success_poll_time;
 
     uint64_t m_server_started_at, m_server_delay;
 
-    std::atomic<uint32_t> m_server_id_online;
-
     bool m_registered_for_once_only;
 
     bool m_save_server_config;
+
+    // Default game settings if no one has ever vote
+    PeerVote* m_default_vote;
 
     // connection management
     void clientDisconnected(Event* event);
@@ -169,7 +172,7 @@ private:
     // kart selection
     void kartSelectionRequested(Event* event);
     // Track(s) votes
-    void playerVote(Event *event);
+    void handlePlayerVote(Event *event);
     void playerFinishedResult(Event *event);
     bool registerServer(bool now);
     void finishedLoadingWorldClient(Event *event);
@@ -180,6 +183,8 @@ private:
     void createServerIdFile();
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
+    void handleServerConfiguration(Event* event);
+    void updateTracksForMode();
     bool checkPeersReady() const
     {
         bool all_ready = true;
@@ -241,7 +246,7 @@ private:
                                   const std::string& iv,
                                   uint32_t online_id,
                                   const irr::core::stringw& online_name);
-    std::tuple<std::string, uint8_t, bool, bool> handleVote();
+    bool handleAllVotes(PeerVote* winner, uint32_t* winner_peer_id);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
@@ -252,12 +257,12 @@ private:
     double getModeSpread();
     double scalingValueForTime(double time);
     void checkRaceFinished();
-    void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
     std::pair<int, float> getHitCaptureLimit(float num_karts);
     void configPeersStartTime();
     void updateWaitingPlayers();
     void resetServer();
     void addWaitingPlayersToGame();
+    void changeHandicap(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -285,6 +290,8 @@ public:
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
+    int getDifficulty() const                   { return m_difficulty.load(); }
+    int getGameMode() const                      { return m_game_mode.load(); }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

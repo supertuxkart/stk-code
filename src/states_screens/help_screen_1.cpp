@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"

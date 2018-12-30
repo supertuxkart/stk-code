@@ -25,18 +25,22 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/time.hpp"
 
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
+    resetGameStartedProgress();
     m_game_setup = new GameSetup();
+    m_end_voting_period.store(0);
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
@@ -138,5 +142,56 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
+    resetVotingTime();
+    m_peers_votes.clear();
     m_game_setup->reset();
 }   // setupNewGame
+
+//-----------------------------------------------------------------------------
+/** Starts the voting period time with the specified maximum time.
+ *  \param max_time Maximum voting time in seconds
+ */
+void LobbyProtocol::startVotingPeriod(float max_time)
+{
+    m_max_voting_time = uint64_t(max_time*1000);
+    m_end_voting_period.store(StkTime::getRealTimeMs() + m_max_voting_time);
+}   // startVotingPeriod
+
+//-----------------------------------------------------------------------------
+/** Returns the remaining voting time in seconds. */
+float LobbyProtocol::getRemainingVotingTime()
+{
+    if (m_end_voting_period.load() == 0 ||
+        StkTime::getRealTimeMs() >= m_end_voting_period.load())
+        return 0.0f;
+    uint64_t t = m_end_voting_period.load() - StkTime::getRealTimeMs();
+    return t / 1000.0f;
+}   // getRemainingVotingTime
+
+//-----------------------------------------------------------------------------
+/** Returns if the voting period is over. */
+bool LobbyProtocol::isVotingOver()
+{
+    return m_end_voting_period.load() != 0 &&
+        m_end_voting_period.load() < StkTime::getRealTimeMs();
+}   // isVotingOver
+
+//-----------------------------------------------------------------------------
+/** Adds a vote.
+ *  \param host_id Host id of this vote.
+ *  \param vote The vote to add. */
+void LobbyProtocol::addVote(uint32_t host_id, const PeerVote &vote)
+{
+    m_peers_votes[host_id] = vote;
+}   // addVote
+
+//-----------------------------------------------------------------------------
+/** Returns the voting data for one host. Returns NULL if the vote from
+ *  the given host id has not yet arrived (or if it is an invalid host id).
+ */
+const PeerVote* LobbyProtocol::getVote(uint32_t host_id) const
+{
+    auto it = m_peers_votes.find(host_id);
+    if (it == m_peers_votes.end()) return NULL;
+    return &(it->second);
+}   // getVote

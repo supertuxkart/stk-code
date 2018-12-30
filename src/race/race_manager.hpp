@@ -356,6 +356,7 @@ private:
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
+    unsigned                         m_flag_return_ticks;
     int                              m_coin_target;
     float                            m_time_target;
     int                              m_goal_target;
@@ -896,7 +897,10 @@ public:
         return m_minor_mode == MINOR_MODE_SOCCER ||
             m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG;
     }
-
+    // ------------------------------------------------------------------------
+    void setFlagReturnTicks(unsigned ticks)    { m_flag_return_ticks = ticks; }
+    // ------------------------------------------------------------------------
+    unsigned getFlagReturnTicks() const         { return m_flag_return_ticks; }
 };   // RaceManager
 
 extern RaceManager *race_manager;

@@ -58,6 +58,7 @@ public:
     void requestAbort() { m_request_abort = true; }
     void setThrottleFPS(bool throttle) { m_throttle_fps = throttle; }
     void setAllowLargeDt(bool enable) { m_allow_large_dt = enable; }
+    void renderGUI(int phase, int loop_index=-1, int loop_size=-1);
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }

@@ -532,8 +532,10 @@ void RaceGUI::drawGlobalMiniMap()
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
             draw2DImage(m_red_flag, rp, rs, NULL, NULL, true, true);
         }
+        Vec3 pos = ctf_world->getRedHolder() == -1 ? ctf_world->getRedFlag() :
+            ctf_world->getKart(ctf_world->getRedHolder())->getSmoothedTrans().getOrigin();
 
-        track->mapPoint2MiniMap(ctf_world->getRedFlag(), &draw_at);
+        track->mapPoint2MiniMap(pos, &draw_at);
         core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
         core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -553,7 +555,10 @@ void RaceGUI::drawGlobalMiniMap()
             draw2DImage(m_blue_flag, rp, rs, NULL, NULL, true, true);
         }
 
-        track->mapPoint2MiniMap(ctf_world->getBlueFlag(), &draw_at);
+        pos = ctf_world->getBlueHolder() == -1 ? ctf_world->getBlueFlag() :
+            ctf_world->getKart(ctf_world->getBlueHolder())->getSmoothedTrans().getOrigin();
+
+        track->mapPoint2MiniMap(pos, &draw_at);
         core::rect<s32> bs(core::position2di(0, 0), m_blue_flag->getSize());
         core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -1228,8 +1233,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     }
 
     if (!world->raceHasLaps()) return;
-    const int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
-
+    int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
+    // Network race has larger lap than getNumLaps near finish line
+    // due to waiting for final race result from server
+    if (lap + 1> race_manager->getNumLaps())
+        lap--;
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;
 

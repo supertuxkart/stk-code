@@ -61,6 +61,8 @@ private:
 
     bool m_ignore_undo;
 
+    bool m_has_smoothing_network_body;
+
 protected:
    /** A pointer to the kart which is animated by this class. */
     AbstractKart *m_kart;

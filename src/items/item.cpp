@@ -108,7 +108,6 @@ void ItemState::update(int ticks)
  */
 void ItemState::collected(const AbstractKart *kart)
 {
-    m_previous_owner = kart;
     if (m_type == ITEM_EASTER_EGG)
     {
         // They will disappear 'forever'
@@ -170,7 +169,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
-    m_graphical_type    = type;
+    m_graphical_type    = getGrahpicalType();
     m_listener          = NULL;
 
     LODNode* lodnode =
@@ -356,10 +355,10 @@ void Item::updateGraphics(float dt)
     if (m_node == NULL)
         return;
 
-    if (m_graphical_type != getType())
+    if (m_graphical_type != getGrahpicalType())
     {
         handleNewMesh(getGrahpicalType());
-        m_graphical_type = getType();
+        m_graphical_type = getGrahpicalType();
     }
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());

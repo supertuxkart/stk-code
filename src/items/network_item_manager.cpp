@@ -40,9 +40,14 @@ void NetworkItemManager::create()
 
 // ============================================================================
 /** Creates a new instance of the item manager. This is done at startup
- *  of each race. */
+ *  of each race.
+ *  We must save the item state first (so that it is restored first), otherwise
+ *  state updates for a kart could be overwritten by e.g. simulating the item
+ *  collection later (which resets bubblegum counter), so a rewinder uid of
+ *  "I" which is less than "Kx" (kart rewinder with id x)
+ */
 NetworkItemManager::NetworkItemManager()
-                  : Rewinder("N"), ItemManager()
+                  : Rewinder("I"), ItemManager()
 {
     m_confirmed_switch_ticks = -1;
     m_last_confirmed_item_ticks.clear();

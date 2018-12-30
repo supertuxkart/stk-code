@@ -101,10 +101,6 @@ void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
 // ----------------------------------------------------------------------------
 void BaseUserScreen::beforeAddingWidget()
 {
-#ifndef SERVER_ONLY
-    getWidget<IconButtonWidget>("default_kart_color")
-        ->setVisible(CVS->isGLSL());
-#endif
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -114,6 +110,11 @@ void BaseUserScreen::beforeAddingWidget()
  */
 void BaseUserScreen::init()
 {
+#ifndef SERVER_ONLY
+    getWidget<IconButtonWidget>("default_kart_color")
+        ->setVisible(CVS->isGLSL());
+#endif
+
     m_password_tb->setPasswordBox(true, L'*');
 
     // The behaviour of the screen is slightly different at startup, i.e.

@@ -344,6 +344,35 @@ void Widget::setVisible(bool visible)
 
 // -----------------------------------------------------------------------------
 
+void Widget::setCollapsed(bool collapsed, Screen* calling_screen)
+{
+    // check for height > 0 to not loose height of widget in uncollapsed state
+    // if widget is set to collapse twice.
+    if (collapsed && m_h > 0)
+        m_uncollapsed_height = m_h;
+
+    setCollapsed(collapsed, m_uncollapsed_height, calling_screen);
+}
+
+// -----------------------------------------------------------------------------
+
+void Widget::setCollapsed(bool collapsed, int uncollapsed_height, Screen* calling_screen)
+{
+    m_uncollapsed_height = uncollapsed_height;
+
+    setVisible(!collapsed);
+
+    if (collapsed)
+        m_properties[GUIEngine::PROP_HEIGHT] = "0";
+    else
+        m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_uncollapsed_height);
+
+    if (calling_screen != NULL)
+        calling_screen->calculateLayout();
+}
+
+// -----------------------------------------------------------------------------
+
 void Widget::moveIrrlichtElement()
 {
     if (m_element != NULL)

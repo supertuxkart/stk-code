@@ -817,20 +817,20 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     {
         ProgressBarWidget * progress = (ProgressBarWidget*)w;
         drawProgressBarInScreen(w, rect, progress->getValue(),
-            w->m_deactivated);
+                                w->m_deactivated);
     }
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
 void Skin::drawProgressBarInScreen(SkinWidgetContainer* swc,
-                                   const core::rect< s32 > &rect, int progress,
-                                   bool deactivated)
+                                   const core::rect< s32 > &rect,
+                                   float progress, bool deactivated)
 {
     drawBoxFromStretchableTexture(swc, rect,
         SkinConfig::m_render_params["progress::neutral"], deactivated);
     core::recti rect2 = rect;
     rect2.LowerRightCorner.X -= (rect.getWidth())
-                              - progress * rect.getWidth() / 100;
+                              - int(progress * rect.getWidth());
     drawBoxFromStretchableTexture(swc, rect2,
         SkinConfig::m_render_params["progress::fill"], deactivated);
 }   // drawProgress
@@ -1786,7 +1786,9 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                                      widget.m_x + widget.m_w,
                                      widget.m_y + widget.m_h );
                     drawBoxFromStretchableTexture(&widget, rect,
-                              SkinConfig::m_render_params["section::neutral"]);
+                           widget.isSelected(0)
+                           ? SkinConfig::m_render_params["section::selected"]
+                           : SkinConfig::m_render_params["section::neutral"]);
                 }
 
                 renderSections( &widget.m_children );
@@ -2007,6 +2009,18 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     // irrLicht does not have widgets for everything we need. so at render
     // time, we just check which type this button represents and render
     // accordingly
+    bool list_header_widget = widget->m_event_handler != NULL &&
+        widget->m_event_handler->getType() == WTYPE_LIST;
+    if (list_header_widget)
+    {
+        drawListHeader(rect, widget);
+        if (type == WTYPE_ICON_BUTTON)
+        {
+            drawIconButton(
+                dynamic_cast<IconButtonWidget*>(widget)->getListHeaderIconRect(),
+                widget, pressed, focused);
+        }
+    }
 
     if (widget->m_event_handler != NULL &&
         widget->m_event_handler->m_type == WTYPE_RIBBON)
@@ -2026,21 +2040,13 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         mvw->drawRTTScene(rect);
 #endif
     }
-    else if (type == WTYPE_ICON_BUTTON)
+    else if (type == WTYPE_ICON_BUTTON && !list_header_widget)
     {
         drawIconButton(rect, widget, pressed, focused);
     }
-    else if (type == WTYPE_BUTTON)
+    else if (type == WTYPE_BUTTON && !list_header_widget)
     {
-        if (widget->m_event_handler != NULL &&
-            widget->m_event_handler->getType() == WTYPE_LIST)
-        {
-            drawListHeader(rect, widget);
-        }
-        else
-        {
-            drawButton(widget, rect, pressed, focused);
-        }
+        drawButton(widget, rect, pressed, focused);
     }
     else if(type == WTYPE_PROGRESS)
     {

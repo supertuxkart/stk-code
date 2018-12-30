@@ -1251,6 +1251,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     {
         NetworkConfig::get()->setServerIdFile(
             file_manager->getUserConfigFile(s));
+        ServerConfig::m_server_configurable = true;
     }
     if (CommandLine::has("--disable-polling"))
     {

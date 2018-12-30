@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-23 23:45+0800\n"
-"PO-Revision-Date: 2018-11-27 17:42+0000\n"
+"POT-Creation-Date: 2018-12-22 11:16+0800\n"
+"PO-Revision-Date: 2018-12-25 09:03+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -276,10 +276,11 @@ msgstr "Alapértékek visszatöltése"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/network/protocols/client_lobby.cpp:466
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
 #: src/states_screens/edit_gp_screen.cpp:260
-#: src/states_screens/ghost_replay_selection.cpp:386
+#: src/states_screens/ghost_replay_selection.cpp:391
+#: src/states_screens/online/tracks_screen.cpp:777
+#: src/states_screens/online/tracks_screen.cpp:814
 msgid "Yes"
 msgstr "Igen"
 
@@ -294,6 +295,8 @@ msgstr "Igen"
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
@@ -310,7 +313,7 @@ msgstr "Igen"
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/dialogs/addons_loading.cpp:236
 #: src/states_screens/online/register_screen.cpp:119
-#: src/states_screens/options/user_screen.cpp:126
+#: src/states_screens/options/user_screen.cpp:127
 msgid "Cancel"
 msgstr "Mégse"
 
@@ -408,6 +411,8 @@ msgstr "* STK újraindítása az új beállítások alkalmazásához"
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -587,6 +592,113 @@ msgstr "Elfogadom a fenti feltételeket és 13 éves vagy idősebb vagyok."
 msgid "Accept"
 msgstr "Elfogadás"
 
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+msgid "Server Configuration"
+msgstr "Kiszolgáló beállításai"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Difficulty"
+msgstr "Nehézség"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:606
+msgid "Novice"
+msgstr "Kezdő"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:607
+msgid "Intermediate"
+msgstr "Haladó"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:608
+msgid "Expert"
+msgstr "Nehéz"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:609
+msgid "SuperTux"
+msgstr "SuperTux"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Game mode"
+msgstr "Játékmód"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:238 src/race/race_manager.hpp:187
+msgid "Normal Race"
+msgstr "Normál verseny"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:240 src/race/race_manager.hpp:189
+msgid "Time Trial"
+msgstr "Időfutam"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+msgid "Battle"
+msgstr "Csata"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:242 src/race/race_manager.hpp:201
+msgid "Soccer"
+msgstr "Foci"
+
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -612,7 +724,6 @@ msgstr "Játékos hozzáadása"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #: src/states_screens/online/online_profile_achievements.cpp:75
-#: src/states_screens/online/server_selection.cpp:119
 msgid "Name"
 msgstr "Név"
 
@@ -754,52 +865,6 @@ msgstr "Versenybeállítások"
 msgid "Type:"
 msgstr "Típus:"
 
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:590
-msgid "Novice"
-msgstr "Kezdő"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:591
-msgid "Intermediate"
-msgstr "Haladó"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:592
-msgid "Expert"
-msgstr "Nehéz"
-
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:593
-msgid "SuperTux"
-msgstr "SuperTux"
-
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
 #. I18N: ./data/gui/screens/feature_unlocked.stkgui
@@ -866,7 +931,7 @@ msgstr "Szabványos"
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:144
 #: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/kart_selection.cpp:293
 #: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "Bővítmények"
@@ -882,10 +947,10 @@ msgstr "Bővítmények"
 #: src/states_screens/arenas_screen.cpp:73
 #: src/states_screens/easter_egg_screen.cpp:136
 #: src/states_screens/edit_track_screen.cpp:145
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:73
 #: src/states_screens/grand_prix_editor_screen.cpp:333
-#: src/states_screens/kart_selection.cpp:282
-#: src/states_screens/online/tracks_screen.cpp:225
+#: src/states_screens/kart_selection.cpp:285
+#: src/states_screens/online/tracks_screen.cpp:338
 #: src/states_screens/tracks_and_gp_screen.cpp:135
 msgid "All"
 msgstr "Összes"
@@ -1017,7 +1082,7 @@ msgstr "Pályacsoport"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:144
 msgid "Continue saved GP"
 msgstr "Mentett nagydíj folytatása"
 
@@ -1475,6 +1540,8 @@ msgstr "Amikor a bemeneti eszközök beállításra kerültek, válaszd a „tö
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
+#. I18N: ./data/gui/screens/online/network_karts.stkgui
+#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Válassz egy gokartot"
 
@@ -1555,44 +1622,6 @@ msgstr "Jelszó a személyes kiszolgálóhoz (elhagyható)"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:121
-msgid "Difficulty"
-msgstr "Nehézség"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:122
-msgid "Game mode"
-msgstr "Játékmód"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:230 src/race/race_manager.hpp:180
-msgid "Normal Race"
-msgstr "Normál verseny"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:232 src/race/race_manager.hpp:182
-msgid "Time Trial"
-msgstr "Időfutam"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-msgid "Battle"
-msgstr "Csata"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:234 src/race/race_manager.hpp:190
-msgid "Soccer"
-msgstr "Foci"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
 msgid "Create"
 msgstr "Létrehozás"
 
@@ -1618,7 +1647,7 @@ msgstr "Kiszolgáló létrehozása"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:153
+#: src/states_screens/online/networking_lobby.cpp:170
 msgid "Lobby"
 msgstr "Váró"
 
@@ -1629,13 +1658,13 @@ msgstr "Küldés"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:155
+#: src/states_screens/online/networking_lobby.cpp:172
 msgid "Start race"
 msgstr "Verseny indítása"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-msgid "Server Configuration"
+msgid "Configuration"
 msgstr ""
 
 #. I18N: ./data/gui/screens/online/online.stkgui
@@ -1864,7 +1893,6 @@ msgstr "Felhasználói felület"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/online/server_selection.cpp:120
 msgid "Players"
 msgstr "Játékosok"
 
@@ -1916,7 +1944,7 @@ msgstr "Zene"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/options/options_screen_video.cpp:429
+#: src/states_screens/options/options_screen_video.cpp:445
 msgid "Enabled"
 msgstr "Engedélyezve"
 
@@ -1951,7 +1979,7 @@ msgstr "Vissza az eszközlistához"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr ""
+msgstr "Internetbeállítások"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -1976,7 +2004,7 @@ msgstr "Csevegés engedélyezése a hálózati váróban"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Miscellaneous options"
-msgstr ""
+msgstr "Egyéb beállítások"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2076,6 +2104,7 @@ msgstr "Kék csapat"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In the create server screen
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:168
 #: src/states_screens/online/create_server_screen.cpp:190
 msgid "Soccer game type"
 msgstr "Foci játéktípus"
@@ -2083,14 +2112,14 @@ msgstr "Foci játéktípus"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:317
+#: src/states_screens/online/tracks_screen.cpp:463
 msgid "Number of goals to win"
 msgstr "Célok száma a nyeréshez"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:325
+#: src/states_screens/online/tracks_screen.cpp:471
 msgid "Maximum time (min.)"
 msgstr "Legtöbb idő (perc)"
 
@@ -2105,14 +2134,13 @@ msgstr "= Toplista ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:328
+#: src/states_screens/track_info_screen.cpp:327
 msgid "(Empty)"
 msgstr "(Üres)"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:349
+#: src/states_screens/online/tracks_screen.cpp:500
 msgid "Number of laps"
 msgstr "Körök száma"
 
@@ -2447,25 +2475,25 @@ msgid ""
 "created."
 msgstr "A beállítófájlod túl régi volt, ezért törölve lett, és egy új került létrehozásra."
 
-#: src/graphics/irr_driver.cpp:585
+#: src/graphics/irr_driver.cpp:588
 msgid "Video recording started."
 msgstr "Videórögzítés elindítva."
 
-#: src/graphics/irr_driver.cpp:591
+#: src/graphics/irr_driver.cpp:594
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Videó elmentve ide: „%s”"
 
-#: src/graphics/irr_driver.cpp:595
+#: src/graphics/irr_driver.cpp:598
 msgid "Encoding progress:"
 msgstr "Kódolási folyamat:"
 
-#: src/graphics/irr_driver.cpp:1781 src/graphics/irr_driver.cpp:1786
+#: src/graphics/irr_driver.cpp:1785 src/graphics/irr_driver.cpp:1790
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#: src/guiengine/engine.cpp:1329
+#: src/guiengine/engine.cpp:1341
 msgid "Loading"
 msgstr "Betöltés"
 
@@ -2489,9 +2517,9 @@ msgstr "Robbanóolaj-hatékonyság"
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:386
 #: src/guiengine/widgets/player_kart_widget.cpp:759
-#: src/karts/controller/local_player_controller.cpp:449
-#: src/karts/controller/player_controller.cpp:408
-#: src/network/protocols/client_lobby.cpp:708
+#: src/karts/controller/local_player_controller.cpp:437
+#: src/karts/controller/player_controller.cpp:407
+#: src/network/protocols/client_lobby.cpp:668
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3162,13 +3190,13 @@ msgstr[1] "%d wiimote található"
 msgid "Could not detect any wiimote :/"
 msgstr "Nem sikerült felismerni egyetlen wiimote-ot sem :/"
 
-#: src/karts/controller/local_player_controller.cpp:307
+#: src/karts/controller/local_player_controller.cpp:295
 msgid "Penalty time!!"
 msgstr "Büntető idő!"
 
-#: src/karts/controller/local_player_controller.cpp:310
+#: src/karts/controller/local_player_controller.cpp:298
 msgid "Don't accelerate before 'Set!'"
-msgstr ""
+msgstr "Ne gyorsíts a „Kész!” előtt."
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
@@ -3213,39 +3241,39 @@ msgid ""
 "your video driver is available. SuperTuxKart requires %s or better."
 msgstr "Az OpenGL verziód túl réginek tűnik. Kérlek ellenőrizd, hogy elérhető-e frissítés a videokártya illesztőprogramodhoz. A SuperTuxKart %s vagy újabb verziót igényel."
 
-#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:85
+#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:86
 msgid "Server connection timed out."
 msgstr "A kiszolgáló-kapcsolat túllépte az időkorlátot."
 
 #. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:366
+#: src/modes/capture_the_flag.cpp:398
 #, c-format
 msgid "%s has the red flag!"
 msgstr "%s megszerezte a piros zászlót!"
 
 #. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:375
+#: src/modes/capture_the_flag.cpp:407
 #, c-format
 msgid "%s has the blue flag!"
 msgstr "%s megszerezte a kék zászlót!"
 
 #. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:402
+#: src/modes/capture_the_flag.cpp:434
 #, c-format
 msgid "%s captured the red flag!"
 msgstr "%s elrabolta a piros zászlót!"
 
 #. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:413
+#: src/modes/capture_the_flag.cpp:445
 #, c-format
 msgid "%s captured the blue flag!"
 msgstr "%s elrabolta a kék zászlót!"
 
-#: src/modes/capture_the_flag.cpp:431
+#: src/modes/capture_the_flag.cpp:463
 msgid "The red flag has returned!"
 msgstr "A piros zászló visszakerült!"
 
-#: src/modes/capture_the_flag.cpp:447
+#: src/modes/capture_the_flag.cpp:479
 msgid "The blue flag has returned!"
 msgstr "A kék zászló visszakerült!"
 
@@ -3288,98 +3316,50 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i pótkerék gokart jelent meg!"
 msgstr[1] "%i pótkerék gokart jelent meg!"
 
-#: src/modes/world.cpp:1239
+#: src/modes/world.cpp:1245
 msgid "You have been eliminated!"
 msgstr "Kizártak a versenyből!"
 
-#: src/modes/world.cpp:1246
+#: src/modes/world.cpp:1252
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "„%s” kizárva."
 
-#: src/network/protocols/client_lobby.cpp:86
+#: src/network/protocols/client_lobby.cpp:87
 msgid "Server has been shut down."
 msgstr "A kiszolgáló le lett állítva."
 
-#: src/network/protocols/client_lobby.cpp:87
+#: src/network/protocols/client_lobby.cpp:88
 msgid "You were kicked from the server."
 msgstr "Kidobtak a kiszolgálóról."
 
-#: src/network/protocols/client_lobby.cpp:89
-#: src/network/protocols/client_lobby.cpp:235
-#: src/network/protocols/client_lobby.cpp:739
+#: src/network/protocols/client_lobby.cpp:90
+#: src/network/protocols/client_lobby.cpp:222
+#: src/network/protocols/client_lobby.cpp:704
 msgid "Bad network connection is detected."
 msgstr "Rossz hálózati kapcsolat észlelhető."
 
-#: src/network/protocols/client_lobby.cpp:467
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:260
-#: src/states_screens/ghost_replay_selection.cpp:386
-msgid "No"
-msgstr "Nem"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:473
-#, c-format
-msgid ""
-"Track: %s,\n"
-"random item location: %s"
-msgstr "Pálya: %s,\nvéletlen elemhely: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:481
-#, c-format
-msgid "Track: %s"
-msgstr "Pálya: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:488
-#, c-format
-msgid ""
-"Track: %s,\n"
-"number of goals to win: %d,\n"
-"random item location: %s"
-msgstr "Pálya: %s,\ngólok száma a győzelemhez: %d,\nvéletlen elemhely: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:495
-#, c-format
-msgid ""
-"Track: %s,\n"
-"maximum time: %d,\n"
-"random item location: %s"
-msgstr "Pálya: %s,\nmaximális idő: %d,\nvéletlen elemhely: %s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:503
-#, c-format
-msgid ""
-"Track: %s,\n"
-"laps: %d, reversed: %s"
-msgstr "Pálya: %s,\nkör: %d, fordított: %s"
-
-#: src/network/protocols/client_lobby.cpp:533
+#: src/network/protocols/client_lobby.cpp:484
 #, c-format
 msgid "%s disconnected."
 msgstr "%s leszakadt."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:560
+#: src/network/protocols/client_lobby.cpp:512
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Nyomj rá a játékos nevére a listában a játékoskezeléshez és a rangsor-információkhoz."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:590
+#: src/network/protocols/client_lobby.cpp:551
 #, c-format
 msgid "Server name: %s"
 msgstr "Kiszolgáló neve: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:598
+#: src/network/protocols/client_lobby.cpp:559
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1640
 #, c-format
@@ -3387,74 +3367,76 @@ msgid "Difficulty: %s"
 msgstr "Nehézség: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:603
+#: src/network/protocols/client_lobby.cpp:564
 #, c-format
 msgid "Max players: %d"
 msgstr "Legtöbb játékos: %d"
 
-#: src/network/protocols/client_lobby.cpp:620
+#: src/network/protocols/client_lobby.cpp:575
 #: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Játékmód: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:632
+#: src/network/protocols/client_lobby.cpp:588
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
 #: src/states_screens/soccer_setup_screen.cpp:230
 msgid "Time limit"
 msgstr "Időkorlát"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:633
+#: src/network/protocols/client_lobby.cpp:589
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/soccer_setup_screen.cpp:231
 msgid "Goals limit"
 msgstr "Gól korlát"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:637
+#: src/network/protocols/client_lobby.cpp:593
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Foci játéktípus: %s"
 
-#: src/network/protocols/client_lobby.cpp:647
+#: src/network/protocols/client_lobby.cpp:603
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Nagydíj állapota: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:731
+#: src/network/protocols/client_lobby.cpp:696
 msgid "All players joined red or blue team."
 msgstr "Az összes játékos csatlakozott a piros vagy a kék csapathoz."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:752
+#: src/network/protocols/client_lobby.cpp:717
 msgid "You are now the owner of server."
 msgstr "Most te vagy a kiszolgáló tulajdonosa."
 
-#: src/network/protocols/client_lobby.cpp:790
+#: src/network/protocols/client_lobby.cpp:755
 msgid "Connection refused: Server is busy."
 msgstr "Kapcsolódás elutasítva: a kiszolgáló foglalt."
 
-#: src/network/protocols/client_lobby.cpp:794
+#: src/network/protocols/client_lobby.cpp:759
 msgid "Connection refused: You are banned from the server."
 msgstr "Kapcsolódás elutasítva: kitiltottak a kiszolgálóról."
 
-#: src/network/protocols/client_lobby.cpp:798
+#: src/network/protocols/client_lobby.cpp:763
 msgid "Connection refused: Server password is incorrect."
 msgstr "Kapcsolódás elutasítva: a kiszolgáló jelszava helytelen."
 
-#: src/network/protocols/client_lobby.cpp:802
+#: src/network/protocols/client_lobby.cpp:767
 msgid "Connection refused: Game data is incompatible."
 msgstr "Kapcsolódás elutasítva: a játékadatok nem megfelelőek."
 
-#: src/network/protocols/client_lobby.cpp:806
+#: src/network/protocols/client_lobby.cpp:771
 msgid "Connection refused: Server is full."
 msgstr "Kapcsolódás elutasítva: a kiszolgáló megtelt."
 
-#: src/network/protocols/client_lobby.cpp:810
+#: src/network/protocols/client_lobby.cpp:775
 msgid "Connection refused: Invalid player connecting."
 msgstr "Kapcsolódás elutasítva: érvénytelen játékos kapcsolódás."
 
@@ -3462,27 +3444,31 @@ msgstr "Kapcsolódás elutasítva: érvénytelen játékos kapcsolódás."
 msgid "No quick play server available."
 msgstr "Nem érhető el gyors játékú kiszolgáló."
 
-#: src/network/protocols/connect_to_server.cpp:281
+#: src/network/protocols/connect_to_server.cpp:282
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nem lehet kapcsolódni a kiszolgálóhoz: %s."
 
-#: src/network/server_config.cpp:226
+#: src/network/server_config.cpp:234
 msgid "Normal Race (Grand Prix)"
 msgstr "Normál verseny (nagydíj)"
 
-#: src/network/server_config.cpp:228
+#: src/network/server_config.cpp:236
 msgid "Time Trial (Grand Prix)"
 msgstr "Időfutam (nagydíj)"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:238
+#: src/network/server_config.cpp:246 src/race/race_manager.hpp:195
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:178
 msgid "Free-For-All"
 msgstr "Mindenki ellen"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:240
+#: src/network/server_config.cpp:248 src/race/race_manager.hpp:197
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:159
 #: src/states_screens/online/create_server_screen.cpp:180
 msgid "Capture The Flag"
 msgstr "Zászló megszerzése"
@@ -3549,17 +3535,17 @@ msgid ""
 msgstr "A ranglista fájl túl régi volt,\naz összes ranglista törölve lett."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:184
+#: src/race/race_manager.hpp:191
 msgid "Follow the Leader"
 msgstr "Kövesd a vezért"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:186
+#: src/race/race_manager.hpp:193
 msgid "3 Strikes Battle"
 msgstr "3-csapásos csata"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:188
+#: src/race/race_manager.hpp:199
 msgid "Egg Hunt"
 msgstr "Tojásvadászat"
 
@@ -3613,18 +3599,18 @@ msgid "Updated date"
 msgstr "Frissítési dátum"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:297
+#: src/states_screens/addons_screen.cpp:298
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s - %s"
 
-#: src/states_screens/addons_screen.cpp:417
+#: src/states_screens/addons_screen.cpp:418
 msgid "Please wait while addons are updated"
 msgstr "Kérlek várj, amíg a kiegészítők frissítésre kerülnek"
 
-#: src/states_screens/addons_screen.cpp:495
-#: src/states_screens/main_menu_screen.cpp:558
+#: src/states_screens/addons_screen.cpp:496
+#: src/states_screens/main_menu_screen.cpp:555
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3637,7 +3623,7 @@ msgstr "Sajnos egy hiba történt a kiegészítők oldalának elérése közben.
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:79
 #: src/states_screens/easter_egg_screen.cpp:142
-#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/kart_selection.cpp:291
 #: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "szabványos"
@@ -3646,8 +3632,8 @@ msgstr "szabványos"
 #: src/states_screens/arenas_screen.cpp:325
 #: src/states_screens/easter_egg_screen.cpp:224
 #: src/states_screens/easter_egg_screen.cpp:255
-#: src/states_screens/kart_selection.cpp:886
-#: src/states_screens/kart_selection.cpp:1522
+#: src/states_screens/kart_selection.cpp:889
+#: src/states_screens/kart_selection.cpp:1525
 #: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Zárolt: teljesítsd az aktív kihívásokat, hogy a többihez is hozzáférj!"
@@ -4164,13 +4150,13 @@ msgstr "Az 1024×768 vagy 1280×720 képpontnál kisebb felbontások nem támoga
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
 #: src/states_screens/online/create_server_screen.cpp:160
-#: src/states_screens/options/options_screen_video.cpp:432
+#: src/states_screens/options/options_screen_video.cpp:448
 msgid "Disabled"
 msgstr "Letiltva"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:63
-#: src/states_screens/options/options_screen_video.cpp:434
+#: src/states_screens/options/options_screen_video.cpp:450
 msgid "Important only"
 msgstr "Csak fontosak"
 
@@ -4180,7 +4166,7 @@ msgstr "Csak fontosak"
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:80
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/options/options_screen_video.cpp:441
+#: src/states_screens/options/options_screen_video.cpp:457
 msgid "Low"
 msgstr "Alacsony"
 
@@ -4190,58 +4176,68 @@ msgstr "Alacsony"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/options/options_screen_video.cpp:444
+#: src/states_screens/options/options_screen_video.cpp:460
 msgid "High"
 msgstr "Magas"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
-#: src/states_screens/options/options_screen_video.cpp:438
+#: src/states_screens/options/options_screen_video.cpp:454
 msgid "Very Low"
 msgstr "Nagyon alacsony"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:143
-#: src/states_screens/ghost_replay_selection.cpp:153
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:154
+msgctxt "column_name"
 msgid "Reverse"
-msgstr "Megfordítás"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
-#: src/states_screens/ghost_replay_selection.cpp:155
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:156
+#: src/states_screens/online/server_selection.cpp:122
+msgctxt "column_name"
 msgid "Difficulty"
-msgstr "Nehézség"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
-#: src/states_screens/ghost_replay_selection.cpp:157
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:158
+msgctxt "column_name"
 msgid "Laps"
-msgstr "Körök"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
-#: src/states_screens/ghost_replay_selection.cpp:158
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:159
+msgctxt "column_name"
 msgid "Time"
-msgstr "Idő"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
-#: src/states_screens/ghost_replay_selection.cpp:159
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:160
+msgctxt "column_name"
 msgid "Kart"
-msgstr "Gokart"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
-#: src/states_screens/ghost_replay_selection.cpp:160
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:161
+msgctxt "column_name"
 msgid "User"
-msgstr "Felhasználó"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
-#: src/states_screens/ghost_replay_selection.cpp:164
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:165
+msgctxt "column_name"
 msgid "Version"
-msgstr "Verzió"
+msgstr ""
+
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:391
+#: src/states_screens/online/tracks_screen.cpp:777
+#: src/states_screens/online/tracks_screen.cpp:814
+msgid "No"
+msgstr "Nem"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:43
@@ -4254,18 +4250,28 @@ msgid "Pick a color from slider"
 msgstr "Válassz egy színt a csúszkáról"
 
 #. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:82
+#: src/states_screens/dialogs/network_user_dialog.cpp:83
 msgid "Kick"
 msgstr "Kirúgás"
 
 #. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:98
+#: src/states_screens/dialogs/network_user_dialog.cpp:99
 msgid "Change team"
 msgstr "Csapatváltás"
 
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:114
+msgid "Enable handicap"
+msgstr ""
+
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:119
+msgid "Disable handicap"
+msgstr ""
+
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
-#: src/states_screens/dialogs/network_user_dialog.cpp:122
+#: src/states_screens/dialogs/network_user_dialog.cpp:143
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:140
 #, c-format
 msgid "Fetching ranking info for %s"
@@ -4326,6 +4332,12 @@ msgstr "Robbanóolaj kihívás"
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
 msgstr "Szellemvisszajátszás verseny"
+
+#. I18N: In the create server screen, show various battle mode available
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:155
+#: src/states_screens/online/create_server_screen.cpp:174
+msgid "Battle mode"
+msgstr "Csata mód"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:99
 #: src/states_screens/race_gui_overworld.cpp:148
@@ -4415,13 +4427,13 @@ msgid "Performing vote"
 msgstr "Szavazás végrehajtása"
 
 #: src/states_screens/easter_egg_screen.cpp:269
-#: src/states_screens/online/tracks_screen.cpp:440
+#: src/states_screens/online/tracks_screen.cpp:590
 #: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
 msgstr "Véletlen pálya"
 
 #: src/states_screens/edit_gp_screen.cpp:116
-#: src/states_screens/ghost_replay_selection.cpp:505
+#: src/states_screens/ghost_replay_selection.cpp:510
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
@@ -4497,30 +4509,31 @@ msgstr "Feloldottad ezt a pályát: %0"
 msgid "You unlocked grand prix %0"
 msgstr "Feloldottad ezt a nagydíjat: %0"
 
-#: src/states_screens/ghost_replay_selection.cpp:151
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:152
+msgctxt "column_name"
 msgid "Track"
-msgstr "Pálya"
+msgstr ""
 
-#: src/states_screens/ghost_replay_selection.cpp:162
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:163
+#: src/states_screens/online/server_selection.cpp:121
+msgctxt "column_name"
 msgid "Players"
-msgstr "Játékosok"
+msgstr ""
 
-#: src/states_screens/gp_info_screen.cpp:72
+#: src/states_screens/gp_info_screen.cpp:71
 msgid "Default"
 msgstr "Alapértelmezett"
 
-#: src/states_screens/gp_info_screen.cpp:73
+#: src/states_screens/gp_info_screen.cpp:72
 msgid "None"
 msgstr "Nincs"
 
-#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/gp_info_screen.cpp:74
 msgid "Random"
 msgstr "Véletlen"
 
-#: src/states_screens/gp_info_screen.cpp:152
-#: src/states_screens/gp_info_screen.cpp:177
+#: src/states_screens/gp_info_screen.cpp:151
+#: src/states_screens/gp_info_screen.cpp:176
 msgid "Reload"
 msgstr "Újratöltés"
 
@@ -4568,49 +4581,46 @@ msgstr "Megnyerted a nagydíjat!"
 msgid "You completed the Grand Prix!"
 msgstr "Teljesítetted a nagydíjat!"
 
-#: src/states_screens/kart_selection.cpp:862
-#: src/states_screens/kart_selection.cpp:1540
+#: src/states_screens/kart_selection.cpp:865
+#: src/states_screens/kart_selection.cpp:1543
 msgid "Random Kart"
 msgstr "Véletlen gokart"
 
-#: src/states_screens/kart_selection.cpp:881
+#: src/states_screens/kart_selection.cpp:884
 msgid "Locked"
 msgstr "Zárolt"
 
-#: src/states_screens/kart_selection.cpp:982
-#: src/states_screens/online/networking_lobby.cpp:309
+#: src/states_screens/kart_selection.cpp:985
+#: src/states_screens/online/networking_lobby.cpp:347
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Mindenki:\nNyomd meg a „kiválasztás\" gombot a csatlakozáshoz"
 
 #: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online/online_screen.cpp:209
 msgid ""
 "You can not play online without internet access. If you want to play online,"
-" go to options, select  tab 'User Interface', and edit \"Connect to the "
-"Internet\"."
-msgstr "Nem játszhatsz az interneten internet-hozzáférés nélkül. Ha az interneten szeretnél játszani, akkor menj a beállításokhoz, válaszd a „Felhasználói felület” lapot, és szerkeszd a „Csatlakozás az Internethez” beállítást."
+" go in the options menu, and check \"Connect to the Internet\"."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:508
+#: src/states_screens/main_menu_screen.cpp:507
 msgid ""
 "You can not download addons without internet access. If you want to download"
-" addons, go to options, select the 'User Interface' tab, and check \"Connect"
-" to the Internet\"."
-msgstr "Nem tölthetsz le kiegészítőket internet-hozzáférés nélkül. Ha kiegészítőket szeretnél letölteni, akkor menj a beállításokhoz, válaszd a „Felhasználói felület” lapot, és ellenőrizd a „Csatlakozás az Internethez” beállítást."
+" addons, go in the options menu, and check \"Connect to the Internet\"."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:517
+#: src/states_screens/main_menu_screen.cpp:515
 msgid ""
-"You can not download addons without internet access. If you want to download addons, go to options, select the 'User Interface' tab, and check \"Connect to the Internet\".\n"
+"You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr "Nem tölthetsz le kiegészítőket internet-hozzáférés nélkül. Ha kiegészítőket szeretnél letölteni, akkor menj a beállításokhoz, válaszd a „Felhasználói felület” lapot, és ellenőrizd a „Csatlakozás az Internethez” beállítást.\n\nAzonban törölheted a már letöltött kiegészítőket."
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:553
+#: src/states_screens/main_menu_screen.cpp:550
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "A kiegészítők modul jelenleg le van tiltva a beállítások képernyőn"
 
-#: src/states_screens/main_menu_screen.cpp:565
+#: src/states_screens/main_menu_screen.cpp:562
 msgid "Please wait while the add-ons are loading"
 msgstr "Kérlek várj, amíg a kiegészítők betöltődnek"
 
@@ -4628,11 +4638,6 @@ msgstr "%s kiszolgálója"
 msgid "No. of grand prix track(s)"
 msgstr "Nagydíj pályák száma"
 
-#. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/online/create_server_screen.cpp:174
-msgid "Battle mode"
-msgstr "Csata mód"
-
 #: src/states_screens/online/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "A névnek 4 és 30 karakter közötti hosszúnak kell lennie!"
@@ -4641,23 +4646,36 @@ msgstr "A névnek 4 és 30 karakter közötti hosszúnak kell lennie!"
 msgid "Incorrect characters in password!"
 msgstr "Helytelen karakterek a jelszóban!"
 
-#: src/states_screens/online/networking_lobby.cpp:186
-#: src/states_screens/online/networking_lobby.cpp:549
+#: src/states_screens/online/networking_lobby.cpp:204
+#: src/states_screens/online/networking_lobby.cpp:603
 msgid "Chat is disabled, enable in options menu."
 msgstr "A csevegés le van tiltva, engedélyezd a beállítások menüben."
 
-#: src/states_screens/online/networking_lobby.cpp:242
+#: src/states_screens/online/networking_lobby.cpp:260
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Váró (ping: %d ms)"
 
-#. I18N: In the networking lobby, show when player is required to wait
-#. before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:251
-msgid "Please wait for current game to end."
-msgstr "Várj, amíg a jelenlegi játék befejeződik."
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with remaining time
+#: src/states_screens/online/networking_lobby.cpp:273
+#, c-format
+msgid "Please wait for the current game's end, estimated remaining time: %s."
+msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:280
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with progress in percent
+#: src/states_screens/online/networking_lobby.cpp:281
+msgid "Please wait for the current game's end, estimated progress: %d%."
+msgstr ""
+
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish
+#: src/states_screens/online/networking_lobby.cpp:288
+msgid "Please wait for the current game's end."
+msgstr ""
+
+#: src/states_screens/online/networking_lobby.cpp:318
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4666,29 +4684,36 @@ msgstr[1] "A játék akkor indul, ha több mint %d játékos van."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:294
+#: src/states_screens/online/networking_lobby.cpp:332
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
 msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
+msgstr[1] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
 
-#: src/states_screens/online/networking_lobby.cpp:327
+#: src/states_screens/online/networking_lobby.cpp:365
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Kapcsolódás a kiszolgálóhoz: %s"
 
-#: src/states_screens/online/networking_lobby.cpp:332
+#: src/states_screens/online/networking_lobby.cpp:370
 msgid "Finding a quick play server"
 msgstr "Gyors játékú kiszolgáló keresése"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:577
+#: src/states_screens/online/networking_lobby.cpp:631
 msgid "Ready"
-msgstr ""
+msgstr "Kész"
+
+#. I18N: In kart screen, show before the voting period in network ends.
+#: src/states_screens/online/network_kart_selection.cpp:137
+#: src/states_screens/online/tracks_screen.cpp:835
+#, c-format
+msgid "Remaining time: %d"
+msgstr "Hátralévő idő: %d"
 
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:82
@@ -4736,6 +4761,13 @@ msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Be kell jelentkezned a globális hálózati játékhoz. Kattints a felhasználónevedre fent."
 
+#: src/states_screens/online/online_screen.cpp:209
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr "Nem játszhatsz az interneten internet-hozzáférés nélkül. Ha az interneten szeretnél játszani, akkor menj a beállításokhoz, válaszd a „Felhasználói felület” lapot, és szerkeszd a „Csatlakozás az Internethez” beállítást."
+
 #: src/states_screens/online/online_screen.cpp:237
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
@@ -4749,7 +4781,7 @@ msgstr "Érvénytelen kiszolgálócím: %s."
 #. I18N: In enter server ip address dialog
 #: src/states_screens/online/online_screen.cpp:273
 msgid "Failed to detect port number."
-msgstr ""
+msgstr "Nem sikerült felismerni a portszámot."
 
 #: src/states_screens/online/online_user_search.cpp:210
 #: src/states_screens/online/online_user_search.cpp:274
@@ -4757,7 +4789,7 @@ msgid "Searching"
 msgstr "Keresés"
 
 #: src/states_screens/online/register_screen.cpp:120
-#: src/states_screens/options/user_screen.cpp:125
+#: src/states_screens/options/user_screen.cpp:126
 msgid "Exit game"
 msgstr "Kilépés a játékból"
 
@@ -4801,32 +4833,44 @@ msgstr "Hamarosan e-mailt fogsz kapni a fiókaktiválással kapcsolatos további
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Az Internet-hozzáférés le van tiltva, kérlek engedélyezd a beállításokban"
 
+#: src/states_screens/online/server_selection.cpp:119
+msgctxt "column_name"
+msgid "Name"
+msgstr ""
+
+#: src/states_screens/online/server_selection.cpp:120
+msgctxt "column_name"
+msgid "Game mode"
+msgstr ""
+
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
 #: src/states_screens/online/server_selection.cpp:127
+msgctxt "column_name"
 msgid "Owner"
-msgstr "Tulajdonos"
+msgstr ""
 
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/online/server_selection.cpp:129
+msgctxt "column_name"
 msgid "Distance (km)"
-msgstr "Távolság (km)"
+msgstr ""
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:215
+#: src/states_screens/online/server_selection.cpp:219
 msgid "Unknown"
 msgstr "Ismeretlen"
 
-#: src/states_screens/online/server_selection.cpp:323
+#: src/states_screens/online/server_selection.cpp:327
 msgid "No server is available."
 msgstr "Nincs elérhető kiszolgáló."
 
-#: src/states_screens/online/server_selection.cpp:331
+#: src/states_screens/online/server_selection.cpp:335
 msgid "Fetching servers"
 msgstr "Kiszolgálók lekérése"
 
 #. I18N: In track screen for networking, clarify voting phase
-#: src/states_screens/online/tracks_screen.cpp:188
+#: src/states_screens/online/tracks_screen.cpp:300
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
@@ -4834,29 +4878,22 @@ msgstr "Ha a játékosok többsége mind ugyanazt a pályát és versenybeállí
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:288
-#: src/states_screens/online/tracks_screen.cpp:333
-#: src/states_screens/track_info_screen.cpp:219
+#: src/states_screens/online/tracks_screen.cpp:433
+#: src/states_screens/online/tracks_screen.cpp:481
+#: src/states_screens/track_info_screen.cpp:218
 msgid "Random item location"
 msgstr "Véletlenszerű elemelhelyezés"
 
-#. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:357
-#: src/states_screens/track_info_screen.cpp:214
+#: src/states_screens/online/tracks_screen.cpp:511
+#: src/states_screens/track_info_screen.cpp:213
 msgid "Drive in reverse"
 msgstr "Fordítva vezetés"
 
-#: src/states_screens/online/tracks_screen.cpp:426
+#: src/states_screens/online/tracks_screen.cpp:576
 #: src/states_screens/tracks_and_gp_screen.cpp:275
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Zárolt: "
-
-#. I18N: In tracks screen, about voting of tracks in network
-#: src/states_screens/online/tracks_screen.cpp:521
-#, c-format
-msgid "Remaining time: %d"
-msgstr "Hátralévő idő: %d"
 
 #: src/states_screens/options/options_screen_device.cpp:70
 msgid "Action"
@@ -5031,109 +5068,109 @@ msgid "Hidden"
 msgstr "Rejtett"
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:411
+#: src/states_screens/options/options_screen_video.cpp:427
 msgid "Custom"
 msgstr "Egyéni"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:447
+#: src/states_screens/options/options_screen_video.cpp:463
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Részecske hatások: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:453
+#: src/states_screens/options/options_screen_video.cpp:469
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animált karakterek: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:456
+#: src/states_screens/options/options_screen_video.cpp:472
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dinamikus fények: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:459
+#: src/states_screens/options/options_screen_video.cpp:475
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Elmosás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:462
+#: src/states_screens/options/options_screen_video.cpp:478
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Élsimítás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:465
+#: src/states_screens/options/options_screen_video.cpp:481
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Környezeti árnyékolás: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:469
+#: src/states_screens/options/options_screen_video.cpp:485
 #, c-format
 msgid "Shadows: %s"
 msgstr "Árnyékok: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:471
+#: src/states_screens/options/options_screen_video.cpp:487
 #, c-format
 msgid "Shadows: %i"
 msgstr "Árnyékok: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:474
+#: src/states_screens/options/options_screen_video.cpp:490
 #, c-format
 msgid "Bloom: %s"
 msgstr "Ragyogás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:478
+#: src/states_screens/options/options_screen_video.cpp:494
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Ragyogás (körvonalak): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:482
+#: src/states_screens/options/options_screen_video.cpp:498
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Fénysugarak (napsugarak): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:486
+#: src/states_screens/options/options_screen_video.cpp:502
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Mélységélesség: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:491
+#: src/states_screens/options/options_screen_video.cpp:507
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Megjelenített képminőség: %s"
 
-#: src/states_screens/options/user_screen.cpp:358
+#: src/states_screens/options/user_screen.cpp:363
 msgid "Internet access is disabled. Do you want to enable it?"
 msgstr "Az internet-hozzáférés le van tiltva. Szeretnéd engedélyezni?"
 
-#: src/states_screens/options/user_screen.cpp:551
+#: src/states_screens/options/user_screen.cpp:556
 msgid "You need to enter a password."
 msgstr "Meg kell adnod egy jelszót."
 
-#: src/states_screens/options/user_screen.cpp:572
+#: src/states_screens/options/user_screen.cpp:577
 #, c-format
 msgid "Logging out '%s'"
 msgstr "Kijelentkezés: „%s”"
 
-#: src/states_screens/options/user_screen.cpp:573
+#: src/states_screens/options/user_screen.cpp:578
 #, c-format
 msgid "Logging in '%s'"
 msgstr "Bejelentkezés: „%s”"
 
-#: src/states_screens/options/user_screen.cpp:654
+#: src/states_screens/options/user_screen.cpp:659
 msgid "You can't delete the only player."
 msgstr "Nem törölheted az egyetlen játékost."
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:662
+#: src/states_screens/options/user_screen.cpp:667
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr "Valóban törölni szeretnéd „%s” játékost?"
@@ -5179,7 +5216,7 @@ msgstr "Gyűjts robbanóolajat!"
 msgid "Follow the leader!"
 msgstr "Kövesd a vezért!"
 
-#: src/states_screens/race_gui_base.cpp:846
+#: src/states_screens/race_gui_base.cpp:848
 #, c-format
 msgid "Top %i"
 msgstr "Legjobb %i"
@@ -5241,24 +5278,24 @@ msgstr "Valóban meg szeretnéd szakítani a nagydíjat?"
 msgid "Network grand prix has been finished."
 msgstr "A hálózati nagydíj befejeződött."
 
-#: src/states_screens/race_result_gui.cpp:497
+#: src/states_screens/race_result_gui.cpp:496
 #: src/states_screens/race_result_gui.cpp:1231
 msgid "Red Team Wins"
 msgstr "A piros csapat nyert"
 
-#: src/states_screens/race_result_gui.cpp:499
+#: src/states_screens/race_result_gui.cpp:498
 #: src/states_screens/race_result_gui.cpp:1235
 msgid "Blue Team Wins"
 msgstr "A kék csapat nyert"
 
-#: src/states_screens/race_result_gui.cpp:501
+#: src/states_screens/race_result_gui.cpp:500
 #: src/states_screens/race_result_gui.cpp:1240
 msgid "It's a draw"
 msgstr "Döntetlen"
 
-#: src/states_screens/race_result_gui.cpp:563
-#: src/states_screens/race_result_gui.cpp:602
-#: src/states_screens/race_result_gui.cpp:700
+#: src/states_screens/race_result_gui.cpp:562
+#: src/states_screens/race_result_gui.cpp:601
+#: src/states_screens/race_result_gui.cpp:699
 #: src/states_screens/race_result_gui.cpp:1084
 msgid "Eliminated"
 msgstr "Kizárva"
@@ -5318,13 +5355,13 @@ msgstr "Versenyezz szellem gokartok ellen, és próbáld meg legyőzni őket!"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:108
+#: src/states_screens/track_info_screen.cpp:107
 #, c-format
 msgid "Track by %s"
 msgstr "A pálya készítője: %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:116
+#: src/states_screens/track_info_screen.cpp:115
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Támogatott legtöbb játékos: %d"

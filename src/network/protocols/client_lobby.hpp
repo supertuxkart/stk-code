@@ -44,7 +44,7 @@ private:
     void raceFinished(Event* event);
     void exitResultScreen(Event *event);
     // race votes
-    void displayPlayerVote(Event* event);
+    void receivePlayerVote(Event* event);
     void updatePlayerList(Event* event);
     void handleChat(Event* event);
     void handleServerInfo(Event* event);
@@ -76,6 +76,8 @@ private:
     bool m_received_server_result;
 
     bool m_auto_started;
+
+    bool m_first_connect;
 
     uint64_t m_auto_back_to_lobby_time;
 
@@ -117,7 +119,6 @@ public:
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-    void clearPlayers();
 };
 
 #endif // CLIENT_LOBBY_HPP

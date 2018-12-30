@@ -19,6 +19,9 @@
 #ifndef HEADER_MAX_SPEED_HPP
 #define HEADER_MAX_SPEED_HPP
 
+#include "utils/types.hpp"
+#include <limits>
+
 /** \defgroup karts */
 
 class AbstractKart;
@@ -73,9 +76,9 @@ private:
          *  to the duration will be decreased. When the duration is <0, the
          *  fade out time starts, and duration will go down to
          *  -m_fade_out_time before this speed increase stops. */
-        int m_duration;
+        int16_t m_duration;
         /** The fadeout time. */
-        int m_fade_out_time;
+        int16_t m_fade_out_time;
         /** The current max speed increase value. */
         float m_current_speedup;
         /** Additional engine force. */
@@ -92,7 +95,7 @@ private:
         void reset()
         {
             m_max_add_speed   = 0;
-            m_duration        = -9999999;
+            m_duration        = std::numeric_limits<int16_t>::min();
             m_fade_out_time   = 0;
             m_current_speedup = 0;
             m_engine_force    = 0;
@@ -128,15 +131,16 @@ private:
     public:
         /** The maximum slowdown to apply. */
         float m_max_speed_fraction;
-        /** How long it should take for the full slowdown to take effect. */
-        int m_fade_in_ticks;
         /** The current slowdown fraction, taking the fade-in time
          *  into account. */
         float m_current_fraction;
 
+        /** How long it should take for the full slowdown to take effect. */
+        int16_t m_fade_in_ticks;
+
         /** How long the effect should last. A -1.0f as value indicates
          *  that this effect stays active till it is changed back. */
-        int m_duration;
+        int16_t m_duration;
 
         /** The constructor initialises the data with data that won't
          *  affect top speed at all. */

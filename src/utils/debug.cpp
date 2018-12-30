@@ -140,6 +140,7 @@ enum DebugMenuCommand
     DEBUG_SCRIPT_CONSOLE,
     DEBUG_RUN_CUTSCENE,
     DEBUG_TEXTURE_CONSOLE,
+    DEBUG_RENDER_NW_DEBUG,
     DEBUG_START_RECORDING,
     DEBUG_STOP_RECORDING
 };   // DebugMenuCommand
@@ -849,6 +850,9 @@ bool handleContextMenuAction(s32 cmd_id)
                 return false;
             });
         break;
+        case DEBUG_RENDER_NW_DEBUG:
+            irr_driver->toggleRenderNetworkDebug();
+        break;
         case DEBUG_START_RECORDING:
             irr_driver->setRecording(true);
         break;
@@ -988,7 +992,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
             mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
             mnu->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
-
+            mnu->addItem(L"Network debugging", DEBUG_RENDER_NW_DEBUG);
             g_debug_menu_visible = true;
             irr_driver->showPointer();
         }

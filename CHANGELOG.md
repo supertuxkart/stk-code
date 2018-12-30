@@ -52,7 +52,8 @@ For similar reasons, and because some features are vastly more complex than othe
     * Around the Lighthouse, Fort Magma Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
-
+#### Karts
+* New version of Beastie by Jymis
 
 ## SuperTuxKart 0.9.3 (28. October 2017)
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau

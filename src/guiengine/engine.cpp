@@ -1143,8 +1143,12 @@ namespace GUIEngine
     }   // reloadSkin
 
     // -----------------------------------------------------------------------
-
-    void render(float elapsed_time)
+    /** \brief called on every frame to trigger the rendering of the GUI.
+     *  \param elapsed_time Time since last rendering calls (in seconds).
+     *  \param is_loading True if the rendering is called during loading of world,
+     *         in which case world, physics etc must not be accessed.
+     */
+    void render(float elapsed_time, bool is_loading)
     {
 #ifndef SERVER_ONLY
         GUIEngine::dt = elapsed_time;
@@ -1158,9 +1162,9 @@ namespace GUIEngine
 
         const GameState gamestate = g_state_manager->getGameState();
 
-        if (gamestate == MENU &&
-            GUIEngine::getCurrentScreen() != NULL &&
-            !GUIEngine::getCurrentScreen()->needs3D())
+        if ( (gamestate == MENU &&
+              GUIEngine::getCurrentScreen() != NULL &&
+             !GUIEngine::getCurrentScreen()->needs3D()  ) || is_loading)
         {
             g_skin->drawBgImage();
         }
@@ -1181,7 +1185,7 @@ namespace GUIEngine
         g_env->drawAll();
 
         // ---- some menus may need updating
-        if (gamestate != GAME)
+        if (gamestate != GAME || is_loading)
         {
             bool dialog_opened = false;
             

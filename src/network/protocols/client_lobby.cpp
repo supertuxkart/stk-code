@@ -35,6 +35,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/network_timer_synchronizer.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -46,7 +47,6 @@
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -88,12 +88,12 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_KICK] = _("You were kicked from the server.");
     m_disconnected_msg[PDI_BAD_CONNECTION] =
         _("Bad network connection is detected.");
+    m_first_connect = true;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
 ClientLobby::~ClientLobby()
 {
-    clearPlayers();
     if (m_server->supportsEncryption())
     {
         Online::XMLRequest* request =
@@ -106,22 +106,8 @@ ClientLobby::~ClientLobby()
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
-void ClientLobby::clearPlayers()
-{
-    StateManager::get()->resetActivePlayers();
-    if (input_manager)
-    {
-        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
-        input_manager->getDeviceManager()->setSinglePlayer(NULL);
-        input_manager->setMasterPlayerOnly(false);
-        input_manager->getDeviceManager()->clearLatestUsedDevice();
-    }
-}   // clearPlayers
-
-//-----------------------------------------------------------------------------
 void ClientLobby::setup()
 {
-    clearPlayers();
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
     m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
@@ -165,7 +151,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_SERVER_INFO:           handleServerInfo(event);    break;
         case LE_PLAYER_DISCONNECTED :  disconnectedPlayer(event);  break;
         case LE_CONNECTION_REFUSED:    connectionRefused(event);   break;
-        case LE_VOTE:                  displayPlayerVote(event);   break;
+        case LE_VOTE:                  receivePlayerVote(event);   break;
         case LE_SERVER_OWNERSHIP:      becomingServerOwner();      break;
         case LE_BAD_TEAM:              handleBadTeam();            break;
         case LE_BAD_CONNECTION:        handleBadConnection();      break;
@@ -243,11 +229,11 @@ void ClientLobby::addAllPlayers(Event* event)
     }
 
     NetworkString& data = event->data();
-    std::string track_name;
-    data.decodeString(&track_name);
-    uint8_t lap = data.getUInt8();
-    uint8_t reverse = data.getUInt8();
-    m_game_setup->setRace(track_name, lap, reverse == 1);
+    uint32_t winner_peer_id = data.getUInt32();
+    PeerVote winner_vote(data);
+
+    m_game_setup->setRace(winner_vote);
+    TracksScreen::getInstance()->setResult(winner_peer_id, winner_vote);
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
@@ -281,9 +267,14 @@ void ClientLobby::addAllPlayers(Event* event)
         int hit_capture_limit = data.getUInt32();
         float time_limit = data.getFloat();
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
+        uint16_t flag_return_timeout = data.getUInt16();
+        race_manager->setFlagReturnTicks(flag_return_timeout);
     }
     configRemoteKart(players);
     loadWorld();
+    // Disable until render gui during loading is bug free
+    //StateManager::get()->enterGameState();
+
     // Switch to assign mode in case a player hasn't chosen any karts
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 }   // addAllPlayers
@@ -445,67 +436,27 @@ void ClientLobby::finalizeConnectionRequest(NetworkString* header,
 }   // finalizeConnectionRequest
 
 //-----------------------------------------------------------------------------
-void ClientLobby::displayPlayerVote(Event* event)
+void ClientLobby::receivePlayerVote(Event* event)
 {
     if (!checkDataSize(event, 4)) return;
     // Get the player name who voted
     NetworkString& data = event->data();
-    float timeout = data.getFloat();
-    TracksScreen::getInstance()->setVoteTimeout(timeout);
-    std::string player_name;
-    data.decodeString(&player_name);
     uint32_t host_id = data.getUInt32();
-    player_name += ": ";
-    std::string track_name;
-    data.decodeString(&track_name);
-    Track* track = track_manager->getTrack(track_name);
+    PeerVote vote(data);
+    Log::debug("ClientLobby",
+        "Vote from server: host %d, track %s, laps %d, reverse %d.",
+        host_id, vote.m_track_name.c_str(), vote.m_num_laps, vote.m_reverse);
+
+    Track* track = track_manager->getTrack(vote.m_track_name);
     if (!track)
-        Log::fatal("ClientLobby", "Missing track %s", track_name.c_str());
-    core::stringw track_readable = track->getName();
-    int lap = data.getUInt8();
-    int rev = data.getUInt8();
-    core::stringw yes = _("Yes");
-    core::stringw no = _("No");
-    core::stringw vote_msg;
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
-        //I18N: Vote message in network game from a player
-        vote_msg = _("Track: %s,\nrandom item location: %s",
-            track_readable, rev == 1 ? yes : no);
+        Log::fatal("ClientLobby", "Missing track %s",
+            vote.m_track_name.c_str());
     }
-    else if (race_manager->getMinorMode() ==
-             RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
-    {
-        //I18N: Vote message in network game from a player
-        vote_msg = _("Track: %s", track_readable);
-    }
-    else if (race_manager->isSoccerMode())
-    {
-        if (m_game_setup->isSoccerGoalTarget())
-        {
-            //I18N: Vote message in network game from a player
-            vote_msg = _("Track: %s,\n"
-                "number of goals to win: %d,\nrandom item location: %s",
-                track_readable, lap, rev == 1 ? yes : no);
-        }
-        else
-        {
-            //I18N: Vote message in network game from a player
-            vote_msg = _("Track: %s,\n"
-                "maximum time: %d,\nrandom item location: %s",
-                track_readable, lap, rev == 1 ? yes : no);
-        }
-    }
-    else
-    {
-        //I18N: Vote message in network game from a player
-        vote_msg = _("Track: %s,\nlaps: %d, reversed: %s",
-            track_readable, lap, rev == 1 ? yes : no);
-    }
-    vote_msg = StringUtils::utf8ToWide(player_name) + vote_msg;
-    TracksScreen::getInstance()->addVoteMessage(player_name +
-        StringUtils::toString(host_id), vote_msg);
-}   // displayPlayerVote
+    addVote(host_id, vote);
+    TracksScreen::getInstance()->addVote(host_id, vote);
+    TracksScreen::getInstance()->updatePlayerVotes();
+}   // receivePlayerVote
 
 //-----------------------------------------------------------------------------
 /*! \brief Called when a new player is disconnected
@@ -525,15 +476,19 @@ void ClientLobby::disconnectedPlayer(Event* event)
     NetworkString &data = event->data();
     SFXManager::get()->quickSound("appear");
     unsigned disconnected_player_count = data.getUInt8();
+    uint32_t host_id = data.getUInt32();
+    m_peers_votes.erase(host_id);
     for (unsigned i = 0; i < disconnected_player_count; i++)
     {
-        core::stringw player_name;
-        data.decodeStringW(&player_name);
+        std::string name;
+        data.decodeString(&name);
+        core::stringw player_name = StringUtils::utf8ToWide(name);
         core::stringw msg = _("%s disconnected.", player_name);
         // Use the friend icon to avoid an error-like message
         MessageQueue::add(MessageQueue::MT_FRIEND, msg);
     }
-
+    TracksScreen::getInstance()->removeVote(host_id);
+    TracksScreen::getInstance()->updatePlayerVotes();
 }   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------
@@ -569,6 +524,8 @@ void ClientLobby::connectionAccepted(Event* event)
     m_auto_started = false;
     m_state.store(CONNECTED);
     float auto_start_timer = data.getFloat();
+    int state_frequency_in_server = data.getUInt32();
+    NetworkConfig::get()->setStateFrequency(state_frequency_in_server);
     if (auto_start_timer != std::numeric_limits<float>::max())
         NetworkingLobby::getInstance()->setStartingTimerTo(auto_start_timer);
 }   // connectionAccepted
@@ -578,6 +535,13 @@ void ClientLobby::handleServerInfo(Event* event)
 {
     // At least 6 bytes should remain now
     if (!checkDataSize(event, 6)) return;
+
+    if (!m_first_connect)
+    {
+        NetworkingLobby::getInstance()
+            ->addMoreServerInfo(L"--------------------");
+    }
+    m_first_connect = false;
 
     NetworkString &data = event->data();
     // Add server info
@@ -603,8 +567,7 @@ void ClientLobby::handleServerInfo(Event* event)
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     u_data = data.getUInt8();
-    ServerConfig::m_server_mode = u_data;
-    auto game_mode = ServerConfig::getLocalGameMode();
+    auto game_mode = ServerConfig::getLocalGameMode(u_data);
     race_manager->setMinorMode(game_mode.first);
     // We use single mode in network even it's grand prix
     race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
@@ -616,6 +579,7 @@ void ClientLobby::handleServerInfo(Event* event)
 
     uint8_t extra_server_info = data.getUInt8();
     bool grand_prix_started = false;
+    m_game_setup->resetExtraServerInfo();
     switch (extra_server_info)
     {
         case 0:
@@ -660,6 +624,8 @@ void ClientLobby::handleServerInfo(Event* event)
         for (const core::stringw& motd : motd_line)
             NetworkingLobby::getInstance()->addMoreServerInfo(motd);
     }
+    bool server_config = data.getUInt8() == 1;
+    NetworkingLobby::getInstance()->toggleServerConfigButton(server_config);
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------
@@ -671,23 +637,24 @@ void ClientLobby::updatePlayerList(Event* event)
     if (m_waiting_for_game && !waiting)
     {
         // The waiting game finished
-        NetworkingLobby::getInstance()
-            ->addMoreServerInfo(L"--------------------");
         SFXManager::get()->quickSound("wee");
     }
 
     m_waiting_for_game = waiting;
     unsigned player_count = data.getUInt8();
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
-        int, KartTeam> > players;
+        int, KartTeam, PerPlayerDifficulty> > players;
     core::stringw total_players;
     for (unsigned i = 0; i < player_count; i++)
     {
         std::tuple<uint32_t, uint32_t, uint32_t, core::stringw, int,
-            KartTeam> pl;
-        std::get<0>(pl) = data.getUInt32();
-        std::get<1>(pl) = data.getUInt32();
-        std::get<2>(pl) = data.getUInt8();
+            KartTeam, PerPlayerDifficulty> pl;
+        uint32_t host_id = data.getUInt32();
+        uint32_t online_id = data.getUInt32();
+        uint8_t local_id = data.getUInt8();
+        std::get<0>(pl) = host_id;
+        std::get<1>(pl) = online_id;
+        std::get<2>(pl) = local_id;
         data.decodeStringW(&std::get<3>(pl));
         total_players += std::get<3>(pl);
         bool is_peer_waiting_for_game = data.getUInt8() == 1;
@@ -698,12 +665,18 @@ void ClientLobby::updatePlayerList(Event* event)
         if (waiting && !is_peer_waiting_for_game)
             std::get<4>(pl) = 3;
         PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
+        std::get<6>(pl) = d;
         if (d == PLAYER_DIFFICULTY_HANDICAP)
             std::get<3>(pl) = _("%s (handicapped)", std::get<3>(pl));
         std::get<5>(pl) = (KartTeam)data.getUInt8();
         bool ready = data.getUInt8() == 1;
         if (ready)
             std::get<4>(pl) = 4;
+        if (host_id == STKHost::get()->getMyHostId())
+        {
+            auto& local_players = NetworkConfig::get()->getNetworkPlayers();
+            std::get<2>(local_players.at(local_id)) = d;
+        }
         players.push_back(pl);
     }
 
@@ -848,6 +821,7 @@ void ClientLobby::startSelection(Event* event)
 {
     SFXManager::get()->quickSound("wee");
     const NetworkString& data = event->data();
+    startVotingPeriod(data.getFloat());
     bool skip_kart_screen = data.getUInt8() == 1;
     m_server_auto_game_time = data.getUInt8() == 1;
     const unsigned kart_num = data.getUInt16();
@@ -893,6 +867,8 @@ void ClientLobby::startSelection(Event* event)
         screen->push();
     }
 
+    TracksScreen *ts = TracksScreen::getInstance();
+    ts->resetVote();
     m_state.store(SELECTING_ASSETS);
     Log::info("ClientLobby", "Selection starts now");
 }   // startSelection
@@ -942,6 +918,7 @@ void ClientLobby::exitResultScreen(Event *event)
     GUIEngine::ModalDialog::dismiss();
     GUIEngine::ScreenKeyboard::dismiss();
 
+    NetworkConfig::get()->clearActivePlayersForClient();
     setup();
     m_auto_started = false;
     m_state.store(CONNECTED);

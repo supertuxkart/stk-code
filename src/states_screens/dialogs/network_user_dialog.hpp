@@ -47,6 +47,8 @@ private:
 
     const uint8_t m_local_id;
 
+    PerPlayerDifficulty m_per_player_difficulty;
+
     const core::stringw m_name;
 
     const bool m_allow_change_team;
@@ -69,11 +71,14 @@ private:
 
     GUIEngine::IconButtonWidget* m_cancel_widget;
 
+    GUIEngine::IconButtonWidget* m_handicap_widget;
+
 public:
     NetworkUserDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
-                      const core::stringw& name, bool allow_change_team)
+                      const core::stringw& name, bool allow_change_team,
+                      PerPlayerDifficulty d)
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
-          m_local_id(local_id), m_name(name),
+          m_local_id(local_id), m_per_player_difficulty(d), m_name(name),
           m_allow_change_team(allow_change_team), m_self_destroy(false),
           m_fetched_ranking(std::make_shared<bool>(false))
     {

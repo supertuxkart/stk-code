@@ -471,7 +471,6 @@ void RaceResultGUI::backToLobby()
     cleanupGPProgress();
     StateManager::get()->resetAndSetStack(
         NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
-    NetworkingLobby::getInstance()->addMoreServerInfo(L"--------------------");
 }   // backToLobby
 
 //-----------------------------------------------------------------------------
@@ -754,6 +753,7 @@ void RaceResultGUI::displayCTFResults()
         // Determine text height
         r = m_font->getDimension(L"Y");
         m_distance_between_rows = (int)(1.5f*r.Height);
+        m_distance_between_meta_rows = m_distance_between_rows;
 
         // If there are too many karts, reduce size between rows
         if (m_distance_between_rows * num_karts > height)
@@ -1582,7 +1582,7 @@ void RaceResultGUI::displayCTFResults()
                 }
 
                 int current_x = x;
-                current_y = y + (int)((i + 1) * m_distance_between_rows);
+                current_y = y + (int)((i + 1) * m_distance_between_meta_rows);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
@@ -1630,7 +1630,7 @@ void RaceResultGUI::displayCTFResults()
             if (race_manager->modeHasLaps())
             {
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
-                current_y += int(m_distance_between_rows * 0.8f * 2);
+                current_y += int(m_distance_between_meta_rows * 0.8f * 2);
                 GUIEngine::getFont()->draw(laps, core::recti(x, current_y, 0, 0),
                     white_color, false, false, nullptr, true);
             }
@@ -1638,7 +1638,7 @@ void RaceResultGUI::displayCTFResults()
             const core::stringw& difficulty_name =
                 race_manager->getDifficultyName(race_manager->getDifficulty());
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
-            current_y += int(m_distance_between_rows * 0.8f);
+            current_y += int(m_distance_between_meta_rows * 0.8f);
             GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
                 white_color, false, false, nullptr, true);
             // show fastest lap
@@ -1651,7 +1651,7 @@ void RaceResultGUI::displayCTFResults()
                 {
                     core::stringw best_lap_string = _("Best lap time: %s",
                         StringUtils::timeToString(best_lap_time, time_precision).c_str());
-                    current_y += int(m_distance_between_rows * 0.8f);
+                    current_y += int(m_distance_between_meta_rows * 0.8f);
                     GUIEngine::getFont()->draw(best_lap_string,
                         core::recti(x, current_y, 0, 0), white_color, false, false,
                         nullptr, true);
