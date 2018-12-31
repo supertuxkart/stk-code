@@ -1409,6 +1409,23 @@ void Kart::update(int ticks)
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
+
+    // Hover the kart above reset position before entering the game
+    if (m_live_join_util != 0 &&
+        (m_live_join_util < World::getWorld()->getTicksSinceStart() ||
+        World::getWorld()->isLiveJoinWorld()))
+    {
+        btRigidBody *body = getBody();
+        body->clearForces();
+        body->setLinearVelocity(Vec3(0.0f));
+        body->setAngularVelocity(Vec3(0.0f));
+        btTransform hovering = m_starting_transform;
+        hovering.setOrigin(hovering.getOrigin() +
+            m_starting_transform.getBasis().getColumn(1) * 3.0f);
+        body->proceedToTransform(hovering);
+        setTrans(hovering);
+    }
+
     // Update the locally maintained speed of the kart (m_speed), which 
     // is used furthermore for engine power, camera distance etc
     updateSpeed();

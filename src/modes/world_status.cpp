@@ -49,7 +49,7 @@ WorldStatus::WorldStatus()
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
-
+    m_live_join_world = false;
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())
@@ -253,9 +253,12 @@ void WorldStatus::updateTime(int ticks)
                 m_phase = WAIT_FOR_SERVER_PHASE;
                 // In networked races, inform the start game protocol that
                 // the world has been setup
-                auto lobby = LobbyProtocol::get<LobbyProtocol>();
-                assert(lobby);
-                lobby->finishedLoadingWorld();
+                if (!m_live_join_world)
+                {
+                    auto lobby = LobbyProtocol::get<LobbyProtocol>();
+                    assert(lobby);
+                    lobby->finishedLoadingWorld();
+                }
             }
             else
             {
@@ -266,6 +269,20 @@ void WorldStatus::updateTime(int ticks)
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
         {
+            if (m_live_join_world)
+            {
+                m_auxiliary_ticks++;
+                // Add 3 seconds delay before telling server finish loading
+                // world, so previous (if any) disconnected player has left
+                // fully
+                if (m_auxiliary_ticks == 360)
+                {
+                    auto lobby = LobbyProtocol::get<LobbyProtocol>();
+                    assert(lobby);
+                    lobby->finishedLoadingWorld();
+                }
+                return;
+            }
             return;   // Don't increase time
         }
         case SERVER_READY_PHASE:
@@ -522,3 +539,10 @@ void WorldStatus::unpause()
         !NetworkConfig::get()->isNetworking())
         device->getTimer()->start();
 }   // unpause
+
+//-----------------------------------------------------------------------------
+void WorldStatus::endLiveJoinWorld(int ticks_now)
+{
+    m_live_join_world = false;
+    m_auxiliary_ticks = 0;
+}   // endLiveJoinWorld

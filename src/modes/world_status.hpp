@@ -136,6 +136,8 @@ private:
 
     bool            m_engines_started;
 
+    bool            m_live_join_world;
+
     void startEngines();
 
 public:
@@ -212,7 +214,12 @@ public:
     int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
     int getAuxiliaryTicks() const { return m_auxiliary_ticks; }
-
+    // ------------------------------------------------------------------------
+    bool isLiveJoinWorld() const { return m_live_join_world; }
+    // ------------------------------------------------------------------------
+    void setLiveJoinWorld(bool val) { m_live_join_world = val; }
+    // ------------------------------------------------------------------------
+    void endLiveJoinWorld(int ticks_now);
 };   // WorldStatus
 
 

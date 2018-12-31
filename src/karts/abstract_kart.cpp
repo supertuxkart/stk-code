@@ -58,6 +58,7 @@ AbstractKart::~AbstractKart()
 // ----------------------------------------------------------------------------
 void AbstractKart::reset()
 {
+    m_live_join_util = 0;
     // important to delete animations before calling reset, as some animations
     // set the kart velocity in their destructor (e.g. cannon) which "reset"
     // can then cancel. See #2738
@@ -192,10 +193,17 @@ void AbstractKart::kartIsInRestNow()
  *  position in case there is a slope. */
 void AbstractKart::makeKartRest()
 {
+    btTransform t = m_starting_transform;
+    if (m_live_join_util != 0)
+    {
+        t.setOrigin(t.getOrigin() +
+            m_starting_transform.getBasis().getColumn(1) * 3.0f);
+    }
+
     btRigidBody *body = getBody();
     body->clearForces();
     body->setLinearVelocity(Vec3(0.0f));
     body->setAngularVelocity(Vec3(0.0f));
-    body->proceedToTransform(m_starting_transform);
-    setTrans(m_starting_transform);
+    body->proceedToTransform(t);
+    setTrans(t);
 }   // makeKartRest

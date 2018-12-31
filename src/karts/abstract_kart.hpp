@@ -75,12 +75,15 @@ private:
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 
-    btTransform m_starting_transform;
     // ------------------------------------------------------------------------
     void loadKartProperties(const std::string& new_ident,
                             PerPlayerDifficulty difficulty,
                             std::shared_ptr<RenderInfo> ri);
 protected:
+    btTransform m_starting_transform;
+
+    int m_live_join_util;
+
     /** The kart properties. */
     std::unique_ptr<KartProperties> m_kart_properties;
 
@@ -532,6 +535,8 @@ public:
     virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
     // ------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const = 0;
+    // ------------------------------------------------------------------------
+    void setLiveJoinKart(int util_ticks)     { m_live_join_util = util_ticks; }
 };   // AbstractKart
 
 
