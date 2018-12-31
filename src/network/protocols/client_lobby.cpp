@@ -844,6 +844,7 @@ void ClientLobby::startSelection(Event* event)
     NetworkKartSelectionScreen* screen =
         NetworkKartSelectionScreen::getInstance();
     screen->setAvailableKartsFromServer(m_available_karts);
+    screen->setLiveJoin(false);
     // In case of auto-connect or continue a grand prix, use random karts
     // (or previous kart) from server and go to track selection
     if (NetworkConfig::get()->isAutoConnect() || skip_kart_screen)
