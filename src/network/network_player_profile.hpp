@@ -25,9 +25,9 @@
 #include "utils/types.hpp"
 
 #include "irrString.h"
+#include <atomic>
 #include <memory>
 #include <string>
-#include <tuple>
 
 class STKPeer;
 enum KartTeam : int8_t;
@@ -52,7 +52,7 @@ private:
     uint32_t m_online_id;
 
     /** Per player difficulty. */
-    PerPlayerDifficulty m_per_player_difficulty;
+    std::atomic<PerPlayerDifficulty> m_per_player_difficulty;
 
     /** The selected kart id. */
     std::string m_kart_name; 
@@ -66,7 +66,7 @@ private:
     /** Overall time if grand prix. */
     float m_overall_time;
 
-    KartTeam m_team;
+    std::atomic<KartTeam> m_team;
 
 public:
     // ------------------------------------------------------------------------
@@ -84,9 +84,9 @@ public:
         m_host_id               = -1;
         m_default_kart_color    = 0.0f;
         m_online_id             = 0;
-        m_per_player_difficulty = (PerPlayerDifficulty)0;
+        m_per_player_difficulty.store((PerPlayerDifficulty)0);
         m_local_player_id       = 0;
-        m_team                  = team;
+        m_team.store(team);
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -101,9 +101,9 @@ public:
         m_host_id               = host_id;
         m_default_kart_color    = default_kart_color;
         m_online_id             = online_id;
-        m_per_player_difficulty = per_player_difficulty;
+        m_per_player_difficulty.store(per_player_difficulty);
         m_local_player_id       = local_player_id;
-        m_team                  = team;
+        m_team.store(team);
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -125,10 +125,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty. */
     PerPlayerDifficulty getPerPlayerDifficulty() const
-                                            { return m_per_player_difficulty; }
+                                     { return m_per_player_difficulty.load(); }
     // ------------------------------------------------------------------------
     void setPerPlayerDifficulty(PerPlayerDifficulty d)
-                                               { m_per_player_difficulty = d; }
+                                          { m_per_player_difficulty.store(d); }
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
     const irr::core::stringw& getName() const         { return m_player_name; }
@@ -155,9 +155,9 @@ public:
         m_overall_time = 0.0f;
     }
     // ------------------------------------------------------------------------
-    void setTeam(KartTeam team)                            { m_team = team; }
+    void setTeam(KartTeam team)                         { m_team.store(team); }
     // ------------------------------------------------------------------------
-    KartTeam getTeam() const                               { return m_team; }
+    KartTeam getTeam() const                          { return m_team.load(); }
 
 };   // class NetworkPlayerProfile
 
