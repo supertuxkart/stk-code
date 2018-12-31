@@ -270,10 +270,12 @@ private:
     void addWaitingPlayersToGame();
     void changeHandicap(Event* event);
     void handlePlayerDisconnection() const;
-    void handleLiveJoin(
+    void addLiveJoinPlaceholder(
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     NetworkString* getLoadWorldMessage(
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+    void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
+    void liveJoinRequest(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();

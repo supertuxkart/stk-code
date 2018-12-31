@@ -67,7 +67,8 @@ public:
         LE_BAD_TEAM,
         LE_BAD_CONNECTION,
         LE_CONFIG_SERVER,
-        LE_CHANGE_HANDICAP
+        LE_CHANGE_HANDICAP,
+        LE_LIVE_JOIN
     };
 
     enum RejectReason : uint8_t

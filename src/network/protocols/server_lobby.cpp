@@ -297,6 +297,7 @@ bool ServerLobby::notifyEvent(Event* event)
     switch (message_type)
     {
     case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
+    case LE_LIVE_JOIN:         liveJoinRequest(event);        break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -579,7 +580,7 @@ void ServerLobby::asynchronousUpdate()
             getHitCaptureLimit(real_players_count);
 
             // Add placeholder players for live join
-            handleLiveJoin(players);
+            addLiveJoinPlaceholder(players);
 
             NetworkString* load_world_message = getLoadWorldMessage(players);
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
@@ -644,6 +645,11 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     }
     return load_world_message;
 }   // getLoadWorldMessage
+
+//-----------------------------------------------------------------------------
+void ServerLobby::liveJoinRequest(Event* event)
+{
+}   // liveJoinRequest
 
 //-----------------------------------------------------------------------------
 /** Simple finite state machine.  Once this
@@ -2005,20 +2011,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
 
     const NetworkString& data = event->data();
     STKPeer* peer = event->getPeer();
-    unsigned player_count = data.getUInt8();
-    for (unsigned i = 0; i < player_count; i++)
-    {
-        std::string kart;
-        data.decodeString(&kart);
-        if (m_available_kts.first.find(kart) == m_available_kts.first.end())
-        {
-            continue;
-        }
-        else
-        {
-            peer->getPlayerProfiles()[i]->setKartName(kart);
-        }
-    }
+    setPlayerKarts(data, peer);
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
@@ -2996,7 +2989,7 @@ void ServerLobby::handlePlayerDisconnection() const
 //-----------------------------------------------------------------------------
 /** Add reserved players for live join later if required.
  */
-void ServerLobby::handleLiveJoin(
+void ServerLobby::addLiveJoinPlaceholder(
     std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
     if (!race_manager->supportsLiveJoining())
@@ -3040,4 +3033,23 @@ void ServerLobby::handleLiveJoin(
                 NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
         }
     }
-}   // handleLiveJoin
+}   // addLiveJoinPlaceholder
+
+//-----------------------------------------------------------------------------
+void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
+{
+    unsigned player_count = ns.getUInt8();
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        std::string kart;
+        ns.decodeString(&kart);
+        if (m_available_kts.first.find(kart) == m_available_kts.first.end())
+        {
+            continue;
+        }
+        else
+        {
+            peer->getPlayerProfiles()[i]->setKartName(kart);
+        }
+    }
+}   // setPlayerKarts
