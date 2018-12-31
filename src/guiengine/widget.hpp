@@ -276,12 +276,11 @@ namespace GUIEngine
         bool m_has_tooltip;
         irr::core::stringw m_tooltip_text;
 
-
         /** height of the widget before it was collapsed (only set if widget got collapsed) */
-        int m_uncollapsed_height = 0;
+        int m_uncollapsed_height;
 
         /** A flag to indicate whether this widget got collapsed. */
-        bool m_is_collapsed = false;
+        bool m_is_collapsed;
 
     public:
 

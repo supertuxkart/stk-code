@@ -76,6 +76,8 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_supports_multiplayer  = false;
     m_is_bounding_box_round = false;
     m_has_tooltip           = false;
+    m_uncollapsed_height    = 0;
+    m_is_collapsed          = false;
 
     m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
     m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
