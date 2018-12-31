@@ -79,7 +79,6 @@ void RewindManager::reset()
     m_is_rewinding = false;
     m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
-    m_last_saved_state = -1;  // forces initial state save
     m_state_frequency = stk_config->getPhysicsFPS() /
         NetworkConfig::get()->getStateFrequency();
 
@@ -189,7 +188,7 @@ void RewindManager::update(int ticks_not_used)
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
-    if (ticks - m_last_saved_state < m_state_frequency)
+    if (!shouldSaveState(ticks))
         return;
 
     // Save state, remove expired rewinder first
@@ -211,7 +210,6 @@ void RewindManager::update(int ticks_not_used)
             gp->sendState();
     }
     PROFILER_POP_CPU_MARKER();
-    m_last_saved_state = ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
