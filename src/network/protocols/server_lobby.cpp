@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -298,6 +299,7 @@ bool ServerLobby::notifyEvent(Event* event)
     {
     case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
     case LE_LIVE_JOIN:         liveJoinRequest(event);        break;
+    case LE_CLIENT_LOADED_WORLD: finishedLoadingLiveJoinClient(event); break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -647,9 +649,229 @@ NetworkString* ServerLobby::getLoadWorldMessage(
 }   // getLoadWorldMessage
 
 //-----------------------------------------------------------------------------
+bool ServerLobby::canLiveJoinNow() const
+{
+    return race_manager->supportsLiveJoining() &&
+        World::getWorld() && RaceEventManager::getInstance()->isRunning() &&
+        !RaceEventManager::getInstance()->isRaceOver() &&
+        (World::getWorld()->getPhase() == WorldStatus::RACE_PHASE ||
+        World::getWorld()->getPhase() == WorldStatus::GOAL_PHASE);
+}   // canLiveJoinNow
+
+//-----------------------------------------------------------------------------
+/** \ref peer will be reset back to the lobby.
+ */
+void ServerLobby::rejectLiveJoin(STKPeer* peer)
+{
+    NetworkString* reset = getNetworkString(1);
+    reset->setSynchronous(true);
+    reset->addUInt8(LE_EXIT_RESULT);
+    peer->sendPacket(reset, /*reliable*/true);
+    delete reset;
+    updatePlayerList();
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    peer->sendPacket(server_info, /*reliable*/true);
+    delete server_info;
+}   // rejectLiveJoin
+
+//-----------------------------------------------------------------------------
+/** This message is like kartSelectionRequested, but it will send the peer
+ *  load world message if he can join the current started game.
+ */
 void ServerLobby::liveJoinRequest(Event* event)
 {
+    STKPeer* peer = event->getPeer();
+    const NetworkString& data = event->data();
+
+    if (!canLiveJoinNow())
+    {
+        rejectLiveJoin(peer);
+        return;
+    }
+    setPlayerKarts(data, peer);
+
+    std::vector<int> used_id;
+    for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
+    {
+        int id = getReservedId(peer->getPlayerProfiles()[i], i);
+        if (id == -1)
+            break;
+        used_id.push_back(id);
+    }
+    if (used_id.size() != peer->getPlayerProfiles().size())
+    {
+        for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
+            peer->getPlayerProfiles()[i]->setKartName("");
+        for (unsigned i = 0; i < used_id.size(); i++)
+        {
+            RemoteKartInfo& rki = race_manager->getKartInfo(used_id[i]);
+            rki.makeReserved();
+        }
+        Log::info("ServerLobby", "Too many players (%d) try to live join",
+            (int)peer->getPlayerProfiles().size());
+        rejectLiveJoin(peer);
+        return;
+    }
+
+    peer->clearAvailableKartIDs();
+    for (int id : used_id)
+    {
+        Log::info("ServerLobby", "%s live joining with reserved kart id %d.",
+            peer->getAddress().toString().c_str(), id);
+        peer->addAvailableKartID(id);
+    }
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    {
+        const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        std::shared_ptr<NetworkPlayerProfile> player =
+            rki.getNetworkPlayerProfile().lock();
+        if (!player)
+        {
+            player = NetworkPlayerProfile::getReservedProfile(
+                race_manager->getMinorMode() ==
+                RaceManager::MINOR_MODE_FREE_FOR_ALL ?
+                KART_TEAM_NONE : rki.getKartTeam());
+        }
+        players.push_back(player);
+    }
+    NetworkString* load_world_message = getLoadWorldMessage(players);
+    peer->sendPacket(load_world_message, true/*reliable*/);
+    delete load_world_message;
+    peer->updateLastActivity();
 }   // liveJoinRequest
+
+//-----------------------------------------------------------------------------
+/** Decide where to put the live join player depends on his team and game mode.
+ */
+int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
+                               unsigned local_id) const
+{
+    const bool is_ffa =
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
+    int red_count = 0;
+    int blue_count = 0;
+    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    {
+        RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        if (rki.isReserved())
+            continue;
+        bool disconnected = rki.disconnected();
+        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
+            !disconnected)
+            red_count++;
+        else if (race_manager->getKartInfo(i).getKartTeam() ==
+            KART_TEAM_BLUE && !disconnected)
+            blue_count++;
+    }
+    KartTeam target_team = red_count > blue_count ? KART_TEAM_BLUE :
+        KART_TEAM_RED;
+
+    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    {
+        RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        std::shared_ptr<NetworkPlayerProfile> player =
+            rki.getNetworkPlayerProfile().lock();
+        if (!player)
+        {
+            if (is_ffa)
+            {
+                rki.copyFrom(p, local_id);
+                return i;
+            }
+            if (ServerConfig::m_team_choosing)
+            {
+                if ((p->getTeam() == KART_TEAM_RED &&
+                    rki.getKartTeam() == KART_TEAM_RED) ||
+                    (p->getTeam() == KART_TEAM_BLUE &&
+                    rki.getKartTeam() == KART_TEAM_BLUE))
+                {
+                    rki.copyFrom(p, local_id);
+                    return i;
+                }
+            }
+            else
+            {
+                if (rki.getKartTeam() == target_team)
+                {
+                    p->setTeam(target_team);
+                    rki.copyFrom(p, local_id);
+                    return i;
+                }
+            }
+        }
+    }
+    return -1;
+}   // getReservedId
+
+//-----------------------------------------------------------------------------
+/** Finally put the kart in the world and inform client the current world
+ *  status, (including current confirmed item state, kart scores...)
+ */
+void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
+{
+    STKPeer* peer = event->getPeer();
+    if (!canLiveJoinNow())
+    {
+        rejectLiveJoin(peer);
+        return;
+    }
+    bool live_joined_in_time = true;
+    for (const int id : peer->getAvailableKartIDs())
+    {
+        const RemoteKartInfo& rki = race_manager->getKartInfo(id);
+        if (rki.isReserved())
+        {
+            live_joined_in_time = false;
+            break;
+        }
+    }
+    if (!live_joined_in_time)
+    {
+        Log::warn("ServerLobby", "%s can't live-join in time.",
+            peer->getAddress().toString().c_str());
+        rejectLiveJoin(peer);
+        return;
+    }
+    World* w = World::getWorld();
+    assert(w);
+
+    // Give 3 seconds for all peers to get new kart info
+    const int live_join_util_ticks = w->getTicksSinceStart() +
+        stk_config->time2Ticks(3.0f);
+    uint64_t live_join_start_time = STKHost::get()->getNetworkTimer();
+    live_join_start_time -= m_server_delay;
+    live_join_start_time += 3000;
+
+    for (const int id : peer->getAvailableKartIDs())
+    {
+        const RemoteKartInfo& rki = race_manager->getKartInfo(id);
+        AbstractKart* k = w->getKart(id);
+        k->changeKart(rki.getKartName(), rki.getDifficulty(),
+            rki.getKartTeam() == KART_TEAM_RED ?
+            std::make_shared<RenderInfo>(1.0f) :
+            rki.getKartTeam() == KART_TEAM_BLUE ?
+            std::make_shared<RenderInfo>(0.66f) :
+            std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
+        k->setLiveJoinKart(live_join_util_ticks);
+        w->addReservedKart(id);
+    }
+    Log::info("ServerLobby", "%s live-joining succeeded.",
+        peer->getAddress().toString().c_str());
+
+    NetworkString* ns = getNetworkString(10);
+    ns->setSynchronous(true);
+    ns->addUInt8(LE_LIVE_JOIN_ACK).addUInt64(m_client_starting_time)
+        .addUInt64(live_join_start_time).addUInt32(live_join_util_ticks);
+    peer->setWaitingForGame(false);
+    peer->sendPacket(ns, true/*reliable*/);
+    delete ns;
+    updatePlayerList();
+    peer->updateLastActivity();
+}   // finishedLoadingLiveJoinClient
 
 //-----------------------------------------------------------------------------
 /** Simple finite state machine.  Once this
@@ -660,8 +882,7 @@ void ServerLobby::update(int ticks)
 {
     World* w = World::getWorld();
     int sec = ServerConfig::m_kick_idle_player_seconds;
-    if (NetworkConfig::get()->isWAN() &&
-        sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
+    if (sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
         m_state.load() <= RACING && m_server_has_loaded_world.load() == true)
     {
         for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
@@ -672,15 +893,27 @@ void ServerLobby::update(int ticks)
             if (!player)
                 continue;
             auto peer = player->getPeer();
-            if (peer && peer->idleForSeconds() > sec &&
-                !peer->isDisconnected())
+            if (peer && peer->idleForSeconds() > sec)
             {
-                if (w && w->getKart(i)->hasFinishedRace())
+                if (w && w->getKart(i)->isEliminated())
+                {
+                    // Remove loading world too long live join peer
+                    Log::info("ServerLobby", "%s hasn't live-joined within"
+                        " %d seconds, remove it.",
+                        peer->getAddress().toString().c_str(), sec);
+                    RemoteKartInfo& rki = race_manager->getKartInfo(i);
+                    rki.makeReserved();
                     continue;
-                Log::info("ServerLobby", "%s has been idle for more than"
-                    " %d seconds, kick.",
-                    peer->getAddress().toString().c_str(), sec);
-                peer->kick();
+                }
+                if (!peer->isDisconnected() && NetworkConfig::get()->isWAN())
+                {
+                    if (w && w->getKart(i)->hasFinishedRace())
+                        continue;
+                    Log::info("ServerLobby", "%s has been idle for more than"
+                        " %d seconds, kick.",
+                        peer->getAddress().toString().c_str(), sec);
+                    peer->kick();
+                }
             }
         }
     }
@@ -2963,10 +3196,12 @@ void ServerLobby::handlePlayerDisconnection() const
             total++;
             continue;
         }
+        else
+            rki.makeReserved();
+
         AbstractKart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated() && !k->hasFinishedRace())
         {
-            rki.makeReserved();
             CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
                 (World::getWorld());
             if (ctf)

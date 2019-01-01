@@ -275,7 +275,7 @@ void WorldStatus::updateTime(int ticks)
                 // Add 3 seconds delay before telling server finish loading
                 // world, so previous (if any) disconnected player has left
                 // fully
-                if (m_auxiliary_ticks == 360)
+                if (m_auxiliary_ticks == stk_config->time2Ticks(3.0f))
                 {
                     auto lobby = LobbyProtocol::get<LobbyProtocol>();
                     assert(lobby);
@@ -545,4 +545,8 @@ void WorldStatus::endLiveJoinWorld(int ticks_now)
 {
     m_live_join_world = false;
     m_auxiliary_ticks = 0;
+    m_phase = RACE_PHASE;
+    startEngines();
+    music_manager->startMusic();
+    setTicksForRewind(ticks_now);
 }   // endLiveJoinWorld

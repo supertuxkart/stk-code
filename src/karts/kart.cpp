@@ -1412,7 +1412,7 @@ void Kart::update(int ticks)
 
     // Hover the kart above reset position before entering the game
     if (m_live_join_util != 0 &&
-        (m_live_join_util < World::getWorld()->getTicksSinceStart() ||
+        (m_live_join_util > World::getWorld()->getTicksSinceStart() ||
         World::getWorld()->isLiveJoinWorld()))
     {
         btRigidBody *body = getBody();

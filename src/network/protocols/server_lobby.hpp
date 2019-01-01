@@ -183,6 +183,7 @@ private:
     void playerFinishedResult(Event *event);
     bool registerServer(bool now);
     void finishedLoadingWorldClient(Event *event);
+    void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
@@ -276,6 +277,10 @@ private:
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
     void liveJoinRequest(Event* event);
+    void rejectLiveJoin(STKPeer* peer);
+    bool canLiveJoinNow() const;
+    int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
+                      unsigned local_id) const;
 public:
              ServerLobby();
     virtual ~ServerLobby();

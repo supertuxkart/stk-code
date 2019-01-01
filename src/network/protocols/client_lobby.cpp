@@ -27,6 +27,8 @@
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -109,6 +111,8 @@ ClientLobby::~ClientLobby()
 void ClientLobby::setup()
 {
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
+    m_start_live_game_time = std::numeric_limits<uint64_t>::max();
+    m_live_join_ticks = -1;
     m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
@@ -155,6 +159,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_SERVER_OWNERSHIP:      becomingServerOwner();      break;
         case LE_BAD_TEAM:              handleBadTeam();            break;
         case LE_BAD_CONNECTION:        handleBadConnection();      break;
+        case LE_LIVE_JOIN_ACK:        liveJoinAcknowledged(event); break;
         default:
             return false;
             break;
@@ -272,6 +277,22 @@ void ClientLobby::addAllPlayers(Event* event)
     // Disable until render gui during loading is bug free
     //StateManager::get()->enterGameState();
 
+    // Live join if state is CONNECTED
+    if (m_state.load() == CONNECTED)
+    {
+        World* w = World::getWorld();
+        w->setLiveJoinWorld(true);
+        for (unsigned i = 0; i < w->getNumKarts(); i++)
+        {
+            AbstractKart* k = w->getKart(i);
+            // The final joining ticks will be set by server later
+            if (k->getController()->isLocalPlayerController())
+                k->setLiveJoinKart(-1);
+            else
+                k->getNode()->setVisible(false);
+        }
+    }
+
     // Switch to assign mode in case a player hasn't chosen any karts
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 }   // addAllPlayers
@@ -374,6 +395,11 @@ void ClientLobby::update(int ticks)
         break;
     case REQUESTING_CONNECTION:
     case CONNECTED:
+        if (m_start_live_game_time != std::numeric_limits<uint64_t>::max() &&
+            STKHost::get()->getNetworkTimer() >= m_start_live_game_time)
+        {
+            finishLiveJoin();
+        }
         if (NetworkConfig::get()->isAutoConnect() && !m_auto_started)
         {
             // Send a message to the server to start
@@ -931,7 +957,51 @@ void ClientLobby::exitResultScreen(Event *event)
 void ClientLobby::finishedLoadingWorld()
 {
     NetworkString* ns = getNetworkString(1);
+    // Live join if state is CONNECTED
+    ns->setSynchronous(m_state.load() == CONNECTED);
     ns->addUInt8(LE_CLIENT_LOADED_WORLD);
     sendToServer(ns, true);
     delete ns;
 }   // finishedLoadingWorld
+
+//-----------------------------------------------------------------------------
+void ClientLobby::liveJoinAcknowledged(Event* event)
+{
+    World* w = World::getWorld();
+    if (!w)
+        return;
+
+    const NetworkString& data = event->data();
+    m_start_live_game_time = data.getUInt64();
+    powerup_manager->setRandomSeed(m_start_live_game_time);
+    m_start_live_game_time = data.getUInt64();
+    m_live_join_ticks = data.getUInt32();
+    for (unsigned i = 0; i < w->getNumKarts(); i++)
+    {
+        AbstractKart* k = w->getKart(i);
+        if (k->getController()->isLocalPlayerController())
+            k->setLiveJoinKart(m_live_join_ticks);
+    }
+}   // liveJoinAcknowledged
+
+//-----------------------------------------------------------------------------
+void ClientLobby::finishLiveJoin()
+{
+    m_start_live_game_time = std::numeric_limits<uint64_t>::max();
+    World* w = World::getWorld();
+    if (!w)
+        return;
+    Log::info("ClientLobby", "Live join started at %lf",
+        StkTime::getRealTime());
+
+    w->setLiveJoinWorld(false);
+    w->endLiveJoinWorld(m_live_join_ticks);
+    for (unsigned i = 0; i < w->getNumKarts(); i++)
+    {
+        AbstractKart* k = w->getKart(i);
+        if (!k->getController()->isLocalPlayerController() &&
+            !k->isEliminated())
+            k->getNode()->setVisible(true);
+    }
+    m_state.store(RACING);
+}   // finishLiveJoin

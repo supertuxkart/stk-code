@@ -173,6 +173,9 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
  */
 void GameProtocol::handleControllerAction(Event *event)
 {
+    STKPeer* peer = event->getPeer();
+    if (NetworkConfig::get()->isServer() && peer->isWaitingForGame())
+        return;
     NetworkString &data = event->data();
     uint8_t count = data.getUInt8();
     bool will_trigger_rewind = false;
@@ -193,10 +196,10 @@ void GameProtocol::handleControllerAction(Event *event)
         }
         uint8_t kart_id = data.getUInt8();
         if (NetworkConfig::get()->isServer() &&
-            !event->getPeer()->availableKartID(kart_id))
+            !peer->availableKartID(kart_id))
         {
             Log::warn("GameProtocol", "Wrong kart id %d from %s.",
-                kart_id, event->getPeer()->getAddress().toString().c_str());
+                kart_id, peer->getAddress().toString().c_str());
             return;
         }
 
@@ -227,9 +230,9 @@ void GameProtocol::handleControllerAction(Event *event)
     {
         // Send update to all clients except the original sender if the event
         // is after the server time
-        event->getPeer()->updateLastActivity();
+        peer->updateLastActivity();
         if (!will_trigger_rewind)
-            STKHost::get()->sendPacketExcept(event->getPeer(), &data, false);
+            STKHost::get()->sendPacketExcept(peer, &data, false);
 
         // FIXME unless there is a network jitter more than 100ms (more than
         // server delay), time adjust is not necessary

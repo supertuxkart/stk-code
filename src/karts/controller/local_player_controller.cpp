@@ -193,7 +193,8 @@ bool LocalPlayerController::action(PlayerAction action, int value,
     // If this is a client, send the action to networking layer
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient() &&
-        !RewindManager::get()->isRewinding())
+        !RewindManager::get()->isRewinding() &&
+        World::getWorld() && !World::getWorld()->isLiveJoinWorld())
     {
         if (auto gp = GameProtocol::lock())
         {

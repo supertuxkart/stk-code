@@ -81,6 +81,10 @@ private:
 
     uint64_t m_auto_back_to_lobby_time;
 
+    uint64_t m_start_live_game_time;
+
+    int m_live_join_ticks;
+
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
 
@@ -95,6 +99,8 @@ private:
 
     irr::core::stringw m_total_players;
 
+    void liveJoinAcknowledged(Event* event);
+    void finishLiveJoin();
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
