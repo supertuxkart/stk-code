@@ -100,6 +100,7 @@ private:
     irr::core::stringw m_total_players;
 
     void liveJoinAcknowledged(Event* event);
+    void handleKartInfo(Event* event);
     void finishLiveJoin();
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
@@ -125,6 +126,7 @@ public:
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
+    void requestKartInfo(uint8_t kart_id);
 };
 
 #endif // CLIENT_LOBBY_HPP

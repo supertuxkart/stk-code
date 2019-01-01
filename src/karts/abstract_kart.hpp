@@ -536,6 +536,8 @@ public:
     // ------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const = 0;
     // ------------------------------------------------------------------------
+    int getLiveJoinUntilTicks() const              { return m_live_join_util; }
+    // ------------------------------------------------------------------------
     void setLiveJoinKart(int util_ticks)     { m_live_join_util = util_ticks; }
 };   // AbstractKart
 

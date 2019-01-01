@@ -300,6 +300,7 @@ bool ServerLobby::notifyEvent(Event* event)
     case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
     case LE_LIVE_JOIN:         liveJoinRequest(event);        break;
     case LE_CLIENT_LOADED_WORLD: finishedLoadingLiveJoinClient(event); break;
+    case LE_KART_INFO: handleKartInfo(event); break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -3288,3 +3289,33 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
         }
     }
 }   // setPlayerKarts
+
+//-----------------------------------------------------------------------------
+void ServerLobby::handleKartInfo(Event* event)
+{
+    World* w = World::getWorld();
+    if (!w)
+        return;
+
+    STKPeer* peer = event->getPeer();
+    const NetworkString& data = event->data();
+    uint8_t kart_id = data.getUInt8();
+    if (kart_id > race_manager->getNumPlayers())
+        return;
+
+    AbstractKart* k = w->getKart(kart_id);
+    int live_join_util_ticks = k->getLiveJoinUntilTicks();
+
+    const RemoteKartInfo& rki = race_manager->getKartInfo(kart_id);
+
+    NetworkString* ns = getNetworkString(1);
+    ns->setSynchronous(true);
+    ns->addUInt8(LE_KART_INFO).addUInt32(live_join_util_ticks)
+        .addUInt8(kart_id) .encodeString(rki.getPlayerName())
+        .addUInt32(rki.getHostId()).addFloat(rki.getDefaultKartColor())
+        .addUInt32(rki.getOnlineId()).addUInt8(rki.getDifficulty())
+        .addUInt8((uint8_t)rki.getLocalPlayerId())
+        .encodeString(rki.getKartName());
+    peer->sendPacket(ns, true/*reliable*/);
+    delete ns;
+}   // handleKartInfo

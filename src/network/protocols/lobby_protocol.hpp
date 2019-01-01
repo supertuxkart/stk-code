@@ -69,7 +69,8 @@ public:
         LE_CONFIG_SERVER,
         LE_CHANGE_HANDICAP,
         LE_LIVE_JOIN,
-        LE_LIVE_JOIN_ACK
+        LE_LIVE_JOIN_ACK,
+        LE_KART_INFO
     };
 
     enum RejectReason : uint8_t

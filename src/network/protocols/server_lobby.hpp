@@ -281,6 +281,7 @@ private:
     bool canLiveJoinNow() const;
     int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                       unsigned local_id) const;
+    void handleKartInfo(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();

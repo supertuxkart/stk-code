@@ -21,6 +21,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
@@ -160,6 +161,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_BAD_TEAM:              handleBadTeam();            break;
         case LE_BAD_CONNECTION:        handleBadConnection();      break;
         case LE_LIVE_JOIN_ACK:        liveJoinAcknowledged(event); break;
+        case LE_KART_INFO:             handleKartInfo(event);      break;
         default:
             return false;
             break;
@@ -1005,3 +1007,56 @@ void ClientLobby::finishLiveJoin()
     }
     m_state.store(RACING);
 }   // finishLiveJoin
+
+//-----------------------------------------------------------------------------
+void ClientLobby::requestKartInfo(uint8_t kart_id)
+{
+    NetworkString* ns = getNetworkString(1);
+    ns->setSynchronous(true);
+    ns->addUInt8(LE_KART_INFO).addUInt8(kart_id);
+    sendToServer(ns, true/*reliable*/);
+    delete ns;
+}   // requestKartInfo
+
+//-----------------------------------------------------------------------------
+void ClientLobby::handleKartInfo(Event* event)
+{
+    World* w = World::getWorld();
+    if (!w)
+        return;
+
+    const NetworkString& data = event->data();
+    int live_join_util_ticks = data.getUInt32();
+    uint8_t kart_id = data.getUInt8();
+    core::stringw player_name;
+    data.decodeStringW(&player_name);
+    uint32_t host_id = data.getUInt32();
+    float kart_color = data.getFloat();
+    uint32_t online_id = data.getUInt32();
+    PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+    uint8_t local_id = data.getUInt8();
+    std::string kart_name;
+    data.decodeString(&kart_name);
+
+    RemoteKartInfo& rki = race_manager->getKartInfo(kart_id);
+    rki.setPlayerName(player_name);
+    rki.setHostId(host_id);
+    rki.setDefaultKartColor(kart_color);
+    rki.setOnlineId(online_id);
+    rki.setPerPlayerDifficulty(ppd);
+    rki.setLocalPlayerId(local_id);
+    rki.setKartName(kart_name);
+
+    AbstractKart* k = w->getKart(kart_id);
+    k->changeKart(rki.getKartName(), rki.getDifficulty(),
+        rki.getKartTeam() == KART_TEAM_RED ?
+        std::make_shared<RenderInfo>(1.0f) :
+        rki.getKartTeam() == KART_TEAM_BLUE ?
+        std::make_shared<RenderInfo>(0.66f) :
+        std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
+    k->setLiveJoinKart(live_join_util_ticks);
+
+    // I18N: Show when player join the started game in network
+    core::stringw msg = _("%s joined the game.", player_name);
+    MessageQueue::add(MessageQueue::MT_FRIEND, msg);
+}   // handleKartInfo
