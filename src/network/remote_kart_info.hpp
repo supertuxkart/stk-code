@@ -109,7 +109,9 @@ public:
                                                       { return m_profile; }
     bool disconnected() const               { return m_profile.expired(); }
     bool isReserved() const                 { return m_user_name.empty(); }
-    void makeReserved()                             {  m_user_name = L""; }
+    void makeReserved();
+    void copyFrom(std::shared_ptr<NetworkPlayerProfile> p,
+                  unsigned local_id);
     bool operator<(const RemoteKartInfo& other) const
     {
         return ((m_host_id<other.m_host_id) ||
