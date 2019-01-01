@@ -163,6 +163,9 @@ public:
     /** Filename of the title music to play.*/
     MusicInformation *m_title_music;
 
+    /** Filename of the music that is played when the track's music was not found */
+    MusicInformation *m_default_music;
+
     /** Maximum number of transform events of a replay. */
     int m_replay_max_frames;
 
