@@ -110,9 +110,6 @@ void NetworkingLobby::loadedFromFile()
     m_send_button = getWidget<ButtonWidget>("send");
     assert(m_send_button != NULL);
 
-    m_player_list = getWidget<ListWidget>("players");
-    assert(m_player_list!= NULL);
-
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
@@ -155,6 +152,9 @@ void NetworkingLobby::beforeAddingWidget()
 void NetworkingLobby::init()
 {
     Screen::init();
+
+    m_player_list = getWidget<ListWidget>("players");
+    assert(m_player_list!= NULL);
 
     m_server_configurable = false;
     m_player_names.clear();
@@ -506,6 +506,7 @@ void NetworkingLobby::unloaded()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::tearDown()
 {
+    m_player_list = NULL;
     m_joined_server.reset();
     // Server has a dummy network lobby too
     if (!NetworkConfig::get()->isClient())
