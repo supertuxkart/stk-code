@@ -541,11 +541,14 @@ void WorldStatus::unpause()
 }   // unpause
 
 //-----------------------------------------------------------------------------
+/** Base on the network timer set current world count up ticks to tick_now.
+ */
 void WorldStatus::endLiveJoinWorld(int ticks_now)
 {
     m_live_join_world = false;
     m_auxiliary_ticks = 0;
     m_phase = RACE_PHASE;
+    onGo();
     startEngines();
     music_manager->startMusic();
     setTicksForRewind(ticks_now);

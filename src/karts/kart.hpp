@@ -572,7 +572,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual bool isVisible() OVERRIDE;
+    virtual bool isVisible() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const OVERRIDE
                                                { return m_stars_effect.get(); }

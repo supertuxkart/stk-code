@@ -590,7 +590,8 @@ void RaceGUI::drawGlobalMiniMap()
         // don't draw eliminated kart
         if (kart->isEliminated() && !(sta && sta->isMoving())) 
             continue;
-            
+        if (!kart->isVisible())
+            continue;
         const Vec3& xyz = kart->getSmoothedTrans().getOrigin();
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);

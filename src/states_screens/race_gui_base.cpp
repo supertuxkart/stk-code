@@ -779,7 +779,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             kart= world->getKart(position-1);
         }
 
-        if(kart->isEliminated()) continue;
+        if (kart->isEliminated() || !kart->isVisible()) continue;
         unsigned int kart_id = kart->getWorldKartId();
 
         KartIconDisplayInfo &info = m_kart_display_infos[kart_id];

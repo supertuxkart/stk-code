@@ -3407,7 +3407,7 @@ const video::SColor& Kart::getColor() const
 }   // getColor
 
 // ------------------------------------------------------------------------
-bool Kart::isVisible()
+bool Kart::isVisible() const
 {
     return m_node && m_node->isVisible();
 }   // isVisible

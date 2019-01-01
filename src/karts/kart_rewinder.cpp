@@ -131,6 +131,8 @@ void KartRewinder::computeError()
             // see ClientLobby::handleKartInfo
             World::getWorld()->addReservedKart(getWorldKartId());
             reset();
+            // Final ticks come from server
+            m_live_join_util = std::numeric_limits<int>::max();
             getNode()->setVisible(false);
         }
     }

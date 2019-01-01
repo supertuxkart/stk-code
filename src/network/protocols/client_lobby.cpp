@@ -289,7 +289,7 @@ void ClientLobby::addAllPlayers(Event* event)
             AbstractKart* k = w->getKart(i);
             // The final joining ticks will be set by server later
             if (k->getController()->isLocalPlayerController())
-                k->setLiveJoinKart(-1);
+                k->setLiveJoinKart(std::numeric_limits<int>::max());
             else
                 k->getNode()->setVisible(false);
         }
