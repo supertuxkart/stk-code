@@ -770,14 +770,8 @@ void TracksScreen::updatePlayerVotes()
         const PeerVote* p = cl->getVote(m_index_to_hostid[i]);
         assert(p);
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        //I18N: In track screen, show reversed / random item location status
-        //for track votes, it's recommended to keep the translated word as
-        //short as possible
-        core::stringw y = _("Y");
-        //I18N: In track screen, show reversed / random item location status
-        //for track votes, it's recommended to keep the translated word as
-        //short as possible
-        core::stringw n = _("N");
+        core::stringw y = L"\u2714";
+        core::stringw n = L"\u2716";
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             row.push_back(GUIEngine::ListWidget::ListCell
