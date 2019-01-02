@@ -21,6 +21,9 @@
 
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "graphics/render_info.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -196,3 +199,20 @@ const PeerVote* LobbyProtocol::getVote(uint32_t host_id) const
     if (it == m_peers_votes.end()) return NULL;
     return &(it->second);
 }   // getVote
+
+//-----------------------------------------------------------------------------
+void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
+                                       int live_join_util_ticks) const
+{
+    AbstractKart* k = World::getWorld()->getKart(kart_id);
+    k->changeKart(rki.getKartName(), rki.getDifficulty(),
+        rki.getKartTeam() == KART_TEAM_RED ?
+        std::make_shared<RenderInfo>(1.0f) :
+        rki.getKartTeam() == KART_TEAM_BLUE ?
+        std::make_shared<RenderInfo>(0.66f) :
+        std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
+    k->setLiveJoinKart(live_join_util_ticks);
+    World::getWorld()->initTeamArrows(k);
+    if (!k->getController()->isLocalPlayerController())
+        k->setOnScreenText(rki.getPlayerName().c_str());
+}   // addLiveJoiningKart

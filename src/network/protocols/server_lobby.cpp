@@ -21,7 +21,6 @@
 #include "config/user_config.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -849,16 +848,9 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
 
     for (const int id : peer->getAvailableKartIDs())
     {
+        World::getWorld()->addReservedKart(id);
         const RemoteKartInfo& rki = race_manager->getKartInfo(id);
-        AbstractKart* k = w->getKart(id);
-        k->changeKart(rki.getKartName(), rki.getDifficulty(),
-            rki.getKartTeam() == KART_TEAM_RED ?
-            std::make_shared<RenderInfo>(1.0f) :
-            rki.getKartTeam() == KART_TEAM_BLUE ?
-            std::make_shared<RenderInfo>(0.66f) :
-            std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
-        k->setLiveJoinKart(live_join_util_ticks);
-        w->addReservedKart(id);
+        addLiveJoiningKart(id, rki, live_join_util_ticks);
     }
     Log::info("ServerLobby", "%s live-joining succeeded.",
         peer->getAddress().toString().c_str());

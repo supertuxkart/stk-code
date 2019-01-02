@@ -24,6 +24,7 @@
 class GameSetup;
 class NetworkPlayerProfile;
 class PeerVote;
+class RemoteKartInfo;
 
 #include <atomic>
 #include <cassert>
@@ -118,6 +119,9 @@ protected:
         if (m_start_game_thread.joinable())
             m_start_game_thread.join();
     }
+    // ------------------------------------------------------------------------
+    void addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
+                            int live_join_util_ticks) const;
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */

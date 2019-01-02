@@ -21,7 +21,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
-#include "graphics/render_info.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
@@ -1046,17 +1045,29 @@ void ClientLobby::handleKartInfo(Event* event)
     rki.setPerPlayerDifficulty(ppd);
     rki.setLocalPlayerId(local_id);
     rki.setKartName(kart_name);
+    addLiveJoiningKart(kart_id, rki, live_join_util_ticks);
 
-    AbstractKart* k = w->getKart(kart_id);
-    k->changeKart(rki.getKartName(), rki.getDifficulty(),
-        rki.getKartTeam() == KART_TEAM_RED ?
-        std::make_shared<RenderInfo>(1.0f) :
-        rki.getKartTeam() == KART_TEAM_BLUE ?
-        std::make_shared<RenderInfo>(0.66f) :
-        std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
-    k->setLiveJoinKart(live_join_util_ticks);
-
-    // I18N: Show when player join the started game in network
-    core::stringw msg = _("%s joined the game.", player_name);
+    core::stringw msg;
+    if (race_manager->teamEnabled())
+    {
+        if (w->getKartTeam(kart_id) == KART_TEAM_RED)
+        {
+            // I18N: Show when player join red team of the started game in
+            // network
+            msg = _("%s joined the red team.", player_name);
+        }
+        else
+        {
+            // I18N: Show when player join blue team of the started game in
+            // network
+            msg = _("%s joined the blue team.", player_name);
+        }
+    }
+    else
+    {
+        // I18N: Show when player join the started game in network
+        msg = _("%s joined the game.", player_name);
+    }
+    SFXManager::get()->quickSound("energy_bar_full");
     MessageQueue::add(MessageQueue::MT_FRIEND, msg);
 }   // handleKartInfo
