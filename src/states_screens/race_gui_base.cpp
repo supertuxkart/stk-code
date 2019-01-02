@@ -195,8 +195,8 @@ void RaceGUIBase::createRegularPolygon(unsigned int n, float radius,
     for (unsigned int i=0; i<n; i++)
     {
         float p = i*f;
-        core::vector2df X = center + core::vector2df( sin(p)*radius,
-                                                     -cos(p)*radius);
+        core::vector2df X = center + core::vector2df( sinf(p)*radius,
+                                                     -cosf(p)*radius);
         v[i].Pos.X = X.X;
         v[i].Pos.Y = X.Y;
         v[i].Color = color;
@@ -534,8 +534,8 @@ void RaceGUIBase::drawGlobalMusicDescription()
     float timeProgression = (float)(race_time) /
                             (float)(stk_config->m_music_credit_time - 2.0f);
 
-    const int x_pulse = (int)(sin(race_time*9.0f)*10.0f);
-    const int y_pulse = (int)(cos(race_time*9.0f)*10.0f);
+    const int x_pulse = (int)(sinf(race_time*9.0f)*10.0f);
+    const int y_pulse = (int)(cosf(race_time*9.0f)*10.0f);
 
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -942,7 +942,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
         {
             colors[i]=kart->getKartProperties()->getColor();
             colors[i].setAlpha(
-                               100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
+                               100+(int)(100*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
         }
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    m_icons_frame->getSize());
@@ -963,7 +963,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
     {
         //icon fades to the left
         float t = kart->getKartAnimation()->getAnimationTimer();
-        float t_anim=100*sin(0.5f*M_PI*t);
+        float t_anim=100*sinf(0.5f*M_PI*t);
         const core::rect<s32> rect1(core::position2d<s32>(0,0),
                                     icon->getSize());
         const core::rect<s32> pos1((int)(x-t_anim), y,
@@ -989,7 +989,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
     {
         //exploses into 4 parts
         float t = kart->getKartAnimation()->getAnimationTimer();
-        float t_anim=50.0f*sin(0.5f*M_PI*t);
+        float t_anim=50.0f*sinf(0.5f*M_PI*t);
         u16 icon_size_x=icon->getSize().Width;
         u16 icon_size_y=icon->getSize().Height;
 
