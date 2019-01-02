@@ -250,6 +250,7 @@ void ServerLobby::setup()
     m_item_seed = 0;
     m_winner_peer_id = 0;
     m_client_starting_time = 0;
+    m_last_live_join_util_ticks = 0;
     auto players = STKHost::get()->getPlayersForNewGame();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
@@ -841,7 +842,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     assert(w);
 
     // Give 3 seconds for all peers to get new kart info
-    const int live_join_util_ticks = w->getTicksSinceStart() +
+    m_last_live_join_util_ticks = w->getTicksSinceStart() +
         stk_config->time2Ticks(3.0f);
     uint64_t live_join_start_time = STKHost::get()->getNetworkTimer();
     live_join_start_time -= m_server_delay;
@@ -851,7 +852,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     {
         World::getWorld()->addReservedKart(id);
         const RemoteKartInfo& rki = race_manager->getKartInfo(id);
-        addLiveJoiningKart(id, rki, live_join_util_ticks);
+        addLiveJoiningKart(id, rki, m_last_live_join_util_ticks);
     }
     Log::info("ServerLobby", "%s live-joining succeeded.",
         peer->getAddress().toString().c_str());
@@ -859,7 +860,8 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     NetworkString* ns = getNetworkString(10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_LIVE_JOIN_ACK).addUInt64(m_client_starting_time)
-        .addUInt64(live_join_start_time).addUInt32(live_join_util_ticks);
+        .addUInt64(live_join_start_time)
+        .addUInt32(m_last_live_join_util_ticks);
 
     NetworkItemManager* nim =
         dynamic_cast<NetworkItemManager*>(ItemManager::get());
@@ -3322,3 +3324,14 @@ void ServerLobby::handleKartInfo(Event* event)
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
 }   // handleKartInfo
+
+//-----------------------------------------------------------------------------
+bool ServerLobby::hasLiveJoiningRecently() const
+{
+    World* w = World::getWorld();
+    if (!w)
+        return false;
+    return m_last_live_join_util_ticks != 0 &&
+        w->getTicksSinceStart() - m_last_live_join_util_ticks > 0 &&
+        w->getTicksSinceStart() - m_last_live_join_util_ticks < 120;
+}   // hasLiveJoiningRecently
