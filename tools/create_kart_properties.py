@@ -55,6 +55,8 @@ Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime
     In the xml files, a value will be assigned to it.
     If the name of the attribute is 'value', the getter method will only
     contain the group name and 'value' will be omitted (e.g. used for mass). """
+
+
 class GroupMember:
     def __init__(self, name, typeC, typeStr):
         self.name = name
@@ -71,6 +73,7 @@ class GroupMember:
         The name 'value' is special: Only the group name will be used to access
             the member but in the xml file it will be still value (because we
             need a name). """
+
     def parse(content):
         typeC = "float"
         typeStr = typeC
@@ -89,14 +92,18 @@ class GroupMember:
 
         return GroupMember(name, typeC, typeStr)
 
+
 """ A Group has a base name and can contain GroupMembers.
     In the xml files, a group is a tag. """
+
+
 class Group:
     def __init__(self, baseName):
         self.baseName = baseName
         self.members = []
 
     """ Parses and adds a member to this group """
+
     def addMember(self, content):
         self.members.append(GroupMember.parse(content))
 
@@ -105,6 +112,7 @@ class Group:
 
     """ E.g. engine: power, gears(std::vector<Gear>/Gears)
         or mass(float) or only mass """
+
     def parse(content):
         pos = content.find(":")
         if pos == -1:
@@ -117,7 +125,10 @@ class Group:
                 group.addMember(m)
             return group
 
+
 """ Creates a list of words from a titlecase string """
+
+
 def toList(name):
     result = []
     cur = ""
@@ -130,8 +141,11 @@ def toList(name):
         result.append(cur)
     return result
 
+
 """ titleCase: true  = result is titlecase
                false = result has underscores """
+
+
 def joinSubName(group, member, titleCase):
     words = toList(group.baseName) + toList(member.getName)
     first = True
@@ -140,6 +154,7 @@ def joinSubName(group, member, titleCase):
         return "".join(words)
     else:
         return "_".join(words)
+
 
 # Functions to generate code
 
@@ -150,6 +165,7 @@ def createEnum(groups):
         for m in g.members:
             print("        {0},".format(joinSubName(g, m, False).upper()))
 
+
 def createAcDefs(groups):
     for g in groups:
         print()
@@ -159,7 +175,8 @@ def createAcDefs(groups):
             typeC = m.typeC
 
             print("    {0} get{1}() const;".
-                format(typeC, nameTitle, nameUnderscore))
+                  format(typeC, nameTitle, nameUnderscore))
+
 
 def createAcGetter(groups):
     for g in groups:
@@ -182,6 +199,7 @@ def createAcGetter(groups):
 }}  // get{1}
 """.format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))
 
+
 def createKpDefs(groups):
     for g in groups:
         print()
@@ -191,7 +209,8 @@ def createKpDefs(groups):
             typeC = m.typeC
 
             print("    {0} get{1}() const;".
-                format(typeC, nameTitle, nameUnderscore))
+                  format(typeC, nameTitle, nameUnderscore))
+
 
 def createKpGetter(groups):
     for g in groups:
@@ -208,13 +227,15 @@ def createKpGetter(groups):
 }}  // get{0}
 """.format(nameTitle, typeC))
 
+
 def createGetType(groups):
     for g in groups:
         for m in g.members:
             nameTitle = joinSubName(g, m, True)
             nameUnderscore = joinSubName(g, m, False)
             print("    case {0}:\n        return TYPE_{1};".
-                format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
+                  format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
+
 
 def createGetName(groups):
     for g in groups:
@@ -222,32 +243,42 @@ def createGetName(groups):
             nameTitle = joinSubName(g, m, True)
             nameUnderscore = joinSubName(g, m, False).upper()
             print("    case {0}:\n        return \"{0}\";".
-                format(nameUnderscore))
+                  format(nameUnderscore))
+
 
 def createLoadXml(groups):
     for g in groups:
         print("    if (const XMLNode *sub_node = node->getNode(\"{0}\"))\n    {{".
-            format(g.baseName.lower()))
+              format(g.baseName.lower()))
         for m in g.members:
             nameUnderscore = joinSubName(g, m, False)
             nameMinus = "-".join(toList(m.name))
             print("""        sub_node->get(\"{0}\",
             &m_values[{1}]);""".
-                format(nameMinus, nameUnderscore.upper()))
+                  format(nameMinus, nameUnderscore.upper()))
         print("    }\n")
+
 
 # Dicionary that maps an argument string to a tupel of
 # a generator function, a help string and a filename
 functions = {
-    "enum":     (createEnum,     "List the enum values for all characteristics",           "karts/abstract_characteristic.hpp"),
-    "acdefs":   (createAcDefs,   "Create the header function definitions",                 "karts/abstract_characteristic.hpp"),
-    "acgetter": (createAcGetter, "Implement the getters",                                  "karts/abstract_characteristic.cpp"),
-    "getType":  (createGetType,  "Implement the getType function",                         "karts/abstract_characteristic.cpp"),
-    "getName":  (createGetName,  "Implement the getName function",                         "karts/abstract_characteristic.cpp"),
-    "kpdefs":   (createKpDefs,   "Create the header function definitions for the getters", "karts/kart_properties.hpp"),
-    "kpgetter": (createKpGetter, "Implement the getters",                                  "karts/kart_properties.cpp"),
-    "loadXml":  (createLoadXml,  "Code to load the characteristics from an xml file",      "karts/xml_characteristic.cpp"),
+    "enum": (createEnum, "List the enum values for all characteristics",
+             "karts/abstract_characteristic.hpp"),
+    "acdefs": (
+        createAcDefs, "Create the header function definitions",
+        "karts/abstract_characteristic.hpp"),
+    "acgetter": (createAcGetter, "Implement the getters", "karts/abstract_characteristic.cpp"),
+    "getType": (
+        createGetType, "Implement the getType function", "karts/abstract_characteristic.cpp"),
+    "getName": (
+        createGetName, "Implement the getName function", "karts/abstract_characteristic.cpp"),
+    "kpdefs": (createKpDefs, "Create the header function definitions for the getters",
+               "karts/kart_properties.hpp"),
+    "kpgetter": (createKpGetter, "Implement the getters", "karts/kart_properties.cpp"),
+    "loadXml": (createLoadXml, "Code to load the characteristics from an xml file",
+                "karts/xml_characteristic.cpp"),
 }
+
 
 def main():
     # Find out what to do
@@ -264,7 +295,8 @@ Operations:""")
             if l > maxDescriptionLength:
                 maxDescriptionLength = l
 
-        formatString = "    {{0:{0}}}    {{1:{1}}} in {{2}}".format(maxOperationLength, maxDescriptionLength)
+        formatString = "    {{0:{0}}}    {{1:{1}}} in {{2}}".format(maxOperationLength,
+                                                                    maxDescriptionLength)
         for o, f in functions.items():
             print(formatString.format(o, f[1], f[2]))
         return
@@ -272,7 +304,8 @@ Operations:""")
     task = sys.argv[1]
 
     if task not in functions:
-        print("The wanted operation was not found. Please call this script without arguments to list available arguments.")
+        print(
+            "The wanted operation was not found. Please call this script without arguments to list available arguments.")
         return
 
     # Parse properties
@@ -280,6 +313,7 @@ Operations:""")
 
     # Create the wanted code
     functions[task][0](groups)
+
 
 if __name__ == '__main__':
     main()

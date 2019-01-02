@@ -4,8 +4,8 @@
   <banana      model="banana.spm"          lowmodel="banana-low.spm"          glow="197 152 37"/>
   <nitro-big   model="nitrotank-big.spm"   lowmodel="nitrotank-big-low.spm"   glow="0 70 158"/>
   <nitro-small model="nitrotank-small.spm" lowmodel="nitrotank-small-low.spm" glow="0 70 158"/>
-  <!-- While a bubble gum technically 
-       isn't an item, it is internally 
+  <!-- While a bubble gum technically
+       isn't an item, it is internally
        handled as one, so list it here    -->
   <bubblegum   model="bubblegum.spm"       lowmodel="bubblegum-low.spm"       glow="246 150 209"/>
   <bubblegum-nolok   model="bubblegum-nolok.spm" lowmodel="bubblegum-nolok-low.spm" glow="20 190 0"/>

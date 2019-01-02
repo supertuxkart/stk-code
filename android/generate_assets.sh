@@ -337,7 +337,7 @@ convert_to_jpg()
 
     DIRNAME="`dirname "$FILE"`"
     BASENAME="`basename "$FILE"`"     
-    IS_GLOSS_MAP=`find "$DIRNAME" -iname "*.xml" -exec cat {} \; \
+    IS_GLOSS_MAP=`find "$DIRNAME" -iname "*.xml" -exec cat \; \
                                             | grep -c "gloss-map=\"$BASENAME\""`
     
     if [ $IS_GLOSS_MAP -gt 0 ]; then

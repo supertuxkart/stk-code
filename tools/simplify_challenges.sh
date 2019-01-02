@@ -16,7 +16,7 @@ for i in data/challenges/*.challenge; do
 done
 
 for i in data/grandprix/*.grandprix; do
-    echo "Simplyfing GP $i"
+    echo "Simplifying GP $i"
     cat $i | sed 's/laps="[0-9]*"/laps="0"/' > $i.new
     mv $i.new $i
 done

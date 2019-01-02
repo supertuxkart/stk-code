@@ -24,7 +24,7 @@ export HOST_ARMV7=arm-linux-androideabi
 export NDK_PLATFORM_ARMV7=android-19
 export MIN_SDK_VERSION_ARMV7=19
 export TARGET_SDK_VERSION_ARMV7=26
-export COMPILE_SDK_VERSION_ARMV7=26
+export COMPILE_SDK_VERSION_ARMV7=28
 
 export NDK_ABI_AARCH64=arm64-v8a
 export ARCH_AARCH64=arm64
@@ -32,7 +32,7 @@ export HOST_AARCH64=aarch64-linux-android
 export NDK_PLATFORM_AARCH64=android-21
 export MIN_SDK_VERSION_AARCH64=21
 export TARGET_SDK_VERSION_AARCH64=26
-export COMPILE_SDK_VERSION_AARCH64=26
+export COMPILE_SDK_VERSION_AARCH64=28
 
 export NDK_ABI_X86=x86
 export ARCH_X86=x86
@@ -40,7 +40,7 @@ export HOST_X86=i686-linux-android
 export NDK_PLATFORM_X86=android-19
 export MIN_SDK_VERSION_X86=19
 export TARGET_SDK_VERSION_X86=26
-export COMPILE_SDK_VERSION_X86=26
+export COMPILE_SDK_VERSION_X86=28
 
 export NDK_ABI_X86_64=x86_64
 export ARCH_X86_64=x86_64
@@ -48,7 +48,7 @@ export HOST_X86_64=x86_64-linux-android
 export NDK_PLATFORM_X86_64=android-21
 export MIN_SDK_VERSION_X86_64=21
 export TARGET_SDK_VERSION_X86_64=26
-export COMPILE_SDK_VERSION_X86_64=26
+export COMPILE_SDK_VERSION_X86_64=28
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
@@ -66,11 +66,11 @@ export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
 
 
-# A helper function that checks if error ocurred
+# A helper function that checks if error occurred
 check_error()
 {
     if [ $? -gt 0 ]; then
-        echo "Error ocurred."
+        echo "Error occurred."
         exit
     fi
 }

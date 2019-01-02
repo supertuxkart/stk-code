@@ -11,8 +11,8 @@
 #
 #  Tested with python 2.7 and python 3
 
-import os
 import argparse
+import os
 import sys
 
 
@@ -82,7 +82,8 @@ def main(directory, is_statistics, is_dry_run, extensions, comments_start):
         print('Total number of files affected in {0}: {1}'.format(directory, files_affected))
         print('Lines in total: {0}'.format(lines_total))
         print('      empty/comments: {0}'.format(lines_comments))
-        print('↳ excluding comments and blank lines: {0}'.format(lines_total - lines_comments), end='\n' * 2)
+        print('↳ excluding comments and blank lines: {0}'.format(lines_total - lines_comments), end
+              ='\n' * 2)
 
     print('Finished.')
 
@@ -95,7 +96,8 @@ if __name__ == '__main__':
                         help='do a dry run. Do not modify/write any files. (default: %(default)s)')
     parser.add_argument('--statistics', dest='statistics', action='store_true',
                         help='display statistics (count files and lines if enabled). On by default.')
-    parser.add_argument('--no-statistics', dest='statistics', action='store_false', help='do not display statistics.')
+    parser.add_argument('--no-statistics', dest='statistics', action='store_false',
+                        help='do not display statistics.')
     parser.add_argument('--extensions', default=["cpp", "hpp", "c", "h"], nargs='+',
                         help='set file extensions. Eg: --extensions cpp hpp (default: %(default)s).')
     parser.add_argument('--comments-start', default=['//', '/*', '*'], nargs='+',

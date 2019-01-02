@@ -32,7 +32,7 @@
             <goal type="name_of_counter" operation="-"/>
         </goal>
         With the value of operation (+ or -) defining if the subgoal is added
-        or substracted from the total.
+        or subtracted from the total.
 
         Sub-goals can also have their own sub-goals,
         however a AND, AND-AT-ONCE or OR can't have a SUM goal for parent.
@@ -138,41 +138,51 @@
         egg-hunt-finished-all    
         -->
 <achievements>
-    <achievement id="1" name="Christoffel Columbus" description="Play every official track at least once." >
-        <goal type="race-finished-all" value="1"/>
+    <achievement name="Christoffel Columbus" description="Play every official track at least once."
+        id="1">
+        <goal type="race-finished-all" value="1" />
     </achievement>
-    <achievement id="2" name="Strike!" description="Hit 10 karts with a bowling-ball.">
-        <goal type="bowling-hit" value="10"/>
+    <achievement name="Strike!" description="Hit 10 karts with a bowling-ball." id="2">
+        <goal type="bowling-hit" value="10" />
     </achievement>
-    <achievement id="3" name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
-        <goal type="hit-same-kart-1race" value="5"/>
+    <achievement name="Arch Enemy" description="Hit the same kart at least 5 times in one race."
+        id="3">
+        <goal type="hit-same-kart-1race" value="5" />
     </achievement>
-    <achievement id="4" name="Marathoner" description="Finish a race with at least twice the track's default lap number.">
-        <goal type="twice-laps" value="1"/>
+    <achievement name="Marathoner"
+        description="Finish a race with at least twice the track's default lap number." id="4">
+        <goal type="twice-laps" value="1" />
     </achievement>
-    <achievement id="5" name="Skid-row" description="Make 5 skidding in a single lap.">
-        <goal type="skidding-1lap" value="5"/>
+    <achievement name="Skid-row" description="Make 5 skidding in a single lap." id="5">
+        <goal type="skidding-1lap" value="5" />
     </achievement>
-    <achievement id="6" name="Gold driver" description="Win against at least 3 AIs in normal race, time-trial, and follow the leader.">
-        <goal type="won-normal-races" value="1"/>
-        <goal type="won-tt-races" value="1"/>
-        <goal type="won-ftl-races" value="1"/>
+    <achievement name="Gold driver"
+        description="Win against at least 3 AIs in normal race, time-trial, and follow the leader."
+        id="6">
+        <goal type="won-normal-races" value="1" />
+        <goal type="won-tt-races" value="1" />
+        <goal type="won-ftl-races" value="1" />
     </achievement>
-    <achievement id="7" name="Powerup Love" description="Use 10 or more powerups in a race.">
-        <goal type="powerup-used-1race" value="10"/>
+    <achievement name="Powerup Love" description="Use 10 or more powerups in a race." id="7">
+        <goal type="powerup-used-1race" value="10" />
     </achievement>
-    <achievement id="8" name="Unstoppable" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
-        <goal type="cons-won-races" value="5"/>
+    <achievement name="Unstoppable"
+        description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss."
+        id="8">
+        <goal type="cons-won-races" value="5" />
     </achievement>
-    <achievement id="9" name="Banana Lover" description="Collect at least 5 bananas in one race.">
-        <goal type="banana-1race" value="5"/>
+    <achievement name="Banana Lover" description="Collect at least 5 bananas in one race." id="9">
+        <goal type="banana-1race" value="5" />
     </achievement>
-    <achievement id="10" name="It's secret" description="Really ... a secret." secret="yes">
+    <achievement name="It's secret" description="Really ... a secret." id="10" secret="yes" />
+    <achievement name="Mosquito Hunter"
+        description="Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race."
+        id="11">
+        <goal type="swatter-hit-1race" value="5" />
     </achievement>
-    <achievement id="11" name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race.">
-        <goal type="swatter-hit-1race" value="5"/>
-    </achievement>
-    <achievement id="12" name="Beyond Luck" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
-        <goal type="cons-won-races-hard" value="10"/>
+    <achievement name="Beyond Luck"
+        description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss."
+        id="12">
+        <goal type="cons-won-races-hard" value="10" />
     </achievement>
 </achievements>

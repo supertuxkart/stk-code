@@ -34,8 +34,8 @@
                 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236
                 for details.
             max-force: Maximum suspension force -->
-        <suspension stiffness="280" rest="0.3" travel="0.29"
-            exp-spring-response="false" max-force="32000" />
+        <suspension exp-spring-response="false" max-force="32000" rest="0.3" stiffness="280"
+            travel="0.29" />
 
         <!-- Values related to stability of the chassis: damping, and reduced
                 impact of roll.
@@ -50,13 +50,9 @@
                 into a roll or pitch, which makes them topple over
             smooth-flying-impulse: apply a torque impulse to flying kart to keep
                 them parallel to the ground. -->
-        <stability roll-influence="0.3"
-                   chassis-linear-damping="0.2"
-                   chassis-angular-damping="0"
-                   downward-impulse-factor="5"
-                   track-connection-accel="2"
-                   angular-factor="0.25 1.0 0.5"
-                   smooth-flying-impulse="250" />
+        <stability angular-factor="0.25 1.0 0.5" chassis-angular-damping="0"
+            chassis-linear-damping="0.2" downward-impulse-factor="5" roll-influence="0.3"
+            smooth-flying-impulse="250" track-connection-accel="2" />
 
         <!-- Turning
             radius: The turn radius of the kart at
@@ -79,9 +75,8 @@
                 settings the expected time-to-full-steer is:
                 0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
                 time we had previously. -->
-        <turn radius="0:2.0 10:7.5 25:15 45:30"
-              time-full-steer="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
-              time-reset-steer="0.1" />
+        <turn radius="0:2.0 10:7.5 25:15 45:30" time-full-steer="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
+            time-reset-steer="0.1" />
 
         <!-- Speed and acceleration
             power: The power of the kart (the engine power needed to accelerate
@@ -97,8 +92,8 @@
             max-speed-reverse-ratio is the percentage of max speed for reverse
                 gear.
           -->
-        <engine power="950" max-speed="25" generic-max-speed="25" brake-factor="15"
-                brake-time-increase="6" max-speed-reverse-ratio="0.65" />
+        <engine brake-factor="15" brake-time-increase="6" generic-max-speed="25" max-speed="25"
+            max-speed-reverse-ratio="0.65" power="950" />
 
         <!-- Simulated gears
             switch-ratio defines at what ratio of the maximum
@@ -108,8 +103,7 @@
                 gear-power-increase contains the increase in max power (to simulate
                 different gears), e.g. 2.5 as first entry means: 2.5 * maxPower in gear 1
                 | first  | second |  third | . -->
-        <gear switch-ratio="0.2 0.45 0.7 1 1.25"
-              power-increase="2.5 2.1 1.7 1.4 1.2" />
+        <gear power-increase="2.5 2.1 1.7 1.4 1.2" switch-ratio="0.2 0.45 0.7 1 1.25" />
 
         <!-- Mass of a kart -->
         <mass value="350" />
@@ -122,11 +116,11 @@
                 position of the physics raycast wheels relative to the center of
                 gravity. Default is to use the corners of the chassis to attach
                 the wheels to. -->
-        <wheels damping-relaxation="35"  damping-compression="15">
-            <front-right position="0.38 0 0.6"   />
-            <front-left  position="-0.38 0 0.6"  />
-            <rear-right  position="0.38 0 -0.6"  />
-            <rear-left   position="-0.38 0 -0.6" />
+        <wheels damping-compression="15" damping-relaxation="35">
+            <front-right position="0.38 0 0.6" />
+            <front-left position="-0.38 0 0.6" />
+            <rear-right position="0.38 0 -0.6" />
+            <rear-left position="-0.38 0 -0.6" />
         </wheels>
 
         <!-- Friction of a kart when e.g. sliding along a wall. -->
@@ -167,14 +161,11 @@
                 effect is that while you skid (say left) you can adjust the direction
                 of the turn the kart is doing somewhat by steering to the left and right,
                 but you will always keep on doing a left turn, just more or less. -->
-        <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-              visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-              min-speed="10"  time-till-bonus="1.0 3.0"
-              bonus-speed="4.5 6.5" bonus-time="3.0 4.0"
-              bonus-force="250 350"
-              physical-jump-time="0" graphical-jump-time="0.4"
-              post-skid-rotate-factor="1"
-              reduce-turn-min="0.2" reduce-turn-max="0.8" enabled="true" />
+        <skid bonus-force="250 350" bonus-speed="4.5 6.5" bonus-time="3.0 4.0" decrease="0.95"
+            enabled="true" graphical-jump-time="0.4" increase="1.05" max="2.5" min-speed="10"
+            physical-jump-time="0" post-skid-rotate-factor="1" reduce-turn-max="0.8"
+            reduce-turn-min="0.2" revert-visual-time="0.7" time-till-bonus="1.0 3.0"
+            time-till-max="0.5" visual="1.25" visual-time="0.7" />
 
         <!-- Camera
             Distance between kart and camera.
@@ -184,14 +175,13 @@
                 when the camera is pointing backwards. This is usually
                 larger than the forward-up-angle, since the kart itself
                 otherwise obstricts too much of the view. -->
-        <camera distance="1.0" forward-up-angle="15"
-                backward-up-angle="5" />
+        <camera backward-up-angle="5" distance="1.0" forward-up-angle="15" />
 
         <!-- Jump animation
             animation-time: only if the estimated time for a jump is larger
                 than this value will the jump animation being
                 shown. -->
-       <jump animation-time="0.5" />
+        <jump animation-time="0.5" />
 
         <!-- Leaning related parameters, i.e. slightly leaning the karts when
              driving a fast curve.
@@ -207,7 +197,7 @@
             weight: The additional weight an anvil adds to a kart.
             speed-factor: The additional slowdown caused by the anvil.
             duration: The time an anvil is active. -->
-        <anvil duration="2.0" weight="150"  speed-factor="0.2" />
+        <anvil duration="2.0" speed-factor="0.2" weight="150" />
 
         <!-- Parachute
             friction: The friction factor when a parachute is attached.
@@ -225,17 +215,17 @@
                 detach parachute. E.g. at max-speed 50% of speed must be lost.
             max-speed: A factor that decides the impact of rate of speed
                 (distance between bounds) -->
-        <parachute friction="5.0" duration="3" duration-other="2.5"
-                   duration-rank-mult="1.5" duration-speed-mult="1.35"
-                   lbound-fraction="0.5" ubound-fraction="0.3" max-speed="30" />
+        <parachute duration="3" duration-other="2.5" duration-rank-mult="1.5"
+            duration-speed-mult="1.35" friction="5.0" lbound-fraction="0.5" max-speed="30"
+            ubound-fraction="0.3" />
         <!-- Bubblegum
             duration: How long the bubblegum lasts.
             speed-fraction: To what fraction of top-speed the speed is reduced.
             torque: To rotate the kart somewhat.
             fade-in-time: How quick the slowdown takes effect.
             shield-duration: How long the bubblegum shield lasts -->
-        <bubblegum duration="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"
-                   shield-duration="10.0" />
+        <bubblegum duration="1" fade-in-time="0.01" shield-duration="10.0" speed-fraction="0.3"
+            torque="500" />
 
         <!-- Zipper
             duration: Time a zipper is active.
@@ -245,8 +235,8 @@
                 kart-specific maximum kart speed.
             fade-out-time: determines how long it takes for a zipper
                 to fade out (after 'time'). -->
-        <zipper duration="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-                fade-out-time="1.0" />
+        <zipper duration="3.5" fade-out-time="1.0" force="250.0" max-speed-increase="15"
+            speed-gain="4.5" />
 
         <!-- Swatter
             duration: How long can the swatter be active.
@@ -256,8 +246,7 @@
             squash-duration: How long a kart will remain squashed.
             squash-slowdown: Percentage of max speed that a kart is
                 restricted to. -->
-        <swatter duration="10" distance="9" squash-duration="5"
-                 squash-slowdown="0.5" />
+        <swatter distance="9" duration="10" squash-duration="5" squash-slowdown="0.5" />
 
         <!-- Plunger and rubber band handling
             band-max-length: The maximum length of rubber band before it snaps.
@@ -265,9 +254,8 @@
             band-duration: The duration a rubber band acts.
             in-face-time determines how long it takes before a plunger
                 in your face is removed. -->
-        <plunger band-max-length="50" band-force="1500" band-duration="1"
-                 band-speed-increase="7" band-fade-out-time="3"
-                 in-face-time="4.5" />
+        <plunger band-duration="1" band-fade-out-time="3" band-force="1500" band-max-length="50"
+            band-speed-increase="7" in-face-time="4.5" />
 
 
         <!-- ********** Miscellaneous ********** -->
@@ -277,8 +265,7 @@
             it receives the corresponding bonus from 'boost'. Those
             fields must have the same size, and must be sorted by
             increasing times. -->
-        <startup time="0.3 0.5"
-                 boost="8 4" />
+        <startup boost="8 4" time="0.3 0.5" />
 
         <!-- Rescue
             duration: How long it takes the kart to be raised.
@@ -288,7 +275,7 @@
                 releasing them on the ground after a rescue. Used to avoid
                 resetting karts into the track. Not sure if this is still
                 necessary. -->
-        <rescue vert-offset="0.0" duration="1.2" height="2" />
+        <rescue duration="1.2" height="2" vert-offset="0.0" />
 
         <!-- Explosion
             duration: how long it takes before the kart can drive again (this
@@ -297,8 +284,7 @@
                 after being hit by an explosion.
             radius: Kart closer to this value will be affected by
                 an explosion as well.  -->
-        <explosion duration="1.5" radius="6"
-                   invulnerability-time="7" />
+        <explosion duration="1.5" invulnerability-time="7" radius="6" />
 
         <!-- Nitro
             engine-force: additional engine power
@@ -314,9 +300,8 @@
             fade-out-time: Duration during which the increased maximum
                 speed due to nitro fades out.
             max: How much nitro a kart can store. -->
-        <nitro engine-force="300" engine-mult="1.2" consumption="1"
-               small-container="1" big-container="3"
-               max-speed-increase="5" duration="1" fade-out-time="2.4" max="20" />
+        <nitro big-container="3" consumption="1" duration="1" engine-force="300" engine-mult="1.2"
+            fade-out-time="2.4" max="20" max-speed-increase="5" small-container="1" />
 
         <!-- Slipstream
             base-speed: the speed for which length and width are valid.
@@ -337,23 +322,23 @@
                 1 means it last as long the total time collected
             fade-out-time: How long the slip stream speed increase will
                 gradually be reduced.  -->
-        <slipstream base-speed="20" length="8" width="4" inner-factor="0.5"
-                    min-collect-time="2.5" max-collect-time="8" add-power="300" min-speed="8"
-                    max-speed-increase="3" duration-factor="1" fade-out-time="2" />
+        <slipstream add-power="300" base-speed="20" duration-factor="1" fade-out-time="2"
+            inner-factor="0.5" length="8" max-collect-time="8" max-speed-increase="3"
+            min-collect-time="2.5" min-speed="8" width="4" />
     </characteristic>
 
     <!-- The different difficulties (like easy, medium, hard) -->
     <difficulties>
         <characteristic name="easy">
-            <engine power="*0.7" max-speed="*0.6" generic-max-speed="*0.6" />
+            <engine generic-max-speed="*0.6" max-speed="*0.6" power="*0.7" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="medium">
-            <engine power="*0.83" max-speed="*0.8" generic-max-speed="*0.8" />
+            <engine generic-max-speed="*0.8" max-speed="*0.8" power="*0.83" />
             <plunger in-face-time="4" />
         </characteristic>
         <characteristic name="hard">
-            <engine power="*0.92" max-speed="*0.92" generic-max-speed="*0.92" />
+            <engine generic-max-speed="*0.92" max-speed="*0.92" power="*0.92" />
         </characteristic>
         <!-- This doesn't need to be changed because the most fast/heavy/extreme
             values should also be the default ones. -->
@@ -364,41 +349,38 @@
     <kart-types>
         <characteristic name="light">
             <turn radius="0:2.0 10:7.5 25:15 45:30" />
-            <engine power="*0.8" max-speed="*0.95" brake-factor="*1"
-                 max-speed-reverse-ratio="*0.8" />
-            <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
-                  power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
+            <engine brake-factor="*1" max-speed="*0.95" max-speed-reverse-ratio="*0.8"
+                power="*0.8" />
+            <gear power-increase="2.8 2.3 1.9 1.5 1.25 1.0"
+                switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0" />
             <mass value="*0.6" />
             <startup boost="*1 *1" />
-            <explosion time="*1" radius="*1" />
-            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1" />
-            <slipstream length="*0.9" collect-time="*0.9"
-                        duration-factor="*1" fade-out-time="*1" />
+            <explosion radius="*1" time="*1" />
+            <nitro duration="*1" engine-force="*0.6" max-speed-increase="*0.9" />
+            <slipstream collect-time="*0.9" duration-factor="*1" fade-out-time="*1" length="*0.9" />
         </characteristic>
         <characteristic name="medium">
             <turn radius="0:2.3 10:8.625 25:17.25 45:34.5" />
-            <engine power="*0.875" max-speed="*1" brake-factor="*0.8"
-                    max-speed-reverse-ratio="*0.75" />
-            <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.4 2 1.7 1.4 1.2 1" />
+            <engine brake-factor="*0.8" max-speed="*1" max-speed-reverse-ratio="*0.75"
+                power="*0.875" />
+            <gear power-increase="2.4 2 1.7 1.4 1.2 1" switch-ratio="0.1 0.25 0.45 0.7 1 4" />
             <mass value="*0.75" />
             <startup boost="*0.8 *0.8" />
-            <explosion time="*0.8" radius="*0.8" />
-            <nitro engine-force="*0.75" consumption="*1.25" />
+            <explosion radius="*0.8" time="*0.8" />
+            <nitro consumption="*1.25" engine-force="*0.75" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
             <turn radius="0:2.6 10:9.75 25:19.5 45:39" />
-            <engine power="*1" max-speed="*1.05" brake-factor="*0.6"
-                    max-speed-reverse-ratio="*0.7" />
-            <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2 1.7 1.5 1.3 1.15 1" />
+            <engine brake-factor="*0.6" max-speed="*1.05" max-speed-reverse-ratio="*0.7"
+                power="*1" />
+            <gear power-increase="2 1.7 1.5 1.3 1.15 1" switch-ratio="0.1 0.25 0.45 0.7 1 4" />
             <mass value="*1" />
             <startup boost="*0.6 *0.6" />
-            <explosion time="*0.6" radius="*0.6" />
-            <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.1" />
-            <slipstream length="*1.1" collect-time="*1.1"
-                   duration-factor="*0.6" fade-out-time="*1" />
+            <explosion radius="*0.6" time="*0.6" />
+            <nitro consumption="*1.67" engine-force="*1" max-speed-increase="*1.1" />
+            <slipstream collect-time="*1.1" duration-factor="*0.6" fade-out-time="*1"
+                length="*1.1" />
         </characteristic>
     </kart-types>
 
@@ -406,17 +388,18 @@
     <player-characteristics>
         <characteristic name="normal" />
         <characteristic name="handicap">
-            <engine power="*0.9" max-speed="*0.9" brake-factor="*0.8" brake-time-increase="*0.85" max-speed-reverse-ratio="*0.8" />
-            <skid time-till-bonus="*1.2 *1.0" bonus-speed="*0.9 *0.8" bonus-force="*0.9 *0.9" />
+            <engine brake-factor="*0.8" brake-time-increase="*0.85" max-speed="*0.9"
+                max-speed-reverse-ratio="*0.8" power="*0.9" />
+            <skid bonus-force="*0.9 *0.9" bonus-speed="*0.9 *0.8" time-till-bonus="*1.2 *1.0" />
             <bubblegum duration="*1.5" torque="*1.5" />
-            <zipper force="*0.8" speed-gain="*0.8" max-speed-increase="*0.8" />
+            <zipper force="*0.8" max-speed-increase="*0.8" speed-gain="*0.8" />
             <swatter duration="*0.8" squash-duration="*1.3" />
             <plunger band-max-length="*0.8" band-speed-increase="*0.8" in-face-time="*1.3" />
-            <startup time="*0.8 *0.8" boost="*0.8 *0.8" />
+            <startup boost="*0.8 *0.8" time="*0.8 *0.8" />
             <rescue duration="*1.5" />
-            <nitro engine-force="*0.8" max-speed-increase="*0.9" max="*0.8" />
-            <slipstream min-collect-time="*1.2" add-power="*0.9"
-                        max-speed-increase="*0.9" duration-factor="*0.9" />
+            <nitro engine-force="*0.8" max="*0.8" max-speed-increase="*0.9" />
+            <slipstream add-power="*0.9" duration-factor="*0.9" max-speed-increase="*0.9"
+                min-collect-time="*1.2" />
         </characteristic>
     </player-characteristics>
 </characteristics>
