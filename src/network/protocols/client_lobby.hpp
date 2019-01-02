@@ -42,7 +42,7 @@ private:
     void startGame(Event* event);
     void startSelection(Event* event);
     void raceFinished(Event* event);
-    void exitResultScreen(Event *event);
+    void backToLobby(Event *event);
     // race votes
     void receivePlayerVote(Event* event);
     void updatePlayerList(Event* event);

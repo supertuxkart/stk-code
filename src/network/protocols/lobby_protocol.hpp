@@ -59,7 +59,7 @@ public:
         LE_START_SELECTION,               // inform client to start selection
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
-        LE_EXIT_RESULT,                   // Force clients to exit race result screen
+        LE_BACK_LOBBY,                    // Force clients to go back to lobby
         LE_VOTE,                          // Track vote
         LE_CHAT,
         LE_SERVER_OWNERSHIP,
@@ -82,6 +82,14 @@ public:
         RR_INCOMPATIBLE_DATA = 3,
         RR_TOO_MANY_PLAYERS = 4,
         RR_INVALID_PLAYER = 5
+    };
+
+    enum BackLobbyReason : uint8_t
+    {
+        BLR_NONE = 0,
+        BLR_NO_GAME_FOR_LIVE_JOIN = 1,
+        BLR_NO_PLACE_FOR_LIVE_JOIN = 2,
+        BLR_ONE_PLAYER_IN_RANKED_MATCH = 3
     };
 
 protected:

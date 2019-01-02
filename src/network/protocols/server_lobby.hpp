@@ -277,7 +277,7 @@ private:
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
     void liveJoinRequest(Event* event);
-    void rejectLiveJoin(STKPeer* peer);
+    void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
     bool canLiveJoinNow() const;
     int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                       unsigned local_id) const;

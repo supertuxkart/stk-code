@@ -659,13 +659,14 @@ bool ServerLobby::canLiveJoinNow() const
 }   // canLiveJoinNow
 
 //-----------------------------------------------------------------------------
-/** \ref peer will be reset back to the lobby.
+/** \ref STKPeer peer will be reset back to the lobby with reason
+ *  \ref BackLobbyReason blr
  */
-void ServerLobby::rejectLiveJoin(STKPeer* peer)
+void ServerLobby::rejectLiveJoin(STKPeer* peer, BackLobbyReason blr)
 {
-    NetworkString* reset = getNetworkString(1);
+    NetworkString* reset = getNetworkString(2);
     reset->setSynchronous(true);
-    reset->addUInt8(LE_EXIT_RESULT);
+    reset->addUInt8(LE_BACK_LOBBY).addUInt8(blr);
     peer->sendPacket(reset, /*reliable*/true);
     delete reset;
     updatePlayerList();
@@ -688,7 +689,7 @@ void ServerLobby::liveJoinRequest(Event* event)
 
     if (!canLiveJoinNow())
     {
-        rejectLiveJoin(peer);
+        rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
     setPlayerKarts(data, peer);
@@ -712,7 +713,7 @@ void ServerLobby::liveJoinRequest(Event* event)
         }
         Log::info("ServerLobby", "Too many players (%d) try to live join",
             (int)peer->getPlayerProfiles().size());
-        rejectLiveJoin(peer);
+        rejectLiveJoin(peer, BLR_NO_PLACE_FOR_LIVE_JOIN);
         return;
     }
 
@@ -816,7 +817,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     STKPeer* peer = event->getPeer();
     if (!canLiveJoinNow())
     {
-        rejectLiveJoin(peer);
+        rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
     bool live_joined_in_time = true;
@@ -833,7 +834,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     {
         Log::warn("ServerLobby", "%s can't live-join in time.",
             peer->getAddress().toString().c_str());
-        rejectLiveJoin(peer);
+        rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
     World* w = World::getWorld();
@@ -951,11 +952,12 @@ void ServerLobby::update(int ticks)
         m_state.load() == SELECTING &&
         STKHost::get()->getPlayersInGame() == 1)
     {
-        NetworkString* exit_result_screen = getNetworkString(1);
-        exit_result_screen->setSynchronous(true);
-        exit_result_screen->addUInt8(LE_EXIT_RESULT);
-        sendMessageToPeers(exit_result_screen, /*reliable*/true);
-        delete exit_result_screen;
+        NetworkString* back_lobby = getNetworkString(1);
+        back_lobby->setSynchronous(true);
+        back_lobby->addUInt8(LE_BACK_LOBBY)
+            .addUInt8(BLR_ONE_PLAYER_IN_RANKED_MATCH);
+        sendMessageToPeers(back_lobby, /*reliable*/true);
+        delete back_lobby;
         std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_game_setup->stopGrandPrix();
         resetServer();
@@ -1013,11 +1015,11 @@ void ServerLobby::update(int ticks)
         {
             // Send a notification to all clients to exit
             // the race result screen
-            NetworkString *exit_result_screen = getNetworkString(1);
-            exit_result_screen->setSynchronous(true);
-            exit_result_screen->addUInt8(LE_EXIT_RESULT);
-            sendMessageToPeers(exit_result_screen, /*reliable*/true);
-            delete exit_result_screen;
+            NetworkString* back_to_lobby = getNetworkString(1);
+            back_to_lobby->setSynchronous(true);
+            back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
+            sendMessageToPeers(back_to_lobby, /*reliable*/true);
+            delete back_to_lobby;
             std::lock_guard<std::mutex> lock(m_connection_mutex);
             resetServer();
         }
@@ -3238,7 +3240,7 @@ void ServerLobby::addLiveJoinPlaceholder(
     }
     else
     {
-        // CTF or soccer, reserve at least 7 players on each team
+        // CTF or soccer, reserve at most 7 players on each team
         int red_count = 0;
         int blue_count = 0;
         for (unsigned i = 0; i < players.size(); i++)

@@ -148,7 +148,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_START_SELECTION:       startSelection(event);      break;
         case LE_LOAD_WORLD:            addAllPlayers(event);       break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
-        case LE_EXIT_RESULT:           exitResultScreen(event);    break;
+        case LE_BACK_LOBBY:            backToLobby(event);         break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
@@ -937,7 +937,7 @@ void ClientLobby::raceFinished(Event* event)
 /** Called when the server informs the clients to exit the race result screen.
  *  It exits the race, and goes back to the lobby.
  */
-void ClientLobby::exitResultScreen(Event *event)
+void ClientLobby::backToLobby(Event *event)
 {
     // In case the user opened a user info dialog
     GUIEngine::ModalDialog::dismiss();
@@ -948,7 +948,32 @@ void ClientLobby::exitResultScreen(Event *event)
     m_auto_started = false;
     m_state.store(CONNECTED);
     RaceResultGUI::getInstance()->backToLobby();
-}   // exitResultScreen
+
+    NetworkString &data = event->data();
+    core::stringw msg;
+    switch ((BackLobbyReason)data.getUInt8()) // the second byte
+    {
+    case BLR_NO_GAME_FOR_LIVE_JOIN:
+        // I18N: Error message shown if live join failed in network
+        msg = _("No more game is available for live join.");
+        break;
+    case BLR_NO_PLACE_FOR_LIVE_JOIN:
+        // I18N: Error message shown if live join failed in network
+        msg = _("No remaining place in the arena - live join disabled.");
+        break;
+    case BLR_ONE_PLAYER_IN_RANKED_MATCH:
+        // I18N: Error message shown if only 1 player remains in network
+        msg = _("Only 1 player remaining, returning to lobby.");
+        break;
+    default:
+        break;
+    }
+    if (!msg.empty())
+    {
+        SFXManager::get()->quickSound("anvil");
+        MessageQueue::add(MessageQueue::MT_ERROR, msg);
+    }
+}   // backToLobby
 
 //-----------------------------------------------------------------------------
 /** Callback when the world is loaded. The client will inform the server
