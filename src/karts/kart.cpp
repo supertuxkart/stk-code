@@ -1411,6 +1411,7 @@ void Kart::update(int ticks)
     m_xyz_front = getTrans()(front);
 
     // Hover the kart above reset position before entering the game
+    // Add invulnerability depends on kart
     if (m_live_join_util != 0 &&
         (m_live_join_util > World::getWorld()->getTicksSinceStart() ||
         World::getWorld()->isLiveJoinWorld()))
@@ -1424,6 +1425,8 @@ void Kart::update(int ticks)
             m_starting_transform.getBasis().getColumn(1) * 3.0f);
         body->proceedToTransform(hovering);
         setTrans(hovering);
+        float time = getKartProperties()->getExplosionInvulnerabilityTime();
+        m_invulnerable_ticks = stk_config->time2Ticks(time);
     }
 
     // Update the locally maintained speed of the kart (m_speed), which 
