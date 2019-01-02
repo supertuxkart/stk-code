@@ -208,6 +208,8 @@ public:
         int a = ticks - m_state_frequency + 1;
         return ticks != 0 && a >= 0 && a % m_state_frequency == 0;
     }
+    // ------------------------------------------------------------------------
+    void resetSmoothNetworkBody();
 };   // RewindManager
 
 

@@ -115,6 +115,10 @@ protected:
       * uint32_t max if not available. */
     std::atomic<uint32_t> m_estimated_progress;
 
+    // Save the last live join ticks, for physical objects to update current
+    // transformation in server, and reset smooth network body in client
+    int m_last_live_join_util_ticks;
+
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
@@ -205,6 +209,8 @@ public:
         m_estimated_remaining_time.store(std::numeric_limits<uint32_t>::max());
         m_estimated_progress.store(std::numeric_limits<uint32_t>::max());
     }
+    // ------------------------------------------------------------------------
+    bool hasLiveJoiningRecently() const;
 };   // class LobbyProtocol
 
 #endif // LOBBY_PROTOCOL_HPP

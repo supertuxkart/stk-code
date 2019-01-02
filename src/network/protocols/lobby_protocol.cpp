@@ -146,6 +146,7 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
+    m_last_live_join_util_ticks = 0;
     resetVotingTime();
     m_peers_votes.clear();
     m_game_setup->reset();
@@ -216,3 +217,14 @@ void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
     if (!k->getController()->isLocalPlayerController())
         k->setOnScreenText(rki.getPlayerName().c_str());
 }   // addLiveJoiningKart
+
+//-----------------------------------------------------------------------------
+bool LobbyProtocol::hasLiveJoiningRecently() const
+{
+    World* w = World::getWorld();
+    if (!w)
+        return false;
+    return m_last_live_join_util_ticks != 0 &&
+        w->getTicksSinceStart() - m_last_live_join_util_ticks > 0 &&
+        w->getTicksSinceStart() - m_last_live_join_util_ticks < 120;
+}   // hasLiveJoiningRecently

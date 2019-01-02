@@ -250,7 +250,6 @@ void ServerLobby::setup()
     m_item_seed = 0;
     m_winner_peer_id = 0;
     m_client_starting_time = 0;
-    m_last_live_join_util_ticks = 0;
     auto players = STKHost::get()->getPlayersForNewGame();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
@@ -3324,14 +3323,3 @@ void ServerLobby::handleKartInfo(Event* event)
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
 }   // handleKartInfo
-
-//-----------------------------------------------------------------------------
-bool ServerLobby::hasLiveJoiningRecently() const
-{
-    World* w = World::getWorld();
-    if (!w)
-        return false;
-    return m_last_live_join_util_ticks != 0 &&
-        w->getTicksSinceStart() - m_last_live_join_util_ticks > 0 &&
-        w->getTicksSinceStart() - m_last_live_join_util_ticks < 120;
-}   // hasLiveJoiningRecently

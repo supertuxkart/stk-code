@@ -112,7 +112,6 @@ void ClientLobby::setup()
 {
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
     m_start_live_game_time = std::numeric_limits<uint64_t>::max();
-    m_live_join_ticks = -1;
     m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
@@ -1001,12 +1000,12 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     m_start_live_game_time = data.getUInt64();
     powerup_manager->setRandomSeed(m_start_live_game_time);
     m_start_live_game_time = data.getUInt64();
-    m_live_join_ticks = data.getUInt32();
+    m_last_live_join_util_ticks = data.getUInt32();
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
         AbstractKart* k = w->getKart(i);
         if (k->getController()->isLocalPlayerController())
-            k->setLiveJoinKart(m_live_join_ticks);
+            k->setLiveJoinKart(m_last_live_join_util_ticks);
     }
 
     NetworkItemManager* nim =
@@ -1027,7 +1026,7 @@ void ClientLobby::finishLiveJoin()
         StkTime::getRealTime());
 
     w->setLiveJoinWorld(false);
-    w->endLiveJoinWorld(m_live_join_ticks);
+    w->endLiveJoinWorld(m_last_live_join_util_ticks);
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
         AbstractKart* k = w->getKart(i);

@@ -25,6 +25,7 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
+#include "network/smooth_network_body.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "utils/log.hpp"
@@ -390,3 +391,20 @@ void RewindManager::mergeRewindInfoEventFunction()
         m_rewind_queue.insertRewindInfo(rief);
     m_pending_rief.clear();
 }   // mergeRewindInfoEventFunction
+
+// ----------------------------------------------------------------------------
+/** Reset all smooth network body of rewinders so the rubber band effect of
+ *  moveable does not exist during firstly live join.
+ */
+void RewindManager::resetSmoothNetworkBody()
+{
+    for (auto& p : m_all_rewinder)
+    {
+        if (auto r = p.second.lock())
+        {
+            auto snb = std::dynamic_pointer_cast<SmoothNetworkBody>(r);
+            if (snb)
+                snb->reset();
+        }
+    }
+}   // resetSmoothNetworkBody

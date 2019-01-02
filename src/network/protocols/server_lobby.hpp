@@ -173,10 +173,6 @@ private:
 
     uint64_t m_client_starting_time;
 
-    // Save the last live join ticks, for physical objects to update current
-    // transformation
-    int m_last_live_join_util_ticks;
-
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -313,7 +309,6 @@ public:
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
-    bool hasLiveJoiningRecently() const;
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

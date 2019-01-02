@@ -52,6 +52,7 @@
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
@@ -1010,6 +1011,14 @@ void World::scheduleTutorial()
  */
 void World::updateGraphics(float dt)
 {
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+    {
+        // Reset all smooth network body of rewinders so the rubber band effect
+        // of moveable does not exist during firstly live join.
+        if (cl->hasLiveJoiningRecently())
+            RewindManager::get()->resetSmoothNetworkBody();
+    }
+
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
     if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
     {

@@ -83,8 +83,6 @@ private:
 
     uint64_t m_start_live_game_time;
 
-    int m_live_join_ticks;
-
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
 
