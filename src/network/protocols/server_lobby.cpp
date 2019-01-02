@@ -19,7 +19,7 @@
 #include "network/protocols/server_lobby.hpp"
 
 #include "config/user_config.hpp"
-#include "items/item_manager.hpp"
+#include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
@@ -814,10 +814,10 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
  */
 void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
 {
-    STKPeer* peer = event->getPeer();
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
     if (!canLiveJoinNow())
     {
-        rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
+        rejectLiveJoin(peer.get(), BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
     bool live_joined_in_time = true;
@@ -834,7 +834,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     {
         Log::warn("ServerLobby", "%s can't live-join in time.",
             peer->getAddress().toString().c_str());
-        rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
+        rejectLiveJoin(peer.get(), BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
     World* w = World::getWorld();
@@ -860,7 +860,16 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     ns->setSynchronous(true);
     ns->addUInt8(LE_LIVE_JOIN_ACK).addUInt64(m_client_starting_time)
         .addUInt64(live_join_start_time).addUInt32(live_join_util_ticks);
+
+    NetworkItemManager* nim =
+        dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    assert(nim);
+    nim->saveCompleteState(ns);
+    nim->addLiveJoinPeer(peer);
+
+    m_peers_ready[peer] = false;
     peer->setWaitingForGame(false);
+
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
     updatePlayerList();

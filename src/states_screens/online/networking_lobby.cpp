@@ -244,7 +244,7 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
-    if (NetworkConfig::get()->isServer())
+    if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
 
     m_ping_update_timer += delta;

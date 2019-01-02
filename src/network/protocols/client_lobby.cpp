@@ -25,7 +25,7 @@
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
-#include "items/item_manager.hpp"
+#include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -1008,6 +1008,12 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
         if (k->getController()->isLocalPlayerController())
             k->setLiveJoinKart(m_live_join_ticks);
     }
+
+    NetworkItemManager* nim =
+    dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    assert(nim);
+    nim->restoreCompleteState(data);
+
 }   // liveJoinAcknowledged
 
 //-----------------------------------------------------------------------------
