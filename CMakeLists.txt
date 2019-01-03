@@ -270,7 +270,7 @@ if(USE_WIIUSE)
     if(WIIUSE_BUILD)
         add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
     endif()
-    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse/src")
 endif()
 
 # Set include paths
