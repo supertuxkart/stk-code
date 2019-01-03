@@ -174,7 +174,7 @@ bool TracksScreen::onEscapePressed()
         StateManager::get()->popMenu();
         STKHost::get()->shutdown();
     }
-    else
+    else if (NetworkConfig::get()->isNetworking())
     {
         NetworkConfig::get()->clearActivePlayersForClient();
     }

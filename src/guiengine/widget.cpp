@@ -348,10 +348,7 @@ void Widget::setVisible(bool visible)
 
 void Widget::setCollapsed(const bool collapsed, Screen* calling_screen)
 {
-    // check for height > 0 to not loose height of widget in uncollapsed state
-    // if widget is set to collapse twice.
-    // the check for m_is_collapsed allows to save a height of 0 if widget was not collapsed
-    if (collapsed && (m_h > 0 || !m_is_collapsed))
+    if (!m_is_collapsed)
         m_uncollapsed_height = m_h;
 
     setCollapsed(collapsed, m_uncollapsed_height, calling_screen);

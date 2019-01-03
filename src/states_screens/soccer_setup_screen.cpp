@@ -108,15 +108,6 @@ void SoccerSetupScreen::beforeAddingWidget()
 {
     Widget* central_div = getWidget<Widget>("central_div");
 
-    // Add red/blue team icon above the karts
-    IconButtonWidget*    red = getWidget<IconButtonWidget>("red_team");
-    IconButtonWidget*    blue = getWidget<IconButtonWidget>("blue_team");
-    red->m_x = central_div->m_x + central_div->m_w/4 - red->m_w/2;
-    red->m_y = central_div->m_y + (int)(red->m_h * 0.5f);
-
-    blue->m_x = central_div->m_x + (central_div->m_w/4)*3 - blue->m_w/2;
-    blue->m_y = central_div->m_y + (int)(blue->m_h * 0.5f);
-
     // Add the 3D views for the karts
     int nb_players = race_manager->getNumPlayers();
     for(int i=0 ; i < nb_players ; i++)
