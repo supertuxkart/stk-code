@@ -26,6 +26,7 @@
 
 #include "irrString.h"
 #include <atomic>
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -76,12 +77,12 @@ public:
         return std::make_shared<NetworkPlayerProfile>(team);
     }
     // ------------------------------------------------------------------------
-    /* Placeholder profile for reserved player in live join, which its player
-     * name is empty. */
+    /* Placeholder profile for reserved player in live join, which its host id
+     * is uint32_t max. */
     NetworkPlayerProfile(KartTeam team)
     {
         m_kart_name             = "tux";
-        m_host_id               = -1;
+        m_host_id               = std::numeric_limits<uint32_t>::max();
         m_default_kart_color    = 0.0f;
         m_online_id             = 0;
         m_per_player_difficulty.store((PerPlayerDifficulty)0);

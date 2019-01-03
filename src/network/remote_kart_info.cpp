@@ -19,13 +19,6 @@
 #include "network/network_player_profile.hpp"
 
 // ----------------------------------------------------------------------------
-void RemoteKartInfo::makeReserved()
-{
-    m_user_name = L"";
-    m_profile.reset();
-}   // makeReserved
-
-// ----------------------------------------------------------------------------
 void RemoteKartInfo::copyFrom(std::shared_ptr<NetworkPlayerProfile> p,
                               unsigned local_id)
 {
