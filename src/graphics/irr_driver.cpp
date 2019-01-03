@@ -731,7 +731,8 @@ void IrrDriver::initDevice()
 #ifndef SERVER_ONLY
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
-    m_device->getCursorControl()->setVisible(true);
+    if (!ProfileWorld::isNoGraphics())
+        m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
 }   // initDevice
@@ -814,6 +815,9 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 void IrrDriver::showPointer()
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     if (!m_pointer_shown)
     {
         m_pointer_shown = true;
@@ -826,6 +830,9 @@ void IrrDriver::showPointer()
 void IrrDriver::hidePointer()
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     // always visible in artist debug mode, to be able to use the context menu
     if (UserConfigParams::m_artist_debug_mode)
     {
