@@ -1,0 +1,19 @@
+# will always be the actual version one
+# Wrapped in a macro because it's got a return before we want.
+macro(_gcvf_version)
+    @GCVF_PREVIOUS_FILE@
+endmacro()
+_gcvf_version()
+
+
+if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "@CMAKE_SYSTEM_NAME@")
+   set(PACKAGE_VERSION "${PACKAGE_VERSION} (@CMAKE_SYSTEM_NAME@)")
+   set(PACKAGE_VERSION_UNSUITABLE TRUE)
+   return()
+endif()
+
+if(ANDROID AND NOT ("${ANDROID_ABI}" STREQUAL "@ANDROID_ABI@"))
+   set(PACKAGE_VERSION "${PACKAGE_VERSION} (Android @ANDROID_ABI@)")
+   set(PACKAGE_VERSION_UNSUITABLE TRUE)
+   return()
+endif()
