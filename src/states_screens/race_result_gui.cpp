@@ -559,7 +559,7 @@ void RaceResultGUI::displayCTFResults()
         result_text.append("  ");
         if (kart->isEliminated())
         {
-            result_text.append(_("Eliminated"));
+            continue;
         }
         else
         {
@@ -598,7 +598,7 @@ void RaceResultGUI::displayCTFResults()
         result_text.append("  ");
         if (kart->isEliminated())
         {
-            result_text.append(_("Eliminated"));
+            continue;
         }
         else
         {
@@ -683,6 +683,8 @@ void RaceResultGUI::displayCTFResults()
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
+            if (ffa && kart->isEliminated())
+                continue;
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
