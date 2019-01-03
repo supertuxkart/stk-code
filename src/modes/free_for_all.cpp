@@ -227,3 +227,17 @@ bool FreeForAll::getKartFFAResult(int kart_id) const
     int top_score = getKartScore(k->getWorldKartId());
     return getKartScore(kart_id) == top_score;
 }   // getKartFFAResult
+
+// ----------------------------------------------------------------------------
+void FreeForAll::saveCompleteState(BareNetworkString* bns)
+{
+    for (unsigned i = 0; i < m_scores.size(); i++)
+        bns->addUInt32(m_scores[i]);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void FreeForAll::restoreCompleteState(const BareNetworkString& b)
+{
+    for (unsigned i = 0; i < m_scores.size(); i++)
+        m_scores[i] = b.getUInt32();
+}   // restoreCompleteState

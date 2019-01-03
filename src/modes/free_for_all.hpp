@@ -85,6 +85,16 @@ public:
                 (float)race_manager->getHitCaptureLimit() * 100.0f);
         return progress;
     }
+    // ------------------------------------------------------------------------
+    virtual void addReservedKart(int kart_id) OVERRIDE
+    {
+        WorldWithRank::addReservedKart(kart_id);
+        m_scores.at(kart_id) = 0;
+    }
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 };   // FreeForAll
 
 

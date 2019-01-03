@@ -41,6 +41,7 @@
 #include "LinearMath/btTransform.h"
 
 class AbstractKart;
+class BareNetworkString;
 class btRigidBody;
 class Controller;
 class ItemState;
@@ -326,7 +327,15 @@ public:
     unsigned int    getCurrentNumPlayers() const { return m_num_players -
                                                          m_eliminated_players;}
     // ------------------------------------------------------------------------
-    virtual void addReservedKart(int kart_id)         { m_eliminated_karts--; }
+    virtual void addReservedKart(int kart_id)
+    {
+        if (m_eliminated_karts > 0)
+            m_eliminated_karts--;
+    }
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns) {}
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& buffer) {}
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */

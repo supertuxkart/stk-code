@@ -1012,7 +1012,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     dynamic_cast<NetworkItemManager*>(ItemManager::get());
     assert(nim);
     nim->restoreCompleteState(data);
-
+    w->restoreCompleteState(data);
 }   // liveJoinAcknowledged
 
 //-----------------------------------------------------------------------------

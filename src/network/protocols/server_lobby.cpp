@@ -868,6 +868,8 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     nim->saveCompleteState(ns);
     nim->addLiveJoinPeer(peer);
 
+    w->saveCompleteState(ns);
+
     m_peers_ready[peer] = false;
     peer->setWaitingForGame(false);
 

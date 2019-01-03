@@ -402,6 +402,9 @@ void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
         scored_msg = _("%s captured the red flag!", name);
     }
 #ifndef SERVER_ONLY
+    // Don't set animation and show message if receiving in live join
+    if (isStartPhase())
+        return;
     m_race_gui->addMessage(scored_msg, NULL, 3.0f);
     kart->getKartModel()
         ->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
@@ -537,3 +540,18 @@ const std::string& CaptureTheFlag::getIdent() const
 {
     return IDENT_CTF;
 }   // getIdent
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::saveCompleteState(BareNetworkString* bns)
+{
+    FreeForAll::saveCompleteState(bns);
+    bns->addUInt32(m_red_scores).addUInt32(m_blue_scores);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::restoreCompleteState(const BareNetworkString& b)
+{
+    FreeForAll::restoreCompleteState(b);
+    m_red_scores = b.getUInt32();
+    m_blue_scores = b.getUInt32();
+}   // restoreCompleteState
