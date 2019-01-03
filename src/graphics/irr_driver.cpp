@@ -1966,10 +1966,19 @@ void IrrDriver::renderNetworkDebug()
         (int)(0.6f * screen_size.Height));
     video::SColor color(0x80, 0xFF, 0xFF, 0xFF);
     GL32_draw2DRectangle(color, background_rect);
-    std::string server_time = StringUtils::timeToString(
-        (float)STKHost::get()->getNetworkTimer() / 1000.0f,
-        /*precision*/2, /*display_minutes_if_zero*/true,
-        /*display_hours*/true);
+    uint64_t r, d, h, m, s, f;
+    r = STKHost::get()->getNetworkTimer();
+    d = r / 86400000;
+    r = r % 86400000;
+    h = r / 3600000;
+    r = r % 3600000;
+    m = r / 60000;
+    r = r % 60000;
+    s = r / 1000;
+    f = r % 1000;
+    char str[128];
+    sprintf(str, "%d day(s), %02d:%02d:%02d.%03d",
+        (int)d, (int)h, (int)m, (int)s, (int)f);
 
     gui::IGUIFont* font = GUIEngine::getFont();
     unsigned height = font->getDimension(L"X").Height + 2;
@@ -1977,7 +1986,7 @@ void IrrDriver::renderNetworkDebug()
     static video::SColor black = video::SColor(255, 0, 0, 0);
     font->draw(StringUtils::insertValues(
         L"Server time: %s      Server state frequency: %d",
-        server_time.c_str(), NetworkConfig::get()->getStateFrequency()),
+        str, NetworkConfig::get()->getStateFrequency()),
         background_rect, black, false);
 
     background_rect.UpperLeftCorner.Y += height;
