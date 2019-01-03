@@ -73,8 +73,6 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Check box for record race. */
     GUIEngine::CheckBoxWidget* m_record_race;
 
-	GUIEngine::SpinnerWidget* m_three_strikes_or_ffa;
-
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
 
