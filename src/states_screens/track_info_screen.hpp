@@ -88,11 +88,11 @@ public:
     TrackInfoScreen();
     virtual ~TrackInfoScreen();
 
-    virtual void init();
+    virtual void init() OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
-                               const int player_id);
+                               const int player_id) OVERRIDE;
 
     void onEnterPressedInternal();
     void setTrack(Track *track);
