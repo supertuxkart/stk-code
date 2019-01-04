@@ -450,7 +450,7 @@ void TrackInfoScreen::onEnterPressedInternal()
 	{
 		num_ai = 0;
 		race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
-        race_manager->setHitCaptureTime(6, static_cast<float>(selected_target_value) * 60);
+        race_manager->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
 	}
 
     if (UserConfigParams::m_num_karts_per_gamemode
