@@ -527,12 +527,11 @@ void RaceGUIBase::drawGlobalMusicDescription()
     gui::IGUIFont*       font = GUIEngine::getFont();
 
     float race_time =
-        stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
+        stk_config->ticks2Time(World::getWorld()->getMusicDescriptionTicks());
 
     // ---- Manage pulsing effect
-    // 3.0 is the duration of ready/set (TODO: don't hardcode)
     float timeProgression = (float)(race_time) /
-                            (float)(stk_config->m_music_credit_time - 2.0f);
+                            (float)(stk_config->m_music_credit_time);
 
     const int x_pulse = (int)(sin(race_time*9.0f)*10.0f);
     const int y_pulse = (int)(cos(race_time*9.0f)*10.0f);

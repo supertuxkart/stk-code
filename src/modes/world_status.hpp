@@ -130,6 +130,12 @@ private:
      */
     int             m_auxiliary_ticks;
 
+    int             m_start_music_ticks;
+
+    int             m_race_ticks;
+
+    int             m_live_join_ticks;
+
     /** Special counter to count ticks since start (in terms of physics
      *  timestep size). */
     int             m_count_up_ticks;
@@ -218,6 +224,12 @@ public:
     bool isLiveJoinWorld() const { return m_live_join_world; }
     // ------------------------------------------------------------------------
     void setLiveJoinWorld(bool val) { m_live_join_world = val; }
+    // ------------------------------------------------------------------------
+    int getMusicDescriptionTicks() const
+    {
+        return m_live_join_ticks == -1 ?
+            m_count_up_ticks : m_count_up_ticks - m_live_join_ticks;
+    }
     // ------------------------------------------------------------------------
     void endLiveJoinWorld(int ticks_now);
 };   // WorldStatus
