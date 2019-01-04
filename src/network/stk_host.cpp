@@ -1317,7 +1317,6 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
     stk_peer->setValidated();
     m_peers[event.peer] = stk_peer;
     setPrivatePort();
-    startListening();
     auto pm = ProtocolManager::lock();
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
