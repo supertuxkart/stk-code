@@ -504,7 +504,7 @@ public:
         m_time_target = time;
     }   // setTimeTarget
     // ------------------------------------------------------------------------
-    const RemoteKartInfo& getKartInfo(unsigned int n) const
+    RemoteKartInfo& getKartInfo(unsigned int n)
     {
         return m_player_karts[n];
     }   // getKartInfo
@@ -901,6 +901,15 @@ public:
     void setFlagReturnTicks(unsigned ticks)    { m_flag_return_ticks = ticks; }
     // ------------------------------------------------------------------------
     unsigned getFlagReturnTicks() const         { return m_flag_return_ticks; }
+    // ------------------------------------------------------------------------
+    /** Whether the current game mode allow live joining even the current game
+     *. started in network*/
+    bool supportsLiveJoining() const
+    {
+        return m_minor_mode == MINOR_MODE_SOCCER ||
+            m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG ||
+            m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
+    }
 };   // RaceManager
 
 extern RaceManager *race_manager;

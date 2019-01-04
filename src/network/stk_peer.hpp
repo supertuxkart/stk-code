@@ -207,6 +207,9 @@ public:
     bool availableKartID(unsigned id)
         { return m_available_kart_ids.find(id) != m_available_kart_ids.end(); }
     // ------------------------------------------------------------------------
+    const std::set<unsigned>& getAvailableKartIDs() const
+                                               { return m_available_kart_ids; }
+    // ------------------------------------------------------------------------
     void setUserVersion(const std::string& uv)         { m_user_version = uv; }
     // ------------------------------------------------------------------------
     const std::string& getUserVersion() const        { return m_user_version; }

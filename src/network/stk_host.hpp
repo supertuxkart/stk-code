@@ -113,6 +113,9 @@ private:
     /** Id of thread listening to enet events. */
     std::thread m_listening_thread;
 
+    /** The private port enet socket is bound. */
+    uint16_t m_private_port;
+
     /** Flag which is set from the protocol manager thread which
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
@@ -133,9 +136,6 @@ private:
     /** The public address stun server used. */
     TransportAddress m_stun_address;
 
-    /** The private port enet socket is bound. */
-    uint16_t m_private_port;
-
     Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
 
     std::atomic<uint32_t> m_client_ping;
@@ -143,6 +143,12 @@ private:
     std::atomic<uint32_t> m_upload_speed;
 
     std::atomic<uint32_t> m_download_speed;
+
+    std::atomic<uint32_t> m_players_in_game;
+
+    std::atomic<uint32_t> m_players_waiting;
+
+    std::atomic<uint32_t> m_total_players;
 
     std::atomic<uint64_t> m_network_timer;
 
@@ -349,6 +355,19 @@ public:
     // ------------------------------------------------------------------------
     /* Return download speed in bytes per second. */
     unsigned getDownloadSpeed() const       { return m_download_speed.load(); }
+    // ------------------------------------------------------------------------
+    void updatePlayers(unsigned* ingame = NULL,
+                       unsigned* waiting = NULL,
+                       unsigned* total = NULL);
+    // ------------------------------------------------------------------------
+    uint32_t getPlayersInGame() const      { return m_players_in_game.load(); }
+    // ------------------------------------------------------------------------
+    uint32_t getWaitingPlayers() const     { return m_players_waiting.load(); }
+    // ------------------------------------------------------------------------
+    uint32_t getTotalPlayers() const         { return m_total_players.load(); }
+    // ------------------------------------------------------------------------
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+        getPlayersForNewGame() const;
 };   // class STKHost
 
 #endif // STK_HOST_HPP

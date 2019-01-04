@@ -26,7 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
@@ -49,7 +49,7 @@ WorldStatus::WorldStatus()
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
-
+    m_live_join_world = false;
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())
@@ -65,7 +65,9 @@ void WorldStatus::reset(bool restart)
     m_time_ticks      = 0;
     m_auxiliary_ticks = 0;
     m_count_up_ticks  = 0;
-
+    m_start_music_ticks = -1;
+    m_race_ticks = -1;
+    m_live_join_ticks = -1;
     m_engines_started = false;
     
     // Using SETUP_PHASE will play the track into sfx first, and has no
@@ -122,7 +124,8 @@ void WorldStatus::startEngines()
     m_engines_started = true;
     for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
     {
-        World::getWorld()->getKart(i)->startEngineSFX();
+        if (!World::getWorld()->getKart(i)->isEliminated())
+            World::getWorld()->getKart(i)->startEngineSFX();
     }
 }   // startEngines
 
@@ -253,9 +256,12 @@ void WorldStatus::updateTime(int ticks)
                 m_phase = WAIT_FOR_SERVER_PHASE;
                 // In networked races, inform the start game protocol that
                 // the world has been setup
-                auto lobby = LobbyProtocol::get<LobbyProtocol>();
-                assert(lobby);
-                lobby->finishedLoadingWorld();
+                if (!m_live_join_world)
+                {
+                    auto lobby = LobbyProtocol::get<LobbyProtocol>();
+                    assert(lobby);
+                    lobby->finishedLoadingWorld();
+                }
             }
             else
             {
@@ -266,6 +272,20 @@ void WorldStatus::updateTime(int ticks)
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
         {
+            if (m_live_join_world)
+            {
+                m_auxiliary_ticks++;
+                // Add 3 seconds delay before telling server finish loading
+                // world, so previous (if any) disconnected player has left
+                // fully
+                if (m_auxiliary_ticks == stk_config->time2Ticks(3.0f))
+                {
+                    auto lobby = LobbyProtocol::get<LobbyProtocol>();
+                    assert(lobby);
+                    lobby->finishedLoadingWorld();
+                }
+                return;
+            }
             return;   // Don't increase time
         }
         case SERVER_READY_PHASE:
@@ -318,6 +338,21 @@ void WorldStatus::updateTime(int ticks)
 
                 // event
                 onGo();
+                // In artist debug mode, when without opponents,
+                // skip the ready/set/go counter faster
+                m_start_music_ticks =
+                    UserConfigParams::m_artist_debug_mode &&
+                    !NetworkConfig::get()->isNetworking()     &&
+                    race_manager->getNumberOfKarts() -
+                    race_manager->getNumSpareTireKarts() == 1 &&
+                    race_manager->getTrackName() != "tutorial" ?
+                    stk_config->time2Ticks(0.2f) :
+                    stk_config->time2Ticks(1.0f);
+                // how long to display the 'music' message
+                // no graphics mode goes race phase at 3 seconds;
+                m_race_ticks = ProfileWorld::isNoGraphics() ?
+                    stk_config->time2Ticks(3.0f) :
+                    stk_config->time2Ticks(stk_config->m_music_credit_time);
             }
 
             m_auxiliary_ticks++;
@@ -334,49 +369,36 @@ void WorldStatus::updateTime(int ticks)
             }
 
             return;   // Do not increase time
-        case GO_PHASE  :
-            // 2.5 seconds
-            if (m_auxiliary_ticks>stk_config->time2Ticks(2.5f) && 
-                music_manager->getCurrentMusic() &&
-                !music_manager->getCurrentMusic()->isPlaying())
+        case GO_PHASE:
+        {
+            if (m_start_music_ticks != -1 &&
+                m_count_up_ticks >= m_start_music_ticks)
             {
-                music_manager->startMusic();
-            }
-            // how long to display the 'go' message
-            if (m_auxiliary_ticks > 3 * stk_config->getPhysicsFPS())
-            {
+                m_start_music_ticks = -1;
+                if (music_manager->getCurrentMusic() &&
+                    !music_manager->getCurrentMusic()->isPlaying())
+                {
+                    music_manager->startMusic();
+                }
                 m_phase = MUSIC_PHASE;
             }
-
-            m_auxiliary_ticks++;
-
-            // In artist debug mode, when without opponents,
-            // skip the ready/set/go counter faster
-            if (UserConfigParams::m_artist_debug_mode &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
-            {
-                m_auxiliary_ticks += 6;
-            }
-
             break;   // Now the world time starts
+        }
         case MUSIC_PHASE:
+        {
             // Start the music here when starting fast
             if (UserConfigParams::m_race_now)
             {
                 music_manager->startMusic();
                 UserConfigParams::m_race_now = false;
             }
-            // how long to display the 'music' message
-            if (m_auxiliary_ticks >  
-                stk_config->time2Ticks(stk_config->m_music_credit_time) )
+            if (m_race_ticks != -1 && m_count_up_ticks >= m_race_ticks)
             {
+                m_race_ticks = -1;
                 m_phase = RACE_PHASE;
             }
-
-            m_auxiliary_ticks++;
             break;
+        }
         case RACE_PHASE:
             // Nothing to do for race phase, switch to delay finish phase
             // happens when
@@ -448,6 +470,7 @@ void WorldStatus::updateTime(int ticks)
             break;
         default: break;
     }   // switch m_phase
+
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -522,3 +545,20 @@ void WorldStatus::unpause()
         !NetworkConfig::get()->isNetworking())
         device->getTimer()->start();
 }   // unpause
+
+//-----------------------------------------------------------------------------
+/** Base on the network timer set current world count up ticks to tick_now.
+ */
+void WorldStatus::endLiveJoinWorld(int ticks_now)
+{
+    m_live_join_ticks = ticks_now;
+    m_live_join_world = false;
+    m_auxiliary_ticks = 0;
+    m_phase = MUSIC_PHASE;
+    m_race_ticks = m_live_join_ticks + stk_config->time2Ticks(
+        stk_config->m_music_credit_time);
+    onGo();
+    startEngines();
+    music_manager->startMusic();
+    setTicksForRewind(m_live_join_ticks);
+}   // endLiveJoinWorld

@@ -77,7 +77,11 @@ private:
     unsigned m_min_start_game_players;
 
     bool m_allow_change_team, m_has_auto_start_in_server,
-        m_server_configurable;
+        m_server_configurable, m_server_live_joinable,
+        m_client_live_joinable;
+
+    video::ITexture* m_config_texture;
+    video::ITexture* m_spectate_texture;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
@@ -145,6 +149,7 @@ public:
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t);
     void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
+    void toggleServerLiveJoinable(bool val)   { m_server_live_joinable = val; }
 };   // class NetworkingLobby
 
 #endif

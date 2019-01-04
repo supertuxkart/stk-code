@@ -41,10 +41,12 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
+#include "network/network_timer_synchronizer.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
 #include "states_screens/dialogs/server_configuration_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/translation.hpp"
 
 #include <utfwrapping.h>
@@ -110,9 +112,6 @@ void NetworkingLobby::loadedFromFile()
     m_send_button = getWidget<ButtonWidget>("send");
     assert(m_send_button != NULL);
 
-    m_player_list = getWidget<ListWidget>("players");
-    assert(m_player_list!= NULL);
-
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
@@ -124,6 +123,10 @@ void NetworkingLobby::loadedFromFile()
         (file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
     video::ITexture* icon_5 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
+    m_config_texture = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "main_options.png"));
+    m_spectate_texture = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "screen_other.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
@@ -156,10 +159,15 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    m_player_list = getWidget<ListWidget>("players");
+    assert(m_player_list!= NULL);
+
     m_server_configurable = false;
     m_player_names.clear();
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
+    m_server_live_joinable = false;
+    m_client_live_joinable = false;
     m_ping_update_timer = 0.0f;
     m_start_timeout = std::numeric_limits<float>::max();
     m_cur_starting_timer = std::numeric_limits<int64_t>::max();
@@ -244,8 +252,13 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
-    if (NetworkConfig::get()->isServer())
+    if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
+
+    m_start_button->setVisible(false);
+    m_config_button->setVisible(false);
+    m_config_button->setImage(m_config_texture);
+    m_client_live_joinable = false;
 
     m_ping_update_timer += delta;
     if (m_player_list && m_ping_update_timer > 2.0f)
@@ -266,20 +279,49 @@ void NetworkingLobby::onUpdate(float delta)
         m_timeout_message->setVisible(true);
         auto progress = cl->getGameStartedProgress();
         core::stringw msg;
+        core::stringw current_track;
+        Track* t = cl->getPlayingTrack();
+        if (t)
+            current_track = t->getName();
         if (progress.first != std::numeric_limits<uint32_t>::max())
         {
-            //I18N: In the networking lobby, show when player is required to
-            //wait before the current game finish with remaining time
-            msg = _("Please wait for the current game's end, "
-                "estimated remaining time: %s.",
-                StringUtils::timeToString((float)progress.first).c_str());
+            if (!current_track.empty())
+            {
+                //I18N: In the networking lobby, show when player is required to
+                //wait before the current game finish with remaining time,
+                //showing the current track name inside bracket
+                msg = _("Please wait for the current game's (%s) end, "
+                    "estimated remaining time: %s.", current_track,
+                    StringUtils::timeToString((float)progress.first).c_str());
+            }
+            else
+            {
+                //I18N: In the networking lobby, show when player is required
+                //to wait before the current game finish with remaining time
+                msg = _("Please wait for the current game's end, "
+                    "estimated remaining time: %s.",
+                    StringUtils::timeToString((float)progress.first).c_str());
+            }
         }
         else if (progress.second != std::numeric_limits<uint32_t>::max())
         {
-            //I18N: In the networking lobby, show when player is required to
-            //wait before the current game finish with progress in percent
-            msg = _("Please wait for the current game's end, "
-                "estimated progress: %d%.", progress.second);
+            if (!current_track.empty())
+            {
+                //I18N: In the networking lobby, show when player is required
+                //to wait before the current game finish with progress in
+                //percent, showing the current track name inside bracket
+                msg = _("Please wait for the current game's (%s) end, "
+                    "estimated progress: %s%.", current_track,
+                    progress.second);
+            }
+            else
+            {
+                //I18N: In the networking lobby, show when player is required
+                //to wait before the current game finish with progress in
+                //percent
+                msg = _("Please wait for the current game's end, "
+                    "estimated progress: %d%.", progress.second);
+            }
         }
         else
         {
@@ -287,6 +329,18 @@ void NetworkingLobby::onUpdate(float delta)
             //wait before the current game finish
             msg = _("Please wait for the current game's end.");
         }
+
+        // You can live join or spectator if u have the current play track
+        // and network timer is synchronized
+        if (t &&
+            STKHost::get()->getNetworkTimerSynchronizer()->isSynchronised() &&
+            m_server_live_joinable)
+        {
+            m_client_live_joinable = true;
+        }
+        else
+            m_client_live_joinable = false;
+
         m_timeout_message->setText(msg, false);
         core::stringw total_msg;
         for (auto& string : m_server_info)
@@ -296,6 +350,19 @@ void NetworkingLobby::onUpdate(float delta)
         }
         m_text_bubble->setText(total_msg, true);
         m_cur_starting_timer = std::numeric_limits<int64_t>::max();
+
+        if (m_client_live_joinable)
+        {
+            m_start_button->setVisible(true);
+            //I18N: Live join is displayed in networking lobby to allow players
+            //to join the current started in-progress game
+            m_start_button->setLabel(_("Live join"));
+            //I18N: Spectate is displayed in networking lobby to allow players
+            //to join the current started in-progress game
+            m_config_button->setLabel(_("Spectate"));
+            m_config_button->setImage(m_spectate_texture);
+            m_config_button->setVisible(true);
+        }
         return;
     }
 
@@ -479,14 +546,34 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }   // send chat message
     else if (name == m_start_button->m_properties[PROP_ID])
     {
-        // Send a message to the server to start
-        NetworkString start(PROTOCOL_LOBBY_ROOM);
-        start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendToServer(&start, true);
+        if (m_client_live_joinable)
+        {
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            if (cl)
+                cl->startLiveJoinKartSelection();
+        }
+        else
+        {
+            // Send a message to the server to start
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
+            STKHost::get()->sendToServer(&start, true);
+        }
     }
     else if (name == m_config_button->m_properties[PROP_ID])
     {
         auto cl = LobbyProtocol::get<ClientLobby>();
+        if (m_client_live_joinable && cl)
+        {
+            cl->setSpectator(true);
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.setSynchronous(true);
+            start.addUInt8(LobbyProtocol::LE_LIVE_JOIN)
+                // is spectating
+                .addUInt8(1);
+            STKHost::get()->sendToServer(&start, true);
+            return;
+        }
         if (cl)
         {
             new ServerConfigurationDialog(
@@ -506,6 +593,7 @@ void NetworkingLobby::unloaded()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::tearDown()
 {
+    m_player_list = NULL;
     m_joined_server.reset();
     // Server has a dummy network lobby too
     if (!NetworkConfig::get()->isClient())

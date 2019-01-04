@@ -52,6 +52,7 @@
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
@@ -252,19 +253,58 @@ void World::init()
 
     if (Camera::getNumCameras() == 0)
     {
+        auto cl = LobbyProtocol::get<ClientLobby>();
         if ( (NetworkConfig::get()->isServer() && 
               !ProfileWorld::isNoGraphics()       ) ||
-            race_manager->isWatchingReplay()            )
+            race_manager->isWatchingReplay()        ||
+            (cl && cl->isSpectator()))
         {
-            // In case that the server is running with gui or watching replay,
-            // create a camera and attach it to the first kart.
+            // In case that the server is running with gui, watching replay or
+            // spectating the game, create a camera and attach it to the first
+            // kart.
             Camera::createCamera(World::getWorld()->getKart(0), 0);
 
         }   // if server with graphics of is watching replay
     } // if getNumCameras()==0
-    initTeamArrows();
+
+    const unsigned int kart_amount = (unsigned int)m_karts.size();
+    for (unsigned int i = 0; i < kart_amount; i++)
+        initTeamArrows(m_karts[i].get());
+
     main_loop->renderGUI(7300);
 }   // init
+
+//-----------------------------------------------------------------------------
+void World::initTeamArrows(AbstractKart* k)
+{
+    if (!hasTeam())
+        return;
+#ifndef SERVER_ONLY
+    //Loading the indicator textures
+    std::string red_path =
+            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
+    std::string blue_path =
+            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
+
+    // Assigning indicators
+    scene::ISceneNode *arrow_node = NULL;
+
+    KartModel* km = k->getKartModel();
+    // Color of karts can be changed using shaders if the model supports
+    if (km->supportColorization() && CVS->isGLSL())
+        return;
+
+    float arrow_pos_height = km->getHeight() + 0.5f;
+    KartTeam team = getKartTeam(k->getWorldKartId());
+
+    arrow_node = irr_driver->addBillboard(
+        core::dimension2d<irr::f32>(0.3f,0.3f),
+        team == KART_TEAM_BLUE ? blue_path : red_path,
+        k->getNode());
+
+    arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
+#endif
+}   // initTeamArrows
 
 //-----------------------------------------------------------------------------
 /** This function is called before a race is started (i.e. either after
@@ -417,8 +457,13 @@ std::shared_ptr<AbstractKart> World::createKart
     {
         if (NetworkConfig::get()->isNetworkAITester())
         {
+            AIBaseController* ai = NULL;
+            if (race_manager->isBattleMode())
+                ai = new BattleAI(new_kart.get());
+            else
+                ai = new SkiddingAI(new_kart.get());
             controller = new NetworkAIController(new_kart.get(),
-                    local_player_id, new SkiddingAI(new_kart.get()));
+                local_player_id, ai);
         }
         else
         {
@@ -974,6 +1019,14 @@ void World::scheduleTutorial()
  */
 void World::updateGraphics(float dt)
 {
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+    {
+        // Reset all smooth network body of rewinders so the rubber band effect
+        // of moveable does not exist during firstly live join.
+        if (cl->hasLiveJoiningRecently())
+            RewindManager::get()->resetSmoothNetworkBody();
+    }
+
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
     if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
     {
@@ -1489,44 +1542,6 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
     assert(n != m_kart_team_map.end());
     return n->second;
 }   // getKartTeam
-
-
-//-----------------------------------------------------------------------------
-void World::initTeamArrows()
-{
-    if (!hasTeam())
-        return;
-#ifndef SERVER_ONLY
-    const unsigned int kart_amount = (unsigned int)m_karts.size();
-
-    //Loading the indicator textures
-    std::string red_path =
-            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
-    std::string blue_path =
-            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
-
-    //Assigning indicators
-    for(unsigned int i = 0; i < kart_amount; i++)
-    {
-        scene::ISceneNode *arrow_node = NULL;
-
-        KartModel* km = m_karts[i]->getKartModel();
-        // Color of karts can be changed using shaders if the model supports
-        if (km->supportColorization() && CVS->isGLSL()) continue;
-
-        float arrow_pos_height = km->getHeight() + 0.5f;
-        KartTeam team = getKartTeam(i);
-
-        arrow_node = irr_driver->addBillboard(
-            core::dimension2d<irr::f32>(0.3f,0.3f),
-            team == KART_TEAM_BLUE ? blue_path : red_path,
-            m_karts[i]->getNode());
-
-        arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
-    }
-#endif
-}   // initTeamArrows
-
 
 //-----------------------------------------------------------------------------
 void World::setAITeam()

@@ -28,6 +28,7 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
 #include "physics/btKart.hpp"
@@ -64,6 +65,8 @@ void KartRewinder::reset()
     m_has_server_state = false;
 }   // reset
 
+
+
 // ----------------------------------------------------------------------------
 /** This function is called immediately before a rewind is done and saves
  *  the current transform for the kart. The difference between this saved
@@ -91,7 +94,7 @@ void KartRewinder::computeError()
         Moveable::checkSmoothing();
         m_skidding->checkSmoothing();
     }
-    else
+    else if (!isEliminated())
         ka->checkNetworkAnimationCreationSucceed(m_transfrom_from_network);
 
     float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
@@ -106,11 +109,32 @@ void KartRewinder::computeError()
     if (!m_has_server_state && !isEliminated())
     {
         const int kartid = getWorldKartId();
-        Log::debug("KartRewinder", "Kart id %d disconnected", kartid);
+        Log::debug("KartRewinder", "Kart id %d disconnected.", kartid);
         World::getWorld()->eliminateKart(kartid,
             false/*notify_of_elimination*/);
         setPosition(World::getWorld()->getCurrentNumKarts() + 1);
         finishedRace(World::getWorld()->getTime(), true/*from_server*/);
+        if (race_manager->supportsLiveJoining())
+        {
+            RemoteKartInfo& rki = race_manager->getKartInfo(kartid);
+            rki.makeReserved();
+        }
+    }
+    else if (m_has_server_state && isEliminated())
+    {
+        if (auto cl = LobbyProtocol::get<ClientLobby>())
+        {
+            Log::debug("KartRewinder", "Kart id %d connected.",
+                getWorldKartId());
+            cl->requestKartInfo((uint8_t)getWorldKartId());
+            // New live join kart, hide the node until new kart info is received
+            // see ClientLobby::handleKartInfo
+            World::getWorld()->addReservedKart(getWorldKartId());
+            reset();
+            // Final ticks come from server
+            m_live_join_util = std::numeric_limits<int>::max();
+            getNode()->setVisible(false);
+        }
     }
 }   // computeError
 

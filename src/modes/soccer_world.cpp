@@ -143,9 +143,7 @@ void SoccerWorld::reset(bool restart)
 
     m_count_down_reached_zero = false;
     m_red_scorers.clear();
-    m_red_score_times.clear();
     m_blue_scorers.clear();
-    m_blue_score_times.clear();
     m_ball_hitter = -1;
     m_red_kdm.clear();
     m_blue_kdm.clear();
@@ -277,9 +275,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             m_goal_frame.push_back(m_frame_count - elapsed_frame);
         }
 
-        ScorerData sd;
+        ScorerData sd = {};
         sd.m_id = m_ball_hitter;
         sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
+        sd.m_kart = getKart(m_ball_hitter)->getIdent();
+        sd.m_player = getKart(m_ball_hitter)->getController()->getName();
 
         if (sd.m_correct_goal)
         {
@@ -293,30 +293,27 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
 
-        float score_time = 0.0f;
         if (first_goal)
         {
+            if (race_manager->hasTimeTarget())
+            {
+                sd.m_time = race_manager->getTimeTarget() - getTime();
+            }
+            else
+                sd.m_time = getTime();
             // Notice: true first_goal means it's blue goal being shoot,
             // so red team can score
             m_red_scorers.push_back(sd);
-            if (race_manager->hasTimeTarget())
-            {
-                score_time = race_manager->getTimeTarget() - getTime();
-            }
-            else
-                score_time = getTime();
-            m_red_score_times.push_back(score_time);
         }
         else
         {
-            m_blue_scorers.push_back(sd);
             if (race_manager->hasTimeTarget())
             {
-                score_time = race_manager->getTimeTarget() - getTime();
+                sd.m_time = race_manager->getTimeTarget() - getTime();
             }
             else
-                score_time = getTime();
-            m_blue_score_times.push_back(score_time);
+                sd.m_time = getTime();
+            m_blue_scorers.push_back(sd);
         }
         if (NetworkConfig::get()->isNetworking() &&
             NetworkConfig::get()->isServer())
@@ -325,9 +322,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             p.setSynchronous(true);
             p.addUInt8(GameEventsProtocol::GE_PLAYER_GOAL)
                 .addUInt8((uint8_t)sd.m_id).addUInt8(sd.m_correct_goal)
-                .addUInt8(first_goal).addFloat(score_time)
+                .addUInt8(first_goal).addFloat(sd.m_time)
                 .addTime(World::getWorld()->getTicksSinceStart() +
-                stk_config->time2Ticks(3.0f));
+                stk_config->time2Ticks(3.0f))
+                .encodeString(sd.m_kart)
+                .encodeString(sd.m_player);
             STKHost::get()->sendPacketToAllPeers(&p, true);
         }
     }
@@ -346,6 +345,9 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 //-----------------------------------------------------------------------------
 void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
 {
+    // Ignore in live join
+    if (isStartPhase())
+        return;
     int ticks_now = World::getWorld()->getTicksSinceStart();
     int ticks_back_to_own_goal = ns.getTime();
     if (ticks_now >= ticks_back_to_own_goal)
@@ -363,11 +365,38 @@ void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
 //-----------------------------------------------------------------------------
 void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
 {
-    ScorerData sd;
+    ScorerData sd = {};
     sd.m_id = ns.getUInt8();
     sd.m_correct_goal = ns.getUInt8() == 1;
     bool first_goal = ns.getUInt8() == 1;
-    float score_time = ns.getFloat();
+    sd.m_time = ns.getFloat();
+    int ticks_now = World::getWorld()->getTicksSinceStart();
+    int ticks_back_to_own_goal = ns.getTime();
+    try
+    {
+        ns.decodeString(&sd.m_kart);
+        ns.decodeStringW(&sd.m_player);
+    }
+    catch (std::exception &e)
+    {
+        sd.m_kart = getKart(sd.m_id)->getIdent();
+        sd.m_player = getKart(sd.m_id)->getController()->getName();
+        (void)e;
+    }
+
+    if (first_goal)
+    {
+        m_red_scorers.push_back(sd);
+    }
+    else
+    {
+        m_blue_scorers.push_back(sd);
+    }
+
+    // Ignore in live join
+    if (isStartPhase())
+        return;
+
     if (sd.m_correct_goal)
     {
         m_karts[sd.m_id]->getKartModel()
@@ -378,19 +407,6 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         m_karts[sd.m_id]->getKartModel()
             ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
     }
-
-    if (first_goal)
-    {
-        m_red_scorers.push_back(sd);
-        m_red_score_times.push_back(score_time);
-    }
-    else
-    {
-        m_blue_scorers.push_back(sd);
-        m_blue_score_times.push_back(score_time);
-    }
-    int ticks_now = World::getWorld()->getTicksSinceStart();
-    int ticks_back_to_own_goal = ns.getTime();
 
     if (ticks_now >= ticks_back_to_own_goal)
     {
@@ -751,3 +767,60 @@ void SoccerWorld::enterRaceOverState()
     }
 
 }   // enterRaceOverState
+
+// ----------------------------------------------------------------------------
+void SoccerWorld::saveCompleteState(BareNetworkString* bns)
+{
+    const unsigned red_scorers = m_red_scorers.size();
+    bns->addUInt32(red_scorers);
+    for (unsigned i = 0; i < red_scorers; i++)
+    {
+        bns->addUInt8((uint8_t)m_red_scorers[i].m_id)
+            .addUInt8(m_red_scorers[i].m_correct_goal)
+            .addFloat(m_red_scorers[i].m_time)
+            .encodeString(m_red_scorers[i].m_kart)
+            .encodeString(m_red_scorers[i].m_player);
+    }
+
+    const unsigned blue_scorers = m_blue_scorers.size();
+    bns->addUInt32(blue_scorers);
+    for (unsigned i = 0; i < blue_scorers; i++)
+    {
+        bns->addUInt8((uint8_t)m_blue_scorers[i].m_id)
+            .addUInt8(m_blue_scorers[i].m_correct_goal)
+            .addFloat(m_blue_scorers[i].m_time)
+            .encodeString(m_blue_scorers[i].m_kart)
+            .encodeString(m_blue_scorers[i].m_player);
+    }
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
+{
+    m_red_scorers.clear();
+    m_blue_scorers.clear();
+
+    const unsigned red_size = b.getUInt32();
+    for (unsigned i = 0; i < red_size; i++)
+    {
+        ScorerData sd;
+        sd.m_id = b.getUInt8();
+        sd.m_correct_goal = b.getUInt8() == 1;
+        sd.m_time = b.getFloat();
+        b.decodeString(&sd.m_kart);
+        b.decodeStringW(&sd.m_player);
+        m_red_scorers.push_back(sd);
+    }
+
+    const unsigned blue_size = b.getUInt32();
+    for (unsigned i = 0; i < blue_size; i++)
+    {
+        ScorerData sd;
+        sd.m_id = b.getUInt8();
+        sd.m_correct_goal = b.getUInt8() == 1;
+        sd.m_time = b.getFloat();
+        b.decodeString(&sd.m_kart);
+        b.decodeStringW(&sd.m_player);
+        m_blue_scorers.push_back(sd);
+    }
+}   // restoreCompleteState

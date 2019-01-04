@@ -52,7 +52,7 @@ Protocol::~Protocol()
 /** Returns a network string with the given type.
  *  \capacity Default preallocated size for the message.
  */
-NetworkString* Protocol::getNetworkString(size_t capacity)
+NetworkString* Protocol::getNetworkString(size_t capacity) const
 {
     return new NetworkString(m_type, (int)capacity);
 }   // getNetworkString

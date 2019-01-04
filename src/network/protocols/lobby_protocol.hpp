@@ -24,6 +24,8 @@
 class GameSetup;
 class NetworkPlayerProfile;
 class PeerVote;
+class RemoteKartInfo;
+class Track;
 
 #include <atomic>
 #include <cassert>
@@ -58,7 +60,7 @@ public:
         LE_START_SELECTION,               // inform client to start selection
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
-        LE_EXIT_RESULT,                   // Force clients to exit race result screen
+        LE_BACK_LOBBY,                    // Force clients to go back to lobby
         LE_VOTE,                          // Track vote
         LE_CHAT,
         LE_SERVER_OWNERSHIP,
@@ -67,7 +69,10 @@ public:
         LE_BAD_TEAM,
         LE_BAD_CONNECTION,
         LE_CONFIG_SERVER,
-        LE_CHANGE_HANDICAP
+        LE_CHANGE_HANDICAP,
+        LE_LIVE_JOIN,
+        LE_LIVE_JOIN_ACK,
+        LE_KART_INFO
     };
 
     enum RejectReason : uint8_t
@@ -78,6 +83,14 @@ public:
         RR_INCOMPATIBLE_DATA = 3,
         RR_TOO_MANY_PLAYERS = 4,
         RR_INVALID_PLAYER = 5
+    };
+
+    enum BackLobbyReason : uint8_t
+    {
+        BLR_NONE = 0,
+        BLR_NO_GAME_FOR_LIVE_JOIN = 1,
+        BLR_NO_PLACE_FOR_LIVE_JOIN = 2,
+        BLR_ONE_PLAYER_IN_RANKED_MATCH = 3
     };
 
 protected:
@@ -103,6 +116,13 @@ protected:
       * uint32_t max if not available. */
     std::atomic<uint32_t> m_estimated_progress;
 
+    /** Save the last live join ticks, for physical objects to update current
+      * transformation in server, and reset smooth network body in client. */
+    int m_last_live_join_util_ticks;
+
+    /** Store current playing track in id. */
+    std::atomic<int> m_current_track;
+
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
@@ -115,6 +135,9 @@ protected:
         if (m_start_game_thread.joinable())
             m_start_game_thread.join();
     }
+    // ------------------------------------------------------------------------
+    void addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
+                            int live_join_util_ticks) const;
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */
@@ -190,6 +213,12 @@ public:
         m_estimated_remaining_time.store(std::numeric_limits<uint32_t>::max());
         m_estimated_progress.store(std::numeric_limits<uint32_t>::max());
     }
+    // ------------------------------------------------------------------------
+    bool hasLiveJoiningRecently() const;
+    // ------------------------------------------------------------------------
+    void storePlayingTrack(int track_id)   { m_current_track.store(track_id); }
+    // ------------------------------------------------------------------------
+    Track* getPlayingTrack() const;
 };   // class LobbyProtocol
 
 #endif // LOBBY_PROTOCOL_HPP

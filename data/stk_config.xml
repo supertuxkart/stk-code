@@ -173,7 +173,7 @@
   <delay-finish time="1.0"/>
 
   <!-- How long the music credits are shown. -->
-  <credits music="10"/>
+  <credits music="8"/>
 
   <!-- time is the time till a bomb explodes. time-increase is the time added
        to timer when bomb is passed on. -->

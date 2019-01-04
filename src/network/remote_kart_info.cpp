@@ -1,6 +1,5 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2018 SuperTuxKart-Team
+//  Copyright (C) 2019 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,27 +15,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NETWORK_AI_CONTROLLER_HPP
-#define HEADER_NETWORK_AI_CONTROLLER_HPP
+#include "network/remote_kart_info.hpp"
+#include "network/network_player_profile.hpp"
 
-#include "karts/controller/player_controller.hpp"
-
-class AbstractKart;
-class AIBaseController;
-
-class NetworkAIController : public PlayerController
+// ----------------------------------------------------------------------------
+void RemoteKartInfo::copyFrom(std::shared_ptr<NetworkPlayerProfile> p,
+                              unsigned local_id)
 {
-private:
-    int m_prev_update_ticks;
-    AIBaseController* m_ai_controller;
-    KartControl* m_ai_controls;
-    void convertAIToPlayerActions();
-public:
-                 NetworkAIController(AbstractKart *kart, int local_player_id,
-                                     AIBaseController* ai);
-    virtual     ~NetworkAIController();
-    virtual void update(int ticks) OVERRIDE;
-    virtual void reset() OVERRIDE;
-};   // class NetworkAIController
-
-#endif // HEADER_PLAYER_CONTROLLER_HPP
+    m_kart_name = p->getKartName();
+    m_user_name = p->getName();
+    m_local_player_id = local_id;
+    m_host_id = p->getHostId();
+    m_difficulty = p->getPerPlayerDifficulty();
+    m_default_kart_color = p->getPerPlayerDifficulty();
+    m_online_id = p->getOnlineId();
+    m_profile = p;
+}   // copyFrom

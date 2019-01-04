@@ -28,6 +28,7 @@
 #include "network/stk_host.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IGUIEnvironment.h>
@@ -79,16 +80,27 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     core::stringw difficulty = race_manager->getDifficultyName(
         server->getDifficulty());
 
-    //I18N: In server info dialog
     core::stringw each_line = _("Difficulty: %s", difficulty);
+    //I18N: In server info dialog
     server_info += each_line;
     server_info += L"\n";
 
-    //I18N: In server info dialog
     core::stringw mode = ServerConfig::getModeName(server->getServerMode());
+    //I18N: In server info dialog
     each_line = _("Game mode: %s", mode);
     server_info += each_line;
     server_info += L"\n";
+
+    Track* t = server->getCurrentTrack();
+    if (t)
+    {
+        core::stringw track_name = t->getName();
+        //I18N: In server info dialog, showing the current track playing in
+        //server
+        each_line = _("Current track: %s", track_name);
+        server_info += each_line;
+        server_info += L"\n";
+    }
 
     if (!players.empty())
     {

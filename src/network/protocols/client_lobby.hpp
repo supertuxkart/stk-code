@@ -42,7 +42,7 @@ private:
     void startGame(Event* event);
     void startSelection(Event* event);
     void raceFinished(Event* event);
-    void exitResultScreen(Event *event);
+    void backToLobby(Event *event);
     // race votes
     void receivePlayerVote(Event* event);
     void updatePlayerList(Event* event);
@@ -79,7 +79,11 @@ private:
 
     bool m_first_connect;
 
+    bool m_spectator;
+
     uint64_t m_auto_back_to_lobby_time;
+
+    uint64_t m_start_live_game_time;
 
     /** The state of the finite state machine. */
     std::atomic<ClientState> m_state;
@@ -95,6 +99,9 @@ private:
 
     irr::core::stringw m_total_players;
 
+    void liveJoinAcknowledged(Event* event);
+    void handleKartInfo(Event* event);
+    void finishLiveJoin();
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
@@ -119,6 +126,10 @@ public:
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
+    void requestKartInfo(uint8_t kart_id);
+    void setSpectator(bool val)                          { m_spectator = val; }
+    bool isSpectator() const                            { return m_spectator; }
+    void startLiveJoinKartSelection();
 };
 
 #endif // CLIENT_LOBBY_HPP

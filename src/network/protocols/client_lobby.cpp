@@ -21,12 +21,16 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/camera.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
-#include "items/item_manager.hpp"
+#include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -89,6 +93,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_BAD_CONNECTION] =
         _("Bad network connection is detected.");
     m_first_connect = true;
+    m_spectator = false;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -108,7 +113,9 @@ ClientLobby::~ClientLobby()
 //-----------------------------------------------------------------------------
 void ClientLobby::setup()
 {
+    m_spectator = false;
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
+    m_start_live_game_time = std::numeric_limits<uint64_t>::max();
     m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
@@ -144,7 +151,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_START_SELECTION:       startSelection(event);      break;
         case LE_LOAD_WORLD:            addAllPlayers(event);       break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
-        case LE_EXIT_RESULT:           exitResultScreen(event);    break;
+        case LE_BACK_LOBBY:            backToLobby(event);         break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
@@ -155,6 +162,8 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_SERVER_OWNERSHIP:      becomingServerOwner();      break;
         case LE_BAD_TEAM:              handleBadTeam();            break;
         case LE_BAD_CONNECTION:        handleBadConnection();      break;
+        case LE_LIVE_JOIN_ACK:        liveJoinAcknowledged(event); break;
+        case LE_KART_INFO:             handleKartInfo(event);      break;
         default:
             return false;
             break;
@@ -237,7 +246,6 @@ void ClientLobby::addAllPlayers(Event* event)
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
-    m_game_setup->update(true/*remove_disconnected_players*/);
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     unsigned player_count = data.getUInt8();
 
@@ -256,8 +264,6 @@ void ClientLobby::addAllPlayers(Event* event)
         std::string kart_name;
         data.decodeString(&kart_name);
         player->setKartName(kart_name);
-        peer->addPlayer(player);
-        m_game_setup->addPlayer(player);
         players.push_back(player);
     }
     uint32_t random_seed = data.getUInt32();
@@ -274,6 +280,29 @@ void ClientLobby::addAllPlayers(Event* event)
     loadWorld();
     // Disable until render gui during loading is bug free
     //StateManager::get()->enterGameState();
+
+    // Live join or spectate if state is CONNECTED
+    if (m_state.load() == CONNECTED)
+    {
+        World* w = World::getWorld();
+        w->setLiveJoinWorld(true);
+        Camera* cam = Camera::getActiveCamera();
+        for (unsigned i = 0; i < w->getNumKarts(); i++)
+        {
+            AbstractKart* k = w->getKart(i);
+            // Change spectating target to first non-eliminated kart
+            if (isSpectator() && cam && !k->isEliminated())
+            {
+                cam->setKart(k);
+                cam = NULL;
+            }
+            // The final joining ticks will be set by server later
+            if (k->getController()->isLocalPlayerController())
+                k->setLiveJoinKart(std::numeric_limits<int>::max());
+            else
+                k->getNode()->setVisible(false);
+        }
+    }
 
     // Switch to assign mode in case a player hasn't chosen any karts
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
@@ -377,6 +406,11 @@ void ClientLobby::update(int ticks)
         break;
     case REQUESTING_CONNECTION:
     case CONNECTED:
+        if (m_start_live_game_time != std::numeric_limits<uint64_t>::max() &&
+            STKHost::get()->getNetworkTimer() >= m_start_live_game_time)
+        {
+            finishLiveJoin();
+        }
         if (NetworkConfig::get()->isAutoConnect() && !m_auto_started)
         {
             // Send a message to the server to start
@@ -626,6 +660,9 @@ void ClientLobby::handleServerInfo(Event* event)
     }
     bool server_config = data.getUInt8() == 1;
     NetworkingLobby::getInstance()->toggleServerConfigButton(server_config);
+    bool live_join_spectator = data.getUInt8() == 1;
+    NetworkingLobby::getInstance()
+        ->toggleServerLiveJoinable(live_join_spectator);
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------
@@ -847,6 +884,7 @@ void ClientLobby::startSelection(Event* event)
     NetworkKartSelectionScreen* screen =
         NetworkKartSelectionScreen::getInstance();
     screen->setAvailableKartsFromServer(m_available_karts);
+    screen->setLiveJoin(false);
     // In case of auto-connect or continue a grand prix, use random karts
     // (or previous kart) from server and go to track selection
     if (NetworkConfig::get()->isAutoConnect() || skip_kart_screen)
@@ -912,7 +950,7 @@ void ClientLobby::raceFinished(Event* event)
 /** Called when the server informs the clients to exit the race result screen.
  *  It exits the race, and goes back to the lobby.
  */
-void ClientLobby::exitResultScreen(Event *event)
+void ClientLobby::backToLobby(Event *event)
 {
     // In case the user opened a user info dialog
     GUIEngine::ModalDialog::dismiss();
@@ -923,7 +961,32 @@ void ClientLobby::exitResultScreen(Event *event)
     m_auto_started = false;
     m_state.store(CONNECTED);
     RaceResultGUI::getInstance()->backToLobby();
-}   // exitResultScreen
+
+    NetworkString &data = event->data();
+    core::stringw msg;
+    switch ((BackLobbyReason)data.getUInt8()) // the second byte
+    {
+    case BLR_NO_GAME_FOR_LIVE_JOIN:
+        // I18N: Error message shown if live join failed in network
+        msg = _("No more game is available for live join or spectating.");
+        break;
+    case BLR_NO_PLACE_FOR_LIVE_JOIN:
+        // I18N: Error message shown if live join failed in network
+        msg = _("No remaining place in the arena - live join disabled.");
+        break;
+    case BLR_ONE_PLAYER_IN_RANKED_MATCH:
+        // I18N: Error message shown if only 1 player remains in network
+        msg = _("Only 1 player remaining, returning to lobby.");
+        break;
+    default:
+        break;
+    }
+    if (!msg.empty())
+    {
+        SFXManager::get()->quickSound("anvil");
+        MessageQueue::add(MessageQueue::MT_ERROR, msg);
+    }
+}   // backToLobby
 
 //-----------------------------------------------------------------------------
 /** Callback when the world is loaded. The client will inform the server
@@ -933,7 +996,140 @@ void ClientLobby::exitResultScreen(Event *event)
 void ClientLobby::finishedLoadingWorld()
 {
     NetworkString* ns = getNetworkString(1);
+    // Live join or spectate if state is CONNECTED
+    ns->setSynchronous(m_state.load() == CONNECTED);
     ns->addUInt8(LE_CLIENT_LOADED_WORLD);
     sendToServer(ns, true);
     delete ns;
 }   // finishedLoadingWorld
+
+//-----------------------------------------------------------------------------
+void ClientLobby::liveJoinAcknowledged(Event* event)
+{
+    World* w = World::getWorld();
+    if (!w)
+        return;
+
+    const NetworkString& data = event->data();
+    m_start_live_game_time = data.getUInt64();
+    powerup_manager->setRandomSeed(m_start_live_game_time);
+    m_start_live_game_time = data.getUInt64();
+    m_last_live_join_util_ticks = data.getUInt32();
+    for (unsigned i = 0; i < w->getNumKarts(); i++)
+    {
+        AbstractKart* k = w->getKart(i);
+        if (k->getController()->isLocalPlayerController())
+            k->setLiveJoinKart(m_last_live_join_util_ticks);
+    }
+
+    NetworkItemManager* nim =
+    dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    assert(nim);
+    nim->restoreCompleteState(data);
+    w->restoreCompleteState(data);
+}   // liveJoinAcknowledged
+
+//-----------------------------------------------------------------------------
+void ClientLobby::finishLiveJoin()
+{
+    m_start_live_game_time = std::numeric_limits<uint64_t>::max();
+    World* w = World::getWorld();
+    if (!w)
+        return;
+    Log::info("ClientLobby", "Live join started at %lf",
+        StkTime::getRealTime());
+
+    w->setLiveJoinWorld(false);
+    w->endLiveJoinWorld(m_last_live_join_util_ticks);
+    for (unsigned i = 0; i < w->getNumKarts(); i++)
+    {
+        AbstractKart* k = w->getKart(i);
+        if (!k->getController()->isLocalPlayerController() &&
+            !k->isEliminated())
+            k->getNode()->setVisible(true);
+    }
+    m_state.store(RACING);
+}   // finishLiveJoin
+
+//-----------------------------------------------------------------------------
+void ClientLobby::requestKartInfo(uint8_t kart_id)
+{
+    NetworkString* ns = getNetworkString(1);
+    ns->setSynchronous(true);
+    ns->addUInt8(LE_KART_INFO).addUInt8(kart_id);
+    sendToServer(ns, true/*reliable*/);
+    delete ns;
+}   // requestKartInfo
+
+//-----------------------------------------------------------------------------
+void ClientLobby::handleKartInfo(Event* event)
+{
+    World* w = World::getWorld();
+    if (!w)
+        return;
+
+    const NetworkString& data = event->data();
+    int live_join_util_ticks = data.getUInt32();
+    uint8_t kart_id = data.getUInt8();
+    core::stringw player_name;
+    data.decodeStringW(&player_name);
+    uint32_t host_id = data.getUInt32();
+    float kart_color = data.getFloat();
+    uint32_t online_id = data.getUInt32();
+    PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+    uint8_t local_id = data.getUInt8();
+    std::string kart_name;
+    data.decodeString(&kart_name);
+
+    RemoteKartInfo& rki = race_manager->getKartInfo(kart_id);
+    rki.setPlayerName(player_name);
+    rki.setHostId(host_id);
+    rki.setDefaultKartColor(kart_color);
+    rki.setOnlineId(online_id);
+    rki.setPerPlayerDifficulty(ppd);
+    rki.setLocalPlayerId(local_id);
+    rki.setKartName(kart_name);
+    addLiveJoiningKart(kart_id, rki, live_join_util_ticks);
+
+    core::stringw msg;
+    if (race_manager->teamEnabled())
+    {
+        if (w->getKartTeam(kart_id) == KART_TEAM_RED)
+        {
+            // I18N: Show when player join red team of the started game in
+            // network
+            msg = _("%s joined the red team.", player_name);
+        }
+        else
+        {
+            // I18N: Show when player join blue team of the started game in
+            // network
+            msg = _("%s joined the blue team.", player_name);
+        }
+    }
+    else
+    {
+        // I18N: Show when player join the started game in network
+        msg = _("%s joined the game.", player_name);
+    }
+    SFXManager::get()->quickSound("energy_bar_full");
+    MessageQueue::add(MessageQueue::MT_FRIEND, msg);
+}   // handleKartInfo
+
+//-----------------------------------------------------------------------------
+void ClientLobby::startLiveJoinKartSelection()
+{
+    NetworkKartSelectionScreen::getInstance()->setLiveJoin(true);
+    std::vector<int> all_k =
+        kart_properties_manager->getKartsInGroup("standard");
+    std::set<std::string> karts;
+    for (int kart : all_k)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(kart);
+        if (!kp->isAddon())
+            karts.insert(kp->getIdent());
+    }
+    NetworkKartSelectionScreen::getInstance()
+        ->setAvailableKartsFromServer(karts);
+    NetworkKartSelectionScreen::getInstance()->push();
+}   // startLiveJoinKartSelection

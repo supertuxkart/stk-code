@@ -38,6 +38,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
@@ -806,6 +807,41 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             if (pk == NULL)
             {
+                if (auto cl = LobbyProtocol::get<ClientLobby>())
+                {
+                    Camera* cam = Camera::getActiveCamera();
+                    if (cl->isSpectator() && cam)
+                    {
+                        // Network spectating handling
+                        int current_idx = 0;
+                        if (cam->getKart())
+                            current_idx = cam->getKart()->getWorldKartId();
+                        bool up = false;
+                        if (action == PA_STEER_LEFT && value == 0)
+                            up = false;
+                        else if (action == PA_STEER_RIGHT && value == 0)
+                            up = true;
+                        else
+                            return;
+
+                        for (int i=0;i<World::getWorld()->getNumKarts();i++)
+                        {
+                            current_idx = up ? current_idx+1 : current_idx-1;
+                            // Handle looping
+                            if (current_idx == -1)
+                                current_idx = World::getWorld()->getNumKarts() - 1;
+                            else if (current_idx == World::getWorld()->getNumKarts())
+                                current_idx = 0;
+
+                            if (!World::getWorld()->getKart(current_idx)->isEliminated())
+                            {
+                                cam->setKart(World::getWorld()->getKart(current_idx));
+                                break;
+                            }
+                        }
+                        return;
+                    }
+                }
                 Log::error("InputManager::dispatchInput", "Trying to process "
                     "action for an unknown player");
                 return;

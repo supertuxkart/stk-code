@@ -47,7 +47,8 @@ BattleAI::BattleAI(AbstractKart *kart)
     m_debug_sphere_next = irr_driver->addSphere(1.0f, col_debug_next);
     m_debug_sphere_next->setVisible(true);
 #endif
-    m_world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
+    m_world = dynamic_cast<WorldWithRank*>(World::getWorld());
+    m_tsb_world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
     m_track = Track::getCurrentTrack();
 
     // Don't call our own setControllerName, since this will add a
@@ -138,20 +139,20 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
 void BattleAI::findTarget()
 {
     bool find_sta = false;
-    if (m_world->spareTireKartsSpawned())
+    if (m_tsb_world && m_tsb_world->spareTireKartsSpawned())
     {
         switch (m_cur_difficulty)
         {
             case RaceManager::DIFFICULTY_EASY:
             case RaceManager::DIFFICULTY_MEDIUM:
             {
-                find_sta = m_world->getKartLife(m_kart->getWorldKartId()) == 1;
+                find_sta = m_tsb_world->getKartLife(m_kart->getWorldKartId()) == 1;
                 break;
             }
             case RaceManager::DIFFICULTY_HARD:
             case RaceManager::DIFFICULTY_BEST:
             {
-                find_sta = m_world->getKartLife(m_kart->getWorldKartId()) != 3;
+                find_sta = m_tsb_world->getKartLife(m_kart->getWorldKartId()) != 3;
                 break;
             }
             default: assert(false);
