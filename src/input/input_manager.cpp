@@ -816,16 +816,33 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         int current_idx = 0;
                         if (cam->getKart())
                             current_idx = cam->getKart()->getWorldKartId();
+                        bool up = false;
                         if (action == PA_STEER_LEFT && value == 0)
-                            current_idx = ++current_idx % World::getWorld()->getNumKarts();
+                            up = false;
                         else if (action == PA_STEER_RIGHT && value == 0)
+                            up = true;
+                        else
+                            return;
+
+                        for (int i=0;i<World::getWorld()->getNumKarts();i++)
                         {
-                            if (current_idx == 0)
+                            current_idx = up ? current_idx+1 : current_idx-1;
+                            // Handle looping
+                            if (current_idx == -1)
                                 current_idx = World::getWorld()->getNumKarts() - 1;
-                            else
-                                current_idx = --current_idx;
+                            else if (current_idx == World::getWorld()->getNumKarts())
+                                current_idx = 0;
+
+                            if (!World::getWorld()->getKart(current_idx)->isEliminated())
+                            {
+                                cam->setKart(World::getWorld()->getKart(current_idx));
+                                break;
+                            }
+
+                            // This can happen if there is only one active kart
+                            if (current_idx == cam->getKart()->getWorldKartId())
+                                break;
                         }
-                        cam->setKart(World::getWorld()->getKart(current_idx));
                         return;
                     }
                 }
