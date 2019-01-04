@@ -46,6 +46,10 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_record_this_race;
 
+    bool m_is_soccer;
+
+    bool m_show_ffa_spinner;
+
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
         
