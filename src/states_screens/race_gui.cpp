@@ -1160,7 +1160,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     int hit_capture_limit =
-        race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max()
+        (race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max()
+         && race_manager->getHitCaptureLimit() != 0)
         ? race_manager->getHitCaptureLimit() : -1;
     int score_limit = sw && !race_manager->hasTimeTarget() ?
         race_manager->getMaxGoal() : ctf ? hit_capture_limit : -1;
