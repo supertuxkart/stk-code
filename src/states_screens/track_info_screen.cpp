@@ -68,6 +68,7 @@ void TrackInfoScreen::loadedFromFile()
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
     m_ai_kart_spinner       = getWidget<SpinnerWidget>("ai-spinner");
+    m_ai_kart_label         = getWidget<LabelWidget>("ai-text");
     m_option                = getWidget<CheckBoxWidget>("option");
     m_record_race           = getWidget<CheckBoxWidget>("record");
     m_option->setState(false);
@@ -212,7 +213,7 @@ void TrackInfoScreen::init()
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          race_manager->hasAI());
     m_ai_kart_spinner->setVisible(has_AI);
-    getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
+    m_ai_kart_label->setVisible(has_AI);
 
     if (has_AI)
     {
@@ -453,13 +454,6 @@ void TrackInfoScreen::onEnterPressedInternal()
         race_manager->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
 	}
 
-    if (UserConfigParams::m_num_karts_per_gamemode
-        [race_manager->getMinorMode()] != unsigned(local_players + num_ai))
-    {
-        race_manager->setNumKarts(local_players + num_ai);
-        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
-    }
-
     if (m_is_soccer)
     {
         if (selected_target_type == 0)
@@ -467,6 +461,14 @@ void TrackInfoScreen::onEnterPressedInternal()
         else
             race_manager->setMaxGoal(selected_target_value);
     }
+
+    if (UserConfigParams::m_num_karts_per_gamemode
+        [race_manager->getMinorMode()] != unsigned(local_players + num_ai))
+    {
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
+    }
+
+    race_manager->setNumKarts(local_players + num_ai);
 
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
@@ -517,11 +519,17 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             {
                 m_target_value_label->setVisible(true);
                 m_target_value_spinner->setVisible(true);
+
+                // disable AI karts for FFA, because they are not implemented
+                m_ai_kart_spinner->setVisible(false);
+                m_ai_kart_label->setVisible(false);
             }
             else
             {
                 m_target_value_label->setVisible(false);
                 m_target_value_spinner->setVisible(false);
+                m_ai_kart_spinner->setVisible(true);
+                m_ai_kart_label->setVisible(true);
             }
         }
     }
@@ -578,7 +586,6 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name=="ai-spinner")
     {
         const int num_ai = m_ai_kart_spinner->getValue();
-        race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
         UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
         updateHighScores();
     }
