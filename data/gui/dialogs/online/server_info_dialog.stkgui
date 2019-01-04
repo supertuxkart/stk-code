@@ -4,6 +4,7 @@
         <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"/>
         <spacer height="30"/>
         <label id="server-info" width="90%" height="fit" align="left" text_align="left" text=""/>
+        <spacer height="10"/>
         <box x="0%" width="90%" height="50%" align="center" layout="vertical-row">
             <list id="player-list" x="0" y="0" width="100%" height="100%"/>
         </box>
