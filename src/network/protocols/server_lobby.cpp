@@ -267,7 +267,10 @@ void ServerLobby::setup()
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     if (all_k.size() >= 65536)
         all_k.resize(65535);
-    m_available_kts.first = { all_k.begin(), all_k.end() };
+    if (ServerConfig::m_live_players)
+        m_available_kts.first = m_official_kts.first;
+    else
+        m_available_kts.first = { all_k.begin(), all_k.end() };
     updateTracksForMode();
 
     m_server_has_loaded_world.store(false);
