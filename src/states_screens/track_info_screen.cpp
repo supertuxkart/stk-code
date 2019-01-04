@@ -284,17 +284,18 @@ void TrackInfoScreen::init()
     else
         m_option->setState(false);
 
+    // options for free-for-all
+    // -------------
 	if (m_show_ffa_spinner)
 	{
         m_target_type_label->setText(_("Game mode"), false);
-
-        m_target_value_label->setText(_("Maximum time (min.)"), false);
-        m_target_value_spinner->setVisible(true);
-        m_target_value_label->setVisible(true);
         m_target_type_spinner->clearLabels();
         m_target_type_spinner->addLabel(_("3 Strikes Battle"));
         m_target_type_spinner->addLabel(_("Free-For-All"));
         m_target_type_spinner->setValue(0);
+
+        m_target_value_label->setText(_("Maximum time (min.)"), false);
+        m_target_value_spinner->setValue(3);
 	}
 
     // Record race or not
@@ -492,19 +493,36 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "target-type-spinner")
     {
-        const bool timed = m_target_type_spinner->getValue() == 0;
-        UserConfigParams::m_soccer_use_time_limit = timed;
-
-        if (timed)
+        const bool target_value = m_target_type_spinner->getValue();
+        if (m_is_soccer)
         {
-            m_target_value_label->setText(_("Maximum time (min.)"), false);
-            m_target_value_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+            const bool timed = target_value == 0;
+            UserConfigParams::m_soccer_use_time_limit = timed;
+
+            if (timed)
+            {
+                m_target_value_label->setText(_("Maximum time (min.)"), false);
+                m_target_value_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+            }
+            else
+            {
+                m_target_value_label->setText(_("Number of goals to win"), false);
+                m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
+            }
         }
-        else
+        else if (m_show_ffa_spinner)
         {
-            m_target_value_label->setText(_("Number of goals to win"), false);
-            m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
-
+            const bool enable_ffa = target_value != 0;
+            if (enable_ffa)
+            {
+                m_target_value_label->setVisible(true);
+                m_target_value_spinner->setVisible(true);
+            }
+            else
+            {
+                m_target_value_label->setVisible(false);
+                m_target_value_spinner->setVisible(false);
+            }
         }
     }
     else if (name == "target-value-spinner")
