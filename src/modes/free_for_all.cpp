@@ -154,7 +154,13 @@ void FreeForAll::update(int ticks)
 
     std::vector<std::pair<int, int> > ranks;
     for (unsigned i = 0; i < m_scores.size(); i++)
-        ranks.emplace_back(i, m_scores[i]);
+    {
+        // For eliminated (disconnected or reserved player) make his score
+        // int min so always last in rank
+        int cur_score = getKart(i)->isEliminated() ?
+            std::numeric_limits<int>::min() : m_scores[i];
+        ranks.emplace_back(i, cur_score);
+    }
     std::sort(ranks.begin(), ranks.end(),
         [](const std::pair<int, int>& a, const std::pair<int, int>& b)
         {
