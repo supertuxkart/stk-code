@@ -158,8 +158,7 @@ void TrackInfoScreen::init()
     const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     if (is_soccer)
     {
-        // TODO: use translation
-        m_target_type_label->setText("Soccer game type", false);
+        m_target_type_label->setText(_("Soccer game type"), false);
 
         m_target_value_spinner->setVisible(true);
         m_target_value_label->setVisible(true);
@@ -288,15 +287,14 @@ void TrackInfoScreen::init()
     const bool show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES && race_manager->getNumLocalPlayers() > 1;
 	if (show_ffa_spinner)
 	{
-        // TODO: use translation
-        m_target_type_label->setText("Game mode", false);
+        m_target_type_label->setText(_("Game mode"), false);
 
         m_target_value_label->setText(_("Maximum time (min.)"), false);
         m_target_value_spinner->setVisible(true);
         m_target_value_label->setVisible(true);
         m_target_type_spinner->clearLabels();
-        m_target_type_spinner->addLabel("Three Strikes Battle");
-        m_target_type_spinner->addLabel("Free-For-All");
+        m_target_type_spinner->addLabel(_("3 Strikes Battle"));
+        m_target_type_spinner->addLabel(_("Free-For-All"));
         m_target_type_spinner->setValue(0);
 	}
 
