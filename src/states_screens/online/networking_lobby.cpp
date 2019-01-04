@@ -45,6 +45,7 @@
 #include "states_screens/dialogs/network_user_dialog.hpp"
 #include "states_screens/dialogs/server_configuration_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/translation.hpp"
 
 #include <utfwrapping.h>
@@ -266,20 +267,49 @@ void NetworkingLobby::onUpdate(float delta)
         m_timeout_message->setVisible(true);
         auto progress = cl->getGameStartedProgress();
         core::stringw msg;
+        core::stringw current_track;
+        Track* t = cl->getPlayingTrack();
+        if (t)
+            current_track = t->getName();
         if (progress.first != std::numeric_limits<uint32_t>::max())
         {
-            //I18N: In the networking lobby, show when player is required to
-            //wait before the current game finish with remaining time
-            msg = _("Please wait for the current game's end, "
-                "estimated remaining time: %s.",
-                StringUtils::timeToString((float)progress.first).c_str());
+            if (!current_track.empty())
+            {
+                //I18N: In the networking lobby, show when player is required to
+                //wait before the current game finish with remaining time,
+                //showing the current track name inside bracket
+                msg = _("Please wait for the current game's (%s) end, "
+                    "estimated remaining time: %s.", current_track,
+                    StringUtils::timeToString((float)progress.first).c_str());
+            }
+            else
+            {
+                //I18N: In the networking lobby, show when player is required
+                //to wait before the current game finish with remaining time
+                msg = _("Please wait for the current game's end, "
+                    "estimated remaining time: %s.",
+                    StringUtils::timeToString((float)progress.first).c_str());
+            }
         }
         else if (progress.second != std::numeric_limits<uint32_t>::max())
         {
-            //I18N: In the networking lobby, show when player is required to
-            //wait before the current game finish with progress in percent
-            msg = _("Please wait for the current game's end, "
-                "estimated progress: %d%.", progress.second);
+            if (!current_track.empty())
+            {
+                //I18N: In the networking lobby, show when player is required
+                //to wait before the current game finish with progress in
+                //percent, showing the current track name inside bracket
+                msg = _("Please wait for the current game's (%s) end, "
+                    "estimated progress: %s%.", current_track,
+                    progress.second);
+            }
+            else
+            {
+                //I18N: In the networking lobby, show when player is required
+                //to wait before the current game finish with progress in
+                //percent
+                msg = _("Please wait for the current game's end, "
+                    "estimated progress: %d%.", progress.second);
+            }
         }
         else
         {

@@ -34,6 +34,7 @@
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/time.hpp"
 
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
@@ -44,6 +45,7 @@ LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
     resetGameStartedProgress();
     m_game_setup = new GameSetup();
     m_end_voting_period.store(0);
+    m_current_track.store(-1);
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
@@ -146,6 +148,7 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
+    m_current_track.store(-1);
     m_last_live_join_util_ticks = 0;
     resetVotingTime();
     m_peers_votes.clear();
@@ -228,3 +231,12 @@ bool LobbyProtocol::hasLiveJoiningRecently() const
         w->getTicksSinceStart() - m_last_live_join_util_ticks > 0 &&
         w->getTicksSinceStart() - m_last_live_join_util_ticks < 120;
 }   // hasLiveJoiningRecently
+
+//-----------------------------------------------------------------------------
+Track* LobbyProtocol::getPlayingTrack() const
+{
+    int cur_idx = m_current_track.load();
+    if (cur_idx != -1)
+        return track_manager->getTrack(cur_idx);
+    return NULL;
+}   // getPlayingTrack

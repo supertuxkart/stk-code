@@ -928,6 +928,15 @@ void ServerLobby::update(int ticks)
     else
         resetGameStartedProgress();
 
+    if (w && (w->getPhase() == World::RACE_PHASE ||
+        w->getPhase() == World::GOAL_PHASE))
+    {
+        storePlayingTrack(track_manager->getTrackIndexByIdent(
+            race_manager->getTrackName()));
+    }
+    else
+        storePlayingTrack(-1);
+
     // Reset server to initial state if no more connected players
     if (m_waiting_for_reset)
     {
@@ -1461,6 +1470,9 @@ void ServerLobby::checkIncomingConnectionRequests()
         STKHost::get()->getTotalPlayers());
     request->addParameter("game-started",
         m_state.load() == WAITING_FOR_START_GAME ? 0 : 1);
+    Track* current_track = getPlayingTrack();
+    if (current_track)
+        request->addParameter("current-track", current_track->getIdent());
     request->queue();
 
 }   // checkIncomingConnectionRequests

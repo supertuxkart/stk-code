@@ -25,6 +25,7 @@ class GameSetup;
 class NetworkPlayerProfile;
 class PeerVote;
 class RemoteKartInfo;
+class Track;
 
 #include <atomic>
 #include <cassert>
@@ -115,9 +116,12 @@ protected:
       * uint32_t max if not available. */
     std::atomic<uint32_t> m_estimated_progress;
 
-    // Save the last live join ticks, for physical objects to update current
-    // transformation in server, and reset smooth network body in client
+    /** Save the last live join ticks, for physical objects to update current
+      * transformation in server, and reset smooth network body in client. */
     int m_last_live_join_util_ticks;
+
+    /** Store current playing track in id. */
+    std::atomic<int> m_current_track;
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
@@ -211,6 +215,10 @@ public:
     }
     // ------------------------------------------------------------------------
     bool hasLiveJoiningRecently() const;
+    // ------------------------------------------------------------------------
+    void storePlayingTrack(int track_id)   { m_current_track.store(track_id); }
+    // ------------------------------------------------------------------------
+    Track* getPlayingTrack() const;
 };   // class LobbyProtocol
 
 #endif // LOBBY_PROTOCOL_HPP
