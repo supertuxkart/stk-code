@@ -74,6 +74,8 @@ RaceGUIBase::RaceGUIBase()
     // I18N: Shown waiting for other players in network to finish loading or
     // waiting
     m_string_waiting_for_others = _("Waiting for others");
+    // I18N: Shown waiting for the server in network if live join or specatate
+    m_string_waiting_for_the_server = _("Waiting for the server");
 
     m_music_icon = irr_driver->getTexture("notes.png");
     if (!m_music_icon)
@@ -651,7 +653,10 @@ void RaceGUIBase::drawGlobalReadySetGo()
     case WorldStatus::WAIT_FOR_SERVER_PHASE:
         {
             font->draw(StringUtils::loadingDots(
-                m_string_waiting_for_others.c_str()), pos, color, true, true);
+                World::getWorld()->isLiveJoinWorld() ?
+                m_string_waiting_for_the_server.c_str() :
+                m_string_waiting_for_others.c_str()
+                ), pos, color, true, true);
         }
         break;
     case WorldStatus::READY_PHASE:

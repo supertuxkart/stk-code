@@ -967,8 +967,8 @@ void ClientLobby::backToLobby(Event *event)
     switch ((BackLobbyReason)data.getUInt8()) // the second byte
     {
     case BLR_NO_GAME_FOR_LIVE_JOIN:
-        // I18N: Error message shown if live join failed in network
-        msg = _("No more game is available for live join or spectating.");
+        // I18N: Error message shown if live join or spectate failed in network
+        msg = _("The game has ended, you can't live join or spectate anymore.");
         break;
     case BLR_NO_PLACE_FOR_LIVE_JOIN:
         // I18N: Error message shown if live join failed in network
