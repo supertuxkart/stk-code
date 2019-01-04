@@ -124,7 +124,8 @@ void WorldStatus::startEngines()
     m_engines_started = true;
     for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
     {
-        World::getWorld()->getKart(i)->startEngineSFX();
+        if (!World::getWorld()->getKart(i)->isEliminated())
+            World::getWorld()->getKart(i)->startEngineSFX();
     }
 }   // startEngines
 

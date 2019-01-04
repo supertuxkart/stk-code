@@ -261,6 +261,7 @@ void Kart::changeKart(const std::string& new_ident,
     m_graphical_y_offset = -m_default_suspension_force /
         m_vehicle->getNumWheels() + m_kart_model->getLowestPoint();
     m_kart_model->setDefaultSuspension();
+    startEngineSFX();
 }   // changeKart
 
 // ----------------------------------------------------------------------------
