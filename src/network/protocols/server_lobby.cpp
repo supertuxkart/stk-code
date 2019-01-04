@@ -1039,7 +1039,7 @@ void ServerLobby::update(int ticks)
             NetworkString* back_to_lobby = getNetworkString(1);
             back_to_lobby->setSynchronous(true);
             back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
-            sendMessageToPeers(back_to_lobby, /*reliable*/true);
+            sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
             delete back_to_lobby;
             std::lock_guard<std::mutex> lock(m_connection_mutex);
             resetServer();
