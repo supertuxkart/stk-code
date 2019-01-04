@@ -291,6 +291,8 @@ void loadServerLobbyFromConfig()
     if (m_official_tracks_threshold > 1.0f)
         m_official_tracks_threshold = 1.0f;
 
+    if (m_live_players)
+        m_official_karts_threshold = 1.0f;
     auto modes = getLocalGameModeFromConfig();
     race_manager->setMinorMode(modes.first);
     race_manager->setMajorMode(modes.second);

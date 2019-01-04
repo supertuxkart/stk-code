@@ -655,7 +655,8 @@ NetworkString* ServerLobby::getLoadWorldMessage(
 //-----------------------------------------------------------------------------
 bool ServerLobby::canLiveJoinNow() const
 {
-    return race_manager->supportsLiveJoining() &&
+    return ServerConfig::m_live_players &&
+        race_manager->supportsLiveJoining() &&
         World::getWorld() && RaceEventManager::getInstance()->isRunning() &&
         !RaceEventManager::getInstance()->isRaceOver() &&
         (World::getWorld()->getPhase() == WorldStatus::RACE_PHASE ||
@@ -2901,7 +2902,7 @@ void ServerLobby::configPeersStartTime()
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
     }
-    if (race_manager->supportsLiveJoining())
+    if (ServerConfig::m_live_players && race_manager->supportsLiveJoining())
     {
         Log::info("ServerLobby", "Max ping to ServerConfig::m_max_ping for "
             "live joining.");
@@ -3253,7 +3254,9 @@ void ServerLobby::handlePlayerDisconnection() const
         }
     }
 
-    if (total != 1 && World::getWorld()->hasTeam() &&
+    // If live players is enabled, don't end the game if unfair team
+    if (!ServerConfig::m_live_players &&
+        total != 1 && World::getWorld()->hasTeam() &&
         (red_count == 0 || blue_count == 0))
         World::getWorld()->setUnfairTeam(true);
 
@@ -3265,7 +3268,7 @@ void ServerLobby::handlePlayerDisconnection() const
 void ServerLobby::addLiveJoinPlaceholder(
     std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
-    if (!race_manager->supportsLiveJoining())
+    if (!ServerConfig::m_live_players || !race_manager->supportsLiveJoining())
         return;
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
