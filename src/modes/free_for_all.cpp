@@ -53,6 +53,7 @@ void FreeForAll::init()
     WorldWithRank::init();
     m_display_rank = false;
     m_count_down_reached_zero = false;
+    m_use_highscores = false;
 }   // init
 
 // ----------------------------------------------------------------------------
