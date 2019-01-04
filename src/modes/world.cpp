@@ -454,8 +454,13 @@ std::shared_ptr<AbstractKart> World::createKart
     {
         if (NetworkConfig::get()->isNetworkAITester())
         {
+            AIBaseController* ai = NULL;
+            if (race_manager->isBattleMode())
+                ai = new BattleAI(new_kart.get());
+            else
+                ai = new SkiddingAI(new_kart.get());
             controller = new NetworkAIController(new_kart.get(),
-                    local_player_id, new SkiddingAI(new_kart.get()));
+                local_player_id, ai);
         }
         else
         {

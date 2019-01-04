@@ -22,18 +22,18 @@
 #include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
-class SkiddingAI;
+class AIBaseController;
 
 class NetworkAIController : public PlayerController
 {
 private:
     int m_prev_update_ticks;
-    SkiddingAI* m_ai_controller;
+    AIBaseController* m_ai_controller;
     KartControl* m_ai_controls;
     void convertAIToPlayerActions();
 public:
                  NetworkAIController(AbstractKart *kart, int local_player_id,
-                                     SkiddingAI* ai);
+                                     AIBaseController* ai);
     virtual     ~NetworkAIController();
     virtual void update(int ticks) OVERRIDE;
     virtual void reset() OVERRIDE;
