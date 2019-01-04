@@ -21,6 +21,9 @@
 
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "graphics/render_info.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -31,6 +34,7 @@
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/time.hpp"
 
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
@@ -41,6 +45,7 @@ LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
     resetGameStartedProgress();
     m_game_setup = new GameSetup();
     m_end_voting_period.store(0);
+    m_current_track.store(-1);
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
@@ -99,7 +104,7 @@ void LobbyProtocol::configRemoteKart(
     // -------------------------------------------------
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        std::shared_ptr<NetworkPlayerProfile> profile = players[i];
+        const std::shared_ptr<NetworkPlayerProfile>& profile = players[i];
         bool is_local = profile->isLocalPlayer();
 
         // All non-local players are created here. This means all players
@@ -128,6 +133,7 @@ void LobbyProtocol::configRemoteKart(
         rki.setOnlineId(profile->getOnlineId());
         if (race_manager->teamEnabled())
             rki.setKartTeam(profile->getTeam());
+        rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
@@ -142,6 +148,8 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
+    m_current_track.store(-1);
+    m_last_live_join_util_ticks = 0;
     resetVotingTime();
     m_peers_votes.clear();
     m_game_setup->reset();
@@ -195,3 +203,40 @@ const PeerVote* LobbyProtocol::getVote(uint32_t host_id) const
     if (it == m_peers_votes.end()) return NULL;
     return &(it->second);
 }   // getVote
+
+//-----------------------------------------------------------------------------
+void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
+                                       int live_join_util_ticks) const
+{
+    AbstractKart* k = World::getWorld()->getKart(kart_id);
+    k->changeKart(rki.getKartName(), rki.getDifficulty(),
+        rki.getKartTeam() == KART_TEAM_RED ?
+        std::make_shared<RenderInfo>(1.0f) :
+        rki.getKartTeam() == KART_TEAM_BLUE ?
+        std::make_shared<RenderInfo>(0.66f) :
+        std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
+    k->setLiveJoinKart(live_join_util_ticks);
+    World::getWorld()->initTeamArrows(k);
+    if (!k->getController()->isLocalPlayerController())
+        k->setOnScreenText(rki.getPlayerName().c_str());
+}   // addLiveJoiningKart
+
+//-----------------------------------------------------------------------------
+bool LobbyProtocol::hasLiveJoiningRecently() const
+{
+    World* w = World::getWorld();
+    if (!w)
+        return false;
+    return m_last_live_join_util_ticks != 0 &&
+        w->getTicksSinceStart() - m_last_live_join_util_ticks > 0 &&
+        w->getTicksSinceStart() - m_last_live_join_util_ticks < 120;
+}   // hasLiveJoiningRecently
+
+//-----------------------------------------------------------------------------
+Track* LobbyProtocol::getPlayingTrack() const
+{
+    int cur_idx = m_current_track.load();
+    if (cur_idx != -1)
+        return track_manager->getTrack(cur_idx);
+    return NULL;
+}   // getPlayingTrack

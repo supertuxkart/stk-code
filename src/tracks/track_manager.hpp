@@ -116,6 +116,8 @@ public:
      *  \param index The index number of the track. */
     Track* getTrack(unsigned int index) const { return m_tracks[index];}
     // ------------------------------------------------------------------------
+    int getTrackIndexByIdent(const std::string& ident) const;
+    // ------------------------------------------------------------------------
     /** Checks if a certain track is available.
      *  \param n Index of the track to check. */
     bool isAvailable(unsigned int n) const {return m_track_avail[n];}

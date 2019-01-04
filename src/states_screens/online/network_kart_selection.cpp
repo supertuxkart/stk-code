@@ -37,7 +37,13 @@ void NetworkKartSelectionScreen::init()
 
     m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
     m_timer->showLabel(false);
-    updateProgressBarText();
+    if (m_live_join)
+        m_timer->setVisible(false);
+    else
+    {
+        m_timer->setVisible(true);
+        updateProgressBarText();
+    }
 
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
@@ -95,7 +101,16 @@ void NetworkKartSelectionScreen::allPlayersDone()
 
     const uint8_t kart_count = (uint8_t)m_kart_widgets.size();
     NetworkString kart(PROTOCOL_LOBBY_ROOM);
-    kart.addUInt8(LobbyProtocol::LE_KART_SELECTION).addUInt8(kart_count);
+    if (m_live_join)
+    {
+        kart.setSynchronous(true);
+        kart.addUInt8(LobbyProtocol::LE_LIVE_JOIN)
+            // not spectator
+            .addUInt8(0);
+    }
+    else
+        kart.addUInt8(LobbyProtocol::LE_KART_SELECTION);
+    kart.addUInt8(kart_count);
     for (unsigned n = 0; n < kart_count; n++)
     {
         // If server recieve an invalid name, it will auto correct to a random
@@ -106,9 +121,11 @@ void NetworkKartSelectionScreen::allPlayersDone()
 
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-    TracksScreen::getInstance()->setNetworkTracks();
-    TracksScreen::getInstance()->push();
-
+    if (!m_live_join)
+    {
+        TracksScreen::getInstance()->setNetworkTracks();
+        TracksScreen::getInstance()->push();
+    }
 }   // allPlayersDone
 
 // ----------------------------------------------------------------------------
@@ -123,6 +140,8 @@ bool NetworkKartSelectionScreen::onEscapePressed()
 // ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::updateProgressBarText()
 {
+    if (m_live_join)
+        return;
     if (auto lp = LobbyProtocol::get<LobbyProtocol>())
     {
         float new_value =

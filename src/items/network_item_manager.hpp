@@ -97,6 +97,14 @@ public:
     virtual void undoState(BareNetworkString *buffer) OVERRIDE {};
     // ------------------------------------------------------------------------
     virtual void undoEvent(BareNetworkString*) OVERRIDE {};
+    // ------------------------------------------------------------------------
+    void addLiveJoinPeer(std::weak_ptr<STKPeer> peer)
+                                     { m_last_confirmed_item_ticks[peer] = 0; }
+    // ------------------------------------------------------------------------
+    void saveCompleteState(BareNetworkString* buffer) const;
+    // ------------------------------------------------------------------------
+    void restoreCompleteState(const BareNetworkString& buffer);
+
 };   // NetworkItemManager
 
 #endif

@@ -59,7 +59,7 @@
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              const int local_player_id,
                                              PerPlayerDifficulty d)
-                     : PlayerController(kart), m_sky_particles_emitter(NULL)
+                     : PlayerController(kart)
 {
     m_has_started = false;
     m_difficulty = d;
@@ -80,26 +80,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     m_unfull_sound = SFXManager::get()->getBuffer("energy_bar_unfull");
 
     m_is_above_nitro_target = false;
-
-    // Attach Particle System
-    Track *track = Track::getCurrentTrack();
-#ifndef SERVER_ONLY
-    if (UserConfigParams::m_particles_effects > 1 &&
-        track->getSkyParticles() != NULL)
-    {
-        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
-
-        m_sky_particles_emitter =
-            new ParticleEmitter(track->getSkyParticles(),
-                                core::vector3df(0.0f, 30.0f, 100.0f),
-                                m_kart->getNode(),
-                                true);
-
-        // FIXME: in multiplayer mode, this will result in several instances
-        //        of the heightmap being calculated and kept in memory
-        m_sky_particles_emitter->addHeightMapAffector(track);
-    }
-#endif
+    initParticleEmitter();
 }   // LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -108,10 +89,32 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
 LocalPlayerController::~LocalPlayerController()
 {
     m_wee_sound->deleteSFX();
-
-    if (m_sky_particles_emitter)
-        delete m_sky_particles_emitter;
 }   // ~LocalPlayerController
+
+//-----------------------------------------------------------------------------
+void LocalPlayerController::initParticleEmitter()
+{
+    // Attach Particle System
+    m_sky_particles_emitter = nullptr;
+    Track *track = Track::getCurrentTrack();
+#ifndef SERVER_ONLY
+    if (UserConfigParams::m_particles_effects > 1 &&
+        track->getSkyParticles() != NULL)
+    {
+        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
+
+        m_sky_particles_emitter.reset(
+            new ParticleEmitter(track->getSkyParticles(),
+                                core::vector3df(0.0f, 30.0f, 100.0f),
+                                m_kart->getNode(),
+                                true));
+
+        // FIXME: in multiplayer mode, this will result in several instances
+        //        of the heightmap being calculated and kept in memory
+        m_sky_particles_emitter->addHeightMapAffector(track);
+    }
+#endif
+}   // initParticleEmitter
 
 //-----------------------------------------------------------------------------
 /** Resets the player kart for a new or restarted race.
@@ -190,7 +193,8 @@ bool LocalPlayerController::action(PlayerAction action, int value,
     // If this is a client, send the action to networking layer
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient() &&
-        !RewindManager::get()->isRewinding())
+        !RewindManager::get()->isRewinding() &&
+        World::getWorld() && !World::getWorld()->isLiveJoinWorld())
     {
         if (auto gp = GameProtocol::lock())
         {

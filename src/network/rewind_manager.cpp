@@ -25,6 +25,7 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
+#include "network/smooth_network_body.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "utils/log.hpp"
@@ -79,7 +80,6 @@ void RewindManager::reset()
     m_is_rewinding = false;
     m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
-    m_last_saved_state = -1;  // forces initial state save
     m_state_frequency = stk_config->getPhysicsFPS() /
         NetworkConfig::get()->getStateFrequency();
 
@@ -189,7 +189,7 @@ void RewindManager::update(int ticks_not_used)
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
-    if (ticks - m_last_saved_state < m_state_frequency)
+    if (!shouldSaveState(ticks))
         return;
 
     // Save state, remove expired rewinder first
@@ -211,7 +211,6 @@ void RewindManager::update(int ticks_not_used)
             gp->sendState();
     }
     PROFILER_POP_CPU_MARKER();
-    m_last_saved_state = ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -392,3 +391,20 @@ void RewindManager::mergeRewindInfoEventFunction()
         m_rewind_queue.insertRewindInfo(rief);
     m_pending_rief.clear();
 }   // mergeRewindInfoEventFunction
+
+// ----------------------------------------------------------------------------
+/** Reset all smooth network body of rewinders so the rubber band effect of
+ *  moveable does not exist during firstly live join.
+ */
+void RewindManager::resetSmoothNetworkBody()
+{
+    for (auto& p : m_all_rewinder)
+    {
+        if (auto r = p.second.lock())
+        {
+            auto snb = std::dynamic_pointer_cast<SmoothNetworkBody>(r);
+            if (snb)
+                snb->reset();
+        }
+    }
+}   // resetSmoothNetworkBody

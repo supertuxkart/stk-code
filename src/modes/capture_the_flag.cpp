@@ -70,6 +70,8 @@ CaptureTheFlag::CaptureTheFlag() : FreeForAll()
 CaptureTheFlag::~CaptureTheFlag()
 {
 #ifndef SERVER_ONLY
+    m_red_flag_node->drop();
+    m_blue_flag_node->drop();
     irr_driver->dropAllTextures(m_red_flag_mesh);
     irr_driver->dropAllTextures(m_blue_flag_mesh);
     irr_driver->removeMeshFromCache(m_red_flag_mesh);
@@ -98,6 +100,8 @@ void CaptureTheFlag::init()
         "blue_flag");
     assert(m_red_flag_node);
     assert(m_blue_flag_node);
+    m_red_flag_node->grab();
+    m_blue_flag_node->grab();
 
     std::string red_path =
         file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
@@ -398,6 +402,9 @@ void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
         scored_msg = _("%s captured the red flag!", name);
     }
 #ifndef SERVER_ONLY
+    // Don't set animation and show message if receiving in live join
+    if (isStartPhase())
+        return;
     m_race_gui->addMessage(scored_msg, NULL, 3.0f);
     kart->getKartModel()
         ->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
@@ -533,3 +540,18 @@ const std::string& CaptureTheFlag::getIdent() const
 {
     return IDENT_CTF;
 }   // getIdent
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::saveCompleteState(BareNetworkString* bns)
+{
+    FreeForAll::saveCompleteState(bns);
+    bns->addUInt32(m_red_scores).addUInt32(m_blue_scores);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::restoreCompleteState(const BareNetworkString& b)
+{
+    FreeForAll::restoreCompleteState(b);
+    m_red_scores = b.getUInt32();
+    m_blue_scores = b.getUInt32();
+}   // restoreCompleteState

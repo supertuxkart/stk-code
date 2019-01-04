@@ -38,6 +38,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
@@ -806,6 +807,42 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             if (pk == NULL)
             {
+                if (auto cl = LobbyProtocol::get<ClientLobby>())
+                {
+                    Camera* cam = Camera::getActiveCamera();
+                    if (cl->isSpectator() && cam)
+                    {
+                        // Network spectating handling
+                        int current_idx = 0;
+                        if (cam->getKart())
+                            current_idx = cam->getKart()->getWorldKartId();
+                        bool up = false;
+                        if (action == PA_STEER_LEFT && value == 0)
+                            up = false;
+                        else if (action == PA_STEER_RIGHT && value == 0)
+                            up = true;
+                        else
+                            return;
+
+                        const int num_karts = World::getWorld()->getNumKarts();
+                        for (int i=0;i<num_karts;i++)
+                        {
+                            current_idx = up ? current_idx+1 : current_idx-1;
+                            // Handle looping
+                            if (current_idx == -1)
+                                current_idx = num_karts - 1;
+                            else if (current_idx == num_karts)
+                                current_idx = 0;
+
+                            if (!World::getWorld()->getKart(current_idx)->isEliminated())
+                            {
+                                cam->setKart(World::getWorld()->getKart(current_idx));
+                                break;
+                            }
+                        }
+                        return;
+                    }
+                }
                 Log::error("InputManager::dispatchInput", "Trying to process "
                     "action for an unknown player");
                 return;
@@ -964,11 +1001,11 @@ EventPropagation InputManager::input(const SEvent& event)
             // *0.017453925f is to convert degrees to radians
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           Input::HAT_H_ID, Input::AD_NEUTRAL,
-                          (int)(cos(event.JoystickEvent.POV*0.017453925f/100.0f)
+                          (int)(cosf(event.JoystickEvent.POV*0.017453925f/100.0f)
                                 *Input::MAX_VALUE));
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           Input::HAT_V_ID, Input::AD_NEUTRAL,
-                          (int)(sin(event.JoystickEvent.POV*0.017453925f/100.0f)
+                          (int)(sinf(event.JoystickEvent.POV*0.017453925f/100.0f)
                                 *Input::MAX_VALUE));
         }
 

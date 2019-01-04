@@ -722,7 +722,7 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
         core::recti sized_rect = rect;
         core::position2d<u32> center =
             core::position2d<u32>(irr_driver->getFrameSize()/2);
-        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
 
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
@@ -794,7 +794,7 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     {
         core::position2d<u32> center =
             core::position2d<u32>(irr_driver->getFrameSize()/2);
-        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
 
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
@@ -1151,7 +1151,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 const float dt = GUIEngine::getLatestDt();
                 glow_effect += dt * 3;
                 if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-                grow = (int)(45 + 10 * sin(glow_effect));
+                grow = (int)(45 + 10 * sinf(glow_effect));
 
 
 
@@ -1372,7 +1372,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center(irr_driver->getFrameSize()/2);
-        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
                             - (int)center.X)*texture_size);
@@ -1503,7 +1503,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
         const float dt = GUIEngine::getLatestDt();
         glow_effect += dt*3;
         if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-        grow = (int)(45 + 10*sin(glow_effect));
+        grow = (int)(45 + 10*sinf(glow_effect));
 
         const int glow_center_x = rect.UpperLeftCorner.X+rect.getWidth()/2;
         const int glow_center_y = rect.LowerRightCorner.Y;
@@ -1532,7 +1532,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
         widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center(irr_driver->getFrameSize()/2);
-        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
                             - (int)center.X)*texture_size);
@@ -2248,7 +2248,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
             widget->m_parent->getType() == gui::EGUIET_WINDOW)
         {
             core::position2d<u32> center(irr_driver->getFrameSize()/2);
-            const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+            const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
 
             borderArea.UpperLeftCorner.X  =
                 center.X + (int)(((int)rect.UpperLeftCorner.X
@@ -2377,7 +2377,7 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
             core::position2d<s32> center = sized_rect.getCenter();
             const int w = sized_rect.getWidth();
             const int h = sized_rect.getHeight();
-            const float tex_size = sin(m_dialog_size*M_PI*0.5f);
+            const float tex_size = sinf(m_dialog_size*M_PI*0.5f);
             sized_rect.UpperLeftCorner.X  = (int)(center.X -(w/2.0f)*tex_size);
             sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*tex_size);
             sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*tex_size);

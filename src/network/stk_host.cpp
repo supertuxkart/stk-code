@@ -33,6 +33,8 @@
 #include "network/protocol_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_peer.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
 #include "utils/time.hpp"
@@ -228,6 +230,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
  *  2. Host id with ping to each client currently connected
  *  3. If game is currently started, 2 uint32_t which tell remaining time or
  *     progress in percent
+ *  4. If game is currently started, the track internal identity
  */
 // ============================================================================
 constexpr std::array<uint8_t, 5> g_ping_packet {{ 255, 'p', 'i', 'n', 'g' }};
@@ -288,6 +291,9 @@ STKHost::STKHost(bool server)
  */
 void STKHost::init()
 {
+    m_players_in_game.store(0);
+    m_players_waiting.store(0);
+    m_total_players.store(0);
     m_network_timer.store(StkTime::getRealTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
@@ -807,11 +813,17 @@ void STKHost::mainLoop()
                     auto progress = sl->getGameStartedProgress();
                     ping_packet.addUInt32(progress.first)
                         .addUInt32(progress.second);
+                    std::string current_track;
+                    Track* t = sl->getPlayingTrack();
+                    if (t)
+                        current_track = t->getIdent();
+                    ping_packet.encodeString(current_track);
                 }
                 else
                 {
                     ping_packet.addUInt32(std::numeric_limits<uint32_t>::max())
-                        .addUInt32(std::numeric_limits<uint32_t>::max());
+                        .addUInt32(std::numeric_limits<uint32_t>::max())
+                        .addUInt8(0);
                 }
                 ping_packet.getBuffer().insert(
                     ping_packet.getBuffer().begin(), g_ping_packet.begin(),
@@ -971,10 +983,12 @@ void STKHost::mainLoop()
                             std::numeric_limits<uint32_t>::max();
                         uint32_t progress =
                             std::numeric_limits<uint32_t>::max();
+                        std::string current_track;
                         try
                         {
                             remaining_time = ping_packet.getUInt32();
                             progress = ping_packet.getUInt32();
+                            ping_packet.decodeString(&current_track);
                         }
                         catch (std::exception& e)
                         {
@@ -997,6 +1011,9 @@ void STKHost::mainLoop()
                             {
                                 lp->setGameStartedProgress(
                                     std::make_pair(remaining_time, progress));
+                                int idx = track_manager
+                                    ->getTrackIndexByIdent(current_track);
+                                lp->storePlayingTrack(idx);
                             }
                         }
                     }
@@ -1081,8 +1098,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt32(ServerConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8((uint8_t)ServerConfig::m_server_max_players);
-        s.addUInt8((uint8_t)(sl->getGameSetup()->getPlayerCount() +
-            sl->getWaitingPlayersCount()));
+        s.addUInt8((uint8_t)getTotalPlayers());
         s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)sl->getDifficulty());
         s.addUInt8((uint8_t)sl->getGameMode());
@@ -1090,6 +1106,10 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt8((uint8_t)
             (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?
             0 : 1));
+        std::string current_track;
+        if (Track* t = sl->getPlayingTrack())
+            current_track = t->getIdent();
+        s.encodeString(current_track);
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == connection_cmd)
@@ -1260,7 +1280,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     std::unique_lock<std::mutex> lock(m_peers_mutex);
     for (auto peer : m_peers)
     {
-        if (peer.second->isDisconnected())
+        if (peer.second->isDisconnected() || !peer.second->isValidated())
             continue;
         auto peer_profile = peer.second->getPlayerProfiles();
         p.insert(p.end(), peer_profile.begin(), peer_profile.end());
@@ -1297,11 +1317,10 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
     stk_peer->setValidated();
     m_peers[event.peer] = stk_peer;
     setPrivatePort();
-    startListening();
     auto pm = ProtocolManager::lock();
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
-}   // replaceNetwork
+}   // initClientNetwork
 
 // ----------------------------------------------------------------------------
 std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
@@ -1319,3 +1338,57 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
     return std::make_pair(red_count, blue_count);
 
 }   // getAllPlayersTeamInfo
+
+// ----------------------------------------------------------------------------
+/** Get the players for starting a new game.
+ *  \return A vector containing pointers on the players profiles. */
+std::vector<std::shared_ptr<NetworkPlayerProfile> >
+    STKHost::getPlayersForNewGame() const
+{
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto& p : m_peers)
+    {
+        auto& stk_peer = p.second;
+        if (stk_peer->isWaitingForGame())
+            continue;
+        for (auto& q : stk_peer->getPlayerProfiles())
+            players.push_back(q);
+    }
+    return players;
+}   // getPlayersForNewGame
+
+// ----------------------------------------------------------------------------
+/** Update players count in server
+ *  \param ingame store the in game players count now
+ *  \param waiting store the waiting players count now
+ *  \param total store the total players count now
+ */
+void STKHost::updatePlayers(unsigned* ingame, unsigned* waiting,
+                            unsigned* total)
+{
+    uint32_t ingame_players = 0;
+    uint32_t waiting_players = 0;
+    uint32_t total_players = 0;
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto& p : m_peers)
+    {
+        auto& stk_peer = p.second;
+        if (!stk_peer->isValidated())
+            continue;
+        if (stk_peer->isWaitingForGame())
+            waiting_players += (uint32_t)stk_peer->getPlayerProfiles().size();
+        else
+            ingame_players += (uint32_t)stk_peer->getPlayerProfiles().size();
+        total_players += (uint32_t)stk_peer->getPlayerProfiles().size();
+    }
+    m_players_in_game.store(ingame_players);
+    m_players_waiting.store(waiting_players);
+    m_total_players.store(total_players);
+    if (ingame)
+        *ingame = ingame_players;
+    if (waiting)
+        *waiting = waiting_players;
+    if (total)
+        *total = total_players;
+}   // updatePlayers

@@ -273,6 +273,7 @@ void ConnectToServer::update(int ticks)
                 NetworkConfig::get()->clearActivePlayersForClient();
                 auto cl = LobbyProtocol::create<ClientLobby>(m_server_address,
                     m_server);
+                STKHost::get()->startListening();
                 cl->requestStart();
             }
             if (STKHost::get()->getPeerCount() == 0)

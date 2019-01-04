@@ -538,3 +538,49 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     m_confirmed_state_time   = world->getTicksSinceStart();
     m_confirmed_switch_ticks = m_switch_ticks;
 }   // restoreState
+
+//-----------------------------------------------------------------------------
+/** Save all current items at current ticks in server for live join
+ */
+void NetworkItemManager::saveCompleteState(BareNetworkString* buffer) const
+{
+    const uint32_t all_items = (uint32_t)m_all_items.size();
+    buffer->addUInt32(World::getWorld()->getTicksSinceStart())
+        .addUInt32(m_switch_ticks).addUInt32(all_items);
+    for (unsigned i = 0; i < all_items; i++)
+    {
+        if (m_all_items[i])
+        {
+            buffer->addUInt8(1);
+            m_all_items[i]->saveCompleteState(buffer);
+        }
+        else
+            buffer->addUInt8(0);
+    }
+}   // saveCompleteState
+
+//-----------------------------------------------------------------------------
+/** Restore all current items at current ticks in client for live join
+ */
+void NetworkItemManager::restoreCompleteState(const BareNetworkString& buffer)
+{
+    m_confirmed_state_time = buffer.getUInt32();
+    m_confirmed_switch_ticks = buffer.getUInt32();
+    uint32_t all_items = buffer.getUInt32();
+    for (ItemState* is : m_confirmed_state)
+    {
+        delete is;
+    }
+    m_confirmed_state.clear();
+    for (unsigned i = 0; i < all_items; i++)
+    {
+        const bool has_item = buffer.getUInt8() == 1;
+        if (has_item)
+        {
+            ItemState* is = new ItemState(buffer);
+            m_confirmed_state.push_back(is);
+        }
+        else
+            m_confirmed_state.push_back(NULL);
+    }
+}   // restoreCompleteState

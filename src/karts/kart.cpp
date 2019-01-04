@@ -49,6 +49,7 @@
 #include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/cached_characteristic.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/explosion_animation.hpp"
@@ -118,21 +119,17 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
-    m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_result          = false;
-
-    m_shadow               = NULL;
     m_wheel_box            = NULL;
     m_collision_particles  = NULL;
-    m_slipstream           = NULL;
-    m_skidmarks            = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
     m_stars_effect         = NULL;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
     m_fire_clicked         = 0;
+    m_default_suspension_force = 0.0f;
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
     m_flying               = false;
@@ -224,13 +221,48 @@ void Kart::init(RaceManager::KartType type)
 #endif
     loadData(type, animations);
 
-    m_kart_gfx = new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay());
-    m_skidding = new Skidding(this);
-    // Create the stars effect
-    m_stars_effect = new Stars(this);
-
     reset();
 }   // init
+
+// ----------------------------------------------------------------------------
+void Kart::changeKart(const std::string& new_ident,
+                      PerPlayerDifficulty difficulty,
+                      std::shared_ptr<RenderInfo> ri)
+{
+    AbstractKart::changeKart(new_ident, difficulty, ri);
+    m_kart_model->setKart(this);
+
+#ifdef SERVER_ONLY
+    bool animations = false;  // server never animates
+#else
+    bool animations = UserConfigParams::m_animated_characters;
+#endif
+    scene::ISceneNode* old_node = m_node;
+
+    loadData(m_type, animations);
+    m_wheel_box = NULL;
+
+    if (LocalPlayerController* lpc =
+        dynamic_cast<LocalPlayerController*>(getController()))
+        lpc->initParticleEmitter();
+
+    if (old_node)
+        old_node->remove();
+
+    // Reset 1 more time (add back the body)
+    reset();
+
+    for (int i = 0; i < m_vehicle->getNumWheels(); i++)
+    {
+        btWheelInfo &wi = m_vehicle->getWheelInfo(i);
+        wi.m_raycastInfo.m_suspensionLength = m_default_suspension_force /
+            m_vehicle->getNumWheels();
+    }
+    m_graphical_y_offset = -m_default_suspension_force /
+        m_vehicle->getNumWheels() + m_kart_model->getLowestPoint();
+    m_kart_model->setDefaultSuspension();
+    startEngineSFX();
+}   // changeKart
 
 // ----------------------------------------------------------------------------
 /** The destructor frees the memory of this kart, but note that the actual kart
@@ -254,18 +286,9 @@ Kart::~Kart()
         m_emitters[i]->deleteSFX();
 
     m_nitro_sound ->deleteSFX();
-    delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
     if(m_collision_particles)    delete m_collision_particles;
-    if(m_slipstream)             delete m_slipstream;
-    if(m_attachment)             delete m_attachment;
-    if(m_stars_effect)          delete m_stars_effect;
-
-#ifndef SERVER_ONLY
-    delete m_shadow;
-    if(m_skidmarks) delete m_skidmarks ;
-#endif
 
     if (m_wheel_box) m_wheel_box->remove();
 
@@ -273,15 +296,8 @@ Kart::~Kart()
     if(m_body)
     {
         Physics::getInstance()->removeKart(this);
-        delete m_vehicle;
-        delete m_vehicle_raycaster;
     }
 
-    for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
-    {
-        delete m_kart_chassis.getChildShape(i);
-    }
-    delete m_skidding;
     delete m_max_speed;
     delete m_terrain_info;
     delete m_powerup;
@@ -708,7 +724,8 @@ void Kart::createPhysics()
     // Shift center of gravity downwards, so that the kart
     // won't topple over too easy.
     shiftCenterOfGravity.setOrigin(m_kart_properties->getGravityCenterShift());
-    m_kart_chassis.addChildShape(shiftCenterOfGravity, hull);
+    m_kart_chassis.reset(new btCompoundShape());
+    m_kart_chassis->addChildShape(shiftCenterOfGravity, hull);
 
     // Set mass and inertia
     // --------------------
@@ -718,7 +735,7 @@ void Kart::createPhysics()
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    createBody(mass, trans, &m_kart_chassis,
+    createBody(mass, trans, m_kart_chassis.get(),
                m_kart_properties->getRestitution(0.0f));
     std::vector<float> ang_fact = m_kart_properties->getStabilityAngularFactor();
     // The angular factor (with X and Z values <1) helps to keep the kart
@@ -736,11 +753,11 @@ void Kart::createPhysics()
 
     // Create the actual vehicle
     // -------------------------
-    m_vehicle_raycaster =
+    m_vehicle_raycaster.reset(
         new btKartRaycaster(Physics::getInstance()->getPhysicsWorld(),
                             stk_config->m_smooth_normals &&
-                            Track::getCurrentTrack()->smoothNormals());
-    m_vehicle = new btKart(m_body, m_vehicle_raycaster, this);
+                            Track::getCurrentTrack()->smoothNormals()));
+    m_vehicle.reset(new btKart(m_body.get(), m_vehicle_raycaster.get(), this));
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
@@ -862,7 +879,7 @@ void Kart::updateWeight()
     {
         m_weight = mass;
         btVector3 inertia;
-        m_kart_chassis.calculateLocalInertia(mass, inertia);
+        m_kart_chassis->calculateLocalInertia(mass, inertia);
         m_body->setMassProps(mass, inertia);
     }
 }   // updateWeight
@@ -875,9 +892,9 @@ float Kart::getSpeedForTurnRadius(float radius) const
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin( 1.0f / turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i)));
 
-    float angle = sin(1.0f / radius);
+    float angle = sinf(1.0f / radius);
     return turn_angle_at_speed.getReverse(angle);
 }   // getSpeedForTurnRadius
 
@@ -894,7 +911,7 @@ float Kart::getMaxSteerAngle(float speed) const
     // across karts of different lengths sharing the same
     // turn radius properties
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin( 1.0f / turn_angle_at_speed.getY(i))
+        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i))
                                     * m_kart_properties->getWheelBase());
 
     return turn_angle_at_speed.get(speed);
@@ -1393,6 +1410,27 @@ void Kart::update(int ticks)
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
+
+    // Hover the kart above reset position before entering the game
+    // Add invulnerability depends on kart
+    if (m_live_join_util != 0 &&
+        ((m_live_join_util > World::getWorld()->getTicksSinceStart() &&
+        World::getWorld()->isActiveRacePhase()) ||
+        World::getWorld()->isLiveJoinWorld()))
+    {
+        btRigidBody *body = getBody();
+        body->clearForces();
+        body->setLinearVelocity(Vec3(0.0f));
+        body->setAngularVelocity(Vec3(0.0f));
+        btTransform hovering = m_starting_transform;
+        hovering.setOrigin(hovering.getOrigin() +
+            m_starting_transform.getBasis().getColumn(1) * 3.0f);
+        body->proceedToTransform(hovering);
+        setTrans(hovering);
+        float time = getKartProperties()->getExplosionInvulnerabilityTime();
+        m_invulnerable_ticks = stk_config->time2Ticks(time);
+    }
+
     // Update the locally maintained speed of the kart (m_speed), which 
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
@@ -2891,8 +2929,8 @@ void Kart::updateFlying()
         if (velocity.length() < 25)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(100.0f*sin(orientation), 0.0,
-                100.0f*cos(orientation)));
+            m_body->applyCentralImpulse(btVector3(100.0f*sinf(orientation), 0.0,
+                100.0f*cosf(orientation)));
         }
     }
     else if (m_controls.getBrake())
@@ -2901,8 +2939,8 @@ void Kart::updateFlying()
         if (velocity.length() > -15)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(-100.0f*sin(orientation), 0.0,
-                -100.0f*cos(orientation)));
+            m_body->applyCentralImpulse(btVector3(-100.0f*sinf(orientation), 0.0,
+                -100.0f*cosf(orientation)));
         }
     }
 
@@ -2939,24 +2977,35 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     // scene node will exist (to which the attachment is added). But the
     // attachment is needed in createPhysics (which gets the mass, which
     // is dependent on the attachment).
-    m_attachment = new Attachment(this);
+    m_attachment.reset(new Attachment(this));
     createPhysics();
 
-    m_slipstream = new SlipStream(this);
+    m_slipstream.reset(new SlipStream(this));
 
 #ifndef SERVER_ONLY
-    if (m_kart_properties->getSkidEnabled() && CVS->isGLSL())
+    m_skidmarks = nullptr;
+    m_shadow = nullptr;
+    if (!ProfileWorld::isNoGraphics() &&
+        m_kart_properties->getSkidEnabled() && CVS->isGLSL())
     {
-        m_skidmarks = new SkidMarks(*this);
+        m_skidmarks.reset(new SkidMarks(*this));
     }
 
-    if (CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
+    if (!ProfileWorld::isNoGraphics() &&
+        CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
         ->getShadowMaterial()->getSamplerPath(0) != "unicolor_white")
     {
-        m_shadow = new Shadow(m_kart_properties->getShadowMaterial(), *this);
+        m_shadow.reset(new Shadow(m_kart_properties->getShadowMaterial(),
+            *this));
     }
 #endif
     World::getWorld()->kartAdded(this, m_node);
+    m_kart_gfx.reset(
+        new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay()));
+    m_skidding.reset(new Skidding(this));
+    // Create the stars effect
+    m_stars_effect.reset(new Stars(this));
+
 }   // loadData
 
 // ----------------------------------------------------------------------------
@@ -2998,11 +3047,11 @@ void Kart::applyEngineForce(float force)
 void Kart::kartIsInRestNow()
 {
     AbstractKart::kartIsInRestNow();
-    float f = 0;
-    for(int i=0; i<m_vehicle->getNumWheels(); i++)
+    m_default_suspension_force = 0.0f;
+    for (int i = 0; i < m_vehicle->getNumWheels(); i++)
     {
         const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
-        f += wi.m_raycastInfo.m_suspensionLength;
+        m_default_suspension_force += wi.m_raycastInfo.m_suspensionLength;
     }
 
     // The offset 'lowest point' is added to avoid that the
@@ -3010,8 +3059,8 @@ void Kart::kartIsInRestNow()
     // constant, there is no real reason to use the lowest point
     // but that value has worked good in the past). See documentation
     // for updateGraphics() for full details.
-    m_graphical_y_offset = -f / m_vehicle->getNumWheels()
-                         + m_kart_model->getLowestPoint();
+    m_graphical_y_offset = -m_default_suspension_force /
+        m_vehicle->getNumWheels() + m_kart_model->getLowestPoint();
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
@@ -3226,7 +3275,7 @@ void Kart::updateGraphics(float dt)
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
+    float lean_height = tanf(m_current_lean) * getKartWidth()*0.5f;
 
     Moveable::updateSmoothedGraphics(dt);
 
@@ -3363,7 +3412,7 @@ const video::SColor& Kart::getColor() const
 }   // getColor
 
 // ------------------------------------------------------------------------
-bool Kart::isVisible()
+bool Kart::isVisible() const
 {
     return m_node && m_node->isVisible();
 }   // isVisible

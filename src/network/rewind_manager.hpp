@@ -109,9 +109,6 @@ private:
     /** How much time between consecutive state saves. */
     int m_state_frequency;
 
-    /** Ticks at which the last state was saved. */
-    int m_last_saved_state;
-
     /** This stores the original World time in ticks during a rewind. It is
      *  used to detect if a client's local time need adjustment to reduce
      *  rewinds. */
@@ -205,7 +202,14 @@ public:
     // ------------------------------------------------------------------------
     void addNetworkRewindInfo(RewindInfo* ri)
                                    { m_rewind_queue.addNetworkRewindInfo(ri); }
-
+    // ------------------------------------------------------------------------
+    bool shouldSaveState(int ticks)
+    {
+        int a = ticks - m_state_frequency + 1;
+        return ticks != 0 && a >= 0 && a % m_state_frequency == 0;
+    }
+    // ------------------------------------------------------------------------
+    void resetSmoothNetworkBody();
 };   // RewindManager
 
 

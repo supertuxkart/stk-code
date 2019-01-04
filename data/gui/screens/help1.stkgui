@@ -21,7 +21,7 @@
                 <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
                         I18N="Tab in help menu" text="Kart classes"/>
                 <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
-                        I18N="Tab in help menu" text="Multi-player"/>
+                        I18N="Tab in help menu" text="Multiplayer"/>
             </vertical-tabs>
 
             <spacer width="2%" height="100%"/>
@@ -75,7 +75,7 @@
 
                 <spacer height="3%" width="10"/>
 
-                <label align="center" word_wrap="true" I18N="in the help screen" text="* Current key bindings can be seen/changed in menu Options"/>
+                <label align="center" word_wrap="true" I18N="in the help screen" text="* Current key bindings can be seen/changed in the Options menu"/>
                 <spacer height="1%" width="10"/>
 
             </box>

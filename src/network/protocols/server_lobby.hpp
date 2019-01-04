@@ -85,11 +85,17 @@ private:
     /** Keeps track of the server state. */
     std::atomic_bool m_server_has_loaded_world;
 
+    bool m_waiting_for_reset;
+
+    bool m_has_created_server_id_file;
+
+    bool m_registered_for_once_only;
+
+    bool m_save_server_config;
+
     /** Counts how many peers have finished loading the world. */
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
-
-    bool m_has_created_server_id_file;
 
     /** It indicates if this server is unregistered with the stk server. */
     std::weak_ptr<bool> m_server_unregistered;
@@ -141,13 +147,7 @@ private:
     /** Number of ranked races done for each current players */
     std::map<uint32_t, unsigned> m_num_ranked_races;
 
-    bool m_waiting_for_reset;
-
     NetworkString* m_result_ns;
-
-    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_waiting_players;
-
-    std::atomic<uint32_t> m_waiting_players_counts;
 
     std::atomic<uint32_t> m_server_id_online;
 
@@ -159,12 +159,19 @@ private:
 
     uint64_t m_server_started_at, m_server_delay;
 
-    bool m_registered_for_once_only;
-
-    bool m_save_server_config;
-
-    // Default game settings if no one has ever vote
+    // Default game settings if no one has ever vote, and save inside here for
+    // final vote (for live join)
     PeerVote* m_default_vote;
+
+    int m_battle_hit_capture_limit;
+
+    float m_battle_time_limit;
+
+    unsigned m_item_seed;
+
+    uint32_t m_winner_peer_id;
+
+    uint64_t m_client_starting_time;
 
     // connection management
     void clientDisconnected(Event* event);
@@ -176,6 +183,7 @@ private:
     void playerFinishedResult(Event *event);
     bool registerServer(bool now);
     void finishedLoadingWorldClient(Event *event);
+    void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
@@ -257,12 +265,23 @@ private:
     double getModeSpread();
     double scalingValueForTime(double time);
     void checkRaceFinished();
-    std::pair<int, float> getHitCaptureLimit(float num_karts);
+    void getHitCaptureLimit(float num_karts);
     void configPeersStartTime();
-    void updateWaitingPlayers();
     void resetServer();
     void addWaitingPlayersToGame();
     void changeHandicap(Event* event);
+    void handlePlayerDisconnection() const;
+    void addLiveJoinPlaceholder(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+    NetworkString* getLoadWorldMessage(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+    void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
+    void liveJoinRequest(Event* event);
+    void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
+    bool canLiveJoinNow() const;
+    int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
+                      unsigned local_id) const;
+    void handleKartInfo(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -281,8 +300,6 @@ public:
     std::unique_lock<std::mutex> acquireConnectionMutex() const
                    { return std::unique_lock<std::mutex>(m_connection_mutex); }
     bool waitingForPlayers() const;
-    uint32_t getWaitingPlayersCount() const
-                                    { return m_waiting_players_counts.load(); }
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }

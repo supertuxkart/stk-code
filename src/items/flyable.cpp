@@ -365,13 +365,13 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
     if (animation)
     {
         assert(m_animation == NULL);
-        Physics::getInstance()->removeBody(m_body);
+        Physics::getInstance()->removeBody(getBody());
     }
     else   // animation = NULL
     {
         assert(m_animation != NULL);
         m_body->setWorldTransform(getTrans());
-        Physics::getInstance()->addBody(m_body);
+        Physics::getInstance()->addBody(getBody());
     }
     m_animation = animation;
 }   // addAnimation
@@ -617,7 +617,7 @@ BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
     BareNetworkString *buffer = new BareNetworkString();
     CompressNetworkBody::compress(m_body->getWorldTransform(),
         m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer,
-        m_body, m_motion_state);
+        m_body.get(), m_motion_state.get());
     buffer->addUInt16(m_ticks_since_thrown);
     return buffer;
 }   // saveState

@@ -28,6 +28,7 @@
 #include "io/xml_node.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
@@ -803,11 +804,17 @@ void PhysicalObject::computeError()
 // ----------------------------------------------------------------------------
 BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 {
+    bool has_live_join = false;
+
+    if (auto sl = LobbyProtocol::get<LobbyProtocol>())
+        has_live_join = sl->hasLiveJoiningRecently();
+
     btTransform cur_transform = m_body->getWorldTransform();
     if ((cur_transform.getOrigin() - m_last_transform.getOrigin())
         .length() < 0.01f &&
         (m_body->getLinearVelocity() - m_last_lv).length() < 0.01f &&
-        (m_body->getLinearVelocity() - m_last_av).length() < 0.01f)
+        (m_body->getLinearVelocity() - m_last_av).length() < 0.01f &&
+        !has_live_join)
         return nullptr;
 
     ru->push_back(getUniqueIdentity());

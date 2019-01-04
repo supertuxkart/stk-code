@@ -194,10 +194,19 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     sender.setPort(port);
                     uint8_t password    = s.getUInt8();
                     uint8_t game_started = s.getUInt8();
+                    std::string current_track;
+                    try
+                    {
+                        s.decodeString(&current_track);
+                    }
+                    catch (std::exception& e)
+                    {
+                        (void)e;
+                    }
                     servers_now.insert(std::make_pair(name, 
                         std::make_shared<Server>(cur_server_id++, name, 
                         max_players, players, difficulty, mode, sender, 
-                        password == 1, game_started == 1)));
+                        password == 1, game_started == 1, current_track)));
                     //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting

@@ -74,6 +74,8 @@ RaceGUIBase::RaceGUIBase()
     // I18N: Shown waiting for other players in network to finish loading or
     // waiting
     m_string_waiting_for_others = _("Waiting for others");
+    // I18N: Shown waiting for the server in network if live join or specatate
+    m_string_waiting_for_the_server = _("Waiting for the server");
 
     m_music_icon = irr_driver->getTexture("notes.png");
     if (!m_music_icon)
@@ -195,8 +197,8 @@ void RaceGUIBase::createRegularPolygon(unsigned int n, float radius,
     for (unsigned int i=0; i<n; i++)
     {
         float p = i*f;
-        core::vector2df X = center + core::vector2df( sin(p)*radius,
-                                                     -cos(p)*radius);
+        core::vector2df X = center + core::vector2df( sinf(p)*radius,
+                                                     -cosf(p)*radius);
         v[i].Pos.X = X.X;
         v[i].Pos.Y = X.Y;
         v[i].Color = color;
@@ -527,15 +529,14 @@ void RaceGUIBase::drawGlobalMusicDescription()
     gui::IGUIFont*       font = GUIEngine::getFont();
 
     float race_time =
-        stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
+        stk_config->ticks2Time(World::getWorld()->getMusicDescriptionTicks());
 
     // ---- Manage pulsing effect
-    // 3.0 is the duration of ready/set (TODO: don't hardcode)
     float timeProgression = (float)(race_time) /
-                            (float)(stk_config->m_music_credit_time - 2.0f);
+                            (float)(stk_config->m_music_credit_time);
 
-    const int x_pulse = (int)(sin(race_time*9.0f)*10.0f);
-    const int y_pulse = (int)(cos(race_time*9.0f)*10.0f);
+    const int x_pulse = (int)(sinf(race_time*9.0f)*10.0f);
+    const int y_pulse = (int)(cosf(race_time*9.0f)*10.0f);
 
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -652,7 +653,10 @@ void RaceGUIBase::drawGlobalReadySetGo()
     case WorldStatus::WAIT_FOR_SERVER_PHASE:
         {
             font->draw(StringUtils::loadingDots(
-                m_string_waiting_for_others.c_str()), pos, color, true, true);
+                World::getWorld()->isLiveJoinWorld() ?
+                m_string_waiting_for_the_server.c_str() :
+                m_string_waiting_for_others.c_str()
+                ), pos, color, true, true);
         }
         break;
     case WorldStatus::READY_PHASE:
@@ -705,7 +709,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     }
 
     unsigned int sta = race_manager->getNumSpareTireKarts();
-    const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
+    unsigned int total_karts = race_manager->getNumberOfKarts() - sta;
+    unsigned int num_karts = 0;
+    if (NetworkConfig::get()->isNetworking())
+        num_karts = World::getWorld()->getCurrentNumKarts();
+    else
+        num_karts = race_manager->getNumberOfKarts() - sta;
 
     // -2 because that's the spacing further on
     int ICON_PLAYER_WIDTH = y_space / (num_karts) - 2;
@@ -732,7 +741,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
     {
-        for(unsigned int i=0; i<num_karts; i++)
+        for(unsigned int i=0; i<total_karts; i++)
         {
             const AbstractKart *kart = world->getKart(i);
             int position = kart->getPosition();
@@ -774,7 +783,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             kart= world->getKart(position-1);
         }
 
-        if(kart->isEliminated()) continue;
+        if (kart->isEliminated() || !kart->isVisible()) continue;
         unsigned int kart_id = kart->getWorldKartId();
 
         KartIconDisplayInfo &info = m_kart_display_infos[kart_id];
@@ -942,7 +951,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
         {
             colors[i]=kart->getKartProperties()->getColor();
             colors[i].setAlpha(
-                               100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
+                               100+(int)(100*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
         }
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    m_icons_frame->getSize());
@@ -963,7 +972,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
     {
         //icon fades to the left
         float t = kart->getKartAnimation()->getAnimationTimer();
-        float t_anim=100*sin(0.5f*M_PI*t);
+        float t_anim=100*sinf(0.5f*M_PI*t);
         const core::rect<s32> rect1(core::position2d<s32>(0,0),
                                     icon->getSize());
         const core::rect<s32> pos1((int)(x-t_anim), y,
@@ -989,7 +998,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w)
     {
         //exploses into 4 parts
         float t = kart->getKartAnimation()->getAnimationTimer();
-        float t_anim=50.0f*sin(0.5f*M_PI*t);
+        float t_anim=50.0f*sinf(0.5f*M_PI*t);
         u16 icon_size_x=icon->getSize().Width;
         u16 icon_size_y=icon->getSize().Height;
 

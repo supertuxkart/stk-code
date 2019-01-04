@@ -141,7 +141,7 @@ void mainLoop(STKHost* host)
             std::cout << "Unknown command: " << str << std::endl;
         }
     }   // while !stop
-    main_loop->abort();
+    main_loop->requestAbort();
 }   // mainLoop
 
 }

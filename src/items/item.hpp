@@ -32,6 +32,7 @@
 
 #include <line3d.h>
 
+class BareNetworkString;
 class AbstractKart;
 class LODNode;
 
@@ -160,7 +161,11 @@ protected:
     }   // hitLine
 
 public:
+    // ------------------------------------------------------------------------
          ItemState(ItemType type, const AbstractKart *owner=NULL, int id = -1);
+    // ------------------------------------------------------------------------
+         ItemState(const BareNetworkString& buffer);
+    // ------------------------------------------------------------------------
     void initItem(ItemType type, const Vec3& xyz, const Vec3& normal);
     void update(int ticks);
     void setDisappearCounter();
@@ -326,7 +331,8 @@ public:
     {
         return m_original_rotation;
     }
-
+    // ------------------------------------------------------------------------
+    void saveCompleteState(BareNetworkString* buffer) const;
 };   // class ItemState
 
 // ============================================================================
@@ -371,8 +377,7 @@ private:
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                        scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-                       const AbstractKart *owner,
-                       bool is_predicted=false);
+                       const AbstractKart *owner);
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();

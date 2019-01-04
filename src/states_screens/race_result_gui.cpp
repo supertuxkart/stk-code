@@ -559,7 +559,7 @@ void RaceResultGUI::displayCTFResults()
         result_text.append("  ");
         if (kart->isEliminated())
         {
-            result_text.append(_("Eliminated"));
+            continue;
         }
         else
         {
@@ -598,7 +598,7 @@ void RaceResultGUI::displayCTFResults()
         result_text.append("  ");
         if (kart->isEliminated())
         {
-            result_text.append(_("Eliminated"));
+            continue;
         }
         else
         {
@@ -683,6 +683,8 @@ void RaceResultGUI::displayCTFResults()
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
+            if (ffa && kart->isEliminated())
+                continue;
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
@@ -1028,9 +1030,9 @@ void RaceResultGUI::displayCTFResults()
                 }
                 case RR_RESORT_TABLE:
                     x = ri->m_x_pos
-                        - ri->m_radius*sin(m_timer / m_time_rotation*M_PI);
+                        - ri->m_radius*sinf(m_timer / m_time_rotation*M_PI);
                     y = ri->m_centre_point
-                        + ri->m_radius*cos(m_timer / m_time_rotation*M_PI);
+                        + ri->m_radius*cosf(m_timer / m_time_rotation*M_PI);
                     break;
                 case RR_WAIT_TILL_END:
                     break;
@@ -1284,16 +1286,12 @@ void RaceResultGUI::displayCTFResults()
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
         std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(KART_TEAM_RED);
+
+        // Maximum 10 scorers displayed in result screen
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        std::vector<float> score_times = sw->getScoreTimes(KART_TEAM_RED);
-        while (score_times.size() > 10)
-        {
-            score_times.erase(score_times.begin());
-        }
-        irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
 
@@ -1301,8 +1299,7 @@ void RaceResultGUI::displayCTFResults()
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
-            const int kart_id = scorers.at(i).m_id;
-            result_text = sw->getKart(kart_id)->getController()->getName();
+            result_text = scorers.at(i).m_player;
 
             if (own_goal)
             {
@@ -1312,7 +1309,7 @@ void RaceResultGUI::displayCTFResults()
             }
 
             result_text.append("  ");
-            result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
+            result_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
             rect = font->getDimension(result_text.c_str());
 
             if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
@@ -1325,34 +1322,35 @@ void RaceResultGUI::displayCTFResults()
             pos = core::rect<s32>(current_x, current_y, current_x, current_y);
             font->draw(result_text, pos, (own_goal ?
                 video::SColor(255, 255, 0, 0) : color), true, false);
-            scorer_icon = sw->getKart(scorers.at(i).m_id)
-                ->getKartProperties()->getIconMaterial()->getTexture();
-            source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-            dest_rect = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
-            draw2DImage(scorer_icon, dest_rect, source_rect,
-                NULL, NULL, true);
+            irr::video::ITexture* scorer_icon = NULL;
+            const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+            if (kp)
+                scorer_icon = kp->getIconMaterial()->getTexture();
+            if (scorer_icon)
+            {
+                source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
+                irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
+                core::recti r = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
+                draw2DImage(scorer_icon, r, source_rect,
+                    NULL, NULL, true);
+            }
         }
 
         //The blue scorers:
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
         scorers = sw->getScorers(KART_TEAM_BLUE);
+
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        score_times = sw->getScoreTimes(KART_TEAM_BLUE);
-        while (score_times.size() > 10)
-        {
-            score_times.erase(score_times.begin());
-        }
+
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
-            const int kart_id = scorers.at(i).m_id;
-            result_text = sw->getKart(kart_id)->getController()->getName();
+            result_text = scorers.at(i).m_player;
 
             if (own_goal)
             {
@@ -1361,7 +1359,7 @@ void RaceResultGUI::displayCTFResults()
             }
 
             result_text.append("  ");
-            result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
+            result_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
             rect = font->getDimension(result_text.c_str());
 
             if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
@@ -1374,14 +1372,18 @@ void RaceResultGUI::displayCTFResults()
             pos = core::rect<s32>(current_x, current_y, current_x, current_y);
             font->draw(result_text, pos, (own_goal ?
                 video::SColor(255, 255, 0, 0) : color), true, false);
-            scorer_icon = sw->getKart(scorers.at(i).m_id)->
-                getKartProperties()->getIconMaterial()->getTexture();
-            source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-
-            dest_rect = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
-            draw2DImage(scorer_icon, dest_rect, source_rect,
-                NULL, NULL, true);
+            irr::video::ITexture* scorer_icon = NULL;
+            const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+            if (kp)
+                scorer_icon = kp->getIconMaterial()->getTexture();
+            if (scorer_icon)
+            {
+                source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
+                irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
+                core::recti r = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
+                draw2DImage(scorer_icon, r, source_rect,
+                    NULL, NULL, true);
+            }
         }
 #endif
     }

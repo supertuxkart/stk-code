@@ -106,21 +106,49 @@ protected:
 
     /** Handles the powerup of a kart. */
     Powerup *m_powerup;
-    
-    /** Remember the last **used** powerup type of a kart for AI purposes. */
-    PowerupManager::PowerupType m_last_used_powerup;
 
-    /** True if kart is flying (for debug purposes only). */
-    bool m_flying;
+    std::unique_ptr<btVehicleRaycaster> m_vehicle_raycaster;
 
-    /** Set when hitting bubblegum */
-    bool m_has_caught_nolok_bubblegum;
-
-    /** Reset position. */
-    btTransform  m_reset_transform;
+    std::unique_ptr<btKart> m_vehicle;
 
     /** This object handles all skidding. */
-    Skidding *m_skidding;
+    std::unique_ptr<Skidding> m_skidding;
+
+    /** For stars rotating around head effect */
+    std::unique_ptr<Stars> m_stars_effect;
+
+    // Graphical effects
+    // -----------------
+
+#ifndef SERVER_ONLY
+    /** The shadow of a kart. */
+    std::unique_ptr<Shadow> m_shadow;
+
+    /** The skidmarks object for this kart. */
+    std::unique_ptr<SkidMarks> m_skidmarks;
+#endif
+
+    /** All particle effects. */
+    std::unique_ptr<KartGFX> m_kart_gfx;
+
+    /** Handles all slipstreaming. */
+    std::unique_ptr<SlipStream> m_slipstream;
+
+    // Bullet physics parameters
+    // -------------------------
+    struct btCompoundShapeDeleter
+    {
+        void operator()(btCompoundShape* p) const
+        {
+            for(int i = 0; i< p->getNumChildShapes(); i++)
+                delete p->getChildShape(i);
+            delete p;
+        }
+    };
+    std::unique_ptr<btCompoundShape, btCompoundShapeDeleter> m_kart_chassis;
+
+    /** For collisions */
+    ParticleEmitter *m_collision_particles;
 
     /** The main controller of this object, used for driving. This
      *  controller is used to run the kart. It will be replaced
@@ -132,11 +160,14 @@ protected:
      *  the controller do not need to be reinitialised. */
     Controller  *m_saved_controller;
 
-    /** Initial rank of the kart. */
-    int m_initial_position;
+    /** Remember the last **used** powerup type of a kart for AI purposes. */
+    PowerupManager::PowerupType m_last_used_powerup;
 
-    /** Current race position (1-num_karts). */
-    int m_race_position;
+    /** True if kart is flying (for debug purposes only). */
+    bool m_flying;
+
+    /** Set when hitting bubblegum */
+    bool m_has_caught_nolok_bubblegum;
 
     /** True if the kart wins, false otherwise. */
     bool m_race_result;
@@ -144,8 +175,11 @@ protected:
     /** True if the kart is eliminated. */
     bool m_eliminated;
 
-    /** For stars rotating around head effect */
-    Stars *m_stars_effect;
+    /** Initial rank of the kart. */
+    int m_initial_position;
+
+    /** Current race position (1-num_karts). */
+    int m_race_position;
 
     /** Maximum engine rpm's for the current gear. */
     float        m_max_gear_rpm;
@@ -161,14 +195,18 @@ protected:
     /** Time a kart is invulnerable. */
     int16_t      m_invulnerable_ticks;
 
-    /** Current leaning of the kart. */
-    float        m_current_lean;
-
     /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
     int16_t      m_bubblegum_ticks;
 
-    /** The torque to apply after hitting a bubble gum. */
-    float        m_bubblegum_torque;
+    /** When a kart has its view blocked by the plunger, this variable will be
+     *  > 0 the number it contains is the time left before removing plunger. */
+    int16_t       m_view_blocked_by_plunger;
+
+    /** Current leaning of the kart. */
+    float        m_current_lean;
+
+    /** To prevent using nitro in too short bursts */
+    int8_t        m_min_nitro_ticks;
 
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
@@ -176,11 +214,12 @@ protected:
     /** True if the kart has been selected to have a boosted ai */
     bool         m_boosted_ai;
 
-    // Bullet physics parameters
-    // -------------------------
-    btCompoundShape          m_kart_chassis;
-    btVehicleRaycaster      *m_vehicle_raycaster;
-    btKart                  *m_vehicle;
+    bool            m_finished_race;
+
+    float           m_finish_time;
+
+    /** The torque to apply after hitting a bubble gum. */
+    float        m_bubblegum_torque;
 
      /** The amount of energy collected with nitro cans. Note that it
       *  must be float, since dt is subtraced in each timestep. */
@@ -190,41 +229,23 @@ protected:
 
     float         m_energy_to_min_ratio;
 
-    // Graphical effects
-    // -----------------
-
-    /** The shadow of a kart. */
-    Shadow          *m_shadow;
-
-    /** All particle effects. */
-    KartGFX         *m_kart_gfx;
-
-    /** For collisions */
-    ParticleEmitter *m_collision_particles;
-
-    /** Handles all slipstreaming. */
-    SlipStream      *m_slipstream;
-
-    /** The skidmarks object for this kart. */
-    SkidMarks      *m_skidmarks;
-
     float           m_startup_boost;
-    float           m_finish_time;
-    bool            m_finished_race;
 
     float           m_falling_time;
 
     float           m_weight;
-
-    /** When a kart has its view blocked by the plunger, this variable will be
-     *  > 0 the number it contains is the time left before removing plunger. */
-    int16_t       m_view_blocked_by_plunger;
 
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
 
     /** For smoothing engine sound**/
     float         m_last_factor_engine_sound;
+
+    /** For changeKart**/
+    float         m_default_suspension_force;
+
+    /** Reset position. */
+    btTransform  m_reset_transform;
 
     std::vector<SFXBase*> m_custom_sounds;
     int m_emitter_id = 0;
@@ -249,9 +270,6 @@ protected:
     SFXBuffer    *m_boing_sound;
     int          m_ticks_last_crash;
     RaceManager::KartType m_type;
-
-    /** To prevent using nitro in too short bursts */
-    int8_t        m_min_nitro_ticks;
 
     void          updatePhysics(int ticks);
     void          handleMaterialSFX();
@@ -327,7 +345,9 @@ public:
     virtual bool   playCustomSFX    (unsigned int type) OVERRIDE;
     virtual void   setController(Controller *controller) OVERRIDE;
     virtual void   setXYZ(const Vec3& a) OVERRIDE;
-
+    virtual void changeKart(const std::string& new_ident,
+                            PerPlayerDifficulty difficulty,
+                            std::shared_ptr<RenderInfo> ri) OVERRIDE;
     // ========================================================================
     // Powerup related functions.
     // ------------------------------------------------------------------------
@@ -353,7 +373,7 @@ public:
     virtual int getNumPowerup() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
-    virtual KartGFX* getKartGFX() OVERRIDE { return m_kart_gfx;         }
+    virtual KartGFX* getKartGFX() OVERRIDE         { return m_kart_gfx.get(); }
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float  getEnergy() const OVERRIDE 
@@ -417,16 +437,17 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */
-    virtual const Skidding *getSkidding() const OVERRIDE { return m_skidding; }
+    virtual const Skidding *getSkidding() const OVERRIDE
+                                                   { return m_skidding.get(); }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values) - non-const. */
-    virtual Skidding *getSkidding() OVERRIDE { return m_skidding; }
+    virtual Skidding *getSkidding() OVERRIDE { return m_skidding.get(); }
     // ------------------------------------------------------------------------
     virtual RaceManager::KartType getType() const OVERRIDE { return m_type; }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
-    virtual btKart *getVehicle() const OVERRIDE { return m_vehicle; }
+    virtual btKart *getVehicle() const OVERRIDE { return m_vehicle.get(); }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float  getSpeed() const OVERRIDE { return m_speed; }
@@ -438,10 +459,11 @@ public:
     virtual btQuaternion getVisualRotation() const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
-    virtual const SlipStream* getSlipstream() const OVERRIDE { return m_slipstream; }
+    virtual const SlipStream* getSlipstream() const OVERRIDE
+                                                 { return m_slipstream.get(); }
     // ------------------------------------------------------------------------
     /** Returns the slipstream object of this kart. */
-    virtual SlipStream* getSlipstream() OVERRIDE  {return m_slipstream; }
+    virtual SlipStream* getSlipstream() OVERRIDE  {return m_slipstream.get(); }
     // ------------------------------------------------------------------------
     /** Activates a slipstream effect, atm that is display some nitro. */
     virtual void setSlipstreamEffect(float f) OVERRIDE;
@@ -550,9 +572,10 @@ public:
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual bool isVisible() OVERRIDE;
+    virtual bool isVisible() const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual Stars* getStarsEffect() const OVERRIDE { return m_stars_effect; }
+    virtual Stars* getStarsEffect() const OVERRIDE
+                                               { return m_stars_effect.get(); }
 
 };   // Kart
 

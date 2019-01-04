@@ -322,3 +322,12 @@ void TrackManager::updateGroups(const Track* track)
 }   // updateGroups
 
 // ----------------------------------------------------------------------------
+int TrackManager::getTrackIndexByIdent(const std::string& ident) const
+{
+    for (unsigned i = 0; i < m_tracks.size(); i++)
+    {
+        if (m_tracks[i]->getIdent() == ident)
+            return i;
+    }
+    return -1;
+}   // getTrackIndexByIdent

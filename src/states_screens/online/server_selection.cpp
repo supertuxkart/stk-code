@@ -32,6 +32,8 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
@@ -102,12 +104,6 @@ void ServerSelection::loadedFromFile()
     assert(m_searcher != NULL);
     m_game_started->setState(false);
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
-    video::ITexture* icon1 = irr_driver->getTexture(
-        file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
-    video::ITexture* icon2 = irr_driver->getTexture(
-        file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
-    m_icon_bank->addTextureAsSprite(icon1);
-    m_icon_bank->addTextureAsSprite(icon2);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -115,6 +111,7 @@ void ServerSelection::loadedFromFile()
  */
 void ServerSelection::beforeAddingWidget()
 {
+    m_icon_bank->clear();
     m_server_list_widget->clearColumns();
     m_server_list_widget->addColumn( _C("column_name", "Name"), 7);
     m_server_list_widget->addColumn(_C("column_name", "Game mode"), 3);
@@ -139,10 +136,31 @@ void ServerSelection::init()
     m_current_column = 5/*distance*/;
     m_searcher->clearListeners();
     m_searcher->addListener(this);
+
     m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
-    
-    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12.0f
-                                                       : getHeight() / 15.0f;
+    m_icon_bank->setTargetIconSize(128, 128);
+
+    video::ITexture* icon1 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
+    video::ITexture* icon2 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
+    m_icon_bank->addTextureAsSprite(icon1);
+    m_icon_bank->addTextureAsSprite(icon2);
+    for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+    {
+        Track* t = track_manager->getTrack(i);
+        video::ITexture* tex =irr_driver->getTexture(t->getScreenshotFile());
+        if (!tex)
+        {
+            tex = irr_driver->getTexture(file_manager
+                ->getAsset(FileManager::GUI_ICON, "main_help.png"));
+        }
+        assert(tex);
+        m_icon_bank->addTextureAsSprite(tex);
+    }
+
+    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12
+                                                       : getHeight() / 15;
     
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
@@ -190,7 +208,10 @@ void ServerSelection::loadList()
         });
     for (auto& server : m_servers)
     {
-        const int icon = server->isGameStarted() ? 1 : 0;
+        int icon = server->isGameStarted() ? 1 : 0;
+        Track* t = server->getCurrentTrack();
+        if (t)
+            icon = track_manager->getTrackIndexByIdent(t->getIdent()) + 2;
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");

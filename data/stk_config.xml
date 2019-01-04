@@ -151,57 +151,179 @@
     <urls donate="https://supertuxkart.net/Donate"
         password-reset="http://addons.supertuxkart.net/password-reset.php" />
 
-    <!-- Skidmark data: maximum number of skid marks, and
-         time for skidmarks to fade out. Maximum number will over
-         current number of karts, so the more karts, the less
-         skidmark is on track. -->
-    <skid-marks fadeout-time="60" max-number="500" />
+  <!-- Skidmark data: maximum number of skid marks, and
+       time for skidmarks to fade out. Maximum number will over
+       current number of karts, so the more karts, the less
+       skidmark is on track. -->
+  <skid-marks max-number="500"  fadeout-time="60"/>
 
-    <!-- Defines when the upright constraint should be active, it's
-         disabled when the kart is more than this value from the track. -->
-    <near-ground distance="2" />
+  <!-- Defines when the upright constraint should be active, it's
+       disabled when the kart is more than this value from the track. -->
+  <near-ground distance="2"/>
 
-    <!-- How long the end animation will be shown. -->
-    <delay-finish time="1.0" />
+  <!-- How long the end animation will be shown. -->
+  <delay-finish time="1.0"/>
 
-    <!-- How long the music credits are shown. -->
-    <credits music="10" />
+  <!-- How long the music credits are shown. -->
+  <credits music="8"/>
 
-    <!-- time is the time till a bomb explodes. time-increase is the time added
-         to timer when bomb is passed on. -->
-    <bomb time="30.0" time-increase="0.0" />
+  <!-- time is the time till a bomb explodes. time-increase is the time added
+       to timer when bomb is passed on. -->
+  <bomb time="30.0" time-increase="0.0"/>
 
-    <!-- Powerup collect-mode decides what is collected if a kart has already an
-         powerup: same: get one more item of the same type.
-                  new:  always get a new item.
-                  only-if-same: if the random item is the same one as the
-                        one currently owned, increase the number, otherwise
-                        no more/new item s are given to the kart.
-         no-explosive-items-timeout determines if world time is less than this value
-         then no cake or basketball is given by bonus boxes. -->
-    <powerup collect-mode="new" no-explosive-items-timeout="15.0" />
-    <!-- time: How long a switch is being effective.
-         items for each item list the index of the item it is switched with.
-               Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
-                      easter egg, trigger-->
-    <switch items="1 0 4 4 2 2 6 7" time="5" />
+  <!-- Powerup collect-mode decides what is collected if a kart has already an
+       powerup: same: get one more item of the same type.
+                new:  always get a new item.
+                only-if-same: if the random item is the same one as the
+                      one currently owned, increase the number, otherwise
+                      no more/new item s are given to the kart.
+       no-explosive-items-timeout determines if world time is less than this value
+       then no cake or basketball is given by bonus boxes. -->
+  <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
+  <!-- time: How long a switch is being effective.
+       items for each item list the index of the item it is switched with.
+             Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
+                    easter egg, trigger-->
+  <switch time="5"  items="1 0 4 4 2 2 6 7"/>
 
-    <!-- disappear-counter: How often bubblegum gets driven over before it disappears.
-         shield-time: How long the bubblegum shield lasts
-         restrict-weapons: If true, using weapons will destroy the user's shield -->
-    <bubblegum disappear-counter="1" restrict-weapons="false" shield-time="10.0" />
+  <!-- disappear-counter: How often bubblegum gets driven over before it disappears.
+       shield-time: How long the bubblegum shield lasts
+       restrict-weapons: If true, using weapons will destroy the user's shield -->
+  <bubblegum disappear-counter="1" shield-time="10.0" restrict-weapons="false"/>
 
-    <!-- explosion-impulse-objects is the impulse that pushes physical objects
-         away if there is an explosion. -->
-    <explosion impulse-objects="500.0" />
+  <!-- explosion-impulse-objects is the impulse that pushes physical objects
+       away if there is an explosion. -->
+  <explosion impulse-objects="500.0" />
 
-    <!-- Networking
-         steering-reduction: Reduce a remote kart's steering by this factor
-             each frame. This helps reduces oversteering by high latency
-             clients when they only do minor steering adjustments.
-         max-moveable-objects: Maximum number of moveable objects in a track
-             when networking is on. Objects will be hidden if total count is
-             larger than this value.
+  <!-- Networking
+       steering-reduction: Reduce a remote kart's steering by this factor
+           each frame. This helps reduces oversteering by high latency
+           clients when they only do minor steering adjustments.
+       max-moveable-objects: Maximum number of moveable objects in a track
+           when networking is on. Objects will be hidden if total count is
+           larger than this value.
+  -->
+  <networking steering-reduction="1.0"
+              max-moveable-objects="15"/>
+
+  <!-- The field od views for 1-4 player split screen. fov-3 is
+       actually not used (since 3 player split screen uses the
+       same layout as 4 player split screen) -->
+  <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" cutscene-fov="0.61" />
+
+  <!-- disable-while-unskid: Disable steering when stop skidding during
+           the time it takes to adjust the physical body with the graphics.
+       camera-follow-skid: If true the camera will stay behind the kart,
+           potentially making it easier to see where the kart is going to
+           after a skid. -->
+  <steer disable-while-unskid="false"
+         camera-follow-skid="true"     />
+
+  <!-- Default values for all karts
+       ============================ -->
+  <general-kart-defaults>
+
+    <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
+         decrease: multiplicative decrease of skidding factor in each frame.
+         max: maximum skidding factor = maximum increase of steering angle.
+         time-till-max: Time till maximum skidding is reached.
+         visual: Additional graphical rotation of kart. The graphical rotation
+           of the kart also determines the direction the kart is driving to
+           when skidding is stopped.
+         visual-time: How long it takes for the visual skid to reach maximum.
+         revert-visual-time: how long it takes when stopping a skid to revert
+           the visual skid and bring visuals and physics in sync again.
+         angular-velocity: Angular velocity to be used for the kart when skidding.
+         min-speed: Minimum speed a kart must have before it can skid. Must be
+           >0, otherwise the kart can skid at the start of the race.
+         time-till-bonus: How long a kart needs to skid in order to get a bonus.
+         bonus-force: A speedup applied to the kart whick skidded for a while.
+         bonus-time: How long the bonus-force is applied.
+         bonus-force: Additional engine force (this is used to offset the fact
+           that turning after skidding (e.g. to correct direction) often uses
+           up the skid bonus).
+         post-skid-rotate-factor: a factor to be used to determine how much
+           the chassis of a kart should rotate to match the graphical view.
+           A factor of 1 is identical, a smaller factor will rotate the kart
+           less (which might  feel better).
+         physical-jump-time: Time for a physical jump at the beginning of a skid.
+         graphical-jump-time: Time for a graphics-only jump at the beginning
+           of a skid.
+         reduce-turn-min/max: The steering done by the controller (which is in
+           [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
+           is active (for left turn, right turn will use [-max, -min]). The
+           effect is that while you skid (say left) you can adjust the direction
+           of the turn the kart is doing somewhat by steering to the left and right,
+           but you will always keep on doing a left turn, just more or less. -->
+
+    <!-- Kart-specific settings used by the AI.
+         use-slipstream: if the AI should try to overtake karts using slipstream.
+         disable-slipstream-usage: even if the AI is not trying to use slipstream,
+           it can get a lot of bonus, esp. on easy since the AI creates trains.
+           Set this to true to make sure AI does not get any slipstream bonus.
+         shield-incoming-radius: Radius at which projectiles will be detected and
+           trigger a shield usage.
+         false-start-probability: Probability of a false start.
+         min/max-start-delay: Minimum and maximum start delay.
+           See http://www.humanbenchmark.com/tests/reactiontime/stats.php
+           Average reaction time is around 0.215 s.
+         nitro-usage: Integer determining how well the AI uses nitro, from 0 to 4
+           0 corresponds to no use ; while 1 to 4 corresponds to various degrees
+           of quality use (using it immediately for 1 to more context-aware strategies)
+         item-skill: Integer determining how well the AI use items, from 0 to 5
+           0 corresponds to no use ; 1 to use after a random time ; while 2 to 5 use
+           more advanced tactics
+         collect-avoid-items: if the AI should collect and avoid items,
+           or just ignore them.
+         handle-bomb: If the AI should actively try to pass on a bomb.
+         skidding-threshold: only for old-style skidding: when sharp turn
+           should be triggered. Smaller values means it will sharp turn
+           earlier, resulting in better driving in thight curves.
+
+
+         max-item-angle: Items that would need more than this change in
+           direction are not considered for collection.
+         time-full-steer is the time for the AI to go from neutral steering to
+           extreme left (or right). This can be used to reduce
+           'shaking' of AI karts caused by changing steering direction
+           too often. It also helps with making it easier to push the
+           AI karts (otherwise micro-corrections make this nearly
+           impossible). A value of 1/maxFPS / 2 will guarantee that
+           the wheel can go from -1 to +1 steering in one frame,
+           basically  disabling this mechanism.
+         bad-item-closeness is the maximum distance between a good and a
+           bad item which can force the AI to abandon a good item in order
+           to avoid hitting a bad item. If the distance is larger, it is
+           assumed that there will be enough time to change steering
+           direction.
+         straight-length-for-zipper is the minimum length a straight
+           section of the track should have in order to activate a zipper.
+
+           competitive when ahead of the player, or more competitive
+           when behind the player.
+
+         skid-probability: Since the AI is usually very good at using
+           skidding, this is used to implement some rubber-banding for
+           the AI: depending on distance to the player, the AI will
+           change the probability of skidding. This attributes takes
+           a space-separated list of "distance:probability" pairs
+           (negative distances meaning the kart is behind the player,
+           a positive number that the AI is ahead of the player).
+           Then list should have at least 2 entries. Depending on
+           the actualy distance the kart has the probability is then
+           linearly interpolated (if the AI is more than the largest
+           distance ahead, the value for the largest distance is used,
+           and similarly if the kart is more than the minimum value
+           behind).
+         first-speed-cap: Fraction of maximum speed the first AI kart
+           should drive at. Used to slow down karts that are ahead of
+           the player. Note that setting this to a value >1 does NOT
+           increase the speed the kart can drive at!
+         last-speed-cap: same as first-speed-cap, but for last AI kart.
+           AI karts in-between use an average of it with first-speed-cap.
+         collect-item-probability: Probability of the AI actually
+           trying to collect an item (if an item is selected for
+           collection in the first place).
     -->
     <networking max-moveable-objects="15" steering-reduction="1.0" />
 

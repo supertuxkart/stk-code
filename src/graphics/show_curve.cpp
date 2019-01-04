@@ -127,7 +127,7 @@ void ShowCurve::makeCircle(const Vec3 &center, float radius)
     float dx = 2.0f*M_PI/num_segs;
     for(float x = 0; x <=2.0f*M_PI; x+=dx)
     {
-        Vec3 xyz(radius*sin(x), 0.2f, radius*cos(x));
+        Vec3 xyz(radius*sinf(x), 0.2f, radius*cosf(x));
         addPoint(xyz+center);
     }
 }   // makeCircle

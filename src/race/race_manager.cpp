@@ -592,6 +592,26 @@ void RaceManager::startNextRace()
     // functions.
     World::getWorld()->reset();
 
+    if (NetworkConfig::get()->isNetworking() &&
+        race_manager->supportsLiveJoining())
+    {
+        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        {
+            // Eliminate all reserved players in the begining
+            const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            if (rki.isReserved())
+            {
+                AbstractKart* k = World::getWorld()->getKart(i);
+                World::getWorld()->eliminateKart(i,
+                    false/*notify_of_elimination*/);
+                k->setPosition(
+                    World::getWorld()->getCurrentNumKarts() + 1);
+                k->finishedRace(World::getWorld()->getTime(),
+                    true/*from_server*/);
+            }
+        }
+    }
+
     irr_driver->onLoadWorld();
     main_loop->renderGUI(8100);
 
