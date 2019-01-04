@@ -987,11 +987,11 @@ EventPropagation InputManager::input(const SEvent& event)
             // *0.017453925f is to convert degrees to radians
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           Input::HAT_H_ID, Input::AD_NEUTRAL,
-                          (int)(cos(event.JoystickEvent.POV*0.017453925f/100.0f)
+                          (int)(cosf(event.JoystickEvent.POV*0.017453925f/100.0f)
                                 *Input::MAX_VALUE));
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           Input::HAT_V_ID, Input::AD_NEUTRAL,
-                          (int)(sin(event.JoystickEvent.POV*0.017453925f/100.0f)
+                          (int)(sinf(event.JoystickEvent.POV*0.017453925f/100.0f)
                                 *Input::MAX_VALUE));
         }
 

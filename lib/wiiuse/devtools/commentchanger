@@ -1,0 +1,13 @@
+#!/bin/sh
+# Simple script to change C++-style // comments to C style ones.
+# Puts one space after (and if not present, before) the contents of the comment
+# Not suitable for unattended use - inspect results before staging and committing.
+# 2011 Ryan Pavlik <abiryan@ryand.net> <rpavlik@iastate.edu> <http://academic.cleardefinition.com>
+
+# Handle comments with text before them. Explicitly excludes :// to not
+# recklessly mangle license headers with URLs in them.
+sed -i -r 's_([^:/])//[ ]?(.*)$_\1/* \2 */_' $@
+
+# Handle comments that start at the beginning of the line.
+sed -i -r 's_^//[ ]?(.*)$_/* \1 */_' $@
+

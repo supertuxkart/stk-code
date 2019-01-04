@@ -1,0 +1,18 @@
+#!/bin/sh
+bindir=$(pwd)
+cd @USERFILE_WORKING_DIRECTORY@
+@USERFILE_ENV_COMMANDS@
+if test "x$1" = "x--debugger"; then
+	shift
+	cmd="$1"
+	shift
+	if test "x@LAUNCHERS_GOT_GDB@" = "xYES"; then
+		echo "r $@" > $bindir/gdbscript
+		echo "bt" >> $bindir/gdbscript
+		@GDB_COMMAND@ -batch -command=$bindir/gdbscript @LAUNCHERS_GDB_ARG@ $cmd
+	else
+		$cmd $@
+	fi
+else
+	$@
+fi

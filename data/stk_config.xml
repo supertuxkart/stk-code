@@ -131,8 +131,8 @@
            solver-split-impulse-threshold="-0.00001"
            solver-mode=""/>
 
-  <!-- The title music. -->
-  <music title="main_theme.music"/>
+  <!-- The title and default musics. -->
+  <music title="main_theme.music" default="kart_grand_prix.music"/>
 
   <!--  Replay related values, mostly concerned with saving less data
         and using interpolation instead.

@@ -159,8 +159,8 @@ void ServerSelection::init()
         m_icon_bank->addTextureAsSprite(tex);
     }
 
-    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12.0f
-                                                       : getHeight() / 15.0f;
+    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12
+                                                       : getHeight() / 15;
     
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;

@@ -892,9 +892,9 @@ float Kart::getSpeedForTurnRadius(float radius) const
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin( 1.0f / turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i)));
 
-    float angle = sin(1.0f / radius);
+    float angle = sinf(1.0f / radius);
     return turn_angle_at_speed.getReverse(angle);
 }   // getSpeedForTurnRadius
 
@@ -911,7 +911,7 @@ float Kart::getMaxSteerAngle(float speed) const
     // across karts of different lengths sharing the same
     // turn radius properties
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sin( 1.0f / turn_angle_at_speed.getY(i))
+        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i))
                                     * m_kart_properties->getWheelBase());
 
     return turn_angle_at_speed.get(speed);
@@ -2929,8 +2929,8 @@ void Kart::updateFlying()
         if (velocity.length() < 25)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(100.0f*sin(orientation), 0.0,
-                100.0f*cos(orientation)));
+            m_body->applyCentralImpulse(btVector3(100.0f*sinf(orientation), 0.0,
+                100.0f*cosf(orientation)));
         }
     }
     else if (m_controls.getBrake())
@@ -2939,8 +2939,8 @@ void Kart::updateFlying()
         if (velocity.length() > -15)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(-100.0f*sin(orientation), 0.0,
-                -100.0f*cos(orientation)));
+            m_body->applyCentralImpulse(btVector3(-100.0f*sinf(orientation), 0.0,
+                -100.0f*cosf(orientation)));
         }
     }
 
@@ -3275,7 +3275,7 @@ void Kart::updateGraphics(float dt)
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
+    float lean_height = tanf(m_current_lean) * getKartWidth()*0.5f;
 
     Moveable::updateSmoothedGraphics(dt);
 

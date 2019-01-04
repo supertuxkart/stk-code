@@ -48,8 +48,21 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
-    /** Spinner for number of laps. */
-    GUIEngine::SpinnerWidget* m_lap_spinner;
+        
+    /** Spinner for target types. */
+    GUIEngine::SpinnerWidget* m_target_type_spinner;
+
+    /** The label besides the target types spinner. */
+    GUIEngine::LabelWidget* m_target_type_label;
+
+    /* The div that contains the target type spinner and label */
+    GUIEngine::Widget* m_target_type_div;
+
+    /** Spinner for target value e.g. number of laps or goals to score. */
+    GUIEngine::SpinnerWidget* m_target_value_spinner;
+
+    /** The label besides the target value spinner. */
+    GUIEngine::LabelWidget* m_target_value_label;
 
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
@@ -75,10 +88,11 @@ public:
     TrackInfoScreen();
     virtual ~TrackInfoScreen();
 
-    virtual void init();
-    virtual void loadedFromFile();
+    virtual void init() OVERRIDE;
+    virtual void beforeAddingWidget() OVERRIDE;
+    virtual void loadedFromFile() OVERRIDE;
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
-                               const int player_id);
+                               const int player_id) OVERRIDE;
 
     void onEnterPressedInternal();
     void setTrack(Track *track);

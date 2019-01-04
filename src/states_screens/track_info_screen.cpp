@@ -62,10 +62,14 @@ TrackInfoScreen::TrackInfoScreen()
 /* Saves some often used pointers. */
 void TrackInfoScreen::loadedFromFile()
 {
-    m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
-    m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
-    m_option          = getWidget<CheckBoxWidget>("option");
-    m_record_race     = getWidget<CheckBoxWidget>("record");
+    m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
+    m_target_type_label     = getWidget <LabelWidget>("target-type-text");
+    m_target_type_div       = getWidget<Widget>("target-type-div");
+    m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
+    m_target_value_label    = getWidget<LabelWidget>("target-value-text");
+    m_ai_kart_spinner       = getWidget<SpinnerWidget>("ai-spinner");
+    m_option                = getWidget<CheckBoxWidget>("option");
+    m_record_race           = getWidget<CheckBoxWidget>("record");
     m_option->setState(false);
     m_record_race->setState(false);
 
@@ -81,6 +85,13 @@ void TrackInfoScreen::loadedFromFile()
     screenshot->setFocusable(false);
     screenshot->m_tab_stop = false;
 }   // loadedFromFile
+
+void TrackInfoScreen::beforeAddingWidget()
+{
+    const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    m_target_type_div->setCollapsed(!is_soccer, this);
+} // beforeAddingWidget
+
 
 // ----------------------------------------------------------------------------
 void TrackInfoScreen::setTrack(Track *track)
@@ -134,18 +145,55 @@ void TrackInfoScreen::init()
     if (image != NULL)
         screenshot->setImage(image);
 
+    m_target_value_spinner->setVisible(false);
+    m_target_value_label->setVisible(false);
+
+    // Soccer options
+    // -------------
+    const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    if (is_soccer)
+    {
+        m_target_value_spinner->setVisible(true);
+        m_target_value_label->setVisible(true);
+
+        if (UserConfigParams::m_num_goals <= 0)
+            UserConfigParams::m_num_goals = UserConfigParams::m_num_goals.getDefaultValue();
+
+        if (UserConfigParams::m_soccer_time_limit <= 0)
+            UserConfigParams::m_soccer_time_limit = UserConfigParams::m_soccer_time_limit.getDefaultValue();
+
+        m_target_type_spinner->clearLabels();
+        m_target_type_spinner->addLabel(_("Time limit"));
+        m_target_type_spinner->addLabel(_("Goals limit"));
+        m_target_type_spinner->setValue(UserConfigParams::m_soccer_use_time_limit ? 0 : 1);
+
+        if (UserConfigParams::m_soccer_use_time_limit)
+        {
+            m_target_value_label->setText(_("Maximum time (min.)"), false);
+            m_target_value_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+        }
+        else
+        {
+            m_target_value_label->setText(_("Number of goals to win"), false);
+            m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
+        }
+    }
+
     // Lap count m_lap_spinner
     // -----------------------
-    m_lap_spinner->setVisible(has_laps);
-    getWidget<LabelWidget>("lap-text")->setVisible(has_laps);
     if (has_laps)
     {
+        m_target_value_spinner->setVisible(true);
+        m_target_value_label->setVisible(true);
+
         if (UserConfigParams::m_artist_debug_mode)
-            m_lap_spinner->setMin(0);
+            m_target_value_spinner->setMin(0);
         else
-            m_lap_spinner->setMin(1);
-        m_lap_spinner->setValue(m_track->getActualNumberOfLap());
-        race_manager->setNumLaps(m_lap_spinner->getValue());
+            m_target_value_spinner->setMin(1);
+        m_target_value_spinner->setValue(m_track->getActualNumberOfLap());
+        race_manager->setNumLaps(m_target_value_spinner->getValue());
+
+        m_target_value_label->setText(_("Number of laps"), false);
     }
 
     // Number of AIs
@@ -346,7 +394,7 @@ void TrackInfoScreen::onEnterPressedInternal()
     race_manager->setRecordRace(m_record_this_race);
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
-    const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue()
+    const int num_laps = race_manager->modeHasLaps() ? m_target_value_spinner->getValue()
                                                      : -1;
     const bool option_state = m_option == NULL ? false
                                                : m_option->getState();
@@ -380,6 +428,13 @@ void TrackInfoScreen::onEnterPressedInternal()
         UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
     }
 
+    const int selected_target_type = m_target_type_spinner->getValue();
+    const int selected_target_value = m_target_value_spinner->getValue();
+    if (selected_target_type == 0)
+        race_manager->setTimeTarget(static_cast<float>(selected_target_value) * 60);
+    else
+        race_manager->setMaxGoal(selected_target_value);
+
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
@@ -402,6 +457,43 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if (name == "target-type-spinner")
+    {
+        const bool timed = m_target_type_spinner->getValue() == 0;
+        UserConfigParams::m_soccer_use_time_limit = timed;
+
+        if (timed)
+        {
+            m_target_value_label->setText(_("Maximum time (min.)"), false);
+            m_target_value_spinner->setValue(UserConfigParams::m_soccer_time_limit);
+        }
+        else
+        {
+            m_target_value_label->setText(_("Number of goals to win"), false);
+            m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
+
+        }
+    }
+    else if (name == "target-value-spinner")
+    {
+        const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+        if (is_soccer)
+        {
+            const bool timed = m_target_type_spinner->getValue() == 0;
+            if (timed)
+                UserConfigParams::m_soccer_time_limit = m_target_value_spinner->getValue();
+            else
+                UserConfigParams::m_num_goals = m_target_value_spinner->getValue();
+        }
+        else
+        {
+            assert(race_manager->modeHasLaps());
+            const int num_laps = m_target_value_spinner->getValue();
+            race_manager->setNumLaps(num_laps);
+            UserConfigParams::m_num_laps = num_laps;
+            updateHighScores();
+        }
     }
     else if (name == "option")
     {
@@ -433,14 +525,6 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         {
             m_ai_kart_spinner->setActive(true);
         }
-    }
-    else if (name == "lap-spinner")
-    {
-        assert(race_manager->modeHasLaps());
-        const int num_laps = m_lap_spinner->getValue();
-        race_manager->setNumLaps(num_laps);
-        UserConfigParams::m_num_laps = num_laps;
-        updateHighScores();
     }
     else if (name=="ai-spinner")
     {

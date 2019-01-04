@@ -21,7 +21,7 @@
                 <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
                         I18N="Tab in help menu" text="Kart classes"/>
                 <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
-                        I18N="Tab in help menu" text="Multi-player"/>
+                        I18N="Tab in help menu" text="Multiplayer"/>
             </vertical-tabs>
 
             <spacer width="2%" height="100%"/>
@@ -87,7 +87,7 @@
                 </div>
 
                <bubble proportion="4" width="100%" I18N="In the help menu"
-                    text="* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
+                    text="* Many of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
 
             </box>
         </div>

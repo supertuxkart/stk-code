@@ -209,6 +209,9 @@ void AbstractStateManager::popMenu()
 {
     assert(m_game_mode != GAME);
 
+    if (m_menu_stack.size() == 0)
+        return;
+
     // Send tear-down event to menu
     getCurrentScreen()->tearDown();
     m_menu_stack.pop_back();

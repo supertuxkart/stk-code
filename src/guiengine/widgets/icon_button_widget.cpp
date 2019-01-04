@@ -144,8 +144,8 @@ void IconButtonWidget::add()
         suggested_w = (int)(suggested_w*needed_scale_factor);
         suggested_h = (int)(suggested_h*needed_scale_factor);
     }
-    const int x_from = m_x + (float)(m_w - suggested_w)/2; // center horizontally
-    const int y_from = m_y + (float)(m_h - suggested_h)/2; // center vertically
+    const int x_from = m_x + (m_w - suggested_w)/2; // center horizontally
+    const int y_from = m_y + (m_h - suggested_h)/2; // center vertically
 
     rect<s32> widget_size = rect<s32>(x_from,
                                       y_from,

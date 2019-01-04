@@ -702,6 +702,15 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
 
     }   // for i in filenames
 
+    if (m_music.empty())
+    {
+        m_music.push_back(stk_config->m_default_music);
+
+        Log::warn("track",
+            "Music information for track '%s' replaced by default music.\n",
+            m_name.c_str());
+    }
+
 }   // getMusicInformation
 
 //-----------------------------------------------------------------------------
