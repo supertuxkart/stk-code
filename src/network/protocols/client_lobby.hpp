@@ -79,6 +79,8 @@ private:
 
     bool m_first_connect;
 
+    bool m_spectator;
+
     uint64_t m_auto_back_to_lobby_time;
 
     uint64_t m_start_live_game_time;
@@ -125,6 +127,9 @@ public:
     bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
     void requestKartInfo(uint8_t kart_id);
+    void setSpectator(bool val)                          { m_spectator = val; }
+    bool isSpectator() const                            { return m_spectator; }
+    void startLiveJoinKartSelection();
 };
 
 #endif // CLIENT_LOBBY_HPP

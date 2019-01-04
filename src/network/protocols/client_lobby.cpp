@@ -29,6 +29,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -91,6 +92,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_BAD_CONNECTION] =
         _("Bad network connection is detected.");
     m_first_connect = true;
+    m_spectator = false;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -110,6 +112,7 @@ ClientLobby::~ClientLobby()
 //-----------------------------------------------------------------------------
 void ClientLobby::setup()
 {
+    m_spectator = false;
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
     m_start_live_game_time = std::numeric_limits<uint64_t>::max();
     m_received_server_result = false;
@@ -649,6 +652,9 @@ void ClientLobby::handleServerInfo(Event* event)
     }
     bool server_config = data.getUInt8() == 1;
     NetworkingLobby::getInstance()->toggleServerConfigButton(server_config);
+    bool live_join_spectator = data.getUInt8() == 1;
+    NetworkingLobby::getInstance()
+        ->toggleServerLiveJoinable(live_join_spectator);
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------
@@ -1101,3 +1107,21 @@ void ClientLobby::handleKartInfo(Event* event)
     SFXManager::get()->quickSound("energy_bar_full");
     MessageQueue::add(MessageQueue::MT_FRIEND, msg);
 }   // handleKartInfo
+
+//-----------------------------------------------------------------------------
+void ClientLobby::startLiveJoinKartSelection()
+{
+    NetworkKartSelectionScreen::getInstance()->setLiveJoin(true);
+    std::vector<int> all_k =
+        kart_properties_manager->getKartsInGroup("standard");
+    std::set<std::string> karts;
+    for (int kart : all_k)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(kart);
+        if (!kp->isAddon())
+            karts.insert(kp->getIdent());
+    }
+    NetworkKartSelectionScreen::getInstance()
+        ->setAvailableKartsFromServer(karts);
+    NetworkKartSelectionScreen::getInstance()->push();
+}   // startLiveJoinKartSelection

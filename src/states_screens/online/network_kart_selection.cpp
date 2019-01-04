@@ -104,7 +104,9 @@ void NetworkKartSelectionScreen::allPlayersDone()
     if (m_live_join)
     {
         kart.setSynchronous(true);
-        kart.addUInt8(LobbyProtocol::LE_LIVE_JOIN);
+        kart.addUInt8(LobbyProtocol::LE_LIVE_JOIN)
+            // not spectator
+            .addUInt8(0);
     }
     else
         kart.addUInt8(LobbyProtocol::LE_KART_SELECTION);

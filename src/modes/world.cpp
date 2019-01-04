@@ -253,12 +253,15 @@ void World::init()
 
     if (Camera::getNumCameras() == 0)
     {
+        auto cl = LobbyProtocol::get<ClientLobby>();
         if ( (NetworkConfig::get()->isServer() && 
               !ProfileWorld::isNoGraphics()       ) ||
-            race_manager->isWatchingReplay()            )
+            race_manager->isWatchingReplay()        ||
+            (cl && cl->isSpectator()))
         {
-            // In case that the server is running with gui or watching replay,
-            // create a camera and attach it to the first kart.
+            // In case that the server is running with gui, watching replay or
+            // spectating the game, create a camera and attach it to the first
+            // kart.
             Camera::createCamera(World::getWorld()->getKart(0), 0);
 
         }   // if server with graphics of is watching replay

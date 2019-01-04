@@ -696,38 +696,48 @@ void ServerLobby::liveJoinRequest(Event* event)
         rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
-    setPlayerKarts(data, peer);
+    bool spectator = data.getUInt8() == 1;
+    if (!spectator)
+    {
+        setPlayerKarts(data, peer);
 
-    std::vector<int> used_id;
-    for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
-    {
-        int id = getReservedId(peer->getPlayerProfiles()[i], i);
-        if (id == -1)
-            break;
-        used_id.push_back(id);
-    }
-    if (used_id.size() != peer->getPlayerProfiles().size())
-    {
+        std::vector<int> used_id;
         for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
-            peer->getPlayerProfiles()[i]->setKartName("");
-        for (unsigned i = 0; i < used_id.size(); i++)
         {
-            RemoteKartInfo& rki = race_manager->getKartInfo(used_id[i]);
-            rki.makeReserved();
+            int id = getReservedId(peer->getPlayerProfiles()[i], i);
+            if (id == -1)
+                break;
+            used_id.push_back(id);
         }
-        Log::info("ServerLobby", "Too many players (%d) try to live join",
-            (int)peer->getPlayerProfiles().size());
-        rejectLiveJoin(peer, BLR_NO_PLACE_FOR_LIVE_JOIN);
-        return;
+        if (used_id.size() != peer->getPlayerProfiles().size())
+        {
+            for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
+                peer->getPlayerProfiles()[i]->setKartName("");
+            for (unsigned i = 0; i < used_id.size(); i++)
+            {
+                RemoteKartInfo& rki = race_manager->getKartInfo(used_id[i]);
+                rki.makeReserved();
+            }
+            Log::info("ServerLobby", "Too many players (%d) try to live join",
+                (int)peer->getPlayerProfiles().size());
+            rejectLiveJoin(peer, BLR_NO_PLACE_FOR_LIVE_JOIN);
+            return;
+        }
+
+        peer->clearAvailableKartIDs();
+        for (int id : used_id)
+        {
+            Log::info("ServerLobby", "%s live joining with reserved kart id %d.",
+                peer->getAddress().toString().c_str(), id);
+            peer->addAvailableKartID(id);
+        }
+    }
+    else
+    {
+        Log::info("ServerLobby", "%s spectating now.",
+            peer->getAddress().toString().c_str());
     }
 
-    peer->clearAvailableKartIDs();
-    for (int id : used_id)
-    {
-        Log::info("ServerLobby", "%s live joining with reserved kart id %d.",
-            peer->getAddress().toString().c_str(), id);
-        peer->addAvailableKartID(id);
-    }
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
     {
@@ -856,9 +866,14 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         World::getWorld()->addReservedKart(id);
         const RemoteKartInfo& rki = race_manager->getKartInfo(id);
         addLiveJoiningKart(id, rki, m_last_live_join_util_ticks);
+        Log::info("ServerLobby", "%s live-joining succeeded with kart id %d.",
+            peer->getAddress().toString().c_str(), id);
     }
-    Log::info("ServerLobby", "%s live-joining succeeded.",
-        peer->getAddress().toString().c_str());
+    if (peer->getAvailableKartIDs().empty())
+    {
+        Log::info("ServerLobby", "%s spectating succeeded.",
+            peer->getAddress().toString().c_str());
+    }
 
     NetworkString* ns = getNetworkString(10);
     ns->setSynchronous(true);
