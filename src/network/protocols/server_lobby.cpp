@@ -573,10 +573,14 @@ void ServerLobby::asynchronousUpdate()
                 std::shared_ptr<NetworkPlayerProfile>& player = players[i];
                 std::shared_ptr<STKPeer> peer = player->getPeer();
                 if (peer)
-                {
                     peer->clearAvailableKartIDs();
+            }
+            for (unsigned i = 0; i < players.size(); i++)
+            {
+                std::shared_ptr<NetworkPlayerProfile>& player = players[i];
+                std::shared_ptr<STKPeer> peer = player->getPeer();
+                if (peer)
                     peer->addAvailableKartID(i);
-                }
             }
             float real_players_count = (float)players.size();
             getHitCaptureLimit(real_players_count);
