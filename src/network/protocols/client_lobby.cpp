@@ -21,6 +21,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/camera.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
@@ -280,14 +281,21 @@ void ClientLobby::addAllPlayers(Event* event)
     // Disable until render gui during loading is bug free
     //StateManager::get()->enterGameState();
 
-    // Live join if state is CONNECTED
+    // Live join or spectate if state is CONNECTED
     if (m_state.load() == CONNECTED)
     {
         World* w = World::getWorld();
         w->setLiveJoinWorld(true);
+        Camera* cam = Camera::getActiveCamera();
         for (unsigned i = 0; i < w->getNumKarts(); i++)
         {
             AbstractKart* k = w->getKart(i);
+            // Change spectating target to first non-eliminated kart
+            if (isSpectator() && cam && !k->isEliminated())
+            {
+                cam->setKart(k);
+                cam = NULL;
+            }
             // The final joining ticks will be set by server later
             if (k->getController()->isLocalPlayerController())
                 k->setLiveJoinKart(std::numeric_limits<int>::max());
@@ -960,7 +968,7 @@ void ClientLobby::backToLobby(Event *event)
     {
     case BLR_NO_GAME_FOR_LIVE_JOIN:
         // I18N: Error message shown if live join failed in network
-        msg = _("No more game is available for live join.");
+        msg = _("No more game is available for live join or spectating.");
         break;
     case BLR_NO_PLACE_FOR_LIVE_JOIN:
         // I18N: Error message shown if live join failed in network
@@ -988,7 +996,7 @@ void ClientLobby::backToLobby(Event *event)
 void ClientLobby::finishedLoadingWorld()
 {
     NetworkString* ns = getNetworkString(1);
-    // Live join if state is CONNECTED
+    // Live join or spectate if state is CONNECTED
     ns->setSynchronous(m_state.load() == CONNECTED);
     ns->addUInt8(LE_CLIENT_LOADED_WORLD);
     sendToServer(ns, true);

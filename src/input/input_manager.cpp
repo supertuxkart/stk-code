@@ -38,6 +38,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
@@ -806,6 +807,28 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             if (pk == NULL)
             {
+                if (auto cl = LobbyProtocol::get<ClientLobby>())
+                {
+                    Camera* cam = Camera::getActiveCamera();
+                    if (cl->isSpectator() && cam)
+                    {
+                        // Network spectating handling
+                        int current_idx = 0;
+                        if (cam->getKart())
+                            current_idx = cam->getKart()->getWorldKartId();
+                        if (action == PA_STEER_LEFT && value == 0)
+                            current_idx = ++current_idx % World::getWorld()->getNumKarts();
+                        else if (action == PA_STEER_RIGHT && value == 0)
+                        {
+                            if (current_idx == 0)
+                                current_idx = World::getWorld()->getNumKarts() - 1;
+                            else
+                                current_idx = --current_idx;
+                        }
+                        cam->setKart(World::getWorld()->getKart(current_idx));
+                        return;
+                    }
+                }
                 Log::error("InputManager::dispatchInput", "Trying to process "
                     "action for an unknown player");
                 return;
