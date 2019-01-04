@@ -838,10 +838,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                 cam->setKart(World::getWorld()->getKart(current_idx));
                                 break;
                             }
-
-                            // This can happen if there is only one active kart
-                            if (current_idx == cam->getKart()->getWorldKartId())
-                                break;
                         }
                         return;
                     }
