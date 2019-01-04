@@ -824,13 +824,14 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         else
                             return;
 
-                        for (int i=0;i<World::getWorld()->getNumKarts();i++)
+                        const int num_karts = World::getWorld()->getNumKarts();
+                        for (int i=0;i<num_karts;i++)
                         {
                             current_idx = up ? current_idx+1 : current_idx-1;
                             // Handle looping
                             if (current_idx == -1)
-                                current_idx = World::getWorld()->getNumKarts() - 1;
-                            else if (current_idx == World::getWorld()->getNumKarts())
+                                current_idx = num_karts - 1;
+                            else if (current_idx == num_karts)
                                 current_idx = 0;
 
                             if (!World::getWorld()->getKart(current_idx)->isEliminated())
