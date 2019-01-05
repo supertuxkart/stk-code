@@ -960,7 +960,20 @@ void ClientLobby::backToLobby(Event *event)
     setup();
     m_auto_started = false;
     m_state.store(CONNECTED);
-    RaceResultGUI::getInstance()->backToLobby();
+
+    RaceEventManager::getInstance()->stop();
+    auto gep = RaceEventManager::getInstance()->getProtocol();
+    if (gep)
+        gep->requestTerminate();
+    auto gp = GameProtocol::lock();
+    if (gp)
+    {
+        auto lock = gp->acquireWorldDeletingMutex();
+        gp->requestTerminate();
+        RaceResultGUI::getInstance()->backToLobby();
+    }
+    else
+        RaceResultGUI::getInstance()->backToLobby();
 
     NetworkString &data = event->data();
     core::stringw msg;
