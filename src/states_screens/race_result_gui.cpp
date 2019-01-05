@@ -1657,6 +1657,16 @@ void RaceResultGUI::displayCTFResults()
                     GUIEngine::getFont()->draw(best_lap_string,
                         core::recti(x, current_y, 0, 0), white_color, false, false,
                         nullptr, true);
+
+                    if (!NetworkConfig::get()->isNetworking())
+                    {
+                        core::stringw best_lap_by = dynamic_cast<LinearWorld*>(World::getWorld())->getFastestLapKartName();
+                        core::stringw best_lab_by_string = _("von %s", best_lap_by);
+                        current_y += int(m_distance_between_meta_rows * 0.6f);
+                        GUIEngine::getFont()->draw(best_lab_by_string,
+                            core::recti(x, current_y, 0, 0), white_color, false, false,
+                            nullptr, true);
+                    }
                 }
             }   // if mode has laps
         }   // if not soccer mode

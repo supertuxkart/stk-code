@@ -46,6 +46,8 @@ private:
     /** The fastest lap time, in ticks of physics dt. */
     int          m_fastest_lap_ticks;
 
+    core::stringw m_fastest_lap_kart_name;
+
     /** The track length returned by Track::getLength() only covers the
      *  distance from start line to finish line, i.e. it does not include
      *  the distance the karts actually start behind the start line (the
@@ -188,6 +190,11 @@ public:
     float getFastestLap() const
     {
         return stk_config->ticks2Time(m_fastest_lap_ticks);
+    }
+
+    stringw getFastestLapKartName() const
+    {
+        return m_fastest_lap_kart_name;
     }
     // ------------------------------------------------------------------------
     /** Network use: get fastest lap in ticks */
