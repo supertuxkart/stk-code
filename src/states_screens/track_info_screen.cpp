@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#define FFA_AI_DISABLED
+
 #include "states_screens/track_info_screen.hpp"
 
 #include "challenges/unlock_manager.hpp"
@@ -92,7 +94,11 @@ void TrackInfoScreen::loadedFromFile()
 void TrackInfoScreen::beforeAddingWidget()
 {
     m_is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+#ifdef FFA_AI_DISABLED
     m_show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES && race_manager->getNumLocalPlayers() > 1;
+#else
+    m_show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES;
+#endif
 
     if (m_is_soccer || m_show_ffa_spinner)
         m_target_type_div->setCollapsed(false, this);
@@ -209,6 +215,9 @@ void TrackInfoScreen::init()
     const int local_players = race_manager->getNumLocalPlayers();
     const bool has_AI =
         (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+#ifdef FFA_AI_DISABLED
+         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+#endif
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          race_manager->hasAI());
@@ -302,8 +311,10 @@ void TrackInfoScreen::init()
         m_target_value_spinner->setVisible(UserConfigParams::m_use_ffa_mode);
 
         // TODO: remove if FFA AI is added
+#ifdef FFA_AI_DISABLED
         m_ai_kart_label->setVisible(!UserConfigParams::m_use_ffa_mode);
         m_ai_kart_spinner->setVisible(!UserConfigParams::m_use_ffa_mode);
+#endif
     }
 
     // Record race or not
@@ -456,7 +467,9 @@ void TrackInfoScreen::onEnterPressedInternal()
 
 	if (enable_ffa)
 	{
+#ifdef FFA_AI_DISABLED
 		num_ai = 0;
+#endif
 		race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
         race_manager->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
 	}
@@ -529,16 +542,20 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
                 m_target_value_label->setVisible(true);
                 m_target_value_spinner->setVisible(true);
 
-                // disable AI karts for FFA, because they are not implemented
+#ifdef FFA_AI_DISABLED
                 m_ai_kart_spinner->setVisible(false);
                 m_ai_kart_label->setVisible(false);
+#endif
+
             }
             else
             {
                 m_target_value_label->setVisible(false);
                 m_target_value_spinner->setVisible(false);
+#ifdef FFA_AI_DISABLED
                 m_ai_kart_spinner->setVisible(true);
                 m_ai_kart_label->setVisible(true);
+#endif
             }
         }
     }
