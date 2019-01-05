@@ -910,39 +910,48 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
 void ServerLobby::update(int ticks)
 {
     World* w = World::getWorld();
+    bool world_started = m_state.load() >= WAIT_FOR_WORLD_LOADED &&
+        m_state.load() <= RACING && m_server_has_loaded_world.load();
+    bool all_players_in_world_disconnected = (w != NULL && world_started);
     int sec = ServerConfig::m_kick_idle_player_seconds;
-    if (sec > 0 && m_state.load() >= WAIT_FOR_WORLD_LOADED &&
-        m_state.load() <= RACING && m_server_has_loaded_world.load() == true)
+    if (world_started)
     {
         for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
         {
             const RemoteKartInfo& rki = race_manager->getKartInfo(i);
             std::shared_ptr<NetworkPlayerProfile> player =
                 rki.getNetworkPlayerProfile().lock();
-            if (!player)
+            if (player)
+            {
+                if (w)
+                    all_players_in_world_disconnected = false;
+            }
+            else
                 continue;
             auto peer = player->getPeer();
-            if (peer && peer->idleForSeconds() > sec)
+            if (!peer)
+                continue;
+
+            if (peer->idleForSeconds() > 60 && w &&
+                w->getKart(i)->isEliminated())
             {
-                if (w && w->getKart(i)->isEliminated())
-                {
-                    // Remove loading world too long live join peer
-                    Log::info("ServerLobby", "%s hasn't live-joined within"
-                        " %d seconds, remove it.",
-                        peer->getAddress().toString().c_str(), sec);
-                    RemoteKartInfo& rki = race_manager->getKartInfo(i);
-                    rki.makeReserved();
+                // Remove loading world too long (60 seconds) live join peer
+                Log::info("ServerLobby", "%s hasn't live-joined within"
+                    " 60 seconds, remove it.",
+                    peer->getAddress().toString().c_str());
+                RemoteKartInfo& rki = race_manager->getKartInfo(i);
+                rki.makeReserved();
+                continue;
+            }
+            if (sec > 0 && peer->idleForSeconds() > sec &&
+                !peer->isDisconnected() && NetworkConfig::get()->isWAN())
+            {
+                if (w && w->getKart(i)->hasFinishedRace())
                     continue;
-                }
-                if (!peer->isDisconnected() && NetworkConfig::get()->isWAN())
-                {
-                    if (w && w->getKart(i)->hasFinishedRace())
-                        continue;
-                    Log::info("ServerLobby", "%s has been idle for more than"
-                        " %d seconds, kick.",
-                        peer->getAddress().toString().c_str(), sec);
-                    peer->kick();
-                }
+                Log::info("ServerLobby", "%s has been idle for more than"
+                    " %d seconds, kick.",
+                    peer->getAddress().toString().c_str(), sec);
+                peer->kick();
             }
         }
     }
@@ -977,12 +986,21 @@ void ServerLobby::update(int ticks)
     STKHost::get()->updatePlayers();
     if ((m_state.load() > WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()) &&
-        STKHost::get()->getPlayersInGame() == 0 &&
+        (STKHost::get()->getPlayersInGame() == 0 ||
+        all_players_in_world_disconnected) &&
         NetworkConfig::get()->getServerIdFile().empty())
     {
         if (RaceEventManager::getInstance() &&
             RaceEventManager::getInstance()->isRunning())
         {
+            // Send a notification to all players who may have start live join
+            // or spectate to go back to lobby
+            NetworkString* back_to_lobby = getNetworkString(2);
+            back_to_lobby->setSynchronous(true);
+            back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
+            sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
+            delete back_to_lobby;
+
             RaceEventManager::getInstance()->stop();
             RaceEventManager::getInstance()->getProtocol()->requestTerminate();
             GameProtocol::lock()->requestTerminate();
@@ -996,7 +1014,7 @@ void ServerLobby::update(int ticks)
         m_state.load() == SELECTING &&
         STKHost::get()->getPlayersInGame() == 1)
     {
-        NetworkString* back_lobby = getNetworkString(1);
+        NetworkString* back_lobby = getNetworkString(2);
         back_lobby->setSynchronous(true);
         back_lobby->addUInt8(LE_BACK_LOBBY)
             .addUInt8(BLR_ONE_PLAYER_IN_RANKED_MATCH);
@@ -1059,7 +1077,7 @@ void ServerLobby::update(int ticks)
         {
             // Send a notification to all clients to exit
             // the race result screen
-            NetworkString* back_to_lobby = getNetworkString(1);
+            NetworkString* back_to_lobby = getNetworkString(2);
             back_to_lobby->setSynchronous(true);
             back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
             sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
