@@ -174,10 +174,22 @@ void NetworkingLobby::init()
     m_min_start_game_players = 0;
     m_timeout_message->setVisible(false);
 
+    m_start_text = _("Start race");
+    //I18N: In the networking lobby, ready button is to allow player to tell
+    //server that he is ready for next game for owner less server
+    m_ready_text = _("Ready");
+    //I18N: Live join is displayed in networking lobby to allow players
+    //to join the current started in-progress game
+    m_live_join_text = _("Live join");
+    //I18N: In networking lobby to configuration server settings
+    m_configuration_text = _("Configuration");
+    //I18N: Spectate is displayed in networking lobby to allow players
+    //to join the current started in-progress game
+    m_spectate_text = _("Spectate");
+
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
-    m_start_button->setLabel(_("Start race"));
     m_start_button->setVisible(false);
     m_config_button->setVisible(false);
     m_state = LS_CONNECTING;
@@ -255,7 +267,16 @@ void NetworkingLobby::onUpdate(float delta)
     if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
 
+    if (m_has_auto_start_in_server)
+    {
+        m_start_button->setLabel(m_ready_text);
+    }
+    else
+        m_start_button->setLabel(m_start_text);
+
     m_start_button->setVisible(false);
+
+    m_config_button->setLabel(m_configuration_text);
     m_config_button->setVisible(false);
     m_config_button->setImage(m_config_texture);
     m_client_live_joinable = false;
@@ -354,12 +375,8 @@ void NetworkingLobby::onUpdate(float delta)
         if (m_client_live_joinable)
         {
             m_start_button->setVisible(true);
-            //I18N: Live join is displayed in networking lobby to allow players
-            //to join the current started in-progress game
-            m_start_button->setLabel(_("Live join"));
-            //I18N: Spectate is displayed in networking lobby to allow players
-            //to join the current started in-progress game
-            m_config_button->setLabel(_("Spectate"));
+            m_start_button->setLabel(m_live_join_text);
+            m_config_button->setLabel(m_spectate_text);
             m_config_button->setImage(m_spectate_texture);
             m_config_button->setVisible(true);
         }
@@ -714,9 +731,6 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
     if (min_players == 0 || start_timeout == 0.0f)
         return;
 
-    //I18N: In the networking lobby, ready button is to allow player to tell
-    //server that he is ready for next game for owner less server
-    m_start_button->setLabel(_("Ready"));
     m_has_auto_start_in_server = true;
     m_min_start_game_players = grand_prix_started ? 0 : min_players;
     m_start_timeout = start_timeout;
