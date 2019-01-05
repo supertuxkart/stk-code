@@ -3,7 +3,8 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Balázs Úr <ur.balazs@fsf.hu>, 2018
+# Balázs Meskó <meskobalazs@gmail.com>, 2019
+# Balázs Úr <ur.balazs@fsf.hu>, 2018-2019
 # Balázs Úr <ur.balazs@fsf.hu>, 2016-2018
 # Bangó Máté <matepenpals@hotmail.com>, 2016
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
@@ -12,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-05 02:42+0800\n"
-"PO-Revision-Date: 2019-01-04 18:50+0000\n"
+"POT-Creation-Date: 2019-01-06 01:29+0800\n"
+"PO-Revision-Date: 2019-01-05 17:31+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -1225,7 +1226,7 @@ msgstr "Gokart osztályok"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Multiplayer"
-msgstr ""
+msgstr "Többszemélyes"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 msgid "Start the tutorial"
@@ -1249,7 +1250,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "A robbanóolaj begyűjtése a megfelelő billentyű vagy gomb megnyomásával lehetővé teszi a sebességlöketeket, amikor csak szeretnéd. A robbanóolaj aktuális szintjét a verseny képernyőjének jobb alsó sarkán lévő műszeren láthatod."
+msgstr "A nitró begyűjtése a megfelelő billentyű vagy gomb megnyomásával lehetővé teszi a sebességlöketeket, amikor csak szeretnéd. A nitró aktuális szintjét a verseny képernyőjének jobb alsó sarkán lévő műszeren láthatod."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1270,7 +1271,7 @@ msgstr "Egy különleges billentyű vagy gomb lenyomásával farolhatsz. Az egym
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in the Options menu"
-msgstr ""
+msgstr "* A jelenlegi billentyűkiosztások a Beállítások menüben tekinthetők meg vagy módosíthatók"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
@@ -1329,7 +1330,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr ""
+msgstr "* Ezen játékmódok közül a legtöbb játszható nagydíj módban is: ahelyett, hogy egy önálló versenyt futnál, többet is játszhatsz egyhuzamban. Minél jobb a helyezésed, annál több pontot kapsz. A végén a legtöbb pontot elérő játékos nyeri a serleget."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
@@ -1374,7 +1375,7 @@ msgstr "Ejtőernyő - lelassítja az összes olyan gokartot, amelyek jobb helyen
 msgid ""
 "Swapper - gift boxes are transformed into bananas, nitro cans into "
 "bubblegums, and vice versa for a short time."
-msgstr "Kicserélő – az ajándékdobozok banánokká, a robbanóolajos kannák rágógumikká változnak egy rövid ideig és fordítva."
+msgstr "Kicserélő – az ajándékdobozok banánokká, a nitrós kannák rágógumikká változnak egy rövid ideig és fordítva."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1476,7 +1477,7 @@ msgstr "Végsebesség – minél magasabb, annál gyorsabban tud menni a gokart.
 msgid ""
 "Nitro consumption - the lower it is, the more speed you can get from a can "
 "of nitro. The lighter the kart, the lower its nitro consumption."
-msgstr "Robbanóolaj-fogyasztás – minél alacsonyabb, annál több sebességet kaphatsz egy kanna robbanóolajtól. Minél könnyebb a gokart, annál alacsonyabb a robbanóolaj-fogyasztása."
+msgstr "Nitrófogyasztás – minél alacsonyabb, annál több sebességet kaphatsz egy kanna nitrótól. Minél könnyebb a gokart, annál alacsonyabb a nitrófogyasztása."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1645,7 +1646,7 @@ msgstr "Kiszolgáló létrehozása"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:178
+#: src/states_screens/online/networking_lobby.cpp:191
 msgid "Lobby"
 msgstr "Váró"
 
@@ -1656,14 +1657,16 @@ msgstr "Küldés"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:180
+#: src/states_screens/online/networking_lobby.cpp:177
 msgid "Start race"
 msgstr "Verseny indítása"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
+#. I18N: In networking lobby to configuration server settings
+#: src/states_screens/online/networking_lobby.cpp:185
 msgid "Configuration"
-msgstr ""
+msgstr "Beállítás"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -2496,7 +2499,7 @@ msgstr "Gyorsulás"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:142
 msgid "Nitro efficiency"
-msgstr "Robbanóolaj-hatékonyság"
+msgstr "Nitróhatékonyság"
 
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
@@ -2504,7 +2507,7 @@ msgstr "Robbanóolaj-hatékonyság"
 #: src/guiengine/widgets/player_kart_widget.cpp:759
 #: src/karts/controller/local_player_controller.cpp:441
 #: src/karts/controller/player_controller.cpp:404
-#: src/network/protocols/client_lobby.cpp:707
+#: src/network/protocols/client_lobby.cpp:711
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3143,12 +3146,12 @@ msgstr "Bal ujj le"
 msgid "Left thumb up"
 msgstr "Bal ujj fel"
 
-#: src/input/input_manager.cpp:886
+#: src/input/input_manager.cpp:887
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s” mellőzése: korábban kellett csatlakoznod a játékhoz!"
 
-#: src/input/input_manager.cpp:916
+#: src/input/input_manager.cpp:917
 msgid "Only the Game Master may act at this point!"
 msgstr "Csak a játékmester cselekedhet ezen a helyen!"
 
@@ -3198,6 +3201,12 @@ msgstr "Megnyerted a versenyt!"
 #: src/karts/kart.cpp:1017
 msgid "You finished the race!"
 msgstr "Befejezted a versenyt!"
+
+#. I18N: Message shown in game to tell player left the game in network
+#: src/karts/kart_rewinder.cpp:117
+#, c-format
+msgid "%s left the game."
+msgstr ""
 
 #: src/main.cpp:1802
 msgid ""
@@ -3320,30 +3329,30 @@ msgstr "Kidobtak a kiszolgálóról."
 
 #: src/network/protocols/client_lobby.cpp:94
 #: src/network/protocols/client_lobby.cpp:231
-#: src/network/protocols/client_lobby.cpp:743
+#: src/network/protocols/client_lobby.cpp:747
 msgid "Bad network connection is detected."
 msgstr "Rossz hálózati kapcsolat észlelhető."
 
-#: src/network/protocols/client_lobby.cpp:520
+#: src/network/protocols/client_lobby.cpp:524
 #, c-format
 msgid "%s disconnected."
 msgstr "%s leszakadt."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:548
+#: src/network/protocols/client_lobby.cpp:552
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Nyomj rá a játékos nevére a listában a játékoskezeléshez és a rangsor-információkhoz."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:587
+#: src/network/protocols/client_lobby.cpp:591
 #, c-format
 msgid "Server name: %s"
 msgstr "Kiszolgáló neve: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:595
+#: src/network/protocols/client_lobby.cpp:599
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1642
 #, c-format
@@ -3351,20 +3360,20 @@ msgid "Difficulty: %s"
 msgstr "Nehézség: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:600
+#: src/network/protocols/client_lobby.cpp:604
 #, c-format
 msgid "Max players: %d"
 msgstr "Legtöbb játékos: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:611
+#: src/network/protocols/client_lobby.cpp:615
 #: src/states_screens/dialogs/server_info_dialog.cpp:90
 #, c-format
 msgid "Game mode: %s"
 msgstr "Játékmód: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:624
+#: src/network/protocols/client_lobby.cpp:628
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
 #: src/states_screens/track_info_screen.cpp:166
@@ -3372,7 +3381,7 @@ msgid "Time limit"
 msgstr "Időkorlát"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:625
+#: src/network/protocols/client_lobby.cpp:629
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/track_info_screen.cpp:167
@@ -3380,85 +3389,85 @@ msgid "Goals limit"
 msgstr "Gól korlát"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:629
+#: src/network/protocols/client_lobby.cpp:633
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Foci játéktípus: %s"
 
-#: src/network/protocols/client_lobby.cpp:639
+#: src/network/protocols/client_lobby.cpp:643
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Nagydíj állapota: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:735
+#: src/network/protocols/client_lobby.cpp:739
 msgid "All players joined red or blue team."
 msgstr "Az összes játékos csatlakozott a piros vagy a kék csapathoz."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:756
+#: src/network/protocols/client_lobby.cpp:760
 msgid "You are now the owner of server."
 msgstr "Most te vagy a kiszolgáló tulajdonosa."
 
-#: src/network/protocols/client_lobby.cpp:794
+#: src/network/protocols/client_lobby.cpp:798
 msgid "Connection refused: Server is busy."
 msgstr "Kapcsolódás elutasítva: a kiszolgáló foglalt."
 
-#: src/network/protocols/client_lobby.cpp:798
+#: src/network/protocols/client_lobby.cpp:802
 msgid "Connection refused: You are banned from the server."
 msgstr "Kapcsolódás elutasítva: kitiltottak a kiszolgálóról."
 
-#: src/network/protocols/client_lobby.cpp:802
+#: src/network/protocols/client_lobby.cpp:806
 msgid "Connection refused: Server password is incorrect."
 msgstr "Kapcsolódás elutasítva: a kiszolgáló jelszava helytelen."
 
-#: src/network/protocols/client_lobby.cpp:806
+#: src/network/protocols/client_lobby.cpp:810
 msgid "Connection refused: Game data is incompatible."
 msgstr "Kapcsolódás elutasítva: a játékadatok nem megfelelőek."
 
-#: src/network/protocols/client_lobby.cpp:810
+#: src/network/protocols/client_lobby.cpp:814
 msgid "Connection refused: Server is full."
 msgstr "Kapcsolódás elutasítva: a kiszolgáló megtelt."
 
-#: src/network/protocols/client_lobby.cpp:814
+#: src/network/protocols/client_lobby.cpp:818
 msgid "Connection refused: Invalid player connecting."
 msgstr "Kapcsolódás elutasítva: érvénytelen játékos kapcsolódás."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:971
+#: src/network/protocols/client_lobby.cpp:992
 msgid "The game has ended, you can't live join or spectate anymore."
-msgstr ""
+msgstr "A játék befejeződött, nem tudsz azonnal csatlakozni vagy megfigyelni többé."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:975
+#: src/network/protocols/client_lobby.cpp:996
 msgid "No remaining place in the arena - live join disabled."
-msgstr ""
+msgstr "Nincs több hely az arénában – az azonnali csatlakozás le van tiltva."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:979
+#: src/network/protocols/client_lobby.cpp:1000
 msgid "Only 1 player remaining, returning to lobby."
-msgstr ""
+msgstr "Csak 1 játékos van hátra, visszatérés a váróba."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1101
+#: src/network/protocols/client_lobby.cpp:1122
 #, c-format
 msgid "%s joined the red team."
-msgstr ""
+msgstr "%s csatlakozott a piros csapathoz."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1107
+#: src/network/protocols/client_lobby.cpp:1128
 #, c-format
 msgid "%s joined the blue team."
-msgstr ""
+msgstr "%s csatlakozott a kék csapathoz."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1113
+#: src/network/protocols/client_lobby.cpp:1134
 #, c-format
 msgid "%s joined the game."
-msgstr ""
+msgstr "%s csatlakozott a játékhoz."
 
 #: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
@@ -4211,44 +4220,44 @@ msgstr "Nagyon alacsony"
 #: src/states_screens/ghost_replay_selection.cpp:154
 msgctxt "column_name"
 msgid "Reverse"
-msgstr ""
+msgstr "Fordítva"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:156
 #: src/states_screens/online/server_selection.cpp:119
 msgctxt "column_name"
 msgid "Difficulty"
-msgstr ""
+msgstr "Nehézség"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
 #: src/states_screens/ghost_replay_selection.cpp:158
 msgctxt "column_name"
 msgid "Laps"
-msgstr ""
+msgstr "Körök"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
 msgctxt "column_name"
 msgid "Time"
-msgstr ""
+msgstr "Idő"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
 #: src/states_screens/ghost_replay_selection.cpp:160
 msgctxt "column_name"
 msgid "Kart"
-msgstr ""
+msgstr "Gokart"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
 #: src/states_screens/ghost_replay_selection.cpp:161
 msgctxt "column_name"
 msgid "User"
-msgstr ""
+msgstr "Felhasználó"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
 #: src/states_screens/ghost_replay_selection.cpp:165
 msgctxt "column_name"
 msgid "Version"
-msgstr ""
+msgstr "Verzió"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
 #: src/states_screens/dialogs/message_dialog.cpp:129
@@ -4280,12 +4289,12 @@ msgstr "Csapatváltás"
 #. I18N: In the network user dialog
 #: src/states_screens/dialogs/network_user_dialog.cpp:114
 msgid "Enable handicap"
-msgstr ""
+msgstr "Hátrány engedélyezése"
 
 #. I18N: In the network user dialog
 #: src/states_screens/dialogs/network_user_dialog.cpp:119
 msgid "Disable handicap"
-msgstr ""
+msgstr "Hátrány letiltása"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -4294,6 +4303,12 @@ msgstr ""
 #, c-format
 msgid "Fetching ranking info for %s"
 msgstr "%s rangsor-információinak lekérése"
+
+#. I18N: show in race paused dialog in network to allow user to go
+#. back to lobby to end spectating (for example)
+#: src/states_screens/dialogs/race_paused_dialog.cpp:273
+msgid "Back to lobby"
+msgstr ""
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -4335,7 +4350,7 @@ msgstr "Szükséges idő: %i"
 #: src/states_screens/dialogs/select_challenge.cpp:63
 #, c-format
 msgid "Required Nitro Points: %i"
-msgstr "Szükséges robbanóolajpontok: %i"
+msgstr "Szükséges nitrópontok: %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:69
 #, c-format
@@ -4344,7 +4359,7 @@ msgstr "MI gokartok száma: %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:149
 msgid "Nitro challenge"
-msgstr "Robbanóolaj kihívás"
+msgstr "Nitró kihívás"
 
 #: src/states_screens/dialogs/select_challenge.cpp:151
 #: src/states_screens/race_setup_screen.cpp:136
@@ -4362,7 +4377,7 @@ msgstr "Csata mód"
 #: src/states_screens/dialogs/server_info_dialog.cpp:100
 #, c-format
 msgid "Current track: %s"
-msgstr ""
+msgstr "Jelenlegi pálya: %s"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:111
 #: src/states_screens/race_gui_overworld.cpp:148
@@ -4537,13 +4552,13 @@ msgstr "Feloldottad ezt a nagydíjat: %0"
 #: src/states_screens/ghost_replay_selection.cpp:152
 msgctxt "column_name"
 msgid "Track"
-msgstr ""
+msgstr "Pálya"
 
 #: src/states_screens/ghost_replay_selection.cpp:163
 #: src/states_screens/online/server_selection.cpp:118
 msgctxt "column_name"
 msgid "Players"
-msgstr ""
+msgstr "Játékosok"
 
 #: src/states_screens/gp_info_screen.cpp:71
 msgid "Default"
@@ -4616,7 +4631,7 @@ msgid "Locked"
 msgstr "Zárolt"
 
 #: src/states_screens/kart_selection.cpp:985
-#: src/states_screens/online/networking_lobby.cpp:414
+#: src/states_screens/online/networking_lobby.cpp:436
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -4626,20 +4641,20 @@ msgstr "Mindenki:\nNyomd meg a „kiválasztás\" gombot a csatlakozáshoz"
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
-msgstr ""
+msgstr "Nem játszhatsz az interneten internet-hozzáférés nélkül. Ha az interneten szeretnél játszani, akkor menj a beállítások menübe, és jelöld be a „Kapcsolódás az internethez” négyzetet."
 
 #: src/states_screens/main_menu_screen.cpp:507
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
-msgstr ""
+msgstr "Nem tölthetsz le kiegészítőket internet-hozzáférés nélkül. Ha kiegészítőket szeretnél letölteni, akkor menj a beállítások menübe, és jelöld be a „Kapcsolódás az internethez” négyzetet."
 
 #: src/states_screens/main_menu_screen.cpp:515
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr ""
+msgstr "Nem tölthetsz le kiegészítőket internet-hozzáférés nélkül. Ha kiegészítőket szeretnél letölteni, akkor menj a beállítások menübe, és jelöld be a „Kapcsolódás az internethez” négyzetet.\n\nAzonban törölheted a már letöltött kiegészítőket."
 
 #: src/states_screens/main_menu_screen.cpp:550
 msgid "The add-ons module is currently disabled in the Options screen"
@@ -4671,12 +4686,30 @@ msgstr "A névnek 4 és 30 karakter közötti hosszúnak kell lennie!"
 msgid "Incorrect characters in password!"
 msgstr "Helytelen karakterek a jelszóban!"
 
-#: src/states_screens/online/networking_lobby.cpp:212
-#: src/states_screens/online/networking_lobby.cpp:691
+#. I18N: In the networking lobby, ready button is to allow player to tell
+#. server that he is ready for next game for owner less server
+#: src/states_screens/online/networking_lobby.cpp:180
+msgid "Ready"
+msgstr "Kész"
+
+#. I18N: Live join is displayed in networking lobby to allow players
+#. to join the current started in-progress game
+#: src/states_screens/online/networking_lobby.cpp:183
+msgid "Live join"
+msgstr "Azonnali csatlakozás"
+
+#. I18N: Spectate is displayed in networking lobby to allow players
+#. to join the current started in-progress game
+#: src/states_screens/online/networking_lobby.cpp:188
+msgid "Spectate"
+msgstr "Megfigyelés"
+
+#: src/states_screens/online/networking_lobby.cpp:224
+#: src/states_screens/online/networking_lobby.cpp:713
 msgid "Chat is disabled, enable in options menu."
 msgstr "A csevegés le van tiltva, engedélyezd a beállítások menüben."
 
-#: src/states_screens/online/networking_lobby.cpp:273
+#: src/states_screens/online/networking_lobby.cpp:294
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Váró (ping: %d ms)"
@@ -4684,52 +4717,40 @@ msgstr "Váró (ping: %d ms)"
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:293
+#: src/states_screens/online/networking_lobby.cpp:314
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
-msgstr ""
+msgstr "Várj a jelenlegi játék (%s) befejezésére. A becsült hátralévő idő: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:301
+#: src/states_screens/online/networking_lobby.cpp:322
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
-msgstr ""
+msgstr "Várj a jelenlegi játék befejezésére. A becsült hátralévő idő: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:313
+#: src/states_screens/online/networking_lobby.cpp:334
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
-msgstr ""
+msgstr "Várj a jelenlegi játék (%s) befejezésére. A becsült állapot: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:322
+#: src/states_screens/online/networking_lobby.cpp:343
 msgid "Please wait for the current game's end, estimated progress: %d%."
-msgstr ""
+msgstr "Várj a jelenlegi játék befejezésére. A becsült állapot: %d%. "
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:330
+#: src/states_screens/online/networking_lobby.cpp:351
 msgid "Please wait for the current game's end."
-msgstr ""
+msgstr "Várj a jelenlegi játék befejezésére."
 
-#. I18N: Live join is displayed in networking lobby to allow players
-#. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:359
-msgid "Live join"
-msgstr ""
-
-#. I18N: Spectate is displayed in networking lobby to allow players
-#. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:362
-msgid "Spectate"
-msgstr ""
-
-#: src/states_screens/online/networking_lobby.cpp:385
+#: src/states_screens/online/networking_lobby.cpp:407
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4738,7 +4759,7 @@ msgstr[1] "A játék akkor indul, ha több mint %d játékos van."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:399
+#: src/states_screens/online/networking_lobby.cpp:421
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -4747,20 +4768,14 @@ msgid_plural ""
 msgstr[0] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
 msgstr[1] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
 
-#: src/states_screens/online/networking_lobby.cpp:432
+#: src/states_screens/online/networking_lobby.cpp:454
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Kapcsolódás a kiszolgálóhoz: %s"
 
-#: src/states_screens/online/networking_lobby.cpp:437
+#: src/states_screens/online/networking_lobby.cpp:459
 msgid "Finding a quick play server"
 msgstr "Gyors játékú kiszolgáló keresése"
-
-#. I18N: In the networking lobby, ready button is to allow player to tell
-#. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:719
-msgid "Ready"
-msgstr "Kész"
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:156
@@ -4890,25 +4905,25 @@ msgstr "Az Internet-hozzáférés le van tiltva, kérlek engedélyezd a beállí
 #: src/states_screens/online/server_selection.cpp:116
 msgctxt "column_name"
 msgid "Name"
-msgstr ""
+msgstr "Név"
 
 #: src/states_screens/online/server_selection.cpp:117
 msgctxt "column_name"
 msgid "Game mode"
-msgstr ""
+msgstr "Játékmód"
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
 #: src/states_screens/online/server_selection.cpp:124
 msgctxt "column_name"
 msgid "Owner"
-msgstr ""
+msgstr "Tulajdonos"
 
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/online/server_selection.cpp:126
 msgctxt "column_name"
 msgid "Distance (km)"
-msgstr ""
+msgstr "Távolság (km)"
 
 #. I18N: In server selection screen, unknown distance to server
 #: src/states_screens/online/server_selection.cpp:240
@@ -5027,7 +5042,7 @@ msgstr "Tüzelés"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:277
 msgid "Nitro"
-msgstr "Robbanóolaj"
+msgstr "Nitró"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:283
@@ -5273,7 +5288,7 @@ msgstr "Várakozás a többiekre"
 #. I18N: Shown waiting for the server in network if live join or specatate
 #: src/states_screens/race_gui_base.cpp:78
 msgid "Waiting for the server"
-msgstr ""
+msgstr "Várakozás a kiszolgálóra"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
@@ -5283,7 +5298,7 @@ msgstr "szerző:"
 
 #: src/states_screens/race_gui_base.cpp:675
 msgid "Collect nitro!"
-msgstr "Gyűjts robbanóolajat!"
+msgstr "Gyűjts nitrót!"
 
 #: src/states_screens/race_gui_base.cpp:677
 msgid "Follow the leader!"
@@ -5496,11 +5511,11 @@ msgstr "Nézz hátra: <%s>. Tüzelj a fegyverrel magad mögé! Nyomd meg: <%s>, 
 #: ../stk-assets/tracks/tutorial/triggers.as:54
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr "Használd az összegyűjtött robbanóolajat, nyomd meg ezt: <%s>!"
+msgstr "Használd az összegyűjtött nitrót, nyomd meg ezt: <%s>!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:58
 msgid "Collect nitro bottles (we will use them after the curve)."
-msgstr "Gyűjts robbanóolajos kannákat (a kanyar után fogjuk használni)."
+msgstr "Gyűjts nitrós kannákat (a kanyar után fogjuk használni)."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:63
 #, c-format
@@ -5534,7 +5549,7 @@ msgstr "Gyorsítás: <%s>, illetve kanyarodás: <%s> és <%s>."
 
 #: ../stk-assets/tracks/tutorial/triggers.as:59
 msgid "Collect nitro bottles (we will use them after the curve)"
-msgstr "Gyűjts robbanóolajos kannákat (a kanyar után fogjuk használni)."
+msgstr "Gyűjts nitrós kannákat (a kanyar után fogjuk használni)."
 
 #: ../stk-assets/tracks/tutorial/triggers.as:64
 #, c-format

@@ -8,15 +8,15 @@
 # GreekLUG <info@greeklug.gr>, 2016
 # Grigoris Pavlakis <morpheus@greeklug.gr>, 2016
 # Marinus Savoritias, 2018
-# Mensious Mensious <ektoras@tutanota.com>, 2018
+# Mensious Mensious <ektoras@tutanota.com>, 2018-2019
 # Vangelis Skarmoutsos <skarmoutsosv@gmail.com>, 2015-2017
 # Wasilis Mandratzis-Walz, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-05 02:42+0800\n"
-"PO-Revision-Date: 2019-01-04 18:50+0000\n"
+"POT-Creation-Date: 2019-01-06 01:29+0800\n"
+"PO-Revision-Date: 2019-01-05 17:31+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Greek (http://www.transifex.com/supertuxkart/supertuxkart/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -1228,7 +1228,7 @@ msgstr "Κατηγορίες Kart"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Multiplayer"
-msgstr ""
+msgstr "Αγώνες με άλλους παίκτες"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 msgid "Start the tutorial"
@@ -1648,7 +1648,7 @@ msgstr "Δημιουργία server"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:178
+#: src/states_screens/online/networking_lobby.cpp:191
 msgid "Lobby"
 msgstr "Δωμάτιο αναμονής"
 
@@ -1659,12 +1659,14 @@ msgstr "Αποστολή"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:180
+#: src/states_screens/online/networking_lobby.cpp:177
 msgid "Start race"
 msgstr "Εκκίνιση αγώνα"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
+#. I18N: In networking lobby to configuration server settings
+#: src/states_screens/online/networking_lobby.cpp:185
 msgid "Configuration"
 msgstr "Ρυθμίσεις server"
 
@@ -2507,7 +2509,7 @@ msgstr "Αποδοτικότητα Nitro"
 #: src/guiengine/widgets/player_kart_widget.cpp:759
 #: src/karts/controller/local_player_controller.cpp:441
 #: src/karts/controller/player_controller.cpp:404
-#: src/network/protocols/client_lobby.cpp:707
+#: src/network/protocols/client_lobby.cpp:711
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -3146,12 +3148,12 @@ msgstr "Αριστερός αντίχειρας κάτω"
 msgid "Left thumb up"
 msgstr "Αριστερός αντίχειρας επάνω"
 
-#: src/input/input_manager.cpp:886
+#: src/input/input_manager.cpp:887
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Αγνόηση '%s'. Έπρεπε να συνδεθείς νωρίτερα για να παίξεις!"
 
-#: src/input/input_manager.cpp:916
+#: src/input/input_manager.cpp:917
 msgid "Only the Game Master may act at this point!"
 msgstr "Μόνο ο υπεύθυνος του παιχνιδιού μπορεί να δράσει σε αυτό το σημείο!"
 
@@ -3201,6 +3203,12 @@ msgstr "Κέρδισες τον αγώνα!"
 #: src/karts/kart.cpp:1017
 msgid "You finished the race!"
 msgstr "Ολοκλήρωσες τον αγώνα!"
+
+#. I18N: Message shown in game to tell player left the game in network
+#: src/karts/kart_rewinder.cpp:117
+#, c-format
+msgid "%s left the game."
+msgstr ""
 
 #: src/main.cpp:1802
 msgid ""
@@ -3323,30 +3331,30 @@ msgstr "Σας διώξανε από τον server."
 
 #: src/network/protocols/client_lobby.cpp:94
 #: src/network/protocols/client_lobby.cpp:231
-#: src/network/protocols/client_lobby.cpp:743
+#: src/network/protocols/client_lobby.cpp:747
 msgid "Bad network connection is detected."
 msgstr "Ανιχνεύθηκε κακή σύνδεση στο internet. "
 
-#: src/network/protocols/client_lobby.cpp:520
+#: src/network/protocols/client_lobby.cpp:524
 #, c-format
 msgid "%s disconnected."
 msgstr "%s Αποσυνδέθηκε"
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:548
+#: src/network/protocols/client_lobby.cpp:552
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Πατήστε ένα όνομα παίκτη απο την λίστα για τις ρυθμισείς και πληροφορίες κατάταξης."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:587
+#: src/network/protocols/client_lobby.cpp:591
 #, c-format
 msgid "Server name: %s"
 msgstr "Όνομα server: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:595
+#: src/network/protocols/client_lobby.cpp:599
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
 #: src/states_screens/race_result_gui.cpp:1642
 #, c-format
@@ -3354,20 +3362,20 @@ msgid "Difficulty: %s"
 msgstr "Δυσκολία: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:600
+#: src/network/protocols/client_lobby.cpp:604
 #, c-format
 msgid "Max players: %d"
 msgstr "Μέγιστος αριθμός παίκτων: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:611
+#: src/network/protocols/client_lobby.cpp:615
 #: src/states_screens/dialogs/server_info_dialog.cpp:90
 #, c-format
 msgid "Game mode: %s"
 msgstr "Κατηγορία παιχνιδιού: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:624
+#: src/network/protocols/client_lobby.cpp:628
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
 #: src/states_screens/track_info_screen.cpp:166
@@ -3375,7 +3383,7 @@ msgid "Time limit"
 msgstr "Όριο χρόνου"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:625
+#: src/network/protocols/client_lobby.cpp:629
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/track_info_screen.cpp:167
@@ -3383,85 +3391,85 @@ msgid "Goals limit"
 msgstr "Όριο Γκολ"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:629
+#: src/network/protocols/client_lobby.cpp:633
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Κατηγορία παιχνιδιού ποδοσφαίρου: %s"
 
-#: src/network/protocols/client_lobby.cpp:639
+#: src/network/protocols/client_lobby.cpp:643
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Πρόοδος Πρωταθλήματος: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:735
+#: src/network/protocols/client_lobby.cpp:739
 msgid "All players joined red or blue team."
 msgstr "Όλοι οι παίκτες μπήκανε στην κόκκινη ή την μπλε ομάδα."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:756
+#: src/network/protocols/client_lobby.cpp:760
 msgid "You are now the owner of server."
 msgstr "Είσαι πλέον ο ιδιοκτήτης του server."
 
-#: src/network/protocols/client_lobby.cpp:794
+#: src/network/protocols/client_lobby.cpp:798
 msgid "Connection refused: Server is busy."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι απασχολημένος"
 
-#: src/network/protocols/client_lobby.cpp:798
+#: src/network/protocols/client_lobby.cpp:802
 msgid "Connection refused: You are banned from the server."
 msgstr "Η σύνδεση απορρίφθηκε: Σε έχουν μπλοκάρει σε αυτόν τον server."
 
-#: src/network/protocols/client_lobby.cpp:802
+#: src/network/protocols/client_lobby.cpp:806
 msgid "Connection refused: Server password is incorrect."
 msgstr "Η σύνδεση απορρίφθηκε: Ο κωδικός του server είναι λάθος."
 
-#: src/network/protocols/client_lobby.cpp:806
+#: src/network/protocols/client_lobby.cpp:810
 msgid "Connection refused: Game data is incompatible."
 msgstr "Η σύνδεση απορρίφθηκε: Τα δεδομένα του παιχνιδιού δεν ταιριάζουν."
 
-#: src/network/protocols/client_lobby.cpp:810
+#: src/network/protocols/client_lobby.cpp:814
 msgid "Connection refused: Server is full."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι γεμάτος."
 
-#: src/network/protocols/client_lobby.cpp:814
+#: src/network/protocols/client_lobby.cpp:818
 msgid "Connection refused: Invalid player connecting."
 msgstr "Η σύνδεση απορρίφθηκε: Ο παίκτης που συνδέεται δεν είναι έγκυρος."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:971
+#: src/network/protocols/client_lobby.cpp:992
 msgid "The game has ended, you can't live join or spectate anymore."
-msgstr ""
+msgstr "Το παιχνίδι εχει τελειώσει, εσύ δεν μπορείς να μπεις κατα την διαρκεια του παιχνιδίου ή να παρακουλουθής οποίονδηποτε."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:975
+#: src/network/protocols/client_lobby.cpp:996
 msgid "No remaining place in the arena - live join disabled."
-msgstr ""
+msgstr "Κανένας δεν περιμένει μέσα στον χόρο της αρένας - Συνδέση κατα την διαρκεία του παιχνιδιού είναι απενεργοποιημένο."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:979
+#: src/network/protocols/client_lobby.cpp:1000
 msgid "Only 1 player remaining, returning to lobby."
-msgstr ""
+msgstr "Μόνο 1 παίκτης περιμένει, για να ξαναλιτουργίσει το Δωμάτιο αναμονής."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1101
+#: src/network/protocols/client_lobby.cpp:1122
 #, c-format
 msgid "%s joined the red team."
-msgstr ""
+msgstr "%s μπήκε στην κόκκινη ομάδα."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1107
+#: src/network/protocols/client_lobby.cpp:1128
 #, c-format
 msgid "%s joined the blue team."
-msgstr ""
+msgstr "%s μπήκε στην μπλε ομάδα."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1113
+#: src/network/protocols/client_lobby.cpp:1134
 #, c-format
 msgid "%s joined the game."
-msgstr ""
+msgstr "%s μπήκε στον παιχνίδι."
 
 #: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
@@ -4298,6 +4306,12 @@ msgstr "Απενεργοποίηση μειωμένης ταχύτητας"
 msgid "Fetching ranking info for %s"
 msgstr "Λήψη πληροφοριών κατάταξης για τον %s"
 
+#. I18N: show in race paused dialog in network to allow user to go
+#. back to lobby to end spectating (for example)
+#: src/states_screens/dialogs/race_paused_dialog.cpp:273
+msgid "Back to lobby"
+msgstr ""
+
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
 #: src/states_screens/dialogs/ranking_callback.hpp:57
@@ -4619,7 +4633,7 @@ msgid "Locked"
 msgstr "Κλειδωμένο"
 
 #: src/states_screens/kart_selection.cpp:985
-#: src/states_screens/online/networking_lobby.cpp:414
+#: src/states_screens/online/networking_lobby.cpp:436
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -4674,12 +4688,30 @@ msgstr "Το όνομα πρέπει να είναι μεταξύ 4 και 30 χ
 msgid "Incorrect characters in password!"
 msgstr "Άκυροι χαρακτήρες στον κωδικό!"
 
-#: src/states_screens/online/networking_lobby.cpp:212
-#: src/states_screens/online/networking_lobby.cpp:691
+#. I18N: In the networking lobby, ready button is to allow player to tell
+#. server that he is ready for next game for owner less server
+#: src/states_screens/online/networking_lobby.cpp:180
+msgid "Ready"
+msgstr "Έτοιμος"
+
+#. I18N: Live join is displayed in networking lobby to allow players
+#. to join the current started in-progress game
+#: src/states_screens/online/networking_lobby.cpp:183
+msgid "Live join"
+msgstr "Σύνδεση κατα την διάρκεια του παιχνιδιού"
+
+#. I18N: Spectate is displayed in networking lobby to allow players
+#. to join the current started in-progress game
+#: src/states_screens/online/networking_lobby.cpp:188
+msgid "Spectate"
+msgstr "Παρακολούθηση"
+
+#: src/states_screens/online/networking_lobby.cpp:224
+#: src/states_screens/online/networking_lobby.cpp:713
 msgid "Chat is disabled, enable in options menu."
 msgstr "Η συζήτηση είναι απενεργοποιημένη, ενεργοποίησέ την στις ρυθμίσεις."
 
-#: src/states_screens/online/networking_lobby.cpp:273
+#: src/states_screens/online/networking_lobby.cpp:294
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Δωμάτιο Αναμονής (ping: %dms)"
@@ -4687,7 +4719,7 @@ msgstr "Δωμάτιο Αναμονής (ping: %dms)"
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:293
+#: src/states_screens/online/networking_lobby.cpp:314
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -4695,7 +4727,7 @@ msgstr ""
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:301
+#: src/states_screens/online/networking_lobby.cpp:322
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι, εκτμιση του χρόνου που απομένει: %s."
@@ -4703,36 +4735,24 @@ msgstr "Παρακαλώ περιμένετε για να τελειώσει τ�
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:313
+#: src/states_screens/online/networking_lobby.cpp:334
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr ""
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:322
+#: src/states_screens/online/networking_lobby.cpp:343
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι, Εκτίμηση πρόοδου: %d%"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:330
+#: src/states_screens/online/networking_lobby.cpp:351
 msgid "Please wait for the current game's end."
 msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι. "
 
-#. I18N: Live join is displayed in networking lobby to allow players
-#. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:359
-msgid "Live join"
-msgstr ""
-
-#. I18N: Spectate is displayed in networking lobby to allow players
-#. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:362
-msgid "Spectate"
-msgstr ""
-
-#: src/states_screens/online/networking_lobby.cpp:385
+#: src/states_screens/online/networking_lobby.cpp:407
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4741,7 +4761,7 @@ msgstr[1] "Το παιχνίδι θα ξεκινήσει όταν οι παίκ�
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:399
+#: src/states_screens/online/networking_lobby.cpp:421
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -4750,20 +4770,14 @@ msgid_plural ""
 msgstr[0] "Θα Ξεκινήσει μετά από %d δευτερόλεπτα, ή άμα όλοι έχουν πατίσει το κουμπί 'Έτοιμος'."
 msgstr[1] "Θα Ξεκινήσει μετά από %d δευτερόλεπτα, ή άμα όλοι έχουν πατίσει το κουμπί 'Έτοιμος'."
 
-#: src/states_screens/online/networking_lobby.cpp:432
+#: src/states_screens/online/networking_lobby.cpp:454
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Σύνδεση στον server %s"
 
-#: src/states_screens/online/networking_lobby.cpp:437
+#: src/states_screens/online/networking_lobby.cpp:459
 msgid "Finding a quick play server"
 msgstr "Αναζήτηση server για γρήγορο παιχνίδι"
-
-#. I18N: In the networking lobby, ready button is to allow player to tell
-#. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:719
-msgid "Ready"
-msgstr "Έτοιμος"
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:156
@@ -5276,7 +5290,7 @@ msgstr "Περιμέντε για άλλους"
 #. I18N: Shown waiting for the server in network if live join or specatate
 #: src/states_screens/race_gui_base.cpp:78
 msgid "Waiting for the server"
-msgstr ""
+msgstr "Περιμένετε για τον server"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
