@@ -413,6 +413,12 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_num_laps
             PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps",
             &m_race_setup_group, "Default number of laps.") );
+    PARAM_PREFIX IntUserConfigParam          m_ffa_time_limit
+        PARAM_DEFAULT(IntUserConfigParam(3, "ffa-time-limit",
+            &m_race_setup_group, "Time limit in ffa mode."));
+    PARAM_PREFIX BoolUserConfigParam         m_use_ffa_mode
+        PARAM_DEFAULT(BoolUserConfigParam(false, "use-ffa-mode",
+            &m_race_setup_group, "Use ffa mode instead of 3 strikes battle."));
     PARAM_PREFIX IntUserConfigParam          m_num_goals
             PARAM_DEFAULT(  IntUserConfigParam(3, "numgoals",
             &m_race_setup_group, "Default number of goals in soccer mode.") );

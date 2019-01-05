@@ -293,11 +293,18 @@ void TrackInfoScreen::init()
         m_target_type_spinner->clearLabels();
         m_target_type_spinner->addLabel(_("3 Strikes Battle"));
         m_target_type_spinner->addLabel(_("Free-For-All"));
-        m_target_type_spinner->setValue(0);
+        m_target_type_spinner->setValue(UserConfigParams::m_use_ffa_mode ? 1 : 0);
 
         m_target_value_label->setText(_("Maximum time (min.)"), false);
-        m_target_value_spinner->setValue(3);
-	}
+        m_target_value_spinner->setValue(UserConfigParams::m_ffa_time_limit);
+
+        m_target_value_label->setVisible(UserConfigParams::m_use_ffa_mode);
+        m_target_value_spinner->setVisible(UserConfigParams::m_use_ffa_mode);
+
+        // TODO: remove if FFA AI is added
+        m_ai_kart_label->setVisible(!UserConfigParams::m_use_ffa_mode);
+        m_ai_kart_spinner->setVisible(!UserConfigParams::m_use_ffa_mode);
+    }
 
     // Record race or not
     // -------------
@@ -515,6 +522,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         else if (m_show_ffa_spinner)
         {
             const bool enable_ffa = target_value != 0;
+            UserConfigParams::m_use_ffa_mode = enable_ffa;
+
             if (enable_ffa)
             {
                 m_target_value_label->setVisible(true);
@@ -543,7 +552,14 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             else
                 UserConfigParams::m_num_goals = m_target_value_spinner->getValue();
         }
-        else if (!m_show_ffa_spinner)
+        else if (m_show_ffa_spinner)
+        {
+            const bool enable_ffa = m_target_type_spinner->getValue() != 0;
+
+            if (enable_ffa)
+                UserConfigParams::m_ffa_time_limit = m_target_value_spinner->getValue();
+        }
+        else
         {
             assert(race_manager->modeHasLaps());
             const int num_laps = m_target_value_spinner->getValue();
