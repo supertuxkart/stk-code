@@ -303,6 +303,7 @@ bool ServerLobby::notifyEvent(Event* event)
     case LE_LIVE_JOIN:         liveJoinRequest(event);        break;
     case LE_CLIENT_LOADED_WORLD: finishedLoadingLiveJoinClient(event); break;
     case LE_KART_INFO: handleKartInfo(event); break;
+    case LE_CLIENT_BACK_LOBBY: clientWantsToBackLobby(event); break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -656,15 +657,25 @@ NetworkString* ServerLobby::getLoadWorldMessage(
 }   // getLoadWorldMessage
 
 //-----------------------------------------------------------------------------
+/** Returns true if server can be live joined or spectating
+ */
 bool ServerLobby::canLiveJoinNow() const
 {
     return ServerConfig::m_live_players &&
-        race_manager->supportsLiveJoining() &&
-        World::getWorld() && RaceEventManager::getInstance()->isRunning() &&
+        race_manager->supportsLiveJoining() && worldIsActive();
+}   // canLiveJoinNow
+
+//-----------------------------------------------------------------------------
+/** Returns true if world is active for clients to live join, spectate or
+ *  going back to lobby live
+ */
+bool ServerLobby::worldIsActive() const
+{
+    return World::getWorld() && RaceEventManager::getInstance()->isRunning() &&
         !RaceEventManager::getInstance()->isRaceOver() &&
         (World::getWorld()->getPhase() == WorldStatus::RACE_PHASE ||
         World::getWorld()->getPhase() == WorldStatus::GOAL_PHASE);
-}   // canLiveJoinNow
+}   // worldIsActive
 
 //-----------------------------------------------------------------------------
 /** \ref STKPeer peer will be reset back to the lobby with reason
@@ -701,6 +712,7 @@ void ServerLobby::liveJoinRequest(Event* event)
         return;
     }
     bool spectator = data.getUInt8() == 1;
+    peer->clearAvailableKartIDs();
     if (!spectator)
     {
         setPlayerKarts(data, peer);
@@ -728,7 +740,6 @@ void ServerLobby::liveJoinRequest(Event* event)
             return;
         }
 
-        peer->clearAvailableKartIDs();
         for (int id : used_id)
         {
             Log::info("ServerLobby", "%s live joining with reserved kart id %d.",
@@ -3352,6 +3363,9 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
 }   // setPlayerKarts
 
 //-----------------------------------------------------------------------------
+/** Tell the client \ref RemoteKartInfo of a player when some player joining
+ *  live.
+ */
 void ServerLobby::handleKartInfo(Event* event)
 {
     World* w = World::getWorld();
@@ -3380,3 +3394,56 @@ void ServerLobby::handleKartInfo(Event* event)
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
 }   // handleKartInfo
+
+//-----------------------------------------------------------------------------
+/** Client if currently in-game (including spectator) wants to go back to
+ *  lobby.
+ */
+void ServerLobby::clientWantsToBackLobby(Event* event)
+{
+    World* w = World::getWorld();
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+
+    if (!w || !worldIsActive() || peer->isWaitingForGame())
+    {
+        Log::warn("ServerLobby", "%s try to leave the game at wrong time.",
+            peer->getAddress().toString().c_str());
+        return;
+    }
+
+    for (const int id : peer->getAvailableKartIDs())
+    {
+        RemoteKartInfo& rki = race_manager->getKartInfo(id);
+        if (rki.getHostId() == peer->getHostId())
+        {
+            Log::info("ServerLobby", "%s left the game with kart id %d.",
+                peer->getAddress().toString().c_str(), id);
+            rki.setNetworkPlayerProfile(
+                std::shared_ptr<NetworkPlayerProfile>());
+        }
+        else
+        {
+            Log::error("ServerLobby", "%s doesn't exist anymore in server.",
+                peer->getAddress().toString().c_str());
+        }
+    }
+    NetworkItemManager* nim =
+        dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    assert(nim);
+    nim->erasePeerInGame(peer);
+    m_peers_ready.erase(peer);
+    peer->setWaitingForGame(true);
+
+    NetworkString* reset = getNetworkString(2);
+    reset->setSynchronous(true);
+    reset->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
+    peer->sendPacket(reset, /*reliable*/true);
+    delete reset;
+    updatePlayerList();
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    peer->sendPacket(server_info, /*reliable*/true);
+    delete server_info;
+}   // clientWantsToBackLobby

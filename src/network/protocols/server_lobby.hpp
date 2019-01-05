@@ -279,9 +279,11 @@ private:
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
     bool canLiveJoinNow() const;
+    bool worldIsActive() const;
     int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                       unsigned local_id) const;
     void handleKartInfo(Event* event);
+    void clientWantsToBackLobby(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();

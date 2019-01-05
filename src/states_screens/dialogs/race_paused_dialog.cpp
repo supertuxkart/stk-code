@@ -28,7 +28,9 @@
 #include "io/file_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
@@ -155,14 +157,21 @@ GUIEngine::EventPropagation
             }
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
-            if (race_manager->raceWasStartedFromOverworld())
+            if (NetworkConfig::get()->isNetworking())
             {
-                OverWorld::enterOverWorld();
+                StateManager::get()->resetAndSetStack(
+                    NetworkConfig::get()->getResetScreens().data());
+                NetworkConfig::get()->unsetNetworking();
             }
-
-            NetworkConfig::get()->unsetNetworking();
+            else
+            {
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                if (race_manager->raceWasStartedFromOverworld())
+                {
+                    OverWorld::enterOverWorld();
+                }
+            }
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "help")
@@ -187,23 +196,26 @@ GUIEngine::EventPropagation
         else if (selection == "newrace")
         {
             ModalDialog::dismiss();
-            if (STKHost::existHost())
+            if (NetworkConfig::get()->isNetworking())
             {
-                STKHost::get()->shutdown();
+                // back lobby
+                NetworkString back(PROTOCOL_LOBBY_ROOM);
+                back.setSynchronous(true);
+                back.addUInt8(LobbyProtocol::LE_CLIENT_BACK_LOBBY);
+                STKHost::get()->sendToServer(&back, true);
             }
-            World::getWorld()->scheduleUnpause();
-            race_manager->exitRace();
-            Screen* new_stack[] =
-                {
-                    MainMenuScreen::getInstance(),
-                    RaceSetupScreen::getInstance(),
-                    NULL
-                };
-            StateManager::get()->resetAndSetStack(
-                NetworkConfig::get()->isNetworking() ?
-                NetworkConfig::get()->getResetScreens().data() :
-                new_stack);
-            NetworkConfig::get()->unsetNetworking();
+            else
+            {
+                World::getWorld()->scheduleUnpause();
+                race_manager->exitRace();
+                Screen* new_stack[] =
+                    {
+                        MainMenuScreen::getInstance(),
+                        RaceSetupScreen::getInstance(),
+                        NULL
+                    };
+                StateManager::get()->resetAndSetStack(new_stack);
+            }
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "endrace")
@@ -224,7 +236,6 @@ GUIEngine::EventPropagation
 }   // processEvent
 
 // ----------------------------------------------------------------------------
-
 void RacePausedDialog::beforeAddingWidgets()
 {
     GUIEngine::RibbonWidget* choice_ribbon =
@@ -238,7 +249,8 @@ void RacePausedDialog::beforeAddingWidgets()
     // Disable in game menu to avoid timer desync if not racing in network
     // game
     if (NetworkConfig::get()->isNetworking() &&
-        World::getWorld()->getPhase() != WorldStatus::RACE_PHASE)
+        !(World::getWorld()->getPhase() == WorldStatus::MUSIC_PHASE ||
+        World::getWorld()->getPhase() == WorldStatus::RACE_PHASE))
     {
         index = choice_ribbon->findItemNamed("help");
         if (index != -1)
@@ -246,8 +258,19 @@ void RacePausedDialog::beforeAddingWidgets()
         index = choice_ribbon->findItemNamed("options");
         if (index != -1)
             choice_ribbon->setItemVisible(index, false);
+        index = choice_ribbon->findItemNamed("newrace");
+        if (index != -1)
+            choice_ribbon->setItemVisible(index, false);
     }
-
-}
-
-// ----------------------------------------------------------------------------
+    if (NetworkConfig::get()->isNetworking())
+    {
+        IconButtonWidget* new_race = dynamic_cast<IconButtonWidget*>
+            (choice_ribbon->findWidgetNamed("newrace"));
+        if (new_race)
+        {
+            //I18N show in race paused dialog in network to allow user to go
+            //back to lobby to end spectating (for example)
+            new_race->setText(_("Back to lobby"));
+        }
+    }
+}   // beforeAddingWidgets

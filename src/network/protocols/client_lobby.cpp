@@ -508,14 +508,18 @@ void ClientLobby::disconnectedPlayer(Event* event)
     if (!checkDataSize(event, 1)) return;
 
     NetworkString &data = event->data();
-    SFXManager::get()->quickSound("appear");
     unsigned disconnected_player_count = data.getUInt8();
     uint32_t host_id = data.getUInt32();
     m_peers_votes.erase(host_id);
+    // If world exists the kart rewinder will know which player disconnects
+    if (!World::getWorld())
+        SFXManager::get()->quickSound("appear");
     for (unsigned i = 0; i < disconnected_player_count; i++)
     {
         std::string name;
         data.decodeString(&name);
+        if (!World::getWorld())
+            continue;
         core::stringw player_name = StringUtils::utf8ToWide(name);
         core::stringw msg = _("%s disconnected.", player_name);
         // Use the friend icon to avoid an error-like message
@@ -961,10 +965,14 @@ void ClientLobby::backToLobby(Event *event)
     m_auto_started = false;
     m_state.store(CONNECTED);
 
-    RaceEventManager::getInstance()->stop();
-    auto gep = RaceEventManager::getInstance()->getProtocol();
-    if (gep)
-        gep->requestTerminate();
+    if (RaceEventManager::getInstance())
+    {
+        RaceEventManager::getInstance()->stop();
+        auto gep = RaceEventManager::getInstance()->getProtocol();
+        // Game events protocol is main thread event only
+        if (gep)
+            gep->requestTerminate();
+    }
     auto gp = GameProtocol::lock();
     if (gp)
     {
