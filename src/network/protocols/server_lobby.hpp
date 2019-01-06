@@ -263,6 +263,8 @@ private:
     double distributeBasePoints(uint32_t online_id);
     double getModeFactor();
     double getModeSpread();
+    double getTimeSpread(double time);
+    double getUncertaintySpread(uint32_t online_id);
     double scalingValueForTime(double time);
     void checkRaceFinished();
     void getHitCaptureLimit(float num_karts);
