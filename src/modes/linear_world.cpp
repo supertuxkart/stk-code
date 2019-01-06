@@ -75,6 +75,8 @@ void LinearWorld::init()
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
 
+    m_fastest_lap_kart_name         = "";
+
     // The values are initialised in reset()
     m_kart_info.resize(m_karts.size());
 }   // init
