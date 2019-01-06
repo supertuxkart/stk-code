@@ -1685,6 +1685,8 @@ void ServerLobby::computeNewRankings()
         double player1_time  = race_manager->getKartRaceTime(i);
         double player1_factor =
             computeRankingFactor(race_manager->getKartInfo(i).getOnlineId());
+        double player1_handicap = (   w->getKart(i)->getPerPlayerDifficulty()
+                                   == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
 
         for (unsigned j = 0; j < player_count; j++)
         {
@@ -1704,6 +1706,8 @@ void ServerLobby::computeNewRankings()
 
             double player2_scores = new_scores[j];
             double player2_time = race_manager->getKartRaceTime(j);
+            double player2_handicap = (   w->getKart(j)->getPerPlayerDifficulty()
+                                       == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
 
             // Compute the result and race ranking importance
             double player_factors = std::min(player1_factor,
@@ -1750,6 +1754,9 @@ void ServerLobby::computeNewRankings()
 
             // Compute the expected result using an ELO-like function
             double diff = player2_scores - player1_scores;
+
+            if (!w->getKart(i)->isEliminated() && !w->getKart(j)->isEliminated())
+                diff += player1_handicap - player2_handicap;
 
             double uncertainty = std::max(getUncertaintySpread(race_manager->getKartInfo(i).getOnlineId()),
                                           getUncertaintySpread(race_manager->getKartInfo(j).getOnlineId()) );
