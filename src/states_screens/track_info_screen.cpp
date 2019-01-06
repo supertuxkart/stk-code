@@ -487,17 +487,6 @@ void TrackInfoScreen::onEnterPressedInternal()
         UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
     }
 
-    const int selected_target_type = m_target_type_spinner->getValue();
-    const int selected_target_value = m_target_value_spinner->getValue();
-
-    if (race_manager->isSoccerMode())
-    {
-        if (selected_target_type == 0)
-            race_manager->setTimeTarget(static_cast<float>(selected_target_value) * 60);
-        else
-            race_manager->setMaxGoal(selected_target_value);
-    }
-
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
