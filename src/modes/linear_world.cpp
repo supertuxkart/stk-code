@@ -1127,9 +1127,11 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
     for (auto& kart : m_karts)
     {
         btTransform t;
-        t.setOrigin(b.getVec3());
+        Vec3 xyz = b.getVec3();
+        t.setOrigin(xyz);
         t.setRotation(b.getQuat());
         kart->setTrans(t);
+        kart->setXYZ(xyz);
     }
     for (KartInfo& ki : m_kart_info)
         ki.restoreCompleteState(b);
