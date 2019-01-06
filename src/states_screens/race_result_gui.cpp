@@ -1660,7 +1660,7 @@ void RaceResultGUI::displayCTFResults()
 
                     core::stringw best_lap_by = dynamic_cast<LinearWorld*>(World::getWorld())->getFastestLapKartName();
 
-                    if (best_lap_by != NULL)
+                    if (best_lap_by != "")
                     {
                         //I18N: is used to indicate who has the bast laptime (best laptime "by kart_name")
                         core::stringw best_lap_by_string = _("by %s", best_lap_by);

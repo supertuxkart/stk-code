@@ -59,6 +59,7 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_fastest_lap_ticks    = INT_MAX;
     m_valid_reference_time = false;
     m_live_time_difference = 0.0f;
+    m_fastest_lap_kart_name = "";
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
