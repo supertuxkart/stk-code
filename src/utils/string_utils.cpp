@@ -1046,7 +1046,7 @@ namespace StringUtils
 	    if ((c > 12287 && c < 40960) || //Common CJK words
 	    	(c > 44031 && c < 55204)  || //Hangul
 	    	(c > 63743 && c < 64256)  || //More Chinese
-	    	c == 173 || c == L' ' || //Soft hyphen and white space
+	    	c == 45 || c == 173 || c == L' ' || //Hypen, soft hyphen and white space
 	    	c == 47 || c == 92) //Slash and blackslash
 	    	return true;
 	    return false;
