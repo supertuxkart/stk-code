@@ -3068,7 +3068,7 @@ void ServerLobby::addWaitingPlayersToGame()
     for (auto& profile : all_profiles)
     {
         auto peer = profile->getPeer();
-        if (!peer || !peer->isWaitingForGame() || !peer->isValidated())
+        if (!peer || !peer->isValidated())
             continue;
         uint32_t online_id = profile->getOnlineId();
         if (ServerConfig::m_ranked)
@@ -3091,13 +3091,15 @@ void ServerLobby::addWaitingPlayersToGame()
         }
 
         peer->setWaitingForGame(false);
-        m_peers_ready[peer] = false;
-        Log::info("ServerLobby",
-            "New player %s with online id %u from %s with %s.",
-            StringUtils::wideToUtf8(profile->getName()).c_str(),
-            profile->getOnlineId(), peer->getAddress().toString().c_str(),
-            peer->getUserVersion().c_str());
-
+        if (m_peers_ready.find(peer) == m_peers_ready.end())
+        {
+            m_peers_ready[peer] = false;
+            Log::info("ServerLobby",
+                "New player %s with online id %u from %s with %s.",
+                StringUtils::wideToUtf8(profile->getName()).c_str(),
+                profile->getOnlineId(), peer->getAddress().toString().c_str(),
+                peer->getUserVersion().c_str());
+        }
         if (ServerConfig::m_ranked)
         {
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
