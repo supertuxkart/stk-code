@@ -76,6 +76,8 @@ void LinearWorld::init()
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
 
+    m_fastest_lap_kart_name         = "";
+
     // The values are initialised in reset()
     m_kart_info.resize(m_karts.size());
 }   // init
@@ -497,6 +499,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
         const core::stringw &kart_name = kart->getController()->getName();
+        m_fastest_lap_kart_name = kart_name;
 
         //I18N: as in "fastest lap: 60 seconds by Wilber"
         irr::core::stringw m_fastest_lap_message =
