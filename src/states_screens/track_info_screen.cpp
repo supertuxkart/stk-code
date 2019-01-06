@@ -390,7 +390,6 @@ void TrackInfoScreen::updateHighScores()
 
 void TrackInfoScreen::onEnterPressedInternal()
 {
-
     race_manager->setRecordRace(m_record_this_race);
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
@@ -430,10 +429,15 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     const int selected_target_type = m_target_type_spinner->getValue();
     const int selected_target_value = m_target_value_spinner->getValue();
-    if (selected_target_type == 0)
-        race_manager->setTimeTarget(static_cast<float>(selected_target_value) * 60);
-    else
-        race_manager->setMaxGoal(selected_target_value);
+
+    const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    if (is_soccer)
+    {
+        if (selected_target_type == 0)
+            race_manager->setTimeTarget(static_cast<float>(selected_target_value) * 60);
+        else
+            race_manager->setMaxGoal(selected_target_value);
+    }
 
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
