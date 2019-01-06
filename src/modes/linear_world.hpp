@@ -112,6 +112,10 @@ private:
             m_overall_distance  = 0.0f;
             m_wrong_way_timer   = 0.0f;
         }   // reset
+        // --------------------------------------------------------------------
+        void saveCompleteState(BareNetworkString* bns);
+        // --------------------------------------------------------------------
+        void restoreCompleteState(const BareNetworkString& b);
     };
     // ------------------------------------------------------------------------
 
@@ -121,7 +125,7 @@ protected:
       * This member is not strictly private but try not to use it directly outside
       * tightly related classes (e.g. AI)
       */
-    AlignedArray<KartInfo> m_kart_info;
+    std::vector<KartInfo> m_kart_info;
 
     virtual void  checkForWrongDirection(unsigned int i, float dt);
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
@@ -204,6 +208,10 @@ public:
     // ------------------------------------------------------------------------
     virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
         OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 };   // LinearWorld
 
 #endif

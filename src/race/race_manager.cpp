@@ -592,8 +592,7 @@ void RaceManager::startNextRace()
     // functions.
     World::getWorld()->reset();
 
-    if (NetworkConfig::get()->isNetworking() &&
-        race_manager->supportsLiveJoining())
+    if (NetworkConfig::get()->isNetworking())
     {
         for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
         {

@@ -661,8 +661,34 @@ NetworkString* ServerLobby::getLoadWorldMessage(
  */
 bool ServerLobby::canLiveJoinNow() const
 {
-    return ServerConfig::m_live_players &&
-        race_manager->supportsLiveJoining() && worldIsActive();
+    bool live_join = ServerConfig::m_live_players && worldIsActive();
+    if (!live_join)
+        return false;
+    if (race_manager->modeHasLaps())
+    {
+        // No spectate when fastest kart is nearly finish, because if there
+        // is endcontroller the spectating remote may not be knowing this
+        // on time
+        LinearWorld* w = dynamic_cast<LinearWorld*>(World::getWorld());
+        if (!w)
+            return false;
+        AbstractKart* fastest_kart = NULL;
+        for (unsigned i = 0; i < w->getNumKarts(); i++)
+        {
+            fastest_kart = w->getKartAtPosition(i + 1);
+            if (fastest_kart && !fastest_kart->isEliminated())
+                break;
+        }
+        if (!fastest_kart)
+            return false;
+        float progress = w->getOverallDistance(
+            fastest_kart->getWorldKartId()) /
+            (Track::getCurrentTrack()->getTrackLength() *
+            (float)race_manager->getNumLaps());
+        if (progress > 0.9f)
+            return false;
+    }
+    return live_join;
 }   // canLiveJoinNow
 
 //-----------------------------------------------------------------------------
@@ -712,6 +738,13 @@ void ServerLobby::liveJoinRequest(Event* event)
         return;
     }
     bool spectator = data.getUInt8() == 1;
+    if (race_manager->modeHasLaps() && !spectator)
+    {
+        // No live join for linear race
+        rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
+        return;
+    }
+
     peer->clearAvailableKartIDs();
     if (!spectator)
     {
@@ -761,10 +794,22 @@ void ServerLobby::liveJoinRequest(Event* event)
             rki.getNetworkPlayerProfile().lock();
         if (!player)
         {
-            player = NetworkPlayerProfile::getReservedProfile(
-                race_manager->getMinorMode() ==
-                RaceManager::MINOR_MODE_FREE_FOR_ALL ?
-                KART_TEAM_NONE : rki.getKartTeam());
+            if (race_manager->modeHasLaps())
+            {
+                player = std::make_shared<NetworkPlayerProfile>(
+                    nullptr, rki.getPlayerName(),
+                    std::numeric_limits<uint32_t>::max(),
+                    rki.getDefaultKartColor(),
+                    rki.getOnlineId(), rki.getDifficulty(),
+                    rki.getLocalPlayerId(), KART_TEAM_NONE);
+            }
+            else
+            {
+                player = NetworkPlayerProfile::getReservedProfile(
+                    race_manager->getMinorMode() ==
+                    RaceManager::MINOR_MODE_FREE_FOR_ALL ?
+                    KART_TEAM_NONE : rki.getKartTeam());
+            }
         }
         players.push_back(player);
     }

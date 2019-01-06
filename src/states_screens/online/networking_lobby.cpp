@@ -374,8 +374,13 @@ void NetworkingLobby::onUpdate(float delta)
 
         if (m_client_live_joinable)
         {
-            m_start_button->setVisible(true);
-            m_start_button->setLabel(m_live_join_text);
+            if (race_manager->supportsLiveJoining())
+            {
+                m_start_button->setVisible(true);
+                m_start_button->setLabel(m_live_join_text);
+            }
+            else
+                m_start_button->setVisible(false);
             m_config_button->setLabel(m_spectate_text);
             m_config_button->setImage(m_spectate_texture);
             m_config_button->setVisible(true);

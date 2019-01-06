@@ -155,9 +155,7 @@ void GameSetup::addServerInfo(NetworkString* ns)
 
     ns->encodeString16(m_message_of_today);
     ns->addUInt8((uint8_t)ServerConfig::m_server_configurable);
-    ns->addUInt8(
-        ServerConfig::m_live_players && race_manager->supportsLiveJoining() ?
-        1 : 0);
+    ns->addUInt8(ServerConfig::m_live_players? 1 : 0);
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------

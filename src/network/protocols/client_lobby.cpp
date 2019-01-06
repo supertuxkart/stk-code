@@ -518,7 +518,7 @@ void ClientLobby::disconnectedPlayer(Event* event)
     {
         std::string name;
         data.decodeString(&name);
-        if (!World::getWorld())
+        if (World::getWorld())
             continue;
         core::stringw player_name = StringUtils::utf8ToWide(name);
         core::stringw msg = _("%s disconnected.", player_name);

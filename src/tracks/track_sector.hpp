@@ -95,6 +95,10 @@ public:
     void saveState(BareNetworkString* buffer) const;
     // ------------------------------------------------------------------------
     void rewindTo(BareNetworkString* buffer);
+    // ------------------------------------------------------------------------
+    void saveCompleteState(BareNetworkString* bns);
+    // ------------------------------------------------------------------------
+    void restoreCompleteState(const BareNetworkString& b);
 
 };   // TrackSector
 

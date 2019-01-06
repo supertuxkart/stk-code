@@ -268,7 +268,7 @@ void RacePausedDialog::beforeAddingWidgets()
             (choice_ribbon->findWidgetNamed("newrace"));
         if (new_race)
         {
-            //I18N show in race paused dialog in network to allow user to go
+            //I18N: show in race paused dialog in network to allow user to go
             //back to lobby to end spectating (for example)
             new_race->setText(_("Back to lobby"));
         }

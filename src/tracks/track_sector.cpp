@@ -192,3 +192,31 @@ void TrackSector::rewindTo(BareNetworkString* buffer)
     m_current_graph_node = node;
     m_current_track_coords.setZ(buffer->getFloat());
 }   // rewindTo
+
+// ----------------------------------------------------------------------------
+/** Save completely for spectating in linear race
+ */
+void TrackSector::saveCompleteState(BareNetworkString* bns)
+{
+    bns->addUInt32(m_current_graph_node);
+    bns->addUInt32(m_estimated_valid_graph_node);
+    bns->addUInt32(m_last_valid_graph_node);
+    bns->add(m_current_track_coords);
+    bns->add(m_estimated_valid_track_coords);
+    bns->add(m_latest_valid_track_coords);
+    bns->addUInt8(m_on_road ? 0 : 1);
+    bns->addUInt32(m_last_triggered_checkline);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void TrackSector::restoreCompleteState(const BareNetworkString& b)
+{
+    m_current_graph_node = b.getUInt32();
+    m_estimated_valid_graph_node = b.getUInt32();
+    m_last_valid_graph_node = b.getUInt32();
+    m_current_track_coords = b.getVec3();
+    m_estimated_valid_track_coords = b.getVec3();
+    m_latest_valid_track_coords = b.getVec3();
+    m_on_road = b.getUInt8() == 1;
+    m_last_triggered_checkline = b.getUInt32();
+}   // restoreCompleteState

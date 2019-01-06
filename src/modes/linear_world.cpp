@@ -32,6 +32,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "physics/physics.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/server_config.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -1075,3 +1076,61 @@ std::pair<uint32_t, uint32_t> LinearWorld::getGameStartedProgress() const
     }
     return progress;
 }   // getGameStartedProgress
+
+// ----------------------------------------------------------------------------
+void LinearWorld::KartInfo::saveCompleteState(BareNetworkString* bns)
+{
+    bns->addUInt32(m_finished_laps);
+    bns->addUInt32(m_ticks_at_last_lap);
+    bns->addUInt32(m_lap_start_ticks);
+    bns->addFloat(m_estimated_finish);
+    bns->addFloat(m_overall_distance);
+    bns->addFloat(m_wrong_way_timer);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void LinearWorld::KartInfo::restoreCompleteState(const BareNetworkString& b)
+{
+    m_finished_laps = b.getUInt32();
+    m_ticks_at_last_lap = b.getUInt32();
+    m_lap_start_ticks = b.getUInt32();
+    m_estimated_finish = b.getFloat();
+    m_overall_distance = b.getFloat();
+    m_wrong_way_timer = b.getFloat();
+}   // restoreCompleteState
+
+// ----------------------------------------------------------------------------
+void LinearWorld::saveCompleteState(BareNetworkString* bns)
+{
+    bns->addUInt32(m_fastest_lap_ticks);
+    bns->addFloat(m_distance_increase);
+    for (auto& kart : m_karts)
+    {
+        bns->add(kart->getXYZ());
+        bns->add(kart->getRotation());
+    }
+    for (KartInfo& ki : m_kart_info)
+        ki.saveCompleteState(bns);
+    for (TrackSector* ts : m_kart_track_sector)
+        ts->saveCompleteState(bns);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void LinearWorld::restoreCompleteState(const BareNetworkString& b)
+{
+    m_fastest_lap_ticks = b.getUInt32();
+    m_distance_increase = b.getFloat();
+    for (auto& kart : m_karts)
+    {
+        btTransform t;
+        t.setOrigin(b.getVec3());
+        t.setRotation(b.getQuat());
+        kart->setTrans(t);
+    }
+    for (KartInfo& ki : m_kart_info)
+        ki.restoreCompleteState(b);
+    for (TrackSector* ts : m_kart_track_sector)
+        ts->restoreCompleteState(b);
+
+    updateRacePosition();
+}   // restoreCompleteState
