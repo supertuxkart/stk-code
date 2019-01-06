@@ -1043,8 +1043,7 @@ void ServerLobby::update(int ticks)
     if ((m_state.load() > WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()) &&
         (STKHost::get()->getPlayersInGame() == 0 ||
-        all_players_in_world_disconnected) &&
-        NetworkConfig::get()->getServerIdFile().empty())
+        all_players_in_world_disconnected))
     {
         if (RaceEventManager::getInstance() &&
             RaceEventManager::getInstance()->isRunning())
