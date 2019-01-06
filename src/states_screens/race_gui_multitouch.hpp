@@ -49,9 +49,14 @@ private:
     video::ITexture* m_bg_button_tex;
     video::ITexture* m_bg_button_focus_tex;
     video::ITexture* m_gui_action_tex;
+    video::ITexture* m_up_tex;
+    video::ITexture* m_down_tex;
 
     void init();
+    void createRaceGUI();
+    void createSpectatorGUI();
     void close();
+    static void onCustomButtonPress(unsigned int button_id, bool pressed);
 
 public:
      RaceGUIMultitouch(RaceGUIBase* race_gui);

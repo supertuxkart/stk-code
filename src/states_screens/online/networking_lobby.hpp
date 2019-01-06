@@ -72,6 +72,9 @@ private:
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
 
+    core::stringw m_start_text, m_ready_text, m_live_join_text,
+        m_configuration_text, m_spectate_text;
+
     float m_start_timeout;
     int64_t m_cur_starting_timer;
     unsigned m_min_start_game_players;

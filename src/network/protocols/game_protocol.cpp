@@ -115,6 +115,11 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
 {
     if(!checkDataSize(event, 1)) return true;
 
+    // Ignore events arriving when client has already exited
+    auto lock = acquireWorldDeletingMutex();
+    if (!World::getWorld())
+        return true;
+
     NetworkString &data = event->data();
     uint8_t message_type = data.getUInt8();
     switch (message_type)
@@ -398,10 +403,6 @@ void GameProtocol::sendState()
  */
 void GameProtocol::handleState(Event *event)
 {
-    // Ignore events arriving when client has already exited
-    if (!World::getWorld())
-        return;
-
     assert(NetworkConfig::get()->isClient());
     NetworkString &data = event->data();
     int ticks          = data.getUInt32();

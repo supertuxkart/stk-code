@@ -134,7 +134,7 @@ private:
     
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal,
-        m_string_waiting_for_others;
+        m_string_waiting_for_others, m_string_waiting_for_the_server;
 
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;

@@ -45,7 +45,8 @@ enum MultitouchButtonType
     BUTTON_UP,
     BUTTON_DOWN,
     BUTTON_LEFT,
-    BUTTON_RIGHT
+    BUTTON_RIGHT,
+    BUTTON_CUSTOM
 };
 
 struct MultitouchEvent
@@ -68,6 +69,8 @@ struct MultitouchButton
     int height;
     float axis_x;
     float axis_y;
+    unsigned int id;
+    void (*callback)(unsigned int, bool);
 };
 
 class Controller;
@@ -118,7 +121,7 @@ public:
     unsigned int getActiveTouchesCount();
 
     void addButton(MultitouchButtonType type, int x, int y, int width,
-                   int height);
+                   int height, void (*callback)(unsigned int, bool) = NULL);
     void clearButtons();
     void reset();
 

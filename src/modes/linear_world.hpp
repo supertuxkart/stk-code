@@ -46,6 +46,8 @@ private:
     /** The fastest lap time, in ticks of physics dt. */
     int          m_fastest_lap_ticks;
 
+    core::stringw m_fastest_lap_kart_name;
+
     /** The track length returned by Track::getLength() only covers the
      *  distance from start line to finish line, i.e. it does not include
      *  the distance the karts actually start behind the start line (the
@@ -112,6 +114,10 @@ private:
             m_overall_distance  = 0.0f;
             m_wrong_way_timer   = 0.0f;
         }   // reset
+        // --------------------------------------------------------------------
+        void saveCompleteState(BareNetworkString* bns);
+        // --------------------------------------------------------------------
+        void restoreCompleteState(const BareNetworkString& b);
     };
     // ------------------------------------------------------------------------
 
@@ -121,7 +127,7 @@ protected:
       * This member is not strictly private but try not to use it directly outside
       * tightly related classes (e.g. AI)
       */
-    AlignedArray<KartInfo> m_kart_info;
+    std::vector<KartInfo> m_kart_info;
 
     virtual void  checkForWrongDirection(unsigned int i, float dt);
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
@@ -190,6 +196,12 @@ public:
         return stk_config->ticks2Time(m_fastest_lap_ticks);
     }
     // ------------------------------------------------------------------------
+    /** Returns the kart name that made the fastest lap time */
+    stringw getFastestLapKartName() const
+    {
+        return m_fastest_lap_kart_name;
+    }
+    // ------------------------------------------------------------------------
     /** Network use: get fastest lap in ticks */
     int getFastestLapTicks() const
     {
@@ -204,6 +216,10 @@ public:
     // ------------------------------------------------------------------------
     virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
         OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 };   // LinearWorld
 
 #endif

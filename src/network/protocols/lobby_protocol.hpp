@@ -46,33 +46,34 @@ public:
     /** Lists all lobby events (LE). */
     enum : uint8_t
     {
-        LE_CONNECTION_REQUESTED   = 1,    // a connection to the server
-        LE_CONNECTION_REFUSED,            // Connection to server refused
-        LE_CONNECTION_ACCEPTED,           // Connection to server accepted
-        LE_SERVER_INFO,                   // inform client about server info
-        LE_REQUEST_BEGIN,                 // begin of kart selection
-        LE_UPDATE_PLAYER_LIST,            // inform client about player list update
-        LE_KART_SELECTION,                // Player selected kart
-        LE_PLAYER_DISCONNECTED,           // Client disconnected
-        LE_CLIENT_LOADED_WORLD,           // Client finished loading world
-        LE_LOAD_WORLD,                    // Clients should load world
-        LE_START_RACE,                    // Server to client to start race
-        LE_START_SELECTION,               // inform client to start selection
-        LE_RACE_FINISHED,                 // race has finished, display result
-        LE_RACE_FINISHED_ACK,             // client went back to lobby
-        LE_BACK_LOBBY,                    // Force clients to go back to lobby
-        LE_VOTE,                          // Track vote
-        LE_CHAT,
-        LE_SERVER_OWNERSHIP,
-        LE_KICK_HOST,
-        LE_CHANGE_TEAM,
-        LE_BAD_TEAM,
-        LE_BAD_CONNECTION,
-        LE_CONFIG_SERVER,
-        LE_CHANGE_HANDICAP,
-        LE_LIVE_JOIN,
-        LE_LIVE_JOIN_ACK,
-        LE_KART_INFO
+        LE_CONNECTION_REQUESTED = 1, // a connection to the server
+        LE_CONNECTION_REFUSED, // Connection to server refused
+        LE_CONNECTION_ACCEPTED, // Connection to server accepted
+        LE_SERVER_INFO, // inform client about server info
+        LE_REQUEST_BEGIN, // begin of kart selection
+        LE_UPDATE_PLAYER_LIST, // inform client about player list update
+        LE_KART_SELECTION, // Player selected kart
+        LE_PLAYER_DISCONNECTED, // Client disconnected
+        LE_CLIENT_LOADED_WORLD, // Client finished loading world
+        LE_LOAD_WORLD, // Clients should load world
+        LE_START_RACE, // Server to client to start race
+        LE_START_SELECTION, // inform client to start selection
+        LE_RACE_FINISHED, // race has finished, display result
+        LE_RACE_FINISHED_ACK, // client went back to lobby
+        LE_BACK_LOBBY, // Force clients to go back to lobby
+        LE_VOTE, // Track vote
+        LE_CHAT, // Client chat message
+        LE_SERVER_OWNERSHIP, // Tell client he is now the server owner
+        LE_KICK_HOST, // Server owner kicks some other peer in game
+        LE_CHANGE_TEAM, // Client wants to change his team
+        LE_BAD_TEAM, // Tell server owner that the team is unbalanced
+        LE_BAD_CONNECTION, // High ping or too many packets loss
+        LE_CONFIG_SERVER, // Server owner config server game mode or difficulty
+        LE_CHANGE_HANDICAP, // Client changes handicap
+        LE_LIVE_JOIN, // Client live join or spectate
+        LE_LIVE_JOIN_ACK, // Server tell client live join or spectate succeed
+        LE_KART_INFO, // Client or server exchange new kart info
+        LE_CLIENT_BACK_LOBBY // Client tell server to go back lobby
     };
 
     enum RejectReason : uint8_t

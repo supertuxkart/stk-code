@@ -81,9 +81,11 @@ unsigned int MultitouchDevice::getActiveTouchesCount()
  *  \param y Horizontal position of the button.
  *  \param width Width of the button.
  *  \param height Height of the button.
+ *  \param callback Pointer to a function that is executed on button event.
  */
 void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
-                                 int width, int height)
+                                 int width, int height, 
+                                 void (*callback)(unsigned int, bool))
 {
     assert(width > 0 && height > 0);
 
@@ -97,6 +99,8 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
     button->height = height;
     button->axis_x = 0.0f;
     button->axis_y = 0.0f;
+    button->id = m_buttons.size();
+    button->callback = callback;
 
     switch (button->type)
     {
@@ -561,6 +565,11 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
             int value = button->pressed ? Input::MAX_VALUE : 0;
             m_controller->action(button->action, value);
         }
+    }
+
+    if (button->callback != NULL)
+    {
+        button->callback(button->id, button->pressed);
     }
 }
 
