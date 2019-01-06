@@ -191,7 +191,8 @@ public:
     {
         return stk_config->ticks2Time(m_fastest_lap_ticks);
     }
-
+    // ------------------------------------------------------------------------
+    /** Returns the kart name that made the fastest lap time */
     stringw getFastestLapKartName() const
     {
         return m_fastest_lap_kart_name;
