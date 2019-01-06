@@ -430,8 +430,7 @@ void TrackInfoScreen::onEnterPressedInternal()
     const int selected_target_type = m_target_type_spinner->getValue();
     const int selected_target_value = m_target_value_spinner->getValue();
 
-    const bool is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    if (is_soccer)
+    if (race_manager->isSoccerMode())
     {
         if (selected_target_type == 0)
             race_manager->setTimeTarget(static_cast<float>(selected_target_value) * 60);
