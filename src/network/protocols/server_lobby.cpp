@@ -1300,7 +1300,8 @@ void ServerLobby::startSelection(const Event *event)
     }
 
 
-    if (ServerConfig::m_team_choosing && race_manager->teamEnabled())
+    if (!ServerConfig::m_owner_less && ServerConfig::m_team_choosing &&
+        race_manager->teamEnabled())
     {
         auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
         if ((red_blue.first == 0 || red_blue.second == 0) &&

@@ -206,7 +206,8 @@ namespace ServerConfig
     SERVER_CFG_PREFIX BoolServerConfigParam m_team_choosing
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "team-choosing",
         "Enable team choosing in lobby in team game (soccer and CTF). "
-        "If owner-less is enabled, than this option is always disabled."));
+        "If owner-less is enabled and live-players is not enabled, than this "
+        "option is always disabled."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "strict-players",
