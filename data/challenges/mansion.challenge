@@ -11,14 +11,14 @@
     </best>
     <hard>
         <karts number="8"/>
-        <requirements position="1" time="115"/>
+        <requirements position="1"/>
     </hard>
     <medium>
         <karts number="7"/>
-        <requirements time="140"/>
+        <requirements position="1"/>
     </medium>
     <easy>
         <karts number="6"/>
-        <requirements time="180"/>
+        <requirements position="1"/>
     </easy>
 </challenge>
