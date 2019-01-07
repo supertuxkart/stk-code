@@ -56,12 +56,15 @@ void override_default_params()
     case ACONFIGURATION_SCREENSIZE_SMALL:
     case ACONFIGURATION_SCREENSIZE_NORMAL:
         UserConfigParams::m_multitouch_scale = 1.3f;
+        UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
         break;
     case ACONFIGURATION_SCREENSIZE_LARGE:
         UserConfigParams::m_multitouch_scale = 1.2f;
+        UserConfigParams::m_multitouch_sensitivity_x = 0.15f;
         break;
     case ACONFIGURATION_SCREENSIZE_XLARGE:
         UserConfigParams::m_multitouch_scale = 1.1f;
+        UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
         break;
     default:
         break;
