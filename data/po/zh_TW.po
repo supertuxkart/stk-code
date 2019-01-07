@@ -17,8 +17,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-06 01:29+0800\n"
-"PO-Revision-Date: 2019-01-06 23:25+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2019-01-07 02:54+0000\n"
+"Last-Translator: Jeff Huang <s8321414@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/supertuxkart/supertuxkart/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3208,7 +3208,7 @@ msgstr "您完成比賽了！"
 #: src/karts/kart_rewinder.cpp:117
 #, c-format
 msgid "%s left the game."
-msgstr ""
+msgstr "%s 已離開遊戲。"
 
 #: src/main.cpp:1802
 msgid ""
@@ -4305,7 +4305,7 @@ msgstr "擷取 %s 的排名資訊"
 #. back to lobby to end spectating (for example)
 #: src/states_screens/dialogs/race_paused_dialog.cpp:273
 msgid "Back to lobby"
-msgstr ""
+msgstr "回到大廳"
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
