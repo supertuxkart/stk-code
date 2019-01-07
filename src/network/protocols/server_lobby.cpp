@@ -802,6 +802,7 @@ void ServerLobby::liveJoinRequest(Event* event)
                     rki.getDefaultKartColor(),
                     rki.getOnlineId(), rki.getDifficulty(),
                     rki.getLocalPlayerId(), KART_TEAM_NONE);
+                player->setKartName(rki.getKartName());
             }
             else
             {
