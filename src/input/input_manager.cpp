@@ -813,6 +813,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     if (cl->isSpectator() && cam)
                     {
                         // Network spectating handling
+                        if (action == PA_LOOK_BACK && value == 0)
+                        {
+                            if (cam->getMode() == Camera::CM_REVERSE)
+                            {
+                                cam->setMode(Camera::CM_NORMAL);
+                            }
+                            else
+                                cam->setMode(Camera::CM_REVERSE);
+                            return;
+                        }
+
                         int current_idx = 0;
                         if (cam->getKart())
                             current_idx = cam->getKart()->getWorldKartId();
