@@ -7,7 +7,7 @@
 
     <best>
         <karts number="7"/>
-        <requirements position="1" time="80"/>
+        <requirements position="1" time="77"/>
     </best>
     <hard>
         <karts number="6"/>

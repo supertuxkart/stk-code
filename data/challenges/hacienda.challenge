@@ -7,18 +7,18 @@
     
     <best>
         <karts number="8"/>
-        <requirements position="1" time="130"/>
+        <requirements position="1" time="124"/>
     </best>
     <hard>
         <karts number="7"/>
-        <requirements position="1" time="160"/>
+        <requirements position="1"/>
     </hard>
     <medium>
         <karts number="6"/>
-        <requirements position="2" time="187"/>
+        <requirements position="1"/>
     </medium>
     <easy>
         <karts number="5"/>
-        <requirements position="2"/>
+        <requirements position="1"/>
     </easy>
 </challenge>
