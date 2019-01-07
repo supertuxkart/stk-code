@@ -285,11 +285,13 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX IntServerConfigParam m_max_ping
         SERVER_CFG_DEFAULT(IntServerConfigParam(300, "max-ping",
-        "Maximum ping allowed for a player (in ms)."));
+        "Maximum ping allowed for a player (in ms), it's recommended to use "
+        "default value if live-players is on."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_jitter_tolerance
         SERVER_CFG_DEFAULT(IntServerConfigParam(100, "jitter-tolerance",
-        "Tolerance of jitter in network allowed (in ms)."));
+        "Tolerance of jitter in network allowed (in ms), it's recommended to "
+        "use default value if live-players is on."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_kick_high_ping_players
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false,
