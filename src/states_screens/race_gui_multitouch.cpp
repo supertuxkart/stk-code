@@ -299,17 +299,14 @@ void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
     
     if (button_id == 3)
     {
-        if (camera->getType() == Camera::CM_TYPE_NORMAL)
+        if (camera->getMode() == Camera::CM_REVERSE)
         {
-            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
-            Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+            camera->setMode(Camera::CM_NORMAL);
         }
         else
         {
-            Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_NORMAL);
+            camera->setMode(Camera::CM_REVERSE);
         }
-        
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(current_idx));
     }
     else
     {
