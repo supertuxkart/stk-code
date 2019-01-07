@@ -60,7 +60,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         loadFromFile("race_paused_dialog.stkgui");
     }
 
-    IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
+    GUIEngine::RibbonWidget* back_btn = getWidget<RibbonWidget>("backbtnribbon");
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 
     if (NetworkConfig::get()->isNetworking())
@@ -137,7 +137,7 @@ GUIEngine::EventPropagation
     GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
 
-    if (eventSource == "backbtn")
+    if (eventSource == "backbtnribbon")
     {
         // unpausing is done in the destructor so nothing more to do here
         ModalDialog::dismiss();
