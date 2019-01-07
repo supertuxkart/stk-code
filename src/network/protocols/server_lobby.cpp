@@ -2116,9 +2116,10 @@ void ServerLobby::connectionRequested(Event* event)
     // Reject non-valiated player joinning if WAN server and not disabled
     // encforement of validation, unless it's player from localhost or lan
     // And no duplicated online id or split screen players in ranked server
+    std::set<uint32_t> all_online_ids =
+        STKHost::get()->getAllPlayerOnlineIds();
     bool duplicated_ranked_player =
-        m_ranked_players.find(online_id) != m_ranked_players.end() &&
-        !m_ranked_players.at(online_id).expired();
+        all_online_ids.find(online_id) != all_online_ids.end();
 
     if (((encrypted_size == 0 || online_id == 0) &&
         !(peer->getAddress().isPublicAddressLocalhost() ||
@@ -2177,9 +2178,10 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     // Check again for duplicated player in ranked server
+    std::set<uint32_t> all_online_ids =
+        STKHost::get()->getAllPlayerOnlineIds();
     bool duplicated_ranked_player =
-        m_ranked_players.find(online_id) != m_ranked_players.end() &&
-        !m_ranked_players.at(online_id).expired();
+        all_online_ids.find(online_id) != all_online_ids.end();
     if (ServerConfig::m_ranked && duplicated_ranked_player)
     {
         NetworkString* message = getNetworkString(2);
@@ -3077,25 +3079,6 @@ void ServerLobby::addWaitingPlayersToGame()
         auto peer = profile->getPeer();
         if (!peer || !peer->isValidated())
             continue;
-        uint32_t online_id = profile->getOnlineId();
-        if (ServerConfig::m_ranked)
-        {
-            bool duplicated_ranked_player =
-                m_ranked_players.find(online_id) != m_ranked_players.end() &&
-                !m_ranked_players.at(online_id).expired();
-            if (duplicated_ranked_player)
-            {
-                NetworkString* message = getNetworkString(2);
-                message->setSynchronous(true);
-                message->addUInt8(LE_CONNECTION_REFUSED)
-                    .addUInt8(RR_INVALID_PLAYER);
-                peer->sendPacket(message, true/*reliable*/);
-                peer->reset();
-                delete message;
-                Log::verbose("ServerLobby", "Player refused: invalid player");
-                continue;
-            }
-        }
 
         peer->setWaitingForGame(false);
         if (m_peers_ready.find(peer) == m_peers_ready.end())
@@ -3107,7 +3090,11 @@ void ServerLobby::addWaitingPlayersToGame()
                 profile->getOnlineId(), peer->getAddress().toString().c_str(),
                 peer->getUserVersion().c_str());
         }
-        if (ServerConfig::m_ranked)
+        uint32_t online_id = profile->getOnlineId();
+        if (ServerConfig::m_ranked &&
+            (m_ranked_players.find(online_id) == m_ranked_players.end() ||
+            (m_ranked_players.find(online_id) != m_ranked_players.end() &&
+            m_ranked_players.at(online_id).expired())))
         {
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }
