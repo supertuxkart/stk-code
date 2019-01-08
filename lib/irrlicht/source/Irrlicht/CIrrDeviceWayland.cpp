@@ -74,6 +74,7 @@ public:
     static const wl_pointer_listener pointer_listener;
     static const wl_seat_listener seat_listener;
     static const wl_keyboard_listener keyboard_listener;
+    static const wl_touch_listener touch_listener;
     static const wl_output_listener output_listener;
     static const wl_shell_surface_listener shell_surface_listener;
     static const wl_registry_listener registry_listener;
@@ -435,6 +436,60 @@ public:
         device->m_repeat_rate = rate == 0 ? 0 : 1000 / rate;
         device->m_repeat_delay = delay;
     }
+    
+    static void touch_handle_down(void* data, wl_touch* touch, uint32_t serial,
+                                  uint32_t time, wl_surface *surface,
+                                  int32_t id, wl_fixed_t x, wl_fixed_t y)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        SEvent event;
+        event.EventType = EET_TOUCH_INPUT_EVENT;
+        event.TouchInput.Event = ETIE_PRESSED_DOWN;
+        event.TouchInput.ID = id;
+        event.TouchInput.X = wl_fixed_to_int(x);
+        event.TouchInput.Y = wl_fixed_to_int(y);
+        
+        device->signalEvent(event);
+    }
+    
+    static void touch_handle_up(void* data, wl_touch* touch, uint32_t serial,
+                                uint32_t time, int32_t id)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        SEvent event;
+        event.EventType = EET_TOUCH_INPUT_EVENT;
+        event.TouchInput.Event = ETIE_LEFT_UP;
+        event.TouchInput.ID = id;
+        event.TouchInput.X = 0;
+        event.TouchInput.Y = 0;
+        
+        device->signalEvent(event);
+    }
+    
+    static void touch_handle_motion(void* data, wl_touch* touch, uint32_t time,
+                                  int32_t id, wl_fixed_t x, wl_fixed_t y)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        SEvent event;
+        event.EventType = EET_TOUCH_INPUT_EVENT;
+        event.TouchInput.Event = ETIE_MOVED;
+        event.TouchInput.ID = id;
+        event.TouchInput.X = wl_fixed_to_int(x);
+        event.TouchInput.Y = wl_fixed_to_int(y);
+        
+        device->signalEvent(event);
+    }
+    
+    static void touch_handle_frame(void* data, wl_touch* touch)
+    {
+    }
+    
+    static void touch_handle_cancel(void* data, wl_touch* touch)
+    {
+    }
 
     static void seat_capabilities(void* data, wl_seat* seat, uint32_t caps)
     {
@@ -461,6 +516,18 @@ public:
         {
             wl_keyboard_destroy(device->m_keyboard);
             device->m_keyboard = NULL;
+        }
+        
+        if ((caps & WL_SEAT_CAPABILITY_TOUCH) && !device->m_touch)
+        {
+            device->m_touch = wl_seat_get_touch(seat);
+            wl_touch_add_listener(device->m_touch, &touch_listener,
+                                  device);
+        }
+        else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && device->m_touch)
+        {
+            wl_touch_destroy(device->m_touch);
+            device->m_touch = NULL;
         }
     }
 
@@ -643,6 +710,15 @@ const wl_keyboard_listener WaylandCallbacks::keyboard_listener =
     WaylandCallbacks::keyboard_key,
     WaylandCallbacks::keyboard_modifiers,
     WaylandCallbacks::keyboard_repeat_info
+};
+
+const wl_touch_listener WaylandCallbacks::touch_listener =
+{
+    WaylandCallbacks::touch_handle_down,
+    WaylandCallbacks::touch_handle_up,
+    WaylandCallbacks::touch_handle_motion,
+    WaylandCallbacks::touch_handle_frame,
+    WaylandCallbacks::touch_handle_cancel
 };
 
 const wl_seat_listener WaylandCallbacks::seat_listener =

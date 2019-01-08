@@ -169,6 +169,7 @@ namespace irr
         wl_display* m_display;
         wl_egl_window* m_egl_window;
         wl_keyboard* m_keyboard;
+        wl_touch* m_touch;
         wl_output* m_output;
         wl_pointer* m_pointer;
         wl_registry* m_registry;
