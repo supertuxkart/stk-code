@@ -240,7 +240,7 @@ namespace StringUtils
     }   // parseString
 
     // ------------------------------------------------------------------------
-
+    
     irr::core::stringw utf8ToWide(const char* input);
     irr::core::stringw utf8ToWide(const std::string &input);
     std::string wideToUtf8(const wchar_t* input);
@@ -270,15 +270,6 @@ namespace StringUtils
 #endif
         return uagent;
     }
-
-    /**
-     * Returns the hostname part of an url (if any)
-     *
-     * Example https://online.supertuxkart.net/
-     *
-     */
-    std::string getHostNameFromURL(const std::string& url);
-
 } // namespace StringUtils
 
 #endif
