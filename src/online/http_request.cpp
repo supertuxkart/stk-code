@@ -98,7 +98,6 @@ namespace Online
         if (m_http_header == nullptr)
         {
             std::string Host = "Host: " + StringUtils::getHostNameFromURL(UserConfigParams::m_server_multiplayer);
-            Log::error("HTTPRequest::init TEST", Host.c_str());
             m_http_header = curl_slist_append(m_http_header, Host.c_str());
         }
         m_disable_sending_log = false;
