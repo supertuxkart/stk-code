@@ -101,6 +101,10 @@ public:
      *  if a line is crossed. Used for basket calls in cannon (the ball can
      *  be too heigh to otherwise trigger he cannon). */
     void setIgnoreHeight(bool b) { m_ignore_height = b;  }
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns);
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& b);
 };   // CheckLine
 
 #endif

@@ -53,48 +53,48 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-        false /* depth of field */, true /* degraded IBL */
+        false /* light scatter */, false /* animatedCharacters */, 1 /* particles */,
+        0 /* image_quality */, false /* depth of field */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
-        false /* depth of field */, true /* degraded IBL */
+        false /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
+        0 /* image_quality */, false /* depth of field */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        false /* depth of field */, true /* degraded IBL */
+        false /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
+        1 /* image_quality */, false /* depth of field */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        false /* depth of field */, false /* degraded IBL */
+        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
+        1 /* image_quality */, false /* depth of field */, false /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        true /* depth of field */, false /* degraded IBL */
+        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
+        2 /* image_quality */, true /* depth of field */, false /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        true /* depth of field */, false /* degraded IBL */
+        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
+        2 /* image_quality */, true /* depth of field */, false /* degraded IBL */
     });
 
 }   // initPresets
@@ -412,6 +412,7 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].motionblur == UserConfigParams::m_motionblur &&
             m_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
             m_presets[l].ssao == UserConfigParams::m_ssao &&
+            m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
             m_presets[l].dof == UserConfigParams::m_dof &&
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
         {
@@ -471,6 +472,9 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Light scattering: %s",
+        UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
@@ -587,6 +591,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_motionblur = m_presets[level].motionblur;
         UserConfigParams::m_shadows_resolution = m_presets[level].shadows;
         UserConfigParams::m_ssao = m_presets[level].ssao;
+        UserConfigParams::m_light_scatter = m_presets[level].light_scatter;
         UserConfigParams::m_dof = m_presets[level].dof;
         UserConfigParams::m_degraded_IBL = m_presets[level].degraded_ibl;
 

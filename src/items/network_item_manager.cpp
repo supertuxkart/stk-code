@@ -191,7 +191,11 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                                  int ticks)
 {
     assert(NetworkConfig::get()->isServer());
-    if (ticks > m_last_confirmed_item_ticks.at(peer))
+    std::unique_lock<std::mutex> ul(m_live_players_mutex);
+    // Peer may get removed earlier if peer request to go back to lobby
+    if (m_last_confirmed_item_ticks.find(peer) !=
+        m_last_confirmed_item_ticks.end() &&
+        ticks > m_last_confirmed_item_ticks.at(peer))
         m_last_confirmed_item_ticks.at(peer) = ticks;
 
     // Now discard unneeded events and expired (disconnected) peer, i.e. all
@@ -210,6 +214,7 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
             it++;
         }
     }
+    ul.unlock();
 
     // Find the last entry before the minimal confirmed time.
     // Since the event list is sorted, all events up to this

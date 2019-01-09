@@ -116,6 +116,18 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
+            <spacer width="70" height="10"/>
+            
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="lightscattering"/>
+                <spacer width="10" height="10"/>
+                <label text="Light Scattering" I18N="Video settings"/>
+            </div>
+        </div>
+        
+        <spacer height="4" width="10" />
+
+        <div layout="horizontal-row" width="100%" proportion="1">
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="animated_characters"/>
                 <spacer width="10" height="10"/>
