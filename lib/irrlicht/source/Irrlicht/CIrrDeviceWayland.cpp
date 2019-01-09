@@ -23,11 +23,16 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
-#include <linux/input.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
 #include <unistd.h>
 #include <time.h>
+
+#ifdef __FreeBSD__
+#include <dev/evdev/input.h>
+#else
+#include <linux/input.h>
+#endif
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
