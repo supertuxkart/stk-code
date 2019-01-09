@@ -454,6 +454,7 @@ public:
              
         if (device->m_touches_count == 0)
         {
+            pointer_motion(data, NULL, 0, x, y);
             pointer_button(data, NULL, 0, 0, BTN_LEFT, 
                            WL_POINTER_BUTTON_STATE_PRESSED);
         }
