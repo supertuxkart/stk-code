@@ -442,7 +442,7 @@ public:
                                   int32_t id, wl_fixed_t x, wl_fixed_t y)
     {
         CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
-        
+
         SEvent event;
         event.EventType = EET_TOUCH_INPUT_EVENT;
         event.TouchInput.Event = ETIE_PRESSED_DOWN;
@@ -451,6 +451,14 @@ public:
         event.TouchInput.Y = wl_fixed_to_int(y);
         
         device->signalEvent(event);
+             
+        if (device->m_touches_count == 0)
+        {
+            pointer_button(data, NULL, 0, 0, BTN_LEFT, 
+                           WL_POINTER_BUTTON_STATE_PRESSED);
+        }
+
+        device->m_touches_count++;
     }
     
     static void touch_handle_up(void* data, wl_touch* touch, uint32_t serial,
@@ -466,6 +474,14 @@ public:
         event.TouchInput.Y = 0;
         
         device->signalEvent(event);
+        
+        if (device->m_touches_count == 1)
+        {
+            pointer_button(data, NULL, 0, 0, BTN_LEFT, 
+                           WL_POINTER_BUTTON_STATE_RELEASED);
+        }
+
+        device->m_touches_count--;
     }
     
     static void touch_handle_motion(void* data, wl_touch* touch, uint32_t time,
@@ -481,6 +497,11 @@ public:
         event.TouchInput.Y = wl_fixed_to_int(y);
         
         device->signalEvent(event);
+        
+        if (device->m_touches_count == 1)
+        {
+            pointer_motion(data, NULL, 0, x, y);
+        }
     }
     
     static void touch_handle_frame(void* data, wl_touch* touch)
@@ -489,6 +510,9 @@ public:
     
     static void touch_handle_cancel(void* data, wl_touch* touch)
     {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        device->m_touches_count = 0;
     }
 
     static void seat_capabilities(void* data, wl_seat* seat, uint32_t caps)
@@ -837,6 +861,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_mouse_button_states = 0;
     m_width = params.WindowSize.Width;
     m_height = params.WindowSize.Height;
+    m_touches_count = 0;
     m_window_has_focus = false;
     m_window_minimized = false;
     
