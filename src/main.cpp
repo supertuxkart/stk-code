@@ -251,6 +251,7 @@
 #include "utils/log.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/profiler.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -2421,6 +2422,8 @@ void runUnitTests()
     NetworkString::unitTesting();
     Log::info("UnitTest", "TransportAddress");
     TransportAddress::unitTesting();
+    Log::info("UnitTest", "StringUtils::versionToInt");
+    StringUtils::unitTesting();
 
     Log::info("UnitTest", "Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
