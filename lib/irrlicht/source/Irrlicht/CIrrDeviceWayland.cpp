@@ -790,6 +790,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_display = NULL;
     m_egl_window = NULL;
     m_keyboard = NULL;
+    m_touch = NULL;
     m_output = NULL;
     m_pointer = NULL;
     m_registry = NULL;
