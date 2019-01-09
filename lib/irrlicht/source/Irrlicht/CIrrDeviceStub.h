@@ -118,6 +118,9 @@ namespace irr
 
 		//! Activate any joysticks, and generate events for them.
 		virtual bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo);
+		
+		//! Returns true if system has touch device
+		virtual bool supportsTouchDevice() { return false; }
 
 		//! Set the current Gamma Value for the Display
 		virtual bool setGammaRamp( f32 red, f32 green, f32 blue, f32 brightness, f32 contrast );

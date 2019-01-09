@@ -545,6 +545,7 @@ public:
         
         if ((caps & WL_SEAT_CAPABILITY_TOUCH) && !device->m_touch)
         {
+            device->m_has_touch_device = true;
             device->m_touch = wl_seat_get_touch(seat);
             wl_touch_add_listener(device->m_touch, &touch_listener,
                                   device);
@@ -863,6 +864,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_width = params.WindowSize.Width;
     m_height = params.WindowSize.Height;
     m_touches_count = 0;
+    m_has_touch_device = false;
     m_window_has_focus = false;
     m_window_minimized = false;
     

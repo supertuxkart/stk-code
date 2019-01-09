@@ -122,9 +122,15 @@ void OptionsScreenUI::loadedFromFile()
     //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("Hidden")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0)
+
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+                               irr_driver->getDevice()->supportsTouchDevice()) ||
+                               UserConfigParams::m_multitouch_active > 1;
+
+    if (multitouch_enabled && UserConfigParams::m_multitouch_mode != 0)
+    {
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+    }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
 }   // loadedFromFile
 
@@ -144,8 +150,11 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
 
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0 &&
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+                               irr_driver->getDevice()->supportsTouchDevice()) ||
+                               UserConfigParams::m_multitouch_active > 1;
+
+    if (multitouch_enabled && UserConfigParams::m_multitouch_mode != 0 &&
         UserConfigParams::m_minimap_display == 0)
     {
         UserConfigParams::m_minimap_display = 1;

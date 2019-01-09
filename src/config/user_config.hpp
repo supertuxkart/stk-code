@@ -478,10 +478,10 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
                                             "Settings for the multitouch device") );
 
-    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(true, "multitouch_enabled",
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_active
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_active",
             &m_multitouch_group,
-            "Enable multitouch support.") );
+            "Enable multitouch support: 0 = disabled, 1 = if available, 2 = enabled") );
             
     PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
             PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",

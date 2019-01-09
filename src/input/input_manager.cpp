@@ -1233,30 +1233,32 @@ EventPropagation InputManager::input(const SEvent& event)
             }
         }
 
-        // Simulate touch event on non-android devices
-        //~ #if !defined(ANDROID)
-        //~ MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-
-        //~ if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
-            //~ type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
-        //~ {
-            //~ device->m_events[0].id = 0;
-            //~ device->m_events[0].x = event.MouseInput.X;
-            //~ device->m_events[0].y = event.MouseInput.Y;
-
-            //~ if (type == EMIE_LMOUSE_PRESSED_DOWN)
-            //~ {
-                //~ device->m_events[0].touched = true;
-            //~ }
-            //~ else if (type == EMIE_LMOUSE_LEFT_UP)
-            //~ {
-                //~ device->m_events[0].touched = false;
-            //~ }
-
-            //~ m_device_manager->updateMultitouchDevice();
-            //~ device->updateDeviceState(0);
-        //~ }
-        //~ #endif
+        // Simulate touch events if there is no real device
+        if (UserConfigParams::m_multitouch_active > 1 && 
+            !irr_driver->getDevice()->supportsTouchDevice())
+        {
+            MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+    
+            if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
+                type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
+            {
+                device->m_events[0].id = 0;
+                device->m_events[0].x = event.MouseInput.X;
+                device->m_events[0].y = event.MouseInput.Y;
+    
+                if (type == EMIE_LMOUSE_PRESSED_DOWN)
+                {
+                    device->m_events[0].touched = true;
+                }
+                else if (type == EMIE_LMOUSE_LEFT_UP)
+                {
+                    device->m_events[0].touched = false;
+                }
+    
+                m_device_manager->updateMultitouchDevice();
+                device->updateDeviceState(0);
+            }
+        }
 
         /*
         EMIE_LMOUSE_PRESSED_DOWN    Left mouse button was pressed down.

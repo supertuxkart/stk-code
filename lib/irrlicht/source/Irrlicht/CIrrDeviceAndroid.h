@@ -75,6 +75,7 @@ namespace irr
         virtual bool isGyroscopeAvailable();
         virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
         virtual void showKeyboard(bool show);
+        virtual bool supportsTouchDevice() { return HasTouchDevice; }
         
         class CCursorControl : public gui::ICursorControl
         {
@@ -143,6 +144,7 @@ namespace irr
         };
         
         TouchEventData TouchEventsData[32];
+        bool HasTouchDevice;
         bool IsMousePressed;
         float GamepadAxisX;
         float GamepadAxisY;
