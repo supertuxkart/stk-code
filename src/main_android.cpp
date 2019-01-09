@@ -39,6 +39,9 @@ void override_default_params()
     
     // Disable advanced lighting by default to make the game playable
     UserConfigParams::m_dynamic_lights = false;
+
+    // Enable multitouch race GUI
+    UserConfigParams::m_multitouch_draw_gui = true;
     
     // Set multitouch device scale depending on actual screen size
     int32_t screen_size = AConfiguration_getScreenSize(global_android_app->config);

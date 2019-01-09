@@ -127,7 +127,7 @@ void OptionsScreenUI::loadedFromFile()
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
-    if (multitouch_enabled && UserConfigParams::m_multitouch_mode != 0)
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui)
     {
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     }
@@ -154,7 +154,7 @@ void OptionsScreenUI::init()
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
-    if (multitouch_enabled && UserConfigParams::m_multitouch_mode != 0 &&
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         UserConfigParams::m_minimap_display == 0)
     {
         UserConfigParams::m_minimap_display = 1;

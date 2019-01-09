@@ -483,10 +483,10 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Enable multitouch support: 0 = disabled, 1 = if available, 2 = enabled") );
             
-    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
-            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_draw_gui
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_draw_gui",
             &m_multitouch_group,
-            "Steering mode: 0 = off, 1 = buttons"));
+            "Enable multitouch race GUI"));
 
     PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
             PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
