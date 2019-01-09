@@ -98,6 +98,7 @@ namespace Online
         if (m_http_header == nullptr)
         {
             std::string Host = "Host: " + StringUtils::getHostNameFromURL(UserConfigParams::m_server_multiplayer);
+            Log::error("HTTPRequest::init TEST", Host.c_str());
             m_http_header = curl_slist_append(m_http_header, Host.c_str());
         }
         m_disable_sending_log = false;
@@ -169,7 +170,7 @@ namespace Online
         }
 
         curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.c_str());
-        curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
         curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, this);
         curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSFUNCTION,
@@ -179,18 +180,22 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
         curl_easy_setopt(m_curl_session, CURLOPT_NOSIGNAL, 1);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
-        if (m_url.substr(0, 8) == "https://")
+
+        // https, load certificate info
+        const std::string& ci = file_manager->getCertBundleLocation();
+        CURLcode error = curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, ci.c_str());
+        if (error != CURLE_OK)
         {
-            // https, load certificate info
-            assert(m_http_header != nullptr);
-            curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, m_http_header);
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
-#ifdef __APPLE__
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
-#else
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 1L);
-#endif
+            Log::error("HTTPRequest", "Error setting CAINFO to '%s'",
+                ci.c_str());
+            Log::error("HTTPRequest", "Error: '%s'.", error,
+                curl_easy_strerror(error));
         }
+
+        assert(m_http_header != nullptr);
+        curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, m_http_header);
+        curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
+        curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 2L);
     }   // prepareOperation
 
     // ------------------------------------------------------------------------

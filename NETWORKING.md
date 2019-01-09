@@ -4,7 +4,7 @@
 First of all, you can compile STK with `-DSERVER_ONLY=ON` which will produce a GUI-less STK binary optimized for size and memory usage, useful for situation like in VPS.
 
 ### Hosting WAN (public internet) server
-You are required to have an stk online account first, go [here](https://addons.supertuxkart.net/register.php) for registration.
+You are required to have an stk online account first, go [here](https://online.supertuxkart.net/register.php) for registration.
 
 It is recommended you have a saved user in your computer to allow hosting multiple servers simultaneously with the same account, if you have a fresh STK installation, first run:
 
@@ -178,7 +178,7 @@ There is a network AI tester in STK which can use AI on player controller for se
 
 x.x.x.x:y is your server ip address with its port, id is the id field of server-info in STK server xml list, omit it if you are testing LAN server, n is the number of AI you want to create.
 
-You can see STK server xml list [here](https://addons.supertuxkart.net/api/v2/server/get-all).
+You can see STK server xml list [here](https://online.supertuxkart.net/api/v2/server/get-all).
 
 You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
 
