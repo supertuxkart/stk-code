@@ -827,22 +827,26 @@ namespace StringUtils
      *  the string is found, it is removed from s, pre-release gets the
      *  value of X, and the function returns true. If the string is not
      *  found, the return value is false, and nothing is changed.
-     *  \param s The string in which to search for WORD. Example:
-     *   checkForStringNumber("10-alpha2", "alpha", &x) will return true,
-     *  set s to "10", and x to 2.
+     *  Example:
+     *    std::string version_with_suffix = "10-alpha2";
+     *    checkForStringNumber(&version_with-suffix, "alpha", &x)
+     *  will set version_with_suffix to "10", x to 2, and return true.
+     *  \param version_with_suffix The string in which to search for WORD.
      *  \param word The word to search for.
      *  \param pre-release An integer pointer in which to store the result.
      */
-    bool checkForStringNumber(std::string *s, const std::string &word,
+    bool checkForStringNumber(std::string *version_with_suffix, const std::string &word,
                               int *pre_release)
     {
-        size_t n = s->find(std::string("-")+word);
-        if (n == std::string::npos) return false;
+        // First check if the word string is contained:
+        size_t pos = version_with_suffix->find(std::string("-")+word);
+        if (pos == std::string::npos) return false;
 
         std::string word_string = std::string("-") + word + "%d";
-        if (sscanf(s->substr(n).c_str(), word_string.c_str(), pre_release) == 1)
+        if (sscanf(version_with_suffix->substr(pos).c_str(),
+                   word_string.c_str(), pre_release         ) == 1)
         {
-            s->erase(n);
+            version_with_suffix->erase(pos);  // Erase the suffix (till end)
             return true;
         }
         return false;
@@ -865,46 +869,59 @@ namespace StringUtils
                     +         99;
         }
 
-        std::vector<std::string> l = StringUtils::split(version_string, '.');
-        std::string s = l.back();   // the string that might contain alpha,...
-        while (l.size() < 3)
-            l.push_back("0");
+        std::vector<std::string> version_parts
+            = StringUtils::split(version_string, '.');
+
+        // The string that might contain alpha, etc details
+        std::string version_with_suffix = version_parts.back();
+
+        // Fill up to a 3 digit number
+        while (version_parts.size() < 3)
+            version_parts.push_back("0");
 
         // To guarantee that a release gets a higher version number than
         // an alpha, beta or release candidate, we assign a 'pre_release' number
         // of 99 to versions which are not alpha/beta/RC. An alpha version
         // gets the number 01 till 09; beta 11 till 19; and RC 21 till 29
         int pre_release=99;
-        if(checkForStringNumber(&s, "alpha", &pre_release))
+        if(checkForStringNumber(&version_with_suffix, "alpha", &pre_release))
         {
             assert(pre_release <= 9 && pre_release >0);
             // Nothing to do, pre_release is between 1 and 9
         }
-        else if(checkForStringNumber(&s, "beta", &pre_release))
+        else if(checkForStringNumber(&version_with_suffix, "beta", &pre_release))
         {
             assert(pre_release <= 9 && pre_release > 0);
             pre_release += 10;
         }
-        else if (checkForStringNumber(&s, "rc", &pre_release))
+        else if (checkForStringNumber(&version_with_suffix, "rc", &pre_release))
         {
             assert(pre_release <= 9 && pre_release > 0);
             pre_release += 20;
         }
 
         int very_minor=0;
-        if(s.length()>0 && s[s.size()-1]>='a' && s[s.size()-1]<='z')
+        if(version_with_suffix.length()>0     &&
+           version_with_suffix.back() >= 'a'  &&
+           version_with_suffix.back() <= 'z'     )
         {
-            very_minor = s[s.size()-1]-'a'+1;
-            s = s.substr(0, s.size()-1);
+            very_minor = version_with_suffix[version_with_suffix.size()-1]-'a'+1;
+            // Remove suffix character
+            version_with_suffix.erase(version_with_suffix.size()-1);
         }
-        int version = 10000000*atoi(l[0].c_str())
-                    +   100000*atoi(l[1].c_str())
-                    +     1000*atoi(l[2].c_str())
+
+        // This relies on the fact that atoi will stop at a non-digit:
+        // E.g. if the version is '1.0-rc1', the 'rc1' is converted and
+        // stored in pre_release, but the version_parts[1] string still
+        // contains the '-rc1' suffix.
+        int version = 10000000*atoi(version_parts[0].c_str())
+                    +   100000*atoi(version_parts[1].c_str())
+                    +     1000*atoi(version_parts[2].c_str())
                     +      100*very_minor
-                    +         pre_release;
+                    +          pre_release;
 
         if(version <= 0)
-            Log::error("StringUtils", "Invalid version string '%s'.", s.c_str());
+            Log::error("StringUtils", "Invalid version string '%s'.", version_with_suffix.c_str());
         return version;
     }   // versionToInt
 
