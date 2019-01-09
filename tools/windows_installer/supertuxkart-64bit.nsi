@@ -32,10 +32,10 @@
   ; Version information
   ; TOOD get these from the source code directly
   !define VERSION_MAJOR 0
-  !define VERSION_MINOR 9
-  !define VERSION_REVISION 3
+  !define VERSION_MINOR 10
+  !define VERSION_REVISION 0
   ; Empty means stable, could be -git, -rc1
-  !define VERSION_BUILD "-git"
+  !define VERSION_BUILD "-beta1"
   
   ;Name and file
   !define APPNAME "SuperTuxKart"
