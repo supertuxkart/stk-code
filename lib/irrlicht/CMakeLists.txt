@@ -579,7 +579,7 @@ include/vector2d.h
 include/vector3d.h
 )
 
-if(ENABLE_WAYLAND_DEVICE)
+if(NOT SERVER_ONLY AND ENABLE_WAYLAND_DEVICE)
     set(IRRLICHT_SOURCES 
         ${IRRLICHT_SOURCES}
         source/Irrlicht/xdg_decoration_unstable_v1_protocol.c
