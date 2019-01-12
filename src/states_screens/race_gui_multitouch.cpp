@@ -44,6 +44,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 {
     m_race_gui = race_gui;
     m_gui_action = false;
+    m_is_spectator_mode = false;
     m_height = 0;
     m_steering_wheel_tex = NULL;
     m_up_down_tex = NULL;
@@ -129,6 +130,7 @@ void RaceGUIMultitouch::init()
     if (cl && cl->isSpectator())
     {
         createSpectatorGUI();
+        m_is_spectator_mode = true;
     }
     else
     {
@@ -246,7 +248,6 @@ void RaceGUIMultitouch::createSpectatorGUI()
 {
     const float scale = UserConfigParams::m_multitouch_scale;
 
-    const int w = irr_driver->getActualScreenSize().Width;
     const int h = irr_driver->getActualScreenSize().Height;
     const float btn_size = 0.125f * h * scale;
     const float margin = 0.075f * h * scale;
@@ -271,7 +272,7 @@ void RaceGUIMultitouch::createSpectatorGUI()
                     int(btn_size), int(btn_size), onCustomButtonPress);
                     
     m_device->addButton(BUTTON_CUSTOM,
-                    int(w - margin - btn_size), int(h - margin - btn_size),
+                    int(margin * 3 + btn_size * 2), int(h - margin - btn_size),
                     int(btn_size), int(btn_size), onCustomButtonPress);
     
 } // createSpectatorGUI
