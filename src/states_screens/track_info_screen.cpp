@@ -93,11 +93,14 @@ void TrackInfoScreen::loadedFromFile()
 
 void TrackInfoScreen::beforeAddingWidget()
 {
-    m_is_soccer = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    m_is_soccer = race_manager->isSoccerMode();
 #ifdef FFA_AI_DISABLED
-    m_show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES && race_manager->getNumLocalPlayers() > 1;
+    m_show_ffa_spinner = (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES 
+                        || race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+                        && race_manager->getNumLocalPlayers() > 1;
 #else
-    m_show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES;
+    m_show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
+                        || race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
 #endif
 
     if (m_is_soccer || m_show_ffa_spinner)
