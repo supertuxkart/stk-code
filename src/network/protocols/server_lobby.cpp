@@ -316,6 +316,7 @@ void ServerLobby::handleChat(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
 
+    const bool sender_in_game = event->getPeer()->isWaitingForGame();
     core::stringw message;
     event->data().decodeString16(&message);
     if (message.size() > 0)
@@ -323,17 +324,19 @@ void ServerLobby::handleChat(Event* event)
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
-        // After game is started, only send to waiting player
         const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
-        STKHost::get()->sendPacketToAllPeersWith([game_started]
-            (STKPeer* p)
+        STKHost::get()->sendPacketToAllPeersWith(
+            [game_started, sender_in_game](STKPeer* p)
             {
                 if (!p->isValidated())
                     return false;
-                if (!game_started)
-                    return true;
-                if (!p->isWaitingForGame() && game_started)
-                    return false;
+                if (game_started)
+                {
+                    if (p->isWaitingForGame() && !sender_in_game)
+                        return false;
+                    if (!p->isWaitingForGame() && sender_in_game)
+                        return false;
+                }
                 return true;
             }, chat);
         delete chat;
@@ -802,6 +805,7 @@ void ServerLobby::liveJoinRequest(Event* event)
                     rki.getDefaultKartColor(),
                     rki.getOnlineId(), rki.getDifficulty(),
                     rki.getLocalPlayerId(), KART_TEAM_NONE);
+                player->setKartName(rki.getKartName());
             }
             else
             {
@@ -1300,7 +1304,8 @@ void ServerLobby::startSelection(const Event *event)
     }
 
 
-    if (ServerConfig::m_team_choosing && race_manager->teamEnabled())
+    if (!ServerConfig::m_owner_less && ServerConfig::m_team_choosing &&
+        race_manager->teamEnabled())
     {
         auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
         if ((red_blue.first == 0 || red_blue.second == 0) &&
@@ -1685,6 +1690,8 @@ void ServerLobby::computeNewRankings()
         double player1_time  = race_manager->getKartRaceTime(i);
         double player1_factor =
             computeRankingFactor(race_manager->getKartInfo(i).getOnlineId());
+        double player1_handicap = (   w->getKart(i)->getPerPlayerDifficulty()
+                                   == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
 
         for (unsigned j = 0; j < player_count; j++)
         {
@@ -1704,6 +1711,8 @@ void ServerLobby::computeNewRankings()
 
             double player2_scores = new_scores[j];
             double player2_time = race_manager->getKartRaceTime(j);
+            double player2_handicap = (   w->getKart(j)->getPerPlayerDifficulty()
+                                       == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
 
             // Compute the result and race ranking importance
             double player_factors = std::min(player1_factor,
@@ -1750,6 +1759,9 @@ void ServerLobby::computeNewRankings()
 
             // Compute the expected result using an ELO-like function
             double diff = player2_scores - player1_scores;
+
+            if (!w->getKart(i)->isEliminated() && !w->getKart(j)->isEliminated())
+                diff += player1_handicap - player2_handicap;
 
             double uncertainty = std::max(getUncertaintySpread(race_manager->getKartInfo(i).getOnlineId()),
                                           getUncertaintySpread(race_manager->getKartInfo(j).getOnlineId()) );
@@ -2108,9 +2120,10 @@ void ServerLobby::connectionRequested(Event* event)
     // Reject non-valiated player joinning if WAN server and not disabled
     // encforement of validation, unless it's player from localhost or lan
     // And no duplicated online id or split screen players in ranked server
+    std::set<uint32_t> all_online_ids =
+        STKHost::get()->getAllPlayerOnlineIds();
     bool duplicated_ranked_player =
-        m_ranked_players.find(online_id) != m_ranked_players.end() &&
-        !m_ranked_players.at(online_id).expired();
+        all_online_ids.find(online_id) != all_online_ids.end();
 
     if (((encrypted_size == 0 || online_id == 0) &&
         !(peer->getAddress().isPublicAddressLocalhost() ||
@@ -2169,9 +2182,10 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     // Check again for duplicated player in ranked server
+    std::set<uint32_t> all_online_ids =
+        STKHost::get()->getAllPlayerOnlineIds();
     bool duplicated_ranked_player =
-        m_ranked_players.find(online_id) != m_ranked_players.end() &&
-        !m_ranked_players.at(online_id).expired();
+        all_online_ids.find(online_id) != all_online_ids.end();
     if (ServerConfig::m_ranked && duplicated_ranked_player)
     {
         NetworkString* message = getNetworkString(2);
@@ -3069,25 +3083,6 @@ void ServerLobby::addWaitingPlayersToGame()
         auto peer = profile->getPeer();
         if (!peer || !peer->isValidated())
             continue;
-        uint32_t online_id = profile->getOnlineId();
-        if (ServerConfig::m_ranked)
-        {
-            bool duplicated_ranked_player =
-                m_ranked_players.find(online_id) != m_ranked_players.end() &&
-                !m_ranked_players.at(online_id).expired();
-            if (duplicated_ranked_player)
-            {
-                NetworkString* message = getNetworkString(2);
-                message->setSynchronous(true);
-                message->addUInt8(LE_CONNECTION_REFUSED)
-                    .addUInt8(RR_INVALID_PLAYER);
-                peer->sendPacket(message, true/*reliable*/);
-                peer->reset();
-                delete message;
-                Log::verbose("ServerLobby", "Player refused: invalid player");
-                continue;
-            }
-        }
 
         peer->setWaitingForGame(false);
         if (m_peers_ready.find(peer) == m_peers_ready.end())
@@ -3099,7 +3094,11 @@ void ServerLobby::addWaitingPlayersToGame()
                 profile->getOnlineId(), peer->getAddress().toString().c_str(),
                 peer->getUserVersion().c_str());
         }
-        if (ServerConfig::m_ranked)
+        uint32_t online_id = profile->getOnlineId();
+        if (ServerConfig::m_ranked &&
+            (m_ranked_players.find(online_id) == m_ranked_players.end() ||
+            (m_ranked_players.find(online_id) != m_ranked_players.end() &&
+            m_ranked_players.at(online_id).expired())))
         {
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }

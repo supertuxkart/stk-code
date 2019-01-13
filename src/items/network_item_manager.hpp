@@ -27,6 +27,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 
 class STKPeer;
 
@@ -53,6 +54,9 @@ private:
 
     /** Time at which m_confirmed_state was taken. */
     int m_confirmed_state_time;
+
+    /** Allow remove or add peer live. */
+    std::mutex m_live_players_mutex;
 
     /** Stores on the server the latest confirmed tick from each client. */
     std::map<std::weak_ptr<STKPeer>, int32_t,
@@ -99,10 +103,16 @@ public:
     virtual void undoEvent(BareNetworkString*) OVERRIDE {};
     // ------------------------------------------------------------------------
     void addLiveJoinPeer(std::weak_ptr<STKPeer> peer)
-                                     { m_last_confirmed_item_ticks[peer] = 0; }
+    {
+        std::lock_guard<std::mutex> lock(m_live_players_mutex);
+        m_last_confirmed_item_ticks[peer] = 0;
+    }
     // ------------------------------------------------------------------------
     void erasePeerInGame(std::weak_ptr<STKPeer> peer)
-                                   { m_last_confirmed_item_ticks.erase(peer); }
+    {
+        std::lock_guard<std::mutex> lock(m_live_players_mutex);
+        m_last_confirmed_item_ticks.erase(peer);
+    }
     // ------------------------------------------------------------------------
     void saveCompleteState(BareNetworkString* buffer) const;
     // ------------------------------------------------------------------------

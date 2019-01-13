@@ -168,7 +168,9 @@ bool DeviceManager::initialize()
         addGamepad(gamepadDevice);
     } // end for
 
-    if (UserConfigParams::m_multitouch_enabled)
+    if ((UserConfigParams::m_multitouch_active == 1 && 
+        irr_driver->getDevice()->supportsTouchDevice()) ||
+        UserConfigParams::m_multitouch_active > 1)
     {
         m_multitouch_device = new MultitouchDevice();
     }

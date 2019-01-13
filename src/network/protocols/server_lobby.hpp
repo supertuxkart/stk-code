@@ -134,6 +134,7 @@ private:
     const double BASE_RANKING_POINTS   = 4000.0;
     const double MAX_SCALING_TIME      = 500.0;
     const double MAX_POINTS_PER_SECOND = 0.125;
+    const double HANDICAP_OFFSET       = 1000.0;
 
     /** Online id to profile map, handling disconnection in ranked server */
     std::map<uint32_t, std::weak_ptr<NetworkPlayerProfile> > m_ranked_players;

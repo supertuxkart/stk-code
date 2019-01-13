@@ -112,7 +112,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
 
         CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
         assert(buttons_en != NULL);
-        UserConfigParams::m_multitouch_mode = buttons_en->getState() ? 1 : 0;
+        UserConfigParams::m_multitouch_draw_gui = buttons_en->getState();
         
         CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
         assert(buttons_inv != NULL);
@@ -151,14 +151,14 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
     }
     else if (eventSource == "restore")
     {
-        UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
         UserConfigParams::m_multitouch_sensitivity_y.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone.revertToDefaults();
-        UserConfigParams::m_multitouch_mode.revertToDefaults();
         UserConfigParams::m_multitouch_inverted.revertToDefaults();
         UserConfigParams::m_multitouch_controls.revertToDefaults();
         
 #ifdef ANDROID
+        UserConfigParams::m_multitouch_draw_gui = true;
+
         int32_t screen_size = AConfiguration_getScreenSize(
                                                     global_android_app->config);
         
@@ -167,19 +167,25 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         case ACONFIGURATION_SCREENSIZE_SMALL:
         case ACONFIGURATION_SCREENSIZE_NORMAL:
             UserConfigParams::m_multitouch_scale = 1.3f;
+            UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
             break;
         case ACONFIGURATION_SCREENSIZE_LARGE:
             UserConfigParams::m_multitouch_scale = 1.2f;
+            UserConfigParams::m_multitouch_sensitivity_x = 0.15f;
             break;
         case ACONFIGURATION_SCREENSIZE_XLARGE:
             UserConfigParams::m_multitouch_scale = 1.1f;
+            UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
             break;
         default:
             UserConfigParams::m_multitouch_scale.revertToDefaults();
+            UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
             break;
         }
 #else
+        UserConfigParams::m_multitouch_draw_gui.revertToDefaults();
         UserConfigParams::m_multitouch_scale.revertToDefaults();
+        UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
 #endif
 
         updateValues();
@@ -227,7 +233,7 @@ void MultitouchSettingsDialog::updateValues()
 
     CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
     assert(buttons_en != NULL);
-    buttons_en->setState(UserConfigParams::m_multitouch_mode != 0);
+    buttons_en->setState(UserConfigParams::m_multitouch_draw_gui);
     
     CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
     assert(buttons_inv != NULL);

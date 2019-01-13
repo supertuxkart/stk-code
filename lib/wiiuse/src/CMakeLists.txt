@@ -85,9 +85,11 @@ set_property(TARGET
 	PUBLIC_HEADER
 	${API})
 
-set_property(TARGET wiiuse APPEND PROPERTY
-  COMPILE_DEFINITIONS $<$<CONFIG:Debug>:WITH_WIIUSE_DEBUG>
-)
+if(MSVC)
+	set_property(TARGET wiiuse APPEND PROPERTY
+	  COMPILE_DEFINITIONS $<$<CONFIG:Debug>:WITH_WIIUSE_DEBUG>
+	)
+endif()
 
 install(TARGETS wiiuse
 	RUNTIME DESTINATION bin

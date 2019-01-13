@@ -813,6 +813,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     if (cl->isSpectator() && cam)
                     {
                         // Network spectating handling
+                        if (action == PA_LOOK_BACK && value == 0)
+                        {
+                            if (cam->getMode() == Camera::CM_REVERSE)
+                            {
+                                cam->setMode(Camera::CM_NORMAL);
+                            }
+                            else
+                                cam->setMode(Camera::CM_REVERSE);
+                            return;
+                        }
+
                         int current_idx = 0;
                         if (cam->getKart())
                             current_idx = cam->getKart()->getWorldKartId();
@@ -1222,30 +1233,32 @@ EventPropagation InputManager::input(const SEvent& event)
             }
         }
 
-        // Simulate touch event on non-android devices
-        #if !defined(ANDROID)
-        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-
-        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
-            type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
+        // Simulate touch events if there is no real device
+        if (UserConfigParams::m_multitouch_active > 1 && 
+            !irr_driver->getDevice()->supportsTouchDevice())
         {
-            device->m_events[0].id = 0;
-            device->m_events[0].x = event.MouseInput.X;
-            device->m_events[0].y = event.MouseInput.Y;
-
-            if (type == EMIE_LMOUSE_PRESSED_DOWN)
+            MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+    
+            if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
+                type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
             {
-                device->m_events[0].touched = true;
+                device->m_events[0].id = 0;
+                device->m_events[0].x = event.MouseInput.X;
+                device->m_events[0].y = event.MouseInput.Y;
+    
+                if (type == EMIE_LMOUSE_PRESSED_DOWN)
+                {
+                    device->m_events[0].touched = true;
+                }
+                else if (type == EMIE_LMOUSE_LEFT_UP)
+                {
+                    device->m_events[0].touched = false;
+                }
+    
+                m_device_manager->updateMultitouchDevice();
+                device->updateDeviceState(0);
             }
-            else if (type == EMIE_LMOUSE_LEFT_UP)
-            {
-                device->m_events[0].touched = false;
-            }
-
-            m_device_manager->updateMultitouchDevice();
-            device->updateDeviceState(0);
         }
-        #endif
 
         /*
         EMIE_LMOUSE_PRESSED_DOWN    Left mouse button was pressed down.

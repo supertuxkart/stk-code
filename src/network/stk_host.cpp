@@ -1278,7 +1278,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
 {
     std::vector<std::shared_ptr<NetworkPlayerProfile> > p;
     std::unique_lock<std::mutex> lock(m_peers_mutex);
-    for (auto peer : m_peers)
+    for (auto& peer : m_peers)
     {
         if (peer.second->isDisconnected() || !peer.second->isValidated())
             continue;
@@ -1288,6 +1288,25 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     lock.unlock();
     return p;
 }   // getAllPlayerProfiles
+
+//-----------------------------------------------------------------------------
+std::set<uint32_t> STKHost::getAllPlayerOnlineIds() const
+{
+    std::set<uint32_t> online_ids;
+    std::unique_lock<std::mutex> lock(m_peers_mutex);
+    for (auto& peer : m_peers)
+    {
+        if (peer.second->isDisconnected() || !peer.second->isValidated())
+            continue;
+        if (!peer.second->getPlayerProfiles().empty())
+        {
+            online_ids.insert(
+                peer.second->getPlayerProfiles()[0]->getOnlineId());
+        }
+    }
+    lock.unlock();
+    return online_ids;
+}   // getAllPlayerOnlineIds
 
 //-----------------------------------------------------------------------------
 std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const

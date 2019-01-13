@@ -204,7 +204,7 @@ void TrackSector::saveCompleteState(BareNetworkString* bns)
     bns->add(m_current_track_coords);
     bns->add(m_estimated_valid_track_coords);
     bns->add(m_latest_valid_track_coords);
-    bns->addUInt8(m_on_road ? 0 : 1);
+    bns->addUInt8(m_on_road ? 1 : 0);
     bns->addUInt32(m_last_triggered_checkline);
 }   // saveCompleteState
 

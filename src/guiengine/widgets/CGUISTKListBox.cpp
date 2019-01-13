@@ -545,7 +545,7 @@ void CGUISTKListBox::draw()
                         core::position2di iconPos = textRect.UpperLeftCorner;
                         iconPos.Y += textRect.getHeight() / 2;
                         
-                        if (Items[i].m_contents[x].m_center)
+                        if (Items[i].m_contents[x].m_center && Items[i].m_contents[x].m_text.size() == 0)
                         {
                             iconPos.X += part_size/2 - 3;
                         }

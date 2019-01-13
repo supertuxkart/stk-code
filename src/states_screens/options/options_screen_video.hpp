@@ -35,6 +35,7 @@ struct GFXPreset
     bool glow;
     bool mlaa;
     bool ssao;
+    bool light_scatter;
     bool animatedCharacters;
     int particles;
     int image_quality;

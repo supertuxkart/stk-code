@@ -515,26 +515,12 @@ void NetworkingLobby::updatePlayerPings()
 }   // updatePlayerPings
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::sendChat(irr::core::stringw text)
+bool NetworkingLobby::onEnterPressed(const irr::core::stringw& text)
 {
-    text = text.trim().removeChars(L"\n\r");
-    if (text.size() > 0)
-    {
-        NetworkString chat(PROTOCOL_LOBBY_ROOM);
-        chat.addUInt8(LobbyProtocol::LE_CHAT);
-
-        core::stringw name;
-        PlayerProfile* player = PlayerManager::getCurrentPlayer();
-        if (PlayerManager::getCurrentOnlineState() ==
-            PlayerProfile::OS_SIGNED_IN)
-            name = PlayerManager::getCurrentOnlineUserName();
-        else
-            name = player->getName();
-        chat.encodeString16(name + L": " + text);
-
-        STKHost::get()->sendToServer(&chat, true);
-    }
-}   // sendChat
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        cl->sendChat(text);
+    return true;
+}   // onEnterPressed
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
@@ -563,7 +549,8 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
-        sendChat(m_chat_box->getText());
+        if (auto cl = LobbyProtocol::get<ClientLobby>())
+            cl->sendChat(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
     else if (name == m_start_button->m_properties[PROP_ID])

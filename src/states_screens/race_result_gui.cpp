@@ -665,6 +665,8 @@ void RaceResultGUI::displayCTFResults()
         // ignore e.g. the leader in a FTL race).
         unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1 - sta;
 
+        // Remove previous entries to avoid reserved kart in network being displayed
+        m_all_row_infos.clear();
         // In FTL races the leader kart is not displayed
         m_all_row_infos.resize(num_karts);
 

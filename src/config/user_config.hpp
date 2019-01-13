@@ -484,15 +484,15 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
                                             "Settings for the multitouch device") );
 
-    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_active
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_active",
             &m_multitouch_group,
-            "Enable multitouch support.") );
+            "Enable multitouch support: 0 = disabled, 1 = if available, 2 = enabled") );
             
-    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
-            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_draw_gui
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_draw_gui",
             &m_multitouch_group,
-            "Steering mode: 0 = off, 1 = buttons"));
+            "Enable multitouch race GUI"));
 
     PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
             PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
@@ -511,7 +511,7 @@ namespace UserConfigParams
             "considered as centered in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_x
-            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_sensitivity_x",
+            PARAM_DEFAULT( FloatUserConfigParam(0.2f, "multitouch_sensitivity_x",
             &m_multitouch_group,
             "A parameter in range [0, 1.0] that determines the sensitivity for x axis."));
             

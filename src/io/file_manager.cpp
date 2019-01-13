@@ -206,7 +206,7 @@ FileManager::FileManager()
 
     if (!m_file_system->existFile((root_dir + version).c_str()))
     {
-        Log::error("FileManager", "Could not file '%s'in any "
+        Log::error("FileManager", "Could not find file '%s'in any "
                    "standard location (esp. ../data).", version.c_str());
         Log::error("FileManager", 
                    "Last location checked '%s'.", root_dir.c_str());

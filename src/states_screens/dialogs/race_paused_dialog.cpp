@@ -21,6 +21,7 @@
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -28,7 +29,7 @@
 #include "io/file_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
-#include "network/protocols/lobby_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/stk_host.hpp"
@@ -51,22 +52,41 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                                    const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
+    m_self_destroy = false;
     if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
     {
         loadFromFile("overworld_dialog.stkgui");
     }
-    else
+    else if (!NetworkConfig::get()->isNetworking())
     {
         loadFromFile("race_paused_dialog.stkgui");
     }
+    else
+    {
+        loadFromFile("network_ingame_dialog.stkgui");
+    }
 
-    IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
+    GUIEngine::RibbonWidget* back_btn = getWidget<RibbonWidget>("backbtnribbon");
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 
     if (NetworkConfig::get()->isNetworking())
     {
         music_manager->pauseMusic();
         SFXManager::get()->pauseAll();
+        m_text_box->clearListeners();
+        if (UserConfigParams::m_lobby_chat)
+        {
+            m_text_box->setActive(true);
+            getWidget("send")->setVisible(true);
+            m_text_box->addListener(this);
+        }
+        else
+        {
+            m_text_box->setActive(false);
+            m_text_box->setText(
+                _("Chat is disabled, enable in options menu."));
+            getWidget("send")->setVisible(false);
+        }
     }
     else
     {
@@ -137,7 +157,12 @@ GUIEngine::EventPropagation
     GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
 
-    if (eventSource == "backbtn")
+    if (eventSource == "send" && m_text_box)
+    {
+        onEnterPressed(m_text_box->getText());
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "backbtnribbon")
     {
         // unpausing is done in the destructor so nothing more to do here
         ModalDialog::dismiss();
@@ -263,14 +288,16 @@ void RacePausedDialog::beforeAddingWidgets()
             choice_ribbon->setItemVisible(index, false);
     }
     if (NetworkConfig::get()->isNetworking())
-    {
-        IconButtonWidget* new_race = dynamic_cast<IconButtonWidget*>
-            (choice_ribbon->findWidgetNamed("newrace"));
-        if (new_race)
-        {
-            //I18N: show in race paused dialog in network to allow user to go
-            //back to lobby to end spectating (for example)
-            new_race->setText(_("Back to lobby"));
-        }
-    }
+        m_text_box = getWidget<TextBoxWidget>("chat");
+    else
+        m_text_box = NULL;
 }   // beforeAddingWidgets
+
+// ----------------------------------------------------------------------------
+bool RacePausedDialog::onEnterPressed(const irr::core::stringw& text)
+{
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        cl->sendChat(text);
+    m_self_destroy = true;
+    return true;
+}   // onEnterPressed

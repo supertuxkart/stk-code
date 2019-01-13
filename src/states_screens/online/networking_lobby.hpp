@@ -102,13 +102,7 @@ private:
     virtual void unloaded() OVERRIDE;
 
     virtual void onTextUpdated() OVERRIDE {}
-    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
-    {
-        sendChat(text);
-        return true;
-    }
-
-    void sendChat(irr::core::stringw text);
+    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
     void updatePlayerPings();
 
 public:

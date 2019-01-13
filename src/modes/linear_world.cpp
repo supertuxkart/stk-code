@@ -36,6 +36,8 @@
 #include "network/server_config.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/check_manager.hpp"
+#include "tracks/check_structure.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
 #include "tracks/track_sector.hpp"
@@ -1117,6 +1119,11 @@ void LinearWorld::saveCompleteState(BareNetworkString* bns)
         ki.saveCompleteState(bns);
     for (TrackSector* ts : m_kart_track_sector)
         ts->saveCompleteState(bns);
+
+    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    bns->addUInt8(cc);
+    for (unsigned i = 0; i < cc; i++)
+        CheckManager::get()->getCheckStructure(i)->saveCompleteState(bns);
 }   // saveCompleteState
 
 // ----------------------------------------------------------------------------
@@ -1139,4 +1146,13 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
         ts->restoreCompleteState(b);
 
     updateRacePosition();
+    const unsigned cc = b.getUInt8();
+    if (cc != CheckManager::get()->getCheckStructureCount())
+    {
+        Log::warn("LinearWorld",
+            "Server has different check structures size.");
+        return;
+    }
+    for (unsigned i = 0; i < cc; i++)
+        CheckManager::get()->getCheckStructure(i)->restoreCompleteState(b);
 }   // restoreCompleteState

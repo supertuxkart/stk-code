@@ -42,6 +42,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <thread>
 #include <tuple>
 
@@ -241,6 +242,8 @@ public:
     // ------------------------------------------------------------------------
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
                                                   getAllPlayerProfiles() const;
+    // ------------------------------------------------------------------------
+    std::set<uint32_t> getAllPlayerOnlineIds() const;
     // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> findPeerByHostId(uint32_t id) const;
     // ------------------------------------------------------------------------

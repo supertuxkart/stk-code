@@ -314,7 +314,8 @@ void loadServerLobbyFromConfig()
     {
         if (m_min_start_game_players > m_server_max_players)
             m_min_start_game_players = 1;
-        m_team_choosing = false;
+        if (!m_live_players)
+            m_team_choosing = false;
         m_server_configurable = false;
     }
     if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)
