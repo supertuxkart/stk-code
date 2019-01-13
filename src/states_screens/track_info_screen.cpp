@@ -193,7 +193,7 @@ void TrackInfoScreen::init()
         }
     }
 
-    // options for free-for-all
+    // options for free-for-all and three strikes battle
     // -------------
     if (m_show_ffa_spinner)
     {
@@ -490,6 +490,7 @@ void TrackInfoScreen::onEnterPressedInternal()
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
+    race_manager->setNumKarts(num_ai + local_players);
     race_manager->startSingleRace(m_track->getIdent(), num_laps, false);
 }   // onEnterPressedInternal
 
