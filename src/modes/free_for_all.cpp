@@ -22,6 +22,7 @@
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/stk_host.hpp"
+#include "tracks/track.hpp"
 
 #include <algorithm>
 #include <utility>
@@ -151,6 +152,8 @@ void FreeForAll::update(int ticks)
 {
     WorldWithRank::update(ticks);
     WorldWithRank::updateTrack(ticks);
+    if (Track::getCurrentTrack()->hasNavMesh())
+        updateSectorForKarts();
 
     std::vector<std::pair<int, int> > ranks;
     for (unsigned i = 0; i < m_scores.size(); i++)
