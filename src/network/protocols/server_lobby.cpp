@@ -316,6 +316,7 @@ void ServerLobby::handleChat(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
 
+    const bool sender_in_game = event->getPeer()->isWaitingForGame();
     core::stringw message;
     event->data().decodeString16(&message);
     if (message.size() > 0)
@@ -323,17 +324,19 @@ void ServerLobby::handleChat(Event* event)
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
-        // After game is started, only send to waiting player
         const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
-        STKHost::get()->sendPacketToAllPeersWith([game_started]
-            (STKPeer* p)
+        STKHost::get()->sendPacketToAllPeersWith(
+            [game_started, sender_in_game](STKPeer* p)
             {
                 if (!p->isValidated())
                     return false;
-                if (!game_started)
-                    return true;
-                if (!p->isWaitingForGame() && game_started)
-                    return false;
+                if (game_started)
+                {
+                    if (p->isWaitingForGame() && !sender_in_game)
+                        return false;
+                    if (!p->isWaitingForGame() && sender_in_game)
+                        return false;
+                }
                 return true;
             }, chat);
         delete chat;

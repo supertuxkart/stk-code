@@ -130,6 +130,7 @@ public:
     void setSpectator(bool val)                          { m_spectator = val; }
     bool isSpectator() const                            { return m_spectator; }
     void startLiveJoinKartSelection();
+    void sendChat(irr::core::stringw text);
 };
 
 #endif // CLIENT_LOBBY_HPP

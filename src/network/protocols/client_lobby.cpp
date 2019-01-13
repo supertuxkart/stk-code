@@ -772,7 +772,10 @@ void ClientLobby::handleChat(Event* event)
     Log::info("ClientLobby", "%s", StringUtils::wideToUtf8(message).c_str());
     if (message.size() > 0)
     {
-        NetworkingLobby::getInstance()->addMoreServerInfo(message);
+        if (GUIEngine::getCurrentScreen() == NetworkingLobby::getInstance())
+            NetworkingLobby::getInstance()->addMoreServerInfo(message);
+        else
+            MessageQueue::add(MessageQueue::MT_GENERIC, message);
     }
 }   // handleChat
 
@@ -1154,3 +1157,27 @@ void ClientLobby::startLiveJoinKartSelection()
         ->setAvailableKartsFromServer(karts);
     NetworkKartSelectionScreen::getInstance()->push();
 }   // startLiveJoinKartSelection
+
+
+// ----------------------------------------------------------------------------
+void ClientLobby::sendChat(irr::core::stringw text)
+{
+    text = text.trim().removeChars(L"\n\r");
+    if (text.size() > 0)
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LobbyProtocol::LE_CHAT);
+
+        core::stringw name;
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        if (PlayerManager::getCurrentOnlineState() ==
+            PlayerProfile::OS_SIGNED_IN)
+            name = PlayerManager::getCurrentOnlineUserName();
+        else
+            name = player->getName();
+        chat->encodeString16(name + L": " + text);
+
+        STKHost::get()->sendToServer(chat, true);
+        delete chat;
+    }
+}   // sendChat
