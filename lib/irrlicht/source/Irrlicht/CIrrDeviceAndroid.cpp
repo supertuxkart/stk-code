@@ -53,6 +53,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     AccelerometerActive(false),
     GyroscopeActive(false),
     TextInputEnabled(false),
+    HasTouchDevice(false),
     IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
@@ -118,6 +119,9 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
         ExposedVideoData.OGLESAndroid.Window = Android->window;
     
         createVideoModeList();
+        
+        int32_t touch = AConfiguration_getTouchscreen(Android->config);
+        HasTouchDevice = touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH;
     }
 
     createDriver();

@@ -115,16 +115,19 @@ RaceGUI::RaceGUI()
     float scaling = irr_driver->getFrameSize().Height / 480.0f;
     const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
+
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+                               irr_driver->getDevice()->supportsTouchDevice()) ||
+                               UserConfigParams::m_multitouch_active > 1;
     
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0 &&
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         race_manager->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
     
     // Check if we have enough space for minimap when touch steering is enabled
-    if (m_multitouch_gui != NULL)
+    if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
     {
         const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
                                          m_multitouch_gui->getHeight());
@@ -169,7 +172,7 @@ RaceGUI::RaceGUI()
                      m_map_width - (int)( 10.0f * scaling);
         m_map_bottom        = (int)( 10.0f * scaling);
     }
-    else if (m_multitouch_gui != NULL)
+    else if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
     {
         m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
                                                         m_map_width) * 0.95f);
@@ -339,7 +342,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    if (m_multitouch_gui == NULL)
+    if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
     {
         drawPowerupIcons(kart, viewport, scaling);
         drawSpeedEnergyRank(kart, viewport, scaling, dt);
@@ -493,7 +496,7 @@ void RaceGUI::drawGlobalMiniMap()
     if (UserConfigParams::m_minimap_display == 2) /*map hidden*/
         return;
     
-    if (m_multitouch_gui != NULL)
+    if (m_multitouch_gui != NULL && !m_multitouch_gui->isSpectatorMode())
     {
         float max_scale = 1.3f;
                                                       

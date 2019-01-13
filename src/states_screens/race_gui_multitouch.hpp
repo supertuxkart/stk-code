@@ -36,6 +36,7 @@ private:
     MultitouchDevice* m_device;
     
     bool m_gui_action;
+    bool m_is_spectator_mode;
     unsigned int m_height;
     
     video::ITexture* m_steering_wheel_tex;
@@ -66,6 +67,7 @@ public:
               const core::vector2df &scaling);
                                 
     unsigned int getHeight() {return m_height;}
+    bool isSpectatorMode() {return m_is_spectator_mode;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
     void reset();
                                  
