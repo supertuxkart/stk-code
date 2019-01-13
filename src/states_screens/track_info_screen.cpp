@@ -193,6 +193,29 @@ void TrackInfoScreen::init()
         }
     }
 
+    // options for free-for-all
+    // -------------
+    if (m_show_ffa_spinner)
+    {
+        m_target_type_label->setText(_("Game mode"), false);
+        m_target_type_spinner->clearLabels();
+        m_target_type_spinner->addLabel(_("3 Strikes Battle"));
+        m_target_type_spinner->addLabel(_("Free-For-All"));
+        m_target_type_spinner->setValue(UserConfigParams::m_use_ffa_mode ? 1 : 0);
+
+        m_target_value_label->setText(_("Maximum time (min.)"), false);
+        m_target_value_spinner->setValue(UserConfigParams::m_ffa_time_limit);
+
+        m_target_value_label->setVisible(UserConfigParams::m_use_ffa_mode);
+        m_target_value_spinner->setVisible(UserConfigParams::m_use_ffa_mode);
+
+        // TODO: remove if FFA AI is added
+#ifdef FFA_AI_DISABLED
+        m_ai_kart_label->setVisible(!UserConfigParams::m_use_ffa_mode);
+        m_ai_kart_spinner->setVisible(!UserConfigParams::m_use_ffa_mode);
+#endif
+    }
+
     // Lap count m_lap_spinner
     // -----------------------
     if (has_laps)
@@ -293,29 +316,6 @@ void TrackInfoScreen::init()
     }
     else
         m_option->setState(false);
-
-    // options for free-for-all
-    // -------------
-	if (m_show_ffa_spinner)
-	{
-        m_target_type_label->setText(_("Game mode"), false);
-        m_target_type_spinner->clearLabels();
-        m_target_type_spinner->addLabel(_("3 Strikes Battle"));
-        m_target_type_spinner->addLabel(_("Free-For-All"));
-        m_target_type_spinner->setValue(UserConfigParams::m_use_ffa_mode ? 1 : 0);
-
-        m_target_value_label->setText(_("Maximum time (min.)"), false);
-        m_target_value_spinner->setValue(UserConfigParams::m_ffa_time_limit);
-
-        m_target_value_label->setVisible(UserConfigParams::m_use_ffa_mode);
-        m_target_value_spinner->setVisible(UserConfigParams::m_use_ffa_mode);
-
-        // TODO: remove if FFA AI is added
-#ifdef FFA_AI_DISABLED
-        m_ai_kart_label->setVisible(!UserConfigParams::m_use_ffa_mode);
-        m_ai_kart_spinner->setVisible(!UserConfigParams::m_use_ffa_mode);
-#endif
-    }
 
     // Record race or not
     // -------------
