@@ -316,6 +316,8 @@ void ServerLobby::handleChat(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
 
+    // Update so that the peer is not kicked
+    event->getPeer()->updateLastActivity();
     const bool sender_in_game = event->getPeer()->isWaitingForGame();
     core::stringw message;
     event->data().decodeString16(&message);
