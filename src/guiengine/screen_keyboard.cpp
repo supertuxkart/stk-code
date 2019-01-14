@@ -89,6 +89,7 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
     m_back_button     = NULL;
     m_repeat_time     = 0;
     m_back_button_pressed = false;
+    m_schedule_close = false;
     
     init();
 }   // ScreenKeyboard
@@ -305,6 +306,44 @@ void ScreenKeyboard::onUpdate(float dt)
         m_back_button_pressed = false;
         m_repeat_time = 0;
     }
+}
+
+// ----------------------------------------------------------------------------
+/** A function that handles irrlicht events
+ *  \param event Irrlicht event
+ *  \return Block event if true
+ */
+bool ScreenKeyboard::onEvent(const SEvent &event)
+{
+    if (event.EventType == EET_MOUSE_INPUT_EVENT)
+    {
+        core::position2d<s32> point(event.MouseInput.X, event.MouseInput.Y);
+        bool is_point_inside = m_irrlicht_window->isPointInside(point);
+        
+        if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
+        {
+            if (!is_point_inside)
+            {
+                m_schedule_close = true;
+                return true;
+            }
+        }
+        else if (event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
+        {
+            if (!is_point_inside && m_schedule_close)
+            {
+                dismiss();
+                return true;
+            }
+            else
+            {
+                m_schedule_close = false;
+                return false;
+            }
+        }
+    }
+    
+    return false;
 }
 
 // ----------------------------------------------------------------------------
