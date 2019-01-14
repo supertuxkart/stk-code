@@ -92,6 +92,11 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     {
         World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
     }
+
+#ifndef ANDROID
+    if (m_text_box && UserConfigParams::m_lobby_chat)
+        m_text_box->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+#endif
 }   // RacePausedDialog
 
 // ----------------------------------------------------------------------------
