@@ -85,6 +85,9 @@ void TrackInfoScreen::loadedFromFile()
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
     screenshot->m_tab_stop = false;
+
+    m_is_soccer = false;
+    m_show_ffa_spinner = false;
 }   // loadedFromFile
 
 
@@ -452,11 +455,11 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     const bool enable_ffa = m_show_ffa_spinner && selected_target_type != 0;
 
-	if (enable_ffa)
-	{
-		race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
+    if (enable_ffa)
+    {
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
         race_manager->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
-	}
+    }
 
     if (m_is_soccer)
     {
@@ -520,16 +523,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             const bool enable_ffa = target_value != 0;
             UserConfigParams::m_use_ffa_mode = enable_ffa;
 
-            if (enable_ffa)
-            {
-                m_target_value_label->setVisible(true);
-                m_target_value_spinner->setVisible(true);
-            }
-            else
-            {
-                m_target_value_label->setVisible(false);
-                m_target_value_spinner->setVisible(false);
-            }
+            m_target_value_label->setVisible(enable_ffa);
+            m_target_value_spinner->setVisible(enable_ffa);
         }
     }
     else if (name == "target-value-spinner")
