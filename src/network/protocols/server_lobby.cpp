@@ -2703,34 +2703,17 @@ void ServerLobby::getHitCaptureLimit(float num_karts)
     if (race_manager->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
-        if (ServerConfig::m_capture_limit_threshold > 0.0f)
-        {
-            float val = fmaxf(3.0f, num_karts *
-                ServerConfig::m_capture_limit_threshold);
-            hit_capture_limit = (int)val;
-        }
-        if (ServerConfig::m_time_limit_threshold_ctf > 0.0f)
-        {
-            time_limit = fmaxf(3.0f, num_karts *
-                (ServerConfig::m_time_limit_threshold_ctf +
-                ServerConfig::m_flag_return_timemout / 60.f)) * 60.0f;
-        }
+        if (ServerConfig::m_capture_limit > 0)
+            hit_capture_limit = ServerConfig::m_capture_limit;
+        if (ServerConfig::m_time_limit_ctf > 0)
+            time_limit = (float)ServerConfig::m_time_limit_ctf;
     }
     else
     {
-        if (ServerConfig::m_hit_limit_threshold > 0.0f)
-        {
-            float val = fminf(num_karts *
-                ServerConfig::m_hit_limit_threshold, 30.0f);
-            hit_capture_limit = (int)val;
-            if (hit_capture_limit == 0)
-                hit_capture_limit = 1;
-        }
-        if (ServerConfig::m_time_limit_threshold_ffa > 0.0f)
-        {
-            time_limit = fmaxf(num_karts *
-                ServerConfig::m_time_limit_threshold_ffa, 3.0f) * 60.0f;
-        }
+        if (ServerConfig::m_hit_limit > 0)
+            hit_capture_limit = ServerConfig::m_hit_limit;
+        if (ServerConfig::m_time_limit_ffa > 0.0f)
+            time_limit = (float)ServerConfig::m_time_limit_ffa;
     }
     m_battle_hit_capture_limit = hit_capture_limit;
     m_battle_time_limit = time_limit;

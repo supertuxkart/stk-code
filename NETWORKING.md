@@ -98,23 +98,23 @@ The current server configuration xml looks like this:
     <!-- If true, the server owner can config the difficulty and game mode in the GUI of lobby. This option cannot be used with owner-less or grand prix server, and will be automatically turned on if the server was created using the in-game GUI. The changed difficulty and game mode will not be saved in this config file. -->
     <server-configurable value="false" />
 
-    <!-- If true, players can live join or spectate the in-progress game. Currently this feature is only available if the current game mode used in server is FFA, CTF or soccer, also no addon karts will be available for players to choose, and official-karts-threshold will be made 1.0. -->
-    <live-players value="false" />
+    <!-- If true, players can live join or spectate the in-progress game. Currently live joining is only available if the current game mode used in server is FFA, CTF or soccer, also no addon karts will be available for players to choose, and official-karts-threshold will be made 1.0. -->
+    <live-players value="true" />
 
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
     <flag-return-timemout value="20" />
 
-    <!-- Value used to calculate hit limit in free for all, which is min(number of players * hit-limit-threshold, 30), negative value to disable hit limit. -->
-    <hit-limit-threshold value="3" />
+    <!-- Hit limit of free for all, zero to disable hit limit. -->
+    <hit-limit value="20" />
 
-    <!-- Value used to calculate time limit in free for all, which is max(number of players * time-limit-threshold-ffa, 3.0) * 60, negative value to disable time limit. -->
-    <time-limit-threshold-ffa value="0.7" />
+    <!-- Time limit of free for all in seconds, zero to disable time limit. -->
+    <time-limit-ffa value="360" />
 
-    <!-- Value used to calculate capture limit in CTF, which is max(3.0, number of players * capture-limit-threshold), negative value to disable capture limit. -->
-    <capture-limit-threshold value="0.7" />
+    <!-- Capture limit of CTF, zero to disable capture limit. -->
+    <capture-limit value="5" />
 
-    <!-- Value used to calculate time limit in CTF, which is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0, negative value to disable time limit. -->
-    <time-limit-threshold-ctf value="0.9" />
+    <!-- Time limit of CTF in seconds, zero to disable time limit. -->
+    <time-limit-ctf value="600" />
 
     <!-- Value used by server to automatically estimate each game time. For races, it decides the lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-game-time-ratio * default lap of that track). For soccer if more than 0.0f, for time limit game it will be auto-game-time-ratio * soccer-time-limit in UserConfig, for goal limit game it will be auto-game-time-ratio * numgoals in UserConfig, -1 to disable for all. -->
     <auto-game-time-ratio value="-1" />

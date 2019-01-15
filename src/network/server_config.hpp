@@ -243,33 +243,22 @@ namespace ServerConfig
         "Time in seconds when a flag is dropped a by player in CTF "
         "returning to its own base."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_hit_limit_threshold
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(3.0f, "hit-limit-threshold",
-        "Value used to calculate hit limit in free for all, which "
-        "is min(number of players * hit-limit-threshold, 30), "
-        "negative value to disable hit limit."));
+    SERVER_CFG_PREFIX IntServerConfigParam m_hit_limit
+        SERVER_CFG_DEFAULT(IntServerConfigParam(20, "hit-limit",
+        "Hit limit of free for all, zero to disable hit limit."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_time_limit_threshold_ffa
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(0.7f,
-        "time-limit-threshold-ffa",
-        "Value used to calculate time limit in free for all, which "
-        "is max(number of players * time-limit-threshold-ffa, 3.0) * 60, "
-        "negative value to disable time limit."));
+    SERVER_CFG_PREFIX IntServerConfigParam m_time_limit_ffa
+        SERVER_CFG_DEFAULT(IntServerConfigParam(360,
+        "time-limit-ffa", "Time limit of free for all in seconds, zero to "
+        "disable time limit."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_capture_limit_threshold
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(0.7f,
-        "capture-limit-threshold",
-        "Value used to calculate capture limit in CTF, which "
-        "is max(3.0, number of players * capture-limit-threshold), "
-        "negative value to disable capture limit."));
+    SERVER_CFG_PREFIX IntServerConfigParam m_capture_limit
+        SERVER_CFG_DEFAULT(IntServerConfigParam(5, "capture-limit",
+        "Capture limit of CTF, zero to disable capture limit."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_time_limit_threshold_ctf
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(0.9f,
-        "time-limit-threshold-ctf",
-        "Value used to calculate time limit in CTF, which "
-        "is max(3.0, number of players * "
-        "(time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0,"
-        " negative value to disable time limit."));
+    SERVER_CFG_PREFIX IntServerConfigParam m_time_limit_ctf
+        SERVER_CFG_DEFAULT(IntServerConfigParam(600, "time-limit-ctf",
+        "Time limit of CTF in seconds, zero to disable time limit."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_auto_game_time_ratio
         SERVER_CFG_DEFAULT(FloatServerConfigParam(-1.0f, "auto-game-time-ratio",
