@@ -231,9 +231,9 @@ namespace ServerConfig
         "mode will not be saved in this config file."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_live_players
-        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "live-players",
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "live-players",
         "If true, players can live join or spectate the in-progress game. "
-        "Currently this feature is only available if the current game mode "
+        "Currently live joining is only available if the current game mode "
         "used in server is FFA, CTF or soccer, also no addon karts will be "
         "available for players to choose, and official-karts-threshold will "
         "be made 1.0."));
@@ -336,7 +336,7 @@ namespace ServerConfig
     // ========================================================================
     void loadServerConfig(const std::string& path = "");
     // ------------------------------------------------------------------------
-    void loadServerConfigXML(const XMLNode* root);
+    void loadServerConfigXML(const XMLNode* root, bool default_config = false);
     // ------------------------------------------------------------------------
     std::string getServerConfigXML();
     // ------------------------------------------------------------------------

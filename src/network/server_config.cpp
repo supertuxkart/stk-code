@@ -109,8 +109,10 @@ MapServerConfigParam<T, U>::MapServerConfigParam(const char* param_name,
 // ============================================================================
 void loadServerConfig(const std::string& path)
 {
+    bool default_config = false;
     if (path.empty())
     {
+        default_config = true;
         g_server_config_path =
             file_manager->getUserConfigFile("server_config.xml");
     }
@@ -120,11 +122,11 @@ void loadServerConfig(const std::string& path)
             ->getAbsolutePath(path.c_str()).c_str();
     }
     const XMLNode* root = file_manager->createXMLTree(g_server_config_path);
-    loadServerConfigXML(root);
+    loadServerConfigXML(root, default_config);
 }   // loadServerConfig
 
 // ----------------------------------------------------------------------------
-void loadServerConfigXML(const XMLNode* root)
+void loadServerConfigXML(const XMLNode* root, bool default_config)
 {
     if (!root || root->getName() != "server-config")
     {
@@ -133,6 +135,12 @@ void loadServerConfigXML(const XMLNode* root)
             "A new file will be created.", g_server_config_path.c_str());
         if (root)
             delete root;
+        if (default_config)
+        {
+            // Below option will have different default value when writing
+            // to server_config.xml in config directory
+            m_live_players = false;
+        }
         writeServerConfigToDisk();
         return;
     }
