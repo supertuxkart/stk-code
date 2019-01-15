@@ -250,3 +250,26 @@ void FreeForAll::restoreCompleteState(const BareNetworkString& b)
     for (unsigned i = 0; i < m_scores.size(); i++)
         m_scores[i] = b.getUInt32();
 }   // restoreCompleteState
+
+// ----------------------------------------------------------------------------
+std::pair<uint32_t, uint32_t> FreeForAll::getGameStartedProgress() const
+{
+    std::pair<uint32_t, uint32_t> progress(
+        std::numeric_limits<uint32_t>::max(),
+        std::numeric_limits<uint32_t>::max());
+    if (race_manager->hasTimeTarget())
+    {
+        progress.first = (uint32_t)m_time;
+    }
+    AbstractKart* k = getKartAtPosition(1);
+    float score = -1.0f;
+    if (k)
+        score = (float)getKartScore(k->getWorldKartId());
+
+    if (score >= 0.0f)
+    {
+        progress.second = (uint32_t)(score /
+            (float)race_manager->getHitCaptureLimit() * 100.0f);
+    }
+    return progress;
+}   // getGameStartedProgress
