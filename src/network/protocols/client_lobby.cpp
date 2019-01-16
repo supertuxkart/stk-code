@@ -94,6 +94,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
         _("Bad network connection is detected.");
     m_first_connect = true;
     m_spectator = false;
+    m_server_live_joinable = false;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -664,9 +665,7 @@ void ClientLobby::handleServerInfo(Event* event)
     }
     bool server_config = data.getUInt8() == 1;
     NetworkingLobby::getInstance()->toggleServerConfigButton(server_config);
-    bool live_join_spectator = data.getUInt8() == 1;
-    NetworkingLobby::getInstance()
-        ->toggleServerLiveJoinable(live_join_spectator);
+    m_server_live_joinable = data.getUInt8() == 1;
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------
@@ -683,42 +682,40 @@ void ClientLobby::updatePlayerList(Event* event)
 
     m_waiting_for_game = waiting;
     unsigned player_count = data.getUInt8();
-    std::vector<std::tuple<uint32_t, uint32_t, uint32_t, core::stringw,
-        int, KartTeam, PerPlayerDifficulty> > players;
     core::stringw total_players;
+    m_lobby_players.clear();
     for (unsigned i = 0; i < player_count; i++)
     {
-        std::tuple<uint32_t, uint32_t, uint32_t, core::stringw, int,
-            KartTeam, PerPlayerDifficulty> pl;
-        uint32_t host_id = data.getUInt32();
-        uint32_t online_id = data.getUInt32();
+        LobbyPlayer lp = {};
+        lp.m_host_id = data.getUInt32();
+        lp.m_online_id = data.getUInt32();
         uint8_t local_id = data.getUInt8();
-        std::get<0>(pl) = host_id;
-        std::get<1>(pl) = online_id;
-        std::get<2>(pl) = local_id;
-        data.decodeStringW(&std::get<3>(pl));
-        total_players += std::get<3>(pl);
+        lp.m_difficulty = PLAYER_DIFFICULTY_NORMAL;
+        lp.m_local_player_id = local_id;
+        data.decodeStringW(&lp.m_user_name);
+        total_players += lp.m_user_name;
         bool is_peer_waiting_for_game = data.getUInt8() == 1;
         bool is_peer_server_owner = data.getUInt8() == 1;
         // icon to be used, see NetworkingLobby::loadedFromFile
-        std::get<4>(pl) = is_peer_server_owner ? 0 :
-            std::get<1>(pl) != 0 /*if online account*/ ? 1 : 2;
+        lp.m_icon_id = is_peer_server_owner ? 0 :
+            lp.m_online_id != 0 /*if online account*/ ? 1 : 2;
         if (waiting && !is_peer_waiting_for_game)
-            std::get<4>(pl) = 3;
-        PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
-        std::get<6>(pl) = d;
-        if (d == PLAYER_DIFFICULTY_HANDICAP)
-            std::get<3>(pl) = _("%s (handicapped)", std::get<3>(pl));
-        std::get<5>(pl) = (KartTeam)data.getUInt8();
+            lp.m_icon_id = 3;
+        lp.m_difficulty = (PerPlayerDifficulty)data.getUInt8();
+        if (lp.m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
+        {
+            lp.m_user_name = _("%s (handicapped)", lp.m_user_name);
+        }
+        lp.m_kart_team = (KartTeam)data.getUInt8();
         bool ready = data.getUInt8() == 1;
         if (ready)
-            std::get<4>(pl) = 4;
-        if (host_id == STKHost::get()->getMyHostId())
+            lp.m_icon_id = 4;
+        if (lp.m_host_id == STKHost::get()->getMyHostId())
         {
             auto& local_players = NetworkConfig::get()->getNetworkPlayers();
-            std::get<2>(local_players.at(local_id)) = d;
+            std::get<2>(local_players.at(local_id)) = lp.m_difficulty;
         }
-        players.push_back(pl);
+        m_lobby_players.push_back(lp);
     }
 
     // Notification sound for new player
@@ -727,7 +724,7 @@ void ClientLobby::updatePlayerList(Event* event)
         SFXManager::get()->quickSound("energy_bar_full");
     m_total_players = total_players;
 
-    NetworkingLobby::getInstance()->updatePlayers(players);
+    NetworkingLobby::getInstance()->updatePlayers();
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------

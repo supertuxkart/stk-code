@@ -29,9 +29,23 @@
 #include <set>
 
 enum PeerDisconnectInfo : unsigned int;
+enum KartTeam : int8_t;
+enum PerPlayerDifficulty : uint8_t;
 
 class BareNetworkString;
 class Server;
+
+struct LobbyPlayer
+{
+    irr::core::stringw m_user_name;
+    int m_local_player_id;
+    uint32_t m_host_id;
+    KartTeam m_kart_team;
+    PerPlayerDifficulty m_difficulty;
+    uint32_t m_online_id;
+    /* Icon used in networking lobby, see NetworkingLobby::loadedFromFile. */
+    int m_icon_id;
+};
 
 class ClientLobby : public LobbyProtocol
 {
@@ -81,6 +95,8 @@ private:
 
     bool m_spectator;
 
+    bool m_server_live_joinable;
+
     uint64_t m_auto_back_to_lobby_time;
 
     uint64_t m_start_live_game_time;
@@ -96,6 +112,8 @@ private:
                                    BareNetworkString* rest, bool encrypt);
 
     std::map<PeerDisconnectInfo, irr::core::stringw> m_disconnected_msg;
+
+    std::vector<LobbyPlayer> m_lobby_players;
 
     irr::core::stringw m_total_players;
 
@@ -131,6 +149,9 @@ public:
     bool isSpectator() const                            { return m_spectator; }
     void startLiveJoinKartSelection();
     void sendChat(irr::core::stringw text);
+    const std::vector<LobbyPlayer>& getLobbyPlayers() const
+                                                    { return m_lobby_players; }
+    bool isServerLiveJoinable() const        { return m_server_live_joinable; }
 };
 
 #endif // CLIENT_LOBBY_HPP
