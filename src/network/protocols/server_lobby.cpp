@@ -303,7 +303,7 @@ bool ServerLobby::notifyEvent(Event* event)
     case LE_LIVE_JOIN:         liveJoinRequest(event);        break;
     case LE_CLIENT_LOADED_WORLD: finishedLoadingLiveJoinClient(event); break;
     case LE_KART_INFO: handleKartInfo(event); break;
-    case LE_CLIENT_BACK_LOBBY: clientWantsToBackLobby(event); break;
+    case LE_CLIENT_BACK_LOBBY: clientInGameWantsToBackLobby(event); break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -409,6 +409,8 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CHAT: handleChat(event);                          break;
         case LE_CONFIG_SERVER: handleServerConfiguration(event);  break;
         case LE_CHANGE_HANDICAP: changeHandicap(event);           break;
+        case LE_CLIENT_BACK_LOBBY:
+            clientSelectingAssetsWantsToBackLobby(event);         break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -3466,7 +3468,7 @@ void ServerLobby::handleKartInfo(Event* event)
 /** Client if currently in-game (including spectator) wants to go back to
  *  lobby.
  */
-void ServerLobby::clientWantsToBackLobby(Event* event)
+void ServerLobby::clientInGameWantsToBackLobby(Event* event)
 {
     World* w = World::getWorld();
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
@@ -3513,4 +3515,36 @@ void ServerLobby::clientWantsToBackLobby(Event* event)
     m_game_setup->addServerInfo(server_info);
     peer->sendPacket(server_info, /*reliable*/true);
     delete server_info;
-}   // clientWantsToBackLobby
+}   // clientInGameWantsToBackLobby
+
+//-----------------------------------------------------------------------------
+/** Client if currently select assets wants to go back to lobby.
+ */
+void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
+{
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+
+    if (m_state.load() != SELECTING || peer->isWaitingForGame())
+    {
+        Log::warn("ServerLobby",
+            "%s try to leave selecting assets at wrong time.",
+            peer->getAddress().toString().c_str());
+        return;
+    }
+
+    m_peers_ready.erase(peer);
+    peer->setWaitingForGame(true);
+
+    NetworkString* reset = getNetworkString(2);
+    reset->setSynchronous(true);
+    reset->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
+    peer->sendPacket(reset, /*reliable*/true);
+    delete reset;
+    updatePlayerList();
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    peer->sendPacket(server_info, /*reliable*/true);
+    delete server_info;
+}   // clientSelectingAssetsWantsToBackLobby

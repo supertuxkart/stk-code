@@ -40,6 +40,7 @@ private:
 
     bool m_live_join;
 
+    uint64_t m_exit_timeout;
 protected:
     // ------------------------------------------------------------------------
     NetworkKartSelectionScreen() 

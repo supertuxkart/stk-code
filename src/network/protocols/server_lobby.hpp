@@ -286,7 +286,8 @@ private:
     int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                       unsigned local_id) const;
     void handleKartInfo(Event* event);
-    void clientWantsToBackLobby(Event* event);
+    void clientInGameWantsToBackLobby(Event* event);
+    void clientSelectingAssetsWantsToBackLobby(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();
