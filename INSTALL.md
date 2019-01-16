@@ -39,7 +39,8 @@ Fedora command:
 sudo dnf install @development-tools cmake bluez-libs-devel \
 openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
-libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
+libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel \
+mesa-libEGL-devel
 ```
 ### In-game recorder
 
