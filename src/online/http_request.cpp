@@ -17,6 +17,7 @@
 #include "online/http_request.hpp"
 
 #include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "online/request_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
@@ -97,7 +98,7 @@ namespace Online
         m_progress.setAtomic(0);
         if (m_http_header == nullptr)
         {
-            std::string Host = "Host: " + StringUtils::getHostNameFromURL(UserConfigParams::m_server_multiplayer);
+            std::string Host = "Host: " + StringUtils::getHostNameFromURL(stk_config->m_server_api);
             m_http_header = curl_slist_append(m_http_header, Host.c_str());
         }
         m_disable_sending_log = false;
@@ -114,25 +115,25 @@ namespace Online
                                 const std::string &action)
     {
         // Old (0.8.1) API: send to client-user.php, and add action as a parameter
-        if(UserConfigParams::m_server_version==1)
+        if (stk_config->m_server_api_version == 1)
         {
-            setURL( (std::string)UserConfigParams::m_server_multiplayer +
-                    "client-user.php"                                      );
-            if(action=="change-password")
+            const std::string final_url = stk_config->m_server_api + "client-user.php";
+            setURL(final_url);
+            if (action == "change-password")
                 addParameter("action", "change_password");
-            else if(action=="recover")
+            else if (action == "recover")
                 addParameter("action", "recovery");
             else
                 addParameter("action", action);
         }
         else
         {
-            setURL(
-                   (std::string)UserConfigParams::m_server_multiplayer +
-                   +"v"+StringUtils::toString(UserConfigParams::m_server_version)
-                   + "/" + path +               // eg: /user/, /server/
-                   action + "/"         // eg: connect/, pool/, get-server-list/
-                   );
+            const std::string final_url = stk_config->m_server_api +
+                + "v" + StringUtils::toString(stk_config->m_server_api_version)
+                + "/" + path // eg: /user/, /server/
+                + action + "/"; // eg: connect/, pool/, get-server-list/
+
+            setURL(final_url);
         }
     }   // setServerURL
 
@@ -143,7 +144,7 @@ namespace Online
      */
      void HTTPRequest::setAddonsURL(const std::string& path)
      {
-        setURL((std::string)UserConfigParams::m_server_addons + "/" + path);
+        setURL(stk_config->m_server_addons + "/" + path);
      }   // set AddonsURL
 
      // ------------------------------------------------------------------------

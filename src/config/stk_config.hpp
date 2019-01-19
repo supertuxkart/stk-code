@@ -113,7 +113,7 @@ public:
 
     /** If position and velocity constraints are solved separately. */
     bool m_solver_split_impulse;
-    
+
     /** Threshold when to use the split impulse approach. */
     float m_solver_split_impulse_thresh;
 
@@ -213,6 +213,21 @@ public:
     float m_snb_min_adjust_length, m_snb_max_adjust_length,
         m_snb_min_adjust_speed, m_snb_max_adjust_time,
         m_snb_adjust_length_threshold;
+
+    /** URL for the server used for the API multiplayer. */
+    std::string m_server_api;
+
+    /** Version of the server API to use */
+    uint32_t m_server_api_version = 0;
+
+    /** URL for the server used for the addons management. */
+    std::string m_server_addons;
+
+    /** URL for the server used for hardware reporting statistics */
+    std::string m_server_hardware_report;
+
+    /** If true we allow all the server urls to be redirected by the news.xml. */
+    bool m_allow_news_redirects = true;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the

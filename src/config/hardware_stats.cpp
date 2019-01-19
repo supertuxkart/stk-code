@@ -24,6 +24,7 @@
 #include "config/hardware_stats.hpp"
 
 #include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -398,7 +399,8 @@ void reportHardwareStats()
     request->addParameter("type", "hwdetect");
     request->addParameter("version", report_version);
     request->addParameter("data", json.toString());
-    request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
+    const std::string request_url = stk_config->m_server_hardware_report + "/upload/v1/";
+    request->setURL(request_url);
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     request->queue();
 #endif   // !SERVER_ONLY

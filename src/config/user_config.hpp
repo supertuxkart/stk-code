@@ -953,13 +953,6 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "random-identifier", &m_hw_report_group,
                                                   "A random number to avoid duplicated reports.") );
 
-    // TODO change new-stats to stats before release
-    PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "https://new-stats.supertuxkart.net",
-                                                     "hw-report-server",
-                                                     &m_hw_report_group,
-                                                    "The server used for reporting statistics to."));
-
     PARAM_PREFIX BoolUserConfigParam      m_hw_report_enable
             PARAM_DEFAULT( BoolUserConfigParam(   true,
                                                      "hw-report-enabled",
@@ -973,34 +966,10 @@ namespace UserConfigParams
           "Always show the login screen even if last player's session was saved."));
 
 
-    // ---- Online gameplay related
-    PARAM_PREFIX GroupUserConfigParam       m_online_group
-            PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
-                                          "Everything related to online play.") );
-
-    PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://online.supertuxkart.net/api/",
-                                                     "server_multiplayer",
-                                                     &m_online_group,
-                                                    "The server used for online multiplayer."));
-
-    PARAM_PREFIX IntUserConfigParam        m_server_version
-            PARAM_DEFAULT( IntUserConfigParam(   2,
-                                                 "server-version",
-                                                 &m_online_group,
-                                                    "Version of the server API to use."));
-
-
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
             PARAM_DEFAULT( GroupUserConfigParam("AddonServer",
                                           "Addon and news related settings") );
-
-    PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("https://online.supertuxkart.net/dl/xml",
-                                                 "server_addons",
-                                                 &m_addon_group,
-                                                "The server used for addon."));
 
     PARAM_PREFIX TimeUserConfigParam        m_news_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "news_last_updated",
