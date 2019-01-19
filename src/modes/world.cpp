@@ -31,6 +31,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -660,6 +661,7 @@ void World::onGo()
 void World::terminateRace()
 {
     // In case the user opened paused dialog in network
+    GUIEngine::ScreenKeyboard::dismiss();
     GUIEngine::ModalDialog::dismiss();
 
     m_schedule_pause = false;

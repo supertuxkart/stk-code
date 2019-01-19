@@ -453,7 +453,7 @@ bool CIrrDeviceLinux::changeResolution()
 				refresh_rate_new = (mode->dotClock * 1000.0) / (mode->hTotal * mode->vTotal);
 
 				if (refresh_rate_new <= refresh_rate)
-					break;
+					continue;
 
 				for (int j = 0; j < output->nmode; j++)
 				{

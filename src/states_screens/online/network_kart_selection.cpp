@@ -45,10 +45,6 @@ void NetworkKartSelectionScreen::init()
         updateProgressBarText();
     }
 
-    // change the back button image (because it makes the game quit)
-    IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
-    back_button->setImage("gui/icons/main_quit.png");
-
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert(w != NULL);
     for (auto& p : NetworkConfig::get()->getNetworkPlayers())
@@ -66,6 +62,7 @@ void NetworkKartSelectionScreen::init()
             w->setSelection(0, 0, true);
         }
     }
+    m_exit_timeout = std::numeric_limits<uint64_t>::max();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -74,6 +71,16 @@ void NetworkKartSelectionScreen::init()
  */
 void NetworkKartSelectionScreen::onUpdate(float dt)
 {
+    if (StkTime::getRealTimeMs() > m_exit_timeout)
+    {
+        // Reset the screen to networking menu if failed to back to lobby
+        STKHost::get()->shutdown();
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens().data());
+        NetworkConfig::get()->unsetNetworking();
+        return;
+    }
+
     KartSelectionScreen::onUpdate(dt);
     updateProgressBarText();
 }   // onUpdate
@@ -131,9 +138,19 @@ void NetworkKartSelectionScreen::allPlayersDone()
 // ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
-    // then remove the lobby screen (you left the server)
-    StateManager::get()->popMenu();
-    STKHost::get()->shutdown();
+    if (!m_live_join)
+    {
+        if (m_exit_timeout == std::numeric_limits<uint64_t>::max())
+        {
+            // Send go back lobby event to server with an exit timeout, so if
+            // server doesn't react in time we exit the server
+            m_exit_timeout = StkTime::getRealTimeMs() + 5000;
+            NetworkString back(PROTOCOL_LOBBY_ROOM);
+            back.addUInt8(LobbyProtocol::LE_CLIENT_BACK_LOBBY);
+            STKHost::get()->sendToServer(&back, true);
+        }
+        return false;
+    }
     return true; // remove the screen
 }   // onEscapePressed
 

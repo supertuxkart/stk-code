@@ -74,6 +74,9 @@ namespace GUIEngine
         /** True if backspace button was pressed */
         bool m_back_button_pressed;
         
+        /** True if screen keyboard is going to be closed */
+        bool m_schedule_close;
+        
         /** The edit box that is assigned to the keyboard */
         CGUIEditBox* m_edit_box;
         
@@ -122,6 +125,8 @@ namespace GUIEngine
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);
+        
+        bool onEvent(const SEvent &event);
         
         /** Get irrlicht window used by the keyboard widget */
         irr::gui::IGUIWindow* getIrrlichtElement() {return m_irrlicht_window;}

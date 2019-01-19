@@ -303,7 +303,7 @@ bool ServerLobby::notifyEvent(Event* event)
     case LE_LIVE_JOIN:         liveJoinRequest(event);        break;
     case LE_CLIENT_LOADED_WORLD: finishedLoadingLiveJoinClient(event); break;
     case LE_KART_INFO: handleKartInfo(event); break;
-    case LE_CLIENT_BACK_LOBBY: clientWantsToBackLobby(event); break;
+    case LE_CLIENT_BACK_LOBBY: clientInGameWantsToBackLobby(event); break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -316,6 +316,9 @@ void ServerLobby::handleChat(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
 
+    // Update so that the peer is not kicked
+    event->getPeer()->updateLastActivity();
+    const bool sender_in_game = event->getPeer()->isWaitingForGame();
     core::stringw message;
     event->data().decodeString16(&message);
     if (message.size() > 0)
@@ -323,17 +326,19 @@ void ServerLobby::handleChat(Event* event)
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
-        // After game is started, only send to waiting player
         const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
-        STKHost::get()->sendPacketToAllPeersWith([game_started]
-            (STKPeer* p)
+        STKHost::get()->sendPacketToAllPeersWith(
+            [game_started, sender_in_game](STKPeer* p)
             {
                 if (!p->isValidated())
                     return false;
-                if (!game_started)
-                    return true;
-                if (!p->isWaitingForGame() && game_started)
-                    return false;
+                if (game_started)
+                {
+                    if (p->isWaitingForGame() && !sender_in_game)
+                        return false;
+                    if (!p->isWaitingForGame() && sender_in_game)
+                        return false;
+                }
                 return true;
             }, chat);
         delete chat;
@@ -404,6 +409,8 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CHAT: handleChat(event);                          break;
         case LE_CONFIG_SERVER: handleServerConfiguration(event);  break;
         case LE_CHANGE_HANDICAP: changeHandicap(event);           break;
+        case LE_CLIENT_BACK_LOBBY:
+            clientSelectingAssetsWantsToBackLobby(event);         break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -2698,34 +2705,17 @@ void ServerLobby::getHitCaptureLimit(float num_karts)
     if (race_manager->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
-        if (ServerConfig::m_capture_limit_threshold > 0.0f)
-        {
-            float val = fmaxf(3.0f, num_karts *
-                ServerConfig::m_capture_limit_threshold);
-            hit_capture_limit = (int)val;
-        }
-        if (ServerConfig::m_time_limit_threshold_ctf > 0.0f)
-        {
-            time_limit = fmaxf(3.0f, num_karts *
-                (ServerConfig::m_time_limit_threshold_ctf +
-                ServerConfig::m_flag_return_timemout / 60.f)) * 60.0f;
-        }
+        if (ServerConfig::m_capture_limit > 0)
+            hit_capture_limit = ServerConfig::m_capture_limit;
+        if (ServerConfig::m_time_limit_ctf > 0)
+            time_limit = (float)ServerConfig::m_time_limit_ctf;
     }
     else
     {
-        if (ServerConfig::m_hit_limit_threshold > 0.0f)
-        {
-            float val = fminf(num_karts *
-                ServerConfig::m_hit_limit_threshold, 30.0f);
-            hit_capture_limit = (int)val;
-            if (hit_capture_limit == 0)
-                hit_capture_limit = 1;
-        }
-        if (ServerConfig::m_time_limit_threshold_ffa > 0.0f)
-        {
-            time_limit = fmaxf(num_karts *
-                ServerConfig::m_time_limit_threshold_ffa, 3.0f) * 60.0f;
-        }
+        if (ServerConfig::m_hit_limit > 0)
+            hit_capture_limit = ServerConfig::m_hit_limit;
+        if (ServerConfig::m_time_limit_ffa > 0.0f)
+            time_limit = (float)ServerConfig::m_time_limit_ffa;
     }
     m_battle_hit_capture_limit = hit_capture_limit;
     m_battle_time_limit = time_limit;
@@ -3478,7 +3468,7 @@ void ServerLobby::handleKartInfo(Event* event)
 /** Client if currently in-game (including spectator) wants to go back to
  *  lobby.
  */
-void ServerLobby::clientWantsToBackLobby(Event* event)
+void ServerLobby::clientInGameWantsToBackLobby(Event* event)
 {
     World* w = World::getWorld();
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
@@ -3525,4 +3515,36 @@ void ServerLobby::clientWantsToBackLobby(Event* event)
     m_game_setup->addServerInfo(server_info);
     peer->sendPacket(server_info, /*reliable*/true);
     delete server_info;
-}   // clientWantsToBackLobby
+}   // clientInGameWantsToBackLobby
+
+//-----------------------------------------------------------------------------
+/** Client if currently select assets wants to go back to lobby.
+ */
+void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
+{
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+
+    if (m_state.load() != SELECTING || peer->isWaitingForGame())
+    {
+        Log::warn("ServerLobby",
+            "%s try to leave selecting assets at wrong time.",
+            peer->getAddress().toString().c_str());
+        return;
+    }
+
+    m_peers_ready.erase(peer);
+    peer->setWaitingForGame(true);
+
+    NetworkString* reset = getNetworkString(2);
+    reset->setSynchronous(true);
+    reset->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
+    peer->sendPacket(reset, /*reliable*/true);
+    delete reset;
+    updatePlayerList();
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    peer->sendPacket(server_info, /*reliable*/true);
+    delete server_info;
+}   // clientSelectingAssetsWantsToBackLobby

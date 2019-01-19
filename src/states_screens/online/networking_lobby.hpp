@@ -28,6 +28,7 @@
 class InputDevice;
 class Server;
 enum KartTeam : int8_t;
+struct LobbyPlayer;
 
 namespace GUIEngine
 { 
@@ -65,9 +66,8 @@ private:
 
     NetworkingLobby();
 
-    float m_ping_update_timer;
-    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam,
-        PerPlayerDifficulty> > m_player_names;
+    uint64_t m_ping_update_timer;
+    std::map<std::string, LobbyPlayer> m_player_names;
     std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
@@ -80,8 +80,7 @@ private:
     unsigned m_min_start_game_players;
 
     bool m_allow_change_team, m_has_auto_start_in_server,
-        m_server_configurable, m_server_live_joinable,
-        m_client_live_joinable;
+        m_server_configurable, m_client_live_joinable;
 
     video::ITexture* m_config_texture;
     video::ITexture* m_spectate_texture;
@@ -102,13 +101,7 @@ private:
     virtual void unloaded() OVERRIDE;
 
     virtual void onTextUpdated() OVERRIDE {}
-    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
-    {
-        sendChat(text);
-        return true;
-    }
-
-    void sendChat(irr::core::stringw text);
+    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
     void updatePlayerPings();
 
 public:
@@ -141,10 +134,7 @@ public:
         m_joined_server = server;
         m_server_info.clear();
     }
-    void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
-                       uint32_t/*online id*/, uint32_t/*local player id*/,
-                       core::stringw/*player name*/, int/*icon id*/,
-                       KartTeam, PerPlayerDifficulty> >& p);
+    void updatePlayers();
     void openSplitscreenDialog(InputDevice* device);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
@@ -152,7 +142,6 @@ public:
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t);
     void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
-    void toggleServerLiveJoinable(bool val)   { m_server_live_joinable = val; }
 };   // class NetworkingLobby
 
 #endif

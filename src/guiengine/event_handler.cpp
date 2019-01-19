@@ -75,6 +75,12 @@ bool EventHandler::OnEvent (const SEvent &event)
 
     if(!Debug::onEvent(event))
         return false;
+        
+    if (ScreenKeyboard::isActive())
+    {
+        if (ScreenKeyboard::getCurrent()->onEvent(event))
+            return true; // EVENT_BLOCK
+    }
     
     // TO DEBUG HATS (when you don't actually have a hat)
     /*

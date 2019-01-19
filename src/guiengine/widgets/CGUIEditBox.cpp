@@ -1786,6 +1786,6 @@ void CGUIEditBox::openScreenKeyboard()
     setTextMarkers(CursorPos, CursorPos);
     calculateScrollPos();
 
-    new GUIEngine::ScreenKeyboard(0.98f, 0.30f, this);
+    new GUIEngine::ScreenKeyboard(0.98f, 0.40f, this);
 }
 

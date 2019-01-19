@@ -109,8 +109,10 @@ MapServerConfigParam<T, U>::MapServerConfigParam(const char* param_name,
 // ============================================================================
 void loadServerConfig(const std::string& path)
 {
+    bool default_config = false;
     if (path.empty())
     {
+        default_config = true;
         g_server_config_path =
             file_manager->getUserConfigFile("server_config.xml");
     }
@@ -120,11 +122,11 @@ void loadServerConfig(const std::string& path)
             ->getAbsolutePath(path.c_str()).c_str();
     }
     const XMLNode* root = file_manager->createXMLTree(g_server_config_path);
-    loadServerConfigXML(root);
+    loadServerConfigXML(root, default_config);
 }   // loadServerConfig
 
 // ----------------------------------------------------------------------------
-void loadServerConfigXML(const XMLNode* root)
+void loadServerConfigXML(const XMLNode* root, bool default_config)
 {
     if (!root || root->getName() != "server-config")
     {
@@ -133,6 +135,24 @@ void loadServerConfigXML(const XMLNode* root)
             "A new file will be created.", g_server_config_path.c_str());
         if (root)
             delete root;
+        if (default_config)
+        {
+            // Below option will have different default value when writing
+            // to server_config.xml in config directory
+            m_live_players = false;
+        }
+        writeServerConfigToDisk();
+        return;
+    }
+
+    int config_file_version = -1;
+    if (root->get("version", &config_file_version) < 1 ||
+        config_file_version < stk_config->m_min_server_version ||
+        config_file_version > stk_config->m_max_server_version)
+    {
+        Log::info("ServerConfig", "Your config file was not compatible, "
+            "so it was deleted and a new one will be created.");
+        delete root;
         writeServerConfigToDisk();
         return;
     }
@@ -257,16 +277,13 @@ void loadServerLobbyFromConfig()
     if (unsupportedGameMode())
         Log::fatal("ServerConfig", "Unsupported game mode");
 
-    // TODO Remove when config directory changed from 0.10-git
-    if (m_voting_timeout == 20.0f)
-        m_voting_timeout = 30.0f;
-
-    if (stk_config->time2Ticks(m_flag_return_timemout) > 65535)
+    if (stk_config->time2Ticks(m_flag_return_timemout) > 65535 ||
+        m_flag_return_timemout <= 0.0f)
     {
         float timeout = m_flag_return_timemout;
         // in CTFFlag it uses 16bit unsigned integer for timeout
         Log::warn("ServerConfig", "Invalid %f m_flag_return_timemout which "
-            "is too large, use default value.", timeout);
+            "is invalid, use default value.", timeout);
         m_flag_return_timemout.revertToDefaults();
     }
 
@@ -341,19 +358,17 @@ void loadServerLobbyFromConfig()
     }
     else if (is_battle)
     {
-        if (m_hit_limit_threshold < 0.0f &&
-            m_time_limit_threshold_ffa < 0.0f)
+        if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
         {
             Log::warn("main", "Reset invalid hit and time limit settings");
-            m_hit_limit_threshold.revertToDefaults();
-            m_time_limit_threshold_ffa.revertToDefaults();
+            m_hit_limit.revertToDefaults();
+            m_time_limit_ffa.revertToDefaults();
         }
-        if (m_capture_limit_threshold < 0.0f &&
-            m_time_limit_threshold_ctf < 0.0f)
+        if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
         {
             Log::warn("main", "Reset invalid Capture and time limit settings");
-            m_capture_limit_threshold.revertToDefaults();
-            m_time_limit_threshold_ctf.revertToDefaults();
+            m_capture_limit.revertToDefaults();
+            m_time_limit_ctf.revertToDefaults();
         }
     }
 

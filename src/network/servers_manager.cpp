@@ -421,10 +421,14 @@ void ServersManager::updateBroadcastAddresses()
 #else
     struct ifaddrs *addresses, *p;
 
-    getifaddrs(&addresses);
+    if (getifaddrs(&addresses) == -1)
+    {
+        Log::warn("ServerManager", "Error in getifaddrs");
+        return;
+    }
     for (p = addresses; p; p = p->ifa_next)
     {
-        if (p->ifa_addr->sa_family == AF_INET)
+        if (p->ifa_addr != NULL && p->ifa_addr->sa_family == AF_INET)
         {
             struct sockaddr_in *sa = (struct sockaddr_in *) p->ifa_addr;
             TransportAddress ta(htonl(sa->sin_addr.s_addr), 0);

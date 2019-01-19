@@ -78,7 +78,7 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
         m_skidding_light_2 =
             irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
                                  0.05f), /* force */0.4f, /*radius*/4.0f,
-                                 1.0f, 0.2f, 0.0f, false, node);
+                                 1.0f, 0.1f, 0.0f, false, node);
         m_skidding_light_2->setVisible(false);
         m_skidding_light_2->setName(("skidding emitter 2 (" + m_kart->getIdent()
                                                             + ")").c_str() );
