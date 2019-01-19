@@ -20,6 +20,7 @@
 #include "addons/news_manager.hpp"
 
 #include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "online/http_request.hpp"
 #include "online/request_manager.hpp"
@@ -167,7 +168,6 @@ void* NewsManager::downloadNews(void *obj)
             // We need a new object, since the state of the old
             // download request is now done.
             download_req = new HTTPRequest("news.xml");
-            UserConfigParams::m_server_addons.revertToDefaults();
 
             // make sure the new server address is actually used
             download_req->setAddonsURL("news.xml");
@@ -225,31 +225,53 @@ void* NewsManager::downloadNews(void *obj)
  */
 void NewsManager::checkRedirect(const XMLNode *xml)
 {
-    std::string new_server;
-    int result = xml->get("redirect", &new_server);
-    if(result==1 && new_server!="")
+    if (stk_config->m_allow_news_redirects)
     {
-        if(UserConfigParams::logAddons())
+        // NOTE: Before 0.10 there were just two redirect attributes
+        // "redirect" - addons server (contains /dl/xml/ path)
+        // "hw-report-server" - hardware report server
+
+        // Redirect for the new addons server
+        std::string new_addons_server;
+        if (xml->get("redirect-server-addons", &new_addons_server) == 1 && !new_addons_server.empty())
         {
-            Log::info("[Addons]", "Current server: '%s'\n [Addons] New server: '%s'",
-                        UserConfigParams::m_server_addons.c_str(), new_server.c_str());
+            if (UserConfigParams::logAddons())
+            {
+                Log::info("[Addons]", "Current addons server: '%s'\n [Addons] New addons server: '%s'",
+                            stk_config->m_server_addons.c_str(), new_addons_server.c_str());
+            }
+            stk_config->m_server_addons = new_addons_server;
         }
-        UserConfigParams::m_server_addons = new_server;
+
+        // Redirect for the API server
+        std::string new_api_server;
+        if (xml->get("redirect-server-api", &new_api_server) == 1 && !new_api_server.empty())
+        {
+            if (UserConfigParams::logAddons())
+            {
+                Log::info("[Addons]", "Current API server: '%s'\n [Addons] New API server: '%s'",
+                            stk_config->m_server_api.c_str(), new_api_server.c_str());
+            }
+            stk_config->m_server_api = new_api_server;
+        }
+
+        // Redirect for the hardware report server
+        std::string new_hardware_report_server;
+        if (xml->get("redirect-server-hardware-report", &new_hardware_report_server) == 1 && !new_hardware_report_server.empty())
+        {
+            Log::info("hw report", "Current hardware report  server: '%s'\n [hw report] New hardware report server: '%s'",
+                        stk_config->m_server_hardware_report.c_str(), new_hardware_report_server.c_str());
+            stk_config->m_server_hardware_report = new_hardware_report_server;
+        }
     }
 
-    std::string hw_report_server;
-    if(xml->get("hw-report-server", &hw_report_server)==1 && hw_report_server.size()>0)
-    {
-        Log::info("hw report", "New server at '%s'.", hw_report_server.c_str());
-        UserConfigParams::m_server_hw_report = hw_report_server;
-    }
-
+    // Update menu/game polling interval
     float polling;
-    if(xml->get("menu-polling-interval", &polling))
+    if (xml->get("menu-polling-interval", &polling))
     {
         RequestManager::get()->setMenuPollingInterval(polling);
     }
-    if(xml->get("game-polling-interval", &polling))
+    if (xml->get("game-polling-interval", &polling))
     {
         RequestManager::get()->setGamePollingInterval(polling);
     }

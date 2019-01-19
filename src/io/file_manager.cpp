@@ -115,7 +115,7 @@ FileManager* file_manager = 0;
 /** The constructor of the file manager creates an irrlicht file system and
  *  detects paths for the user config file and assets base directory (data).
  *  A second initialisation is done later once (see init()), once the user
- *  config file is read. This is necessary since part of discoverPaths 
+ *  config file is read. This is necessary since part of discoverPaths
  *  depend on artist debug mode.
  */
 FileManager::FileManager()
@@ -208,17 +208,17 @@ FileManager::FileManager()
     {
         Log::error("FileManager", "Could not find file '%s'in any "
                    "standard location (esp. ../data).", version.c_str());
-        Log::error("FileManager", 
+        Log::error("FileManager",
                    "Last location checked '%s'.", root_dir.c_str());
-        Log::fatal("FileManager", 
+        Log::fatal("FileManager",
                    "Set $SUPERTUXKART_DATADIR to point to the data directory.");
         // fatal will exit the application
     }
-    
+
     addRootDirs(root_dir);
-    
+
     std::string assets_dir;
-    
+
     if (getenv("SUPERTUXKART_ASSETS_DIR") != NULL)
     {
         assets_dir = std::string(getenv("SUPERTUXKART_ASSETS_DIR"));
@@ -236,7 +236,7 @@ FileManager::FileManager()
         //is this needed?
         assets_dir = std::string(getenv("SUPERTUXKART_ROOT_PATH"));
     }
-    
+
     if (!assets_dir.empty() && assets_dir != root_dir)
     {
         addRootDirs(assets_dir);
@@ -348,8 +348,9 @@ void FileManager::init()
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
-    m_cert_location = m_file_system->getAbsolutePath(
-        getAsset("addons.supertuxkart.net.pem").c_str()).c_str();
+
+    m_cert_bundle_location = m_file_system->getAbsolutePath(
+        getAsset("cacert.pem").c_str()).c_str();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -825,7 +826,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
         current_path += split[i] + "/";
         //Log::verbose("[FileManager]", "Checking for: '%s",
         //            current_path.c_str());
-        
+
         if (!checkAndCreateDirectory(current_path))
         {
             Log::error("[FileManager]", "Can't create dir '%s'",
@@ -937,12 +938,12 @@ void FileManager::checkAndCreateConfigDir()
                   "falling back to '.'.", m_user_config_dir.c_str());
         m_user_config_dir = "./";
     }
-    
+
     if (m_stdout_dir.empty())
     {
         m_stdout_dir = m_user_config_dir;
     }
-    
+
     return;
 }   // checkAndCreateConfigDir
 
@@ -1188,7 +1189,7 @@ void FileManager::setStdoutName(const std::string& filename)
 void FileManager::setStdoutDir(const std::string& dir)
 {
     m_stdout_dir = dir;
-    
+
     if (!m_stdout_dir.empty() && m_stdout_dir[m_stdout_dir.size() - 1] != '/')
     {
          m_stdout_dir += "/";
@@ -1392,8 +1393,8 @@ bool FileManager::removeDirectory(const std::string &name) const
 
     for (std::string file : files)
     {
-        if (file == "." || file == ".." || file == name + "/." || 
-            file == name + "/..") 
+        if (file == "." || file == ".." || file == name + "/." ||
+            file == name + "/..")
             continue;
 
         if (UserConfigParams::logMisc())
@@ -1417,7 +1418,7 @@ bool FileManager::removeDirectory(const std::string &name) const
             removeFile(file);
         }
     }
-    
+
 #if defined(WIN32)
     return RemoveDirectory(name.c_str())==TRUE;
 #else
@@ -1483,4 +1484,3 @@ bool FileManager::fileIsNewer(const std::string& f1, const std::string& f2) cons
     stat(f2.c_str(), &stat2);
     return stat1.st_mtime > stat2.st_mtime;
 }   // fileIsNewer
-

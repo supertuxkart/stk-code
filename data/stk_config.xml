@@ -18,6 +18,27 @@
        positions for those additional karts. -->
   <karts max-number="20"/>
 
+  <!-- Everything related to hardware configuration.
+            url : The server used for reporting statistics to.
+            // TODO change new-stats to stats before release-->
+  <HardwareReportServer url="https://new-stats.supertuxkart.net" />>
+
+  <!-- Everything related to online play.
+            url: The server used for online multiplayer.
+            server-version : Version of the server API to use. -->
+  <OnlineServer
+    url="https://online.supertuxkart.net/api/"
+    server-version="2"
+  />
+
+  <!-- Addon and news related settings
+            url : The server used for addon.
+            allow-news-redirects : If true we allow all the server urls to be redirected by the addons news.xml file-->
+  <AddonServer
+    url="https://online.supertuxkart.net/dl/xml"
+    allow-news-redirects="true"
+  />
+
   <!-- Scores are the number of points given when the race ends. -->
   <grand-prix>
   <!-- Establish the distribution of points in GP.
@@ -157,7 +178,7 @@
   <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
   <urls donate="https://supertuxkart.net/Donate"
-        password-reset="http://addons.supertuxkart.net/password-reset.php" />
+        password-reset="https://online.supertuxkart.net/password-reset.php" />
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over

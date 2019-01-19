@@ -946,16 +946,44 @@ namespace StringUtils
     std::string removeWhitespaces(const std::string& input)
     {
         std::string out;
-        
+
         for (char ch : input)
         {
             if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
                 continue;
-                
+
             out += ch;
         }
-        
+
         return out;
+    }
+
+    // ------------------------------------------------------------------------
+    std::string getHostNameFromURL(const std::string& url)
+    {
+        // Not even a valid URL
+        if (url.length() < 8)
+            return "";
+
+        // protocol is substr(0, first_color_position)
+        const size_t first_colon_position = url.find_first_of(":");
+        if (first_colon_position == std::string::npos)
+            return "";
+
+        // skip ://
+        const std::string url_without_protocol = url.substr(first_colon_position + 3);
+
+        // Find end with port
+        const size_t port_colon_position = url_without_protocol.find_first_of(":");
+        if (port_colon_position != std::string::npos)
+            return url_without_protocol.substr(0, port_colon_position);
+
+        // Find end with path
+        const size_t slash_position = url_without_protocol.find_first_of("/");
+        if (slash_position != std::string::npos)
+            return url_without_protocol.substr(0, slash_position);
+
+        return url_without_protocol;
     }
 
     // ------------------------------------------------------------------------
