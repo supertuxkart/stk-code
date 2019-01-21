@@ -774,13 +774,19 @@ void STKHost::mainLoop()
                     if (p.second->isValidated() &&
                         p.second->getConnectedTime() > 5.0f && ap > max_ping)
                     {
+                        std::string player_name;
+                        if (!p.second->getPlayerProfiles().empty())
+                        {
+                            player_name = StringUtils::wideToUtf8
+                                (p.second->getPlayerProfiles()[0]->getName());
+                        }
                         if (ServerConfig::m_kick_high_ping_players &&
                             !p.second->isDisconnected())
                         {
-                            Log::info("STKHost", "%s with ping %d is higher"
+                            Log::info("STKHost", "%s %s with ping %d is higher"
                                 " than %d ms, kick.",
                                 p.second->getAddress().toString().c_str(),
-                                ap, max_ping);
+                                player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
                             p.second->setDisconnected(true);
                             std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
@@ -790,10 +796,10 @@ void STKHost::mainLoop()
                         }
                         else if (!p.second->hasWarnedForHighPing())
                         {
-                            Log::info("STKHost", "%s with ping %d is higher"
+                            Log::info("STKHost", "%s %s with ping %d is higher"
                                 " than %d ms.",
                                 p.second->getAddress().toString().c_str(),
-                                ap, max_ping);
+                                player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
                             NetworkString msg(PROTOCOL_LOBBY_ROOM);
                             msg.setSynchronous(true);
