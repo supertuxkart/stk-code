@@ -426,8 +426,11 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
     s32 oldSelected = Selected;
 
     Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
-    if (Selected < 0 && !Items.empty())
-        Selected = 0;
+    if (Selected == -1 || Items.empty())
+    {
+        Selected = -1;
+        return;
+    }
 
     recalculateScrollPos();
 
