@@ -150,7 +150,7 @@
     <achievement id="4" name="Marathoner" description="Finish a race with at least twice the track's default lap number.">
         <goal type="twice-laps" value="1"/>
     </achievement>
-    <achievement id="5" name="Skid-row" description="Make 5 skidding in a single lap.">
+    <achievement id="5" name="Skid-row" description="Skid 5 times in a single lap.">
         <goal type="skidding-1lap" value="5"/>
     </achievement>
     <achievement id="6" name="Gold driver" description="Win against at least 3 AIs in normal race, time-trial, and follow the leader.">
