@@ -266,6 +266,23 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *kart_node = root->getNode("karts"))
         kart_node->get("max-number", &m_max_karts);
 
+    if (const XMLNode *node = root->getNode("HardwareReportServer"))
+    {
+        node->get("url", &m_server_hardware_report);
+    }
+
+    if (const XMLNode *node = root->getNode("OnlineServer"))
+    {
+        node->get("url", &m_server_api);
+        node->get("server-version", &m_server_api_version);
+    }
+
+    if (const XMLNode *node = root->getNode("AddonServer"))
+    {
+        node->get("url", &m_server_addons);
+        node->get("allow-news-redirects", &m_allow_news_redirects);
+    }
+
     if(const XMLNode *gp_node = root->getNode("grand-prix"))
     {
         for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
@@ -364,8 +381,8 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-2", &m_camera_fov[1]);
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
-        
-        for (unsigned int i = 4; i < MAX_PLAYER_COUNT; i++) 
+
+        for (unsigned int i = 4; i < MAX_PLAYER_COUNT; i++)
         {
             camera->get("fov-4", &m_camera_fov[i]);
         }

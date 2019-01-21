@@ -152,15 +152,15 @@ public:
     }
     std::map<T, U>& operator=(const std::map<T,U>& v)
     {
-        m_elements = std::map<T, U>(v); 
+        m_elements = std::map<T, U>(v);
         return m_elements;
     }
     std::map<T, U>& operator=(const MapUserConfigParam& v)
     {
-        m_elements = std::map<T,U>(v); 
+        m_elements = std::map<T,U>(v);
         return m_elements;
     }
-    U& operator[] (const T key) 
+    U& operator[] (const T key)
     {
         return m_elements[key];
     }
@@ -443,7 +443,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
-    
+
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
@@ -482,7 +482,7 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_active",
             &m_multitouch_group,
             "Enable multitouch support: 0 = disabled, 1 = if available, 2 = enabled") );
-            
+
     PARAM_PREFIX BoolUserConfigParam         m_multitouch_draw_gui
             PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_draw_gui",
             &m_multitouch_group,
@@ -508,12 +508,12 @@ namespace UserConfigParams
             PARAM_DEFAULT( FloatUserConfigParam(0.2f, "multitouch_sensitivity_x",
             &m_multitouch_group,
             "A parameter in range [0, 1.0] that determines the sensitivity for x axis."));
-            
+
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_y
             PARAM_DEFAULT( FloatUserConfigParam(0.65f, "multitouch_sensitivity_y",
             &m_multitouch_group,
             "A parameter in range [0, 1.0] that determines the sensitivity for y axis."));
-            
+
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
             PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",
             &m_multitouch_group,
@@ -530,7 +530,7 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
             "keyboard, 2 = always enabled, 3 = android keyboard (experimental)") );
-            
+
     PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
             PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
             &m_multitouch_group,
@@ -728,7 +728,7 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
-    
+
     PARAM_PREFIX bool m_enable_sound PARAM_DEFAULT( true );
 
     /** True to test funky ambient/diffuse/specularity in RGB &
@@ -953,12 +953,6 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "random-identifier", &m_hw_report_group,
                                                   "A random number to avoid duplicated reports.") );
 
-    PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "http://addons.supertuxkart.net:8080",
-                                                     "hw-report-server",
-                                                     &m_hw_report_group,
-                                                    "The server used for reporting statistics to."));
-
     PARAM_PREFIX BoolUserConfigParam      m_hw_report_enable
             PARAM_DEFAULT( BoolUserConfigParam(   true,
                                                      "hw-report-enabled",
@@ -972,34 +966,10 @@ namespace UserConfigParams
           "Always show the login screen even if last player's session was saved."));
 
 
-    // ---- Online gameplay related
-    PARAM_PREFIX GroupUserConfigParam       m_online_group
-            PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
-                                          "Everything related to online play.") );
-
-    PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://addons.supertuxkart.net/api/",
-                                                     "server_multiplayer",
-                                                     &m_online_group,
-                                                    "The server used for online multiplayer."));
-
-    PARAM_PREFIX IntUserConfigParam        m_server_version
-            PARAM_DEFAULT( IntUserConfigParam(   2,
-                                                 "server-version",
-                                                 &m_online_group,
-                                                    "Version of the server API to use."));
-
-
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
             PARAM_DEFAULT( GroupUserConfigParam("AddonServer",
                                           "Addon and news related settings") );
-
-    PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("http://addons.supertuxkart.net/dl/xml",
-                                                 "server_addons",
-                                                 &m_addon_group,
-                                                "The server used for addon."));
 
     PARAM_PREFIX TimeUserConfigParam        m_news_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "news_last_updated",
@@ -1044,7 +1014,7 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0, "unlock_everything",
                         "Enable all karts and tracks: 0 = disabled, "
                         "1 = everything except final race, 2 = everything") );
-                               
+
     PARAM_PREFIX StringUserConfigParam      m_commandline
             PARAM_DEFAULT( StringUserConfigParam("", "commandline",
                              "Allows to set commandline args in config file") );
