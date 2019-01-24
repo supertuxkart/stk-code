@@ -125,7 +125,8 @@ protected:
     virtual unsigned int insertItem(Item *item);
     void switchItemsInternal(std::vector < ItemState*> &all_items);
     void setSwitchItems(const std::vector<int> &switch_items);
-
+    void insertItemInQuad(Item *item);
+    void deleteItemInQuad(ItemState *item);
              ItemManager();
 public:
     virtual ~ItemManager();
