@@ -3,6 +3,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/capture_the_flag.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
@@ -52,6 +53,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     switch (type)
     {
     case GE_KART_FINISHED_RACE:
@@ -124,6 +126,14 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             else
                 k->setStartupBoost(boost);
         }
+        break;
+    }
+    case GE_CHECK_LINE:
+    {
+        if (!lw)
+            throw std::invalid_argument("No linear world");
+        if (NetworkConfig::get()->isClient())
+            lw->updateCheckLinesClient(data);
         break;
     }
     default:

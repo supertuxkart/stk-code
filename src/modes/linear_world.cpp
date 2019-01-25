@@ -33,7 +33,9 @@
 #include "physics/physics.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "network/server_config.hpp"
+#include "network/stk_host.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/check_manager.hpp"
@@ -1156,3 +1158,66 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
     for (unsigned i = 0; i < cc; i++)
         CheckManager::get()->getCheckStructure(i)->restoreCompleteState(b);
 }   // restoreCompleteState
+
+// ----------------------------------------------------------------------------
+/** Called in server whenever a kart cross a check line, it send server
+ *  all karts lap count, last triggered checkline and check structure status
+ *  to all players in game (including spectators so that the lap count is
+ *  correct)
+ */
+void LinearWorld::updateCheckLinesServer()
+{
+    if (!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isClient())
+        return;
+
+    NetworkString cl(PROTOCOL_GAME_EVENTS);
+    cl.setSynchronous(true);
+    cl.addUInt8(GameEventsProtocol::GE_CHECK_LINE);
+
+    for (KartInfo& ki : m_kart_info)
+    {
+        int8_t finished_laps = (int8_t)ki.m_finished_laps;
+        cl.addUInt8(finished_laps);
+    }
+
+    for (TrackSector* ts : m_kart_track_sector)
+    {
+        int8_t ltcl = (int8_t)ts->getLastTriggeredCheckline();
+        cl.addUInt8(ltcl);
+    }
+
+    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    cl.addUInt8(cc);
+    for (unsigned i = 0; i < cc; i++)
+        CheckManager::get()->getCheckStructure(i)->saveIsActive(&cl);
+
+    STKHost::get()->sendPacketToAllPeers(&cl, true);
+}   // updateCheckLinesServer
+
+// ----------------------------------------------------------------------------
+/* Synchronize with server from the above data. */
+void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
+{
+    for (KartInfo& ki : m_kart_info)
+    {
+        int8_t finished_laps = b.getUInt8();
+        ki.m_finished_laps = finished_laps;
+    }
+
+    for (TrackSector* ts : m_kart_track_sector)
+    {
+        int8_t ltcl = b.getUInt8();
+        ts->setLastTriggeredCheckline(ltcl);
+    }
+
+    const unsigned cc = b.getUInt8();
+    if (cc != CheckManager::get()->getCheckStructureCount())
+    {
+        throw std::invalid_argument(
+            "Server has different check structures size.");
+    }
+    for (unsigned i = 0; i < cc; i++)
+        CheckManager::get()->getCheckStructure(i)->restoreIsActive(b);
+
+}   // updateCheckLinesClient

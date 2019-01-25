@@ -131,9 +131,15 @@ public:
         m_check_structures_to_change_state.push_back(i);
     }   // addSuccessor
     // ------------------------------------------------------------------------
+    virtual bool triggeringCheckline() const { return false; }
+    // ------------------------------------------------------------------------
     virtual void saveCompleteState(BareNetworkString* bns);
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b);
+    // ------------------------------------------------------------------------
+    void saveIsActive(BareNetworkString* bns);
+    // ------------------------------------------------------------------------
+    void restoreIsActive(const BareNetworkString& b);
 };   // CheckStructure
 
 #endif
