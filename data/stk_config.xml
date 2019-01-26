@@ -19,9 +19,8 @@
   <karts max-number="20"/>
 
   <!-- Everything related to hardware configuration.
-            url : The server used for reporting statistics to.
-            // TODO change new-stats to stats before release-->
-  <HardwareReportServer url="https://new-stats.supertuxkart.net" />>
+            url : The server used for reporting statistics to. -->
+  <HardwareReportServer url="https://stats.supertuxkart.net" />
 
   <!-- Everything related to online play.
             url: The server used for online multiplayer.
