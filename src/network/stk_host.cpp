@@ -780,11 +780,14 @@ void STKHost::mainLoop()
                             player_name = StringUtils::wideToUtf8
                                 (p.second->getPlayerProfiles()[0]->getName());
                         }
+                        const bool peer_not_in_game =
+                            sl->getCurrentState() <= ServerLobby::SELECTING
+                            || p.second->isWaitingForGame();
                         if (ServerConfig::m_kick_high_ping_players &&
-                            !p.second->isDisconnected())
+                            !p.second->isDisconnected() && peer_not_in_game)
                         {
                             Log::info("STKHost", "%s %s with ping %d is higher"
-                                " than %d ms, kick.",
+                                " than %d ms when not in game, kick.",
                                 p.second->getAddress().toString().c_str(),
                                 player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
