@@ -81,6 +81,11 @@ public:
     bool listUpdated() const                         { return m_list_updated; }
     // ------------------------------------------------------------------------
     const std::vector<TransportAddress>& getBroadcastAddresses();
-
+    // ------------------------------------------------------------------------
+    void reset()
+    {
+        m_last_load_time.store(0);
+        m_list_updated = false;
+    }
 };   // class ServersManager
 #endif // HEADER_SERVERS_MANAGER_HPP
