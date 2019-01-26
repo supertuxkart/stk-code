@@ -235,9 +235,18 @@ unsigned int ItemManager::insertItem(Item *item)
         m_all_items[index] = item;
     }
     item->setItemId(index);
-
+    insertItemInQuad(item);
     // Now insert into the appropriate quad list, if there is a quad list
     // (i.e. race mode has a quad graph).
+    return index;
+}   // insertItem
+
+//-----------------------------------------------------------------------------
+/** Insert into the appropriate quad list, if there is a quad list
+ *  (i.e. race mode has a quad graph).
+ */
+void ItemManager::insertItemInQuad(Item *item)
+{
     if(m_items_in_quads)
     {
         int graph_node = item->getGraphNode();
@@ -249,8 +258,7 @@ unsigned int ItemManager::insertItem(Item *item)
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
     }   // if m_items_in_quads
-    return index;
-}   // insertItem
+}   // insertItemInQuad
 
 //-----------------------------------------------------------------------------
 /** Creates a new item at the location of the kart (e.g. kart drops a
@@ -303,7 +311,10 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
-    insertItem(item);
+
+    // restoreState in NetworkItemManager will handle the insert item
+    if (!server_xyz)
+        insertItem(item);
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
@@ -522,6 +533,18 @@ void ItemManager::updateGraphics(float dt)
 void ItemManager::deleteItem(ItemState *item)
 {
     // First check if the item needs to be removed from the items-in-quad list
+    deleteItemInQuad(item);
+    int index = item->getItemId();
+    m_all_items[index] = NULL;
+    delete item;
+}   // delete item
+
+//-----------------------------------------------------------------------------
+/** Removes an items from the items-in-quad list only
+ *  \param The item to delete.
+ */
+void ItemManager::deleteItemInQuad(ItemState* item)
+{
     if(m_items_in_quads)
     {
         int sector = item->getGraphNode();
@@ -533,11 +556,7 @@ void ItemManager::deleteItem(ItemState *item)
         assert(it!=items.end());
         items.erase(it);
     }   // if m_items_in_quads
-
-    int index = item->getItemId();
-    m_all_items[index] = NULL;
-    delete item;
-}   // delete item
+}   // deleteItemInQuad
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain

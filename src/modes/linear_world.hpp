@@ -220,6 +220,10 @@ public:
     virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
+    // ------------------------------------------------------------------------
+    void updateCheckLinesServer();
+    // ------------------------------------------------------------------------
+    void updateCheckLinesClient(const BareNetworkString& b);
 };   // LinearWorld
 
 #endif

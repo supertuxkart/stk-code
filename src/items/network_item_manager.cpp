@@ -492,12 +492,15 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // the client, but not yet confirmed). So 
     unsigned int max_index = std::max(m_confirmed_state.size(),
                                       m_all_items.size()        );
+    m_all_items.resize(max_index, NULL);
 
     for(unsigned int i=0; i<max_index; i++)
     {
-        ItemState *item     = i < m_all_items.size() ?  m_all_items[i] : NULL;
+        ItemState *item     = m_all_items[i];
         const ItemState *is = i < m_confirmed_state.size() 
                             ? m_confirmed_state[i] : NULL;
+        // For every *(ItemState*)item = *is, all deactivated ticks, item id
+        // ... will be copied from item state to item
         if (is && item)
         {
             *(ItemState*)item = *is;
@@ -510,31 +513,19 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             Vec3 normal = is->getNormal();
             Item *item_new = dropNewItem(is->getType(), is->getPreviousOwner(),
                                          &xyz, &normal );
-            if (i != item_new->getItemId())
-            {
-                // The newly created item on the client has been given a 
-                // different index than the one given by the server. This
-                // indicates that this client has either a different item
-                // at the index that the server sent (i.e. client predicted
-                // an item, which the server has not confirmed), or the
-                // client found an empty slot that the server did not have
-                // (so an earlier index was found).
-                if(i < m_all_items.size() && m_all_items[i])
-                    deleteItem(m_all_items[i]);
-                // Move item_new from its position to the index given
-                // by the server
-                m_all_items[item_new->getItemId()] = NULL;
-                m_all_items[i] = item_new;
-                item_new->setItemId(i);
-            }
-            item_new->setDeactivatedTicks(is->getDeactivatedTicks());
-            *((ItemState*)m_all_items[i]) = *is;
+            *((ItemState*)item_new) = *is;
+            m_all_items[i] = item_new;
+            insertItemInQuad(item_new);
         }
         else if (!is && item)
         {
-            deleteItem(m_all_items[i]);
+            deleteItemInQuad(item);
+            delete item;
+            m_all_items[i] = NULL;
         }
     }   // for i < max_index
+    // Clean up the rest
+    m_all_items.resize(m_confirmed_state.size());
 
     // Now set the clock back to the 'rewindto' time:
     world->setTicksForRewind(rewind_to_time);

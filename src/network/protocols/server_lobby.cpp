@@ -982,7 +982,7 @@ void ServerLobby::update(int ticks)
     {
         for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
         {
-            const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            RemoteKartInfo& rki = race_manager->getKartInfo(i);
             std::shared_ptr<NetworkPlayerProfile> player =
                 rki.getNetworkPlayerProfile().lock();
             if (player)
@@ -1003,7 +1003,6 @@ void ServerLobby::update(int ticks)
                 Log::info("ServerLobby", "%s hasn't live-joined within"
                     " 60 seconds, remove it.",
                     peer->getAddress().toString().c_str());
-                RemoteKartInfo& rki = race_manager->getKartInfo(i);
                 rki.makeReserved();
                 continue;
             }
@@ -1012,9 +1011,10 @@ void ServerLobby::update(int ticks)
             {
                 if (w && w->getKart(i)->hasFinishedRace())
                     continue;
-                Log::info("ServerLobby", "%s has been idle for more than"
+                Log::info("ServerLobby", "%s %s has been idle for more than"
                     " %d seconds, kick.",
-                    peer->getAddress().toString().c_str(), sec);
+                    peer->getAddress().toString().c_str(),
+                    StringUtils::wideToUtf8(rki.getPlayerName()).c_str(), sec);
                 peer->kick();
             }
         }

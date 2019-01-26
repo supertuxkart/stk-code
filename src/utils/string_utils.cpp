@@ -1092,6 +1092,25 @@ namespace StringUtils
 
             // Step 7
             push_text:
+            
+            // Calculate break index depending on max text length if there is no
+            // breakable character
+            if (break_index == 0)
+            {
+                for (unsigned int i = 0; i < work_copy.size(); i++)
+                {
+                    std::wstring text = work_copy.substr(0, i+1);
+                    unsigned int width = font->getDimension(text.c_str()).Width;
+                    
+                    if (width > max_width)
+                        break;
+                    
+                    break_index++;
+                }
+                
+                break_index = std::max(0, (int)break_index - 1);
+            }
+            
             // To include the char at break_index, we need a length of break_index+1
             std::wstring text_line = work_copy.substr(0,break_index+1);
             output.push_back(text_line);
@@ -1106,6 +1125,7 @@ namespace StringUtils
             {
                 work_copy = work_copy.substr(break_index+1); // All the string except the pushed back part
                 index = 0;
+                break_index = 0;
             }
         } // While(true) - active until the whole string has been broken and copied
         if (right_to_left)

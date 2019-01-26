@@ -64,8 +64,7 @@ void ServersManager::deallocate()
 // ----------------------------------------------------------------------------
 ServersManager::ServersManager()
 {
-    m_last_load_time.store(0);
-    m_list_updated = false;
+    reset();
 }   // ServersManager
 
 // ----------------------------------------------------------------------------
@@ -237,6 +236,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
 {
     m_servers.clear();
     for (auto i : servers) m_servers.emplace_back(i.second);
+    m_last_load_time.store(StkTime::getRealTimeMs());
     m_list_updated = true;
 
 }

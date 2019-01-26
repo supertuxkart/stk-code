@@ -165,6 +165,7 @@ void ServerSelection::init()
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
+    ServersManager::get()->reset();
     refresh(true);
 }   // init
 
