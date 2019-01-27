@@ -69,6 +69,10 @@ private:
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
 
+    uint64_t m_network_spectate_time;
+
+    bool m_use_normal_camera_spectating;
+
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
      *variable.
@@ -114,7 +118,9 @@ public:
     /** Returns the name of the previous controller (which has the right
      *  player name associated). */
     core::stringw getName() const { return m_previous_controller->getName(); }
-
+    // ------------------------------------------------------------------------
+    void setNetworkSpectateTime(uint64_t time)
+                                            { m_network_spectate_time = time; }
 };   // EndKart
 
 #endif

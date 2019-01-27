@@ -39,10 +39,12 @@
 #include "graphics/irr_driver.hpp"
 #endif
 
+#include "graphics/camera.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "tracks/drive_graph.hpp"
@@ -55,6 +57,8 @@ EndController::EndController(AbstractKart *kart,
                              Controller *prev_controller)
              : AIBaseLapController(kart)
 {
+    m_network_spectate_time = std::numeric_limits<uint64_t>::max();
+    m_use_normal_camera_spectating = false;
     m_previous_controller = prev_controller;
     if(!race_manager->isBattleMode() &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
@@ -164,6 +168,18 @@ void  EndController::newLap(int lap)
  */
 bool EndController::action(PlayerAction action, int value, bool dry_run)
 {
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (StkTime::getRealTimeMs() > m_network_spectate_time && cl)
+    {
+        if (!m_use_normal_camera_spectating)
+        {
+            // Only 1 local player will be able to change target
+            m_use_normal_camera_spectating = true;
+            Camera::changeCamera(0, Camera::CM_TYPE_NORMAL);
+        }
+        cl->changeSpectateTarget(action, value);
+        return true;
+    }
     if(action!=PA_FIRE) return true;
     RaceResultGUI *race_result_gui =
         dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
@@ -325,4 +341,3 @@ int EndController::calcSteps()
 
     return steps;
 }   // calcSteps
-

@@ -68,6 +68,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
@@ -986,6 +987,29 @@ void Kart::finishedRace(float time, bool from_server)
             return;
         }
     }   // !from_server
+
+#ifndef ANDROID
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl && m_controller->isLocalPlayerController() &&
+        race_manager->getNumLocalPlayers() == 1 &&
+        race_manager->modeHasLaps() && from_server)
+    {
+        static bool msg_shown = false;
+        if (!msg_shown)
+        {
+            msg_shown = true;
+            cl->addSpectateHelperMessage();
+        }
+        EndController* ec = dynamic_cast<EndController*>(m_controller);
+        if (ec)
+        {
+            // Enable spectate mode after 3 seconds which allow player to
+            // release left / right button if they keep pressing it during
+            // finishing line
+            ec->setNetworkSpectateTime(StkTime::getRealTimeMs() + 3000);
+        }
+    }
+#endif
 
     m_finished_race = true;
 
