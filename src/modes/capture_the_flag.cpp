@@ -229,6 +229,7 @@ void CaptureTheFlag::update(int ticks)
                 kart->getBody()->proceedToTransform(t);
                 kart->setTrans(t);
                 kart->getPowerup()->reset();
+                static_cast<SmoothNetworkBody*>(kart)->reset();
             }
             it++;
         }
