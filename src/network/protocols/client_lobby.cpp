@@ -26,6 +26,7 @@
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_device.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -422,6 +423,16 @@ void ClientLobby::update(int ticks)
         }
     case SELECTING_ASSETS:
     case RACING:
+#ifndef ANDROID
+    {
+        static bool helper_msg_shown = false;
+        if (!helper_msg_shown && isSpectator())
+        {
+            helper_msg_shown = true;
+            addSpectateHelperMessage();
+        }
+    }
+#endif
     case EXITING:
         break;
     }
@@ -1221,3 +1232,23 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value) const
         }
     }
 }   // changeSpectateTarget
+
+// ----------------------------------------------------------------------------
+void ClientLobby::addSpectateHelperMessage() const
+{
+    auto& local_players = NetworkConfig::get()->getNetworkPlayers();
+    if (local_players.empty())
+        return;
+    DeviceConfig* dc = std::get<0>(local_players[0])->getConfiguration();
+    if (!dc)
+        return;
+    core::stringw left = dc->getBindingAsString(PA_STEER_LEFT);
+    core::stringw right = dc->getBindingAsString(PA_STEER_RIGHT);
+    core::stringw back = dc->getBindingAsString(PA_LOOK_BACK);
+
+    // I18N: Message shown in game to tell player it's possible to change
+    // camera target in spectate mode of network
+    core::stringw msg = _("Press <%s>, <%s> or <%s> to change targeted "
+        "player or camera position.", left, right, back);
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+}   // addSpectateHelperMessage

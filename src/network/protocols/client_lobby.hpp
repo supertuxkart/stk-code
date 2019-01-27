@@ -154,6 +154,7 @@ public:
                                                     { return m_lobby_players; }
     bool isServerLiveJoinable() const        { return m_server_live_joinable; }
     void changeSpectateTarget(PlayerAction action, int value) const;
+    void addSpectateHelperMessage() const;
 };
 
 #endif // CLIENT_LOBBY_HPP
