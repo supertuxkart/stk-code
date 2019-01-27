@@ -809,48 +809,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             {
                 if (auto cl = LobbyProtocol::get<ClientLobby>())
                 {
-                    Camera* cam = Camera::getActiveCamera();
-                    if (cl->isSpectator() && cam)
+                    if (cl->isSpectator())
                     {
-                        // Network spectating handling
-                        if (action == PA_LOOK_BACK && value == 0)
-                        {
-                            if (cam->getMode() == Camera::CM_REVERSE)
-                            {
-                                cam->setMode(Camera::CM_NORMAL);
-                            }
-                            else
-                                cam->setMode(Camera::CM_REVERSE);
-                            return;
-                        }
-
-                        int current_idx = 0;
-                        if (cam->getKart())
-                            current_idx = cam->getKart()->getWorldKartId();
-                        bool up = false;
-                        if (action == PA_STEER_LEFT && value == 0)
-                            up = false;
-                        else if (action == PA_STEER_RIGHT && value == 0)
-                            up = true;
-                        else
-                            return;
-
-                        const int num_karts = World::getWorld()->getNumKarts();
-                        for (int i=0;i<num_karts;i++)
-                        {
-                            current_idx = up ? current_idx+1 : current_idx-1;
-                            // Handle looping
-                            if (current_idx == -1)
-                                current_idx = num_karts - 1;
-                            else if (current_idx == num_karts)
-                                current_idx = 0;
-
-                            if (!World::getWorld()->getKart(current_idx)->isEliminated())
-                            {
-                                cam->setKart(World::getWorld()->getKart(current_idx));
-                                break;
-                            }
-                        }
+                        cl->changeSpectateTarget(action, value);
                         return;
                     }
                 }

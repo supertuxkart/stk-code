@@ -19,6 +19,7 @@
 #ifndef CLIENT_LOBBY_HPP
 #define CLIENT_LOBBY_HPP
 
+#include "input/input.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
@@ -152,6 +153,7 @@ public:
     const std::vector<LobbyPlayer>& getLobbyPlayers() const
                                                     { return m_lobby_players; }
     bool isServerLiveJoinable() const        { return m_server_live_joinable; }
+    void changeSpectateTarget(PlayerAction action, int value) const;
 };
 
 #endif // CLIENT_LOBBY_HPP
