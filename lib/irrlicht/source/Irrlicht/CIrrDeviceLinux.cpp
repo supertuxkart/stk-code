@@ -688,18 +688,22 @@ bool CIrrDeviceLinux::createWindow()
 	Atom type;
 	int form;
 	unsigned long remain, len;
-
-	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
-	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
-								  WMCheck, 0L, 1L, False, XA_WINDOW,
-								  &type, &form, &len, &remain,
-								  (unsigned char **)&list);
-								  
 	
-	if (s == Success)
+	const char* disable_netwm = getenv("IRR_DISABLE_NETWM");
+
+	if (!disable_netwm || strcmp(disable_netwm, "0") == 0)
 	{
-		XFree(list);
-		SupportsNetWM = (len > 0);
+		Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+		Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+									  WMCheck, 0L, 1L, False, XA_WINDOW,
+									  &type, &form, &len, &remain,
+									  (unsigned char **)&list);
+		
+		if (s == Success)
+		{
+			XFree(list);
+			SupportsNetWM = (len > 0);
+		}
 	}
 
 	changeResolution();
