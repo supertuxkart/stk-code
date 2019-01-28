@@ -684,6 +684,14 @@ void cmdLineHelp()
     "       --apitrace          This will disable buffer storage and\n"
     "                           writing gpu query strings to opengl, which\n"
     "                           can be seen later in apitrace.\n"
+#if defined(__linux__) || defined(__FreeBSD__)
+    "\n"
+    "Environment variables:\n"
+    "       IRR_DEVICE_TYPE=[x11, wayland] Force x11/wayland device\n"
+    "       IRR_DISABLE_NETWM=1            Force to use legacy fullscreen\n"
+    "       IRR_VIDEO_OUTPUT=output_name   Force to use selected monitor for\n"
+    "                                      fullscreen window, eg. HDMI-0\n"
+#endif
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "https://supertuxkart.net\n\n",
