@@ -523,14 +523,20 @@ void ClientLobby::disconnectedPlayer(Event* event)
     unsigned disconnected_player_count = data.getUInt8();
     uint32_t host_id = data.getUInt32();
     m_peers_votes.erase(host_id);
-    // If world exists the kart rewinder will know which player disconnects
-    if (!World::getWorld())
+    // If in-game world exists the kart rewinder will know which player
+    // disconnects
+    bool in_game_world = World::getWorld() &&
+        RaceEventManager::getInstance() &&
+        RaceEventManager::getInstance()->isRunning() &&
+        !RaceEventManager::getInstance()->isRaceOver();
+
+    if (!in_game_world)
         SFXManager::get()->quickSound("appear");
     for (unsigned i = 0; i < disconnected_player_count; i++)
     {
         std::string name;
         data.decodeString(&name);
-        if (World::getWorld())
+        if (in_game_world)
             continue;
         core::stringw player_name = StringUtils::utf8ToWide(name);
         core::stringw msg = _("%s disconnected.", player_name);
