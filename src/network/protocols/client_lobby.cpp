@@ -948,16 +948,39 @@ void ClientLobby::raceFinished(Event* event)
 {
     NetworkString &data = event->data();
     Log::info("ClientLobby", "Server notified that the race is finished.");
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     if (m_game_setup->isGrandPrix())
     {
         int t = data.getUInt32();
-        static_cast<LinearWorld*>(World::getWorld())->setFastestLapTicks(t);
+        lw->setFastestLapTicks(t);
         race_manager->configGrandPrixResultFromNetwork(data);
     }
     else if (race_manager->modeHasLaps())
     {
         int t = data.getUInt32();
-        static_cast<LinearWorld*>(World::getWorld())->setFastestLapTicks(t);
+        lw->setFastestLapTicks(t);
+    }
+
+    if (lw)
+    {
+        // Eliminate all karts which have not finished the race, it can happen
+        // if the last player leave the game instead of crossing the finish
+        // line
+        lw->updateRacePosition();
+        for (unsigned i = 0; i < lw->getNumKarts(); i++)
+        {
+            AbstractKart* k = lw->getKart(i);
+            if (!k->hasFinishedRace() && !k->isEliminated())
+            {
+                core::stringw player_name = k->getController()->getName();
+                core::stringw msg = _("%s left the game.", player_name);
+                MessageQueue::add(MessageQueue::MT_FRIEND, msg);
+                World::getWorld()->eliminateKart(i,
+                    false/*notify_of_elimination*/);
+                k->finishedRace(World::getWorld()->getTime(),
+                    true/*from_server*/);
+            }
+        }
     }
 
     // stop race protocols
