@@ -68,6 +68,8 @@ protected:
     /** True if this peer is waiting for game. */
     std::atomic_bool m_waiting_for_game;
 
+    std::atomic_bool m_spectator;
+
     std::atomic_bool m_disconnected;
 
     std::atomic_bool m_warned_for_high_ping;
@@ -191,6 +193,10 @@ public:
     void setWaitingForGame(bool val)         { m_waiting_for_game.store(val); }
     // ------------------------------------------------------------------------
     bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
+    // ------------------------------------------------------------------------
+    void setSpectator(bool val)                     { m_spectator.store(val); }
+    // ------------------------------------------------------------------------
+    bool isSpectator() const                     { return m_spectator.load(); }
     // ------------------------------------------------------------------------
     bool isDisconnected() const               { return m_disconnected.load(); }
     // ------------------------------------------------------------------------

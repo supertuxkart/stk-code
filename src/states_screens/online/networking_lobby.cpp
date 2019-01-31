@@ -132,7 +132,7 @@ void NetworkingLobby::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon_3);
     m_icon_bank->addTextureAsSprite(icon_4);
     m_icon_bank->addTextureAsSprite(icon_5);
-    
+    m_icon_bank->addTextureAsSprite(m_spectate_texture);
 
     if (UserConfigParams::m_hidpi_enabled)
     {

@@ -711,13 +711,20 @@ void ClientLobby::updatePlayerList(Event* event)
         lp.m_local_player_id = local_id;
         data.decodeStringW(&lp.m_user_name);
         total_players += lp.m_user_name;
-        bool is_peer_waiting_for_game = data.getUInt8() == 1;
+        uint8_t waiting_and_spectator = data.getUInt8();
+        bool is_peer_waiting_for_game = waiting_and_spectator == 1;
+        bool is_spectator = waiting_and_spectator == 2;
         bool is_peer_server_owner = data.getUInt8() == 1;
         // icon to be used, see NetworkingLobby::loadedFromFile
         lp.m_icon_id = is_peer_server_owner ? 0 :
             lp.m_online_id != 0 /*if online account*/ ? 1 : 2;
-        if (waiting && !is_peer_waiting_for_game)
-            lp.m_icon_id = 3;
+        if (waiting)
+        {
+            if (is_spectator)
+                lp.m_icon_id = 5;
+            else if (!is_peer_waiting_for_game)
+                lp.m_icon_id = 3;
+        }
         lp.m_difficulty = (PerPlayerDifficulty)data.getUInt8();
         if (lp.m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
         {

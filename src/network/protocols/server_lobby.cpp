@@ -929,6 +929,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     live_join_start_time -= m_server_delay;
     live_join_start_time += 3000;
 
+    bool spectator = false;
     for (const int id : peer->getAvailableKartIDs())
     {
         World::getWorld()->addReservedKart(id);
@@ -941,6 +942,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     {
         Log::info("ServerLobby", "%s spectating succeeded.",
             peer->getAddress().toString().c_str());
+        spectator = true;
     }
 
     NetworkString* ns = getNetworkString(10);
@@ -959,6 +961,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
 
     m_peers_ready[peer] = false;
     peer->setWaitingForGame(false);
+    peer->setSpectator(spectator);
 
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
@@ -2261,6 +2264,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         .addUInt32(ServerConfig::m_server_version).addFloat(auto_start_timer)
         .addUInt32(ServerConfig::m_state_frequency);
 
+    peer->setSpectator(false);
     if (game_started)
     {
         peer->setWaitingForGame(true);
@@ -2322,7 +2326,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             .encodeString(profile->getName());
         std::shared_ptr<STKPeer> p = profile->getPeer();
         pl->addUInt8((uint8_t)
-            (p && p->isWaitingForGame() ? 1 : 0));
+            (p && p->isWaitingForGame() ? 1 : p && p->isSpectator() ? 2 : 0));
         uint8_t server_owner = 0;
         if (p && m_server_owner_id.load() == p->getHostId())
             server_owner = 1;
@@ -3072,6 +3076,7 @@ void ServerLobby::addWaitingPlayersToGame()
             continue;
 
         peer->setWaitingForGame(false);
+        peer->setSpectator(false);
         if (m_peers_ready.find(peer) == m_peers_ready.end())
         {
             m_peers_ready[peer] = false;
@@ -3502,6 +3507,7 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
     nim->erasePeerInGame(peer);
     m_peers_ready.erase(peer);
     peer->setWaitingForGame(true);
+    peer->setSpectator(false);
 
     NetworkString* reset = getNetworkString(2);
     reset->setSynchronous(true);
@@ -3534,6 +3540,7 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
 
     m_peers_ready.erase(peer);
     peer->setWaitingForGame(true);
+    peer->setSpectator(false);
 
     NetworkString* reset = getNetworkString(2);
     reset->setSynchronous(true);
