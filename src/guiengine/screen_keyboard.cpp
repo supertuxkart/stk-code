@@ -167,7 +167,8 @@ void ScreenKeyboard::createButtons()
     int rows_num = layout_proportions.size();
     int pos_y = 3;
 
-    int height = (m_area.getHeight() - 2 * pos_y) / rows_num;
+    const int margin = 2;
+    int height = (m_area.getHeight() - 2 * pos_y) / rows_num - margin;
     char height_str[100];
     sprintf(height_str, "%i", height);
 
@@ -177,7 +178,7 @@ void ScreenKeyboard::createButtons()
         int total_width = m_area.getWidth() - 2 * (int)pos_x;
 
         char tmp[100];
-        sprintf(tmp, "%i", pos_y + height * i);
+        sprintf(tmp, "%i", pos_y + (height + margin) * i);
         std::string pos_y_str = tmp;
         
         int total_proportions = 0;
@@ -192,7 +193,7 @@ void ScreenKeyboard::createButtons()
         for (int j = 0; j < cols_num; j++)
         {
             float width = (float)total_width * layout_proportions[i][j] 
-                                             / total_proportions;
+                                             / total_proportions - margin;
             
             char width_str[100];
             sprintf(width_str, "%i", (int)roundf(width));
@@ -210,7 +211,7 @@ void ScreenKeyboard::createButtons()
             m_widgets.push_back(button);
             m_buttons.push_back(button);
             
-            pos_x += width;
+            pos_x += width + margin;
         }
     }
 
