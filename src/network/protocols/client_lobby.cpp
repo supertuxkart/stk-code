@@ -1275,7 +1275,10 @@ void ClientLobby::addSpectateHelperMessage() const
     auto& local_players = NetworkConfig::get()->getNetworkPlayers();
     if (local_players.empty())
         return;
-    DeviceConfig* dc = std::get<0>(local_players[0])->getConfiguration();
+    InputDevice* id = std::get<0>(local_players[0]);
+    if (!id)
+        return;
+    DeviceConfig* dc = id->getConfiguration();
     if (!dc)
         return;
     core::stringw left = dc->getBindingAsString(PA_STEER_LEFT);
