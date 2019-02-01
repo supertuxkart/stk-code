@@ -158,8 +158,8 @@ public:
 
     void reset();
     void update(int ticks);
-    void rewindTo(int target_ticks, int ticks_now);
-    void playEventsTill(int world_ticks, int *ticks);
+    void rewindTo(int target_ticks, int ticks_now, bool fast_forward);
+    void playEventsTill(int world_ticks, bool fast_forward);
     void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                   bool confirmed, int ticks = -1);
     void addNetworkEvent(EventRewinder *event_rewinder,

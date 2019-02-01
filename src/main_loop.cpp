@@ -198,15 +198,17 @@ float MainLoop::getLimitedDt()
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.
  *  \param ticks Number of ticks (physics steps) to simulate - should be 1.
+ *  \param fast_forward If true, then only rewinders in network will be
+ *  updated, but not the physics.
  */
-void MainLoop::updateRace(int ticks)
+void MainLoop::updateRace(int ticks, bool fast_forward)
 {
     if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
 
     // The race event manager will update world in case of an online race
     if ( RaceEventManager::getInstance() && 
          RaceEventManager::getInstance()->isRunning() )
-        RaceEventManager::getInstance()->update(ticks);
+        RaceEventManager::getInstance()->update(ticks, fast_forward);
     else
         World::getWorld()->updateWorld(ticks);
 }   // updateRace
@@ -453,7 +455,12 @@ void MainLoop::run()
                 }
             }
             m_ticks_adjustment.unlock();
-    
+
+            // Avoid hang when some function in world takes too long time or
+            // when leave / come back from android home button
+            bool fast_forward = NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isClient() &&
+                num_steps > stk_config->time2Ticks(1.0f);
             for (int i = 0; i < num_steps; i++)
             {
                 if (World::getWorld() && history->replayHistory())
@@ -461,7 +468,7 @@ void MainLoop::run()
                     history->updateReplay(
                                        World::getWorld()->getTicksSinceStart());
                 }
-    
+
                 PROFILER_PUSH_CPU_MARKER("Protocol manager update",
                                          0x7F, 0x00, 0x7F);
                 if (auto pm = ProtocolManager::lock())
@@ -469,26 +476,26 @@ void MainLoop::run()
                     pm->update(1);
                 }
                 PROFILER_POP_CPU_MARKER();
-    
+
                 PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
                 if (World::getWorld())
                 {
-                    updateRace(1);
+                    updateRace(1, fast_forward);
                 }
                 PROFILER_POP_CPU_MARKER();
-    
+
                 // We need to check again because update_race may have requested
                 // the main loop to abort; and it's not a good idea to continue
                 // since the GUI engine is no more to be called then.
                 if (m_abort || m_request_abort) 
                     break;
-    
+
                 if (m_frame_before_loading_world)
                 {
                     m_frame_before_loading_world = false;
                     break;
                 }
-                
+
                 if (World::getWorld())
                 {
                     if (World::getWorld()->getPhase()==WorldStatus::SETUP_PHASE)
@@ -513,7 +520,7 @@ void MainLoop::run()
                     m_request_abort = true;
                 }
             }
-            
+
             if (auto gp = GameProtocol::lock())
             {
                 gp->sendActions();

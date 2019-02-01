@@ -48,7 +48,7 @@ private:
     uint64_t m_prev_time;
     unsigned m_parent_pid;
     float    getLimitedDt();
-    void     updateRace(int ticks);
+    void     updateRace(int ticks, bool fast_forward);
 public:
          MainLoop(unsigned parent_pid);
         ~MainLoop();

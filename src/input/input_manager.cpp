@@ -303,7 +303,7 @@ void InputManager::handleStaticAction(int key, int value)
                 fgets(s, 256, stdin);
                 int t;
                 StringUtils::fromString(s,t);
-                RewindManager::get()->rewindTo(t, world->getTicksSinceStart());
+                RewindManager::get()->rewindTo(t, world->getTicksSinceStart(), false);
                 Log::info("Rewind", "Rewinding from %d to %d",
                           world->getTicksSinceStart(), t);
             }

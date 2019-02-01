@@ -216,9 +216,10 @@ void RewindManager::update(int ticks_not_used)
 // ----------------------------------------------------------------------------
 /** Replays all events from the last event played till the specified time.
  *  \param world_ticks Up to (and inclusive) which time events will be replayed.
- *  \param ticks Number of time steps - should be 1.
+ *  \param fast_forward If true, then only rewinders in network will be
+ *  updated, but not the physics.
  */
-void RewindManager::playEventsTill(int world_ticks, int *ticks)
+void RewindManager::playEventsTill(int world_ticks, bool fast_forward)
 {
     // We add the RewindInfoEventFunction to rewind queue before and after
     // possible rewind, some RewindInfoEventFunction can be created during
@@ -237,7 +238,7 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
     {
         Log::setPrefix("Rewind");
         PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
-        rewindTo(rewind_ticks, world_ticks);
+        rewindTo(rewind_ticks, world_ticks, fast_forward);
         // This should replay everything up to 'now'
         assert(World::getWorld()->getTicksSinceStart() == world_ticks);
         PROFILER_POP_CPU_MARKER();
@@ -279,8 +280,11 @@ bool RewindManager::addRewinder(std::shared_ptr<Rewinder> rewinder)
  *  \param now_ticks Up to which ticks events are replayed: up to but 
  *         EXCLUDING new_ticks (the event at now_ticks are played in
  *         the calling subroutine playEventsTill).
+ *  \param fast_forward If true, then only rewinders in network will be
+ *  updated, but not the physics.
  */
-void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
+void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
+                             bool fast_forward)
 {
     assert(!m_is_rewinding);
     bool is_history = history->replayHistory();
@@ -335,7 +339,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
                 break;
         }
     }
-    else
+    else if (!fast_forward)
     {
         Log::warn("RewindManager", "Missing local state at ticks %d",
             exact_rewind_ticks);
@@ -356,7 +360,8 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
         m_rewind_queue.replayAllEvents(world->getTicksSinceStart());
 
         // Now simulate the next time step
-        world->updateWorld(1);
+        if (!fast_forward)
+            world->updateWorld(1);
 #undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
         irr_driver->update(stk_config->ticks2Time(1));
