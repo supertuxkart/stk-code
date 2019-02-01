@@ -91,14 +91,14 @@ void LobbyProtocol::loadWorld()
 
 // ----------------------------------------------------------------------------
 void LobbyProtocol::configRemoteKart(
-      const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+    const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
+    int local_player_size) const
 {
     // The number of karts includes the AI karts, which are not supported atm
     race_manager->setNumKarts((int)players.size());
 
     // Set number of global and local players.
-    race_manager->setNumPlayers((int)players.size(),
-        (int)NetworkConfig::get()->getNetworkPlayers().size());
+    race_manager->setNumPlayers((int)players.size(), local_player_size);
 
     // Create the kart information for the race manager:
     // -------------------------------------------------

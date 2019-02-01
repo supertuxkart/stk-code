@@ -603,7 +603,7 @@ void ServerLobby::asynchronousUpdate()
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
                 ServerConfig::m_flag_return_timemout);
             race_manager->setFlagReturnTicks(flag_return_time);
-            configRemoteKart(players);
+            configRemoteKart(players, 0);
 
             // Reset for next state usage
             resetPeersReady();

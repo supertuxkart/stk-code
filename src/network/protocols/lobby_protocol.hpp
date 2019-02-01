@@ -129,7 +129,8 @@ protected:
 
     // ------------------------------------------------------------------------
     void configRemoteKart(
-     const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+        const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
+        int local_player_size) const;
     // ------------------------------------------------------------------------
     void joinStartGameThread()
     {

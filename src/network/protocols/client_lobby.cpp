@@ -278,7 +278,8 @@ void ClientLobby::addAllPlayers(Event* event)
         uint16_t flag_return_timeout = data.getUInt16();
         race_manager->setFlagReturnTicks(flag_return_timeout);
     }
-    configRemoteKart(players);
+    configRemoteKart(players, isSpectator() ? 1 :
+        (int)NetworkConfig::get()->getNetworkPlayers().size());
     loadWorld();
     // Disable until render gui during loading is bug free
     //StateManager::get()->enterGameState();
