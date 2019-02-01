@@ -1161,11 +1161,12 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
 
 // ----------------------------------------------------------------------------
 /** Called in server whenever a kart cross a check line, it send server
- *  all karts lap count, last triggered checkline and check structure status
+ *  current kart lap count, last triggered checkline and check structure status
  *  to all players in game (including spectators so that the lap count is
  *  correct)
+ *  \param kart_id The kart which triggered a checkline.
  */
-void LinearWorld::updateCheckLinesServer()
+void LinearWorld::updateCheckLinesServer(int kart_id)
 {
     if (!NetworkConfig::get()->isNetworking() ||
         NetworkConfig::get()->isClient())
@@ -1173,24 +1174,23 @@ void LinearWorld::updateCheckLinesServer()
 
     NetworkString cl(PROTOCOL_GAME_EVENTS);
     cl.setSynchronous(true);
-    cl.addUInt8(GameEventsProtocol::GE_CHECK_LINE);
+    cl.addUInt8(GameEventsProtocol::GE_CHECK_LINE_KART)
+        .addUInt8((uint8_t)kart_id);
 
-    for (KartInfo& ki : m_kart_info)
-    {
-        int8_t finished_laps = (int8_t)ki.m_finished_laps;
-        cl.addUInt8(finished_laps);
-    }
+    int8_t finished_laps = (int8_t)m_kart_info[kart_id].m_finished_laps;
+    cl.addUInt8(finished_laps);
 
-    for (TrackSector* ts : m_kart_track_sector)
-    {
-        int8_t ltcl = (int8_t)ts->getLastTriggeredCheckline();
-        cl.addUInt8(ltcl);
-    }
+    int8_t ltcl =
+        (int8_t)m_kart_track_sector[kart_id]->getLastTriggeredCheckline();
+    cl.addUInt8(ltcl);
+
+    cl.addUInt32(m_fastest_lap_ticks);
+    cl.encodeString(m_fastest_lap_kart_name);
 
     const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
     cl.addUInt8(cc);
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->saveIsActive(&cl);
+        CheckManager::get()->getCheckStructure(i)->saveIsActive(kart_id, &cl);
 
     STKHost::get()->sendPacketToAllPeers(&cl, true);
 }   // updateCheckLinesServer
@@ -1199,17 +1199,16 @@ void LinearWorld::updateCheckLinesServer()
 /* Synchronize with server from the above data. */
 void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
 {
-    for (KartInfo& ki : m_kart_info)
-    {
-        int8_t finished_laps = b.getUInt8();
-        ki.m_finished_laps = finished_laps;
-    }
+    int kart_id = b.getUInt8();
 
-    for (TrackSector* ts : m_kart_track_sector)
-    {
-        int8_t ltcl = b.getUInt8();
-        ts->setLastTriggeredCheckline(ltcl);
-    }
+    int8_t finished_laps = b.getUInt8();
+    m_kart_info.at(kart_id).m_finished_laps = finished_laps;
+
+    int8_t ltcl = b.getUInt8();
+    m_kart_track_sector.at(kart_id)->setLastTriggeredCheckline(ltcl);
+
+    m_fastest_lap_ticks = b.getUInt32();
+    b.decodeStringW(&m_fastest_lap_kart_name);
 
     const unsigned cc = b.getUInt8();
     if (cc != CheckManager::get()->getCheckStructureCount())
@@ -1218,6 +1217,6 @@ void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
             "Server has different check structures size.");
     }
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->restoreIsActive(b);
+        CheckManager::get()->getCheckStructure(i)->restoreIsActive(kart_id, b);
 
 }   // updateCheckLinesClient

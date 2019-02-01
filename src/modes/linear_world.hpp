@@ -221,7 +221,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
     // ------------------------------------------------------------------------
-    void updateCheckLinesServer();
+    void updateCheckLinesServer(int kart_id);
     // ------------------------------------------------------------------------
     void updateCheckLinesClient(const BareNetworkString& b);
 };   // LinearWorld

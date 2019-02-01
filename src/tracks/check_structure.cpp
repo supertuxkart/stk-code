@@ -116,7 +116,7 @@ void CheckStructure::update(float dt)
                           World::getWorld()->getTime());
             trigger(i);
             if (triggeringCheckline() && lw)
-                lw->updateCheckLinesServer();
+                lw->updateCheckLinesServer(i);
         }
         m_previous_position[i] = xyz;
     }   // for i<getNumKarts
@@ -257,21 +257,14 @@ void CheckStructure::restoreCompleteState(const BareNetworkString& b)
 }   // restoreCompleteState
 
 // ----------------------------------------------------------------------------
-void CheckStructure::saveIsActive(BareNetworkString* bns)
+void CheckStructure::saveIsActive(int kart_id, BareNetworkString* bns)
 {
-    World* world = World::getWorld();
-    for (unsigned int i = 0; i < world->getNumKarts(); i++)
-        bns->addUInt8(m_is_active[i] ? 1 : 0);
+    bns->addUInt8(m_is_active[kart_id] ? 1 : 0);
 }   // saveIsActive
 
 // ----------------------------------------------------------------------------
-void CheckStructure::restoreIsActive(const BareNetworkString& b)
+void CheckStructure::restoreIsActive(int kart_id, const BareNetworkString& b)
 {
-    m_is_active.clear();
-    World* world = World::getWorld();
-    for (unsigned int i = 0; i < world->getNumKarts(); i++)
-    {
-        bool is_active = b.getUInt8() == 1;
-        m_is_active.push_back(is_active);
-    }
+    bool is_active = b.getUInt8() == 1;
+    m_is_active.at(kart_id) = is_active;
 }   // restoreIsActive

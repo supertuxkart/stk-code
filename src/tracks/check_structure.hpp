@@ -137,9 +137,9 @@ public:
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b);
     // ------------------------------------------------------------------------
-    void saveIsActive(BareNetworkString* bns);
+    void saveIsActive(int kart_id, BareNetworkString* bns);
     // ------------------------------------------------------------------------
-    void restoreIsActive(const BareNetworkString& b);
+    void restoreIsActive(int kart_id, const BareNetworkString& b);
 };   // CheckStructure
 
 #endif

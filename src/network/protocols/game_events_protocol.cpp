@@ -129,6 +129,9 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         break;
     }
     case GE_CHECK_LINE:
+        // Old and unused now
+        break;
+    case GE_CHECK_LINE_KART:
     {
         if (!lw)
             throw std::invalid_argument("No linear world");
