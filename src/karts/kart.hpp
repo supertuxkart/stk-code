@@ -97,6 +97,8 @@ protected:
     /** Is time flying activated */
     bool m_is_jumping;
 
+    bool m_enabled_network_spectator;
+
 protected:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;

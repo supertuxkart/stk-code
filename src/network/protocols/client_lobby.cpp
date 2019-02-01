@@ -1227,12 +1227,25 @@ void ClientLobby::sendChat(irr::core::stringw text)
 }   // sendChat
 
 // ----------------------------------------------------------------------------
-void ClientLobby::changeSpectateTarget(PlayerAction action, int value) const
+void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
+                                       Input::InputType type) const
 {
     Camera* cam = Camera::getActiveCamera();
     if (!cam)
         return;
-    if (action == PA_LOOK_BACK && value == 0)
+
+    // Only 1 local player will be able to change target, and this will replace
+    // the end camera with normal
+    if (cam->getType() != Camera::CM_TYPE_NORMAL)
+        Camera::changeCamera(0, Camera::CM_TYPE_NORMAL);
+
+    // Copied from EventHandler::processGUIAction
+    const bool pressed_down = value > Input::MAX_VALUE * 2 / 3;
+
+    if (!pressed_down && type == Input::IT_STICKMOTION)
+        return;
+
+    if (action == PA_LOOK_BACK)
     {
         if (cam->getMode() == Camera::CM_REVERSE)
             cam->setMode(Camera::CM_NORMAL);
@@ -1245,17 +1258,16 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value) const
     if (cam->getKart())
         current_idx = cam->getKart()->getWorldKartId();
     bool up = false;
-    if (action == PA_STEER_LEFT && value == 0)
+    if (action == PA_STEER_LEFT)
         up = false;
-    else if (action == PA_STEER_RIGHT && value == 0)
+    else if (action == PA_STEER_RIGHT)
         up = true;
     else
         return;
-
     const int num_karts = World::getWorld()->getNumKarts();
-    for (int i = 0;i < num_karts; i++)
+    for (int i = 0; i < num_karts; i++)
     {
-        current_idx = up ? current_idx+1 : current_idx-1;
+        current_idx = up ? current_idx + 1 : current_idx - 1;
         // Handle looping
         if (current_idx == -1)
             current_idx = num_karts - 1;

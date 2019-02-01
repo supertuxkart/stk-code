@@ -790,11 +790,16 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        bool is_nw_spectator = cl && cl->isSpectator() &&
+             StateManager::get()->getGameState() == GUIEngine::GAME &&
+             !GUIEngine::ModalDialog::isADialogActive();
+
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
              !GUIEngine::ModalDialog::isADialogActive()            &&
              !GUIEngine::ScreenKeyboard::isActive()                &&
-             !race_manager->isWatchingReplay() )
+             !race_manager->isWatchingReplay() && !is_nw_spectator)
         {
             if (player == NULL)
             {
@@ -807,14 +812,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             if (pk == NULL)
             {
-                if (auto cl = LobbyProtocol::get<ClientLobby>())
-                {
-                    if (cl->isSpectator())
-                    {
-                        cl->changeSpectateTarget(action, value);
-                        return;
-                    }
-                }
                 Log::error("InputManager::dispatchInput", "Trying to process "
                     "action for an unknown player");
                 return;
@@ -842,7 +839,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             // When in master-only mode, we can safely assume that players
             // are set up, contrarly to early menus where we accept every
             // input because players are not set-up yet
-            if (m_master_player_only && player == NULL)
+            if (m_master_player_only && player == NULL && !is_nw_spectator)
             {
                 if (type == Input::IT_STICKMOTION ||
                     type == Input::IT_STICKBUTTON)
@@ -870,6 +867,12 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 {
                     m_timer_in_use = true;
                     m_timer = 0.25;
+                }
+
+                if (is_nw_spectator)
+                {
+                    cl->changeSpectateTarget(action, abs(value), type);
+                    return;
                 }
 
                 // player may be NULL in early menus, before player setup has

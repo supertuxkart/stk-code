@@ -147,13 +147,15 @@ public:
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
     void requestKartInfo(uint8_t kart_id);
     void setSpectator(bool val)                          { m_spectator = val; }
-    bool isSpectator() const                            { return m_spectator; }
+    bool isSpectator() const
+                     { return m_spectator && m_state.load() != RACE_FINISHED; }
     void startLiveJoinKartSelection();
     void sendChat(irr::core::stringw text);
     const std::vector<LobbyPlayer>& getLobbyPlayers() const
                                                     { return m_lobby_players; }
     bool isServerLiveJoinable() const        { return m_server_live_joinable; }
-    void changeSpectateTarget(PlayerAction action, int value) const;
+    void changeSpectateTarget(PlayerAction action, int value,
+                              Input::InputType type) const;
     void addSpectateHelperMessage() const;
 };
 

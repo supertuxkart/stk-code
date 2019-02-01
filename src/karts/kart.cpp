@@ -322,6 +322,7 @@ void Kart::reset()
     }
 
     m_network_finish_check_ticks = 0;
+    m_enabled_network_spectator = false;
     // Add karts back in case that they have been removed (i.e. in battle
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
@@ -988,29 +989,6 @@ void Kart::finishedRace(float time, bool from_server)
         }
     }   // !from_server
 
-#ifndef ANDROID
-    auto cl = LobbyProtocol::get<ClientLobby>();
-    if (cl && m_controller->isLocalPlayerController() &&
-        race_manager->getNumLocalPlayers() == 1 &&
-        race_manager->modeHasLaps() && from_server)
-    {
-        static bool msg_shown = false;
-        if (!msg_shown)
-        {
-            msg_shown = true;
-            cl->addSpectateHelperMessage();
-        }
-        EndController* ec = dynamic_cast<EndController*>(m_controller);
-        if (ec)
-        {
-            // Enable spectate mode after 3 seconds which allow player to
-            // release left / right button if they keep pressing it during
-            // finishing line
-            ec->setNetworkSpectateTime(StkTime::getRealTimeMs() + 3000);
-        }
-    }
-#endif
-
     m_finished_race = true;
 
     m_finish_time   = time;
@@ -1379,6 +1357,31 @@ void Kart::update(int ticks)
         m_controller = m_saved_controller;
         m_saved_controller = NULL;
     }
+
+#ifndef ANDROID
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    // Enable spectate mode after 2 seconds which allow player to
+    // release left / right button if they keep pressing it during
+    // finishing line (1 second here because m_network_finish_check_ticks is
+    // already 1 second ahead of time when crossing finished line)
+
+    if (cl && m_finished_race && m_controller->isLocalPlayerController() &&
+        race_manager->getNumLocalPlayers() == 1 &&
+        race_manager->modeHasLaps() &&
+        World::getWorld()->getTicksSinceStart() >
+        m_network_finish_check_ticks + stk_config->time2Ticks(1.0f) &&
+        !m_enabled_network_spectator)
+    {
+        static bool msg_shown = false;
+        if (!msg_shown)
+        {
+            msg_shown = true;
+            cl->addSpectateHelperMessage();
+        }
+        m_enabled_network_spectator = true;
+        cl->setSpectator(true);
+    }
+#endif
 
     m_powerup->update(ticks);
 
