@@ -249,7 +249,8 @@ public:
     virtual void clearAllMessages() { m_messages.clear(); }
 
     void drawGlobalPlayerIcons(int bottom_margin);
-    void drawPlayerIcon(AbstractKart *kart, int x, int y, int w);
+    void drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
+                        bool is_local);
     
     virtual void drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                  const core::recti &viewport,

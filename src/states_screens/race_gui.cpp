@@ -49,6 +49,7 @@ using namespace irr;
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
@@ -569,19 +570,25 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
-    
+
+    AbstractKart* target_kart = NULL;
+    Camera* cam = Camera::getActiveCamera();
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    bool is_nw_spectate = cl && cl->isSpectator();
+    // For network spectator highlight
+    if (race_manager->getNumLocalPlayers() == 1 && cam && is_nw_spectate)
+        target_kart = cam->getKart();
+
     // Move AI/remote players to the beginning, so that local players icons
     // are drawn above them
     World::KartList karts = world->getKarts();
-    std::sort(karts.begin(), karts.end(), []
-        (const std::shared_ptr<AbstractKart>& a,
-         const std::shared_ptr<AbstractKart>& b)->bool
+    std::partition(karts.begin(), karts.end(), [target_kart, is_nw_spectate]
+        (const std::shared_ptr<AbstractKart>& k)->bool
     {
-        bool aIsLocalPlayer = a->getController()->isLocalPlayerController();
-        bool bIsLocalPlayer = b->getController()->isLocalPlayerController();
-
-        // strictly greater than, so return false if equal
-        return !aIsLocalPlayer && aIsLocalPlayer != bIsLocalPlayer;
+        if (is_nw_spectate)
+            return k.get() != target_kart;
+        else
+            return !k->getController()->isLocalPlayerController();
     });
 
     for (unsigned int i = 0; i < karts.size(); i++)
@@ -589,7 +596,7 @@ void RaceGUI::drawGlobalMiniMap()
         const AbstractKart *kart = karts[i].get();
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
-            
+
         // don't draw eliminated kart
         if (kart->isEliminated() && !(sta && sta->isMoving())) 
             continue;
@@ -605,9 +612,11 @@ void RaceGUI::drawGlobalMiniMap()
         {
             continue;
         }
+        bool is_local = is_nw_spectate ? kart == target_kart :
+            kart->getController()->isLocalPlayerController();
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        int marker_half_size = (kart->getController()->isLocalPlayerController()
+        int marker_half_size = (is_local
                                 ? m_minimap_player_size
                                 : m_minimap_ai_size                        )>>1;
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
@@ -618,8 +627,7 @@ void RaceGUI::drawGlobalMiniMap()
         bool has_teams = (ctf_world || soccer_world);
         
         // Highlight the player icons with some backgorund image.
-        if ((has_teams || kart->getController()->isLocalPlayerController()) &&
-            m_icons_frame != NULL)
+        if ((has_teams || is_local) && m_icons_frame != NULL)
         {
             video::SColor color = kart->getKartProperties()->getColor();
             
