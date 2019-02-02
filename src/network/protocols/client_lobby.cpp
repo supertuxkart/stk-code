@@ -1254,9 +1254,32 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
         return;
     }
 
-    int current_idx = 0;
+    World::KartList karts = World::getWorld()->getKarts();
+    bool sort_kart_for_position =
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        race_manager->modeHasLaps();
+    if (sort_kart_for_position)
+    {
+        std::sort(karts.begin(), karts.end(), []
+            (const std::shared_ptr<AbstractKart>& a,
+            const std::shared_ptr<AbstractKart>& b)->bool
+        {
+            return a->getPosition() < b->getPosition();
+        });
+    }
+
+    const int num_karts = karts.size();
+    int current_idx = -1;
     if (cam->getKart())
-        current_idx = cam->getKart()->getWorldKartId();
+    {
+        if (sort_kart_for_position)
+            current_idx = cam->getKart()->getPosition() - 1;
+        else
+            current_idx = cam->getKart()->getWorldKartId();
+    }
+    if (current_idx < 0 || current_idx >= num_karts)
+        return;
+
     bool up = false;
     if (action == PA_STEER_LEFT)
         up = false;
@@ -1264,7 +1287,6 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
         up = true;
     else
         return;
-    const int num_karts = World::getWorld()->getNumKarts();
     for (int i = 0; i < num_karts; i++)
     {
         current_idx = up ? current_idx + 1 : current_idx - 1;
@@ -1274,9 +1296,9 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
         else if (current_idx == num_karts)
             current_idx = 0;
 
-        if (!World::getWorld()->getKart(current_idx)->isEliminated())
+        if (!karts[current_idx]->isEliminated())
         {
-            cam->setKart(World::getWorld()->getKart(current_idx));
+            cam->setKart(karts[current_idx].get());
             break;
         }
     }
