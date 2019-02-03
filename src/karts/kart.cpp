@@ -1368,6 +1368,8 @@ void Kart::update(int ticks)
     if (cl && m_finished_race && m_controller->isLocalPlayerController() &&
         race_manager->getNumLocalPlayers() == 1 &&
         race_manager->modeHasLaps() &&
+        World::getWorld()->isActiveRacePhase() &&
+        m_network_finish_check_ticks > 0 &&
         World::getWorld()->getTicksSinceStart() >
         m_network_finish_check_ticks + stk_config->time2Ticks(1.0f) &&
         !m_enabled_network_spectator)
