@@ -512,7 +512,10 @@ void NetworkingLobby::updatePlayerPings()
         if (id != -1)
         {
             m_player_list->renameItem(id, name_with_ping, p.second.m_icon_id);
-            if (p.second.m_kart_team == KART_TEAM_RED)
+            // Don't show chosen team color for spectator
+            if (p.second.isSpectator())
+                m_player_list->markItemRed(id, false/*red*/);
+            else if (p.second.m_kart_team == KART_TEAM_RED)
                 m_player_list->markItemRed(id);
             else if (p.second.m_kart_team == KART_TEAM_BLUE)
                 m_player_list->markItemBlue(id);
@@ -664,7 +667,10 @@ void NetworkingLobby::updatePlayers()
             StringUtils::toString(player.m_local_player_id);
         m_player_list->addItem(internal_name, player.m_user_name,
             player.m_icon_id);
-        if (cur_team == KART_TEAM_RED)
+        // Don't show chosen team color for spectator
+        if (player.isSpectator())
+            m_player_list->markItemRed(i, false/*red*/);
+        else if (cur_team == KART_TEAM_RED)
             m_player_list->markItemRed(i);
         else if (cur_team == KART_TEAM_BLUE)
             m_player_list->markItemBlue(i);
