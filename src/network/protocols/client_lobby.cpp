@@ -1253,6 +1253,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     World::KartList karts = World::getWorld()->getKarts();
     bool sort_kart_for_position =
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
         race_manager->modeHasLaps();
     if (sort_kart_for_position)
     {
