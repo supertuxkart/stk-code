@@ -1239,6 +1239,12 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     if (cam->getType() != Camera::CM_TYPE_NORMAL)
         Camera::changeCamera(0, Camera::CM_TYPE_NORMAL);
 
+    // Update if the camera again beacuse when race finished cam will be
+    // changed above and invalid
+    cam = Camera::getActiveCamera();
+    if (!cam)
+        return;
+
     // Copied from EventHandler::processGUIAction
     const bool pressed_down = value > Input::MAX_VALUE * 2 / 3;
 
