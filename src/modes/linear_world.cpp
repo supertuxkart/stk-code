@@ -386,7 +386,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Last lap message (kart_index's assert in previous block already)
     if (raceHasLaps() && kart_info.m_finished_laps+1 == lap_count)
     {
-        if (lap_count > 1)
+        if (lap_count > 1 && !isLiveJoinWorld())
         {
             m_race_gui->addMessage(_("Final lap!"), kart,
                                3.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
@@ -415,7 +415,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         }
     }
     else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
-             kart_info.m_finished_laps+1 < lap_count)
+             kart_info.m_finished_laps+1 < lap_count && !isLiveJoinWorld())
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1), kart,
                                2.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
@@ -495,7 +495,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
     // if new fastest lap
     if(ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
-        kart_info.m_finished_laps>0                                )
+        kart_info.m_finished_laps>0 && !isLiveJoinWorld())
     {
         m_fastest_lap_ticks = ticks_per_lap;
 
