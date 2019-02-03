@@ -280,9 +280,17 @@ void WorldStatus::updateTime(int ticks)
                 // fully
                 if (m_auxiliary_ticks == stk_config->time2Ticks(3.0f))
                 {
-                    auto lobby = LobbyProtocol::get<LobbyProtocol>();
-                    assert(lobby);
-                    lobby->finishedLoadingWorld();
+                    auto cl = LobbyProtocol::get<ClientLobby>();
+                    assert(cl);
+                    cl->finishedLoadingWorld();
+#ifndef ANDROID
+                    static bool helper_msg_shown = false;
+                    if (!helper_msg_shown && cl->isSpectator())
+                    {
+                        helper_msg_shown = true;
+                        cl->addSpectateHelperMessage();
+                    }
+#endif
                 }
                 return;
             }

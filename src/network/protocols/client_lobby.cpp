@@ -424,16 +424,6 @@ void ClientLobby::update(int ticks)
         }
     case SELECTING_ASSETS:
     case RACING:
-#ifndef ANDROID
-    {
-        static bool helper_msg_shown = false;
-        if (!helper_msg_shown && isSpectator())
-        {
-            helper_msg_shown = true;
-            addSpectateHelperMessage();
-        }
-    }
-#endif
     case EXITING:
         break;
     }
