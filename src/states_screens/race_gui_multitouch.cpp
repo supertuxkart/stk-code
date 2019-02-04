@@ -285,54 +285,26 @@ void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
 {
     if (!pressed)
         return;
-
-    Camera* camera = Camera::getActiveCamera();
+        
+    auto cl = LobbyProtocol::get<ClientLobby>();
     
-    if (!camera)
+    if (!cl || !cl->isSpectator())
         return;
 
-    int current_idx = 0;
-
-    if (camera->getKart())
+    switch (button_id)
     {
-        current_idx = camera->getKart()->getWorldKartId();
-    }
-    
-    if (button_id == 3)
-    {
-        if (camera->getMode() == Camera::CM_REVERSE)
-        {
-            camera->setMode(Camera::CM_NORMAL);
-        }
-        else
-        {
-            camera->setMode(Camera::CM_REVERSE);
-        }
-    }
-    else
-    {
-        bool up = button_id == 1;
-        const int num_karts = World::getWorld()->getNumKarts();
-        
-        for (int i = 0; i < num_karts; i++)
-        {
-            current_idx = up ? current_idx + 1 : current_idx - 1;
-            
-            if (current_idx == -1)
-            {
-                current_idx = num_karts - 1;
-            }
-            else if (current_idx == num_karts)
-            {
-                current_idx = 0;
-            }
-    
-            if (!World::getWorld()->getKart(current_idx)->isEliminated())
-            {
-                camera->setKart(World::getWorld()->getKart(current_idx));
-                break;
-            }
-        }
+    case 1:
+        cl->changeSpectateTarget(PA_STEER_LEFT, Input::MAX_VALUE,
+                                 Input::IT_KEYBOARD);
+        break;
+    case 2:
+        cl->changeSpectateTarget(PA_STEER_RIGHT, Input::MAX_VALUE,
+                                 Input::IT_KEYBOARD);
+        break;
+    case 3:
+        cl->changeSpectateTarget(PA_LOOK_BACK, Input::MAX_VALUE,
+                                 Input::IT_KEYBOARD);
+        break;
     }
 }
 
