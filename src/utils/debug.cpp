@@ -1098,4 +1098,12 @@ bool isOpen()
     return g_debug_menu_visible;
 }   // isOpen
 
+// ----------------------------------------------------------------------------
+/** Close the debug menu.
+ */
+void closeDebugMenu()
+{
+    g_debug_menu_visible = false;
+}   // closeDebugMenu
+
 }  // namespace Debug

@@ -24,6 +24,7 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
+#include "utils/debug.hpp"
 
 #include <vector>
 #include <iostream>
@@ -55,6 +56,8 @@ void AbstractStateManager::enterGameState()
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
+
+    Debug::closeDebugMenu();
     setGameState(GAME);
     GUIEngine::cleanForGame();
 }   // enterGameState

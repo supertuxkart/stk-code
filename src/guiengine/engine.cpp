@@ -683,6 +683,7 @@ namespace GUIEngine
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "utils/debug.hpp"
 
 #include <iostream>
 #include <assert.h>
@@ -911,6 +912,7 @@ namespace GUIEngine
             return;
         }
 
+        Debug::closeDebugMenu();
         g_current_screen->beforeAddingWidget();
 
         // show screen
