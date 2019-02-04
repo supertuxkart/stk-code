@@ -7,7 +7,7 @@
 
 export SELF_PID=$$
 export BASENAME="$(basename "$0")"
-export DIRNAME="$(readlink -e "$(dirname "$0")")"
+export DIRNAME="$(dirname "$(readlink -f "$0")")"
 export DATETIME="$(date +%Y%m%d%H%M%S)"
 
 ############## General info ##############
