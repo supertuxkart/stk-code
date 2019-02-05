@@ -133,6 +133,7 @@ void AddonsScreen::init()
 {
     Screen::init();
 
+    m_sort_desc = false;
     m_reloading = false;
 
     getWidget<GUIEngine::RibbonWidget>("category")->setActive(false);
@@ -187,9 +188,8 @@ void AddonsScreen::tearDown()
 // ----------------------------------------------------------------------------
 /** Loads the list of all addons of the given type. The gui element will be
  *  updated.
- *  \param type Must be 'kart' or 'track'.
  */
-void AddonsScreen::loadList(bool sort_desc)
+void AddonsScreen::loadList()
 {
 #ifndef SERVER_ONLY
     // Get the filter by words.
@@ -244,7 +244,7 @@ void AddonsScreen::loadList(bool sort_desc)
 
         sorted_list.push_back(&addon);
     }
-    sorted_list.insertionSort(/*start=*/0, sort_desc);
+    sorted_list.insertionSort(/*start=*/0, m_sort_desc);
 
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
@@ -390,7 +390,8 @@ void AddonsScreen::onColumnClicked(int column_id, bool sort_desc, bool sort_defa
     default: assert(0); break;
     }   // switch
     /** \brief Toggle the sort order after column click **/
-    loadList(sort_desc && !sort_default);
+    m_sort_desc = sort_desc && !sort_default;
+    loadList();
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
