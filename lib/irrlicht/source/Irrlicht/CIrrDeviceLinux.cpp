@@ -665,6 +665,11 @@ void CIrrDeviceLinux::grabPointer(bool grab)
 #endif
 }
 
+Bool CIrrDeviceLinux::isWindowMapped(Display* display, XEvent* event, XPointer arg)
+{
+    return event->type == MapNotify && event->xmap.window == *((Window*)arg);
+}
+
 bool CIrrDeviceLinux::createWindow()
 {
 #ifdef _IRR_COMPILE_WITH_X11_
@@ -1149,6 +1154,9 @@ bool CIrrDeviceLinux::createWindow()
 			IrrPrintXGrabError(grabPointer, "XGrabPointer");
 			XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
 		}
+		
+		XEvent event;
+		XPeekIfEvent(display, &event, &isWindowMapped, (XPointer)&window);
 	}
 	else
 	{

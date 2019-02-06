@@ -166,6 +166,7 @@ namespace irr
 		int getNumlockMask(Display* display);
 		EKEY_CODE getKeyCode(XEvent &event);
 		void updateIMELocation();
+		static Bool isWindowMapped(Display* display, XEvent* event, XPointer arg);
 #endif
 
 		//! Implementation of the linux cursor control
