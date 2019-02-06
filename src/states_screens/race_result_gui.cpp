@@ -30,6 +30,7 @@
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -468,9 +469,13 @@ void RaceResultGUI::backToLobby()
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
     GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ScreenKeyboard::dismiss();
     cleanupGPProgress();
-    StateManager::get()->resetAndSetStack(
-        NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    if (GUIEngine::getCurrentScreen() != NetworkingLobby::getInstance())
+    {
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    }
 }   // backToLobby
 
 //-----------------------------------------------------------------------------
