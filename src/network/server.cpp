@@ -114,7 +114,6 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
         // not operated by us). #3691 will introduce the various states
         // required to properly distinguish between trusted, ranked,
         // and official servers.
-        // (currently) 'official' servers 'trusted', since we 
         m_server_owner_name = _("Trusted");
         m_server_owner_lower_case_name = "trusted";
         return;
