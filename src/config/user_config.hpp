@@ -954,7 +954,7 @@ namespace UserConfigParams
                                                   "A random number to avoid duplicated reports.") );
 
     PARAM_PREFIX BoolUserConfigParam      m_hw_report_enable
-            PARAM_DEFAULT( BoolUserConfigParam(   true,
+            PARAM_DEFAULT( BoolUserConfigParam(   false,
                                                      "hw-report-enabled",
                                                      &m_hw_report_group,
                                                     "If HW reports are enabled."));
