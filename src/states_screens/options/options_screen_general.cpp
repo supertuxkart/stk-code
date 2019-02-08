@@ -177,7 +177,7 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
             stats_label->setVisible(true);
             stats->setState(UserConfigParams::m_hw_report_enable);
             chat->setVisible(true);
-            stats->setState(UserConfigParams::m_lobby_chat);
+            chat->setState(UserConfigParams::m_lobby_chat);
             chat_label->setVisible(true);
         }
         else
