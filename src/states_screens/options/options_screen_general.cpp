@@ -81,29 +81,35 @@ void OptionsScreenGeneral::init()
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_general", PLAYER_ID_GAME_MASTER );
 
-    CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
-    assert( news != NULL );
-    news->setState( UserConfigParams::m_internet_status
+    CheckBoxWidget* internet_enabled = getWidget<CheckBoxWidget>("enable-internet");
+    assert( internet_enabled != NULL );
+    internet_enabled->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
     CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
     assert( stats != NULL );
     LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
     assert( stats_label );
-            stats->setState(UserConfigParams::m_hw_report_enable);
+    stats->setState(UserConfigParams::m_hw_report_enable);
 
-    getWidget<CheckBoxWidget>("enable-lobby-chat")
-        ->setState(UserConfigParams::m_lobby_chat);
+    
+    CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+    LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
 
-    if(news->getState())
+    if(internet_enabled->getState())
     {
         stats_label->setVisible(true);
         stats->setVisible(true);
         stats->setState(UserConfigParams::m_hw_report_enable);
+        chat_label->setVisible(true);
+        chat->setVisible(true);
+        chat->setState(UserConfigParams::m_lobby_chat);
     }
     else
     {
         stats_label->setVisible(false);
         stats->setVisible(false);
+        chat_label->setVisible(false);
+        chat->setVisible(false);
     }
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
@@ -186,6 +192,9 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
             chat_label->setVisible(false);
             stats->setVisible(false);
             stats_label->setVisible(false);
+            // Disable this, so that the user has to re-check this if
+            // enabled later (for GDPR compliance).
+            UserConfigParams::m_hw_report_enable = false;
             PlayerProfile* profile = PlayerManager::getCurrentPlayer();
             if (profile != NULL && profile->isLoggedIn())
                 profile->requestSignOut();
