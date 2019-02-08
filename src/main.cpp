@@ -1807,7 +1807,7 @@ void askForInternetPermission()
         }   // onCancel
     };   // ConfirmServer
 
-    GUIEngine::ModalDialog *dialog =
+    MessageDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
@@ -1818,6 +1818,10 @@ void askForInternetPermission()
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.7f, 0.7f);
+
+    // Changes the default focus to be 'cancel', which is not
+    // GDPR compliant, see #3378
+    dialog->setFocusCancel();
     GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
