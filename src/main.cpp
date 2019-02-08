@@ -1814,7 +1814,7 @@ void askForInternetPermission()
         "Please read our privacy policy at http://privacy.supertuxkart.net. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
-        "'User Interface', and edit \"Connect to the "
+        "'General', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.7f, 0.7f);
