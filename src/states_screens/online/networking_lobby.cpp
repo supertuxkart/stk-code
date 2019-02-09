@@ -212,6 +212,7 @@ void NetworkingLobby::init()
         if (UserConfigParams::m_lobby_chat)
         {
             m_chat_box->addListener(this);
+            m_chat_box->setText("");
             getWidget("chat")->setVisible(true);
             getWidget("chat")->setActive(true);
             getWidget("send")->setVisible(true);
