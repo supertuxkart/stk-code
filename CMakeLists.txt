@@ -24,8 +24,7 @@ option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angels
 option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
-CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF
-    "NOT APPLE" ON)
+option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
 CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
