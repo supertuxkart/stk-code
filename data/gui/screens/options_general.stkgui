@@ -36,6 +36,14 @@
                     <spacer width="5" height="4%"/>
 
                     <div layout="horizontal-row" width="100%" height="fit">
+                        <checkbox id="show-login"/>
+                        <spacer width="1%" height="100%" />
+                        <label height="100%" I18N="In the general settings" text="Always show login screen" word_wrap="true"/>
+                    </div>
+
+                    <spacer width="5" height="4%"/>
+
+                    <div layout="horizontal-row" width="100%" height="fit">
                         <checkbox id="enable-internet"/>
                         <spacer width="1%" height="100%" />
                         <label height="100%" I18N="In the general settings" text="Connect to the Internet" word_wrap="true"/>
@@ -48,14 +56,6 @@
                         <spacer width="1%" height="100%" />
                         <label height="100%" id="label-hw-report" I18N="In the general settings"
                                text="Send anonymous hardware statistics" word_wrap="true"/>
-                    </div>
-
-                    <spacer width="5" height="4%"/>
-
-                    <div layout="horizontal-row" width="100%" height="fit">
-                        <checkbox id="show-login"/>
-                        <spacer width="1%" height="100%" />
-                        <label height="100%" I18N="In the general settings" text="Always show login screen" word_wrap="true"/>
                     </div>
 
                     <spacer width="5" height="4%"/>
