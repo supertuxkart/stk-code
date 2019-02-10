@@ -213,6 +213,12 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::addAllPlayers(Event* event)
 {
+    if (World::getWorld())
+    {
+        Log::warn("ClientLobby", "World already loaded.");
+        return;
+    }
+
     // In case the user opened a user info dialog
     GUIEngine::ModalDialog::dismiss();
     GUIEngine::ScreenKeyboard::dismiss();
