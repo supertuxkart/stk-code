@@ -1058,6 +1058,12 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     bool can_wan = false;
     if (!login.empty() && !password.empty())
     {
+        if (!PlayerManager::getCurrentPlayer())
+        {
+            Log::error("Main", "Run supertuxkart with --init-user");
+            cleanSuperTuxKart();
+            return false;
+        }
         irr::core::stringw s;
         PlayerManager::requestSignIn(login, password);
         while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
