@@ -221,27 +221,14 @@ void WorldStatus::updateTime(int ticks)
                 m_auxiliary_ticks += 6;
             }
 
-            // Work around a bug that occurred on linux once:
-            // the SFXManager::get() kept on reporting that it is playing,
-            // while it was not - so STK would never reach the ready
-            // ... phase. Since the sound effect is about 3 seconds
-            // long, we use the aux timer to force the next phase
-            // after 3.5 seconds.
-            if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
-                m_auxiliary_ticks < stk_config->time2Ticks(3.5f)           )
-                return;   // Do not increase time
-
-            // Wait before ready phase if sounds are disabled
-            if (!UserConfigParams::m_sfx &&
-                m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
-                return;
-
             if (!m_play_track_intro_sound)
             {
                 startEngines();
-                if (m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
-                    return;   // Do not increase time
             }
+
+            // Wait before ready phase
+            if (m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
+                return;
 
             m_auxiliary_ticks = 0;
 

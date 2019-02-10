@@ -1393,8 +1393,8 @@ void World::escapePressed()
             m_karts[i]->getController()->action((PlayerAction)j, 0);
         }
     }
-    if (NetworkConfig::get()->isNetworking() || getPhase() >= MUSIC_PHASE)
-        new RacePausedDialog(0.8f, 0.6f);
+
+    new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
 
 // ----------------------------------------------------------------------------
