@@ -155,7 +155,7 @@ By default STK servers use port `2759`. For example, in Ubuntu based distributio
 
 You may also need to handle the server discovery port `2757` for connecting your WAN server in LAN / localhost.
 
-Notice: You don't need to make any firewall or router configuration changes if you connect to our official servers.
+Notice: You don't need to make any firewall or router configuration changes if you connect to our trusted servers.
 
 ### Hosting LAN (local internet) server
 Everything is basically the same as WAN one, except you don't need an stk online account, just do:
