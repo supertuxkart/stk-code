@@ -1825,8 +1825,8 @@ void askForInternetPermission()
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.7f, 0.7f);
 
-    // Changes the default focus to be 'cancel', which is not
-    // GDPR compliant, see #3378
+    // Changes the default focus to be 'cancel' ('ok' as default is not
+    // GDPR compliant, see #3378).
     dialog->setFocusCancel();
     GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
