@@ -1220,10 +1220,7 @@ bool ServerLobby::registerServer(bool now)
     request->addParameter("port",         m_server_address.getPort()      );
     request->addParameter("private_port",
                                     STKHost::get()->getPrivatePort()      );
-    // The ServerConfig::m_server_name has xml encoded name so we send this
-    // insteaf of from game_setup
-    const std::string& server_name = ServerConfig::m_server_name;
-    request->addParameter("name", server_name);
+    request->addParameter("name", m_game_setup->getServerNameUtf8());
     request->addParameter("max_players", ServerConfig::m_server_max_players);
     int difficulty = m_difficulty.load();
     request->addParameter("difficulty", difficulty);
