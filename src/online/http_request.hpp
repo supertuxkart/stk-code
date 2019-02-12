@@ -143,7 +143,7 @@ namespace Online
         void addParameter(const std::string &name,
                           const irr::core::stringw &value)
         {
-            std::string s = StringUtils::xmlEncode(value);
+            std::string s = StringUtils::wideToUtf8(value);
 
             // Call the template to escape strings properly
             addParameter(name, s.c_str());
