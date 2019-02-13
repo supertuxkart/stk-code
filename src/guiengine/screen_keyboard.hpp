@@ -143,6 +143,9 @@ namespace GUIEngine
         
         /** Returns height of the screen keyboard */
         int getHeight() {return m_area.getHeight();}
+        
+        /** Returns assigned edit box */
+        CGUIEditBox* getEditBox() {return m_edit_box;}
     };
 }
 

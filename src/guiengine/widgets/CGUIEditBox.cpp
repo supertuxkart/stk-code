@@ -964,8 +964,11 @@ void CGUIEditBox::draw()
     if (!IsVisible)
         return;
 
-    const bool focus = Environment->hasFocus(this);
-
+    GUIEngine::ScreenKeyboard* screen_kbd = GUIEngine::ScreenKeyboard::getCurrent();
+    bool has_screen_kbd = (screen_kbd && screen_kbd->getEditBox() == this);
+    
+    const bool focus = Environment->hasFocus(this) || has_screen_kbd;
+    
     IGUISkin* skin = Environment->getSkin();
     if (!skin)
         return;
