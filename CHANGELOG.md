@@ -6,37 +6,63 @@ It should be kept in mind that some versions have a less complete changelog than
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
 
 ## Unreleased
-* New game mode Capture the Flag for online multiplayer by Benau
-* New game mode Free for All for online multiplayer by Benau
-* Networking game for normal race, time trial, free for all, capture the flag and soccer
+### Networking
+* Networking support for normal race, time trial, free for all, capture the flag and soccer by Benau and hiker :
+    * Access to a global server list, possibility to also create a LAN server
+    * Track voting system to allow players to decide where the race will be
+    * Communication between server and clients to exchange inputs and general game data
+    * A lot of work on rewind code to make sure server and client are well synchronized
+    * Chat lobby for general server information and discussion among players between races
+    * Support for handicap, which can be changed before each game
+* Spectating option for players having entered a server while a race or game is underway by Benau
+* Option to join live an active game in FFA, CTF and soccer by Benau
+* Global rankings by Benau (communication with main server) and Alayan (ranking formula)
+
+### Race gameplay and physics
+* New game mode Capture the Flag by Benau (online multiplayer only)
+* New game mode Free for All by Benau (online multiplayer only)
+* Revised kart characteristics for better balance between light, medium and heavy karts by Alayan
 * Better random item distribution for various numbers of karts by Alayan and hiker
-* Numerous improvements to input on Android by deveee
-* Gyroscope support for Android by Pelya
+* Fix position interpolation causing some incorrect lapline validation by Auria
+* Fix kart being uncontrollable and hovering when landing on some downward slopes by hiker
+* Mitigate a physics issue which could send a kart flying on collisions by hiker
+* Make kart turn radius based on kart class instead of kart model length (which made Adiumy unplayable and caused AI issues) by Alayan
+* Revisited slipstreaming with boost easier to obtain, especially in curves, but not as strong as in 0.9.3 when the zipper boost was incorrectly activated, by Alayan
+* Minor gameplay improvements (level 1 skid boost doesn't interrupt level 2 boost, fairer rubber-banding in low difficulties, boosted AI for some karts for more challenge in GPs, small balance change of GP points, more useful and consistent handicap option...)
+* Start boost/penalty moved to the set phase for smoother networking
+* Terrain slowdown works again as intended on several tracks where it was missing
+
+### AI
+* Improved powerup and nitro handling in AI by Alayan
+
+### General
+* Option to disable light scattering (for improved FPS), used in graphics level 3, by Partmedia
 * Unlockable SuperTux challenges in Story Mode by Alayan
 * Improvements to ghost replays (more data saved, live time difference, replay comparison, egg hunt replays) by Alayan
 * Kart color customization by Benau
 * Multithreading contention fixes by Benau
-* Improved powerup and nitro handling in AI by Alayan
 * Local multiplayer improvements by Fantasmos
-* Revised kart characteristics for better balance between light, medium and heavy karts by Alayan
-* Fix kart being uncontrollable and hovering when landing on some downward slopes by hiker
-* Mitigate a physics issue which could send a kart flying on collisions by hiker
-* Make kart turn radius based on kart class instead of kart model length (which made Adiumy unplayable and caused AI issues) by Alayan
 * Major revamp of the achievement system to make adding new achievements much easier and flexible, also fixing some related bugs by Alayan
-* Fix position interpolation causing some incorrect lapline validation by Auria
 * Store up to 5 highscores for a track/difficulty/mode/kart number combination, instead of 3
-* Start boost/penalty moved to the set phase for smoother networking
+* Smooth turning for non-keyboard inputs for improved consistency between input mode by deveee
+* Updated standard replays by Alayan
 * Visual improvements (new skidding particles, better rescue, bubblegum flashing before ending)
 * Audio improvements (crash sound depending on speed/direction, sound cue in nitro challenges)
-* Gameplay improvements (level 1 skid boost doesn't interrupt level 2 boost, fairer rubber-banding in low difficulties, boosted AI for some karts for more challenge in GPs, much better slipstreaming, small balance change of GP points, more useful and consistent handicap option...)
-* Terrain slowdown works again as intended on several tracks where it was missing
 * Fix STK incorrectly connecting to the server when the internet option is disabled by Auria
+* Updated WiiUse library
 * Many bugfixes
+
+### Android
+* Gyroscope support by Pelya
+* Numerous improvements to input on Android, especially screen keyboard, by deveee
+
 ### User Interface
+* New networking user interface by Benau and hiker
 * Race UI improvements (new speedometer, nitro gauge, bigger minimap, minimap display options, more legible text with outlines and for some bigger font) by Alayan
 * New coal skin by Alayan
-* New networking user interface by Benau and hiker
+* Support for collapsing widgets in UI by Mrxx99
 * Multidirectional keyboard navigation in menus by Alayan
+* Alternating background darkness in lists to enhance readability by Benau
 * Support text breaks into multiple line in lists, e.g. in the addons menu, by Alayan
 * Improved help menu with lateral tabs and a lot more information by Alayan
 * Improved option menu with lateral tabs by Alayan
@@ -52,6 +78,8 @@ For similar reasons, and because some features are vastly more complex than othe
     * Around the Lighthouse, Fort Magma Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
+* Item positions improvement by Alayan and theThomasPat :
+    * Northern Resort, Zen Garden, Volcano Island, Minigolf, Around the Lighthouse
 #### Karts
 * New version of Beastie by Jymis
 
