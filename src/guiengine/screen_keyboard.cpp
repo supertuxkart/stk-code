@@ -362,27 +362,35 @@ bool ScreenKeyboard::onEvent(const SEvent &event)
     if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         core::position2d<s32> point(event.MouseInput.X, event.MouseInput.Y);
-        bool is_point_inside = m_irrlicht_window->isPointInside(point);
         
-        if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
+        if (m_edit_box->isPointInside(point))
         {
-            if (!is_point_inside)
-            {
-                m_schedule_close = true;
-                return true;
-            }
+            m_edit_box->OnEvent(event);
         }
-        else if (event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
+        else
         {
-            if (!is_point_inside && m_schedule_close)
+            bool is_point_inside = m_irrlicht_window->isPointInside(point);
+            
+            if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
             {
-                dismiss();
-                return true;
+                if (!is_point_inside)
+                {
+                    m_schedule_close = true;
+                    return true;
+                }
             }
-            else
+            else if (event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
             {
-                m_schedule_close = false;
-                return false;
+                if (!is_point_inside && m_schedule_close)
+                {
+                    dismiss();
+                    return true;
+                }
+                else
+                {
+                    m_schedule_close = false;
+                    return false;
+                }
             }
         }
     }
