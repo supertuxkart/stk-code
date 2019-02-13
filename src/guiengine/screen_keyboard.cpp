@@ -366,6 +366,7 @@ bool ScreenKeyboard::onEvent(const SEvent &event)
         if (m_edit_box->isPointInside(point))
         {
             m_edit_box->OnEvent(event);
+            return true;
         }
         else
         {
