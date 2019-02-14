@@ -2659,10 +2659,16 @@ void Track::itemCommand(const XMLNode *node)
 #ifndef DEBUG
         m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
             &m, &normal);
+        m_track_object_manager->castRay(loc,
+            loc + (-10000 * quad_normal), &hit_point, &m, &normal,
+            /*interpolate*/false);
 #else
         bool drop_success = m_track_mesh->castRay(loc, loc +
             (-10000 * quad_normal), &hit_point, &m, &normal);
-        if (!drop_success)
+        bool over_driveable = m_track_object_manager->castRay(loc,
+            loc + (-10000 * quad_normal), &hit_point, &m, &normal,
+            /*interpolate*/false);
+        if (!drop_success && !over_driveable)
         {
             Log::warn("track",
                       "Item at position (%f,%f,%f) can not be dropped",
@@ -2746,7 +2752,15 @@ bool Track::findGround(AbstractKart *kart)
     Vec3 hit_point, normal;
     bool over_ground = m_track_mesh->castRay(xyz, down, &hit_point,
                                              &m, &normal);
-    if(!over_ground)
+
+    // Now also raycast against all track objects (that are driveable). If
+    // there should be a closer result (than the one against the main track
+    // mesh), its data will be returned.
+    // From TerrainInfo::update
+    bool over_driveable = m_track_object_manager->castRay(xyz, down,
+        &hit_point, &m, &normal, /*interpolate*/false);
+
+    if (!over_ground && !over_driveable)
     {
         Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
                   xyz.getX(),xyz.getY(),xyz.getZ());

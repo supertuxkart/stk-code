@@ -215,12 +215,13 @@ void TrackObjectManager::update(float dt)
  *          variable will be set.
  
  */
-void TrackObjectManager::castRay(const btVector3 &from, 
-                                 const btVector3 &to, btVector3 *hit_point, 
+bool TrackObjectManager::castRay(const btVector3 &from,
+                                 const btVector3 &to, btVector3 *hit_point,
                                  const Material **material,
                                  btVector3 *normal,
                                  bool interpolate_normal) const
 {
+    bool result = false;
     float distance = 9999.9f;
     // If there was a hit already, compute the current distance
     if(*material)
@@ -249,9 +250,11 @@ void TrackObjectManager::castRay(const btVector3 &from,
                 *hit_point = new_hit_point;
                 *normal    = new_normal;
                 distance   = new_distance;
+                result = true;
             }   // if new_distance < distance
         }   // if hit
     }   // for all track objects.
+    return result;
 }   // castRay
 
 // ----------------------------------------------------------------------------

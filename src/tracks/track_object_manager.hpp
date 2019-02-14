@@ -63,7 +63,7 @@ public:
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
-    void castRay(const btVector3 &from,
+    bool castRay(const btVector3 &from,
                  const btVector3 &to, btVector3 *hit_point,
                  const Material **material, btVector3 *normal = NULL,
                  bool interpolate_normal = false) const;
