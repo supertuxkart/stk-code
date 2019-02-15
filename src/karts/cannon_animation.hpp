@@ -26,6 +26,7 @@
 
 class AbstractKart;
 class AnimationBase;
+class CheckCannon;
 class Flyable;
 class Ipo;
 
@@ -38,6 +39,24 @@ class Ipo;
 class CannonAnimation: public AbstractKartAnimation
 {
 protected:
+friend class KartRewinder;
+    CannonAnimation(AbstractKart* kart, BareNetworkString* buffer);
+    // ------------------------------------------------------------------------
+    void init(Ipo *ipo, const Vec3 &start_left, const Vec3 &start_right,
+              const Vec3 &end_left, const Vec3 &end_right, float skid_rot);
+    // ------------------------------------------------------------------------
+    void initDeltaHeading(float skidding_rotation);
+    // ------------------------------------------------------------------------
+    void restoreData(BareNetworkString* buffer);
+
+private:
+    /** The \ref CheckCannon which created this animation. */
+    CheckCannon*   m_check_cannon;
+
+    /* Skidding rotation by the time the kart enter this cannon,
+     * will be restored during rewind, */
+    float m_skid_rot;
+
     /** This is the difference between the position of the kart when the
      *  cannon line is crossed and the curve interpolation at t=0. This
      *  is added to each interpolated curve value to give the final
@@ -64,25 +83,22 @@ protected:
     float m_fraction_of_line;
 
     /** The initial heading of the kart when crossing the line. This is
-     *  used to smoothly orient the kart towards the normal of the cuve. */
+     *  used to smoothly orient the kart towards the normal of the curve. */
     btQuaternion m_delta_heading;
 
-    void init(Ipo *ipo, const Vec3 &start_left, const Vec3 &start_right,
-              const Vec3 &end_left, const Vec3 &end_right, float skid_rot);
-
+    /** Current rotation of the object, saved for rewinding usage if needed. */
+    btQuaternion m_current_rotation;
 public:
-             CannonAnimation(AbstractKart *kart, Ipo *ipo,
-                             const Vec3 &start_left, const Vec3 &start_right,
-                             const Vec3 &end_left, const Vec3 &end_right,
+             CannonAnimation(AbstractKart *kart, CheckCannon* cc,
                              float skid_rot);
-             CannonAnimation(Flyable *flyable, Ipo *ipo,
-                             const Vec3 &start_left, const Vec3 &start_right,
-                             const Vec3 &end_left, const Vec3 &end_right);
+             CannonAnimation(Flyable *flyable, CheckCannon* cc);
              virtual ~CannonAnimation();
     virtual void  update(int ticks);
     // ------------------------------------------------------------------------
-    virtual bool usePredefinedEndTransform() const            { return false; }
-    // ------------------------------------------------------------------------
     virtual KartAnimationType getAnimationType() const   { return KAT_CANNON; }
+    // ------------------------------------------------------------------------
+    virtual void saveState(BareNetworkString* buffer);
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString* buffer);
 };   // CannonAnimation
 #endif

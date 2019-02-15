@@ -140,6 +140,8 @@ public:
     void saveIsActive(int kart_id, BareNetworkString* bns);
     // ------------------------------------------------------------------------
     void restoreIsActive(int kart_id, const BareNetworkString& b);
+    // ------------------------------------------------------------------------
+    int getIndex() const { return m_index; }
 };   // CheckStructure
 
 #endif

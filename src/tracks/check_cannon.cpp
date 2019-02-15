@@ -170,10 +170,10 @@ void CheckCannon::update(float dt)
         if(!triggered) continue;
 
         // Cross the checkline - add the cannon animation
-        CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
-            m_curve->clone(), getLeftPoint(), getRightPoint(),
-            m_target_left, m_target_right);
-        m_all_flyables[i]->setAnimation(animation);
+        //CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
+        //    m_curve->clone(), getLeftPoint(), getRightPoint(),
+        //    m_target_left, m_target_right);
+        //m_all_flyables[i]->setAnimation(animation);
     }   // for i in all flyables
 }   // update
 // ----------------------------------------------------------------------------
@@ -185,17 +185,11 @@ void CheckCannon::trigger(unsigned int kart_index)
 {
     AbstractKart *kart = World::getWorld()->getKart(kart_index);
     if (kart->getKartAnimation() || kart->isGhostKart())
-    {
         return;
-    }
 
     // The constructor AbstractKartAnimation resets the skidding to 0. So in
     // order to smooth rotate the kart, we need to keep the current visual
     // rotation and pass it to the CannonAnimation.
     float skid_rot = kart->getSkidding()->getVisualSkidRotation();
-    if (!RewindManager::get()->isRewinding())
-    {
-        new CannonAnimation(kart, m_curve->clone(), getLeftPoint(),
-            getRightPoint(), m_target_left, m_target_right, skid_rot);
-    }
+    new CannonAnimation(kart, this, skid_rot);
 }   // CheckCannon

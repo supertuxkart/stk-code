@@ -303,7 +303,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     }
 
     // If playing kart animation, don't rewind to any attacment
-    if (is_removing_bomb || m_kart->getKartAnimation())
+    if (is_removing_bomb)
         return;
 
     // Attaching an object can be expensive (loading new models, ...)
@@ -353,12 +353,6 @@ void Attachment::hitBanana(ItemState *item_state)
         return;
     }
 
-    // Make it consistent with attachment rewind when eating banana with bomb
-    // see if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
-    // in 515
-    if (m_kart->getKartAnimation())
-        return;
-
     AttachmentType new_attachment = ATTACH_NOTHING;
     const KartProperties *kp = m_kart->getKartProperties();
     // Use this as a basic random number to make sync with server easier.
@@ -375,7 +369,8 @@ void Attachment::hitBanana(ItemState *item_state)
         if(m_kart->getController()->isLocalPlayerController())
             he->setLocalPlayerKartHit();
         projectile_manager->addHitEffect(he);
-        ExplosionAnimation::create(m_kart);
+        if (m_kart->getKartAnimation() == NULL)
+            ExplosionAnimation::create(m_kart);
         clear();
         new_attachment = AttachmentType(ticks % 3);
         // Disable the banana on which the kart just is for more than the
@@ -605,7 +600,8 @@ void Attachment::update(int ticks)
             if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
             projectile_manager->addHitEffect(he);
-            ExplosionAnimation::create(m_kart);
+            if (m_kart->getKartAnimation() == NULL)
+                ExplosionAnimation::create(m_kart);
         }
         break;
     }

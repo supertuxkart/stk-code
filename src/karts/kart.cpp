@@ -1410,7 +1410,7 @@ void Kart::update(int ticks)
     // before updating the graphical position (which is done in
     // Moveable::update() ), otherwise 'stuttering' can happen (caused by
     // graphical and physical position not being the same).
-    if (has_animation_before && !RewindManager::get()->isRewinding())
+    if (has_animation_before)
     {
         m_kart_animation->update(ticks);
     }
@@ -1576,19 +1576,29 @@ void Kart::update(int ticks)
     // To avoid this problem, we do the raycast for terrain detection from
     // the center of the 4 wheel positions (in world coordinates).
 
-    Vec3 from(0.0f, 0.0f, 0.0f);
-    for (unsigned int i = 0; i < 4; i++)
-        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
+    if (!has_animation_before)
+    {
+        Vec3 from(0.0f, 0.0f, 0.0f);
+        for (unsigned int i = 0; i < 4; i++)
+            from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
 
-    // Add a certain epsilon (0.3) to the height of the kart. This avoids
-    // problems of the ray being cast from under the track (which happened
-    // e.g. on tux tollway when jumping down from the ramp, when the chassis
-    // partly tunnels through the track). While tunneling should not be
-    // happening (since Z velocity is clamped), the epsilon is left in place
-    // just to be on the safe side (it will not hit the chassis itself).
-    from = from/4 + (getTrans().getBasis() * Vec3(0.0f, 0.3f, 0.0f));
+        // Add a certain epsilon (0.3) to the height of the kart. This avoids
+        // problems of the ray being cast from under the track (which happened
+        // e.g. on tux tollway when jumping down from the ramp, when the chassis
+        // partly tunnels through the track). While tunneling should not be
+        // happening (since Z velocity is clamped), the epsilon is left in place
+        // just to be on the safe side (it will not hit the chassis itself).
+        from = from/4 + (getTrans().getBasis() * Vec3(0.0f, 0.3f, 0.0f));
 
-    m_terrain_info->update(getTrans().getBasis(), from);
+        m_terrain_info->update(getTrans().getBasis(), from);
+    }
+    else
+    {
+        // Use kart transform directly as wheel info is not updated when
+        // there is an animation
+        m_terrain_info->update(getTrans().getBasis(),
+            getXYZ() + getTrans().getBasis().getColumn(1) * 0.1f);
+    }
 
     if (m_body->getBroadphaseHandle())
     {
@@ -3216,6 +3226,27 @@ void Kart::updateGraphics(float dt)
         unsetSquash();
 #endif
 
+    // Disable smoothing network body so it doesn't smooth the animation
+    // for karts in client
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        SmoothNetworkBody* snb = static_cast<SmoothNetworkBody*>(this);
+        if (m_kart_animation && snb->isEnabled())
+        {
+            snb->setEnable(false);
+        }
+        else if (!m_kart_animation && !snb->isEnabled())
+        {
+            snb->setEnable(true);
+            snb->reset();
+            snb->setSmoothedTransform(getTrans());
+        }
+    }
+
+    if (m_kart_animation)
+        m_kart_animation->updateGraphics(dt);
+
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
     m_skid_sound->setPosition(getXYZ());
@@ -3224,7 +3255,14 @@ void Kart::updateGraphics(float dt)
     m_attachment->updateGraphics(dt);
 
     // update star effect (call will do nothing if stars are not activated)
-    m_stars_effect->update(dt);
+    // Remove it if no invulnerability
+    if (!isInvulnerable() && m_stars_effect->isEnabled())
+    {
+        m_stars_effect->reset();
+        m_stars_effect->update(1);
+    }
+    else
+        m_stars_effect->update(dt);
 
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)

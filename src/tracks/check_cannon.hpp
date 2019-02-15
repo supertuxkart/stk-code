@@ -70,6 +70,9 @@ public:
     virtual bool triggeringCheckline() const OVERRIDE { return false; }
     void addFlyable(Flyable *flyable);
     void removeFlyable(Flyable *flyable);
+    const Vec3& getTargetLeft() const { return m_target_left; }
+    const Vec3& getTargetRight() const { return m_target_right; }
+    Ipo* getIpo() const { return m_curve; }
 };   // CheckLine
 
 #endif

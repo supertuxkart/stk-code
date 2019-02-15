@@ -31,31 +31,43 @@ class Referee;
 class RescueAnimation: public AbstractKartAnimation
 {
 protected:
-    /** The coordinates where the kart was hit originally. */
-    Vec3 m_xyz;
-
+friend class KartRewinder;
     /** Column 1 of btTransform of kart. */
     Vec3 m_up_vector;
 
     /** The velocity with which the kart is moved. */
     float m_velocity;
 
+    /** When world ticks > this, it will move the kart above the
+     *  m_rescue_transform. */
     int m_rescue_moment;
 
-    /* Has the kart been moved onto the track */
-    bool m_kart_on_track = false;
-
     /** The referee during a rescue operation. */
-    Referee      *m_referee;
+    Referee* m_referee;
 
+    /* Final transformation to place kart. */
+    btTransform m_rescue_transform;
+
+    // ------------------------------------------------------------------------
+    RescueAnimation(AbstractKart* kart, BareNetworkString* b);
+    // ------------------------------------------------------------------------
+    void restoreData(BareNetworkString* b);
+    // ------------------------------------------------------------------------
+    void init(const btTransform& rescue_transform, float velocity,
+              const Vec3& up_vector);
 public:
-                 RescueAnimation(AbstractKart *kart,
-                                 bool is_auto_rescue = false,
-                                 bool from_state = false);
-    float maximumHeight();
+                 RescueAnimation(AbstractKart* kart,
+                                 bool is_auto_rescue = false);
     virtual     ~RescueAnimation();
+    // ------------------------------------------------------------------------
     virtual void update(int ticks);
     // ------------------------------------------------------------------------
+    virtual void updateGraphics(float dt);
+    // ------------------------------------------------------------------------
     virtual KartAnimationType getAnimationType() const   { return KAT_RESCUE; }
+    // ------------------------------------------------------------------------
+    virtual void saveState(BareNetworkString* buffer);
+    // ------------------------------------------------------------------------
+    virtual void restoreState(BareNetworkString* buffer);
 };   // RescueAnimation
 #endif

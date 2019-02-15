@@ -43,6 +43,12 @@ class AbstractKart;
   */
 class Referee
 {
+public:
+    /** Start frame of rescue animation. */
+    static int m_st_first_rescue_frame;
+
+    /** End frame of rescue animation. */
+    static int m_st_last_rescue_frame;
 private:
     /** The static mesh, which is loaded from a static function and shared
      *  between all instances. */
@@ -59,12 +65,6 @@ private:
 
     /** End frame of start animation. */
     static int m_st_last_start_frame;
-
-    /** Start frame of rescue animation. */
-    static int m_st_first_rescue_frame;
-
-    /** End frame of rescue animation. */
-    static int m_st_last_rescue_frame;
 
     /** The position the referee should be shown relative to the kart
      *  when starting the race. */
