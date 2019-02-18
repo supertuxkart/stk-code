@@ -64,6 +64,11 @@ xgettext  -j  -d supertuxkart --keyword="translate" --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $ANGELSCRIPT_FILE_LIST \
                                --package-name=supertuxkart --language=c++
 
+# AppData and desktop entry
+xgettext  -j  -d supertuxkart --add-comments="I18N:" \
+                              -p ./data/po -o supertuxkart.pot \
+                              ./data/supertuxkart.desktop ./data/supertuxkart.appdata.xml \
+                              --package-name=supertuxkart
 
 echo "    Done"
 echo "---------------------------"

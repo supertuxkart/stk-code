@@ -626,17 +626,43 @@ if(CHECK_ASSETS)
 endif()
 
 
+# ==== Create translated AppData and desktop entry ====
+find_package(Gettext 0.18)
+if(GETTEXT_FOUND)
+  set(LINGUAS_FILE ${STK_DATA_DIR}/po/LINGUAS)
+  file(READ ${LINGUAS_FILE} LINGUAS)
+  string(REGEX REPLACE "\n" ";" LINGUAS ${LINGUAS})
+  foreach(lang ${LINGUAS})
+    list(APPEND PO_FILES ${STK_DATA_DIR}/po/${lang}.po)
+  endforeach()
+  add_custom_command(OUTPUT supertuxkart.i18n.desktop
+    COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --desktop -d ${STK_DATA_DIR}/po
+      --template ${STK_DATA_DIR}/supertuxkart.desktop -o supertuxkart.i18n.desktop
+    DEPENDS ${STK_DATA_DIR}/supertuxkart.desktop ${PO_FILES} ${LINGUAS_FILE})
+  add_custom_command(OUTPUT supertuxkart.appdata.i18n.xml
+    COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${STK_DATA_DIR}/po
+      --template ${STK_DATA_DIR}/supertuxkart.appdata.xml -o supertuxkart.appdata.i18n.xml
+    DEPENDS ${STK_DATA_DIR}/supertuxkart.appdata.xml ${PO_FILES} ${LINGUAS_FILE})
+  add_custom_target(desktopfiles ALL DEPENDS supertuxkart.i18n.desktop supertuxkart.appdata.i18n.xml)
+endif()
+
+
 # ==== Install target ====
 install(TARGETS supertuxkart RUNTIME DESTINATION ${STK_INSTALL_BINARY_DIR} BUNDLE DESTINATION .)
 install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
-install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
-install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
+if(GETTEXT_FOUND)
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/supertuxkart.i18n.desktop" DESTINATION share/applications RENAME supertuxkart.desktop)
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/supertuxkart.appdata.i18n.xml" DESTINATION share/metainfo RENAME supertuxkart.appdata.xml)
+else()
+  install(FILES data/supertuxkart.desktop DESTINATION share/applications)
+  install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
+endif()
 
 if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
