@@ -78,7 +78,7 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="2" height="100%" word_wrap="true"
                             I18N="In the help menu"
-                            text="If you press Accelerate button on 'Set!' command before race is started, you will get startup boost."/>
+                            text="You can get a startup boost by pressing the accelerate button at 'Set!', before the race's start."/>
                 </div>
 
                 <spacer height="2%" width="10"/>
