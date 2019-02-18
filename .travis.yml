@@ -25,7 +25,6 @@ env:
 addons:
   apt:
     packages:
-    - appstream
     - build-essential
     - cmake
     - libbluetooth-dev
