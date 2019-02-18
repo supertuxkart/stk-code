@@ -24,12 +24,12 @@ To build SuperTuxKart from source, you'll need to install the following packages
   * libpng (libpng-devel)
   * zlib (zlib-devel)
   * jpeg (libjpeg-turbo-devel)
-  * gettext
+  * [Unix] gettext, appstream
 
 Ubuntu command:
 
 ```bash
-sudo apt-get install build-essential cmake gettext libbluetooth-dev \
+sudo apt-get install appstream build-essential cmake gettext libbluetooth-dev \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
 libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
 libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
@@ -37,7 +37,7 @@ libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-d
 Fedora command:
 
 ```bash
-sudo dnf install @development-tools cmake bluez-libs-devel \
+sudo dnf install @development-tools appstream cmake bluez-libs-devel \
 openssl-devel libcurl-devel freetype-devel fribidi-devel gettext mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
