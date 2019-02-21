@@ -29,7 +29,7 @@
 
 #include <pthread.h>
 
-#define MAX_WIIMOTES  4
+#define MAX_WIIMOTES 8
 
 struct wiimote_t;
 class GamepadConfig;
