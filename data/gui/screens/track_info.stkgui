@@ -81,7 +81,7 @@
                                      wrap_around="true" />
                         </div>
                         <spacer width="3%"/>
-                        <label id="target-type-text" proportion="3" I18N="In the track info screen" text="Soccer game type" text_align="left" />
+                        <label id="target-type-text" proportion="3" I18N="In the track info screen" text_align="left" />
                     </div>
                     <spacer width="1" height="2%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >

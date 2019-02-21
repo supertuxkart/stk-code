@@ -46,6 +46,10 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_record_this_race;
 
+    bool m_is_soccer;
+
+    bool m_show_ffa_spinner;
+
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
         
@@ -66,6 +70,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
+
+    /** The label besides the AI karts spinner. */
+    GUIEngine::LabelWidget* m_ai_kart_label;
 
     /** Check box for reverse mode or random item in arena. */
     GUIEngine::CheckBoxWidget* m_option;
