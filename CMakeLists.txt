@@ -628,7 +628,9 @@ endif()
 
 # ==== Create translated AppData and desktop entry ====
 find_package(Gettext 0.18)
-find_file(METAINFO_ITS metainfo.its HINTS /usr/share/gettext/its)
+get_filename_component(GETTEXT_BIN_DIR ${GETTEXT_MSGFMT_EXECUTABLE} DIRECTORY)
+get_filename_component(GETTEXT_INSTALL_DIR ${GETTEXT_BIN_DIR} DIRECTORY)
+find_file(METAINFO_ITS NAMES metainfo.its appdata.its HINTS ${GETTEXT_INSTALL_DIR}/share/gettext/its)
 if(GETTEXT_FOUND AND METAINFO_ITS)
   set(LINGUAS_FILE ${STK_DATA_DIR}/po/LINGUAS)
   file(READ ${LINGUAS_FILE} LINGUAS)
