@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-11 09:19+0800\n"
+"POT-Creation-Date: 2019-02-25 10:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -720,6 +720,7 @@ msgstr ""
 #. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
+#: src/states_screens/track_info_screen.cpp:198
 msgid "Game mode"
 msgstr ""
 
@@ -745,6 +746,7 @@ msgstr ""
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
+#: src/states_screens/race_setup_screen.cpp:111
 msgid "Battle"
 msgstr ""
 
@@ -1285,6 +1287,13 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
+msgstr ""
+
+#. I18N: ./data/gui/screens/help1.stkgui
+#. I18N: In the help menu
+msgid ""
+"You can get a startup boost by pressing the accelerate button at 'Set!', "
+"before the race's start."
 msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
@@ -2127,22 +2136,14 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:375
+#: src/states_screens/track_info_screen.cpp:405
 msgid "(Empty)"
 msgstr ""
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#. I18N: In the create server screen
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:168
-#: src/states_screens/online/create_server_screen.cpp:190
-msgid "Soccer game type"
-msgstr ""
-
-#. I18N: ./data/gui/screens/track_info.stkgui
-#. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:510
-#: src/states_screens/track_info_screen.cpp:196
+#: src/states_screens/track_info_screen.cpp:225
 msgid "Number of laps"
 msgstr ""
 
@@ -2269,6 +2270,10 @@ msgstr ""
 msgid "Battle Island"
 msgstr ""
 
+#. I18N: ../stk-assets/tracks/black_forest/track.xml
+msgid "Black Forest"
+msgstr ""
+
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr ""
@@ -2354,6 +2359,10 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
+msgid "Ravenbridge mansion"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
@@ -3242,8 +3251,9 @@ msgstr ""
 #: src/main.cpp:2128
 #, c-format
 msgid ""
-"Your OpenGL version appears to be too old. Please verify if an update for "
-"your video driver is available. SuperTuxKart requires %s or better."
+"Your graphics driver appears to be very old. Please check if an update is "
+"available. SuperTuxKart recommends a driver supporting %s or better. The "
+"game will likely still run, but in a reduced-graphics mode."
 msgstr ""
 
 #: src/main_loop.cpp:347 src/network/protocols/client_lobby.cpp:91
@@ -3321,11 +3331,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/modes/world.cpp:1300
+#: src/modes/world.cpp:1301
 msgid "You have been eliminated!"
 msgstr ""
 
-#: src/modes/world.cpp:1307
+#: src/modes/world.cpp:1308
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr ""
@@ -3387,7 +3397,7 @@ msgstr ""
 #: src/network/protocols/client_lobby.cpp:643
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
-#: src/states_screens/track_info_screen.cpp:166
+#: src/states_screens/track_info_screen.cpp:178
 msgid "Time limit"
 msgstr ""
 
@@ -3395,7 +3405,7 @@ msgstr ""
 #: src/network/protocols/client_lobby.cpp:644
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
-#: src/states_screens/track_info_screen.cpp:167
+#: src/states_screens/track_info_screen.cpp:179
 msgid "Goals limit"
 msgstr ""
 
@@ -3511,6 +3521,7 @@ msgstr ""
 #: src/network/server_config.cpp:266 src/race/race_manager.hpp:195
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:178
+#: src/states_screens/track_info_screen.cpp:201
 msgid "Free-For-All"
 msgstr ""
 
@@ -3527,7 +3538,11 @@ msgstr ""
 msgid "Official"
 msgstr ""
 
-#: src/network/server.cpp:117
+#. I18N: Trusted means this server is trusted by team to not
+#. doing any modification on server side, so players playing
+#. in this server will not meet cheaters, and trusted server
+#. will optionally host a ranked matching game
+#: src/network/server.cpp:122
 msgid "Trusted"
 msgstr ""
 
@@ -3593,7 +3608,7 @@ msgid "Follow the Leader"
 msgstr ""
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:193
+#: src/race/race_manager.hpp:193 src/states_screens/track_info_screen.cpp:200
 msgid "3 Strikes Battle"
 msgstr ""
 
@@ -4338,7 +4353,7 @@ msgid "Nitro challenge"
 msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:151
-#: src/states_screens/race_setup_screen.cpp:136
+#: src/states_screens/race_setup_screen.cpp:135
 msgid "Ghost replay race"
 msgstr ""
 
@@ -4346,6 +4361,13 @@ msgstr ""
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:155
 #: src/states_screens/online/create_server_screen.cpp:174
 msgid "Battle mode"
+msgstr ""
+
+#. I18N: In the create server screen
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:168
+#: src/states_screens/online/create_server_screen.cpp:190
+#: src/states_screens/track_info_screen.cpp:166
+msgid "Soccer game type"
 msgstr ""
 
 #. I18N: In server info dialog, showing the current track playing in
@@ -4921,27 +4943,28 @@ msgstr ""
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:443
 #: src/states_screens/online/tracks_screen.cpp:491
-#: src/states_screens/track_info_screen.cpp:266
+#: src/states_screens/track_info_screen.cpp:296
 msgid "Random item location"
 msgstr ""
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:473
-#: src/states_screens/track_info_screen.cpp:177
-#: src/states_screens/track_info_screen.cpp:476
+#: src/states_screens/track_info_screen.cpp:189
+#: src/states_screens/track_info_screen.cpp:517
 msgid "Number of goals to win"
 msgstr ""
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:481
-#: src/states_screens/track_info_screen.cpp:172
-#: src/states_screens/track_info_screen.cpp:471
+#: src/states_screens/track_info_screen.cpp:184
+#: src/states_screens/track_info_screen.cpp:204
+#: src/states_screens/track_info_screen.cpp:512
 msgid "Maximum time (min.)"
 msgstr ""
 
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:521
-#: src/states_screens/track_info_screen.cpp:261
+#: src/states_screens/track_info_screen.cpp:291
 msgid "Drive in reverse"
 msgstr ""
 
@@ -5405,31 +5428,31 @@ msgstr ""
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:114
+#: src/states_screens/race_setup_screen.cpp:113
 msgid "Hit others with weapons until they lose all their lives."
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:119
+#: src/states_screens/race_setup_screen.cpp:118
 msgid "Push the ball into the opposite cage to score goals."
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:129
+#: src/states_screens/race_setup_screen.cpp:128
 msgid "Explore tracks to find all hidden eggs"
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:137
+#: src/states_screens/race_setup_screen.cpp:136
 msgid "Race against ghost karts and try to beat them!"
 msgstr ""
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:118
+#: src/states_screens/track_info_screen.cpp:129
 #, c-format
 msgid "Track by %s"
 msgstr ""
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:126
+#: src/states_screens/track_info_screen.cpp:137
 #, c-format
 msgid "Max players supported: %d"
 msgstr ""
