@@ -2124,13 +2124,12 @@ int main(int argc, char *argv[] )
                     #else
                     irr::core::stringw version = "OpenGL 3.3";
                     #endif
-                    MessageDialog *dialog =
-                        new MessageDialog(_("Your OpenGL version appears to be "
-                                            "too old. Please verify if an "
-                                            "update for your video driver is "
-                                            "available. SuperTuxKart requires "
-                                            "%s or better.", version), 
-                                            /*from queue*/ true);
+                    MessageDialog *dialog = new MessageDialog(_(
+                        "Your graphics driver appears to be very old. Please "
+                        "check if an update is available. SuperTuxKart "
+                        "recommends a driver supporting %s or better. The game "
+                        "will still run, but in a reduced-graphics mode.",
+                        version), /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
                 #endif
