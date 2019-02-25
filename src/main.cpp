@@ -2128,7 +2128,7 @@ int main(int argc, char *argv[] )
                         "Your graphics driver appears to be very old. Please "
                         "check if an update is available. SuperTuxKart "
                         "recommends a driver supporting %s or better. The game "
-                        "will still run, but in a reduced-graphics mode.",
+                        "will likely still run, but in a reduced-graphics mode.",
                         version), /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
