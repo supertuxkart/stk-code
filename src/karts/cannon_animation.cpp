@@ -42,7 +42,7 @@
  *         value can be queried, the AbstractkartAnimation constructor
  *         resets the value to 0, so it needs to be passed in.
  */
-CannonAnimation::CannonAnimation(AbstractKart *kart, CheckCannon* cc,
+CannonAnimation::CannonAnimation(AbstractKart* kart, CheckCannon* cc,
                                  float skid_rot)
                : AbstractKartAnimation(kart, "CannonAnimation")
 {
@@ -70,7 +70,7 @@ CannonAnimation::CannonAnimation(AbstractKart* kart, BareNetworkString* buffer)
 // ----------------------------------------------------------------------------
 /** Constructor for a flyable. It sets the kart data to NULL.
  */
-CannonAnimation::CannonAnimation(Flyable *flyable, CheckCannon* cc)
+CannonAnimation::CannonAnimation(Flyable* flyable, CheckCannon* cc)
                : AbstractKartAnimation(NULL, "CannonAnimation")
 {
     m_flyable = flyable;
@@ -79,6 +79,19 @@ CannonAnimation::CannonAnimation(Flyable *flyable, CheckCannon* cc)
     init(cc->getIpo()->clone(), cc->getLeftPoint(), cc->getRightPoint(),
         cc->getTargetLeft(), cc->getTargetRight(), /*skid_rot*/0);
 }   // CannonAnimation(Flyable*...)
+
+// ----------------------------------------------------------------------------
+/** The constructor for the cannon animation for flyable during rewind.
+ */
+CannonAnimation::CannonAnimation(Flyable* flyable, BareNetworkString* buffer)
+               : AbstractKartAnimation(NULL, "CannonAnimation")
+{
+    m_flyable = flyable;
+    restoreBasicState(buffer);
+    m_check_cannon = NULL;
+    m_skid_rot = 0;
+    restoreData(buffer);
+}   // CannonAnimation
 
 // ----------------------------------------------------------------------------
 /** Common initialisation for kart-based and flyable-based animations.
@@ -226,7 +239,7 @@ CannonAnimation::~CannonAnimation()
         m_kart->setVelocity(pos.getBasis()*v);
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
     }
-    else
+    else if (m_end_ticks != std::numeric_limits<int>::max())
     {
         m_flyable->setAnimation(NULL);
     }
@@ -337,9 +350,15 @@ void CannonAnimation::update(int ticks)
 void CannonAnimation::saveState(BareNetworkString* buffer)
 {
     AbstractKartAnimation::saveState(buffer);
-    buffer->addUInt8((uint8_t)m_check_cannon->getIndex())
-        .addFloat(m_skid_rot).addFloat(m_fraction_of_line)
+    buffer->addUInt8((uint8_t)m_check_cannon->getIndex());
+    // Flyable only use Y in m_delta
+    if (m_kart)
+    {
+        buffer->addFloat(m_skid_rot).addFloat(m_fraction_of_line)
         .add(m_current_rotation);
+    }
+    else
+        buffer->addFloat(m_delta.y());
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -353,6 +372,11 @@ void CannonAnimation::restoreState(BareNetworkString* buffer)
 void CannonAnimation::restoreData(BareNetworkString* buffer)
 {
     int cc_idx = buffer->getInt8();
+    if ((unsigned)cc_idx > CheckManager::get()->getCheckStructureCount())
+    {
+        throw std::invalid_argument(
+            "Server has different check structure size.");
+    }
     CheckCannon* cc = dynamic_cast<CheckCannon*>
         (CheckManager::get()->getCheckStructure(cc_idx));
     if (!cc)
@@ -360,9 +384,18 @@ void CannonAnimation::restoreData(BareNetworkString* buffer)
         throw std::invalid_argument(
             "Server has different check cannon index.");
     }
-    float skid_rot = buffer->getFloat();
-    float fraction_of_line = buffer->getFloat();
-    btQuaternion current_rotation = buffer->getQuat();
+    float skid_rot = 0.0f;
+    float fraction_of_line = 0.0f;
+    btQuaternion current_rotation = btQuaternion(0, 0, 0, 1);
+    float delta = 0.0f;
+    if (m_kart)
+    {
+        skid_rot = buffer->getFloat();
+        fraction_of_line = buffer->getFloat();
+        current_rotation = buffer->getQuat();
+    }
+    else
+        delta = buffer->getFloat();
     if (m_check_cannon != cc || skid_rot != m_skid_rot)
     {
         // Re-init if different or undoing the destruction of check cannon
@@ -372,6 +405,11 @@ void CannonAnimation::restoreData(BareNetworkString* buffer)
         m_check_cannon = cc;
         m_skid_rot = skid_rot;
     }
-    m_fraction_of_line = fraction_of_line;
-    m_current_rotation = current_rotation;
+    if (m_kart)
+    {
+        m_fraction_of_line = fraction_of_line;
+        m_current_rotation = current_rotation;
+    }
+    else
+        m_delta.setY(delta);
 }   // restoreData

@@ -36,6 +36,7 @@
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/cannon_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
@@ -204,6 +205,11 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
 Flyable::~Flyable()
 {
     removePhysics();
+    if (m_animation)
+    {
+        m_animation->handleResetRace();
+        delete m_animation;
+    }
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
@@ -377,13 +383,13 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
     if (animation)
     {
         assert(m_animation == NULL);
-        Physics::getInstance()->removeBody(getBody());
+        // add or removeBody currently breaks animation rewind
+        moveToInfinity(/*set_moveable_trans*/false);
     }
     else   // animation = NULL
     {
         assert(m_animation != NULL);
         m_body->setWorldTransform(getTrans());
-        Physics::getInstance()->addBody(getBody());
     }
     m_animation = animation;
 }   // addAnimation
@@ -414,11 +420,16 @@ bool Flyable::updateAndDelete(int ticks)
     {
         m_animation->update(ticks);
         Moveable::update(ticks);
+        // Move the physical body to infinity so it doesn't interact with
+        // game objects (for easier rewind)
+        moveToInfinity(/*set_moveable_trans*/false);
         return false;
     }   // if animation
 
-    m_ticks_since_thrown += ticks;
-    if(m_max_lifespan > -1 && m_ticks_since_thrown > m_max_lifespan)
+    // 32767 for max m_ticks_since_thrown so the last bit for animation save
+    if (m_ticks_since_thrown < 32767)
+        m_ticks_since_thrown += ticks;
+    if(m_max_lifespan > -1 && (int)m_ticks_since_thrown > m_max_lifespan)
         hit(NULL);
 
     if(m_has_hit_something) return true;
@@ -510,7 +521,7 @@ bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
 {
     return m_owner_has_temporary_immunity &&
         kart_hit == m_owner            &&
-        m_ticks_since_thrown < stk_config->time2Ticks(2.0f);
+        (int)m_ticks_since_thrown < stk_config->time2Ticks(2.0f);
 }   // isOwnerImmunity
 
 // ----------------------------------------------------------------------------
@@ -522,7 +533,7 @@ bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
  */
 bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
 {
-    if (!m_has_server_state)
+    if (!m_has_server_state || hasAnimation())
         return false;
     // the owner of this flyable should not be hit by his own flyable
     if(isOwnerImmunity(kart_hit)) return false;
@@ -633,26 +644,56 @@ BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
         return NULL;
 
     ru->push_back(getUniqueIdentity());
-    BareNetworkString *buffer = new BareNetworkString();
-    CompressNetworkBody::compress(m_body->getWorldTransform(),
-        m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer,
-        m_body.get(), m_motion_state.get());
-    buffer->addUInt16(m_ticks_since_thrown);
+
+    BareNetworkString* buffer = new BareNetworkString();
+    uint16_t ticks_since_thrown_animation = (m_ticks_since_thrown & 32767) |
+        (hasAnimation() ? 32768 : 0);
+    buffer->addUInt16(ticks_since_thrown_animation);
+
+    if (hasAnimation())
+        m_animation->saveState(buffer);
+    else
+    {
+        CompressNetworkBody::compress(m_body->getWorldTransform(),
+            m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer,
+            m_body.get(), m_motion_state.get());
+    }
     return buffer;
 }   // saveState
 
 // ----------------------------------------------------------------------------
 void Flyable::restoreState(BareNetworkString *buffer, int count)
 {
-    btTransform t;
-    Vec3 lv, av;
-    CompressNetworkBody::decompress(buffer, &t, &lv, &av);
+    uint16_t ticks_since_thrown_animation = buffer->getUInt16();
+    bool has_animation_in_state =
+        (ticks_since_thrown_animation >> 15 & 1) == 1;
 
-    m_body->setLinearVelocity(lv);
-    m_body->setAngularVelocity(av);
-    m_body->proceedToTransform(t);
-    setTrans(t);
-    m_ticks_since_thrown = buffer->getUInt16();
+    if (has_animation_in_state)
+    {
+        // At the moment we only have cannon animation for rubber ball
+        if (!m_animation)
+            setAnimation(new CannonAnimation(this, buffer));
+        else
+            m_animation->restoreState(buffer);
+    }
+    else
+    {
+        if (hasAnimation())
+        {
+            // Delete unconfirmed animation, destructor of cannon animation
+            // will set m_animation to null
+            delete m_animation;
+        }
+        btTransform t;
+        Vec3 lv, av;
+        CompressNetworkBody::decompress(buffer, &t, &lv, &av);
+
+        m_body->setLinearVelocity(lv);
+        m_body->setAngularVelocity(av);
+        m_body->proceedToTransform(t);
+        setTrans(t);
+    }
+    m_ticks_since_thrown = ticks_since_thrown_animation & 32767;
     m_has_server_state = true;
     m_has_hit_something = false;
 }   // restoreState
@@ -697,6 +738,13 @@ void Flyable::computeError()
  *  projectile_manager. */
 void Flyable::onFireFlyable()
 {
+    if (m_animation)
+    {
+        m_animation->handleResetRace();
+        delete m_animation;
+        m_animation = NULL;
+    }
+
     m_ticks_since_thrown = 0;
     m_has_hit_something = false;
     m_has_server_state = true;

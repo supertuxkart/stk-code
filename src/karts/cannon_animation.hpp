@@ -40,7 +40,11 @@ class CannonAnimation: public AbstractKartAnimation
 {
 protected:
 friend class KartRewinder;
+friend class Flyable;
+    // ------------------------------------------------------------------------
     CannonAnimation(AbstractKart* kart, BareNetworkString* buffer);
+    // ------------------------------------------------------------------------
+    CannonAnimation(Flyable* flyable, BareNetworkString* buffer);
     // ------------------------------------------------------------------------
     void init(Ipo *ipo, const Vec3 &start_left, const Vec3 &start_right,
               const Vec3 &end_left, const Vec3 &end_right, float skid_rot);

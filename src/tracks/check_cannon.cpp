@@ -128,26 +128,10 @@ void CheckCannon::changeDebugColor(bool is_active)
 /** Adds a flyable to be tested for crossing a cannon checkline.
  *  \param flyable The flyable to be tested.
  */
-void CheckCannon::addFlyable(Flyable *flyable)
+void CheckCannon::addFlyable(Flyable* flyable)
 {
-    m_all_flyables.push_back(flyable);
-    m_flyable_previous_position.push_back(flyable->getXYZ());
+    m_all_flyables_previous_position[flyable] = flyable->getXYZ();
 }   // addFlyable
-
-// ----------------------------------------------------------------------------
-/** Removes a flyable from the tests if it crosses a checkline. Used when
- *  the flyable is removed (e.g. explodes).
- */
-void CheckCannon::removeFlyable(Flyable *flyable)
-{
-    std::vector<Flyable*>::iterator i = std::find(m_all_flyables.begin(),
-                                                  m_all_flyables.end(),
-                                                  flyable);
-    assert(i != m_all_flyables.end());
-    size_t index = i - m_all_flyables.begin();   // get the index
-    m_all_flyables.erase(i);
-    m_flyable_previous_position.erase(m_flyable_previous_position.begin() + index);
-}   // removeFlyable
 
 // ----------------------------------------------------------------------------
 /** Overriden to also check all flyables registered with the cannon.
@@ -155,24 +139,26 @@ void CheckCannon::removeFlyable(Flyable *flyable)
 void CheckCannon::update(float dt)
 {
     CheckLine::update(dt);
-    for (unsigned int i = 0; i < m_all_flyables.size(); i++)
+    for (auto& f : m_all_flyables_previous_position)
     {
-        if (!m_all_flyables[i]->hasServerState() ||
-            m_all_flyables[i]->hasAnimation())
+        Flyable* flyable = f.first;
+        if (!flyable->hasServerState() || flyable->hasAnimation())
             continue;
+
+        const Vec3& previous_position = f.second;
+        const Vec3 current_position = flyable->getXYZ();
+
         setIgnoreHeight(true);
-        bool triggered = isTriggered(m_flyable_previous_position[i],
-                                     m_all_flyables[i]->getXYZ(),
-                                     /*kart index - ignore*/ -1     );
+        bool triggered = isTriggered(previous_position, current_position,
+            /*kart index - ignore*/ -1);
         setIgnoreHeight(false);
-        m_flyable_previous_position[i] = m_all_flyables[i]->getXYZ();
-        if(!triggered) continue;
+        f.second = current_position;
+        if (!triggered) continue;
 
         // Cross the checkline - add the cannon animation
-        //CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
-        //    m_curve->clone(), getLeftPoint(), getRightPoint(),
-        //    m_target_left, m_target_right);
-        //m_all_flyables[i]->setAnimation(animation);
+        CannonAnimation* animation = new CannonAnimation(flyable,
+            this);
+        flyable->setAnimation(animation);
     }   // for i in all flyables
 }   // update
 
@@ -192,4 +178,17 @@ void CheckCannon::trigger(unsigned int kart_index)
     // rotation and pass it to the CannonAnimation.
     float skid_rot = kart->getSkidding()->getVisualSkidRotation();
     new CannonAnimation(kart, this, skid_rot);
-}   // CheckCannon
+}   // trigger
+
+// ----------------------------------------------------------------------------
+void CheckCannon::resetAfterRewind(unsigned int kart_index)
+{
+    CheckLine::resetAfterRewind(kart_index);
+    for (auto& f : m_all_flyables_previous_position)
+    {
+        Flyable* flyable = f.first;
+        if (!flyable->hasServerState() || flyable->hasAnimation())
+            continue;
+        f.second = flyable->getXYZ();
+    }
+}   // resetAfterRewind

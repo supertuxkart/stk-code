@@ -72,13 +72,13 @@ RubberBall::RubberBall(AbstractKart *kart)
 
     m_target = NULL;
     m_ping_sfx = SFXManager::get()->createSoundSource("ball_bounce");
-    CheckManager::get()->addFlyableToCannons(this);
 }   // RubberBall
 
 // ----------------------------------------------------------------------------
 void RubberBall::onFireFlyable()
 {
     Flyable::onFireFlyable();
+    CheckManager::get()->addFlyableToCannons(this);
     // Don't let Flyable update the terrain information, since this object
     // has to do it earlier than that.
     setDoTerrainInfo(false);
@@ -840,6 +840,9 @@ void RubberBall::updateDistanceToTarget()
  */
 bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 {
+    // When moved to infinity during cannon animation do nothing
+    if (hasAnimation())
+        return false;
 #ifdef PRINT_BALL_REMOVE_INFO
     if(kart)
         Log::debug("[RuberBall]", "ball %d hit kart.", m_id);

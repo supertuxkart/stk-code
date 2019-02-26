@@ -89,6 +89,8 @@ public:
                              int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
     virtual void resetAfterKartMove(unsigned int kart_index) OVERRIDE;
+    virtual void resetAfterRewind(unsigned int kart_index) OVERRIDE
+                                            { resetAfterKartMove(kart_index); }
     virtual void changeDebugColor(bool is_active) OVERRIDE;
     virtual bool triggeringCheckline() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------

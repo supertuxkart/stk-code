@@ -356,8 +356,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
     }
 
     // Update check line, so the cannon animation can be replayed correctly
-    for (unsigned i = 0; i < world->getNumKarts(); i++)
-        CheckManager::get()->resetAfterKartMove(world->getKart(i));
+    CheckManager::get()->resetAfterRewind();
 
     // Now go forward through the list of rewind infos till we reach 'now':
     while (world->getTicksSinceStart() < now_ticks)

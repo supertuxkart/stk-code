@@ -106,7 +106,7 @@ protected:
 
     /** Time since thrown. used so a kart can't hit himself when trying
      *  something, and also to put some time limit to some collectibles */
-    int16_t           m_ticks_since_thrown;
+    uint16_t          m_ticks_since_thrown;
 
     /* True if this flyable exists in server, and will trigger a rewind.
      * For each local state it will reset it to false and call moveToInfinity,
