@@ -191,11 +191,10 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
     vsync->setState( UserConfigParams::m_vsync );
 
-
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    assert( res != NULL );
-
+    assert(res != NULL);
+    res->registerScrollCallback(onScrollResolutionsList, this);
 
     CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
     assert( full != NULL );
@@ -394,6 +393,14 @@ void OptionsScreenVideo::updateResolutionsList()
             w->setActive(active);
         }
     }
+}
+
+// ----------------------------------------------------------------------------
+
+void OptionsScreenVideo::onScrollResolutionsList(void* data)
+{
+    OptionsScreenVideo* screen = (OptionsScreenVideo*)data;
+    screen->updateResolutionsList();
 }
 
 // ----------------------------------------------------------------------------

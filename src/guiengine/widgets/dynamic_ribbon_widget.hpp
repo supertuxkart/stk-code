@@ -64,6 +64,12 @@ namespace GUIEngine
         unsigned int m_badges;
     };
 
+    struct DynamicRibbonScrollCallback
+    {
+        void* data;
+        void (*callback)(void* data);
+    };
+
     /**
       * \brief An extended version of RibbonWidget, with more capabilities.
       * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
@@ -191,6 +197,7 @@ namespace GUIEngine
         /** Max length of a label, in characters */
         unsigned int m_max_label_length;
 
+        DynamicRibbonScrollCallback m_scroll_callback;
     public:
 
         LEAK_CHECK()
@@ -313,6 +320,12 @@ namespace GUIEngine
 
         /** Set max length of displayed text. */
         void setMaxLabelLength(int length) { m_max_label_length = length; }
+
+        void registerScrollCallback(void (*callback)(void* data), void* data)
+        { 
+            m_scroll_callback.callback = callback; 
+            m_scroll_callback.data = data;
+        }
     };
 
 }

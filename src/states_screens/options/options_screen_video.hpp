@@ -89,8 +89,8 @@ private:
 
     void updateTooltip();
     void updateResolutionsList();
-
     void initPresets();
+    static void onScrollResolutionsList(void* data);
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
 
