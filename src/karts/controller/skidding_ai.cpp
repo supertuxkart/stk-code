@@ -2231,7 +2231,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     {
         if ((nitro_skill < 4) && (item_skill < 5))
             return;
-        // No sle-if because the nitro_skill and item_skill conditions can happen together
+        // No else-if because the nitro_skill and item_skill conditions can happen together
         if (nitro_skill < 4)
             nitro_skill = 0;
         if (item_skill < 5)
@@ -2262,6 +2262,15 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
 
     // If the AI has a lot of nitro, it should consume it without waiting for some fadeout
     bool big_reserve = false;
+
+
+    // If this kart is the last kart, set nitro reserve to be at most 2
+    const unsigned int num_karts = m_world->getCurrentNumKarts();
+    if(nitro_skill >= 2 && m_kart->getPosition()== (int)num_karts &&
+        num_karts > 1 )
+    {
+        energy_reserve = 2;
+    }
 
     // Estimate time towards the end of the race.
     // Decreases the reserve size when there is an estimate of time remaining
@@ -2313,14 +2322,6 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
         {
             energy_reserve = 0;
         }
-    }
-
-    // If this kart is the last kart, set nitro reserve to 2
-    const unsigned int num_karts = m_world->getCurrentNumKarts();
-    if(nitro_skill >= 2 && m_kart->getPosition()== (int)num_karts &&
-        num_karts > 1 )
-    {
-        energy_reserve = 0;
     }
 
     // TODO : if a kart behind and reasonably close goes faster
