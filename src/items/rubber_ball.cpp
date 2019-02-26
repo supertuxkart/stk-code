@@ -70,10 +70,20 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_next_id++;
     m_id = m_next_id;
 
+    m_target = NULL;
+    m_ping_sfx = SFXManager::get()->createSoundSource("ball_bounce");
+    CheckManager::get()->addFlyableToCannons(this);
+}   // RubberBall
+
+// ----------------------------------------------------------------------------
+void RubberBall::onFireFlyable()
+{
+    Flyable::onFireFlyable();
     // Don't let Flyable update the terrain information, since this object
     // has to do it earlier than that.
     setDoTerrainInfo(false);
-    float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
+    float forw_offset =
+        0.5f * m_owner->getKartLength() + m_extend.getZ() * 0.5f + 5.0f;
 
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()), -70.0f,
@@ -84,17 +94,6 @@ RubberBall::RubberBall(AbstractKart *kart)
     setAdjustUpVelocity(false);
     m_max_lifespan       = stk_config->time2Ticks(9999);
     m_target             = NULL;
-    m_ping_sfx           = SFXManager::get()->createSoundSource("ball_bounce");
-    m_owner_init_pos     = m_owner->getXYZ();
-    m_init_pos           = getXYZ();
-    additionalPhysicsProperties();
-    CheckManager::get()->addFlyableToCannons(this);
-}   // RubberBall
-
-// ----------------------------------------------------------------------------
-void RubberBall::additionalPhysicsProperties()
-{
-    setXYZ(m_init_pos);
     m_aiming_at_target   = false;
     m_fast_ping          = false;
     // At the start the ball aims at quads till it gets close enough to the
@@ -102,8 +101,8 @@ void RubberBall::additionalPhysicsProperties()
     m_height_timer       = 0.0f;
     m_interval           = m_st_interval;
     m_current_max_height = m_max_height;
-    // Just init the previoux coordinates with some value that's not getXYZ()
-    m_previous_xyz       = m_owner_init_pos;
+    // Just init the previous coordinates with some value that's not getXYZ()
+    m_previous_xyz       = m_owner->getXYZ();
     m_previous_height    = 2.0f;  //
     // A negative value indicates that the timer is not active
     m_delete_ticks       = -1;
@@ -121,17 +120,15 @@ void RubberBall::additionalPhysicsProperties()
     const Vec3& normal =
         DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
     TerrainInfo::update(getXYZ(), -normal);
-    initializeControlPoints(m_owner_init_pos);
-}   // additionalPhysicsProperties
+    initializeControlPoints(m_owner->getXYZ());
+}   // onFireFlyable
 
 // ----------------------------------------------------------------------------
 /** Destructor, removes any playing sfx.
  */
 RubberBall::~RubberBall()
 {
-    if(m_ping_sfx->getStatus()==SFXBase::SFX_PLAYING)
-        m_ping_sfx->stop();
-    m_ping_sfx->deleteSFX();
+    removePingSFX();
     CheckManager::get()->removeFlyableFromCannons(this);
 }   // ~RubberBall
 
@@ -171,29 +168,6 @@ void RubberBall::setAnimation(AbstractKartAnimation *animation)
     {
         initializeControlPoints(getXYZ());
         m_height_timer = 0;
-        if (RewindManager::get()->useLocalEvent())
-        {
-            std::shared_ptr<RubberBall> rb = getShared<RubberBall>();
-            btTransform cur_trans = getTrans();
-            Vec3 cur_previous_xyz = m_previous_xyz;
-            RewindManager::get()->addRewindInfoEventFunction(new
-            RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
-                /*undo_function*/[rb]()
-                {
-                    rb->m_undo_creation = true;
-                    rb->moveToInfinity();
-                },
-                /*replay_function*/[rb, cur_trans, cur_previous_xyz]()
-                {
-                    rb->m_undo_creation = false;
-                    rb->m_body->setWorldTransform(cur_trans);
-                    rb->m_motion_state->setWorldTransform(cur_trans);
-                    rb->m_body->setInterpolationWorldTransform(cur_trans);
-                    rb->m_previous_xyz = cur_previous_xyz;
-                    rb->initializeControlPoints(cur_trans.getOrigin());
-                    rb->m_height_timer = 0;
-                }));
-        }
     }
     Flyable::setAnimation(animation);
 }   // setAnimation
@@ -405,6 +379,7 @@ bool RubberBall::updateAndDelete(int ticks)
 #ifdef PRINT_BALL_REMOVE_INFO
             Log::debug("[RubberBall]", "ball %d deleted.", m_id);
 #endif
+            removePingSFX();
             return true;
         }
     }
@@ -414,7 +389,10 @@ bool RubberBall::updateAndDelete(int ticks)
         // Flyable will call update() of the animation to 
         // update the ball's position.
         m_previous_xyz = getXYZ();
-        return Flyable::updateAndDelete(ticks);
+        bool can_be_deleted = Flyable::updateAndDelete(ticks);
+        if (can_be_deleted)
+            removePingSFX();
+        return can_be_deleted;
     }
 
     // Update normal from rewind first
@@ -499,13 +477,19 @@ bool RubberBall::updateAndDelete(int ticks)
     m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);
 
-    if(checkTunneling())
+    if (checkTunneling())
+    {
+        removePingSFX();
         return true;
+    }
 
     // Determine new distance along track
     TrackSector::update(next_xyz);
 
-    return Flyable::updateAndDelete(ticks);
+    bool can_be_deleted = Flyable::updateAndDelete(ticks);
+    if (can_be_deleted)
+        removePingSFX();
+    return can_be_deleted;
 }   // updateAndDelete
 
 // ----------------------------------------------------------------------------
@@ -705,7 +689,7 @@ float RubberBall::updateHeight()
     if(m_height_timer>m_interval)
     {
         m_height_timer -= m_interval;
-        if (m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING &&
+        if (m_ping_sfx && m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING &&
             !RewindManager::get()->isRewinding())
         {
             m_ping_sfx->setPosition(getXYZ());
@@ -938,3 +922,14 @@ void RubberBall::restoreState(BareNetworkString *buffer, int count)
     m_aiming_at_target = ((tunnel_and_aiming >> 7) & 1) == 1;
     TrackSector::rewindTo(buffer);
 }   // restoreState
+
+// ----------------------------------------------------------------------------
+void RubberBall::removePingSFX()
+{
+    if (!m_ping_sfx)
+        return;
+    if (m_ping_sfx->getStatus() == SFXBase::SFX_PLAYING)
+        m_ping_sfx->stop();
+    m_ping_sfx->deleteSFX();
+    m_ping_sfx = NULL;
+}   // removePingSFX

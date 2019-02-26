@@ -42,38 +42,55 @@ Plunger::Plunger(AbstractKart *kart)
 {
     m_has_locally_played_sound = false;
     m_moved_to_infinity = false;
+    m_reverse_mode = false;
+    m_rubber_band = NULL;
+}   // Plunger
+
+// ----------------------------------------------------------------------------
+Plunger::~Plunger()
+{
+    if(m_rubber_band)
+        delete m_rubber_band;
+}   // ~Plunger
+
+// ----------------------------------------------------------------------------
+void Plunger::onFireFlyable()
+{
+    Flyable::onFireFlyable();
+    m_has_locally_played_sound = false;
+    m_moved_to_infinity = false;
     const float gravity = 0.0f;
 
     setDoTerrainInfo(false);
 
-    float forward_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getZ();
+    float forward_offset = 0.5f*m_owner->getKartLength()+0.5f*m_extend.getZ();
     float up_velocity = 0.0f;
     float plunger_speed = 2 * m_speed;
 
     // if the kart is looking backwards, release from the back
-    m_reverse_mode = kart->getControls().getLookBack();
+    m_reverse_mode = m_owner->getControls().getLookBack();
 
     // find closest kart in front of the current one
     const AbstractKart *closest_kart=0;
     Vec3        direction;
     float       kart_dist_2;
     getClosestKart(&closest_kart, &kart_dist_2, &direction,
-                   kart /* search in front of this kart */, m_reverse_mode);
+                   m_owner /* search in front of this kart */, m_reverse_mode);
 
-    btTransform kart_transform = kart->getAlignedTransform();
+    btTransform kart_transform = m_owner->getAlignedTransform();
 
-    float heading =kart->getHeading();
-    float pitch  = kart->getTerrainPitch(heading);
+    float heading =m_owner->getHeading();
+    float pitch  = m_owner->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
     if(closest_kart != NULL && kart_dist_2 < 30*30)
     {
         float fire_angle     = 0.0f;
-        getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
+        getLinearKartItemIntersection (m_owner->getXYZ(), closest_kart,
                                        plunger_speed, gravity, forward_offset,
                                        &fire_angle, &up_velocity);
 
-        btTransform trans = kart->getTrans();
+        btTransform trans = m_owner->getTrans();
         btQuaternion q;
         q = trans.getRotation()*(btQuaternion(btVector3(0, 1, 0), fire_angle));
         trans.setRotation(q);
@@ -96,22 +113,22 @@ Plunger::Plunger(AbstractKart *kart)
     //adjust height according to terrain
     setAdjustUpVelocity(false);
 
-    m_rubber_band = NULL;
-    // pulling back makes no sense in battle mode, since this mode is not a race.
-    // so in battle mode, always hide view
-    if (!(m_reverse_mode || race_manager->isBattleMode()))
+    const bool create_rubber_band =
+        !(m_reverse_mode || race_manager->isBattleMode());
+    if (create_rubber_band && !m_rubber_band)
+        m_rubber_band = new RubberBand(this, m_owner);
+    else if (!create_rubber_band && m_rubber_band)
     {
-        m_rubber_band = new RubberBand(this, kart);
-    }
-    additionalPhysicsProperties();
-}   // Plunger
-
-// ----------------------------------------------------------------------------
-Plunger::~Plunger()
-{
-    if(m_rubber_band)
         delete m_rubber_band;
-}   // ~Plunger
+        m_rubber_band = NULL;
+    }
+
+    if (m_rubber_band)
+        m_rubber_band->reset();
+
+    m_keep_alive = -1;
+    m_moved_to_infinity = false;
+}   // onFireFlyable
 
 // ----------------------------------------------------------------------------
 void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
@@ -123,6 +140,13 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 void Plunger::updateGraphics(float dt)
 {
     Flyable::updateGraphics(dt);
+#ifndef SERVER_ONLY
+    scene::ISceneNode *node = getNode();
+    if (node && m_moved_to_infinity)
+        node->setVisible(false);
+    else if (node && !m_moved_to_infinity)
+        node->setVisible(true);
+#endif
     if (m_rubber_band)
         m_rubber_band->updateGraphics(dt);
 }   // updateGraphics
@@ -155,7 +179,6 @@ bool Plunger::updateAndDelete(int ticks)
     return ret;
 
 }   // updateAndDelete
-
 // -----------------------------------------------------------------------------
 /** Virtual function called when the plunger hits something.
  *  The plunger is special in that it is not deleted when hitting an object.
@@ -168,7 +191,7 @@ bool Plunger::updateAndDelete(int ticks)
  */
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
-    if (isOwnerImmunity(kart) || m_moved_to_infinity || m_undo_creation)
+    if (isOwnerImmunity(kart) || m_moved_to_infinity || !m_has_server_state)
         return false;
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
@@ -187,37 +210,17 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         }
 
         m_keep_alive = 0;
-        // Make this object invisible.
-#ifndef SERVER_ONLY
-        getNode()->setVisible(false);
-#endif
         // Previously removeBody will break rewind
-        moveToInfinity();
+        moveToInfinity(false/*set_moveable_trans*/);
         m_moved_to_infinity = true;
     }
     else
     {
-        m_keep_alive = stk_config->time2Ticks(m_owner->getKartProperties()
-                                             ->getPlungerBandDuration()    );
-
-#ifndef SERVER_ONLY
-        // Make this object invisible by placing it faaar down. Not that if
-        // this objects is simply removed from the scene graph, it might be
-        // auto-deleted because the ref count reaches zero.
-        scene::ISceneNode *node = getNode();
-        if(node)
-        {
-            node->setVisible(false);
-        }
-#endif
-        // Previously removeBody will break rewind
-        moveToInfinity();
-        m_moved_to_infinity = true;
-
+        m_keep_alive = (int16_t)stk_config->time2Ticks(m_owner->getKartProperties()
+            ->getPlungerBandDuration());
         if(kart)
         {
             m_rubber_band->hit(kart);
-            return false;
         }
         else if(obj)
         {
@@ -228,6 +231,9 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         {
             m_rubber_band->hit(NULL, &(getXYZ()));
         }
+        // Previously removeBody will break rewind
+        moveToInfinity(false/*set_moveable_trans*/);
+        m_moved_to_infinity = true;
     }
 
     // Rubber band attached.
@@ -240,16 +246,10 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
  */
 void Plunger::hitTrack()
 {
+    if (m_moved_to_infinity || !m_has_server_state)
+        return;
     hit(NULL, NULL);
 }   // hitTrack
-
-// ----------------------------------------------------------------------------
-void Plunger::hideNodeWhenUndoDestruction()
-{
-    Flyable::hideNodeWhenUndoDestruction();
-    if (m_rubber_band)
-        m_rubber_band->remove();
-}   // hideNodeWhenUndoDestruction
 
 // ----------------------------------------------------------------------------
 BareNetworkString* Plunger::saveState(std::vector<std::string>* ru)
@@ -271,7 +271,15 @@ void Plunger::restoreState(BareNetworkString *buffer, int count)
 {
     Flyable::restoreState(buffer, count);
     m_keep_alive = buffer->getUInt16();
-    m_moved_to_infinity = false;
+    // Restore position base on m_keep_alive in Plunger::hit
+    if (m_keep_alive == -1)
+        m_moved_to_infinity = false;
+    else
+    {
+        moveToInfinity(false/*set_moveable_trans*/);
+        m_moved_to_infinity = true;
+    }
+
     uint8_t bit_state = buffer->getUInt8();
     if (bit_state == 255 && m_rubber_band)
     {
@@ -289,3 +297,11 @@ void Plunger::restoreState(BareNetworkString *buffer, int count)
     if (bit_state != 255)
         m_rubber_band->set8BitState(bit_state);
 }   // restoreState
+
+// ----------------------------------------------------------------------------
+void Plunger::onDeleteFlyable()
+{
+    Flyable::onDeleteFlyable();
+    if (m_rubber_band)
+        m_rubber_band->remove();
+}   // onDeleteFlyable

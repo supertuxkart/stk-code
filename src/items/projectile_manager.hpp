@@ -51,8 +51,6 @@ private:
      *  currently moving on the track. */
     std::map<std::string, std::shared_ptr<Flyable> > m_active_projectiles;
 
-    std::unordered_set<std::string> m_deleted_projectiles;
-
     /** All active hit effects, i.e. hit effects which are currently
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
@@ -91,9 +89,6 @@ public:
     // ------------------------------------------------------------------------
     void removeByUID(const std::string& uid)
                                            { m_active_projectiles.erase(uid); }
-    // ------------------------------------------------------------------------
-    void addDeletedUID(const std::string& uid)
-                                         { m_deleted_projectiles.insert(uid); }
 };
 
 extern ProjectileManager *projectile_manager;

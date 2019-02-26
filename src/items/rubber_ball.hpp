@@ -196,9 +196,6 @@ private:
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;
 
-    /* Used by undo and redo the firing when rewind */
-    Vec3 m_owner_init_pos, m_init_pos;
-
     bool m_restoring_state;
 
     void         computeTarget();
@@ -214,7 +211,7 @@ private:
     float        getTunnelHeight(const Vec3 &next_xyz, 
                                      const float vertical_offset) const;
     bool         checkTunneling();
-    virtual void additionalPhysicsProperties() OVERRIDE;
+    void removePingSFX();
 
 public:
                  RubberBall  (AbstractKart* kart);
@@ -233,6 +230,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------
+    virtual void onFireFlyable() OVERRIDE;
 
 };   // RubberBall
 

@@ -33,8 +33,6 @@
 
 Moveable::Moveable()
 {
-    m_body            = 0;
-    m_motion_state    = 0;
     m_node            = NULL;
     m_heading         = 0;
 }   // Moveable

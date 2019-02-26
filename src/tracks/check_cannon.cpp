@@ -32,7 +32,6 @@
 #include "karts/skidding.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "network/rewind_manager.hpp"
 
 /** Constructor for a check cannon.
  *  \param node XML node containing the parameters for this checkline.
@@ -158,8 +157,8 @@ void CheckCannon::update(float dt)
     CheckLine::update(dt);
     for (unsigned int i = 0; i < m_all_flyables.size(); i++)
     {
-        if (m_all_flyables[i]->hasUndoneDestruction() ||
-            RewindManager::get()->isRewinding())
+        if (!m_all_flyables[i]->hasServerState() ||
+            m_all_flyables[i]->hasAnimation())
             continue;
         setIgnoreHeight(true);
         bool triggered = isTriggered(m_flyable_previous_position[i],
@@ -176,6 +175,7 @@ void CheckCannon::update(float dt)
         //m_all_flyables[i]->setAnimation(animation);
     }   // for i in all flyables
 }   // update
+
 // ----------------------------------------------------------------------------
 /** Called when the check line is triggered. This function  creates a cannon
  *  animation object and attaches it to the kart.

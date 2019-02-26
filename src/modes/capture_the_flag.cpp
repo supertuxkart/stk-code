@@ -27,8 +27,6 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "network/rewind_info.hpp"
-#include "network/rewind_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -487,30 +485,6 @@ void CaptureTheFlag::loseFlagForKart(int kart_id)
             m_blue_flag->dropFlagAt(dropped_trans);
         else
             m_blue_flag->resetToBase();
-    }
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
-    {
-        RewindManager::get()->addRewindInfoEventFunction(new
-            RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
-            [](){},
-            /*replay_function*/[dropped_trans, drop_red_flag, succeed, this]()
-            {
-                if (drop_red_flag)
-                {
-                    if (succeed)
-                        m_red_flag->dropFlagAt(dropped_trans);
-                    else
-                        m_red_flag->resetToBase();
-                }
-                else
-                {
-                    if (succeed)
-                        m_blue_flag->dropFlagAt(dropped_trans);
-                    else
-                        m_blue_flag->resetToBase();
-                }
-            }));
     }
 }   // loseFlagForKart
 

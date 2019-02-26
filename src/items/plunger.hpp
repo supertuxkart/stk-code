@@ -48,12 +48,6 @@ private:
 
     bool m_reverse_mode, m_has_locally_played_sound, m_moved_to_infinity;
 
-    virtual void additionalPhysicsProperties() OVERRIDE
-    {
-        m_keep_alive = -1;
-        m_moved_to_infinity = false;
-    }
-    virtual void hideNodeWhenUndoDestruction() OVERRIDE;
 public:
                  Plunger(AbstractKart *kart);
                 ~Plunger();
@@ -77,6 +71,10 @@ public:
         OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void onFireFlyable() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void onDeleteFlyable() OVERRIDE;
 
 };   // Plunger
 

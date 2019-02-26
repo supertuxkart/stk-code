@@ -47,8 +47,6 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 {
     m_hit_kart = NULL;
     m_attached_state = RB_TO_PLUNGER;
-    updatePosition();
-
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics() || !CVS->isGLSL())
     {
@@ -80,6 +78,14 @@ RubberBand::~RubberBand()
 {
     remove();
 }   // RubberBand
+
+// ----------------------------------------------------------------------------
+void RubberBand::reset()
+{
+    m_hit_kart = NULL;
+    m_attached_state = RB_TO_PLUNGER;
+    updatePosition();
+}   // reset
 
 // ----------------------------------------------------------------------------
 /** Updates the position of the rubber band. It especially sets the
