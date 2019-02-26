@@ -98,34 +98,6 @@ void OptionsScreenVideo::initPresets()
     });
 
 }   // initPresets
-// ----------------------------------------------------------------------------
-
-struct Resolution
-{
-    int width, height;
-
-    Resolution()
-    {
-        width = 0;
-        height = 0;
-    }
-
-    Resolution(int w, int h)
-    {
-        width = w;
-        height = h;
-    }
-
-    bool operator< (Resolution r) const
-    {
-        return width < r.width || (width == r.width && height < r.height);
-    }
-
-    float getRatio() const
-    {
-        return (float) width / height;
-    }
-};
 
 // ----------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
@@ -250,7 +222,7 @@ void OptionsScreenVideo::init()
                                                 irr_driver->getVideoModes();
         const int amount = (int)modes.size();
 
-        std::vector<Resolution> resolutions;
+        m_resolutions.clear();
         Resolution r;
 
         bool found_config_res = false;
@@ -265,7 +237,8 @@ void OptionsScreenVideo::init()
         {
             r.width  = modes[n].getWidth();
             r.height = modes[n].getHeight();
-            resolutions.push_back(r);
+            r.fullscreen = true;
+            m_resolutions.push_back(r);
 
             if (r.width  == UserConfigParams::m_width &&
                 r.height == UserConfigParams::m_height)
@@ -287,7 +260,8 @@ void OptionsScreenVideo::init()
         {
             r.width  = UserConfigParams::m_width;
             r.height = UserConfigParams::m_height;
-            resolutions.push_back(r);
+            r.fullscreen = false;
+            m_resolutions.push_back(r);
 
             if (r.width == 1024 && r.height == 768)
             {
@@ -305,23 +279,25 @@ void OptionsScreenVideo::init()
         {
             r.width  = 1024;
             r.height = 768;
-            resolutions.push_back(r);
+            r.fullscreen = false;
+            m_resolutions.push_back(r);
         }
 
         if (!found_1280_720)
         {
             r.width  = 1280;
             r.height = 720;
-            resolutions.push_back(r);
+            r.fullscreen = false;
+            m_resolutions.push_back(r);
         }
 #endif
 
         // Sort resolutions by size
-        std::sort(resolutions.begin(), resolutions.end());
+        std::sort(m_resolutions.begin(), m_resolutions.end());
 
         // Add resolutions list
-        for(std::vector<Resolution>::iterator it = resolutions.begin();
-            it != resolutions.end(); it++)
+        for(std::vector<Resolution>::iterator it = m_resolutions.begin();
+            it != m_resolutions.end(); it++)
         {
             const float ratio = it->getRatio();
             char name[32];
@@ -388,7 +364,37 @@ void OptionsScreenVideo::init()
     rememberWinpos->setVisible(false);
     getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
 #endif
+
+    updateResolutionsList();
+    
 }   // init
+
+// ----------------------------------------------------------------------------
+
+void OptionsScreenVideo::updateResolutionsList()
+{
+    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
+    assert(full != NULL);
+    bool fullscreen_selected = full->getState();
+    
+    for (auto resolution : m_resolutions)
+    {
+        DynamicRibbonWidget* drw = getWidget<DynamicRibbonWidget>("resolutions");
+        assert(drw != NULL);
+        assert(drw->m_rows.size() == 1);
+        
+        char name[128];
+        sprintf(name, "%ix%i", resolution.width, resolution.height);
+        
+        Widget* w = drw->m_rows[0].findWidgetNamed(name);
+        
+        if (w != NULL)
+        {
+            bool active = !fullscreen_selected || resolution.fullscreen;
+            w->setActive(active);
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 
@@ -555,6 +561,13 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         DynamicRibbonWidget* w1=getWidget<DynamicRibbonWidget>("resolutions");
         assert(w1 != NULL);
+        assert(w1->m_rows.size() == 1);
+        
+        int index = w1->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
+        Widget* selected_widget = &w1->m_rows[0].getChildren()[index];
+        
+        if (!selected_widget->isActivated())
+            return;
 
         const std::string& res =
             w1->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -615,6 +628,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
+        
+        updateResolutionsList();
     }
 }   // eventCallback
 
