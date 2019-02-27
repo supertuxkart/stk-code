@@ -229,6 +229,8 @@ public:
     void setStateFrequency(int frequency)    { m_state_frequency = frequency; }
     // ------------------------------------------------------------------------
     int getStateFrequency() const                 { return m_state_frequency; }
+    // ------------------------------------------------------------------------
+    bool roundValuesNow() const;
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

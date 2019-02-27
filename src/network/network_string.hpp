@@ -246,6 +246,17 @@ public:
     }   // addUInt16
 
     // ------------------------------------------------------------------------
+    /** Adds signed 24 bit integer. */
+    BareNetworkString& addInt24(const int value)
+    {
+        uint32_t combined = (uint32_t)value & 16777215;
+        m_buffer.push_back((combined >> 16) & 0xff);
+        m_buffer.push_back((combined >> 8) & 0xff);
+        m_buffer.push_back(combined & 0xff);
+        return *this;
+    }   // addInt24
+
+    // ------------------------------------------------------------------------
     /** Adds unsigned 32 bit integer. */
     BareNetworkString& addUInt32(const uint32_t& value)
     {
@@ -327,6 +338,16 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getUInt32() const { return get<uint32_t, 4>(); }
+    // ------------------------------------------------------------------------
+    /** Returns a signed 24 bit integer. */
+    inline int getInt24() const
+    {
+        uint32_t combined = get<uint32_t, 3>();
+        if (combined & 8388608)
+            return (16777216 - (int)combined) * -1;
+        else
+            return (int)combined;
+    }
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getTime() const { return get<uint32_t, 4>(); }

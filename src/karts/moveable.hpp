@@ -46,8 +46,6 @@ class Moveable: public NoCopy,
 {
 private:
     Vec3                   m_velocityLC;      /**<Velocity in kart coordinates. */
-    /** The bullet transform of this rigid body. */
-    btTransform            m_transform;
     /** The 'real' heading between -180 to 180 degrees. */
     float                  m_heading;
     /** The pitch between -90 and 90 degrees. */
@@ -55,6 +53,8 @@ private:
     /** The roll between -180 and 180 degrees. */
     float                  m_roll;
 protected:
+    /** The bullet transform of this rigid body. */
+    btTransform            m_transform;
     UserPointer            m_user_pointer;
     scene::ISceneNode     *m_node;
     std::unique_ptr<btRigidBody> m_body;

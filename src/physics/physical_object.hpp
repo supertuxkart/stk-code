@@ -188,9 +188,13 @@ private:
     /** Non-null only if the shape is exact */
     TriangleMesh         *m_triangle_mesh;
 
+    /* Last transform and velocities recieved or saved for networking */
     btTransform           m_last_transform;
     Vec3                  m_last_lv;
     Vec3                  m_last_av;
+
+    /* Used to determine if local state should be used, which is true
+     * when the object is not moving */
     bool                  m_no_server_state;
 
 public:

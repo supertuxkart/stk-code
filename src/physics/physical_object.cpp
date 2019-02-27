@@ -20,6 +20,7 @@
 
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -28,9 +29,9 @@
 #include "io/xml_node.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
-#include "network/protocols/lobby_protocol.hpp"
 #include "network/compress_network_body.hpp"
-#include "network/rewind_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
@@ -42,6 +43,7 @@
 #include <ITexture.h>
 using namespace irr;
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -631,8 +633,11 @@ void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
 
-    m_current_transform = m_body->getWorldTransform();
+    // Round down values in network for better synchronization
+    if (NetworkConfig::get()->roundValuesNow())
+        CompressNetworkBody::compress(m_body, m_motion_state);
 
+    m_current_transform = m_body->getWorldTransform();
     const Vec3 &xyz = m_current_transform.getOrigin();
     if(m_reset_when_too_low && xyz.getY()<m_reset_height)
     {
@@ -809,21 +814,28 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
     if (auto sl = LobbyProtocol::get<LobbyProtocol>())
         has_live_join = sl->hasLiveJoiningRecently();
 
+    BareNetworkString* buffer = new BareNetworkString();
+    // This will compress and round down values of body, use the rounded
+    // down value to test if sending state is needed
+    // If any client live-joined always send new state for this object
+    CompressNetworkBody::compress(m_body, m_motion_state, buffer);
     btTransform cur_transform = m_body->getWorldTransform();
+    Vec3 current_lv = m_body->getLinearVelocity();
+    Vec3 current_av = m_body->getAngularVelocity();
+
     if ((cur_transform.getOrigin() - m_last_transform.getOrigin())
         .length() < 0.01f &&
-        (m_body->getLinearVelocity() - m_last_lv).length() < 0.01f &&
-        (m_body->getLinearVelocity() - m_last_av).length() < 0.01f &&
-        !has_live_join)
+        (current_lv - m_last_lv).length() < 0.01f &&
+        (current_av - m_last_av).length() < 0.01f && !has_live_join)
+    {
+        delete buffer;
         return nullptr;
+    }
 
     ru->push_back(getUniqueIdentity());
-    BareNetworkString *buffer = new BareNetworkString();
     m_last_transform = cur_transform;
-    m_last_lv = m_body->getLinearVelocity();
-    m_last_av = m_body->getAngularVelocity();
-    CompressNetworkBody::compress(m_last_transform, m_last_lv, m_last_av,
-        buffer, m_body, m_motion_state);
+    m_last_lv = current_lv;
+    m_last_av = current_av;
     return buffer;
 }   // saveState
 
@@ -831,16 +843,11 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 void PhysicalObject::restoreState(BareNetworkString *buffer, int count)
 {
     m_no_server_state = false;
-    CompressNetworkBody::decompress(buffer, &m_last_transform, &m_last_lv,
-        &m_last_av);
-
-    m_body->setWorldTransform(m_last_transform);
-    m_motion_state->setWorldTransform(m_last_transform);
-    m_body->setInterpolationWorldTransform(m_last_transform);
-    m_body->setLinearVelocity(m_last_lv);
-    m_body->setAngularVelocity(m_last_av);
-    m_body->setInterpolationLinearVelocity(m_last_lv);
-    m_body->setInterpolationAngularVelocity(m_last_av);
+    CompressNetworkBody::decompress(buffer, m_body, m_motion_state);
+    // Save the newly decompressed value for local state restore
+    m_last_transform = m_body->getWorldTransform();
+    m_last_lv = m_body->getLinearVelocity();
+    m_last_av = m_body->getAngularVelocity();
 }   // restoreState
 
 // ----------------------------------------------------------------------------

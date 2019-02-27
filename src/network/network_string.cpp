@@ -37,6 +37,19 @@ void NetworkString::unitTesting()
     s.setSynchronous(false);
     assert(!s.isSynchronous());
 
+    // 24bit saving, min -8388608, max 8388607
+    int min = -8388608;
+    BareNetworkString smin;
+    smin.addInt24(min);
+    min = smin.getInt24();
+    assert(min == -8388608);
+
+    int max = 8388607;
+    BareNetworkString smax;
+    smax.addInt24(max);
+    max = smax.getInt24();
+    assert(max == 8388607);
+
     // Check log message format
     BareNetworkString slog(28);
     for(unsigned int i=0; i<28; i++)

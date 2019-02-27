@@ -41,6 +41,7 @@
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "network/compress_network_body.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
@@ -426,6 +427,10 @@ bool Flyable::updateAndDelete(int ticks)
         return false;
     }   // if animation
 
+    // Round down values in network for better synchronization
+    if (NetworkConfig::get()->roundValuesNow())
+        CompressNetworkBody::compress(m_body.get(), m_motion_state.get());
+
     // 32767 for max m_ticks_since_thrown so the last bit for animation save
     if (m_ticks_since_thrown < 32767)
         m_ticks_since_thrown += ticks;
@@ -654,9 +659,8 @@ BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
         m_animation->saveState(buffer);
     else
     {
-        CompressNetworkBody::compress(m_body->getWorldTransform(),
-            m_body->getLinearVelocity(), m_body->getAngularVelocity(), buffer,
-            m_body.get(), m_motion_state.get());
+        CompressNetworkBody::compress(
+            m_body.get(), m_motion_state.get(), buffer);
     }
     return buffer;
 }   // saveState
@@ -684,14 +688,9 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
             // will set m_animation to null
             delete m_animation;
         }
-        btTransform t;
-        Vec3 lv, av;
-        CompressNetworkBody::decompress(buffer, &t, &lv, &av);
-
-        m_body->setLinearVelocity(lv);
-        m_body->setAngularVelocity(av);
-        m_body->proceedToTransform(t);
-        setTrans(t);
+        CompressNetworkBody::decompress(
+            buffer, m_body.get(), m_motion_state.get());
+        m_transform = m_body->getWorldTransform();
     }
     m_ticks_since_thrown = ticks_since_thrown_animation & 32767;
     m_has_server_state = true;
