@@ -62,6 +62,9 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
+    // Volume of the bounding box (for autoLOD computation)
+    int m_volume;
+
     enum PreviousVisibility
     {
         FIRST_PASS,
