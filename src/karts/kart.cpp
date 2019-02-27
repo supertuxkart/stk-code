@@ -1640,6 +1640,35 @@ void Kart::update(int ticks)
 
     // Update physics from newly updated material
     PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
+    const Material* material = m_terrain_info->getMaterial();
+    // Update gravity of kart first, as updateSliding in updatePhysics needs
+    // the newly set gravity to test for sliding
+    if (!material)   // kart falling off the track
+    {
+        if (!m_flying)
+        {
+            float g = Track::getCurrentTrack()->getGravity();
+            Vec3 gravity(0, -g, 0);
+            btRigidBody *body = getVehicle()->getRigidBody();
+            body->setGravity(gravity);
+        }
+    }
+    else
+    {
+        if (!m_flying)
+        {
+            float g = Track::getCurrentTrack()->getGravity();
+            Vec3 gravity(0.0f, -g, 0.0f);
+            btRigidBody *body = getVehicle()->getRigidBody();
+            // If the material should overwrite the gravity,
+            if (material->hasGravity())
+            {
+                Vec3 normal = m_terrain_info->getNormal();
+                gravity = normal * -g;
+            }
+            body->setGravity(gravity);
+        }   // if !flying
+    }
     updatePhysics(ticks);
     PROFILER_POP_CPU_MARKER();
 
@@ -1697,16 +1726,8 @@ void Kart::update(int ticks)
 #endif
 
     PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
-    const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
-        if (!m_flying)
-        {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0, -g, 0);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            body->setGravity(gravity);
-        }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         Track::getCurrentTrack()->getAABB(&min, &max);
@@ -1720,19 +1741,6 @@ void Kart::update(int ticks)
     }
     else
     {
-        if (!m_flying)
-        {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0.0f, -g, 0.0f);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            // If the material should overwrite the gravity,
-            if (material->hasGravity())
-            {
-                Vec3 normal = m_terrain_info->getNormal();
-                gravity = normal * -g;
-            }
-            body->setGravity(gravity);
-        }   // if !flying
         if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
             new RescueAnimation(this);
