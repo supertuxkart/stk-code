@@ -148,7 +148,11 @@ private:
     /** Number of ranked races done for each current players */
     std::map<uint32_t, unsigned> m_num_ranked_races;
 
+    /* Saved the last game result */
     NetworkString* m_result_ns;
+
+    /* Used to make sure clients are having same item list at start */
+    BareNetworkString* m_items_complete_state;
 
     std::atomic<uint32_t> m_server_id_online;
 
@@ -315,6 +319,7 @@ public:
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
+    void saveInitialItems();
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

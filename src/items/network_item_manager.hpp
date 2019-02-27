@@ -75,10 +75,6 @@ public:
 
     static void create();
     virtual ~NetworkItemManager();
-
-    void sendItemUpdate();
-    void initClientConfirmState();
-
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                          int ticks) OVERRIDE;

@@ -61,6 +61,7 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -2190,12 +2191,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     delete root;
     main_loop->renderGUI(5800);
 
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
-    {
-        static_cast<NetworkItemManager*>(NetworkItemManager::get())
-            ->initClientConfirmState();
-    }
+    if (auto sl = LobbyProtocol::get<ServerLobby>())
+        sl->saveInitialItems();
+
     main_loop->renderGUI(5900);
 
     if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)

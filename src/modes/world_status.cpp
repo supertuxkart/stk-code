@@ -45,6 +45,10 @@ WorldStatus::WorldStatus()
     m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
     m_start_sound       = SFXManager::get()->createSoundSource("start_race");
     m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
+    m_time            = 0.0f;
+    m_time_ticks      = 0;
+    m_auxiliary_ticks = 0;
+    m_count_up_ticks  = 0;
 
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;

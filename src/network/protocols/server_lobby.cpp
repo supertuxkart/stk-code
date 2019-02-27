@@ -137,6 +137,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     }
     m_result_ns = getNetworkString();
     m_result_ns->setSynchronous(true);
+    m_items_complete_state = new BareNetworkString();
     m_waiting_for_reset = false;
     m_server_id_online.store(0);
     m_difficulty.store(ServerConfig::m_server_difficulty);
@@ -155,6 +156,7 @@ ServerLobby::~ServerLobby()
         unregisterServer(true/*now*/);
     }
     delete m_result_ns;
+    delete m_items_complete_state;
     if (m_save_server_config)
         ServerConfig::writeServerConfigToDisk();
     delete m_default_vote;
@@ -3028,7 +3030,9 @@ void ServerLobby::configPeersStartTime()
     uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2500;
     powerup_manager->setRandomSeed(start_time);
     NetworkString* ns = getNetworkString(10);
+    ns->setSynchronous(true);
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
+    *ns += *m_items_complete_state;
     m_client_starting_time = start_time;
     sendMessageToPeers(ns, /*reliable*/true);
 
@@ -3552,3 +3556,14 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
     peer->sendPacket(server_info, /*reliable*/true);
     delete server_info;
 }   // clientSelectingAssetsWantsToBackLobby
+
+//-----------------------------------------------------------------------------
+void ServerLobby::saveInitialItems()
+{
+    m_items_complete_state->getBuffer().clear();
+    m_items_complete_state->reset();
+    NetworkItemManager* nim =
+        dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    assert(nim);
+    nim->saveCompleteState(m_items_complete_state);
+}   // saveInitialItems

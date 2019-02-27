@@ -84,21 +84,6 @@ void NetworkItemManager::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Initialize state at the start of a race.
- */
-void NetworkItemManager::initClientConfirmState()
-{
-    m_confirmed_state_time = 0;
-
-    m_confirmed_state.clear();
-    for(auto i : m_all_items)
-    {
-        ItemState *is = new ItemState(*i);
-        m_confirmed_state.push_back(is);
-    }
-}   // initClientConfirmState
-
-//-----------------------------------------------------------------------------
 /** Called when a kart collects an item. In network games only the server
  *  acts on this event.
  *  \param item The item that was collected.
@@ -557,6 +542,7 @@ void NetworkItemManager::saveCompleteState(BareNetworkString* buffer) const
 
 //-----------------------------------------------------------------------------
 /** Restore all current items at current ticks in client for live join
+ *  or at the start of a race.
  */
 void NetworkItemManager::restoreCompleteState(const BareNetworkString& buffer)
 {

@@ -166,6 +166,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_BAD_CONNECTION:        handleBadConnection();      break;
         case LE_LIVE_JOIN_ACK:        liveJoinAcknowledged(event); break;
         case LE_KART_INFO:             handleKartInfo(event);      break;
+        case LE_START_RACE:            startGame(event);           break;
         default:
             return false;
             break;
@@ -187,7 +188,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
                   message_type);
         switch(message_type)
         {
-            case LE_START_RACE: startGame(event);                        break;
             default:                                                     break;
         }   // switch
 
@@ -853,6 +853,12 @@ void ClientLobby::startGame(Event* event)
     World::getWorld()->setPhase(WorldStatus::SERVER_READY_PHASE);
     uint64_t start_time = event->data().getUInt64();
     powerup_manager->setRandomSeed(start_time);
+
+    NetworkItemManager* nim =
+    dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    assert(nim);
+    nim->restoreCompleteState(event->data());
+
     joinStartGameThread();
     m_start_game_thread = std::thread([start_time, this]()
         {
