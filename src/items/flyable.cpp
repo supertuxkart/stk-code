@@ -50,6 +50,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
+#include <typeinfo>
+
 // static variables:
 float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
 scene::IMesh* Flyable::m_st_model       [PowerupManager::POWERUP_MAX];
@@ -98,6 +100,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     // Smooth network body for flyable doesn't seem to be needed, most of the
     // time it rewinds almost the same
     SmoothNetworkBody::setEnable(false);
+    m_created_ticks = World::getWorld()->getTicksSinceStart();
 }   // Flyable
 
 // ----------------------------------------------------------------------------
@@ -726,8 +729,10 @@ void Flyable::computeError()
         state_ticks > m_last_deleted_ticks))
     {
         const std::string& uid = getUniqueIdentity();
-        Log::debug("Flyable", "Item %s doesn't exist on server, "
-            "remove it.", uid.c_str());
+        Log::debug("Flyable", "Flyable %s by %s created at %d "
+            "doesn't exist on server, remove it.",
+            typeid(*this).name(), StringUtils::wideToUtf8(
+            m_owner->getController()->getName()).c_str(), m_created_ticks);
         projectile_manager->removeByUID(uid);
     }
 }   // computeError

@@ -153,6 +153,8 @@ protected:
      *  that may ticks. */
     int               m_max_lifespan;
 
+    /* For debugging purpose */
+    int               m_created_ticks;
 
     void              getClosestKart(const AbstractKart **minKart,
                                      float *minDistSquared,
@@ -265,7 +267,8 @@ public:
     virtual void onFireFlyable();
     // ------------------------------------------------------------------------
     virtual void onDeleteFlyable();
-
+    // ------------------------------------------------------------------------
+    void setCreatedTicks(int ticks)                { m_created_ticks = ticks; }
 };   // Flyable
 
 #endif

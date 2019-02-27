@@ -27,6 +27,19 @@
 
 class BareNetworkString;
 
+enum RewinderName : char
+{
+    RN_ITEM_MANAGER = 0x01,
+    RN_KART = 0x02,
+    RN_RED_FLAG = 0x03,
+    RN_BLUE_FLAG = 0x04,
+    RN_CAKE = 0x05,
+    RN_BOWLING = 0x06,
+    RN_PLUNGER = 0x07,
+    RN_RUBBERBALL = 0x08,
+    RN_PHYSICAL_OBJ = 0x09
+};
+
 class Rewinder : public std::enable_shared_from_this<Rewinder>
 {
 protected:
@@ -37,10 +50,10 @@ private:
      *     uid. (see RewindInfoState::restore)
      *  2. Determine the order of restoring state for each rewinder, this is
      *     used as a key in std::string, Rewinder map, which is less than.
-     *     So uid of "I" (item manager) is restored before "Kx" (which kart
-     *     id x) and TR / TB (the red / blue flag) is restored after karts,
-     *     because the restoreState in CTFFlag read kart transformation.
-     *  Otherwise it can be named whatever. */
+     *     So uid of "0x01" (item manager) is restored before "0x02, x" (which
+     *     kart id x) and 0x03 / 0x04 (the red / blue flag) is restored after
+     *     karts, because the restoreState in CTFFlag read kart transformation.
+    */
     std::string m_unique_identity;
 
 public:

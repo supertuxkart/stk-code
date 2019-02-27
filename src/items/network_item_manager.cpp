@@ -47,7 +47,7 @@ void NetworkItemManager::create()
  *  "I" which is less than "Kx" (kart rewinder with id x)
  */
 NetworkItemManager::NetworkItemManager()
-                  : Rewinder("I"), ItemManager()
+                  : Rewinder({RN_ITEM_MANAGER}), ItemManager()
 {
     m_confirmed_switch_ticks = -1;
     m_last_confirmed_item_ticks.clear();

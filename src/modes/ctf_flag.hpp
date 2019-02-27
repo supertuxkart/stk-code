@@ -64,10 +64,12 @@ private:
 public:
     // ------------------------------------------------------------------------
     CTFFlag(FlagColor fc, const btTransform& base_trans)
-        : Rewinder(fc == FC_RED ? "TR" : "TB"), m_flag_base_trans(base_trans)
+        : Rewinder(fc == FC_RED ?
+          std::string{RN_RED_FLAG} : std::string{RN_BLUE_FLAG}),
+          m_flag_base_trans(base_trans)
     {
-        // UID rewinder with "T" which is after "Kx" for kart so
-        // updateFlagTrans is called after kart is rewound
+        // updateFlagTrans is called after kart is rewound, see rewinder name
+        // defined in rewinder header
         m_flag_status = IN_BASE;
         m_flag_trans.setOrigin(Vec3(0.0f));
         m_flag_trans.setRotation(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));

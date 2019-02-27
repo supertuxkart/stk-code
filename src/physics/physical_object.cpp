@@ -786,8 +786,13 @@ void PhysicalObject::addForRewind()
     SmoothNetworkBody::setEnable(true);
     SmoothNetworkBody::setSmoothRotation(false);
     SmoothNetworkBody::setAdjustVerticalOffset(false);
-    Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
-        (Track::getCurrentTrack()->getPhysicalObjectUID()));
+    Rewinder::setUniqueIdentity(
+        {
+            RN_PHYSICAL_OBJ,
+            // We have max moveable physical object defined in stk_config,
+            // which is 15 at the moment
+            static_cast<char>(Track::getCurrentTrack()->getPhysicalObjectUID())
+        });
     Rewinder::rewinderAdd();
 }   // addForRewind
 
