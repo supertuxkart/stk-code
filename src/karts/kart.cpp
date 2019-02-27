@@ -1142,8 +1142,8 @@ void Kart::collectedItem(ItemState *item_state)
              item_state->getPreviousOwner()->getIdent() == "nolok");
 
         // slow down
-        m_bubblegum_ticks =
-            stk_config->time2Ticks(m_kart_properties->getBubblegumDuration());
+        m_bubblegum_ticks = (int16_t)stk_config->time2Ticks(
+            m_kart_properties->getBubblegumDuration());
         m_bubblegum_torque =
             ((World::getWorld()->getTicksSinceStart() / 10) % 2 == 0) ?
             m_kart_properties->getBubblegumTorque() :

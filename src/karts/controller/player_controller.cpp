@@ -375,7 +375,7 @@ void PlayerController::saveState(BareNetworkString *buffer) const
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    buffer->addUInt32(m_steer_val).addUInt16(m_prev_accel)
+    buffer->addInt24(m_steer_val).addUInt16(m_prev_accel)
         .addUInt8((m_prev_brake ? 1 : 0) | (m_prev_nitro ? 2 : 0));
 }   // copyToBuffer
 
@@ -384,7 +384,7 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    m_steer_val  = buffer->getUInt32();
+    m_steer_val  = buffer->getInt24();
     m_prev_accel = buffer->getUInt16();
     uint8_t c = buffer->getUInt8();
     m_prev_brake = (c & 1) != 0;

@@ -157,18 +157,35 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
 
-    // 1) Firing and related handling
-    // -----------
-    buffer->addUInt16(m_bubblegum_ticks);
-    bool plunger_on = m_view_blocked_by_plunger != 0;
-    // m_invulnerable_ticks will not be negative
-    bool has_animation = m_kart_animation != NULL;
-    uint16_t fire_and_invulnerable = (m_fire_clicked ? 1 << 15 : 0) |
-        (has_animation ? 1 << 14 : 0) | (plunger_on ? 1 << 13 : 0) |
-        m_invulnerable_ticks;
-    buffer->addUInt16(fire_and_invulnerable);
-    if (plunger_on)
+    // 1) Boolean handling to determine if need saving
+    const bool has_animation = m_kart_animation != NULL;
+    uint8_t bool_for_each_data = 0;
+    if (m_fire_clicked)
+        bool_for_each_data |= 1;
+    if (m_bubblegum_ticks > 0)
+        bool_for_each_data |= (1 << 1);
+    if (m_view_blocked_by_plunger > 0)
+        bool_for_each_data |= (1 << 2);
+    if (m_invulnerable_ticks > 0)
+        bool_for_each_data |= (1 << 3);
+    if (getEnergy() > 0.0f)
+        bool_for_each_data |= (1 << 4);
+    if (has_animation)
+        bool_for_each_data |= (1 << 5);
+    if (m_vehicle->getTimedRotationTicks() > 0)
+        bool_for_each_data |= (1 << 6);
+    if (m_vehicle->getCentralImpulseTicks() > 0)
+        bool_for_each_data |= (1 << 7);
+    buffer->addUInt8(bool_for_each_data);
+
+    if (m_bubblegum_ticks > 0)
+        buffer->addUInt16(m_bubblegum_ticks);
+    if (m_view_blocked_by_plunger > 0)
         buffer->addUInt16(m_view_blocked_by_plunger);
+    if (m_invulnerable_ticks > 0)
+        buffer->addUInt16(m_invulnerable_ticks);
+    if (getEnergy() > 0.0f)
+        buffer->addFloat(getEnergy());
 
     // 2) Kart animation status or physics values (transform and velocities)
     // -------------------------------------------
@@ -186,13 +203,19 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         buffer->add(q);
         buffer->add(body->getLinearVelocity());
         buffer->add(body->getAngularVelocity());
-        buffer->addUInt16(m_vehicle->getTimedRotationTicks());
-        buffer->addFloat(m_vehicle->getTimedRotation());
+        if (m_vehicle->getTimedRotationTicks() > 0)
+        {
+            buffer->addUInt16(m_vehicle->getTimedRotationTicks());
+            buffer->addFloat(m_vehicle->getTimedRotation());
+        }
 
         // For collision rewind
         buffer->addUInt16(m_bounce_back_ticks);
-        buffer->addUInt16(m_vehicle->getCentralImpulseTicks());
-        buffer->add(m_vehicle->getAdditionalImpulse());
+        if (m_vehicle->getCentralImpulseTicks() > 0)
+        {
+            buffer->addUInt16(m_vehicle->getCentralImpulseTicks());
+            buffer->add(m_vehicle->getAdditionalImpulse());
+        }
     }
 
     // 3) Steering and other player controls
@@ -204,7 +227,6 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     // -----------------------------
     getAttachment()->saveState(buffer);
     getPowerup()->saveState(buffer);
-    buffer->addFloat(getEnergy());
 
     // 5) Max speed info
     // ------------------
@@ -227,19 +249,40 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 {
     m_has_server_state = true;
 
-    // 1) Firing and related handling
+    // 1) Boolean handling to determine if need saving
     // -----------
-    m_bubblegum_ticks = buffer->getUInt16();
-    uint16_t fire_and_invulnerable = buffer->getUInt16();
-    m_fire_clicked = ((fire_and_invulnerable >> 15) & 1) == 1;
-    bool has_animation_in_state = ((fire_and_invulnerable >> 14) & 1) == 1;
-    bool has_plunger = ((fire_and_invulnerable >> 13) & 1) == 1;
-    if (has_plunger)
+    uint8_t bool_for_each_data = buffer->getUInt8();
+    m_fire_clicked = (bool_for_each_data & 1) == 1;
+    bool read_bubblegum = ((bool_for_each_data >> 1) & 1) == 1;
+    bool read_plunger = ((bool_for_each_data >> 2) & 1) == 1;
+    bool read_invulnerable = ((bool_for_each_data >> 3) & 1) == 1;
+    bool read_energy =  ((bool_for_each_data >> 4) & 1) == 1;
+    bool has_animation_in_state = ((bool_for_each_data >> 5) & 1) == 1;
+    bool read_timed_rotation =  ((bool_for_each_data >> 6) & 1) == 1;
+    bool read_impulse = ((bool_for_each_data >> 7) & 1) == 1;
+
+    if (read_bubblegum)
+        m_bubblegum_ticks = buffer->getUInt16();
+    else
+        m_bubblegum_ticks = 0;
+
+    if (read_plunger)
         m_view_blocked_by_plunger = buffer->getUInt16();
     else
         m_view_blocked_by_plunger = 0;
 
-    m_invulnerable_ticks = fire_and_invulnerable & ~(1 << 13);
+    if (read_invulnerable)
+        m_invulnerable_ticks = buffer->getUInt16();
+    else
+        m_invulnerable_ticks = 0;
+
+    if (read_energy)
+    {
+        float nitro = buffer->getFloat();
+        setEnergy(nitro);
+    }
+    else
+        setEnergy(0.0f);
 
     // 2) Kart animation status or transform and velocities
     // -----------
@@ -294,18 +337,28 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         // before Moveable::update() is called (which updates the transform)
         setTrans(kart_trans);
 
-        uint16_t time_rot = buffer->getUInt16();
-        float timed_rotation_y = buffer->getFloat();
-        // Set timed rotation divides by time_rot
-        m_vehicle->setTimedRotation(time_rot,
-            stk_config->ticks2Time(time_rot) * timed_rotation_y);
+        if (read_timed_rotation)
+        {
+            uint16_t time_rot = buffer->getUInt16();
+            float timed_rotation_y = buffer->getFloat();
+            // Set timed rotation divides by time_rot
+            m_vehicle->setTimedRotation(time_rot,
+                stk_config->ticks2Time(time_rot) * timed_rotation_y);
+        }
+        else
+            m_vehicle->setTimedRotation(0, 0.0f);
 
         // Collision rewind
         m_bounce_back_ticks = buffer->getUInt16();
-        uint16_t central_impulse_ticks = buffer->getUInt16();
-        Vec3 additional_impulse = buffer->getVec3();
-        m_vehicle->setTimedCentralImpulse(central_impulse_ticks,
-            additional_impulse, true/*rewind*/);
+        if (read_impulse)
+        {
+            uint16_t central_impulse_ticks = buffer->getUInt16();
+            Vec3 additional_impulse = buffer->getVec3();
+            m_vehicle->setTimedCentralImpulse(central_impulse_ticks,
+                additional_impulse, true/*rewind*/);
+        }
+        else
+            m_vehicle->setTimedCentralImpulse(0, Vec3(0.0f), true/*rewind*/);
 
         // For the raycast to determine the current material under the kart
         // the m_hardPointWS of the wheels is used. So after a rewind we
@@ -327,8 +380,6 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     updateWeight();
 
     getPowerup()->rewindTo(buffer);
-    float nitro = buffer->getFloat();
-    setEnergy(nitro);
 
     // 5) Max speed info
     // ------------------

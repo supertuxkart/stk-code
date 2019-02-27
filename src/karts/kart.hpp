@@ -494,10 +494,9 @@ public:
     /** Makes a kart invulnerable for a certain amount of time. */
     virtual void setInvulnerableTicks(int ticks) OVERRIDE
     {
-        // The last 3 bits are saving fire clicked, kart animation status and
-        // plunger state for rewind
-        if (ticks > 8191)
-            ticks = 8191;
+        // int16_t max
+        if (ticks > 32767)
+            ticks = 32767;
         m_invulnerable_ticks = ticks;
     }   // setInvulnerableTicks
     // ------------------------------------------------------------------------
