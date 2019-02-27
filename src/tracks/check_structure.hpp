@@ -59,13 +59,14 @@ public:
      *  CANNON:   Causes the kart to be shot to a specified point.
      *  GOAL:     Causes a point to be scored when a soccer ball crosses its line
      *  AMBIENT_SPHERE: Modifies the ambient color.
+     *  TRIGGER:  Run custom trigger function
      *  A combination of an activate and new_lap line are used to
      *  avoid shortcuts: a new_lap line is deactivated after crossing it, and
      *  you have to cross a corresponding activate structure to re-activate it,
      *  enabling you to count the lap again.
      */
     enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
-                    CT_GOAL, CT_AMBIENT_SPHERE};
+                    CT_GOAL, CT_AMBIENT_SPHERE, CT_TRIGGER};
 
 protected:
     /** Stores the previous position of all karts. This is needed to detect
@@ -82,6 +83,9 @@ protected:
      *  debugging (use --check-debug option). */
     unsigned int      m_index;
 
+    /** For CheckTrigger or CheckCylinder */
+    CheckStructure(unsigned index) : m_active_at_reset(true), m_index(index),
+        m_check_type(CT_TRIGGER) {}
 private:
     /** The type of this checkline. */
     CheckType         m_check_type;

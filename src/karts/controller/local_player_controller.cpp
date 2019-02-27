@@ -398,9 +398,6 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
             //See Kart::collectedItem()
             m_kart->playSound(m_ugh_sound);
             break;
-        case Item::ITEM_TRIGGER:
-            // no default sound for triggers
-            break;
         default:
             m_kart->playSound(m_grab_sound);
             break;

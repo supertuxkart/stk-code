@@ -86,7 +86,6 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
     item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
     item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
-    item_names[ItemState::ITEM_TRIGGER    ] = "trigger";
     item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
     item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
 
@@ -352,23 +351,6 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     }
     return item;
 }   // placeItem
-
-//-----------------------------------------------------------------------------
-/** Creates a new trigger item. This is not synched between client and 
- *  server, since the triggers are created at startup only and should
- *  therefore always be in sync.
- *  \param xyz  Position of the item.
- *  \param listener The listener object that gets called when a kart
- *         triggers this trigger.
- */
-Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
-                                TriggerItemListener* listener)
-{
-    Item* item = new Item(xyz, distance, listener);
-    insertItem(item);
-
-    return item;
-}   // placeTrigger
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.

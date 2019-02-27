@@ -999,8 +999,6 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
             break;
         case Item::ITEM_BONUS_BOX:
             break;
-        case Item::ITEM_TRIGGER: return; break;
-
         default: assert(false); break;
     }    // switch
 

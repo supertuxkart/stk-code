@@ -195,13 +195,10 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            const AbstractKart *owner)
     : ItemState(type, owner)
 {
-    assert(type != ITEM_TRIGGER); // use other constructor for that
-
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
     m_graphical_type    = getGrahpicalType();
-    m_listener          = NULL;
 
     LODNode* lodnode =
         new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
@@ -237,23 +234,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
-
-//-----------------------------------------------------------------------------
-
-/** \brief Constructor to create a trigger item.
-  * Trigger items are invisible and can be used to trigger a behavior when
-  * approaching a point.
-  */
-Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
-    : ItemState(ITEM_TRIGGER)
-{
-    m_distance_2        = distance*distance;
-    initItem(ITEM_TRIGGER, xyz, /*normal not required*/Vec3(0,1,0));
-    m_graphical_type    = ITEM_TRIGGER;
-    m_node              = NULL;
-    m_listener          = trigger;
-    m_was_available_previously = true;
-}   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
 /** Initialises the item. Note that m_distance_2 must be defined before calling

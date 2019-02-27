@@ -211,8 +211,8 @@
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
              Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
-                    easter egg, trigger-->
-  <switch time="5"  items="1 0 4 4 2 2 6 7"/>
+                    easter egg-->
+  <switch time="5"  items="1 0 4 4 2 2 6"/>
 
   <!-- disappear-counter: How often bubblegum gets driven over before it disappears.
        shield-time: How long the bubblegum shield lasts

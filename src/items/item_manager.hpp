@@ -137,8 +137,6 @@ public:
                                     const AbstractKart* parent,
                                     const Vec3 *server_xyz = NULL,
                                     const Vec3 *normal = NULL);
-    virtual Item* placeTrigger     (const Vec3& xyz, float distance,
-                                    TriggerItemListener* listener);
     void           update          (int ticks);
     void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);
