@@ -23,6 +23,7 @@
 #include "utils/vec3.hpp"
 
 #include "LinearMath/btTransform.h"
+#include <cstring>
 
 enum FlagColor : unsigned int
 {
@@ -58,6 +59,8 @@ private:
 
     FlagColor m_flag_color;
 
+    /* Set by dropFlagAt to pre-compressed the dropped flag transformation. */
+    int m_off_base_compressed[4];
 public:
     // ------------------------------------------------------------------------
     CTFFlag(FlagColor fc, const btTransform& base_trans)
@@ -70,6 +73,7 @@ public:
         m_flag_trans.setRotation(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
         m_flag_color = fc;
         m_ticks_since_off_base = 0;
+        memset(m_off_base_compressed, 0, 16);
     }
     // ------------------------------------------------------------------------
     virtual void saveTransform() {}
@@ -116,12 +120,7 @@ public:
         updateFlagTrans();
     }
     // ------------------------------------------------------------------------
-    void dropFlagAt(const btTransform& t)
-    {
-        m_flag_status = OFF_BASE;
-        m_ticks_since_off_base = 0;
-        m_flag_trans = t;
-    }
+    void dropFlagAt(const btTransform& t);
     // ------------------------------------------------------------------------
     bool isInBase() const                  { return m_flag_status == IN_BASE; }
     // ------------------------------------------------------------------------

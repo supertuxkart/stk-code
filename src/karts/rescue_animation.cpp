@@ -26,6 +26,7 @@
 #include "modes/follow_the_leader.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_string.hpp"
+#include "utils/mini_glm.hpp"
 
 #include "ISceneNode.h"
 
@@ -46,9 +47,10 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
     World::getWorld()->moveKartAfterRescue(kart);
 
     btTransform rescue_transform = kart->getTrans();
+    MiniGLM::compressbtTransform(rescue_transform,
+        m_rescue_transform_compressed);
     kart->getBody()->setCenterOfMassTransform(prev_trans);
     kart->setTrans(prev_trans);
-    m_created_transform = prev_trans;
 
     // Determine maximum rescue height with up-raycast
     float max_height = m_kart->getKartProperties()->getRescueHeight();
@@ -59,7 +61,7 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
     float timer = m_kart->getKartProperties()->getRescueDuration();
     float velocity = max_height / timer;
 
-    init(rescue_transform, velocity, up_vector);
+    init(rescue_transform, velocity);
     m_kart->getAttachment()->clear();
 
     // Add a hit unless it was auto-rescue
@@ -103,12 +105,14 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, BareNetworkString* b)
 //-----------------------------------------------------------------------------
 void RescueAnimation::restoreData(BareNetworkString* b)
 {
-    btTransform rescue_transform;
-    rescue_transform.setOrigin(b->getVec3());
-    rescue_transform.setRotation(b->getQuat());
+    m_rescue_transform_compressed[0] = b->getInt24();
+    m_rescue_transform_compressed[1] = b->getInt24();
+    m_rescue_transform_compressed[2] = b->getInt24();
+    m_rescue_transform_compressed[3] = b->getUInt32();
+    btTransform rescue_transform =
+        MiniGLM::decompressbtTransform(m_rescue_transform_compressed);
     float velocity = b->getFloat();
-    Vec3 up_vector = b->getVec3();
-    init(rescue_transform, velocity, up_vector);
+    init(rescue_transform, velocity);
 }   // restoreData
 
 //-----------------------------------------------------------------------------
@@ -117,14 +121,13 @@ void RescueAnimation::restoreData(BareNetworkString* b)
  * time.
  */
 void RescueAnimation::init(const btTransform& rescue_transform,
-                           float velocity, const Vec3& up_vector)
+                           float velocity)
 {
     m_rescue_transform = rescue_transform;
     float timer = m_kart->getKartProperties()->getRescueDuration();
     m_end_ticks = m_created_ticks + stk_config->time2Ticks(timer);
     m_rescue_moment = m_created_ticks + stk_config->time2Ticks(timer * 0.4f);
     m_velocity = velocity;
-    m_up_vector = up_vector;
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -152,7 +155,7 @@ void RescueAnimation::update(int ticks)
         float dur = stk_config->ticks2Time(m_end_ticks - m_rescue_moment -
             (World::getWorld()->getTicksSinceStart() - m_rescue_moment));
         Vec3 xyz = m_rescue_transform.getOrigin() +
-            dur * m_velocity * m_up_vector;
+            dur * m_velocity * m_rescue_transform.getBasis().getColumn(1);
         m_kart->setXYZ(xyz);
         m_kart->setRotation(m_rescue_transform.getRotation());
     }
@@ -161,7 +164,7 @@ void RescueAnimation::update(int ticks)
         float dur = stk_config->ticks2Time(
             World::getWorld()->getTicksSinceStart() - m_created_ticks);
         Vec3 xyz = m_created_transform.getOrigin() +
-            dur * m_velocity * m_up_vector;
+            dur * m_velocity * m_created_transform.getBasis().getColumn(1);
         m_kart->setXYZ(xyz);
         m_kart->setRotation(m_created_transform.getRotation());
     }
@@ -191,10 +194,11 @@ void RescueAnimation::updateGraphics(float dt)
 void RescueAnimation::saveState(BareNetworkString* buffer)
 {
     AbstractKartAnimation::saveState(buffer);
-    buffer->add(m_rescue_transform.getOrigin());
-    btQuaternion q = m_rescue_transform.getRotation();
-    buffer->add(q);
-    buffer->addFloat(m_velocity).add(m_up_vector);
+    buffer->addInt24(m_rescue_transform_compressed[0])
+        .addInt24(m_rescue_transform_compressed[1])
+        .addInt24(m_rescue_transform_compressed[2])
+        .addUInt32(m_rescue_transform_compressed[3]);
+    buffer->addFloat(m_velocity);
 }   // saveState
 
 // ----------------------------------------------------------------------------

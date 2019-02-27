@@ -29,6 +29,7 @@
 #include "network/network_string.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_manager.hpp"
+#include "utils/mini_glm.hpp"
 
 #include "LinearMath/btTransform.h"
 
@@ -75,6 +76,8 @@ CannonAnimation::CannonAnimation(Flyable* flyable, CheckCannon* cc)
 {
     m_flyable = flyable;
     m_created_transform = m_flyable->getTrans();
+    MiniGLM::compressbtTransform(m_created_transform,
+        m_created_transform_compressed);
     m_check_cannon = cc;
     init(cc->getIpo()->clone(), cc->getLeftPoint(), cc->getRightPoint(),
         cc->getTargetLeft(), cc->getTargetRight(), /*skid_rot*/0);

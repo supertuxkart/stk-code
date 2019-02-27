@@ -30,17 +30,15 @@ const Vec3 g_kart_flag_offset(0.0, 0.2f, -0.5f);
 // ============================================================================
 BareNetworkString* CTFFlag::saveState(std::vector<std::string>* ru)
 {
-    using namespace MiniGLM;
     ru->push_back(getUniqueIdentity());
     BareNetworkString* buffer = new BareNetworkString();
     buffer->addUInt8(m_flag_status);
     if (m_flag_status == OFF_BASE)
     {
-        Vec3 normal = quatRotate(m_flag_trans.getRotation(),
-            Vec3(0.0f, 1.0f, 0.0f));
-        buffer->add(m_flag_trans.getOrigin());
-        buffer->addUInt32(
-            compressVector3(Vec3(normal.normalize()).toIrrVector()));
+        buffer->addInt24(m_off_base_compressed[0])
+            .addInt24(m_off_base_compressed[1])
+            .addInt24(m_off_base_compressed[2])
+            .addUInt32(m_off_base_compressed[3]);
         buffer->addUInt16(m_ticks_since_off_base);
     }
     return buffer;
@@ -53,12 +51,11 @@ void CTFFlag::restoreState(BareNetworkString* buffer, int count)
     m_flag_status = buffer->getUInt8();
     if (m_flag_status == OFF_BASE)
     {
-        Vec3 origin = buffer->getVec3();
-        uint32_t normal_packed = buffer->getUInt32();
-        Vec3 normal = decompressVector3(normal_packed);
-        m_flag_trans.setOrigin(origin);
-        m_flag_trans.setRotation(
-            shortestArcQuat(Vec3(0.0f, 1.0f, 0.0f), normal));
+        m_off_base_compressed[0] = buffer->getInt24();
+        m_off_base_compressed[1] = buffer->getInt24();
+        m_off_base_compressed[2] = buffer->getInt24();
+        m_off_base_compressed[3] = buffer->getUInt32();
+        m_flag_trans = decompressbtTransform(m_off_base_compressed);
         m_ticks_since_off_base = buffer->getUInt16();
     }
     updateFlagTrans(m_flag_trans);
@@ -120,3 +117,13 @@ void CTFFlag::updateFlagGraphics(irr::scene::IAnimatedMeshSceneNode* flag_node)
         flag_node->setAnimationSpeed(25.0f);
     }
 }   // updateFlagPosition
+
+// ----------------------------------------------------------------------------
+void CTFFlag::dropFlagAt(const btTransform& t)
+{
+    m_flag_status = OFF_BASE;
+    m_ticks_since_off_base = 0;
+    m_flag_trans = t;
+    using namespace MiniGLM;
+    compressbtTransform(m_flag_trans, m_off_base_compressed);
+}    // updateFlagPosition

@@ -58,6 +58,9 @@ friend class KartRewinder;
     /** Used for reset kart back to flag base in CTF. */
     btTransform m_reset_trans;
 
+    /* Compressed values for server to send to avoid compressing everytime. */
+    int m_reset_trans_compressed[4];
+
     bool m_direct_hit;
 
     // ------------------------------------------------------------------------

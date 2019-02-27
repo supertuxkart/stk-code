@@ -29,6 +29,7 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
+#include "utils/mini_glm.hpp"
 
 #include <limits>
 
@@ -72,6 +73,8 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart* kart,
             kart->setSquash(0.0f, 0.0f);
         }
     }
+    MiniGLM::compressbtTransform(m_created_transform,
+        m_created_transform_compressed);
 }   // AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
@@ -179,9 +182,10 @@ float AbstractKartAnimation::getMaximumHeight(const Vec3& up_vector,
 void AbstractKartAnimation::saveState(BareNetworkString* buffer)
 {
     buffer->addUInt32(m_created_ticks);
-    buffer->add(m_created_transform.getOrigin());
-    btQuaternion q = m_created_transform.getRotation();
-    buffer->add(q);
+    buffer->addInt24(m_created_transform_compressed[0])
+        .addInt24(m_created_transform_compressed[1])
+        .addInt24(m_created_transform_compressed[2])
+        .addUInt32(m_created_transform_compressed[3]);
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -190,6 +194,10 @@ void AbstractKartAnimation::saveState(BareNetworkString* buffer)
 void AbstractKartAnimation::restoreBasicState(BareNetworkString* buffer)
 {
     m_created_ticks = buffer->getUInt32();
-    m_created_transform.setOrigin(buffer->getVec3());
-    m_created_transform.setRotation(buffer->getQuat());
+    m_created_transform_compressed[0] = buffer->getInt24();
+    m_created_transform_compressed[1] = buffer->getInt24();
+    m_created_transform_compressed[2] = buffer->getInt24();
+    m_created_transform_compressed[3] = buffer->getUInt32();
+    m_created_transform =
+        MiniGLM::decompressbtTransform(m_created_transform_compressed);
 }   // restoreBasicState

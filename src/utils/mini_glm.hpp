@@ -19,6 +19,7 @@
 #define HEADER_MINI_GLM_HPP
 
 #include "LinearMath/btQuaternion.h"
+#include "LinearMath/btTransform.h"
 #include "utils/vec3.hpp"
 
 #include <algorithm>
@@ -28,6 +29,8 @@
 #include <cstdint>
 #include <quaternion.h>
 #include <vector3d.h>
+
+#include "irrMath.h"
 
 using namespace irr;
 
@@ -564,6 +567,42 @@ namespace MiniGLM
         // Assume bitangent sign is positive 1.0f
         return compressVector3(tangent) | 1 << 30;
     }   // quickTangent
+    // ------------------------------------------------------------------------
+    inline void compressbtTransform(btTransform& cur_t,
+                                    int* compressed_data = NULL)
+    {
+        int x = (int)(cur_t.getOrigin().x() * 1000.0f);
+        int y = (int)(cur_t.getOrigin().y() * 1000.0f);
+        int z = (int)(cur_t.getOrigin().z() * 1000.0f);
+        x = core::clamp(x, -8388608, 8388607);
+        y = core::clamp(y, -8388608, 8388607);
+        z = core::clamp(z, -8388608, 8388607);
+        uint32_t compressed_q = compressQuaternion(cur_t.getRotation());
+        cur_t.setOrigin(btVector3(
+            (float)x / 1000.0f,
+            (float)y / 1000.0f,
+            (float)z / 1000.0f));
+        cur_t.setRotation(decompressbtQuaternion(compressed_q));
+        if (compressed_data)
+        {
+            compressed_data[0] = x;
+            compressed_data[1] = y;
+            compressed_data[2] = z;
+            compressed_data[3] = (int)compressed_q;
+        }
+    }   // compressbtTransform
+    // ------------------------------------------------------------------------
+    inline btTransform decompressbtTransform(int* compressed_data)
+    {
+        btTransform trans;
+        trans.setOrigin(btVector3(
+            (float)compressed_data[0] / 1000.0f,
+            (float)compressed_data[1] / 1000.0f,
+            (float)compressed_data[2] / 1000.0f));
+        trans.setRotation(decompressbtQuaternion(
+            (uint32_t)compressed_data[3]));
+        return trans;
+    }   // decompressbtTransform
     // ------------------------------------------------------------------------
     void unitTesting();
 }

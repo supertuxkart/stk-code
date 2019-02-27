@@ -27,6 +27,9 @@
 #include "network/network_string.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/mini_glm.hpp"
+
+#include <cstring>
 
 /** A static create function that does only create an explosion if
  *  the explosion happens to be close enough to affect the kart.
@@ -82,6 +85,8 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, bool direct_hit)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
+    memset(m_reset_trans_compressed, 0, 16);
+    Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
     // Put the kart back to its own flag base like rescue if direct hit in CTF
     bool reset = race_manager->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit;
@@ -92,11 +97,13 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, bool direct_hit)
         btTransform reset_trans = m_kart->getTrans();
         m_kart->getBody()->setCenterOfMassTransform(prev_trans);
         m_kart->setTrans(prev_trans);
-        init(direct_hit, m_kart->getNormal(), reset_trans);
+        MiniGLM::compressbtTransform(reset_trans,
+            m_reset_trans_compressed);
+        init(direct_hit, normal, reset_trans);
     }
     else
     {
-        init(direct_hit, m_kart->getNormal(),
+        init(direct_hit, normal,
              btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f)));
     }
 
@@ -121,15 +128,19 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, BareNetworkString* b)
 void ExplosionAnimation::restoreData(BareNetworkString* b)
 {
     bool direct_hit = b->getUInt8() == 1;
-    Vec3 normal = b->getVec3();
+    Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
     btTransform reset_transform =
         btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
     if (race_manager->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
     {
-        reset_transform.setOrigin(b->getVec3());
-        reset_transform.setRotation(b->getQuat());
+        m_reset_trans_compressed[0] = b->getInt24();
+        m_reset_trans_compressed[1] = b->getInt24();
+        m_reset_trans_compressed[2] = b->getInt24();
+        m_reset_trans_compressed[3] = b->getUInt32();
+        reset_transform =
+            MiniGLM::decompressbtTransform(m_reset_trans_compressed);
     }
     init(direct_hit, normal, reset_transform);
 }   // restoreData
@@ -288,13 +299,14 @@ bool ExplosionAnimation::hasResetAlready() const
 void ExplosionAnimation::saveState(BareNetworkString* buffer)
 {
     AbstractKartAnimation::saveState(buffer);
-    buffer->addUInt8(m_direct_hit ? 1 : 0).add(m_normal);
+    buffer->addUInt8(m_direct_hit ? 1 : 0);
     if (race_manager->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
     {
-        buffer->add(m_reset_trans.getOrigin());
-        btQuaternion q = m_reset_trans.getRotation();
-        buffer->add(q);
+        buffer->addInt24(m_reset_trans_compressed[0])
+            .addInt24(m_reset_trans_compressed[1])
+            .addInt24(m_reset_trans_compressed[2])
+            .addUInt32(m_reset_trans_compressed[3]);
     }
 }   // saveState
 

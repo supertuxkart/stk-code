@@ -32,9 +32,6 @@ class RescueAnimation: public AbstractKartAnimation
 {
 protected:
 friend class KartRewinder;
-    /** Column 1 of btTransform of kart. */
-    Vec3 m_up_vector;
-
     /** The velocity with which the kart is moved. */
     float m_velocity;
 
@@ -48,13 +45,15 @@ friend class KartRewinder;
     /* Final transformation to place kart. */
     btTransform m_rescue_transform;
 
+    /* Compressed values for server to send to avoid compressing everytime. */
+    int m_rescue_transform_compressed[4];
+
     // ------------------------------------------------------------------------
     RescueAnimation(AbstractKart* kart, BareNetworkString* b);
     // ------------------------------------------------------------------------
     void restoreData(BareNetworkString* b);
     // ------------------------------------------------------------------------
-    void init(const btTransform& rescue_transform, float velocity,
-              const Vec3& up_vector);
+    void init(const btTransform& rescue_transform, float velocity);
 public:
                  RescueAnimation(AbstractKart* kart,
                                  bool is_auto_rescue = false);

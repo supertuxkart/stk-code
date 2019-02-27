@@ -67,6 +67,9 @@ protected:
      *  to recreate the animation with the same one. */
     btTransform m_created_transform;
 
+    /* Compressed values for server to send to avoid compressing everytime. */
+    int m_created_transform_compressed[4];
+
     void resetPowerUp();
     // ------------------------------------------------------------------------
     void restoreBasicState(BareNetworkString* buffer);
