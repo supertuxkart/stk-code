@@ -70,8 +70,8 @@ private:
     class SpeedIncrease
     {
     public:
-        /** The maximum additional speed allowed. */
-        float m_max_add_speed;
+        /** The maximum additional speed allowed, 3 digits precision. */
+        uint16_t m_max_add_speed;
         /** How long this speed will apply. This is used as a timer internally,
          *  to the duration will be decreased. When the duration is <0, the
          *  fade out time starts, and duration will go down to
@@ -79,11 +79,10 @@ private:
         int16_t m_duration;
         /** The fadeout time. */
         int16_t m_fade_out_time;
-        /** The current max speed increase value. */
+        /** The current max speed increase value, updated with duration. */
         float m_current_speedup;
-        /** Additional engine force. */
-        float m_engine_force;
-
+        /** Additional engine force, 1 digit precision. */
+        uint16_t m_engine_force;
         /** The constructor initialised the values with a no-increase
          *  entry, i.e. an entry that does affect top speed at all. */
         SpeedIncrease()
@@ -117,7 +116,7 @@ private:
         /** Returns the additional engine force for this speed increase. */
         float getEngineForce() const
         {
-            return m_duration > 0 ? m_engine_force : 0;
+            return m_duration > 0 ? (float)m_engine_force / 10.0f : 0;
         }   // getEngineForce
         // --------------------------------------------------------------------
         /** Returns if this speed increase is active atm. */
@@ -129,8 +128,8 @@ private:
     class SpeedDecrease
     {
     public:
-        /** The maximum slowdown to apply. */
-        float m_max_speed_fraction;
+        /** The maximum slowdown to apply, 3 digits precision. */
+        uint16_t m_max_speed_fraction;
         /** The current slowdown fraction, taking the fade-in time
          *  into account. */
         float m_current_fraction;
@@ -138,7 +137,7 @@ private:
         /** How long it should take for the full slowdown to take effect. */
         int16_t m_fade_in_ticks;
 
-        /** How long the effect should last. A -1.0f as value indicates
+        /** How long the effect should last. A -1 as value indicates
          *  that this effect stays active till it is changed back. */
         int16_t m_duration;
 
@@ -152,7 +151,7 @@ private:
         /** Resets the state to be inactive. */
         void reset()
         {
-            m_max_speed_fraction = 1.0f;
+            m_max_speed_fraction = 1000;
             m_current_fraction   = 1.0f;
             m_fade_in_ticks      = 0;
             m_duration           = 0;

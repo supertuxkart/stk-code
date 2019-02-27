@@ -377,7 +377,7 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     // Max speed local state (terrain)
     float current_fraction = m_max_speed->m_speed_decrease
         [MaxSpeed::MS_DECREASE_TERRAIN].m_current_fraction;
-    float max_speed_fraction = m_max_speed->m_speed_decrease
+    uint16_t max_speed_fraction = m_max_speed->m_speed_decrease
         [MaxSpeed::MS_DECREASE_TERRAIN].m_max_speed_fraction;
 
     // Skidding local state
