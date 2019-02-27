@@ -997,9 +997,9 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         Vec3 normals[3];
 
 #ifndef SERVER_ONLY
-        if (CVS->isGLSL())
+        SP::SPMeshBuffer* spmb = dynamic_cast<SP::SPMeshBuffer*>(mb);
+        if (spmb)
         {
-            SP::SPMeshBuffer* spmb = static_cast<SP::SPMeshBuffer*>(mb);
             video::S3DVertexSkinnedMesh* mbVertices = (video::S3DVertexSkinnedMesh*)mb->getVertices();
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
@@ -2143,6 +2143,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 #endif
     main_loop->renderGUI(5500);
+
+    // Join all static physics only object to main track if possible
+    // Take the visibility condition by scripting into account
+    for (auto* to : m_track_object_manager->getObjects().m_contents_vector)
+    {
+        if (to->joinToMainTrack())
+            m_track_object_manager->removeDriveableObject(to);
+    }
 
     createPhysicsModel(main_track_count);
     main_loop->renderGUI(5600);

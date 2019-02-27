@@ -286,6 +286,8 @@ public:
     virtual void restoreState(BareNetworkString *buffer, int count);
     virtual void undoState(BareNetworkString *buffer) {}
     virtual std::function<void()> getLocalStateRestoreFunction();
+    bool hasTriangleMesh() const { return m_triangle_mesh != NULL; }
+    void joinToMainTrack();
     LEAK_CHECK()
 };  // PhysicalObject
 

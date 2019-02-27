@@ -873,3 +873,136 @@ std::function<void()> PhysicalObject::getLocalStateRestoreFunction()
         }
     };
 }   // getLocalStateRestoreFunction
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::joinToMainTrack()
+{
+    auto sm = irr_driver->getSceneManager();
+    auto gc = sm->getGeometryCreator();
+    scene::IMeshManipulator* mani =
+        irr_driver->getVideoDriver()->getMeshManipulator();
+
+    if (m_body_type == MP_EXACT)
+    {
+        TrackObjectPresentationSceneNode* presentation =
+            m_object->getPresentation<TrackObjectPresentationSceneNode>();
+        assert(presentation);
+        Track::getCurrentTrack()->convertTrackToBullet(presentation->getNode());
+    }
+    else if (m_body_type == MP_CYLINDER_X || m_body_type == MP_CYLINDER_Y ||
+        m_body_type == MP_CYLINDER_Z)
+    {
+        btCylinderShape* cylinder = dynamic_cast<btCylinderShape*>(m_shape);
+        assert(cylinder);
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+
+        int up_axis = cylinder->getUpAxis();
+        scene::IMesh* mesh =
+            gc->createCylinderMesh(cylinder->getRadius(),
+            cylinder->getHalfExtentsWithMargin()[up_axis] * 2.0f,
+            std::max((int)(cylinder->getRadius() / 2.0f), 4));
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+        Vec3 offset;
+        offset.setY(-cylinder->getHalfExtentsWithMargin()[up_axis]);
+        translate.setTranslation(offset.toIrrVector());
+        mani->transform(mesh, translate);
+
+        core::matrix4 adjust_axis(core::matrix4::EM4CONST_IDENTITY);
+        if (m_body_type == MP_CYLINDER_X)
+            adjust_axis.setRotationDegrees(core::vector3df(0, 0, -90));
+        else if (m_body_type == MP_CYLINDER_Z)
+            adjust_axis.setRotationDegrees(core::vector3df(90, 0, 0));
+        mani->transform(mesh, adjust_axis);
+
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+    else if (m_body_type == MP_CONE_X || m_body_type == MP_CONE_Y ||
+        m_body_type == MP_CONE_Z)
+    {
+        btConeShape* cone = dynamic_cast<btConeShape*>(m_shape);
+        assert(cone);
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+
+        scene::IMesh* mesh =
+            gc->createConeMesh(cone->getRadius(),
+            cone->getHeight(),
+            std::max((int)(cone->getRadius() / 2.0f), 4));
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+        Vec3 offset;
+        offset.setY(cone->getHeight() * -0.5f);
+        translate.setTranslation(offset.toIrrVector());
+        mani->transform(mesh, translate);
+
+        core::matrix4 adjust_axis(core::matrix4::EM4CONST_IDENTITY);
+        if (m_body_type == MP_CONE_X)
+            adjust_axis.setRotationDegrees(core::vector3df(0, 0, -90));
+        else if (m_body_type == MP_CONE_Z)
+            adjust_axis.setRotationDegrees(core::vector3df(90, 0, 0));
+        mani->transform(mesh, adjust_axis);
+
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+    else if (m_body_type == MP_SPHERE)
+    {
+        btSphereShape* sphere = dynamic_cast<btSphereShape*>(m_shape);
+        assert(sphere);
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+
+        scene::IMesh* mesh =
+            gc->createSphereMesh(sphere->getRadius(),
+            std::max((int)(sphere->getRadius() / 2.0f), 4),
+            std::max((int)(sphere->getRadius() / 2.0f), 4));
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+    else if (m_body_type == MP_BOX)
+    {
+        btBoxShape* box = dynamic_cast<btBoxShape*>(m_shape);
+        assert(box);
+        scene::IMesh* mesh =
+            gc->createCubeMesh(
+            Vec3(box->getHalfExtentsWithMargin() * 2.0f).toIrrVector());
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+
+}   // joinToMainTrack

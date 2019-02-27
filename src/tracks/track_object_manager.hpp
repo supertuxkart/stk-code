@@ -71,7 +71,7 @@ public:
     void insertObject(TrackObject* object);
 
     void removeObject(TrackObject* who);
-
+    void removeDriveableObject(TrackObject* obj) { m_driveable_objects.remove(obj); }
     TrackObject* getTrackObject(const std::string& libraryInstance, const std::string& name);
 
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }

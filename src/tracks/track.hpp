@@ -394,7 +394,6 @@ private:
     void loadDriveGraph(unsigned int mode_id, const bool reverse);
     void loadArenaGraph(const XMLNode &node);
     btQuaternion getArenaStartRotation(const Vec3& xyz, float heading);
-    void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void loadMinimap();
     void createWater(const XMLNode &node);
@@ -695,6 +694,8 @@ public:
     const btTransform& getBlueFlag() const              { return m_blue_flag; }
     // ------------------------------------------------------------------------
     bool isAddon() const                                 { return m_is_addon; }
+    // ------------------------------------------------------------------------
+    void convertTrackToBullet(scene::ISceneNode *node);
 };   // class Track
 
 #endif
