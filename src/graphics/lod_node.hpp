@@ -63,7 +63,7 @@ private:
     int m_forced_lod;
 
     // Volume of the bounding box (for autoLOD computation)
-    int m_volume;
+    float m_volume;
 
     enum PreviousVisibility
     {
@@ -106,6 +106,11 @@ public:
       * \param reparent If true, node will be removed from its current parent first
       */
     void add(int level, scene::ISceneNode* node, bool reparent);
+
+    /**
+      * This method can be used to automatically compute LoD level
+      */
+    void autoComputeLevel();
 
     void forceLevelOfDetail(int n);
 

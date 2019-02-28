@@ -250,31 +250,39 @@ void LODNode::OnRegisterSceneNode()
     scene::ISceneNode::OnRegisterSceneNode();
 }
 
-void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
+void LODNode::autoComputeLevel()
 {
-    // Dynamic auto computation of LoD level
-    printf("Autocomputation of LoD level: >%s<\n ---- \n", node->getName());
 
-    Box = node->getBoundingBox();
-    float volume = Box.getVolume();
+    // This will be set based on the amount of objects in a scene.
+    float agressivity = 1.0;
+
+    // First we try to estimate how far away we need to draw
     float max_draw = 0.0;
-
-    if (volume < 2.0)
+    if (m_volume < 2.0)
     {
-        max_draw = (volume * 1.3) + 50.0;
+        max_draw = (m_volume * 1.3) + 50.0;
     }
     else
     {
-        max_draw = (volume * 0.05) + 100;
+        max_draw = (m_volume * 0.05) + 100;        
     }
+    max_draw *= agressivity;
 
-    int level2 = (int) max_draw * (m_detail.size() + 1) * 0.3;
-    
-    
-    printf("Volume: %f\n", max_draw);
-    printf("Level: %d\n", level);
+    int step = (int) max_draw / m_detail.size();
 
-    printf("Level2: %d\n", level2);
+    // Then we recompute the level of detail culling distance
+    int cursor = 0;
+    while(cursor < m_detail.size())
+    {
+        m_detail[cursor] = step * step * (cursor + 1); 
+        cursor++;
+    }
+}
+
+void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
+{
+    Box = node->getBoundingBox();
+    m_volume = Box.getVolume();
 
     // samuncle suggested to put a slight randomisation in LOD
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
@@ -282,7 +290,7 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     // and the location is disapparition needs to be deterministic
     if (m_detail.size() > 0)
     {
-        assert(m_detail.back()<level2*level2);
+        assert(m_detail.back()<level*level);
         m_detail[m_detail.size() - 1] += (int)(((rand()%1000)-500)/500.0f*(m_detail[m_detail.size() - 1]*0.2f));
     }
 
@@ -291,7 +299,7 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     node->grab();
     node->remove();
     node->setPosition(core::vector3df(0,0,0));
-    m_detail.push_back(level2*level2);
+    m_detail.push_back(level*level);
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
     node->setParent(this);

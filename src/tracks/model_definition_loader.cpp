@@ -142,6 +142,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
         }
+        lod_node->autoComputeLevel();
 
 #ifdef DEBUG
         std::string debug_name = groupname+" (LOD track-object)";
