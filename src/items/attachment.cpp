@@ -37,7 +37,6 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
-#include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -57,7 +56,7 @@ Attachment::Attachment(AbstractKart* kart)
     m_bubble_explode_sound = NULL;
     m_node_scale           = std::numeric_limits<float>::max();
     m_initial_speed        = 0.0f;
-
+    m_graphical_type       = ATTACH_NOTHING;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     if (kart->isGhostKart())
@@ -364,11 +363,6 @@ void Attachment::hitBanana(ItemState *item_state)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion",
-                                      "explosion_bomb.xml"          );
-        if(m_kart->getController()->isLocalPlayerController())
-            he->setLocalPlayerKartHit();
-        projectile_manager->addHitEffect(he);
         if (m_kart->getKartAnimation() == NULL)
             ExplosionAnimation::create(m_kart);
         clear();
@@ -595,11 +589,6 @@ void Attachment::update(int ticks)
         }
         if (m_ticks_left <= 0)
         {
-            HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion",
-                "explosion_bomb.xml");
-            if (m_kart->getController()->isLocalPlayerController())
-                he->setLocalPlayerKartHit();
-            projectile_manager->addHitEffect(he);
             if (m_kart->getKartAnimation() == NULL)
                 ExplosionAnimation::create(m_kart);
         }
@@ -609,15 +598,6 @@ void Attachment::update(int ticks)
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
         if (m_ticks_left <= 0)
         {
-            if (!RewindManager::get()->isRewinding())
-            {
-                if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
-                m_bubble_explode_sound =
-                    SFXManager::get()->createSoundSource("bubblegum_explode");
-                m_bubble_explode_sound->setPosition(m_kart->getXYZ());
-                m_bubble_explode_sound->play();
-            }
-
             if (!m_kart->isGhostKart())
                 ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
@@ -650,6 +630,35 @@ void Attachment::updateGraphics(float dt)
     else
     {
         m_node_scale = std::numeric_limits<float>::max();
+    }
+
+    // Add the suitable graphical effects if different attachment is set
+    if (m_type != m_graphical_type)
+    {
+        if (m_type == ATTACH_NOTHING)
+        {
+            if (m_graphical_type == ATTACH_BOMB)
+            {
+                // Cleared a bomb
+                HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion",
+                    "explosion_bomb.xml");
+                if (m_kart->getController()->isLocalPlayerController())
+                    he->setLocalPlayerKartHit();
+                projectile_manager->addHitEffect(he);
+            }
+            else if (m_graphical_type == ATTACH_BUBBLEGUM_SHIELD ||
+                m_graphical_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+            {
+                // Dropped a bubblegum
+                if (m_bubble_explode_sound)
+                    m_bubble_explode_sound->deleteSFX();
+                m_bubble_explode_sound =
+                    SFXManager::get()->createSoundSource("bubblegum_explode");
+                m_bubble_explode_sound->setPosition(m_kart->getXYZ());
+                m_bubble_explode_sound->play();
+            }
+        }
+        m_graphical_type = m_type;
     }
 
     switch (m_type)

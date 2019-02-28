@@ -75,6 +75,9 @@ private:
     /** Attachment type. */
     AttachmentType  m_type;
 
+    /** Graphical Attachment type (comparing in updateGraphics). */
+    AttachmentType m_graphical_type;
+
     /** Kart the attachment is attached to. */
     AbstractKart   *m_kart;
 
