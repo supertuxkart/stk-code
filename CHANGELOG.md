@@ -20,7 +20,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Race gameplay and physics
 * New game mode Capture the Flag by Benau (online multiplayer only)
-* New game mode Free for All by Benau (online multiplayer only)
+* New game mode Free for All by Benau
+* Free for All available in offline mode with AI, by Mrxx99
 * Revised kart characteristics for better balance between light, medium and heavy karts by Alayan
 * Better random item distribution for various numbers of karts by Alayan and hiker
 * Fix position interpolation causing some incorrect lapline validation by Auria
@@ -54,7 +55,11 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Android
 * Gyroscope support by Pelya
-* Numerous improvements to input on Android, especially screen keyboard, by deveee
+* Numerous improvements to input on Android, including screen keyboard, keyboard, gamepads, by deveee
+* Android TV support
+* Improved UI and font scaling by deveee
+* More compact APK thanks to png optimization, allows to have several tracks more than the 0.9.3 APK, by deveee and Alayan
+* Wayland support and many other smaller improvements and fixes
 
 ### User Interface
 * New networking user interface by Benau and hiker
@@ -67,19 +72,20 @@ For similar reasons, and because some features are vastly more complex than othe
 * Improved help menu with lateral tabs and a lot more information by Alayan
 * Improved option menu with lateral tabs by Alayan
 * Many improvements to the ghost replay selection list (give access to egg hunt replays, kart icon shown in the list, replay's game version shown, hide player number column by default) and dialog (allow replay comparison, show track picture, show information about the selected replays) by Alayan
-* Other significant enhancements (detailed progress of multi-goal achievements, reset password button, clearer checkbox status, milliseconds displayed in time-trials and egg hunts, nitro efficiency in the kart selection screen, better track info screen, better warnings when trying to do an online action with internet access disabled, control configurations can be disabled without being deleted...)
+* Other significant enhancements (detailed progress of multi-goal achievements, reset password button, clearer checkbox status, milliseconds displayed in time-trials and egg hunts, nitro efficiency in the kart selection screen, better track info screen, better warnings when trying to do an online action with internet access disabled, control configurations can be disabled without being deleted, default resolutions can't be used in fullscreen if unsupported by the monitor...)
 * Many bugfixes and small enhancements mostly by deveee and Alayan
 
 ### Tracks and modeling
 #### Tracks
+* Ravenbridge Mansion by samuncle, replacing Black Hill Mansion
 * Las Dunas Soccer by samuncle
 * Candela City arena by Benau based on samuncle's track
-* Unwanted shortcuts and exploits fixed by Auria in many tracks :
-    * Around the Lighthouse, Fort Magma Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
+* Unwanted shortcuts and exploits found by several players and fixed by Auria in many tracks :
+    * Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
 * Item positions improvement by Alayan and theThomasPat :
-    * Northern Resort, Zen Garden, Volcano Island, Minigolf, Around the Lighthouse
+    * Around the Lighthouse, Black Forest, Candela City, Hacienda, Minigolf, Northern Resort, Oliver's Math Class, STK Enterprise, Old Mine, Volcano Island, Zen Garden
 #### Karts
 * New version of Beastie by Jymis
 
