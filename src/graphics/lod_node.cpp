@@ -175,6 +175,15 @@ void LODNode::updateVisibility()
             if (i == m_current_level || i == m_previous_level)
             {
                 m_nodes[i]->setVisible(true);
+                float size = m_timer / 20.f;
+                if (i == m_current_level)
+                {
+                    m_nodes[i]->setScale( core::vector3df(size, size, size) );
+                }
+                else
+                {
+                    m_nodes[i]->setScale( core::vector3df(-size, -size, -size) );
+                }
             }
             else
             {
@@ -200,13 +209,6 @@ void LODNode::updateVisibility()
     }
 
     //const u32 now = irr_driver->getDevice()->getTimer()->getTime();
-
-    /*
-    for (size_t i = 0; i < m_nodes.size(); i++)
-    {
-        //printf("Level:  %d %d\n", level, now);
-        m_nodes[i]->setVisible(i == m_current_level);
-    }*/
 }
 
 void LODNode::OnRegisterSceneNode()
@@ -266,7 +268,7 @@ void LODNode::autoComputeLevel()
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
     Box = node->getBoundingBox();
-    m_volume = Box.getVolume();
+    m_volume = Box.getArea();
     printf("Area %f\n", Box.getArea());
     printf("Volume %f\n", Box.getVolume());
 
