@@ -84,6 +84,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_do_terrain_info              = true;
     m_deleted_once                 = false;
     m_max_lifespan                 = -1;
+    m_compressed_gravity_vector    = 0;
     // It will be reset for each state restore
     m_has_server_state = true;
     m_last_deleted_ticks = -1;
@@ -154,6 +155,11 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     Physics::getInstance()->addBody(getBody());
 
     m_body->setGravity(gravity);
+    if (gravity.length() != 0.0f && m_do_terrain_info)
+    {
+        m_compressed_gravity_vector = MiniGLM::compressVector3(
+            Vec3(m_body->getGravity().normalized()).toIrrVector());
+    }
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;
@@ -430,10 +436,6 @@ bool Flyable::updateAndDelete(int ticks)
         return false;
     }   // if animation
 
-    // Round down values in network for better synchronization
-    if (NetworkConfig::get()->roundValuesNow())
-        CompressNetworkBody::compress(m_body.get(), m_motion_state.get());
-
     // 32767 for max m_ticks_since_thrown so the last bit for animation save
     if (m_ticks_since_thrown < 32767)
         m_ticks_since_thrown += ticks;
@@ -441,6 +443,12 @@ bool Flyable::updateAndDelete(int ticks)
         hit(NULL);
 
     if(m_has_hit_something) return true;
+
+    // Round down values in network for better synchronization
+    if (NetworkConfig::get()->roundValuesNow())
+        CompressNetworkBody::compress(m_body.get(), m_motion_state.get());
+    // Save the compressed values if done in client
+    Moveable::update(ticks);
 
     //Vec3 xyz=getBody()->getWorldTransform().getOrigin();
     const Vec3 &xyz=getXYZ();
@@ -469,8 +477,7 @@ bool Flyable::updateAndDelete(int ticks)
 
     if (m_do_terrain_info)
     {
-        Vec3 towards = getBody()->getGravity();
-        towards.normalize();
+        Vec3 towards = MiniGLM::decompressVector3(m_compressed_gravity_vector);
         // Add the position offset so that the flyable can adjust its position
         // (usually to do the raycast from a slightly higher position to avoid
         // problems finding the terrain in steep uphill sections).
@@ -488,6 +495,8 @@ bool Flyable::updateAndDelete(int ticks)
         {
             getBody()->setGravity(Vec3(0, 1, 0) * -70.0f);
         }
+        m_compressed_gravity_vector = MiniGLM::compressVector3(
+            Vec3(m_body->getGravity().normalized()).toIrrVector());
     }
 
     if(m_adjust_up_velocity)
@@ -514,9 +523,6 @@ bool Flyable::updateAndDelete(int ticks)
         v.setY(vel_up);
         setVelocity(v);
     }   // if m_adjust_up_velocity
-
-    Moveable::update(ticks);
-
     return false;
 }   // updateAndDelete
 
@@ -657,6 +663,8 @@ BareNetworkString* Flyable::saveState(std::vector<std::string>* ru)
     uint16_t ticks_since_thrown_animation = (m_ticks_since_thrown & 32767) |
         (hasAnimation() ? 32768 : 0);
     buffer->addUInt16(ticks_since_thrown_animation);
+    if (m_do_terrain_info)
+        buffer->addUInt32(m_compressed_gravity_vector);
 
     if (hasAnimation())
         m_animation->saveState(buffer);
@@ -674,6 +682,8 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
     uint16_t ticks_since_thrown_animation = buffer->getUInt16();
     bool has_animation_in_state =
         (ticks_since_thrown_animation >> 15 & 1) == 1;
+    if (m_do_terrain_info)
+        m_compressed_gravity_vector = buffer->getUInt32();
 
     if (has_animation_in_state)
     {

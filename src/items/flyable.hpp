@@ -68,6 +68,9 @@ private:
      *  set this to false with a call do setDoTerrainInfo(). */
     bool              m_do_terrain_info;
 
+    /* Used in network to restore previous gravity in compressed form. */
+    uint32_t          m_compressed_gravity_vector;
+
     /** If the flyable is in a cannon, this is the pointer to the cannon
      *  animation. NULL otherwise. */
     AbstractKartAnimation *m_animation;
