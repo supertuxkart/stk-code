@@ -65,14 +65,15 @@ private:
     // Volume of the bounding box (for autoLOD computation)
     float m_volume;
 
-    enum PreviousVisibility
-    {
-        FIRST_PASS,
-        WAS_SHOWN,
-        WAS_HIDDEN
-    };
+    // Previous level for the smooth transitions
+    int m_previous_level;
+    int m_current_level;
 
-    PreviousVisibility m_previous_visibility;
+    int m_timer;
+
+    bool is_in_transition;
+
+
 
     u32 m_last_tick;
 
@@ -86,7 +87,7 @@ public:
 
     int getLevel();
 
-    void updateVisibility(bool* shown = NULL);
+    void updateVisibility();
 
     /*
     //! Returns a reference to the current relative transformation matrix.

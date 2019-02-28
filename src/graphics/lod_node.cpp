@@ -40,8 +40,6 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_group_name = group_name;
 
-    m_previous_visibility = FIRST_PASS;
-
     // At this stage refcount is two: one because of the object being
     // created, and once because it is a child of the parent. Drop once,
     // so that only the reference from the parent is active, causing this
@@ -50,6 +48,17 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_forced_lod = -1;
     m_last_tick = 0;
+    m_volume = 0;
+
+    m_previous_level = 0;
+    m_current_level  = 0;
+
+    m_timer = 0;
+
+    is_in_transition = false;
+
+    //m_node_to_fade_out = 0;
+    //m_node_to_fade_in = 0;
 }
 
 LODNode::~LODNode()
@@ -144,24 +153,64 @@ void LODNode::OnAnimate(u32 timeMs)
     }
 }
 
-void LODNode::updateVisibility(bool* shown)
+void LODNode::updateVisibility()
 {
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
     unsigned int level = getLevel();
+
+    if (m_previous_level != level && !is_in_transition)
+    {
+        m_current_level = level;
+        is_in_transition = true;
+        m_timer = 0;
+    }
+
+    if (is_in_transition)
+    {
+        // Initially we display the previous and the current one
+        for (size_t i = 0; i < m_nodes.size(); i++)
+        {
+            if (i == m_current_level || i == m_previous_level)
+            {
+                m_nodes[i]->setVisible(true);
+            }
+            else
+            {
+                m_nodes[i]->setVisible(false);
+            }
+        }
+
+        // We reset counting
+        if (m_timer > 20)
+        {
+            is_in_transition = false;
+            m_previous_level = m_current_level;
+        }
+        m_timer ++;
+    }
+    else
+    {
+        // General case everything is hidden except the current one
+        for (size_t i = 0; i < m_nodes.size(); i++)
+        {
+            m_nodes[i]->setVisible(i == m_current_level);
+        }
+    }
+
+    //const u32 now = irr_driver->getDevice()->getTimer()->getTime();
+
+    /*
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
-        m_nodes[i]->setVisible(i == level);
-        if (i == level && shown != NULL)
-            *shown = (i > 0);
-    }
+        //printf("Level:  %d %d\n", level, now);
+        m_nodes[i]->setVisible(i == m_current_level);
+    }*/
 }
 
 void LODNode::OnRegisterSceneNode()
 {
-    bool shown = false;
-    updateVisibility(&shown);
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -173,69 +222,7 @@ void LODNode::OnRegisterSceneNode()
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();
 
     // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
-    if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
-                                m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
-        now > m_last_tick)
-    {
-        if (m_previous_visibility == WAS_HIDDEN && shown)
-        {
-            scene::IMesh* mesh;
-
-            if (m_nodes[0]->getType() == scene::ESNT_MESH)
-            {
-                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
-                mesh = node->getMesh();
-            }
-            else
-            {
-                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
-                scene::IAnimatedMeshSceneNode* node =
-                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
-                assert(node != NULL);
-                mesh = node->getMesh();
-            }
-        }
-        else if (m_previous_visibility == WAS_SHOWN && !shown)
-        {
-            scene::IMesh* mesh;
-
-            if (m_nodes[0]->getType() == scene::ESNT_MESH)
-            {
-                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
-                mesh = node->getMesh();
-            }
-            else
-            {
-                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
-                scene::IAnimatedMeshSceneNode* node =
-                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
-                assert(node != NULL);
-                mesh = node->getMesh();
-            }
-
-        }
-        else if (m_previous_visibility == FIRST_PASS && !shown)
-        {
-            scene::IMesh* mesh;
-
-            if (m_nodes[0]->getType() == scene::ESNT_MESH)
-            {
-                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
-                mesh = node->getMesh();
-            }
-            else
-            {
-                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
-                scene::IAnimatedMeshSceneNode* node =
-                (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
-                assert(node != NULL);
-                mesh = node->getMesh();
-            }
-        }
-    }
-
-    m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
-    m_last_tick = now;
+    
 #ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
@@ -280,6 +267,8 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
     Box = node->getBoundingBox();
     m_volume = Box.getVolume();
+    printf("Area %f\n", Box.getArea());
+    printf("Volume %f\n", Box.getVolume());
 
     // samuncle suggested to put a slight randomisation in LOD
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
