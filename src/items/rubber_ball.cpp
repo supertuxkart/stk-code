@@ -395,6 +395,13 @@ bool RubberBall::updateAndDelete(int ticks)
         return can_be_deleted;
     }
 
+    bool can_be_deleted = Flyable::updateAndDelete(ticks);
+    if (can_be_deleted)
+    {
+        removePingSFX();
+        return true;
+    }
+
     // Update normal from rewind first
     const Vec3& normal =
         DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
@@ -486,10 +493,7 @@ bool RubberBall::updateAndDelete(int ticks)
     // Determine new distance along track
     TrackSector::update(next_xyz);
 
-    bool can_be_deleted = Flyable::updateAndDelete(ticks);
-    if (can_be_deleted)
-        removePingSFX();
-    return can_be_deleted;
+    return false;
 }   // updateAndDelete
 
 // ----------------------------------------------------------------------------
