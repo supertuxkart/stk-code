@@ -177,7 +177,6 @@ void LODNode::OnRegisterSceneNode()
                                 m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
         now > m_last_tick)
     {
-        printf("Hi, we are in level mode one :p\n\n");
         if (m_previous_visibility == WAS_HIDDEN && shown)
         {
             scene::IMesh* mesh;
@@ -271,11 +270,9 @@ void LODNode::autoComputeLevel()
     int step = (int) max_draw / m_detail.size();
 
     // Then we recompute the level of detail culling distance
-    int cursor = 0;
-    while(cursor < m_detail.size())
+    for(int i = 0; i < m_detail.size(); i++)
     {
-        m_detail[cursor] = step * step * (cursor + 1); 
-        cursor++;
+        m_detail[i] = step * step * (i + 1); 
     }
 }
 
