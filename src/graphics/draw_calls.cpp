@@ -146,10 +146,10 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         {
             node->updateVisibility();
         }
-        (*I)->updateAbsolutePosition();
         if (!(*I)->isVisible())
             continue;
 
+        (*I)->updateAbsolutePosition();
         if (STKParticle *node = dynamic_cast<STKParticle*>(*I))
         {
             if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
