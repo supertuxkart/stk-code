@@ -88,7 +88,7 @@ private:
     float           m_initial_speed;
 
     /** For zoom-in animation */
-    float           m_node_scale;
+    int             m_scaling_end_ticks;
 
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
@@ -105,13 +105,18 @@ private:
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
-    /** Soung for exploding bubble gum shield */
+    /** Sound for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
+    // ------------------------------------------------------------------------
+    /** Called in clear() to update m_graphical_type now, so for example
+     *  the explosion sfx or bubblegum sound is not displayed or played when
+     *  the bomb or shield is forcely cleared like in kart animation. */
+    void updateGraphicalTypeNow()                { m_graphical_type = m_type; }
 
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();
-    void  clear ();
+    void  clear (bool update_graphical_now = false);
     void  hitBanana(ItemState *item);
     void  updateGraphics(float dt);
 
@@ -154,6 +159,12 @@ public:
     /** Nothing to undo when going back during a rewind, the full state info
      *  will take care of creating the right attachment. */
     virtual void undo(BareNetworkString *buffer) { }
+    // ------------------------------------------------------------------------
+    void reset()
+    {
+        clear();
+        m_scaling_end_ticks = -1;
+    }
     // ------------------------------------------------------------------------
     float getInitialSpeed() const                   { return m_initial_speed; }
     // ------------------------------------------------------------------------

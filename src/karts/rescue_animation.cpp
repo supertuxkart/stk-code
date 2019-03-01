@@ -62,7 +62,7 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
     float velocity = max_height / timer;
 
     init(rescue_transform, velocity);
-    m_kart->getAttachment()->clear();
+    m_kart->getAttachment()->clear(true/*update_graphical_now*/);
 
     // Add a hit unless it was auto-rescue
     if (race_manager->isBattleMode() &&

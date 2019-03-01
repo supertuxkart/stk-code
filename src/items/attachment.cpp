@@ -54,9 +54,9 @@ Attachment::Attachment(AbstractKart* kart)
     m_previous_owner       = NULL;
     m_bomb_sound           = NULL;
     m_bubble_explode_sound = NULL;
-    m_node_scale           = std::numeric_limits<float>::max();
     m_initial_speed        = 0.0f;
     m_graphical_type       = ATTACH_NOTHING;
+    m_scaling_end_ticks    = -1;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     if (kart->isGhostKart())
@@ -112,8 +112,9 @@ void Attachment::set(AttachmentType type, int ticks,
                      bool disable_swatter_animation,
                      bool set_by_rewind_parachute)
 {
+    bool was_bomb = m_type == ATTACH_BOMB;
     // Don't override currently player swatter removing bomb animation
-    Swatter* s = dynamic_cast<Swatter*>(m_plugin);
+    /*Swatter* s = dynamic_cast<Swatter*>(m_plugin);
     if (s && s->isRemovingBomb())
         return;
 
@@ -134,7 +135,7 @@ void Attachment::set(AttachmentType type, int ticks,
         m_node->setAnimationEndCallback(this);
         m_node->setParent(m_kart->getNode());
         m_node->setVisible(false);
-    }
+    }*/
 
     clear();
 
@@ -143,38 +144,21 @@ void Attachment::set(AttachmentType type, int ticks,
     switch(type)
     {
     case ATTACH_SWATTER :
-        if (m_kart->getIdent() == "nolok")
-            m_node->setMesh(attachment_manager->getMesh(ATTACH_NOLOKS_SWATTER));
-        else
-            m_node->setMesh(attachment_manager->getMesh(type));
-        m_plugin = new Swatter(m_kart, was_bomb, bomb_scene_node, ticks);
-        break;
-    case ATTACH_BOMB:
-        m_node->setMesh(attachment_manager->getMesh(type));
-        m_node->setAnimationSpeed(0);
+        //if (m_kart->getIdent() == "nolok")
+        //    m_node->setMesh(attachment_manager->getMesh(ATTACH_NOLOKS_SWATTER));
+        //else
+        //    m_node->setMesh(attachment_manager->getMesh(type));
+        //m_plugin = new Swatter(m_kart, was_bomb, bomb_scene_node, ticks);
         break;
     default:
-        m_node->setMesh(attachment_manager->getMesh(type));
         break;
     }   // switch(type)
-
-    if (UserConfigParams::m_particles_effects < 2)
-    {
-        m_node->setAnimationSpeed(0);
-        m_node->setCurrentFrame(0);
-    }
-
-    if (m_node_scale == std::numeric_limits<float>::max())
-    {
-        m_node_scale = 0.3f;
-        m_node->setScale(core::vector3df(m_node_scale, m_node_scale,
-            m_node_scale));
-    }
 
     m_type             = type;
     m_ticks_left       = ticks;
     m_previous_owner   = current_kart;
-    m_node->setRotation(core::vector3df(0, 0, 0));
+    m_scaling_end_ticks = World::getWorld()->getTicksSinceStart() +
+        stk_config->time2Ticks(0.7f);
 
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
@@ -200,14 +184,7 @@ void Attachment::set(AttachmentType type, int ticks,
         speed_mult = 1.0f + (f *  (temp_mult - 1.0f));
 
         m_ticks_left = int(m_ticks_left * speed_mult);
-
-        if (UserConfigParams::m_particles_effects > 1)
-        {
-            // .blend was created @25 (<10 real, slow computer), make it faster
-            m_node->setAnimationSpeed(50);
-        }
     }
-    m_node->setVisible(true);
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -215,7 +192,7 @@ void Attachment::set(AttachmentType type, int ticks,
  *  takes care of resetting the owner kart's physics structures to account for
  *  the updated mass.
  */
-void Attachment::clear()
+void Attachment::clear(bool update_graphical_now)
 {
     if(m_plugin)
     {
@@ -226,9 +203,8 @@ void Attachment::clear()
     m_type=ATTACH_NOTHING;
 
     m_ticks_left = 0;
-    m_node->setVisible(false);
-    m_node->setPosition(core::vector3df());
-    m_node->setRotation(core::vector3df());
+    if (update_graphical_now)
+        updateGraphicalTypeNow();
 }   // clear
 
 // -----------------------------------------------------------------------------
@@ -305,18 +281,8 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     if (is_removing_bomb)
         return;
 
-    // Attaching an object can be expensive (loading new models, ...)
-    // so avoid doing this if there is no change in attachment type
-    if (m_type == new_type)
-    {
-        setTicksLeft(ticks_left);
-        return;
-    }
-
-    set(new_type, ticks_left, m_previous_owner,
-        new_type == ATTACH_SWATTER && !is_removing_bomb
-        /*disable_swatter_animation*/,
-        new_type == ATTACH_PARACHUTE);
+    m_type = new_type;
+    m_ticks_left = ticks_left;
 }   // rewindTo
 
 // -----------------------------------------------------------------------------
@@ -466,7 +432,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
                                            stk_config->m_bomb_time_increase),
                           m_kart);
                 other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-                clear();
+                clear(true/*update_graphical_now*/);
             }
         }
     }   // type==BOMB
@@ -484,7 +450,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             other->getAttachment()->getTicksLeft()+
                stk_config->time2Ticks(stk_config->m_bomb_time_increase),
             other);
-        other->getAttachment()->clear();
+        other->getAttachment()->clear(true/*update_graphical_now*/);
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     }
     else
@@ -506,23 +472,6 @@ void Attachment::update(int ticks)
         return;
 
     m_ticks_left -= ticks;
-
-    bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
-                     m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-    int slow_flashes = stk_config->time2Ticks(3.0f);
-    if (is_shield && m_ticks_left < slow_flashes)
-    {
-        int ticks_per_flash = stk_config->time2Ticks(0.2f);
-
-        int fast_flashes = stk_config->time2Ticks(0.5f);
-        if (m_ticks_left < fast_flashes)
-        {
-            ticks_per_flash = stk_config->time2Ticks(0.07f);
-        }
-
-        int division = (m_ticks_left / ticks_per_flash);
-        m_node->setVisible((division & 0x1) == 0);
-    }
 
     if (m_plugin)
     {
@@ -578,15 +527,6 @@ void Attachment::update(int ticks)
         break;
     case ATTACH_BOMB:
     {
-        // Mesh animation frames are 1 to 61 frames (60 steps)
-        // The idea is change second by second, counterclockwise 60 to 0 secs
-        // If longer times needed, it should be a surprise "oh! bomb activated!"
-        float time_left = stk_config->ticks2Time(m_ticks_left);
-        if (time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
-        {
-            m_node->setCurrentFrame(m_node->getEndFrame()
-                - m_node->getStartFrame() - 1 - time_left);
-        }
         if (m_ticks_left <= 0)
         {
             if (m_kart->getKartAnimation() == NULL)
@@ -612,30 +552,13 @@ void Attachment::update(int ticks)
 // ----------------------------------------------------------------------------
 void Attachment::updateGraphics(float dt)
 {
-    if (m_plugin)
-        m_plugin->updateGrahpics(dt);
-
-    bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
-                     m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-    float wanted_node_scale = is_shield ?
-        std::max(1.0f, m_kart->getHighestPoint() * 1.1f) : 1.0f;
-    if (m_node_scale < wanted_node_scale)
-    {
-        m_node_scale += dt * 1.5f;
-        float scale = m_node_scale;
-        if (scale > wanted_node_scale)
-            scale = wanted_node_scale;
-        m_node->setScale(core::vector3df(scale, scale, scale));
-    }
-    else
-    {
-        m_node_scale = std::numeric_limits<float>::max();
-    }
-
     // Add the suitable graphical effects if different attachment is set
     if (m_type != m_graphical_type)
     {
-        if (m_type == ATTACH_NOTHING)
+        // Old attachement is cleared, add suitable sfx effects
+        switch (m_type)
+        {
+        case ATTACH_NOTHING:
         {
             if (m_graphical_type == ATTACH_BOMB)
             {
@@ -657,9 +580,72 @@ void Attachment::updateGraphics(float dt)
                 m_bubble_explode_sound->setPosition(m_kart->getXYZ());
                 m_bubble_explode_sound->play();
             }
+            break;
+        }
+        case ATTACH_SWATTER:
+            // Graphical model set in swatter class
+            break;
+        default:
+            m_node->setMesh(attachment_manager->getMesh(m_type));
+            break;
+        }   // switch(type)
+
+        if (UserConfigParams::m_particles_effects < 2 &&
+            m_type != ATTACH_NOTHING)
+        {
+            m_node->setAnimationSpeed(0);
+            m_node->setCurrentFrame(0);
+        }
+        if (UserConfigParams::m_particles_effects > 1 &&
+            m_type == ATTACH_PARACHUTE)
+        {
+            // .blend was created @25 (<10 real, slow computer), make it faster
+            m_node->setAnimationSpeed(50);
         }
         m_graphical_type = m_type;
     }
+
+    if (m_type != ATTACH_NOTHING)
+    {
+        m_node->setVisible(true);
+        bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
+                        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+        float wanted_node_scale = is_shield ?
+            std::max(1.0f, m_kart->getHighestPoint() * 1.1f) : 1.0f;
+        float scale_ratio = stk_config->ticks2Time(m_scaling_end_ticks -
+            World::getWorld()->getTicksSinceStart()) / 0.7f;
+        if (scale_ratio > 0.0f)
+        {
+            float scale = 0.3 * scale_ratio +
+                wanted_node_scale * (1.0f - scale_ratio);
+            m_node->setScale(core::vector3df(scale, scale, scale));
+        }
+        else
+        {
+            m_node->setScale(core::vector3df(
+                wanted_node_scale, wanted_node_scale, wanted_node_scale));
+        }
+        int slow_flashes = stk_config->time2Ticks(3.0f);
+        if (is_shield && m_ticks_left < slow_flashes)
+        {
+            // Bubble gum flashing when close to dropping
+            int ticks_per_flash = stk_config->time2Ticks(0.2f);
+
+            int fast_flashes = stk_config->time2Ticks(0.5f);
+            if (m_ticks_left < fast_flashes)
+            {
+                ticks_per_flash = stk_config->time2Ticks(0.07f);
+            }
+
+            int division = (m_ticks_left / ticks_per_flash);
+            m_node->setVisible((division & 0x1) == 0);
+        }
+    }
+    else
+        m_node->setVisible(false);
+
+    if (m_plugin)
+        m_plugin->updateGrahpics(dt);
 
     switch (m_type)
     {
@@ -672,6 +658,15 @@ void Attachment::updateGraphics(float dt)
             m_bomb_sound->play();
         }
         m_bomb_sound->setPosition(m_kart->getXYZ());
+        // Mesh animation frames are 1 to 61 frames (60 steps)
+        // The idea is change second by second, counterclockwise 60 to 0 secs
+        // If longer times needed, it should be a surprise "oh! bomb activated!"
+        float time_left = stk_config->ticks2Time(m_ticks_left);
+        if (time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
+        {
+            m_node->setCurrentFrame(m_node->getEndFrame()
+                - m_node->getStartFrame() - 1 - time_left);
+        }
         return;
     }
     default:
