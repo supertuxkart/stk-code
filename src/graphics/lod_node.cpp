@@ -158,11 +158,14 @@ void LODNode::updateVisibility()
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    unsigned int level = getLevel();
-
-    if (m_previous_level != level && !is_in_transition)
+    // Don't need to run the computation of the level everytime
+    if ((int)(rand()%5) == 1)
     {
-        m_current_level = level;
+        m_current_level = getLevel();
+    }
+
+    if (m_previous_level != m_current_level && !is_in_transition)
+    {
         is_in_transition = true;
         m_timer = 0;
     }
