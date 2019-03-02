@@ -147,6 +147,7 @@ public:
         TrackObjectPresentation(xyz, hpr, scale)
     {
         m_node = node;
+        m_force_always_hidden = false;
     }   // TrackObjectPresentationSceneNode
 
     // ------------------------------------------------------------------------
@@ -166,6 +167,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the scene node, const version. */
     const scene::ISceneNode* getNode() const { return m_node; }
+    // ------------------------------------------------------------------------
+    bool isAlwaysHidden() const { return m_force_always_hidden; }
 };   // class TrackObjectPresentationSceneNode
 
 // ============================================================================

@@ -2149,7 +2149,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     for (auto* to : m_track_object_manager->getObjects().m_contents_vector)
     {
         if (to->joinToMainTrack())
+        {
             m_track_object_manager->removeDriveableObject(to);
+            TrackObjectPresentationSceneNode* ts =
+                to->getPresentation<TrackObjectPresentationSceneNode>();
+            // physicial only node is always hidden, remove it from stk after
+            // joining to track mesh
+            if (ts && ts->isAlwaysHidden())
+                m_track_object_manager->removeObject(to);
+        }
     }
 
     createPhysicsModel(main_track_count);
