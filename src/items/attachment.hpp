@@ -19,12 +19,15 @@
 #ifndef HEADER_ATTACHMENT_HPP
 #define HEADER_ATTACHMENT_HPP
 
-#include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
 #include "utils/no_copy.hpp"
 
-#include <IAnimatedMeshSceneNode.h>
 using namespace irr;
+
+namespace irr
+{
+    namespace scene { class IAnimatedMeshSceneNode; }
+}
 
 class AbstractKart;
 class BareNetworkString;
@@ -44,7 +47,7 @@ class SFXBase;
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy, public scene::IAnimationEndCallBack
+class Attachment: public NoCopy
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -124,7 +127,6 @@ public:
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
                AbstractKart *previous_kart=NULL,
-               bool disable_swatter_animation = false,
                bool set_by_rewind_parachute = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
@@ -152,13 +154,6 @@ public:
     // ------------------------------------------------------------------------
     /** Return the currently associated scene node (used by e.g the swatter) */
     scene::IAnimatedMeshSceneNode* getNode() {return m_node;}
-    // ------------------------------------------------------------------------
-    /** Implement IAnimatedMeshSceneNode */
-    virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
-    // ------------------------------------------------------------------------
-    /** Nothing to undo when going back during a rewind, the full state info
-     *  will take care of creating the right attachment. */
-    virtual void undo(BareNetworkString *buffer) { }
     // ------------------------------------------------------------------------
     void reset()
     {

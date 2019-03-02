@@ -354,7 +354,7 @@ void Kart::reset()
         m_saved_controller = NULL;
     }
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
-    m_attachment->clear();
+    m_attachment->reset();
     m_kart_gfx->reset();
     m_skidding->reset();
 

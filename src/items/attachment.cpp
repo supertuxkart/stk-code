@@ -43,6 +43,8 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
+
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(AbstractKart* kart)
@@ -70,7 +72,6 @@ Attachment::Attachment(AbstractKart* kart)
     std::string debug_name = kart->getIdent()+" (attachment)";
     m_node->setName(debug_name.c_str());
 #endif
-    m_node->setAnimationEndCallback(this);
     m_node->setParent(m_kart->getNode());
     m_node->setVisible(false);
 }   // Attachment
@@ -109,46 +110,19 @@ Attachment::~Attachment()
  */
 void Attachment::set(AttachmentType type, int ticks,
                      AbstractKart *current_kart,
-                     bool disable_swatter_animation,
                      bool set_by_rewind_parachute)
 {
     bool was_bomb = m_type == ATTACH_BOMB;
-    // Don't override currently player swatter removing bomb animation
-    /*Swatter* s = dynamic_cast<Swatter*>(m_plugin);
-    if (s && s->isRemovingBomb())
-        return;
-
-    bool was_bomb = (m_type == ATTACH_BOMB) && !disable_swatter_animation;
-    scene::ISceneNode* bomb_scene_node = NULL;
-    if (was_bomb && type == ATTACH_SWATTER)
-    {
-        // let's keep the bomb node, and create a new one for
-        // the new attachment
-        bomb_scene_node = m_node;
-
-        m_node = irr_driver->addAnimatedMesh(
-                     attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
-#ifdef DEBUG
-        std::string debug_name = m_kart->getIdent() + " (attachment)";
-        m_node->setName(debug_name.c_str());
-#endif
-        m_node->setAnimationEndCallback(this);
-        m_node->setParent(m_kart->getNode());
-        m_node->setVisible(false);
-    }*/
-
+    int16_t prev_ticks = m_ticks_left;
     clear();
 
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
     switch(type)
     {
-    case ATTACH_SWATTER :
-        //if (m_kart->getIdent() == "nolok")
-        //    m_node->setMesh(attachment_manager->getMesh(ATTACH_NOLOKS_SWATTER));
-        //else
-        //    m_node->setMesh(attachment_manager->getMesh(type));
-        //m_plugin = new Swatter(m_kart, was_bomb, bomb_scene_node, ticks);
+    case ATTACH_SWATTER:
+        m_plugin =
+            new Swatter(m_kart, was_bomb ? prev_ticks : -1, ticks, this);
         break;
     default:
         break;
@@ -214,14 +188,12 @@ void Attachment::clear(bool update_graphical_now)
 void Attachment::saveState(BareNetworkString *buffer) const
 {
     // We use bit 6 to indicate if a previous owner is defined for a bomb,
-    // bit 7 to indicate if the attachment is swatter removing animation
+    // bit 7 to indicate if the attachment is a plugin
     assert(ATTACH_MAX < 64);
     uint8_t bit_7 = 0;
-    Swatter* s = dynamic_cast<Swatter*>(m_plugin);
-    if (s)
+    if (m_plugin)
     {
-        bit_7 = s->isRemovingBomb() ? 1 : 0;
-        bit_7 <<= 7;
+        bit_7 = 1 << 7;
     }
     uint8_t type = m_type | (( (m_type==ATTACH_BOMB) && (m_previous_owner!=NULL) )
                              ? (1 << 6) : 0 ) | bit_7;
@@ -233,6 +205,8 @@ void Attachment::saveState(BareNetworkString *buffer) const
             buffer->addUInt8(m_previous_owner->getWorldKartId());
         // m_initial_speed is not saved, on restore state it will
         // be set to the kart speed, which has already been restored
+        if (m_plugin)
+            m_plugin->saveState(buffer);
     }
 }   // saveState
 
@@ -243,19 +217,14 @@ void Attachment::saveState(BareNetworkString *buffer) const
 void Attachment::rewindTo(BareNetworkString *buffer)
 {
     uint8_t type = buffer->getUInt8();
-    bool is_removing_bomb = (type >> 7 & 1) == 1;
-
-    Swatter* s = dynamic_cast<Swatter*>(m_plugin);
-    // If locally removing a bomb
-    if (s)
-        is_removing_bomb = s->isRemovingBomb();
+    bool is_plugin = (type >> 7 & 1) == 1;
 
     // mask out bit 6 and 7
     AttachmentType new_type = AttachmentType(type & 63);
     type &= 127;
 
     // If there is no attachment, clear the attachment if necessary and exit
-    if (new_type == ATTACH_NOTHING && !is_removing_bomb)
+    if (new_type == ATTACH_NOTHING)
     {
         if (m_type != new_type)
             clear();
@@ -277,9 +246,18 @@ void Attachment::rewindTo(BareNetworkString *buffer)
         m_previous_owner = NULL;
     }
 
-    // If playing kart animation, don't rewind to any attacment
-    if (is_removing_bomb)
-        return;
+    if (is_plugin)
+    {
+        if (!m_plugin)
+            m_plugin = new Swatter(m_kart, -1, 0, this);
+        m_plugin->restoreState(buffer);
+    }
+    else
+    {
+        // Remove unconfirmed plugin
+        delete m_plugin;
+        m_plugin = NULL;
+    }
 
     m_type = new_type;
     m_ticks_left = ticks_left;
@@ -475,17 +453,10 @@ void Attachment::update(int ticks)
 
     if (m_plugin)
     {
-        int discard_ticks = m_plugin->updateAndTestFinished(ticks);
-        if (discard_ticks != -1)
+        if (m_plugin->updateAndTestFinished(ticks))
         {
-            // Save it for rewinding
-            m_ticks_left =
-                discard_ticks - World::getWorld()->getTicksSinceStart();
-            if (m_ticks_left <= 0)
-            {
-                clear();  // also removes the plugin
-                return;
-            }
+            clear();  // also removes the plugin
+            return;
         }
     }
 
@@ -555,7 +526,11 @@ void Attachment::updateGraphics(float dt)
     // Add the suitable graphical effects if different attachment is set
     if (m_type != m_graphical_type)
     {
-        // Old attachement is cleared, add suitable sfx effects
+        // Attachement is different, reset and add suitable sfx effects
+        m_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
+        m_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
+        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+        m_node->setLoopMode(true);
         switch (m_type)
         {
         case ATTACH_NOTHING:
@@ -605,6 +580,9 @@ void Attachment::updateGraphics(float dt)
         m_graphical_type = m_type;
     }
 
+    if (m_plugin)
+        m_plugin->updateGrahpics(dt);
+
     if (m_type != ATTACH_NOTHING)
     {
         m_node->setVisible(true);
@@ -643,9 +621,6 @@ void Attachment::updateGraphics(float dt)
     }
     else
         m_node->setVisible(false);
-
-    if (m_plugin)
-        m_plugin->updateGrahpics(dt);
 
     switch (m_type)
     {
@@ -690,11 +665,3 @@ float Attachment::weightAdjust() const
            ? m_kart->getKartProperties()->getAnvilWeight() 
           : 0.0f;
 }   // weightAdjust
-
-// ----------------------------------------------------------------------------
-/** Inform any eventual plugin when an animation is done. */
-void Attachment::OnAnimationEnd(scene::IAnimatedMeshSceneNode* node)
-{
-    if(m_plugin)
-        m_plugin->onAnimationEnd();
-}   // OnAnimationEnd

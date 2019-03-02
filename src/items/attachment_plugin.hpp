@@ -23,6 +23,7 @@
 
 class AbstractKart;
 class Attachment;
+class BareNetworkString;
 
 /**
   * \ingroup items
@@ -38,13 +39,15 @@ class AttachmentPlugin
 {
 protected:
     /** Kart the attachment is attached to. */
-    AbstractKart *m_kart;
+    AbstractKart* m_kart;
 
+    Attachment* m_attachment;
 public:
     /** Constructor for a plugin. */
-    AttachmentPlugin(AbstractKart *kart)
+    AttachmentPlugin(AbstractKart *kart, Attachment* attachment)
     {
-        m_kart       = kart;
+        m_kart = kart;
+        m_attachment = attachment;
     }
 
     virtual ~AttachmentPlugin() {}
@@ -53,13 +56,13 @@ public:
 
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
-     *  function returns a non-negative number, the attachment is discarded
-     *  when world ticks >= that number. */
-    virtual int updateAndTestFinished(int ticks) = 0;
-
+     *  function returns true, the attachment is discarded. */
+    virtual bool updateAndTestFinished(int ticks) = 0;
     // ------------------------------------------------------------------------
-    /** Called when the animation of the Attachment's node is done. */
-    virtual void onAnimationEnd() {}
+    virtual void restoreState(BareNetworkString *buffer) {}
+    // ------------------------------------------------------------------------
+    virtual void saveState(BareNetworkString *buffer) const {}
+
 };   // AttachmentPlugin
 
 #endif

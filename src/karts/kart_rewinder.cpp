@@ -37,6 +37,7 @@
 #include "physics/btKart.hpp"
 #include "utils/vec3.hpp"
 
+#include <ISceneNode.h>
 #include <string.h>
 
 KartRewinder::KartRewinder(const std::string& ident,
