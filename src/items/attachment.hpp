@@ -21,6 +21,7 @@
 
 #include "items/attachment_plugin.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/types.hpp"
 
 using namespace irr;
 
@@ -87,8 +88,8 @@ private:
     /** Time left till attachment expires. */
     int16_t         m_ticks_left;
 
-    /** For parachutes only. */
-    float           m_initial_speed;
+    /** For parachutes only, rounded down to 2 digits for network. */
+    int16_t         m_initial_speed;
 
     /** For zoom-in animation */
     int             m_scaling_end_ticks;
@@ -160,10 +161,6 @@ public:
         clear();
         m_scaling_end_ticks = -1;
     }
-    // ------------------------------------------------------------------------
-    float getInitialSpeed() const                   { return m_initial_speed; }
-    // ------------------------------------------------------------------------
-    void setInitialSpeed(float speed)              { m_initial_speed = speed; }
 
 };   // Attachment
 

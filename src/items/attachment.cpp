@@ -43,6 +43,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
+#include "irrMath.h"
 #include <IAnimatedMeshSceneNode.h>
 
 /** Initialises the attachment each kart has.
@@ -56,7 +57,7 @@ Attachment::Attachment(AbstractKart* kart)
     m_previous_owner       = NULL;
     m_bomb_sound           = NULL;
     m_bubble_explode_sound = NULL;
-    m_initial_speed        = 0.0f;
+    m_initial_speed        = 0;
     m_graphical_type       = ATTACH_NOTHING;
     m_scaling_end_ticks    = -1;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
@@ -134,6 +135,7 @@ void Attachment::set(AttachmentType type, int ticks,
     m_scaling_end_ticks = World::getWorld()->getTicksSinceStart() +
         stk_config->time2Ticks(0.7f);
 
+    m_initial_speed = 0;
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
     // by slowing down.
@@ -143,11 +145,11 @@ void Attachment::set(AttachmentType type, int ticks,
         const KartProperties *kp = m_kart->getKartProperties();
         float speed_mult;
 
-        m_initial_speed = m_kart->getSpeed();
+        float initial_speed = m_kart->getSpeed();
         // if going very slowly or backwards, braking won't remove parachute
-        if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
+        if(initial_speed <= 1.5f) initial_speed = 1.5f;
 
-        float f = m_initial_speed / kp->getParachuteMaxSpeed();
+        float f = initial_speed / kp->getParachuteMaxSpeed();
         float temp_mult = kp->getParachuteDurationSpeedMult();
 
         // duration can't be reduced by higher speed
@@ -158,6 +160,10 @@ void Attachment::set(AttachmentType type, int ticks,
         speed_mult = 1.0f + (f *  (temp_mult - 1.0f));
 
         m_ticks_left = int(m_ticks_left * speed_mult);
+        int initial_speed_round = (int)(initial_speed * 100.0f);
+        initial_speed_round =
+            irr::core::clamp(initial_speed_round, -32768, 32767);
+        m_initial_speed = (int16_t)initial_speed_round;
     }
 }   // set
 
@@ -203,8 +209,8 @@ void Attachment::saveState(BareNetworkString *buffer) const
         buffer->addUInt16(m_ticks_left);
         if(m_type==ATTACH_BOMB && m_previous_owner)
             buffer->addUInt8(m_previous_owner->getWorldKartId());
-        // m_initial_speed is not saved, on restore state it will
-        // be set to the kart speed, which has already been restored
+        if (m_type == ATTACH_PARACHUTE)
+            buffer->addUInt16(m_initial_speed);
         if (m_plugin)
             m_plugin->saveState(buffer);
     }
@@ -226,6 +232,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     // If there is no attachment, clear the attachment if necessary and exit
     if (new_type == ATTACH_NOTHING)
     {
+        m_initial_speed = 0;
         if (m_type != new_type)
             clear();
         return;
@@ -245,6 +252,11 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     {
         m_previous_owner = NULL;
     }
+
+    if (new_type == ATTACH_PARACHUTE)
+        m_initial_speed = buffer->getUInt16();
+    else
+        m_initial_speed = 0;
 
     if (is_plugin)
     {
@@ -347,13 +359,17 @@ void Attachment::hitBanana(ItemState *item_state)
         switch (new_attachment)
         {
         case ATTACH_PARACHUTE:
+        {
             set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_ticks);
-            m_initial_speed = m_kart->getSpeed();
-
+            int initial_speed_round = (int)(m_kart->getSpeed() * 100.0f);
+            initial_speed_round =
+                irr::core::clamp(initial_speed_round, -32768, 32767);
+            m_initial_speed = (int16_t)initial_speed_round;
             // if going very slowly or backwards,
             // braking won't remove parachute
-            if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
+            if (m_initial_speed <= 150) m_initial_speed = 150;
             break;
+        }
         case ATTACH_ANVIL:
             set(ATTACH_ANVIL, stk_config->time2Ticks(kp->getAnvilDuration())
                 + leftover_ticks                                      );
@@ -472,9 +488,10 @@ void Attachment::update(int ticks)
 
         const KartProperties *kp = m_kart->getKartProperties();
 
-        float f = m_initial_speed / kp->getParachuteMaxSpeed();
+        float initial_speed = (float)m_initial_speed / 100.f;
+        float f = initial_speed / kp->getParachuteMaxSpeed();
         if (f > 1.0f) f = 1.0f;   // cap fraction
-        if (m_kart->getSpeed() <= m_initial_speed *
+        if (m_kart->getSpeed() <= initial_speed *
                                  (kp->getParachuteLboundFraction() +
                                   f * (kp->getParachuteUboundFraction()
                                      - kp->getParachuteLboundFraction())))
@@ -486,9 +503,11 @@ void Attachment::update(int ticks)
     case ATTACH_ANVIL:     // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:
+        m_initial_speed = 0;
         break;
     case ATTACH_SWATTER:
         // Everything is done in the plugin.
+        m_initial_speed = 0;
         break;
     case ATTACH_NOLOKS_SWATTER:
     case ATTACH_SWATTER_ANIM:
@@ -498,6 +517,7 @@ void Attachment::update(int ticks)
         break;
     case ATTACH_BOMB:
     {
+        m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
             if (m_kart->getKartAnimation() == NULL)
@@ -507,6 +527,7 @@ void Attachment::update(int ticks)
     }
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
+        m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
             if (!m_kart->isGhostKart())

@@ -417,9 +417,6 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     int8_t min_nitro_ticks = m_min_nitro_ticks;
     float bubblegum_torque = m_bubblegum_torque;
 
-    // Attachment local state
-    float initial_speed = getAttachment()->getInitialSpeed();
-
     // Controller local state
     int steer_val_l = 0;
     int steer_val_r = 0;
@@ -440,13 +437,12 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     float remaining_jump_time = m_skidding->m_remaining_jump_time;
 
     return [brake_ticks, min_nitro_ticks, bubblegum_torque,
-        initial_speed, steer_val_l, steer_val_r, current_fraction,
+        steer_val_l, steer_val_r, current_fraction,
         max_speed_fraction, remaining_jump_time, this]()
     {
         m_brake_ticks = brake_ticks;
         m_min_nitro_ticks = min_nitro_ticks;
         m_bubblegum_torque = bubblegum_torque;
-        getAttachment()->setInitialSpeed(initial_speed);
         PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
         if (pc)
         {
