@@ -111,7 +111,7 @@ public:
     /**
       * This method can be used to automatically compute LoD level
       */
-    void autoComputeLevel();
+    void autoComputeLevel(float scale);
 
     void forceLevelOfDetail(int n);
 

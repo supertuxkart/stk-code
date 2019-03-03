@@ -241,8 +241,11 @@ void LODNode::OnRegisterSceneNode()
     scene::ISceneNode::OnRegisterSceneNode();
 }
 
-void LODNode::autoComputeLevel()
+void LODNode::autoComputeLevel(float scale)
 {
+    printf("Scale2 %f\n", scale);
+    m_volume *= scale;
+    printf("Factor %f\n", m_volume);
 
     // This will be set based on the amount of objects in a scene.
     float agressivity = 1.0;
@@ -272,8 +275,11 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
     Box = node->getBoundingBox();
     m_volume = Box.getArea();
+    printf("\nLod\n==========================\n");
+    printf("Level %d\n", level);
     printf("Area %f\n", Box.getArea());
     printf("Volume %f\n", Box.getVolume());
+    printf("Scale %f, %f, %f \n", node->getScale().X, node->getScale().Y, node->getScale().Z);
 
     // samuncle suggested to put a slight randomisation in LOD
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
