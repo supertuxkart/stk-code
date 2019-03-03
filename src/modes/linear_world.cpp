@@ -64,6 +64,7 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_valid_reference_time = false;
     m_live_time_difference = 0.0f;
     m_fastest_lap_kart_name = "";
+    m_check_structure_compatible = false;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -1164,9 +1165,10 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
  *  current kart lap count, last triggered checkline and check structure status
  *  to all players in game (including spectators so that the lap count is
  *  correct)
+ *  \param check_id The check structure it it triggered.
  *  \param kart_id The kart which triggered a checkline.
  */
-void LinearWorld::updateCheckLinesServer(int kart_id)
+void LinearWorld::updateCheckLinesServer(int check_id, int kart_id)
 {
     if (!NetworkConfig::get()->isNetworking() ||
         NetworkConfig::get()->isClient())
@@ -1174,7 +1176,7 @@ void LinearWorld::updateCheckLinesServer(int kart_id)
 
     NetworkString cl(PROTOCOL_GAME_EVENTS);
     cl.setSynchronous(true);
-    cl.addUInt8(GameEventsProtocol::GE_CHECK_LINE_KART)
+    cl.addUInt8(GameEventsProtocol::GE_CHECK_LINE).addUInt8((uint8_t)check_id)
         .addUInt8((uint8_t)kart_id);
 
     int8_t finished_laps = (int8_t)m_kart_info[kart_id].m_finished_laps;
@@ -1199,6 +1201,9 @@ void LinearWorld::updateCheckLinesServer(int kart_id)
 /* Synchronize with server from the above data. */
 void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
 {
+    // Reserve for future auto checkline correction
+    //int check_id = b.getUInt8();
+    b.getUInt8();
     int kart_id = b.getUInt8();
 
     int8_t finished_laps = b.getUInt8();
@@ -1212,11 +1217,21 @@ void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
 
     const unsigned cc = b.getUInt8();
     if (cc != CheckManager::get()->getCheckStructureCount())
-    {
-        throw std::invalid_argument(
-            "Server has different check structures size.");
-    }
+        return;
     for (unsigned i = 0; i < cc; i++)
         CheckManager::get()->getCheckStructure(i)->restoreIsActive(kart_id, b);
 
 }   // updateCheckLinesClient
+
+// ----------------------------------------------------------------------------
+void LinearWorld::handleServerCheckStructureCount(unsigned count)
+{
+    if (count != CheckManager::get()->getCheckStructureCount())
+    {
+        Log::warn("LinearWorld",
+            "Server has different check structures size.");
+        m_check_structure_compatible = false;
+    }
+    else
+        m_check_structure_compatible = true;
+}   // handleServerCheckStructureCount

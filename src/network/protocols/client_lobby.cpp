@@ -854,6 +854,11 @@ void ClientLobby::startGame(Event* event)
     uint64_t start_time = event->data().getUInt64();
     powerup_manager->setRandomSeed(start_time);
 
+    unsigned check_structure_count = event->data().getUInt8();
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
+    if (lw)
+        lw->handleServerCheckStructureCount(check_structure_count);
+
     NetworkItemManager* nim =
     dynamic_cast<NetworkItemManager*>(ItemManager::get());
     assert(nim);
@@ -962,13 +967,19 @@ void ClientLobby::raceFinished(Event* event)
     if (m_game_setup->isGrandPrix())
     {
         int t = data.getUInt32();
+        core::stringw kart_name;
+        data.decodeStringW(&kart_name);
         lw->setFastestLapTicks(t);
+        lw->setFastestKartName(kart_name);
         race_manager->configGrandPrixResultFromNetwork(data);
     }
     else if (race_manager->modeHasLaps())
     {
         int t = data.getUInt32();
+        core::stringw kart_name;
+        data.decodeStringW(&kart_name);
         lw->setFastestLapTicks(t);
+        lw->setFastestKartName(kart_name);
     }
 
     if (lw)
@@ -1084,6 +1095,12 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     const NetworkString& data = event->data();
     m_start_live_game_time = data.getUInt64();
     powerup_manager->setRandomSeed(m_start_live_game_time);
+
+    unsigned check_structure_count = event->data().getUInt8();
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
+    if (lw)
+        lw->handleServerCheckStructureCount(check_structure_count);
+
     m_start_live_game_time = data.getUInt64();
     m_last_live_join_util_ticks = data.getUInt32();
     for (unsigned i = 0; i < w->getNumKarts(); i++)

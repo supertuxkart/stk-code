@@ -116,7 +116,7 @@ void CheckStructure::update(float dt)
                           World::getWorld()->getTime());
             trigger(i);
             if (triggeringCheckline() && lw)
-                lw->updateCheckLinesServer(i);
+                lw->updateCheckLinesServer(getIndex(), i);
         }
         m_previous_position[i] = xyz;
     }   // for i<getNumKarts

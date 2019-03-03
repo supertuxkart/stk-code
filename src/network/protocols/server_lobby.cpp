@@ -46,6 +46,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
@@ -947,10 +948,11 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         spectator = true;
     }
 
+    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
     NetworkString* ns = getNetworkString(10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_LIVE_JOIN_ACK).addUInt64(m_client_starting_time)
-        .addUInt64(live_join_start_time)
+        .addUInt8(cc).addUInt64(live_join_start_time)
         .addUInt32(m_last_live_join_util_ticks);
 
     NetworkItemManager* nim =
@@ -1612,6 +1614,8 @@ void ServerLobby::checkRaceFinished()
         int fastest_lap =
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
         m_result_ns->addUInt32(fastest_lap);
+        m_result_ns->encodeString(static_cast<LinearWorld*>(World::getWorld())
+            ->getFastestLapKartName());
 
         // all gp tracks
         m_result_ns->addUInt8((uint8_t)m_game_setup->getTotalGrandPrixTracks())
@@ -1644,6 +1648,8 @@ void ServerLobby::checkRaceFinished()
         int fastest_lap =
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
         m_result_ns->addUInt32(fastest_lap);
+        m_result_ns->encodeString(static_cast<LinearWorld*>(World::getWorld())
+            ->getFastestLapKartName());
     }
     if (ServerConfig::m_ranked)
     {
@@ -3032,6 +3038,8 @@ void ServerLobby::configPeersStartTime()
     NetworkString* ns = getNetworkString(10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
+    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    ns->addUInt8(cc);
     *ns += *m_items_complete_state;
     m_client_starting_time = start_time;
     sendMessageToPeers(ns, /*reliable*/true);

@@ -43,6 +43,9 @@ private:
 
     bool         m_last_lap_sfx_playing;
 
+    /** True if clients and server has the same check structure. */
+    bool         m_check_structure_compatible;
+
     /** The fastest lap time, in ticks of physics dt. */
     int          m_fastest_lap_ticks;
 
@@ -214,6 +217,12 @@ public:
         m_fastest_lap_ticks = ticks;
     }
     // ------------------------------------------------------------------------
+    /** Network use: set fastest kart name */
+    void setFastestKartName(const stringw& name)
+    {
+        m_fastest_lap_kart_name = name;
+    }
+    // ------------------------------------------------------------------------
     virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
         OVERRIDE;
     // ------------------------------------------------------------------------
@@ -221,9 +230,11 @@ public:
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
     // ------------------------------------------------------------------------
-    void updateCheckLinesServer(int kart_id);
+    void updateCheckLinesServer(int check_id, int kart_id);
     // ------------------------------------------------------------------------
     void updateCheckLinesClient(const BareNetworkString& b);
+    // ------------------------------------------------------------------------
+    void handleServerCheckStructureCount(unsigned count);
 };   // LinearWorld
 
 #endif

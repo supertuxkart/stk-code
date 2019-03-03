@@ -17,8 +17,7 @@ public:
         GE_CTF_SCORED = 4,
         GE_RESET_BALL = 5,
         GE_PLAYER_GOAL = 6,
-        GE_CHECK_LINE = 7,
-        GE_CHECK_LINE_KART = 8
+        GE_CHECK_LINE = 7
     };   // GameEventType
 private:
     int m_last_finished_position;
