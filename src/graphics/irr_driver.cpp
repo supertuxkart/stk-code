@@ -1719,7 +1719,7 @@ void IrrDriver::displayFPS()
     core::rect<s32> position;
 
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(75, 0, 1100, 40);
+        position = core::rect<s32>(51, 0, 1100, 80);
     else
         position = core::rect<s32>(75, 0, 900, 40);
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
@@ -1778,18 +1778,18 @@ void IrrDriver::displayFPS()
     {
         fps_string = StringUtils::insertValues
                     (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d, Total skinning joints: %d, "
+                      "%d Shadows - LightDist : %d\nComplexity %d, Total skinning joints: %d, "
                       "Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
-                    SP::sp_shadow_poly_count, m_last_light_bucket_distance,
+                    SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
                     m_skinning_joint, ping);
     }
     else
     {
         if (CVS->isGLSL())
         {
-            fps_string = _("FPS: %d/%d/%d - %d KTris\n Complexity %d, Ping: %dms", min, fps,
-                max, SP::sp_solid_poly_count / 1000, ping, irr_driver->getSceneComplexity());
+            fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
+                max, SP::sp_solid_poly_count / 1000, ping);
         }
         else
         {
