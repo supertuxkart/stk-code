@@ -146,6 +146,8 @@ public:
     /** Allows to read a buffer from the beginning again. */
     void reset() { m_current_offset = 0; }
     // ------------------------------------------------------------------------
+    /** Encode string with max length of 16bit and utf32, used in motd or
+     *  chat. */
     BareNetworkString& encodeString16(const irr::core::stringw& value)
     {
         uint16_t str_len = (uint16_t)value.size();
@@ -153,7 +155,7 @@ public:
             str_len = 65535;
         addUInt16(str_len);
         for (unsigned i = 0; i < str_len; i++)
-            addUInt16((uint16_t)value[i]);
+            addUInt32(value[i]);
         return *this;
     }
     // ------------------------------------------------------------------------
@@ -162,10 +164,13 @@ public:
         uint16_t str_len = getUInt16();
         for (unsigned i = 0; i < str_len; i++)
         {
-            uint16_t c = getUInt16();
+            uint32_t c = getUInt32();
+            // In the future convert for windows
+            if (c > 65535)
+                c = 20; // whitespace
             out->append((wchar_t)c);
         }
-        return str_len + 2;
+        return str_len * 4 + 2;
     }
     // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
