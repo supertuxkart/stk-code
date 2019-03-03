@@ -67,6 +67,7 @@
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/race_event_manager.hpp"
@@ -1414,6 +1415,8 @@ void Kart::update(int ticks)
     {
         m_kart_animation->update(ticks);
     }
+    else if (NetworkConfig::get()->roundValuesNow())
+        CompressNetworkBody::compress(m_body.get(), m_motion_state.get());
 
     float dt = stk_config->ticks2Time(ticks);
     if (!RewindManager::get()->isRewinding())

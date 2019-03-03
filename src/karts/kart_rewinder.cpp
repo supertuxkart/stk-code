@@ -31,6 +31,7 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
+#include "network/compress_network_body.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
@@ -201,13 +202,9 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     }
     else
     {
-        btRigidBody *body = getBody();
-        const btTransform &t = body->getWorldTransform();
-        buffer->add(t.getOrigin());
-        btQuaternion q = t.getRotation();
-        buffer->add(q);
-        buffer->add(body->getLinearVelocity());
-        buffer->add(body->getAngularVelocity());
+        CompressNetworkBody::compress(
+            m_body.get(), m_motion_state.get(), buffer);
+
         if (m_vehicle->getTimedRotationTicks() > 0)
         {
             buffer->addUInt16(m_vehicle->getTimedRotationTicks());
@@ -324,23 +321,13 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
             m_kart_animation = NULL;
         }
 
-        btTransform kart_trans;
-        kart_trans.setOrigin(buffer->getVec3());
-        kart_trans.setRotation(buffer->getQuat());
-        Vec3 lv = buffer->getVec3();
-        Vec3 av = buffer->getVec3();
-
         // Clear any forces applied (like by plunger or bubble gum torque)
-        btRigidBody *body = getBody();
-        body->clearForces();
-        body->setLinearVelocity(lv);
-        body->setAngularVelocity(av);
-        // This function also reads the velocity, so it must be called
-        // after the velocities are set
-        body->proceedToTransform(kart_trans);
+        m_body->clearForces();
+        CompressNetworkBody::decompress(
+            buffer, m_body.get(), m_motion_state.get());
         // Update kart transform in case that there are access to its value
         // before Moveable::update() is called (which updates the transform)
-        setTrans(kart_trans);
+        m_transform = m_body->getWorldTransform();
 
         if (read_timed_rotation)
         {
