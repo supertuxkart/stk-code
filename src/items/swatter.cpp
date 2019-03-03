@@ -351,7 +351,7 @@ void Swatter::chooseTarget()
         }
     }
     // Not larger than 2^5 - 1 for kart id for optimizing state saving
-    if (closest_kart->getWorldKartId() < 31)
+    if (closest_kart && closest_kart->getWorldKartId() < 31)
         m_closest_kart = closest_kart;
     else
         m_closest_kart = NULL;
