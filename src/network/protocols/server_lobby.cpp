@@ -642,7 +642,8 @@ NetworkString* ServerLobby::getLoadWorldMessage(
             .addUInt8(player->getPerPlayerDifficulty())
             .addUInt8(player->getLocalPlayerId())
             .addUInt8(
-            race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE);
+            race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
+            .encodeString(player->getCountryId());
         if (player->getKartName().empty())
         {
             RandomGenerator rg;
@@ -811,7 +812,8 @@ void ServerLobby::liveJoinRequest(Event* event)
                     std::numeric_limits<uint32_t>::max(),
                     rki.getDefaultKartColor(),
                     rki.getOnlineId(), rki.getDifficulty(),
-                    rki.getLocalPlayerId(), KART_TEAM_NONE);
+                    rki.getLocalPlayerId(), KART_TEAM_NONE,
+                    rki.getCountryId());
                 player->setKartName(rki.getKartName());
             }
             else
@@ -2224,7 +2226,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         auto player = std::make_shared<NetworkPlayerProfile>
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
-            per_player_difficulty, (uint8_t)i, KART_TEAM_NONE);
+            per_player_difficulty, (uint8_t)i, KART_TEAM_NONE,
+            ""/* reserved for country id */);
         if (ServerConfig::m_team_choosing)
         {
             KartTeam cur_team = KART_TEAM_NONE;
@@ -2346,6 +2349,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             m_peers_ready.find(p) != m_peers_ready.end() &&
             m_peers_ready.at(p)) ? 1 : 0;
         pl->addUInt8(ready);
+        pl->encodeString(profile->getCountryId());
     }
 
     // Don't send this message to in-game players
@@ -3473,7 +3477,7 @@ void ServerLobby::handleKartInfo(Event* event)
         .addUInt32(rki.getHostId()).addFloat(rki.getDefaultKartColor())
         .addUInt32(rki.getOnlineId()).addUInt8(rki.getDifficulty())
         .addUInt8((uint8_t)rki.getLocalPlayerId())
-        .encodeString(rki.getKartName());
+        .encodeString(rki.getKartName()).encodeString(rki.getCountryId());
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
 }   // handleKartInfo

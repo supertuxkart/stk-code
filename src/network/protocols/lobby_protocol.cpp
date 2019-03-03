@@ -133,6 +133,7 @@ void LobbyProtocol::configRemoteKart(
         rki.setOnlineId(profile->getOnlineId());
         if (race_manager->teamEnabled())
             rki.setKartTeam(profile->getTeam());
+        rki.setCountryId(profile->getCountryId());
         rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);

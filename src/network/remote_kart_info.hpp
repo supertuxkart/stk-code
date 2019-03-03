@@ -57,6 +57,7 @@ class RemoteKartInfo
         PerPlayerDifficulty m_difficulty;
         float               m_default_kart_color;
         uint32_t            m_online_id;
+        std::string         m_country_id;
         std::weak_ptr<NetworkPlayerProfile> m_profile;
 public:
      RemoteKartInfo(int player_id, const std::string& kart_name,
@@ -105,6 +106,8 @@ public:
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
     float getDefaultKartColor() const      { return m_default_kart_color; }
     uint32_t getOnlineId() const           { return m_online_id;          }
+    void setCountryId(const std::string& id) { m_country_id = id;         }
+    const std::string& getCountryId() const { return m_country_id;        }
     void setNetworkPlayerProfile(
         std::weak_ptr<NetworkPlayerProfile> npp)       { m_profile = npp; }
     std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const
