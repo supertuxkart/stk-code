@@ -172,6 +172,7 @@ IrrDriver::IrrDriver()
     m_skinning_joint             = 0;
     m_recording = false;
     m_sun_interposer = NULL;
+    m_scene_complexity           = 0;
 
 #ifndef SERVER_ONLY
     for (unsigned i = 0; i < Q_LAST; i++)
@@ -1787,8 +1788,8 @@ void IrrDriver::displayFPS()
     {
         if (CVS->isGLSL())
         {
-            fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", min, fps,
-                max, SP::sp_solid_poly_count / 1000, ping);
+            fps_string = _("FPS: %d/%d/%d - %d KTris\n Complexity %d, Ping: %dms", min, fps,
+                max, SP::sp_solid_poly_count / 1000, ping, irr_driver->getSceneComplexity());
         }
         else
         {
