@@ -224,9 +224,10 @@ public:
     /** Returns the ID of this physical object. */
     std::string getID()          { return m_id; }
     // ------------------------------------------------------------------------
+    btDefaultMotionState* getMotionState() const { return m_motion_state; }
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
-    btRigidBody *getBody        ()          { return m_body; }
+    btRigidBody* getBody() const  { return m_body; }
     // ------------------------------------------------------------------------
     /** Returns true if this object should trigger a rescue in a kart that
      *  hits it. */

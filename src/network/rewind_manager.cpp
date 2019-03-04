@@ -29,6 +29,8 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
@@ -357,6 +359,15 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
 
     // Update check line, so the cannon animation can be replayed correctly
     CheckManager::get()->resetAfterRewind();
+
+    if (exact_rewind_ticks > 0)
+    {
+        // Restore all physical objects moved by 3d animation, as it only
+        // set the motion state of physical bodies, it has 1 frame delay
+        world->setTicksForRewind(exact_rewind_ticks - 1);
+        Track::getCurrentTrack()->getTrackObjectManager()->resetAfterRewind();
+        world->setTicksForRewind(exact_rewind_ticks);
+    }
 
     // Now go forward through the list of rewind infos till we reach 'now':
     while (world->getTicksSinceStart() < now_ticks)

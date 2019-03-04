@@ -552,6 +552,20 @@ void TrackObject::update(float dt)
     if (m_animator) m_animator->updateWithWorldTicks(true/*has_physics*/);
 }   // update
 
+
+// ----------------------------------------------------------------------------
+/** This reset all physical object moved by 3d animation back to current ticks
+ */
+void TrackObject::resetAfterRewind()
+{
+    if (!m_animator || !m_physical_object)
+        return;
+    m_animator->updateWithWorldTicks(true/*has_physics*/);
+    btTransform new_trans;
+    m_physical_object->getMotionState()->getWorldTransform(new_trans);
+    m_physical_object->getBody()->setCenterOfMassTransform(new_trans);
+}   // resetAfterRewind
+
 // ----------------------------------------------------------------------------
 /** Does a raycast against the track object. The object must have a physical
  *  object.

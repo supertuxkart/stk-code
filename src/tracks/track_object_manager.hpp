@@ -61,6 +61,7 @@ public:
              TrackObject* parent_library);
     void updateGraphics(float dt);
     void update(float dt);
+    void resetAfterRewind();
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
     bool castRay(const btVector3 &from,

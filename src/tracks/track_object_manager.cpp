@@ -196,6 +196,16 @@ void TrackObjectManager::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+void TrackObjectManager::resetAfterRewind()
+{
+    TrackObject* curr;
+    for_in (curr, m_all_objects)
+    {
+        curr->resetAfterRewind();
+    }
+}   // resetAfterRewind
+
+// ----------------------------------------------------------------------------
 /** Does a raycast against all driveable objects. This way part of the track
  *  can be a physical object, and can e.g. be animated. A separate list of all
  *  driveable objects is maintained (in one case there were over 2000 bodies,
