@@ -41,6 +41,8 @@ namespace scene
 	{
 	public:
 
+        bool isAnimated = true;
+
 		//! Constructor
 		ISceneNode(ISceneNode* parent, ISceneManager* mgr, s32 id=-1,
 				const core::vector3df& position = core::vector3df(0,0,0),
@@ -113,7 +115,7 @@ namespace scene
 
 				ISceneNodeAnimatorList::Iterator ait = Animators.begin();
 				while (ait != Animators.end())
-					{
+				{
 					// continue to the next node before calling animateNode()
 					// so that the animator may remove itself from the scene
 					// node without the iterator becoming invalid
@@ -123,13 +125,17 @@ namespace scene
 				}
 
 				// update absolute position
-				updateAbsolutePosition();
+                if (isAnimated)
+				    updateAbsolutePosition();
 
 				// perform the post render process on all children
 
 				ISceneNodeList::Iterator it = Children.begin();
 				for (; it != Children.end(); ++it)
-					(*it)->OnAnimate(timeMs);
+                {
+                    if ((*it)->isAnimated)
+					    (*it)->OnAnimate(timeMs);
+                }
 			}
 		}
 

@@ -366,8 +366,13 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             btClamp(power, 0.5f, 10.0f);
             irr_driver->addForcedBloomNode(glownode, power);
         }
+
+        m_is_movable = is_movable;
     }
 
+    TrackObjectPresentationSceneNode* sceneNodePresentation = dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
+    if (sceneNodePresentation != NULL)
+        sceneNodePresentation->getNode()->isAnimated = this->isAnimated();
 
     if (type == "animation" || xml_node.hasChildNamed("curve"))
     {
@@ -387,6 +392,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         setEnabled(false);
     if (parent_library != NULL && !parent_library->isEnabled())
         setEnabled(false);
+
 }   // TrackObject
 
 // ----------------------------------------------------------------------------

@@ -134,7 +134,8 @@ void LODNode::OnAnimate(u32 timeMs)
     if (isVisible() && m_nodes.size() > 0)
     {
         // update absolute position
-        updateAbsolutePosition();
+        if (isAnimated)
+            updateAbsolutePosition();
 
 #ifndef SERVER_ONLY
         if (CVS->isGLSL())
@@ -142,7 +143,9 @@ void LODNode::OnAnimate(u32 timeMs)
             for (size_t i = 0; i < m_nodes.size(); i++)
             {
                 m_nodes[i]->setVisible(true);
-                m_nodes[i]->OnAnimate(timeMs);
+
+                if (m_nodes[i]->isAnimated)
+                    m_nodes[i]->OnAnimate(timeMs);
             }
         }
         else
@@ -150,11 +153,12 @@ void LODNode::OnAnimate(u32 timeMs)
         {
             int level = getLevel();
             // Assume all the scene node have the same bouding box
-            if(level>=0)
+            if(level>=0 && m_nodes[level]->isAnimated)
                 m_nodes[level]->OnAnimate(timeMs);
         }
 
-        Box = m_nodes[m_detail.size()-1]->getBoundingBox();
+        if (isAnimated)
+            Box = m_nodes[m_detail.size()-1]->getBoundingBox();
 
         // If this node has children other than the LOD nodes, animate it
         core::list<ISceneNode*>::Iterator it;
@@ -163,7 +167,7 @@ void LODNode::OnAnimate(u32 timeMs)
             if (m_nodes_set.find(*it) == m_nodes_set.end())
             {
                 assert(*it != NULL);
-                if ((*it)->isVisible())
+                if ((*it)->isVisible() && (*it)->isAnimated)
                 {
                     (*it)->OnAnimate(timeMs);
                 }

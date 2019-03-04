@@ -96,8 +96,8 @@ protected:
     std::vector<TrackObject*>      m_children;
 
     bool                           m_initially_visible;
-
-    std::string                     m_visibility_condition;
+    bool                           m_is_movable = false;
+    std::string                    m_visibility_condition;
 
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
@@ -249,6 +249,15 @@ public:
     std::vector<TrackObject*>& getChildren() { return m_children; }
     // ------------------------------------------------------------------------
     void movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr);
+    // ------------------------------------------------------------------------
+
+    bool isAnimated() const
+    {
+        return m_animator != NULL || m_is_movable
+            || m_movable_children.size() > 0
+            || (m_parent_library != NULL && m_parent_library->isAnimated());
+    }
+
     LEAK_CHECK()
 };   // TrackObject
 
