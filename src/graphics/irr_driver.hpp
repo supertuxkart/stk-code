@@ -150,6 +150,9 @@ private:
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
 
+    /** Store if the scene is complex (based on polycount, etc) */
+    int                  m_scene_complexity;
+
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings();
     void                 createListOfVideoModes();
@@ -368,6 +371,13 @@ public:
     void renderNetworkDebug();
     // ------------------------------------------------------------------------
     bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
+    // ------------------------------------------------------------------------
+    int getSceneComplexity() { return m_scene_complexity;           }
+    void resetSceneComplexity() { m_scene_complexity = 0;           }
+    void addSceneComplexity(int complexity)
+    {
+        if (complexity > 1) m_scene_complexity += (complexity - 1.0);
+    }
     // ------------------------------------------------------------------------
     bool isRecording() const { return m_recording; }
     // ------------------------------------------------------------------------

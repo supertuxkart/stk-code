@@ -202,11 +202,17 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
     CPUParticleManager::getInstance()->reset();
     TextBillboardDrawer::reset();
-    PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
+    PROFILER_PUSH_CPU_MARKER("- prepare draw call", 0xFF, 0xFF, 0x0);
     SP::prepareDrawCalls();
+    PROFILER_POP_CPU_MARKER();
+
+    PROFILER_PUSH_CPU_MARKER("-- parse scene manager", 0x00, 0xFF, 0x0);
     parseSceneManager(
         irr_driver->getSceneManager()->getRootSceneNode()->getChildren(),
         camnode);
+    PROFILER_POP_CPU_MARKER();
+
+    PROFILER_PUSH_CPU_MARKER("-- handle dynamic draw", 0x00, 0xFF, 0x0);
     SP::handleDynamicDrawCall();
     SP::updateModelMatrix();
     PROFILER_POP_CPU_MARKER();
@@ -214,7 +220,7 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
     PROFILER_PUSH_CPU_MARKER("- cpu particle generation", 0x2F, 0x1F, 0x11);
     CPUParticleManager::getInstance()->generateAll();
     PROFILER_POP_CPU_MARKER();
-
+    
     // Add a 1 s timeout
     if (m_sync != 0)
     {
@@ -233,22 +239,7 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
         PROFILER_POP_CPU_MARKER();
     }
 
-    /*    switch (reason)
-    {
-    case GL_ALREADY_SIGNALED:
-    printf("Already Signaled\n");
-    break;
-    case GL_TIMEOUT_EXPIRED:
-    printf("Timeout Expired\n");
-    break;
-    case GL_CONDITION_SATISFIED:
-    printf("Condition Satisfied\n");
-    break;
-    case GL_WAIT_FAILED:
-    printf("Wait Failed\n");
-    break;
-    }*/
-
+   
     PROFILER_PUSH_CPU_MARKER("- particle and text billboard upload", 0x3F,
         0x03, 0x61);
     CPUParticleManager::getInstance()->uploadAll();

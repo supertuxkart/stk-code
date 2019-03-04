@@ -62,14 +62,18 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
-    enum PreviousVisibility
-    {
-        FIRST_PASS,
-        WAS_SHOWN,
-        WAS_HIDDEN
-    };
+    // Area of the bounding box (for autoLOD computation)
+    float m_area;
 
-    PreviousVisibility m_previous_visibility;
+    // Previous level for the smooth transitions
+    int m_previous_level;
+    int m_current_level;
+
+    int m_timer;
+
+    bool is_in_transition;
+
+
 
     u32 m_last_tick;
 
@@ -83,7 +87,7 @@ public:
 
     int getLevel();
 
-    void updateVisibility(bool* shown = NULL);
+    void updateVisibility();
 
     /*
     //! Returns a reference to the current relative transformation matrix.
@@ -103,6 +107,11 @@ public:
       * \param reparent If true, node will be removed from its current parent first
       */
     void add(int level, scene::ISceneNode* node, bool reparent);
+
+    /**
+      * This method can be used to automatically compute LoD level
+      */
+    void autoComputeLevel(float scale);
 
     void forceLevelOfDetail(int n);
 
