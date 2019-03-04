@@ -131,6 +131,9 @@ void LODNode::forceLevelOfDetail(int n)
 // ----------------------------------------------------------------------------
 void LODNode::OnAnimate(u32 timeMs)
 {
+    if (!isAnimated)
+        return;
+
     if (isVisible() && m_nodes.size() > 0)
     {
         // update absolute position

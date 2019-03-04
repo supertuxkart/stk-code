@@ -142,12 +142,13 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
     {
+        if (!(*I)->isVisible())
+            continue;
+
         if (LODNode *node = dynamic_cast<LODNode *>(*I))
         {
             node->updateVisibility();
         }
-        if (!(*I)->isVisible())
-            continue;
 
         (*I)->updateAbsolutePosition();
         if (STKParticle *node = dynamic_cast<STKParticle*>(*I))
