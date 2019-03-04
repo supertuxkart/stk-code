@@ -362,11 +362,16 @@ void FontWithFace::setDPI()
     {
         float scale = std::max(0, screen_width - 640) / 564.0f;
         
-        // fix >= 2k scaling
+        // fix 2k and 4k scaling
         if (screen_height > 1300)
             scale = std::max(0, screen_width - 800) / 650.0f;
         if (screen_height > 2000)
-            scale = std::max(0, screen_width - 900) / 750.0f;
+            scale = std::max(0, screen_width - 1050) / 850.0f;
+        // not sure if these are OK
+        if (screen_height > 2800)
+            scale = std::max(0, screen_width - 1300) / 1050.0f;
+        if (screen_height > 3800)
+            scale = std::max(0, screen_width - 1800) / 1500.0f;
         // attempt to compensate for small screens
         if (screen_width < 1200)
             scale = std::max(0, screen_width - 640) / 750.0f;
