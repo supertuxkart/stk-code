@@ -62,8 +62,8 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
-    // Volume of the bounding box (for autoLOD computation)
-    float m_volume;
+    // Area of the bounding box (for autoLOD computation)
+    float m_area;
 
     // Previous level for the smooth transitions
     int m_previous_level;

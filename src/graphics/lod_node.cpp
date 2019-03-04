@@ -48,7 +48,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_forced_lod = -1;
     m_last_tick = 0;
-    m_volume = 0;
+    m_area = 0;
 
     m_previous_level = 0;
     m_current_level  = 0;
@@ -244,7 +244,7 @@ void LODNode::OnRegisterSceneNode()
 
 void LODNode::autoComputeLevel(float scale)
 {
-    m_volume *= scale;
+    m_area *= scale;
 
     // Amount of details based on user's input
     float agressivity = 1.0;
@@ -254,11 +254,11 @@ void LODNode::autoComputeLevel(float scale)
 
     // First we try to estimate how far away we need to draw
     float max_draw = 0.0;
-    max_draw = sqrtf((0.5 * m_volume + 10) * 200) - 10;
+    max_draw = sqrtf((0.5 * m_area + 10) * 200) - 10;
     // If the draw distance is too big we artificially reduce it
     if(max_draw > 250)
     {
-        max_draw = 250 + (max_draw * 0.05);
+        max_draw = 250 + (max_draw * 0.06);
     }
 
     max_draw *= agressivity;
@@ -277,7 +277,7 @@ void LODNode::autoComputeLevel(float scale)
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
     Box = node->getBoundingBox();
-    m_volume = Box.getArea();
+    m_area = Box.getArea();
 
     // samuncle suggested to put a slight randomisation in LOD
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
