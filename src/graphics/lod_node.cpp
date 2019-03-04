@@ -87,13 +87,33 @@ int LODNode::getLevel()
         return (int)m_detail.size() - 1;
     const Vec3 &pos = camera->getCameraSceneNode()->getAbsolutePosition();
 
-    const int dist =
+    int dist =
         (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ(pos.toIrrVector() ));
+    
+    // Based on the complexity of the track we are more or less aggressive with culling
+    int complexity = irr_driver->getSceneComplexity();
+    // The track has high complexity so we decrease the draw distance by 10%
+    if (complexity > 3000 )
+    {
+        dist += (dist/10);
+    }
+    // The track has medium complexity, we can increase slightly the draw distance
+    else if(complexity > 1500 )
+    {
+        dist -= (dist/100);
+    }
+    // The track has low complexity we can increase a lot the draw distance
+    else
+    {
+        dist -= (dist/10);
+    }
 
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
+        {
             return n;
+        }
     }
 
     return -1;
@@ -159,7 +179,7 @@ void LODNode::updateVisibility()
     if (m_nodes.size() == 0) return;
 
     // Don't need to run the computation of the level everytime
-    if ((int)(rand()%5) == 1)
+    if ((int)(rand()%10) == 1)
     {
         m_current_level = getLevel();
     }
@@ -172,27 +192,11 @@ void LODNode::updateVisibility()
 
     if (is_in_transition)
     {
-        // Initially we display the previous and the current one
+        // Initially we display the previous one along the new one
         for (size_t i = 0; i < m_nodes.size(); i++)
         {
-            if (i == m_current_level || i == m_previous_level)
-            {
+            if (m_current_level == i || m_previous_level == i)
                 m_nodes[i]->setVisible(true);
-                float size = m_timer / 20.f;
-                /*
-                if (i == m_current_level)
-                {
-                    m_nodes[i]->setScale( core::vector3df(size, size, size) );
-                }
-                else
-                {
-                    m_nodes[i]->setScale( core::vector3df(-size, -size, -size) );
-                }*/
-            }
-            else
-            {
-                m_nodes[i]->setVisible(false);
-            }
         }
 
         // We reset counting
@@ -205,7 +209,6 @@ void LODNode::updateVisibility()
     }
     else
     {
-        // General case everything is hidden except the current one
         for (size_t i = 0; i < m_nodes.size(); i++)
         {
             m_nodes[i]->setVisible(i == m_current_level);
@@ -248,9 +251,9 @@ void LODNode::autoComputeLevel(float scale)
 
     // Amount of details based on user's input
     float agressivity = 1.0;
-    if(UserConfigParams::m_geometry_level == 0) agressivity = 1.0;
-    if(UserConfigParams::m_geometry_level == 1) agressivity = 0.75;
-    if(UserConfigParams::m_geometry_level == 2) agressivity = 0.5;
+    if(UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
+    if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
+    if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
 
     // First we try to estimate how far away we need to draw
     float max_draw = 0.0;
@@ -294,6 +297,7 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     node->grab();
     node->remove();
     node->setPosition(core::vector3df(0,0,0));
+    node->setVisible(false);
     m_detail.push_back(level*level);
     m_nodes.push_back(node);
     m_nodes_set.insert(node);
