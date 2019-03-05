@@ -861,7 +861,9 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    font->setScale(min_ratio * scale);
+    
+    int font_height = font->getDimension(L"X").Height;
+    font->setScale((float)meter_height / font_height * 0.4f * scale);
     font->setShadow(video::SColor(255, 128, 0, 0));
     std::ostringstream oss;
     oss << rank; // the current font has no . :(   << ".";
