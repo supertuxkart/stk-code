@@ -255,7 +255,7 @@ void LODNode::autoComputeLevel(float scale)
     // If the draw distance is too big we artificially reduce it
     if(max_draw > 250)
     {
-        max_draw = 250 + (max_draw * 0.06);
+        max_draw = 235 + (max_draw * 0.06);
     }
 
     max_draw *= agressivity;
