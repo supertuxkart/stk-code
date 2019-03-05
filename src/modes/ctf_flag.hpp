@@ -31,6 +31,8 @@ enum FlagColor : unsigned int
     FC_BLUE = 1
 };
 
+class RenderInfo;
+
 namespace irr
 {
     namespace scene
@@ -61,6 +63,11 @@ private:
 
     /* Set by dropFlagAt to pre-compressed the dropped flag transformation. */
     int m_off_base_compressed[4];
+
+    /* Determine if the flag should be drawn translucently */
+    std::shared_ptr<RenderInfo> m_flag_render_info;
+
+    uint16_t m_deactivated_ticks;
 public:
     // ------------------------------------------------------------------------
     CTFFlag(FlagColor fc, const btTransform& base_trans)
@@ -108,8 +115,12 @@ public:
     // ------------------------------------------------------------------------
     const btTransform& getBaseTrans() const       { return m_flag_base_trans; }
     // ------------------------------------------------------------------------
-    void resetToBase()
+    void resetToBase(uint16_t deactivated_ticks = 0)
     {
+        // 11 bit for deactivated_ticks saved with flag status (5 bits)
+        if (deactivated_ticks > 2047)
+            deactivated_ticks = 2047;
+        m_deactivated_ticks = deactivated_ticks;
         m_flag_status = IN_BASE;
         m_ticks_since_off_base = 0;
         updateFlagTrans();
@@ -126,13 +137,18 @@ public:
     // ------------------------------------------------------------------------
     bool isInBase() const                  { return m_flag_status == IN_BASE; }
     // ------------------------------------------------------------------------
-    bool canBeCaptured() const                { return !(m_flag_status >= 0); }
+    bool isActivated() const               { return m_deactivated_ticks == 0; }
+    // ------------------------------------------------------------------------
+    bool canBeCaptured() const
+                             { return !(m_flag_status >= 0) && isActivated(); }
     // ------------------------------------------------------------------------
     void update(int ticks);
     // ------------------------------------------------------------------------
     void updateFlagTrans(const btTransform& off_base_trans = btTransform());
     // ------------------------------------------------------------------------
     void updateFlagGraphics(irr::scene::IAnimatedMeshSceneNode* flag_node);
+    // ------------------------------------------------------------------------
+    void initFlagRenderInfo(irr::scene::IAnimatedMeshSceneNode* flag_node);
 };   // CTFFlag
 #endif
 

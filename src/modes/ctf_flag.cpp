@@ -17,6 +17,8 @@
 
 #include "modes/ctf_flag.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
@@ -32,7 +34,11 @@ BareNetworkString* CTFFlag::saveState(std::vector<std::string>* ru)
 {
     ru->push_back(getUniqueIdentity());
     BareNetworkString* buffer = new BareNetworkString();
-    buffer->addUInt8(m_flag_status);
+    int flag_status_unsigned = m_flag_status + 2;
+    flag_status_unsigned &= 31;
+    // Max 2047 for m_deactivated_ticks set by resetToBase
+    flag_status_unsigned |= m_deactivated_ticks << 5;
+    buffer->addUInt16((uint16_t)flag_status_unsigned);
     if (m_flag_status == OFF_BASE)
     {
         buffer->addInt24(m_off_base_compressed[0])
@@ -48,7 +54,10 @@ BareNetworkString* CTFFlag::saveState(std::vector<std::string>* ru)
 void CTFFlag::restoreState(BareNetworkString* buffer, int count)
 {
     using namespace MiniGLM;
-    m_flag_status = buffer->getUInt8();
+    unsigned flag_status_unsigned = buffer->getUInt16();
+    int flag_status = flag_status_unsigned & 31;
+    m_flag_status = (int8_t)(flag_status - 2);
+    m_deactivated_ticks = flag_status_unsigned >> 5;
     if (m_flag_status == OFF_BASE)
     {
         m_off_base_compressed[0] = buffer->getInt24();
@@ -83,6 +92,9 @@ void CTFFlag::update(int ticks)
 {
     updateFlagTrans(m_flag_trans);
 
+    if (m_deactivated_ticks > 0)
+        m_deactivated_ticks -= ticks;
+
     // Check if not returning for too long
     if (m_flag_status != OFF_BASE)
         return;
@@ -116,7 +128,28 @@ void CTFFlag::updateFlagGraphics(irr::scene::IAnimatedMeshSceneNode* flag_node)
         flag_node->setRotation(hpr.toIrrHPR());
         flag_node->setAnimationSpeed(25.0f);
     }
+
+#ifndef SERVER_ONLY
+    if (m_flag_render_info)
+    {
+        if (m_deactivated_ticks > 0)
+            m_flag_render_info->setTransparent(true);
+        else
+            m_flag_render_info->setTransparent(false);
+    }
+#endif
+
 }   // updateFlagPosition
+
+// ----------------------------------------------------------------------------
+void CTFFlag::initFlagRenderInfo(irr::scene::IAnimatedMeshSceneNode* flag_node)
+{
+    SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(flag_node);
+    if (!spmn)
+        return;
+    m_flag_render_info = std::make_shared<RenderInfo>(0.0f, true);
+    spmn->resetFirstRenderInfo(m_flag_render_info);
+}   // initFlagRenderInfo
 
 // ----------------------------------------------------------------------------
 void CTFFlag::dropFlagAt(const btTransform& t)
