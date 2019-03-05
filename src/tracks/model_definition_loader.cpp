@@ -144,7 +144,8 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         }
         vector3df scale = vector3df(1.f, 1.f, 1.f);
         node->get("scale", &scale);
-        lod_node->autoComputeLevel(scale.getLength());
+        // TODO samuncle: can be enabled after RC
+        //lod_node->autoComputeLevel(scale.getLength());
 
 #ifdef DEBUG
         std::string debug_name = groupname+" (LOD track-object)";

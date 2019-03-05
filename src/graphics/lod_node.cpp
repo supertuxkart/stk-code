@@ -214,8 +214,6 @@ void LODNode::updateVisibility()
             m_nodes[i]->setVisible(i == m_current_level);
         }
     }
-
-    //const u32 now = irr_driver->getDevice()->getTimer()->getTime();
 }
 
 void LODNode::OnRegisterSceneNode()
@@ -227,10 +225,6 @@ void LODNode::OnRegisterSceneNode()
         return;
     }
 #endif
-
-    const u32 now = irr_driver->getDevice()->getTimer()->getTime();
-
-    // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
     
 #ifndef SERVER_ONLY
     if (!CVS->isGLSL())
