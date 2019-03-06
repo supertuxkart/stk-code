@@ -163,7 +163,12 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
 
-    // 1) Boolean handling to determine if need saving
+    // 1) Steering and other player controls
+    // -------------------------------------
+    getControls().saveState(buffer);
+    bool sign_neg = getController()->saveState(buffer);
+
+    // 2) Boolean handling to determine if need saving
     const bool has_animation = m_kart_animation != NULL;
     uint8_t bool_for_each_data = 0;
     if (m_fire_clicked)
@@ -184,6 +189,19 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         bool_for_each_data |= (1 << 7);
     buffer->addUInt8(bool_for_each_data);
 
+    uint8_t bool_for_each_data_2 = 0;
+    if (sign_neg)
+        bool_for_each_data_2 |= 1;
+    if (m_bounce_back_ticks > 0)
+        bool_for_each_data_2 |= (1 << 1);
+    if (getAttachment()->getType() != Attachment::ATTACH_NOTHING)
+        bool_for_each_data_2 |= (1 << 2);
+    if (getPowerup()->getType() != PowerupManager::POWERUP_NOTHING)
+        bool_for_each_data_2 |= (1 << 3);
+    if (m_bubblegum_torque_sign)
+        bool_for_each_data_2 |= (1 << 4);
+    buffer->addUInt8(bool_for_each_data_2);
+
     if (m_bubblegum_ticks > 0)
         buffer->addUInt16(m_bubblegum_ticks);
     if (m_view_blocked_by_plunger > 0)
@@ -193,7 +211,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     if (getEnergy() > 0.0f)
         buffer->addFloat(getEnergy());
 
-    // 2) Kart animation status or physics values (transform and velocities)
+    // 3) Kart animation status or physics values (transform and velocities)
     // -------------------------------------------
     if (has_animation)
     {
@@ -212,7 +230,8 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         }
 
         // For collision rewind
-        buffer->addUInt16(m_bounce_back_ticks);
+        if (m_bounce_back_ticks > 0)
+            buffer->addUInt8(m_bounce_back_ticks);
         if (m_vehicle->getCentralImpulseTicks() > 0)
         {
             buffer->addUInt16(m_vehicle->getCentralImpulseTicks());
@@ -220,15 +239,12 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         }
     }
 
-    // 3) Steering and other player controls
-    // -------------------------------------
-    getControls().saveState(buffer);
-    getController()->saveState(buffer);
-
     // 4) Attachment, powerup, nitro
     // -----------------------------
-    getAttachment()->saveState(buffer);
-    getPowerup()->saveState(buffer);
+    if (getAttachment()->getType() != Attachment::ATTACH_NOTHING)
+        getAttachment()->saveState(buffer);
+    if (getPowerup()->getType() != PowerupManager::POWERUP_NOTHING)
+        getPowerup()->saveState(buffer);
 
     // 5) Max speed info
     // ------------------
@@ -251,7 +267,12 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 {
     m_has_server_state = true;
 
-    // 1) Boolean handling to determine if need saving
+    // 1) Steering and other controls
+    // ------------------------------
+    getControls().rewindTo(buffer);
+    getController()->rewindTo(buffer);
+
+    // 2) Boolean handling to determine if need saving
     // -----------
     uint8_t bool_for_each_data = buffer->getUInt8();
     m_fire_clicked = (bool_for_each_data & 1) == 1;
@@ -262,6 +283,19 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     bool has_animation_in_state = ((bool_for_each_data >> 5) & 1) == 1;
     bool read_timed_rotation =  ((bool_for_each_data >> 6) & 1) == 1;
     bool read_impulse = ((bool_for_each_data >> 7) & 1) == 1;
+
+    uint8_t bool_for_each_data_2 = buffer->getUInt8();
+    bool controller_steer_sign = (bool_for_each_data_2 & 1) == 1;
+    if (controller_steer_sign)
+    {
+        PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
+        if (pc)
+            pc->m_steer_val = pc->m_steer_val * -1;
+    }
+    bool read_bounce_back = ((bool_for_each_data_2 >> 1) & 1) == 1;
+    bool read_attachment = ((bool_for_each_data_2 >> 2) & 1) == 1;
+    bool read_powerup = ((bool_for_each_data_2 >> 3) & 1) == 1;
+    m_bubblegum_torque_sign = ((bool_for_each_data_2 >> 4) & 1) == 1;
 
     if (read_bubblegum)
         m_bubblegum_ticks = buffer->getUInt16();
@@ -286,7 +320,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     else
         setEnergy(0.0f);
 
-    // 2) Kart animation status or transform and velocities
+    // 3) Kart animation status or transform and velocities
     // -----------
     if (has_animation_in_state)
     {
@@ -341,7 +375,10 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
             m_vehicle->setTimedRotation(0, 0.0f);
 
         // Collision rewind
-        m_bounce_back_ticks = buffer->getUInt16();
+        if (read_bounce_back)
+            m_bounce_back_ticks = buffer->getUInt8();
+        else
+            m_bounce_back_ticks = 0;
         if (read_impulse)
         {
             uint16_t central_impulse_ticks = buffer->getUInt16();
@@ -360,18 +397,19 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         m_vehicle->updateAllWheelTransformsWS();
     }
 
-    // 3) Steering and other controls
-    // ------------------------------
-    getControls().rewindTo(buffer);
-    getController()->rewindTo(buffer);
-
     // 4) Attachment, powerup, nitro
     // ------------------------------
-    getAttachment()->rewindTo(buffer);
+    if (read_attachment)
+        getAttachment()->rewindTo(buffer);
+    else
+        getAttachment()->clear();
     // Required for going back to anvil when rewinding
     updateWeight();
 
-    getPowerup()->rewindTo(buffer);
+    if (read_powerup)
+        getPowerup()->rewindTo(buffer);
+    else
+        getPowerup()->set(PowerupManager::POWERUP_NOTHING, 0);
 
     // 5) Max speed info
     // ------------------
@@ -402,7 +440,6 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     // itself
     int brake_ticks = m_brake_ticks;
     int8_t min_nitro_ticks = m_min_nitro_ticks;
-    float bubblegum_torque = m_bubblegum_torque;
 
     // Controller local state
     int steer_val_l = 0;
@@ -423,13 +460,12 @@ std::function<void()> KartRewinder::getLocalStateRestoreFunction()
     // Skidding local state
     float remaining_jump_time = m_skidding->m_remaining_jump_time;
 
-    return [brake_ticks, min_nitro_ticks, bubblegum_torque,
+    return [brake_ticks, min_nitro_ticks,
         steer_val_l, steer_val_r, current_fraction,
         max_speed_fraction, remaining_jump_time, this]()
     {
         m_brake_ticks = brake_ticks;
         m_min_nitro_ticks = min_nitro_ticks;
-        m_bubblegum_torque = bubblegum_torque;
         PlayerController* pc = dynamic_cast<PlayerController*>(m_controller);
         if (pc)
         {

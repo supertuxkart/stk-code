@@ -99,6 +99,13 @@ protected:
 
     bool m_enabled_network_spectator;
 
+    /** The sign of torque to apply after hitting a bubble gum. */
+    bool        m_bubblegum_torque_sign;
+
+    /** A short time after a collision acceleration is disabled to allow
+     *  the karts to bounce back*/
+    uint8_t      m_bounce_back_ticks;
+
 protected:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
@@ -190,10 +197,6 @@ protected:
      *  the kart will brake. */
     int          m_brake_ticks;
 
-    /** A short time after a collision acceleration is disabled to allow
-     *  the karts to bounce back*/
-    int16_t      m_bounce_back_ticks;
-
     /** Time a kart is invulnerable. */
     int16_t      m_invulnerable_ticks;
 
@@ -219,9 +222,6 @@ protected:
     bool            m_finished_race;
 
     float           m_finish_time;
-
-    /** The torque to apply after hitting a bubble gum. */
-    float        m_bubblegum_torque;
 
      /** The amount of energy collected with nitro cans. Note that it
       *  must be float, since dt is subtraced in each timestep. */

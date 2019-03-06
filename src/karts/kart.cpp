@@ -375,7 +375,7 @@ void Kart::reset()
     m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_bubblegum_ticks      = 0;
-    m_bubblegum_torque     = 0.0f;
+    m_bubblegum_torque_sign = true;
     m_invulnerable_ticks   = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
@@ -1145,10 +1145,9 @@ void Kart::collectedItem(ItemState *item_state)
         // slow down
         m_bubblegum_ticks = (int16_t)stk_config->time2Ticks(
             m_kart_properties->getBubblegumDuration());
-        m_bubblegum_torque =
+        m_bubblegum_torque_sign =
             ((World::getWorld()->getTicksSinceStart() / 10) % 2 == 0) ?
-            m_kart_properties->getBubblegumTorque() :
-            -m_kart_properties->getBubblegumTorque();
+            true : false;
         m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTicks(),
@@ -1394,15 +1393,6 @@ void Kart::update(int ticks)
     if (m_bubblegum_ticks > 0)
     {
         m_bubblegum_ticks -= ticks;
-        if (m_bubblegum_ticks <= 0)
-        {
-            m_bubblegum_torque = 0;
-        }
-    }
-    else
-    {
-        // Not strictly necessary, but makes sure torque has expected values
-        m_bubblegum_torque = 0;
     }
 
     // This is to avoid a rescue immediately after an explosion
@@ -1702,7 +1692,7 @@ void Kart::update(int ticks)
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
         "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
         "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d heading(43) %f "
-        "bubticks(45) %d bubtor(47) %f",
+        "bubticks(45) %d",
         getIdent().c_str(),
         World::getWorld()->getTime(), World::getWorld()->getTicksSinceStart(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1723,8 +1713,7 @@ void Kart::update(int ticks)
         m_brake_ticks, //39
         m_controls.getButtonsCompressed(),  //41
         getHeading(),  //43
-        m_bubblegum_ticks, // 45
-        m_bubblegum_torque // 47
+        m_bubblegum_ticks // 45
     );
 #endif
 
@@ -2420,7 +2409,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             else
                 impulse = Vec3(0, 0, -1); // Arbitrary
             impulse *= m_kart_properties->getCollisionTerrainImpulse();
-            m_bounce_back_ticks = stk_config->time2Ticks(0.2f);
+            m_bounce_back_ticks = (uint8_t)stk_config->time2Ticks(0.2f);
             m_vehicle->setTimedCentralImpulse(
                 (uint16_t)stk_config->time2Ticks(0.1f), impulse);
         }
@@ -2469,12 +2458,12 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
             // This variable is set to 0.2 in case of a kart-terrain collision
-            if (m_bounce_back_ticks <= stk_config->time2Ticks(0.2f))
+            if (m_bounce_back_ticks <= (uint8_t)stk_config->time2Ticks(0.2f))
             {
                 btVector3 push = m_body->getLinearVelocity().normalized();
                 push[1] = 0.1f;
                 m_body->applyCentralImpulse( -4000.0f*push );
-                m_bounce_back_ticks = stk_config->time2Ticks(2.0f);
+                m_bounce_back_ticks = (uint8_t)stk_config->time2Ticks(2.0f);
             }   // if m_bounce_back_ticks <= 0.2f
         }   // if (m->getCollisionReaction() == Material::PUSH_BACK)
     }   // if(m && m->getCollisionReaction() != Material::NORMAL &&
@@ -2496,7 +2485,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
-    if(m_bounce_back_ticks <= 0)
+    if(m_bounce_back_ticks == 0)
     {
         if (getVelocity().length()> 0.555f)
         {
@@ -2540,7 +2529,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
                 crash_sound_emitter->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
-    }   // if m_bounce_back_ticks <= 0
+    }   // if m_bounce_back_ticks == 0
 }   // playCrashSFX
 
 // -----------------------------------------------------------------------------
@@ -2642,7 +2631,7 @@ void Kart::updatePhysics(int ticks)
                 /*fade_out_time*/stk_config->time2Ticks(5.0f));
         }
     }
-    if (m_bounce_back_ticks > std::numeric_limits<int16_t>::min())
+    if (m_bounce_back_ticks > 0)
         m_bounce_back_ticks -= ticks;
 
     updateEnginePowerAndBrakes(ticks);
@@ -2803,7 +2792,9 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     if (m_bubblegum_ticks > 0)
     {
         engine_power = 0.0f;
-        m_body->applyTorque(btVector3(0.0, m_bubblegum_torque, 0.0));
+        m_body->applyTorque(btVector3(0.0,
+            m_kart_properties->getBubblegumTorque() *
+            (m_bubblegum_torque_sign ? 1.0f : -1.0f), 0.0));
     }
 
     if(m_controls.getAccel())   // accelerating

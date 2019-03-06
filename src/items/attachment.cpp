@@ -180,9 +180,9 @@ void Attachment::clear(bool update_graphical_now)
         m_plugin = NULL;
     }
 
-    m_type=ATTACH_NOTHING;
-
+    m_type = ATTACH_NOTHING;
     m_ticks_left = 0;
+    m_initial_speed = 0;
     if (update_graphical_now)
         updateGraphicalTypeNow();
 }   // clear
@@ -204,16 +204,13 @@ void Attachment::saveState(BareNetworkString *buffer) const
     uint8_t type = m_type | (( (m_type==ATTACH_BOMB) && (m_previous_owner!=NULL) )
                              ? (1 << 6) : 0 ) | bit_7;
     buffer->addUInt8(type);
-    if(m_type!=ATTACH_NOTHING)
-    {
-        buffer->addUInt16(m_ticks_left);
-        if(m_type==ATTACH_BOMB && m_previous_owner)
-            buffer->addUInt8(m_previous_owner->getWorldKartId());
-        if (m_type == ATTACH_PARACHUTE)
-            buffer->addUInt16(m_initial_speed);
-        if (m_plugin)
-            m_plugin->saveState(buffer);
-    }
+    buffer->addUInt16(m_ticks_left);
+    if (m_type==ATTACH_BOMB && m_previous_owner)
+        buffer->addUInt8(m_previous_owner->getWorldKartId());
+    if (m_type == ATTACH_PARACHUTE)
+        buffer->addUInt16(m_initial_speed);
+    if (m_plugin)
+        m_plugin->saveState(buffer);
 }   // saveState
 
 // -----------------------------------------------------------------------------
@@ -229,19 +226,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     AttachmentType new_type = AttachmentType(type & 63);
     type &= 127;
 
-    // If there is no attachment, clear the attachment if necessary and exit
-    if (new_type == ATTACH_NOTHING)
-    {
-        m_initial_speed = 0;
-        if (m_type != new_type)
-            clear();
-        return;
-    }
-
-    int16_t ticks_left = 0;
-    if (new_type != ATTACH_NOTHING)
-        ticks_left = buffer->getUInt16();
-
+    int16_t ticks_left = buffer->getUInt16();
     // Now it is a new attachment:
     if (type == (ATTACH_BOMB | 64))   // we have previous owner information
     {
