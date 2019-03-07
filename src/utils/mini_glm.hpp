@@ -571,17 +571,17 @@ namespace MiniGLM
     inline void compressbtTransform(btTransform& cur_t,
                                     int* compressed_data = NULL)
     {
-        int x = (int)(cur_t.getOrigin().x() * 1000.0f);
-        int y = (int)(cur_t.getOrigin().y() * 1000.0f);
-        int z = (int)(cur_t.getOrigin().z() * 1000.0f);
+        int x = (int)(cur_t.getOrigin().x() * 100.0f);
+        int y = (int)(cur_t.getOrigin().y() * 100.0f);
+        int z = (int)(cur_t.getOrigin().z() * 100.0f);
         x = core::clamp(x, -8388608, 8388607);
         y = core::clamp(y, -8388608, 8388607);
         z = core::clamp(z, -8388608, 8388607);
         uint32_t compressed_q = compressQuaternion(cur_t.getRotation());
         cur_t.setOrigin(btVector3(
-            (float)x / 1000.0f,
-            (float)y / 1000.0f,
-            (float)z / 1000.0f));
+            (float)x / 100.0f,
+            (float)y / 100.0f,
+            (float)z / 100.0f));
         cur_t.setRotation(decompressbtQuaternion(compressed_q));
         if (compressed_data)
         {
@@ -596,9 +596,9 @@ namespace MiniGLM
     {
         btTransform trans;
         trans.setOrigin(btVector3(
-            (float)compressed_data[0] / 1000.0f,
-            (float)compressed_data[1] / 1000.0f,
-            (float)compressed_data[2] / 1000.0f));
+            (float)compressed_data[0] / 100.0f,
+            (float)compressed_data[1] / 100.0f,
+            (float)compressed_data[2] / 100.0f));
         trans.setRotation(decompressbtQuaternion(
             (uint32_t)compressed_data[3]));
         return trans;
