@@ -571,8 +571,7 @@ void Attachment::updateGraphics(float dt)
             break;
         }   // switch(type)
 
-        if (UserConfigParams::m_particles_effects < 2 &&
-            m_type != ATTACH_NOTHING)
+        if (m_type != ATTACH_NOTHING)
         {
             m_node->setAnimationSpeed(0);
             m_node->setCurrentFrame(0);
