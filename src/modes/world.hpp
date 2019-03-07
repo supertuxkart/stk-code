@@ -383,6 +383,8 @@ public:
         return std::make_pair(std::numeric_limits<uint32_t>::max(),
             std::numeric_limits<uint32_t>::max());
     }
+    // ------------------------------------------------------------------------
+    virtual bool isGoalPhase() const { return false; }
 };   // World
 
 #endif

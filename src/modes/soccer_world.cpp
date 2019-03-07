@@ -23,18 +23,13 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/kart_rewinder.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "network/rewind_info.hpp"
-#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -91,7 +86,6 @@ void SoccerWorld::init()
     m_kart_position_map.clear();
     WorldWithRank::init();
     m_display_rank = false;
-    m_goal_timer   = 0;
     m_ball_hitter  = -1;
     m_ball         = NULL;
     m_ball_body    = NULL;
@@ -165,6 +159,7 @@ void SoccerWorld::reset(bool restart)
     m_reset_ball_ticks = -1;
     m_ball->reset();
     m_bgd.reset();
+    m_ticks_back_to_own_goal = -1;
     m_ball->setEnabled(false);
 
     // Make the player kart in profiling mode up
@@ -220,7 +215,7 @@ void SoccerWorld::update(int ticks)
     WorldWithRank::update(ticks);
     WorldWithRank::updateTrack(ticks);
 
-    if (getPhase() == World::GOAL_PHASE)
+    if (isGoalPhase())
     {
         for (unsigned int i = 0; i < m_karts.size(); i++)
         {
@@ -232,22 +227,13 @@ void SoccerWorld::update(int ticks)
             kart->getBody()->proceedToTransform(m_goal_transforms[i]);
             kart->setTrans(m_goal_transforms[i]);
         }
-
-        if (NetworkConfig::get()->isNetworking() &&
-            NetworkConfig::get()->isClient())
-            return;
-
-        m_goal_timer += ticks;
-        if (m_goal_timer > stk_config->time2Ticks(3.0f))
+        if (m_ticks_back_to_own_goal - getTicksSinceStart() == 1 &&
+            !isRaceOver())
         {
-            m_goal_timer = 0;
-            if (!isRaceOver())
-            {
-                // Reset all karts and ball
-                resetKartsToSelfGoals();
-                if (UserConfigParams::m_arena_ai_stats)
-                    getKart(8)->flyUp();
-            }
+            // Reset all karts and ball
+            resetKartsToSelfGoals();
+            if (UserConfigParams::m_arena_ai_stats)
+                getKart(8)->flyUp();
         }
     }
     if (UserConfigParams::m_arena_ai_stats)
@@ -263,8 +249,10 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         NetworkConfig::get()->isClient()))
         return;
 
-    setPhase(WorldStatus::GOAL_PHASE);
+    m_ticks_back_to_own_goal = getTicksSinceStart() +
+        stk_config->time2Ticks(3.0f);
     m_goal_sound->play();
+    m_ball->reset();
     m_ball->setEnabled(false);
     if (m_ball_hitter != -1)
     {
@@ -323,8 +311,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             p.addUInt8(GameEventsProtocol::GE_PLAYER_GOAL)
                 .addUInt8((uint8_t)sd.m_id).addUInt8(sd.m_correct_goal)
                 .addUInt8(first_goal).addFloat(sd.m_time)
-                .addTime(World::getWorld()->getTicksSinceStart() +
-                stk_config->time2Ticks(3.0f))
+                .addTime(m_ticks_back_to_own_goal)
                 .encodeString(sd.m_kart)
                 .encodeString(sd.m_player);
             STKHost::get()->sendPacketToAllPeers(&p, true);
@@ -333,21 +320,15 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     for (unsigned i = 0; i < m_karts.size(); i++)
     {
         auto& kart = m_karts[i];
-        if (kart->isEliminated())
-            continue;
         kart->getBody()->setLinearVelocity(Vec3(0.0f));
         kart->getBody()->setAngularVelocity(Vec3(0.0f));
         m_goal_transforms[i] = kart->getBody()->getWorldTransform();
     }
-
 }   // onCheckGoalTriggered
 
 //-----------------------------------------------------------------------------
 void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
 {
-    // Ignore in live join
-    if (isStartPhase())
-        return;
     int ticks_now = World::getWorld()->getTicksSinceStart();
     int ticks_back_to_own_goal = ns.getTime();
     if (ticks_now >= ticks_back_to_own_goal)
@@ -356,10 +337,7 @@ void SoccerWorld::handleResetBallFromServer(const NetworkString& ns)
             "%d when reset player", ticks_back_to_own_goal, ticks_now);
         return;
     }
-    RewindManager::get()->addRewindInfoEventFunction(new
-        RewindInfoEventFunction(ticks_back_to_own_goal,
-        [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
-
+    m_reset_ball_ticks = ticks_back_to_own_goal;
 }   // handleResetBallFromServer
 
 //-----------------------------------------------------------------------------
@@ -372,17 +350,8 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     sd.m_time = ns.getFloat();
     int ticks_now = World::getWorld()->getTicksSinceStart();
     int ticks_back_to_own_goal = ns.getTime();
-    try
-    {
-        ns.decodeString(&sd.m_kart);
-        ns.decodeStringW(&sd.m_player);
-    }
-    catch (std::exception &e)
-    {
-        sd.m_kart = getKart(sd.m_id)->getIdent();
-        sd.m_player = getKart(sd.m_id)->getController()->getName();
-        (void)e;
-    }
+    ns.decodeString(&sd.m_kart);
+    ns.decodeStringW(&sd.m_player);
 
     if (first_goal)
     {
@@ -393,7 +362,27 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         m_blue_scorers.push_back(sd);
     }
 
-    // Ignore in live join
+    if (ticks_now >= ticks_back_to_own_goal && !isStartPhase())
+    {
+        Log::warn("SoccerWorld", "Server ticks %d is too close to client ticks "
+            "%d when goal", ticks_back_to_own_goal, ticks_now);
+        return;
+    }
+    m_ticks_back_to_own_goal = ticks_back_to_own_goal;
+    for (unsigned i = 0; i < m_karts.size(); i++)
+    {
+        auto& kart = m_karts[i];
+        btTransform transform_now = kart->getBody()->getWorldTransform();
+        kart->getBody()->setLinearVelocity(Vec3(0.0f));
+        kart->getBody()->setAngularVelocity(Vec3(0.0f));
+        kart->getBody()->proceedToTransform(transform_now);
+        kart->setTrans(transform_now);
+        m_goal_transforms[i] = transform_now;
+    }
+    m_ball->reset();
+    m_ball->setEnabled(false);
+
+    // Ignore the rest in live join
     if (isStartPhase())
         return;
 
@@ -407,32 +396,7 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         m_karts[sd.m_id]->getKartModel()
             ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
     }
-
-    if (ticks_now >= ticks_back_to_own_goal)
-    {
-        Log::warn("SoccerWorld", "Server ticks %d is too close to client ticks "
-            "%d when goal", ticks_back_to_own_goal, ticks_now);
-        return;
-    }
-
-    setPhase(WorldStatus::GOAL_PHASE);
     m_goal_sound->play();
-    m_ball->setEnabled(false);
-    for (unsigned i = 0; i < m_karts.size(); i++)
-    {
-        auto& kart = m_karts[i];
-        if (kart->isEliminated())
-            continue;
-        btTransform transform_now = kart->getBody()->getWorldTransform();
-        kart->getBody()->setLinearVelocity(Vec3(0.0f));
-        kart->getBody()->setAngularVelocity(Vec3(0.0f));
-        kart->getBody()->proceedToTransform(transform_now);
-        kart->setTrans(transform_now);
-        m_goal_transforms[i] = transform_now;
-    }
-    RewindManager::get()->addRewindInfoEventFunction(new
-        RewindInfoEventFunction(ticks_back_to_own_goal,
-        [](){}, std::bind(&SoccerWorld::resetKartsToSelfGoals, this)));
 
 }   // handlePlayerGoalFromServer
 
@@ -442,7 +406,6 @@ void SoccerWorld::resetKartsToSelfGoals()
     m_ball->setEnabled(true);
     m_ball->reset();
     m_bgd.resetCheckGoal(Track::getCurrentTrack());
-    setPhase(WorldStatus::RACE_PHASE);
     for (unsigned i = 0; i < m_karts.size(); i++)
     {
         auto& kart = m_karts[i];
@@ -532,20 +495,24 @@ void SoccerWorld::updateBallPosition(int ticks)
     {
         m_ball_track_sector
             ->update(getBallPosition(), true/*ignore_vertical*/);
-        if (!m_ball_track_sector->isOnRoad() && getPhase() == RACE_PHASE &&
-            m_reset_ball_ticks == -1)
+
+        bool is_client = NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isClient();
+        bool is_server = NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isServer();
+
+        if (!is_client && getTicksSinceStart() > m_reset_ball_ticks &&
+            !m_ball_track_sector->isOnRoad())
         {
             m_ball_invalid_timer += ticks;
             // Reset the ball and karts if out of navmesh after 2 seconds
             if (m_ball_invalid_timer >= stk_config->time2Ticks(2.0f))
             {
-                if (NetworkConfig::get()->isNetworking() &&
-                    NetworkConfig::get()->isServer())
+                if (is_server)
                 {
                     // Reset the ball 2 seconds in the future to make sure it's
                     // after all clients time
-                    m_reset_ball_ticks =
-                        World::getWorld()->getTicksSinceStart() +
+                    m_reset_ball_ticks = getTicksSinceStart() +
                         stk_config->time2Ticks(2.0f);
 
                     NetworkString p(PROTOCOL_GAME_EVENTS);
@@ -567,10 +534,7 @@ void SoccerWorld::updateBallPosition(int ticks)
             m_ball_invalid_timer = 0;
         if (m_reset_ball_ticks == World::getWorld()->getTicksSinceStart())
         {
-            assert(NetworkConfig::get()->isNetworking() &&
-                NetworkConfig::get()->isServer());
             resetKartsToSelfGoals();
-            m_reset_ball_ticks = -1;
         }
     }
 
@@ -792,6 +756,7 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns)
             .encodeString(m_blue_scorers[i].m_kart)
             .encodeString(m_blue_scorers[i].m_player);
     }
+    bns->addTime(m_reset_ball_ticks).addTime(m_ticks_back_to_own_goal);
 }   // saveCompleteState
 
 // ----------------------------------------------------------------------------
@@ -823,4 +788,6 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
         b.decodeStringW(&sd.m_player);
         m_blue_scorers.push_back(sd);
     }
+    m_reset_ball_ticks = b.getTime();
+    m_ticks_back_to_own_goal = b.getTime();
 }   // restoreCompleteState

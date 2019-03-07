@@ -269,9 +269,6 @@ private:
 
     SFXBase *m_goal_sound;
 
-    /** Timer for displaying goal text*/
-    int m_goal_timer;
-
     /** Counts ticks when the ball is off track, so a reset can be
      *  triggered if the ball is off for more than 2 seconds. */
     int m_ball_invalid_timer;
@@ -299,6 +296,8 @@ private:
     std::vector<int> m_goal_frame;
 
     int m_reset_ball_ticks;
+    int m_ticks_back_to_own_goal;
+
     void resetKartsToSelfGoals();
 
 public:
@@ -418,6 +417,12 @@ public:
     virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool isGoalPhase() const OVERRIDE
+    {
+        int diff = m_ticks_back_to_own_goal - getTicksSinceStart();
+        return diff > 0 && diff < stk_config->time2Ticks(3.0f);
+    }
 };   // SoccerWorld
 
 

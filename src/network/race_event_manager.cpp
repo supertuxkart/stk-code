@@ -44,7 +44,6 @@ bool RaceEventManager::isRaceOver()
     if(!World::getWorld())
         return false;
     return (World::getWorld()->getPhase() > WorldStatus::RACE_PHASE &&
-        World::getWorld()->getPhase() != WorldStatus::GOAL_PHASE &&
         World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE);
 }   // isRaceOver
 

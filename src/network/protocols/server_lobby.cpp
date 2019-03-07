@@ -710,8 +710,7 @@ bool ServerLobby::worldIsActive() const
 {
     return World::getWorld() && RaceEventManager::getInstance()->isRunning() &&
         !RaceEventManager::getInstance()->isRaceOver() &&
-        (World::getWorld()->getPhase() == WorldStatus::RACE_PHASE ||
-        World::getWorld()->getPhase() == WorldStatus::GOAL_PHASE);
+        World::getWorld()->getPhase() == WorldStatus::RACE_PHASE;
 }   // worldIsActive
 
 //-----------------------------------------------------------------------------
@@ -1033,8 +1032,7 @@ void ServerLobby::update(int ticks)
     else
         resetGameStartedProgress();
 
-    if (w && (w->getPhase() == World::RACE_PHASE ||
-        w->getPhase() == World::GOAL_PHASE))
+    if (w && w->getPhase() == World::RACE_PHASE)
     {
         storePlayingTrack(track_manager->getTrackIndexByIdent(
             race_manager->getTrackName()));

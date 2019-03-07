@@ -263,7 +263,7 @@ void RaceGUI::renderGlobal(float dt)
     {
         drawGlobalReadySetGo();
     }
-    if(world->getPhase() == World::GOAL_PHASE)
+    else if (world->isGoalPhase())
         drawGlobalGoal();
 
     if (!m_enabled) return;

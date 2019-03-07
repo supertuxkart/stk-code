@@ -120,7 +120,7 @@ void SoccerAI::update(int ticks)
     m_front_transform.setOrigin(m_kart->getFrontXYZ());
     m_front_transform.setBasis(m_kart->getTrans().getBasis());
 
-    if (m_world->getPhase() == World::GOAL_PHASE)
+    if (m_world->isGoalPhase())
     {
         resetAfterStop();
         m_controls->setBrake(false);
