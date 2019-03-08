@@ -134,7 +134,7 @@ void main(void)
     float dDepth;
     float minRayStep            = 100.0f;
     // Fallback
-    vec3 fallback = .25 * SpecularIBL(normal, eyedir, 1.);
+    vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
     vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback);
 
     // float lodval = 7. * (1 - specval);
