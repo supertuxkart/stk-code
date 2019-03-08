@@ -49,6 +49,8 @@ CannonAnimation::CannonAnimation(AbstractKart* kart, CheckCannon* cc,
 {
     m_flyable = NULL;
     m_created_transform = m_kart->getTrans();
+    MiniGLM::compressbtTransform(m_created_transform,
+        m_created_transform_compressed);
     m_check_cannon = cc;
     m_skid_rot = skid_rot;
     init(cc->getIpo()->clone(), cc->getLeftPoint(), cc->getRightPoint(),
@@ -184,7 +186,7 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
     if (f <= 0)
         f = 0;
     else if (f >= l)
-        f = l;
+        f = 1;
     else
         f = f / l;
     // Now f is in [0,1] - 0 in case of left side, 1 if the kart is at the
