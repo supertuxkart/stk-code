@@ -1981,6 +1981,9 @@ int main(int argc, char *argv[] )
 
         // Preload the explosion effects (explode.png)
         ParticleKindManager::get()->getParticles("explosion.xml");
+        ParticleKindManager::get()->getParticles("explosion_bomb.xml");
+        ParticleKindManager::get()->getParticles("explosion_cake.xml");
+        ParticleKindManager::get()->getParticles("jump_explosion.xml");
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
