@@ -58,5 +58,5 @@ void main()
     color_2.g = ls.g + color_1.g * (1.0 - ls.a);
     color_2.b = ls.b + color_1.b * (1.0 - ls.a);
     color_2.a = ls.a + color_1.a * (1.0 - ls.a);
-    o_final_color = color_2;
+    o_final_color = vec4(SpecularComponent, 1.0);
 }
