@@ -63,7 +63,6 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
 
         if(dDepth < 0.0)
         {
-            //return vec3(1.0, 0.0, 0.0);
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0))
             {
                 // Mix with fallback (black area should be dark anyway)
