@@ -523,6 +523,8 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
  */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
+    int scwidth = irr_driver->getActualScreenSize().Width;
+    int scheight = irr_driver->getActualScreenSize().Height;
 #ifndef SERVER_ONLY
      // show no music description when it's off
     if (!UserConfigParams::m_music) return;
@@ -536,8 +538,8 @@ void RaceGUIBase::drawGlobalMusicDescription()
     float timeProgression = (float)(race_time) /
                             (float)(stk_config->m_music_credit_time);
 
-    const int x_pulse = (int)(sinf(race_time*9.0f)*irr_driver->getActualScreenSize().Width / 192);
-    const int y_pulse = (int)(cosf(race_time*9.0f)*irr_driver->getActualScreenSize().Width / 192);
+    const int x_pulse = (int)(sinf(race_time*9.0f)*scwidth / 192);
+    const int y_pulse = (int)(cosf(race_time*9.0f)*scwidth / 192);
 
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -570,32 +572,31 @@ void RaceGUIBase::drawGlobalMusicDescription()
         thetext_composer += mi->getComposer().c_str();
         textWidth2 = font->getDimension(thetext_composer.c_str()).Width;
     }
-    const int max_text_size = (int)(irr_driver->getActualScreenSize().Width*2.0f/3.0f);
+    const int max_text_size = (int)(scwidth*2.0f/3.0f);
     if (textWidth  > max_text_size) textWidth  = max_text_size;
     if (textWidth2 > max_text_size) textWidth2 = max_text_size;
 
-    const int ICON_SIZE = 5 + irr_driver->getActualScreenSize().Height / 20;
-    const int y         = irr_driver->getActualScreenSize().Height - irr_driver->getActualScreenSize().Height / 14 - 10;
+    const int ICON_SIZE = 5 + scheight / 20;
+    const int y         = scheight - scheight / 14 - 10;
     // the 20 is an arbitrary space left between the note icon and the text
-    const int noteX     = (irr_driver->getActualScreenSize().Width / 2) - 5
-                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - irr_driver->getActualScreenSize().Width / 100;
+    const int noteX     = (scwidth / 2) - 5
+                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - scwidth / 100;
     const int noteY     = y;
     // the 20 is an arbitrary space left between the note icon and the text
-    const int textXFrom = (irr_driver->getActualScreenSize().Width / 2)
-                        - std::max(textWidth, textWidth2)/2 + 20 + irr_driver->getActualScreenSize().Width / 216;
-    const int textXTo   = (irr_driver->getActualScreenSize().Width / 2)
-                        + std::max(textWidth, textWidth2)/2 + 10 + irr_driver->getActualScreenSize().Width / 128;
+    const int textXFrom = (scwidth / 2)
+                        - std::max(textWidth, textWidth2)/2 + 20 + scwidth / 216;
+    const int textXTo   = (scwidth / 2)
+                        + std::max(textWidth, textWidth2)/2 + 10 + scwidth / 128;
 
     // ---- Draw "by" text
-    const int text_y = (int)(irr_driver->getActualScreenSize().Height
-                     - (10 +irr_driver->getActualScreenSize().Height / 16)*(resize3)
-                     + (5 +irr_driver->getActualScreenSize().Height / 32)*(1 - resize));
+    const int text_y = (int)(scheight- (10 + scheight / 16)*(resize3)
+                     + (5 + scheight / 32)*(1 - resize));
 
     static const video::SColor white = video::SColor(255, 255, 255, 255);
     if(mi->getComposer()!="")
     {
-        core::rect<s32> pos_by(textXFrom, text_y + 10 + irr_driver->getActualScreenSize().Height / 40,
-                               textXTo,   text_y + 10 + irr_driver->getActualScreenSize().Height / 40);
+        core::rect<s32> pos_by(textXFrom, text_y + 10 + scheight / 40,
+                               textXTo,   text_y + 10 + scheight / 40);
         font->draw(thetext_composer, pos_by, white,
                    true, true);
     }
