@@ -1,6 +1,6 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2D colorBuffer;
+uniform sampler2D albedo;
 
 #ifdef GL_ES
 layout (location = 0) out vec4 Diff;
@@ -26,7 +26,7 @@ vec3 getXcYcZc(int x, int y, float zC)
 
 float makeLinear(float f, float n, float z)
 {
-    return pow(z, 10);//(2 * n) / (f + n - z * (f - n));
+    return (2 * n) / (f + n - z * (f - n));
 }
 
 
@@ -66,7 +66,7 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0))
             {
                 // Mix with fallback (black area should be dark anyway)
-                vec3 finalColor = textureLod(ntex, projectedCoord.xy, 1.0).rgb;
+                vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
                     return finalColor;
