@@ -332,10 +332,13 @@ void ClientLobby::update(int ticks)
         break;
     case LINKED:
     {
+        NetworkConfig::get()->clearServerCapabilities();
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
             .addUInt32(ServerConfig::m_server_version)
-            .encodeString(StringUtils::getUserAgentString());
+            .encodeString(StringUtils::getUserAgentString())
+            // Reserved for future to supply list of network capabilities
+            .addUInt16(0);
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
@@ -578,6 +581,17 @@ void ClientLobby::connectionAccepted(Event* event)
     assert(server_version != 0);
     m_auto_started = false;
     m_state.store(CONNECTED);
+
+    unsigned list_caps = data.getUInt16();
+    std::vector<std::string> caps;
+    for (unsigned i = 0; i < list_caps; i++)
+    {
+        std::string cap;
+        data.decodeString(&cap);
+        caps.push_back(cap);
+    }
+    NetworkConfig::get()->setServerCapabilities(caps);
+
     float auto_start_timer = data.getFloat();
     int state_frequency_in_server = data.getUInt32();
     NetworkConfig::get()->setStateFrequency(state_frequency_in_server);

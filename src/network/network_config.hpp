@@ -93,6 +93,10 @@ private:
     /** Set by client or server which is required to be the same. */
     int m_state_frequency;
 
+    /** List of server capabilities set when joining it, to determine features
+     *  available in same version. */
+    std::vector<std::string> m_server_capabilities;
+
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -231,6 +235,15 @@ public:
     int getStateFrequency() const                 { return m_state_frequency; }
     // ------------------------------------------------------------------------
     bool roundValuesNow() const;
+    // ------------------------------------------------------------------------
+    void setServerCapabilities(std::vector<std::string>& caps)
+                                   { m_server_capabilities = std::move(caps); }
+    // ------------------------------------------------------------------------
+    void clearServerCapabilities()           { m_server_capabilities.clear(); }
+    // ------------------------------------------------------------------------
+    const std::vector<std::string>& getServerCapabilities() const
+                                              { return m_server_capabilities; }
+
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

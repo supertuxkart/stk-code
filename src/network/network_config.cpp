@@ -67,6 +67,7 @@ NetworkConfig::NetworkConfig()
  */
 void NetworkConfig::unsetNetworking()
 {
+    clearServerCapabilities();
     m_network_type = NETWORK_NONE;
     ServerConfig::m_private_server_password = "";
 }   // unsetNetworking

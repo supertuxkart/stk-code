@@ -2011,6 +2011,16 @@ void ServerLobby::connectionRequested(Event* event)
     data.decodeString(&user_version);
     event->getPeer()->setUserVersion(user_version);
 
+    unsigned list_caps = data.getUInt16();
+    std::vector<std::string> caps;
+    for (unsigned i = 0; i < list_caps; i++)
+    {
+        std::string cap;
+        data.decodeString(&cap);
+        caps.push_back(cap);
+    }
+    event->getPeer()->setClientCapabilities(caps);
+
     std::set<std::string> client_karts, client_tracks;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
@@ -2267,7 +2277,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (m_timeout.load() - (int64_t)StkTime::getRealTimeMs()) / 1000.0f;
     }
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
-        .addUInt32(ServerConfig::m_server_version).addFloat(auto_start_timer)
+        .addUInt32(ServerConfig::m_server_version);
+
+    // Reserved for future to supply list of network capabilities
+    message_ack->addUInt16(0);
+
+    message_ack->addFloat(auto_start_timer)
         .addUInt32(ServerConfig::m_state_frequency);
 
     peer->setSpectator(false);
