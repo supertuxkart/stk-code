@@ -836,9 +836,19 @@ void ClientLobby::connectionRefused(Event* event)
             _("Connection refused: Server is busy."));
         break;
     case RR_BANNED:
-        STKHost::get()->setErrorMessage(
-            _("Connection refused: You are banned from the server."));
+    {
+        core::stringw msg =
+            _("Connection refused: You are banned from the server.");
+        core::stringw reason;
+        data.decodeStringW(&reason);
+        if (!reason.empty())
+        {
+            msg += L"\n";
+            msg += reason;
+        }
+        STKHost::get()->setErrorMessage(msg);
         break;
+    }
     case RR_INCORRECT_PASSWORD:
         STKHost::get()->setErrorMessage(
             _("Connection refused: Server password is incorrect."));

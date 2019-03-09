@@ -2116,6 +2116,9 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkString *message = getNetworkString(2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
+        // For future we can say the reason here
+        // and use encodeString instead
+        message->addUInt8(0);
         peer->cleanPlayerProfiles();
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
