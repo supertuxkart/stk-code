@@ -1718,10 +1718,12 @@ void IrrDriver::displayFPS()
     gui::IGUIFont* font = GUIEngine::getSmallFont();
     core::rect<s32> position;
 
+    int scheight = irr_driver->getActualScreenSize().Height;
+    int scwidth = irr_driver->getActualScreenSize().Width;
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(51, 0, 1100, 80);
+        position = core::rect<s32>(scwidth / 42, 0, 120 + scwidth / 5, 10 + scheight / 25);
     else
-        position = core::rect<s32>(75, 0, 900, 40);
+        position = core::rect<s32>(scwidth / 42, 0, 120 + scwidth / 6, 10 + scheight / 45);
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1760,7 +1762,6 @@ void IrrDriver::displayFPS()
             core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
-
     // Ask for current frames per second and last number of triangles
     // processed (trimed to thousands)
     const int fps         = m_video_driver->getFPS();
