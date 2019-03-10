@@ -29,28 +29,22 @@ float makeLinear(float f, float n, float z)
     return (2 * n) / (f + n - z * (f - n));
 }
 
-vec3 fastBlur(vec2 uv)
+vec3 fastBlur(vec2 uv, float spread)
 {
     vec4 sum = vec4(0.0);
     float X = uv.x;
     float Y = uv.y;
-    vec2 pixel = vec2(0.001);
-/*
-    sum += textureLod(albedo, vec2(X, Y - 3.0 * pixel.y),    1.0) * 0.03125;
-    sum += textureLod(albedo, vec2(X, Y - 1.3333 * pixel.y), 1.0) * 0.328125;
-    sum += textureLod(albedo, vec2(X, Y),                    1.0) * 0.273438;
-    sum += textureLod(albedo, vec2(X, Y + 1.3333 * pixel.y), 1.0) * 0.328125;
-    sum += textureLod(albedo, vec2(X, Y + 3.0 * pixel.y),    1.0) * 0.03125;*/
+    vec2 pixel = vec2(spread);
+    float biais = 1.0;
 
-    sum += textureLod(albedo, vec2(X - 3.0 * pixel.x, Y),    1.0) * 0.03125;
-    sum += textureLod(albedo, vec2(X - 1.3333 * pixel.x, Y), 1.0) * 0.328125;
-    sum += textureLod(albedo, vec2(X, Y),                    1.0) * 0.273438;
-    sum += textureLod(albedo, vec2(X + 1.3333 * pixel.x, Y), 1.0) * 0.328125;
-    sum += textureLod(albedo, vec2(X + 3.0 * pixel.x, Y),    1.0) * 0.03125;
+    sum += textureLod(albedo, vec2(X - 3.0 * pixel.x, Y),    biais) * 0.03125;
+    sum += textureLod(albedo, vec2(X - 1.3333 * pixel.x, Y), biais) * 0.328125;
+    sum += textureLod(albedo, vec2(X, Y),                    biais) * 0.273438;
+    sum += textureLod(albedo, vec2(X + 1.3333 * pixel.x, Y), biais) * 0.328125;
+    sum += textureLod(albedo, vec2(X + 3.0 * pixel.x, Y),    biais) * 0.03125;
 
     return sum.rgb;
 }
-
 
 vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 {
@@ -69,11 +63,11 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 }
 
 
-vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback)
+vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback, float spread)
 {
     dir *= 0.25f;
 
-    for(int i = 0; i < 10; ++i) {
+    for(int i = 0; i < 8; ++i) {
         hitCoord               += dir;
 
         vec4 projectedCoord     = u_projection_matrix * vec4(hitCoord, 1.0);
@@ -89,12 +83,12 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             {
                 // Mix with fallback (black area should be dark anyway)
                 vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
-                finalColor = fastBlur(projectedCoord.xy);
+                finalColor = fastBlur(projectedCoord.xy, spread);
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
                     vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
-                    float vignette = 1. - dot(inside, inside) * 3;
-                    vignette = clamp(pow(vignette, 10.0), 0., 0.2);
+                    float vignette = 1. - dot(inside, inside) * 5;
+                    vignette = clamp(pow(vignette, 10.0), 0., 1.0);
                     return mix(fallback, finalColor, vignette);
                 }
                 else
@@ -114,8 +108,15 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
 
 
 
+float rand(vec2 co)
+{
+   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+}
 
-
+float rand2(vec2 co)
+{
+   return fract(sin(dot(co.xy,vec2(45.454545,5631.4))) * 43758.5453);
+}
 
 // Main ===================================================================
 
@@ -149,7 +150,12 @@ void main(void)
          View_Pos              /= View_Pos.w;
 
     // Reflection vector
+    vec3 eyedir2 = eyedir;
+    eyedir2.y *= clamp(rand(uv), 0.01, 2.7);
+    vec3 normal2 = normal;
+    normal2.y = 0.5; //clamp(rand2(uv), 0.01, 2.7);
     vec3 reflected              = normalize(reflect(eyedir, normal));
+    vec3 reflected2              = normalize(reflect(eyedir2, normal2));
 
     // Ray cast
     vec3 hitPos                 = View_Pos.xyz;
@@ -157,13 +163,11 @@ void main(void)
     float minRayStep            = 100.0f;
     // Fallback
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
-    vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback);
+    vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback, 0.001);
+    vec3 outColor2 = RayCast(reflected2 * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback, 0.001);
+    outColor = mix(outColor, outColor2, 1.0 - specval);
 
 
     Spec = vec4(outColor.rgb, 1.0);
-
-    //Diff = vec4(red, green, blue, 1.0);
-
-    //Diff = vec4(reflection.rgb, 1.0);
 
 }

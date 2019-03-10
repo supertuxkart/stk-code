@@ -275,11 +275,10 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         {
             specular_probe = m_skybox->getSpecularProbe();
         }
-
         m_lighting_passes.renderLights( hasShadow,
                                         m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                         m_rtts->getDepthStencilTexture(),
-                                        m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
+                                        m_rtts->getRenderTarget(RTT_COLOR),
                                         m_rtts->getShadowFrameBuffer(),
                                         specular_probe);
         PROFILER_POP_CPU_MARKER();

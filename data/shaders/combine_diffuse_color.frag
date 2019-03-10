@@ -20,7 +20,7 @@ void main()
     // Polish map is stored in normal color framebuffer .z
     // Metallic map is stored in normal color framebuffer .w
     // Emit map is stored in diffuse color framebuffer.w
-    float metallicMapValue = texture(normal_color, tc).w;
+    float metallicMapValue = 0.0; //texture(normal_color, tc).w;
     float emitMapValue = diffuseMatColor.w;
 
     float ao = texture(ssao_tex, tc).x;
@@ -28,11 +28,12 @@ void main()
     vec3 SpecularComponent = texture(specular_map, tc).xyz;
 
     vec3 diffuse_color_for_mix = diffuseMatColor.xyz * 4.0;
-    vec3 metallicMatColor = mix(vec3(0.04), diffuse_color_for_mix, metallicMapValue);
+    vec3 metallicMatColor = mix(vec3(0.5), diffuse_color_for_mix, metallicMapValue);
     vec3 tmp = DiffuseComponent * mix(diffuseMatColor.xyz, vec3(0.0), metallicMapValue) + (metallicMatColor * SpecularComponent);
 
     vec3 emitCol = diffuseMatColor.xyz + (diffuseMatColor.xyz * diffuseMatColor.xyz * emitMapValue * emitMapValue * 10.0);
     vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), 1.0);
+    //color_1 = vec4(tmp, 1.);
 
     // Fog
     float depth = texture(depth_stencil, tc).x;
@@ -58,5 +59,5 @@ void main()
     color_2.g = ls.g + color_1.g * (1.0 - ls.a);
     color_2.b = ls.b + color_1.b * (1.0 - ls.a);
     color_2.a = ls.a + color_1.a * (1.0 - ls.a);
-    o_final_color = vec4(SpecularComponent, 1.0);
+    o_final_color = vec4(color_2.rgb, 1.0);
 }
