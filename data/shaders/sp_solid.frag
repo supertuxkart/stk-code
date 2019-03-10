@@ -39,7 +39,7 @@ void main(void)
 
     o_normal_color.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
     o_normal_color.zw = layer_2.xy;
-    o_normal_color.z = 0.1;
+    //o_normal_color.z = 0;
 #else
     o_diffuse_color = vec4(final_color, 1.0);
 #endif
