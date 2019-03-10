@@ -29,6 +29,28 @@ float makeLinear(float f, float n, float z)
     return (2 * n) / (f + n - z * (f - n));
 }
 
+vec3 fastBlur(vec2 uv)
+{
+    vec4 sum = vec4(0.0);
+    float X = uv.x;
+    float Y = uv.y;
+    vec2 pixel = vec2(0.001);
+/*
+    sum += textureLod(albedo, vec2(X, Y - 3.0 * pixel.y),    1.0) * 0.03125;
+    sum += textureLod(albedo, vec2(X, Y - 1.3333 * pixel.y), 1.0) * 0.328125;
+    sum += textureLod(albedo, vec2(X, Y),                    1.0) * 0.273438;
+    sum += textureLod(albedo, vec2(X, Y + 1.3333 * pixel.y), 1.0) * 0.328125;
+    sum += textureLod(albedo, vec2(X, Y + 3.0 * pixel.y),    1.0) * 0.03125;*/
+
+    sum += textureLod(albedo, vec2(X - 3.0 * pixel.x, Y),    1.0) * 0.03125;
+    sum += textureLod(albedo, vec2(X - 1.3333 * pixel.x, Y), 1.0) * 0.328125;
+    sum += textureLod(albedo, vec2(X, Y),                    1.0) * 0.273438;
+    sum += textureLod(albedo, vec2(X + 1.3333 * pixel.x, Y), 1.0) * 0.328125;
+    sum += textureLod(albedo, vec2(X + 3.0 * pixel.x, Y),    1.0) * 0.03125;
+
+    return sum.rgb;
+}
+
 
 vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 {
@@ -67,9 +89,13 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             {
                 // Mix with fallback (black area should be dark anyway)
                 vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
+                finalColor = fastBlur(projectedCoord.xy);
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
-                    return finalColor;
+                    vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
+                    float vignette = 1. - dot(inside, inside) * 3;
+                    vignette = clamp(pow(vignette, 10.0), 0., 0.2);
+                    return mix(fallback, finalColor, vignette);
                 }
                 else
                 {
@@ -80,8 +106,6 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             {
                 return fallback;
             }
-            //return textureLod(ntex, vec2(clamp(projectedCoord.x, 0.1, 0.9), clamp(projectedCoord.y, 0.1, 0.9)), 1.0).rgb;
-            // return projectedCoord.xy;
         }
     }
 
@@ -119,14 +143,13 @@ void main(void)
 
     // Better implementation: :::::::::::::::::::::::::::::::::::
 
-    vec3 View_Normal            = normal;
-    float View_Depth            = makeLinear(1000.0, 0.01, lineardepth);
+    float View_Depth            = makeLinear(1000.0, 0.001, lineardepth);
     vec3 ScreenPos              = xpos.xyz;
     vec4 View_Pos               = u_inverse_projection_matrix * vec4(ScreenPos, 1.0f);
          View_Pos              /= View_Pos.w;
 
     // Reflection vector
-    vec3 reflected              = normalize(reflect(eyedir, normal)); // normalize(reflect(normalize(View_Pos.xyz), normalize(View_Normal)));
+    vec3 reflected              = normalize(reflect(eyedir, normal));
 
     // Ray cast
     vec3 hitPos                 = View_Pos.xyz;
@@ -136,26 +159,8 @@ void main(void)
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
     vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback);
 
-    // float lodval = 7. * (1 - specval);
-    //vec4 finalColor = textureLod(ntex, coords, lodval);
-
-
-    vec2 inside = uv - 0.5;
-    float vignette = 1. - dot(inside, inside) * 3;
-    vignette = clamp(pow(vignette, 0.8), 0., 1.);
-
 
     Spec = vec4(outColor.rgb, 1.0);
-
-    // Normal vis
-
-    vec3 reflection = reflect(eyedir, normal);
-
-    float red = 0.5+0.5*reflection.r;
-    float green = 0.5+0.5*reflection.g;
-    float blue = 0.5+0.5*reflection.b;
-
-
 
     //Diff = vec4(red, green, blue, 1.0);
 
