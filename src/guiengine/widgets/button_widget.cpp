@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include <IGUIElement.h>
@@ -34,7 +35,11 @@ ButtonWidget::ButtonWidget() : Widget(WTYPE_BUTTON)
 
 void ButtonWidget::add()
 {
+    int adapt_w = irr_driver->getActualScreenSize().Width / 768 - 2;
+    int adapt_h = irr_driver->getActualScreenSize().Height / 432 - 2;
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    if(irr_driver->getActualScreenSize().Height > 1300)
+        widget_size = rect<s32>(m_x - adapt_w, m_y - adapt_h, m_x + m_w + adapt_w, m_y + m_h + adapt_h);
     const stringw&  message = getText();
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent,
                                                   (m_reserved_id == -1 ? getNewID() : m_reserved_id),
