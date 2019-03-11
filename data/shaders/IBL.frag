@@ -87,8 +87,8 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0))
             {
                 // Mix with fallback (black area should be dark anyway)
-                //vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
-                vec3 finalColor = fastBlur(projectedCoord.xy, spread);
+                vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
+                //vec3 finalColor = fastBlur(projectedCoord.xy, spread);
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
                     vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
