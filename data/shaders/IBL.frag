@@ -62,6 +62,11 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
     return                          ViewPosition.xyz / ViewPosition.w;
 }
 
+float rand(vec2 co)
+{
+   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 
 vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback, float spread)
 {
@@ -82,8 +87,8 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0))
             {
                 // Mix with fallback (black area should be dark anyway)
-                vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
-                finalColor = fastBlur(projectedCoord.xy, spread);
+                //vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
+                vec3 finalColor = fastBlur(projectedCoord.xy, spread);
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
                     vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
@@ -104,13 +109,6 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
     }
 
     return fallback;
-}
-
-
-
-float rand(vec2 co)
-{
-   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
 }
 
 float rand2(vec2 co)
@@ -164,11 +162,9 @@ void main(void)
     vec3 hitPos                 = View_Pos.xyz;
     float dDepth;
     float minRayStep            = 100.0f;
-    
-    vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback, 0.001);
-    vec3 outColor2 = RayCast(reflected2 * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback, 0.001);
-    outColor = mix(outColor, outColor2, 1.0 - specval);
 
+    vec3 outColor = RayCast(mix(reflected, reflected2, 1.0 - specval) * max(minRayStep, -View_Pos.z),
+                            hitPos, dDepth, dtex, fallback, mix(0.001, 0.01, 1.0 - specval));
 
     Spec = vec4(outColor.rgb, 1.0);
 
