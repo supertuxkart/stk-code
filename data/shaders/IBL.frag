@@ -88,6 +88,7 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
             {
                 // Mix with fallback (black area should be dark anyway)
                 vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
+                // FIXME, this is heavy, needs to be an option in the settings
                 //vec3 finalColor = fastBlur(projectedCoord.xy, spread);
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
@@ -132,8 +133,9 @@ void main(void)
     // Extract roughness
     float specval = texture(ntex, uv).z;
 
+#ifdef GL_ES
     Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval), 1.);
-
+#else
     // Compute Space Screen Reflection =========================================================
 
     float lineardepth = textureLod(dtex, uv, 0.).x;
@@ -167,5 +169,6 @@ void main(void)
                             hitPos, dDepth, dtex, fallback, mix(0.001, 0.01, 1.0 - specval));
 
     Spec = vec4(outColor.rgb, 1.0);
+#endif
 
 }
