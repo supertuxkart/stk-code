@@ -295,6 +295,9 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         m_latest_confirmed_state_time = latest_confirmed_state;
     }
 
+    if (NetworkConfig::get()->isServer())
+        cleanupOldRewindInfo(world_ticks);
+
     // If the computed rewind time is before the last confirmed
     // state, instead rewind from the latest confirmed state.
     // This should not be necessary anymore, but I'll leave it
@@ -321,12 +324,16 @@ void RewindQueue::cleanupOldRewindInfo(int ticks)
 {
     auto i = m_all_rewind_info.begin();
 
-    while ( (*i)->getTicks() < ticks)
+    while (!m_all_rewind_info.empty() &&
+        (*i)->getTicks() < ticks)
     {
         if (m_current == i) next();
         delete *i;
         i = m_all_rewind_info.erase(i);
     }
+
+    if (m_all_rewind_info.empty())
+        m_current = m_all_rewind_info.end();
 
 }   // cleanupOldRewindInfo
 
