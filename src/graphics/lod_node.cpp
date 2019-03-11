@@ -179,11 +179,15 @@ void LODNode::updateVisibility()
     if (m_nodes.size() == 0) return;
 
     // Don't need to run the computation of the level everytime
-    if ((int)(rand()%10) == 1)
+    // FIXME actually we need this was causing weird issue in multiplayer
+    // TO be fixed after RC (samuncle)
+    /*if ((int)(rand()%10) == 1)
     {
         m_current_level = getLevel();
-    }
+    }*/
 
+    m_current_level = getLevel();
+/*
     if (m_previous_level != m_current_level && !is_in_transition)
     {
         is_in_transition = true;
@@ -213,7 +217,13 @@ void LODNode::updateVisibility()
         {
             m_nodes[i]->setVisible(i == m_current_level);
         }
+    }*/
+
+    for (size_t i = 0; i < m_nodes.size(); i++)
+    {
+        m_nodes[i]->setVisible(i == m_current_level);
     }
+
 }
 
 void LODNode::OnRegisterSceneNode()
