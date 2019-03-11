@@ -142,6 +142,9 @@ void main(void)
     int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     vec3 FragPos = getXcYcZc(x, y, lineardepth);
 
+    // Fallback
+    vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
+
     // Better implementation: :::::::::::::::::::::::::::::::::::
 
     float View_Depth            = makeLinear(1000.0, 0.001, lineardepth);
@@ -161,8 +164,7 @@ void main(void)
     vec3 hitPos                 = View_Pos.xyz;
     float dDepth;
     float minRayStep            = 100.0f;
-    // Fallback
-    vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
+    
     vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback, 0.001);
     vec3 outColor2 = RayCast(reflected2 * max(minRayStep, -View_Pos.z), hitPos, dDepth, dtex, fallback, 0.001);
     outColor = mix(outColor, outColor2, 1.0 - specval);
