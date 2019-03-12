@@ -66,8 +66,8 @@ private:
     float m_area;
 
     // Previous level for the smooth transitions
-    int m_previous_level;
-    int m_current_level;
+    unsigned int m_previous_level;
+    unsigned int m_current_level;
 
     int m_timer;
 

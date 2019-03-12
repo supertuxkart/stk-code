@@ -180,7 +180,7 @@ void LODNode::updateVisibility()
 
     m_current_level = getLevel();
 
-    for (size_t i = 0; i < m_nodes.size(); i++)
+    for (unsigned int i = 0; i < m_nodes.size(); i++)
     {
         m_nodes[i]->setVisible(i == m_current_level);
     }
@@ -235,7 +235,7 @@ void LODNode::autoComputeLevel(float scale)
 
     // Then we recompute the level of detail culling distance
     int biais = m_detail.size();
-    for(int i = 0; i < m_detail.size(); i++)
+    for(unsigned int i = 0; i < m_detail.size(); i++)
     {
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;
