@@ -2145,6 +2145,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Join all static physics only object to main track if possible
     // Take the visibility condition by scripting into account
+    std::vector<TrackObject*> objs_removing;
     for (auto* to : m_track_object_manager->getObjects().m_contents_vector)
     {
         if (to->joinToMainTrack())
@@ -2155,9 +2156,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             // physicial only node is always hidden, remove it from stk after
             // joining to track mesh
             if (ts && ts->isAlwaysHidden())
-                m_track_object_manager->removeObject(to);
+                objs_removing.push_back(to);
         }
     }
+    for (auto* obj : objs_removing)
+        m_track_object_manager->removeObject(obj);
 
     createPhysicsModel(main_track_count);
     main_loop->renderGUI(5600);
