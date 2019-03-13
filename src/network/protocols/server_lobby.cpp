@@ -596,16 +596,20 @@ void ServerLobby::asynchronousUpdate()
                 if (peer)
                     peer->addAvailableKartID(i);
             }
-            float real_players_count = (float)players.size();
-            getHitCaptureLimit(real_players_count);
+            getHitCaptureLimit();
 
             // Add placeholder players for live join
             addLiveJoinPlaceholder(players);
 
             NetworkString* load_world_message = getLoadWorldMessage(players);
+            m_game_setup->setHitCaptureTime(m_battle_hit_capture_limit,
+                m_battle_time_limit);
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
-                ServerConfig::m_flag_return_timemout);
+                ServerConfig::m_flag_return_timeout);
             race_manager->setFlagReturnTicks(flag_return_time);
+            uint16_t flag_deactivated_time = (uint16_t)stk_config->time2Ticks(
+                ServerConfig::m_flag_deactivated_time);
+            race_manager->setFlagDeactivatedTicks(flag_deactivated_time);
             configRemoteKart(players, 0);
 
             // Reset for next state usage
@@ -658,11 +662,12 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     {
         load_world_message->addUInt32(m_battle_hit_capture_limit)
             .addFloat(m_battle_time_limit);
-        m_game_setup->setHitCaptureTime(m_battle_hit_capture_limit,
-            m_battle_time_limit);
         uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
-            ServerConfig::m_flag_return_timemout);
+            ServerConfig::m_flag_return_timeout);
         load_world_message->addUInt16(flag_return_time);
+        uint16_t flag_deactivated_time = (uint16_t)stk_config->time2Ticks(
+            ServerConfig::m_flag_deactivated_time);
+        load_world_message->addUInt16(flag_deactivated_time);
     }
     return load_world_message;
 }   // getLoadWorldMessage
@@ -2726,9 +2731,8 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
 }   // handleAllVotes
 
 // ----------------------------------------------------------------------------
-void ServerLobby::getHitCaptureLimit(float num_karts)
+void ServerLobby::getHitCaptureLimit()
 {
-    // Read user_config.hpp for formula
     int hit_capture_limit = std::numeric_limits<int>::max();
     float time_limit = 0.0f;
     if (race_manager->getMinorMode() ==

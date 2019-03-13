@@ -276,7 +276,7 @@ void CaptureTheFlag::update(int ticks)
                 m_red_scores, new_blue_scores);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_red_flag->resetToBase(360/*deactivated_ticks*/);
+        m_red_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
     }
     else if (m_blue_flag->getHolder() != -1 && m_red_flag->isInBase() &&
         m_red_flag->isActivated() &&
@@ -307,7 +307,7 @@ void CaptureTheFlag::update(int ticks)
                 new_red_scores, m_blue_scores);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_blue_flag->resetToBase(360/*deactivated_ticks*/);
+        m_blue_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
     }
 
     // Test if red or blue flag is touched
@@ -326,7 +326,8 @@ void CaptureTheFlag::update(int ticks)
                 if (!m_red_flag->isInBase())
                 {
                     // Return the flag
-                    m_red_flag->resetToBase(360/*deactivated_ticks*/);
+                    m_red_flag->resetToBase(
+                        race_manager->getFlagDeactivatedTicks());
                 }
             }
             else
@@ -345,7 +346,8 @@ void CaptureTheFlag::update(int ticks)
                 if (!m_blue_flag->isInBase())
                 {
                     // Return the flag
-                    m_blue_flag->resetToBase(360/*deactivated_ticks*/);
+                    m_blue_flag->resetToBase(
+                        race_manager->getFlagDeactivatedTicks());
                 }
             }
             else
@@ -489,14 +491,20 @@ void CaptureTheFlag::loseFlagForKart(int kart_id)
         if (succeed)
             m_red_flag->dropFlagAt(dropped_trans);
         else
-            m_red_flag->resetToBase(360/*deactivated_ticks*/);
+        {
+            m_red_flag->resetToBase(
+                race_manager->getFlagDeactivatedTicks());
+        }
     }
     else
     {
         if (succeed)
             m_blue_flag->dropFlagAt(dropped_trans);
         else
-            m_blue_flag->resetToBase(360/*deactivated_ticks*/);
+        {
+            m_blue_flag->resetToBase(
+                race_manager->getFlagDeactivatedTicks());
+        }
     }
 }   // loseFlagForKart
 

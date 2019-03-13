@@ -285,6 +285,8 @@ void ClientLobby::addAllPlayers(Event* event)
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
         uint16_t flag_return_timeout = data.getUInt16();
         race_manager->setFlagReturnTicks(flag_return_timeout);
+        unsigned flag_deactivated_time = data.getUInt16();
+        race_manager->setFlagDeactivatedTicks(flag_deactivated_time);
     }
     configRemoteKart(players, isSpectator() ? 1 :
         (int)NetworkConfig::get()->getNetworkPlayers().size());

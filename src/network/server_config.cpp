@@ -277,14 +277,24 @@ void loadServerLobbyFromConfig()
     if (unsupportedGameMode())
         Log::fatal("ServerConfig", "Unsupported game mode");
 
-    if (stk_config->time2Ticks(m_flag_return_timemout) > 65535 ||
-        m_flag_return_timemout <= 0.0f)
+    if (stk_config->time2Ticks(m_flag_return_timeout) > 65535 ||
+        m_flag_return_timeout <= 0.0f)
     {
-        float timeout = m_flag_return_timemout;
+        float timeout = m_flag_return_timeout;
         // in CTFFlag it uses 16bit unsigned integer for timeout
         Log::warn("ServerConfig", "Invalid %f m_flag_return_timemout which "
             "is invalid, use default value.", timeout);
-        m_flag_return_timemout.revertToDefaults();
+        m_flag_return_timeout.revertToDefaults();
+    }
+
+    if (stk_config->time2Ticks(m_flag_deactivated_time) > 2047 ||
+        m_flag_deactivated_time < 0.0f)
+    {
+        float timeout = m_flag_deactivated_time;
+        // in CTFFlag it uses 11bit unsigned integer for timeout
+        Log::warn("ServerConfig", "Invalid %f m_flag_return_timemout which "
+            "is invalid, use default value.", timeout);
+        m_flag_deactivated_time.revertToDefaults();
     }
 
     int frequency_in_config = m_state_frequency;

@@ -272,7 +272,7 @@ private:
     double getUncertaintySpread(uint32_t online_id);
     double scalingValueForTime(double time);
     void checkRaceFinished();
-    void getHitCaptureLimit(float num_karts);
+    void getHitCaptureLimit();
     void configPeersStartTime();
     void resetServer();
     void addWaitingPlayersToGame();

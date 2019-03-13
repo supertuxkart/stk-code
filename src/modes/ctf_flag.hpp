@@ -115,7 +115,7 @@ public:
     // ------------------------------------------------------------------------
     const btTransform& getBaseTrans() const       { return m_flag_base_trans; }
     // ------------------------------------------------------------------------
-    void resetToBase(uint16_t deactivated_ticks = 0)
+    void resetToBase(unsigned deactivated_ticks = 0)
     {
         // 11 bit for deactivated_ticks saved with flag status (5 bits)
         if (deactivated_ticks > 2047)

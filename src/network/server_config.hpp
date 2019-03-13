@@ -238,10 +238,15 @@ namespace ServerConfig
         "available for players to choose, and official-karts-threshold will "
         "be made 1.0."));
 
-    SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timemout
-        SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timemout",
+    SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timeout
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timeout",
         "Time in seconds when a flag is dropped a by player in CTF "
         "returning to its own base."));
+
+    SERVER_CFG_PREFIX FloatServerConfigParam m_flag_deactivated_time
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(3.0f, "flag-deactivated-time",
+        "Time in seconds to deactivate a flag when it's captured or returned "
+        "to own base by players."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_hit_limit
         SERVER_CFG_DEFAULT(IntServerConfigParam(20, "hit-limit",
