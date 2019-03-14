@@ -53,7 +53,8 @@ enum EVENT_CHANNEL : uint8_t
 {
     EVENT_CHANNEL_NORMAL = 0,   //!< Normal channel (encrypted if supported)
     EVENT_CHANNEL_UNENCRYPTED = 1,//!< Unencrypted channel
-    EVENT_CHANNEL_COUNT = 2
+    EVENT_CHANNEL_DATA_TRANSFER = 2,//!< Data transfer channel (like game replay)
+    EVENT_CHANNEL_COUNT = 3
 };
 
 enum PeerDisconnectInfo : unsigned int;
