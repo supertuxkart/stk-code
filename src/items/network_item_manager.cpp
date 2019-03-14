@@ -475,7 +475,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // be the larger group (confirmed: when a new item was dropped
     // by a remote kart; all_items: if an item is predicted on
     // the client, but not yet confirmed). So 
-    unsigned int max_index = std::max(m_confirmed_state.size(),
+    size_t max_index = std::max(m_confirmed_state.size(),
                                       m_all_items.size()        );
     m_all_items.resize(max_index, NULL);
 

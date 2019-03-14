@@ -599,7 +599,7 @@ void Attachment::updateGraphics(float dt)
             World::getWorld()->getTicksSinceStart()) / 0.7f;
         if (scale_ratio > 0.0f)
         {
-            float scale = 0.3 * scale_ratio +
+            float scale = 0.3f * scale_ratio +
                 wanted_node_scale * (1.0f - scale_ratio);
             m_node->setScale(core::vector3df(scale, scale, scale));
         }

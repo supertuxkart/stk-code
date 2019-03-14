@@ -1329,7 +1329,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
         });
     }
 
-    const int num_karts = karts.size();
+    const int num_karts = (int)karts.size();
     int current_idx = -1;
     if (cam->getKart())
     {

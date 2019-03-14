@@ -277,7 +277,7 @@ std::shared_ptr<Rewinder>
 {
     if (uid.size() != 6)
         return nullptr;
-    BareNetworkString data(uid.data(), uid.size());
+    BareNetworkString data(uid.data(), (int)uid.size());
 
     RewinderName rn = (RewinderName)data.getUInt8();
     if (!(rn == RN_BOWLING || rn == RN_PLUNGER ||

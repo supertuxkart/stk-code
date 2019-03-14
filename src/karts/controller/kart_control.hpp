@@ -70,8 +70,8 @@ public:
     /** Resets all controls. */
     void reset()
     {
-        m_steer     = 0.0f;
-        m_accel     = 0.0f;
+        m_steer     = 0;
+        m_accel     = 0;
         m_brake     = false;
         m_nitro     = false;
         m_skid      = SC_NONE;
@@ -93,10 +93,6 @@ public:
                m_fire      == other.m_fire    &&
                m_look_back == other.m_look_back;
     }    // operator==
-
-    // ------------------------------------------------------------------------
-    /** Return the serialised size in bytes.                                 */
-    static int getLength() { return 9; }
     // ------------------------------------------------------------------------
     /** Copies the important data from this objects into a memory buffer. */
     void saveState(BareNetworkString *buffer) const;

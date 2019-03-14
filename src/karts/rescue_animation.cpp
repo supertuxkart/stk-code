@@ -182,8 +182,8 @@ void RescueAnimation::updateGraphics(float dt)
     float dur = stk_config->ticks2Time(
         World::getWorld()->getTicksSinceStart() - m_created_ticks);
     dur *= 25.0f;
-    float ref_dur =
-        Referee::m_st_last_rescue_frame - Referee::m_st_first_rescue_frame;
+    float ref_dur = (float)
+        (Referee::m_st_last_rescue_frame - Referee::m_st_first_rescue_frame);
     float frame = std::fmod(dur, ref_dur);
     frame += (float)Referee::m_st_first_rescue_frame;
     m_referee->getSceneNode()->setCurrentFrame(frame);

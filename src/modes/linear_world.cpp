@@ -1069,7 +1069,7 @@ std::pair<uint32_t, uint32_t> LinearWorld::getGameStartedProgress() const
         std::numeric_limits<uint32_t>::max(),
         std::numeric_limits<uint32_t>::max());
     AbstractKart* slowest_kart = NULL;
-    for (unsigned i = m_karts.size(); i > 0; i--)
+    for (unsigned i = (unsigned)m_karts.size(); i > 0; i--)
     {
         slowest_kart = getKartAtPosition(i);
         if (slowest_kart && !slowest_kart->isEliminated())

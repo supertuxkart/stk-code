@@ -735,7 +735,7 @@ void SoccerWorld::enterRaceOverState()
 // ----------------------------------------------------------------------------
 void SoccerWorld::saveCompleteState(BareNetworkString* bns)
 {
-    const unsigned red_scorers = m_red_scorers.size();
+    const unsigned red_scorers = (unsigned)m_red_scorers.size();
     bns->addUInt32(red_scorers);
     for (unsigned i = 0; i < red_scorers; i++)
     {
@@ -746,7 +746,7 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns)
             .encodeString(m_red_scorers[i].m_player);
     }
 
-    const unsigned blue_scorers = m_blue_scorers.size();
+    const unsigned blue_scorers = (unsigned)m_blue_scorers.size();
     bns->addUInt32(blue_scorers);
     for (unsigned i = 0; i < blue_scorers; i++)
     {
