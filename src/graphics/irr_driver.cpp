@@ -1721,9 +1721,9 @@ void IrrDriver::displayFPS()
     int fheight = font->getDimension(L"X").Height;
     int scwidth = irr_driver->getActualScreenSize().Width;
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(51, 0, 320 + scwidth / 4, 2*fheight + fheight / 3);
+        position = core::rect<s32>(51, 0, 420 + scwidth / 4, 2*fheight + fheight / 3);
     else
-        position = core::rect<s32>(75, 0, 200 + scwidth / 7, fheight + fheight / 5);
+        position = core::rect<s32>(75, 0, 250 + scwidth / 7, fheight + fheight / 5);
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
