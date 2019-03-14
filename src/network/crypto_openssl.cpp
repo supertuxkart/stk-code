@@ -144,9 +144,19 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
 
     uint32_t val = ++m_packet_counter;
     if (NetworkConfig::get()->isClient())
-        memcpy(iv.data(), &val, 4);
+    {
+        iv[0] = (val >> 24) & 0xff;
+        iv[1] = (val >> 16) & 0xff;
+        iv[2] = (val >> 8) & 0xff;
+        iv[3] = val & 0xff;
+    }
     else
-        memcpy(iv.data() + 4, &val, 4);
+    {
+        iv[4] = (val >> 24) & 0xff;
+        iv[5] = (val >> 16) & 0xff;
+        iv[6] = (val >> 8) & 0xff;
+        iv[7] = val & 0xff;
+    }
 
     uint8_t* packet_start = p->data + 8;
 
@@ -176,7 +186,10 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
     }
     ul.unlock();
 
-    memcpy(p->data, &val, 4);
+    p->data[0] = (val >> 24) & 0xff;
+    p->data[1] = (val >> 16) & 0xff;
+    p->data[2] = (val >> 8) & 0xff;
+    p->data[3] = val & 0xff;
     return p;
 }   // encryptSend
 
