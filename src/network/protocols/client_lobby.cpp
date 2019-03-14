@@ -716,6 +716,7 @@ void ClientLobby::updatePlayerList(Event* event)
     unsigned player_count = data.getUInt8();
     core::stringw total_players;
     m_lobby_players.clear();
+    bool client_server_owner = false;
     for (unsigned i = 0; i < player_count; i++)
     {
         LobbyPlayer lp = {};
@@ -751,12 +752,15 @@ void ClientLobby::updatePlayerList(Event* event)
             lp.m_icon_id = 4;
         if (lp.m_host_id == STKHost::get()->getMyHostId())
         {
+            if (is_peer_server_owner)
+                client_server_owner = true;
             auto& local_players = NetworkConfig::get()->getNetworkPlayers();
             std::get<2>(local_players.at(local_id)) = lp.m_difficulty;
         }
         data.decodeString(&lp.m_country_id);
         m_lobby_players.push_back(lp);
     }
+    STKHost::get()->setAuthorisedToControl(client_server_owner);
 
     // Notification sound for new player
     if (!m_total_players.empty() &&
@@ -788,7 +792,6 @@ void ClientLobby::handleBadConnection()
 //-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
 {
-    STKHost::get()->setAuthorisedToControl(true);
     if (STKHost::get()->isClientServer())
         return;
 
