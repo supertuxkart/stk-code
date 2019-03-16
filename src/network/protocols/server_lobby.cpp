@@ -3135,8 +3135,6 @@ void ServerLobby::resetServer()
 {
     addWaitingPlayersToGame();
     resetPeersReady();
-    m_state = NetworkConfig::get()->isLAN() ?
-        WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
     updatePlayerList(true/*update_when_reset_server*/);
     NetworkString* server_info = getNetworkString();
     server_info->setSynchronous(true);
@@ -3145,6 +3143,8 @@ void ServerLobby::resetServer()
     sendMessageToPeersInServer(server_info);
     delete server_info;
     setup();
+    m_state = NetworkConfig::get()->isLAN() ?
+        WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
 }   // resetServer
 
 //-----------------------------------------------------------------------------
