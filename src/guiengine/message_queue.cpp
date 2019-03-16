@@ -233,8 +233,9 @@ public:
         core::dimension2du dim(int(width * 0.75f), int(height * 0.05f));
         int x = (width - dim.Width) / 2;
         int y = height - int(1.5f * dim.Height);
-        m_area = irr::core::recti(x, y, x + dim.Width,
-            y + dim.Height);
+        m_area = irr::core::recti(x, y, x + dim.Width, y + dim.Height);
+        if(height > 1300)
+            m_area = irr::core::recti(x - height / 108 + 8, y, x + dim.Width, y + dim.Height + height / 108 - 8);
     }
     // ------------------------------------------------------------------------
     virtual void draw(float dt)
