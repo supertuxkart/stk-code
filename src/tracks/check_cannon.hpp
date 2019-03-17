@@ -23,7 +23,7 @@
 #include "tracks/check_line.hpp"
 #include "utils/cpp2011.hpp"
 
-#include <map>
+#include <set>
 
 class CheckManager;
 class Flyable;
@@ -61,13 +61,13 @@ private:
     std::shared_ptr<SP::SPDynamicDrawCall> m_debug_target_dy_dc;
 #endif
 
-    std::map<Flyable*, Vec3> m_all_flyables_previous_position;
+    std::set<Flyable*> m_all_flyables;
 public:
              CheckCannon(const XMLNode &node, unsigned int index);
     // ------------------------------------------------------------------------
     virtual ~CheckCannon();
     // ------------------------------------------------------------------------
-    virtual void trigger(unsigned int kart_index) OVERRIDE;
+    virtual void trigger(unsigned int kart_index) OVERRIDE {}
     // ------------------------------------------------------------------------
     virtual void changeDebugColor(bool is_active) OVERRIDE;
     // ------------------------------------------------------------------------
@@ -75,15 +75,15 @@ public:
     // ------------------------------------------------------------------------
     virtual bool triggeringCheckline() const OVERRIDE         { return false; }
     // ------------------------------------------------------------------------
-    virtual void resetAfterRewind(unsigned int kart_index) OVERRIDE;
-    // ------------------------------------------------------------------------
-    void addFlyable(Flyable* flyable);
+    /** Adds a flyable to be tested for crossing a cannon checkline.
+    *  \param flyable The flyable to be tested.
+    */
+    void addFlyable(Flyable* flyable)       { m_all_flyables.insert(flyable); }
     // ------------------------------------------------------------------------
     /** Removes a flyable from the tests if it crosses a checkline. Used when
     *  the flyable is removed (e.g. explodes).
     */
-    void removeFlyable(Flyable* flyable)
-                           { m_all_flyables_previous_position.erase(flyable); }
+    void removeFlyable(Flyable* flyable)     { m_all_flyables.erase(flyable); }
     // ------------------------------------------------------------------------
     const Vec3& getTargetLeft() const                 { return m_target_left; }
     // ------------------------------------------------------------------------
