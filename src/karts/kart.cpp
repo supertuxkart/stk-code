@@ -3337,9 +3337,10 @@ void Kart::updateGraphics(float dt)
     }
 #endif
 
-    // m_speed*dt is the distance the kart has moved, which determines
+    // m_speed * dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
+    m_kart_model->update(dt, m_speed * dt, getSteerPercent(), m_speed,
+        m_current_lean);
 
 #ifndef SERVER_ONLY
     // Determine the shadow position from the terrain Y position. This
