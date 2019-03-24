@@ -2358,22 +2358,24 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             .addUInt8(profile->getLocalPlayerId())
             .encodeString(profile->getName());
         std::shared_ptr<STKPeer> p = profile->getPeer();
-        pl->addUInt8((uint8_t)
-            (p && p->isWaitingForGame() ? 1 : p && p->isSpectator() ? 2 : 0));
-        uint8_t server_owner = 0;
+        uint8_t boolean_combine = 0;
+        if (p && p->isWaitingForGame())
+            boolean_combine |= 1;
+        if (p && p->isSpectator())
+            boolean_combine |= (1 << 1);
         if (p && m_server_owner_id.load() == p->getHostId())
-            server_owner = 1;
-        pl->addUInt8(server_owner);
+            boolean_combine |= (1 << 2);
+        if (ServerConfig::m_owner_less && !game_started &&
+            m_peers_ready.find(p) != m_peers_ready.end() &&
+            m_peers_ready.at(p))
+            boolean_combine |= (1 << 3);
+        pl->addUInt8(boolean_combine);
         pl->addUInt8(profile->getPerPlayerDifficulty());
         if (ServerConfig::m_team_choosing &&
             race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
-        uint8_t ready = (!game_started &&
-            m_peers_ready.find(p) != m_peers_ready.end() &&
-            m_peers_ready.at(p)) ? 1 : 0;
-        pl->addUInt8(ready);
         pl->encodeString(profile->getCountryId());
     }
 

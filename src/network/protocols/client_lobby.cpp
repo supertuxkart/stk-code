@@ -735,29 +735,26 @@ void ClientLobby::updatePlayerList(Event* event)
         lp.m_local_player_id = local_id;
         data.decodeStringW(&lp.m_user_name);
         total_players += lp.m_user_name;
-        uint8_t waiting_and_spectator = data.getUInt8();
-        bool is_peer_waiting_for_game = waiting_and_spectator == 1;
-        bool is_spectator = waiting_and_spectator == 2;
-        bool is_peer_server_owner = data.getUInt8() == 1;
+        uint8_t boolean_combine = data.getUInt8();
+        bool is_peer_waiting_for_game = (boolean_combine & 1) == 1;
+        bool is_spectator = ((boolean_combine >> 1) & 1) == 1;
+        bool is_peer_server_owner = ((boolean_combine >> 2) & 1) == 1;
+        bool ready = ((boolean_combine >> 3) & 1) == 1;
         // icon to be used, see NetworkingLobby::loadedFromFile
         lp.m_icon_id = is_peer_server_owner ? 0 :
             lp.m_online_id != 0 /*if online account*/ ? 1 : 2;
-        if (waiting)
-        {
-            if (is_spectator)
-                lp.m_icon_id = 5;
-            else if (!is_peer_waiting_for_game)
-                lp.m_icon_id = 3;
-        }
+        if (waiting && !is_peer_waiting_for_game)
+            lp.m_icon_id = 3;
+        if (is_spectator)
+            lp.m_icon_id = 5;
+        if (ready)
+            lp.m_icon_id = 4;
         lp.m_difficulty = (PerPlayerDifficulty)data.getUInt8();
         if (lp.m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
         {
             lp.m_user_name = _("%s (handicapped)", lp.m_user_name);
         }
         lp.m_kart_team = (KartTeam)data.getUInt8();
-        bool ready = data.getUInt8() == 1;
-        if (ready)
-            lp.m_icon_id = 4;
         if (lp.m_host_id == STKHost::get()->getMyHostId())
         {
             if (is_peer_server_owner)
