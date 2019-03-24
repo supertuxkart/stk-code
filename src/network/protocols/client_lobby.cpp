@@ -96,6 +96,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_first_connect = true;
     m_spectator = false;
     m_server_live_joinable = false;
+    m_server_send_live_load_world = false;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -116,6 +117,7 @@ ClientLobby::~ClientLobby()
 void ClientLobby::setup()
 {
     m_spectator = false;
+    m_server_send_live_load_world = false;
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
     m_start_live_game_time = std::numeric_limits<uint64_t>::max();
     m_received_server_result = false;
@@ -254,9 +256,12 @@ void ClientLobby::addAllPlayers(Event* event)
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
+    m_server_send_live_load_world = data.getUInt8() == 1;
+
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     unsigned player_count = data.getUInt8();
 
+    bool is_specator = true;
     for (unsigned i = 0; i < player_count; i++)
     {
         core::stringw player_name;
@@ -269,6 +274,8 @@ void ClientLobby::addAllPlayers(Event* event)
         KartTeam team = (KartTeam)data.getUInt8();
         std::string country_id;
         data.decodeString(&country_id);
+        if (host_id == STKHost::get()->getMyHostId())
+            is_specator = false;
         auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
             host_id, kart_color, online_id, ppd, local_id, team, country_id);
         std::string kart_name;
@@ -276,6 +283,8 @@ void ClientLobby::addAllPlayers(Event* event)
         player->setKartName(kart_name);
         players.push_back(player);
     }
+    setSpectator(is_specator);
+
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
     if (race_manager->isBattleMode())
@@ -294,8 +303,7 @@ void ClientLobby::addAllPlayers(Event* event)
     // Disable until render gui during loading is bug free
     //StateManager::get()->enterGameState();
 
-    // Live join or spectate if state is CONNECTED
-    if (m_state.load() == CONNECTED)
+    if (m_server_send_live_load_world)
     {
         World* w = World::getWorld();
         w->setLiveJoinWorld(true);
@@ -1110,8 +1118,7 @@ void ClientLobby::backToLobby(Event *event)
 void ClientLobby::finishedLoadingWorld()
 {
     NetworkString* ns = getNetworkString(1);
-    // Live join or spectate if state is CONNECTED
-    ns->setSynchronous(m_state.load() == CONNECTED);
+    ns->setSynchronous(m_server_send_live_load_world);
     ns->addUInt8(LE_CLIENT_LOADED_WORLD);
     sendToServer(ns, true);
     delete ns;

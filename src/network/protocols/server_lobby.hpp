@@ -281,7 +281,8 @@ private:
     void addLiveJoinPlaceholder(
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     NetworkString* getLoadWorldMessage(
-        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
+        bool live_join) const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);

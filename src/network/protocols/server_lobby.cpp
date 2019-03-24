@@ -601,7 +601,8 @@ void ServerLobby::asynchronousUpdate()
             // Add placeholder players for live join
             addLiveJoinPlaceholder(players);
 
-            NetworkString* load_world_message = getLoadWorldMessage(players);
+            NetworkString* load_world_message = getLoadWorldMessage(players,
+                false/*live_join*/);
             m_game_setup->setHitCaptureTime(m_battle_hit_capture_limit,
                 m_battle_time_limit);
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
@@ -628,14 +629,16 @@ void ServerLobby::asynchronousUpdate()
 
 //-----------------------------------------------------------------------------
 NetworkString* ServerLobby::getLoadWorldMessage(
-    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
+    bool live_join) const
 {
     NetworkString* load_world_message = getNetworkString();
     load_world_message->setSynchronous(true);
     load_world_message->addUInt8(LE_LOAD_WORLD);
     load_world_message->addUInt32(m_winner_peer_id);
     m_default_vote->encode(load_world_message);
-    load_world_message->addUInt8((uint8_t)players.size());
+    load_world_message->addUInt8(live_join ? 1 : 0).
+        addUInt8((uint8_t)players.size());
     for (unsigned i = 0; i < players.size(); i++)
     {
         std::shared_ptr<NetworkPlayerProfile>& player = players[i];
@@ -830,7 +833,8 @@ void ServerLobby::liveJoinRequest(Event* event)
         }
         players.push_back(player);
     }
-    NetworkString* load_world_message = getLoadWorldMessage(players);
+    NetworkString* load_world_message = getLoadWorldMessage(players,
+        true/*live_join*/);
     peer->sendPacket(load_world_message, true/*reliable*/);
     delete load_world_message;
     peer->updateLastActivity();

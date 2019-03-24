@@ -584,7 +584,6 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         auto cl = LobbyProtocol::get<ClientLobby>();
         if (m_client_live_joinable && cl)
         {
-            cl->setSpectator(true);
             NetworkString start(PROTOCOL_LOBBY_ROOM);
             start.setSynchronous(true);
             start.addUInt8(LobbyProtocol::LE_LIVE_JOIN)

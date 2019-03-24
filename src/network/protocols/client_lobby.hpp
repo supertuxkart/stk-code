@@ -101,6 +101,8 @@ private:
 
     bool m_server_live_joinable;
 
+    bool m_server_send_live_load_world;
+
     uint64_t m_auto_back_to_lobby_time;
 
     uint64_t m_start_live_game_time;
