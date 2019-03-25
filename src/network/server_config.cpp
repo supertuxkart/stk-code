@@ -145,7 +145,7 @@ void loadServerConfigXML(const XMLNode* root, bool default_config)
         return;
     }
 
-    int config_file_version = -1;
+    /*int config_file_version = -1;
     if (root->get("version", &config_file_version) < 1 ||
         config_file_version < stk_config->m_min_server_version ||
         config_file_version > stk_config->m_max_server_version)
@@ -155,7 +155,7 @@ void loadServerConfigXML(const XMLNode* root, bool default_config)
         delete root;
         writeServerConfigToDisk();
         return;
-    }
+    }*/
 
     for (unsigned i = 0; i < g_server_params.size(); i++)
         g_server_params[i]->findYourDataInAChildOf(root);

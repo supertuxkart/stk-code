@@ -326,7 +326,7 @@ namespace ServerConfig
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
-    static const uint32_t m_server_version = 5;
+    static const uint32_t m_server_version = 6;
     // ========================================================================
     void loadServerConfig(const std::string& path = "");
     // ------------------------------------------------------------------------
