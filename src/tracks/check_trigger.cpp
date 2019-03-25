@@ -21,10 +21,10 @@
 #include "tracks/check_manager.hpp"
 #include "utils/time.hpp"
 
-/** Constructor for a checksphere.
- *  \param check_manager Pointer to the check manager, which is needed when
- *         resetting e.g. new lap counters.
- *  \param node XML node containing the parameters for this checkline.
+/** Constructor for a check trigger.
+ *  \param center Center point of this trigger
+ *  \param distance Kart within it between center will trigger
+ *  \param triggering_function callback function to be used when triggered
  */
 CheckTrigger::CheckTrigger(const Vec3& center, float distance,
                            std::function<void()> triggering_function)
