@@ -235,7 +235,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
-    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
+    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation xxx", 0xFF, 0xFF, 0xFF);
     m_draw_calls.prepareDrawCalls(camnode);
     PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);

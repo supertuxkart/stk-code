@@ -187,8 +187,7 @@ void RubberBall::computeTarget()
         m_restoring_state = false;
     }
 
-    for(unsigned int p = race_manager->getFinishedKarts()+1;
-                     p < world->getNumKarts()+1; p++)
+    for (unsigned int p = 1; p < world->getNumKarts() + 1; p++)
     {
         m_target = world->getKartAtPosition(p);
         if(!m_target->isEliminated() && !m_target->hasFinishedRace())

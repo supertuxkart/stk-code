@@ -87,29 +87,21 @@ void OptionsScreenGeneral::init()
                                      ==RequestManager::IPERM_ALLOWED );
     CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
     assert( stats != NULL );
-    LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
-    assert( stats_label );
     stats->setState(UserConfigParams::m_hw_report_enable);
 
-    
     CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
-    LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
 
     if(internet_enabled->getState())
     {
-        stats_label->setVisible(true);
-        stats->setVisible(true);
+        stats->setActive(true);
         stats->setState(UserConfigParams::m_hw_report_enable);
-        chat_label->setVisible(true);
-        chat->setVisible(true);
+        chat->setActive(true);
         chat->setState(UserConfigParams::m_lobby_chat);
     }
     else
     {
-        stats_label->setVisible(false);
-        stats->setVisible(false);
-        chat_label->setVisible(false);
-        chat->setVisible(false);
+        stats->setActive(false);
+        chat->setActive(false);
     }
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
@@ -173,28 +165,25 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
         CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        LabelWidget* stats_label = getWidget<LabelWidget>("label-hw-report");
         CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
-        LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
         if(internet->getState())
         {
             NewsManager::get()->init(false);
-            stats->setVisible(true);
-            stats_label->setVisible(true);
+            stats->setActive(true);
             stats->setState(UserConfigParams::m_hw_report_enable);
-            chat->setVisible(true);
+            chat->setActive(true);
             chat->setState(UserConfigParams::m_lobby_chat);
-            chat_label->setVisible(true);
         }
         else
         {
-            chat->setVisible(false);
-            chat_label->setVisible(false);
-            stats->setVisible(false);
-            stats_label->setVisible(false);
+            chat->setActive(false);
+            stats->setActive(false);
+
             // Disable this, so that the user has to re-check this if
             // enabled later (for GDPR compliance).
             UserConfigParams::m_hw_report_enable = false;
+            stats->setState(false);
+
             PlayerProfile* profile = PlayerManager::getCurrentPlayer();
             if (profile != NULL && profile->isLoggedIn())
                 profile->requestSignOut();

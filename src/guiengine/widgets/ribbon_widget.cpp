@@ -708,8 +708,11 @@ EventPropagation RibbonWidget::focused(const int playerID)
         if (m_mouse_focus == NULL && m_selection[playerID] != -1  &&
             (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER))
         {
-            m_mouse_focus = m_active_children.get(m_selection[playerID]);
-            m_mouse_focus->focused(playerID);
+            if (m_selection[playerID] < int(m_active_children.size()))
+            {
+                m_mouse_focus = m_active_children.get(m_selection[playerID]);
+                m_mouse_focus->focused(playerID);
+            }
         }
     }
     else

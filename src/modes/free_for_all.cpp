@@ -54,6 +54,7 @@ void FreeForAll::init()
     WorldWithRank::init();
     m_display_rank = false;
     m_count_down_reached_zero = false;
+    m_use_highscores = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -62,6 +63,7 @@ void FreeForAll::init()
 void FreeForAll::reset(bool restart)
 {
     WorldWithRank::reset(restart);
+    m_count_down_reached_zero = false;
     if (race_manager->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
@@ -186,9 +188,12 @@ bool FreeForAll::isRaceOver()
 
     if (!getKartAtPosition(1))
         return false;
-    int top_id = getKartAtPosition(1)->getWorldKartId();
+
+    const int top_id = getKartAtPosition(1)->getWorldKartId();
+    const int hit_capture_limit = race_manager->getHitCaptureLimit();
+
     return (m_count_down_reached_zero && race_manager->hasTimeTarget()) ||
-        m_scores[top_id] >= race_manager->getHitCaptureLimit();
+        (hit_capture_limit != 0 && m_scores[top_id] >= hit_capture_limit);
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------

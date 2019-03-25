@@ -560,15 +560,6 @@ void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
     {
         if(!*i) continue;
 
-        if ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM ||
-             (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK)
-        {
-            if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
-            {
-                continue;
-            }
-        }
-
         ItemState::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if (new_type == (*i)->getType())

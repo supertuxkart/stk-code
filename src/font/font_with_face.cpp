@@ -358,6 +358,11 @@ void FontWithFace::setDPI()
         float scale = screen_height / 480.0f;
         m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
     }
+    else if (screen_height > 1300)
+    {
+        float scale = screen_height / 480.0f * 0.45f;
+        m_face_dpi = int(getScalingFactorTwo() * (getScalingFactorOne() + 0.3f) * scale);
+    }
     else
     {
         float scale = std::max(0, screen_width - 640) / 564.0f;

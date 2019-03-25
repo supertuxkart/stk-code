@@ -303,6 +303,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+    irr_driver->resetSceneComplexity();
     m_physical_object_uid = 0;
 #ifdef USE_RESIZE_CACHE
     if (!UserConfigParams::m_high_definition_textures)
@@ -2019,6 +2020,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadObjects(root, path, model_def_loader, true, NULL, NULL);
     main_loop->renderGUI(5000);
 
+    Log::info("Track", "Overall scene complexity estimated at %d", irr_driver->getSceneComplexity());
     // Correct the parenting of meta library
     for (auto& p : m_meta_library)
     {
@@ -2275,6 +2277,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
     const bool is_mode_ctf = m_is_ctf && race_manager->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
 
+    // We keep track of the complexity of the scene (amount of objects loaded, etc)
+    irr_driver->addSceneComplexity(node_count);
     for (unsigned int i = 0; i < node_count; i++)
     {
         main_loop->renderGUI(4950, i, node_count);
