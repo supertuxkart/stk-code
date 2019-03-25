@@ -42,7 +42,10 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                const Vec3 &pos,
                                                bool direct_hit)
 {
-    if(kart->isInvulnerable()) return NULL;
+    // When goal phase is happening karts is made stationary, so no animation
+    // will be created
+    if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
+        return NULL;
 
     float r = kart->getKartProperties()->getExplosionRadius();
 
@@ -72,8 +75,9 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
  *  Otherwise, NULL is returned. */
 ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 {
-    if(kart->isInvulnerable()) return NULL;
-    else if(kart->isShielded())
+    if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
+        return NULL;
+    else if (kart->isShielded())
     {
         kart->decreaseShieldTime();
         return NULL;

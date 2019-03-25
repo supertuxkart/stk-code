@@ -110,7 +110,7 @@ void ArenaAI::update(int ticks)
         m_kart->isOnGround()                                     )
     {
         m_ticks_since_off_road = 0;
-        new RescueAnimation(m_kart);
+        RescueAnimation::create(m_kart);
         AIBaseController::update(ticks);
         return;
     }

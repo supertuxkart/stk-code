@@ -130,6 +130,11 @@ void CheckCannon::changeDebugColor(bool is_active)
 void CheckCannon::update(float dt)
 {
     World* world = World::getWorld();
+    // When goal phase is happening karts is made stationary, so no animation
+    // will be created
+    if (world->isGoalPhase())
+        return;
+
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
         AbstractKart* kart = world->getKart(i);

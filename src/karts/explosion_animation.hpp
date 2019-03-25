@@ -70,10 +70,9 @@ friend class KartRewinder;
               const btTransform& reset_trans);
     // ------------------------------------------------------------------------
     ExplosionAnimation(AbstractKart* kart, BareNetworkString* buffer);
-
-public:
     // ------------------------------------------------------------------------
     ExplosionAnimation(AbstractKart* kart, bool direct_hit);
+public:
     // ------------------------------------------------------------------------
     static ExplosionAnimation *create(AbstractKart* kart, const Vec3 &pos,
                                       bool direct_hit);

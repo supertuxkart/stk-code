@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/local_player_controller.hpp"
@@ -222,6 +223,12 @@ void SoccerWorld::update(int ticks)
             auto& kart = m_karts[i];
             if (kart->isEliminated())
                 continue;
+            if (kart->getKartAnimation())
+            {
+                AbstractKartAnimation* ka = kart->getKartAnimation();
+                kart->setKartAnimation(NULL);
+                delete ka;
+            }
             kart->getBody()->setLinearVelocity(Vec3(0.0f));
             kart->getBody()->setAngularVelocity(Vec3(0.0f));
             kart->getBody()->proceedToTransform(m_goal_transforms[i]);

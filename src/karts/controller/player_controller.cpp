@@ -359,7 +359,7 @@ void PlayerController::update(int ticks)
     // starting any other animation).
     if ( m_controls->getRescue() && !m_kart->getKartAnimation() )
     {
-        new RescueAnimation(m_kart);
+        RescueAnimation::create(m_kart);
         m_controls->setRescue(false);
     }
 }   // update

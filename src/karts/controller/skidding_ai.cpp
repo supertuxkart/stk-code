@@ -299,7 +299,7 @@ void SkiddingAI::update(int ticks)
         if (m_enabled_network_ai)
             m_controls->setRescue(true);
         else
-            new RescueAnimation(m_kart);
+            RescueAnimation::create(m_kart);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -2158,7 +2158,7 @@ void SkiddingAI::handleRescue(const float dt)
             if (m_enabled_network_ai)
                 m_controls->setRescue(true);
             else
-                new RescueAnimation(m_kart);
+                RescueAnimation::create(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

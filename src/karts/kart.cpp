@@ -1626,7 +1626,7 @@ void Kart::update(int ticks)
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
-            new RescueAnimation(this, /*is_auto_rescue*/true);
+            RescueAnimation::create(this, /*is_auto_rescue*/true);
             m_last_factor_engine_sound = 0.0f;
         }
     }
@@ -1727,7 +1727,7 @@ void Kart::update(int ticks)
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !has_animation_before)
         {
-            new RescueAnimation(this);
+            RescueAnimation::create(this);
             m_last_factor_engine_sound = 0.0f;
         }
     }
@@ -1735,7 +1735,7 @@ void Kart::update(int ticks)
     {
         if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
-            new RescueAnimation(this);
+            RescueAnimation::create(this);
             m_last_factor_engine_sound = 0.0f;
         }
         else if(material->isZipper()     && isOnGround())
@@ -2452,7 +2452,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 #endif
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            new RescueAnimation(this);
+            RescueAnimation::create(this);
             m_last_factor_engine_sound = 0.0f;
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)

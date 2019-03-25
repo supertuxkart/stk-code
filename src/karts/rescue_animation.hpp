@@ -51,13 +51,17 @@ friend class KartRewinder;
     // ------------------------------------------------------------------------
     RescueAnimation(AbstractKart* kart, BareNetworkString* b);
     // ------------------------------------------------------------------------
+    RescueAnimation(AbstractKart* kart, bool is_auto_rescue);
+    // ------------------------------------------------------------------------
     void restoreData(BareNetworkString* b);
     // ------------------------------------------------------------------------
     void init(const btTransform& rescue_transform, float velocity);
 public:
-                 RescueAnimation(AbstractKart* kart,
-                                 bool is_auto_rescue = false);
-    virtual     ~RescueAnimation();
+    // ------------------------------------------------------------------------
+    static RescueAnimation* create(AbstractKart* kart,
+                                   bool is_auto_rescue = false);
+    // ------------------------------------------------------------------------
+    virtual ~RescueAnimation();
     // ------------------------------------------------------------------------
     virtual void update(int ticks);
     // ------------------------------------------------------------------------

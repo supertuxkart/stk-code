@@ -33,6 +33,17 @@
 #include <algorithm>
 #include <cmath>
 
+RescueAnimation* RescueAnimation::create(AbstractKart* kart,
+                                         bool is_auto_rescue)
+{
+    // When goal phase is happening karts is made stationary, so no animation
+    // will be created
+    if (World::getWorld()->isGoalPhase())
+        return NULL;
+    return new RescueAnimation(kart, is_auto_rescue);
+}   // create
+
+//-----------------------------------------------------------------------------
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
