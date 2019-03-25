@@ -155,7 +155,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     Physics::getInstance()->addBody(getBody());
 
     m_body->setGravity(gravity);
-    if (gravity.length() != 0.0f && m_do_terrain_info)
+    if (gravity.length2() != 0.0f && m_do_terrain_info)
     {
         m_compressed_gravity_vector = MiniGLM::compressVector3(
             Vec3(m_body->getGravity().normalized()).toIrrVector());
