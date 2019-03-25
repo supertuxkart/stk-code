@@ -88,7 +88,7 @@ private:
     /** Time left till attachment expires. */
     int16_t         m_ticks_left;
 
-    /** For parachutes only, rounded down to 2 digits for network. */
+    /** For parachutes only, stored in cm/s for networking. */
     int16_t         m_initial_speed;
 
     /** For zoom-in animation */

@@ -633,7 +633,7 @@ void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
 
-    // Round down values in network for better synchronization
+    // Round values in network for better synchronization
     if (NetworkConfig::get()->roundValuesNow())
         CompressNetworkBody::compress(m_body, m_motion_state);
 

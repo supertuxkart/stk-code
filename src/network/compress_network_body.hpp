@@ -29,11 +29,12 @@ namespace CompressNetworkBody
 {
     using namespace MiniGLM;
     // ------------------------------------------------------------------------
-    inline void setRoundedDownValues(float x, float y, float z,
-                                     uint32_t compressed_q,
-                                     short lvx, short lvy, short lvz,
-                                     short avx, short avy, short avz,
-                                     btRigidBody* body, btMotionState* ms)
+    /** Set body and motion state of bullet object with compressed values. */
+    inline void setCompressedValues(float x, float y, float z,
+                                    uint32_t compressed_q,
+                                    short lvx, short lvy, short lvz,
+                                    short avx, short avy, short avz,
+                                    btRigidBody* body, btMotionState* ms)
     {
         btTransform trans;
         trans.setOrigin(btVector3(x,y,z));
@@ -49,8 +50,15 @@ namespace CompressNetworkBody
         body->setInterpolationLinearVelocity(lv);
         body->setInterpolationAngularVelocity(av);
         body->updateInertiaTensor();
-    }   // setRoundedDownValues
+    }   // setCompressedValues
     // ------------------------------------------------------------------------
+    /** Compress transformation and velocities of bullet object, it will
+     *  call MiniGLM::compressQuaternion for compress quaternion of
+     *  transformation and convert linear and angular velocities to half floats
+     *  it can be used by client to locally round values to make sure client
+     *  and server have similar state when saving state if you don't provoide
+     *  bns.
+     */
     inline void compress(btRigidBody* body, btMotionState* ms,
                          BareNetworkString* bns = NULL)
     {
@@ -65,9 +73,9 @@ namespace CompressNetworkBody
         short avx = toFloat16(body->getAngularVelocity().x());
         short avy = toFloat16(body->getAngularVelocity().y());
         short avz = toFloat16(body->getAngularVelocity().z());
-        setRoundedDownValues(x, y, z, compressed_q, lvx, lvy, lvz, avx, avy,
+        setCompressedValues(x, y, z, compressed_q, lvx, lvy, lvz, avx, avy,
             avz, body, ms);
-        // if bns is null, it's locally compress (for rounding down values)
+        // if bns is null, it's locally compress (for rounding values)
         if (!bns)
             return;
 
@@ -76,6 +84,7 @@ namespace CompressNetworkBody
             .addUInt16(avx).addUInt16(avy).addUInt16(avz);
     }   // compress
     // ------------------------------------------------------------------------
+    /* Called during rewind when restoring data from game state. */
     inline void decompress(const BareNetworkString* bns,
                            btRigidBody* body, btMotionState* ms)
     {
@@ -89,7 +98,7 @@ namespace CompressNetworkBody
         short avx = bns->getUInt16();
         short avy = bns->getUInt16();
         short avz = bns->getUInt16();
-        setRoundedDownValues(x, y, z, compressed_q, lvx, lvy, lvz, avx, avy,
+        setCompressedValues(x, y, z, compressed_q, lvx, lvy, lvz, avx, avy,
             avz, body, ms);
     }   // decompress
 };

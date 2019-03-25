@@ -568,6 +568,12 @@ namespace MiniGLM
         return compressVector3(tangent) | 1 << 30;
     }   // quickTangent
     // ------------------------------------------------------------------------
+    /** Round and save compressed values (optionally) btTransform.
+     *  It will round with 2 digits with min / max +/- 2^23 / 100 for origin in
+     *  btTransform and call compressQuaternion above to compress the rotation
+     *  part, if compressed_data is provided, 3 24 bits and 1 32 bits of
+     *  compressed data will be written in an int[4] array.
+     */
     inline void compressbtTransform(btTransform& cur_t,
                                     int* compressed_data = NULL)
     {

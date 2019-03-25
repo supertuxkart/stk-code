@@ -444,7 +444,7 @@ bool Flyable::updateAndDelete(int ticks)
 
     if(m_has_hit_something) return true;
 
-    // Round down values in network for better synchronization
+    // Round values in network for better synchronization
     if (NetworkConfig::get()->roundValuesNow())
         CompressNetworkBody::compress(m_body.get(), m_motion_state.get());
     // Save the compressed values if done in client
