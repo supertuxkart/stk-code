@@ -190,14 +190,7 @@ void RescueAnimation::updateGraphics(float dt)
         m_referee = new Referee(*m_kart);
         m_kart->getNode()->addChild(m_referee->getSceneNode());
     }
-    float dur = stk_config->ticks2Time(
-        World::getWorld()->getTicksSinceStart() - m_created_ticks);
-    dur *= 25.0f;
-    float ref_dur = (float)
-        (Referee::m_st_last_rescue_frame - Referee::m_st_first_rescue_frame);
-    float frame = std::fmod(dur, ref_dur);
-    frame += (float)Referee::m_st_first_rescue_frame;
-    m_referee->getSceneNode()->setCurrentFrame(frame);
+    m_referee->setAnimationFrameWithCreatedTicks(m_created_ticks);
     AbstractKartAnimation::updateGraphics(dt);
 }   // updateGraphics
 

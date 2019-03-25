@@ -43,12 +43,6 @@ class AbstractKart;
   */
 class Referee
 {
-public:
-    /** Start frame of rescue animation. */
-    static int m_st_first_rescue_frame;
-
-    /** End frame of rescue animation. */
-    static int m_st_last_rescue_frame;
 private:
     /** The static mesh, which is loaded from a static function and shared
      *  between all instances. */
@@ -65,6 +59,12 @@ private:
 
     /** End frame of start animation. */
     static int m_st_last_start_frame;
+
+    /** Start frame of rescue animation. */
+    static int m_st_first_rescue_frame;
+
+    /** End frame of rescue animation. */
+    static int m_st_last_rescue_frame;
 
     /** The position the referee should be shown relative to the kart
      *  when starting the race. */
@@ -107,6 +107,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this referee is attached to the scene graph. */
     bool        isAttached() const {return m_scene_node->getParent()!=NULL;}
+    // ------------------------------------------------------------------------
+    void        setAnimationFrameWithCreatedTicks(int created_ticks);
     // ------------------------------------------------------------------------
     /** Returns the graphical offset the referee should be drawn at at the
      *  start of a race. */
