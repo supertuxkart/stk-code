@@ -114,7 +114,8 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
     const Vec3 &start_right, const Vec3 &end_left,
     const Vec3 &end_right, float skid_rot)
 {
-    m_current_rotation = m_created_transform.getRotation();
+    m_current_rotation =
+        MiniGLM::compressQuaternion(m_created_transform.getRotation());
     m_curve = new AnimationBase(ipo);
     m_end_ticks = m_created_ticks + stk_config->time2Ticks(ipo->getEndTime());
 
@@ -265,7 +266,9 @@ void CannonAnimation::update(int ticks)
     Vec3 tangent;
     m_curve->getDerivativeAt(cannon_timer, &tangent);
     // Get the current kart orientation
-    const btTransform &trans = btTransform(m_current_rotation);
+    btQuaternion current_rotation =
+        MiniGLM::decompressbtQuaternion(m_current_rotation);
+    const btTransform& trans = btTransform(current_rotation);
     Vec3 forward = trans.getBasis().getColumn(2);
 
     // Heading
@@ -312,9 +315,10 @@ void CannonAnimation::update(int ticks)
     {
         btQuaternion zero(gravity, 0);
         btQuaternion current_delta_heading = zero.slerp(m_delta_heading, f);
-        all_heading = m_current_rotation * current_delta_heading * heading;
-        m_current_rotation = q_up * all_heading;
-        m_kart->setRotation(m_current_rotation);
+        all_heading = current_rotation * current_delta_heading * heading;
+        current_rotation = q_up * all_heading;
+        m_kart->setRotation(current_rotation);
+        m_current_rotation = MiniGLM::compressQuaternion(current_rotation);
 
         // Adjust the horizontal location based on steering
         // Use values from getControls directly because in networking steering
@@ -360,7 +364,7 @@ void CannonAnimation::saveState(BareNetworkString* buffer)
     if (m_kart)
     {
         buffer->addFloat(m_skid_rot).addFloat(m_fraction_of_line)
-        .add(m_current_rotation);
+        .addUInt32(m_current_rotation);
     }
     else
         buffer->addFloat(m_delta.y());
@@ -391,13 +395,13 @@ void CannonAnimation::restoreData(BareNetworkString* buffer)
     }
     float skid_rot = 0.0f;
     float fraction_of_line = 0.0f;
-    btQuaternion current_rotation = btQuaternion(0, 0, 0, 1);
+    uint32_t current_rotation = 0;
     float delta = 0.0f;
     if (m_kart)
     {
         skid_rot = buffer->getFloat();
         fraction_of_line = buffer->getFloat();
-        current_rotation = buffer->getQuat();
+        current_rotation = buffer->getUInt32();
     }
     else
         delta = buffer->getFloat();

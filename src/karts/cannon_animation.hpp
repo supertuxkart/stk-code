@@ -90,8 +90,10 @@ private:
      *  used to smoothly orient the kart towards the normal of the curve. */
     btQuaternion m_delta_heading;
 
-    /** Current rotation of the object, saved for rewinding usage if needed. */
-    btQuaternion m_current_rotation;
+    /** Current rotation of the object, saved for rewinding usage if needed,
+     *  it will be compressed by MiniGLM. */
+    uint32_t m_current_rotation;
+
 public:
              CannonAnimation(AbstractKart *kart, CheckCannon* cc,
                              float skid_rot);
