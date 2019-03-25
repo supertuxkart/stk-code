@@ -25,6 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/mini_glm.hpp"
@@ -160,11 +161,16 @@ ExplosionAnimation::~ExplosionAnimation()
     {
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        // Don't reset spectate camera
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (!cl || !cl->isSpectator())
         {
-            Camera *camera = Camera::getCamera(i);
-            if(camera->getType() != Camera::CM_TYPE_END)
-                camera->setMode(Camera::CM_NORMAL);
+            for (unsigned i = 0; i < Camera::getNumCameras(); i++)
+            {
+                Camera *camera = Camera::getCamera(i);
+                if (camera->getType() != Camera::CM_TYPE_END)
+                    camera->setMode(Camera::CM_NORMAL);
+            }
         }
     }
 }   // ~ExplosionAnimation
