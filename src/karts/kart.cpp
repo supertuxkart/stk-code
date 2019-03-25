@@ -3233,16 +3233,15 @@ void Kart::updateGraphics(float dt)
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient())
     {
-        SmoothNetworkBody* snb = static_cast<SmoothNetworkBody*>(this);
-        if (m_kart_animation && snb->isEnabled())
+        if (m_kart_animation && SmoothNetworkBody::isEnabled())
         {
-            snb->setEnable(false);
+            SmoothNetworkBody::setEnable(false);
         }
-        else if (!m_kart_animation && !snb->isEnabled())
+        else if (!m_kart_animation && !SmoothNetworkBody::isEnabled())
         {
-            snb->setEnable(true);
-            snb->reset();
-            snb->setSmoothedTransform(getTrans());
+            SmoothNetworkBody::setEnable(true);
+            SmoothNetworkBody::reset();
+            SmoothNetworkBody::setSmoothedTransform(getTrans());
         }
     }
 
