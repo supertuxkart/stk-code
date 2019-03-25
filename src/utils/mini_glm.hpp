@@ -574,9 +574,9 @@ namespace MiniGLM
         int x = (int)(cur_t.getOrigin().x() * 100.0f);
         int y = (int)(cur_t.getOrigin().y() * 100.0f);
         int z = (int)(cur_t.getOrigin().z() * 100.0f);
-        x = core::clamp(x, -8388608, 8388607);
-        y = core::clamp(y, -8388608, 8388607);
-        z = core::clamp(z, -8388608, 8388607);
+        x = core::clamp(x, -0x800000, 0x7fffff);
+        y = core::clamp(y, -0x800000, 0x7fffff);
+        z = core::clamp(z, -0x800000, 0x7fffff);
         uint32_t compressed_q = compressQuaternion(cur_t.getRotation());
         cur_t.setOrigin(btVector3(
             (float)x / 100.0f,

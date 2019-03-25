@@ -254,7 +254,7 @@ public:
     /** Adds signed 24 bit integer. */
     BareNetworkString& addInt24(const int value)
     {
-        uint32_t combined = (uint32_t)value & 16777215;
+        uint32_t combined = (uint32_t)value & 0xffffff;
         m_buffer.push_back((combined >> 16) & 0xff);
         m_buffer.push_back((combined >> 8) & 0xff);
         m_buffer.push_back(combined & 0xff);
@@ -348,8 +348,8 @@ public:
     inline int getInt24() const
     {
         uint32_t combined = get<uint32_t, 3>();
-        if (combined & 8388608)
-            return (16777216 - (int)combined) * -1;
+        if (combined & 0x800000)
+            return (0x1000000 - (int)combined) * -1;
         else
             return (int)combined;
     }
