@@ -757,6 +757,11 @@ scene::IAnimatedMeshSceneNode* TrackObject::getMesh()
 }   // getMesh
 
 // ----------------------------------------------------------------------------
+/* This function will join this (if true) static track object to main track
+ * model, the geometry creator in irrlicht will draw its physical shape to
+ * triangle mesh, so it can be combined to main track mesh.
+ * \return True if this track object is joinable and can be removed if needeed
+ */
 bool TrackObject::joinToMainTrack()
 {
     // If no physical object or there is animator, skip it
