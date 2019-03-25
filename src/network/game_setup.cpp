@@ -123,6 +123,8 @@ void GameSetup::addServerInfo(NetworkString* ns)
     assert(sl);
     ns->addUInt8((uint8_t)sl->getDifficulty())
         .addUInt8((uint8_t)ServerConfig::m_server_max_players)
+        // Reserve for extra spectators
+        .addUInt8(0)
         .addUInt8((uint8_t)sl->getGameMode());
     if (hasExtraSeverInfo())
     {

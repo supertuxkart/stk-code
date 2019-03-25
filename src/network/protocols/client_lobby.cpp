@@ -645,6 +645,8 @@ void ClientLobby::handleServerInfo(Event* event)
     each_line = _("Max players: %d", (int)max_player);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
+    // Reserved for extra spectators
+    u_data = data.getUInt8();
     u_data = data.getUInt8();
     auto game_mode = ServerConfig::getLocalGameMode(u_data);
     race_manager->setMinorMode(game_mode.first);
