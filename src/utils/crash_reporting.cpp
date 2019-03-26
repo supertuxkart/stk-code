@@ -107,7 +107,7 @@
                                 "Call stack:\n";
             msg += callstack;
             Log::error("StackTrace", "%s", msg.c_str());
-            MessageBoxA(NULL, msg.c_str(), "SuperTuxKart crashed :/", MB_OK);
+            MessageBoxA(NULL, msg.c_str(), "SuperTuxKart crashed :/", MB_ICONERROR | MB_OK);
         }   // winCrashHandler
 
         // --------------------------------------------------------------------
