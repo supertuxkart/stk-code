@@ -21,7 +21,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="5" >
+<server-config version="6" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -102,7 +102,10 @@ The current server configuration xml looks like this:
     <live-players value="true" />
 
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
-    <flag-return-timemout value="20" />
+    <flag-return-timeout value="20" />
+
+    <!-- Time in seconds to deactivate a flag when it's captured or returned to own base by players. -->
+    <flag-deactivated-time value="3" />
 
     <!-- Hit limit of free for all, zero to disable hit limit. -->
     <hit-limit value="20" />
