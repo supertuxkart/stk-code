@@ -23,10 +23,10 @@
 
 #include <string.h>
 
-#if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__)
+#if defined(WIN32) && !defined(DEBUG)
     // --------------------- Windows version -----------------
-    #include <Windows.h>
-    #include <DbgHelp.h>
+    #include <windows.h>
+    #include <dbghelp.h>
     #include <stdlib.h>
     #include <signal.h>
     #include <new.h>
@@ -151,8 +151,11 @@
             _set_purecall_handler(pureCallHandler);     // Pure virtual function calls handler
 
             // Catch new operator memory allocation exceptions
+            // FIXME: Does not work on MinGW builds, why?
+#if !defined(__MINGW32__)
             _set_new_mode(1); // Force malloc() to call new handler too
             _set_new_handler(newHandler);
+#endif
 
             _set_invalid_parameter_handler(invalidParameterHandler);     // Catch invalid parameter exceptions.
             //_set_security_error_handler(securityHandler);              // Catch buffer overrun exceptions
