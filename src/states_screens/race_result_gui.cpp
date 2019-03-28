@@ -182,7 +182,9 @@ void RaceResultGUI::enableAllButtons()
     // If something was unlocked
     // -------------------------
     int n = (int)PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
-    if (n > 0)
+    if (n > 0 &&
+         (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+          race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
     {
         top->setText(n == 1 ? _("You completed a challenge!")
             : _("You completed challenges!"));
@@ -289,7 +291,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // ---------------------------------------------------------
     int n = (int)PlayerManager::getCurrentPlayer()
         ->getRecentlyCompletedChallenges().size();
-    if (n>0)
+    if (n > 0 &&
+         (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+          race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
+
     {
         if (name == "top")
         {
