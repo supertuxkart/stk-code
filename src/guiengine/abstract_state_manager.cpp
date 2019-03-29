@@ -28,7 +28,7 @@
 
 #include <vector>
 #include <iostream>
-
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 
@@ -212,15 +212,17 @@ void AbstractStateManager::popMenu()
 {
     assert(m_game_mode != GAME);
 
-    if (m_menu_stack.size() == 0)
+    if (m_menu_stack.empty())
         return;
 
     // Send tear-down event to menu
     getCurrentScreen()->tearDown();
     m_menu_stack.pop_back();
 
-    if (m_menu_stack.size() == 0)
+    if (m_menu_stack.empty())
     {
+        getGUIEnv()->clear();
+        getCurrentScreen()->elementsWereDeleted();
         onStackEmptied();
         return;
     }
