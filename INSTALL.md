@@ -47,7 +47,7 @@ OpenSUSE command:
 sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
 freetype-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel libXrandr-devel pkgconf zlib-devel enet-devel glew-devel \
-libjpeg-devel bluez-devel freetype2-devel
+libjpeg-devel bluez-devel freetype2-devel glu-devel
 ```
 Ubuntu command:
 
