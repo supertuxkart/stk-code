@@ -96,7 +96,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     b = false;
     node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.4 style
     node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.5 style
-
+    node->get("tex-compression", &m_tex_compression);
 
     std::string s;
 
@@ -483,6 +483,7 @@ void Material::init()
     m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_colorizable               = false;
+    m_tex_compression           = true;
     m_colorization_factor       = 0.0f;
     m_colorization_mask         = "";
     m_max_speed_fraction        = 1.0f;
