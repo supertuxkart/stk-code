@@ -56,7 +56,13 @@ The current server configuration xml looks like this:
     <!-- Message of today shown in lobby, you can enter encoded XML words here or a file.txt and let STK load it. -->
     <motd value="" />
 
-    <!-- Timeout in seconds for voting tracks in server. -->
+    <!-- If off this server will ignore chat message from all players. -->
+    <chat value="true" />
+
+    <!-- Allow players to vote track to play, if off server will pick next track to play randomly. -->
+    <track-voting value="true" />
+
+    <!-- Timeout in seconds for selecting karts and (or) voting tracks in server, you may want to use a lower value if you have track-voting off. -->
     <voting-timeout value="30" />
 
     <!-- Timeout in seconds for validation of clients in wan, currently stk will use the stk-addons server to share AES key between client and server. -->
