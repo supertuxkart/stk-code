@@ -79,6 +79,12 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
             m_text_box->setActive(true);
             getWidget("send")->setVisible(true);
             m_text_box->addListener(this);
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            if (cl && !cl->serverEnabledChat())
+            {
+                m_text_box->setActive(false);
+                getWidget("send")->setActive(false);
+            }
         }
         else
         {

@@ -103,6 +103,8 @@ private:
 
     bool m_server_send_live_load_world;
 
+    bool m_server_enabled_chat;
+
     uint64_t m_auto_back_to_lobby_time;
 
     uint64_t m_start_live_game_time;
@@ -162,6 +164,7 @@ public:
     void changeSpectateTarget(PlayerAction action, int value,
                               Input::InputType type) const;
     void addSpectateHelperMessage() const;
+    bool serverEnabledChat() const            { return m_server_enabled_chat; }
 };
 
 #endif // CLIENT_LOBBY_HPP

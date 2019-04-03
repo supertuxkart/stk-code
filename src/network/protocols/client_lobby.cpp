@@ -97,6 +97,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_spectator = false;
     m_server_live_joinable = false;
     m_server_send_live_load_world = false;
+    m_server_enabled_chat = true;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -607,6 +608,7 @@ void ClientLobby::connectionAccepted(Event* event)
     NetworkConfig::get()->setStateFrequency(state_frequency_in_server);
     if (auto_start_timer != std::numeric_limits<float>::max())
         NetworkingLobby::getInstance()->setStartingTimerTo(auto_start_timer);
+    m_server_enabled_chat = data.getUInt8() == 1;
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------

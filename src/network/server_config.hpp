@@ -144,6 +144,10 @@ namespace ServerConfig
         "motd", "Message of today shown in lobby, you can enter encoded XML "
         "words here or a file.txt and let STK load it."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_chat
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "chat",
+        "If off this server will ignore chat message from all players."));
+
     SERVER_CFG_PREFIX FloatServerConfigParam m_voting_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "voting-timeout",
         "Timeout in seconds for voting tracks in server."));

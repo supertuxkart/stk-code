@@ -192,10 +192,10 @@ void NetworkingLobby::init()
     m_start_button->setVisible(false);
     m_config_button->setVisible(false);
     m_state = LS_CONNECTING;
-    getWidget("chat")->setVisible(false);
-    getWidget("chat")->setActive(false);
-    getWidget("send")->setVisible(false);
-    getWidget("send")->setActive(false);
+    m_chat_box->setVisible(false);
+    m_chat_box->setActive(false);
+    m_send_button->setVisible(false);
+    m_send_button->setActive(false);
 
     // Connect to server now if we have saved players and not disconnected
     if (!LobbyProtocol::get<LobbyProtocol>() &&
@@ -213,19 +213,19 @@ void NetworkingLobby::init()
         {
             m_chat_box->addListener(this);
             m_chat_box->setText("");
-            getWidget("chat")->setVisible(true);
-            getWidget("chat")->setActive(true);
-            getWidget("send")->setVisible(true);
-            getWidget("send")->setActive(true);
+            m_chat_box->setVisible(true);
+            m_chat_box->setActive(true);
+            m_send_button->setVisible(true);
+            m_send_button->setActive(true);
         }
         else
         {
             m_chat_box->setText(
                 _("Chat is disabled, enable in options menu."));
-            getWidget("chat")->setVisible(true);
-            getWidget("chat")->setActive(false);
-            getWidget("send")->setVisible(true);
-            getWidget("send")->setActive(false);
+            m_chat_box->setVisible(true);
+            m_chat_box->setActive(false);
+            m_send_button->setVisible(true);
+            m_send_button->setActive(false);
         }
         if (auto cl = LobbyProtocol::get<ClientLobby>())
         {
@@ -298,6 +298,19 @@ void NetworkingLobby::onUpdate(float delta)
         m_header->setText(_("Lobby (ping: %dms)", ping), false);
 
     auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl && UserConfigParams::m_lobby_chat)
+    {
+        if (cl->serverEnabledChat() && !m_send_button->isActivated())
+        {
+            m_chat_box->setActive(true);
+            m_send_button->setActive(true);
+        }
+        else if (!cl->serverEnabledChat() && m_send_button->isActivated())
+        {
+            m_chat_box->setActive(false);
+            m_send_button->setActive(false);
+        }
+    }
     if (cl && cl->isWaitingForGame())
     {
         m_start_button->setVisible(false);
@@ -704,18 +717,18 @@ void NetworkingLobby::finishAddingPlayers()
     if (UserConfigParams::m_lobby_chat)
     {
         m_chat_box->addListener(this);
-        getWidget("chat")->setVisible(true);
-        getWidget("chat")->setActive(true);
-        getWidget("send")->setVisible(true);
-        getWidget("send")->setActive(true);
+        m_chat_box->setVisible(true);
+        m_chat_box->setActive(true);
+        m_send_button->setVisible(true);
+        m_send_button->setActive(true);
     }
     else
     {
         m_chat_box->setText(_("Chat is disabled, enable in options menu."));
-        getWidget("chat")->setVisible(true);
-        getWidget("chat")->setActive(false);
-        getWidget("send")->setVisible(true);
-        getWidget("send")->setActive(false);
+        m_chat_box->setVisible(true);
+        m_chat_box->setActive(false);
+        m_send_button->setVisible(true);
+        m_send_button->setActive(false);
     }
 }   // finishAddingPlayers
 

@@ -317,7 +317,7 @@ bool ServerLobby::notifyEvent(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::handleChat(Event* event)
 {
-    if (!checkDataSize(event, 1)) return;
+    if (!checkDataSize(event, 1) || !ServerConfig::m_chat) return;
 
     // Update so that the peer is not kicked
     event->getPeer()->updateLastActivity();
@@ -2295,7 +2295,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     message_ack->addUInt16(0);
 
     message_ack->addFloat(auto_start_timer)
-        .addUInt32(ServerConfig::m_state_frequency);
+        .addUInt32(ServerConfig::m_state_frequency)
+        .addUInt8(ServerConfig::m_chat ? 1 : 0);
 
     peer->setSpectator(false);
     if (game_started)
