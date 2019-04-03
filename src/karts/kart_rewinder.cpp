@@ -330,17 +330,27 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         {
             delete m_kart_animation;
             m_kart_animation = NULL;
-            switch (kat)
+            try
             {
-            case KAT_RESCUE:
-                new RescueAnimation(this, buffer);
-                break;
-            case KAT_EXPLOSION:
-                new ExplosionAnimation(this, buffer);
-                break;
-            case KAT_CANNON:
-                new CannonAnimation(this, buffer);
-                break;
+                switch (kat)
+                {
+                case KAT_RESCUE:
+                    new RescueAnimation(this, buffer);
+                    break;
+                case KAT_EXPLOSION:
+                    new ExplosionAnimation(this, buffer);
+                    break;
+                case KAT_CANNON:
+                    new CannonAnimation(this, buffer);
+                    break;
+                }
+            }
+            catch (const KartAnimationCreationException& kace)
+            {
+                Log::error("KartRewinder", "Kart animation creation error: %s",
+                    kace.what());
+                buffer->skip(kace.getSkippingOffset());
+                m_kart_animation = NULL;
             }
         }
         else

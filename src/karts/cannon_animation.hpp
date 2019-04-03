@@ -30,7 +30,6 @@ class CheckCannon;
 class Flyable;
 class Ipo;
 
-
 /** This animation shoots the kart to a specified point on the track.
  *
  * \ingroup karts

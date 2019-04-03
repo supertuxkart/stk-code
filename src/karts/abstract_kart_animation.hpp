@@ -25,6 +25,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <exception>
 #include <limits>
 #include <string>
 
@@ -36,6 +37,14 @@ enum KartAnimationType : uint8_t
     KAT_RESCUE = 0,
     KAT_EXPLOSION = 1,
     KAT_CANNON = 2
+};
+
+/** Exception for kart animation creation in networking, so if thrown it will
+ *  tell the num of bytes skipping in the game state. */
+class KartAnimationCreationException : public std::exception
+{
+public:
+    virtual int getSkippingOffset() const = 0;
 };
 
 /** The base class for all kart animation, like rescue, explosion, or cannon.

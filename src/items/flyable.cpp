@@ -689,7 +689,19 @@ void Flyable::restoreState(BareNetworkString *buffer, int count)
     {
         // At the moment we only have cannon animation for rubber ball
         if (!m_animation)
-            setAnimation(new CannonAnimation(this, buffer));
+        {
+            try
+            {
+                CannonAnimation* ca = new CannonAnimation(this, buffer);
+                setAnimation(ca);
+            }
+            catch (const KartAnimationCreationException& kace)
+            {
+                Log::error("Flyable", "Kart animation creation error: %s",
+                    kace.what());
+                buffer->skip(kace.getSkippingOffset());
+            }
+        }
         else
             m_animation->restoreState(buffer);
     }
