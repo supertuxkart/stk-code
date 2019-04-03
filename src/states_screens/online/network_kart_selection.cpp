@@ -21,7 +21,7 @@
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "input/device_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/lobby_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/tracks_screen.hpp"
@@ -32,6 +32,7 @@ using namespace GUIEngine;
 void NetworkKartSelectionScreen::init()
 {
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+    m_all_players_done = false;
     m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::init();
 
@@ -88,6 +89,7 @@ void NetworkKartSelectionScreen::onUpdate(float dt)
 // ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::allPlayersDone()
 {
+    m_all_players_done = true;
     input_manager->setMasterPlayerOnly(true);
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
@@ -128,7 +130,8 @@ void NetworkKartSelectionScreen::allPlayersDone()
 
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-    if (!m_live_join)
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (!m_live_join && cl && cl->serverEnabledTrackVoting())
     {
         TracksScreen::getInstance()->setNetworkTracks();
         TracksScreen::getInstance()->push();
@@ -140,6 +143,13 @@ bool NetworkKartSelectionScreen::onEscapePressed()
 {
     if (!m_live_join)
     {
+        /*auto cl = LobbyProtocol::get<ClientLobby>();
+        if (m_all_players_done && cl && !cl->serverEnabledTrackVoting())
+        {
+            // TODO: Allow players to re-choose kart(s) if no track voting
+            init();
+            return false;
+        }*/
         if (m_exit_timeout == std::numeric_limits<uint64_t>::max())
         {
             // Send go back lobby event to server with an exit timeout, so if

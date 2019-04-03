@@ -572,7 +572,14 @@ void ServerLobby::asynchronousUpdate()
     {
         PeerVote winner_vote;
         m_winner_peer_id = std::numeric_limits<uint32_t>::max();
-        bool go_on_race = handleAllVotes(&winner_vote, &m_winner_peer_id);
+        bool go_on_race = false;
+        if (ServerConfig::m_track_voting)
+            go_on_race = handleAllVotes(&winner_vote, &m_winner_peer_id);
+        else if (m_game_setup->isGrandPrixStarted() || isVotingOver())
+        {
+            winner_vote = *m_default_vote;
+            go_on_race = true;
+        }
         if (go_on_race)
         {
             *m_default_vote = winner_vote;
@@ -1407,11 +1414,15 @@ void ServerLobby::startSelection(const Event *event)
             Track* t = track_manager->getTrack(*it);
             assert(t);
             m_default_vote->m_num_laps = t->getDefaultNumberOfLaps();
-            m_default_vote->m_reverse =
-                m_default_vote->m_track_name.size() % 2 == 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
             break;
         }
         case RaceManager::MINOR_MODE_FREE_FOR_ALL:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
         case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
         {
             m_default_vote->m_num_laps = 0;
@@ -1420,8 +1431,21 @@ void ServerLobby::startSelection(const Event *event)
         }
         case RaceManager::MINOR_MODE_SOCCER:
         {
-            m_default_vote->m_num_laps = 3;
-            m_default_vote->m_reverse = 0;
+            if (m_game_setup->isSoccerGoalTarget())
+            {
+                m_default_vote->m_num_laps =
+                    (uint8_t)(UserConfigParams::m_num_goals);
+                if (m_default_vote->m_num_laps > 10)
+                    m_default_vote->m_num_laps = (uint8_t)5;
+            }
+            else
+            {
+                m_default_vote->m_num_laps =
+                    (uint8_t)(UserConfigParams::m_soccer_time_limit);
+                if (m_default_vote->m_num_laps > 15)
+                    m_default_vote->m_num_laps = (uint8_t)7;
+            }
+            m_default_vote->m_reverse = rg.get(2) == 0;
             break;
         }
         default:
@@ -1446,7 +1470,8 @@ void ServerLobby::startSelection(const Event *event)
     ns->addUInt8(LE_START_SELECTION)
        .addFloat(ServerConfig::m_voting_timeout)
        .addUInt8(m_game_setup->isGrandPrixStarted() ? 1 : 0)
-       .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0);
+       .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0)
+       .addUInt8(ServerConfig::m_track_voting ? 1 : 0);
 
     const auto& all_k = m_available_kts.first;
     const auto& all_t = m_available_kts.second;
@@ -2465,7 +2490,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
  */
 void ServerLobby::handlePlayerVote(Event* event)
 {
-    if (m_state != SELECTING)
+    if (m_state != SELECTING || !ServerConfig::m_track_voting)
     {
         Log::warn("ServerLobby", "Received track vote while in state %d.",
                   m_state.load());

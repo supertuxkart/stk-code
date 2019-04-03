@@ -105,6 +105,8 @@ private:
 
     bool m_server_enabled_chat;
 
+    bool m_server_enabled_track_voting;
+
     uint64_t m_auto_back_to_lobby_time;
 
     uint64_t m_start_live_game_time;
@@ -165,6 +167,8 @@ public:
                               Input::InputType type) const;
     void addSpectateHelperMessage() const;
     bool serverEnabledChat() const            { return m_server_enabled_chat; }
+    bool serverEnabledTrackVoting() const
+                                      { return m_server_enabled_track_voting; }
 };
 
 #endif // CLIENT_LOBBY_HPP

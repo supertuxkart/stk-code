@@ -148,9 +148,16 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "chat",
         "If off this server will ignore chat message from all players."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_track_voting
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "track-voting",
+        "Allow players to vote track to play, if off server will pick next "
+        "track to play randomly."));
+
     SERVER_CFG_PREFIX FloatServerConfigParam m_voting_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "voting-timeout",
-        "Timeout in seconds for voting tracks in server."));
+        "Timeout in seconds for selecting karts and (or) voting tracks in "
+        "server, you may want to use a lower value if you have track-voting "
+        "off."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_validation_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "validation-timeout",

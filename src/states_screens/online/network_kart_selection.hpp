@@ -40,6 +40,8 @@ private:
 
     bool m_live_join;
 
+    bool m_all_players_done;
+
     uint64_t m_exit_timeout;
 protected:
     // ------------------------------------------------------------------------
@@ -47,6 +49,7 @@ protected:
                         : KartSelectionScreen("online/network_karts.stkgui")
     {
         m_live_join = false;
+        m_all_players_done = false;
     }
     // ------------------------------------------------------------------------
     ~NetworkKartSelectionScreen() {}

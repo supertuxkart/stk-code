@@ -98,6 +98,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_server_live_joinable = false;
     m_server_send_live_load_world = false;
     m_server_enabled_chat = true;
+    m_server_enabled_track_voting = true;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -938,6 +939,7 @@ void ClientLobby::startSelection(Event* event)
     startVotingPeriod(data.getFloat());
     bool skip_kart_screen = data.getUInt8() == 1;
     m_server_auto_game_time = data.getUInt8() == 1;
+    m_server_enabled_track_voting = data.getUInt8() == 1;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
     m_available_karts.clear();
@@ -964,7 +966,8 @@ void ClientLobby::startSelection(Event* event)
     screen->setLiveJoin(false);
     // In case of auto-connect or continue a grand prix, use random karts
     // (or previous kart) from server and go to track selection
-    if (NetworkConfig::get()->isAutoConnect() || skip_kart_screen)
+    if ((NetworkConfig::get()->isAutoConnect() || skip_kart_screen) &&
+        m_server_enabled_track_voting)
     {
         input_manager->setMasterPlayerOnly(true);
         for (auto& p : NetworkConfig::get()->getNetworkPlayers())
