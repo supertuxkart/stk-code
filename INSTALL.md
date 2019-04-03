@@ -25,14 +25,6 @@ To build SuperTuxKart from source, you'll need to install the following packages
   * zlib (zlib-devel)
   * jpeg (libjpeg-turbo-devel)
 
-Ubuntu command:
-
-```bash
-sudo apt-get install build-essential cmake libbluetooth-dev \
-libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
-libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
-```
 Fedora command:
 
 ```bash
@@ -41,6 +33,31 @@ openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
 ```
+Mageia 6 command:
+
+```bash
+su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel \
+fribidi-devel libjpeg-turbo-devel libogg-devel openal-soft-devel \
+libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
+mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
+```
+OpenSUSE command:
+
+```bash
+sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
+freetype-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
+libvorbis-devel libXrandr-devel pkgconf zlib-devel enet-devel glew-devel \
+libjpeg-devel bluez-devel freetype2-devel glu-devel
+```
+Ubuntu command:
+
+```bash
+sudo apt-get install build-essential cmake libbluetooth-dev \
+libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
+libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
+libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
+```
+
 ### In-game recorder
 
 To build the in-game recorder for STK, you have to install
@@ -63,7 +80,7 @@ cd cmake_build
 cmake ..
  
 # compile
-make -j4
+make -j$(nproc)
 ```
 
 STK can then be run from the build directory with `bin/supertuxkart`
@@ -76,12 +93,12 @@ To recompile the latest code without redownloading the entire source, first run 
 git pull
 cd cmake_build
 cmake ..
-make -j4
+make -j$(nproc)
 ```
 
 ##### Build Speed Optimization
 
-"-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one. "-j$(nproc)" usually works.
+"-j$(nproc)" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
 
 ### Further options
 
