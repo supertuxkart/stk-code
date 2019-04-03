@@ -252,13 +252,9 @@ void StateManager::onTopMostScreenChanged()
 
 void StateManager::onStackEmptied()
 {
-    #ifdef ANDROID
-    ANativeActivity_finish(global_android_app->activity);
-    #else
     GUIEngine::cleanUp();
     GUIEngine::deallocate();
     main_loop->abort();
-    #endif
 }   // onStackEmptied
 
 // ============================================================================
