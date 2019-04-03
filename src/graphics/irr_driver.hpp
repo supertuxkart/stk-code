@@ -101,6 +101,8 @@ private:
     /** Wind. */
     Wind                 *m_wind;
 
+    core::dimension2du m_actual_screen_size;
+
     /** The main MRT setup. */
     core::array<video::IRenderTarget> m_mrt;
 
@@ -467,9 +469,8 @@ public:
     }
     // ------------------------------------------------------------------------
     const core::dimension2du getActualScreenSize() const
-    {
-        assert(m_video_driver != NULL);
-        return m_video_driver->getCurrentRenderTargetSize(); 
+    { 
+        return m_actual_screen_size;
     }
     // ------------------------------------------------------------------------
     float getSSAORadius() const

@@ -581,6 +581,8 @@ void IrrDriver::initDevice()
     m_scene_manager->addExternalMeshLoader(spml);
     spml->drop();
 
+    m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+
 #ifdef ENABLE_RECORDER
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
         [] (void* user_data) { MessageQueue::add
@@ -599,8 +601,8 @@ void IrrDriver::initDevice()
     RecorderConfig cfg;
     cfg.m_triple_buffering = 1;
     cfg.m_record_audio = 1;
-    cfg.m_width = getActualScreenSize().Width;
-    cfg.m_height = getActualScreenSize().Height;
+    cfg.m_width = m_actual_screen_size.Width;
+    cfg.m_height = m_actual_screen_size.Height;
     int vf = UserConfigParams::m_video_format;
     cfg.m_video_format = (VideoFormat)vf;
     cfg.m_audio_format = OGR_AF_VORBIS;
