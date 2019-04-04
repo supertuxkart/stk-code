@@ -856,7 +856,7 @@ namespace GUIEngine
         {
             frame++;
             if (frame == 2)
-                GUIEngine::EventHandler::get()->startAcceptingEvents();
+                GUIEngine::EventHandler::get()->setAcceptEvents(true);
         }
     }
     // ------------------------------------------------------------------------

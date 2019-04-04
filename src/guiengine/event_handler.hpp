@@ -114,7 +114,7 @@ namespace GUIEngine
         static EventHandler* get();
         static void deallocate();
         
-        void startAcceptingEvents() { m_accept_events = true; }
+        void setAcceptEvents(bool value) { m_accept_events = value; }
     };
 
 }

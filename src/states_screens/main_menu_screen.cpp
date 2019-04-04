@@ -406,6 +406,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "quit")
     {
 #ifdef ANDROID
+        GUIEngine::EventHandler::get()->setAcceptEvents(false);
         ANativeActivity_finish(global_android_app->activity);
 #else
         StateManager::get()->popMenu();
@@ -574,6 +575,7 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 bool MainMenuScreen::onEscapePressed()
 {
 #ifdef ANDROID
+    GUIEngine::EventHandler::get()->setAcceptEvents(false);
     ANativeActivity_finish(global_android_app->activity);
     return false;
 #endif
