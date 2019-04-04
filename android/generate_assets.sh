@@ -45,8 +45,7 @@ export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
 export CONVERT_TO_JPG=1
 
-export CONVERT_TO_JPG_BLACKLIST="data/karts/hexley/hexley_kart_diffuse.png \
-                                 data/models/traffic_light.png"
+export CONVERT_TO_JPG_BLACKLIST="data/models/traffic_light.png"
 
 export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 
@@ -569,7 +568,9 @@ fi
 if [ $CONVERT_TO_JPG -gt 0 ]; then
     rm -f "./converted_textures"
     
-    find assets/data -not -path "assets/data/textures/*" -iname "*.png" | while read f; do convert_to_jpg "$f"; done
+    find assets/data -not -path "assets/data/textures/*" \
+                     -not -path "assets/data/karts/*"    \
+                     -iname "*.png" | while read f; do convert_to_jpg "$f"; done
 
     find assets/data -iname "*.b3dz" | while read f; do convert_to_jpg_extract_b3dz "$f"; done
     find assets/data -iname "*.b3d" | while read f; do convert_to_jpg_update_b3d "$f"; done
