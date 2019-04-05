@@ -21,8 +21,9 @@ endif()
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
+option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
+option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 
 option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
@@ -266,10 +267,21 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 # (at least on VS) irrlicht will find wiiuse io.h file because
 # of the added include directory.
 if(USE_WIIUSE)
-    if(WIIUSE_BUILD)
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+    # Find system WiiUse library or build it if missing
+    if((UNIX AND NOT APPLE) AND USE_SYSTEM_WIIUSE)
+        find_package(WiiUse)
     endif()
-    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse/src")
+
+    if(WIIUSE_FOUND)
+        include_directories(${WIIUSE_INCLUDE_DIR})
+    else()
+        # Fallback to built-in version
+        if(WIIUSE_BUILD)
+            add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+        endif()
+        include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse/src")
+        set(WIIUSE_LIBRARIES "wiiuse bluetooth")
+    endif()
 endif()
 
 # Set include paths
@@ -566,7 +578,7 @@ if(USE_WIIUSE)
             target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/wiiuse.lib)
         endif()
     else()
-        target_link_libraries(supertuxkart wiiuse bluetooth)
+        target_link_libraries(supertuxkart ${WIIUSE_LIBRARIES})
     endif()
     add_definitions(-DENABLE_WIIUSE)
 
