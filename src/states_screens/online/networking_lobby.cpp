@@ -264,6 +264,16 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     {
         m_server_info.erase(m_server_info.begin());
     }
+
+    if (GUIEngine::getCurrentScreen() != this)
+        return;
+    core::stringw total_msg;
+    for (auto& string : m_server_info)
+    {
+        total_msg += string;
+        total_msg += L"\n";
+    }
+    m_text_bubble->setText(total_msg, true);
 }   // addMoreServerInfo
 
 // ----------------------------------------------------------------------------
@@ -380,13 +390,6 @@ void NetworkingLobby::onUpdate(float delta)
             m_client_live_joinable = false;
 
         m_timeout_message->setText(msg, false);
-        core::stringw total_msg;
-        for (auto& string : m_server_info)
-        {
-            total_msg += string;
-            total_msg += L"\n";
-        }
-        m_text_bubble->setText(total_msg, true);
         m_cur_starting_timer = std::numeric_limits<int64_t>::max();
 
         if (m_client_live_joinable)
@@ -477,16 +480,6 @@ void NetworkingLobby::onUpdate(float delta)
         }
         m_text_bubble->setText(connect_msg, false);
         m_start_button->setVisible(false);
-    }
-    else
-    {
-        core::stringw total_msg;
-        for (auto& string : m_server_info)
-        {
-            total_msg += string;
-            total_msg += L"\n";
-        }
-        m_text_bubble->setText(total_msg, true);
     }
 
     m_config_button->setVisible(STKHost::get()->isAuthorisedToControl() &&
