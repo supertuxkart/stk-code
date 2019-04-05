@@ -378,7 +378,7 @@ public:
     void resetSceneComplexity() { m_scene_complexity = 0;           }
     void addSceneComplexity(int complexity)
     {
-        if (complexity > 1) m_scene_complexity += (complexity - 1.0);
+        if (complexity > 1) m_scene_complexity += (complexity - 1);
     }
     // ------------------------------------------------------------------------
     bool isRecording() const { return m_recording; }
