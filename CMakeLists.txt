@@ -280,7 +280,7 @@ if(USE_WIIUSE)
             add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
         endif()
         include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse/src")
-        set(WIIUSE_LIBRARIES "wiiuse bluetooth")
+        set(WIIUSE_LIBRARIES "wiiuse" "bluetooth")
     endif()
 endif()
 
