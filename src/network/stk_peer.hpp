@@ -49,7 +49,7 @@ enum PeerDisconnectInfo : unsigned int
     PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
     PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
     PDI_KICK = 2, //!< Kick disconnection
-    PDI_BAD_CONNECTION = 3, //!< Bad connection disconnection
+    PDI_KICK_HIGH_PING = 3, //!< Too high ping, kicked by server
 };   // PeerDisconnectInfo
 
 /*! \class STKPeer

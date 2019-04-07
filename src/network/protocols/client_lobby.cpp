@@ -91,8 +91,8 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_disconnected_msg[PDI_TIMEOUT] = _("Server connection timed out.");
     m_disconnected_msg[PDI_NORMAL] = _("Server has been shut down.");
     m_disconnected_msg[PDI_KICK] = _("You were kicked from the server.");
-    m_disconnected_msg[PDI_BAD_CONNECTION] =
-        _("Bad network connection is detected.");
+    m_disconnected_msg[PDI_KICK_HIGH_PING] =
+        _("You were kicked: Ping too high.");
     m_first_connect = true;
     m_spectator = false;
     m_server_live_joinable = false;
@@ -906,16 +906,16 @@ void ClientLobby::startGame(Event* event)
     assert(nim);
     nim->restoreCompleteState(event->data());
 
+    core::stringw err_msg = _("Failed to start the network game.");
     joinStartGameThread();
-    m_start_game_thread = std::thread([start_time, this]()
+    m_start_game_thread = std::thread([start_time, this, err_msg]()
         {
             const uint64_t cur_time = STKHost::get()->getNetworkTimer();
             if (!(start_time > cur_time))
             {
-                Log::warn("ClientLobby", "Network timer is too slow to catch "
+                Log::error("ClientLobby", "Network timer is too slow to catch "
                     "up, you must have a poor network.");
-                STKHost::get()->setErrorMessage(
-                    m_disconnected_msg.at(PDI_BAD_CONNECTION));
+                STKHost::get()->setErrorMessage(err_msg);
                 STKHost::get()->requestShutdown();
                 return;
             }

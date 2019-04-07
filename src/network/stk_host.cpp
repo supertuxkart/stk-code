@@ -794,7 +794,7 @@ void STKHost::mainLoop()
                             p.second->setDisconnected(true);
                             std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
                             m_enet_cmd.emplace_back(p.second->getENetPeer(),
-                                (ENetPacket*)NULL, PDI_BAD_CONNECTION,
+                                (ENetPacket*)NULL, PDI_KICK_HIGH_PING,
                                 ECT_DISCONNECT);
                         }
                         else if (!p.second->hasWarnedForHighPing())
