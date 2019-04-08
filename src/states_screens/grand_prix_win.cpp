@@ -230,8 +230,7 @@ void GrandPrixWin::onUpdate(float dt)
         {
             if (m_kart_node[k] != NULL)
             {
-
-                if (fabsf(m_kart_x[k] - KARTS_PODIUM_X[k]) > dt)
+                if (m_kart_x[k] != KARTS_PODIUM_X[k])
                 {
                     if (m_kart_x[k] < KARTS_PODIUM_X[k] - dt)
                         m_kart_x[k] += dt;
