@@ -492,7 +492,12 @@ void MainLoop::run()
 
                 if (m_frame_before_loading_world)
                 {
+                    // This will be called when changing introcutscene 1 and 2
+                    // in CutsceneWorld::enterRaceOverState
+                    // Reset the timer for correct time for cutscene
                     m_frame_before_loading_world = false;
+                    m_curr_time = StkTime::getRealTimeMs();
+                    left_over_time = 0.0f;
                     break;
                 }
 
@@ -514,7 +519,15 @@ void MainLoop::run()
             {
                 // User aborted (e.g. closed window)
                 bool abort = !irr_driver->getDevice()->run();
-                
+
+                if (m_frame_before_loading_world)
+                {
+                    // irr_driver->getDevice()->run() loads the world
+                    m_frame_before_loading_world = false;
+                    m_curr_time = StkTime::getRealTimeMs();
+                    left_over_time = 0.0f;
+                }
+
                 if (abort)
                 {
                     m_request_abort = true;
