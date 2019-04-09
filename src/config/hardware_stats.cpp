@@ -31,10 +31,6 @@
 #include "online/http_request.hpp"
 #include "utils/random_generator.hpp"
 
-#ifdef __APPLE__
-#  include <sys/sysctl.h>
-#endif
-
 #include <fstream>
 #include <set>
 #include <sstream>
@@ -43,6 +39,10 @@
 #  include <sys/param.h>    // To get BSD macro
 #  include <sys/utsname.h>
 #endif
+#if defined(__APPLE__) || defined(BSD)
+#  include <sys/sysctl.h>
+#endif
+
 #include <vector>
 
 
@@ -83,7 +83,7 @@ int getRAM()
     return (int)ceil(memory_size/mbyte);
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(BSD)
     size_t memory_size = 0;
     size_t len = sizeof(memory_size);
     // Argh, the API doesn't seem to be const-correct
@@ -103,7 +103,7 @@ int getRAM()
  */
 int getNumProcessors()
 {
-#if defined(__linux__) || defined(__CYGWIN__)
+#if defined(__linux__) || defined(__CYGWIN__) || (defined(BSD) && !defined(__APPLE__))
     return sysconf(_SC_NPROCESSORS_CONF);
 #endif
 #ifdef WIN32
@@ -111,7 +111,7 @@ int getNumProcessors()
     GetSystemInfo(&si);	// guaranteed to succeed
     return si.dwNumberOfProcessors;
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__)
     // Mac OS X doesn't have sysconf(_SC_NPROCESSORS_CONF)
     int mib[] = { CTL_HW, HW_NCPU };
     int ncpus;
