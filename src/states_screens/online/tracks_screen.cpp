@@ -764,6 +764,9 @@ void TracksScreen::updatePlayerVotes()
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (GUIEngine::getCurrentScreen() != this || !cl || !m_vote_list)
         return;
+    
+    std::string selected_name = m_vote_list->getSelectionInternalName();
+    
     m_vote_list->clear();
     for (unsigned i = 0; i < m_index_to_hostid.size(); i++)
     {
@@ -827,6 +830,12 @@ void TracksScreen::updatePlayerVotes()
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
+    }
+    
+    if (!selected_name.empty())
+    {
+        int id = m_vote_list->getItemID(selected_name);
+        m_vote_list->setSelectionID(id);
     }
 }   // updatePlayerVotes
 
