@@ -1152,7 +1152,8 @@ void Kart::collectedItem(ItemState *item_state)
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTicks(),
                                  m_bubblegum_ticks);
-        getNextEmitter()->play(getXYZ(), m_goo_sound);
+        if (!RewindManager::get()->isRewinding())
+            getNextEmitter()->play(getXYZ(), m_goo_sound);
 
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
