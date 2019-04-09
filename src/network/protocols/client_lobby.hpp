@@ -150,7 +150,7 @@ public:
                                            { return m_state.load() >= RACING; }
     bool waitingForServerRespond() const
                             { return m_state.load() == REQUESTING_CONNECTION; }
-    bool isLobbyReady() const           { return m_state.load() == CONNECTED; }
+    bool isLobbyReady() const                      { return !m_first_connect; }
     bool isWaitingForGame() const                { return m_waiting_for_game; }
     bool isServerAutoGameTime() const       { return m_server_auto_game_time; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
