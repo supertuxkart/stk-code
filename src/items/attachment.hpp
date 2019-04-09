@@ -111,16 +111,11 @@ private:
 
     /** Sound for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
-    // ------------------------------------------------------------------------
-    /** Called in clear() to update m_graphical_type now, so for example
-     *  the explosion sfx or bubblegum sound is not displayed or played when
-     *  the bomb or shield is forcely cleared like in kart animation. */
-    void updateGraphicalTypeNow()                { m_graphical_type = m_type; }
 
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();
-    void  clear (bool update_graphical_now = false);
+    void  clear();
     void  hitBanana(ItemState *item);
     void  updateGraphics(float dt);
 

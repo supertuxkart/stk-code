@@ -37,6 +37,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -172,9 +173,9 @@ void Attachment::set(AttachmentType type, int ticks,
  *  takes care of resetting the owner kart's physics structures to account for
  *  the updated mass.
  */
-void Attachment::clear(bool update_graphical_now)
+void Attachment::clear()
 {
-    if(m_plugin)
+    if (m_plugin)
     {
         delete m_plugin;
         m_plugin = NULL;
@@ -183,8 +184,6 @@ void Attachment::clear(bool update_graphical_now)
     m_type = ATTACH_NOTHING;
     m_ticks_left = 0;
     m_initial_speed = 0;
-    if (update_graphical_now)
-        updateGraphicalTypeNow();
 }   // clear
 
 // -----------------------------------------------------------------------------
@@ -304,6 +303,14 @@ void Attachment::hitBanana(ItemState *item_state)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
+        if (!RewindManager::get()->isRewinding())
+        {
+            HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
+                "explosion_bomb.xml");
+            if (m_kart->getController()->isLocalPlayerController())
+                he->setLocalPlayerKartHit();
+            projectile_manager->addHitEffect(he);
+        }
         if (m_kart->getKartAnimation() == NULL)
             ExplosionAnimation::create(m_kart);
         clear();
@@ -411,7 +418,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
                                            stk_config->m_bomb_time_increase),
                           m_kart);
                 other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-                clear(true/*update_graphical_now*/);
+                clear();
             }
         }
     }   // type==BOMB
@@ -429,7 +436,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             other->getAttachment()->getTicksLeft()+
                stk_config->time2Ticks(stk_config->m_bomb_time_increase),
             other);
-        other->getAttachment()->clear(true/*update_graphical_now*/);
+        other->getAttachment()->clear();
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     }
     else
@@ -505,6 +512,14 @@ void Attachment::update(int ticks)
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
+            if (!RewindManager::get()->isRewinding())
+            {
+                HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
+                    "explosion_bomb.xml");
+                if (m_kart->getController()->isLocalPlayerController())
+                    he->setLocalPlayerKartHit();
+                projectile_manager->addHitEffect(he);
+            }
             if (m_kart->getKartAnimation() == NULL)
                 ExplosionAnimation::create(m_kart);
         }
@@ -515,6 +530,14 @@ void Attachment::update(int ticks)
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
+            if (!RewindManager::get()->isRewinding())
+            {
+                if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
+                m_bubble_explode_sound =
+                    SFXManager::get()->createSoundSource("bubblegum_explode");
+                m_bubble_explode_sound->setPosition(m_kart->getXYZ());
+                m_bubble_explode_sound->play();
+            }
             if (!m_kart->isGhostKart())
                 ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
@@ -540,29 +563,7 @@ void Attachment::updateGraphics(float dt)
         switch (m_type)
         {
         case ATTACH_NOTHING:
-        {
-            if (m_graphical_type == ATTACH_BOMB)
-            {
-                // Cleared a bomb
-                HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion",
-                    "explosion_bomb.xml");
-                if (m_kart->getController()->isLocalPlayerController())
-                    he->setLocalPlayerKartHit();
-                projectile_manager->addHitEffect(he);
-            }
-            else if (m_graphical_type == ATTACH_BUBBLEGUM_SHIELD ||
-                m_graphical_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
-            {
-                // Dropped a bubblegum
-                if (m_bubble_explode_sound)
-                    m_bubble_explode_sound->deleteSFX();
-                m_bubble_explode_sound =
-                    SFXManager::get()->createSoundSource("bubblegum_explode");
-                m_bubble_explode_sound->setPosition(m_kart->getXYZ());
-                m_bubble_explode_sound->play();
-            }
             break;
-        }
         case ATTACH_SWATTER:
             // Graphical model set in swatter class
             break;
