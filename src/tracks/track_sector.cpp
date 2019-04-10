@@ -211,9 +211,27 @@ void TrackSector::saveCompleteState(BareNetworkString* bns)
 // ----------------------------------------------------------------------------
 void TrackSector::restoreCompleteState(const BareNetworkString& b)
 {
+    const int max_node = Graph::get()->getNumNodes();
     m_current_graph_node = b.getUInt32();
+    if (m_current_graph_node >= max_node)
+    {
+        Log::warn("TrackSector", "Server has different graph node list.");
+        // 0 so that if any function is called before update track sector
+        // again it will have at least a valid node
+        m_current_graph_node = 0;
+    }
     m_estimated_valid_graph_node = b.getUInt32();
+    if (m_estimated_valid_graph_node >= max_node)
+    {
+        Log::warn("TrackSector", "Server has different graph node list.");
+        m_estimated_valid_graph_node = 0;
+    }
     m_last_valid_graph_node = b.getUInt32();
+    if (m_last_valid_graph_node >= max_node)
+    {
+        Log::warn("TrackSector", "Server has different graph node list.");
+        m_last_valid_graph_node = 0;
+    }
     m_current_track_coords = b.getVec3();
     m_estimated_valid_track_coords = b.getVec3();
     m_latest_valid_track_coords = b.getVec3();
