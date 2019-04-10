@@ -77,6 +77,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Tracks
+* Black Forest by Sven Andreas Belting, replacing Green Valley
 * Ravenbridge Mansion by samuncle, replacing Black Hill Mansion
 * Las Dunas Soccer by samuncle
 * Candela City arena by Benau based on samuncle's track
@@ -88,6 +89,7 @@ For similar reasons, and because some features are vastly more complex than othe
     * Around the Lighthouse, Black Forest, Candela City, Hacienda, Minigolf, Northern Resort, Oliver's Math Class, STK Enterprise, Old Mine, Volcano Island, Zen Garden
 #### Karts
 * New version of Beastie by Jymis
+* New version of Kiki by Benau
 
 ## SuperTuxKart 0.9.3 (28. October 2017)
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau
