@@ -180,12 +180,19 @@ void ConnectToServer::asynchronousUpdate()
 
                 if (!servers.empty())
                 {
-                    // For quick play we choose the server with the least player
+                    // For quick play we choose the server with the shortest
+                    // distance and not empty and full server
                     std::sort(servers.begin(), servers.end(), []
                         (const std::shared_ptr<Server> a,
                         const std::shared_ptr<Server> b)->bool
                         {
-                            return a->getCurrentPlayers() < b->getCurrentPlayers();
+                            return a->getDistance() < b->getDistance();
+                        });
+                    std::stable_partition(servers.begin(), servers.end(), []
+                        (const std::shared_ptr<Server> a)->bool
+                        {
+                            return a->getCurrentPlayers() != 0 &&
+                                a->getCurrentPlayers() != a->getMaxPlayers();
                         });
                     m_server = servers[0];
                     m_server_address = m_server->getAddress();
