@@ -475,7 +475,6 @@ void WorldStatus::updateTime(int ticks)
 void WorldStatus::setTime(const float time)
 {
     int new_time_ticks = stk_config->time2Ticks(time);
-    m_count_up_ticks  += (new_time_ticks - m_time_ticks);
     m_time_ticks       = new_time_ticks;
     m_time             = stk_config->ticks2Time(new_time_ticks);
 }   // setTime
@@ -486,7 +485,6 @@ void WorldStatus::setTime(const float time)
  */
 void WorldStatus::setTicks(int ticks)
 {
-    m_count_up_ticks += ticks - m_time_ticks;
     m_time_ticks = ticks;
     m_time = stk_config->ticks2Time(ticks);
 }   // setTicks
