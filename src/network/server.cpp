@@ -104,23 +104,8 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("official", &m_official);
     if (m_official)
     {
-        // TODO: I'll leave this string in so that we don't lose
-        // the translations already done, to be fixed as part of #3691
-        // I18N: Official means this server is hosted by STK team
-        m_server_owner_name = _("Official");
-
-        // TODO: temporary work around for #3691: for now call all
-        // 'official' server 'trusted' (since most trusted servers are
-        // not operated by us). #3691 will introduce the various states
-        // required to properly distinguish between trusted, ranked,
-        // and official servers.
-
-        // I18N: Trusted means this server is trusted by team to not
-        // doing any modification on server side, so players playing
-        // in this server will not meet cheaters, and trusted server
-        // will optionally host a ranked matching game
-        m_server_owner_name = _("Trusted");
-        m_server_owner_lower_case_name = "trusted";
+        m_server_owner_name = L"\u2606\u2605STK\u2605\u2606";
+        m_server_owner_lower_case_name = "stk";
         return;
     }
 
