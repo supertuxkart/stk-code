@@ -558,6 +558,23 @@ void ServerLobby::asynchronousUpdate()
     }
     case WAIT_FOR_WORLD_LOADED:
     {
+        // For WAIT_FOR_WORLD_LOADED and SELECTING make sure there are enough
+        // players to start next game, otherwise exiting and let main thread
+        // reset
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
+        if (m_end_voting_period.load() == 0)
+            return;
+
+        unsigned player_in_game = 0;
+        STKHost::get()->updatePlayers(&player_in_game);
+        // Reset lobby will be done in main thread
+        if ((player_in_game == 1 && ServerConfig::m_ranked) ||
+            player_in_game == 0)
+        {
+            resetVotingTime();
+            return;
+        }
+
         // m_server_has_loaded_world is set by main thread with atomic write
         if (m_server_has_loaded_world.load() == false)
             return;
@@ -570,6 +587,18 @@ void ServerLobby::asynchronousUpdate()
     }
     case SELECTING:
     {
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
+        if (m_end_voting_period.load() == 0)
+            return;
+        unsigned player_in_game = 0;
+        STKHost::get()->updatePlayers(&player_in_game);
+        if ((player_in_game == 1 && ServerConfig::m_ranked) ||
+            player_in_game == 0)
+        {
+            resetVotingTime();
+            return;
+        }
+
         PeerVote winner_vote;
         m_winner_peer_id = std::numeric_limits<uint32_t>::max();
         bool go_on_race = false;
@@ -1065,6 +1094,7 @@ void ServerLobby::update(int ticks)
             return;
 
         RaceResultGUI::getInstance()->backToLobby();
+        resetVotingTime();
         std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_game_setup->stopGrandPrix();
         resetServer();
@@ -1106,6 +1136,7 @@ void ServerLobby::update(int ticks)
             .addUInt8(BLR_ONE_PLAYER_IN_RANKED_MATCH);
         sendMessageToPeers(back_lobby, /*reliable*/true);
         delete back_lobby;
+        resetVotingTime();
         std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_game_setup->stopGrandPrix();
         resetServer();
