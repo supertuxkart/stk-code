@@ -348,9 +348,7 @@ void WorldStatus::updateTime(int ticks)
                     stk_config->time2Ticks(0.2f) :
                     stk_config->time2Ticks(1.0f);
                 // how long to display the 'music' message
-                // no graphics mode goes race phase at 3 seconds;
-                m_race_ticks = ProfileWorld::isNoGraphics() ?
-                    stk_config->time2Ticks(3.0f) :
+                m_race_ticks =
                     stk_config->time2Ticks(stk_config->m_music_credit_time);
             }
 
@@ -379,7 +377,14 @@ void WorldStatus::updateTime(int ticks)
                 {
                     music_manager->startMusic();
                 }
-                m_phase = MUSIC_PHASE;
+                // no graphics mode goes race phase now
+                if (ProfileWorld::isNoGraphics())
+                {
+                    m_race_ticks = -1;
+                    m_phase = RACE_PHASE;
+                }
+                else
+                    m_phase = MUSIC_PHASE;
             }
             break;   // Now the world time starts
         }
