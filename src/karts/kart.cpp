@@ -323,6 +323,7 @@ void Kart::reset()
     }
 
     m_network_finish_check_ticks = 0;
+    m_network_confirmed_finish_ticks = 0;
     m_enabled_network_spectator = false;
     // Add karts back in case that they have been removed (i.e. in battle
     // mode) - but only if they actually have a body (e.g. ghost karts
@@ -990,6 +991,12 @@ void Kart::finishedRace(float time, bool from_server)
         }
     }   // !from_server
 
+    if (NetworkConfig::get()->isClient())
+    {
+        m_network_confirmed_finish_ticks =
+            World::getWorld()->getTicksSinceStart();
+    }
+
     m_finished_race = true;
 
     m_finish_time   = time;
@@ -1370,9 +1377,9 @@ void Kart::update(int ticks)
         race_manager->getNumLocalPlayers() == 1 &&
         race_manager->modeHasLaps() &&
         World::getWorld()->isActiveRacePhase() &&
-        m_network_finish_check_ticks > 0 &&
+        m_network_confirmed_finish_ticks > 0 &&
         World::getWorld()->getTicksSinceStart() >
-        m_network_finish_check_ticks + stk_config->time2Ticks(1.0f) &&
+        m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f) &&
         !m_enabled_network_spectator)
     {
         static bool msg_shown = false;

@@ -70,6 +70,7 @@ class Kart : public AbstractKart
     friend class Skidding;
 private:
     int m_network_finish_check_ticks;
+    int m_network_confirmed_finish_ticks;
 protected:
     /** Offset of the graphical kart chassis from the physical chassis. */
     float m_graphical_y_offset;
