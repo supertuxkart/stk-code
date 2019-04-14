@@ -913,7 +913,7 @@ void PhysicalObject::joinToMainTrack()
         scene::IMesh* mesh =
             gc->createCylinderMesh(cylinder->getRadius(),
             cylinder->getHalfExtentsWithMargin()[up_axis] * 2.0f,
-            std::max((int)(cylinder->getRadius() / 2.0f), 4));
+            std::max((int)(cylinder->getRadius() * M_PI), 4));
         scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
         mesh->drop();
 
@@ -949,7 +949,7 @@ void PhysicalObject::joinToMainTrack()
         scene::IMesh* mesh =
             gc->createConeMesh(cone->getRadius(),
             cone->getHeight(),
-            std::max((int)(cone->getRadius() / 2.0f), 4));
+            std::max((int)(cone->getRadius() * M_PI), 4));
         scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
         mesh->drop();
 
