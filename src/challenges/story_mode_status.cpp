@@ -101,24 +101,12 @@ void StoryModeStatus::computeActive(bool first_call)
             // locks all features, so unlock the solved ones (and don't try to
             // save the state, since we are currently reading it)
 
-            if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
+
+            // Challenge-specific unlocked features don't depend on
+            // the difficulty at which the challenge has been solved.
+            if (i->second->isSolvedAtAnyDifficulty())
             {
                 unlockFeature(i->second, RaceManager::DIFFICULTY_EASY,
-                              /*save*/ false);
-            }
-            if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
-            {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_MEDIUM,
-                              /*save*/ false);
-            }
-            if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
-            {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_HARD,
-                              /*save*/ false);
-            }
-            if (i->second->isSolved(RaceManager::DIFFICULTY_BEST))
-            {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_BEST,
                               /*save*/ false);
             }
 
@@ -261,18 +249,22 @@ void StoryModeStatus::lockFeature(ChallengeStatus *challenge_status)
 void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty d,
                              bool do_save)
 {
-    const unsigned int amount=(unsigned int)c->getData()->getFeatures().size();
-    for (unsigned int n=0; n<amount; n++)
+    // Special challenge-specific features are only unlocked once.
+    if(!c->isSolvedAtAnyDifficulty())
     {
-        std::string feature = c->getData()->getFeatures()[n].m_name;
-        std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
-        if (p == m_locked_features.end())
+        const unsigned int amount=(unsigned int)c->getData()->getFeatures().size();
+        for (unsigned int n=0; n<amount; n++)
         {
-            c->setSolved(d);
-            if(do_save) PlayerManager::get()->save();
-            return;
+            std::string feature = c->getData()->getFeatures()[n].m_name;
+            std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
+            if (p == m_locked_features.end())
+            {
+                c->setSolved(d);
+                if(do_save) PlayerManager::get()->save();
+                return;
+            }
+            m_locked_features.erase(p);
         }
-        m_locked_features.erase(p);
     }
 
     // Add to list of recently unlocked features
