@@ -716,6 +716,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         num_karts = World::getWorld()->getCurrentNumKarts();
     else
         num_karts = race_manager->getNumberOfKarts() - sta;
+    // May happen in spectate mode if all players disconnected before server
+    // reset
+    if (num_karts == 0)
+        return;
 
     // -2 because that's the spacing further on
     int ICON_PLAYER_WIDTH = y_space / (num_karts) - 2;
