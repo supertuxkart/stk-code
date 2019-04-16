@@ -1032,6 +1032,14 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     nim->addLiveJoinPeer(peer);
 
     w->saveCompleteState(ns);
+    if (race_manager->supportsLiveJoining())
+    {
+        // Only needed in non-racing mode as no need players can added after
+        // starting of race
+        std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
+            getLivePlayers();
+        encodePlayers(ns, players);
+    }
 
     m_peers_ready[peer] = false;
     peer->setWaitingForGame(false);

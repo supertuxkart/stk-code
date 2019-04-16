@@ -327,6 +327,12 @@ public:
     unsigned int    getCurrentNumPlayers() const { return m_num_players -
                                                          m_eliminated_players;}
     // ------------------------------------------------------------------------
+    void resetElimination()
+    {
+        m_eliminated_karts = 0;
+        m_eliminated_players = 0;
+    }
+    // ------------------------------------------------------------------------
     virtual void addReservedKart(int kart_id)
     {
         if (m_eliminated_karts > 0)

@@ -1169,6 +1169,40 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     assert(nim);
     nim->restoreCompleteState(data);
     w->restoreCompleteState(data);
+
+    if (race_manager->supportsLiveJoining() && data.size() > 0)
+    {
+        // Get and update the players list 1 more time in case the was
+        // player connection or disconnection
+        std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
+            decodePlayers(data);
+        w->resetElimination();
+        for (unsigned i = 0; i < players.size(); i++)
+        {
+            AbstractKart* k = w->getKart(i);
+            if (k->getController()->isLocalPlayerController())
+                continue;
+            k->reset();
+            // Only need to change non local player karts
+            RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            rki.copyFrom(players[i], players[i]->getLocalPlayerId());
+            if (rki.isReserved())
+            {
+                World::getWorld()->eliminateKart(i,
+                    false/*notify_of_elimination*/);
+                k->setPosition(
+                    World::getWorld()->getCurrentNumKarts() + 1);
+                k->finishedRace(World::getWorld()->getTime(),
+                    true/*from_server*/);
+            }
+            else
+            {
+                // Will be reset once again after live join is finished
+                addLiveJoiningKart(i, rki, 0/*live_join_util_ticks*/);
+                k->getNode()->setVisible(false);
+            }
+        }
+    }
 }   // liveJoinAcknowledged
 
 //-----------------------------------------------------------------------------
