@@ -260,31 +260,9 @@ void ClientLobby::addAllPlayers(Event* event)
     peer->cleanPlayerProfiles();
     m_server_send_live_load_world = data.getUInt8() == 1;
 
-    std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
-    unsigned player_count = data.getUInt8();
-
     bool is_specator = true;
-    for (unsigned i = 0; i < player_count; i++)
-    {
-        core::stringw player_name;
-        data.decodeStringW(&player_name);
-        uint32_t host_id = data.getUInt32();
-        float kart_color = data.getFloat();
-        uint32_t online_id = data.getUInt32();
-        PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
-        uint8_t local_id = data.getUInt8();
-        KartTeam team = (KartTeam)data.getUInt8();
-        std::string country_id;
-        data.decodeString(&country_id);
-        if (host_id == STKHost::get()->getMyHostId())
-            is_specator = false;
-        auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
-            host_id, kart_color, online_id, ppd, local_id, team, country_id);
-        std::string kart_name;
-        data.decodeString(&kart_name);
-        player->setKartName(kart_name);
-        players.push_back(player);
-    }
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
+        decodePlayers(data, peer, &is_specator);
     setSpectator(is_specator);
 
     uint32_t random_seed = data.getUInt32();
@@ -330,6 +308,39 @@ void ClientLobby::addAllPlayers(Event* event)
     // Switch to assign mode in case a player hasn't chosen any karts
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 }   // addAllPlayers
+
+//-----------------------------------------------------------------------------
+/* Get list of players from server and see if we are spectating it. */
+std::vector<std::shared_ptr<NetworkPlayerProfile> >
+  ClientLobby::decodePlayers(const BareNetworkString& data,
+                             std::shared_ptr<STKPeer> peer,
+                             bool* is_specator) const
+{
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+    unsigned player_count = data.getUInt8();
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        core::stringw player_name;
+        data.decodeStringW(&player_name);
+        uint32_t host_id = data.getUInt32();
+        float kart_color = data.getFloat();
+        uint32_t online_id = data.getUInt32();
+        PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+        uint8_t local_id = data.getUInt8();
+        KartTeam team = (KartTeam)data.getUInt8();
+        std::string country_id;
+        data.decodeString(&country_id);
+        if (is_specator && host_id == STKHost::get()->getMyHostId())
+            *is_specator = false;
+        auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
+            host_id, kart_color, online_id, ppd, local_id, team, country_id);
+        std::string kart_name;
+        data.decodeString(&kart_name);
+        player->setKartName(kart_name);
+        players.push_back(player);
+    }
+    return players;
+}   // decodePlayers
 
 //-----------------------------------------------------------------------------
 void ClientLobby::update(int ticks)

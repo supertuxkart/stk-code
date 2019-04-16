@@ -636,6 +636,19 @@ void ServerLobby::asynchronousUpdate()
 
             // Add placeholder players for live join
             addLiveJoinPlaceholder(players);
+            // If player chose random / hasn't chose any kart
+            for (unsigned i = 0; i < players.size(); i++)
+            {
+                if (players[i]->getKartName().empty())
+                {
+                    RandomGenerator rg;
+                    std::set<std::string>::iterator it =
+                        m_available_kts.first.begin();
+                    std::advance(it,
+                        rg.get((int)m_available_kts.first.size()));
+                    players[i]->setKartName(*it);
+                }
+            }
 
             NetworkString* load_world_message = getLoadWorldMessage(players,
                 false/*live_join*/);
@@ -664,6 +677,27 @@ void ServerLobby::asynchronousUpdate()
 }   // asynchronousUpdate
 
 //-----------------------------------------------------------------------------
+void ServerLobby::encodePlayers(BareNetworkString* bns,
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+{
+    bns->addUInt8((uint8_t)players.size());
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        std::shared_ptr<NetworkPlayerProfile>& player = players[i];
+        bns->encodeString(player->getName())
+            .addUInt32(player->getHostId())
+            .addFloat(player->getDefaultKartColor())
+            .addUInt32(player->getOnlineId())
+            .addUInt8(player->getPerPlayerDifficulty())
+            .addUInt8(player->getLocalPlayerId())
+            .addUInt8(
+            race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
+            .encodeString(player->getCountryId());
+        bns->encodeString(player->getKartName());
+    }
+}   // encodePlayers
+
+//-----------------------------------------------------------------------------
 NetworkString* ServerLobby::getLoadWorldMessage(
     std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
     bool live_join) const
@@ -673,29 +707,8 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     load_world_message->addUInt8(LE_LOAD_WORLD);
     load_world_message->addUInt32(m_winner_peer_id);
     m_default_vote->encode(load_world_message);
-    load_world_message->addUInt8(live_join ? 1 : 0).
-        addUInt8((uint8_t)players.size());
-    for (unsigned i = 0; i < players.size(); i++)
-    {
-        std::shared_ptr<NetworkPlayerProfile>& player = players[i];
-        load_world_message->encodeString(player->getName())
-            .addUInt32(player->getHostId())
-            .addFloat(player->getDefaultKartColor())
-            .addUInt32(player->getOnlineId())
-            .addUInt8(player->getPerPlayerDifficulty())
-            .addUInt8(player->getLocalPlayerId())
-            .addUInt8(
-            race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
-            .encodeString(player->getCountryId());
-        if (player->getKartName().empty())
-        {
-            RandomGenerator rg;
-            std::set<std::string>::iterator it = m_available_kts.first.begin();
-            std::advance(it, rg.get((int)m_available_kts.first.size()));
-            player->setKartName(*it);
-        }
-        load_world_message->encodeString(player->getKartName());
-    }
+    load_world_message->addUInt8(live_join ? 1 : 0);
+    encodePlayers(load_world_message, players);
     load_world_message->addUInt32(m_item_seed);
     if (race_manager->isBattleMode())
     {
@@ -840,6 +853,21 @@ void ServerLobby::liveJoinRequest(Event* event)
             peer->getAddress().toString().c_str());
     }
 
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
+        getLivePlayers();
+    NetworkString* load_world_message = getLoadWorldMessage(players,
+        true/*live_join*/);
+    peer->sendPacket(load_world_message, true/*reliable*/);
+    delete load_world_message;
+    peer->updateLastActivity();
+}   // liveJoinRequest
+
+//-----------------------------------------------------------------------------
+/** Get a list of current ingame players for live join or spectate.
+ */
+std::vector<std::shared_ptr<NetworkPlayerProfile> >
+                                            ServerLobby::getLivePlayers() const
+{
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
     {
@@ -869,12 +897,8 @@ void ServerLobby::liveJoinRequest(Event* event)
         }
         players.push_back(player);
     }
-    NetworkString* load_world_message = getLoadWorldMessage(players,
-        true/*live_join*/);
-    peer->sendPacket(load_world_message, true/*reliable*/);
-    delete load_world_message;
-    peer->updateLastActivity();
-}   // liveJoinRequest
+    return players;
+}   // getLivePlayers
 
 //-----------------------------------------------------------------------------
 /** Decide where to put the live join player depends on his team and game mode.

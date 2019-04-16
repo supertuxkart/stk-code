@@ -130,6 +130,10 @@ private:
     void liveJoinAcknowledged(Event* event);
     void handleKartInfo(Event* event);
     void finishLiveJoin();
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+         decodePlayers(const BareNetworkString& data,
+         std::shared_ptr<STKPeer> peer = nullptr,
+         bool* is_specator = NULL) const;
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
