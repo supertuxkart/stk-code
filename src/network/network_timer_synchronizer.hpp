@@ -53,6 +53,8 @@ public:
         m_force_set_timer.store(true);
     }
     // ------------------------------------------------------------------------
+    void resynchroniseTimer()                  { m_synchronised.store(false); }
+    // ------------------------------------------------------------------------
     void addAndSetTime(uint32_t ping, uint64_t server_time)
     {
         if (m_synchronised.load() == true)
@@ -94,6 +96,7 @@ public:
                 UserConfigParams::m_timer_sync_difference_tolerance)
             {
                 STKHost::get()->setNetworkTimer(averaged_time);
+                m_times.clear();
                 m_force_set_timer.store(false);
                 m_synchronised.store(true);
                 Log::info("NetworkTimerSynchronizer", "Network "
