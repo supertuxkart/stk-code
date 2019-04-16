@@ -97,19 +97,6 @@ void StoryModeStatus::computeActive(bool first_call)
         // -----------------
         if((i->second)->isSolvedAtAnyDifficulty())
         {
-            // computeActive is called in createStoryModeStatus, which actually
-            // locks all features, so unlock the solved ones (and don't try to
-            // save the state, since we are currently reading it)
-
-
-            // Challenge-specific unlocked features don't depend on
-            // the difficulty at which the challenge has been solved.
-            if (i->second->isSolvedAtAnyDifficulty())
-            {
-                unlockFeature(i->second, RaceManager::DIFFICULTY_EASY,
-                              /*save*/ false);
-            }
-
             int gp_factor = i->second->isGrandPrix() ? GP_FACTOR : 1;
 
             if (i->second->isSolved(RaceManager::DIFFICULTY_BEST) && !i->second->isUnlockList())
@@ -242,6 +229,8 @@ void StoryModeStatus::lockFeature(ChallengeStatus *challenge_status)
 
 //-----------------------------------------------------------------------------
 /** Unlocks a feature.
+ *  ComputeActive resets the locked feature list, so no special code
+ *  is required in order to update m_locked_features.
  *  \param c  The challenge that was fulfilled.
  *  \param d Difficulty at which the challenge was solved.
  *  \param do_save If true update the challenge file on disk.
@@ -249,24 +238,6 @@ void StoryModeStatus::lockFeature(ChallengeStatus *challenge_status)
 void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty d,
                              bool do_save)
 {
-    // Special challenge-specific features are only unlocked once.
-    if(!c->isSolvedAtAnyDifficulty())
-    {
-        const unsigned int amount=(unsigned int)c->getData()->getFeatures().size();
-        for (unsigned int n=0; n<amount; n++)
-        {
-            std::string feature = c->getData()->getFeatures()[n].m_name;
-            std::map<std::string,bool>::iterator p=m_locked_features.find(feature);
-            if (p == m_locked_features.end())
-            {
-                c->setSolved(d);
-                if(do_save) PlayerManager::get()->save();
-                return;
-            }
-            m_locked_features.erase(p);
-        }
-    }
-
     // Add to list of recently unlocked features
     // if the challenge is newly completed at the current difficulty
     if (!c->isSolved(d))
