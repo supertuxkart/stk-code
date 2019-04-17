@@ -254,7 +254,8 @@ public:
                           DIFFICULTY_HARD,
                           DIFFICULTY_BEST,
                           DIFFICULTY_LAST = DIFFICULTY_BEST,
-                          DIFFICULTY_COUNT};
+                          DIFFICULTY_COUNT,
+                          DIFFICULTY_NONE};
 
     /** Different kart types: A local player, a player connected via network,
      *  an AI kart, the leader kart (currently not used), a ghost kart and

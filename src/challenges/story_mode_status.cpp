@@ -95,26 +95,26 @@ void StoryModeStatus::computeActive(bool first_call)
     {
         // Changed challenge
         // -----------------
-        if((i->second)->isSolvedAtAnyDifficulty())
+        if(!i->second->isUnlockList() && (i->second)->isSolvedAtAnyDifficulty())
         {
             int gp_factor = i->second->isGrandPrix() ? GP_FACTOR : 1;
 
-            if (i->second->isSolved(RaceManager::DIFFICULTY_BEST) && !i->second->isUnlockList())
+            if (i->second->isSolved(RaceManager::DIFFICULTY_BEST))
             {
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_BEST]*gp_factor;
                 m_best_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::DIFFICULTY_HARD) && !i->second->isUnlockList())
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
             {
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]*gp_factor;
                 m_hard_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM) && !i->second->isUnlockList())
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
             {
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]*gp_factor;
                 m_medium_challenges++;
             }
-            else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY) && !i->second->isUnlockList())
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
             {
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor;
                 m_easy_challenges++;
@@ -127,32 +127,19 @@ void StoryModeStatus::computeActive(bool first_call)
             lockFeature(i->second);
         }
 
-        if (i->second->isSolved(RaceManager::DIFFICULTY_BEST))
+        switch(i->second->highestSolved())
         {
-            // challenge beaten at hardest, nothing more to do here
-            continue;
-        }
-        else if (i->second->isSolved(RaceManager::DIFFICULTY_HARD))
-        {
-            i->second->setActive(RaceManager::DIFFICULTY_BEST);
-        }
-        else if (i->second->isSolved(RaceManager::DIFFICULTY_MEDIUM))
-        {
-            i->second->setActive(RaceManager::DIFFICULTY_BEST);
-            i->second->setActive(RaceManager::DIFFICULTY_HARD);
-        }
-        else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
-        {
-            i->second->setActive(RaceManager::DIFFICULTY_BEST);
-            i->second->setActive(RaceManager::DIFFICULTY_HARD);
-            i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
-        }
-        else
-        {
-            i->second->setActive(RaceManager::DIFFICULTY_BEST);
-            i->second->setActive(RaceManager::DIFFICULTY_HARD);
-            i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
-            i->second->setActive(RaceManager::DIFFICULTY_EASY);
+            // Uses switch fallthrough
+            case RaceManager::DIFFICULTY_NONE:
+                i->second->setActive(RaceManager::DIFFICULTY_EASY);
+            case RaceManager::DIFFICULTY_EASY:
+                i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
+            case RaceManager::DIFFICULTY_MEDIUM:
+                i->second->setActive(RaceManager::DIFFICULTY_HARD);
+            case RaceManager::DIFFICULTY_HARD:
+                i->second->setActive(RaceManager::DIFFICULTY_BEST);
+            default:
+                break;
         }
     }   // for i
 
