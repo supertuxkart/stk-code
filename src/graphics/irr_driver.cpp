@@ -914,13 +914,16 @@ void IrrDriver::applyResolutionSettings()
     m_video_driver->endScene();
     track_manager->removeAllCachedData();
     delete attachment_manager;
+    attachment_manager = NULL;
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
     delete powerup_manager;
+    powerup_manager = NULL;
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
+    input_manager = NULL;
     delete font_manager;
     font_manager = NULL;
     GUIEngine::clear();
@@ -944,7 +947,9 @@ void IrrDriver::applyResolutionSettings()
 #endif
     // initDevice will drop the current device.
     delete m_renderer;
+    m_renderer = NULL;
     SharedGPUObjects::reset();
+    
     SP::setMaxTextureSize();
     initDevice();
 
