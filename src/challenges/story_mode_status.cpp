@@ -93,9 +93,13 @@ void StoryModeStatus::computeActive(bool first_call)
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
     {
-        // Changed challenge
-        // -----------------
-        if(!i->second->isUnlockList() && (i->second)->isSolvedAtAnyDifficulty())
+        // Lock features from unsolved challenges
+        if(!(i->second)->isSolvedAtAnyDifficulty())
+        {
+            lockFeature(i->second);
+        }
+        // Count points from solved challenges
+        else if(!i->second->isUnlockList())
         {
             int gp_factor = i->second->isGrandPrix() ? GP_FACTOR : 1;
 
@@ -119,12 +123,6 @@ void StoryModeStatus::computeActive(bool first_call)
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor;
                 m_easy_challenges++;
             }
-        }
-        else
-        {
-            // Otherwise lock the feature
-            // --------------------------
-            lockFeature(i->second);
         }
 
         switch(i->second->highestSolved())
