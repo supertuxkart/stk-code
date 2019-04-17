@@ -644,8 +644,11 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
-    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights)
+    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
+        CVS->isGLSL())
+    {
         irr_driver->sameRestart();
+    }
     else if (m_prev_img_quality != getImageQuality())
     {
         irr_driver->setMaxTextureSize();
