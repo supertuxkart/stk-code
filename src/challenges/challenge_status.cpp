@@ -72,7 +72,7 @@ void ChallengeStatus::setSolved(RaceManager::Difficulty d)
 {
     if ((int) d <= 3)
     {
-        m_solved |= (0x0F >> (3 - (int) d));
+        m_solved |= (0x0F >> (3 - (int) d)); // Sets the last d+1 bits to 1
         m_active &= ~m_solved; // Sets to 0 all bits which are at 1 in m_solved
     }
 } // setSolved
