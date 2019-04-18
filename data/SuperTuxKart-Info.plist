@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>SuperTuxKart</string>
+	<string>supertuxkart</string>
 	<key>CFBundleIconFile</key>
 	<string>supertuxkart.icns</string>
 	<key>CFBundleIdentifier</key>
