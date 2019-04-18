@@ -22,7 +22,7 @@ Developer
 Developer, modeller & animator
 - Soccer and battle mode AI, Shader, graphics
 - SPM file format definition, importer and exporter
-- Kiki
+- A lot of networking code
 - Other graphical improvements to karts and tracks
 
 = Dawid Gan (deveee) =
@@ -36,7 +36,7 @@ Developer
 Lead graphical artist
 - Art work:
 -   Cocoa temple, Grand Paradiso Island, Old Mine
--   BlackHill Mansion, Hacienda, Fort Magma, XR591
+-   Ravenbridge Mansion, Hacienda, Fort Magma, XR591
 -   Snow Peak, Zen Garden, Ligthouse, Sara
 - Thanks to my family and especially my father
 - Jean Claude Clemençon
@@ -44,8 +44,9 @@ Lead graphical artist
 = Alayan =
 
 Developer
-- Improved item distribution 
+- Story mode and gameplay improvements
 - AI improvements
+- General improvements and bugfixes
 
 = Magne Djupvik (Arthur) =
 
@@ -96,14 +97,14 @@ Bug fixes & misc contributions
 = Visual art =
 
 Tracks
-- Wolfs : Green Valley
+- Sven Andreas Belting : Black Forest
 - Mac_DMH : Minigolf
 - Rubberduck : STK Enterprise
 - Ponzino : Volcan Island
 
 Tracks
 - Canis Lupus : Original 'Northern Resort' & Scotland
-- Ivar ten Cate (Varivar) : Original 'Old Mine' &'Snow Peaks' Improvements
+- Ivar ten Cate (Varivar) : Original 'Old Mine' & 'Snow Peaks' Improvements
 - MacIO : Cave X
 - Steve and Oliver Baker : Oliver's Math Class
 
@@ -112,6 +113,7 @@ Karts
 - Minibjorn : Puffy
 - Cheleb : Nolok, Pidgin
 - Néd J. Édoire : Wilber, Hexley
+- Benau : Kiki
 
 Karts
 - Cédric Archambault : Suzanne

@@ -5,7 +5,7 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
 
-## Unreleased
+## SuperTuxKart 0.10.0 (19. April 2019)
 ### Networking
 * Networking support for normal race, time trial, free for all, capture the flag and soccer by Benau and hiker :
     * Access to a global server list, possibility to also create a LAN server
@@ -48,7 +48,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Smooth turning for non-keyboard inputs for improved consistency between input mode by deveee
 * Updated standard replays by Alayan
 * Visual improvements (new skidding particles, better rescue, bubblegum flashing before ending)
-* Audio improvements (crash sound depending on speed/direction, sound cue in nitro challenges)
+* Audio improvements (crash sound depending on speed/direction, no crash sound on rescue walls, sound cue in nitro challenges)
 * Fix STK incorrectly connecting to the server when the internet option is disabled by Auria
 * Updated WiiUse library
 * Many bugfixes
@@ -70,9 +70,10 @@ For similar reasons, and because some features are vastly more complex than othe
 * Alternating background darkness in lists to enhance readability by Benau
 * Support text breaks into multiple line in lists, e.g. in the addons menu, by Alayan
 * Improved help menu with lateral tabs and a lot more information by Alayan
-* Improved option menu with lateral tabs by Alayan
+* Improved option menu with lateral tabs and a separate language tab by Alayan
 * Many improvements to the ghost replay selection list (give access to egg hunt replays, kart icon shown in the list, replay's game version shown, hide player number column by default) and dialog (allow replay comparison, show track picture, show information about the selected replays) by Alayan
-* Other significant enhancements (detailed progress of multi-goal achievements, reset password button, clearer checkbox status, milliseconds displayed in time-trials and egg hunts, nitro efficiency in the kart selection screen, better track info screen, better warnings when trying to do an online action with internet access disabled, control configurations can be disabled without being deleted, default resolutions can't be used in fullscreen if unsupported by the monitor...)
+* Control configurations can be disabled without being deleted by Alayan
+* Other significant enhancements (detailed progress of multi-goal achievements, reset password button, clearer checkbox status, milliseconds displayed in time-trials and egg hunts, nitro efficiency in the kart selection screen, better track info screen, better warnings when trying to do an online action with internet access disabled, hour support for GP time, default resolutions can't be used in fullscreen if unsupported by the monitor...)
 * Many bugfixes and small enhancements mostly by deveee and Alayan
 
 ### Tracks and modeling
@@ -81,12 +82,12 @@ For similar reasons, and because some features are vastly more complex than othe
 * Ravenbridge Mansion by samuncle, replacing Black Hill Mansion
 * Las Dunas Soccer by samuncle
 * Candela City arena by Benau based on samuncle's track
-* Unwanted shortcuts and exploits found by several players and fixed by Auria in many tracks :
-    * Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
+* Unwanted shortcuts and exploits found by several players and fixed mostly by Auria in many tracks :
+    * Antediluvian Abyss, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
-* Item positions improvement by Alayan and theThomasPat :
-    * Around the Lighthouse, Black Forest, Candela City, Hacienda, Minigolf, Northern Resort, Oliver's Math Class, STK Enterprise, Old Mine, Volcano Island, Zen Garden
+* Item (boxes, nitro, bananas) positions improvement by Alayan and theThomasPat :
+    * Around the Lighthouse, Black Forest, Candela City, Hacienda, Minigolf, Northern Resort, Oliver's Math Class, STK Enterprise, The Old Mine, Volcano Island, Zen Garden
 #### Karts
 * New version of Beastie by Jymis
 * New version of Kiki by Benau
