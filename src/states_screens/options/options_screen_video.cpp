@@ -644,6 +644,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
+#ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
         CVS->isGLSL())
     {
@@ -656,6 +657,7 @@ void OptionsScreenVideo::tearDown()
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
+#endif
 }   // tearDown
 
 // ----------------------------------------------------------------------------
