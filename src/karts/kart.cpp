@@ -2351,7 +2351,8 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
  */
 void Kart::crashed(const Material *m, const Vec3 &normal)
 {
-    playCrashSFX(m, NULL);
+    if (m && !(m->getCollisionReaction() == Material::RESCUE))
+        playCrashSFX(m, NULL);
 #ifdef DEBUG
     // Simple debug output for people playing without sound.
     // This makes it easier to see if a kart hit the track (esp.
