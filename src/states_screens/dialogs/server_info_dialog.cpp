@@ -46,7 +46,7 @@ using namespace Online;
  *         server (i.e. while it is being created).
  */
 ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
-                : ModalDialog(0.8f,0.8f), m_server(server), m_password(NULL)
+                : ModalDialog(0.85f,0.85f), m_server(server), m_password(NULL)
 {
     Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
        server->getServerId(), server->getServerOwner());
@@ -71,8 +71,8 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     }
     else
     {
-        getWidget("label_password")->setVisible(false);
-        getWidget("password")->setVisible(false);
+        Widget* password_box = getWidget("password-box");
+        password_box->setCollapsed(true); // FIXME Doesn't reuse free space for other widgets
     }
 
     auto& players = m_server->getPlayers();

@@ -355,6 +355,7 @@ void Widget::setCollapsed(const bool collapsed, Screen* calling_screen)
 }
 
 // -----------------------------------------------------------------------------
+//TODO : Support recalculating layout for dialogs
 
 void Widget::setCollapsed(const bool collapsed, const int uncollapsed_height, Screen* calling_screen)
 {
