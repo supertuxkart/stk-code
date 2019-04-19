@@ -35,7 +35,8 @@
 
 using namespace Online;
 
-NewsManager *NewsManager::m_news_manager=NULL;
+NewsManager *NewsManager::m_news_manager = nullptr;
+std::string NewsManager::m_news_filename = "online_news.xml";
 
 // ----------------------------------------------------------------------------
 NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
@@ -45,7 +46,7 @@ NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
     m_force_refresh = false;
 
     // Clean .part file which may be left behind
-    std::string news_part = file_manager->getAddonsFile("news.xml.part");
+    std::string news_part = file_manager->getAddonsFile(m_news_filename + ".part");
     if (file_manager->fileExists(news_part))
         file_manager->removeFile(news_part);
 
@@ -60,16 +61,16 @@ NewsManager::~NewsManager()
 // ---------------------------------------------------------------------------
 /** This function initialises the data for the news manager. It starts a
  *  separate thread to execute downloadNews() - which (if necessary) downloads
- *  the news.xml file and updates the list of news messages. It also
+ *  the m_news_filename file and updates the list of news messages. It also
  *  initialises the addons manager (which can trigger another download of
- *  news.xml).
- *  \param force_refresh Re-download news.xml, even if
+ *  m_news_filename).
+ *  \param force_refresh Re-download m_news_filename, even if
  */
 void NewsManager::init(bool force_refresh)
 {
     m_force_refresh = force_refresh;
 
-    // The rest (which potentially involves downloading news.xml) is handled
+    // The rest (which potentially involves downloading m_news_filename) is handled
     // in a separate thread, so that the GUI remains responsive. It is only
     // started if internet access is enabled, else nothing is done in the
     // thread anyway (and the addons menu is disabled as a result).
@@ -93,7 +94,7 @@ void NewsManager::init(bool force_refresh)
 }   //init
 
 // ---------------------------------------------------------------------------
-/** This function submits request which will download the news.xml file
+/** This function submits request which will download the m_news_filename file
  *  if necessary. It is running in its own thread, so we can use blocking
  *  download calls without blocking the GUI.
  *  \param obj This is 'this' object, passed on during pthread creation.
@@ -104,15 +105,15 @@ void* NewsManager::downloadNews(void *obj)
     NewsManager *me = (NewsManager*)obj;
     me->clearErrorMessage();
 
-    std::string xml_file = file_manager->getAddonsFile("news.xml");
+    std::string xml_file = file_manager->getAddonsFile(m_news_filename);
     // Prevent downloading when .part file created, which is already downloaded
-    std::string xml_file_part = file_manager->getAddonsFile("news.xml.part");
+    std::string xml_file_part = file_manager->getAddonsFile(m_news_filename + ".part");
     bool news_exists = file_manager->fileExists(xml_file);
 
     // The news message must be updated if either it has never been updated,
     // or if the time of the last update was more than news_frequency ago,
     // or because a 'refresh' was explicitly requested by the user, or no
-    // news.xml file exists.
+    // m_news_filename file exists.
     bool download = ( UserConfigParams::m_news_last_updated==0  ||
                       UserConfigParams::m_news_last_updated
                           +UserConfigParams::m_news_frequency
@@ -149,8 +150,8 @@ void* NewsManager::downloadNews(void *obj)
     {
         core::stringw error_message("");
 
-        HTTPRequest *download_req = new HTTPRequest("news.xml");
-        download_req->setAddonsURL("news.xml");
+        HTTPRequest *download_req = new HTTPRequest(m_news_filename);
+        download_req->setAddonsURL(m_news_filename);
 
         // Initialise the online portion of the addons manager.
         if(UserConfigParams::logAddons())
@@ -167,10 +168,10 @@ void* NewsManager::downloadNews(void *obj)
 
             // We need a new object, since the state of the old
             // download request is now done.
-            download_req = new HTTPRequest("news.xml");
+            download_req = new HTTPRequest(m_news_filename);
 
             // make sure the new server address is actually used
-            download_req->setAddonsURL("news.xml");
+            download_req->setAddonsURL(m_news_filename);
             download_req->executeNow();
 
             if(download_req->hadDownloadError())
