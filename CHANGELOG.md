@@ -5,7 +5,7 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
 
-## SuperTuxKart 0.10.0 (19. April 2019)
+## SuperTuxKart 1.0 (20. April 2019)
 ### Networking
 * Networking support for normal race, time trial, free for all, capture the flag and soccer by Benau and hiker :
     * Access to a global server list, possibility to also create a LAN server
