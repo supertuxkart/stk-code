@@ -2031,7 +2031,7 @@ msgstr "Anslut till Internet"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Send anonymous hardware statistics"
-msgstr "Sänd anonym hårtvare statistik"
+msgstr "Sänd anonym hårdvarustatistik"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
