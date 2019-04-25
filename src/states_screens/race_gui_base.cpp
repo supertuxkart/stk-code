@@ -523,6 +523,9 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
  */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
+	int scwidth = irr_driver->getActualScreenSize().Width;
+    int scheight = irr_driver->getActualScreenSize().Height;
+	
 #ifndef SERVER_ONLY
      // show no music description when it's off
     if (!UserConfigParams::m_music) return;
@@ -536,8 +539,8 @@ void RaceGUIBase::drawGlobalMusicDescription()
     float timeProgression = (float)(race_time) /
                             (float)(stk_config->m_music_credit_time);
 
-    const int x_pulse = (int)(sinf(race_time*9.0f)*10.0f);
-    const int y_pulse = (int)(cosf(race_time*9.0f)*10.0f);
+    const int x_pulse = (int)(sinf(race_time*9.0f)*scwidth / 192);
+    const int y_pulse = (int)(cosf(race_time*9.0f)*scwidth / 192);
 
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -570,31 +573,31 @@ void RaceGUIBase::drawGlobalMusicDescription()
         thetext_composer += mi->getComposer().c_str();
         textWidth2 = font->getDimension(thetext_composer.c_str()).Width;
     }
-    const int max_text_size = (int)(irr_driver->getActualScreenSize().Width*2.0f/3.0f);
+    const int max_text_size = (int)(scwidth*2.0f/3.0f);
     if (textWidth  > max_text_size) textWidth  = max_text_size;
     if (textWidth2 > max_text_size) textWidth2 = max_text_size;
 
-    const int ICON_SIZE = 64;
-    const int y         = irr_driver->getActualScreenSize().Height - 80;
-    // the 20 is an arbitrary space left between the note icon and the text
-    const int noteX     = (irr_driver->getActualScreenSize().Width / 2)
-                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - 20;
+    const int ICON_SIZE = scheight / 16;
+    const int y         = scheight - ICON_SIZE*5/4;
+    // the scwidth/32 is an arbitrary space left between the note icon and the text
+    const int noteX     = (scwidth / 2)
+                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - scwidth/64;
     const int noteY     = y;
-    // the 20 is an arbitrary space left between the note icon and the text
-    const int textXFrom = (irr_driver->getActualScreenSize().Width / 2)
-                        - std::max(textWidth, textWidth2)/2 + 20;
-    const int textXTo   = (irr_driver->getActualScreenSize().Width / 2)
-                        + std::max(textWidth, textWidth2)/2 + 20;
+    // the scwidth/32 is an arbitrary space left between the note icon and the text
+    const int textXFrom = (scwidth / 2)
+                        - std::max(textWidth, textWidth2)/2 + scwidth/32;
+    const int textXTo   = (scwidth / 2)
+                        + std::max(textWidth, textWidth2)/2 + scwidth/32;
 
     // ---- Draw "by" text
-    const int text_y = (int)(irr_driver->getActualScreenSize().Height - 80*(resize3)
-                     + 40*(1-resize));
+    const int text_y = (int)(scheight - scheight/16*(resize3)
+                     + scheight/32*(1-resize));
 
     static const video::SColor white = video::SColor(255, 255, 255, 255);
     if(mi->getComposer()!="")
     {
-        core::rect<s32> pos_by(textXFrom, text_y+40,
-                               textXTo,   text_y+40);
+        core::rect<s32> pos_by(textXFrom, text_y+scheight/32,
+                               textXTo,   text_y+scheight/32);
         font->draw(thetext_composer, pos_by, white,
                    true, true);
     }
@@ -612,9 +615,9 @@ void RaceGUIBase::drawGlobalMusicDescription()
         int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
         int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
     
-        core::rect<s32> dest(noteX-iconSizeX/2+20,
+        core::rect<s32> dest(noteX-iconSizeX/2+scwidth/32,
                              noteY-iconSizeY/2+ICON_SIZE/2,
-                             noteX+iconSizeX/2+20,
+                             noteX+iconSizeX/2+scwidth/32,
                              noteY+iconSizeY/2+ICON_SIZE/2);
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_music_icon->getSize());
