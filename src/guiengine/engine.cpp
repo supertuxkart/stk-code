@@ -1347,7 +1347,7 @@ namespace GUIEngine
                            true/* center h */, false /* center v */ );
 
         const int icon_count = (int)g_loading_icons.size();
-        const int icon_size = (int)(screen_w / 16.0f);
+        const int icon_size = (int)(std::min(screen_w*3, screen_h*4) / 32.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;
         int y = screen_h - icon_size - ICON_MARGIN;
