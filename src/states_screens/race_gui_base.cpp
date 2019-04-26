@@ -523,15 +523,16 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
  */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
-	int scwidth = irr_driver->getActualScreenSize().Width;
-    int scheight = irr_driver->getActualScreenSize().Height;
-	
 #ifndef SERVER_ONLY
      // show no music description when it's off
     if (!UserConfigParams::m_music) return;
 
     gui::IGUIFont*       font = GUIEngine::getFont();
 
+	const int scwidth = irr_driver->getActualScreenSize().Width;
+    const int scheight = irr_driver->getActualScreenSize().Height;
+    const int fheight = font->getDimension(L"X").Height;
+    
     float race_time =
         stk_config->ticks2Time(World::getWorld()->getMusicDescriptionTicks());
 
@@ -539,8 +540,8 @@ void RaceGUIBase::drawGlobalMusicDescription()
     float timeProgression = (float)(race_time) /
                             (float)(stk_config->m_music_credit_time);
 
-    const int x_pulse = (int)(sinf(race_time*9.0f)*scwidth / 192);
-    const int y_pulse = (int)(cosf(race_time*9.0f)*scwidth / 192);
+    const int x_pulse = (int)(sinf(race_time*9.0f)*fheight/4);
+    const int y_pulse = (int)(cosf(race_time*9.0f)*fheight/4);
 
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -577,27 +578,27 @@ void RaceGUIBase::drawGlobalMusicDescription()
     if (textWidth  > max_text_size) textWidth  = max_text_size;
     if (textWidth2 > max_text_size) textWidth2 = max_text_size;
 
-    const int ICON_SIZE = scheight / 16;
+    const int ICON_SIZE = fheight * 2;
     const int y         = scheight - ICON_SIZE*5/4;
-    // the scwidth/32 is an arbitrary space left between the note icon and the text
+    // the fheight/2 is an arbitrary space left between the note icon and the text
     const int noteX     = (scwidth / 2)
-                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - scwidth/64;
+                        - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - fheight/2;
     const int noteY     = y;
-    // the scwidth/32 is an arbitrary space left between the note icon and the text
+    // the fheight/2 is an arbitrary space left between the note icon and the text
     const int textXFrom = (scwidth / 2)
-                        - std::max(textWidth, textWidth2)/2 + scwidth/32;
+                        - std::max(textWidth, textWidth2)/2 + fheight;
     const int textXTo   = (scwidth / 2)
-                        + std::max(textWidth, textWidth2)/2 + scwidth/32;
+                        + std::max(textWidth, textWidth2)/2 + fheight;
 
     // ---- Draw "by" text
-    const int text_y = (int)(scheight - scheight/16*(resize3)
-                     + scheight/32*(1-resize));
+    const int text_y = (int)(scheight - fheight*2*(resize3)
+                     + fheight*(1-resize));
 
     static const video::SColor white = video::SColor(255, 255, 255, 255);
     if(mi->getComposer()!="")
     {
-        core::rect<s32> pos_by(textXFrom, text_y+scheight/32,
-                               textXTo,   text_y+scheight/32);
+        core::rect<s32> pos_by(textXFrom, text_y+fheight,
+                               textXTo,   text_y+fheight);
         font->draw(thetext_composer, pos_by, white,
                    true, true);
     }
@@ -615,9 +616,9 @@ void RaceGUIBase::drawGlobalMusicDescription()
         int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
         int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
     
-        core::rect<s32> dest(noteX-iconSizeX/2+scwidth/32,
+        core::rect<s32> dest(noteX-iconSizeX/2+fheight,
                              noteY-iconSizeY/2+ICON_SIZE/2,
-                             noteX+iconSizeX/2+scwidth/32,
+                             noteX+iconSizeX/2+fheight,
                              noteY+iconSizeY/2+ICON_SIZE/2);
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_music_icon->getSize());
