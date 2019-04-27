@@ -355,7 +355,7 @@ void FontWithFace::setDPI()
 
     if (UserConfigParams::m_hidpi_enabled)
     {
-        float scale = screen_height / 480.0f;
+        float scale = std::min(screen_width, screen_height) / 640.0f;
         m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
     }
     else if (screen_height > 1300 && screen_width > 1300)
