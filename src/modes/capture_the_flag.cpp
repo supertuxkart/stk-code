@@ -248,7 +248,6 @@ void CaptureTheFlag::update(int ticks)
     m_blue_flag->update(ticks);
 
     if (m_red_flag->getHolder() != -1 && m_blue_flag->isInBase() &&
-        m_blue_flag->isActivated() &&
         (m_blue_flag->getBaseOrigin() - m_red_flag->getOrigin()).length() <
         g_capture_length)
     {
@@ -279,7 +278,6 @@ void CaptureTheFlag::update(int ticks)
         m_red_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
     }
     else if (m_blue_flag->getHolder() != -1 && m_red_flag->isInBase() &&
-        m_red_flag->isActivated() &&
         (m_red_flag->getBaseOrigin() - m_blue_flag->getOrigin()).length() <
         g_capture_length)
     {
