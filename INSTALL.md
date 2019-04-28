@@ -67,18 +67,18 @@ Compilation instruction is explained there. If you don't need this feature, pass
 ### Compiling
 
 To compile SuperTuxKart, run the following commands inside `stk-code` directory
- 
+
 ```bash
 # go into the stk-code directory
 cd stk-code
- 
+
 # create and enter the cmake_build directory
 mkdir cmake_build
 cd cmake_build
- 
+
 # run cmake to generate the makefile
 cmake ..
- 
+
 # compile
 make -j$(nproc)
 ```
@@ -137,11 +137,11 @@ Open your file browser and find somewhere you want to put the development versio
 
 4. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point it to a new directory called `build` or `bld` inside the stk-code directory.
 
-5. Press 'Configure'; CMake will ask you if it is OK to create the aforementioned directory, press `Yes`. CMake will then ask you about your version of Visual Studio. 
+5. Press 'Configure'; CMake will ask you if it is OK to create the aforementioned directory, press `Yes`. CMake will then ask you about your version of Visual Studio.
 
 Confirm your selection; *Please look at the table below to avoid confusion between version numbers and releases of Visual Studio*; CMake will begin creating the required files for the build in the directory. If you want to do a 64-bit build, select the version of Visual Studio you installed with "Win64" appended.
 
-6. Navigate to your build directory and open the `SuperTuxKart.sln` file; Visual Studio will now load the solution. 
+6. Navigate to your build directory and open the `SuperTuxKart.sln` file; Visual Studio will now load the solution.
 
 7. In the 'Solution Explorer', right click on the `supertuxkart` project and select "Set as StartUp project".
 
@@ -159,7 +159,7 @@ Visual Studio 2013| 13
 1. Download and install Visual Studio from here: [Visual Studio - Download](https://www.visualstudio.com/downloads/), the free Visual Studio Community edition works fine.
 
 2. Download a source package from either [SuperTuxKart 0.9.2 download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart/0.9.2) or [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control)
-NOTE: the `stk-code` and `stk-assets` directories **must** be in the same directory 
+NOTE: the `stk-code` and `stk-assets` directories **must** be in the same directory
 3. Download the Windows dependencies package from either [SuperTuxKart download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/)
 or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/dependencies)
 and unpack the archive; once unpacked, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory
@@ -174,9 +174,9 @@ cmake ..
 ```
 6. Now that CMake finished configuring and creating the necessary files for the build, run the build command in the same directory:
 ```cmd
-msbuild.exe SuperTuxKart.sln 
-``` 
-SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe` 
+msbuild.exe SuperTuxKart.sln
+```
+SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe`
 
 ## Building SuperTuxKart on macOS
 
