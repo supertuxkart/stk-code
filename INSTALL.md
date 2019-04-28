@@ -98,6 +98,8 @@ make -j$(nproc)
 
 ##### Build Speed Optimization
 
+To speed up recompilations install `ccache`. It'll be automatically detected on cmake configuration stage *(i.e. when you run `cmake ..`)*, and used.
+
 "-j$(nproc)" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
 
 ### Further options
