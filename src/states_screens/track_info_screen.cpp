@@ -309,7 +309,7 @@ void TrackInfoScreen::init()
 
     // Record race or not
     // -------------
-    const bool record_available = race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL;
+    const bool record_available = (race_manager->isTimeTrialMode() || race_manager->isEggHuntMode());
     m_record_race->setVisible(record_available);
     getWidget<LabelWidget>("record-race-text")->setVisible(record_available);
     if (race_manager->isRecordingRace())
