@@ -126,14 +126,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_map_rendered_width    = map_texture;
     m_map_rendered_height   = map_texture;
 
-
-    // special case : when 3 players play, use available 4th space for such things
-    // TODO : determine if there are plans for multiplayer in story mode in the future
-    if (race_manager->getIfEmptyScreenSpaceExists())
-    {
-        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
-    }
-    else if (m_multitouch_gui != NULL)
+    if (m_multitouch_gui != NULL)
     {
         m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
                                                         m_map_width) * 0.9f);
@@ -143,12 +136,6 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     //createMarkerTexture();
-
-    // Translate strings only one in constructor to avoid calling
-    // gettext in each frame.
-    //I18N: Shown at the end of a race
-    m_string_lap      = _("Lap");
-    m_string_rank     = _("Rank");
 
     m_active_challenge = NULL;
 
@@ -187,27 +174,6 @@ void RaceGUIOverworld::renderGlobal(float dt)
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
 
-    // Special case : when 3 players play, use 4th window to display such
-    // stuff (but we must clear it)
-    //TODO : remove if no story mode multiplayer plans
-    if (race_manager->getIfEmptyScreenSpaceExists() &&
-        !GUIEngine::ModalDialog::isADialogActive())
-    {
-        static video::SColor black = video::SColor(255,0,0,0);
-        GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
-            race_manager->getNumLocalPlayers()));
-    }
-
-    World *world = World::getWorld();
-    assert(world != NULL);
-    if(world->getPhase() >= WorldStatus::READY_PHASE &&
-       world->getPhase() <= WorldStatus::GO_PHASE      )
-    {
-        drawGlobalReadySetGo();
-    }
-
-    // Timer etc. are not displayed unless the game is actually started.
-    if(!world->isRacePhase()) return;
     if (!m_enabled) return;
 
     if (m_multitouch_gui == NULL)
@@ -215,10 +181,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
         drawTrophyPoints();
     }
 
-    // minimap has no mipmaps so disable material2D
-    //irr_driver->getVideoDriver()->enableMaterial2D(false);
     drawGlobalMiniMap();
-    //irr_driver->getVideoDriver()->enableMaterial2D();
 
     m_is_first_render_call = false;
 #endif
@@ -265,10 +228,8 @@ void RaceGUIOverworld::drawTrophyPoints()
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     const int points = player->getPoints();
     const int next_unlock_points = player->getNextUnlockPoints();
-    std::string s = StringUtils::toString(points);
-    std::string s_goal = StringUtils::toString(next_unlock_points);
-    core::stringw sw(s.c_str());
-    core::stringw swg(s_goal.c_str());
+    core::stringw sw(StringUtils::toString(points).c_str());
+    core::stringw swg(StringUtils::toString(next_unlock_points).c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
 
@@ -313,8 +274,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest = core::rect<s32>(pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y,
                            pos.UpperLeftCorner.X, pos.UpperLeftCorner.Y + size);
 
-    draw2DImage(m_open_challenge, dest, source, NULL,
-                                              NULL, true /* alpha */);
+    draw2DImage(m_open_challenge, dest, source, NULL, NULL, true /* alpha */);
 
     core::dimension2du area = font->getDimension(L"9");
     int small_width = area.Width;
@@ -323,11 +283,8 @@ void RaceGUIOverworld::drawTrophyPoints()
     area = font->getDimension(L"999");
     int large_width = area.Width;
 
-    int number_width;
-
-    if (points < 9) number_width = small_width;
-    else if (points <99) number_width = middle_width;
-    else number_width = large_width;
+    int number_width = (points <= 9)  ? small_width  :
+                       (points <= 99) ? middle_width : large_width;
 
     pos.LowerRightCorner.Y = int(dest.LowerRightCorner.Y + 1.5f*size);
     pos.UpperLeftCorner.X -= int(0.5f*size + number_width*0.5f);
@@ -368,11 +325,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
     World *world = World::getWorld();
-    // arenas currently don't have a map.
     Track* track = Track::getCurrentTrack();
-    if(track->isArena() || track->isSoccer()) return;
-    const std::vector<OverworldChallenge>& challenges =
-                                                     track->getChallengeList();
+    const std::vector<OverworldChallenge>& challenges = track->getChallengeList();
 
     // The trophies might be to the left of the minimap on large displays
     // Adjust the left side of the minimap to take this into account.
@@ -412,56 +366,42 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
     Vec3 kart_xyz;
 
-    // In the first iteration, only draw AI karts, then only draw
-    // player karts. This guarantees that player kart icons are always
-    // on top of AI kart icons.
-    for(unsigned int only_draw_player_kart=0; only_draw_player_kart<=1;
-        only_draw_player_kart++)
+    // There can be only player karts on the overworld.
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        for(unsigned int i=0; i<world->getNumKarts(); i++)
+        const AbstractKart *kart = world->getKart(i);
+
+        kart_xyz= kart->getXYZ();
+        Vec3 draw_at;
+        track->mapPoint2MiniMap(kart_xyz, &draw_at);
+
+        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        if (icon == NULL)
+            continue;
+
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+        int marker_half_size = m_minimap_player_size>>1;
+        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
+                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
+                                 m_map_left+(int)(draw_at.getX()+marker_half_size),
+                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
+
+        // Highlight the player icons with some background image.
+        if (m_icons_frame != NULL)
         {
-            const AbstractKart *kart = world->getKart(i);
-            if(kart->isEliminated()) continue;   // don't draw eliminated kart
-                                                 // Make sure to only draw AI kart icons first, then
-                                                 // only player karts.
-            if(kart->getController()->isLocalPlayerController()
-               !=(only_draw_player_kart==1)) continue;
-            kart_xyz= kart->getXYZ();
-            Vec3 draw_at;
-            track->mapPoint2MiniMap(kart_xyz, &draw_at);
-
-            video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
-            if (icon == NULL)
+            video::SColor colors[4];
+            for (unsigned int i=0;i<4;i++)
             {
-                continue;
+                colors[i]=kart->getKartProperties()->getColor();
             }
-            core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-            int marker_half_size = (kart->getController()->isLocalPlayerController()
-                                    ? m_minimap_player_size
-                                    : m_minimap_challenge_size                        )>>1;
-            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
-                                     lower_y   -(int)(draw_at.getY()+marker_half_size),
-                                     m_map_left+(int)(draw_at.getX()+marker_half_size),
-                                     lower_y   -(int)(draw_at.getY()-marker_half_size));
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                       m_icons_frame->getSize());
 
-            // Highlight the player icons with some backgorund image.
-            if (kart->getController()->isLocalPlayerController() &&
-                m_icons_frame != NULL)
-            {
-                video::SColor colors[4];
-                for (unsigned int i=0;i<4;i++)
-                {
-                    colors[i]=kart->getKartProperties()->getColor();
-                }
-                const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           m_icons_frame->getSize());
+            draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
+        }
 
-                draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
-            }   // if isPlayerController
-
-            draw2DImage(icon, position, source, NULL, NULL, true);
-        }   // for i<getNumKarts
-    }   // for only_draw_player_kart
+        draw2DImage(icon, position, source, NULL, NULL, true);
+    }   // for i<getNumKarts
 
     m_current_challenge = NULL;
     for (unsigned int n=0; n<challenges.size(); n++)
