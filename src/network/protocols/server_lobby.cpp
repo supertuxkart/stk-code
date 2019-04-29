@@ -133,8 +133,8 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     if (ServerConfig::m_ranked)
     {
         Log::info("ServerLobby", "This server will submit ranking scores to "
-            "STK addons server, don't bother host one if you don't have the "
-            "corresponding permission, they will be rejected if so.");
+            "the STK addons server. Don't bother hosting one without the "
+            "corresponding permissions, as they would be rejected.");
     }
     m_result_ns = getNetworkString();
     m_result_ns->setSynchronous(true);
@@ -284,7 +284,7 @@ void ServerLobby::setup()
     m_timeout.store(std::numeric_limits<int64_t>::max());
     m_waiting_for_reset = false;
     m_server_started_at = m_server_delay = 0;
-    Log::info("ServerLobby", "Reset server to initial state.");
+    Log::info("ServerLobby", "Resetting the server to its initial state.");
 }   // setup
 
 //-----------------------------------------------------------------------------
@@ -298,7 +298,7 @@ bool ServerLobby::notifyEvent(Event* event)
     assert(data.size()); // message not empty
     uint8_t message_type;
     message_type = data.getUInt8();
-    Log::info("ServerLobby", "Synchronous message received with type %d.",
+    Log::info("ServerLobby", "Synchronous message of type %d received.",
               message_type);
     switch (message_type)
     {
@@ -307,7 +307,7 @@ bool ServerLobby::notifyEvent(Event* event)
     case LE_CLIENT_LOADED_WORLD: finishedLoadingLiveJoinClient(event); break;
     case LE_KART_INFO: handleKartInfo(event); break;
     case LE_CLIENT_BACK_LOBBY: clientInGameWantsToBackLobby(event); break;
-    default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
+    default: Log::error("ServerLobby", "Unknown message of type %d - ignored.",
                         message_type);
              break;
     }   // switch message_type
@@ -398,7 +398,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         assert(data.size()); // message not empty
         uint8_t message_type;
         message_type = data.getUInt8();
-        Log::info("ServerLobby", "Message received with type %d.",
+        Log::info("ServerLobby", "Message of type %d received.",
                   message_type);
         switch(message_type)
         {
@@ -1008,7 +1008,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         World::getWorld()->addReservedKart(id);
         const RemoteKartInfo& rki = race_manager->getKartInfo(id);
         addLiveJoiningKart(id, rki, m_last_live_join_util_ticks);
-        Log::info("ServerLobby", "%s live-joining succeeded with kart id %d.",
+        Log::info("ServerLobby", "%s succeeded live-joining with kart id %d.",
             peer->getAddress().toString().c_str(), id);
     }
     if (peer->getAvailableKartIDs().empty())
@@ -1283,7 +1283,7 @@ bool ServerLobby::registerServer(bool now)
                 if (!is_official && ServerConfig::m_ranked)
                 {
                     Log::fatal("ServerLobby", "You don't have permission to "
-                        "host ranked server.");
+                        "host a ranked server.");
                 }
                 Log::info("ServerLobby",
                     "Server %d is now online.", server_id_online);
@@ -1701,7 +1701,7 @@ void ServerLobby::checkRaceFinished()
     assert(World::getWorld());
     if (!RaceEventManager::getInstance()->isRaceOver()) return;
 
-    Log::info("ServerLobby", "The game is considered finish.");
+    Log::info("ServerLobby", "The game is considered finished.");
     // notify the network world that it is stopped
     RaceEventManager::getInstance()->stop();
 
