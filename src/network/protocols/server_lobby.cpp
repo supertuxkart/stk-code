@@ -1278,6 +1278,13 @@ bool ServerLobby::registerServer(bool now)
                 unsigned server_id_online = 0;
                 server_info->get("id", &server_id_online);
                 assert(server_id_online != 0);
+                bool is_official = false;
+                server_info->get("official", &is_official);
+                if (!is_official && ServerConfig::m_ranked)
+                {
+                    Log::fatal("ServerLobby", "You don't have permission to "
+                        "host ranked server.");
+                }
                 Log::info("ServerLobby",
                     "Server %d is now online.", server_id_online);
                 sl->m_server_id_online.store(server_id_online);
