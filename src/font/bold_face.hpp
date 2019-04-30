@@ -32,9 +32,9 @@ class BoldFace : public FontWithFace
 private:
     virtual unsigned int getGlyphPageSize() const OVERRIDE     { return 1024; }
     // ------------------------------------------------------------------------
-    virtual float getScalingFactorOne() const OVERRIDE         { return 0.2f; }
+    virtual float getScalingFactorOne() const OVERRIDE         { return 0.25f; }
     // ------------------------------------------------------------------------
-    virtual unsigned int getScalingFactorTwo() const OVERRIDE   { return 120; }
+    virtual unsigned int getScalingFactorTwo() const OVERRIDE   { return 150; }
     // ------------------------------------------------------------------------
     virtual bool isBold() const OVERRIDE                       { return true; }
     // ------------------------------------------------------------------------
