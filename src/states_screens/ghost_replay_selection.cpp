@@ -173,11 +173,8 @@ void GhostReplaySelection::init()
     Screen::init();
     m_cur_difficulty = race_manager->getDifficulty();
     
-    int icon_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 15
-                                                        : getHeight() / 24;
-
-    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12
-                                                       : getHeight() / 24;
+    int icon_height = getHeight() / 18;
+    int row_height = getHeight() / 12;
                                                         
     // 128 is the height of the image file
     m_icon_bank->setScale(icon_height/128.0f);
