@@ -159,8 +159,7 @@ void ServerSelection::init()
         m_icon_bank->addTextureAsSprite(tex);
     }
 
-    int row_height = UserConfigParams::m_hidpi_enabled ? getHeight() / 12
-                                                       : getHeight() / 15;
+    int row_height = getHeight() / 12
     
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
@@ -332,6 +331,7 @@ void ServerSelection::onUpdate(float dt)
     {
         m_refreshing_server = false;
         if (!ServersManager::get()->getServers().empty())
+#include <cassert>
         {
             int selection = m_server_list_widget->getSelectionID();
             std::string selection_str = m_server_list_widget
