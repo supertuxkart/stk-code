@@ -159,7 +159,7 @@ void ServerSelection::init()
         m_icon_bank->addTextureAsSprite(tex);
     }
 
-    int row_height = getHeight() / 12
+    int row_height = getHeight() / 12;
     
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
