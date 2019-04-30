@@ -537,11 +537,6 @@ namespace UserConfigParams
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
             "keyboard, 2 = always enabled, 3 = android keyboard (experimental)") );
 
-    PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
-            &m_multitouch_group,
-            "Enable high-DPI support.") );
-
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
