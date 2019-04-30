@@ -331,7 +331,6 @@ void ServerSelection::onUpdate(float dt)
     {
         m_refreshing_server = false;
         if (!ServersManager::get()->getServers().empty())
-#include <cassert>
         {
             int selection = m_server_list_widget->getSelectionID();
             std::string selection_str = m_server_list_widget
@@ -399,3 +398,4 @@ void ServerSelection::unloaded()
     delete m_icon_bank;
     m_icon_bank = NULL;
 }   // unloaded
+
