@@ -153,13 +153,8 @@ void DynamicRibbonWidget::add()
     const int average_y = m_y + (m_h - m_label_height)/2;
 
     unsigned int screen_height = irr_driver->getActualScreenSize().Height;
-    m_arrows_w = (int)(screen_height / 15);
+    m_arrows_w = (int)(screen_height / 10);
     m_arrows_w = std::max(m_arrows_w, 40);
-    
-    if (UserConfigParams::m_hidpi_enabled)
-    {
-        m_arrows_w = int(m_arrows_w*1.5f);
-    }
 
     const int button_h = m_arrows_w;
 
