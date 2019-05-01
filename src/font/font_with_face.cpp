@@ -352,7 +352,8 @@ void FontWithFace::setDPI()
 {
     float scale = std::min(irr_driver->getActualScreenSize().Width,
                              irr_driver->getActualScreenSize().Height) / 640.0f;
-    m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
+    m_face_dpi = int(getScalingFactorTwo() + (UserConfigParams::m_bigger_fonts ? 5 : 0))
+		               * getScalingFactorOne() * scale;
 }   // setDPI
 
 // ----------------------------------------------------------------------------
