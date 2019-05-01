@@ -536,6 +536,11 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
             "keyboard, 2 = always enabled, 3 = android keyboard (experimental)") );
+            
+    PARAM_PREFIX BoolUserConfigParam         m_bigger_fonts
+            PARAM_DEFAULT( BoolUserConfigParam(false, "bigger_fonts",
+            &m_multitouch_group,
+            "Bigger fonts for high dpi screens.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
