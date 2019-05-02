@@ -54,21 +54,21 @@ namespace GUIEngine
 
     /** \brief Returns the widget currently focused by given player, or NULL if none.
       * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-      *       needs, so we use ours. (i.e. always call these functions are never those
+      *       needs, so we use ours. (i.e. always call these functions, never those
       *       in IGUIEnvironment)
       */
     Widget* getFocusForPlayer(const unsigned int playerID);
 
     /** \brief Focuses nothing for given player (removes any selection for this player).
       * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-      *       needs, so we use ours. (i.e. always call these functions are never those
+      *       needs, so we use ours. (i.e. always call these functions, never those
       *       in IGUIEnvironment)
       */
     void focusNothingForPlayer(const unsigned int playerID);
 
     /** \brief Returns whether given the widget is currently focused by given player.
       * \note  Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-      *        needs, so we use ours. (i.e. always call these functions are never those
+      *        needs, so we use ours. (i.e. always call these functions, never those
       *        in IGUIEnvironment)
       */
     bool isFocusedForPlayer(const Widget*w, const unsigned int playerID);

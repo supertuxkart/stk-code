@@ -914,10 +914,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (ribbon == NULL) break;
 
                     // give the mouse "game master" priviledges
-                    const int playerID = PLAYER_ID_GAME_MASTER; //input_manager->getPlayerKeyboardID();
-
-                    if (playerID == -1) break;
-                    if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
+                    const int playerID = PLAYER_ID_GAME_MASTER;
 
                     ribbon->mouseHovered(w, playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
@@ -927,9 +924,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 {
                     // focus on hover for other widgets
                     // give the mouse "game master" priviledges
-                    const int playerID = PLAYER_ID_GAME_MASTER; //input_manager->getPlayerKeyboardID();
-                    if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
-                    if (playerID != -1)
+                    const int playerID = PLAYER_ID_GAME_MASTER;
                     {
                         // lists don't like that combined with scrollbars
                         // (FIXME: find why instead of working around)
