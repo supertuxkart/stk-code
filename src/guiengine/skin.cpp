@@ -972,7 +972,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["tab::focused"];
-        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
+        else if (parent_focused && parentRibbon->m_mouse_focus == widget && mouseIn)
             params = &SkinConfig::m_render_params["tab::focused"];
         else if (mark_selected)
             params = &SkinConfig::m_render_params["tab::down"];
@@ -1022,7 +1022,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["verticalTab::focused"];
-        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
+        else if (parent_focused && parentRibbon->m_mouse_focus == widget && mouseIn)
             params = &SkinConfig::m_render_params["verticalTab::focused"];
         else if (mark_selected)
             params = &SkinConfig::m_render_params["verticalTab::down"];
@@ -1260,9 +1260,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
     } // end if icon ribbons
 
 
-    if (/*mark_selected && widget->hasTooltip() &&
-        (focused || parent_focused) &&*/
-        parentRibbon->m_mouse_focus == widget)
+    if (parent_focused && parentRibbon->m_mouse_focus == widget)
     {
         if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()
                                                       ->getPosition()))
