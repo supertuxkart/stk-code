@@ -69,6 +69,17 @@ private:
 
     std::atomic<ServerState> m_state;
 
+    /* The state used in multiple threads when reseting server. */
+    enum ResetState : unsigned int
+    {
+        RS_NONE, // Default state
+        RS_WAITING, // Waiting for reseting finished
+        RS_ASYNC_RESET // Finished reseting server in main thread, now async
+                       // thread
+    };
+
+    std::atomic<ResetState> m_rs_state;
+
     /** Hold the next connected peer for server owner if current one expired
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
@@ -84,8 +95,6 @@ private:
 
     /** Keeps track of the server state. */
     std::atomic_bool m_server_has_loaded_world;
-
-    bool m_waiting_for_reset;
 
     bool m_has_created_server_id_file;
 

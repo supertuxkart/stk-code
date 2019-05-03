@@ -122,6 +122,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
             m_official_kts.second.insert(t->getIdent());
     }
 
+    m_rs_state.store(RS_NONE);
     m_last_success_poll_time.store(StkTime::getRealTimeMs() + 30000);
     m_server_owner_id.store(-1);
     m_registered_for_once_only = false;
@@ -139,7 +140,6 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_result_ns = getNetworkString();
     m_result_ns->setSynchronous(true);
     m_items_complete_state = new BareNetworkString();
-    m_waiting_for_reset = false;
     m_server_id_online.store(0);
     m_difficulty.store(ServerConfig::m_server_difficulty);
     m_game_mode.store(ServerConfig::m_server_mode);
@@ -282,7 +282,6 @@ void ServerLobby::setup()
     // the server are ready:
     resetPeersReady();
     m_timeout.store(std::numeric_limits<int64_t>::max());
-    m_waiting_for_reset = false;
     m_server_started_at = m_server_delay = 0;
     Log::info("ServerLobby", "Resetting the server to its initial state.");
 }   // setup
@@ -444,6 +443,13 @@ void ServerLobby::createServerIdFile()
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
+    if (m_rs_state.load() == RS_ASYNC_RESET)
+    {
+        resetVotingTime();
+        resetServer();
+        m_rs_state.store(RS_NONE);
+    }
+
     // Check if server owner has left
     updateServerOwner();
 
@@ -561,7 +567,6 @@ void ServerLobby::asynchronousUpdate()
         // For WAIT_FOR_WORLD_LOADED and SELECTING make sure there are enough
         // players to start next game, otherwise exiting and let main thread
         // reset
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
         if (m_end_voting_period.load() == 0)
             return;
 
@@ -587,7 +592,6 @@ void ServerLobby::asynchronousUpdate()
     }
     case SELECTING:
     {
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
         if (m_end_voting_period.load() == 0)
             return;
         unsigned player_in_game = 0;
@@ -1118,7 +1122,7 @@ void ServerLobby::update(int ticks)
         storePlayingTrack(-1);
 
     // Reset server to initial state if no more connected players
-    if (m_waiting_for_reset)
+    if (m_rs_state.load() == RS_WAITING)
     {
         if ((RaceEventManager::getInstance() &&
             !RaceEventManager::getInstance()->protocolStopped()) ||
@@ -1126,14 +1130,12 @@ void ServerLobby::update(int ticks)
             return;
 
         RaceResultGUI::getInstance()->backToLobby();
-        resetVotingTime();
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
-        m_game_setup->stopGrandPrix();
-        resetServer();
+        m_rs_state.store(RS_ASYNC_RESET);
     }
 
     STKHost::get()->updatePlayers();
-    if ((m_state.load() > WAITING_FOR_START_GAME ||
+    if (m_rs_state.load() == RS_NONE &&
+        (m_state.load() > WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()) &&
         (STKHost::get()->getPlayersInGame() == 0 ||
         all_players_in_world_disconnected))
@@ -1153,9 +1155,14 @@ void ServerLobby::update(int ticks)
             RaceEventManager::getInstance()->getProtocol()->requestTerminate();
             GameProtocol::lock()->requestTerminate();
         }
-        m_waiting_for_reset = true;
+        resetVotingTime();
+        m_game_setup->stopGrandPrix();
+        m_rs_state.store(RS_WAITING);
         return;
     }
+
+    if (m_rs_state.load() != RS_NONE)
+        return;
 
     // Reset for ranked server if in kart / track selection has only 1 player
     if (ServerConfig::m_ranked &&
@@ -1169,9 +1176,8 @@ void ServerLobby::update(int ticks)
         sendMessageToPeers(back_lobby, /*reliable*/true);
         delete back_lobby;
         resetVotingTime();
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_game_setup->stopGrandPrix();
-        resetServer();
+        m_rs_state.store(RS_ASYNC_RESET);
     }
 
     handlePlayerDisconnection();
@@ -1231,8 +1237,7 @@ void ServerLobby::update(int ticks)
             back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
             sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
             delete back_to_lobby;
-            std::lock_guard<std::mutex> lock(m_connection_mutex);
-            resetServer();
+            m_rs_state.store(RS_ASYNC_RESET);
         }
         break;
     case ERROR_LEAVE:
@@ -2073,7 +2078,6 @@ void ServerLobby::clearDisconnectedRankedPlayer()
 //-----------------------------------------------------------------------------
 void ServerLobby::connectionRequested(Event* event)
 {
-    std::lock_guard<std::mutex> lock(m_connection_mutex);
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     NetworkString& data = event->data();
     if (!checkDataSize(event, 14)) return;
@@ -3027,7 +3031,6 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
     if (crypto->decryptConnectionRequest(data))
     {
         peer->setCrypto(std::move(crypto));
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
         Log::info("ServerLobby", "%s validated",
             StringUtils::wideToUtf8(online_name).c_str());
         handleUnencryptedConnection(peer, data, online_id,
