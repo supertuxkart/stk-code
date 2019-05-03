@@ -69,7 +69,7 @@ void override_default_params()
     UserConfigParams::m_screen_keyboard = 1;
     
     // Set bigger fonts and buttons
-    UserConfigParams::m_bigger_fonts = true
+    UserConfigParams::m_bigger_fonts = true;
     
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
