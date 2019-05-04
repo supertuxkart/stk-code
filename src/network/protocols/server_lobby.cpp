@@ -2893,7 +2893,8 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
  */
 void ServerLobby::playerFinishedResult(Event *event)
 {
-    if (m_state.load() != RESULT_DISPLAY)
+    if (m_rs_state.load() == RS_ASYNC_RESET ||
+        m_state.load() != RESULT_DISPLAY)
         return;
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     m_peers_ready.at(peer) = true;
