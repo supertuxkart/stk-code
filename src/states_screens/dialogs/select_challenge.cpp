@@ -143,15 +143,34 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     }
 
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
-    if (c->getData()->isGrandPrix())
-        typeLbl->setText(_("Grand Prix"), false );
-    else if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
-        typeLbl->setText(_("Nitro challenge"), false );
-    else if (c->getData()->isGhostReplay())
-        typeLbl->setText(_("Ghost replay race"), false );
-    else
-        typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
+    core::stringw description;
 
+    if (c->getData()->isGrandPrix())
+    {
+        // Doesn't work for RTL
+        description = _("Grand Prix");
+        description += L" - ";
+        description += RaceManager::getNameOf(c->getData()->getMinorMode());
+    } // if isGrandPrix
+    else
+    {
+        if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
+            description = _("Nitro challenge");
+        else if (c->getData()->isGhostReplay())
+            description = _("Ghost replay race");
+        else
+            description = RaceManager::getNameOf(c->getData()->getMinorMode());
+
+        description += L" - ";
+        description += _("Laps: %i", c->getData()->getNumLaps());
+
+        if (c->getData()->getReverse())
+        {
+            description += L" - ";
+            description += _("Mode: Reverse");
+        }
+    } // if !isGrandPrix
+    typeLbl->setText(description, false );
 }
 
 // ----------------------------------------------------------------------------
