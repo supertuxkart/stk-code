@@ -1293,7 +1293,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
     AbstractKart *kart = m_karts[kart_id].get();
     if (kart->isGhostKart()) return;
 
-    // Display a message about the eliminated kart in the race guia
+    // Display a message about the eliminated kart in the race gui
     if (notify_of_elimination)
     {
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
@@ -1512,9 +1512,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
         controller = loadAIController(new_kart.get());
         break;
     case RaceManager::KT_GHOST:
-        break;
     case RaceManager::KT_LEADER:
-        break;
     case RaceManager::KT_SPARE_TIRE:
         break;
     }
@@ -1551,15 +1549,15 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 //-----------------------------------------------------------------------------
 void World::setAITeam()
 {
-    const int total_player = race_manager->getNumPlayers();
+    const int total_players = race_manager->getNumPlayers();
     const int total_karts = race_manager->getNumberOfKarts();
 
     // No AI
-    if ((total_karts - total_player) == 0) return;
+    if ((total_karts - total_players) == 0) return;
 
-    int red_player = 0;
-    int blue_player = 0;
-    for (int i = 0; i < total_player; i++)
+    int red_players = 0;
+    int blue_players = 0;
+    for (int i = 0; i < total_players; i++)
     {
         KartTeam team = race_manager->getKartInfo(i).getKartTeam();
 
@@ -1568,31 +1566,21 @@ void World::setAITeam()
         {
             race_manager->setKartTeam(i, KART_TEAM_BLUE);
             team = KART_TEAM_BLUE;
-            continue;
+            continue; //FIXME, this is illogical
         }
 
-        team == KART_TEAM_BLUE ? blue_player++ : red_player++;
+        team == KART_TEAM_BLUE ? blue_players++ : red_players++;
     }
 
-    int available_ai = total_karts - red_player - blue_player;
-    while (available_ai > 0)
-    {
-        if ((m_red_ai + red_player) > (m_blue_ai + blue_player))
-        {
-            m_blue_ai++;
-            available_ai--;
-        }
-        else if ((m_blue_ai + blue_player) > (m_red_ai + red_player))
-        {
-            m_red_ai++;
-            available_ai--;
-        }
-        else if ((m_blue_ai + blue_player) == (m_red_ai + red_player))
-        {
-            blue_player > red_player ? m_red_ai++ : m_blue_ai++;
-            available_ai--;
-        }
-    }
+    int available_ai = total_karts - red_players - blue_players;
+    int additional_blue = red_players - blue_players;
+
+    m_blue_ai = (available_ai - additional_blue) / 2 + additional_blue;
+    m_red_ai  = (available_ai - additional_blue) / 2;
+
+    if ((available_ai + additional_blue)%2 == 1)
+        (additional_blue < 0) ? m_red_ai++ : m_blue_ai++;
+
     Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 
 }   // setAITeam
