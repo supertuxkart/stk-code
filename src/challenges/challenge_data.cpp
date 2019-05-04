@@ -306,6 +306,8 @@ const irr::core::stringw ChallengeData::getChallengeDescription() const
     {
         if (m_is_ghost_replay)
             description = _("Time-Trial - beat the replay");
+        else if (m_energy[0] > 0)
+            description = _("Time-Trial - nitro challenge");
         else if (m_minor == RaceManager::MINOR_MODE_NORMAL_RACE)
             description = _("Normal Race (single race)");
         else if (m_minor == RaceManager::MINOR_MODE_TIME_TRIAL)
