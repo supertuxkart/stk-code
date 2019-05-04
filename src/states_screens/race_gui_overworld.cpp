@@ -532,14 +532,6 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
                 font->draw(translations->fribidize(gp->getName()), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
-
-                core::rect<s32> pos2(pos);
-                pos2.UpperLeftCorner.Y += 10 + GUIEngine::getTitleFontHeight();
-                pos2.LowerRightCorner.Y += 10 + GUIEngine::getTitleFontHeight();
-
-                //just below GP name
-                font->draw(_("Type: Grand Prix"), pos2, video::SColor(255,255,255,255),
-                           false, true /* vcenter */, NULL);
             }
             else
             {
@@ -567,17 +559,21 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 m_active_challenge = challenge;
                 m_challenge_description = challenge->getChallengeDescription();
             }
-            GUIEngine::getFont()->draw(m_challenge_description,
-                                       pos, video::SColor(255,255,255,255),
-                                       false, false /* vcenter */, NULL);
+
+            gui::ScalableFont* font = GUIEngine::getLargeFont();
+            //FIXME : large font is upscaled and blurry
+            font->setBlackBorder(true);
+            font->draw(m_challenge_description, pos, video::SColor(255,255,255,255),
+                       false, false /* vcenter */, NULL);
 
             core::rect<s32> pos2(0,
                                  irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                  irr_driver->getActualScreenSize().Width,
                                  irr_driver->getActualScreenSize().Height);
-            GUIEngine::getOutlineFont()->draw(_("Press fire to start the challenge"), pos2,
-                                       GUIEngine::getSkin()->getColor("font::normal"),
-                                       true, true /* vcenter */, NULL);
+            font->draw(_("Press fire to start the challenge"), pos2,
+                        GUIEngine::getSkin()->getColor("font::normal"),
+                        true, true /* vcenter */, NULL);
+            font->setBlackBorder(false);
         }
     }
     
