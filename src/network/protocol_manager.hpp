@@ -31,8 +31,10 @@
 #include "utils/types.hpp"
 
 #include <atomic>
+#include <condition_variable>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include <thread>
 
@@ -217,6 +219,16 @@ private:
 
     /*! Asynchronous update thread.*/
     std::thread m_asynchronous_update_thread;
+
+    /** Asynchronous game protocol thread to handle controller action as fast
+     *  as possible. */
+    std::thread m_game_protocol_thread;
+
+    std::condition_variable m_game_protocol_cv;
+
+    std::mutex m_game_protocol_mutex;
+
+    EventList m_controller_events_list;
 
     /*! Single instance of protocol manager.*/
     static std::weak_ptr<ProtocolManager> m_protocol_manager;

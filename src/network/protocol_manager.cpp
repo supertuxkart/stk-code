@@ -19,7 +19,9 @@
 #include "network/protocol_manager.hpp"
 
 #include "network/event.hpp"
-#include "network/protocol.hpp"
+#include "network/network_config.hpp"
+#include "network/protocols/game_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -56,6 +58,41 @@ std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
                 PROFILER_POP_CPU_MARKER();
             }
         });
+    if (NetworkConfig::get()->isServer())
+    {
+        pm->m_game_protocol_thread = std::thread([pm]()
+            {
+                VS::setThreadName("CtrlEvents");
+                while (true)
+                {
+                    std::unique_lock<std::mutex> ul(pm->m_game_protocol_mutex);
+                    pm->m_game_protocol_cv.wait(ul, [&pm]
+                        {
+                            return !pm->m_controller_events_list.empty();
+                        });
+                    Event* event_top = pm->m_controller_events_list.front();
+                    pm->m_controller_events_list.pop_front();
+                    ul.unlock();
+                    if (event_top == NULL)
+                        break;
+                    auto sl = LobbyProtocol::get<ServerLobby>();
+                    if (sl)
+                    {
+                        ServerLobby::ServerState ss = sl->getCurrentState();
+                        if (!(ss >= ServerLobby::WAIT_FOR_WORLD_LOADED &&
+                            ss <= ServerLobby::RACING))
+                        {
+                            delete event_top;
+                            continue;
+                        }
+                    }
+                    auto gp = GameProtocol::lock();
+                    if (gp)
+                        gp->notifyEventAsynchronous(event_top);
+                    delete event_top;
+                }
+            });
+    }
     m_protocol_manager = pm;
     return pm;
 }   // createInstance
@@ -90,6 +127,11 @@ ProtocolManager::~ProtocolManager()
     m_async_events_to_process.getData().clear();
     m_async_events_to_process.unlock();
 
+    for (EventList::iterator i = m_controller_events_list.begin();
+                             i!= m_controller_events_list.end(); ++i)
+        delete *i;
+    m_controller_events_list.clear();
+
     m_requests.lock();
     m_requests.getData().clear();
     m_requests.unlock();
@@ -108,6 +150,14 @@ void ProtocolManager::OneProtocolType::abort()
 void ProtocolManager::abort()
 {
     m_exit.store(true);
+    if (NetworkConfig::get()->isServer())
+    {
+        std::unique_lock<std::mutex> ul(m_game_protocol_mutex);
+        m_controller_events_list.push_back(NULL);
+        m_game_protocol_cv.notify_one();
+        ul.unlock();
+        m_game_protocol_thread.join();
+    }
     // wait the thread to finish
     m_asynchronous_update_thread.join();
 }   // abort
@@ -119,6 +169,16 @@ void ProtocolManager::abort()
  */
 void ProtocolManager::propagateEvent(Event* event)
 {
+    // Special handling for contoller events in server
+    if (NetworkConfig::get()->isServer() &&
+        event->getType() == EVENT_TYPE_MESSAGE &&
+        event->data().getProtocolType() == PROTOCOL_CONTROLLER_EVENTS)
+    {
+        std::lock_guard<std::mutex> lock(m_game_protocol_mutex);
+        m_controller_events_list.push_back(event);
+        m_game_protocol_cv.notify_one();
+        return;
+    }
     if (event->isSynchronous())
     {
         m_sync_events_to_process.lock();
@@ -131,7 +191,6 @@ void ProtocolManager::propagateEvent(Event* event)
         m_async_events_to_process.getData().push_back(event);
         m_async_events_to_process.unlock();
     }
-    return;
 }   // propagateEvent
 
 // ----------------------------------------------------------------------------
