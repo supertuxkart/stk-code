@@ -2670,14 +2670,17 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     {
         peer->setWaitingForGame(false);
         m_peers_ready[peer] = false;
-        for (std::shared_ptr<NetworkPlayerProfile>& npp :
-            peer->getPlayerProfiles())
+        if (!ServerConfig::m_sql_management)
         {
-            Log::info("ServerLobby",
-                "New player %s with online id %u from %s with %s.",
-                StringUtils::wideToUtf8(npp->getName()).c_str(),
-                npp->getOnlineId(), peer->getAddress().toString().c_str(),
-                peer->getUserVersion().c_str());
+            for (std::shared_ptr<NetworkPlayerProfile>& npp :
+                peer->getPlayerProfiles())
+            {
+                Log::info("ServerLobby",
+                    "New player %s with online id %u from %s with %s.",
+                    StringUtils::wideToUtf8(npp->getName()).c_str(),
+                    npp->getOnlineId(), peer->getAddress().toString().c_str(),
+                    peer->getUserVersion().c_str());
+            }
         }
         updatePlayerList();
         peer->sendPacket(message_ack);
@@ -3441,11 +3444,15 @@ void ServerLobby::addWaitingPlayersToGame()
         if (m_peers_ready.find(peer) == m_peers_ready.end())
         {
             m_peers_ready[peer] = false;
-            Log::info("ServerLobby",
-                "New player %s with online id %u from %s with %s.",
-                StringUtils::wideToUtf8(profile->getName()).c_str(),
-                profile->getOnlineId(), peer->getAddress().toString().c_str(),
-                peer->getUserVersion().c_str());
+            if (!ServerConfig::m_sql_management)
+            {
+                Log::info("ServerLobby",
+                    "New player %s with online id %u from %s with %s.",
+                    StringUtils::wideToUtf8(profile->getName()).c_str(),
+                    profile->getOnlineId(),
+                    peer->getAddress().toString().c_str(),
+                    peer->getUserVersion().c_str());
+            }
         }
         uint32_t online_id = profile->getOnlineId();
         if (ServerConfig::m_ranked &&
