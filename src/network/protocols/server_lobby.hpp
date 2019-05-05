@@ -73,6 +73,8 @@ private:
 #ifdef ENABLE_SQLITE3
     sqlite3* m_db;
 
+    std::string m_server_stats_table;
+
     bool m_ip_ban_table_exists;
 
     bool m_online_id_ban_table_exists;
@@ -315,6 +317,7 @@ private:
     void kickPlayerWithReason(STKPeer* peer, const char* reason) const;
     void testBannedForIP(STKPeer* peer) const;
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
+    void writeDisconnectInfoTable(STKPeer* peer);
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -344,6 +347,7 @@ public:
     void saveInitialItems();
     void saveIPBanTable(const TransportAddress& addr);
     void listBanTable();
+    void initServerStatsTable();
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

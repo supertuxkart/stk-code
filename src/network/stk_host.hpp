@@ -315,6 +315,8 @@ public:
         return m_next_unique_host_id;
     }
     // ------------------------------------------------------------------------
+    void setNextHostId(uint32_t id)             { m_next_unique_host_id = id; }
+    // ------------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() const
     {

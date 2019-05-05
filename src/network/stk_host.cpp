@@ -79,8 +79,11 @@ std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
     std::shared_ptr<LobbyProtocol> lp;
     if (NetworkConfig::get()->isServer())
     {
-        lp = LobbyProtocol::create<ServerLobby>();
+        std::shared_ptr<ServerLobby> sl =
+            LobbyProtocol::create<ServerLobby>();
         m_stk_host = new STKHost(true/*server*/);
+        sl->initServerStatsTable();
+        lp = sl;
     }
     else
     {
@@ -929,8 +932,9 @@ void STKHost::mainLoop()
             Event* stk_event = NULL;
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
+                // ++m_next_unique_host_id for unique host id for database
                 auto stk_peer = std::make_shared<STKPeer>
-                    (event.peer, this, m_next_unique_host_id++);
+                    (event.peer, this, ++m_next_unique_host_id);
                 std::unique_lock<std::mutex> lock(m_peers_mutex);
                 m_peers[event.peer] = stk_peer;
                 lock.unlock();

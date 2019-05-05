@@ -46,6 +46,7 @@ namespace ServerConfig
 {
 // ============================================================================
 std::string g_server_config_path;
+std::string m_server_uid;
 // ============================================================================
 FloatServerConfigParam::FloatServerConfigParam(float default_value,
                                                const char* param_name,
@@ -121,6 +122,8 @@ void loadServerConfig(const std::string& path)
         g_server_config_path = file_manager->getFileSystem()
             ->getAbsolutePath(path.c_str()).c_str();
     }
+    m_server_uid = StringUtils::removeExtension(
+        StringUtils::getBasename(g_server_config_path));
     const XMLNode* root = file_manager->createXMLTree(g_server_config_path);
     loadServerConfigXML(root, default_config);
 }   // loadServerConfig

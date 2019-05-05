@@ -253,13 +253,146 @@ void ServerLobby::initDatabase()
 }   // initDatabase
 
 //-----------------------------------------------------------------------------
+void ServerLobby::initServerStatsTable()
+{
+#ifdef ENABLE_SQLITE3
+    if (!ServerConfig::m_sql_management || !m_db)
+        return;
+    std::string table_name = std::string("v") +
+        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
+        ServerConfig::m_server_uid + "_stats";
+
+    std::string query = StringUtils::insertValues(
+        "CREATE TABLE IF NOT EXISTS %s (\n"
+        "    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer\n"
+        "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n"
+        "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
+        "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
+        "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
+        "    player_num INEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
+        "    country_id TEXT NULL DEFAULT NULL, -- Country id of the host\n"
+        "    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)\n"
+        "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
+        "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
+        "    ping INEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
+        ") WITHOUT ROWID;", table_name.c_str());
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret == SQLITE_OK)
+            m_server_stats_table = table_name;
+        else
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+    }
+    if (m_server_stats_table.empty())
+        return;
+
+    uint32_t last_host_id = 0;
+    query = StringUtils::insertValues("SELECT MAX(host_id) FROM %s;",
+        m_server_stats_table.c_str());
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW && sqlite3_column_type(stmt, 0) != SQLITE_NULL)
+        {
+            last_host_id = (unsigned)sqlite3_column_int64(stmt, 0);
+            Log::info("ServerLobby", "%u was last server session max host id.",
+                last_host_id);
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+            m_server_stats_table = "";
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+        m_server_stats_table = "";
+    }
+    STKHost::get()->setNextHostId(last_host_id);
+
+    // Update disconnected time (if stk crashed it will not be written)
+    query = StringUtils::insertValues(
+        "UPDATE %s SET disconnected_time = datetime('now')"
+        "WHERE connected_time = disconnected_time;",
+        m_server_stats_table.c_str());
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+    }
+#endif
+}   // initServerStatsTable
+
+//-----------------------------------------------------------------------------
 void ServerLobby::destroyDatabase()
 {
 #ifdef ENABLE_SQLITE3
+    auto peers = STKHost::get()->getPeers();
+    for (auto& peer : peers)
+        writeDisconnectInfoTable(peer.get());
     if (m_db != NULL)
         sqlite3_close(m_db);
 #endif
 }   // destroyDatabase
+
+//-----------------------------------------------------------------------------
+void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
+{
+#ifdef ENABLE_SQLITE3
+    if (m_server_stats_table.empty())
+        return;
+    std::string query = StringUtils::insertValues(
+        "UPDATE %s SET disconnected_time = datetime('now'), ping = %d "
+        "WHERE host_id = %u;", m_server_stats_table.c_str(),
+        peer->getAveragePing(), peer->getHostId());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+    }
+#endif
+}   // writeDisconnectInfoTable
 
 //-----------------------------------------------------------------------------
 /** Called whenever server is reset or game mode is changed.
@@ -2151,6 +2284,8 @@ void ServerLobby::clientDisconnected(Event* event)
         }, msg);
     updatePlayerList();
     delete msg;
+
+    writeDisconnectInfoTable(event->getPeer());
 }   // clientDisconnected
 
 //-----------------------------------------------------------------------------
@@ -2235,7 +2370,7 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkString *message = getNetworkString(2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
-        // send only to the peer that made the request and disconect it now
+        // send only to the peer that made the request and disconnect it now
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
         peer->reset();
         delete message;
@@ -2553,6 +2688,37 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }
     }
+#ifdef ENABLE_SQLITE3
+    if (m_server_stats_table.empty())
+        return;
+    std::string query = StringUtils::insertValues(
+        "INSERT INTO %s "
+        "(host_id, ip, port, online_id, username, player_num, version, ping) "
+        "VALUES (%u, %u, %u, %u, \"%s\", %u, \"%s\", %u);",
+        m_server_stats_table.c_str(), peer->getHostId(),
+        peer->getAddress().getIP(), peer->getAddress().getPort(), online_id,
+        StringUtils::wideToUtf8(
+        peer->getPlayerProfiles()[0]->getName()).c_str(), player_count,
+        peer->getUserVersion().c_str(), peer->getAveragePing());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+    }
+#endif
 }   // handleUnencryptedConnection
 
 //-----------------------------------------------------------------------------

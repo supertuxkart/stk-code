@@ -349,6 +349,13 @@ namespace ServerConfig
     /** Server version, will be advanced if there are protocol changes. */
     static const uint32_t m_server_version = 6;
     // ========================================================================
+    /** Server database version, will be advanced if there are protocol
+     *  changes. */
+    static const uint32_t m_server_db_version = 1;
+    // ========================================================================
+    /** Server uid, extracted from server_config.xml file with .xml removed. */
+    extern std::string m_server_uid;
+    // ========================================================================
     void loadServerConfig(const std::string& path = "");
     // ------------------------------------------------------------------------
     void loadServerConfigXML(const XMLNode* root, bool default_config = false);
