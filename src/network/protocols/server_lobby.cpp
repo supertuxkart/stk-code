@@ -207,7 +207,8 @@ void ServerLobby::initDatabase()
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s", query.c_str(),
                 sqlite3_errmsg(m_db));
         }
     }
@@ -239,8 +240,9 @@ void ServerLobby::initDatabase()
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     if (!m_online_id_ban_table_exists)
@@ -286,14 +288,15 @@ void ServerLobby::initServerStatsTable()
             m_server_stats_table = table_name;
         else
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
     }
     if (m_server_stats_table.empty())
         return;
@@ -314,15 +317,16 @@ void ServerLobby::initServerStatsTable()
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
             m_server_stats_table = "";
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
         m_server_stats_table = "";
     }
     STKHost::get()->setNextHostId(last_host_id);
@@ -339,14 +343,15 @@ void ServerLobby::initServerStatsTable()
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
     }
 #endif
 }   // initServerStatsTable
@@ -382,14 +387,15 @@ void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
     }
 #endif
 }   // writeDisconnectInfoTable
@@ -2341,14 +2347,15 @@ void ServerLobby::saveIPBanTable(const TransportAddress& addr)
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
     }
 #endif
 }   // saveIPBanTable
@@ -2712,14 +2719,15 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
     }
 #endif
 }   // handleUnencryptedConnection
@@ -3522,14 +3530,15 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
         {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
         return;
     }
     if (row_id != -1)
@@ -3546,14 +3555,16 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
             ret = sqlite3_finalize(stmt);
             if (ret != SQLITE_OK)
             {
-                Log::error("ServerLobby", "Error finalize database: %s",
-                    sqlite3_errmsg(m_db));
+                Log::error("ServerLobby",
+                    "Error finalize database for query %s: %s",
+                    query.c_str(), sqlite3_errmsg(m_db));
             }
         }
         else
         {
-            Log::error("ServerLobby", "Error preparing database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error preparing database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
 #endif
@@ -3620,14 +3631,16 @@ void ServerLobby::testBannedForOnlineId(STKPeer* peer,
             ret = sqlite3_finalize(stmt);
             if (ret != SQLITE_OK)
             {
-                Log::error("ServerLobby", "Error finalize database: %s",
-                    sqlite3_errmsg(m_db));
+                Log::error("ServerLobby",
+                    "Error finalize database for query %s: %s",
+                    query.c_str(), sqlite3_errmsg(m_db));
             }
         }
         else
         {
-            Log::error("ServerLobby", "Error preparing database: %s",
-                sqlite3_errmsg(m_db));
+            Log::error("ServerLobby",
+                "Error preparing database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
         }
     }
 #endif
