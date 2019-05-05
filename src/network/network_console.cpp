@@ -93,11 +93,6 @@ void mainLoop(STKHost* host)
                 auto sl = LobbyProtocol::get<ServerLobby>();
                 if (sl)
                     sl->saveIPBanTable(peer->getAddress());
-                auto lock = sl->acquireConnectionMutex();
-                ServerConfig::m_server_ip_ban_list
-                    [peer->getAddress().toString(false/*show_port*/) + "/32"]
-                    = std::numeric_limits<uint32_t>::max();
-                sl->updateBanList();
             }
             else
                 std::cout << "Unknown host id: " << number << std::endl;
@@ -119,21 +114,6 @@ void mainLoop(STKHost* host)
             auto sl = LobbyProtocol::get<ServerLobby>();
             if (sl)
                 sl->listBanTable();
-
-            for (auto& ban : ServerConfig::m_server_ip_ban_list)
-            {
-                if (ban.first == "0.0.0.0/0")
-                    continue;
-                std::cout << "IP: " << ban.first << ", expire at: " <<
-                    ban.second << std::endl;
-            }
-            for (auto& ban : ServerConfig::m_server_online_id_ban_list)
-            {
-                if (ban.first == 0)
-                    continue;
-                std::cout << "Online id: " << ban.first << ", expire at: " <<
-                    ban.second << std::endl;
-            }
         }
         else if (str == "speedstats")
         {

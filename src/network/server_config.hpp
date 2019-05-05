@@ -345,22 +345,6 @@ namespace ServerConfig
         "Online ID ban list table name, you need to create the table first, "
         "see NETWORKING.md for details."));
 
-    SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
-        SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
-        "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "
-        "specific ip, expired-time: unix timestamp to expire, "
-        "-1 (uint32_t max) for a permanent ban.",
-        {{ "ban", "ip", "expired-time" }},
-        { { "0.0.0.0/0", 0u } }));
-
-    SERVER_CFG_PREFIX UIntToUIntServerConfigParam m_server_online_id_ban_list
-        SERVER_CFG_DEFAULT(UIntToUIntServerConfigParam(
-        "server-online-id-ban-list",
-        "online-id: online id for banning, expired-time: unix timestamp to "
-        "expire, -1 (uint32_t max) for a permanent ban.",
-        {{ "ban", "online-id", "expired-time" }},
-        { { 0u, 0u } }));
-
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
     static const uint32_t m_server_version = 6;

@@ -133,14 +133,6 @@ private:
      *  starting race. */
     mutable std::mutex m_connection_mutex;
 
-    /** Ban list of ip ranges. */
-    std::map</*ip_start*/uint32_t, std::tuple</*ip_end*/uint32_t,
-        /*CIDR*/std::string, /*expired time epoch*/uint32_t> >
-        m_ip_ban_list;
-
-    /** Ban list of online user id. */
-    std::map<uint32_t, /*expired time epoch*/uint32_t> m_online_id_ban_list;
-
     TransportAddress m_server_address;
 
     std::mutex m_keys_mutex;
@@ -344,7 +336,6 @@ public:
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-    bool isBannedForIP(const TransportAddress& addr) const;
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);

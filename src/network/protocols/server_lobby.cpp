@@ -131,7 +131,6 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
     m_save_server_config = true;
-    updateBanList();
     if (ServerConfig::m_ranked)
     {
         Log::info("ServerLobby", "This server will submit ranking scores to "
@@ -3028,76 +3027,6 @@ void ServerLobby::playerFinishedResult(Event *event)
 }   // playerFinishedResult
 
 //-----------------------------------------------------------------------------
-void ServerLobby::updateBanList()
-{
-    m_ip_ban_list.clear();
-    m_online_id_ban_list.clear();
-
-    for (auto& ban : ServerConfig::m_server_ip_ban_list)
-    {
-        if (ban.first == "0.0.0.0/0" ||
-            (uint32_t)StkTime::getTimeSinceEpoch() > ban.second)
-            continue;
-        uint32_t netbits = 0;
-        std::vector<std::string> ip_and_netbits =
-            StringUtils::split(ban.first, '/');
-        if (ip_and_netbits.size() != 2 ||
-            !StringUtils::fromString(ip_and_netbits[1], netbits) ||
-            netbits > 32)
-        {
-            Log::error("STKHost", "Wrong CIDR: %s", ban.first.c_str());
-            continue;
-        }
-        TransportAddress addr(ip_and_netbits[0]);
-        if (addr.getIP() == 0)
-        {
-            Log::error("STKHost", "Wrong CIDR: %s", ban.first.c_str());
-            continue;
-        }
-        uint32_t mask = ~((1 << (32 - netbits)) - 1);
-        uint32_t ip_start = addr.getIP() & mask;
-        uint32_t ip_end = (addr.getIP() & mask) | ~mask;
-        m_ip_ban_list[ip_start] =
-            std::make_tuple(ip_end, ban.first, ban.second);
-    }
-
-    std::map<std::string, uint32_t> final_ip_ban_list;
-    for (auto it = m_ip_ban_list.begin();
-        it != m_ip_ban_list.end();)
-    {
-        auto next_itr = std::next(it);
-        if (next_itr != m_ip_ban_list.end() &&
-            next_itr->first <= std::get<0>(it->second))
-        {
-            Log::warn("ServerLobby", "%s overlaps %s, removing the first one.",
-                std::get<1>(next_itr->second).c_str(),
-                std::get<1>(it->second).c_str());
-            m_ip_ban_list.erase(next_itr);
-            continue;
-        }
-        final_ip_ban_list[std::get<1>(it->second)] =
-            ServerConfig::m_server_ip_ban_list.at(std::get<1>(it->second));
-        it++;
-    }
-    ServerConfig::m_server_ip_ban_list = final_ip_ban_list;
-    // Default guided entry
-    ServerConfig::m_server_ip_ban_list["0.0.0.0/0"] = 0;
-
-    std::map<uint32_t, uint32_t> final_online_id_ban_list;
-    for (auto& ban : ServerConfig::m_server_online_id_ban_list)
-    {
-        if (ban.first == 0 ||
-            (uint32_t)StkTime::getTimeSinceEpoch() > ban.second)
-            continue;
-        m_online_id_ban_list[ban.first] = ban.second;
-        final_online_id_ban_list[ban.first] =
-            ServerConfig::m_server_online_id_ban_list.at(ban.first);
-    }
-    ServerConfig::m_server_online_id_ban_list = final_online_id_ban_list;
-    ServerConfig::m_server_online_id_ban_list[0] = 0;
-}   // updateBanList
-
-//-----------------------------------------------------------------------------
 bool ServerLobby::waitingForPlayers() const
 {
     if (m_game_setup->isGrandPrix() && m_game_setup->isGrandPrixStarted())
@@ -3565,35 +3494,6 @@ void ServerLobby::listBanTable()
     }
 #endif
 }   // listBanTable
-
-//-----------------------------------------------------------------------------
-bool ServerLobby::isBannedForIP(const TransportAddress& addr) const
-{
-    uint32_t ip_decimal = addr.getIP();
-    auto lb = m_ip_ban_list.lower_bound(addr.getIP());
-    bool is_banned = false;
-    if (lb != m_ip_ban_list.end() && ip_decimal >= lb->first/*ip_start*/)
-    {
-        if (ip_decimal <= std::get<0>(lb->second)/*ip_end*/ &&
-            (uint32_t)StkTime::getTimeSinceEpoch() < std::get<2>(lb->second))
-            is_banned = true;
-    }
-    else if (lb != m_ip_ban_list.begin())
-    {
-        lb--;
-        if (ip_decimal>= lb->first/*ip_start*/ &&
-            ip_decimal <= std::get<0>(lb->second)/*ip_end*/ &&
-            (uint32_t)StkTime::getTimeSinceEpoch() < std::get<2>(lb->second))
-            is_banned = true;
-    }
-    if (is_banned)
-    {
-        Log::info("ServerLobby", "%s is banned by CIDR %s",
-            addr.toString(false/*show_port*/).c_str(),
-            std::get<1>(lb->second).c_str());
-    }
-    return is_banned;
-}   // isBannedForIP
 
 //-----------------------------------------------------------------------------
 float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
