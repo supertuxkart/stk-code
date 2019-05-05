@@ -319,6 +319,32 @@ namespace ServerConfig
         "more rewind, which clients with slow device may have problem playing "
         "this server, use the default value is recommended."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_sql_management
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false,
+        "sql-management",
+        "Use sql to manage server stats and banlist, STK needs to be compiled "
+        "with sqlite3 supported."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_database_file
+        SERVER_CFG_DEFAULT(StringServerConfigParam("stkservers.db",
+        "database-file",
+        "Database filename for sqlite to use, it can be shared for servers "
+        "creating in this machine, and stk will create specific table for each "
+        "server. You need to create the database yourself first, see "
+        "NETWORKING.md for details"));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_ip_ban_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("ipban",
+        "ip-ban-table",
+        "Ip ban list table name, you need to create the table first, see "
+        "NETWORKING.md for details."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_online_id_ban_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("onlineidban",
+        "online-id-ban-table",
+        "Online ID ban list table name, you need to create the table first, "
+        "see NETWORKING.md for details."));
+
     SERVER_CFG_PREFIX StringToUIntServerConfigParam m_server_ip_ban_list
         SERVER_CFG_DEFAULT(StringToUIntServerConfigParam("server-ip-ban-list",
         "ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a "

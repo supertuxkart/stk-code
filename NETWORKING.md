@@ -202,3 +202,55 @@ Tested on a Raspberry Pi 3 Model B+, if you have 8 players connected to a server
 For bad network simulation, we recommend `network traffic control` by linux kernel, see [here](https://wiki.linuxfoundation.org/networking/netem) for details.
 
 You have the best gaming experience when choosing server having all players less than 100ms ping with no packet loss.
+
+## Server management (Since 1.1)
+
+Currently STK uses sqlite (if building with sqlite3 on) for server management with the following functions at the moment:
+1. Server statistics
+2. IP / online ID ban list
+
+You need to create a database in sqlite first, run `sqlite3 stkservers.db` in the folder where (all) your server_config.xml(s) located.
+
+STK will automatically create a table named `v(server database version)_(your_server_config_filename_without_.xml_extension)_stats` in your database if not exists:
+```sql
+CREATE TABLE IF NOT EXISTS (table name above)
+(
+    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer
+    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host
+    port INTEGER UNSIGNED NOT NULL, -- Port of host
+    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)
+    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)
+    player_num INEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player
+    country_id TEXT NULL DEFAULT NULL, -- Country id of the host
+    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)
+    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected
+    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)
+    ping INEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host
+) WITHOUT ROWID;
+```
+
+For IP or online ID ban list, you need to create one yourself:
+```sql
+CREATE TABLE ipban
+(
+    ip_start INTEGER UNSIGNED NOT NULL UNIQUE, -- Starting of ip decimal for banning (inclusive)
+    ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- Ending of ip decimal for banning (inclusive)
+    starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
+    expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
+    reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
+    description TEXT NOT NULL DEFAULT '', -- Private description for server admin
+    trigger_count INEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
+);
+
+CREATE TABLE onlineidban
+(
+    online_id INTEGER UNSIGNED NOT NULL UNIQUE, -- Online id from STK addons database for banning
+    starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
+    expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
+    reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
+    description TEXT NOT NULL DEFAULT '', -- Private description for server admin
+    trigger_count INEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
+);
+```

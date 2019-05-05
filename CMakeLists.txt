@@ -24,6 +24,7 @@ option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angels
 option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
+option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
 option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
@@ -363,6 +364,23 @@ if(USE_LIBBFD)
     endif()
 endif()
 
+# SQLITE
+if(USE_SQLITE3)
+    find_library(SQLITE3_LIBRARY NAMES sqlite3 libsqlite3)
+    find_path(SQLITE3_INCLUDEDIR NAMES sqlite3.h PATHS)
+    if (NOT SQLITE3_LIBRARY OR NOT SQLITE3_INCLUDEDIR)
+#        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/sqlite3")
+#        include_directories("${PROJECT_SOURCE_DIR}/lib/sqlite3")
+#        SET(SQLITE3_LIBRARY sqlite3)
+        set(USE_SQLITE3 OFF CACHE BOOL "Use sqlite to manage server stats and ban list." FORCE)
+        message(WARNING "Sqlite3 not found, disable advanced server management.")
+    else()
+        add_definitions(-DENABLE_SQLITE3)
+        include_directories("${SQLITE3_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system libsqlite3: ${SQLITE3_LIBRARY}")
+    endif()
+endif()
+
 # Set some compiler options
 if(UNIX OR MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
@@ -517,6 +535,10 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     )
+
+if (USE_SQLITE3)
+    target_link_libraries(supertuxkart ${SQLITE3_LIBRARY})
+endif()
 
 if (USE_CRYPTO_OPENSSL)
     target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})

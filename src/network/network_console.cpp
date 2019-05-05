@@ -91,6 +91,8 @@ void mainLoop(STKHost* host)
                 peer->kick();
                 // ATM use permanently ban
                 auto sl = LobbyProtocol::get<ServerLobby>();
+                if (sl)
+                    sl->saveIPBanTable(peer->getAddress());
                 auto lock = sl->acquireConnectionMutex();
                 ServerConfig::m_server_ip_ban_list
                     [peer->getAddress().toString(false/*show_port*/) + "/32"]
@@ -114,6 +116,10 @@ void mainLoop(STKHost* host)
         }
         else if (str == "listban")
         {
+            auto sl = LobbyProtocol::get<ServerLobby>();
+            if (sl)
+                sl->listBanTable();
+
             for (auto& ban : ServerConfig::m_server_ip_ban_list)
             {
                 if (ban.first == "0.0.0.0/0")

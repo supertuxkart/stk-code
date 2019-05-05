@@ -55,6 +55,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 
 /** This is the central game setup protocol running in the server. It is
@@ -144,6 +145,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_difficulty.store(ServerConfig::m_server_difficulty);
     m_game_mode.store(ServerConfig::m_server_mode);
     m_default_vote = new PeerVote();
+    initDatabase();
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -161,7 +163,104 @@ ServerLobby::~ServerLobby()
     if (m_save_server_config)
         ServerConfig::writeServerConfigToDisk();
     delete m_default_vote;
+    destroyDatabase();
 }   // ~ServerLobby
+
+//-----------------------------------------------------------------------------
+void ServerLobby::initDatabase()
+{
+#ifdef ENABLE_SQLITE3
+    m_db = NULL;
+    sqlite3_stmt* stmt = NULL;;
+    m_ip_ban_table_exists = false;
+    m_online_id_ban_table_exists = false;
+    if (!ServerConfig::m_sql_management)
+        return;
+    int ret = sqlite3_open(ServerConfig::m_database_file.c_str(), &m_db);
+    if (ret != SQLITE_OK)
+    {
+        Log::error("ServerLobby", "Cannot open database: %s.",
+            sqlite3_errmsg(m_db));
+        sqlite3_close(m_db);
+        m_db = NULL;
+        return;
+    }
+
+    std::string query = StringUtils::insertValues(
+        "SELECT count(type) FROM sqlite_master "
+        "WHERE type='table' AND name='%s';",
+        ServerConfig::m_ip_ban_table.c_str());
+
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            int number = sqlite3_column_int(stmt, 0);
+            if (number == 1)
+            {
+                Log::info("ServerLobby", "%s ip ban table will used.",
+                    ServerConfig::m_ip_ban_table.c_str());
+                m_ip_ban_table_exists = true;
+            }
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    if (!m_ip_ban_table_exists)
+    {
+        Log::warn("ServerLobby", "%s ip ban table not found in database.",
+            ServerConfig::m_ip_ban_table.c_str());
+    }
+
+    query = StringUtils::insertValues(
+        "SELECT count(type) FROM sqlite_master "
+        "WHERE type='table' AND name='%s';",
+        ServerConfig::m_online_id_ban_table.c_str());
+
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            int number = sqlite3_column_int(stmt, 0);
+            if (number == 1)
+            {
+                Log::info("ServerLobby", "%s online id ban table will used.",
+                    ServerConfig::m_online_id_ban_table.c_str());
+                m_online_id_ban_table_exists = true;
+            }
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    if (!m_online_id_ban_table_exists)
+    {
+        Log::warn("ServerLobby",
+            "%s online id ban table not found in database.",
+            ServerConfig::m_online_id_ban_table.c_str());
+    }
+#endif
+}   // initDatabase
+
+//-----------------------------------------------------------------------------
+void ServerLobby::destroyDatabase()
+{
+#ifdef ENABLE_SQLITE3
+    if (m_db != NULL)
+        sqlite3_close(m_db);
+#endif
+}   // destroyDatabase
 
 //-----------------------------------------------------------------------------
 /** Called whenever server is reset or game mode is changed.
@@ -2076,6 +2175,51 @@ void ServerLobby::clearDisconnectedRankedPlayer()
 }   // clearDisconnectedRankedPlayer
 
 //-----------------------------------------------------------------------------
+void ServerLobby::kickPlayerWithReason(STKPeer* peer, const char* reason) const
+{
+    NetworkString *message = getNetworkString(2);
+    message->setSynchronous(true);
+    message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
+    message->encodeString(std::string(reason));
+    peer->cleanPlayerProfiles();
+    peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+    peer->reset();
+    delete message;
+}   // kickPlayerWithReason
+
+//-----------------------------------------------------------------------------
+void ServerLobby::saveIPBanTable(const TransportAddress& addr)
+{
+#ifdef ENABLE_SQLITE3
+    if (!m_db || !m_ip_ban_table_exists)
+        return;
+
+    std::string query = StringUtils::insertValues(
+        "INSERT INTO %s (ip_start, ip_end) "
+        "VALUES (%u, %u);",
+        ServerConfig::m_ip_ban_table.c_str(), addr.getIP(), addr.getIP());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+    }
+#endif
+}   // saveIPBanTable
+
+//-----------------------------------------------------------------------------
 void ServerLobby::connectionRequested(Event* event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
@@ -2207,33 +2351,16 @@ void ServerLobby::connectionRequested(Event* event)
     online_id = data.getUInt32();
     encrypted_size = data.getUInt32();
 
-    bool is_banned = isBannedForIP(peer->getAddress());
-    if (online_id != 0 && !is_banned)
-    {
-        if (m_online_id_ban_list.find(online_id) !=
-            m_online_id_ban_list.end() &&
-            (uint32_t)StkTime::getTimeSinceEpoch() <
-            m_online_id_ban_list.at(online_id))
-        {
-            is_banned = true;
-        }
-    }
-
-    if (is_banned)
-    {
-        NetworkString *message = getNetworkString(2);
-        message->setSynchronous(true);
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
-        // For future we can say the reason here
-        // and use encodeString instead
-        message->addUInt8(0);
-        peer->cleanPlayerProfiles();
-        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: banned");
+    // Will be disconnected if banned by IP
+    testBannedForIP(peer.get());
+    if (peer->isDisconnected())
         return;
-    }
+
+    if (online_id != 0)
+        testBannedForOnlineId(peer.get(), online_id);
+    // Will be disconnected if banned by online id
+    if (peer->isDisconnected())
+        return;
 
     unsigned total_players = 0;
     STKHost::get()->updatePlayers(NULL, NULL, &total_players);
@@ -3252,6 +3379,192 @@ void ServerLobby::resetServer()
     m_state = NetworkConfig::get()->isLAN() ?
         WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
 }   // resetServer
+
+//-----------------------------------------------------------------------------
+void ServerLobby::testBannedForIP(STKPeer* peer) const
+{
+#ifdef ENABLE_SQLITE3
+    if (!m_db || !m_ip_ban_table_exists)
+        return;
+
+    int row_id = -1;
+    unsigned ip_start = 0;
+    unsigned ip_end = 0;
+    std::string query = StringUtils::insertValues(
+        "SELECT rowid, ip_start, ip_end, reason, description FROM %s "
+        "WHERE ip_start <= %u AND ip_end >= %u "
+        "AND datetime('now') > datetime(starting_time) AND "
+        "(expired_days is NULL OR datetime"
+        "(starting_time, '+'||expired_days||' days') > datetime('now')) "
+        "LIMIT 1;",
+        ServerConfig::m_ip_ban_table.c_str(),
+        peer->getAddress().getIP(), peer->getAddress().getIP());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            row_id = sqlite3_column_int(stmt, 0);
+            ip_start = (unsigned)sqlite3_column_int64(stmt, 1);
+            ip_end = (unsigned)sqlite3_column_int64(stmt, 2);
+            const char* reason = (char*)sqlite3_column_text(stmt, 3);
+            const char* desc = (char*)sqlite3_column_text(stmt, 4);
+            Log::info("ServerLobby", "%s banned by IP: %s "
+                "(rowid: %d, description: %s).",
+                peer->getAddress().toString().c_str(), reason, row_id, desc);
+            kickPlayerWithReason(peer, reason);
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+        return;
+    }
+    if (row_id != -1)
+    {
+        query = StringUtils::insertValues(
+            "UPDATE %s SET trigger_count = trigger_count + 1, "
+            "last_trigger = datetime('now') "
+            "WHERE ip_start = %u AND ip_end = %u;",
+            ServerConfig::m_ip_ban_table.c_str(), ip_start, ip_end);
+        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+        if (ret == SQLITE_OK)
+        {
+            ret = sqlite3_step(stmt);
+            ret = sqlite3_finalize(stmt);
+            if (ret != SQLITE_OK)
+            {
+                Log::error("ServerLobby", "Error finalize database: %s",
+                    sqlite3_errmsg(m_db));
+            }
+        }
+        else
+        {
+            Log::error("ServerLobby", "Error preparing database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+#endif
+}   // testBannedForIP
+
+//-----------------------------------------------------------------------------
+void ServerLobby::testBannedForOnlineId(STKPeer* peer,
+                                        uint32_t online_id) const
+{
+#ifdef ENABLE_SQLITE3
+    if (!m_db || !m_online_id_ban_table_exists)
+        return;
+
+    int row_id = -1;
+    std::string query = StringUtils::insertValues(
+        "SELECT rowid, reason, description FROM %s "
+        "WHERE online_id = %u "
+        "AND datetime('now') > datetime(starting_time) AND "
+        "(expired_days is NULL OR datetime"
+        "(starting_time, '+'||expired_days||' days') > datetime('now')) "
+        "LIMIT 1;",
+        ServerConfig::m_online_id_ban_table.c_str(), online_id);
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            row_id = sqlite3_column_int(stmt, 0);
+            const char* reason = (char*)sqlite3_column_text(stmt, 1);
+            const char* desc = (char*)sqlite3_column_text(stmt, 2);
+            Log::info("ServerLobby", "%s banned by online id: %s "
+                "(online id: %u rowid: %d, description: %s).",
+                peer->getAddress().toString().c_str(), reason, online_id,
+                row_id, desc);
+            kickPlayerWithReason(peer, reason);
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error finalize database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database: %s",
+            sqlite3_errmsg(m_db));
+        return;
+    }
+    if (row_id != -1)
+    {
+        query = StringUtils::insertValues(
+            "UPDATE %s SET trigger_count = trigger_count + 1, "
+            "last_trigger = datetime('now') "
+            "WHERE online_id = %u;",
+            ServerConfig::m_online_id_ban_table.c_str(), online_id);
+        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+        if (ret == SQLITE_OK)
+        {
+            ret = sqlite3_step(stmt);
+            ret = sqlite3_finalize(stmt);
+            if (ret != SQLITE_OK)
+            {
+                Log::error("ServerLobby", "Error finalize database: %s",
+                    sqlite3_errmsg(m_db));
+            }
+        }
+        else
+        {
+            Log::error("ServerLobby", "Error preparing database: %s",
+                sqlite3_errmsg(m_db));
+        }
+    }
+#endif
+}   // testBannedForOnlineId
+
+//-----------------------------------------------------------------------------
+void ServerLobby::listBanTable()
+{
+#ifdef ENABLE_SQLITE3
+    if (!m_db)
+        return;
+    auto printer = [](void* data, int argc, char** argv, char** name)
+        {
+            for (int i = 0; i < argc; i++)
+            {
+                std::cout << name[i] << " = " << (argv[i] ? argv[i] : "NULL")
+                    << "\n";
+            }
+            std::cout << "\n";
+            return 0;
+        };
+    if (m_ip_ban_table_exists)
+    {
+        std::string query = "SELECT * FROM ";
+        query += ServerConfig::m_ip_ban_table;
+        query += ";";
+        std::cout << "IP ban list:\n";
+        sqlite3_exec(m_db, query.c_str(), printer, NULL, NULL);
+    }
+    if (m_online_id_ban_table_exists)
+    {
+        std::string query = "SELECT * FROM ";
+        query += ServerConfig::m_online_id_ban_table;
+        query += ";";
+        std::cout << "Online Id ban list:\n";
+        sqlite3_exec(m_db, query.c_str(), printer, NULL, NULL);
+    }
+#endif
+}   // listBanTable
 
 //-----------------------------------------------------------------------------
 bool ServerLobby::isBannedForIP(const TransportAddress& addr) const

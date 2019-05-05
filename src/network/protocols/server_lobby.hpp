@@ -34,6 +34,10 @@
 #include <set>
 #include <tuple>
 
+#ifdef ENABLE_SQLITE3
+#include <sqlite3.h>
+#endif
+
 class BareNetworkString;
 class NetworkString;
 class NetworkPlayerProfile;
@@ -66,6 +70,17 @@ private:
         irr::core::stringw m_name;
         bool m_tried = false;
     };
+#ifdef ENABLE_SQLITE3
+    sqlite3* m_db;
+
+    bool m_ip_ban_table_exists;
+
+    bool m_online_id_ban_table_exists;
+
+#endif
+    void initDatabase();
+
+    void destroyDatabase();
 
     std::atomic<ServerState> m_state;
 
@@ -305,6 +320,9 @@ private:
     void handleKartInfo(Event* event);
     void clientInGameWantsToBackLobby(Event* event);
     void clientSelectingAssetsWantsToBackLobby(Event* event);
+    void kickPlayerWithReason(STKPeer* peer, const char* reason) const;
+    void testBannedForIP(STKPeer* peer) const;
+    void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -333,6 +351,8 @@ public:
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
     void saveInitialItems();
+    void saveIPBanTable(const TransportAddress& addr);
+    void listBanTable();
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP
