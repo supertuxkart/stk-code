@@ -21,6 +21,7 @@
 #include "config/stk_config.hpp"
 #include "modes/world.hpp"
 #include "network/dummy_rewinder.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
@@ -246,8 +247,12 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // player might have a network hickup).
         if (NetworkConfig::get()->isServer() && (*i)->getTicks() < world_ticks)
         {
-            Log::warn("RewindQueue", "Server received at %d message from %d",
-                      world_ticks, (*i)->getTicks());
+            if (Network::m_connection_debug)
+            {
+                Log::warn("RewindQueue",
+                    "Server received at %d message from %d",
+                    world_ticks, (*i)->getTicks());
+            }
             // Server received an event in the past. Adjust this event
             // to be executed 'now' - at least we get a bit closer to the
             // client state.
