@@ -41,7 +41,7 @@
 #  include <ifaddrs.h>
 #endif
 
-const uint64_t SERVER_REFRESH_INTERVAL = 5000;
+const int64_t SERVER_REFRESH_INTERVAL = 5000;
 
 static ServersManager* g_manager_singleton(NULL);
 
@@ -246,7 +246,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
  */
 bool ServersManager::refresh(bool full_refresh)
 {
-    if (StkTime::getMonoTimeMs() - m_last_load_time.load()
+    if ((int64_t)StkTime::getMonoTimeMs() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
@@ -255,7 +255,7 @@ bool ServersManager::refresh(bool full_refresh)
 
     cleanUpServers();
     m_list_updated = false;
-    
+
     if (NetworkConfig::get()->isWAN())
     {
         Online::RequestManager::get()->addRequest(getWANRefreshRequest());

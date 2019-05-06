@@ -297,7 +297,7 @@ void STKHost::init()
     m_players_in_game.store(0);
     m_players_waiting.store(0);
     m_total_players.store(0);
-    m_network_timer.store(StkTime::getMonoTimeMs());
+    m_network_timer.store((int64_t)StkTime::getMonoTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
     m_network          = NULL;

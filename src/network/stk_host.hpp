@@ -151,7 +151,7 @@ private:
 
     std::atomic<uint32_t> m_total_players;
 
-    std::atomic<uint64_t> m_network_timer;
+    std::atomic<int64_t> m_network_timer;
 
     std::unique_ptr<NetworkTimerSynchronizer> m_nts;
 
@@ -351,7 +351,10 @@ public:
                   { return StkTime::getMonoTimeMs() - m_network_timer.load(); }
     // ------------------------------------------------------------------------
     void setNetworkTimer(uint64_t ticks)
-                   { m_network_timer.store(StkTime::getMonoTimeMs() - ticks); }
+    {
+        m_network_timer.store(
+            (int64_t)StkTime::getMonoTimeMs() - (int64_t)ticks);
+    }
     // ------------------------------------------------------------------------
     std::pair<int, int> getAllPlayersTeamInfo() const;
     // ------------------------------------------------------------------------
