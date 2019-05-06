@@ -301,6 +301,109 @@ void ServerLobby::initServerStatsTable()
     if (m_server_stats_table.empty())
         return;
 
+    // Default views:
+    // _full_stats
+    // Full stats with ip in human readable format and time played of each
+    // players in minutes
+    std::string view_name = std::string("v") +
+        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
+        ServerConfig::m_server_uid + "_full_stats";
+    std::ostringstream oss;
+    oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
+        << "    SELECT host_id, ip,\n"
+        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
+        << "    port, online_id, username, player_num, country_id, version,\n"
+        << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
+        << "    connected_time, disconnected_time, ping\n"
+        << "    FROM " << m_server_stats_table << ";";
+    query = oss.str();
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+    }
+
+    // _current_players
+    // Current players in server with ip in human readable format and time
+    // played of each players in minutes
+    view_name = std::string("v") +
+        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
+        ServerConfig::m_server_uid + "_current_players";
+    oss.str("");
+    oss.clear();
+    oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
+        << "    SELECT host_id, ip,\n"
+        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
+        << "    port, online_id, username, player_num, country_id, version,\n"
+        << "    ROUND((STRFTIME(\"%s\", 'now') - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
+        << "    connected_time, ping FROM " << m_server_stats_table << "\n"
+        << "    WHERE connected_time = disconnected_time;";
+    query = oss.str();
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+    }
+
+    // _player_stats
+    // All players with online id and username with their time played stats
+    // in this server since creation of this database
+    view_name = std::string("v") +
+        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
+        ServerConfig::m_server_uid + "_player_stats";
+    oss.str("");
+    oss.clear();
+    oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
+        << "    SELECT online_id, username, COUNT(online_id) AS num_connections,\n"
+        << "    ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
+        << "    ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
+        << "    ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
+        << "    ROUND(MAX((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS max_time_played\n"
+        << "    FROM " << m_server_stats_table << "\n"
+        << "    WHERE online_id != 0 GROUP BY online_id ORDER BY num_connections DESC;";
+    query = oss.str();
+    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+    }
+
     uint32_t last_host_id = 0;
     query = StringUtils::insertValues("SELECT MAX(host_id) FROM %s;",
         m_server_stats_table.c_str());

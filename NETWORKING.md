@@ -147,15 +147,17 @@ The current server configuration xml looks like this:
     <!-- Set how many states the server will send per second, the higher this value, the more bandwidth requires, also each client will trigger more rewind, which clients with slow device may have problem playing this server, use the default value is recommended. -->
     <state-frequency value="10" />
 
-    <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
-    <server-ip-ban-list>
-        <ban ip="0.0.0.0/0" expired-time="0"/>
-    </server-ip-ban-list>
+    <!-- Use sql to manage server stats and banlist, STK needs to be compiled with sqlite3 supported. -->
+    <sql-management value="false" />
 
-    <!-- online-id: online id for banning, expired-time: unix timestamp to expire, -1 (uint32_t max) for a permanent ban. -->
-    <server-online-id-ban-list>
-        <ban online-id="0" expired-time="0"/>
-    </server-online-id-ban-list>
+    <!-- Database filename for sqlite to use, it can be shared for servers creating in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
+    <database-file value="stkservers.db" />
+
+    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details. -->
+    <ip-ban-table value="ipban" />
+
+    <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details. -->
+    <online-id-ban-table value="onlineidban" />
 
 </server-config>
 
@@ -228,6 +230,17 @@ CREATE TABLE IF NOT EXISTS (table name above)
     ping INEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host
 ) WITHOUT ROWID;
 ```
+
+STK will also create the following default views from the stats table:
+
+`*_full_stats`
+Full stats with ip in human readable format and time played of each players in minutes.
+
+`*_current_players`
+Current players in server with ip in human readable format and time played of each players in minutes.
+
+`*_player_stats`
+All players with online id and username with their time played stats in this server since creation of this database.
 
 For IP or online ID ban list, you need to create one yourself:
 ```sql
