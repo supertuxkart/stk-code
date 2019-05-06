@@ -379,6 +379,8 @@ void ServerLobby::initServerStatsTable()
     oss.clear();
     oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
         << "    SELECT online_id, username, COUNT(online_id) AS num_connections,\n"
+        << "    MIN(connected_time) AS first_played_time,\n"
+        << "    MAX(connected_time) AS last_played_time,\n"
         << "    ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
         << "    ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
         << "    ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
