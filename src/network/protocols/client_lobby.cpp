@@ -422,7 +422,7 @@ void ClientLobby::update(int ticks)
         if (!m_received_server_result)
         {
             m_received_server_result = true;
-            m_auto_back_to_lobby_time = StkTime::getRealTimeMs() + 5000;
+            m_auto_back_to_lobby_time = StkTime::getMonoTimeMs() + 5000;
             // In case someone opened paused race dialog or menu in network game
             GUIEngine::ModalDialog::dismiss();
             GUIEngine::ScreenKeyboard::dismiss();
@@ -431,7 +431,7 @@ void ClientLobby::update(int ticks)
             World::getWorld()->enterRaceOverState();
         }
         if (NetworkConfig::get()->isAutoConnect() &&
-            StkTime::getRealTimeMs() > m_auto_back_to_lobby_time)
+            StkTime::getMonoTimeMs() > m_auto_back_to_lobby_time)
         {
             m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
             doneWithResults();

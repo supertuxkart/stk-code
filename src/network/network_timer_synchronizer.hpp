@@ -68,7 +68,7 @@ public:
             return;
         }
 
-        const uint64_t cur_time = StkTime::getRealTimeMs();
+        const uint64_t cur_time = StkTime::getMonoTimeMs();
         // Discard too close time compared to last ping
         // (due to resend when packet loss)
         // 10 packets per second as seen in STKHost

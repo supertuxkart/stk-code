@@ -502,7 +502,7 @@ void MultitouchDevice::updateOrientationFromGyroscope(float z)
 {
     const float GYRO_SPEED_THRESHOLD = 0.005f;
 
-    uint64_t now = StkTime::getRealTimeMs();
+    uint64_t now = StkTime::getMonoTimeMs();
     uint64_t delta = now - m_gyro_time;
     m_gyro_time = now;
     float timedelta = (float)delta / 1000.f;

@@ -90,14 +90,14 @@ void ConnectToServer::getClientServerInfo()
     assert(m_server);
     // Allow up to 10 seconds for the separate process to fully start-up
     bool started = false;
-    uint64_t timeout = StkTime::getRealTimeMs() + 10000;
+    uint64_t timeout = StkTime::getMonoTimeMs() + 10000;
     const std::string& sid = NetworkConfig::get()->getServerIdFile();
     assert(!sid.empty());
     const std::string dir = StringUtils::getPath(sid);
     const std::string server_id_file = StringUtils::getBasename(sid);
     uint16_t port = 0;
     unsigned server_id = 0;
-    while (StkTime::getRealTimeMs() < timeout)
+    while (StkTime::getMonoTimeMs() < timeout)
     {
         std::set<std::string> files;
         file_manager->listFiles(files, dir);

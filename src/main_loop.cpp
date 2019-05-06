@@ -118,7 +118,7 @@ float MainLoop::getLimitedDt()
 
     while( 1 )
     {
-        m_curr_time = StkTime::getRealTimeMs();
+        m_curr_time = StkTime::getMonoTimeMs();
         if (m_prev_time > m_curr_time)
         {
             m_prev_time = m_curr_time;
@@ -157,7 +157,7 @@ float MainLoop::getLimitedDt()
         while (dt == 0)
         {
             StkTime::sleep(1);
-            m_curr_time = StkTime::getRealTimeMs();
+            m_curr_time = StkTime::getMonoTimeMs();
             if (m_prev_time > m_curr_time)
             {
                 Log::error("MainLopp", "System clock keeps backwards!");
@@ -313,7 +313,7 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
  */
 void MainLoop::run()
 {
-    m_curr_time = StkTime::getRealTimeMs();
+    m_curr_time = StkTime::getMonoTimeMs();
     // DT keeps track of the leftover time, since the race update
     // happens in fixed timesteps
     float left_over_time = 0;
@@ -525,7 +525,7 @@ void MainLoop::run()
                     // in CutsceneWorld::enterRaceOverState
                     // Reset the timer for correct time for cutscene
                     m_frame_before_loading_world = false;
-                    m_curr_time = StkTime::getRealTimeMs();
+                    m_curr_time = StkTime::getMonoTimeMs();
                     left_over_time = 0.0f;
                     break;
                 }
@@ -553,7 +553,7 @@ void MainLoop::run()
                 {
                     // irr_driver->getDevice()->run() loads the world
                     m_frame_before_loading_world = false;
-                    m_curr_time = StkTime::getRealTimeMs();
+                    m_curr_time = StkTime::getMonoTimeMs();
                     left_over_time = 0.0f;
                 }
 
@@ -608,7 +608,7 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
         return;
     }
 
-    uint64_t now = StkTime::getRealTimeMs();
+    uint64_t now = StkTime::getMonoTimeMs();
     float dt = (now - m_curr_time)/1000.0f;
     
     if (dt < 1.0 / 30.0f) return;
@@ -624,7 +624,7 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
     m_request_abort = !irr_driver->getDevice()->run();
     
     //TODO: remove debug output
-    // uint64_t now2 = StkTime::getRealTimeMs();
+    // uint64_t now2 = StkTime::getMonoTimeMs();
     // Log::verbose("mainloop", "  duration t %llu dt %llu", now, now2-now);
 #endif
 }   // renderGUI

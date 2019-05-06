@@ -674,7 +674,7 @@ void TracksScreen::onUpdate(float dt)
     {
         int list_id =
             m_vote_list->getItemID(StringUtils::toString(m_winning_index));
-        //if (StkTime::getRealTimeMs() / 1000 % 2 == 0)
+        //if (StkTime::getMonoTimeMs() / 1000 % 2 == 0)
             m_vote_list->setSelectionID(list_id);
         //else
         //    m_vote_list->unfocused(PLAYER_ID_GAME_MASTER, NULL);

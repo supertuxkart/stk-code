@@ -348,10 +348,10 @@ public:
                                                         { return m_nts.get(); }
     // ------------------------------------------------------------------------
     uint64_t getNetworkTimer() const
-                  { return StkTime::getRealTimeMs() - m_network_timer.load(); }
+                  { return StkTime::getMonoTimeMs() - m_network_timer.load(); }
     // ------------------------------------------------------------------------
     void setNetworkTimer(uint64_t ticks)
-                   { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
+                   { m_network_timer.store(StkTime::getMonoTimeMs() - ticks); }
     // ------------------------------------------------------------------------
     std::pair<int, int> getAllPlayersTeamInfo() const;
     // ------------------------------------------------------------------------

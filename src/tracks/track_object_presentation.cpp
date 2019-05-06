@@ -1142,7 +1142,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
-    if (m_reenable_timeout > StkTime::getRealTimeMs())
+    if (m_reenable_timeout > StkTime::getMonoTimeMs())
     {
         return;
     }

@@ -142,7 +142,7 @@ public:
     uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
     float getConnectedTime() const
-       { return float(StkTime::getRealTimeMs() - m_connected_time) / 1000.0f; }
+       { return float(StkTime::getMonoTimeMs() - m_connected_time) / 1000.0f; }
     // ------------------------------------------------------------------------
     void setAvailableKartsTracks(std::set<std::string>& k,
                                  std::set<std::string>& t)
@@ -225,12 +225,12 @@ public:
     const std::string& getUserVersion() const        { return m_user_version; }
     // ------------------------------------------------------------------------
     void updateLastActivity()
-                  { m_last_activity.store((int64_t)StkTime::getRealTimeMs()); }
+                  { m_last_activity.store((int64_t)StkTime::getMonoTimeMs()); }
     // ------------------------------------------------------------------------
     int idleForSeconds() const
     {
         int64_t diff =
-            (int64_t)StkTime::getRealTimeMs() - m_last_activity.load();
+            (int64_t)StkTime::getMonoTimeMs() - m_last_activity.load();
         if (diff < 0)
             return 0;
         return (int)(diff / 1000);

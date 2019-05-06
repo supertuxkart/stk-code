@@ -296,9 +296,9 @@ void NetworkingLobby::onUpdate(float delta)
     m_config_button->setImage(m_config_texture);
     m_client_live_joinable = false;
 
-    if (m_player_list && StkTime::getRealTimeMs() > m_ping_update_timer)
+    if (m_player_list && StkTime::getMonoTimeMs() > m_ping_update_timer)
     {
-        m_ping_update_timer = StkTime::getRealTimeMs() + 2000;
+        m_ping_update_timer = StkTime::getMonoTimeMs() + 2000;
         updatePlayerPings();
     }
 
@@ -415,7 +415,7 @@ void NetworkingLobby::onUpdate(float delta)
         if (cur_player >= m_min_start_game_players &&
             m_cur_starting_timer == std::numeric_limits<int64_t>::max())
         {
-            m_cur_starting_timer = (int64_t)StkTime::getRealTimeMs() +
+            m_cur_starting_timer = (int64_t)StkTime::getMonoTimeMs() +
                 (int64_t)(m_start_timeout * 1000.0);
         }
         else if (cur_player < m_min_start_game_players)
@@ -433,7 +433,7 @@ void NetworkingLobby::onUpdate(float delta)
         if (m_cur_starting_timer != std::numeric_limits<int64_t>::max())
         {
             int64_t remain = (m_cur_starting_timer -
-                (int64_t)StkTime::getRealTimeMs()) / 1000;
+                (int64_t)StkTime::getMonoTimeMs()) / 1000;
             if (remain < 0)
                 remain = 0;
             //I18N: In the networking lobby, display the starting timeout
@@ -752,5 +752,5 @@ void NetworkingLobby::initAutoStartTimer(bool grand_prix_started,
 void NetworkingLobby::setStartingTimerTo(float t)
 {
     m_cur_starting_timer =
-        (int64_t)StkTime::getRealTimeMs() + (int64_t)(t * 1000.0f);
+        (int64_t)StkTime::getMonoTimeMs() + (int64_t)(t * 1000.0f);
 }   // setStartingTimerTo

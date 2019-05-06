@@ -163,7 +163,7 @@ void LobbyProtocol::setup()
 void LobbyProtocol::startVotingPeriod(float max_time)
 {
     m_max_voting_time = uint64_t(max_time*1000);
-    m_end_voting_period.store(StkTime::getRealTimeMs() + m_max_voting_time);
+    m_end_voting_period.store(StkTime::getMonoTimeMs() + m_max_voting_time);
 }   // startVotingPeriod
 
 //-----------------------------------------------------------------------------
@@ -171,9 +171,9 @@ void LobbyProtocol::startVotingPeriod(float max_time)
 float LobbyProtocol::getRemainingVotingTime()
 {
     if (m_end_voting_period.load() == 0 ||
-        StkTime::getRealTimeMs() >= m_end_voting_period.load())
+        StkTime::getMonoTimeMs() >= m_end_voting_period.load())
         return 0.0f;
-    uint64_t t = m_end_voting_period.load() - StkTime::getRealTimeMs();
+    uint64_t t = m_end_voting_period.load() - StkTime::getMonoTimeMs();
     return t / 1000.0f;
 }   // getRemainingVotingTime
 
@@ -182,7 +182,7 @@ float LobbyProtocol::getRemainingVotingTime()
 bool LobbyProtocol::isVotingOver()
 {
     return m_end_voting_period.load() != 0 &&
-        m_end_voting_period.load() < StkTime::getRealTimeMs();
+        m_end_voting_period.load() < StkTime::getMonoTimeMs();
 }   // isVotingOver
 
 //-----------------------------------------------------------------------------

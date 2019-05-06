@@ -478,9 +478,9 @@ void* SFXManager::mainLoop(void *obj)
         {
             // Wait some time to let other threads run, then queue an
             // update event to keep music playing.
-            uint64_t t = StkTime::getRealTimeMs();
+            uint64_t t = StkTime::getMonoTimeMs();
             StkTime::sleep(1);
-            t = StkTime::getRealTimeMs() - t;
+            t = StkTime::getMonoTimeMs() - t;
             me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t / 1000.0));
         }
         me->m_sfx_commands.lock();
@@ -838,11 +838,11 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
     if (m_last_update_time == std::numeric_limits<uint64_t>::max())
     {
         // first time
-        m_last_update_time = StkTime::getRealTimeMs();
+        m_last_update_time = StkTime::getMonoTimeMs();
     }
 
     uint64_t previous_update_time = m_last_update_time;
-    m_last_update_time = StkTime::getRealTimeMs();
+    m_last_update_time = StkTime::getMonoTimeMs();
     float dt = float(m_last_update_time - previous_update_time) / 1000.0f;
 
     assert(current->m_command==SFX_UPDATE);

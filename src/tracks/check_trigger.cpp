@@ -32,7 +32,7 @@ CheckTrigger::CheckTrigger(const Vec3& center, float distance,
               m_center(center), m_distance2(distance * distance),
               m_triggering_function(triggering_function)
 {
-    m_last_triggered_time = StkTime::getRealTimeMs();
+    m_last_triggered_time = StkTime::getMonoTimeMs();
 }   // CheckSphere
 
 // ----------------------------------------------------------------------------
@@ -44,12 +44,12 @@ bool CheckTrigger::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     // kart_id will be -1 if called by CheckManager::getChecklineTriggering
     if (kart_id < 0 || kart_id >= (int)World::getWorld()->getNumKarts())
         return false;
-    if (m_last_triggered_time + 2000 > StkTime::getRealTimeMs())
+    if (m_last_triggered_time + 2000 > StkTime::getMonoTimeMs())
         return false;
     AbstractKart* k = World::getWorld()->getKart(kart_id);
     if ((k->getXYZ() - m_center).length2() < m_distance2)
     {
-        m_last_triggered_time = StkTime::getRealTimeMs();
+        m_last_triggered_time = StkTime::getMonoTimeMs();
         return true;
     }
     return false;

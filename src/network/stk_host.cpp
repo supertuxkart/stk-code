@@ -297,7 +297,7 @@ void STKHost::init()
     m_players_in_game.store(0);
     m_players_waiting.store(0);
     m_total_players.store(0);
-    m_network_timer.store(StkTime::getRealTimeMs());
+    m_network_timer.store(StkTime::getMonoTimeMs());
     m_shutdown         = false;
     m_authorised       = false;
     m_network          = NULL;
@@ -435,7 +435,7 @@ void STKHost::setPublicAddress()
         }
 
         m_network->sendRawPacket(s, m_stun_address);
-        uint64_t ping = StkTime::getRealTimeMs();
+        uint64_t ping = StkTime::getMonoTimeMs();
         freeaddrinfo(res);
 
         // Recieve now
@@ -443,7 +443,7 @@ void STKHost::setPublicAddress()
         const int LEN = 2048;
         char buffer[LEN];
         int len = m_network->receiveRawPacket(buffer, LEN, &sender, 2000);
-        ping = StkTime::getRealTimeMs() - ping;
+        ping = StkTime::getMonoTimeMs() - ping;
 
         if (sender.getIP() != m_stun_address.getIP())
         {
@@ -614,7 +614,7 @@ void STKHost::disconnectAllPeers(bool timeout_waiting)
         for (auto peer : m_peers)
             peer.second->disconnect();
         // Wait for at most 2 seconds for disconnect event to be generated
-        m_exit_timeout.store(StkTime::getRealTimeMs() + 2000);
+        m_exit_timeout.store(StkTime::getMonoTimeMs() + 2000);
     }
     m_peers.clear();
 }   // disconnectAllPeers
@@ -708,25 +708,25 @@ void STKHost::mainLoop()
         }
     }
 
-    uint64_t last_ping_time = StkTime::getRealTimeMs();
-    uint64_t last_update_speed_time = StkTime::getRealTimeMs();
-    uint64_t last_ping_time_update_for_client = StkTime::getRealTimeMs();
+    uint64_t last_ping_time = StkTime::getMonoTimeMs();
+    uint64_t last_update_speed_time = StkTime::getMonoTimeMs();
+    uint64_t last_ping_time_update_for_client = StkTime::getMonoTimeMs();
     std::map<std::string, uint64_t> ctp;
-    while (m_exit_timeout.load() > StkTime::getRealTimeMs())
+    while (m_exit_timeout.load() > StkTime::getMonoTimeMs())
     {
         // Clear outdated connect to peer list every 15 seconds
         for (auto it = ctp.begin(); it != ctp.end();)
         {
-            if (it->second + 15000 < StkTime::getRealTimeMs())
+            if (it->second + 15000 < StkTime::getMonoTimeMs())
                 it = ctp.erase(it);
             else
                 it++;
         }
 
-        if (last_update_speed_time < StkTime::getRealTimeMs())
+        if (last_update_speed_time < StkTime::getMonoTimeMs())
         {
             // Update upload / download speed per second
-            last_update_speed_time = StkTime::getRealTimeMs() + 1000;
+            last_update_speed_time = StkTime::getMonoTimeMs() + 1000;
             m_upload_speed.store(getNetwork()->getENetHost()->totalSentData);
             m_download_speed.store(
                 getNetwork()->getENetHost()->totalReceivedData);
@@ -754,11 +754,11 @@ void STKHost::mainLoop()
             const float timeout = ServerConfig::m_validation_timeout;
             bool need_ping = false;
             if (sl && (!sl->isRacing() || sl->allowJoinedPlayersWaiting()) &&
-                last_ping_time < StkTime::getRealTimeMs())
+                last_ping_time < StkTime::getMonoTimeMs())
             {
                 // If not racing, send an reliable packet at the 10 packets
                 // per second, which is for accurate ping calculation by enet
-                last_ping_time = StkTime::getRealTimeMs() +
+                last_ping_time = StkTime::getMonoTimeMs() +
                     (uint64_t)((1.0f / 10.0f) * 1000.0f);
                 need_ping = true;
             }
@@ -909,10 +909,10 @@ void STKHost::mainLoop()
         {
             auto lp = LobbyProtocol::get<LobbyProtocol>();
             if (!is_server &&
-                last_ping_time_update_for_client < StkTime::getRealTimeMs())
+                last_ping_time_update_for_client < StkTime::getMonoTimeMs())
             {
                 last_ping_time_update_for_client =
-                    StkTime::getRealTimeMs() + 2000;
+                    StkTime::getMonoTimeMs() + 2000;
                 if (lp && lp->isRacing())
                 {
                     auto p = getServerPeerForClient();
@@ -1070,7 +1070,7 @@ void STKHost::mainLoop()
             else
                 delete stk_event;
         }   // while enet_host_service
-    }   // while m_exit_timeout.load() > StkTime::getRealTimeMs()
+    }   // while m_exit_timeout.load() > StkTime::getMonoTimeMs()
     delete direct_socket;
     Log::info("STKHost", "Listening has been stopped.");
 }   // mainLoop
@@ -1140,7 +1140,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         }
         if (ctp.find(peer_addr) == ctp.end())
         {
-            ctp[peer_addr] = StkTime::getRealTimeMs();
+            ctp[peer_addr] = StkTime::getMonoTimeMs();
             std::make_shared<ConnectToPeer>(sender)->requestStart();
         }
     }

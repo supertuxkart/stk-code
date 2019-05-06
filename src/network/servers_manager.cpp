@@ -157,7 +157,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             char buffer[LEN];
             // Wait for up to 0.5 seconds to receive an answer from 
             // any local servers.
-            uint64_t start_time = StkTime::getRealTimeMs();
+            uint64_t start_time = StkTime::getMonoTimeMs();
             const uint64_t DURATION = 1000;
             const auto& servers = ServersManager::get()->getServers();
             int cur_server_id = (int)servers.size();
@@ -168,7 +168,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             // because e.g. a local client would answer as 127.0.0.1 and
             // 192.168.**.
             std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
-            while (StkTime::getRealTimeMs() - start_time < DURATION)
+            while (StkTime::getMonoTimeMs() - start_time < DURATION)
             {
                 TransportAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
@@ -236,7 +236,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
 {
     m_servers.clear();
     for (auto i : servers) m_servers.emplace_back(i.second);
-    m_last_load_time.store(StkTime::getRealTimeMs());
+    m_last_load_time.store(StkTime::getMonoTimeMs());
     m_list_updated = true;
 
 }
@@ -246,7 +246,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
  */
 bool ServersManager::refresh(bool full_refresh)
 {
-    if (StkTime::getRealTimeMs() - m_last_load_time.load()
+    if (StkTime::getMonoTimeMs() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
@@ -305,7 +305,7 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
         }
         m_servers.emplace_back(std::make_shared<Server>(*s));
     }
-    m_last_load_time.store(StkTime::getRealTimeMs());
+    m_last_load_time.store(StkTime::getMonoTimeMs());
     m_list_updated = true;
 }   // refresh
 

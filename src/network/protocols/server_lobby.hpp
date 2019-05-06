@@ -246,7 +246,7 @@ private:
     }
     void addPeerConnection(const std::string& addr_str)
     {
-        m_pending_peer_connection[addr_str] = StkTime::getRealTimeMs();
+        m_pending_peer_connection[addr_str] = StkTime::getMonoTimeMs();
     }
     void removeExpiredPeerConnection()
     {
@@ -255,7 +255,7 @@ private:
         for (auto it = m_pending_peer_connection.begin();
              it != m_pending_peer_connection.end();)
         {
-            if (StkTime::getRealTimeMs() - it->second > 45000)
+            if (StkTime::getMonoTimeMs() - it->second > 45000)
                 it = m_pending_peer_connection.erase(it);
             else
                 it++;

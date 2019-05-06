@@ -124,7 +124,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     }
 
     m_rs_state.store(RS_NONE);
-    m_last_success_poll_time.store(StkTime::getRealTimeMs() + 30000);
+    m_last_success_poll_time.store(StkTime::getMonoTimeMs() + 30000);
     m_server_owner_id.store(-1);
     m_registered_for_once_only = false;
     m_has_created_server_id_file = false;
@@ -809,7 +809,7 @@ void ServerLobby::asynchronousUpdate()
 
     if (NetworkConfig::get()->isWAN() &&
         allowJoinedPlayersWaiting() && m_server_recovering.expired() &&
-        StkTime::getRealTimeMs() > m_last_success_poll_time.load() + 30000)
+        StkTime::getMonoTimeMs() > m_last_success_poll_time.load() + 30000)
     {
         Log::warn("ServerLobby", "Trying auto server recovery.");
         registerServer(false/*now*/);
@@ -874,7 +874,7 @@ void ServerLobby::asynchronousUpdate()
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
             {
-                m_timeout.store((int64_t)StkTime::getRealTimeMs() +
+                m_timeout.store((int64_t)StkTime::getMonoTimeMs() +
                     (int64_t)
                     (ServerConfig::m_start_game_counter * 1000.0f));
             }
@@ -886,7 +886,7 @@ void ServerLobby::asynchronousUpdate()
                     updatePlayerList();
                 m_timeout.store(std::numeric_limits<int64_t>::max());
             }
-            if (m_timeout.load() < (int64_t)StkTime::getRealTimeMs() ||
+            if (m_timeout.load() < (int64_t)StkTime::getMonoTimeMs() ||
                 (checkPeersReady() &&
                 (int)players >= ServerConfig::m_min_start_game_players))
             {
@@ -1563,14 +1563,14 @@ void ServerLobby::update(int ticks)
         resetPeersReady();
         // Set the delay before the server forces all clients to exit the race
         // result screen and go back to the lobby
-        m_timeout.store((int64_t)StkTime::getRealTimeMs() + 15000);
+        m_timeout.store((int64_t)StkTime::getMonoTimeMs() + 15000);
         m_state = RESULT_DISPLAY;
         sendMessageToPeers(m_result_ns, /*reliable*/ true);
         Log::info("ServerLobby", "End of game message sent");
         break;
     case RESULT_DISPLAY:
         if (checkPeersReady() ||
-            (int64_t)StkTime::getRealTimeMs() > m_timeout.load())
+            (int64_t)StkTime::getMonoTimeMs() > m_timeout.load())
         {
             // Send a notification to all clients to exit
             // the race result screen
@@ -1635,7 +1635,7 @@ bool ServerLobby::registerServer(bool now)
                 Log::info("ServerLobby",
                     "Server %d is now online.", server_id_online);
                 sl->m_server_id_online.store(server_id_online);
-                sl->m_last_success_poll_time.store(StkTime::getRealTimeMs());
+                sl->m_last_success_poll_time.store(StkTime::getMonoTimeMs());
                 return;
             }
             Log::error("ServerLobby", "%s",
@@ -1933,8 +1933,8 @@ void ServerLobby::checkIncomingConnectionRequests()
     // First poll every 5 seconds. Return if no polling needs to be done.
     const uint64_t POLL_INTERVAL = 5000;
     static uint64_t last_poll_time = 0;
-    if (StkTime::getRealTimeMs() < last_poll_time + POLL_INTERVAL ||
-        StkTime::getRealTimeMs() > m_last_success_poll_time.load() + 30000 ||
+    if (StkTime::getMonoTimeMs() < last_poll_time + POLL_INTERVAL ||
+        StkTime::getMonoTimeMs() > m_last_success_poll_time.load() + 30000 ||
         m_server_id_online.load() == 0)
         return;
 
@@ -1948,7 +1948,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     }
 
     // Now poll the stk server
-    last_poll_time = StkTime::getRealTimeMs();
+    last_poll_time = StkTime::getMonoTimeMs();
 
     // ========================================================================
     class PollServerRequest : public Online::XMLRequest
@@ -1975,7 +1975,7 @@ void ServerLobby::checkIncomingConnectionRequests()
             auto sl = m_server_lobby.lock();
             if (!sl)
                 return;
-            sl->m_last_success_poll_time.store(StkTime::getRealTimeMs());
+            sl->m_last_success_poll_time.store(StkTime::getMonoTimeMs());
             if (sl->m_state.load() != WAITING_FOR_START_GAME &&
                 !sl->allowJoinedPlayersWaiting())
             {
@@ -2758,7 +2758,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     else
     {
         auto_start_timer =
-            (m_timeout.load() - (int64_t)StkTime::getRealTimeMs()) / 1000.0f;
+            (m_timeout.load() - (int64_t)StkTime::getMonoTimeMs()) / 1000.0f;
     }
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId())
         .addUInt32(ServerConfig::m_server_version);

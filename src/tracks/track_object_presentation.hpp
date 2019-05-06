@@ -412,20 +412,20 @@ public:
     // ------------------------------------------------------------------------
     /** Reset the trigger (i.e. sets it to active again). */
     virtual void reset() OVERRIDE 
-                             { m_reenable_timeout = StkTime::getRealTimeMs(); }
+                             { m_reenable_timeout = StkTime::getMonoTimeMs(); }
     // ------------------------------------------------------------------------
-    /** Sets the trigger to be enabled or disabled. getRealTimeMs is used to
+    /** Sets the trigger to be enabled or disabled. getMonoTimeMs is used to
      *  to avoid called update which duplicated in network rewinding. */
     virtual void setEnable(bool status) OVERRIDE
     {
-        m_reenable_timeout = status ? StkTime::getRealTimeMs() :
+        m_reenable_timeout = status ? StkTime::getMonoTimeMs() :
             std::numeric_limits<uint64_t>::max();
     }
     // ------------------------------------------------------------------------
     void setReenableTimeout(float time)
     {
         m_reenable_timeout =
-            StkTime::getRealTimeMs() + (uint64_t)(time * 1000.0f);
+            StkTime::getMonoTimeMs() + (uint64_t)(time * 1000.0f);
     }
 };   // class TrackObjectPresentationActionTrigger
 

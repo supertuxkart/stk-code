@@ -72,7 +72,7 @@ void NetworkKartSelectionScreen::init()
  */
 void NetworkKartSelectionScreen::onUpdate(float dt)
 {
-    if (StkTime::getRealTimeMs() > m_exit_timeout)
+    if (StkTime::getMonoTimeMs() > m_exit_timeout)
     {
         // Reset the screen to networking menu if failed to back to lobby
         STKHost::get()->shutdown();
@@ -154,7 +154,7 @@ bool NetworkKartSelectionScreen::onEscapePressed()
         {
             // Send go back lobby event to server with an exit timeout, so if
             // server doesn't react in time we exit the server
-            m_exit_timeout = StkTime::getRealTimeMs() + 5000;
+            m_exit_timeout = StkTime::getMonoTimeMs() + 5000;
             NetworkString back(PROTOCOL_LOBBY_ROOM);
             back.addUInt8(LobbyProtocol::LE_CLIENT_BACK_LOBBY);
             STKHost::get()->sendToServer(&back, true);
