@@ -4,7 +4,7 @@
         <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
         I18N="Splitscreen player in network" text="Add player"/>
 
-        <spacer height="8%" width="10"/>
+        <spacer height="2f" width="10"/>
 
         <div width="100%" align="center" layout="horizontal-row" height="fit" >
             <div proportion="1" align="center" layout="horizontal-row" height="fit" >
