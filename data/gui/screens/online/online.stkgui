@@ -39,5 +39,5 @@
 
     </div>
     
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="0" y="0" height="2f" icon="gui/icons/back.png"/>
 </stkgui>
