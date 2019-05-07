@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="0%" y="0%" width="100%" height="98%" layout="vertical-row" >
-        <div x="0" y="0" width="100%" layout="horizontal-row" height="9%">
+        <div x="0" y="0" width="100%" layout="horizontal-row" height="2f">
             <icon-button id="back"   height="100%" icon="gui/icons/back.png"/>
             <header text_align="center" proportion="1" text="SuperTuxKart Addons" align="center"/>
             <icon-button id="reload"   height="90%" icon="gui/icons/restart.png"/>
         </div>
 
-        <box id="filter_box" width="97%" height="8%" max_height="120" layout="vertical-row" align="center">
+        <box id="filter_box" width="97%" height="2f" max_height="120" layout="vertical-row" align="center">
             <div x="0" y="0" width="98%" height="100%" layout="horizontal-row" align="center">
                 <textbox id="filter_name" proportion="7" align="center" />
-                <spacer width="25" />
+                <spacer width="1f" />
                 <label text="Updated" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only recently updated items"/>
-                <spacer width="15" />
+                <spacer width="1f" />
                 <spinner id="filter_date" proportion="8" align="center" min_value="0" wrap_around="true"/>
-                <spacer width="15" />
+                <spacer width="1f" />
                 <label text="Rating >=" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only items with good rating"/>
-                <spacer width="15" />
+                <spacer width="1f" />
                 <spinner id="filter_rating" proportion="5" align="center" min_value="0" wrap_around="true"/>
                 <icon-button id="filter_search" height="100%" icon="gui/icons/search.png"/>
             </div>
