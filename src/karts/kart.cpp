@@ -384,6 +384,7 @@ void Kart::reset()
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
     m_ticks_last_crash     = 0;
+    m_ticks_last_zipper    = 0;
     m_speed                = 0.0f;
     m_current_lean         = 0.0f;
     m_falling_time         = 0.0f;
@@ -2247,8 +2248,10 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      stk_config->time2Ticks(duration),
                                      stk_config->time2Ticks(fade_out_time));
     // Play custom character sound (weee!)
-    if (!RewindManager::get()->isRewinding())
+    int zipper_ticks = World::getWorld()->getTicksSinceStart();
+    if (zipper_ticks > m_ticks_last_zipper)
     {
+        m_ticks_last_zipper = zipper_ticks;
         playCustomSFX(SFXManager::CUSTOM_ZIPPER);
         m_controller->handleZipper(play_sound);
     }

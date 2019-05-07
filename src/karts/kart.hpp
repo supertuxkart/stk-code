@@ -271,7 +271,10 @@ protected:
     SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
     SFXBuffer    *m_goo_sound;
     SFXBuffer    *m_boing_sound;
+    /* Used to avoid re-play the sound during rewinding, if it's happening at
+     * the same ticks. */
     int          m_ticks_last_crash;
+    int          m_ticks_last_zipper;
     RaceManager::KartType m_type;
 
     void          updatePhysics(int ticks);
