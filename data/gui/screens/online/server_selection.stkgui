@@ -2,7 +2,7 @@
 <stkgui>
     <div x="0%" y="0%" width="100%" height="98%" layout="vertical-row" >
 
-        <div x="0" y="0" width="100%" layout="horizontal-row" height="8%">
+        <div x="0" y="0" width="100%" layout="horizontal-row" height="2f">
             <icon-button id="back"   height="100%" icon="gui/icons/back.png"/>
             <header text_align="center" proportion="1" text="Server Selection" align="center"/>
             <icon-button id="reload"   height="90%" icon="gui/icons/restart.png"/>
