@@ -645,6 +645,8 @@ void NetworkingLobby::updatePlayers()
     // initialisation
     if (!m_player_list)
         return;
+
+    std::string selected_name = m_player_list->getSelectionInternalName();
     m_player_list->clear();
     m_player_names.clear();
 
@@ -683,6 +685,12 @@ void NetworkingLobby::updatePlayers()
         m_player_names[internal_name] = player;
     }
     updatePlayerPings();
+    if (!selected_name.empty())
+    {
+        int id = m_player_list->getItemID(selected_name);
+        if (id != -1)
+            m_player_list->setSelectionID(id);
+    }
 }   // updatePlayers
 
 // ----------------------------------------------------------------------------
