@@ -169,6 +169,7 @@ ServerLobby::~ServerLobby()
 void ServerLobby::initDatabase()
 {
 #ifdef ENABLE_SQLITE3
+    m_last_cleanup_db_time = StkTime::getMonoTimeMs();
     m_db = NULL;
     sqlite3_stmt* stmt = NULL;;
     m_ip_ban_table_exists = false;
@@ -438,7 +439,7 @@ void ServerLobby::initServerStatsTable()
 
     // Update disconnected time (if stk crashed it will not be written)
     query = StringUtils::insertValues(
-        "UPDATE %s SET disconnected_time = datetime('now')"
+        "UPDATE %s SET disconnected_time = datetime('now') "
         "WHERE connected_time = disconnected_time;",
         m_server_stats_table.c_str());
     ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
@@ -782,6 +783,81 @@ void ServerLobby::createServerIdFile()
 }   // createServerIdFile
 
 //-----------------------------------------------------------------------------
+#ifdef ENABLE_SQLITE3
+/* Every 1 minute STK will clean up database:
+ * 1. Set disconnected time to now for non-exists host.
+ */
+void ServerLobby::cleanupDatabase()
+{
+    if (!ServerConfig::m_sql_management || !m_db)
+        return;
+
+    if (StkTime::getMonoTimeMs() < m_last_cleanup_db_time + 60000)
+        return;
+
+    m_last_cleanup_db_time = StkTime::getMonoTimeMs();
+
+    if (m_server_stats_table.empty())
+        return;
+
+    std::string query;
+    auto peers = STKHost::get()->getPeers();
+    std::vector<uint32_t> exist_hosts;
+    if (!peers.empty())
+    {
+        for (auto& peer : peers)
+        {
+            if (!peer->isValidated())
+                continue;
+            exist_hosts.push_back(peer->getHostId());
+        }
+    }
+    if (peers.empty() || exist_hosts.empty())
+    {
+        query = StringUtils::insertValues(
+            "UPDATE %s SET disconnected_time = datetime('now') "
+            "WHERE connected_time = disconnected_time;",
+            m_server_stats_table.c_str());
+    }
+    else
+    {
+        std::ostringstream oss;
+        oss << "UPDATE " << m_server_stats_table
+            << "    SET disconnected_time = datetime('now')"
+            << "    WHERE connected_time = disconnected_time AND"
+            << "    host_id NOT IN (";
+        for (unsigned i = 0; i < exist_hosts.size(); i++)
+        {
+            oss << exist_hosts[i];
+            if (i != (exist_hosts.size() - 1))
+                oss << ",";
+        }
+        oss << ");";
+        query = oss.str();
+    }
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+    }
+}   // cleanupDatabase
+#endif
+
+//-----------------------------------------------------------------------------
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
@@ -791,6 +867,10 @@ void ServerLobby::asynchronousUpdate()
         resetServer();
         m_rs_state.store(RS_NONE);
     }
+
+#ifdef ENABLE_SQLITE3
+    cleanupDatabase();
+#endif
 
     // Check if server owner has left
     updateServerOwner();

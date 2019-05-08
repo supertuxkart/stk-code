@@ -79,6 +79,9 @@ private:
 
     bool m_online_id_ban_table_exists;
 
+    uint64_t m_last_cleanup_db_time;
+
+    void cleanupDatabase();
 #endif
     void initDatabase();
 
@@ -130,10 +133,6 @@ private:
 
     /** Timeout counter for various state. */
     std::atomic<int64_t> m_timeout;
-
-    /** Lock this mutex whenever a client is connect / disconnect or
-     *  starting race. */
-    mutable std::mutex m_connection_mutex;
 
     TransportAddress m_server_address;
 
@@ -333,8 +332,6 @@ public:
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();
-    std::unique_lock<std::mutex> acquireConnectionMutex() const
-                   { return std::unique_lock<std::mutex>(m_connection_mutex); }
     bool waitingForPlayers() const;
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
