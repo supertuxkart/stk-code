@@ -222,12 +222,12 @@ CREATE TABLE IF NOT EXISTS (table name above)
     port INTEGER UNSIGNED NOT NULL, -- Port of host
     online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)
     username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)
-    player_num INEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player
+    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player
     country_id TEXT NULL DEFAULT NULL, -- Country id of the host
     version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)
     connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected
     disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)
-    ping INEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host
+    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host
 ) WITHOUT ROWID;
 ```
 
@@ -252,7 +252,7 @@ CREATE TABLE ipban
     expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
     reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
     description TEXT NOT NULL DEFAULT '', -- Private description for server admin
-    trigger_count INEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    trigger_count INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
     last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
 );
 
@@ -263,7 +263,7 @@ CREATE TABLE onlineidban
     expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
     reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
     description TEXT NOT NULL DEFAULT '', -- Private description for server admin
-    trigger_count INEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    trigger_count INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
     last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
 );
 ```

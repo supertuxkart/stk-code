@@ -272,12 +272,12 @@ void ServerLobby::initServerStatsTable()
         "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
         "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
         "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
-        "    player_num INEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
+        "    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
         "    country_id TEXT NULL DEFAULT NULL, -- Country id of the host\n"
         "    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)\n"
         "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
         "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
-        "    ping INEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
+        "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
         ") WITHOUT ROWID;", table_name.c_str());
     sqlite3_stmt* stmt = NULL;
     int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
