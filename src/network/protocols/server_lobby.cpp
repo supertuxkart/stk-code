@@ -644,6 +644,7 @@ void ServerLobby::createServerIdFile()
 #ifdef ENABLE_SQLITE3
 /* Every 1 minute STK will clean up database:
  * 1. Set disconnected time to now for non-exists host.
+ * 2. Clear expired player reports if necessary
  */
 void ServerLobby::cleanupDatabase()
 {
@@ -655,6 +656,17 @@ void ServerLobby::cleanupDatabase()
 
     m_last_cleanup_db_time = StkTime::getMonoTimeMs();
 
+    if (m_player_reports_table_exists &&
+        ServerConfig::m_player_reports_expired_days != 0.0f)
+    {
+        std::string query = StringUtils::insertValues(
+            "DELETE FROM %s "
+            "WHERE datetime"
+            "(reported_time, '+%f days') < datetime('now');",
+            ServerConfig::m_player_reports_table.c_str(),
+            ServerConfig::m_player_reports_expired_days);
+        easySQLQuery(query);
+    }
     if (m_server_stats_table.empty())
         return;
 
