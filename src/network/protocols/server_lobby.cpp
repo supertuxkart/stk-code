@@ -212,7 +212,7 @@ void ServerLobby::initServerStatsTable()
         "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
         "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
         "    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
-        "    country_id TEXT NULL DEFAULT NULL, -- Country id of the host\n"
+        "    country_code TEXT NULL DEFAULT NULL, -- 2-letter country code of the host\n"
         "    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)\n"
         "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
         "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
@@ -252,7 +252,7 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num, country_id, version,\n"
+        << "    port, online_id, username, player_num, country_code, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, disconnected_time, ping\n"
         << "    FROM " << m_server_stats_table << ";";
@@ -270,7 +270,7 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num, country_id, version,\n"
+        << "    port, online_id, username, player_num, country_code, version,\n"
         << "    ROUND((STRFTIME(\"%s\", 'now') - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, ping FROM " << m_server_stats_table << "\n"
         << "    WHERE connected_time = disconnected_time;";
@@ -1077,7 +1077,7 @@ void ServerLobby::encodePlayers(BareNetworkString* bns,
             .addUInt8(player->getLocalPlayerId())
             .addUInt8(
             race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
-            .encodeString(player->getCountryId());
+            .encodeString(player->getCountryCode());
         bns->encodeString(player->getKartName());
     }
 }   // encodePlayers
@@ -1269,7 +1269,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
                     rki.getDefaultKartColor(),
                     rki.getOnlineId(), rki.getDifficulty(),
                     rki.getLocalPlayerId(), KART_TEAM_NONE,
-                    rki.getCountryId());
+                    rki.getCountryCode());
                 player->setKartName(rki.getKartName());
             }
             else
@@ -2890,7 +2890,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
-        pl->encodeString(profile->getCountryId());
+        pl->encodeString(profile->getCountryCode());
     }
 
     // Don't send this message to in-game players
@@ -4079,7 +4079,7 @@ void ServerLobby::handleKartInfo(Event* event)
         .addUInt32(rki.getHostId()).addFloat(rki.getDefaultKartColor())
         .addUInt32(rki.getOnlineId()).addUInt8(rki.getDifficulty())
         .addUInt8((uint8_t)rki.getLocalPlayerId())
-        .encodeString(rki.getKartName()).encodeString(rki.getCountryId());
+        .encodeString(rki.getKartName()).encodeString(rki.getCountryCode());
     peer->sendPacket(ns, true/*reliable*/);
     delete ns;
 }   // handleKartInfo

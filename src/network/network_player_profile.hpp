@@ -69,7 +69,8 @@ private:
 
     std::atomic<KartTeam> m_team;
 
-    std::string m_country_id;
+    /** 2-letter country code of player. */
+    std::string m_country_code;
 
 public:
     // ------------------------------------------------------------------------
@@ -98,7 +99,7 @@ public:
                          float default_kart_color, uint32_t online_id,
                          PerPlayerDifficulty per_player_difficulty,
                          uint8_t local_player_id, KartTeam team,
-                         const std::string& country_id)
+                         const std::string& country_code)
     {
         m_peer                  = peer;
         m_player_name           = name;
@@ -108,7 +109,7 @@ public:
         m_per_player_difficulty.store(per_player_difficulty);
         m_local_player_id       = local_player_id;
         m_team.store(team);
-        m_country_id            = country_id;
+        m_country_code          = country_code;
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -164,7 +165,7 @@ public:
     // ------------------------------------------------------------------------
     KartTeam getTeam() const                          { return m_team.load(); }
     // ------------------------------------------------------------------------
-    const std::string& getCountryId() const            { return m_country_id; }
+    const std::string& getCountryCode() const        { return m_country_code; }
 };   // class NetworkPlayerProfile
 
 #endif // HEADER_NETWORK_PLAYER_PROFILE

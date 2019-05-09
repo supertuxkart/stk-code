@@ -329,12 +329,12 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
         PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
         uint8_t local_id = data.getUInt8();
         KartTeam team = (KartTeam)data.getUInt8();
-        std::string country_id;
-        data.decodeString(&country_id);
+        std::string country_code;
+        data.decodeString(&country_code);
         if (is_specator && host_id == STKHost::get()->getMyHostId())
             *is_specator = false;
         auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
-            host_id, kart_color, online_id, ppd, local_id, team, country_id);
+            host_id, kart_color, online_id, ppd, local_id, team, country_code);
         std::string kart_name;
         data.decodeString(&kart_name);
         player->setKartName(kart_name);
@@ -783,7 +783,7 @@ void ClientLobby::updatePlayerList(Event* event)
             auto& local_players = NetworkConfig::get()->getNetworkPlayers();
             std::get<2>(local_players.at(local_id)) = lp.m_difficulty;
         }
-        data.decodeString(&lp.m_country_id);
+        data.decodeString(&lp.m_country_code);
         m_lobby_players.push_back(lp);
     }
     STKHost::get()->setAuthorisedToControl(client_server_owner);
@@ -1261,8 +1261,8 @@ void ClientLobby::handleKartInfo(Event* event)
     uint8_t local_id = data.getUInt8();
     std::string kart_name;
     data.decodeString(&kart_name);
-    std::string country_id;
-    data.decodeString(&country_id);
+    std::string country_code;
+    data.decodeString(&country_code);
 
     RemoteKartInfo& rki = race_manager->getKartInfo(kart_id);
     rki.setPlayerName(player_name);
@@ -1272,7 +1272,7 @@ void ClientLobby::handleKartInfo(Event* event)
     rki.setPerPlayerDifficulty(ppd);
     rki.setLocalPlayerId(local_id);
     rki.setKartName(kart_name);
-    rki.setCountryId(country_id);
+    rki.setCountryCode(country_code);
     addLiveJoiningKart(kart_id, rki, live_join_util_ticks);
 
     core::stringw msg;

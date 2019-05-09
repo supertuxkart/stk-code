@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS (table name above)
     online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)
     username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)
     player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player
-    country_id TEXT NULL DEFAULT NULL, -- Country id of the host
+    country_code TEXT NULL DEFAULT NULL, -- 2-letter country code of the host
     version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)
     connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected
     disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)

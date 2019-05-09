@@ -46,7 +46,7 @@ struct LobbyPlayer
     uint32_t m_online_id;
     /* Icon used in networking lobby, see NetworkingLobby::loadedFromFile. */
     int m_icon_id;
-    std::string m_country_id;
+    std::string m_country_code;
     /* Icon id for spectator in NetworkingLobby::loadedFromFile is 5. */
     bool isSpectator() const { return m_icon_id == 5; }
 };
