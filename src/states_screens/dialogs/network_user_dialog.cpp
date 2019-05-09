@@ -24,9 +24,11 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "online/online_profile.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -78,6 +80,8 @@ void NetworkUserDialog::beforeAddingWidgets()
 
     m_kick_widget = getWidget<IconButtonWidget>("decline");
     assert(m_kick_widget != NULL);
+    m_kick_widget->setImage(file_manager->getAsset(FileManager::GUI_ICON,
+        "remove.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
     //I18N: In the network user dialog
     m_kick_widget->setText(_("Kick"));
@@ -123,7 +127,18 @@ void NetworkUserDialog::beforeAddingWidgets()
     }
     else
         getWidget<IconButtonWidget>("remove")->setVisible(false);
-    getWidget<IconButtonWidget>("enter")->setVisible(false);
+    m_report_widget = getWidget<IconButtonWidget>("enter");
+    assert(m_report_widget != NULL);
+    if (m_host_id != STKHost::get()->getMyHostId())
+    {
+        // I18N: In the network user dialog,
+        // report player about for example abusive behaviour in game
+        m_report_widget->setText(_("Report player"));
+        m_report_widget->setImage(file_manager->getAsset(FileManager::GUI_ICON,
+            "red_mark.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+    else
+        m_report_widget->setVisible(false);
 }   // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
@@ -145,6 +160,28 @@ void NetworkUserDialog::onUpdate(float dt)
     }
 
     // It's unsafe to delete from inside the event handler so we do it here
+    if (m_open_report_textbox)
+    {
+        // I18N: In the network player dialog, instruction for reporting player
+        core::stringw t = _("Tell server administrator about this player (%s):", m_name);
+        uint32_t host_id = m_host_id;
+        ModalDialog::dismiss();
+        new GeneralTextFieldDialog(t.c_str(),
+            [] (const irr::core::stringw& text) {},
+            [host_id] (GUIEngine::LabelWidget* lw,
+                       GUIEngine::TextBoxWidget* tb)->bool
+            {
+                core::stringw info = tb->getText();
+                if (info.empty())
+                    return false;
+                NetworkString report(PROTOCOL_LOBBY_ROOM);
+                report.addUInt8(LobbyProtocol::LE_REPORT_USER)
+                    .addUInt32(host_id).encodeString(info);
+                STKHost::get()->sendToServer(&report, true/*reliable*/);
+                return true;
+            });
+        return;
+    }
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
@@ -163,6 +200,11 @@ GUIEngine::EventPropagation
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == m_report_widget->m_properties[PROP_ID])
+        {
+            m_open_report_textbox = true;
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == m_friend_widget->m_properties[PROP_ID])

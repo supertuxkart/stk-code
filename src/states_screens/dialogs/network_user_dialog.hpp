@@ -53,7 +53,7 @@ private:
 
     const bool m_allow_change_team;
 
-    bool m_self_destroy;
+    bool m_self_destroy, m_open_report_textbox;
 
     std::shared_ptr<bool> m_fetched_ranking;
 
@@ -73,6 +73,7 @@ private:
 
     GUIEngine::IconButtonWidget* m_handicap_widget;
 
+    GUIEngine::IconButtonWidget* m_report_widget;
 public:
     NetworkUserDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
                       const core::stringw& name, bool allow_change_team,
@@ -80,6 +81,7 @@ public:
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
           m_local_id(local_id), m_per_player_difficulty(d), m_name(name),
           m_allow_change_team(allow_change_team), m_self_destroy(false),
+          m_open_report_textbox(false),
           m_fetched_ranking(std::make_shared<bool>(false))
     {
         loadFromFile("online/user_info_dialog.stkgui");
