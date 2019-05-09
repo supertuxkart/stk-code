@@ -581,4 +581,9 @@
                      max-adjust-time="2.0"
                      adjust-length-threshold="4.0"/>
 
+  <!-- List of network capabilities to handle different servers with same version.
+  -->
+  <network-capabilities>
+      <capabilities name="report_player"/>
+  </network-capabilities>
 </config>

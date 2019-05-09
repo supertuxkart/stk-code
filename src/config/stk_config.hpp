@@ -31,9 +31,10 @@
 #include "utils/no_copy.hpp"
 
 #include "utils/constants.hpp"
-#include <vector>
-#include <string>
 #include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 class KartProperties;
 class MusicInformation;
@@ -228,6 +229,10 @@ public:
 
     /** If true we allow all the server urls to be redirected by the news.xml. */
     bool m_allow_news_redirects = true;
+
+    /** List of network capabilities to handle different servers with same
+     *  version. */
+    std::set<std::string> m_network_capabilities;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the

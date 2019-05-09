@@ -360,8 +360,9 @@ void ClientLobby::update(int ticks)
         ns->addUInt8(LE_CONNECTION_REQUESTED)
             .addUInt32(ServerConfig::m_server_version)
             .encodeString(StringUtils::getUserAgentString())
-            // Reserved for future to supply list of network capabilities
-            .addUInt16(0);
+            .addUInt16((uint16_t)stk_config->m_network_capabilities.size());
+        for (const std::string& cap : stk_config->m_network_capabilities)
+            ns->encodeString(cap);
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
@@ -606,12 +607,12 @@ void ClientLobby::connectionAccepted(Event* event)
     m_state.store(CONNECTED);
 
     unsigned list_caps = data.getUInt16();
-    std::vector<std::string> caps;
+    std::set<std::string> caps;
     for (unsigned i = 0; i < list_caps; i++)
     {
         std::string cap;
         data.decodeString(&cap);
-        caps.push_back(cap);
+        caps.insert(cap);
     }
     NetworkConfig::get()->setServerCapabilities(caps);
 

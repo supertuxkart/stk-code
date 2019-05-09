@@ -539,6 +539,18 @@ void STKConfig::getAllData(const XMLNode * root)
         ns->get("adjust-length-threshold", &m_snb_adjust_length_threshold);
     }
 
+    if (const XMLNode* nc = root->getNode("network-capabilities"))
+    {
+        for (unsigned int i = 0; i < nc->getNumNodes(); i++)
+        {
+            const XMLNode* name = nc->getNode(i);
+            std::string cap;
+            name->get("name", &cap);
+            if (!cap.empty())
+                m_network_capabilities.insert(cap);
+        }
+    }
+
     // Get the default KartProperties
     // ------------------------------
     const XMLNode *node = root -> getNode("general-kart-defaults");

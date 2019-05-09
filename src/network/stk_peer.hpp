@@ -102,7 +102,7 @@ protected:
 
     /** List of client capabilities set when connecting it, to determine
      *  features available in same version. */
-    std::vector<std::string> m_client_capabilities;
+    std::set<std::string> m_client_capabilities;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -236,10 +236,10 @@ public:
         return (int)(diff / 1000);
     }
     // ------------------------------------------------------------------------
-    void setClientCapabilities(std::vector<std::string>& caps)
+    void setClientCapabilities(std::set<std::string>& caps)
                                    { m_client_capabilities = std::move(caps); }
     // ------------------------------------------------------------------------
-    const std::vector<std::string>& getClientCapabilities() const
+    const std::set<std::string>& getClientCapabilities() const
                                               { return m_client_capabilities; }
 };   // STKPeer
 

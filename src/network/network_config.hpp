@@ -27,6 +27,7 @@
 #include "utils/no_copy.hpp"
 
 #include "irrString.h"
+#include <set>
 #include <tuple>
 #include <vector>
 
@@ -95,7 +96,7 @@ private:
 
     /** List of server capabilities set when joining it, to determine features
      *  available in same version. */
-    std::vector<std::string> m_server_capabilities;
+    std::set<std::string> m_server_capabilities;
 
 public:
     /** Singleton get, which creates this object if necessary. */
@@ -236,12 +237,12 @@ public:
     // ------------------------------------------------------------------------
     bool roundValuesNow() const;
     // ------------------------------------------------------------------------
-    void setServerCapabilities(std::vector<std::string>& caps)
+    void setServerCapabilities(std::set<std::string>& caps)
                                    { m_server_capabilities = std::move(caps); }
     // ------------------------------------------------------------------------
     void clearServerCapabilities()           { m_server_capabilities.clear(); }
     // ------------------------------------------------------------------------
-    const std::vector<std::string>& getServerCapabilities() const
+    const std::set<std::string>& getServerCapabilities() const
                                               { return m_server_capabilities; }
 
 };   // class NetworkConfig
