@@ -275,10 +275,12 @@ CREATE TABLE online_id_ban
 
 CREATE TABLE player_reports
 (
-    reported_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player who reports, 0 for offline player
-    reported_username TEXT NOT NULL, -- Player name who reports
+    reporter_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player who reports
+    reporter_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player who reports, 0 for offline player
+    reporter_username TEXT NOT NULL, -- Player name who reports
     reported_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time of reporting
     info TEXT NOT NULL, -- Report info by reporter
+    reporting_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player being reported
     reporting_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player being reported, 0 for offline player
     reporting_username TEXT NOT NULL -- Player name being reported
 );

@@ -74,7 +74,8 @@ public:
         LE_LIVE_JOIN_ACK, // Server tell client live join or spectate succeed
         LE_KART_INFO, // Client or server exchange new kart info
         LE_CLIENT_BACK_LOBBY, // Client tell server to go back lobby
-        LE_REPORT_USER // Client report user in server (like abusive behaviour)
+        LE_REPORT_PLAYER // Client report some player in server
+                         // (like abusive behaviour)
     };
 
     enum RejectReason : uint8_t

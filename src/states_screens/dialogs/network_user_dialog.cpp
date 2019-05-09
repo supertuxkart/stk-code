@@ -177,8 +177,8 @@ void NetworkUserDialog::onUpdate(float dt)
                 if (info.empty())
                     return false;
                 NetworkString report(PROTOCOL_LOBBY_ROOM);
-                report.addUInt8(LobbyProtocol::LE_REPORT_USER)
-                    .addUInt32(host_id).encodeString(info);
+                report.addUInt8(LobbyProtocol::LE_REPORT_PLAYER)
+                    .addUInt32(host_id).encodeString16(info);
                 STKHost::get()->sendToServer(&report, true/*reliable*/);
                 return true;
             });

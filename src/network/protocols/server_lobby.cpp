@@ -613,6 +613,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CHANGE_HANDICAP: changeHandicap(event);           break;
         case LE_CLIENT_BACK_LOBBY:
             clientSelectingAssetsWantsToBackLobby(event);         break;
+        case LE_REPORT_PLAYER: writePlayerReport(event);          break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -765,6 +766,43 @@ void ServerLobby::checkTableExists(const std::string& table, bool& result)
     }
 }   // checkTableExists
 #endif
+
+//-----------------------------------------------------------------------------
+void ServerLobby::writePlayerReport(Event* event)
+{
+#ifdef ENABLE_SQLITE3
+    if (!m_db || !m_player_reports_table_exists)
+        return;
+    STKPeer* reporter = event->getPeer();
+    if (!reporter->hasPlayerProfiles())
+        return;
+    auto reporter_npp = reporter->getPlayerProfiles()[0];
+
+    uint32_t reporting_host_id = event->data().getUInt32();
+    core::stringw info;
+    event->data().decodeString16(&info);
+    if (info.empty())
+        return;
+
+    auto reporting_peer = STKHost::get()->findPeerByHostId(reporting_host_id);
+    if (!reporting_peer || !reporting_peer->hasPlayerProfiles())
+        return;
+    auto reporting_npp = reporting_peer->getPlayerProfiles()[0];
+
+    std::string query = StringUtils::insertValues(
+        "INSERT INTO %s "
+        "(reporter_ip, reporter_online_id, reporter_username, info, "
+        "reporting_ip, reporting_online_id, reporting_username) "
+        "VALUES (%u, %u, \"%s\", \"%s\", %u, %u, \"%s\");",
+        ServerConfig::m_player_reports_table.c_str(),
+        reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
+        StringUtils::wideToUtf8(reporter_npp->getName()).c_str(),
+        StringUtils::wideToUtf8(info).c_str(),
+        reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId(),
+        StringUtils::wideToUtf8(reporting_npp->getName()).c_str());
+    easySQLQuery(query);
+#endif
+}   // writePlayerReport
 
 //-----------------------------------------------------------------------------
 /** Find out the public IP server or poll STK server asynchronously. */

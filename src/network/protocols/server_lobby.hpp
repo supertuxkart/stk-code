@@ -323,6 +323,7 @@ private:
     void testBannedForIP(STKPeer* peer) const;
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
     void writeDisconnectInfoTable(STKPeer* peer);
+    void writePlayerReport(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();
