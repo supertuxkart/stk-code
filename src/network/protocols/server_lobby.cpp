@@ -803,10 +803,11 @@ void ServerLobby::writePlayerReport(Event* event)
 
     std::string query = StringUtils::insertValues(
         "INSERT INTO %s "
-        "(reporter_ip, reporter_online_id, reporter_username, info, "
-        "reporting_ip, reporting_online_id, reporting_username) "
-        "VALUES (%u, %u, \"%s\", \"%s\", %u, %u, \"%s\");",
+        "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
+        "info, reporting_ip, reporting_online_id, reporting_username) "
+        "VALUES (\"%s\", %u, %u, \"%s\", \"%s\", %u, %u, \"%s\");",
         ServerConfig::m_player_reports_table.c_str(),
+        ServerConfig::m_server_uid.c_str(),
         reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
         StringUtils::wideToUtf8(reporter_npp->getName()).c_str(),
         StringUtils::wideToUtf8(info).c_str(),

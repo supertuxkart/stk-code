@@ -275,6 +275,7 @@ CREATE TABLE online_id_ban
 
 CREATE TABLE player_reports
 (
+    server_uid TEXT NOT NULL, -- Report from which server unique id (config filename)
     reporter_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player who reports
     reporter_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player who reports, 0 for offline player
     reporter_username TEXT NOT NULL, -- Player name who reports
