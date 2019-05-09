@@ -147,17 +147,23 @@ The current server configuration xml looks like this:
     <!-- Set how many states the server will send per second, the higher this value, the more bandwidth requires, also each client will trigger more rewind, which clients with slow device may have problem playing this server, use the default value is recommended. -->
     <state-frequency value="10" />
 
-    <!-- Use sql to manage server stats and banlist, STK needs to be compiled with sqlite3 supported. -->
+    <!-- Use sql database for handling server stats and maintenance, STK needs to be compiled with sqlite3 supported. -->
     <sql-management value="false" />
 
     <!-- Database filename for sqlite to use, it can be shared for servers creating in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
     <database-file value="stkservers.db" />
 
-    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details. -->
-    <ip-ban-table value="ipban" />
+    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. -->
+    <ip-ban-table value="ip_ban" />
 
-    <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details. -->
-    <online-id-ban-table value="onlineidban" />
+    <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. -->
+    <online-id-ban-table value="online_id_ban" />
+
+    <!-- Player reports table name, which will be written when a player reports player in the network user dialog, you need to create the table first, see NETWORKING.md for details, empty to disable. -->
+    <player-reports-table value="player_reports" />
+
+    <!-- Days to keep player reports, older than that will be auto cleared, 0 to keep them forever. -->
+    <player-reports-expired-days value="3" />
 
 </server-config>
 
@@ -242,9 +248,9 @@ Current players in server with ip in human readable format and time played of ea
 `*_player_stats`
 All players with online id and username with their time played stats in this server since creation of this database.
 
-For IP or online ID ban list, you need to create one yourself:
+For IP, online ID ban list or player reports, you need to create one yourself:
 ```sql
-CREATE TABLE ipban
+CREATE TABLE ip_ban
 (
     ip_start INTEGER UNSIGNED NOT NULL UNIQUE, -- Starting of ip decimal for banning (inclusive)
     ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- Ending of ip decimal for banning (inclusive)
@@ -256,7 +262,7 @@ CREATE TABLE ipban
     last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
 );
 
-CREATE TABLE onlineidban
+CREATE TABLE online_id_ban
 (
     online_id INTEGER UNSIGNED NOT NULL UNIQUE, -- Online id from STK addons database for banning
     starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
@@ -265,5 +271,15 @@ CREATE TABLE onlineidban
     description TEXT NOT NULL DEFAULT '', -- Private description for server admin
     trigger_count INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
     last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
+);
+
+CREATE TABLE player_reports
+(
+    reported_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player who reports, 0 for offline player
+    reported_username TEXT NOT NULL, -- Player name who reports
+    reported_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time of reporting
+    info TEXT NOT NULL, -- Report info by reporter
+    reporting_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player being reported, 0 for offline player
+    reporting_username TEXT NOT NULL -- Player name being reported
 );
 ```

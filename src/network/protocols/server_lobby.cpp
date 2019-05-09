@@ -144,6 +144,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_difficulty.store(ServerConfig::m_server_difficulty);
     m_game_mode.store(ServerConfig::m_server_mode);
     m_default_vote = new PeerVote();
+    m_player_reports_table_exists = false;
     initDatabase();
 }   // ServerLobby
 
@@ -171,7 +172,6 @@ void ServerLobby::initDatabase()
 #ifdef ENABLE_SQLITE3
     m_last_cleanup_db_time = StkTime::getMonoTimeMs();
     m_db = NULL;
-    sqlite3_stmt* stmt = NULL;;
     m_ip_ban_table_exists = false;
     m_online_id_ban_table_exists = false;
     if (!ServerConfig::m_sql_management)
@@ -186,80 +186,11 @@ void ServerLobby::initDatabase()
         return;
     }
 
-    const std::string ip_ban_table = ServerConfig::m_ip_ban_table;
-    if (!ip_ban_table.empty())
-    {
-        std::string query = StringUtils::insertValues(
-            "SELECT count(type) FROM sqlite_master "
-            "WHERE type='table' AND name='%s';", ip_ban_table.c_str());
-
-        ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-        if (ret == SQLITE_OK)
-        {
-            ret = sqlite3_step(stmt);
-            if (ret == SQLITE_ROW)
-            {
-                int number = sqlite3_column_int(stmt, 0);
-                if (number == 1)
-                {
-                    Log::info("ServerLobby", "%s ip ban table will used.",
-                        ip_ban_table.c_str());
-                    m_ip_ban_table_exists = true;
-                }
-            }
-            ret = sqlite3_finalize(stmt);
-            if (ret != SQLITE_OK)
-            {
-                Log::error("ServerLobby",
-                    "Error finalize database for query %s: %s", query.c_str(),
-                    sqlite3_errmsg(m_db));
-            }
-        }
-    }
-    if (!m_ip_ban_table_exists && !ip_ban_table.empty())
-    {
-        Log::warn("ServerLobby", "%s ip ban table not found in database.",
-            ip_ban_table.c_str());
-    }
-
-    const std::string online_id_ban_table =
-        ServerConfig::m_online_id_ban_table;
-    if (!online_id_ban_table.empty())
-    {
-        std::string query = StringUtils::insertValues(
-            "SELECT count(type) FROM sqlite_master "
-            "WHERE type='table' AND name='%s';", online_id_ban_table.c_str());
-
-        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-        if (ret == SQLITE_OK)
-        {
-            ret = sqlite3_step(stmt);
-            if (ret == SQLITE_ROW)
-            {
-                int number = sqlite3_column_int(stmt, 0);
-                if (number == 1)
-                {
-                    Log::info("ServerLobby",
-                        "%s online id ban table will used.",
-                        online_id_ban_table.c_str());
-                    m_online_id_ban_table_exists = true;
-                }
-            }
-            ret = sqlite3_finalize(stmt);
-            if (ret != SQLITE_OK)
-            {
-                Log::error("ServerLobby",
-                    "Error finalize database for query %s: %s",
-                    query.c_str(), sqlite3_errmsg(m_db));
-            }
-        }
-    }
-    if (!m_online_id_ban_table_exists && !online_id_ban_table.empty())
-    {
-        Log::warn("ServerLobby",
-            "%s online id ban table not found in database.",
-            online_id_ban_table.c_str());
-    }
+    checkTableExists(ServerConfig::m_ip_ban_table, m_ip_ban_table_exists);
+    checkTableExists(ServerConfig::m_online_id_ban_table,
+        m_online_id_ban_table_exists);
+    checkTableExists(ServerConfig::m_player_reports_table,
+        m_player_reports_table_exists);
 #endif
 }   // initDatabase
 
@@ -790,6 +721,49 @@ void ServerLobby::easySQLQuery(const std::string& query) const
             query.c_str(), sqlite3_errmsg(m_db));
     }
 }   // easySQLQuery
+
+//-----------------------------------------------------------------------------
+/* Write true to result if table name exists in database. */
+void ServerLobby::checkTableExists(const std::string& table, bool& result)
+{
+    if (!m_db)
+        return;
+    sqlite3_stmt* stmt = NULL;
+    if (!table.empty())
+    {
+        std::string query = StringUtils::insertValues(
+            "SELECT count(type) FROM sqlite_master "
+            "WHERE type='table' AND name='%s';", table.c_str());
+
+        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+        if (ret == SQLITE_OK)
+        {
+            ret = sqlite3_step(stmt);
+            if (ret == SQLITE_ROW)
+            {
+                int number = sqlite3_column_int(stmt, 0);
+                if (number == 1)
+                {
+                    Log::info("ServerLobby", "Table named %s will used.",
+                        table.c_str());
+                    result = true;
+                }
+            }
+            ret = sqlite3_finalize(stmt);
+            if (ret != SQLITE_OK)
+            {
+                Log::error("ServerLobby",
+                    "Error finalize database for query %s: %s",
+                    query.c_str(), sqlite3_errmsg(m_db));
+            }
+        }
+    }
+    if (!result && !table.empty())
+    {
+        Log::warn("ServerLobby", "Table named %s not found in database.",
+            table.c_str());
+    }
+}   // checkTableExists
 #endif
 
 //-----------------------------------------------------------------------------
@@ -2767,7 +2741,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 
     message_ack->addFloat(auto_start_timer)
         .addUInt32(ServerConfig::m_state_frequency)
-        .addUInt8(ServerConfig::m_chat ? 1 : 0);
+        .addUInt8(ServerConfig::m_chat ? 1 : 0)
+        .addUInt8(m_player_reports_table_exists ? 1 : 0);
 
     peer->setSpectator(false);
     if (game_started)

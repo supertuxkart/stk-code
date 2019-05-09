@@ -322,8 +322,8 @@ namespace ServerConfig
     SERVER_CFG_PREFIX BoolServerConfigParam m_sql_management
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false,
         "sql-management",
-        "Use sql to manage server stats and banlist, STK needs to be compiled "
-        "with sqlite3 supported."));
+        "Use sql database for handling server stats and maintenance, STK "
+        "needs to be compiled with sqlite3 supported."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_database_file
         SERVER_CFG_DEFAULT(StringServerConfigParam("stkservers.db",
@@ -334,16 +334,28 @@ namespace ServerConfig
         "NETWORKING.md for details"));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_ip_ban_table
-        SERVER_CFG_DEFAULT(StringServerConfigParam("ipban",
+        SERVER_CFG_DEFAULT(StringServerConfigParam("ip_ban",
         "ip-ban-table",
         "Ip ban list table name, you need to create the table first, see "
         "NETWORKING.md for details, empty to disable."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_online_id_ban_table
-        SERVER_CFG_DEFAULT(StringServerConfigParam("onlineidban",
+        SERVER_CFG_DEFAULT(StringServerConfigParam("online_id_ban",
         "online-id-ban-table",
         "Online ID ban list table name, you need to create the table first, "
         "see NETWORKING.md for details, empty to disable."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_player_reports_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("player_reports",
+        "player-reports-table",
+        "Player reports table name, which will be written when a player "
+        "reports player in the network user dialog, you need to create the "
+        "table first, see NETWORKING.md for details, empty to disable."));
+
+    SERVER_CFG_PREFIX FloatServerConfigParam m_player_reports_expired_days
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(3.0f,
+        "player-reports-expired-days", "Days to keep player reports, "
+        "older than that will be auto cleared, 0 to keep them forever."));
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */

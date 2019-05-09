@@ -26,7 +26,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "online/online_profile.hpp"
-#include "network/protocols/lobby_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -129,7 +129,9 @@ void NetworkUserDialog::beforeAddingWidgets()
         getWidget<IconButtonWidget>("remove")->setVisible(false);
     m_report_widget = getWidget<IconButtonWidget>("enter");
     assert(m_report_widget != NULL);
-    if (m_host_id != STKHost::get()->getMyHostId())
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl->serverEnabledReportPlayer() &&
+        m_host_id != STKHost::get()->getMyHostId())
     {
         // I18N: In the network user dialog,
         // report player about for example abusive behaviour in game

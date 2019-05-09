@@ -99,6 +99,7 @@ ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
     m_server_send_live_load_world = false;
     m_server_enabled_chat = true;
     m_server_enabled_track_voting = true;
+    m_server_enabled_report_player = false;
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
@@ -622,6 +623,9 @@ void ClientLobby::connectionAccepted(Event* event)
     if (auto_start_timer != std::numeric_limits<float>::max())
         NetworkingLobby::getInstance()->setStartingTimerTo(auto_start_timer);
     m_server_enabled_chat = data.getUInt8() == 1;
+    if (NetworkConfig::get()->getServerCapabilities().find("report_player") !=
+        NetworkConfig::get()->getServerCapabilities().end())
+        m_server_enabled_report_player = data.getUInt8() == 1;
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------

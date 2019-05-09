@@ -70,6 +70,8 @@ private:
         irr::core::stringw m_name;
         bool m_tried = false;
     };
+    bool m_player_reports_table_exists;
+
 #ifdef ENABLE_SQLITE3
     sqlite3* m_db;
 
@@ -84,6 +86,8 @@ private:
     void cleanupDatabase();
 
     void easySQLQuery(const std::string& query) const;
+
+    void checkTableExists(const std::string& table, bool& result);
 #endif
     void initDatabase();
 

@@ -311,6 +311,8 @@ void loadServerLobbyFromConfig()
     }
     NetworkConfig::get()->setStateFrequency(m_state_frequency);
 
+    if (m_player_reports_expired_days < 0.0f)
+        m_player_reports_expired_days.revertToDefaults();
     if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
         m_server_difficulty = RaceManager::DIFFICULTY_LAST;
     if (m_server_mode > 8)
