@@ -82,6 +82,8 @@ private:
     uint64_t m_last_cleanup_db_time;
 
     void cleanupDatabase();
+
+    void easySQLQuery(const std::string& query) const;
 #endif
     void initDatabase();
 

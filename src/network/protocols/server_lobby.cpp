@@ -318,23 +318,7 @@ void ServerLobby::initServerStatsTable()
         << "    connected_time, disconnected_time, ping\n"
         << "    FROM " << m_server_stats_table << ";";
     query = oss.str();
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 
     // _current_players
     // Current players in server with ip in human readable format and time
@@ -352,23 +336,7 @@ void ServerLobby::initServerStatsTable()
         << "    connected_time, ping FROM " << m_server_stats_table << "\n"
         << "    WHERE connected_time = disconnected_time;";
     query = oss.str();
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 
     // _player_stats
     // All players with online id and username with their time played stats
@@ -389,23 +357,7 @@ void ServerLobby::initServerStatsTable()
         << "    FROM " << m_server_stats_table << "\n"
         << "    WHERE online_id != 0 GROUP BY online_id ORDER BY num_connections DESC;";
     query = oss.str();
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 
     uint32_t last_host_id = 0;
     query = StringUtils::insertValues("SELECT MAX(host_id) FROM %s;",
@@ -442,23 +394,7 @@ void ServerLobby::initServerStatsTable()
         "UPDATE %s SET disconnected_time = datetime('now') "
         "WHERE connected_time = disconnected_time;",
         m_server_stats_table.c_str());
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 #endif
 }   // initServerStatsTable
 
@@ -484,25 +420,7 @@ void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
         "UPDATE %s SET disconnected_time = datetime('now'), ping = %d "
         "WHERE host_id = %u;", m_server_stats_table.c_str(),
         peer->getAveragePing(), peer->getHostId());
-
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 #endif
 }   // writeDisconnectInfoTable
 
@@ -835,7 +753,15 @@ void ServerLobby::cleanupDatabase()
         oss << ");";
         query = oss.str();
     }
+    easySQLQuery(query);
+}   // cleanupDatabase
 
+//-----------------------------------------------------------------------------
+/** Run simple query without bothering the result. */
+void ServerLobby::easySQLQuery(const std::string& query) const
+{
+    if (!m_db)
+        return;
     sqlite3_stmt* stmt = NULL;
     int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
     if (ret == SQLITE_OK)
@@ -845,16 +771,17 @@ void ServerLobby::cleanupDatabase()
         if (ret != SQLITE_OK)
         {
             Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
+                "Error finalize database for easy query %s: %s",
                 query.c_str(), sqlite3_errmsg(m_db));
         }
     }
     else
     {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+        Log::error("ServerLobby",
+            "Error preparing database for easy query %s: %s",
             query.c_str(), sqlite3_errmsg(m_db));
     }
-}   // cleanupDatabase
+}   // easySQLQuery
 #endif
 
 //-----------------------------------------------------------------------------
@@ -2523,25 +2450,7 @@ void ServerLobby::saveIPBanTable(const TransportAddress& addr)
         "INSERT INTO %s (ip_start, ip_end) "
         "VALUES (%u, %u);",
         ServerConfig::m_ip_ban_table.c_str(), addr.getIP(), addr.getIP());
-
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 #endif
 }   // saveIPBanTable
 
@@ -2897,25 +2806,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         StringUtils::wideToUtf8(
         peer->getPlayerProfiles()[0]->getName()).c_str(), player_count,
         peer->getUserVersion().c_str(), peer->getAveragePing());
-
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
+    easySQLQuery(query);
 #endif
 }   // handleUnencryptedConnection
 
@@ -3735,24 +3626,7 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
             "last_trigger = datetime('now') "
             "WHERE ip_start = %u AND ip_end = %u;",
             ServerConfig::m_ip_ban_table.c_str(), ip_start, ip_end);
-        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-        if (ret == SQLITE_OK)
-        {
-            ret = sqlite3_step(stmt);
-            ret = sqlite3_finalize(stmt);
-            if (ret != SQLITE_OK)
-            {
-                Log::error("ServerLobby",
-                    "Error finalize database for query %s: %s",
-                    query.c_str(), sqlite3_errmsg(m_db));
-            }
-        }
-        else
-        {
-            Log::error("ServerLobby",
-                "Error preparing database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
+        easySQLQuery(query);
     }
 #endif
 }   // testBannedForIP
@@ -3811,24 +3685,7 @@ void ServerLobby::testBannedForOnlineId(STKPeer* peer,
             "last_trigger = datetime('now') "
             "WHERE online_id = %u;",
             ServerConfig::m_online_id_ban_table.c_str(), online_id);
-        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-        if (ret == SQLITE_OK)
-        {
-            ret = sqlite3_step(stmt);
-            ret = sqlite3_finalize(stmt);
-            if (ret != SQLITE_OK)
-            {
-                Log::error("ServerLobby",
-                    "Error finalize database for query %s: %s",
-                    query.c_str(), sqlite3_errmsg(m_db));
-            }
-        }
-        else
-        {
-            Log::error("ServerLobby",
-                "Error preparing database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
+        easySQLQuery(query);
     }
 #endif
 }   // testBannedForOnlineId
