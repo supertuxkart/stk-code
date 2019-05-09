@@ -337,13 +337,13 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(StringServerConfigParam("ipban",
         "ip-ban-table",
         "Ip ban list table name, you need to create the table first, see "
-        "NETWORKING.md for details."));
+        "NETWORKING.md for details, empty to disable."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_online_id_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("onlineidban",
         "online-id-ban-table",
         "Online ID ban list table name, you need to create the table first, "
-        "see NETWORKING.md for details."));
+        "see NETWORKING.md for details, empty to disable."));
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */

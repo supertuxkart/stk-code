@@ -186,71 +186,79 @@ void ServerLobby::initDatabase()
         return;
     }
 
-    std::string query = StringUtils::insertValues(
-        "SELECT count(type) FROM sqlite_master "
-        "WHERE type='table' AND name='%s';",
-        ServerConfig::m_ip_ban_table.c_str());
-
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
+    const std::string ip_ban_table = ServerConfig::m_ip_ban_table;
+    if (!ip_ban_table.empty())
     {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
+        std::string query = StringUtils::insertValues(
+            "SELECT count(type) FROM sqlite_master "
+            "WHERE type='table' AND name='%s';", ip_ban_table.c_str());
+
+        ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+        if (ret == SQLITE_OK)
         {
-            int number = sqlite3_column_int(stmt, 0);
-            if (number == 1)
+            ret = sqlite3_step(stmt);
+            if (ret == SQLITE_ROW)
             {
-                Log::info("ServerLobby", "%s ip ban table will used.",
-                    ServerConfig::m_ip_ban_table.c_str());
-                m_ip_ban_table_exists = true;
+                int number = sqlite3_column_int(stmt, 0);
+                if (number == 1)
+                {
+                    Log::info("ServerLobby", "%s ip ban table will used.",
+                        ip_ban_table.c_str());
+                    m_ip_ban_table_exists = true;
+                }
+            }
+            ret = sqlite3_finalize(stmt);
+            if (ret != SQLITE_OK)
+            {
+                Log::error("ServerLobby",
+                    "Error finalize database for query %s: %s", query.c_str(),
+                    sqlite3_errmsg(m_db));
             }
         }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s", query.c_str(),
-                sqlite3_errmsg(m_db));
-        }
     }
-    if (!m_ip_ban_table_exists)
+    if (!m_ip_ban_table_exists && !ip_ban_table.empty())
     {
         Log::warn("ServerLobby", "%s ip ban table not found in database.",
-            ServerConfig::m_ip_ban_table.c_str());
+            ip_ban_table.c_str());
     }
 
-    query = StringUtils::insertValues(
-        "SELECT count(type) FROM sqlite_master "
-        "WHERE type='table' AND name='%s';",
-        ServerConfig::m_online_id_ban_table.c_str());
-
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
+    const std::string online_id_ban_table =
+        ServerConfig::m_online_id_ban_table;
+    if (!online_id_ban_table.empty())
     {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
+        std::string query = StringUtils::insertValues(
+            "SELECT count(type) FROM sqlite_master "
+            "WHERE type='table' AND name='%s';", online_id_ban_table.c_str());
+
+        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+        if (ret == SQLITE_OK)
         {
-            int number = sqlite3_column_int(stmt, 0);
-            if (number == 1)
+            ret = sqlite3_step(stmt);
+            if (ret == SQLITE_ROW)
             {
-                Log::info("ServerLobby", "%s online id ban table will used.",
-                    ServerConfig::m_online_id_ban_table.c_str());
-                m_online_id_ban_table_exists = true;
+                int number = sqlite3_column_int(stmt, 0);
+                if (number == 1)
+                {
+                    Log::info("ServerLobby",
+                        "%s online id ban table will used.",
+                        online_id_ban_table.c_str());
+                    m_online_id_ban_table_exists = true;
+                }
+            }
+            ret = sqlite3_finalize(stmt);
+            if (ret != SQLITE_OK)
+            {
+                Log::error("ServerLobby",
+                    "Error finalize database for query %s: %s",
+                    query.c_str(), sqlite3_errmsg(m_db));
             }
         }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
     }
-    if (!m_online_id_ban_table_exists)
+    if (!m_online_id_ban_table_exists && !online_id_ban_table.empty())
     {
         Log::warn("ServerLobby",
             "%s online id ban table not found in database.",
-            ServerConfig::m_online_id_ban_table.c_str());
+            online_id_ban_table.c_str());
     }
 #endif
 }   // initDatabase
