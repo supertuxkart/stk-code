@@ -188,6 +188,18 @@ void ServerLobby::initDatabase()
         m_db = NULL;
         return;
     }
+    sqlite3_busy_handler(m_db, [](void* data, int retry)
+        {
+            // Maximum 1 second total retry time
+            if (retry < 10)
+            {
+                sqlite3_sleep(100);
+                // Return non-zero to let caller retry again
+                return 1;
+            }
+            // Return zero to let caller return SQLITE_BUSY immediately
+            return 0;
+        }, NULL);
 
     checkTableExists(ServerConfig::m_ip_ban_table, m_ip_ban_table_exists);
     checkTableExists(ServerConfig::m_online_id_ban_table,
@@ -714,7 +726,9 @@ void ServerLobby::cleanupDatabase()
 }   // cleanupDatabase
 
 //-----------------------------------------------------------------------------
-/** Run simple query without bothering the result. */
+/** Run simple query with write lock waiting and optional function, this
+ *  function has no callback for the return (if any) by the query.
+ */
 void ServerLobby::easySQLQuery(const std::string& query,
                    std::function<void(sqlite3_stmt* stmt)> bind_function) const
 {
