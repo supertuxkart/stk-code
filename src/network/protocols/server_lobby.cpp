@@ -790,6 +790,7 @@ std::string ServerLobby::ip2Country(const TransportAddress& addr) const
     if (!m_db || !m_ip_geolocation_table_exists || addr.isLAN())
         return "";
 
+    std::string cc_code;
     std::string query = StringUtils::insertValues(
         "SELECT country_code FROM %s "
         "WHERE `ip_start` <= %d AND `ip_end` >= %d "
@@ -805,7 +806,7 @@ std::string ServerLobby::ip2Country(const TransportAddress& addr) const
         if (ret == SQLITE_ROW)
         {
             const char* country_code = (char*)sqlite3_column_text(stmt, 0);
-            return std::string(country_code);
+            cc_code = country_code;
         }
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
@@ -821,7 +822,7 @@ std::string ServerLobby::ip2Country(const TransportAddress& addr) const
             query.c_str(), sqlite3_errmsg(m_db));
         return "";
     }
-    return "";
+    return cc_code;
 }   // ip2Country
 
 #endif
