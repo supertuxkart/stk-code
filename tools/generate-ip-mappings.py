@@ -28,7 +28,7 @@ CSV_FILE = 'GeoLite2-City-Blocks-IPv4.csv'
 CSV_LOCATION = 'GeoLite2-City-Locations-en.csv'
 
 if not os.path.exists(CSV_LOCATION):
-    print("File = {} does not exist. Download it from = {} ".format(CSV_FILE, CSV_WEB_LINK))
+    print("File = {} does not exist. Download it from = {} ".format(CSV_LOCATION, CSV_WEB_LINK))
     sys.exit(1)
 
 COUNTRY_DICT = {}
