@@ -559,6 +559,8 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             host_online_local_ids[1], host_online_local_ids[2],
             m_player_names.at(
             m_player_list->getSelectionInternalName()).m_user_name,
+            m_player_names.at(
+            m_player_list->getSelectionInternalName()).m_country_code,
             m_allow_change_team,
             m_player_names.at(
             m_player_list->getSelectionInternalName()).m_difficulty);

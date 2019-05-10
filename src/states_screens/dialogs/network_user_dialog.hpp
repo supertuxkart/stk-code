@@ -23,6 +23,7 @@
 #include "states_screens/dialogs/ranking_callback.hpp"
 #include "utils/types.hpp"
 
+#include <string>
 #include <irrString.h>
 #include <memory>
 
@@ -51,6 +52,8 @@ private:
 
     const core::stringw m_name;
 
+    const std::string m_country_code;
+
     const bool m_allow_change_team;
 
     bool m_self_destroy, m_open_report_textbox;
@@ -59,7 +62,7 @@ private:
 
     GUIEngine::RibbonWidget* m_options_widget;
 
-    GUIEngine::LabelWidget* m_name_widget;
+    GUIEngine::LabelWidget* m_desc_widget;
 
     GUIEngine::LabelWidget* m_info_widget;
 
@@ -76,10 +79,12 @@ private:
     GUIEngine::IconButtonWidget* m_report_widget;
 public:
     NetworkUserDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
-                      const core::stringw& name, bool allow_change_team,
+                      const core::stringw& name,
+                      const std::string& country_code, bool allow_change_team,
                       PerPlayerDifficulty d)
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
-          m_local_id(local_id), m_per_player_difficulty(d), m_name(name),
+          m_local_id(local_id), m_per_player_difficulty(d),
+          m_name(name), m_country_code(country_code),
           m_allow_change_team(allow_change_team), m_self_destroy(false),
           m_open_report_textbox(false),
           m_fetched_ranking(std::make_shared<bool>(false))

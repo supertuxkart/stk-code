@@ -42,9 +42,20 @@ using namespace Online;
 // ----------------------------------------------------------------------------
 void NetworkUserDialog::beforeAddingWidgets()
 {
-    m_name_widget = getWidget<LabelWidget>("name");
-    assert(m_name_widget != NULL);
-    m_name_widget->setText(m_name, false);
+    m_desc_widget = getWidget<LabelWidget>("desc");
+    assert(m_desc_widget != NULL);
+    //I18N: In the network user dialog
+    core::stringw desc = _("Player name: %s", m_name);
+    if (!m_country_code.empty())
+    {
+        core::stringw country_name =
+            translations->getLocalizedCountryName(m_country_code);
+        desc += L"\n";
+        //I18N: In the network user dialog, show the player location with
+        //country name (based on IP geolocation)
+        desc += _("Player location: %s", country_name);
+    }
+    m_desc_widget->setText(desc, false);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
