@@ -710,7 +710,8 @@ void ServerLobby::cleanupDatabase()
 
 //-----------------------------------------------------------------------------
 /** Run simple query without bothering the result. */
-void ServerLobby::easySQLQuery(const std::string& query) const
+void ServerLobby::easySQLQuery(const std::string& query,
+                   std::function<void(sqlite3_stmt* stmt)> bind_function) const
 {
     if (!m_db)
         return;
@@ -718,6 +719,8 @@ void ServerLobby::easySQLQuery(const std::string& query) const
     int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
     if (ret == SQLITE_OK)
     {
+        if (bind_function)
+            bind_function(stmt);
         ret = sqlite3_step(stmt);
         ret = sqlite3_finalize(stmt);
         if (ret != SQLITE_OK)
@@ -805,15 +808,41 @@ void ServerLobby::writePlayerReport(Event* event)
         "INSERT INTO %s "
         "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
         "info, reporting_ip, reporting_online_id, reporting_username) "
-        "VALUES (\"%s\", %u, %u, \"%s\", \"%s\", %u, %u, \"%s\");",
+        "VALUES (?, %u, %u, ?, ?, %u, %u, ?);",
         ServerConfig::m_player_reports_table.c_str(),
-        ServerConfig::m_server_uid.c_str(),
         reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
-        StringUtils::wideToUtf8(reporter_npp->getName()).c_str(),
-        StringUtils::wideToUtf8(info).c_str(),
-        reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId(),
-        StringUtils::wideToUtf8(reporting_npp->getName()).c_str());
-    easySQLQuery(query);
+        reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
+    easySQLQuery(query, [reporter_npp, reporting_npp, info](sqlite3_stmt* stmt)
+        {
+            // SQLITE_TRANSIENT to copy string
+            if (sqlite3_bind_text(stmt, 1, ServerConfig::m_server_uid.c_str(),
+                -1, SQLITE_TRANSIENT) != SQLITE_OK)
+            {
+                Log::error("easySQLQuery", "Failed to bind %s.",
+                    ServerConfig::m_server_uid.c_str());
+            }
+            if (sqlite3_bind_text(stmt, 2,
+                StringUtils::wideToUtf8(reporter_npp->getName()).c_str(),
+                -1, SQLITE_TRANSIENT) != SQLITE_OK)
+            {
+                Log::error("easySQLQuery", "Failed to bind %s.",
+                    StringUtils::wideToUtf8(reporter_npp->getName()).c_str());
+            }
+            if (sqlite3_bind_text(stmt, 3,
+                StringUtils::wideToUtf8(info).c_str(),
+                -1, SQLITE_TRANSIENT) != SQLITE_OK)
+            {
+                Log::error("easySQLQuery", "Failed to bind %s.",
+                    StringUtils::wideToUtf8(info).c_str());
+            }
+            if (sqlite3_bind_text(stmt, 4,
+                StringUtils::wideToUtf8(reporting_npp->getName()).c_str(),
+                -1, SQLITE_TRANSIENT) != SQLITE_OK)
+            {
+                Log::error("easySQLQuery", "Failed to bind %s.",
+                    StringUtils::wideToUtf8(reporting_npp->getName()).c_str());
+            }
+        });
 #endif
 }   // writePlayerReport
 
@@ -2834,13 +2863,28 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     std::string query = StringUtils::insertValues(
         "INSERT INTO %s "
         "(host_id, ip, port, online_id, username, player_num, version, ping) "
-        "VALUES (%u, %u, %u, %u, \"%s\", %u, \"%s\", %u);",
+        "VALUES (%u, %u, %u, %u, ?, %u, ?, %u);",
         m_server_stats_table.c_str(), peer->getHostId(),
         peer->getAddress().getIP(), peer->getAddress().getPort(), online_id,
-        StringUtils::wideToUtf8(
-        peer->getPlayerProfiles()[0]->getName()).c_str(), player_count,
-        peer->getUserVersion().c_str(), peer->getAveragePing());
-    easySQLQuery(query);
+        player_count, peer->getAveragePing());
+    easySQLQuery(query, [peer](sqlite3_stmt* stmt)
+        {
+            if (sqlite3_bind_text(stmt, 1, StringUtils::wideToUtf8(
+                peer->getPlayerProfiles()[0]->getName()).c_str(),
+                -1, SQLITE_TRANSIENT) != SQLITE_OK)
+            {
+                Log::error("easySQLQuery", "Failed to bind %s.",
+                    StringUtils::wideToUtf8(
+                    peer->getPlayerProfiles()[0]->getName()).c_str());
+            }
+            if (sqlite3_bind_text(stmt, 2, peer->getUserVersion().c_str(),
+                -1, SQLITE_TRANSIENT) != SQLITE_OK)
+            {
+                Log::error("easySQLQuery", "Failed to bind %s.",
+                    peer->getUserVersion().c_str());
+            }
+        }
+    );
 #endif
 }   // handleUnencryptedConnection
 

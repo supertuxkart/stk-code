@@ -28,11 +28,11 @@
 
 #include <array>
 #include <atomic>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <set>
-#include <tuple>
 
 #ifdef ENABLE_SQLITE3
 #include <sqlite3.h>
@@ -85,7 +85,8 @@ private:
 
     void cleanupDatabase();
 
-    void easySQLQuery(const std::string& query) const;
+    void easySQLQuery(const std::string& query,
+        std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
 
     void checkTableExists(const std::string& table, bool& result);
 #endif
