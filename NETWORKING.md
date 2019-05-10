@@ -150,20 +150,23 @@ The current server configuration xml looks like this:
     <!-- Use sql database for handling server stats and maintenance, STK needs to be compiled with sqlite3 supported. -->
     <sql-management value="false" />
 
-    <!-- Database filename for sqlite to use, it can be shared for servers creating in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
+    <!-- Database filename for sqlite to use, it can be shared for all servers created in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
     <database-file value="stkservers.db" />
 
-    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. -->
+    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <ip-ban-table value="ip_ban" />
 
-    <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. -->
+    <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <online-id-ban-table value="online_id_ban" />
 
-    <!-- Player reports table name, which will be written when a player reports player in the network user dialog, you need to create the table first, see NETWORKING.md for details, empty to disable. -->
+    <!-- Player reports table name, which will be written when a player reports player in the network user dialog, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <player-reports-table value="player_reports" />
 
     <!-- Days to keep player reports, older than that will be auto cleared, 0 to keep them forever. -->
     <player-reports-expired-days value="3" />
+
+    <!-- IP geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <ip-geolocation-table value="ip_mapping" />
 
 </server-config>
 
@@ -216,6 +219,8 @@ You have the best gaming experience when choosing server having all players less
 Currently STK uses sqlite (if building with sqlite3 on) for server management with the following functions at the moment:
 1. Server statistics
 2. IP / online ID ban list
+3. Player reports
+4. IP geolocation
 
 You need to create a database in sqlite first, run `sqlite3 stkservers.db` in the folder where (all) your server_config.xml(s) located.
 
@@ -285,4 +290,15 @@ CREATE TABLE player_reports
     reporting_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player being reported, 0 for offline player
     reporting_username TEXT NOT NULL -- Player name being reported
 );
+
+CREATE TABLE ip_mapping
+(
+    ip_start INTEGER UNSIGNED NOT NULL PRIMARY KEY UNIQUE, -- IP decimal start
+    ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- IP decimal end
+    latitude REAL NOT NULL, -- Latitude of this IP range
+    longitude REAL NOT NULL, -- Longitude of this IP range
+    country_code TEXT NOT NULL -- 2-letter country code
+) WITHOUT ROWID;
 ```
+
+For initialization of `ip_mapping` table, check [this script](tools/generate-ip-mappings.py).

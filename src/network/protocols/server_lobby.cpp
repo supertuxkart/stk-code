@@ -174,6 +174,7 @@ void ServerLobby::initDatabase()
     m_db = NULL;
     m_ip_ban_table_exists = false;
     m_online_id_ban_table_exists = false;
+    m_ip_geolocation_table_exists = false;
     if (!ServerConfig::m_sql_management)
         return;
     int ret = sqlite3_open(ServerConfig::m_database_file.c_str(), &m_db);
@@ -191,6 +192,8 @@ void ServerLobby::initDatabase()
         m_online_id_ban_table_exists);
     checkTableExists(ServerConfig::m_player_reports_table,
         m_player_reports_table_exists);
+    checkTableExists(ServerConfig::m_ip_geolocation_table,
+        m_ip_geolocation_table_exists);
 #endif
 }   // initDatabase
 
@@ -780,6 +783,47 @@ void ServerLobby::checkTableExists(const std::string& table, bool& result)
             table.c_str());
     }
 }   // checkTableExists
+
+//-----------------------------------------------------------------------------
+std::string ServerLobby::ip2Country(const TransportAddress& addr) const
+{
+    if (!m_db || !m_ip_geolocation_table_exists || addr.isLAN())
+        return "";
+
+    std::string query = StringUtils::insertValues(
+        "SELECT country_code FROM %s "
+        "WHERE `ip_start` <= %d AND `ip_end` >= %d "
+        "ORDER BY `ip_start` DESC LIMIT 1;",
+        ServerConfig::m_ip_geolocation_table.c_str(), addr.getIP(),
+        addr.getIP());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            const char* country_code = (char*)sqlite3_column_text(stmt, 0);
+            return std::string(country_code);
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+        return "";
+    }
+    return "";
+}   // ip2Country
+
 #endif
 
 //-----------------------------------------------------------------------------
@@ -2063,6 +2107,8 @@ void ServerLobby::checkIncomingConnectionRequests()
                 users_xml->getNode(i)->get("aes-key", &keys[id].m_aes_key);
                 users_xml->getNode(i)->get("aes-iv", &keys[id].m_aes_iv);
                 users_xml->getNode(i)->get("username", &keys[id].m_name);
+                users_xml->getNode(i)->get("country-code",
+                    &keys[id].m_country_code);
                 keys[id].m_tried = false;
                 if (ServerConfig::m_firewalled_server)
                 {
@@ -2717,7 +2763,7 @@ void ServerLobby::connectionRequested(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     BareNetworkString& data, uint32_t online_id,
-    const core::stringw& online_name)
+    const core::stringw& online_name, std::string country_code)
 {
     if (data.size() < 2) return;
 
@@ -2755,6 +2801,11 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         return;
     }
 
+#ifdef ENABLE_SQLITE3
+    if (country_code.empty())
+        country_code = ip2Country(peer->getAddress());
+#endif
+
     unsigned player_count = data.getUInt8();
     auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
     for (unsigned i = 0; i < player_count; i++)
@@ -2770,7 +2821,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             (peer, i == 0 && !online_name.empty() ? online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
             per_player_difficulty, (uint8_t)i, KART_TEAM_NONE,
-            ""/* reserved for country id */);
+            country_code);
         if (ServerConfig::m_team_choosing)
         {
             KartTeam cur_team = KART_TEAM_NONE;
@@ -2862,12 +2913,13 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         return;
     std::string query = StringUtils::insertValues(
         "INSERT INTO %s "
-        "(host_id, ip, port, online_id, username, player_num, version, ping) "
-        "VALUES (%u, %u, %u, %u, ?, %u, ?, %u);",
+        "(host_id, ip, port, online_id, username, player_num, "
+        "country_code, version, ping) "
+        "VALUES (%u, %u, %u, %u, ?, %u, ?, ?, %u);",
         m_server_stats_table.c_str(), peer->getHostId(),
         peer->getAddress().getIP(), peer->getAddress().getPort(), online_id,
         player_count, peer->getAveragePing());
-    easySQLQuery(query, [peer](sqlite3_stmt* stmt)
+    easySQLQuery(query, [peer, country_code](sqlite3_stmt* stmt)
         {
             if (sqlite3_bind_text(stmt, 1, StringUtils::wideToUtf8(
                 peer->getPlayerProfiles()[0]->getName()).c_str(),
@@ -2877,7 +2929,24 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                     StringUtils::wideToUtf8(
                     peer->getPlayerProfiles()[0]->getName()).c_str());
             }
-            if (sqlite3_bind_text(stmt, 2, peer->getUserVersion().c_str(),
+            if (country_code.empty())
+            {
+                if (sqlite3_bind_null(stmt, 2) != SQLITE_OK)
+                {
+                    Log::error("easySQLQuery",
+                        "Failed to bind NULL for country code.");
+                }
+            }
+            else
+            {
+                if (sqlite3_bind_text(stmt, 2, country_code.c_str(),
+                    -1, SQLITE_TRANSIENT) != SQLITE_OK)
+                {
+                    Log::error("easySQLQuery", "Failed to bind country: %s.",
+                        country_code.c_str());
+                }
+            }
+            if (sqlite3_bind_text(stmt, 3, peer->getUserVersion().c_str(),
                 -1, SQLITE_TRANSIENT) != SQLITE_OK)
             {
                 Log::error("easySQLQuery", "Failed to bind %s.",
@@ -3390,7 +3459,7 @@ void ServerLobby::handlePendingConnection()
                 {
                     if (decryptConnectionRequest(peer, it->second.second,
                         key->second.m_aes_key, key->second.m_aes_iv, online_id,
-                        key->second.m_name))
+                        key->second.m_name, key->second.m_country_code))
                     {
                         it = m_pending_connection.erase(it);
                         m_keys.erase(online_id);
@@ -3414,7 +3483,8 @@ void ServerLobby::handlePendingConnection()
 //-----------------------------------------------------------------------------
 bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
     BareNetworkString& data, const std::string& key, const std::string& iv,
-    uint32_t online_id, const core::stringw& online_name)
+    uint32_t online_id, const core::stringw& online_name,
+    const std::string& country_code)
 {
     auto crypto = std::unique_ptr<Crypto>(new Crypto(
         Crypto::decode64(key), Crypto::decode64(iv)));
@@ -3424,7 +3494,7 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
         Log::info("ServerLobby", "%s validated",
             StringUtils::wideToUtf8(online_name).c_str());
         handleUnencryptedConnection(peer, data, online_id,
-            online_name);
+            online_name, country_code);
         return true;
     }
     return false;

@@ -68,6 +68,7 @@ private:
         std::string m_aes_key;
         std::string m_aes_iv;
         irr::core::stringw m_name;
+        std::string m_country_code;
         bool m_tried = false;
     };
     bool m_player_reports_table_exists;
@@ -81,6 +82,8 @@ private:
 
     bool m_online_id_ban_table_exists;
 
+    bool m_ip_geolocation_table_exists;
+
     uint64_t m_last_cleanup_db_time;
 
     void cleanupDatabase();
@@ -89,6 +92,8 @@ private:
         std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
 
     void checkTableExists(const std::string& table, bool& result);
+
+    std::string ip2Country(const TransportAddress& addr) const;
 #endif
     void initDatabase();
 
@@ -276,13 +281,15 @@ private:
     void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                                      BareNetworkString& data,
                                      uint32_t online_id,
-                                     const irr::core::stringw& online_name);
+                                     const irr::core::stringw& online_name,
+                                     std::string country_code = "");
     bool decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
                                   BareNetworkString& data,
                                   const std::string& key,
                                   const std::string& iv,
                                   uint32_t online_id,
-                                  const irr::core::stringw& online_name);
+                                  const irr::core::stringw& online_name,
+                                  const std::string& country_code);
     bool handleAllVotes(PeerVote* winner, uint32_t* winner_peer_id);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();

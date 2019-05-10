@@ -328,34 +328,47 @@ namespace ServerConfig
     SERVER_CFG_PREFIX StringServerConfigParam m_database_file
         SERVER_CFG_DEFAULT(StringServerConfigParam("stkservers.db",
         "database-file",
-        "Database filename for sqlite to use, it can be shared for servers "
-        "creating in this machine, and stk will create specific table for each "
-        "server. You need to create the database yourself first, see "
+        "Database filename for sqlite to use, it can be shared for all "
+        "servers created in this machine, and stk will create specific table "
+        "for each server. You need to create the database yourself first, see "
         "NETWORKING.md for details"));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_ip_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("ip_ban",
         "ip-ban-table",
         "Ip ban list table name, you need to create the table first, see "
-        "NETWORKING.md for details, empty to disable."));
+        "NETWORKING.md for details, empty to disable. "
+        "This table can be shared for all servers if you use the same name."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_online_id_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("online_id_ban",
         "online-id-ban-table",
         "Online ID ban list table name, you need to create the table first, "
-        "see NETWORKING.md for details, empty to disable."));
+        "see NETWORKING.md for details, empty to disable. "
+        "This table can be shared for all servers if you use the same name."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_player_reports_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("player_reports",
         "player-reports-table",
         "Player reports table name, which will be written when a player "
         "reports player in the network user dialog, you need to create the "
-        "table first, see NETWORKING.md for details, empty to disable."));
+        "table first, see NETWORKING.md for details, empty to disable. "
+        "This table can be shared for all servers if you use the same name."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_player_reports_expired_days
         SERVER_CFG_DEFAULT(FloatServerConfigParam(3.0f,
         "player-reports-expired-days", "Days to keep player reports, "
         "older than that will be auto cleared, 0 to keep them forever."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_ip_geolocation_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("ip_mapping",
+        "ip-geolocation-table",
+        "IP geolocation table, you only need this table if you want to "
+        "geolocate IP from non-stk-addons connection, as all validated "
+        "players connecting from stk-addons will provide the location info, "
+        "you need to create the table first, see NETWORKING.md for details, "
+        "empty to disable. "
+        "This table can be shared for all servers if you use the same name."));
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
