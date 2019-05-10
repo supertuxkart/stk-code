@@ -272,7 +272,7 @@ void ServerLobby::initServerStatsTable()
         << "    port, online_id, username, player_num, country_code, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, disconnected_time, ping\n"
-        << "    FROM " << m_server_stats_table << ";";
+        << "    FROM " << m_server_stats_table << " ORDER BY connected_time DESC;";
     query = oss.str();
     easySQLQuery(query);
 
