@@ -177,7 +177,9 @@ void ServerLobby::initDatabase()
     m_ip_geolocation_table_exists = false;
     if (!ServerConfig::m_sql_management)
         return;
-    int ret = sqlite3_open(ServerConfig::m_database_file.c_str(), &m_db);
+    int ret = sqlite3_open_v2(ServerConfig::m_database_file.c_str(), &m_db,
+        SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_FULLMUTEX |
+        SQLITE_OPEN_READWRITE, NULL);
     if (ret != SQLITE_OK)
     {
         Log::error("ServerLobby", "Cannot open database: %s.",
