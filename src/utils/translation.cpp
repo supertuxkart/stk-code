@@ -63,6 +63,10 @@ Translations* translations = NULL;
 #endif
 
 #ifndef SERVER_ONLY
+std::map<std::string, std::string> Translations::m_localized_name;
+std::map<std::string, std::map<std::string, irr::core::stringw> >
+    Translations::m_localized_country_codes;
+
 const bool REMOVE_BOM = false;
 using namespace tinygettext;
 /** The list of available languages; this is global so that it is cached (and remains
@@ -200,50 +204,106 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
     }
 
-    const std::string file_name = file_manager->getAsset("localized_name.txt");
-    try
+    if (m_localized_name.empty())
     {
-        std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
-        if (!in.get())
+        const std::string file_name = file_manager->getAsset("localized_name.txt");
+        try
         {
-            Log::error("translation", "error: failure opening: '%s'.",
-                file_name.c_str());
-        }
-        else
-        {
-            for (std::string line; std::getline(*in, line, ';'); )
+            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
+            if (!in.get())
             {
-                line = StringUtils::removeWhitespaces(line);
-                
-                if (line.empty())
-                    continue;
-                    
-                std::size_t pos = line.find("=");
-                
-                if (pos == std::string::npos)
-                    continue;
-                    
-                std::string name = line.substr(0, pos);
-                std::string localized_name = line.substr(pos + 1);
-                
-                if (name.empty() || localized_name.empty())
-                    continue;
-                    
-                if (localized_name == "0")
+                Log::error("translation", "error: failure opening: '%s'.",
+                    file_name.c_str());
+            }
+            else
+            {
+                for (std::string line; std::getline(*in, line, ';'); )
                 {
-                    localized_name =
-                        tinygettext::Language::from_name(name).get_name();
+                    line = StringUtils::removeWhitespaces(line);
+
+                    if (line.empty())
+                        continue;
+
+                    std::size_t pos = line.find("=");
+
+                    if (pos == std::string::npos)
+                        continue;
+
+                    std::string name = line.substr(0, pos);
+                    std::string localized_name = line.substr(pos + 1);
+
+                    if (name.empty() || localized_name.empty())
+                        continue;
+
+                    if (localized_name == "0")
+                    {
+                        localized_name =
+                            tinygettext::Language::from_name(name).get_name();
+                    }
+                    m_localized_name[name] = localized_name;
                 }
-                m_localized_name[name] = localized_name;
             }
         }
-    }
-    catch(std::exception& e)
-    {
-        Log::error("translation", "error: failure extract localized name.");
-        Log::error("translation", "%s", e.what());
+        catch(std::exception& e)
+        {
+            Log::error("translation", "error: failure extract localized name.");
+            Log::error("translation", "%s", e.what());
+        }
     }
 
+    if (m_localized_country_codes.empty())
+    {
+        const std::string file_name = file_manager->getAsset("country_names.csv");
+        try
+        {
+            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
+            if (!in.get())
+            {
+                Log::error("translation", "error: failure opening: '%s'.",
+                    file_name.c_str());
+            }
+            else
+            {
+                std::vector<std::string> header;
+                std::string line;
+                while (!StringUtils::safeGetline(*in, line).eof())
+                {
+                    std::vector<std::string> lists = StringUtils::split(line, ';');
+                    if (lists.size() < 2)
+                    {
+                        Log::error("translation", "Invaild list.");
+                        break;
+                    }
+                    if (lists[0] == "country_code")
+                    {
+                        header = lists;
+                        continue;
+                    }
+                    if (lists.size() != header.size())
+                    {
+                        Log::error("translation", "Different column size.");
+                        break;
+                    }
+                    if (m_localized_country_codes.find(lists[0]) ==
+                        m_localized_country_codes.end())
+                    {
+                        m_localized_country_codes[lists[0]] =
+                        std::map<std::string, irr::core::stringw>();
+                    }
+                    for (unsigned i = 1; i < lists.size(); i++)
+                    {
+                        auto& ret = m_localized_country_codes.at(lists[0]);
+                        ret[header[i]] = StringUtils::utf8ToWide(lists[i]);
+                    }
+                }
+            }
+        }
+        catch (std::exception& e)
+        {
+            Log::error("translation", "error: failure extract localized country name.");
+            Log::error("translation", "%s", e.what());
+        }
+    }
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.
@@ -375,7 +435,12 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
             m_current_language_name = l.get_name();
             m_current_language_name_code = l.get_language();
-
+            m_current_language_tag = m_current_language_name_code;
+            if (!l.get_country().empty())
+            {
+                m_current_language_tag += "-";
+                m_current_language_tag += l.get_country();
+            }
             if (!l)
             {
                 m_dictionary = m_dictionary_manager.get_dictionary();
@@ -390,12 +455,19 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 UserConfigParams::m_language = "system";
                 m_current_language_name = "Default language";
                 m_current_language_name_code = "en";
+                m_current_language_tag = "en";
                 m_dictionary = m_dictionary_manager.get_dictionary();
             }
             else
             {
                 m_current_language_name = tgtLang.get_name();
                 m_current_language_name_code = tgtLang.get_language();
+                m_current_language_tag = m_current_language_name_code;
+                if (!tgtLang.get_country().empty())
+                {
+                    m_current_language_tag += "-";
+                    m_current_language_tag += tgtLang.get_country();
+                }
                 Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
                 m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
             }
@@ -405,6 +477,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     {
         m_current_language_name = "Default language";
         m_current_language_name_code = "en";
+        m_current_language_tag = m_current_language_name_code;
         m_dictionary = m_dictionary_manager.get_dictionary();
     }
 
@@ -698,6 +771,25 @@ const std::string& Translations::getLocalizedName(const std::string& str) const
     std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
     assert (n != m_localized_name.end());
     return n->second;
+}
+
+/* Convert 2-letter country code to localized readable name.
+ */
+irr::core::stringw Translations::getLocalizedCountryName(const std::string& country_code) const
+{
+    auto it = m_localized_country_codes.find(country_code);
+    // If unknown 2 letter country just return the same
+    if (it == m_localized_country_codes.end())
+        return StringUtils::utf8ToWide(country_code);
+    auto name_itr = it->second.find(m_current_language_tag);
+    if (name_itr != it->second.end())
+        return name_itr->second;
+    // If there should be invalid language tag, use en (which always exists)
+    name_itr = it->second.find("en");
+    if (name_itr != it->second.end())
+        return name_itr->second;
+    // Fallback
+    return StringUtils::utf8ToWide(country_code);
 }
 
 #endif
