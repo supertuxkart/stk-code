@@ -46,6 +46,7 @@ void NetworkUserDialog::beforeAddingWidgets()
     assert(m_desc_widget != NULL);
     //I18N: In the network user dialog
     core::stringw desc = _("Player name: %s", m_name);
+#ifndef SERVER_ONLY
     if (!m_country_code.empty())
     {
         core::stringw country_name =
@@ -55,6 +56,7 @@ void NetworkUserDialog::beforeAddingWidgets()
         //country name (based on IP geolocation)
         desc += _("Player location: %s", country_name);
     }
+#endif
     m_desc_widget->setText(desc, false);
 
     m_info_widget = getWidget<LabelWidget>("info");
