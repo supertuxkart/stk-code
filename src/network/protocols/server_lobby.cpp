@@ -258,6 +258,18 @@ void ServerLobby::initServerStatsTable()
     if (m_server_stats_table.empty())
         return;
 
+    // Extra default table _countries:
+    // Server owner need to initialise this table himself, check NETWORKING.md
+    std::string country_table_name = std::string("v") + StringUtils::toString(
+        ServerConfig::m_server_db_version) + "_countries";
+    query = StringUtils::insertValues(
+        "CREATE TABLE IF NOT EXISTS %s (\n"
+        "    country_code TEXT NOT NULL PRIMARY KEY UNIQUE, -- Unique 2-letter country code\n"
+        "    country_flag TEXT NOT NULL, -- Unicode country flag representation of 2-letter country code\n"
+        "    country_name TEXT NOT NULL -- Readable name of this country\n"
+        ") WITHOUT ROWID;", country_table_name.c_str());
+    easySQLQuery(query);
+
     // Default views:
     // _full_stats
     // Full stats with ip in human readable format and time played of each
@@ -269,10 +281,13 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num, country_code, version,\n"
+        << "    port, online_id, username, player_num,\n"
+        << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
-        << "    connected_time, disconnected_time, ping\n"
-        << "    FROM " << m_server_stats_table << " ORDER BY connected_time DESC;";
+        << "    connected_time, disconnected_time, ping FROM " << m_server_stats_table << "\n"
+        << "    LEFT JOIN " << country_table_name << " ON "
+        <<      country_table_name << ".country_code = " << m_server_stats_table << ".country_code\n"
+        << "    ORDER BY connected_time DESC;";
     query = oss.str();
     easySQLQuery(query);
 
@@ -287,9 +302,12 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num, country_code, version,\n"
+        << "    port, online_id, username, player_num,\n"
+        << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", 'now') - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, ping FROM " << m_server_stats_table << "\n"
+        << "    LEFT JOIN " << country_table_name << " ON "
+        <<      country_table_name << ".country_code = " << m_server_stats_table << ".country_code\n"
         << "    WHERE connected_time = disconnected_time;";
     query = oss.str();
     easySQLQuery(query);
