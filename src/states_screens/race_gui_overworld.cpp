@@ -86,7 +86,8 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
     m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
-    float scaling = irr_driver->getFrameSize().Height / 420.0f;
+    float scaling = std::min(irr_driver->getFrameSize().Height,  
+			                    irr_driver->getFrameSize().Width) / 420.0f;
     const float map_size = 250.0f;
 
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
@@ -242,7 +243,8 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     bool vcenter = true;
 
-    const int size = irr_driver->getActualScreenSize().Width/20;
+    const int size = std::min((int)irr_driver->getActualScreenSize().Width/20,
+                                      2 * GUIEngine::getFontHeight());
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
                          size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy[3]->getSize());
