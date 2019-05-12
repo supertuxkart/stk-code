@@ -350,32 +350,14 @@ void FontWithFace::dumpGlyphPage()
  */
 void FontWithFace::setDPI()
 {
-    const int screen_width = irr_driver->getActualScreenSize().Width;
-    const int screen_height = irr_driver->getActualScreenSize().Height;
-
-    if (UserConfigParams::m_hidpi_enabled)
-    {
-        float scale = screen_height / 480.0f;
-        m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
-    }
-    else if (screen_height > 1300)
-    {
-        float scale = screen_height / 480.0f * 0.45f;
-        m_face_dpi = int(getScalingFactorTwo() * (getScalingFactorOne() + 0.3f) * scale);
-    }
-    else
-    {
-        float scale = std::max(0, screen_width - 640) / 564.0f;
+    float scale = irr_driver->getActualScreenSize().Height / 720.0f;
+    int factorTwo = getScalingFactorTwo();
     
-        // attempt to compensate for small screens
-        if (screen_width < 1200)
-            scale = std::max(0, screen_width - 640) / 750.0f;
-        if (screen_width < 900 || screen_height < 700)
-            scale = std::min(scale, 0.05f);
+    if(0 <= UserConfigParams::m_fonts_size && UserConfigParams::m_fonts_size <= 4)
+	    factorTwo += UserConfigParams::m_fonts_size * 5 - 10;
     
-        m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
-            getScalingFactorTwo());
-    }
+    m_face_dpi = int(factorTwo * getScalingFactorOne() * scale);
+    
 }   // setDPI
 
 // ----------------------------------------------------------------------------

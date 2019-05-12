@@ -537,11 +537,6 @@ namespace UserConfigParams
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
             "keyboard, 2 = always enabled, 3 = android keyboard (experimental)") );
 
-    PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
-            &m_multitouch_group,
-            "Enable high-DPI support.") );
-
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
@@ -648,6 +643,9 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
+    PARAM_PREFIX IntUserConfigParam         m_fonts_size
+        PARAM_DEFAULT(  IntUserConfigParam(2, "fonts_size",
+        &m_video_group,"The size of fonts. 0 is the smallest and 4 is the biggest") );
 
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
