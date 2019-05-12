@@ -350,7 +350,8 @@ void FontWithFace::dumpGlyphPage()
  */
 void FontWithFace::setDPI()
 {
-    float scale = irr_driver->getActualScreenSize().Height / 720.0f;
+    float scale = std::min(irr_driver->getActualScreenSize().Height,
+                             irr_driver->getActualScreenSize().Width)  / 720.0f;
     int factorTwo = getScalingFactorTwo();
     
     if(0 <= UserConfigParams::m_fonts_size && UserConfigParams::m_fonts_size <= 4)
