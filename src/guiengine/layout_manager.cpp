@@ -66,7 +66,7 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
     }
     else if( x[x.size()-1] == 'f' ) // font height
     {
-	    *absolute = i * GUIEngine::getFontHeight();
+        *absolute = i * GUIEngine::getFontHeight();
     	return true;
     }
     else // absolute number
@@ -515,7 +515,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                             }
                             else if(prop_y[ prop_y.size()-1 ] == 'f')
                             {
-		                		widgets[n].m_y = y + atoi_p(prop_y.c_str()) * GUIEngine::getFontHeight();
+                                widgets[n].m_y = y + atoi_p(prop_y.c_str()) * GUIEngine::getFontHeight();
                             }
                             else
                             {
@@ -594,7 +594,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                             }
                             else if(prop_x[ prop_x.size()-1 ] == 'f')
                             {
-			                	widgets[n].m_x = x + atoi_p(prop_x.c_str()) * GUIEngine::getFontHeight();
+                                widgets[n].m_x = x + atoi_p(prop_x.c_str()) * GUIEngine::getFontHeight();
                             }
                             else
                             {
@@ -652,7 +652,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                             }
                             else if(prop_y[ prop_y.size()-1 ] == 'f')
                             {
-			                 	widgets[n].m_y = y + atoi_p(prop_y.c_str()) * GUIEngine::getFontHeight();
+                                widgets[n].m_y = y + atoi_p(prop_y.c_str()) * GUIEngine::getFontHeight();
                             }
                             else
                             {
@@ -702,7 +702,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                             }
                             else if(prop_x[ prop_x.size()-1 ] == 'f')
                             {
-				                widgets[n].m_x = x + atoi_p(prop_x.c_str()) * GUIEngine::getFontHeight();
+                                widgets[n].m_x = x + atoi_p(prop_x.c_str()) * GUIEngine::getFontHeight();
                             }
                             else
                             {
