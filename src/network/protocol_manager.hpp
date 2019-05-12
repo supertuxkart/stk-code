@@ -144,7 +144,7 @@ private:
     class OneProtocolType
     {
     private:
-        Synchronised< std::vector<std::shared_ptr<Protocol> > > m_protocols;
+        std::vector<std::shared_ptr<Protocol> > m_protocols;
     public:
         void removeProtocol(std::shared_ptr<Protocol> p);
         void requestTerminateAll();
@@ -154,16 +154,15 @@ private:
         // --------------------------------------------------------------------
         /** Returns the first protocol of a given type. It is assumed that
          *  there is a protocol of that type. */
-        std::shared_ptr<Protocol> getFirstProtocol()
-                                           { return m_protocols.getData()[0]; }
+        std::shared_ptr<Protocol> getFirstProtocol() { return m_protocols[0]; }
         // --------------------------------------------------------------------
         /** Returns if this protocol class handles connect events. Protocols
          *  of the same class either all handle a connect event, or none, so
          *  only the first protocol is actually tested. */
         bool handleConnects() const
         {
-            return !m_protocols.getData().empty() &&
-                    m_protocols.getData()[0]->handleConnects();
+            return !m_protocols.empty() &&
+                    m_protocols[0]->handleConnects();
         }   // handleConnects
         // --------------------------------------------------------------------
         /** Returns if this protocol class handles disconnect events. Protocols
@@ -171,23 +170,17 @@ private:
         *  only the first protocol is actually tested. */
         bool handleDisconnects() const
         {
-            return !m_protocols.getData().empty() &&
-                m_protocols.getData()[0]->handleDisconnects();
+            return !m_protocols.empty() &&
+                m_protocols[0]->handleDisconnects();
         }   // handleDisconnects
-        // --------------------------------------------------------------------
-        /** Locks access to this list of all protocols of a certain type. */
-        void lock() { m_protocols.lock(); }
-        // --------------------------------------------------------------------
-        /** Locks access to this list of all protocols of a certain type. */
-        void unlock() { m_protocols.unlock(); }
         // --------------------------------------------------------------------
         void addProtocol(std::shared_ptr<Protocol> p)
         {
-            m_protocols.getData().push_back(p); 
+            m_protocols.push_back(p);
         }   // addProtocol
         // --------------------------------------------------------------------
         /** Returns if there are no protocols of this type registered. */
-        bool isEmpty() const { return m_protocols.getData().empty(); }
+        bool isEmpty() const { return m_protocols.empty(); }
         // --------------------------------------------------------------------
 
     };   // class OneProtocolType
@@ -224,20 +217,19 @@ private:
 
     std::condition_variable m_game_protocol_cv;
 
-    std::mutex m_game_protocol_mutex;
+    std::mutex m_game_protocol_mutex, m_protocols_mutex;
 
     EventList m_controller_events_list;
 
     /*! Single instance of protocol manager.*/
     static std::weak_ptr<ProtocolManager> m_protocol_manager;
 
-    bool         sendEvent(Event* event);
+    bool         sendEvent(Event* event,
+                           std::vector<OneProtocolType>& protocols);
 
     virtual void startProtocol(std::shared_ptr<Protocol> protocol);
     virtual void terminateProtocol(std::shared_ptr<Protocol> protocol);
     virtual void asynchronousUpdate();
-    virtual void pauseProtocol(std::shared_ptr<Protocol> protocol);
-    virtual void unpauseProtocol(std::shared_ptr<Protocol> protocol);
 
 public:
     // ===========================================
