@@ -282,6 +282,7 @@ private:
                                      BareNetworkString& data,
                                      uint32_t online_id,
                                      const irr::core::stringw& online_name,
+                                     bool is_pending_connection,
                                      std::string country_code = "");
     bool decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
                                   BareNetworkString& data,

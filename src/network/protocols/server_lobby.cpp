@@ -2828,14 +2828,16 @@ void ServerLobby::connectionRequested(Event* event)
         core::stringw online_name;
         if (online_id > 0)
             data.decodeStringW(&online_name);
-        handleUnencryptedConnection(peer, data, online_id, online_name);
+        handleUnencryptedConnection(peer, data, online_id, online_name,
+            false/*is_pending_connection*/);
     }
 }   // connectionRequested
 
 //-----------------------------------------------------------------------------
 void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     BareNetworkString& data, uint32_t online_id,
-    const core::stringw& online_name, std::string country_code)
+    const core::stringw& online_name, bool is_pending_connection,
+    std::string country_code)
 {
     if (data.size() < 2) return;
 
@@ -2856,21 +2858,44 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         return;
     }
 
-    // Check again for duplicated player in ranked server
-    std::set<uint32_t> all_online_ids =
-        STKHost::get()->getAllPlayerOnlineIds();
-    bool duplicated_ranked_player =
-        all_online_ids.find(online_id) != all_online_ids.end();
-    if (ServerConfig::m_ranked && duplicated_ranked_player)
+    // Check again max players and duplicated player in ranked server,
+    // if this is a pending connection
+    unsigned total_players = 0;
+    unsigned player_count = data.getUInt8();
+
+    if (is_pending_connection)
     {
-        NetworkString* message = getNetworkString(2);
-        message->setSynchronous(true);
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_INVALID_PLAYER);
-        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: invalid player");
-        return;
+        STKHost::get()->updatePlayers(NULL, NULL, &total_players);
+        if (total_players + player_count >
+            (unsigned)ServerConfig::m_server_max_players)
+        {
+            NetworkString *message = getNetworkString(2);
+            message->setSynchronous(true);
+            message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_TOO_MANY_PLAYERS);
+            peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+            peer->reset();
+            delete message;
+            Log::verbose("ServerLobby", "Player refused: too many players");
+            return;
+        }
+
+        std::set<uint32_t> all_online_ids =
+            STKHost::get()->getAllPlayerOnlineIds();
+        bool duplicated_ranked_player =
+            all_online_ids.find(online_id) != all_online_ids.end();
+        if (ServerConfig::m_ranked && duplicated_ranked_player)
+        {
+            NetworkString* message = getNetworkString(2);
+            message->setSynchronous(true);
+            message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_INVALID_PLAYER);
+            peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+            peer->reset();
+            delete message;
+            Log::verbose("ServerLobby", "Player refused: invalid player");
+            return;
+        }
     }
 
 #ifdef ENABLE_SQLITE3
@@ -2878,7 +2903,6 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         country_code = ip2Country(peer->getAddress());
 #endif
 
-    unsigned player_count = data.getUInt8();
     auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
     for (unsigned i = 0; i < player_count; i++)
     {
@@ -3566,7 +3590,7 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
         Log::info("ServerLobby", "%s validated",
             StringUtils::wideToUtf8(online_name).c_str());
         handleUnencryptedConnection(peer, data, online_id,
-            online_name, country_code);
+            online_name, true/*is_pending_connection*/, country_code);
         return true;
     }
     return false;
