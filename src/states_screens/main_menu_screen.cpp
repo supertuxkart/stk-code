@@ -79,7 +79,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(15);
+    w->setScrollSpeed(GUIEngine::getFontHeight() / 2);
     
     RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
     assert(rw_top != NULL);
