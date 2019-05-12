@@ -274,11 +274,11 @@ void ServerLobby::initServerStatsTable()
     // _full_stats
     // Full stats with ip in human readable format and time played of each
     // players in minutes
-    std::string view_name = std::string("v") +
+    std::string full_stats_view_name = std::string("v") +
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_full_stats";
     std::ostringstream oss;
-    oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
+    oss << "CREATE VIEW IF NOT EXISTS " << full_stats_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
         << "    port, online_id, username, player_num,\n"
@@ -294,12 +294,12 @@ void ServerLobby::initServerStatsTable()
     // _current_players
     // Current players in server with ip in human readable format and time
     // played of each players in minutes
-    view_name = std::string("v") +
+    std::string current_players_view_name = std::string("v") +
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_current_players";
     oss.str("");
     oss.clear();
-    oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
+    oss << "CREATE VIEW IF NOT EXISTS " << current_players_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
         << "    port, online_id, username, player_num,\n"
@@ -315,21 +315,58 @@ void ServerLobby::initServerStatsTable()
     // _player_stats
     // All players with online id and username with their time played stats
     // in this server since creation of this database
-    view_name = std::string("v") +
+    // If sqlite supports window functions (since 3.25), it will include last session player info (ip, country, ping...)
+    std::string player_stats_view_name = std::string("v") +
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_player_stats";
     oss.str("");
     oss.clear();
-    oss << "CREATE VIEW IF NOT EXISTS " << view_name << " AS\n"
-        << "    SELECT online_id, username, COUNT(online_id) AS num_connections,\n"
-        << "    MIN(connected_time) AS first_played_time,\n"
-        << "    MAX(connected_time) AS last_played_time,\n"
-        << "    ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
-        << "    ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
-        << "    ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
-        << "    ROUND(MAX((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS max_time_played\n"
-        << "    FROM " << m_server_stats_table << "\n"
-        << "    WHERE online_id != 0 GROUP BY online_id ORDER BY num_connections DESC;";
+    if (sqlite3_libversion_number() < 3025000)
+    {
+        oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
+            << "    SELECT online_id, username, COUNT(online_id) AS num_connections,\n"
+            << "    MIN(connected_time) AS first_connected_time,\n"
+            << "    MAX(connected_time) AS last_connected_time,\n"
+            << "    ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
+            << "    ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
+            << "    ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
+            << "    ROUND(MAX((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS max_time_played\n"
+            << "    FROM " << m_server_stats_table << "\n"
+            << "    WHERE online_id != 0 GROUP BY online_id ORDER BY num_connections DESC;";
+    }
+    else
+    {
+        oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
+            << "    SELECT a.online_id, a.username, a.ip, a.ip_readable, a.port, a.player_num,\n"
+            << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping,\n"
+            << "    b.num_connections, b.first_connected_time, b.first_disconnected_time,\n"
+            << "    a.connected_time AS last_connected_time, a.disconnected_time AS last_disconnected_time,\n"
+            << "    a.time_played AS last_time_played, b.total_time_played, b.average_time_played,\n"
+            << "    b.min_time_played, b.max_time_played\n"
+            << "    FROM\n"
+            << "    (\n"
+            << "        SELECT *,\n"
+            << "        ROW_NUMBER() OVER\n"
+            << "        (\n"
+            << "            PARTITION BY online_id\n"
+            << "            ORDER BY connected_time DESC\n"
+            << "        ) RowNum\n"
+            << "        FROM " << full_stats_view_name << " where online_id != 0\n"
+            << "    ) as a\n"
+            << "    JOIN\n"
+            << "    (\n"
+            << "        SELECT online_id, COUNT(online_id) AS num_connections,\n"
+            << "        MIN(connected_time) AS first_connected_time,\n"
+            << "        MIN(disconnected_time) AS first_disconnected_time,\n"
+            << "        ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
+            << "        ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
+            << "        ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
+            << "        ROUND(MAX((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS max_time_played\n"
+            << "        FROM " << m_server_stats_table << " WHERE online_id != 0 GROUP BY online_id\n"
+            << "    ) AS b\n"
+            << "    ON b.online_id = a.online_id\n"
+            << "    WHERE RowNum = 1 ORDER BY num_connections DESC;\n";
+    }
     query = oss.str();
     easySQLQuery(query);
 

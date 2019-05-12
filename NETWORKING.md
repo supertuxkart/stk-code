@@ -252,6 +252,7 @@ Current players in server with ip in human readable format and time played of ea
 
 `*_player_stats`
 All players with online id and username with their time played stats in this server since creation of this database.
+If sqlite supports window functions (since 3.25), it will include last session player info (ip, country, ping...).
 
 A empty table named `v(server database version)_countries` will also be created in your database if not exists:
 ```sql
@@ -263,9 +264,9 @@ CREATE TABLE IF NOT EXISTS (table name above)
 ) WITHOUT ROWID;
 ```
 
-If you want to see flags and readable names of countries in `*_full_stats` and `*_current_players` views, you need to initialize `v(server database version)_countries` table, check [this script](tools/generate-countries-table.py).
+If you want to see flags and readable names of countries in the above views, you need to initialize `v(server database version)_countries` table, check [this script](tools/generate-countries-table.py).
 
-For IP, online ID ban list or player reports, you need to create one yourself:
+For IP and online ID ban list, player reports or IP mapping, you need to create one yourself:
 ```sql
 CREATE TABLE ip_ban
 (
