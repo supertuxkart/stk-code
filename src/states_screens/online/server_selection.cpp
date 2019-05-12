@@ -137,7 +137,7 @@ void ServerSelection::init()
     m_searcher->clearListeners();
     m_searcher->addListener(this);
 
-    m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 96.0f);
     m_icon_bank->setTargetIconSize(128, 128);
 
     video::ITexture* icon1 = irr_driver->getTexture(
