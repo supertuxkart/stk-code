@@ -114,7 +114,7 @@ RaceGUI::RaceGUI()
 
     // Originally m_map_height was 100, and we take 480 as minimum res
     float scaling = std::min(irr_driver->getFrameSize().Height,  
-							    irr_driver->getFrameSize().Width) / 480.0f;
+                             irr_driver->getFrameSize().Width) / 480.0f;
     const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
 
