@@ -41,8 +41,6 @@
 class Event;
 class STKPeer;
 
-#define TIME_TO_KEEP_EVENTS 1.0
-
 // ----------------------------------------------------------------------------
 /** \enum ProtocolRequestType
  *  \brief Defines actions that can be done about protocols.

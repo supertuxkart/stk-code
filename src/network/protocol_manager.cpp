@@ -449,7 +449,8 @@ bool ProtocolManager::sendEvent(Event* event)
             can_be_deleted |= m_all_protocols.at(i).notifyEvent(event);
         }
     }
-    return can_be_deleted || StkTime::getTimeSinceEpoch() - event->getArrivalTime()
+    const uint64_t TIME_TO_KEEP_EVENTS = 1000;
+    return can_be_deleted || StkTime::getMonoTimeMs() - event->getArrivalTime()
                               >= TIME_TO_KEEP_EVENTS;
 }   // sendEvent
 

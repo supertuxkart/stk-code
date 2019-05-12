@@ -84,7 +84,7 @@ private:
     std::shared_ptr<STKPeer> m_peer;
 
     /** Arrivial time of the event, for timeouts. */
-    double m_arrival_time;
+    uint64_t m_arrival_time;
 
     /** For disconnection event, a bit more info is provided. */
     PeerDisconnectInfo m_pdi;
@@ -119,7 +119,7 @@ public:
                                         m_data->isSynchronous();     }
     // ------------------------------------------------------------------------
     /** Returns the arrival time of this event. */
-    double getArrivalTime() const { return m_arrival_time; }
+    uint64_t getArrivalTime() const { return m_arrival_time; }
     // ------------------------------------------------------------------------
     PeerDisconnectInfo getPeerDisconnectInfo() const { return m_pdi; }
     // ------------------------------------------------------------------------

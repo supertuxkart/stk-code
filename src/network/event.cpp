@@ -41,7 +41,7 @@ constexpr bool isConnectionRequestPacket(unsigned char* data, size_t length)
 // ============================================================================
 Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
 {
-    m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+    m_arrival_time = StkTime::getMonoTimeMs();
     m_pdi = PDI_TIMEOUT;
     m_peer = peer;
 
