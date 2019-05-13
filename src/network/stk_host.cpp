@@ -339,6 +339,15 @@ STKHost::~STKHost()
     Network::closeLog();
     stopListening();
 
+    // Drop all unsent packets
+    for (auto& p : m_enet_cmd)
+    {
+        if (std::get<3>(p) == ECT_SEND_PACKET)
+        {
+            ENetPacket* packet = std::get<1>(p);
+            enet_packet_destroy(packet);
+        }
+    }
     delete m_network;
     enet_deinitialize();
     delete m_separate_process;
@@ -763,8 +772,7 @@ void STKHost::mainLoop()
                 need_ping = true;
             }
 
-            ENetPacket* packet = NULL;
-            bool need_destroy_packet = true;
+            BareNetworkString ping_packet;
             if (need_ping)
             {
                 m_peer_pings.getData().clear();
@@ -814,7 +822,6 @@ void STKHost::mainLoop()
                         }
                     }
                 }
-                BareNetworkString ping_packet;
                 uint64_t network_timer = getNetworkTimer();
                 ping_packet.addUInt64(network_timer);
                 ping_packet.addUInt8((uint8_t)m_peer_pings.getData().size());
@@ -840,18 +847,27 @@ void STKHost::mainLoop()
                 ping_packet.getBuffer().insert(
                     ping_packet.getBuffer().begin(), g_ping_packet.begin(),
                     g_ping_packet.end());
-                packet = enet_packet_create(ping_packet.getData(),
-                    ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
             }
 
             for (auto it = m_peers.begin(); it != m_peers.end();)
             {
-                if (need_ping &&
+                if (!ping_packet.getBuffer().empty() &&
                     (!sl->allowJoinedPlayersWaiting() ||
                     !sl->isRacing() || it->second->isWaitingForGame()))
                 {
-                    need_destroy_packet = false;
-                    enet_peer_send(it->first, EVENT_CHANNEL_UNENCRYPTED, packet);
+                    ENetPacket* packet = enet_packet_create(ping_packet.getData(),
+                        ping_packet.getTotalSize(), ENET_PACKET_FLAG_RELIABLE);
+                    if (packet)
+                    {
+                        // If enet_peer_send failed, destroy the packet to
+                        // prevent leaking, this can only be done if the packet
+                        // is copied instead of shared sending to all peers
+                        if (enet_peer_send(
+                            it->first, EVENT_CHANNEL_UNENCRYPTED, packet) < 0)
+                        {
+                            enet_packet_destroy(packet);
+                        }
+                    }
                 }
 
                 // Remove peer which has not been validated after a specific time
@@ -873,8 +889,6 @@ void STKHost::mainLoop()
                 }
             }
             peer_lock.unlock();
-            if (need_destroy_packet && packet != NULL)
-                enet_packet_destroy(packet);
         }
 
         std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
@@ -887,9 +901,18 @@ void STKHost::mainLoop()
             switch (std::get<3>(p))
             {
             case ECT_SEND_PACKET:
-                enet_peer_send(std::get<0>(p), (uint8_t)std::get<2>(p),
-                    std::get<1>(p));
+            {
+                // If enet_peer_send failed, destroy the packet to
+                // prevent leaking, this can only be done if the packet
+                // is copied instead of shared sending to all peers
+                ENetPacket* packet = std::get<1>(p);
+                if (enet_peer_send(
+                    std::get<0>(p), (uint8_t)std::get<2>(p), packet) < 0)
+                {
+                    enet_packet_destroy(packet);
+                }
                 break;
+            }
             case ECT_DISCONNECT:
                 enet_peer_disconnect(std::get<0>(p), std::get<2>(p));
                 break;
