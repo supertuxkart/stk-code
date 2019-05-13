@@ -147,6 +147,8 @@ void ClientLobby::doneWithResults()
 bool ClientLobby::notifyEvent(Event* event)
 {
     assert(m_game_setup); // assert that the setup exists
+    if (event->getType() != EVENT_TYPE_MESSAGE)
+        return true;
 
     NetworkString &data = event->data();
     assert(data.size()); // assert that data isn't empty
@@ -174,7 +176,6 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_START_RACE:            startGame(event);           break;
         case LE_REPORT_PLAYER:         reportSuccess(event);       break;
         default:
-            return false;
             break;
     }   // switch
     return true;
@@ -196,8 +197,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
         {
             default:                                                     break;
         }   // switch
-
-        return true;
     } // message
     else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
     {
@@ -211,9 +210,8 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
         STKHost::get()->setErrorMessage(
             m_disconnected_msg.at(event->getPeerDisconnectInfo()));
         STKHost::get()->requestShutdown();
-        return true;
     } // disconnection
-    return false;
+    return true;
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------

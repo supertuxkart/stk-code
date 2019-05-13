@@ -563,7 +563,7 @@ bool ServerLobby::notifyEvent(Event* event)
 {
     assert(m_game_setup); // assert that the setup exists
     if (event->getType() != EVENT_TYPE_MESSAGE)
-        return false;
+        return true;
 
     NetworkString &data = event->data();
     assert(data.size()); // message not empty
