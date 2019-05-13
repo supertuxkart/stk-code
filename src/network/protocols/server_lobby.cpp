@@ -604,8 +604,6 @@ void ServerLobby::handleChat(Event* event)
         STKHost::get()->sendPacketToAllPeersWith(
             [game_started, sender_in_game](STKPeer* p)
             {
-                if (!p->isValidated())
-                    return false;
                 if (game_started)
                 {
                     if (p->isWaitingForGame() && !sender_in_game)

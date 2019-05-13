@@ -1269,6 +1269,8 @@ void STKHost::sendPacketToAllPeersWith(std::function<bool(STKPeer*)> predicate,
     for (auto p : m_peers)
     {
         STKPeer* stk_peer = p.second.get();
+        if (!stk_peer->isValidated())
+            continue;
         if (predicate(stk_peer))
             stk_peer->sendPacket(data, reliable);
     }
