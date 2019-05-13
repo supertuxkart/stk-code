@@ -643,9 +643,9 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
-    PARAM_PREFIX IntUserConfigParam         m_fonts_size
-        PARAM_DEFAULT(  IntUserConfigParam(2, "fonts_size",
-        &m_video_group,"The size of fonts. 0 is the smallest and 4 is the biggest") );
+    PARAM_PREFIX FloatUserConfigParam         m_fonts_size
+        PARAM_DEFAULT(  FloatUserConfigParam(2, "fonts_size",
+        &m_video_group,"The size of fonts. 0 is the smallest and 6 is the biggest") );
 
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
