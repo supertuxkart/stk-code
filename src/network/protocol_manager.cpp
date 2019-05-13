@@ -247,13 +247,27 @@ void ProtocolManager::startProtocol(std::shared_ptr<Protocol> protocol)
     assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     OneProtocolType &opt = m_all_protocols[protocol->getProtocolType()];
     opt.addProtocol(protocol);
-    protocol->setup();
-    Protocol* protocol_ptr = protocol.get();
-    Log::info("ProtocolManager",
-        "A %s protocol has been started.", typeid(*protocol_ptr).name());
-
-    // setup the protocol and notify it that it's started
 }   // startProtocol
+
+// ----------------------------------------------------------------------------
+void ProtocolManager::OneProtocolType::addProtocol(std::shared_ptr<Protocol> p)
+{
+    auto i = std::find(m_protocols.begin(), m_protocols.end(), p);
+    Protocol* protocol_ptr = p.get();
+    if (i == m_protocols.end())
+    {
+        // setup the protocol and notify it that it's started
+        p->setup();
+        Log::info("ProtocolManager",
+            "A %s protocol has been started.", typeid(*protocol_ptr).name());
+        m_protocols.push_back(p);
+    }
+    else
+    {
+        Log::warn("ProtocolManager", "A %s protocol has already started.",
+            typeid(*protocol_ptr).name());
+    }
+}   // addProtocol
 
 // ----------------------------------------------------------------------------
 /** Removes a protocol from the list of protocols of a certain type.

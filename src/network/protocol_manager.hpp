@@ -173,10 +173,7 @@ private:
                 m_protocols[0]->handleDisconnects();
         }   // handleDisconnects
         // --------------------------------------------------------------------
-        void addProtocol(std::shared_ptr<Protocol> p)
-        {
-            m_protocols.push_back(p);
-        }   // addProtocol
+        void addProtocol(std::shared_ptr<Protocol> p);
         // --------------------------------------------------------------------
         /** Returns if there are no protocols of this type registered. */
         bool isEmpty() const { return m_protocols.empty(); }
