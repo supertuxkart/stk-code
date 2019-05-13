@@ -78,7 +78,7 @@ engine.
 */
 
 ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
-           : LobbyProtocol(NULL)
+           : LobbyProtocol()
 {
     m_auto_started = false;
     m_waiting_for_game = false;

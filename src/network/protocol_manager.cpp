@@ -101,7 +101,6 @@ std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
 ProtocolManager::ProtocolManager()
 {
     m_exit.store(false);
-    m_all_protocols.resize(PROTOCOL_MAX);
 }   // ProtocolManager
 
 // ----------------------------------------------------------------------------
@@ -211,42 +210,6 @@ void ProtocolManager::requestStart(std::shared_ptr<Protocol> protocol)
 }   // requestStart
 
 // ----------------------------------------------------------------------------
-/** \brief Asks the manager to pause a protocol.
- *  This function will store the request, and process it at a time it is
- *  thread-safe.
- *  \param protocol : A pointer to the protocol to pause
- */
-void ProtocolManager::requestPause(std::shared_ptr<Protocol> protocol)
-{
-    if (!protocol)
-        return;
-    // create the request
-    ProtocolRequest req(PROTOCOL_REQUEST_PAUSE, protocol);
-    // add it to the request stack
-    m_requests.lock();
-    m_requests.getData().push_back(req);
-    m_requests.unlock();
-}   // requestPause
-
-// ----------------------------------------------------------------------------
-/** \brief Asks the manager to unpause a protocol.
- *  This function will store the request, and process it at a time it is
- *  thread-safe.
- *  \param protocol : A pointer to the protocol to unpause
- */
-void ProtocolManager::requestUnpause(std::shared_ptr<Protocol> protocol)
-{
-    if (!protocol)
-        return;
-    // create the request
-    ProtocolRequest req(PROTOCOL_REQUEST_UNPAUSE, protocol);
-    // add it to the request stack
-    m_requests.lock();
-    m_requests.getData().push_back(req);
-    m_requests.unlock();
-}   // requestUnpause
-
-// ----------------------------------------------------------------------------
 /** \brief Notifies the manager that a protocol is terminated.
  *  This function will store the request, and process it at a time it is
  *  thread-safe.
@@ -285,7 +248,6 @@ void ProtocolManager::startProtocol(std::shared_ptr<Protocol> protocol)
     OneProtocolType &opt = m_all_protocols[protocol->getProtocolType()];
     opt.addProtocol(protocol);
     protocol->setup();
-    protocol->setState(PROTOCOL_STATE_RUNNING);
     Protocol* protocol_ptr = protocol.get();
     Log::info("ProtocolManager",
         "A %s protocol has been started.", typeid(*protocol_ptr).name());
@@ -301,16 +263,18 @@ void ProtocolManager::startProtocol(std::shared_ptr<Protocol> protocol)
 void ProtocolManager::OneProtocolType::removeProtocol(std::shared_ptr<Protocol> p)
 {
     auto i = std::find(m_protocols.begin(), m_protocols.end(), p);
-    if (i == m_protocols.end())
+    Protocol* protocol_ptr = p.get();
+    if (i != m_protocols.end())
     {
-        Protocol* protocol_ptr = p.get();
-        Log::error("ProtocolManager",
-                   "Trying to delete protocol '%s', which was not found",
-                   typeid(*protocol_ptr).name());
+        m_protocols.erase(i);
+        Log::info("ProtocolManager",
+            "A %s protocol has been terminated.", typeid(*protocol_ptr).name());
     }
     else
     {
-        m_protocols.erase(i);
+        Log::warn("ProtocolManager",
+            "A %s protocol not found in list for removal.",
+            typeid(*protocol_ptr).name());
     }
 }   // deleteProtocol
 
@@ -325,11 +289,6 @@ void ProtocolManager::terminateProtocol(std::shared_ptr<Protocol> protocol)
 
     OneProtocolType &opt = m_all_protocols[protocol->getProtocolType()];
     opt.removeProtocol(protocol);
-    protocol->setState(PROTOCOL_STATE_TERMINATED);
-    protocol->terminated();
-    Protocol* protocol_ptr = protocol.get();
-    Log::info("ProtocolManager",
-        "A %s protocol has been terminated.", typeid(*protocol_ptr).name());
 }   // terminateProtocol
 
 // ----------------------------------------------------------------------------
@@ -349,6 +308,9 @@ void ProtocolManager::OneProtocolType::requestTerminateAll()
 // ----------------------------------------------------------------------------
 /** Finds a protocol with the given type and requests it to be terminated.
  *  If no such protocol exist, log an error message.
+ *  This function must be called from the ProtocolManager thread in order
+ *  to avoid a race condition (only the ProtocolManager thread can change the
+ *  number of elements in that list).
  *  \param type The protocol type to delete.
  */
 void ProtocolManager::findAndTerminate(ProtocolType type)
@@ -395,7 +357,7 @@ bool ProtocolManager::OneProtocolType::notifyEvent(Event *event)
  *  can be ignored, or false otherwise.
  */
 bool ProtocolManager::sendEvent(Event* event,
-                                std::vector<OneProtocolType>& protocols)
+                          std::array<OneProtocolType, PROTOCOL_MAX>& protocols)
 {
     bool can_be_deleted = false;
     if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -426,11 +388,10 @@ void ProtocolManager::OneProtocolType::update(int ticks, bool async)
 {
     for (unsigned int i = 0; i < m_protocols.size(); i++)
     {
-        if (m_protocols[i]->getState() == PROTOCOL_STATE_RUNNING)
-        {
-            async ? m_protocols[i]->asynchronousUpdate()
-                  : m_protocols[i]->update(ticks);
-        }
+        if (async)
+            m_protocols[i]->asynchronousUpdate();
+        else
+            m_protocols[i]->update(ticks);
     }
 }   // update
 
@@ -559,7 +520,7 @@ void ProtocolManager::asynchronousUpdate()
         // the only one who changes the number of protocols.
         // But you need to make sure async and non-async
         // update in each protocol will have atomic or mutex-protected write
-        opt.update(0, /*async*/true);  // dt does not matter, so set it to 0
+        opt.update(0, /*async*/true);  // ticks does not matter, so set it to 0
     }
 
     PROFILER_POP_CPU_MARKER();
@@ -576,7 +537,7 @@ void ProtocolManager::asynchronousUpdate()
         m_requests.unlock();
         // This is often used that terminating a protocol unpauses another,
         // so the m_requests queue must not be locked while executing requests.
-        std::lock_guard<std::mutex> ul(m_protocols_mutex);
+        std::lock_guard<std::mutex> lock(m_protocols_mutex);
         switch (request.getType())
         {
             case PROTOCOL_REQUEST_START:
@@ -584,10 +545,6 @@ void ProtocolManager::asynchronousUpdate()
                 break;
             case PROTOCOL_REQUEST_TERMINATE:
                 terminateProtocol(request.getProtocol());
-                break;
-            // Unused
-            case PROTOCOL_REQUEST_PAUSE:
-            case PROTOCOL_REQUEST_UNPAUSE:
                 break;
         }   // switch (type)
         m_requests.lock();
@@ -603,8 +560,10 @@ void ProtocolManager::asynchronousUpdate()
  */
 std::shared_ptr<Protocol> ProtocolManager::getProtocol(ProtocolType type)
 {
+    std::lock_guard<std::mutex> lock(m_protocols_mutex);
     OneProtocolType &opt = m_all_protocols[type];
-    if (opt.isEmpty()) return NULL;
+    if (opt.isEmpty())
+        return nullptr;
 
     return opt.getFirstProtocol();
 }   // getProtocol

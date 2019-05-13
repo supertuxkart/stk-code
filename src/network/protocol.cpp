@@ -32,11 +32,9 @@
  *          it to NULL.
  *  \param type The type of the protocol.
  */
-Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
+Protocol::Protocol(ProtocolType type)
 {
-    m_callback_object       = callback_object;
     m_type                  = type;
-    m_state                 = PROTOCOL_STATE_INITIALISING;
     m_handle_connections    = false;
     m_handle_disconnections = false;
 }   // Protocol
@@ -82,24 +80,6 @@ void Protocol::requestStart()
     if (auto pm = ProtocolManager::lock())
         pm->requestStart(shared_from_this());
 }   // requestStart
-
-// ----------------------------------------------------------------------------
-/** Submits a request to the ProtocolManager to pause this protocol.
- */
-void Protocol::requestPause()
-{
-    if (auto pm = ProtocolManager::lock())
-        pm->requestPause(shared_from_this());
-}   // requestPause
-
-// ----------------------------------------------------------------------------
-/** Submits a request to the ProtocolManager to unpause this protocol.
- */
-void Protocol::requestUnpause()
-{
-    if (auto pm = ProtocolManager::lock())
-        pm->requestUnpause(shared_from_this());
-}   // requestUnpause
 
 // ----------------------------------------------------------------------------
 /** Submits a request to the ProtocolManager to terminate this protocol.

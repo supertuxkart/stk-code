@@ -30,6 +30,7 @@
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
+#include <array>
 #include <atomic>
 #include <condition_variable>
 #include <list>
@@ -50,8 +51,6 @@ class STKPeer;
 enum ProtocolRequestType
 {
     PROTOCOL_REQUEST_START,     //!< Start a protocol
-    PROTOCOL_REQUEST_PAUSE,     //!< Pause a protocol
-    PROTOCOL_REQUEST_UNPAUSE,   //!< Unpause a protocol
     PROTOCOL_REQUEST_TERMINATE  //!< Terminate a protocol
 };   // ProtocolRequestType
 
@@ -189,7 +188,7 @@ private:
     
     /** The list of all protocol types, each one containing a (potentially
      *  empty) list of protocols. */
-    std::vector<OneProtocolType> m_all_protocols;
+    std::array<OneProtocolType, PROTOCOL_MAX> m_all_protocols;
 
     /** A list of network events - messages, disconnect and disconnects. */
     typedef std::list<Event*> EventList;
@@ -224,8 +223,8 @@ private:
     /*! Single instance of protocol manager.*/
     static std::weak_ptr<ProtocolManager> m_protocol_manager;
 
-    bool         sendEvent(Event* event,
-                           std::vector<OneProtocolType>& protocols);
+    bool sendEvent(Event* event,
+                   std::array<OneProtocolType, PROTOCOL_MAX>& protocols);
 
     virtual void startProtocol(std::shared_ptr<Protocol> protocol);
     virtual void terminateProtocol(std::shared_ptr<Protocol> protocol);
@@ -240,8 +239,6 @@ public:
     void      propagateEvent(Event* event);
     std::shared_ptr<Protocol> getProtocol(ProtocolType type);
     void      requestStart(std::shared_ptr<Protocol> protocol);
-    void      requestPause(std::shared_ptr<Protocol> protocol);
-    void      requestUnpause(std::shared_ptr<Protocol> protocol);
     void      requestTerminate(std::shared_ptr<Protocol> protocol);
     void      findAndTerminate(ProtocolType type);
     void      update(int ticks);

@@ -97,7 +97,7 @@
  *  It starts with detecting the public ip address and port of this
  *  host (GetPublicAddress).
  */
-ServerLobby::ServerLobby() : LobbyProtocol(NULL)
+ServerLobby::ServerLobby() : LobbyProtocol()
 {
     std::vector<int> all_k =
         kart_properties_manager->getKartsInGroup("standard");

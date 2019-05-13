@@ -169,7 +169,7 @@ public:
 
     // ------------------------------------------------------------------------
 
-             LobbyProtocol(CallbackObject* callback_object);
+             LobbyProtocol();
     virtual ~LobbyProtocol();
     virtual void setup()                = 0;
     virtual void update(int ticks)      = 0;
