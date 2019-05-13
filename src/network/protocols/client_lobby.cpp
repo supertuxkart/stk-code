@@ -172,6 +172,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_LIVE_JOIN_ACK:        liveJoinAcknowledged(event); break;
         case LE_KART_INFO:             handleKartInfo(event);      break;
         case LE_START_RACE:            startGame(event);           break;
+        case LE_REPORT_PLAYER:         reportSuccess(event);       break;
         default:
             return false;
             break;
@@ -1448,3 +1449,19 @@ void ClientLobby::addSpectateHelperMessage() const
         "or <%s> for the camera position.", left, right, back);
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 }   // addSpectateHelperMessage
+
+// ----------------------------------------------------------------------------
+void ClientLobby::reportSuccess(Event* event)
+{
+    bool succeeded = false;
+    core::stringw reporting_name;
+    succeeded = event->data().getUInt8() == 1;
+    if (succeeded)
+        event->data().decodeStringW(&reporting_name);
+    if (succeeded && !reporting_name.empty())
+    {
+        // I18N: Tell player he has successfully report this named player
+        core::stringw msg = _("Successfully reported %s.", reporting_name);
+        MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+    }
+}   // reportSuccess

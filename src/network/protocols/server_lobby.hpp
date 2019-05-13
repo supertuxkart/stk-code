@@ -88,7 +88,7 @@ private:
 
     void cleanupDatabase();
 
-    void easySQLQuery(const std::string& query,
+    bool easySQLQuery(const std::string& query,
         std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
 
     void checkTableExists(const std::string& table, bool& result);

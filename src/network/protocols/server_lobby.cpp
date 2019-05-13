@@ -783,12 +783,13 @@ void ServerLobby::cleanupDatabase()
 //-----------------------------------------------------------------------------
 /** Run simple query with write lock waiting and optional function, this
  *  function has no callback for the return (if any) by the query.
+ *  Return true if no error occurs
  */
-void ServerLobby::easySQLQuery(const std::string& query,
+bool ServerLobby::easySQLQuery(const std::string& query,
                    std::function<void(sqlite3_stmt* stmt)> bind_function) const
 {
     if (!m_db)
-        return;
+        return false;
     sqlite3_stmt* stmt = NULL;
     int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
     if (ret == SQLITE_OK)
@@ -802,6 +803,7 @@ void ServerLobby::easySQLQuery(const std::string& query,
             Log::error("ServerLobby",
                 "Error finalize database for easy query %s: %s",
                 query.c_str(), sqlite3_errmsg(m_db));
+            return false;
         }
     }
     else
@@ -809,7 +811,9 @@ void ServerLobby::easySQLQuery(const std::string& query,
         Log::error("ServerLobby",
             "Error preparing database for easy query %s: %s",
             query.c_str(), sqlite3_errmsg(m_db));
+        return false;
     }
+    return true;
 }   // easySQLQuery
 
 //-----------------------------------------------------------------------------
@@ -928,7 +932,8 @@ void ServerLobby::writePlayerReport(Event* event)
         ServerConfig::m_player_reports_table.c_str(),
         reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
         reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
-    easySQLQuery(query, [reporter_npp, reporting_npp, info](sqlite3_stmt* stmt)
+    bool written = easySQLQuery(query,
+        [reporter_npp, reporting_npp, info](sqlite3_stmt* stmt)
         {
             // SQLITE_TRANSIENT to copy string
             if (sqlite3_bind_text(stmt, 1, ServerConfig::m_server_uid.c_str(),
@@ -959,6 +964,15 @@ void ServerLobby::writePlayerReport(Event* event)
                     StringUtils::wideToUtf8(reporting_npp->getName()).c_str());
             }
         });
+    if (written)
+    {
+        NetworkString* success = getNetworkString();
+        success->setSynchronous(true);
+        success->addUInt8(LE_REPORT_PLAYER).addUInt8(1)
+            .encodeString(reporting_npp->getName());
+        event->getPeer()->sendPacket(success, true/*reliable*/);
+        delete success;
+    }
 #endif
 }   // writePlayerReport
 

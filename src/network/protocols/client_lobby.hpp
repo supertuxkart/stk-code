@@ -66,6 +66,7 @@ private:
     void updatePlayerList(Event* event);
     void handleChat(Event* event);
     void handleServerInfo(Event* event);
+    void reportSuccess(Event* event);
     void handleBadTeam();
     void handleBadConnection();
     void becomingServerOwner();
