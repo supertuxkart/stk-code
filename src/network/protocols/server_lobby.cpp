@@ -3661,13 +3661,15 @@ void ServerLobby::submitRankingsToAddons()
     {
     public:
         SumbitRankingRequest(uint32_t online_id, double scores,
-                             double max_scores, unsigned num_races)
+                             double max_scores, unsigned num_races,
+                             const std::string& country_code)
             : XMLRequest(true)
         {
             addParameter("id", online_id);
             addParameter("scores", scores);
             addParameter("max-scores", max_scores);
             addParameter("num-races-done", num_races);
+            addParameter("country-code", country_code);
         }
         virtual void afterOperation()
         {
@@ -3688,7 +3690,8 @@ void ServerLobby::submitRankingsToAddons()
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
         SumbitRankingRequest* request = new SumbitRankingRequest
             (id, m_scores.at(id), m_max_scores.at(id),
-            m_num_ranked_races.at(id));
+            m_num_ranked_races.at(id),
+            race_manager->getKartInfo(i).getCountryCode());
         NetworkConfig::get()->setUserDetails(request, "submit-ranking");
         Log::info("ServerLobby", "Submiting ranking for %s (%d) : %lf, %lf %d",
             StringUtils::wideToUtf8(
