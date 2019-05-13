@@ -1725,10 +1725,11 @@ void IrrDriver::displayFPS()
     gui::IGUIFont* font = GUIEngine::getSmallFont();
     core::rect<s32> position;
 
+    const int fheight = font->getDimension(L"X").Height;
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(51, 0, 1100, 80);
+        position = core::rect<s32>(51, 0, 30*fheight+51, 2*fheight + fheight / 3);
     else
-        position = core::rect<s32>(75, 0, 900, 40);
+        position = core::rect<s32>(75, 0, 18*fheight+75 , fheight + fheight / 5);
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks

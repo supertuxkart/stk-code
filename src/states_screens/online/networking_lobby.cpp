@@ -134,15 +134,7 @@ void NetworkingLobby::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon_5);
     m_icon_bank->addTextureAsSprite(m_spectate_texture);
 
-    if (UserConfigParams::m_hidpi_enabled)
-    {
-        m_icon_bank->setScale(getHeight() / 15.0f / 128.0f);
-    }
-    else
-    {
-        const int screen_width = irr_driver->getFrameSize().Width;
-        m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
-    }
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 96.0f);
 }   // loadedFromFile
 
 // ---------------------------------------------------------------------------

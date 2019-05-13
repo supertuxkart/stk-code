@@ -16,7 +16,7 @@
         </box>
 
         <!-- Populated dynamically at runtime -->
-        <tabs width="100%" height="5%" id="gpgroups"> </tabs>
+        <tabs width="100%" height="1f" id="gpgroups"> </tabs>
 
         <spacer height="20" />
 
