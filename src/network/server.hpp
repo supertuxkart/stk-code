@@ -97,6 +97,8 @@ protected:
         > > m_players;
 
     std::string m_current_track;
+
+    std::string m_country_code;
 public:
 
          /** Initialises the object from an XML node. */
@@ -174,5 +176,7 @@ public:
     }
     // ------------------------------------------------------------------------
     Track* getCurrentTrack() const;
+    // ------------------------------------------------------------------------
+    const std::string& getCountryCode() const        { return m_country_code; }
 };   // Server
 #endif // HEADER_SERVER_HPP

@@ -67,6 +67,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("password", &m_password_protected);
     xml.get("game_started", &m_game_started);
     xml.get("distance", &m_distance);
+    xml.get("country_code", &m_country_code);
     m_server_owner_name = L"-";
     m_server_owner_lower_case_name = "-";
 

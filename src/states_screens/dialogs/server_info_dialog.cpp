@@ -101,6 +101,25 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         server_info += each_line;
         server_info += L"\n";
     }
+    getWidget("server-info-1")->setVisible(true);
+    getWidget<LabelWidget>("server-info-1")->setText(server_info, true);
+
+    server_info = L"";
+    each_line = L"";
+#ifndef SERVER_ONLY
+    if (!server->getCountryCode().empty())
+    {
+        core::stringw country_name =
+            translations->getLocalizedCountryName(server->getCountryCode());
+        //I18N: In the server info dialog, show the server location with
+        //country name (based on IP geolocation)
+        each_line = _("Server location: %s", country_name);
+        server_info += each_line;
+        server_info += L"\n";
+    }
+#endif
+    getWidget("server-info-2")->setVisible(true);
+    getWidget<LabelWidget>("server-info-2")->setText(server_info, true);
 
     if (!players.empty())
     {
@@ -140,9 +159,6 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     {
         getWidget("player-list")->setVisible(false);
     }
-    getWidget("server-info")->setVisible(true);
-    getWidget<LabelWidget>("server-info")->setText(server_info, true);
-
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
