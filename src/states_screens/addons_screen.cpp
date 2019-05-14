@@ -145,9 +145,9 @@ void AddonsScreen::init()
         getWidget<GUIEngine::ListWidget>("list_addons");
 
     // This defines the row height !
-    m_icon_height = getHeight()/10.0f;
+    m_icon_height = GUIEngine::getFontHeight() * 5 / 2;
     // 128 is the height of the image file
-    m_icon_bank->setScale((float)getHeight() / 12.0f / 128.0f);
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 64.0f);
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";
