@@ -36,8 +36,10 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/game_setup.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
@@ -371,10 +373,13 @@ void NetworkingLobby::onUpdate(float delta)
         }
 
         // You can live join or spectator if u have the current play track
-        // and network timer is synchronized
+        // and network timer is synchronized, and no game protocols exist
+        bool no_gep = !RaceEventManager::getInstance() ||
+            RaceEventManager::getInstance()->protocolStopped();
+        bool no_gp = GameProtocol::emptyInstance();
         if (t &&
             STKHost::get()->getNetworkTimerSynchronizer()->isSynchronised() &&
-            cl->isServerLiveJoinable())
+            cl->isServerLiveJoinable() && no_gep && no_gp)
         {
             m_client_live_joinable = true;
         }
