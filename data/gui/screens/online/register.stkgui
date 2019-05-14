@@ -5,7 +5,7 @@
         <header align="center" width="80%" text="Create User" text_align="center"
                 I18N="In the registration dialog" />
       <spacer height="15" width="10"/>
-      <tabs id="mode_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+      <tabs id="mode_tabs" height="2f" x="2%" width="98%" align="center">
         <icon-button id="tab_new_online" width="128" height="128" icon="gui/icons/main_network.png"
                      I18N="Section in the register screen" text="New Online Account"/>
         <icon-button id="tab_existing_online" width="128" height="128" icon="gui/icons/main_network.png"
