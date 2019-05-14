@@ -45,7 +45,7 @@
 #include "network/stk_host.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
-#include "states_screens/dialogs/network_user_dialog.hpp"
+#include "states_screens/dialogs/network_player_dialog.hpp"
 #include "states_screens/dialogs/server_configuration_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -552,7 +552,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         {
             return;
         }
-        new NetworkUserDialog(host_online_local_ids[0],
+        new NetworkPlayerDialog(host_online_local_ids[0],
             host_online_local_ids[1], host_online_local_ids[2],
             m_player_names.at(
             m_player_list->getSelectionInternalName()).m_user_name,

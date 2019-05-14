@@ -35,11 +35,11 @@ namespace GUIEngine
 }
 
 /**
- * \brief Dialog that handle user in network lobby
+ * \brief Dialog that handle player in network lobby
  * \ingroup states_screens
  */
-class NetworkUserDialog : public GUIEngine::ModalDialog,
-                          public RankingCallback
+class NetworkPlayerDialog : public GUIEngine::ModalDialog,
+                            public RankingCallback
 {
 private:
     const uint32_t m_host_id;
@@ -78,10 +78,10 @@ private:
 
     GUIEngine::IconButtonWidget* m_report_widget;
 public:
-    NetworkUserDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
-                      const core::stringw& name,
-                      const std::string& country_code, bool allow_change_team,
-                      PerPlayerDifficulty d)
+    NetworkPlayerDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
+                        const core::stringw& name,
+                        const std::string& country_code,
+                        bool allow_change_team, PerPlayerDifficulty d)
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
           m_local_id(local_id), m_per_player_difficulty(d),
           m_name(name), m_country_code(country_code),
@@ -92,7 +92,7 @@ public:
         loadFromFile("online/user_info_dialog.stkgui");
     }
     // ------------------------------------------------------------------------
-    ~NetworkUserDialog() {}
+    ~NetworkPlayerDialog() {}
     // ------------------------------------------------------------------------
     virtual void beforeAddingWidgets();
     // ------------------------------------------------------------------------

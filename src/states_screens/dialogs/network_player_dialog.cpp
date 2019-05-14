@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/dialogs/network_user_dialog.hpp"
+#include "states_screens/dialogs/network_player_dialog.hpp"
 
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -40,11 +40,16 @@ using namespace irr::gui;
 using namespace Online;
 
 // ----------------------------------------------------------------------------
-void NetworkUserDialog::beforeAddingWidgets()
+void NetworkPlayerDialog::beforeAddingWidgets()
 {
+    LabelWidget* header = getWidget<LabelWidget>("title");
+    assert(header);
+    //I18N: In the network player dialog
+    header->setText(_("Player info"), false);
+
     m_desc_widget = getWidget<LabelWidget>("desc");
     assert(m_desc_widget != NULL);
-    //I18N: In the network user dialog
+    //I18N: In the network player dialog
     core::stringw desc = _("Player name: %s", m_name);
 #ifndef SERVER_ONLY
     if (!m_country_code.empty())
@@ -52,7 +57,7 @@ void NetworkUserDialog::beforeAddingWidgets()
         core::stringw country_name =
             translations->getLocalizedCountryName(m_country_code);
         desc += L"\n";
-        //I18N: In the network user dialog, show the player location with
+        //I18N: In the network player dialog, show the player location with
         //country name (based on IP geolocation)
         desc += _("Player location: %s", country_name);
     }
@@ -96,7 +101,7 @@ void NetworkUserDialog::beforeAddingWidgets()
     m_kick_widget->setImage(file_manager->getAsset(FileManager::GUI_ICON,
         "remove.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
-    //I18N: In the network user dialog
+    //I18N: In the network player dialog
     m_kick_widget->setText(_("Kick"));
     m_kick_widget->setVisible(STKHost::get()->isAuthorisedToControl()
         && m_host_id != STKHost::get()->getMyHostId());
@@ -112,7 +117,7 @@ void NetworkUserDialog::beforeAddingWidgets()
     {
         m_change_team_widget = getWidget<IconButtonWidget>("accept");
         m_change_team_widget->setVisible(true);
-        //I18N: In the network user dialog
+        //I18N: In the network player dialog
         m_change_team_widget->setText(_("Change team"));
         m_change_team_widget->setImage(file_manager->getAsset(FileManager::GUI_ICON,
             "race_giveup.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
@@ -127,12 +132,12 @@ void NetworkUserDialog::beforeAddingWidgets()
         m_handicap_widget->setVisible(true);
         if (m_per_player_difficulty == PLAYER_DIFFICULTY_NORMAL)
         {
-            //I18N: In the network user dialog
+            //I18N: In the network player dialog
             m_handicap_widget->setText(_("Enable handicap"));
         }
         else
         {
-            //I18N: In the network user dialog
+            //I18N: In the network player dialog
             m_handicap_widget->setText(_("Disable handicap"));
         }
         m_handicap_widget->setImage(irr_driver->getTexture(FileManager::MODEL,
@@ -146,7 +151,7 @@ void NetworkUserDialog::beforeAddingWidgets()
     if (cl->serverEnabledReportPlayer() &&
         m_host_id != STKHost::get()->getMyHostId())
     {
-        // I18N: In the network user dialog,
+        // I18N: In the network player dialog,
         // report player about for example abusive behaviour in game
         m_report_widget->setText(_("Report player"));
         m_report_widget->setImage(file_manager->getAsset(FileManager::GUI_ICON,
@@ -157,14 +162,14 @@ void NetworkUserDialog::beforeAddingWidgets()
 }   // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
-void NetworkUserDialog::init()
+void NetworkPlayerDialog::init()
 {
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -----------------------------------------------------------------------------
-void NetworkUserDialog::onUpdate(float dt)
+void NetworkPlayerDialog::onUpdate(float dt)
 {
     if (*m_fetched_ranking == false)
     {
@@ -206,7 +211,7 @@ void NetworkUserDialog::onUpdate(float dt)
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation
-    NetworkUserDialog::processEvent(const std::string& source)
+    NetworkPlayerDialog::processEvent(const std::string& source)
 {
     if (source == m_options_widget->m_properties[PROP_ID])
     {
@@ -269,7 +274,7 @@ GUIEngine::EventPropagation
 }   // processEvent
 
 // -----------------------------------------------------------------------------
-bool NetworkUserDialog::onEscapePressed()
+bool NetworkPlayerDialog::onEscapePressed()
 {
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
