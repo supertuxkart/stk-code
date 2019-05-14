@@ -1077,17 +1077,17 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
         }
     }
 
-	//lap flag for finished karts
+    //lap flag for finished karts
     if (kart->hasFinishedRace())
-	{
+    {
         if (m_lap_flag != NULL)
-		{
+        {
             const core::rect<s32> rect(core::position2d<s32>(0, 0),
                 m_lap_flag->getSize());
             const core::rect<s32> pos1(x - 20, y - 10, x + w - 20, y + w - 10);
             draw2DImage(m_lap_flag, pos1, rect, NULL, NULL, true);
-		}
-	}
+        }
+    }
 #endif
 }   // drawPlayerIcon
 
