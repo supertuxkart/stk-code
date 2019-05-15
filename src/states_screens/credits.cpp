@@ -224,7 +224,11 @@ void CreditsScreen::init()
     assert(w != NULL);
 
     reset();
-    setArea(w->m_x + 15, w->m_y + 8, w->m_w - 30, w->m_h - 16);
+    
+    setArea(w->m_x + GUIEngine::getFontHeight(),
+             w->m_y + GUIEngine::getFontHeight() / 2,
+             w->m_w - GUIEngine::getFontHeight() * 2,
+             w->m_h - GUIEngine::getFontHeight());
 }   // init
 
 // ----------------------------------------------------------------------------
