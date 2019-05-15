@@ -21,7 +21,9 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/material.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -73,13 +75,25 @@ void TrackInfoScreen::loadedFromFile()
     m_record_race           = getWidget<CheckBoxWidget>("record");
     m_option->setState(false);
     m_record_race->setState(false);
+    
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
+    
+    for (unsigned int i=0; i < kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+    }
+    
+    video::ITexture* kart_not_found = irr_driver->getTexture(
+              file_manager->getAsset(FileManager::GUI_ICON, "random_kart.png"));
+
+    m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
 
     for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
     {
-        m_kart_icons[i] = getWidget<IconButtonWidget>(("iconscore"+StringUtils::toString(i+1)).c_str());
-        m_highscore_entries[i] = getWidget<LabelWidget>(("highscore"+StringUtils::toString(i+1)).c_str());
+        m_highscore_entries = getWidget<ListWidget>("highscore_entries");
     }
     
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
@@ -333,13 +347,15 @@ void TrackInfoScreen::init()
 
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
-
-    for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
-    {
-        m_kart_icons[i]->setVisible(has_highscores);
-        m_highscore_entries[i]->setVisible(has_highscores);
-    }
-
+    
+    int icon_height = GUIEngine::getFontHeight();
+    int row_height = GUIEngine::getFontHeight() * 1.2f;
+                                                        
+    m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
+    m_highscore_entries->setIcons(m_icon_bank, (int)row_height);
+    m_highscore_entries->setVisible(has_highscores);
+    
     RibbonWidget* bt_start = getWidget<GUIEngine::RibbonWidget>("buttons");
     bt_start->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
@@ -347,13 +363,25 @@ void TrackInfoScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-
 TrackInfoScreen::~TrackInfoScreen()
 {
 }   // ~TrackInfoScreen
 
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+void TrackInfoScreen::tearDown()
+{
+    m_highscore_entries->setIcons(NULL);
+}
+
+// ----------------------------------------------------------------------------
+void TrackInfoScreen::unloaded()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}   // unloaded
+
+// ----------------------------------------------------------------------------
 void TrackInfoScreen::updateHighScores()
 {
     if (!race_manager->modeHasHighscores())
@@ -377,10 +405,13 @@ void TrackInfoScreen::updateHighScores()
 
     int time_precision = race_manager->currentModeTimePrecision();
 
+    m_highscore_entries->clear();
+    
     // fill highscore entries
     for (int n=0; n<HIGHSCORE_COUNT; n++)
     {
         irr::core::stringw line;
+        int icon = -1;
 
         // Check if this entry is filled or still empty
         if (n < amount)
@@ -389,30 +420,33 @@ void TrackInfoScreen::updateHighScores()
 
             std::string time_string = StringUtils::timeToString(time, time_precision);
 
-            const KartProperties* prop = kart_properties_manager->getKart(kart_name);
-            if (prop != NULL)
+            for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
             {
-                const std::string &icon_path = prop->getAbsoluteIconFile();
-                ITexture* kart_icon_texture =
-                    STKTexManager::getInstance()->getTexture( icon_path );
-                m_kart_icons[n]->setImage(kart_icon_texture);
+                const KartProperties* prop = kart_properties_manager->getKartById(i);
+                if (kart_name == prop->getIdent())
+                {
+                    icon = i;
+                    break;
+                }
             }
+        
             line = name + "\t" + core::stringw(time_string.c_str());
         }
         else
         {
             //I18N: for empty highscores entries
             line = _("(Empty)");
-
-            ITexture* no_kart_texture =
-                STKTexManager::getInstance()->getTexture
-                (file_manager->getAsset(FileManager::GUI_ICON, "random_kart.png"));
-            m_kart_icons[n]->setImage(no_kart_texture);
-
         }
 
-        m_highscore_entries[n]->setText( line.c_str(), false );
+        if (icon == -1)
+        {
+            icon = m_icon_unknown_kart;
+        }
 
+        std::vector<GUIEngine::ListWidget::ListCell> row;
+        
+        row.push_back(GUIEngine::ListWidget::ListCell(line.c_str(), icon, 5, false));
+        m_highscore_entries->addItem(StringUtils::toString(n), row);
     }
 }   // updateHighScores
 

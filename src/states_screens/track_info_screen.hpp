@@ -21,6 +21,7 @@
 #define HEADER_TRACK_INFO_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets.hpp"
 
 namespace GUIEngine
 {
@@ -83,11 +84,12 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
 
-    /** The icons for the highscore list. */
-    GUIEngine::IconButtonWidget* m_kart_icons[HIGHSCORE_COUNT];
-
     /** The actual highscore text values shown. */
-    GUIEngine::LabelWidget* m_highscore_entries[HIGHSCORE_COUNT];
+    GUIEngine::ListWidget* m_highscore_entries;
+    
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+    
+    int m_icon_unknown_kart;
 
     void updateHighScores();
 
@@ -98,6 +100,8 @@ public:
     virtual void init() OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
     virtual void loadedFromFile() OVERRIDE;
+    virtual void tearDown() OVERRIDE;
+    virtual void unloaded() OVERRIDE;
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
                                const int player_id) OVERRIDE;
 
