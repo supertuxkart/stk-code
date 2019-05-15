@@ -43,6 +43,9 @@
       <caption>Soccer Mode</caption>
     </screenshot>
   </screenshots>
+  <metadata>
+    <value key="GnomeSoftware::popular-background">https://raw.githubusercontent.com/supertuxkart/stk-code/master/data/net.supertuxkart.SuperTuxKart-thumb.png</value>
+  </metadata>
   <developer_name>SuperTuxKart Team</developer_name>
   <update_contact>supertuxkart-devel@lists.sourceforge.net</update_contact>
   <url type="homepage">https://supertuxkart.net</url>
