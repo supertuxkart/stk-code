@@ -52,14 +52,17 @@ void override_default_params()
     case ACONFIGURATION_SCREENSIZE_NORMAL:
         UserConfigParams::m_multitouch_scale = 1.3f;
         UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
+        UserConfigParams::m_fonts_size = 5.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_LARGE:
         UserConfigParams::m_multitouch_scale = 1.2f;
         UserConfigParams::m_multitouch_sensitivity_x = 0.15f;
+        UserConfigParams::m_fonts_size = 5.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_XLARGE:
         UserConfigParams::m_multitouch_scale = 1.1f;
         UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
+        UserConfigParams::m_fonts_size = 4.0f;
         break;
     default:
         break;
@@ -67,9 +70,6 @@ void override_default_params()
     
     // Enable screen keyboard
     UserConfigParams::m_screen_keyboard = 1;
-    
-    // Set bigger fonts and buttons
-    UserConfigParams::m_fonts_size = 4.5f;
     
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
