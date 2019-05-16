@@ -137,7 +137,7 @@ void ServerSelection::init()
     m_searcher->clearListeners();
     m_searcher->addListener(this);
 
-    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 64.0f);
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
     m_icon_bank->setTargetIconSize(128, 128);
 
     video::ITexture* icon1 = irr_driver->getTexture(
@@ -159,7 +159,7 @@ void ServerSelection::init()
         m_icon_bank->addTextureAsSprite(tex);
     }
 
-    int row_height = GUIEngine::getFontHeight() * 5 / 2;
+    int row_height = GUIEngine::getFontHeight() * 2;
     
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
