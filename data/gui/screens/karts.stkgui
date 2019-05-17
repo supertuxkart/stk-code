@@ -13,7 +13,7 @@
             <!-- Contents is added programatically -->
         </placeholder>
 
-        <spacer height="15" width="25"/>
+        <spacer height="1f" width="25"/>
 
         <box proportion="2" width="100%" layout="vertical-row" padding="2">
             <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"

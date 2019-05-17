@@ -2,7 +2,7 @@
 <stkgui>
     <div x="2%" y="0%" width="96%" height="100%" layout="vertical-row" >
         <header id="title" width="96%" proportion="4" text_align="center" word_wrap="true"/>
-        <spacer height="1%" width="5"/>
+        <spacer height="1f" width="5"/>
         <div width="90%" height="fit" layout="horizontal-row">
             <label id="server-info-1" align="top" proportion="2" text_align="left" word_wrap="true" text=""/>
             <label id="server-info-2" align="top" proportion="2" text_align="left" word_wrap="true" text=""/>
@@ -25,6 +25,6 @@
                 <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
                              I18N="In the server info dialog" text="Cancel" label_location="bottom"/>
         </buttonbar>
-        <spacer height="3%" width="5"/>
+        <spacer height="1f" width="5"/>
     </div>
 </stkgui>
