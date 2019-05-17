@@ -165,10 +165,8 @@ void KartStatsWidget::move(int x, int y, int w, int h)
 {
     Widget::move(x,y,w,h);
     setSize(m_x, m_y, m_w, m_h);
-    int margin = m_h / SKILL_COUNT - m_skill_bar_h / 2;
-    if (margin > m_skill_bar_h)
-        margin = m_skill_bar_h;
-    int offset = (m_h - (SKILL_COUNT * margin)) / 2;
+    int margin = m_h / SKILL_COUNT / 2;
+    int offset = m_h / 4;
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
         m_skills[i]->move(m_skill_bar_x,
@@ -192,7 +190,7 @@ void KartStatsWidget::setValue(Stats type, float value)
 float KartStatsWidget::getValue(Stats type)
 {
     return m_skills[type]->getValue();
-}   // getVAlue
+}   // getValue
 
 // -----------------------------------------------------------------------------
 /** Set size for widgets inside KartStatsWidget
@@ -205,18 +203,10 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_h = h;
 
     // -- sizes
-    m_skill_bar_w = w;
-    m_skill_bar_h = (m_title_font ? GUIEngine::getTitleFontHeight() : GUIEngine::getFontHeight());
-
-    // for shrinking effect
-    if (h < 175)
-    {
-        const float factor = h / 175.0f;
-        m_skill_bar_h   = (int)(m_skill_bar_h*factor);
-    }
+    m_skill_bar_w = w - m_w / 32; // make sure the bars can't be out of screen 
+    m_skill_bar_h = m_h / SKILL_COUNT / 4;
 
     m_skill_bar_x = x;
-    m_skill_bar_y = y + h/2 - m_skill_bar_h/2;
 }   // setSize
 
 // -----------------------------------------------------------------------------
