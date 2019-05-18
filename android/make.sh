@@ -52,16 +52,19 @@ export COMPILE_SDK_VERSION_X86_64=26
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
+export PACKAGE_CALLBACK_NAME_RELEASE="org_supertuxkart_stk"
 export APP_DIR_NAME_RELEASE="supertuxkart"
 export APP_ICON_RELEASE="$DIRNAME/icon.png"
 
 export APP_NAME_BETA="SuperTuxKart Beta"
 export PACKAGE_NAME_BETA="org.supertuxkart.stk_beta"
+export PACKAGE_CALLBACK_NAME_BETA="org_supertuxkart_stk_1beta"
 export APP_DIR_NAME_BETA="supertuxkart-beta"
 export APP_ICON_BETA="$DIRNAME/icon-dbg.png"
 
 export APP_NAME_DEBUG="SuperTuxKart Debug"
 export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dbg"
+export PACKAGE_CALLBACK_NAME_DEBUG="org_supertuxkart_stk_1dbg"
 export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
 
@@ -154,6 +157,7 @@ if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
     export IS_DEBUG_BUILD=1
     export APP_NAME="$APP_NAME_DEBUG"
     export PACKAGE_NAME="$PACKAGE_NAME_DEBUG"
+    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_DEBUG"
     export APP_DIR_NAME="$APP_DIR_NAME_DEBUG"
     export APP_ICON="$APP_ICON_DEBUG"
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
@@ -162,6 +166,7 @@ elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_RELEASE"
     export PACKAGE_NAME="$PACKAGE_NAME_RELEASE"
+    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_RELEASE"
     export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
 elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
@@ -170,6 +175,7 @@ elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_BETA"
     export PACKAGE_NAME="$PACKAGE_NAME_BETA"
+    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_BETA"
     export APP_DIR_NAME="$APP_DIR_NAME_BETA"
     export APP_ICON="$APP_ICON_BETA"
 else
@@ -464,7 +470,10 @@ sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
        
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
        "$DIRNAME/AndroidManifest.xml"
-       
+
+sed -i "s/package .*/package $PACKAGE_NAME;/g" \
+       "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
+
 sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        

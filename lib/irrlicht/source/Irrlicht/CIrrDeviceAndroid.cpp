@@ -9,10 +9,37 @@
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 
 #include <assert.h>
+#include <vector>
 #include "os.h"
 #include "CContextEGL.h"
 #include "CFileSystem.h"
 #include "COGLES2Driver.h"
+#include "../../../../src/utils/utf8/unchecked.h"
+
+std::string g_from_java_chars;
+
+// Save any String in java to g_from_java_chars (triggered by voice-text input,
+// clipboard or unicode char from keyboard) and manually postEventFromUser for
+// each character
+
+#if !defined(ANDROID_PACKAGE_CALLBACK_NAME)
+    #error
+#endif
+
+#define MAKE_ANDROID_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveFromJavaChars(JNIEnv* env, jobject this_obj, jstring from_java_chars)
+#define ANDROID_CALLBACK(PKG_NAME) MAKE_ANDROID_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    if (from_java_chars == NULL)
+        return;
+    const char* chars = env->GetStringUTFChars(from_java_chars, NULL);
+    if (chars == NULL)
+        return;
+    g_from_java_chars += chars;
+    env->ReleaseStringUTFChars(from_java_chars, chars);
+}
 
 namespace irr
 {
@@ -240,6 +267,26 @@ bool CIrrDeviceAndroid::run()
     
     while (!Close)
     {
+        if (!g_from_java_chars.empty())
+        {
+            std::vector<wchar_t> utf32;
+            const char* chars = g_from_java_chars.c_str();
+            utf8::unchecked::utf8to32(chars, chars + strlen(chars), back_inserter(utf32));
+            for (wchar_t wc : utf32)
+            {
+                SEvent event;
+                event.EventType = EET_KEY_INPUT_EVENT;
+                event.KeyInput.Char = wc;
+                event.KeyInput.PressedDown = true;
+                event.KeyInput.Key = IRR_KEY_UNKNOWN;
+                event.KeyInput.Shift = false;
+                event.KeyInput.Control = false;
+                event.KeyInput.SystemKeyCode = 0;
+                event.KeyInput.Key = IRR_KEY_UNKNOWN;
+                postEventFromUser(event);
+            }
+            g_from_java_chars.clear();
+        }
         s32 Events = 0;
         android_poll_source* Source = 0;
         bool should_run = (IsStarted && IsFocused && !IsPaused);

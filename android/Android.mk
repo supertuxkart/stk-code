@@ -131,7 +131,8 @@ LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -Iobj/jpeglib/                     \
                       -Iobj/libpng/                      \
-                      -Iobj/zlib/                        
+                      -Iobj/zlib/                        \
+                      -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := jpeglib png zlib
 include $(BUILD_STATIC_LIBRARY)
