@@ -204,7 +204,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
 
     // -- sizes
     m_skill_bar_w = w - m_w / 16; // make sure the bars can't be out of screen 
-    m_skill_bar_h = m_h / SKILL_COUNT / 4;
+    m_skill_bar_h = m_h / SKILL_COUNT / 5;
 
     m_skill_bar_x = x;
 }   // setSize
