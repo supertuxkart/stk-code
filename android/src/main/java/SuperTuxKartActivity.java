@@ -1,7 +1,9 @@
 package org.supertuxkart.stk_dbg;
 
 import android.app.NativeActivity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 
 public class SuperTuxKartActivity extends NativeActivity
@@ -32,5 +34,21 @@ public class SuperTuxKartActivity extends NativeActivity
             }
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    public void showKeyboard()
+    {
+        InputMethodManager imm = (InputMethodManager)
+            getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(getWindow().getDecorView(),
+            InputMethodManager.SHOW_FORCED);
+    }
+
+    public void hideKeyboard()
+    {
+        InputMethodManager imm = (InputMethodManager)
+            getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(
+            getWindow().getDecorView().getWindowToken(), 0);
     }
 }
