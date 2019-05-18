@@ -130,10 +130,10 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_bar_w = m_w - iconbox_w - 25;  //leaving just enough space for icon + its margin  
     m_bar_h = h;
     
-    m_bar_x = x + iconbox_w;    
+    m_bar_x = x + iconbox_w + m_w / 32;    
     m_bar_y = y + h/2 - m_bar_h/2; //align to midpoint in y direction
 
-    m_iconbutton_x = x - m_w / 32; //make sure icon has enough space on the right
+    m_iconbutton_x = x; //make sure icon has enough space on the right
     m_iconbutton_y = y + h/2 - m_iconbutton_h/2; //align to midpoint in y direction
 }   // setSize
 
