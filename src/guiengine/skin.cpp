@@ -2148,7 +2148,7 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
-        float max_icon_size = 0.43f;
+        float max_icon_size = 1.0f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);

@@ -663,15 +663,15 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     m_h = h;
 
     // -- sizes
-    player_name_h = 40;
+    player_name_h = GUIEngine::getFontHeight();
     // Set it a bit higher so there's space for "(handicapped)"
     if(UserConfigParams::m_per_player_difficulty)
-        player_name_w = std::min(500, w);
+        player_name_w = std::min(GUIEngine::getFontHeight() * 12, w);
     else
-        player_name_w = std::min(400, w);
+        player_name_w = std::min(GUIEngine::getFontHeight() * 10, w);
 
     kart_name_w = w;
-    kart_name_h = 25;
+    kart_name_h = GUIEngine::getFontHeight();
 
     // for shrinking effect
     if (h < 175)
