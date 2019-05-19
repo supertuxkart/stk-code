@@ -2,19 +2,38 @@ package org.supertuxkart.stk_dbg;
 
 import android.app.NativeActivity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.View;
 
 public class SuperTuxKartActivity extends NativeActivity
 {
     private native void saveFromJavaChars(String chars);
+    private native void saveKeyboardHeight(int height);
 
     @Override
     public void onCreate(Bundle instance)
     {
         super.onCreate(instance);
         System.loadLibrary("main");
+        final View root = getWindow().getDecorView().findViewById(
+            android.R.id.content);
+        root.getViewTreeObserver().addOnGlobalLayoutListener(new
+            OnGlobalLayoutListener()
+            {
+                @Override
+                public void onGlobalLayout()
+                {
+                    Rect r = new Rect();
+                    root.getWindowVisibleDisplayFrame(r);
+                    int screen_height = root.getRootView().getHeight();
+                    int keyboard_height = screen_height - (r.bottom);
+                    saveKeyboardHeight(keyboard_height);
+                }
+            });
     }
 
     @Override

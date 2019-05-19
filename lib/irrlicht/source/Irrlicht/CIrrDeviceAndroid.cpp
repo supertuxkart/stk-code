@@ -26,11 +26,11 @@ std::string g_from_java_chars;
     #error
 #endif
 
-#define MAKE_ANDROID_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveFromJavaChars(JNIEnv* env, jobject this_obj, jstring from_java_chars)
-#define ANDROID_CALLBACK(PKG_NAME) MAKE_ANDROID_CALLBACK(PKG_NAME)
+#define MAKE_ANDROID_SAVE_CHARS_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveFromJavaChars(JNIEnv* env, jobject this_obj, jstring from_java_chars)
+#define ANDROID_SAVE_CHARS_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_CHARS_CALLBACK(PKG_NAME)
 
 extern "C"
-ANDROID_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+ANDROID_SAVE_CHARS_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 {
     if (from_java_chars == NULL)
         return;
@@ -39,6 +39,19 @@ ANDROID_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
         return;
     g_from_java_chars += chars;
     env->ReleaseStringUTFChars(from_java_chars, chars);
+}
+
+// Call when android keyboard is opened or close, and save its height for
+// moving screen
+int g_keyboard_height = 0;
+
+#define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jobject this_obj, jint height)
+#define ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_SAVE_KBD_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    g_keyboard_height = (int)height;
 }
 
 namespace irr
