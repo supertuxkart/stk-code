@@ -60,6 +60,7 @@ init_directories()
         ln -s ../android/android-ndk
         ln -s ../android/android-sdk
         ln -s ../android/assets
+        ln -s ../android/src
     
         cd -
     fi
@@ -128,12 +129,12 @@ build_package()
     ./make.sh -j5
     cd -
 
-    if [ ! -f ./android-$ARCH1/build/outputs/apk/android-$ARCH1-release-unsigned.apk ]; then
+    if [ ! -f ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release-unsigned.apk ]; then
         echo "Error: Couldn't build apk for architecture $ARCH1"
         return
     fi
 
-    cp ./android-$ARCH1/build/outputs/apk/android-$ARCH1-release-unsigned.apk \
+    cp ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release-unsigned.apk \
        ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1-unaligned.apk
 
     cp ./android-$ARCH1/obj/local/$ARCH2/libmain.so \
