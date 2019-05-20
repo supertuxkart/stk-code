@@ -42,6 +42,8 @@ namespace irr
 	*/
 	class IrrlichtDevice : public virtual IReferenceCounted
 	{
+	protected:
+		typedef s32 (*HeightFunc)(const IrrlichtDevice*);
 	public:
 
 		//! Runs the device.
@@ -286,6 +288,13 @@ namespace irr
 		/** This allows the user to check which windowing system is currently being
 		used. */
 		virtual E_DEVICE_TYPE getType() const = 0;
+
+		/** Onscreen keyboard addition, to determine how much to move vertically. */
+		virtual u32 getScreenHeight() const { return 0; }
+		virtual u32 getOnScreenKeyboardHeight() const { return 0; }
+		virtual s32 getMovedHeight() const { return 0; }
+		virtual void toggleOnScreenKeyboard(bool show) { }
+		virtual void registerGetMovedHeightFunction(HeightFunc) { }
 
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available

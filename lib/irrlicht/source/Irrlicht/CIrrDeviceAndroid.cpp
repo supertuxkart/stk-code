@@ -59,7 +59,7 @@ namespace irr
     namespace video
     {
         IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-            video::SExposedVideoData& data, io::IFileSystem* io);
+            video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device);
     }
 }
 
@@ -102,7 +102,10 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
     #endif
-    
+    m_screen_height = 0;
+    m_moved_height = 0;
+    m_moved_height_func = NULL;
+
     createKeyMap();
 
     CursorControl = new CCursorControl();
@@ -223,6 +226,13 @@ void CIrrDeviceAndroid::printConfig()
     os::Printer::log("   ui_mode_night:", core::stringc(ui_mode_night).c_str(), ELL_DEBUG);
 }
 
+u32 CIrrDeviceAndroid::getOnScreenKeyboardHeight() const
+{
+    if (g_keyboard_height > 0)
+        return g_keyboard_height;
+    return 0;
+}
+
 void CIrrDeviceAndroid::createVideoModeList()
 {
     if (VideoModeList.getVideoModeCount() > 0)
@@ -238,6 +248,7 @@ void CIrrDeviceAndroid::createVideoModeList()
     {
         CreationParams.WindowSize.Width = width;
         CreationParams.WindowSize.Height = height;
+        m_screen_height = height;
     }
 
     core::dimension2d<u32> size = core::dimension2d<u32>(
@@ -255,7 +266,7 @@ void CIrrDeviceAndroid::createDriver()
     {
     case video::EDT_OGLES2:
         #ifdef _IRR_COMPILE_WITH_OGLES2_
-        VideoDriver = video::createOGLES2Driver(CreationParams, ExposedVideoData, FileSystem);
+        VideoDriver = video::createOGLES2Driver(CreationParams, ExposedVideoData, FileSystem, this);
         #else
         os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
         #endif
@@ -280,6 +291,8 @@ bool CIrrDeviceAndroid::run()
     
     while (!Close)
     {
+        if (m_moved_height_func != NULL)
+            m_moved_height = m_moved_height_func(this);
         if (!g_from_java_chars.empty())
         {
             std::vector<wchar_t> utf32;
@@ -609,6 +622,7 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
 
     bool touchReceived = true;
     bool simulate_mouse = false;
+    int adjusted_height = getMovedHeight();
     core::position2d<s32> mouse_pos = core::position2d<s32>(0, 0);
 
     switch (eventAction & AMOTION_EVENT_ACTION_MASK)
@@ -662,7 +676,7 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
                 
             event_data.event = event.TouchInput.Event;
             event_data.x = event.TouchInput.X;
-            event_data.y = event.TouchInput.Y;
+            event_data.y = event.TouchInput.Y + adjusted_height;
             
             postEventFromUser(event);
             
@@ -712,7 +726,7 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
                                                             irr::EMBSM_LEFT : 0;
             irrevent.EventType = EET_MOUSE_INPUT_EVENT;
             irrevent.MouseInput.X = mouse_pos.X;
-            irrevent.MouseInput.Y = mouse_pos.Y;
+            irrevent.MouseInput.Y = mouse_pos.Y + adjusted_height;
 
             postEventFromUser(irrevent);
         }
@@ -1384,8 +1398,11 @@ void CIrrDeviceAndroid::hideNavBar(ANativeActivity* activity)
     }
 }
 
-void CIrrDeviceAndroid::showKeyboard(bool show) 
+void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show)
 {
+    if (!Android)
+        return;
+
     bool was_detached = false;
     JNIEnv* env = NULL;
 

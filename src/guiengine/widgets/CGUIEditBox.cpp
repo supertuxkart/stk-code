@@ -127,6 +127,7 @@ CGUIEditBox::~CGUIEditBox()
                                                        irr_driver->getDevice());
         dl->setTextInputEnabled(false);
     }
+    irr_driver->getDevice()->toggleOnScreenKeyboard(false);
 #endif
 #endif
 }
@@ -610,13 +611,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
         else
         {
 #ifdef ANDROID
-            if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID &&
-                UserConfigParams::m_screen_keyboard == 3)
-            {
-                CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                   irr_driver->getDevice());
-                dl->showKeyboard(false);
-            }
+            irr_driver->getDevice()->toggleOnScreenKeyboard(false);
 #endif
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
@@ -1315,12 +1310,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
 #ifdef ANDROID
             else if (UserConfigParams::m_screen_keyboard == 3)
             {
-                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
-                {
-                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                       irr_driver->getDevice());
-                    dl->showKeyboard(true);
-                }
+                irr_driver->getDevice()->toggleOnScreenKeyboard(true);
             }
 #endif
             // move cursor

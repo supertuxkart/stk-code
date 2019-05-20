@@ -17,6 +17,7 @@ extern bool GLContextDebugBit;
 #include "COpenGLNormalMapRenderer.h"
 #include "COpenGLParallaxMapRenderer.h"
 #include "os.h"
+#include "IrrlichtDevice.h"
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 #include <SDL/SDL.h>
@@ -29,6 +30,14 @@ extern bool GLContextDebugBit;
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #include "CIrrDeviceWayland.h"
 #include "CContextEGL.h"
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+#include "CIrrDeviceWin32.h"
+#endif
+
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+#include "CIrrDeviceLinux.h"
 #endif
 
 namespace irr
@@ -54,6 +63,7 @@ COpenGLDriver::COpenGLDriver(const irr::SIrrlichtCreationParameters& params,
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
 	#endif
+	m_device = device;
 }
 
 
@@ -589,6 +599,7 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	#endif
 
 	genericDriverInit();
+	m_device = device;
 }
 
 #endif
@@ -610,6 +621,7 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
 	#endif
+	m_device = device;
 }
 
 
@@ -699,6 +711,7 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	#ifdef _DEBUG
 	setDebugName("COpenGLDriver");
 	#endif
+	m_device = device;
 }
 
 
@@ -746,6 +759,7 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 	#endif
 
 	genericDriverInit();
+	m_device = device;
 }
 
 #endif // _IRR_COMPILE_WITH_SDL_DEVICE_
@@ -2387,7 +2401,8 @@ void COpenGLDriver::draw2DImage(const video::ITexture* texture, const core::rect
 
 		glEnable(GL_SCISSOR_TEST);
 		const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
-		glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height-clipRect->LowerRightCorner.Y,
+		glScissor(clipRect->UpperLeftCorner.X,
+			(s32)renderTargetSize.Height-clipRect->LowerRightCorner.Y+m_device->getMovedHeight(),
 			clipRect->getWidth(), clipRect->getHeight());
 	}
 
@@ -2444,8 +2459,9 @@ void COpenGLDriver::draw2DImage(const video::ITexture* texture,
 
 		glEnable(GL_SCISSOR_TEST);
 		const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
-		glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height-clipRect->LowerRightCorner.Y,
-			clipRect->getWidth(),clipRect->getHeight());
+		glScissor(clipRect->UpperLeftCorner.X,
+			(s32)renderTargetSize.Height-clipRect->LowerRightCorner.Y+m_device->getMovedHeight(),
+			clipRect->getWidth(), clipRect->getHeight());
 	}
 
 	const core::dimension2d<u32>& ss = texture->getSize();

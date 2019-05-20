@@ -736,6 +736,39 @@ void IrrDriver::initDevice()
         m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
+
+#ifdef ANDROID
+    if (ProfileWorld::isNoGraphics())
+        return;
+
+    m_device->registerGetMovedHeightFunction([]
+        (const IrrlichtDevice* device)->int
+        {
+            int screen_keyboard_height =
+                device->getOnScreenKeyboardHeight();
+            int screen_height = device->getScreenHeight();
+            if (screen_keyboard_height == 0 || screen_height == 0)
+                return 0;
+
+            GUIEngine::Widget* w = GUIEngine::getFocusForPlayer(0);
+            if (!w)
+                return 0;
+
+            core::rect<s32> pos =
+                w->getIrrlichtElement()->getAbsolutePosition();
+            // Add 10% margin
+            int element_height = (int)device->getScreenHeight() -
+                pos.LowerRightCorner.Y - int(screen_height * 0.01f);
+            if (element_height > screen_keyboard_height)
+                return 0;
+            else if (element_height < 0)
+            {
+                // For buttons near the edge of the bottom of screen
+                return screen_keyboard_height;
+            }
+            return screen_keyboard_height - element_height;
+        });
+#endif
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -1899,6 +1932,7 @@ void IrrDriver::update(float dt, bool is_loading)
 #endif
     World *world = World::getWorld();
 
+    int moved_height = irr_driver->getDevice()->getMovedHeight();
     if (world)
     {
 #ifndef SERVER_ONLY
@@ -1907,7 +1941,11 @@ void IrrDriver::update(float dt, bool is_loading)
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
+            glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
+                irr_driver->getActualScreenSize().Height);
             GUIEngine::render(dt, is_loading);
+            glViewport(0, 0, irr_driver->getActualScreenSize().Width,
+                irr_driver->getActualScreenSize().Height);
         }
 
         if (!is_loading && Physics::getInstance())
@@ -1922,15 +1960,21 @@ void IrrDriver::update(float dt, bool is_loading)
     }
     else
     {
+#ifndef SERVER_ONLY
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
+        glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
+            irr_driver->getActualScreenSize().Height);
         GUIEngine::render(dt, is_loading);
         if (m_render_nw_debug && !is_loading)
         {
             renderNetworkDebug();
         }
+        glViewport(0, 0, irr_driver->getActualScreenSize().Width,
+            irr_driver->getActualScreenSize().Height);
         m_video_driver->endScene();
+#endif
     }
 
     if (m_request_screenshot) doScreenShot();

@@ -74,9 +74,16 @@ namespace irr
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
         virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
-        virtual void showKeyboard(bool show);
+        virtual void toggleOnScreenKeyboard(bool show);
         virtual bool supportsTouchDevice() { return HasTouchDevice; }
-        
+        virtual u32 getScreenHeight() const { return m_screen_height; }
+        virtual u32 getOnScreenKeyboardHeight() const;
+        virtual s32 getMovedHeight() const { return m_moved_height; }
+        virtual void registerGetMovedHeightFunction(HeightFunc height_function)
+        {
+            m_moved_height_func = height_function;
+        }
+
         class CCursorControl : public gui::ICursorControl
         {
         public:
@@ -120,6 +127,9 @@ namespace irr
                                                     ANativeActivity* activity);
 
     private:
+        s32 m_moved_height;
+        u32 m_screen_height;
+        HeightFunc m_moved_height_func;
         android_app* Android;
         ASensorManager* SensorManager;
         ASensorEventQueue* SensorEventQueue;

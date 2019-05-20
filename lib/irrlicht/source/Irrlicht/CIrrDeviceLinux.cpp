@@ -75,7 +75,7 @@ namespace irr
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			video::SExposedVideoData& data, io::IFileSystem* io);
+			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device);
 	}
 } // end namespace irr
 
@@ -1324,7 +1324,7 @@ void CIrrDeviceLinux::createDriver()
 		video::SExposedVideoData data;
 		data.OpenGLLinux.X11Window = window;
 		data.OpenGLLinux.X11Display = display;
-		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem, this);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
 		#endif
