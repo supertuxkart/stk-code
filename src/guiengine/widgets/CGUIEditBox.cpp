@@ -127,8 +127,9 @@ CGUIEditBox::~CGUIEditBox()
                                                        irr_driver->getDevice());
         dl->setTextInputEnabled(false);
     }
-    irr_driver->getDevice()->toggleOnScreenKeyboard(false);
 #endif
+    irr_driver->getDevice()->toggleOnScreenKeyboard(false);
+
 #endif
 }
 
@@ -610,9 +611,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
         }
         else
         {
-#ifdef ANDROID
             irr_driver->getDevice()->toggleOnScreenKeyboard(false);
-#endif
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
         break;
@@ -1305,14 +1304,12 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             
             if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
-                openScreenKeyboard();
+                if (irr_driver->getDevice()->hasOnScreenKeyboard())
+                    irr_driver->getDevice()->toggleOnScreenKeyboard(true);
+                else
+                    openScreenKeyboard();
             }
-#ifdef ANDROID
-            else if (UserConfigParams::m_screen_keyboard == 3)
-            {
-                irr_driver->getDevice()->toggleOnScreenKeyboard(true);
-            }
-#endif
+
             // move cursor
             CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
 
@@ -1773,9 +1770,10 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
 
 void CGUIEditBox::openScreenKeyboard()
 {
-    if (UserConfigParams::m_screen_keyboard == 3)
+    // If the device has native on screen keyboard, always use it
+    if (irr_driver->getDevice()->hasOnScreenKeyboard())
         return;
-    
+
     if (GUIEngine::ScreenKeyboard::getCurrent() != NULL)
         return;
     

@@ -1754,6 +1754,11 @@ bool CIrrDeviceAndroid::isGyroscopeAvailable()
     return (Gyroscope != NULL);
 }
 
+bool CIrrDeviceAndroid::hasHardwareKeyboard() const
+{
+    int32_t keyboard = AConfiguration_getKeyboard(Android->config);
+    return (keyboard == ACONFIGURATION_KEYBOARD_QWERTY);
+}
 
 } // end namespace irr
 

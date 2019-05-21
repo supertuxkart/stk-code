@@ -503,21 +503,20 @@ bool ScreenKeyboard::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
-/** A function that determines if screen keyboard should be activated
+/** A function that determines if (native) screen keyboard should be activated
  */
 bool ScreenKeyboard::shouldUseScreenKeyboard()
 {
-    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard == 2;
-    
-    #ifdef ANDROID
+    bool always_use_screen_keyboard =
+        UserConfigParams::m_screen_keyboard == 2;
+
+    // Enable if no hardware keyboard
     if (UserConfigParams::m_screen_keyboard == 1)
     {
-        int32_t keyboard = AConfiguration_getKeyboard(
-                                            global_android_app->config);
-        
-        use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
+        if (irr_driver->getDevice()->hasHardwareKeyboard())
+            return false;
+        return true;
     }
-    #endif
-    
-    return use_screen_keyboard;
+
+    return always_use_screen_keyboard;
 }

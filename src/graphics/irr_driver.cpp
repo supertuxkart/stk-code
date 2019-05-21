@@ -737,7 +737,6 @@ void IrrDriver::initDevice()
 #endif
     m_pointer_shown = true;
 
-#ifdef ANDROID
     if (ProfileWorld::isNoGraphics())
         return;
 
@@ -768,7 +767,6 @@ void IrrDriver::initDevice()
             }
             return screen_keyboard_height - element_height;
         });
-#endif
 }   // initDevice
 
 // ----------------------------------------------------------------------------

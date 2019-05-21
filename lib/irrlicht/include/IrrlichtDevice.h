@@ -262,7 +262,13 @@ namespace irr
 		virtual bool activateJoysticks(core::array<SJoystickInfo>& joystickInfo) =0;
 
 		//! Returns true if system has touch device
-		virtual bool supportsTouchDevice() =0;
+		virtual bool supportsTouchDevice() const = 0;
+
+		//! Returns true if system has hardware keyboard attached
+		virtual bool hasHardwareKeyboard() const = 0;
+
+		//! Returns true if system has native on screen keyboard
+		virtual bool hasOnScreenKeyboard() const = 0;
 
 		//! Set the current Gamma Value for the Display
 		virtual bool setGammaRamp(f32 red, f32 green, f32 blue,
@@ -290,11 +296,11 @@ namespace irr
 		virtual E_DEVICE_TYPE getType() const = 0;
 
 		/** Onscreen keyboard addition, to determine how much to move vertically. */
-		virtual u32 getScreenHeight() const { return 0; }
-		virtual u32 getOnScreenKeyboardHeight() const { return 0; }
-		virtual s32 getMovedHeight() const { return 0; }
-		virtual void toggleOnScreenKeyboard(bool show) { }
-		virtual void registerGetMovedHeightFunction(HeightFunc) { }
+		virtual u32 getScreenHeight() const = 0;
+		virtual u32 getOnScreenKeyboardHeight() const = 0;
+		virtual s32 getMovedHeight() const = 0;
+		virtual void toggleOnScreenKeyboard(bool show) = 0;
+		virtual void registerGetMovedHeightFunction(HeightFunc) = 0;
 
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available

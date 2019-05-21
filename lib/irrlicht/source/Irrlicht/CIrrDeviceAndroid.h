@@ -75,7 +75,11 @@ namespace irr
         virtual bool isGyroscopeAvailable();
         virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
         virtual void toggleOnScreenKeyboard(bool show);
-        virtual bool supportsTouchDevice() { return HasTouchDevice; }
+        virtual bool supportsTouchDevice() const { return HasTouchDevice; }
+        virtual bool hasHardwareKeyboard() const;
+        // ATM if there is touch device we assume native screen keyboard is
+        // available which for example android tv doesn't
+        virtual bool hasOnScreenKeyboard() const { return HasTouchDevice; }
         virtual u32 getScreenHeight() const { return m_screen_height; }
         virtual u32 getOnScreenKeyboardHeight() const;
         virtual s32 getMovedHeight() const { return m_moved_height; }
