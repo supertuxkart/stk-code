@@ -3,6 +3,7 @@ package org.supertuxkart.stk_dbg;
 import android.app.NativeActivity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
@@ -13,6 +14,19 @@ public class SuperTuxKartActivity extends NativeActivity
 {
     private native void saveFromJavaChars(String chars);
     private native void saveKeyboardHeight(int height);
+
+    private void hideNavBar(View decor_view)
+    {
+        if (Build.VERSION.SDK_INT < 19)
+            return;
+        decor_view.setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_FULLSCREEN |
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+    }
 
     @Override
     public void onCreate(Bundle instance)
@@ -34,6 +48,18 @@ public class SuperTuxKartActivity extends NativeActivity
                     saveKeyboardHeight(keyboard_height);
                 }
             });
+
+        final View decor_view = getWindow().getDecorView();
+        decor_view.setOnSystemUiVisibilityChangeListener(
+            new View.OnSystemUiVisibilityChangeListener()
+            {
+                @Override
+                public void onSystemUiVisibilityChange(int visibility)
+                {
+                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+                        hideNavBar(decor_view);
+                }
+            });
     }
 
     @Override
@@ -53,6 +79,14 @@ public class SuperTuxKartActivity extends NativeActivity
             }
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean has_focus)
+    {
+        super.onWindowFocusChanged(has_focus);
+        if (has_focus)
+            hideNavBar(getWindow().getDecorView());
     }
 
     public void showKeyboard()

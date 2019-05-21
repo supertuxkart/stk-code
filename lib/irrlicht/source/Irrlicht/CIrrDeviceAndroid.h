@@ -174,14 +174,11 @@ namespace irr
         void createVideoModeList();
         wchar_t getKeyChar(SEvent& event);
         wchar_t getUnicodeChar(AInputEvent* event);
-        static void hideNavBar(ANativeActivity* activity);
         static void readApplicationInfo(ANativeActivity* activity);
         int getRotation();
         DeviceOrientation getDefaultOrientation();
         video::SExposedVideoData& getExposedVideoData();
         
-        static void handleAndroidCommandDirect(ANativeActivity* activity, 
-                                               int32_t cmd);
         static void handleAndroidCommand(android_app* app, int32_t cmd);
         static s32 handleInput(android_app* app, AInputEvent* event);
 
