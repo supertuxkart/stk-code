@@ -1,20 +1,27 @@
 package org.supertuxkart.stk_dbg;
 
+import org.supertuxkart.stk_dbg.STKEditText;
+
 import android.app.NativeActivity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.View;
+import android.widget.FrameLayout;
 
 public class SuperTuxKartActivity extends NativeActivity
 {
-    private native void saveFromJavaChars(String chars);
-    private native void saveKeyboardHeight(int height);
+    private STKEditText m_stk_edittext;
 
+    // ------------------------------------------------------------------------
+    private native void saveKeyboardHeight(int height);
+    // ------------------------------------------------------------------------
     private void hideNavBar(View decor_view)
     {
         if (Build.VERSION.SDK_INT < 19)
@@ -27,12 +34,14 @@ public class SuperTuxKartActivity extends NativeActivity
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     }
-
+    // ------------------------------------------------------------------------
     @Override
     public void onCreate(Bundle instance)
     {
         super.onCreate(instance);
         System.loadLibrary("main");
+        m_stk_edittext = null;
+
         final View root = getWindow().getDecorView().findViewById(
             android.R.id.content);
         root.getViewTreeObserver().addOnGlobalLayoutListener(new
@@ -61,26 +70,7 @@ public class SuperTuxKartActivity extends NativeActivity
                 }
             });
     }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event)
-    {
-        // ACTION_MULTIPLE deprecated in API level Q, it says if the key code
-        // is KEYCODE_UNKNOWN, then this is a sequence of characters as
-        // returned by getCharacters()
-        if (event.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN &&
-            event.getAction() == KeyEvent.ACTION_MULTIPLE)
-        {
-            String chars = event.getCharacters();
-            if (chars != null)
-            {
-                saveFromJavaChars(chars);
-                return true;
-            }
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
+    // ------------------------------------------------------------------------
     @Override
     public void onWindowFocusChanged(boolean has_focus)
     {
@@ -88,20 +78,88 @@ public class SuperTuxKartActivity extends NativeActivity
         if (has_focus)
             hideNavBar(getWindow().getDecorView());
     }
-
+    // ------------------------------------------------------------------------
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        // Called when user change cursor / select all text in native android
+        // keyboard
+        boolean ret = super.dispatchKeyEvent(event);
+        if (m_stk_edittext != null)
+            m_stk_edittext.updateSTKEditBox();
+        return ret;
+    }
+    // ------------------------------------------------------------------------
     public void showKeyboard()
     {
-        InputMethodManager imm = (InputMethodManager)
-            getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(getWindow().getDecorView(),
-            InputMethodManager.SHOW_FORCED);
-    }
+        final Context context = this;
+        // Need to run in ui thread as it access the view m_stk_edittext
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
 
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT);
+                if (m_stk_edittext == null)
+                {
+                    m_stk_edittext = new STKEditText(context);
+                    // For some copy-and-paste text are not done by commitText
+                    // in STKInputConnection, so we need an extra watcher
+                    m_stk_edittext.addTextChangedListener(new TextWatcher()
+                        {
+                            @Override
+                            public void onTextChanged(CharSequence s,
+                                                      int start, int before,
+                                                      int count) {}
+                            @Override
+                            public void beforeTextChanged(CharSequence s,
+                                                          int start, int count,
+                                                          int after) {}
+                            @Override
+                            public void afterTextChanged(Editable edit)
+                            {
+                                if (m_stk_edittext != null)
+                                    m_stk_edittext.updateSTKEditBox();
+                            }
+                        });
+                    addContentView(m_stk_edittext, params);
+                }
+                else
+                    m_stk_edittext.setLayoutParams(params);
+
+                m_stk_edittext.resetWhenFocus();
+                m_stk_edittext.setVisibility(View.VISIBLE);
+                m_stk_edittext.requestFocus();
+
+                imm.showSoftInput(m_stk_edittext,
+                    InputMethodManager.SHOW_FORCED);
+            }
+        });
+    }
+    // ------------------------------------------------------------------------
     public void hideKeyboard()
     {
-        InputMethodManager imm = (InputMethodManager)
-            getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(
-            getWindow().getDecorView().getWindowToken(), 0);
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (m_stk_edittext == null)
+                    return;
+
+                m_stk_edittext.clearFocus();
+                m_stk_edittext.setVisibility(View.GONE);
+
+                InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(m_stk_edittext.getWindowToken(),
+                    0);
+            }
+        });
     }
 }

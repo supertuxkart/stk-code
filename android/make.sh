@@ -471,7 +471,22 @@ sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
        "$DIRNAME/AndroidManifest.xml"
 
-sed -i "s/package .*/package $PACKAGE_NAME;/g" \
+sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
+       "$DIRNAME/src/main/java/STKEditText.java"
+
+sed -i "s/import org.supertuxkart.*/import $PACKAGE_NAME.STKInputConnection;/g" \
+       "$DIRNAME/src/main/java/STKEditText.java"
+
+sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
+       "$DIRNAME/src/main/java/STKInputConnection.java"
+
+sed -i "s/import org.supertuxkart.*.STKEditText;/import $PACKAGE_NAME.STKEditText;/g" \
+       "$DIRNAME/src/main/java/STKInputConnection.java"
+
+sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
+       "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
+
+sed -i "s/import org.supertuxkart.*/import $PACKAGE_NAME.STKEditText;/g" \
        "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
 
 sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
@@ -479,7 +494,7 @@ sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
        
 sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
        "$DIRNAME/AndroidManifest.xml"
-       
+
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"
 cp "$APP_ICON" "$DIRNAME/res/drawable/icon.png"
 convert -scale 72x72 "$APP_ICON" "$DIRNAME/res/drawable-hdpi/icon.png"

@@ -228,3 +228,34 @@ EventPropagation TextBoxWidget::leftPressed (const int playerID)
 
     return EVENT_LET;
 }   // leftPressed
+
+// ============================================================================
+/* This callback will allow copying android edittext data directly to editbox,
+ * which will allow composing text to be auto updated. */
+#ifdef ANDROID
+#include "jni.h"
+
+#if !defined(ANDROID_PACKAGE_CALLBACK_NAME)
+    #error
+#endif
+
+#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jobject this_obj, jstring text, jint start, jint end, jint composing_start, jint composing_end)
+#define ANDROID_EDITTEXT_CALLBACK(PKG_NAME) MAKE_EDITTEXT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    TextBoxWidget* tb = dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
+    if (!tb || text == NULL)
+        return;
+
+    const char* utf8_text = env->GetStringUTFChars(text, NULL);
+    if (utf8_text == NULL)
+        return;
+
+    core::stringw to_editbox = StringUtils::utf8ToWide(utf8_text);
+    tb->getIrrlichtElement<MyCGUIEditBox>()->fromAndroidEditText(
+        to_editbox, start, end, composing_start, composing_end);
+    env->ReleaseStringUTFChars(text, utf8_text);
+}
+#endif
