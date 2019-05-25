@@ -22,6 +22,7 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
+#include "utils/utf8/unchecked.h"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -253,7 +254,14 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     if (utf8_text == NULL)
         return;
 
-    core::stringw to_editbox = StringUtils::utf8ToWide(utf8_text);
+    // Use utf32 for emoji later
+    static_assert(sizeof(wchar_t) == sizeof(uint32_t), "Invalid wchar size");
+    std::vector<wchar_t> utf32line;
+    utf8::unchecked::utf8to32(utf8_text, utf8_text + strlen(utf8_text),
+        back_inserter(utf32line));
+    utf32line.push_back(0);
+
+    core::stringw to_editbox(&utf32line[0]);
     tb->getIrrlichtElement<MyCGUIEditBox>()->fromAndroidEditText(
         to_editbox, start, end, composing_start, composing_end);
     env->ReleaseStringUTFChars(text, utf8_text);
