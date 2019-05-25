@@ -6,6 +6,7 @@ import android.content.Context;
 import android.text.InputType;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.View;
 import android.widget.EditText;
 
 // We need to extend EditText instead of view to allow copying to our STK
@@ -74,5 +75,11 @@ public class STKEditText extends EditText
             return;
         editText2STKEditbox(getText().toString(), getSelectionStart(),
             getSelectionEnd(), m_composing_start, m_composing_end);
+    }
+    // ------------------------------------------------------------------------
+    public void beforeHideKeyboard()
+    {
+        clearFocus();
+        setVisibility(View.GONE);
     }
 }

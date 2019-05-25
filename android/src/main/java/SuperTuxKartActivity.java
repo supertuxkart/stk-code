@@ -22,6 +22,18 @@ public class SuperTuxKartActivity extends NativeActivity
     // ------------------------------------------------------------------------
     private native void saveKeyboardHeight(int height);
     // ------------------------------------------------------------------------
+    private void hideKeyboardNative()
+    {
+        if (m_stk_edittext == null)
+            return;
+
+        m_stk_edittext.beforeHideKeyboard();
+
+        InputMethodManager imm = (InputMethodManager)
+            getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(m_stk_edittext.getWindowToken(), 0);
+    }
+    // ------------------------------------------------------------------------
     private void hideNavBar(View decor_view)
     {
         if (Build.VERSION.SDK_INT < 19)
@@ -69,6 +81,13 @@ public class SuperTuxKartActivity extends NativeActivity
                         hideNavBar(decor_view);
                 }
             });
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        hideKeyboardNative();
     }
     // ------------------------------------------------------------------------
     @Override
@@ -142,6 +161,7 @@ public class SuperTuxKartActivity extends NativeActivity
         });
     }
     // ------------------------------------------------------------------------
+    /* Called by STK in JNI. */
     public void hideKeyboard()
     {
         runOnUiThread(new Runnable()
@@ -149,16 +169,7 @@ public class SuperTuxKartActivity extends NativeActivity
             @Override
             public void run()
             {
-                if (m_stk_edittext == null)
-                    return;
-
-                m_stk_edittext.clearFocus();
-                m_stk_edittext.setVisibility(View.GONE);
-
-                InputMethodManager imm = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(m_stk_edittext.getWindowToken(),
-                    0);
+                hideKeyboardNative();
             }
         });
     }

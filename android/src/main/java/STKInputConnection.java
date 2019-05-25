@@ -9,7 +9,7 @@ public class STKInputConnection extends InputConnectionWrapper
 {
     /* The global edittext which will be "copied" to the current focused STK
      * box. */
-    private STKEditText m_stk_edittext;
+    final private STKEditText m_stk_edittext;
 
     // ------------------------------------------------------------------------
     public STKInputConnection(InputConnection target, STKEditText stk_edittext)
