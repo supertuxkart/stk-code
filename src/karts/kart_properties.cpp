@@ -194,7 +194,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         {
             copyFrom(&stk_config->getKartProperties(kart_type));
         }
-        catch (std::out_of_range)
+        catch (std::out_of_range &)
         {
             copyFrom(&stk_config->getDefaultKartProperties());
         }   // try .. catch
