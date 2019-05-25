@@ -73,7 +73,7 @@ namespace irr
         virtual bool deactivateGyroscope();
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
-        virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
+        void fromSTKEditBox(const core::stringw& text, int selection_start, int selection_end);
         virtual void toggleOnScreenKeyboard(bool show);
         virtual bool supportsTouchDevice() const { return HasTouchDevice; }
         virtual bool hasHardwareKeyboard() const;
@@ -141,7 +141,6 @@ namespace irr
         const ASensor* Gyroscope;
         bool AccelerometerActive;
         bool GyroscopeActive;
-        bool TextInputEnabled;
         static AndroidApplicationInfo ApplicationInfo;
 
         static bool IsPaused;

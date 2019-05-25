@@ -31,6 +31,9 @@ public class SuperTuxKartActivity extends NativeActivity
 
         InputMethodManager imm = (InputMethodManager)
             getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null)
+            return;
+
         imm.hideSoftInputFromWindow(m_stk_edittext.getWindowToken(), 0);
     }
     // ------------------------------------------------------------------------
@@ -45,6 +48,34 @@ public class SuperTuxKartActivity extends NativeActivity
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+    }
+    // ------------------------------------------------------------------------
+    private void createSTKEditText()
+    {
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT);
+        m_stk_edittext = new STKEditText(this);
+        // For some copy-and-paste text are not done by commitText in
+        // STKInputConnection, so we need an extra watcher
+        m_stk_edittext.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {}
+            @Override
+            public void afterTextChanged(Editable edit)
+            {
+                if (m_stk_edittext != null)
+                    m_stk_edittext.updateSTKEditBox();
+            }
+        });
+        addContentView(m_stk_edittext, params);
+        // Only focus it and make visible when soft keybord is opened
+        m_stk_edittext.setVisibility(View.GONE);
     }
     // ------------------------------------------------------------------------
     @Override
@@ -120,38 +151,12 @@ public class SuperTuxKartActivity extends NativeActivity
             {
                 InputMethodManager imm = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm == null)
+                    return;
 
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT);
                 if (m_stk_edittext == null)
-                {
-                    m_stk_edittext = new STKEditText(context);
-                    // For some copy-and-paste text are not done by commitText
-                    // in STKInputConnection, so we need an extra watcher
-                    m_stk_edittext.addTextChangedListener(new TextWatcher()
-                        {
-                            @Override
-                            public void onTextChanged(CharSequence s,
-                                                      int start, int before,
-                                                      int count) {}
-                            @Override
-                            public void beforeTextChanged(CharSequence s,
-                                                          int start, int count,
-                                                          int after) {}
-                            @Override
-                            public void afterTextChanged(Editable edit)
-                            {
-                                if (m_stk_edittext != null)
-                                    m_stk_edittext.updateSTKEditBox();
-                            }
-                        });
-                    addContentView(m_stk_edittext, params);
-                }
-                else
-                    m_stk_edittext.setLayoutParams(params);
+                    createSTKEditText();
 
-                m_stk_edittext.resetWhenFocus();
                 m_stk_edittext.setVisibility(View.VISIBLE);
                 m_stk_edittext.requestFocus();
 
@@ -170,6 +175,26 @@ public class SuperTuxKartActivity extends NativeActivity
             public void run()
             {
                 hideKeyboardNative();
+            }
+        });
+    }
+    // ------------------------------------------------------------------------
+    /* Called by STK in JNI. */
+    public void fromSTKEditBox(final String text, final int selection_start,
+                              final int selection_end)
+    {
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (m_stk_edittext == null)
+                    createSTKEditText();
+                m_stk_edittext.setTextFromSTK(text);
+                STKInputConnection ic = m_stk_edittext.getSTKInputConnection();
+                if (ic == null)
+                    return;
+                ic.setSelection(selection_start, selection_end);
             }
         });
     }
