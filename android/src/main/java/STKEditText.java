@@ -6,6 +6,7 @@ import android.content.Context;
 import android.text.InputType;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 import android.view.View;
 import android.widget.EditText;
 
@@ -86,10 +87,55 @@ public class STKEditText extends EditText
         setVisibility(View.GONE);
     }
     // ------------------------------------------------------------------------
-    public void setTextFromSTK(final String text)
+    /* Called by STK with JNI to set this view with new text (like user focus
+     * a new editbox in stk, or change cursor / selection). */
+    public void setTextFromSTK(final String text, int selection_start,
+                               int selection_end)
     {
+        // Avoid sending the newly set text back to STK at the same time
         m_from_stk_editbox = true;
-        super.setText(text);
+        try
+        {
+            String old_text = getText().toString();
+            boolean text_changed = !text.equals(old_text);
+            if (text_changed)
+            {
+                super.clearComposingText();
+                super.setText(text);
+                m_stk_input_connection.setComposingRegion(0, 0);
+            }
+
+            if (selection_start != selection_end &&
+                selection_start > selection_end)
+            {
+                int temp = selection_end;
+                selection_end = selection_start;
+                selection_start = temp;
+            }
+            if (selection_start < 0)
+                selection_start = 0;
+            if (selection_end > length())
+                selection_end = length();
+
+            if (text_changed)
+            {
+                InputMethodManager imm = (InputMethodManager)getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null)
+                {
+                    // From google, You should call this when the text within
+                    // your view changes outside of the normal input method or
+                    // key input flow, such as when an application calls
+                    // TextView.setText().
+                    imm.restartInput(this);
+                }
+            }
+            setSelection(selection_start, selection_end);
+        }
+        catch (Exception e)
+        {
+            m_from_stk_editbox = false;
+        }
         m_from_stk_editbox = false;
     }
     // ------------------------------------------------------------------------

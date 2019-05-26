@@ -190,11 +190,8 @@ public class SuperTuxKartActivity extends NativeActivity
             {
                 if (m_stk_edittext == null)
                     createSTKEditText();
-                m_stk_edittext.setTextFromSTK(text);
-                STKInputConnection ic = m_stk_edittext.getSTKInputConnection();
-                if (ic == null)
-                    return;
-                ic.setSelection(selection_start, selection_end);
+                m_stk_edittext.setTextFromSTK(text, selection_start,
+                    selection_end);
             }
         });
     }
