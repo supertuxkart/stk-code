@@ -286,6 +286,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
             }
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
+                MarkBegin = MarkEnd = CursorPos = (u32)Text.size();
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
                 if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
                 {
@@ -296,13 +297,21 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 }
 #endif
 #ifdef ANDROID
-                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                if (irr_driver->getDevice()->hasOnScreenKeyboard() &&
+                    irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
                 {
+                    // If user toggle with hacker keyboard with arrows, keep
+                    // using only text from STKEditTex
+                    m_from_android_edittext = true;
                     CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                        irr_driver->getDevice());
                     dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd, m_type);
                 }
+                else
 #endif
+                {
+                    m_from_android_edittext = false;
+                }
             }
             break;
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
@@ -1176,8 +1185,7 @@ void CGUIEditBox::draw()
 void CGUIEditBox::setText(const wchar_t* text)
 {
     Text = text;
-    if (u32(CursorPos) > Text.size())
-        CursorPos = Text.size();
+    MarkBegin = MarkEnd = CursorPos = (u32)Text.size();
     HScrollPos = 0;
     breakText();
 #ifdef ANDROID
