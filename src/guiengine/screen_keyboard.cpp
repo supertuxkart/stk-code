@@ -27,10 +27,6 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
-#ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#endif
-
 #include <algorithm>
 #include <string>
 

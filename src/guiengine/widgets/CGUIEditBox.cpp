@@ -297,7 +297,8 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 }
 #endif
 #ifdef ANDROID
-                if (irr_driver->getDevice()->hasOnScreenKeyboard() &&
+                if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
+                    irr_driver->getDevice()->hasOnScreenKeyboard() &&
                     irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
                 {
                     // If user toggle with hacker keyboard with arrows, keep
@@ -1189,7 +1190,8 @@ void CGUIEditBox::setText(const wchar_t* text)
     HScrollPos = 0;
     breakText();
 #ifdef ANDROID
-        if (irr_driver->getDevice()->hasOnScreenKeyboard() &&
+        if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
+            irr_driver->getDevice()->hasOnScreenKeyboard() &&
             irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
@@ -1730,7 +1732,8 @@ void CGUIEditBox::setTextMarkers(s32 begin, s32 end)
         MarkEnd = end;
         sendGuiEvent(EGET_EDITBOX_MARKING_CHANGED);
 #ifdef ANDROID
-        if (irr_driver->getDevice()->hasOnScreenKeyboard() &&
+        if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
+            irr_driver->getDevice()->hasOnScreenKeyboard() &&
             irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
