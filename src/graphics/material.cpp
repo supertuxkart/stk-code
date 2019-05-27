@@ -447,7 +447,7 @@ Material::Material(const std::string& fname, bool is_full_path,
             else
             {
                 Log::warn("Material", "Cannot determine texture full path: %s",
-                    m_sampler_path[0].c_str());
+                    fname.c_str());
             }
         }
     }
