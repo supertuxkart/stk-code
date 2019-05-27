@@ -7,6 +7,7 @@ import android.text.InputType;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -62,6 +63,16 @@ public class STKEditText extends EditText
     // ------------------------------------------------------------------------
     @Override
     public boolean onCheckIsTextEditor()                       { return true; }
+    // ------------------------------------------------------------------------
+    @Override
+    public boolean onKeyPreIme(int key_code, KeyEvent event)
+    {
+        // Always remove the focus on STKEdit when pressing back button in
+        // phone, which hideSoftInputFromWindow is called by java itself
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+            beforeHideKeyboard();
+        return false;
+    }
     // ------------------------------------------------------------------------
     public void setComposingRegion(int start, int end)
     {
