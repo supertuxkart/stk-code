@@ -183,11 +183,11 @@ void CIrrDeviceAndroid::printConfig()
     int32_t ui_mode_night = AConfiguration_getUiModeNight(Android->config);
 
     os::Printer::log("Android configuration: ", ELL_DEBUG);
-    os::Printer::log("   country:", country != NULL ? country : "unknown", ELL_DEBUG);
+    os::Printer::log("   country:", !std::string(country).empty() ? country : "unknown", ELL_DEBUG);
     os::Printer::log("   density:", core::stringc(density).c_str(), ELL_DEBUG);
     os::Printer::log("   keyboard:", core::stringc(keyboard).c_str(), ELL_DEBUG);
     os::Printer::log("   keys_hidden:", core::stringc(keys_hidden).c_str(), ELL_DEBUG);
-    os::Printer::log("   language:", language != NULL ? language : "unknown", ELL_DEBUG);
+    os::Printer::log("   language:", !std::string(language).empty() ? language : "unknown", ELL_DEBUG);
     os::Printer::log("   mcc:", core::stringc(mcc).c_str(), ELL_DEBUG);
     os::Printer::log("   mnc:", core::stringc(mnc).c_str(), ELL_DEBUG);
     os::Printer::log("   nav_hidden:", core::stringc(nav_hidden).c_str(), ELL_DEBUG);

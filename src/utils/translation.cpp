@@ -390,19 +390,19 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 char p_language[3] = {};
                 AConfiguration_getLanguage(global_android_app->config, 
                                            p_language);
-                
-                if (p_language != NULL)
+                std::string s_language(p_language);
+                if (!s_language.empty())
                 {
-                    language += p_language;
-                    
+                    language += s_language;
+
                     char p_country[3] = {};
                     AConfiguration_getCountry(global_android_app->config, 
                                               p_country);
-                    
-                    if (p_country)
+                    std::string s_country(p_country);
+                    if (!s_country.empty())
                     {
                         language += "_";
-                        language += p_country;
+                        language += s_country;
                     }
                 }
             }
