@@ -18,15 +18,20 @@ public class STKEditText extends EditText
 
     private int m_composing_end;
 
+    /* Used to prevent copying text to non focused widget in STK. */
+    private int m_stk_widget_id;
+
     STKInputConnection m_stk_input_connection;
 
     /* Used to avoid infinite calling updateSTKEditBox if setText currently
      * by jni. */
     private boolean m_from_stk_editbox;
     // ------------------------------------------------------------------------
-    private native static void editText2STKEditbox(String full_text, int start,
-                                                  int end, int composing_start,
-                                                  int composing_end);
+    private native static void editText2STKEditbox(int widget_id,
+                                                   String full_text, int start,
+                                                   int end,
+                                                   int composing_start,
+                                                   int composing_end);
     // ------------------------------------------------------------------------
     public STKEditText(Context context)
     {
@@ -34,6 +39,7 @@ public class STKEditText extends EditText
         setFocusableInTouchMode(true);
         m_composing_start = 0;
         m_composing_end = 0;
+        m_stk_widget_id = -1;
         m_from_stk_editbox = false;
         m_stk_input_connection = null;
     }
@@ -77,8 +83,9 @@ public class STKEditText extends EditText
     {
         if (!isFocused() || m_from_stk_editbox)
             return;
-        editText2STKEditbox(getText().toString(), getSelectionStart(),
-            getSelectionEnd(), m_composing_start, m_composing_end);
+        editText2STKEditbox(m_stk_widget_id, getText().toString(),
+            getSelectionStart(), getSelectionEnd(), m_composing_start,
+            m_composing_end);
     }
     // ------------------------------------------------------------------------
     public void beforeHideKeyboard()
@@ -89,9 +96,10 @@ public class STKEditText extends EditText
     // ------------------------------------------------------------------------
     /* Called by STK with JNI to set this view with new text (like user focus
      * a new editbox in stk, or change cursor / selection). */
-    public void setTextFromSTK(final String text, int selection_start,
-                               int selection_end)
+    public void setTextFromSTK(int widget_id, final String text,
+                               int selection_start, int selection_end)
     {
+        m_stk_widget_id = widget_id;
         // Avoid sending the newly set text back to STK at the same time
         m_from_stk_editbox = true;
         try

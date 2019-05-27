@@ -73,7 +73,7 @@ namespace irr
         virtual bool deactivateGyroscope();
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
-        void fromSTKEditBox(const core::stringw& text, int selection_start, int selection_end);
+        void fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end);
         virtual void toggleOnScreenKeyboard(bool show);
         virtual bool supportsTouchDevice() const { return HasTouchDevice; }
         virtual bool hasHardwareKeyboard() const;

@@ -299,7 +299,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 {
                     CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                        irr_driver->getDevice());
-                    dl->fromSTKEditBox(Text, MarkBegin, MarkEnd);
+                    dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd);
                 }
 #endif
             }
@@ -1185,7 +1185,7 @@ void CGUIEditBox::setText(const wchar_t* text)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                 irr_driver->getDevice());
-            dl->fromSTKEditBox(Text, MarkBegin, MarkEnd);
+            dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd);
         }
 #endif
 }
@@ -1726,7 +1726,7 @@ void CGUIEditBox::setTextMarkers(s32 begin, s32 end)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                 irr_driver->getDevice());
-            dl->fromSTKEditBox(Text, MarkBegin, MarkEnd);
+            dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd);
         }
 #endif
     }

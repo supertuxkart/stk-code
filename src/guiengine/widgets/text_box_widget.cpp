@@ -240,14 +240,14 @@ EventPropagation TextBoxWidget::leftPressed (const int playerID)
     #error
 #endif
 
-#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jobject this_obj, jstring text, jint start, jint end, jint composing_start, jint composing_end)
+#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jobject this_obj, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end)
 #define ANDROID_EDITTEXT_CALLBACK(PKG_NAME) MAKE_EDITTEXT_CALLBACK(PKG_NAME)
 
 extern "C"
 ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 {
     TextBoxWidget* tb = dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
-    if (!tb || text == NULL)
+    if (!tb || (int)widget_id != tb->getID() || text == NULL)
         return;
 
     const char* utf8_text = env->GetStringUTFChars(text, NULL);

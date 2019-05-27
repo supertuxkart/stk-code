@@ -180,8 +180,9 @@ public class SuperTuxKartActivity extends NativeActivity
     }
     // ------------------------------------------------------------------------
     /* Called by STK in JNI. */
-    public void fromSTKEditBox(final String text, final int selection_start,
-                              final int selection_end)
+    public void fromSTKEditBox(final int widget_id, final String text,
+                               final int selection_start,
+                               final int selection_end)
     {
         runOnUiThread(new Runnable()
         {
@@ -190,7 +191,7 @@ public class SuperTuxKartActivity extends NativeActivity
             {
                 if (m_stk_edittext == null)
                     createSTKEditText();
-                m_stk_edittext.setTextFromSTK(text, selection_start,
+                m_stk_edittext.setTextFromSTK(widget_id, text, selection_start,
                     selection_end);
             }
         });
