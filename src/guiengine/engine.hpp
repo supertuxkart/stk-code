@@ -34,6 +34,7 @@ namespace irr
     namespace video { class IVideoDriver; class ITexture;        }
 }
 
+#include <functional>
 #include <string>
 
 #include "utils/constants.hpp"
@@ -248,6 +249,10 @@ namespace GUIEngine
       */
     void reloadSkin();
 
+    /**
+      * \brief Add gui-related function before rendering GUI (from other thread)
+      */
+    void addGUIFunctionBeforeRendering(std::function<void()> func);
 }
 
 #endif

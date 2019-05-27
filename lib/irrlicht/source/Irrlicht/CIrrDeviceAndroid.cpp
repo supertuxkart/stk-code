@@ -9,6 +9,7 @@
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 
 #include <assert.h>
+#include <atomic>
 #include <vector>
 #include "os.h"
 #include "CContextEGL.h"
@@ -43,7 +44,7 @@ ANDROID_SAVE_CHARS_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 
 // Call when android keyboard is opened or close, and save its height for
 // moving screen
-int g_keyboard_height = 0;
+std::atomic<int> g_keyboard_height(0);
 
 #define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jobject this_obj, jint height)
 #define ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME)
@@ -51,7 +52,7 @@ int g_keyboard_height = 0;
 extern "C"
 ANDROID_SAVE_KBD_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 {
-    g_keyboard_height = (int)height;
+    g_keyboard_height.store((int)height);
 }
 
 namespace irr
@@ -227,8 +228,9 @@ void CIrrDeviceAndroid::printConfig()
 
 u32 CIrrDeviceAndroid::getOnScreenKeyboardHeight() const
 {
-    if (g_keyboard_height > 0)
-        return g_keyboard_height;
+    int height = g_keyboard_height.load();
+    if (height > 0)
+        return height;
     return 0;
 }
 

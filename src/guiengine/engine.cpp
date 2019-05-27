@@ -685,9 +685,11 @@ namespace GUIEngine
 #include "states_screens/race_gui_base.hpp"
 #include "utils/debug.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
+#include <mutex>
 
 using namespace irr::gui;
 using namespace irr::video;
@@ -716,6 +718,10 @@ namespace GUIEngine
         int large_font_height;
         int small_font_height;
         int title_font_height;
+#ifdef ANDROID
+        std::mutex m_gui_functions_mutex;
+        std::vector<std::function<void()> > m_gui_functions;
+#endif
     }
     using namespace Private;
 
@@ -1145,6 +1151,15 @@ namespace GUIEngine
     }   // reloadSkin
 
     // -----------------------------------------------------------------------
+    void addGUIFunctionBeforeRendering(std::function<void()> func)
+    {
+#ifdef ANDROID
+        std::lock_guard<std::mutex> lock(m_gui_functions_mutex);
+        m_gui_functions.push_back(func);
+#endif
+    }   // addGUIFunctionBeforeRendering
+
+    // -----------------------------------------------------------------------
     /** \brief called on every frame to trigger the rendering of the GUI.
      *  \param elapsed_time Time since last rendering calls (in seconds).
      *  \param is_loading True if the rendering is called during loading of world,
@@ -1157,6 +1172,21 @@ namespace GUIEngine
 
         // Not yet initialized, or already cleaned up
         if (g_skin == NULL) return;
+
+#ifdef ANDROID
+        // Run all GUI functions first (if any)
+        std::unique_lock<std::mutex> ul(m_gui_functions_mutex);
+        if (!m_gui_functions.empty())
+        {
+            std::vector<std::function<void()> > functions;
+            std::swap(functions, m_gui_functions);
+            ul.unlock();
+            for (auto& f : functions)
+                f();
+        }
+        else
+            ul.unlock();
+#endif
 
         // ---- menu drawing
 

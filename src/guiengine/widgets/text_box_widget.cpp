@@ -246,8 +246,7 @@ EventPropagation TextBoxWidget::leftPressed (const int playerID)
 extern "C"
 ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 {
-    TextBoxWidget* tb = dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
-    if (!tb || (int)widget_id != tb->getID() || text == NULL)
+    if (text == NULL)
         return;
 
     const char* utf8_text = env->GetStringUTFChars(text, NULL);
@@ -262,8 +261,17 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     utf32line.push_back(0);
 
     core::stringw to_editbox(&utf32line[0]);
-    tb->getIrrlichtElement<MyCGUIEditBox>()->fromAndroidEditText(
-        to_editbox, start, end, composing_start, composing_end);
     env->ReleaseStringUTFChars(text, utf8_text);
+
+    GUIEngine::addGUIFunctionBeforeRendering([widget_id, to_editbox, start,
+        end, composing_start, composing_end]()
+        {
+            TextBoxWidget* tb =
+                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
+            if (!tb || (int)widget_id != tb->getID())
+                return;
+            tb->getIrrlichtElement<MyCGUIEditBox>()->fromAndroidEditText(
+                to_editbox, start, end, composing_start, composing_end);
+        });
 }
 #endif
