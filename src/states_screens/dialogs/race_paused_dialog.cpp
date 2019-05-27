@@ -74,6 +74,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         music_manager->pauseMusic();
         SFXManager::get()->pauseAll();
         m_text_box->clearListeners();
+        m_text_box->setTextBoxType(TBT_CAP_SENTENCES);
         if (UserConfigParams::m_lobby_chat)
         {
             m_text_box->setActive(true);

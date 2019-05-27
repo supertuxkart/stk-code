@@ -31,10 +31,11 @@ namespace GUIEngine
     // This enum can allow showing different soft keyboard in android
     enum TextBoxType: int
     {
-        TBT_TEXT = 0,
-        TBT_PASSWORD = 1,
-        TBT_NUMBER = 2,
-        TBT_EMAIL = 3,
+        TBT_TEXT = 0, /* Normal text input (default) */
+        TBT_CAP_SENTENCES = 1, /* Capitalize the first character of each sentence */
+        TBT_PASSWORD = 2, /* Password input */
+        TBT_NUMBER = 3, /* Number only input */
+        TBT_EMAIL = 4, /* Email input */
     };
 
     class ITextBoxWidgetListener

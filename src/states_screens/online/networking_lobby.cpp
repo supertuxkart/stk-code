@@ -188,6 +188,7 @@ void NetworkingLobby::init()
     m_state = LS_CONNECTING;
     m_chat_box->setVisible(false);
     m_chat_box->setActive(false);
+    m_chat_box->setTextBoxType(TBT_CAP_SENTENCES);
     m_send_button->setVisible(false);
     m_send_button->setActive(false);
 

@@ -189,12 +189,16 @@ public class STKEditText extends EditText
             setInputType(InputType.TYPE_CLASS_TEXT);
             break;
         case 1:
-            setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
             break;
         case 2:
-            setInputType(InputType.TYPE_CLASS_NUMBER);
+            setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
             break;
         case 3:
+            setInputType(InputType.TYPE_CLASS_NUMBER);
+            break;
+        case 4:
             setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
             break;
         default:
