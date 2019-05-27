@@ -78,6 +78,9 @@ public:
         return out;
     }
 
+    PtrVector<GUIEngine::ITextBoxWidgetListener, REF>&
+                                         getListeners() { return m_listeners; }
+
 };
 
 using namespace GUIEngine;
@@ -270,8 +273,17 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
                 dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
             if (!tb || (int)widget_id != tb->getID())
                 return;
-            tb->getIrrlichtElement<MyCGUIEditBox>()->fromAndroidEditText(
-                to_editbox, start, end, composing_start, composing_end);
+            MyCGUIEditBox* eb = tb->getIrrlichtElement<MyCGUIEditBox>();
+            if (!eb)
+                return;
+            core::stringw old_text = eb->getText();
+            eb->fromAndroidEditText(to_editbox, start, end, composing_start,
+                composing_end);
+            if (old_text != eb->getText())
+            {
+                for (unsigned n = 0; n < eb->getListeners().size(); n++)
+                    eb->getListeners()[n].onTextUpdated();
+            }
         });
 }
 #endif
