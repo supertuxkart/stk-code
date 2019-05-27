@@ -172,7 +172,6 @@ namespace irr
         void createKeyMap();
         void createVideoModeList();
         wchar_t getKeyChar(SEvent& event);
-        wchar_t getUnicodeChar(AInputEvent* event);
         static void readApplicationInfo(ANativeActivity* activity);
         int getRotation();
         DeviceOrientation getDefaultOrientation();

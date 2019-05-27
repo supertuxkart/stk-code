@@ -17,31 +17,6 @@
 #include "COGLES2Driver.h"
 #include "../../../../src/utils/utf8/unchecked.h"
 
-std::string g_from_java_chars;
-
-// Save any String in java to g_from_java_chars (triggered by voice-text input,
-// clipboard or unicode char from keyboard) and manually postEventFromUser for
-// each character
-
-#if !defined(ANDROID_PACKAGE_CALLBACK_NAME)
-    #error
-#endif
-
-#define MAKE_ANDROID_SAVE_CHARS_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveFromJavaChars(JNIEnv* env, jobject this_obj, jstring from_java_chars)
-#define ANDROID_SAVE_CHARS_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_CHARS_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_SAVE_CHARS_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
-{
-    if (from_java_chars == NULL)
-        return;
-    const char* chars = env->GetStringUTFChars(from_java_chars, NULL);
-    if (chars == NULL)
-        return;
-    g_from_java_chars += chars;
-    env->ReleaseStringUTFChars(from_java_chars, chars);
-}
-
 // Call when android keyboard is opened or close, and save its height for
 // moving screen
 std::atomic<int> g_keyboard_height(0);
@@ -294,26 +269,6 @@ bool CIrrDeviceAndroid::run()
     {
         if (m_moved_height_func != NULL)
             m_moved_height = m_moved_height_func(this);
-        if (!g_from_java_chars.empty())
-        {
-            std::vector<wchar_t> utf32;
-            const char* chars = g_from_java_chars.c_str();
-            utf8::unchecked::utf8to32(chars, chars + strlen(chars), back_inserter(utf32));
-            for (wchar_t wc : utf32)
-            {
-                SEvent event;
-                event.EventType = EET_KEY_INPUT_EVENT;
-                event.KeyInput.Char = wc;
-                event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = IRR_KEY_UNKNOWN;
-                event.KeyInput.Shift = false;
-                event.KeyInput.Control = false;
-                event.KeyInput.SystemKeyCode = 0;
-                event.KeyInput.Key = IRR_KEY_UNKNOWN;
-                postEventFromUser(event);
-            }
-            g_from_java_chars.clear();
-        }
         s32 Events = 0;
         android_poll_source* Source = 0;
         bool should_run = (IsStarted && IsFocused && !IsPaused);
@@ -1239,63 +1194,6 @@ wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
     }
     
     return key_char;
-}
-
-wchar_t CIrrDeviceAndroid::getUnicodeChar(AInputEvent* event)
-{
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-    
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-    
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot get unicode character.", ELL_DEBUG);
-        return 0;
-    }
-
-    jlong down_time = AKeyEvent_getDownTime(event);
-    jlong event_time = AKeyEvent_getEventTime(event);
-    jint action = AKeyEvent_getAction(event);
-    jint code = AKeyEvent_getKeyCode(event);
-    jint repeat = AKeyEvent_getRepeatCount(event);
-    jint meta_state = AKeyEvent_getMetaState(event);
-    jint device_id = AInputEvent_getDeviceId(event);
-    jint scan_code = AKeyEvent_getScanCode(event);
-    jint flags = AKeyEvent_getFlags(event);
-    jint source = AInputEvent_getSource(event);
-
-    jclass key_event = env->FindClass("android/view/KeyEvent");
-    jmethodID key_event_constructor = env->GetMethodID(key_event, "<init>", 
-                                                       "(JJIIIIIIII)V");
-                                                       
-    jobject key_event_obj = env->NewObject(key_event, key_event_constructor, 
-                                           down_time, event_time, action, code, 
-                                           repeat, meta_state, device_id, 
-                                           scan_code, flags, source);
-
-    jmethodID get_unicode = env->GetMethodID(key_event, "getUnicodeChar", "(I)I");
-    
-    wchar_t unicode_char = env->CallIntMethod(key_event_obj, get_unicode, 
-                                              meta_state);
-
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
-
-    return unicode_char;
 }
 
 void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show)
