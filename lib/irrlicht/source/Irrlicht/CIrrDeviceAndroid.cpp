@@ -704,15 +704,6 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
     {
         event.KeyInput.PressedDown = false;
     }
-    else if (keyAction == AKEY_EVENT_ACTION_MULTIPLE)
-    {
-        // TODO: Multiple duplicate key events have occurred in a row,
-        // or a complex string is being delivered. The repeat_count
-        // property of the key event contains the number of times the
-        // given key code should be executed.
-        // I guess this might necessary for more complicated i18n key input,
-        // but don't see yet how to handle this correctly.
-    }
 
     event.KeyInput.Shift = (keyMetaState & AMETA_SHIFT_ON ||
                             keyMetaState & AMETA_SHIFT_LEFT_ON ||
@@ -732,7 +723,7 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
             event.KeyInput.Char = getKeyChar(event);
         }
     }
-    
+
     // If button doesn't return key code, then at least use device-specific
     // scan code, because it's better than nothing
     if (event.KeyInput.Key == 0)
