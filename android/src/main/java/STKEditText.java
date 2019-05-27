@@ -182,27 +182,40 @@ public class STKEditText extends EditText
     // ------------------------------------------------------------------------
     public void configType(final int type)
     {
+        int it = InputType.TYPE_CLASS_TEXT;
         // Check text_box_widget.hpp for definition
         switch (type)
         {
         case 0:
-            setInputType(InputType.TYPE_CLASS_TEXT);
+        {
+            it = InputType.TYPE_CLASS_TEXT;
             break;
+        }
         case 1:
-            setInputType(InputType.TYPE_CLASS_TEXT |
-                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        {
+            it = InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
             break;
+        }
         case 2:
-            setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        {
+            it = InputType.TYPE_TEXT_VARIATION_PASSWORD;
             break;
+        }
         case 3:
-            setInputType(InputType.TYPE_CLASS_NUMBER);
+        {
+            it = InputType.TYPE_CLASS_NUMBER;
             break;
+        }
         case 4:
-            setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        {
+            it = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
             break;
+        }
         default:
             break;
         }
+        if (it != getInputType())
+            setInputType(it);
     }
 }
