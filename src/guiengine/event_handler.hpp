@@ -73,8 +73,6 @@ namespace GUIEngine
         EventPropagation onWidgetActivated(Widget* w, const int playerID);
         void sendNavigationEvent(const NavigationDirection nav, const int playerID);
         void navigate(const NavigationDirection nav, const int playerID);
-        int findIDClosestWidget(const NavigationDirection nav, const int playerID,
-                                Widget* w, bool ignore_disabled, int recursion_counter=1);
 
         /** \brief          send an event to the GUI module user's event callback
           * \param widget   the widget that triggerred this event
@@ -115,6 +113,8 @@ namespace GUIEngine
         static void deallocate();
         
         void setAcceptEvents(bool value) { m_accept_events = value; }
+        int findIDClosestWidget(const NavigationDirection nav, const int playerID,
+                                Widget* w, bool ignore_disabled, int recursion_counter=1);
     };
 
 }

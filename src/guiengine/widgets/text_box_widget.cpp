@@ -27,6 +27,7 @@
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
+#include <IrrlichtDevice.h>
 
 using namespace irr;
 
@@ -53,34 +54,41 @@ public:
         m_listeners.clearWithoutDeleting();
     }
 
+    void handleTextUpdated()
+    {
+        for (unsigned n = 0; n < m_listeners.size(); n++)
+            m_listeners[n].onTextUpdated();
+    }
+
+    bool handleEnterPressed()
+    {
+        bool handled = false;
+        for (unsigned n = 0; n < m_listeners.size(); n++)
+        {
+            if (m_listeners[n].onEnterPressed(Text))
+            {
+                handled = true;
+                Text = L"";
+                CursorPos = MarkBegin = MarkEnd = 0;
+            }
+        }
+        return handled;
+    }
+
     virtual bool OnEvent(const SEvent& event)
     {
         bool out = CGUIEditBox::OnEvent(event);
 
-        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
-        {
-            for (unsigned int n=0; n<m_listeners.size(); n++)
-            {
-                m_listeners[n].onTextUpdated();
-            }
-        }
-        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.Key == IRR_KEY_RETURN)
-        {
-            for (unsigned int n=0; n<m_listeners.size(); n++)
-            {
-                if (m_listeners[n].onEnterPressed(Text))
-                {
-                    Text = L"";
-                    CursorPos = 0;
-                }
-            }
-        }
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.PressedDown)
+            handleTextUpdated();
+
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.Key == IRR_KEY_RETURN)
+            handleEnterPressed();
+
         return out;
     }
-
-    PtrVector<GUIEngine::ITextBoxWidgetListener, REF>&
-                                         getListeners() { return m_listeners; }
-
 };
 
 using namespace GUIEngine;
@@ -280,9 +288,61 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
             eb->fromAndroidEditText(to_editbox, start, end, composing_start,
                 composing_end);
             if (old_text != eb->getText())
+                eb->handleTextUpdated();
+        });
+}
+
+#define MAKE_HANDLE_ACTION_NEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleActionNext(JNIEnv* env, jobject this_obj, jint widget_id)
+#define ANDROID_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME) MAKE_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    GUIEngine::addGUIFunctionBeforeRendering([widget_id]()
+        {
+            TextBoxWidget* tb =
+                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
+            if (!tb || (int)widget_id != tb->getID())
+                return;
+            MyCGUIEditBox* eb = tb->getIrrlichtElement<MyCGUIEditBox>();
+            if (!eb)
+                return;
+
+            // First test for onEnterPressed, if true then close keyboard
+            if (eb->handleEnterPressed())
             {
-                for (unsigned n = 0; n < eb->getListeners().size(); n++)
-                    eb->getListeners()[n].onTextUpdated();
+                GUIEngine::getDevice()->toggleOnScreenKeyboard(false);
+                return;
+            }
+
+            // As it's action "next", check if below widget is a text box, if
+            // so focus it and keep the screen keyboard, so user can keep
+            // typing
+            int id = GUIEngine::EventHandler::get()->findIDClosestWidget(
+                NAV_DOWN, 0, tb, true/*ignore_disabled*/);
+            TextBoxWidget* closest_tb = NULL;
+            if (id != -1)
+            {
+                closest_tb =
+                    dynamic_cast<TextBoxWidget*>(GUIEngine::getWidget(id));
+            }
+
+            if (closest_tb)
+            {
+                closest_tb->setFocusForPlayer(0);
+            }
+            else
+            {
+                // Post an enter event and close the keyboard
+                SEvent enter_event;
+                enter_event.EventType = EET_KEY_INPUT_EVENT;
+                enter_event.KeyInput.Char = 0;
+                enter_event.KeyInput.PressedDown = true;
+                enter_event.KeyInput.Key = IRR_KEY_RETURN;
+                GUIEngine::getDevice()->postEventFromUser(enter_event);
+                enter_event.KeyInput.PressedDown = false;
+                GUIEngine::getDevice()->postEventFromUser(enter_event);
+                GUIEngine::getDevice()->toggleOnScreenKeyboard(false);
             }
         });
 }

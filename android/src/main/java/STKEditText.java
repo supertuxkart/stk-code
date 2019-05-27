@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 // We need to extend EditText instead of view to allow copying to our STK
 // editbox
@@ -34,6 +35,8 @@ public class STKEditText extends EditText
                                                    int composing_start,
                                                    int composing_end);
     // ------------------------------------------------------------------------
+    private native static void handleActionNext(int widget_id);
+    // ------------------------------------------------------------------------
     public STKEditText(Context context)
     {
         super(context);
@@ -43,6 +46,21 @@ public class STKEditText extends EditText
         m_stk_widget_id = -1;
         m_from_stk_editbox = false;
         m_stk_input_connection = null;
+        setOnEditorActionListener(new EditText.OnEditorActionListener()
+        {
+        @Override
+            public boolean onEditorAction(TextView v, int action_id,
+                                          KeyEvent event)
+            {
+                if (action_id == EditorInfo.IME_ACTION_NEXT)
+                {
+                    handleActionNext(m_stk_widget_id);
+                    // STK will handle the closing of the screen keyboard
+                    return true;
+                }
+                return false;
+            }
+        });
     }
     // ------------------------------------------------------------------------
     @Override
