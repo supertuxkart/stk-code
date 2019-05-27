@@ -158,6 +158,13 @@ void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
     IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
     assert(textCtrl != NULL);
     textCtrl->setPasswordBox(passwordBox, passwordChar);
+    setTextBoxType(TBT_PASSWORD);
+}
+
+// -----------------------------------------------------------------------------
+void TextBoxWidget::setTextBoxType(TextBoxType t)
+{
+    ((MyCGUIEditBox*)m_element)->setTextBoxType(t);
 }
 
 // -----------------------------------------------------------------------------

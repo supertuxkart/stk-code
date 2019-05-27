@@ -1196,7 +1196,7 @@ wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
     return key_char;
 }
 
-void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show)
+void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
 {
     if (!Android)
         return;
@@ -1234,7 +1234,12 @@ void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show)
         return;
     }
 
-    jmethodID method_id = env->GetMethodID(class_native_activity, show ? "showKeyboard" : "hideKeyboard", "()V");
+    jmethodID method_id = NULL;
+    if (show)
+        method_id = env->GetMethodID(class_native_activity, "showKeyboard", "(I)V");
+    else
+        method_id = env->GetMethodID(class_native_activity, "hideKeyboard", "()V");
+
     if (method_id == NULL)
     {
         os::Printer::log("showKeyboard unable to find method id.", ELL_ERROR);
@@ -1245,14 +1250,17 @@ void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show)
         return;
     }
 
-    env->CallVoidMethod(native_activity, method_id);
+    if (show)
+        env->CallVoidMethod(native_activity, method_id, (jint)type);
+    else
+        env->CallVoidMethod(native_activity, method_id);
     if (was_detached)
     {
         Android->activity->vm->DetachCurrentThread();
     }
 }
 
-void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end)
+void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type)
 {
     if (!Android)
         return;
@@ -1290,7 +1298,7 @@ void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text,
         return;
     }
 
-    jmethodID method_id = env->GetMethodID(class_native_activity, "fromSTKEditBox", "(ILjava/lang/String;II)V");
+    jmethodID method_id = env->GetMethodID(class_native_activity, "fromSTKEditBox", "(ILjava/lang/String;III)V");
     if (method_id == NULL)
     {
         os::Printer::log("fromSTKEditBox unable to find method id.", ELL_ERROR);
@@ -1309,7 +1317,7 @@ void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text,
     utf8.push_back(0);
     jstring jstring_text = env->NewStringUTF(utf8.data());
 
-    env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end);
+    env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end, (jint)type);
     if (was_detached)
     {
         Android->activity->vm->DetachCurrentThread();

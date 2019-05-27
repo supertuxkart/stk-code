@@ -40,6 +40,7 @@ public class STKEditText extends EditText
     public STKEditText(Context context)
     {
         super(context);
+        setInputType(InputType.TYPE_CLASS_TEXT);
         setFocusableInTouchMode(true);
         m_composing_start = 0;
         m_composing_end = 0;
@@ -72,7 +73,7 @@ public class STKEditText extends EditText
                 super.onCreateInputConnection(out_attrs), this);
         }
         out_attrs.actionLabel = null;
-        out_attrs.inputType = InputType.TYPE_CLASS_TEXT;
+        out_attrs.inputType = getInputType();
         out_attrs.imeOptions = EditorInfo.IME_ACTION_NEXT |
             EditorInfo.IME_FLAG_NO_FULLSCREEN |
             EditorInfo.IME_FLAG_NO_EXTRACT_UI;
@@ -178,4 +179,26 @@ public class STKEditText extends EditText
     // ------------------------------------------------------------------------
     public STKInputConnection getSTKInputConnection()
                                              { return m_stk_input_connection; }
+    // ------------------------------------------------------------------------
+    public void configType(final int type)
+    {
+        // Check text_box_widget.hpp for definition
+        switch (type)
+        {
+        case 0:
+            setInputType(InputType.TYPE_CLASS_TEXT);
+            break;
+        case 1:
+            setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            break;
+        case 2:
+            setInputType(InputType.TYPE_CLASS_NUMBER);
+            break;
+        case 3:
+            setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            break;
+        default:
+            break;
+        }
+    }
 }

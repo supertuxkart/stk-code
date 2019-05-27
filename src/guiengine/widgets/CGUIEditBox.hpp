@@ -15,6 +15,10 @@
 
 using namespace irr;
 using namespace gui;
+namespace GUIEngine
+{
+    enum TextBoxType: int;
+}
 
     class CGUIEditBox : public IGUIEditBox
     {
@@ -124,6 +128,7 @@ using namespace gui;
         void openScreenKeyboard();
         s32 getCursorPosInBox() const { return CursorPos; }
         s32 getTextCount() const { return (s32)Text.size(); }
+        void setTextBoxType(GUIEngine::TextBoxType t) { m_type = t; }
     protected:
         //! Breaks the single text line.
         void breakText();
@@ -156,6 +161,8 @@ using namespace gui;
         bool OverrideColorEnabled;
         s32 MarkBegin;
         s32 MarkEnd;
+
+        GUIEngine::TextBoxType m_type;
 
         video::SColor OverrideColor;
         gui::IGUIFont *OverrideFont, *LastBreakFont;

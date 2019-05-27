@@ -28,6 +28,15 @@
 
 namespace GUIEngine
 {
+    // This enum can allow showing different soft keyboard in android
+    enum TextBoxType: int
+    {
+        TBT_TEXT = 0,
+        TBT_PASSWORD = 1,
+        TBT_NUMBER = 2,
+        TBT_EMAIL = 3,
+    };
+
     class ITextBoxWidgetListener
     {
     public:
@@ -70,7 +79,7 @@ namespace GUIEngine
         
         irr::core::stringw getText() const;
         void setPasswordBox(bool passwordBox, wchar_t passwordChar = L'*');
-        
+        void setTextBoxType(TextBoxType t);
         virtual void elementRemoved();
 
         /** Override method from base class Widget */

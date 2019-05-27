@@ -123,7 +123,7 @@ namespace irr
 		virtual u32 getScreenHeight() const { return 0; }
 		virtual u32 getOnScreenKeyboardHeight() const { return 0; }
 		virtual s32 getMovedHeight() const { return 0; }
-		virtual void toggleOnScreenKeyboard(bool show) {}
+		virtual void toggleOnScreenKeyboard(bool show, s32 type = 0) {}
 		virtual void registerGetMovedHeightFunction(HeightFunc) {}
 
 		//! Returns true if system has touch device

@@ -74,6 +74,7 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
     m_from_android_edittext = false;
     m_composing_start = 0;
     m_composing_end = 0;
+    m_type = (GUIEngine::TextBoxType)0;
 
     #ifdef _DEBUG
     setDebugName("CGUIEditBox");
@@ -299,7 +300,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 {
                     CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                        irr_driver->getDevice());
-                    dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd);
+                    dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd, m_type);
                 }
 #endif
             }
@@ -1185,7 +1186,7 @@ void CGUIEditBox::setText(const wchar_t* text)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                 irr_driver->getDevice());
-            dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd);
+            dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd, m_type);
         }
 #endif
 }
@@ -1322,7 +1323,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
                 if (irr_driver->getDevice()->hasOnScreenKeyboard())
-                    irr_driver->getDevice()->toggleOnScreenKeyboard(true);
+                    irr_driver->getDevice()->toggleOnScreenKeyboard(true, m_type);
                 else
                     openScreenKeyboard();
             }
@@ -1726,7 +1727,7 @@ void CGUIEditBox::setTextMarkers(s32 begin, s32 end)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                 irr_driver->getDevice());
-            dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd);
+            dl->fromSTKEditBox(getID(), Text, MarkBegin, MarkEnd, m_type);
         }
 #endif
     }

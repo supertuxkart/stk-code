@@ -140,7 +140,7 @@ public class SuperTuxKartActivity extends NativeActivity
         return ret;
     }
     // ------------------------------------------------------------------------
-    public void showKeyboard()
+    public void showKeyboard(final int type)
     {
         final Context context = this;
         // Need to run in ui thread as it access the view m_stk_edittext
@@ -157,6 +157,7 @@ public class SuperTuxKartActivity extends NativeActivity
                 if (m_stk_edittext == null)
                     createSTKEditText();
 
+                m_stk_edittext.configType(type);
                 m_stk_edittext.setVisibility(View.VISIBLE);
                 m_stk_edittext.requestFocus();
 
@@ -182,7 +183,7 @@ public class SuperTuxKartActivity extends NativeActivity
     /* Called by STK in JNI. */
     public void fromSTKEditBox(final int widget_id, final String text,
                                final int selection_start,
-                               final int selection_end)
+                               final int selection_end, final int type)
     {
         runOnUiThread(new Runnable()
         {
@@ -191,6 +192,7 @@ public class SuperTuxKartActivity extends NativeActivity
             {
                 if (m_stk_edittext == null)
                     createSTKEditText();
+                m_stk_edittext.configType(type);
                 m_stk_edittext.setTextFromSTK(widget_id, text, selection_start,
                     selection_end);
             }
