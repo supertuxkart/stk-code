@@ -3,22 +3,22 @@
     <unlock_list list="false"/>
     <track id="snowmountain" laps="3" reverse="false"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="115"/>
+    <requirements trophies="105"/>
 
     <best>
-        <karts number="10"/>
-        <requirements position="1" time="120"/>
+        <karts number="9"/>
+        <requirements position="1" time="110"/>
     </best>
     <hard>
-        <karts number="9"/>
-        <requirements position="2" time="145"/>
+        <karts number="8"/>
+        <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="8"/>
+        <karts number="7"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="7"/>
+        <karts number="6"/>
         <requirements position="1"/>
     </easy>
 </challenge>

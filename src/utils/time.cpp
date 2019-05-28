@@ -24,6 +24,8 @@
 #include <ctime>
 
 irr::ITimer *StkTime::m_timer = NULL;
+std::chrono::steady_clock::time_point
+   StkTime::m_mono_start = std::chrono::steady_clock::now();
 
 /** Init function for the timer. It grabs a copy of the timer of the
  *  current irrlicht device (which is the NULL device). This way the
@@ -94,14 +96,14 @@ void StkTime::getDate(int *day, int *month, int *year)
 StkTime::ScopeProfiler::ScopeProfiler(const char* name)
 {
     Log::info("ScopeProfiler", "%s {\n", name);
-    m_time = getRealTimeMs();
+    m_time = getMonoTimeMs();
     m_name = name;
 }   // StkTime::ScopeProfiler::ScopeProfiler
 
 // ----------------------------------------------------------------------------
 StkTime::ScopeProfiler::~ScopeProfiler()
 {
-    uint64_t difference = getRealTimeMs() - m_time;
+    uint64_t difference = getMonoTimeMs() - m_time;
     Log::info("ScopeProfiler", "} // took %d ms (%s)\n",
         (int)difference, m_name.c_str());
 }   // StkTime::ScopeProfiler::ScopeProfiler

@@ -21,6 +21,7 @@
 
 #include <irrString.h>
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include <utility>
@@ -56,10 +57,12 @@ private:
     std::map<const irr::core::stringw, const irr::core::stringw> m_fribidized_strings;
     bool m_rtl;
 
-    std::map<std::string, std::string> m_localized_name;
-
+    static std::map<std::string, std::string> m_localized_name;
+    static std::map<std::string, std::map<std::string, irr::core::stringw> > m_localized_country_codes;
     std::string m_current_language_name;
     std::string m_current_language_name_code;
+    std::string m_current_language_tag;
+    std::mutex m_fribidized_mutex, m_gettext_mutex, m_ngettext_mutex;
 #endif
 
 public:
@@ -96,6 +99,8 @@ public:
     std::string              getCurrentLanguageNameCode();
 
     const std::string&       getLocalizedName(const std::string& str) const;
+
+    irr::core::stringw       getLocalizedCountryName(const std::string& country_code) const;
 #endif
 
 private:

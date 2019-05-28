@@ -50,7 +50,9 @@ void UserInfoDialog::load()
     loadFromFile("online/user_info_dialog.stkgui");
     if(m_error)
         m_info_widget->setErrorColor();
-    m_name_widget->setText(m_online_profile->getUserName(),false);
+    //I18N: In the user info dialog
+    m_desc_widget->setText(_("Username: %s", m_online_profile->getUserName()),
+        false);
     m_info_widget->setText(m_info, false);
     if(m_remove_widget->isVisible() && !m_online_profile->isFriend())
         m_remove_widget->setLabel(_("Cancel Request"));
@@ -68,8 +70,8 @@ void UserInfoDialog::beforeAddingWidgets()
     m_self_destroy = false;
     m_enter_profile = false;
     m_processing = false;
-    m_name_widget = getWidget<LabelWidget>("name");
-    assert(m_name_widget != NULL);
+    m_desc_widget = getWidget<LabelWidget>("desc");
+    assert(m_desc_widget != NULL);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
 
@@ -124,9 +126,11 @@ void UserInfoDialog::beforeAddingWidgets()
 }   // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
-UserInfoDialog::~UserInfoDialog()
+void UserInfoDialog::init()
 {
-}   // ~UserInfoDialog
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
+}   // init
 
 // -----------------------------------------------------------------------------
 /** Sends a friend request to the server. When the request is finished, it

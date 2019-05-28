@@ -3,7 +3,7 @@
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
         <header text_align="center" width="80%" align="center" text="Online"/>
         <spacer height="15" width="10"/>
-        <button id="user-id" width="20%" height="fit" align="center"/>
+        <button id="user-id" width="12f" height="fit" align="center"/>
         <spacer height="20"/>
 
         <box width="fit" height="fit"  layout="horizontal-row" align="center" valign="center">

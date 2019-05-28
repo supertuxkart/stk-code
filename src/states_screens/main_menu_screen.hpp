@@ -58,6 +58,10 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
+
+    /** \brief implement optional callback from parent
+     *  class GUIEngine::Screen */
+    virtual bool onEscapePressed() OVERRIDE;
 };
 
 #endif

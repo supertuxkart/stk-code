@@ -23,7 +23,6 @@
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -88,14 +87,6 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
     }
-    else if(name == "time_enabled")
-    {
-        CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
-        bool timed = timeEnabled->getState();
-        UserConfigParams::m_soccer_use_time_limit = timed;
-        getWidget<SpinnerWidget>("goalamount")->setActive(!timed);
-        getWidget<SpinnerWidget>("timeamount")->setActive(timed);
-    }
     else if (name == "red_team")
     {
         if (m_kart_view_info.size() == 1)
@@ -116,15 +107,6 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
 void SoccerSetupScreen::beforeAddingWidget()
 {
     Widget* central_div = getWidget<Widget>("central_div");
-
-    // Add red/blue team icon above the karts
-    IconButtonWidget*    red = getWidget<IconButtonWidget>("red_team");
-    IconButtonWidget*    blue = getWidget<IconButtonWidget>("blue_team");
-    red->m_x = central_div->m_x + central_div->m_w/4 - red->m_w/2;
-    red->m_y = central_div->m_y + (int)(red->m_h * 0.5f);
-
-    blue->m_x = central_div->m_x + (central_div->m_w/4)*3 - blue->m_w/2;
-    blue->m_y = central_div->m_y + (int)(blue->m_h * 0.5f);
 
     // Add the 3D views for the karts
     int nb_players = race_manager->getNumPlayers();
@@ -212,23 +194,6 @@ void SoccerSetupScreen::init()
 
     Screen::init();
 
-    if (UserConfigParams::m_num_goals <= 0)
-        UserConfigParams::m_num_goals = 3;
-
-    if (UserConfigParams::m_soccer_time_limit <= 0)
-        UserConfigParams::m_soccer_time_limit = 3;
-
-    SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
-    goalamount->setValue(UserConfigParams::m_num_goals);
-    goalamount->setActive(!UserConfigParams::m_soccer_use_time_limit);
-
-    SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
-    timeAmount->setValue(UserConfigParams::m_soccer_time_limit);
-    timeAmount->setActive(UserConfigParams::m_soccer_use_time_limit);
-
-    CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
-    timeEnabled->setState(UserConfigParams::m_soccer_use_time_limit);
-
     // Set focus on "continue"
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
     bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -249,9 +214,6 @@ void SoccerSetupScreen::tearDown()
 
     // Reset the 'map fire to select' option of the device manager
     input_manager->getDeviceManager()->mapFireToSelect(false);
-
-    UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
-    UserConfigParams::m_soccer_time_limit = getWidget<SpinnerWidget>("timeamount")->getValue();
 
     // Remove all ModelViewWidgets we created manually
     PtrVector<Widget>&  children = central_div->getChildren();
@@ -518,10 +480,5 @@ bool SoccerSetupScreen::onEscapePressed()
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::prepareGame()
 {
-    if (getWidget<SpinnerWidget>("goalamount")->isActivated())
-        race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
-    else
-        race_manager->setTimeTarget((float)getWidget<SpinnerWidget>("timeamount")->getValue() * 60);
-
     input_manager->setMasterPlayerOnly(true);
 }   // prepareGame

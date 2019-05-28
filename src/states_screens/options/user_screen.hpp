@@ -110,6 +110,9 @@ public:
                                const std::string& name, const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -149,7 +152,6 @@ class TabbedUserScreen : public BaseUserScreen,
                          public GUIEngine::ScreenSingleton<TabbedUserScreen>
 {
 private:
-    //FIXME : options_players.stkgui exists but is unused
     TabbedUserScreen() : BaseUserScreen("user_screen_tab.stkgui")
     {}
 

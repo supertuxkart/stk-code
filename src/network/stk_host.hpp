@@ -42,6 +42,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <thread>
 #include <tuple>
 
@@ -113,6 +114,9 @@ private:
     /** Id of thread listening to enet events. */
     std::thread m_listening_thread;
 
+    /** The private port enet socket is bound. */
+    uint16_t m_private_port;
+
     /** Flag which is set from the protocol manager thread which
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
@@ -133,14 +137,21 @@ private:
     /** The public address stun server used. */
     TransportAddress m_stun_address;
 
-    /** The private port enet socket is bound. */
-    uint16_t m_private_port;
-
     Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
 
     std::atomic<uint32_t> m_client_ping;
 
-    std::atomic<uint64_t> m_network_timer;
+    std::atomic<uint32_t> m_upload_speed;
+
+    std::atomic<uint32_t> m_download_speed;
+
+    std::atomic<uint32_t> m_players_in_game;
+
+    std::atomic<uint32_t> m_players_waiting;
+
+    std::atomic<uint32_t> m_total_players;
+
+    std::atomic<int64_t> m_network_timer;
 
     std::unique_ptr<NetworkTimerSynchronizer> m_nts;
 
@@ -232,6 +243,8 @@ public:
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
                                                   getAllPlayerProfiles() const;
     // ------------------------------------------------------------------------
+    std::set<uint32_t> getAllPlayerOnlineIds() const;
+    // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> findPeerByHostId(uint32_t id) const;
     // ------------------------------------------------------------------------
     void sendPacketExcept(STKPeer* peer, NetworkString *data,
@@ -302,6 +315,8 @@ public:
         return m_next_unique_host_id;
     }
     // ------------------------------------------------------------------------
+    void setNextHostId(uint32_t id)             { m_next_unique_host_id = id; }
+    // ------------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() const
     {
@@ -333,10 +348,34 @@ public:
                                                         { return m_nts.get(); }
     // ------------------------------------------------------------------------
     uint64_t getNetworkTimer() const
-                  { return StkTime::getRealTimeMs() - m_network_timer.load(); }
+                  { return StkTime::getMonoTimeMs() - m_network_timer.load(); }
     // ------------------------------------------------------------------------
     void setNetworkTimer(uint64_t ticks)
-                   { m_network_timer.store(StkTime::getRealTimeMs() - ticks); }
+    {
+        m_network_timer.store(
+            (int64_t)StkTime::getMonoTimeMs() - (int64_t)ticks);
+    }
+    // ------------------------------------------------------------------------
+    std::pair<int, int> getAllPlayersTeamInfo() const;
+    // ------------------------------------------------------------------------
+    /* Return upload speed in bytes per second. */
+    unsigned getUploadSpeed() const           { return m_upload_speed.load(); }
+    // ------------------------------------------------------------------------
+    /* Return download speed in bytes per second. */
+    unsigned getDownloadSpeed() const       { return m_download_speed.load(); }
+    // ------------------------------------------------------------------------
+    void updatePlayers(unsigned* ingame = NULL,
+                       unsigned* waiting = NULL,
+                       unsigned* total = NULL);
+    // ------------------------------------------------------------------------
+    uint32_t getPlayersInGame() const      { return m_players_in_game.load(); }
+    // ------------------------------------------------------------------------
+    uint32_t getWaitingPlayers() const     { return m_players_waiting.load(); }
+    // ------------------------------------------------------------------------
+    uint32_t getTotalPlayers() const         { return m_total_players.load(); }
+    // ------------------------------------------------------------------------
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+        getPlayersForNewGame() const;
 };   // class STKHost
 
 #endif // STK_HOST_HPP

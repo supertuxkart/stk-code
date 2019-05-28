@@ -16,7 +16,7 @@
         </box>
 
         <!-- Populated dynamically at runtime -->
-        <tabs width="100%" height="5%" id="trackgroups"> </tabs>
+        <tabs width="100%" height="1f" id="trackgroups"> </tabs>
 
         <spacer height="10%" />
 

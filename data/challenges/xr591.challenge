@@ -3,15 +3,15 @@
     <unlock_list list="false"/>
     <track id="xr591" laps="2" reverse="false"/>
     <mode major="single" minor="timetrial"/>
-    <requirements trophies="135"/>
+    <requirements trophies="150"/>
     
     <best>
         <karts number="1"/>
-        <requirements energy="20" time="95"/>
+        <requirements energy="20" time="92"/>
     </best>
     <hard>
         <karts number="1"/>
-        <requirements energy="18" time="115"/>
+        <requirements energy="18" time="112"/>
     </hard>
     <medium>
         <karts number="1"/>

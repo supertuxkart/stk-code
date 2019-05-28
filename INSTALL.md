@@ -20,26 +20,44 @@ To build SuperTuxKart from source, you'll need to install the following packages
   * Freetype (libfreetype6-dev)
   * libcurl (libcurl-devel)
   * libbluetooth (bluez-devel)
+  * libnettle (nettle-dev)
   * libpng (libpng-devel)
   * zlib (zlib-devel)
   * jpeg (libjpeg-turbo-devel)
 
-Ubuntu command:
-
-```bash
-sudo apt-get install build-essential cmake libbluetooth-dev \
-libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
-libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev libxrandr-dev libx11-dev pkg-config zlib1g-dev
-```
 Fedora command:
 
 ```bash
 sudo dnf install @development-tools cmake bluez-libs-devel \
 openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
-libvorbis-devel libXrandr-devel libGLEW pkgconf zlib-devel
+libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
 ```
+Mageia 6 command:
+
+```bash
+su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel \
+fribidi-devel libjpeg-turbo-devel libogg-devel openal-soft-devel \
+libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
+mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
+```
+OpenSUSE command:
+
+```bash
+sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
+freetype-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
+libvorbis-devel libXrandr-devel pkgconf zlib-devel enet-devel glew-devel \
+libjpeg-devel bluez-devel freetype2-devel glu-devel
+```
+Ubuntu command:
+
+```bash
+sudo apt-get install build-essential cmake libbluetooth-dev \
+libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
+libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
+libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
+```
+
 ### In-game recorder
 
 To build the in-game recorder for STK, you have to install
@@ -48,14 +66,23 @@ Compilation instruction is explained there. If you don't need this feature, pass
 
 ### Compiling
 
-To compile SuperTuxKart, run the following commands inside `stk-code` directory:
-
+To compile SuperTuxKart, run the following commands inside `stk-code` directory
+ 
 ```bash
+# go into the stk-code directory
+cd stk-code
+ 
+# create and enter the cmake_build directory
 mkdir cmake_build
 cd cmake_build
+ 
+# run cmake to generate the makefile
 cmake ..
-make -j4
+ 
+# compile
+make -j$(nproc)
 ```
+
 STK can then be run from the build directory with `bin/supertuxkart`
 
 #### Keeping your build up to date
@@ -66,12 +93,12 @@ To recompile the latest code without redownloading the entire source, first run 
 git pull
 cd cmake_build
 cmake ..
-make -j4
+make -j$(nproc)
 ```
 
 ##### Build Speed Optimization
 
-"-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one. "-j$(nproc)" usually works.
+"-j$(nproc)" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
 
 ### Further options
 
@@ -177,34 +204,21 @@ sudo ln -s `xcrun --show-sdk-path`/System/Library/Frameworks/OpenGL.framework/He
 ```
 The first link is required in order to find libcurl, the second to find opengl.
 
-### CMake
+### STK 0.10 or later (or latest git)
 
-CMake is used to build STK. At this time CMake will not make a binary that is ready for distribution.
-
-You'll have to run these commands inside your stk-code directory.
-
-
-### STK 0.9.4 or later (or latest git)
-
-Install homebrew ( https://brew.sh/)
-Install all of the dependencies using homebrew :
+Install homebrew (https://brew.sh/)
+Install all of the dependencies using homebrew:
 
 ```bash
-brew install libogg
-brew install libvorbis
-brew install openal-soft
-brew install freetype
-brew install curl
-brew install openssl@1.1
-brew install fribidi
-brew install glew
+cd /path/to/stk-code
+brew bundle
 ```
 
 Build STK
 ```bash
 mkdir cmake_build
 cd cmake_build
-CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/ /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib
+CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/glew/:/usr/local/opt/fribidi/ cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib
 make
 ```
 
@@ -225,6 +239,7 @@ Download pre-built dependencies from [here](https://sourceforge.net/projects/sup
 Building with clang:
 
 ```bash
+cd /path/to/stk-code
 mkdir cmake_build
 cd cmake_build
 cmake ..
@@ -233,6 +248,7 @@ make
 
 Building with GCC:
 ```bash
+cd /path/to/stk-code
 mkdir cmake_build
 cd cmake_build
 cmake .. -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_C_COMPILER=/usr/bin/gcc

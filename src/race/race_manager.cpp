@@ -32,6 +32,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "main_loop.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
@@ -80,6 +81,8 @@ RaceManager::RaceManager()
     m_have_kart_last_position_on_overworld = false;
     m_num_local_players = 0;
     m_hit_capture_limit = 0;
+    m_flag_return_ticks = stk_config->time2Ticks(20.0f);
+    m_flag_deactivated_ticks = stk_config->time2Ticks(3.0f);
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -470,6 +473,8 @@ void RaceManager::startNew(bool from_overworld)
  */
 void RaceManager::startNextRace()
 {
+
+    main_loop->renderGUI(0);
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
@@ -512,10 +517,10 @@ void RaceManager::startNextRace()
     }   // not first race
 
     // set boosted AI status for AI karts
-    int boosted_ai_count = std::min<int>(m_ai_kart_list.size(),
-                                         (m_kart_status.size()-2)/4 + 1);
+    int boosted_ai_count = std::min<int>((int)m_ai_kart_list.size(),
+                                         ((int)(m_kart_status.size())-2)/4 + 1);
     if (boosted_ai_count > 4) boosted_ai_count = 4;
-    int ai_count = m_ai_kart_list.size();
+    int ai_count = (int)m_ai_kart_list.size();
 
     for (unsigned int i=0;i<m_kart_status.size();i++)
     {
@@ -536,6 +541,8 @@ void RaceManager::startNextRace()
         }
     }
 
+    main_loop->renderGUI(100);
+
     // the constructor assigns this object to the global
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
@@ -551,13 +558,13 @@ void RaceManager::startNextRace()
         World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_TUTORIAL)
         World::setWorld(new TutorialWorld());
-    else if(m_minor_mode==MINOR_MODE_BATTLE)
+    else if (isBattleMode())
     {
-        if (m_major_mode == MAJOR_MODE_3_STRIKES)
+        if (m_minor_mode == MINOR_MODE_3_STRIKES)
             World::setWorld(new ThreeStrikesBattle());
-        else if (m_major_mode == MAJOR_MODE_FREE_FOR_ALL)
+        else if (m_minor_mode == MINOR_MODE_FREE_FOR_ALL)
             World::setWorld(new FreeForAll());
-        else if (m_major_mode == MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
@@ -573,19 +580,40 @@ void RaceManager::startNextRace()
         Log::error("RaceManager", "Could not create given race mode.");
         assert(0);
     }
+    main_loop->renderGUI(200);
 
     // A second constructor phase is necessary in order to be able to
     // call functions which are overwritten (otherwise polymorphism
     // will fail and the results will be incorrect). Also in init() functions
     // can be called that use World::getWorld().
     World::getWorld()->init();
-
+    main_loop->renderGUI(8000);
     // Now initialise all values that need to be reset from race to race
     // Calling this here reduces code duplication in init and restartRace()
     // functions.
     World::getWorld()->reset();
 
+    if (NetworkConfig::get()->isNetworking())
+    {
+        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        {
+            // Eliminate all reserved players in the begining
+            const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            if (rki.isReserved())
+            {
+                AbstractKart* k = World::getWorld()->getKart(i);
+                World::getWorld()->eliminateKart(i,
+                    false/*notify_of_elimination*/);
+                k->setPosition(
+                    World::getWorld()->getCurrentNumKarts() + 1);
+                k->finishedRace(World::getWorld()->getTime(),
+                    true/*from_server*/);
+            }
+        }
+    }
+
     irr_driver->onLoadWorld();
+    main_loop->renderGUI(8100);
 
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
@@ -597,6 +625,7 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
     }
+    main_loop->renderGUI(8200);
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
@@ -955,12 +984,31 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 {
     assert(!m_watching_replay);
     StateManager::get()->enterGameState();
+
+    // In networking, make sure that the tracks screen is shown. This will
+    // allow for a 'randomly pick track' animation to be shown while
+    // world is loaded.
+    // Disable until render gui during loading is bug free
+    /*if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient()        )
+    {
+        // TODO: The enterGameState() call above deleted all GUIs, which
+        // means even if the tracks screen is shown, it need to be recreated.
+        // And we have to make sure that it is recreated as network version.
+        TracksScreen *ts = TracksScreen::getInstance();
+        if (GUIEngine::getCurrentScreen() != ts)
+        {
+            ts->setNetworkTracks();
+            ts->push();
+        }
+    }*/
+
+
     setTrack(track_ident);
 
     if (num_laps != -1) setNumLaps( num_laps );
 
-    if (m_minor_mode != MINOR_MODE_BATTLE)
-        setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
 
@@ -1011,7 +1059,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
 
     m_track_number = 0;
     startNextRace();
-}   // startSingleRace
+}   // startWatchingReplay
 
 //-----------------------------------------------------------------------------
 void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
@@ -1027,7 +1075,7 @@ void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
             { return m_tracks; }
         virtual unsigned int
             getNumberOfTracks(const bool includeLocked=false) const
-            { return m_tracks.size(); }
+            { return (unsigned int)m_tracks.size(); }
         void addNetworkTrack(const std::string& t) { m_tracks.push_back(t); }
     };
 

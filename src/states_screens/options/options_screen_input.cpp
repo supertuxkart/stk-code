@@ -30,6 +30,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/options/options_screen_device.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
@@ -68,9 +69,8 @@ void OptionsScreenInput::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon3);
     m_icon_bank->addTextureAsSprite(icon4);
 
-    // scale icons depending on screen resolution. the numbers below are a bit arbitrary
-    const int screen_width = irr_driver->getFrameSize().Width;
-    const float scale = 0.3f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+    // scale icons depending on font height
+    const float scale = GUIEngine::getFontHeight() / 72.0f;
     m_icon_bank->setScale(scale);
 }   // loadFromFile
 
@@ -222,6 +222,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         //    screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_general")
+            screen = OptionsScreenGeneral::getInstance();
         else if (selection == "tab_language")
             screen = OptionsScreenLanguage::getInstance();
         if(screen)

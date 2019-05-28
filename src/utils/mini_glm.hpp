@@ -19,6 +19,7 @@
 #define HEADER_MINI_GLM_HPP
 
 #include "LinearMath/btQuaternion.h"
+#include "LinearMath/btTransform.h"
 #include "utils/vec3.hpp"
 
 #include <algorithm>
@@ -28,6 +29,8 @@
 #include <cstdint>
 #include <quaternion.h>
 #include <vector3d.h>
+
+#include "irrMath.h"
 
 using namespace irr;
 
@@ -564,6 +567,48 @@ namespace MiniGLM
         // Assume bitangent sign is positive 1.0f
         return compressVector3(tangent) | 1 << 30;
     }   // quickTangent
+    // ------------------------------------------------------------------------
+    /** Round and save compressed values (optionally) btTransform.
+     *  It will round with 2 digits with min / max +/- 2^23 / 100 for origin in
+     *  btTransform and call compressQuaternion above to compress the rotation
+     *  part, if compressed_data is provided, 3 24 bits and 1 32 bits of
+     *  compressed data will be written in an int[4] array.
+     */
+    inline void compressbtTransform(btTransform& cur_t,
+                                    int* compressed_data = NULL)
+    {
+        int x = (int)(cur_t.getOrigin().x() * 100.0f);
+        int y = (int)(cur_t.getOrigin().y() * 100.0f);
+        int z = (int)(cur_t.getOrigin().z() * 100.0f);
+        x = core::clamp(x, -0x800000, 0x7fffff);
+        y = core::clamp(y, -0x800000, 0x7fffff);
+        z = core::clamp(z, -0x800000, 0x7fffff);
+        uint32_t compressed_q = compressQuaternion(cur_t.getRotation());
+        cur_t.setOrigin(btVector3(
+            (float)x / 100.0f,
+            (float)y / 100.0f,
+            (float)z / 100.0f));
+        cur_t.setRotation(decompressbtQuaternion(compressed_q));
+        if (compressed_data)
+        {
+            compressed_data[0] = x;
+            compressed_data[1] = y;
+            compressed_data[2] = z;
+            compressed_data[3] = (int)compressed_q;
+        }
+    }   // compressbtTransform
+    // ------------------------------------------------------------------------
+    inline btTransform decompressbtTransform(int* compressed_data)
+    {
+        btTransform trans;
+        trans.setOrigin(btVector3(
+            (float)compressed_data[0] / 100.0f,
+            (float)compressed_data[1] / 100.0f,
+            (float)compressed_data[2] / 100.0f));
+        trans.setRotation(decompressbtQuaternion(
+            (uint32_t)compressed_data[3]));
+        return trans;
+    }   // decompressbtTransform
     // ------------------------------------------------------------------------
     void unitTesting();
 }

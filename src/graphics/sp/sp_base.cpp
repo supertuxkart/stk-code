@@ -97,6 +97,8 @@ std::array<GLuint, ST_COUNT> g_samplers;
 // Check sp_shader.cpp for the name
 std::array<GLuint, 1> sp_prefilled_tex;
 // ----------------------------------------------------------------------------
+std::atomic<uint32_t> sp_max_texture_size(2048);
+// ----------------------------------------------------------------------------
 std::vector<float> g_bounding_boxes;
 // ----------------------------------------------------------------------------
 std::vector<std::shared_ptr<SPDynamicDrawCall> > g_dy_dc;
@@ -1434,6 +1436,15 @@ void uploadSPM(irr::scene::IMesh* mesh)
         }
     }
 }   // uploadSPM
+
+// ----------------------------------------------------------------------------
+void setMaxTextureSize()
+{
+    const unsigned max =
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0 ?
+        UserConfigParams::m_max_texture_size : 2048;
+    sp_max_texture_size.store(max);
+}   // setMaxTextureSize
 
 }
 

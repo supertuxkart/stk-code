@@ -93,13 +93,14 @@ private:
 
     /** Icon textures (stored as variables to not look up
         their location on every frame) */
-    irr::video::ITexture *m_lap_flag;
     irr::video::ITexture *m_red_team;
     irr::video::ITexture *m_blue_team;
     irr::video::ITexture *m_red_flag;
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;
     irr::video::ITexture *m_heart_icon;
+    /** Texture for the hit limit icon*/
+    irr::video::ITexture* m_champion;
 
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
@@ -141,8 +142,6 @@ private:
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
     void drawLiveDifference    ();
-    void drawScores();
-
 
 public:
 

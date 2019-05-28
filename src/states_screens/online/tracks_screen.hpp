@@ -19,19 +19,30 @@
 #define HEADER_TRACKS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "utils/synchronised.hpp"
+
 #include <deque>
 #include <limits>
-#include <map>
 #include <string>
+#include <vector>
 
+class PeerVote;
 class Track;
 
 namespace GUIEngine
 {
     class CheckBoxWidget;
-    class LabelWidget;
+    class CheckBoxWidget;
+    class ListWidget;
     class SpinnerWidget;
+    class ProgressBarWidget;
+}
+
+namespace irr
+{
+    namespace gui
+    {
+        class STKModifiedSpriteBank;
+    }
 }
 
 /**
@@ -44,24 +55,28 @@ class TracksScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
 
 private:
-    TracksScreen() : Screen("tracks.stkgui")
-    {
-        m_network_tracks = false;
-        m_reverse_checked = false;
-    }
 
     Track* m_selected_track = NULL;
     GUIEngine::CheckBoxWidget* m_reversed;
     GUIEngine::SpinnerWidget* m_laps;
-    GUIEngine::LabelWidget* m_votes;
+    GUIEngine::ListWidget* m_vote_list;
 
-    bool m_network_tracks, m_reverse_checked;
+    /** Pointer to progress bar widget which is used as a timer
+    *  (going backwards). */
+    GUIEngine::ProgressBarWidget *m_timer;
 
-    int m_bottom_box_height = -1;
+    irr::gui::STKModifiedSpriteBank* m_track_icons;
 
-    uint64_t m_vote_timeout = std::numeric_limits<uint64_t>::max();
+    bool m_network_tracks, m_quit_server;
 
-    std::map<std::string, core::stringw> m_vote_messages;
+    int m_bottom_box_height;
+
+    /** Id of the winning peer. */
+    uint32_t m_winning_index;
+
+    /** This stores which vote (hostid) is shown at which index in
+     *  the vote overview list. */
+    std::vector<uint32_t> m_index_to_hostid;
 
     std::deque<std::string> m_random_track_list;
 
@@ -70,7 +85,26 @@ private:
 
     void voteForPlayer();
 
+    TracksScreen() : Screen("tracks.stkgui")
+    {
+        m_network_tracks = false;
+        m_quit_server = false;
+        m_bottom_box_height = -1;
+        m_track_icons = NULL;
+        m_timer = NULL;
+        m_winning_index = std::numeric_limits<uint32_t>::max();
+        m_vote_list = NULL;
+        m_reversed = NULL;
+        m_laps     = NULL;
+    }
+    // ------------------------------------------------------------------------
+    void updateProgressBarText();
+
 public:
+
+    void addVote(uint32_t host_id, const PeerVote& vote);
+    void removeVote(uint32_t host_id);
+    void setResult(uint32_t winner_host, const PeerVote& winner_vote);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -95,24 +129,24 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void unloaded() OVERRIDE;
+    // ------------------------------------------------------------------------
     void setFocusOnTrack(const std::string& trackName);
-
+    // ------------------------------------------------------------------------
     void setNetworkTracks() { m_network_tracks = true; }
-
+    // ------------------------------------------------------------------------
+    void setQuitServer() { m_quit_server = true; }
+    // ------------------------------------------------------------------------
+    /** Called at the beginning of the voting process to reset any previous
+     *  data fields. */
     void resetVote()
     {
-        m_vote_messages.clear();
-        m_vote_timeout = std::numeric_limits<uint64_t>::max();
+        m_winning_index = std::numeric_limits<uint32_t>::max();
+        m_index_to_hostid.clear();
     }
-
-    void setVoteTimeout(float timeout);
-
-    void addVoteMessage(const std::string& user,
-                        const irr::core::stringw& message)
-    {
-        m_vote_messages[user] = message;
-    }
-
+    // ------------------------------------------------------------------------
+    void updatePlayerVotes();
 };
 
 #endif

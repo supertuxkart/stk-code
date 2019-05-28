@@ -17,8 +17,23 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/smooth_network_body.hpp"
+#include "config/stk_config.hpp"
 
 #include <algorithm>
+
+// ----------------------------------------------------------------------------
+SmoothNetworkBody::SmoothNetworkBody(bool enable)
+{
+    reset();
+    m_enabled = enable;
+    m_smooth_rotation = true;
+    m_adjust_vertical_offset = true;
+    m_min_adjust_length = stk_config->m_snb_min_adjust_length;
+    m_max_adjust_length = stk_config->m_snb_max_adjust_length;
+    m_min_adjust_speed = stk_config->m_snb_min_adjust_speed;
+    m_max_adjust_time = stk_config->m_snb_max_adjust_time;
+    m_adjust_length_threshold = stk_config->m_snb_adjust_length_threshold;
+}   // SmoothNetworkBody
 
 // ----------------------------------------------------------------------------
 void SmoothNetworkBody::prepareSmoothing(const btTransform& current_transform,
@@ -58,13 +73,9 @@ void SmoothNetworkBody::checkSmoothing(const btTransform& current_transform,
     if (speed < m_min_adjust_speed)
         return;
 
-    float adjust_time = (adjust_length * 2.0f) / speed;
+    float adjust_time = (adjust_length * m_adjust_length_threshold) / speed;
     if (adjust_time > m_max_adjust_time)
         return;
-
-    m_smoothing = SS_TO_ADJUST;
-    m_adjust_time_dt = 0.0f;
-    m_adjust_time = adjust_time;
 
     m_start_smoothing_postion.first = m_smoothing == SS_NONE ?
         m_prev_position_data.first.getOrigin() :
@@ -73,6 +84,10 @@ void SmoothNetworkBody::checkSmoothing(const btTransform& current_transform,
         m_prev_position_data.first.getRotation() :
         m_smoothed_transform.getRotation();
     m_start_smoothing_postion.second.normalize();
+
+    m_smoothing = SS_TO_ADJUST;
+    m_adjust_time_dt = 0.0f;
+    m_adjust_time = adjust_time;
 
     m_adjust_control_point = m_start_smoothing_postion.first +
         m_prev_position_data.second * m_adjust_time;

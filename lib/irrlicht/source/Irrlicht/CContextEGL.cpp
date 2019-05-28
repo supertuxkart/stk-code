@@ -512,8 +512,11 @@ bool ContextManagerEGL::createContext()
 
 void ContextManagerEGL::close()
 {
-    eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                   EGL_NO_CONTEXT);
+    if (m_egl_display != EGL_NO_DISPLAY)
+    {
+        eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                       EGL_NO_CONTEXT);
+    }
 
     if (m_egl_context != EGL_NO_CONTEXT)
     {
@@ -532,6 +535,8 @@ void ContextManagerEGL::close()
         eglTerminate(m_egl_display);
         m_egl_display = EGL_NO_DISPLAY;
     }
+    
+    eglReleaseThread();
 }
 
 

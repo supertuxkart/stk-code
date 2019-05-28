@@ -4,20 +4,21 @@
 # 
 # Translators:
 # Ben Au, 2015
-# Benau, 2016,2018
+# Benau, 2016,2018-2019
 # Benau, 2015-2016
 # byStarTW (pan93412) <pan93412@gmail.com>, 2018
 # Hsiu-Ming Chang <cges30901@gmail.com>, 2015
 # Hsiu-Ming Chang <cges30901@gmail.com>, 2015-2016
-# Jeff Huang <s8321414@gmail.com>, 2015,2017-2018
+# Hsiu-Ming Chang <cges30901@gmail.com>, 2018-2019
+# Jeff Huang <s8321414@gmail.com>, 2015,2017-2019
 # Ｖ字龍(Vdragon) <Vdragon.Taiwan@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-20 10:40+0800\n"
-"PO-Revision-Date: 2018-10-20 07:41+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2019-05-14 15:17+0800\n"
+"PO-Revision-Date: 2019-05-15 08:31+0000\n"
+"Last-Translator: Jeff Huang <s8321414@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/supertuxkart/supertuxkart/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,8 +63,8 @@ msgid "Skid-row"
 msgstr "甩尾滑行"
 
 #. I18N: ./data/achievements.xml
-msgid "Make 5 skidding in a single lap."
-msgstr "在一圈裡甩尾 5 次。"
+msgid "Skid 5 times in a single lap."
+msgstr "單圈甩尾 5 次。"
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -121,7 +122,7 @@ msgstr "把你的對手當成蚊子打！在一場比賽中用蒼蠅拍打扁他
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
-msgstr "超級好運"
+msgstr "超出好運"
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -219,6 +220,22 @@ msgstr "觸控裝置設定"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
+#. I18N: ./data/gui/screens/options_audio.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_language.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_video.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
 msgid "General"
 msgstr "一般"
 
@@ -249,8 +266,13 @@ msgstr "死區"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-msgid "Sensitivity"
-msgstr "靈敏度"
+msgid "Sensitivity X"
+msgstr "X 靈敏度"
+
+#. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Sensitivity Y"
+msgstr "Y 靈敏度"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Restore defaults"
@@ -258,10 +280,9 @@ msgstr "恢復預設值"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/network/protocols/client_lobby.cpp:457
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
-#: src/states_screens/edit_gp_screen.cpp:255
-#: src/states_screens/ghost_replay_selection.cpp:386
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:388
 msgid "Yes"
 msgstr "是"
 
@@ -276,6 +297,8 @@ msgstr "是"
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
@@ -292,7 +315,7 @@ msgstr "是"
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/dialogs/addons_loading.cpp:236
 #: src/states_screens/online/register_screen.cpp:119
-#: src/states_screens/options/user_screen.cpp:114
+#: src/states_screens/options/user_screen.cpp:127
 msgid "Cancel"
 msgstr "取消"
 
@@ -358,6 +381,11 @@ msgstr "基於圖片的照明"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
+msgid "Light Scattering"
+msgstr "光散射"
+
+#. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 msgid "Animated characters"
 msgstr "角色動畫"
 
@@ -390,6 +418,8 @@ msgstr "※ 重新啟動 STK 以套用新的設定"
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -397,8 +427,8 @@ msgstr "※ 重新啟動 STK 以套用新的設定"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/message_dialog.cpp:123
-#: src/states_screens/dialogs/message_dialog.cpp:135
+#: src/states_screens/dialogs/message_dialog.cpp:124
+#: src/states_screens/dialogs/message_dialog.cpp:138
 msgid "OK"
 msgstr "確認"
 
@@ -443,6 +473,81 @@ msgstr "比較幻影"
 #. I18N: Menu item
 msgid "Remove"
 msgstr "移除"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: In the network lobby
+#. I18N: ./data/gui/screens/online/networking_lobby.stkgui
+#. I18N: In the network lobby
+msgid "Send"
+msgstr "傳送"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Back to Race"
+msgstr "回到比賽"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Show in network ingame dialog to allow user to go back to lobby to
+#. end spectating (for example)
+msgid "Back to lobby"
+msgstr "回到大廳"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Restart Race"
+msgstr "比賽重來"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Give Up Race"
+msgstr "放棄比賽"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+msgid "Options"
+msgstr "選項"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+msgid "Help"
+msgstr "說明"
+
+#. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Exit Race"
+msgstr "退出比賽"
+
+#. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
+#. I18N: Objective shown in achievement dialog
+msgid "Goal"
+msgstr "目標"
+
+#. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
+#. I18N: Progress shown in achievement dialog
+#. I18N: Progress in achievement
+#: src/states_screens/online/online_profile_achievements.cpp:84
+msgid "Progress"
+msgstr "進度"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -557,6 +662,115 @@ msgstr "我同意以上條款，且我已年滿 13 歲。"
 msgid "Accept"
 msgstr "同意"
 
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+msgid "Server Configuration"
+msgstr "伺服器設定"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Difficulty"
+msgstr "難度"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:609
+msgid "Novice"
+msgstr "新手難度"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:610
+msgid "Intermediate"
+msgstr "中等難度"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:611
+msgid "Expert"
+msgstr "專家"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:612
+msgid "SuperTux"
+msgstr "SuperTux"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+#: src/states_screens/track_info_screen.cpp:198
+msgid "Game mode"
+msgstr "遊戲模式"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:261 src/race/race_manager.hpp:187
+msgid "Normal Race"
+msgstr "正常比賽"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:263 src/race/race_manager.hpp:189
+msgid "Time Trial"
+msgstr "競速計時"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#: src/states_screens/race_setup_screen.cpp:111
+msgid "Battle"
+msgstr "對戰"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:265 src/race/race_manager.hpp:201
+msgid "Soccer"
+msgstr "足球"
+
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -579,10 +793,7 @@ msgstr "新增玩家"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#: src/states_screens/online/online_profile_achievements.cpp:71
-#: src/states_screens/online/server_selection.cpp:119
+#: src/states_screens/online/online_profile_achievements.cpp:75
 msgid "Name"
 msgstr "名稱"
 
@@ -603,11 +814,11 @@ msgstr "所有玩家都準備好了"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
-msgid "Clear added player"
-msgstr "清除已加入的玩家"
+msgid "Clear players"
+msgstr "清除玩家"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog' dialog
+#. I18N: User info dialog
 msgid "User Info"
 msgstr "使用者資訊"
 
@@ -643,24 +854,6 @@ msgstr "選擇賽車"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/screens/main_menu.stkgui
-#. I18N: In the main screen
-msgid "Options"
-msgstr "選項"
-
-#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
-#. I18N: In the in-game dialog
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/screens/main_menu.stkgui
-#. I18N: In the main screen
-msgid "Help"
-msgstr "說明"
-
-#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
-#. I18N: In the in-game dialog
 msgid "Back to menu"
 msgstr "回到選單"
 
@@ -686,29 +879,9 @@ msgstr "按下 ESC 取消"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-msgid "Back to Race"
-msgstr "回到比賽"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:232
+#: src/states_screens/race_result_gui.cpp:235
 msgid "Setup New Race"
 msgstr "安排新賽事"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Restart Race"
-msgstr "比賽重來"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Give Up Race"
-msgstr "放棄比賽"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Exit Race"
-msgstr "退出比賽"
 
 #. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
@@ -724,52 +897,6 @@ msgstr "比賽設定"
 msgid "Type:"
 msgstr "類型："
 
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:586
-msgid "Novice"
-msgstr "新手難度"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:587
-msgid "Intermediate"
-msgstr "中等難度"
-
-#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:588
-msgid "Expert"
-msgstr "專家"
-
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.hpp:589
-msgid "SuperTux"
-msgstr "SuperTux"
-
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
 #. I18N: ./data/gui/screens/feature_unlocked.stkgui
@@ -777,8 +904,8 @@ msgstr "SuperTux"
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:173
-#: src/states_screens/race_result_gui.cpp:198
+#: src/states_screens/race_result_gui.cpp:174
+#: src/states_screens/race_result_gui.cpp:201
 msgid "Continue"
 msgstr "繼續"
 
@@ -836,7 +963,7 @@ msgstr "標準"
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:144
 #: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/kart_selection.cpp:293
 #: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "附加元件"
@@ -852,10 +979,10 @@ msgstr "附加元件"
 #: src/states_screens/arenas_screen.cpp:73
 #: src/states_screens/easter_egg_screen.cpp:136
 #: src/states_screens/edit_track_screen.cpp:145
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:73
 #: src/states_screens/grand_prix_editor_screen.cpp:333
-#: src/states_screens/kart_selection.cpp:282
-#: src/states_screens/online/tracks_screen.cpp:213
+#: src/states_screens/kart_selection.cpp:285
+#: src/states_screens/online/tracks_screen.cpp:348
 #: src/states_screens/tracks_and_gp_screen.cpp:135
 msgid "All"
 msgstr "全部"
@@ -976,7 +1103,6 @@ msgstr "電腦操控的賽車"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/challenges/challenge_data.cpp:309
 msgid "Reverse"
 msgstr "反向進行比賽"
 
@@ -987,7 +1113,7 @@ msgstr "賽道群組"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:144
 msgid "Continue saved GP"
 msgstr "繼續已儲存的大獎賽"
 
@@ -1115,7 +1241,7 @@ msgstr "劇情模式"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Kart classes"
-msgstr "卡丁車課程"
+msgstr "卡丁車類型"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1131,7 +1257,7 @@ msgstr "卡丁車課程"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
-msgid "Multi-player"
+msgid "Multiplayer"
 msgstr "多人遊戲"
 
 #. I18N: ./data/gui/screens/help1.stkgui
@@ -1172,12 +1298,19 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr ""
+msgstr "您可以按下特殊的按鍵或按鈕來甩尾。成功的甩尾可以協助過角度較大的彎，中等的甩尾可以加速，較長的甩尾則會有更多的加速。您不能在甩尾的時候變換方向，所以要看好你的卡丁車的方向！"
+
+#. I18N: ./data/gui/screens/help1.stkgui
+#. I18N: In the help menu
+msgid ""
+"You can get a startup boost by pressing the accelerate button at 'Set!', "
+"before the race's start."
+msgstr "您可以在顯示「預備！」時按下加速按鈕來在比賽開始前得到速度提升。"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
-msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "※ 目前的按鍵組合可以在主選單的「選項」中查看或更改"
+msgid "* Current key bindings can be seen/changed in the Options menu"
+msgstr "※ 目前的按鍵組合可以在「選項」選單中查看或更改"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
@@ -1232,7 +1365,7 @@ msgstr "幻影重播：在競速計時或復活節彩蛋狩獵模式中與幻影
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
-"* Most of these game modes can also be played in a Grand Prix fashion: "
+"* Many of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
@@ -1405,8 +1538,8 @@ msgid ""
 "networking, or global networking (requires internet to be enabled in the "
 "options). Then, you can either create your own server with custom options, "
 "or search among a list of existing servers to join. Some of them are "
-"official servers with optionally ranked races."
-msgstr "首先，在主選單中選取「線上」圖示。可以選擇區域網路或全球網路（必須在選項中啟用網際網路）。然後，你就可以用自訂選項建立自己的伺服器，或是搜尋既有的伺服器清單以加入。其中有一些是有排位賽的官方伺服器。"
+"recommended servers with optionally ranked races."
+msgstr "首先，在主選單中選取「線上」圖示。選擇區域網路或全球網路（必須在選項中啟用網際網路）。然後，您就可以使用自訂選項建立您自己的伺服器，或搜尋既有的伺服器清單以加入。其中一些是選擇性排位賽的建議伺服器。"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1445,6 +1578,8 @@ msgstr "輸入裝置設定好後，選取主選單中的「多人遊戲」。每
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
+#. I18N: ./data/gui/screens/online/network_karts.stkgui
+#. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "選擇一台賽車"
 
@@ -1455,8 +1590,8 @@ msgstr "單人遊戲"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
-msgid "Multiplayer"
-msgstr "多人遊戲"
+msgid "Local Multiplayer"
+msgstr "本機多人遊戲"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1467,7 +1602,7 @@ msgstr "多人遊戲"
 #. I18N: In the user screen
 #: src/states_screens/online/online_profile_friends.cpp:239
 msgid "Online"
-msgstr "上線中"
+msgstr "線上"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1476,7 +1611,7 @@ msgstr "附加元件"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:552
+#: src/states_screens/race_gui_overworld.cpp:497
 msgid "Tutorial"
 msgstr "教學"
 
@@ -1525,44 +1660,6 @@ msgstr "私人伺服器的密碼（選擇性）"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:121
-msgid "Difficulty"
-msgstr "難度"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
-#: src/states_screens/online/server_selection.cpp:122
-msgid "Game mode"
-msgstr "遊戲模式"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:242 src/race/race_manager.hpp:180
-msgid "Normal Race"
-msgstr "正常比賽"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:244 src/race/race_manager.hpp:182
-msgid "Time Trial"
-msgstr "競速計時"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-msgid "Battle"
-msgstr "對戰"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:246 src/race/race_manager.hpp:190
-msgid "Soccer"
-msgstr "足球"
-
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
 msgid "Create"
 msgstr "建立"
 
@@ -1588,24 +1685,22 @@ msgstr "建立伺服器"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:153
+#: src/states_screens/online/networking_lobby.cpp:184
 msgid "Lobby"
 msgstr "大廳"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-msgid "Send"
-msgstr "傳送"
-
-#. I18N: ./data/gui/screens/online/networking_lobby.stkgui
-#. I18N: In the network lobby
+#: src/states_screens/online/networking_lobby.cpp:170
 msgid "Start race"
 msgstr "開始競賽"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-msgid "Exit"
-msgstr "離開"
+#. I18N: In networking lobby to configuration server settings
+#: src/states_screens/online/networking_lobby.cpp:178
+msgid "Configuration"
+msgstr "設定"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -1729,7 +1824,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr "您可以選取離線帳號以避免在要遊玩時建立線上帳號。不過這樣您就無法與朋友連線，為附加元件投票等。請到 http://privacy.supertuxkart.net 詳閱我們的隱私聲明"
+msgstr "您可以藉由選取離線帳號，在不需要建立線上帳號的情況下進行遊戲。不過這樣您就無法與朋友連線，為附加元件投票等。請到 http://privacy.supertuxkart.net 詳閱我們的隱私聲明"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 msgid "Server Selection"
@@ -1751,9 +1846,9 @@ msgstr "使用者搜尋"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: ./data/gui/screens/options_language.stkgui
-#. I18N: ./data/gui/screens/options_players.stkgui
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
@@ -1763,6 +1858,8 @@ msgstr "SuperTuxKart 選項"
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: Section in the settings menu
@@ -1781,6 +1878,8 @@ msgstr "圖像"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_language.stkgui
@@ -1797,6 +1896,8 @@ msgstr "音效"
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: Section in the settings menu
@@ -1815,11 +1916,11 @@ msgstr "使用者介面"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_language.stkgui
-#. I18N: Section in the settings menu
-#. I18N: ./data/gui/screens/options_players.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: Section in the settings menu
@@ -1827,13 +1928,14 @@ msgstr "使用者介面"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/online/server_selection.cpp:120
 msgid "Players"
 msgstr "玩家"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: Section in the settings menu
@@ -1851,6 +1953,8 @@ msgstr "操控"
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: Section in the settings menu
@@ -1875,7 +1979,7 @@ msgstr "音樂"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/options/options_screen_video.cpp:428
+#: src/states_screens/options/options_screen_video.cpp:459
 msgid "Enabled"
 msgstr "已啟用"
 
@@ -1897,8 +2001,8 @@ msgstr "刪除設定"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:119
-#: src/states_screens/options/options_screen_device.cpp:630
+#: src/states_screens/options/options_screen_device.cpp:120
+#: src/states_screens/options/options_screen_device.cpp:633
 msgid "Disable Configuration"
 msgstr "停用設定"
 
@@ -1906,6 +2010,41 @@ msgstr "停用設定"
 #. I18N: In the input configuration screen
 msgid "Back to device list"
 msgstr "回到裝置列表"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Internet options"
+msgstr "網際網路選項"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Always show login screen"
+msgstr "總是顯示登入畫面"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Connect to the Internet"
+msgstr "連線到網路"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Send anonymous hardware statistics"
+msgstr "傳送匿名硬體統計資料"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Enable chatting in online games"
+msgstr "在線上遊戲啟用聊天"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Miscellaneous options"
+msgstr "雜項選項"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Enable per-player handicaps"
+msgstr "啟用每個玩家的讓賽功能"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -1924,20 +2063,6 @@ msgid ""
 " join the game."
 msgstr "※ 使用何種設定將會由加入遊戲時所按下的「選擇」鍵來推斷。"
 
-#. I18N: ./data/gui/screens/options_players.stkgui
-msgid "You are playing as"
-msgstr "你現在的身份是"
-
-#. I18N: ./data/gui/screens/options_players.stkgui
-#. I18N: In the player configuration screen
-msgid "Press enter or double-click on a player to edit their settings"
-msgstr "按 Enter 或對玩家雙擊以編輯該玩家"
-
-#. I18N: ./data/gui/screens/options_players.stkgui
-#. I18N: In the player configuration screen
-msgid "Add Player"
-msgstr "新增玩家"
-
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
@@ -1951,37 +2076,12 @@ msgstr "迷你地圖"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr "顯示畫面楨速率(FPS)"
+msgstr "顯示畫面幀速率 (FPS)"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Multiplayer splits screen horizontally"
 msgstr "多玩家水平分割畫面"
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Enable per-player handicaps"
-msgstr "啟用每個玩家的讓賽功能"
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Connect to the Internet"
-msgstr "連線到網路"
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Send anonymous hardware statistics"
-msgstr "傳送匿名硬體統計資料"
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Always show login screen"
-msgstr "總是顯示登入畫面"
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Enable chatting in networking lobby"
-msgstr "在網路大廳啟用聊天"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2028,6 +2128,11 @@ msgstr "選擇遊戲模式"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
+msgid "Use left/right to choose your team and press fire"
+msgstr "使用左/右方向鍵來選取您的隊伍並按下開始"
+
+#. I18N: ./data/gui/screens/soccer_setup.stkgui
+#. I18N: In soccer setup screen
 msgid "Red Team"
 msgstr "紅隊"
 
@@ -2036,44 +2141,20 @@ msgstr "紅隊"
 msgid "Blue Team"
 msgstr "藍隊"
 
-#. I18N: ./data/gui/screens/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:293
-msgid "Number of goals to win"
-msgstr "獲勝的得分數量"
-
-#. I18N: ./data/gui/screens/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:301
-msgid "Maximum time (min.)"
-msgstr "最大時間（分鐘）"
-
-#. I18N: ./data/gui/screens/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-msgid "Game type (Goals limit / Time limit)"
-msgstr "遊戲類型（得分限制/時間限制）"
-
-#. I18N: ./data/gui/screens/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-msgid "Use left/right to choose your team and press fire"
-msgstr "使用左/右方向鍵來選取您的隊伍並按下開始"
-
 #. I18N: ./data/gui/screens/track_info.stkgui
 msgid "= Highscores ="
 msgstr "= 高分榜 ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:328
+#: src/states_screens/track_info_screen.cpp:405
 msgid "(Empty)"
 msgstr "（無）"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:326
+#: src/states_screens/online/tracks_screen.cpp:510
+#: src/states_screens/track_info_screen.cpp:225
 msgid "Number of laps"
 msgstr "圈數"
 
@@ -2084,7 +2165,7 @@ msgstr "電腦操控的賽車數量"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:147
+#: src/states_screens/dialogs/select_challenge.cpp:151
 msgid "Grand Prix"
 msgstr "大獎賽"
 
@@ -2200,6 +2281,10 @@ msgstr "坎德拉市"
 msgid "Battle Island"
 msgstr "對戰之島"
 
+#. I18N: ../stk-assets/tracks/black_forest/track.xml
+msgid "Black Forest"
+msgstr "黑森林"
+
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "未知的洞穴"
@@ -2219,10 +2304,6 @@ msgstr "岩漿要塞"
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
 msgstr "大天堂島"
-
-#. I18N: ../stk-assets/tracks/greenvalley/track.xml
-msgid "Green Valley"
-msgstr "綠色山谷"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
@@ -2263,17 +2344,13 @@ msgstr " 但就憑你們這些蠢材是沒辦法打敗我的！我可是賽車�
 msgid "Las Dunas Arena"
 msgstr "沙丘競技場"
 
-#. I18N: ../stk-assets/tracks/lasdunasscoccer/track.xml
+#. I18N: ../stk-assets/tracks/lasdunassoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
 msgstr "沙丘足球場"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "圍繞燈塔"
-
-#. I18N: ../stk-assets/tracks/mansion/track.xml
-msgid "Blackhill Mansion"
-msgstr "黑陵宅邸"
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
@@ -2286,6 +2363,10 @@ msgstr "迷你高爾夫"
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
 msgstr "奧力佛的數學課"
+
+#. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
+msgid "Ravenbridge mansion"
+msgstr "Ravenbridge 豪宅"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
@@ -2331,52 +2412,74 @@ msgstr "XR591"
 msgid "Zen Garden"
 msgstr "禪意花園"
 
-#: src/achievements/achievement.cpp:377
+#: src/achievements/achievement.cpp:385
 #, c-format
 msgid "Completed achievement \"%s\"."
 msgstr "已完成成就「%s」"
 
-#: src/addons/addons_manager.cpp:106 src/addons/news_manager.cpp:324
+#: src/addons/addons_manager.cpp:106 src/addons/news_manager.cpp:347
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "無法連線至 SuperTuxKart 附加元件伺服器。"
 
-#: src/addons/news_manager.cpp:181
+#: src/addons/news_manager.cpp:182
 #, c-format
 msgid "Error downloading news: '%s'."
 msgstr "下載新聞時錯誤：「%s」"
 
-#. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:299
-#: src/states_screens/race_result_gui.cpp:1632
-#, c-format
-msgid "Laps: %i"
-msgstr "圈數：%i"
+#: src/challenges/challenge_data.cpp:301 src/network/server_config.cpp:257
+msgid "Normal Race (Grand Prix)"
+msgstr "一般比賽（大獎賽）"
 
-#: src/challenges/challenge_data.cpp:305
-msgid "Follow the leader"
-msgstr "緊隨領隊"
+#: src/challenges/challenge_data.cpp:303
+msgid "Time-Trial (Grand Prix)"
+msgstr "計時賽（大獎賽）"
 
-#: src/challenges/challenge_data.cpp:587
+#: src/challenges/challenge_data.cpp:308
+msgid "Time-Trial - beat the replay"
+msgstr "計時賽（擊敗重播）"
+
+#: src/challenges/challenge_data.cpp:310
+msgid "Time-Trial - nitro challenge"
+msgstr "計時賽（氮氣挑戰）"
+
+#: src/challenges/challenge_data.cpp:312
+msgid "Normal Race (single race)"
+msgstr "一般比賽（單人）"
+
+#: src/challenges/challenge_data.cpp:314
+msgid "Time-Trial (single race)"
+msgstr "計時賽（單人）"
+
+#: src/challenges/challenge_data.cpp:316
+msgid "Follow the Leader (single race)"
+msgstr "跟隨領隊（單人）"
+
+#: src/challenges/challenge_data.cpp:322
+#: src/states_screens/dialogs/select_challenge.cpp:170
+msgid "Mode: Reverse"
+msgstr "模式：逆向"
+
+#: src/challenges/challenge_data.cpp:599
 #, c-format
 msgid "New track '%s' now available"
 msgstr "現在可以選擇新的「%s」賽道"
 
-#: src/challenges/challenge_data.cpp:591
+#: src/challenges/challenge_data.cpp:603
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "現在可以執行新的「%s」遊戲模式"
 
-#: src/challenges/challenge_data.cpp:601
+#: src/challenges/challenge_data.cpp:613
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "現在可以參加新的「%s」大獎賽"
 
-#: src/challenges/challenge_data.cpp:605
+#: src/challenges/challenge_data.cpp:617
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "現在可以挑戰新的「%s」難度"
 
-#: src/challenges/challenge_data.cpp:615
+#: src/challenges/challenge_data.cpp:627
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "現在可以駕駛新的「%s」賽車"
@@ -2408,25 +2511,25 @@ msgid ""
 "created."
 msgstr "您的設定檔太舊了，它已經被移除並由一份新的取代。"
 
-#: src/graphics/irr_driver.cpp:585
+#: src/graphics/irr_driver.cpp:589
 msgid "Video recording started."
 msgstr "開始視訊錄製。"
 
-#: src/graphics/irr_driver.cpp:591
+#: src/graphics/irr_driver.cpp:595
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "視訊儲存於「%s」。"
 
-#: src/graphics/irr_driver.cpp:595
+#: src/graphics/irr_driver.cpp:599
 msgid "Encoding progress:"
 msgstr "編碼進度："
 
-#: src/graphics/irr_driver.cpp:1781 src/graphics/irr_driver.cpp:1786
+#: src/graphics/irr_driver.cpp:1799 src/graphics/irr_driver.cpp:1804
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS：%d/%d/%d - %d KTris，Ping：%d毫秒"
 
-#: src/guiengine/engine.cpp:1329
+#: src/guiengine/engine.cpp:1343
 msgid "Loading"
 msgstr "載入中"
 
@@ -2449,10 +2552,10 @@ msgstr "氮氣效率"
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:386
-#: src/guiengine/widgets/player_kart_widget.cpp:758
-#: src/karts/controller/local_player_controller.cpp:437
+#: src/guiengine/widgets/player_kart_widget.cpp:759
+#: src/karts/controller/local_player_controller.cpp:438
 #: src/karts/controller/player_controller.cpp:408
-#: src/network/protocols/client_lobby.cpp:691
+#: src/network/protocols/client_lobby.cpp:775
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
@@ -2952,11 +3055,11 @@ msgid "Mouse axis %d %s"
 msgstr "滑鼠軸 %d %s"
 
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:576
+#: src/input/device_manager.cpp:578
 msgid "Please re-configure your key bindings."
 msgstr "請重新設定您的按鍵組合。"
 
-#: src/input/device_manager.cpp:577
+#: src/input/device_manager.cpp:579
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "您的遊戲操作設定檔與此版本的 SuperTuxKart 不相容。"
 
@@ -3091,12 +3194,12 @@ msgstr "左拇指下"
 msgid "Left thumb up"
 msgstr "左拇指上"
 
-#: src/input/input_manager.cpp:845
+#: src/input/input_manager.cpp:856
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "忽略「%s」。您必須要早一點加入遊戲！"
 
-#: src/input/input_manager.cpp:878
+#: src/input/input_manager.cpp:892
 msgid "Only the Game Master may act at this point!"
 msgstr "只有比賽發起人可以執行動作！"
 
@@ -3122,13 +3225,13 @@ msgstr[0] "找到 %d 個 Wii 搖桿"
 msgid "Could not detect any wiimote :/"
 msgstr "未偵測到任何 Wii 搖桿 :/"
 
-#: src/karts/controller/local_player_controller.cpp:295
+#: src/karts/controller/local_player_controller.cpp:299
 msgid "Penalty time!!"
 msgstr "偷跑懲罰時間！！！"
 
-#: src/karts/controller/local_player_controller.cpp:298
-msgid "Don't accelerate before go"
-msgstr "不要在起跑前加速"
+#: src/karts/controller/local_player_controller.cpp:302
+msgid "Don't accelerate before 'Set!'"
+msgstr "在「預備！」前不要加速"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
@@ -3138,13 +3241,19 @@ msgstr "您最多有三條命！"
 msgid "+1 life."
 msgstr "+1 條命。"
 
-#: src/karts/kart.cpp:1000 src/karts/kart.cpp:1005
+#: src/karts/kart.cpp:1028
 msgid "You won the race!"
 msgstr "您贏得了這場比賽！"
 
-#: src/karts/kart.cpp:1005
+#: src/karts/kart.cpp:1028
 msgid "You finished the race!"
 msgstr "您完成比賽了！"
+
+#. I18N: Message shown in game to tell player left the game in network
+#: src/karts/kart_rewinder.cpp:118 src/network/protocols/client_lobby.cpp:1056
+#, c-format
+msgid "%s left the game."
+msgstr "%s 已離開遊戲。"
 
 #: src/main.cpp:1817
 msgid ""
@@ -3152,64 +3261,65 @@ msgid ""
 "updates. We also collect anonymous hardware statistics to help with the "
 "development of STK. Please read our privacy policy at "
 "http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab 'User "
-"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
+"(To change this setting at a later time, go to options, select tab "
+"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr "SuperTuxKart 可能會連線到伺服器下載附加元件並提醒您更新資訊。我們也會收集匿名的硬體統計資訊以協助 STK 的開發。請到 http://privacy.supertuxkart.net 詳閱我們的隱私權政策。您想要讓此功能開啟嗎？（若要在稍後改變這個設定，請到選項中，選取「使用者介面」分頁，然後編輯「連線到網際網路」及「傳送匿名硬體統計」）。"
+msgstr "SuperTuxKart 可能會連線到伺服器下載附加元件並提醒您更新資訊。我們也會收集匿名的硬體統計資訊以協助 STK 的開發。請到 http://privacy.supertuxkart.net 詳閱我們的隱私權政策。您想要讓此功能開啟嗎？（若要在稍後改變這個設定，請到選項中，選取「一般」分頁，然後編輯「連線到網際網路」及「傳送匿名硬體統計資訊」）。"
 
-#: src/main.cpp:2077
+#: src/main.cpp:2084
 msgid "Your screen resolution is too low to run STK."
 msgstr "您的螢幕解析度太低了，不能玩 SuperTuxKart。"
 
-#: src/main.cpp:2106
+#: src/main.cpp:2113
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "你的驅動程式版本太舊。請安裝最新的顯示卡驅動程式。"
 
-#: src/main.cpp:2124
+#: src/main.cpp:2131
 #, c-format
 msgid ""
-"Your OpenGL version appears to be too old. Please verify if an update for "
-"your video driver is available. SuperTuxKart requires %s or better."
-msgstr "您的 OpenGL 版本似乎太舊了。請確認您的顯示卡驅動程式是否有更新。SuperTuxKart 需要 %s 或更新的版本。"
+"Your graphics driver appears to be very old. Please check if an update is "
+"available. SuperTuxKart recommends a driver supporting %s or better. The "
+"game will likely still run, but in a reduced-graphics mode."
+msgstr "您的顯示卡驅動程式似乎很老舊了。請檢查是否有更新。SuperTuxKart 建議支援 %s 或更新的驅動程式。遊戲仍然可以執行，但會使用較低畫質的模式。"
 
-#: src/main_loop.cpp:341 src/network/protocols/client_lobby.cpp:84
+#: src/main_loop.cpp:376 src/network/protocols/client_lobby.cpp:91
 msgid "Server connection timed out."
 msgstr "伺服器連線逾時。"
 
-#. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:366
+#. I18N: Show when a player gets the red flag in CTF
+#: src/modes/capture_the_flag.cpp:176
 #, c-format
 msgid "%s has the red flag!"
 msgstr "%s 有紅旗！"
 
-#. I18N: Show when a player gets the flag in CTF
-#: src/modes/capture_the_flag.cpp:375
+#. I18N: Show when the red flag is returned to its base in CTF
+#: src/modes/capture_the_flag.cpp:183
+msgid "The red flag has returned!"
+msgstr "紅旗回來了！"
+
+#. I18N: Show when a player gets the blue flag in CTF
+#: src/modes/capture_the_flag.cpp:194
 #, c-format
 msgid "%s has the blue flag!"
 msgstr "%s 有藍旗！"
 
-#. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:402
-#, c-format
-msgid "%s captured the red flag!"
-msgstr "%s 搶得紅旗！"
+#. I18N: Show when the blue flag is returned to its base in CTF
+#: src/modes/capture_the_flag.cpp:201
+msgid "The blue flag has returned!"
+msgstr "藍旗回來了！"
 
-#. I18N: Show when a player captured the flag in CTF
-#: src/modes/capture_the_flag.cpp:413
+#: src/modes/capture_the_flag.cpp:409
 #, c-format
 msgid "%s captured the blue flag!"
 msgstr "%s 搶得藍旗！"
 
-#: src/modes/capture_the_flag.cpp:431
-msgid "The red flag has returned!"
-msgstr "紅旗回來了！"
+#: src/modes/capture_the_flag.cpp:413
+#, c-format
+msgid "%s captured the red flag!"
+msgstr "%s 搶得紅旗！"
 
-#: src/modes/capture_the_flag.cpp:447
-msgid "The blue flag has returned!"
-msgstr "藍旗回來了！"
-
-#: src/modes/easter_egg_hunt.cpp:237
+#: src/modes/easter_egg_hunt.cpp:224
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "復活節彩蛋：%d / %d"
@@ -3218,237 +3328,245 @@ msgstr "復活節彩蛋：%d / %d"
 msgid "Leader"
 msgstr "領隊"
 
-#: src/modes/linear_world.cpp:383
+#: src/modes/linear_world.cpp:392
 msgid "Final lap!"
 msgstr "最後一圈！"
 
-#: src/modes/linear_world.cpp:412
+#: src/modes/linear_world.cpp:421
 #, c-format
 msgid "Lap %i"
 msgstr "第 %i 圈"
 
-#: src/modes/linear_world.cpp:502
+#: src/modes/linear_world.cpp:512
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s 由 %s 跑完"
 
-#: src/modes/linear_world.cpp:507
+#: src/modes/linear_world.cpp:517
 msgid "New fastest lap"
 msgstr "新的最快圈速"
 
-#: src/modes/linear_world.cpp:1035
+#: src/modes/linear_world.cpp:1049
 msgid "WRONG WAY!"
 msgstr "方向錯誤！"
 
-#: src/modes/three_strikes_battle.cpp:661
+#: src/modes/three_strikes_battle.cpp:639
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i 備胎卡丁車已產生！"
 
-#: src/modes/world.cpp:1238
+#: src/modes/world.cpp:1303
 msgid "You have been eliminated!"
 msgstr "您已經被淘汰！"
 
-#: src/modes/world.cpp:1245
+#: src/modes/world.cpp:1310
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "「%s」已經被淘汰。"
 
-#: src/network/protocols/client_lobby.cpp:85
+#: src/network/protocols/client_lobby.cpp:92
 msgid "Server has been shut down."
 msgstr "伺服器已關機。"
 
-#: src/network/protocols/client_lobby.cpp:86
+#: src/network/protocols/client_lobby.cpp:93
 msgid "You were kicked from the server."
 msgstr "您被從伺服器踢出了。"
 
-#: src/network/protocols/client_lobby.cpp:88
-#: src/network/protocols/client_lobby.cpp:233
-#: src/network/protocols/client_lobby.cpp:712
+#: src/network/protocols/client_lobby.cpp:95
+msgid "You were kicked: Ping too high."
+msgstr "您被踢出去了：延遲太高。"
+
+#: src/network/protocols/client_lobby.cpp:243
+#: src/network/protocols/client_lobby.cpp:813
 msgid "Bad network connection is detected."
 msgstr "偵測到不穩定的網路連線。"
 
-#: src/network/protocols/client_lobby.cpp:458
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:255
-#: src/states_screens/ghost_replay_selection.cpp:386
-msgid "No"
-msgstr "否"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:464
-#, c-format
-msgid ""
-"Track: %s,\n"
-"random item location: %s"
-msgstr "賽道：%s，\n隨機物品位置：%s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:472
-#, c-format
-msgid "Track: %s"
-msgstr "賽道：%s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:479
-#, c-format
-msgid ""
-"Track: %s,\n"
-"number of goals to win: %d,\n"
-"random item location: %s"
-msgstr "賽道：%s，\n獲勝目標數：%d，\n隨機物品位置：%s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:486
-#, c-format
-msgid ""
-"Track: %s,\n"
-"maximum time: %d,\n"
-"random item location: %s"
-msgstr "賽道：%s，\n最大時間：%d，\n隨機物品位置：%s"
-
-#. I18N: Vote message in network game from a player
-#: src/network/protocols/client_lobby.cpp:494
-#, c-format
-msgid ""
-"Track: %s,\n"
-"laps: %d, reversed: %s"
-msgstr "賽道：%s，\n圈數：%d，反向：%s"
-
-#: src/network/protocols/client_lobby.cpp:524
+#: src/network/protocols/client_lobby.cpp:568
 #, c-format
 msgid "%s disconnected."
 msgstr "%s 已斷線。"
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:547
+#: src/network/protocols/client_lobby.cpp:596
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "在列表中按玩家名稱以管理玩家並取得排名資訊。"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:575
+#: src/network/protocols/client_lobby.cpp:650
 #, c-format
 msgid "Server name: %s"
 msgstr "伺服器名稱：%s"
 
 #. I18N: In the networking lobby
-#. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:583
+#: src/network/protocols/client_lobby.cpp:658
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
-#: src/states_screens/race_result_gui.cpp:1640
+#: src/states_screens/race_result_gui.cpp:1662
 #, c-format
 msgid "Difficulty: %s"
 msgstr "難度：%s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:588
+#: src/network/protocols/client_lobby.cpp:663
 #, c-format
 msgid "Max players: %d"
 msgstr "最多玩家：%d"
 
-#: src/network/protocols/client_lobby.cpp:605
-#: src/states_screens/dialogs/server_info_dialog.cpp:89
+#. I18N: In server info dialog
+#: src/network/protocols/client_lobby.cpp:676
+#: src/states_screens/dialogs/server_info_dialog.cpp:90
 #, c-format
 msgid "Game mode: %s"
 msgstr "遊戲模式：%s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:617
+#: src/network/protocols/client_lobby.cpp:689
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:194
+#: src/states_screens/track_info_screen.cpp:178
 msgid "Time limit"
 msgstr "時間限制"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:618
+#: src/network/protocols/client_lobby.cpp:690
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:172
 #: src/states_screens/online/create_server_screen.cpp:196
+#: src/states_screens/track_info_screen.cpp:179
 msgid "Goals limit"
 msgstr "得分限制"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:622
+#: src/network/protocols/client_lobby.cpp:694
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "足球比賽類型：%s"
 
-#: src/network/protocols/client_lobby.cpp:632
+#: src/network/protocols/client_lobby.cpp:704
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "大獎賽進度：%d/%d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:704
+#: src/network/protocols/client_lobby.cpp:805
 msgid "All players joined red or blue team."
-msgstr "所有玩家都會加入紅或藍隊。"
+msgstr "所有玩家都加入了紅或藍隊。"
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:725
+#: src/network/protocols/client_lobby.cpp:825
 msgid "You are now the owner of server."
 msgstr "您現在是伺服器的擁有者。"
 
-#: src/network/protocols/client_lobby.cpp:763
+#: src/network/protocols/client_lobby.cpp:866
 msgid "Connection refused: Server is busy."
 msgstr "連線被拒絕：伺服器忙碌中。"
 
-#: src/network/protocols/client_lobby.cpp:767
+#: src/network/protocols/client_lobby.cpp:871
 msgid "Connection refused: You are banned from the server."
 msgstr "連線被拒絕：您被伺服器禁止進入。"
 
-#: src/network/protocols/client_lobby.cpp:771
+#: src/network/protocols/client_lobby.cpp:884
 msgid "Connection refused: Server password is incorrect."
 msgstr "連線被拒絕：伺服器密碼不正確。"
 
-#: src/network/protocols/client_lobby.cpp:775
+#: src/network/protocols/client_lobby.cpp:888
 msgid "Connection refused: Game data is incompatible."
 msgstr "連線被拒絕：遊戲資料不相容。"
 
-#: src/network/protocols/client_lobby.cpp:779
+#: src/network/protocols/client_lobby.cpp:892
 msgid "Connection refused: Server is full."
 msgstr "連線被拒絕：伺服器已滿。"
 
-#: src/network/protocols/client_lobby.cpp:783
+#: src/network/protocols/client_lobby.cpp:896
 msgid "Connection refused: Invalid player connecting."
 msgstr "連線被拒絕：無效的玩家連線。"
 
-#: src/network/protocols/connect_to_server.cpp:196
+#: src/network/protocols/client_lobby.cpp:924
+msgid "Failed to start the network game."
+msgstr "開始網路遊戲失敗。"
+
+#. I18N: Error message shown if live join or spectate failed in network
+#: src/network/protocols/client_lobby.cpp:1112
+msgid "The game has ended, you can't live join or spectate anymore."
+msgstr "遊戲已經結束，您無法再加入或觀賽了。"
+
+#. I18N: Error message shown if live join failed in network
+#: src/network/protocols/client_lobby.cpp:1116
+msgid "No remaining place in the arena - live join disabled."
+msgstr "競技場沒有空間了，停用即時加入。"
+
+#. I18N: Error message shown if only 1 player remains in network
+#: src/network/protocols/client_lobby.cpp:1120
+msgid "Only 1 player remaining, returning to lobby."
+msgstr "僅剩 1 個玩家，回到大廳。"
+
+#. I18N: Show when player join red team of the started game in
+#. network
+#: src/network/protocols/client_lobby.cpp:1284
+#, c-format
+msgid "%s joined the red team."
+msgstr "%s 已加入紅隊。"
+
+#. I18N: Show when player join blue team of the started game in
+#. network
+#: src/network/protocols/client_lobby.cpp:1290
+#, c-format
+msgid "%s joined the blue team."
+msgstr "%s 已加入藍隊。"
+
+#. I18N: Show when player join the started game in network
+#: src/network/protocols/client_lobby.cpp:1296
+#, c-format
+msgid "%s joined the game."
+msgstr "%s 已加入遊戲。"
+
+#. I18N: Message shown in game to tell the player it's possible to change
+#. the camera target in spectate mode of network
+#: src/network/protocols/client_lobby.cpp:1446
+#, c-format
+msgid ""
+"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
+"position."
+msgstr "按 <%s> 或 <%s> 以變更目標玩家或 <%s> 以變更攝影機位置。"
+
+#. I18N: Tell player he has successfully report this named player
+#: src/network/protocols/client_lobby.cpp:1462
+#, c-format
+msgid "Successfully reported %s."
+msgstr "已成功回報 %s。"
+
+#: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
 msgstr "無可用的快速遊玩伺服器。"
 
-#: src/network/protocols/connect_to_server.cpp:281
-#: src/states_screens/online/online_screen.cpp:259
+#: src/network/protocols/connect_to_server.cpp:290
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "無法連線到伺服器 %s。"
 
-#: src/network/server_config.cpp:238
-msgid "Normal Race (Grand Prix)"
-msgstr "一般比賽（大獎賽）"
-
-#: src/network/server_config.cpp:240
+#: src/network/server_config.cpp:259
 msgid "Time Trial (Grand Prix)"
 msgstr "競速計時（大獎賽）"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:250
+#: src/network/server_config.cpp:269 src/race/race_manager.hpp:195
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:178
+#: src/states_screens/track_info_screen.cpp:201
 msgid "Free-For-All"
 msgstr "自由對戰"
 
+#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:252
+#: src/network/server_config.cpp:271 src/race/race_manager.hpp:197
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:159
 #: src/states_screens/online/create_server_screen.cpp:180
 msgid "Capture The Flag"
 msgstr "搶旗"
-
-#. I18N: Official means this server is hosted by STK team
-#: src/network/server.cpp:106
-msgid "Official"
-msgstr "官方"
 
 #: src/online/online_player_profile.cpp:434
 #, c-format
@@ -3473,18 +3591,18 @@ msgid_plural "%d friends are now online."
 msgstr[0] "現在有 %d 個朋友在線上。"
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:497
+#: src/online/online_player_profile.cpp:498
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s 在伺服器「%s」上。"
 
-#: src/online/online_player_profile.cpp:528
+#: src/online/online_player_profile.cpp:529
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
 msgstr[0] "您有 %d 個新的朋友請求！"
 
-#: src/online/online_player_profile.cpp:534
+#: src/online/online_player_profile.cpp:535
 msgid "You have a new friend request!"
 msgstr "您有一個新的朋友請求！"
 
@@ -3505,17 +3623,17 @@ msgid ""
 msgstr "高分榜的檔案格式太舊了，\n所有的高分紀錄都將被清除。"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:184
+#: src/race/race_manager.hpp:191
 msgid "Follow the Leader"
 msgstr "緊隨領隊"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:186
+#: src/race/race_manager.hpp:193 src/states_screens/track_info_screen.cpp:200
 msgid "3 Strikes Battle"
 msgstr "三擊對戰"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:188
+#: src/race/race_manager.hpp:199
 msgid "Egg Hunt"
 msgstr "復活節彩蛋狩獵"
 
@@ -3560,27 +3678,27 @@ msgstr "一年"
 msgid "2 years"
 msgstr "2 年"
 
-#: src/states_screens/addons_screen.cpp:113
+#: src/states_screens/addons_screen.cpp:106
 msgid "Add-on name"
 msgstr "附加元件名稱"
 
-#: src/states_screens/addons_screen.cpp:114
+#: src/states_screens/addons_screen.cpp:107
 msgid "Updated date"
 msgstr "更新日期"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:319
+#: src/states_screens/addons_screen.cpp:298
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s 由 %s 製作"
 
-#: src/states_screens/addons_screen.cpp:439
+#: src/states_screens/addons_screen.cpp:419
 msgid "Please wait while addons are updated"
 msgstr "附加元件更新中請稍待"
 
-#: src/states_screens/addons_screen.cpp:517
-#: src/states_screens/main_menu_screen.cpp:558
+#: src/states_screens/addons_screen.cpp:497
+#: src/states_screens/main_menu_screen.cpp:560
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3593,7 +3711,7 @@ msgstr "抱歉，連接到附加元件網站時發生錯誤。請確定您已經
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:79
 #: src/states_screens/easter_egg_screen.cpp:142
-#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/kart_selection.cpp:291
 #: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "一般"
@@ -3602,8 +3720,8 @@ msgstr "一般"
 #: src/states_screens/arenas_screen.cpp:325
 #: src/states_screens/easter_egg_screen.cpp:224
 #: src/states_screens/easter_egg_screen.cpp:255
-#: src/states_screens/kart_selection.cpp:886
-#: src/states_screens/kart_selection.cpp:1506
+#: src/states_screens/kart_selection.cpp:889
+#: src/states_screens/kart_selection.cpp:1525
 #: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "已鎖定：您必須先通過其它挑戰才能掌握更多！"
@@ -3622,380 +3740,308 @@ msgstr[0] "%d 個競技場在單人遊戲中不適用。"
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\n  Bill https://launchpad.net/~cges30901\n  Carl X. Su https://launchpad.net/~bcbcarl\n  Jeff Huang https://launchpad.net/~s8321414\n  STK-team https://launchpad.net/~stk\n  WM https://launchpad.net/~wandererm\n  jyc https://launchpad.net/~alphabet14\n  minhsien https://launchpad.net/~minhsien0330\n  tryneeds https://launchpad.net/~tryneeds\n  Ｖ字龍(Vdragon) https://launchpad.net/~vdragon"
 
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:55
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:64
 msgctxt "achievement_info"
-msgid "Goal"
-msgstr "目標"
+msgid "Subgoals"
+msgstr "子目標"
 
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:57
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:66
 msgctxt "achievement_info"
 msgid "Progress"
 msgstr "進度"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:134
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:161
 msgid "Fulfill all the subgoals"
 msgstr "完成所有的子目標"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:136
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:163
 msgid "Fulfill all the subgoals at the same time"
 msgstr "同時完成所有子目標"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:138
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:165
 msgid "Fulfill at least one subgoal"
 msgstr "完成至少一個子目標"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:140
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:167
 msgid "The sum of the subgoals must reach the indicated value"
 msgstr "子目標的總和必須達到指示的值"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:142
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:169
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:300
 msgid "Races won"
 msgstr "比賽獲勝"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:144
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:171
 msgid "Normal races won"
 msgstr "正常比賽獲勝"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:146
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:173
 msgid "Time-trial races won"
 msgstr "計時賽獲勝"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:148
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:175
 msgid "Follow-the-Leader races won"
 msgstr "跟隨領隊獲勝"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:150
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:177
 msgid "Consecutive won races"
 msgstr "連續贏得比賽"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:152
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:179
 msgid "Consecutive won races in Expert or SuperTux"
 msgstr "在專家或 SuperTux 中連續贏得比賽"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:154
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:181
 msgid "Novice races started"
 msgstr "新手比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:156
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:183
 msgid "Novice races finished"
 msgstr "新手比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:158
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:185
 msgid "Intermediate races started"
 msgstr "中級比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:160
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:187
 msgid "Intermediate races finished"
 msgstr "中級比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:162
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:189
 msgid "Expert races started"
 msgstr "專家比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:164
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:191
 msgid "Expert races finished"
 msgstr "專家比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:166
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:193
 msgid "SuperTux races started"
 msgstr "SuperTux 比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:168
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:195
 msgid "SuperTux races finished"
 msgstr "SuperTux 比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:170
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:197
 msgid "Normal races started"
 msgstr "正常比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:172
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:199
 msgid "Normal races finished"
 msgstr "正常比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:174
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:201
 msgid "Time-trial races started"
 msgstr "計時賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:203
 msgid "Time-trial races finished"
 msgstr "計時賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:178
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:205
 msgid "Follow-the-Leader races started"
 msgstr "跟隨領隊開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:180
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:207
 msgid "Follow-the-Leader races finished"
 msgstr "跟隨領隊結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:182
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:209
 msgid "3 Strikes battle started"
 msgstr "三擊對戰開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:184
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:211
 msgid "3 Strikes battle finished"
 msgstr "三擊對戰結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:186
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:213
 msgid "Soccer matches started"
 msgstr "足球比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:188
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:215
 msgid "Soccer matches finished"
 msgstr "足球比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:190
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:217
 msgid "Egg Hunts started"
 msgstr "復活節彩蛋狩獵開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:192
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:219
 msgid "Egg Hunts finished"
 msgstr "復活節彩蛋狩獵結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:194
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:221
 msgid "Races started with a ghost replay"
 msgstr "與重播錄影一起比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:196
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:223
 msgid "Races finished with a ghost replay"
 msgstr "與重播錄影一起比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:198
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:225
 msgid "Capture-the-Flag matches started"
 msgstr "搶旗比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:200
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:227
 msgid "Capture-the-Flag matches finished"
 msgstr "搶旗比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:202
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:229
 msgid "Free-for-All matches started"
 msgstr "自由對戰比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:204
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:231
 msgid "Free-for-All matches finished"
 msgstr "自由對戰比賽結束"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:233
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:235
 msgid "Powerups used"
 msgstr "使用強化道具"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:234
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:235
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:239
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:243
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:247
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:249
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:253
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:261
 msgid " (1 race)"
 msgstr "（一場比賽）"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:237
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:239
 msgid "Bowling ball hits"
 msgstr "保齡球擊中"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:214
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:241
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:243
 msgid "Swatter hits"
 msgstr "蒼蠅拍擊中"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:218
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:245
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:247
 msgid "All hits"
 msgstr "全部擊中"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:249
 msgid "Hits against the same kart"
 msgstr "擊中同一台卡丁車"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:224
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:251
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:253
 msgid "Bananas collected"
 msgstr "已收集的香蕉"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #. I18N: Key binding name
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:239
-#: src/states_screens/options/options_screen_device.cpp:279
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:255
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:259
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:280
 msgid "Skidding"
 msgstr "甩尾衝刺"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:241
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:268
 msgid " (1 lap)"
 msgstr "（一圈）"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:296
 msgid "Races started"
 msgstr "比賽開始"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:246
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:258
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:266
-msgid " (maximum on one official track)"
-msgstr "（在一個官方賽道中最大）"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:246
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
-msgid "Races finished"
-msgstr "比賽結束"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
-msgid "Reverse direction races finished"
-msgstr "反向比賽結束"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:277
-msgid "Races finished alone"
-msgstr "單獨結束比賽"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:279
-msgid "Races with less than the default lap number"
-msgstr "少於賽道預設圈數的比賽"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
-msgid "Races with more than the default lap number"
-msgstr "多於賽道預設圈數的比賽"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:258
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
-msgid "Races with at least twice as much as the default lap number"
-msgstr "至少賽道預設圈數兩倍的比賽"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
-msgid "Egg hunts started"
-msgstr "復活節彩蛋狩獵開始"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:264
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:289
-msgid "Egg hunts finished"
-msgstr "復活節彩蛋狩獵結束"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
@@ -4004,7 +4050,79 @@ msgstr "復活節彩蛋狩獵結束"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:287
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:293
+msgid " (maximum on one official track)"
+msgstr "（在一個官方賽道中最大）"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:298
+msgid "Races finished"
+msgstr "比賽結束"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:277
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:302
+msgid "Reverse direction races finished"
+msgstr "反向比賽結束"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:279
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:304
+msgid "Races finished alone"
+msgstr "單獨結束比賽"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:306
+msgid "Races with less than the default lap number"
+msgstr "少於賽道預設圈數的比賽"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:308
+msgid "Races with more than the default lap number"
+msgstr "多於賽道預設圈數的比賽"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:310
+msgid "Races with at least twice as much as the default lap number"
+msgstr "至少賽道預設圈數兩倍的比賽"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:287
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:312
+msgid "Egg hunts started"
+msgstr "復活節彩蛋狩獵開始"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:291
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:316
+msgid "Egg hunts finished"
+msgstr "復活節彩蛋狩獵結束"
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:296
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:298
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:300
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:302
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:304
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:306
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:308
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:310
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:312
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:318
 msgid " (official tracks matching the goal)"
 msgstr "（符合目標的官方賽道）"
 
@@ -4109,7 +4227,7 @@ msgstr[0] "於 %i 秒內確認畫面解析度是否合適"
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr ""
+msgstr "不支援小於 1024x768 或 1280x720 的解析度。部份介面可能無法正常運作。"
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
@@ -4118,13 +4236,13 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
 #: src/states_screens/online/create_server_screen.cpp:160
-#: src/states_screens/options/options_screen_video.cpp:431
+#: src/states_screens/options/options_screen_video.cpp:462
 msgid "Disabled"
 msgstr "已停用"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:63
-#: src/states_screens/options/options_screen_video.cpp:433
+#: src/states_screens/options/options_screen_video.cpp:464
 msgid "Important only"
 msgstr "僅重要的"
 
@@ -4134,7 +4252,7 @@ msgstr "僅重要的"
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:80
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/options/options_screen_video.cpp:440
+#: src/states_screens/options/options_screen_video.cpp:471
 msgid "Low"
 msgstr "低"
 
@@ -4144,86 +4262,140 @@ msgstr "低"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/options/options_screen_video.cpp:443
+#: src/states_screens/options/options_screen_video.cpp:474
 msgid "High"
 msgstr "高"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:79
-#: src/states_screens/options/options_screen_video.cpp:437
+#: src/states_screens/options/options_screen_video.cpp:468
 msgid "Very Low"
 msgstr "非常低"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:143
-#: src/states_screens/ghost_replay_selection.cpp:153
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:154
+msgctxt "column_name"
 msgid "Reverse"
-msgstr "反向"
+msgstr "反向進行比賽"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
-#: src/states_screens/ghost_replay_selection.cpp:155
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:156
+#: src/states_screens/online/server_selection.cpp:119
+msgctxt "column_name"
 msgid "Difficulty"
 msgstr "難度"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
-#: src/states_screens/ghost_replay_selection.cpp:157
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:158
+msgctxt "column_name"
 msgid "Laps"
 msgstr "圈"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
-#: src/states_screens/ghost_replay_selection.cpp:158
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:159
+msgctxt "column_name"
 msgid "Time"
 msgstr "時間"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
-#: src/states_screens/ghost_replay_selection.cpp:159
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:160
+msgctxt "column_name"
 msgid "Kart"
 msgstr "卡丁車"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
-#: src/states_screens/ghost_replay_selection.cpp:160
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:161
+msgctxt "column_name"
 msgid "User"
 msgstr "使用者"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
-#: src/states_screens/ghost_replay_selection.cpp:164
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:165
+msgctxt "column_name"
 msgid "Version"
 msgstr "版本"
 
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/dialogs/message_dialog.cpp:130
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:388
+msgid "No"
+msgstr "否"
+
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:44
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:43
 msgid "Use original color"
 msgstr "使用原始色彩"
 
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:46
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:45
 msgid "Pick a color from slider"
 msgstr "從滑桿中挑選色彩"
 
-#. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:82
+#. I18N: In the network player dialog
+#: src/states_screens/dialogs/network_player_dialog.cpp:48
+msgid "Player info"
+msgstr "玩家資訊"
+
+#. I18N: In the network player dialog
+#: src/states_screens/dialogs/network_player_dialog.cpp:53
+#, c-format
+msgid "Player name: %s"
+msgstr "玩家名稱：%s"
+
+#. I18N: In the network player dialog, show the player location with
+#. country name (based on IP geolocation)
+#: src/states_screens/dialogs/network_player_dialog.cpp:62
+#, c-format
+msgid "Player location: %s"
+msgstr "玩家位置：%s"
+
+#. I18N: In the network player dialog
+#: src/states_screens/dialogs/network_player_dialog.cpp:105
 msgid "Kick"
 msgstr "踢出"
 
-#. I18N: In the network user dialog
-#: src/states_screens/dialogs/network_user_dialog.cpp:100
+#. I18N: In the network player dialog
+#: src/states_screens/dialogs/network_player_dialog.cpp:121
 msgid "Change team"
 msgstr "變更隊伍"
 
+#. I18N: In the network player dialog
+#: src/states_screens/dialogs/network_player_dialog.cpp:136
+msgid "Enable handicap"
+msgstr "啟用讓賽"
+
+#. I18N: In the network player dialog
+#: src/states_screens/dialogs/network_player_dialog.cpp:141
+msgid "Disable handicap"
+msgstr "停用讓賽"
+
+#. I18N: In the network player dialog,
+#. report player about for example abusive behaviour in game
+#: src/states_screens/dialogs/network_player_dialog.cpp:156
+msgid "Report player"
+msgstr "回報玩家"
+
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
-#: src/states_screens/dialogs/network_user_dialog.cpp:117
+#: src/states_screens/dialogs/network_player_dialog.cpp:178
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:140
 #, c-format
 msgid "Fetching ranking info for %s"
 msgstr "擷取 %s 的排名資訊"
+
+#. I18N: In the network player dialog, instruction for reporting player
+#: src/states_screens/dialogs/network_player_dialog.cpp:186
+#, c-format
+msgid "Tell server administrator about this player (%s):"
+msgstr "告訴伺服器管理員關於此玩家 (%s)："
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:93
+#: src/states_screens/online/networking_lobby.cpp:218
+#: src/states_screens/online/networking_lobby.cpp:727
+msgid "Chat is disabled, enable in options menu."
+msgstr "聊天已停用，到選單中啟用。"
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -4272,35 +4444,67 @@ msgstr "需要的氮氣點數：%i"
 msgid "Number of AI Karts: %i"
 msgstr "電腦操控的賽車數量：%i"
 
-#: src/states_screens/dialogs/select_challenge.cpp:149
+#: src/states_screens/dialogs/select_challenge.cpp:158
 msgid "Nitro challenge"
 msgstr "氮氣挑戰"
 
-#: src/states_screens/dialogs/select_challenge.cpp:151
-#: src/states_screens/race_setup_screen.cpp:136
+#: src/states_screens/dialogs/select_challenge.cpp:160
+#: src/states_screens/race_setup_screen.cpp:135
 msgid "Ghost replay race"
 msgstr "重播錄像比賽"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:99
-#: src/states_screens/race_gui_overworld.cpp:148
+#: src/states_screens/dialogs/select_challenge.cpp:165
+#: src/states_screens/race_result_gui.cpp:1654
+#, c-format
+msgid "Laps: %i"
+msgstr "圈數：%i"
+
+#. I18N: In the create server screen, show various battle mode available
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:155
+#: src/states_screens/online/create_server_screen.cpp:174
+msgid "Battle mode"
+msgstr "對戰模式"
+
+#. I18N: In the create server screen
+#: src/states_screens/dialogs/server_configuration_dialog.cpp:168
+#: src/states_screens/online/create_server_screen.cpp:190
+#: src/states_screens/track_info_screen.cpp:166
+msgid "Soccer game type"
+msgstr "足球遊戲類型"
+
+#. I18N: In server info dialog, showing the current track playing in
+#. server
+#: src/states_screens/dialogs/server_info_dialog.cpp:100
+#, c-format
+msgid "Current track: %s"
+msgstr "目前的賽道：%s"
+
+#. I18N: In the server info dialog, show the server location with
+#. country name (based on IP geolocation)
+#: src/states_screens/dialogs/server_info_dialog.cpp:116
+#, c-format
+msgid "Server location: %s"
+msgstr "伺服器位置：%s"
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Rank"
 msgstr "排名"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:102
+#: src/states_screens/dialogs/server_info_dialog.cpp:133
 msgid "Player"
 msgstr "玩家"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:105
+#: src/states_screens/dialogs/server_info_dialog.cpp:136
 msgid "Scores"
 msgstr "分數"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:108
+#: src/states_screens/dialogs/server_info_dialog.cpp:139
 msgid "Time played"
 msgstr "玩家時間"
 
@@ -4309,40 +4513,46 @@ msgid "Input device already exists."
 msgstr "輸入裝置已存在。"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
-#: src/states_screens/online/online_screen.cpp:226
+#: src/states_screens/online/online_screen.cpp:232
 msgid "No player available for connecting to server."
 msgstr "沒有連線到伺服器的玩家可用。"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:56
+#. I18N: In the user info dialog
+#: src/states_screens/dialogs/user_info_dialog.cpp:54
+#, c-format
+msgid "Username: %s"
+msgstr "使用者名稱：%s"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:58
 msgid "Cancel Request"
 msgstr "取消請求"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:154
-#: src/states_screens/dialogs/user_info_dialog.cpp:211
+#: src/states_screens/dialogs/user_info_dialog.cpp:158
+#: src/states_screens/dialogs/user_info_dialog.cpp:215
 msgid "Today"
 msgstr "今日"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:158
+#: src/states_screens/dialogs/user_info_dialog.cpp:162
 msgid "Friend request sent!"
 msgstr "朋友請求已寄出！"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:215
+#: src/states_screens/dialogs/user_info_dialog.cpp:219
 msgid "Friend request accepted!"
 msgstr "已接受朋友請求！"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:267
+#: src/states_screens/dialogs/user_info_dialog.cpp:271
 msgid "Friend request declined!"
 msgstr "朋友請求已拒絕！"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:313
+#: src/states_screens/dialogs/user_info_dialog.cpp:317
 msgid "Friend removed!"
 msgstr "朋友已移除！"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:364
+#: src/states_screens/dialogs/user_info_dialog.cpp:368
 msgid "Friend request cancelled!"
 msgstr "朋友請求已取消！"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:474
+#: src/states_screens/dialogs/user_info_dialog.cpp:478
 msgid "Processing"
 msgstr "處理中"
 
@@ -4369,41 +4579,41 @@ msgid "Performing vote"
 msgstr "執行投票"
 
 #: src/states_screens/easter_egg_screen.cpp:269
-#: src/states_screens/online/tracks_screen.cpp:417
+#: src/states_screens/online/tracks_screen.cpp:600
 #: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
 msgstr "隨機賽道"
 
-#: src/states_screens/edit_gp_screen.cpp:64
-msgid "Track"
-msgstr "賽道"
-
-#: src/states_screens/edit_gp_screen.cpp:65
-msgid "Laps"
-msgstr "圈"
-
-#: src/states_screens/edit_gp_screen.cpp:66
-msgid "Reversed"
-msgstr "反向"
-
-#: src/states_screens/edit_gp_screen.cpp:122
-#: src/states_screens/ghost_replay_selection.cpp:505
+#: src/states_screens/edit_gp_screen.cpp:116
+#: src/states_screens/ghost_replay_selection.cpp:507
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr "您確定要移除「%s」嗎？"
 
-#: src/states_screens/edit_gp_screen.cpp:139
+#: src/states_screens/edit_gp_screen.cpp:133
 msgid "Do you want to save your changes?"
 msgstr "您要儲存您的變動嗎？"
 
+#: src/states_screens/edit_gp_screen.cpp:150
+msgid "Track"
+msgstr "賽道"
+
+#: src/states_screens/edit_gp_screen.cpp:151
+msgid "Laps"
+msgstr "圈"
+
+#: src/states_screens/edit_gp_screen.cpp:152
+msgid "Reversed"
+msgstr "反向"
+
 #. I18N: Indicate that the grand prix is modified and not saved
-#: src/states_screens/edit_gp_screen.cpp:284
+#: src/states_screens/edit_gp_screen.cpp:289
 #, c-format
 msgid "%s (+)"
 msgstr "%s（+）"
 
-#: src/states_screens/edit_gp_screen.cpp:324
+#: src/states_screens/edit_gp_screen.cpp:329
 msgid "An error occurred while trying to save your grand prix."
 msgstr "嘗試儲存您的大獎賽時發生錯誤。"
 
@@ -4411,70 +4621,71 @@ msgstr "嘗試儲存您的大獎賽時發生錯誤。"
 msgid "Select a track"
 msgstr "選擇賽道"
 
-#: src/states_screens/feature_unlocked.cpp:244
+#: src/states_screens/feature_unlocked.cpp:248
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr "您完成了簡單的挑戰！在這個等級得到的點數：%i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:250
+#: src/states_screens/feature_unlocked.cpp:254
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr "您完成了中等的挑戰！在這個等級得到的點數：%i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:256
+#: src/states_screens/feature_unlocked.cpp:260
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr "您完成了困難的挑戰！在這個等級得到的點數：%i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:262
+#: src/states_screens/feature_unlocked.cpp:266
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
 msgstr "您完成了 SuperTux 挑戰！在此等級賺到的點數：%i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:305
+#: src/states_screens/feature_unlocked.cpp:309
 #, c-format
 msgid "You unlocked %s!"
 msgstr "您解鎖了 %s！"
 
-#: src/states_screens/feature_unlocked.cpp:622
+#: src/states_screens/feature_unlocked.cpp:628
 msgid "Challenge Completed"
 msgstr "挑戰完成"
 
-#: src/states_screens/feature_unlocked.cpp:661
+#: src/states_screens/feature_unlocked.cpp:667
 msgid "You unlocked track %0"
 msgstr "你解鎖了 %0 賽道"
 
-#: src/states_screens/feature_unlocked.cpp:707
+#: src/states_screens/feature_unlocked.cpp:713
 msgid "You unlocked grand prix %0"
 msgstr "你解鎖了 %0 大獎賽"
 
-#: src/states_screens/ghost_replay_selection.cpp:151
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:152
+msgctxt "column_name"
 msgid "Track"
 msgstr "賽道"
 
-#: src/states_screens/ghost_replay_selection.cpp:162
-msgctxt "ghost_info"
+#: src/states_screens/ghost_replay_selection.cpp:163
+#: src/states_screens/online/server_selection.cpp:118
+msgctxt "column_name"
 msgid "Players"
 msgstr "玩家"
 
-#: src/states_screens/gp_info_screen.cpp:72
+#: src/states_screens/gp_info_screen.cpp:71
 msgid "Default"
 msgstr "預設"
 
-#: src/states_screens/gp_info_screen.cpp:73
+#: src/states_screens/gp_info_screen.cpp:72
 msgid "None"
 msgstr "無"
 
-#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/gp_info_screen.cpp:74
 msgid "Random"
 msgstr "隨機"
 
-#: src/states_screens/gp_info_screen.cpp:152
-#: src/states_screens/gp_info_screen.cpp:177
+#: src/states_screens/gp_info_screen.cpp:151
+#: src/states_screens/gp_info_screen.cpp:176
 msgid "Reload"
 msgstr "重新載入"
 
@@ -4510,61 +4721,58 @@ msgid "Better luck next time!"
 msgstr "下次運氣會更好！"
 
 #: src/states_screens/grand_prix_win.cpp:163
-#: src/states_screens/race_result_gui.cpp:186
+#: src/states_screens/race_result_gui.cpp:189
 msgid "You completed a challenge!"
 msgstr "你完成了一項挑戰！"
 
-#: src/states_screens/grand_prix_win.cpp:320
+#: src/states_screens/grand_prix_win.cpp:319
 msgid "You won the Grand Prix!"
 msgstr "您贏了大獎賽！"
 
-#: src/states_screens/grand_prix_win.cpp:321
+#: src/states_screens/grand_prix_win.cpp:320
 msgid "You completed the Grand Prix!"
 msgstr "您完成了大獎賽！"
 
-#: src/states_screens/kart_selection.cpp:862
-#: src/states_screens/kart_selection.cpp:1524
+#: src/states_screens/kart_selection.cpp:865
+#: src/states_screens/kart_selection.cpp:1543
 msgid "Random Kart"
 msgstr "隨機賽車"
 
-#: src/states_screens/kart_selection.cpp:881
+#: src/states_screens/kart_selection.cpp:884
 msgid "Locked"
 msgstr "未解鎖"
 
-#: src/states_screens/kart_selection.cpp:982
-#: src/states_screens/online/networking_lobby.cpp:294
+#: src/states_screens/kart_selection.cpp:985
+#: src/states_screens/online/networking_lobby.cpp:453
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "各位玩家：\n現在按「選擇」鍵來加入遊戲！"
 
-#: src/states_screens/main_menu_screen.cpp:492
-#: src/states_screens/online/online_screen.cpp:204
+#: src/states_screens/main_menu_screen.cpp:497
 msgid ""
 "You can not play online without internet access. If you want to play online,"
-" go to options, select  tab 'User Interface', and edit \"Connect to the "
-"Internet\"."
-msgstr "您無法在沒有網路連線時玩線上遊戲。若您想要玩線上遊戲，到選項中，選取「使用者介面」頁面，並編輯「連線到網際網路」。"
+" go in the options menu, and check \"Connect to the Internet\"."
+msgstr "您無法在沒有網路連線時玩線上遊戲。若您想要玩線上遊戲，到選項中勾選「連線到網際網路」。"
 
-#: src/states_screens/main_menu_screen.cpp:508
+#: src/states_screens/main_menu_screen.cpp:512
 msgid ""
 "You can not download addons without internet access. If you want to download"
-" addons, go to options, select the 'User Interface' tab, and check \"Connect"
-" to the Internet\"."
-msgstr "您無法在沒有網路時下載附加元件。如果您想要下載附加元件，到選項中選取「使用者介面」分頁，並勾選「連線到網路」。"
+" addons, go in the options menu, and check \"Connect to the Internet\"."
+msgstr "您無法在沒有網路時下載附加元件。如果您想要下載附加元件，到選項中勾選「連線到網際網路」。"
 
-#: src/states_screens/main_menu_screen.cpp:517
+#: src/states_screens/main_menu_screen.cpp:520
 msgid ""
-"You can not download addons without internet access. If you want to download addons, go to options, select the 'User Interface' tab, and check \"Connect to the Internet\".\n"
+"You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr "您無法在沒有網路時下載附加元件。如果您想要下載附加元件，到選項中選取「使用者介面」分頁，並勾選「連線到網路」。\n\n您可以刪除已下載的附加元件。"
+msgstr "您無法在沒有網路時下載附加元件。如果您想要下載附加元件，到選項中勾選「連線到網際網路」。\n\n您可以刪除已下載的附加元件。"
 
-#: src/states_screens/main_menu_screen.cpp:553
+#: src/states_screens/main_menu_screen.cpp:555
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "這個附加元件目前在選項畫面中被停用"
 
-#: src/states_screens/main_menu_screen.cpp:565
+#: src/states_screens/main_menu_screen.cpp:567
 msgid "Please wait while the add-ons are loading"
 msgstr "附加元件載入中請稍待"
 
@@ -4582,16 +4790,6 @@ msgstr "%s 的伺服器"
 msgid "No. of grand prix track(s)"
 msgstr "大獎賽賽道數量"
 
-#. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/online/create_server_screen.cpp:174
-msgid "Battle mode"
-msgstr "對戰模式"
-
-#. I18N: In the create server screen
-#: src/states_screens/online/create_server_screen.cpp:190
-msgid "Soccer game type"
-msgstr "足球遊戲類型"
-
 #: src/states_screens/online/create_server_screen.cpp:239
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "名稱須為 4 至 30 個字元長！"
@@ -4600,52 +4798,104 @@ msgstr "名稱須為 4 至 30 個字元長！"
 msgid "Incorrect characters in password!"
 msgstr "密碼中的字元不正確！"
 
-#: src/states_screens/online/networking_lobby.cpp:231
+#. I18N: In the networking lobby, ready button is to allow player to tell
+#. server that he is ready for next game for owner less server
+#: src/states_screens/online/networking_lobby.cpp:173
+msgid "Ready"
+msgstr "準備"
+
+#. I18N: Live join is displayed in networking lobby to allow players
+#. to join the current started in-progress game
+#: src/states_screens/online/networking_lobby.cpp:176
+msgid "Live join"
+msgstr "即時加入"
+
+#. I18N: Spectate is displayed in networking lobby to allow players
+#. to join the current started in-progress game
+#: src/states_screens/online/networking_lobby.cpp:181
+msgid "Spectate"
+msgstr "觀賽"
+
+#: src/states_screens/online/networking_lobby.cpp:302
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "大廳（延遲：%d 毫秒）"
 
-#. I18N: In the networking lobby, show when player is required to wait
-#. before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:241
-msgid "Please wait for current game to end."
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish with remaining time,
+#. showing the current track name inside bracket
+#: src/states_screens/online/networking_lobby.cpp:335
+#, c-format
+msgid ""
+"Please wait for the current game's (%s) end, estimated remaining time: %s."
+msgstr "請等待目前的遊戲（%s）結束，預估剩餘時間：%s。"
+
+#. I18N: In the networking lobby, show when player is required
+#. to wait before the current game finish with remaining time
+#: src/states_screens/online/networking_lobby.cpp:343
+#, c-format
+msgid "Please wait for the current game's end, estimated remaining time: %s."
+msgstr "請等待目前的遊戲結束，預估剩餘時間：%s。"
+
+#. I18N: In the networking lobby, show when player is required
+#. to wait before the current game finish with progress in
+#. percent, showing the current track name inside bracket
+#: src/states_screens/online/networking_lobby.cpp:355
+msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
+msgstr "請等待目前的遊戲（%s）結束，預估進度：%d%。"
+
+#. I18N: In the networking lobby, show when player is required
+#. to wait before the current game finish with progress in
+#. percent
+#: src/states_screens/online/networking_lobby.cpp:364
+msgid "Please wait for the current game's end, estimated progress: %d%."
+msgstr "請等待目前的遊戲結束，預估進度：%d%。"
+
+#. I18N: In the networking lobby, show when player is required to
+#. wait before the current game finish
+#: src/states_screens/online/networking_lobby.cpp:372
+msgid "Please wait for the current game's end."
 msgstr "請等待目前的遊戲結束。"
 
-#: src/states_screens/online/networking_lobby.cpp:269
+#: src/states_screens/online/networking_lobby.cpp:424
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
 msgstr[0] "如果有多於 %d 個玩家時，遊戲將會開始。"
 
 #. I18N: In the networking lobby, display the starting timeout
-#. for owner-less server
-#: src/states_screens/online/networking_lobby.cpp:282
+#. for owner-less server to begin a game
+#: src/states_screens/online/networking_lobby.cpp:438
 #, c-format
-msgid "Game will start after %d second."
-msgid_plural "Game will start after %d seconds."
-msgstr[0] "遊戲將會在 %d 秒後開始。"
+msgid ""
+"Starting after %d second, or once everyone has pressed the 'Ready' button."
+msgid_plural ""
+"Starting after %d seconds, or once everyone has pressed the 'Ready' button."
+msgstr[0] "在 %d 秒後開始，或是在每個人都按下「準備」鈕時開始。"
 
-#: src/states_screens/online/networking_lobby.cpp:314
+#: src/states_screens/online/networking_lobby.cpp:471
 #, c-format
 msgid "Connecting to server %s"
 msgstr "正在連線至伺服器 %s"
 
-#: src/states_screens/online/networking_lobby.cpp:319
+#: src/states_screens/online/networking_lobby.cpp:476
 msgid "Finding a quick play server"
 msgstr "正在尋找快速遊玩伺服器"
 
+#. I18N: In kart screen, show before the voting period in network ends.
+#: src/states_screens/online/network_kart_selection.cpp:183
+#: src/states_screens/online/tracks_screen.cpp:856
+#, c-format
+msgid "Remaining time: %d"
+msgstr "剩餘時間：%d"
+
 #. I18N: Goals in achievement
-#: src/states_screens/online/online_profile_achievements.cpp:78
+#: src/states_screens/online/online_profile_achievements.cpp:82
 msgid "Goals"
 msgstr "目標"
 
-#. I18N: Progress in achievement
-#: src/states_screens/online/online_profile_achievements.cpp:80
-msgid "Progress"
-msgstr "進度"
-
-#: src/states_screens/online/online_profile_achievements.cpp:134
-#: src/states_screens/online/online_profile_achievements.cpp:192
+#: src/states_screens/online/online_profile_achievements.cpp:115
+#: src/states_screens/online/online_profile_achievements.cpp:314
 msgid "Fetching achievements"
 msgstr "正在擷取成就"
 
@@ -4680,20 +4930,32 @@ msgid "Offline"
 msgstr "離線"
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online/online_screen.cpp:194
+#: src/states_screens/online/online_screen.cpp:199
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "您必須登入以遊玩全球網路。點選上面的使用者名稱。"
 
-#: src/states_screens/online/online_screen.cpp:231
+#: src/states_screens/online/online_screen.cpp:209
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr "您無法在沒有網路連線時玩線上遊戲。若您想要玩線上遊戲，到選項中，選取「使用者介面」頁面，並編輯「連線到網際網路」。"
+
+#: src/states_screens/online/online_screen.cpp:237
 msgid ""
 "Enter the server address with IP (optional) followed by : and then port."
 msgstr "輸入伺服器的 IP 位址， (可選用)接著「:」和連線埠。"
 
-#: src/states_screens/online/online_screen.cpp:242
+#: src/states_screens/online/online_screen.cpp:248
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "無效的伺服器位址：%s。"
+
+#. I18N: In enter server ip address dialog
+#: src/states_screens/online/online_screen.cpp:273
+msgid "Failed to detect port number."
+msgstr "偵測連接埠號失敗。"
 
 #: src/states_screens/online/online_user_search.cpp:210
 #: src/states_screens/online/online_user_search.cpp:274
@@ -4701,7 +4963,7 @@ msgid "Searching"
 msgstr "正在搜尋"
 
 #: src/states_screens/online/register_screen.cpp:120
-#: src/states_screens/options/user_screen.cpp:113
+#: src/states_screens/options/user_screen.cpp:126
 msgid "Exit game"
 msgstr "離開遊戲"
 
@@ -4745,32 +5007,44 @@ msgstr "您將會收到一封電子郵件，就如何啟動帳號進一步說明
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "網路存取已停用，請在選項中啟用它"
 
+#: src/states_screens/online/server_selection.cpp:116
+msgctxt "column_name"
+msgid "Name"
+msgstr "名稱"
+
+#: src/states_screens/online/server_selection.cpp:117
+msgctxt "column_name"
+msgid "Game mode"
+msgstr "遊戲模式"
+
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/online/server_selection.cpp:127
+#: src/states_screens/online/server_selection.cpp:124
+msgctxt "column_name"
 msgid "Owner"
 msgstr "擁有者"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/online/server_selection.cpp:129
+#: src/states_screens/online/server_selection.cpp:126
+msgctxt "column_name"
 msgid "Distance (km)"
-msgstr "距離 (km)"
+msgstr "距離（公里）"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:214
+#: src/states_screens/online/server_selection.cpp:240
 msgid "Unknown"
 msgstr "未知"
 
-#: src/states_screens/online/server_selection.cpp:322
+#: src/states_screens/online/server_selection.cpp:348
 msgid "No server is available."
 msgstr "沒有可玩的伺服器"
 
-#: src/states_screens/online/server_selection.cpp:330
+#: src/states_screens/online/server_selection.cpp:356
 msgid "Fetching servers"
 msgstr "正在擷取伺服器"
 
 #. I18N: In track screen for networking, clarify voting phase
-#: src/states_screens/online/tracks_screen.cpp:177
+#: src/states_screens/online/tracks_screen.cpp:311
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
@@ -4778,150 +5052,158 @@ msgstr "如果大多數的玩家選擇了相同的賽道與比賽設定，投票
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:272
-#: src/states_screens/online/tracks_screen.cpp:308
-#: src/states_screens/track_info_screen.cpp:219
+#: src/states_screens/online/tracks_screen.cpp:443
+#: src/states_screens/online/tracks_screen.cpp:491
+#: src/states_screens/track_info_screen.cpp:296
 msgid "Random item location"
 msgstr "隨機物品位置"
 
 #. I18N: In track screen
+#: src/states_screens/online/tracks_screen.cpp:473
+#: src/states_screens/track_info_screen.cpp:189
+#: src/states_screens/track_info_screen.cpp:517
+msgid "Number of goals to win"
+msgstr "獲勝的得分數量"
+
+#. I18N: In track screen
+#: src/states_screens/online/tracks_screen.cpp:481
+#: src/states_screens/track_info_screen.cpp:184
+#: src/states_screens/track_info_screen.cpp:204
+#: src/states_screens/track_info_screen.cpp:512
+msgid "Maximum time (min.)"
+msgstr "最大時間（分鐘）"
+
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:334
-#: src/states_screens/track_info_screen.cpp:214
+#: src/states_screens/online/tracks_screen.cpp:521
+#: src/states_screens/track_info_screen.cpp:291
 msgid "Drive in reverse"
 msgstr "反向駕駛"
 
-#: src/states_screens/online/tracks_screen.cpp:403
+#: src/states_screens/online/tracks_screen.cpp:586
 #: src/states_screens/tracks_and_gp_screen.cpp:275
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "已鎖定：您必須先通過其它挑戰才能掌握更多！"
 
-#. I18N: In tracks screen, about voting of tracks in network
-#: src/states_screens/online/tracks_screen.cpp:498
-#, c-format
-msgid "Remaining time: %d"
-msgstr "剩餘時間：%d"
-
-#: src/states_screens/options/options_screen_device.cpp:69
+#: src/states_screens/options/options_screen_device.cpp:70
 msgid "Action"
 msgstr "動作"
 
-#: src/states_screens/options/options_screen_device.cpp:70
+#: src/states_screens/options/options_screen_device.cpp:71
 msgid "Key binding"
 msgstr "按鍵設置"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:104
-#: src/states_screens/options/options_screen_device.cpp:625
+#: src/states_screens/options/options_screen_device.cpp:105
+#: src/states_screens/options/options_screen_device.cpp:628
 msgid "Disable Device"
 msgstr "停用裝置"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:106
-#: src/states_screens/options/options_screen_device.cpp:626
+#: src/states_screens/options/options_screen_device.cpp:107
+#: src/states_screens/options/options_screen_device.cpp:629
 msgid "Enable Device"
 msgstr "啟用裝置"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:121
-#: src/states_screens/options/options_screen_device.cpp:631
+#: src/states_screens/options/options_screen_device.cpp:122
+#: src/states_screens/options/options_screen_device.cpp:634
 msgid "Enable Configuration"
 msgstr "啟用設定"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:171
+#: src/states_screens/options/options_screen_device.cpp:172
 msgid "Game Keys"
 msgstr "遊戲按鍵"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:185
+#: src/states_screens/options/options_screen_device.cpp:186
 msgid "Menu Keys"
 msgstr "選單按鍵"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:261
+#: src/states_screens/options/options_screen_device.cpp:262
 msgid "Steer Left"
 msgstr "左轉"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:264
+#: src/states_screens/options/options_screen_device.cpp:265
 msgid "Steer Right"
 msgstr "右轉"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:267
+#: src/states_screens/options/options_screen_device.cpp:268
 msgid "Accelerate"
 msgstr "加速"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:270
+#: src/states_screens/options/options_screen_device.cpp:271
 msgid "Brake"
 msgstr "煞車"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:273
+#: src/states_screens/options/options_screen_device.cpp:274
 msgid "Fire"
 msgstr "射擊"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:276
+#: src/states_screens/options/options_screen_device.cpp:277
 msgid "Nitro"
 msgstr "氮氣"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:282
+#: src/states_screens/options/options_screen_device.cpp:283
 msgid "Look Back"
 msgstr "向後看"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:285
+#: src/states_screens/options/options_screen_device.cpp:286
 msgid "Rescue"
 msgstr "救援"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:288
+#: src/states_screens/options/options_screen_device.cpp:289
 msgid "Pause Game"
 msgstr "遊戲暫停"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:293
+#: src/states_screens/options/options_screen_device.cpp:294
 msgid "Up"
 msgstr "上"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:296
+#: src/states_screens/options/options_screen_device.cpp:297
 msgid "Down"
 msgstr "下"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:299
+#: src/states_screens/options/options_screen_device.cpp:300
 msgid "Left"
 msgstr "左"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:302
+#: src/states_screens/options/options_screen_device.cpp:303
 msgid "Right"
 msgstr "右"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:305
+#: src/states_screens/options/options_screen_device.cpp:306
 msgid "Select"
 msgstr "選擇"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:308
+#: src/states_screens/options/options_screen_device.cpp:309
 msgid "Cancel/Back"
 msgstr "取消／返回"
 
-#: src/states_screens/options/options_screen_device.cpp:403
+#: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A blue item means a conflict with another configuration"
 msgstr "※ 藍色的項目表示與另一個項目有衝突"
 
-#: src/states_screens/options/options_screen_device.cpp:408
+#: src/states_screens/options/options_screen_device.cpp:409
 msgid "* A red item means a conflict in the current configuration"
 msgstr "※ 紅色的項目表示與目前的設定衝突"
 
-#: src/states_screens/options/options_screen_device.cpp:514
+#: src/states_screens/options/options_screen_device.cpp:515
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -4929,307 +5211,314 @@ msgid ""
 msgstr "注意：不建議使用「Shift」鍵。當 Shift 按下時，所有字母鍵會變換大小寫，因而無法使用。"
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:611
+#: src/states_screens/options/options_screen_device.cpp:614
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "您確定要永久刪除這個設定？"
 
-#: src/states_screens/options/options_screen_input.cpp:104
-msgid "Gamepad"
-msgstr "Gamepad"
-
-#: src/states_screens/options/options_screen_input.cpp:113
-#, c-format
-msgid "Keyboard %i"
-msgstr "鍵盤 %i"
-
-#: src/states_screens/options/options_screen_input.cpp:152
-msgid "Touch Device"
-msgstr "觸控裝置"
-
-#. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options/options_screen_language.cpp:87
-msgid "System Language"
-msgstr "使用系統語系"
-
-#. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:118
-msgid "In the bottom-left"
-msgstr "在左下角"
-
-#. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:120
-msgid "On the right side"
-msgstr "在右邊"
-
-#. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:122
-msgid "Hidden"
-msgstr "已隱藏"
-
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_ui.cpp:194
+#: src/states_screens/options/options_screen_general.cpp:110
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr "在多人模式中，玩家可以在賽車選取\n畫面中選取讓賽（較困難）的設定檔"
 
+#: src/states_screens/options/options_screen_input.cpp:105
+msgid "Gamepad"
+msgstr "Gamepad"
+
+#: src/states_screens/options/options_screen_input.cpp:114
+#, c-format
+msgid "Keyboard %i"
+msgstr "鍵盤 %i"
+
+#: src/states_screens/options/options_screen_input.cpp:153
+msgid "Touch Device"
+msgstr "觸控裝置"
+
+#. I18N: in the language choice, to select the same language as the OS
+#: src/states_screens/options/options_screen_language.cpp:88
+msgid "System Language"
+msgstr "使用系統語系"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:119
+msgid "In the bottom-left"
+msgstr "在左下角"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:121
+msgid "On the right side"
+msgstr "在右邊"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:123
+msgid "Hidden"
+msgstr "已隱藏"
+
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:410
+#: src/states_screens/options/options_screen_video.cpp:441
 msgid "Custom"
 msgstr "自訂"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:446
+#: src/states_screens/options/options_screen_video.cpp:477
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "粒子特效：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:452
+#: src/states_screens/options/options_screen_video.cpp:483
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "角色動畫：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:455
+#: src/states_screens/options/options_screen_video.cpp:486
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "動態燈光：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:458
+#: src/states_screens/options/options_screen_video.cpp:489
+#, c-format
+msgid "Light scattering: %s"
+msgstr "光散射：%s"
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:492
 #, c-format
 msgid "Motion blur: %s"
 msgstr "動態模糊：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:461
+#: src/states_screens/options/options_screen_video.cpp:495
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "反鋸齒：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:464
+#: src/states_screens/options/options_screen_video.cpp:498
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "環境光遮蔽：%s"
 
-#: src/states_screens/options/options_screen_video.cpp:468
+#: src/states_screens/options/options_screen_video.cpp:502
 #, c-format
 msgid "Shadows: %s"
 msgstr "陰影：%s"
 
-#: src/states_screens/options/options_screen_video.cpp:470
+#: src/states_screens/options/options_screen_video.cpp:504
 #, c-format
 msgid "Shadows: %i"
 msgstr "陰影：%i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:473
+#: src/states_screens/options/options_screen_video.cpp:507
 #, c-format
 msgid "Bloom: %s"
 msgstr "光暈：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:477
+#: src/states_screens/options/options_screen_video.cpp:511
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "光輝（外框）：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:481
+#: src/states_screens/options/options_screen_video.cpp:515
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "一道光（上帝射線）：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:485
+#: src/states_screens/options/options_screen_video.cpp:519
 #, c-format
 msgid "Depth of field: %s"
 msgstr "景深：%s"
 
-#: src/states_screens/options/options_screen_video.cpp:490
+#: src/states_screens/options/options_screen_video.cpp:524
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "彩現圖片品質：%s"
 
-#: src/states_screens/options/user_screen.cpp:345
+#: src/states_screens/options/user_screen.cpp:363
 msgid "Internet access is disabled. Do you want to enable it?"
 msgstr "網路存取已停用。您想要啟用它嗎？"
 
-#: src/states_screens/options/user_screen.cpp:538
+#: src/states_screens/options/user_screen.cpp:556
 msgid "You need to enter a password."
 msgstr "您必須輸入密碼。"
 
-#: src/states_screens/options/user_screen.cpp:559
+#: src/states_screens/options/user_screen.cpp:577
 #, c-format
 msgid "Logging out '%s'"
 msgstr "正在登出「%s」"
 
-#: src/states_screens/options/user_screen.cpp:560
+#: src/states_screens/options/user_screen.cpp:578
 #, c-format
 msgid "Logging in '%s'"
 msgstr "正在登入「%s」"
 
-#: src/states_screens/options/user_screen.cpp:641
+#: src/states_screens/options/user_screen.cpp:659
 msgid "You can't delete the only player."
 msgstr "您無法刪除僅有的玩家。"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:649
+#: src/states_screens/options/user_screen.cpp:667
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr "您確定要刪除玩家 %s 嗎？"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:66
+#: src/states_screens/race_gui_base.cpp:68
 msgid "Ready!"
 msgstr "就位！"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:68
+#: src/states_screens/race_gui_base.cpp:70
 msgid "Set!"
 msgstr "預備！"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:72
 msgid "Go!"
 msgstr "衝啊！"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:72
+#: src/states_screens/race_gui_base.cpp:74
 msgid "GOAL!"
 msgstr "得分！"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:75
-#: src/states_screens/race_result_gui.cpp:268
+#: src/states_screens/race_gui_base.cpp:77
+#: src/states_screens/race_result_gui.cpp:271
 msgid "Waiting for others"
 msgstr "等待其他人中"
 
+#. I18N: Shown waiting for the server in network if live join or specatate
+#: src/states_screens/race_gui_base.cpp:79
+msgid "Waiting for the server"
+msgstr "正在等待伺服器"
+
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:556
+#: src/states_screens/race_gui_base.cpp:570
 msgid "by"
 msgstr "作者"
 
-#: src/states_screens/race_gui_base.cpp:661
+#: src/states_screens/race_gui_base.cpp:678
 msgid "Collect nitro!"
 msgstr "收集氮氣罐！"
 
-#: src/states_screens/race_gui_base.cpp:663
+#: src/states_screens/race_gui_base.cpp:680
 msgid "Follow the leader!"
 msgstr "緊隨領隊！"
 
-#: src/states_screens/race_gui_base.cpp:836
+#: src/states_screens/race_gui_base.cpp:864
 #, c-format
 msgid "Top %i"
 msgstr "前 %i 名"
 
-#: src/states_screens/race_gui.cpp:440 src/states_screens/race_gui.cpp:442
+#: src/states_screens/race_gui.cpp:394 src/states_screens/race_gui.cpp:396
 msgid "Challenge Failed"
 msgstr "挑戰失敗"
 
-#. I18N: Shown at the end of a race
-#: src/states_screens/race_gui_overworld.cpp:147
-msgid "Lap"
-msgstr "圈"
-
-#: src/states_screens/race_gui_overworld.cpp:559
+#: src/states_screens/race_gui_overworld.cpp:504
 msgid "Press fire to start the tutorial"
 msgstr "按「射擊鍵」開始遊戲教學"
 
-#: src/states_screens/race_gui_overworld.cpp:598
-msgid "Type: Grand Prix"
-msgstr "類型：大獎賽"
-
-#: src/states_screens/race_gui_overworld.cpp:635
+#: src/states_screens/race_gui_overworld.cpp:575
 msgid "Press fire to start the challenge"
 msgstr "請按「射擊」開始這場挑戰"
 
-#: src/states_screens/race_result_gui.cpp:176
+#: src/states_screens/race_result_gui.cpp:177
 msgid "Quit the server"
 msgstr "離開伺服器"
 
-#: src/states_screens/race_result_gui.cpp:187
+#: src/states_screens/race_result_gui.cpp:190
 msgid "You completed challenges!"
 msgstr "你完成了挑戰！"
 
-#: src/states_screens/race_result_gui.cpp:203
+#: src/states_screens/race_result_gui.cpp:206
 msgid "Abort Grand Prix"
 msgstr "放棄大獎賽"
 
-#: src/states_screens/race_result_gui.cpp:219
+#: src/states_screens/race_result_gui.cpp:222
 msgid "Restart"
 msgstr "重新開始"
 
-#: src/states_screens/race_result_gui.cpp:225
+#: src/states_screens/race_result_gui.cpp:228
 msgid "Back to challenge selection"
 msgstr "回到挑戰選擇"
 
-#: src/states_screens/race_result_gui.cpp:230
+#: src/states_screens/race_result_gui.cpp:233
 msgid "Race against the new ghost replay"
 msgstr "與新的重播錄像一起比賽"
 
-#: src/states_screens/race_result_gui.cpp:234
+#: src/states_screens/race_result_gui.cpp:237
 msgid "Back to the menu"
 msgstr "回到選單"
 
-#: src/states_screens/race_result_gui.cpp:379
+#: src/states_screens/race_result_gui.cpp:385
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "你真的想放棄大獎賽？"
 
-#: src/states_screens/race_result_gui.cpp:464
+#: src/states_screens/race_result_gui.cpp:470
 msgid "Network grand prix has been finished."
 msgstr "已經完成了網路大獎賽。"
 
-#: src/states_screens/race_result_gui.cpp:497
-#: src/states_screens/race_result_gui.cpp:1231
+#: src/states_screens/race_result_gui.cpp:506
+#: src/states_screens/race_result_gui.cpp:1253
 msgid "Red Team Wins"
 msgstr "紅隊贏了"
 
-#: src/states_screens/race_result_gui.cpp:499
-#: src/states_screens/race_result_gui.cpp:1235
+#: src/states_screens/race_result_gui.cpp:508
+#: src/states_screens/race_result_gui.cpp:1257
 msgid "Blue Team Wins"
 msgstr "藍隊贏了"
 
-#: src/states_screens/race_result_gui.cpp:501
-#: src/states_screens/race_result_gui.cpp:1240
+#: src/states_screens/race_result_gui.cpp:510
+#: src/states_screens/race_result_gui.cpp:1262
 msgid "It's a draw"
 msgstr "平手"
 
-#: src/states_screens/race_result_gui.cpp:563
-#: src/states_screens/race_result_gui.cpp:602
-#: src/states_screens/race_result_gui.cpp:700
-#: src/states_screens/race_result_gui.cpp:1084
+#: src/states_screens/race_result_gui.cpp:714
+#: src/states_screens/race_result_gui.cpp:1106
 msgid "Eliminated"
 msgstr "被淘汰"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1311
-#: src/states_screens/race_result_gui.cpp:1360
+#: src/states_screens/race_result_gui.cpp:1328
+#: src/states_screens/race_result_gui.cpp:1378
 msgid "(Own Goal)"
 msgstr "（烏龍球）"
 
-#: src/states_screens/race_result_gui.cpp:1426
+#: src/states_screens/race_result_gui.cpp:1448
 #, c-format
 msgid "Track %i/%i"
 msgstr "賽道 %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1510
+#: src/states_screens/race_result_gui.cpp:1532
 msgid "Grand Prix progress:"
 msgstr "大獎賽進度："
 
-#: src/states_screens/race_result_gui.cpp:1554
+#: src/states_screens/race_result_gui.cpp:1576
 msgid "Highscores"
 msgstr "最高分數"
 
-#: src/states_screens/race_result_gui.cpp:1648
+#: src/states_screens/race_result_gui.cpp:1674
 #, c-format
 msgid "Best lap time: %s"
 msgstr "最佳單圈成績：%s"
+
+#. I18N: is used to indicate who has the bast laptime (best laptime "by
+#. kart_name")
+#: src/states_screens/race_result_gui.cpp:1686
+#, c-format
+msgid "by %s"
+msgstr "由 %s"
 
 #: src/states_screens/race_setup_screen.cpp:87
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -5244,31 +5533,31 @@ msgstr "沒有道具，所以您只能靠您的賽車技巧了！"
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "緊跟著領隊，但別超過他！"
 
-#: src/states_screens/race_setup_screen.cpp:114
+#: src/states_screens/race_setup_screen.cpp:113
 msgid "Hit others with weapons until they lose all their lives."
 msgstr "利用武器攻擊對手，直到他們掛掉。"
 
-#: src/states_screens/race_setup_screen.cpp:119
+#: src/states_screens/race_setup_screen.cpp:118
 msgid "Push the ball into the opposite cage to score goals."
 msgstr "將球推到對面的球門來得分。"
 
-#: src/states_screens/race_setup_screen.cpp:129
+#: src/states_screens/race_setup_screen.cpp:128
 msgid "Explore tracks to find all hidden eggs"
 msgstr "探索賽道來找到所有隱藏的復活節彩蛋"
 
-#: src/states_screens/race_setup_screen.cpp:137
+#: src/states_screens/race_setup_screen.cpp:136
 msgid "Race against ghost karts and try to beat them!"
 msgstr "和錄像賽車比賽並嘗試擊敗它們！"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:108
+#: src/states_screens/track_info_screen.cpp:129
 #, c-format
 msgid "Track by %s"
 msgstr "賽道作者：%s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:116
+#: src/states_screens/track_info_screen.cpp:137
 #, c-format
 msgid "Max players supported: %d"
 msgstr "最大玩家支持數目：%d"
@@ -5285,14 +5574,14 @@ msgstr "已鎖定！"
 #. I18N: Format for dates (%d = day, %m = month, %Y = year). See
 #. http://www.cplusplus.com/reference/ctime/strftime/ for more info about date
 #. formats.
-#: src/utils/time.cpp:50
+#: src/utils/time.cpp:52
 msgid "%d/%m/%Y"
 msgstr "%d/%m/%Y"
 
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:409
+#: src/utils/translation.cpp:494
 msgid "   Is this a RTL language?"
 msgstr "   N"
 

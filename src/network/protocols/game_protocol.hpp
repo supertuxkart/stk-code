@@ -27,7 +27,7 @@
 #include "utils/singleton.hpp"
 
 #include <cstdlib>
-#include <map>
+#include <mutex>
 #include <vector>
 #include <tuple>
 
@@ -39,6 +39,9 @@ class GameProtocol : public Protocol
                    , public EventRewinder
 {
 private:
+    /* Used to check if deleting world is doing at the same the for
+     * asynchronous event update. */
+    mutable std::mutex m_world_deleting_mutex;
 
     /** The type of game events to be forwarded to the server. */
     enum { GP_CONTROLLER_ACTION,
@@ -75,8 +78,6 @@ private:
     void handleAdjustTime(Event *event);
     void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
-    std::map<STKPeer*, int> m_initial_ticks;
-    std::map<STKPeer*, double> m_last_adjustments;
     // Maximum value of values are only 32768
     std::tuple<uint8_t, uint16_t, uint16_t, uint16_t>
                                                 compressAction(const Action& a)
@@ -112,7 +113,6 @@ public:
     void addState(BareNetworkString *buffer);
     void sendState();
     void finalizeState(std::vector<std::string>& cur_rewinder);
-    void adjustTimeForClient(STKPeer *peer, int ticks);
     void sendItemEventConfirmation(int ticks);
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
@@ -137,7 +137,8 @@ public:
     /** Returns the NetworkString in which a state was saved. */
     NetworkString* getState() const { return m_data_to_send;  }
     // ------------------------------------------------------------------------
-    void addInitialTicks(STKPeer* p, int ticks);
+    std::unique_lock<std::mutex> acquireWorldDeletingMutex() const
+               { return std::unique_lock<std::mutex>(m_world_deleting_mutex); }
 
 };   // class GameProtocol
 

@@ -29,49 +29,77 @@ namespace CompressNetworkBody
 {
     using namespace MiniGLM;
     // ------------------------------------------------------------------------
-    inline void compress(btTransform t, const Vec3& lv, const Vec3& av,
-                         BareNetworkString* bns, btRigidBody* body,
-                         btMotionState* ms)
+    /** Set body and motion state of bullet object with compressed values. */
+    inline void setCompressedValues(float x, float y, float z,
+                                    uint32_t compressed_q,
+                                    short lvx, short lvy, short lvz,
+                                    short avx, short avy, short avz,
+                                    btRigidBody* body, btMotionState* ms)
     {
-        bns->add(t.getOrigin());
-        uint32_t compressed_q = compressQuaternion(t.getRotation());
-        bns->addUInt32(compressed_q);
-        std::array<short, 3> lvs =
-            {{ toFloat16(lv.x()), toFloat16(lv.y()), toFloat16(lv.z()) }};
-        bns->addUInt16(lvs[0]).addUInt16(lvs[1]).addUInt16(lvs[2]);
-        std::array<short, 3> avs =
-            {{ toFloat16(av.x()), toFloat16(av.y()), toFloat16(av.z()) }};
-        bns->addUInt16(avs[0]).addUInt16(avs[1]).addUInt16(avs[2]);
+        btTransform trans;
+        trans.setOrigin(btVector3(x,y,z));
+        trans.setRotation(decompressbtQuaternion(compressed_q));
+        btVector3 lv(toFloat32(lvx), toFloat32(lvy), toFloat32(lvz));
+        btVector3 av(toFloat32(avx), toFloat32(avy), toFloat32(avz));
 
-        btQuaternion uncompressed_q = decompressbtQuaternion(compressed_q);
-        t.setRotation(uncompressed_q);
-        Vec3 uncompressed_lv(toFloat32(lvs[0]), toFloat32(lvs[1]),
-            toFloat32(lvs[2]));
-        Vec3 uncompressed_av(toFloat32(avs[0]), toFloat32(avs[1]),
-            toFloat32(avs[2]));
-        body->setWorldTransform(t);
-        ms->setWorldTransform(t);
-        body->setInterpolationWorldTransform(t);
-        body->setLinearVelocity(uncompressed_lv);
-        body->setAngularVelocity(uncompressed_av);
-        body->setInterpolationLinearVelocity(uncompressed_lv);
-        body->setInterpolationAngularVelocity(uncompressed_av);
+        body->setWorldTransform(trans);
+        ms->setWorldTransform(trans);
+        body->setInterpolationWorldTransform(trans);
+        body->setLinearVelocity(lv);
+        body->setAngularVelocity(av);
+        body->setInterpolationLinearVelocity(lv);
+        body->setInterpolationAngularVelocity(av);
+        body->updateInertiaTensor();
+    }   // setCompressedValues
+    // ------------------------------------------------------------------------
+    /** Compress transformation and velocities of bullet object, it will
+     *  call MiniGLM::compressQuaternion for compress quaternion of
+     *  transformation and convert linear and angular velocities to half floats
+     *  it can be used by client to locally round values to make sure client
+     *  and server have similar state when saving state if you don't provoide
+     *  bns.
+     */
+    inline void compress(btRigidBody* body, btMotionState* ms,
+                         BareNetworkString* bns = NULL)
+    {
+        float x = body->getWorldTransform().getOrigin().x();
+        float y = body->getWorldTransform().getOrigin().y();
+        float z = body->getWorldTransform().getOrigin().z();
+        uint32_t compressed_q =
+            compressQuaternion(body->getWorldTransform().getRotation());
+        short lvx = toFloat16(body->getLinearVelocity().x());
+        short lvy = toFloat16(body->getLinearVelocity().y());
+        short lvz = toFloat16(body->getLinearVelocity().z());
+        short avx = toFloat16(body->getAngularVelocity().x());
+        short avy = toFloat16(body->getAngularVelocity().y());
+        short avz = toFloat16(body->getAngularVelocity().z());
+        setCompressedValues(x, y, z, compressed_q, lvx, lvy, lvz, avx, avy,
+            avz, body, ms);
+        // if bns is null, it's locally compress (for rounding values)
+        if (!bns)
+            return;
+
+        bns->addFloat(x).addFloat(y).addFloat(z).addUInt32(compressed_q);
+        bns->addUInt16(lvx).addUInt16(lvy).addUInt16(lvz)
+            .addUInt16(avx).addUInt16(avy).addUInt16(avz);
     }   // compress
     // ------------------------------------------------------------------------
-    inline void decompress(const BareNetworkString* bns, btTransform* t,
-                           Vec3* lv, Vec3* av)
+    /* Called during rewind when restoring data from game state. */
+    inline void decompress(const BareNetworkString* bns,
+                           btRigidBody* body, btMotionState* ms)
     {
-        t->setOrigin(bns->getVec3());
-        t->setRotation(decompressbtQuaternion(bns->getUInt32()));
-        short vec[3];
-        vec[0] = bns->getUInt16();
-        vec[1] = bns->getUInt16();
-        vec[2] = bns->getUInt16();
-        *lv = Vec3(toFloat32(vec[0]), toFloat32(vec[1]), toFloat32(vec[2]));
-        vec[0] = bns->getUInt16();
-        vec[1] = bns->getUInt16();
-        vec[2] = bns->getUInt16();
-        *av = Vec3(toFloat32(vec[0]), toFloat32(vec[1]), toFloat32(vec[2]));
+        float x = bns->getFloat();
+        float y = bns->getFloat();
+        float z = bns->getFloat();
+        uint32_t compressed_q = bns->getUInt32();
+        short lvx = bns->getUInt16();
+        short lvy = bns->getUInt16();
+        short lvz = bns->getUInt16();
+        short avx = bns->getUInt16();
+        short avy = bns->getUInt16();
+        short avz = bns->getUInt16();
+        setCompressedValues(x, y, z, compressed_q, lvx, lvy, lvz, avx, avy,
+            avz, body, ms);
     }   // decompress
 };
 

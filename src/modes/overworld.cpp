@@ -264,7 +264,7 @@ void OverWorld::onFirePressed(Controller* who)
 #endif
                 bool unlocked = enough_challenges && (PlayerManager::getCurrentPlayer()->getPoints() >= val);
                 
-                if (UserConfigParams::m_everything_unlocked)
+                if (UserConfigParams::m_unlock_everything > 0)
                     unlocked = true;
 
                 if (unlocked)

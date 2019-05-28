@@ -188,9 +188,13 @@ private:
     /** Non-null only if the shape is exact */
     TriangleMesh         *m_triangle_mesh;
 
+    /* Last transform and velocities recieved or saved for networking */
     btTransform           m_last_transform;
     Vec3                  m_last_lv;
     Vec3                  m_last_av;
+
+    /* Used to determine if local state should be used, which is true
+     * when the object is not moving */
     bool                  m_no_server_state;
 
 public:
@@ -220,9 +224,10 @@ public:
     /** Returns the ID of this physical object. */
     std::string getID()          { return m_id; }
     // ------------------------------------------------------------------------
+    btDefaultMotionState* getMotionState() const { return m_motion_state; }
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
-    btRigidBody *getBody        ()          { return m_body; }
+    btRigidBody* getBody() const  { return m_body; }
     // ------------------------------------------------------------------------
     /** Returns true if this object should trigger a rescue in a kart that
      *  hits it. */
@@ -286,6 +291,8 @@ public:
     virtual void restoreState(BareNetworkString *buffer, int count);
     virtual void undoState(BareNetworkString *buffer) {}
     virtual std::function<void()> getLocalStateRestoreFunction();
+    bool hasTriangleMesh() const { return m_triangle_mesh != NULL; }
+    void joinToMainTrack();
     LEAK_CHECK()
 };  // PhysicalObject
 

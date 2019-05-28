@@ -3,22 +3,22 @@
     <unlock_list list="false"/>
     <track id="hacienda" laps="3" reverse="false"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="25"/>
+    <requirements trophies="0"/>
     
     <best>
-        <karts number="8"/>
-        <requirements position="1" time="130"/>
+        <karts number="7"/>
+        <requirements position="1" time="124"/>
     </best>
     <hard>
-        <karts number="7"/>
-        <requirements position="1" time="160"/>
+        <karts number="6"/>
+        <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="6"/>
-        <requirements position="2" time="187"/>
+        <karts number="5"/>
+        <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="5"/>
-        <requirements position="2"/>
+        <karts number="4"/>
+        <requirements position="1"/>
     </easy>
 </challenge>

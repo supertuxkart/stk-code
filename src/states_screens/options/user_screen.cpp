@@ -22,6 +22,8 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -34,6 +36,7 @@
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
@@ -96,12 +99,22 @@ void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
 }   // setOnline
 
 // ----------------------------------------------------------------------------
+void BaseUserScreen::beforeAddingWidget()
+{
+}   // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
 /** Initialises the user screen. Searches for all players to fill the 
  *  list of users with their icons, and initialises all widgets for the
  *  current user (e.g. the online flag etc).
  */
 void BaseUserScreen::init()
 {
+#ifndef SERVER_ONLY
+    getWidget<IconButtonWidget>("default_kart_color")
+        ->setVisible(CVS->isGLSL());
+#endif
+
     m_password_tb->setPasswordBox(true, L'*');
 
     // The behaviour of the screen is slightly different at startup, i.e.
@@ -155,7 +168,8 @@ void BaseUserScreen::init()
     getWidget<IconButtonWidget>("new_user")->setActive(!in_game);
     getWidget<IconButtonWidget>("rename")->setActive(!in_game);
     getWidget<IconButtonWidget>("delete")->setActive(!in_game);
-    getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
+    if (getWidget<IconButtonWidget>("default_kart_color")->isVisible())
+        getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
 
     m_new_registered_data = false;
     if (m_auto_login)
@@ -192,7 +206,9 @@ EventPropagation BaseUserScreen::filterActions(PlayerAction action,
     Input::InputType type,
     int playerId)
 {
-    if (action == PA_MENU_SELECT)
+    if (action == PA_MENU_SELECT &&
+        (!ScreenKeyboard::shouldUseScreenKeyboard() ||
+        GUIEngine::getDevice()->hasOnScreenKeyboard()))
     {
         if ((m_username_tb != NULL && m_username_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
@@ -244,7 +260,11 @@ void BaseUserScreen::selectUser(int index)
     }
 
     // Now last use was with online --> Display the saved data
-    m_online_cb->setState(true);
+    if (UserConfigParams::m_internet_status == Online::RequestManager::IPERM_NOT_ALLOWED)
+        m_online_cb->setState(false);
+    else
+        m_online_cb->setState(true);
+
     makeEntryFieldsVisible();
     m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
@@ -736,6 +756,8 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
             screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_general")
+            screen = OptionsScreenGeneral::getInstance();
         else if (selection == "tab_language")
             screen = OptionsScreenLanguage::getInstance();
         if(screen)

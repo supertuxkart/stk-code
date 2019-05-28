@@ -17,15 +17,17 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
+#include "utils/utf8/unchecked.h"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
+#include <IrrlichtDevice.h>
 
 using namespace irr;
 
@@ -52,31 +54,41 @@ public:
         m_listeners.clearWithoutDeleting();
     }
 
+    void handleTextUpdated()
+    {
+        for (unsigned n = 0; n < m_listeners.size(); n++)
+            m_listeners[n].onTextUpdated();
+    }
+
+    bool handleEnterPressed()
+    {
+        bool handled = false;
+        for (unsigned n = 0; n < m_listeners.size(); n++)
+        {
+            if (m_listeners[n].onEnterPressed(Text))
+            {
+                handled = true;
+                Text = L"";
+                CursorPos = MarkBegin = MarkEnd = 0;
+            }
+        }
+        return handled;
+    }
+
     virtual bool OnEvent(const SEvent& event)
     {
         bool out = CGUIEditBox::OnEvent(event);
 
-        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
-        {
-            for (unsigned int n=0; n<m_listeners.size(); n++)
-            {
-                m_listeners[n].onTextUpdated();
-            }
-        }
-        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.Key == IRR_KEY_RETURN)
-        {
-            for (unsigned int n=0; n<m_listeners.size(); n++)
-            {
-                if (m_listeners[n].onEnterPressed(Text))
-                {
-                    Text = L"";
-                    CursorPos = 0;
-                }
-            }
-        }
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.PressedDown)
+            handleTextUpdated();
+
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.Key == IRR_KEY_RETURN)
+            handleEnterPressed();
+
         return out;
     }
-
 };
 
 using namespace GUIEngine;
@@ -146,6 +158,13 @@ void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
     IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
     assert(textCtrl != NULL);
     textCtrl->setPasswordBox(passwordBox, passwordChar);
+    setTextBoxType(TBT_PASSWORD);
+}
+
+// -----------------------------------------------------------------------------
+void TextBoxWidget::setTextBoxType(TextBoxType t)
+{
+    ((MyCGUIEditBox*)m_element)->setTextBoxType(t);
 }
 
 // -----------------------------------------------------------------------------
@@ -197,3 +216,143 @@ void TextBoxWidget::setActive(bool active)
 }   // setActive
 
 // -----------------------------------------------------------------------------
+
+EventPropagation TextBoxWidget::onActivationInput(const int playerID)
+{
+    if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
+    {
+        ((MyCGUIEditBox*)m_element)->openScreenKeyboard();
+    }
+
+    // The onWidgetActivated() wasn't used at all before, so always block
+    // event to avoid breaking something
+    return EVENT_BLOCK;
+}
+
+// -----------------------------------------------------------------------------
+EventPropagation TextBoxWidget::rightPressed(const int playerID)
+{
+    if (((MyCGUIEditBox*)m_element)->getTextCount() ==
+        ((MyCGUIEditBox*)m_element)->getCursorPosInBox())
+        return EVENT_BLOCK;
+
+    return EVENT_LET;
+}   // rightPressed
+
+// -----------------------------------------------------------------------------
+EventPropagation TextBoxWidget::leftPressed (const int playerID)
+{
+    if (((MyCGUIEditBox*)m_element)->getCursorPosInBox() == 0)
+        return EVENT_BLOCK;
+
+    return EVENT_LET;
+}   // leftPressed
+
+// ============================================================================
+/* This callback will allow copying android edittext data directly to editbox,
+ * which will allow composing text to be auto updated. */
+#ifdef ANDROID
+#include "jni.h"
+
+#if !defined(ANDROID_PACKAGE_CALLBACK_NAME)
+    #error
+#endif
+
+#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jobject this_obj, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end)
+#define ANDROID_EDITTEXT_CALLBACK(PKG_NAME) MAKE_EDITTEXT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    if (text == NULL)
+        return;
+
+    const char* utf8_text = env->GetStringUTFChars(text, NULL);
+    if (utf8_text == NULL)
+        return;
+
+    // Use utf32 for emoji later
+    static_assert(sizeof(wchar_t) == sizeof(uint32_t), "Invalid wchar size");
+    std::vector<wchar_t> utf32line;
+    utf8::unchecked::utf8to32(utf8_text, utf8_text + strlen(utf8_text),
+        back_inserter(utf32line));
+    utf32line.push_back(0);
+
+    core::stringw to_editbox(&utf32line[0]);
+    env->ReleaseStringUTFChars(text, utf8_text);
+
+    GUIEngine::addGUIFunctionBeforeRendering([widget_id, to_editbox, start,
+        end, composing_start, composing_end]()
+        {
+            TextBoxWidget* tb =
+                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
+            if (!tb || (int)widget_id != tb->getID())
+                return;
+            MyCGUIEditBox* eb = tb->getIrrlichtElement<MyCGUIEditBox>();
+            if (!eb)
+                return;
+            core::stringw old_text = eb->getText();
+            eb->fromAndroidEditText(to_editbox, start, end, composing_start,
+                composing_end);
+            if (old_text != eb->getText())
+                eb->handleTextUpdated();
+        });
+}
+
+#define MAKE_HANDLE_ACTION_NEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleActionNext(JNIEnv* env, jobject this_obj, jint widget_id)
+#define ANDROID_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME) MAKE_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    GUIEngine::addGUIFunctionBeforeRendering([widget_id]()
+        {
+            TextBoxWidget* tb =
+                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
+            if (!tb || (int)widget_id != tb->getID())
+                return;
+            MyCGUIEditBox* eb = tb->getIrrlichtElement<MyCGUIEditBox>();
+            if (!eb)
+                return;
+
+            // First test for onEnterPressed, if true then close keyboard
+            if (eb->handleEnterPressed())
+            {
+                // Clear text like onEnterPressed callback
+                GUIEngine::getDevice()->toggleOnScreenKeyboard(false,
+                    1/*clear_text*/);
+                return;
+            }
+
+            // As it's action "next", check if below widget is a text box, if
+            // so focus it and keep the screen keyboard, so user can keep
+            // typing
+            int id = GUIEngine::EventHandler::get()->findIDClosestWidget(
+                NAV_DOWN, 0, tb, true/*ignore_disabled*/);
+            TextBoxWidget* closest_tb = NULL;
+            if (id != -1)
+            {
+                closest_tb =
+                    dynamic_cast<TextBoxWidget*>(GUIEngine::getWidget(id));
+            }
+
+            if (closest_tb)
+            {
+                closest_tb->setFocusForPlayer(0);
+            }
+            else
+            {
+                // Post an enter event and close the keyboard
+                SEvent enter_event;
+                enter_event.EventType = EET_KEY_INPUT_EVENT;
+                enter_event.KeyInput.Char = 0;
+                enter_event.KeyInput.PressedDown = true;
+                enter_event.KeyInput.Key = IRR_KEY_RETURN;
+                GUIEngine::getDevice()->postEventFromUser(enter_event);
+                enter_event.KeyInput.PressedDown = false;
+                GUIEngine::getDevice()->postEventFromUser(enter_event);
+                GUIEngine::getDevice()->toggleOnScreenKeyboard(false);
+            }
+        });
+}
+#endif

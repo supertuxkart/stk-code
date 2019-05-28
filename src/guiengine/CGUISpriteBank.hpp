@@ -69,6 +69,9 @@ public:
 
     void scaleToHeight(int height);
 
+    void setTargetIconSize(int width, int height)
+                    { m_target_icon_size = core::dimension2du(width, height); }
+
 protected:
 
     // this object was getting access after being freed, I wanna see when/why
@@ -84,6 +87,7 @@ protected:
         u32 textureNumber;
     };
 
+    core::dimension2du m_target_icon_size;
     //FIXME: ugly hack to work around irrLicht limitations, see STKModifiedSpriteBank::getPositions()
     // for all the gory details.
     core::array< core::rect<s32> > copy;

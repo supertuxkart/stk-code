@@ -20,12 +20,17 @@
 #include "CContextEGL.h"
 #include "CImage.h"
 #include "os.h"
+#include "IrrlichtDevice.h"
 
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
 #include <GLES2/gl2.h>
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#include "CIrrDeviceWayland.h"
 #endif
 
 namespace irr
@@ -39,6 +44,8 @@ namespace video
 			const SExposedVideoData& data, io::IFileSystem* io
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 			, CIrrDeviceIPhone* device
+#else
+			, IrrlichtDevice* device
 #endif
 	)
 		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
@@ -138,6 +145,7 @@ namespace video
 
         genericDriverInit(WindowSize, params.Stencilbuffer);
 #endif
+		m_device = device;
 	}
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
@@ -153,6 +161,7 @@ namespace video
 		EglContext = device->getEGLContext();
 		EglContextExternal = true;
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
+		m_device = device;
 	}
 #endif
 				  
@@ -438,7 +447,7 @@ namespace video
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA, this));
 
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_ONETEXTURE_BLEND, this));
-		
+		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_STK_GRASS, this));
 		delete[] FPVSData;
 		delete[] FPFSData;
 		delete[] NMVSData;
@@ -828,6 +837,16 @@ namespace video
 		drawVertexPrimitiveList2d3d(vertices, vertexCount, (const u16*)indexList, primitiveCount, vType, pType, iType);
 	}
 
+	void COGLES2Driver::draw2DVertexPrimitiveList(const void* vertices,
+		u32 vertexCount, const void* indexList, u32 primitiveCount,
+		E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, E_INDEX_TYPE iType)
+    {
+		testGLError();
+		if (!checkPrimitiveCount(primitiveCount))
+			return;
+		setRenderStates2DMode(Material.MaterialType==EMT_TRANSPARENT_VERTEX_ALPHA, (Material.getTexture(0) != 0), Material.MaterialType==EMT_TRANSPARENT_ALPHA_CHANNEL);
+		drawVertexPrimitiveList2d3d(vertices, vertexCount, (const u16*)indexList, primitiveCount, vType, pType, iType, false);
+    }
 
 	void COGLES2Driver::drawVertexPrimitiveList2d3d(const void* vertices, u32 vertexCount,
 			const void* indexList, u32 primitiveCount,
@@ -1375,8 +1394,9 @@ namespace video
 
 			glEnable(GL_SCISSOR_TEST);
 			const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
-			glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
-					clipRect->getWidth(), clipRect->getHeight());
+			glScissor(clipRect->UpperLeftCorner.X,
+				(s32)renderTargetSize.Height - clipRect->LowerRightCorner.Y + m_device->getMovedHeight(),
+				clipRect->getWidth(), clipRect->getHeight());
 		}
 
 		u16 indices[] = {0, 1, 2, 3};
@@ -1416,8 +1436,9 @@ namespace video
 
 			glEnable(GL_SCISSOR_TEST);
 			const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
-			glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
-					clipRect->getWidth(), clipRect->getHeight());
+			glScissor(clipRect->UpperLeftCorner.X,
+				(s32)renderTargetSize.Height - clipRect->LowerRightCorner.Y + m_device->getMovedHeight(),
+				clipRect->getWidth(), clipRect->getHeight());
 		}
 
 		const core::dimension2du& ss = texture->getSize();
@@ -2894,10 +2915,10 @@ namespace video
 // #if defined(__EMSCRIPTEN__) || !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
 #ifdef __EMSCRIPTEN__
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			video::SExposedVideoData& data, io::IFileSystem* io)
+			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device)
 	{
 #ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, data, io);
+		return new COGLES2Driver(params, data, io, device);
 #else
 		return 0;
 #endif // _IRR_COMPILE_WITH_OGLES2_

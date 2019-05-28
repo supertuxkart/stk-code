@@ -59,6 +59,9 @@ CheckSphere::CheckSphere(const XMLNode &node, unsigned int index)
 bool CheckSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                               int kart_id)
 {
+    // kart_id will be -1 if called by CheckManager::getChecklineTriggering
+    if (kart_id < 0 || kart_id >= (int)m_is_inside.size())
+        return false;
     float old_dist2   = (old_pos-m_center_point).length2();
     float new_dist2   = (new_pos-m_center_point).length2();
     m_is_inside[kart_id] = new_dist2<m_radius2;

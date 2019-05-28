@@ -85,12 +85,19 @@ const std::string& StandardRace::getIdent() const
  *  as well as being placed at the back. Players that already finished keep
  *  their position.
  *
- *  End time for the punished players is calculated as follows
+ *  End time for the punished players is calculated as follows :
+ *
+ *  1) Intended for races without auto-end where a finish before all
+ *     karts arrived means a player abandoned.
  *  end_time = current_time + (estimated_time - current_time)
  *                          + (estimated_time_for_last - current_time)
  *           = estimated_time + estimated_time_for_last - current_time
  *  This will put them at the end at all times. The further you (and the last in
  *  the race) are from the finish line, the harsher the punishment will be.
+ *
+ *  2) When there is no AI. Intended for online races with auto-end.
+ *  end_time = current_time + 2*(estimated_time - current_time)
+ *           = 2*estimated_time - current_time
  */
 void StandardRace::endRaceEarly()
 {
@@ -140,8 +147,14 @@ void StandardRace::endRaceEarly()
         int kartid = active_players[i];
         int position = getNumKarts() - (int) active_players.size() + 1 + i;
         setKartPosition(kartid, position);
-        float punished_time = estimateFinishTimeForKart(m_karts[kartid].get())
-                              + worse_finish_time - WorldStatus::getTime();
+        // Compute the finish time, with a different formula for networked races
+        // to avoid making auto-end too punishing
+        float punished_time = estimateFinishTimeForKart(m_karts[kartid].get());
+        if (!isNetworkWorld())
+            punished_time += worse_finish_time - WorldStatus::getTime();
+        else
+            punished_time = (punished_time * 2) - WorldStatus::getTime();
+
         m_karts[kartid]->finishedRace(punished_time);
 
         // In networked races, endRaceEarly will be called if a player

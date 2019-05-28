@@ -30,6 +30,7 @@
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -181,7 +182,9 @@ void RaceResultGUI::enableAllButtons()
     // If something was unlocked
     // -------------------------
     int n = (int)PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
-    if (n > 0)
+    if (n > 0 &&
+         (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+          race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
     {
         top->setText(n == 1 ? _("You completed a challenge!")
             : _("You completed challenges!"));
@@ -288,7 +291,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // ---------------------------------------------------------
     int n = (int)PlayerManager::getCurrentPlayer()
         ->getRecentlyCompletedChallenges().size();
-    if (n>0)
+    if (n > 0 &&
+         (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+          race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
+
     {
         if (name == "top")
         {
@@ -468,10 +474,13 @@ void RaceResultGUI::backToLobby()
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
     GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ScreenKeyboard::dismiss();
     cleanupGPProgress();
-    StateManager::get()->resetAndSetStack(
-        NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
-    NetworkingLobby::getInstance()->addMoreServerInfo(L"--------------------");
+    if (GUIEngine::getCurrentScreen() != NetworkingLobby::getInstance())
+    {
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    }
 }   // backToLobby
 
 //-----------------------------------------------------------------------------
@@ -560,7 +569,7 @@ void RaceResultGUI::displayCTFResults()
         result_text.append("  ");
         if (kart->isEliminated())
         {
-            result_text.append(_("Eliminated"));
+            continue;
         }
         else
         {
@@ -599,7 +608,7 @@ void RaceResultGUI::displayCTFResults()
         result_text.append("  ");
         if (kart->isEliminated())
         {
-            result_text.append(_("Eliminated"));
+            continue;
         }
         else
         {
@@ -666,6 +675,8 @@ void RaceResultGUI::displayCTFResults()
         // ignore e.g. the leader in a FTL race).
         unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1 - sta;
 
+        // Remove previous entries to avoid reserved kart in network being displayed
+        m_all_row_infos.clear();
         // In FTL races the leader kart is not displayed
         m_all_row_infos.resize(num_karts);
 
@@ -678,12 +689,15 @@ void RaceResultGUI::displayCTFResults()
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
 
         int time_precision = race_manager->currentModeTimePrecision();
+        bool active_gp = (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX);
 
         for (unsigned int position = first_position;
         position <= race_manager->getNumberOfKarts() - sta; position++)
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
+            if (ffa && kart->isEliminated())
+                continue;
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
@@ -699,8 +713,8 @@ void RaceResultGUI::displayCTFResults()
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
-            else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_FREE_FOR_ALL ||
-                race_manager->getMajorMode() == RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+            else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+                race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
             {
                 assert(ffa);
                 ri->m_finish_time_string =
@@ -720,7 +734,7 @@ void RaceResultGUI::displayCTFResults()
                 m_width_kart_name = rect.Width;
         }   // for position
 
-        std::string max_time = StringUtils::timeToString(max_finish_time, time_precision);
+        std::string max_time = StringUtils::timeToString(max_finish_time, time_precision, true, /*display hours*/ active_gp);
         core::stringw string_max_time(max_time.c_str());
         core::dimension2du r = m_font->getDimension(string_max_time.c_str());
         m_width_finish_time = r.Width;
@@ -754,6 +768,7 @@ void RaceResultGUI::displayCTFResults()
         // Determine text height
         r = m_font->getDimension(L"Y");
         m_distance_between_rows = (int)(1.5f*r.Height);
+        m_distance_between_meta_rows = m_distance_between_rows;
 
         // If there are too many karts, reduce size between rows
         if (m_distance_between_rows * num_karts > height)
@@ -783,7 +798,7 @@ void RaceResultGUI::displayCTFResults()
             m_table_width += m_width_finish_time + m_width_column_space;
 
         // Only in GP mode are the points displayed.
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        if (active_gp)
             m_table_width += m_width_new_points + m_width_all_points
             + 2 * m_width_column_space;
 
@@ -978,8 +993,8 @@ void RaceResultGUI::displayCTFResults()
         {
             displaySoccerResults();
         }
-        else if (race_manager->getMajorMode() ==
-            RaceManager::MAJOR_MODE_CAPTURE_THE_FLAG)
+        else if (race_manager->getMinorMode() ==
+            RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             displayCTFResults();
         }
@@ -1028,9 +1043,9 @@ void RaceResultGUI::displayCTFResults()
                 }
                 case RR_RESORT_TABLE:
                     x = ri->m_x_pos
-                        - ri->m_radius*sin(m_timer / m_time_rotation*M_PI);
+                        - ri->m_radius*sinf(m_timer / m_time_rotation*M_PI);
                     y = ri->m_centre_point
-                        + ri->m_radius*cos(m_timer / m_time_rotation*M_PI);
+                        + ri->m_radius*cosf(m_timer / m_time_rotation*M_PI);
                     break;
                 case RR_WAIT_TILL_END:
                     break;
@@ -1063,6 +1078,13 @@ void RaceResultGUI::displayCTFResults()
 
         int time_precision = race_manager->currentModeTimePrecision();
 
+        float max_time = 0;
+        /* Compute highest overall time to know if hours should be displayed */
+        for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
+        {
+            max_time = std::max(race_manager->getOverallTime(kart_id), max_time);
+        }
+
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
         {
             int rank = race_manager->getKartGPRank(kart_id);
@@ -1087,7 +1109,7 @@ void RaceResultGUI::displayCTFResults()
             {
                 float time = race_manager->getOverallTime(kart_id);
                 ri->m_finish_time_string
-                    = StringUtils::timeToString(time, time_precision).c_str();
+                    = StringUtils::timeToString(time, time_precision, true, /*display hours*/ (max_time > 7199.99f)).c_str();
             }
             ri->m_start_at = m_time_between_rows * rank;
             ri->m_x_pos = (float)UserConfigParams::m_width;
@@ -1284,16 +1306,12 @@ void RaceResultGUI::displayCTFResults()
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
         std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(KART_TEAM_RED);
+
+        // Maximum 10 scorers displayed in result screen
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        std::vector<float> score_times = sw->getScoreTimes(KART_TEAM_RED);
-        while (score_times.size() > 10)
-        {
-            score_times.erase(score_times.begin());
-        }
-        irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
 
@@ -1301,8 +1319,7 @@ void RaceResultGUI::displayCTFResults()
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
-            const int kart_id = scorers.at(i).m_id;
-            result_text = sw->getKart(kart_id)->getController()->getName();
+            result_text = scorers.at(i).m_player;
 
             if (own_goal)
             {
@@ -1312,7 +1329,7 @@ void RaceResultGUI::displayCTFResults()
             }
 
             result_text.append("  ");
-            result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
+            result_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
             rect = font->getDimension(result_text.c_str());
 
             if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
@@ -1325,34 +1342,35 @@ void RaceResultGUI::displayCTFResults()
             pos = core::rect<s32>(current_x, current_y, current_x, current_y);
             font->draw(result_text, pos, (own_goal ?
                 video::SColor(255, 255, 0, 0) : color), true, false);
-            scorer_icon = sw->getKart(scorers.at(i).m_id)
-                ->getKartProperties()->getIconMaterial()->getTexture();
-            source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-            dest_rect = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
-            draw2DImage(scorer_icon, dest_rect, source_rect,
-                NULL, NULL, true);
+            irr::video::ITexture* scorer_icon = NULL;
+            const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+            if (kp)
+                scorer_icon = kp->getIconMaterial()->getTexture();
+            if (scorer_icon)
+            {
+                source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
+                irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
+                core::recti r = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
+                draw2DImage(scorer_icon, r, source_rect,
+                    NULL, NULL, true);
+            }
         }
 
         //The blue scorers:
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
         scorers = sw->getScorers(KART_TEAM_BLUE);
+
         while (scorers.size() > 10)
         {
             scorers.erase(scorers.begin());
         }
-        score_times = sw->getScoreTimes(KART_TEAM_BLUE);
-        while (score_times.size() > 10)
-        {
-            score_times.erase(score_times.begin());
-        }
+
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
-            const int kart_id = scorers.at(i).m_id;
-            result_text = sw->getKart(kart_id)->getController()->getName();
+            result_text = scorers.at(i).m_player;
 
             if (own_goal)
             {
@@ -1361,7 +1379,7 @@ void RaceResultGUI::displayCTFResults()
             }
 
             result_text.append("  ");
-            result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
+            result_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
             rect = font->getDimension(result_text.c_str());
 
             if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
@@ -1374,14 +1392,18 @@ void RaceResultGUI::displayCTFResults()
             pos = core::rect<s32>(current_x, current_y, current_x, current_y);
             font->draw(result_text, pos, (own_goal ?
                 video::SColor(255, 255, 0, 0) : color), true, false);
-            scorer_icon = sw->getKart(scorers.at(i).m_id)->
-                getKartProperties()->getIconMaterial()->getTexture();
-            source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-
-            dest_rect = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
-            draw2DImage(scorer_icon, dest_rect, source_rect,
-                NULL, NULL, true);
+            irr::video::ITexture* scorer_icon = NULL;
+            const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+            if (kp)
+                scorer_icon = kp->getIconMaterial()->getTexture();
+            if (scorer_icon)
+            {
+                source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
+                irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
+                core::recti r = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
+                draw2DImage(scorer_icon, r, source_rect,
+                    NULL, NULL, true);
+            }
         }
 #endif
     }
@@ -1582,7 +1604,7 @@ void RaceResultGUI::displayCTFResults()
                 }
 
                 int current_x = x;
-                current_y = y + (int)((i + 1) * m_distance_between_rows);
+                current_y = y + (int)((i + 1) * m_distance_between_meta_rows);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
@@ -1630,7 +1652,7 @@ void RaceResultGUI::displayCTFResults()
             if (race_manager->modeHasLaps())
             {
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
-                current_y += int(m_distance_between_rows * 0.8f * 2);
+                current_y += int(m_distance_between_meta_rows * 0.8f * 2);
                 GUIEngine::getFont()->draw(laps, core::recti(x, current_y, 0, 0),
                     white_color, false, false, nullptr, true);
             }
@@ -1638,19 +1660,36 @@ void RaceResultGUI::displayCTFResults()
             const core::stringw& difficulty_name =
                 race_manager->getDifficultyName(race_manager->getDifficulty());
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
-            current_y += int(m_distance_between_rows * 0.8f);
+            current_y += int(m_distance_between_meta_rows * 0.8f);
             GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
                 white_color, false, false, nullptr, true);
             // show fastest lap
             if (race_manager->modeHasLaps())
             {
                 float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
-                core::stringw best_lap_string = _("Best lap time: %s",
-                    StringUtils::timeToString(best_lap_time, time_precision).c_str());
-                current_y += int(m_distance_between_rows * 0.8f);
-                GUIEngine::getFont()->draw(best_lap_string,
-                    core::recti(x, current_y, 0, 0), white_color, false, false,
-                    nullptr, true);
+                // The fastest lap ticks is set to INT_MAX, so the best_lap_time will be
+                // very high when none has been set yet.
+                if (best_lap_time <= 3600.0)
+                {
+                    core::stringw best_lap_string = _("Best lap time: %s",
+                        StringUtils::timeToString(best_lap_time, time_precision).c_str());
+                    current_y += int(m_distance_between_meta_rows * 0.8f);
+                    GUIEngine::getFont()->draw(best_lap_string,
+                        core::recti(x, current_y, 0, 0), white_color, false, false,
+                        nullptr, true);
+
+                    core::stringw best_lap_by = dynamic_cast<LinearWorld*>(World::getWorld())->getFastestLapKartName();
+
+                    if (best_lap_by != "")
+                    {
+                        //I18N: is used to indicate who has the bast laptime (best laptime "by kart_name")
+                        core::stringw best_lap_by_string = _("by %s", best_lap_by);
+                        current_y += int(m_distance_between_meta_rows * 0.6f);
+                        GUIEngine::getFont()->draw(best_lap_by_string,
+                            core::recti(x, current_y, 0, 0), white_color, false, false,
+                            nullptr, true);
+                    }
+                }
             }   // if mode has laps
         }   // if not soccer mode
 #endif

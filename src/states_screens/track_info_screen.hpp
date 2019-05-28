@@ -21,6 +21,7 @@
 #define HEADER_TRACK_INFO_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets.hpp"
 
 namespace GUIEngine
 {
@@ -46,13 +47,33 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_record_this_race;
 
+    bool m_is_soccer;
+
+    bool m_show_ffa_spinner;
+
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
-    /** Spinner for number of laps. */
-    GUIEngine::SpinnerWidget* m_lap_spinner;
+        
+    /** Spinner for target types. */
+    GUIEngine::SpinnerWidget* m_target_type_spinner;
+
+    /** The label besides the target types spinner. */
+    GUIEngine::LabelWidget* m_target_type_label;
+
+    /* The div that contains the target type spinner and label */
+    GUIEngine::Widget* m_target_type_div;
+
+    /** Spinner for target value e.g. number of laps or goals to score. */
+    GUIEngine::SpinnerWidget* m_target_value_spinner;
+
+    /** The label besides the target value spinner. */
+    GUIEngine::LabelWidget* m_target_value_label;
 
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
+
+    /** The label besides the AI karts spinner. */
+    GUIEngine::LabelWidget* m_ai_kart_label;
 
     /** Check box for reverse mode or random item in arena. */
     GUIEngine::CheckBoxWidget* m_option;
@@ -63,11 +84,12 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
 
-    /** The icons for the highscore list. */
-    GUIEngine::IconButtonWidget* m_kart_icons[HIGHSCORE_COUNT];
-
     /** The actual highscore text values shown. */
-    GUIEngine::LabelWidget* m_highscore_entries[HIGHSCORE_COUNT];
+    GUIEngine::ListWidget* m_highscore_entries;
+    
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+    
+    int m_icon_unknown_kart;
 
     void updateHighScores();
 
@@ -75,10 +97,13 @@ public:
     TrackInfoScreen();
     virtual ~TrackInfoScreen();
 
-    virtual void init();
-    virtual void loadedFromFile();
+    virtual void init() OVERRIDE;
+    virtual void beforeAddingWidget() OVERRIDE;
+    virtual void loadedFromFile() OVERRIDE;
+    virtual void tearDown() OVERRIDE;
+    virtual void unloaded() OVERRIDE;
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
-                               const int player_id);
+                               const int player_id) OVERRIDE;
 
     void onEnterPressedInternal();
     void setTrack(Track *track);

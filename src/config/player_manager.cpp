@@ -361,7 +361,7 @@ void PlayerManager::enforceCurrentPlayer()
  */
 void PlayerManager::addDefaultPlayer()
 {
-    std::string username = "unnamed player";
+    std::string username = "Player";
 
     if(getenv("USERNAME")!=NULL)        // for windows
         username = getenv("USERNAME");

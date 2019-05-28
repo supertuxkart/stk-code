@@ -26,8 +26,11 @@ extern bool GLContextDebugBit;
 #include "CColorConverter.h"
 #include "SIrrCreationParameters.h"
 #include "IGUISpriteBank.h"
+
+#ifdef _IRR_COMPILE_WITH_X11_
 #include <X11/XKBlib.h>
 #include <X11/Xatom.h>
+#endif
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #include <GL/gl.h>
@@ -74,7 +77,7 @@ namespace irr
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			video::SExposedVideoData& data, io::IFileSystem* io);
+			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device);
 	}
 } // end namespace irr
 
@@ -324,6 +327,11 @@ bool CIrrDeviceLinux::changeResolution()
 		return true;
 
 	getVideoModeList();
+	
+	core::dimension2d<u32> desktop_res = VideoModeList.getDesktopResolution();
+	
+	if (desktop_res.Width == Width && desktop_res.Height == Height)
+		return true;
 
 	#if defined(_IRR_LINUX_X11_VIDMODE_) || defined(_IRR_LINUX_X11_RANDR_)
 	s32 eventbase, errorbase;
@@ -452,7 +460,7 @@ bool CIrrDeviceLinux::changeResolution()
 				refresh_rate_new = (mode->dotClock * 1000.0) / (mode->hTotal * mode->vTotal);
 
 				if (refresh_rate_new <= refresh_rate)
-					break;
+					continue;
 
 				for (int j = 0; j < output->nmode; j++)
 				{
@@ -479,7 +487,11 @@ bool CIrrDeviceLinux::changeResolution()
 									crtc->rotation, &output_id, 1);
 		
 		if (s == Success)
+		{
 			UseXRandR = true;
+			XSync(display, false);
+			sleep(1000, false);
+		}
 			
 		if (UseXRandR && SupportsNetWM)
 		{
@@ -687,18 +699,22 @@ bool CIrrDeviceLinux::createWindow()
 	Atom type;
 	int form;
 	unsigned long remain, len;
-
-	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
-	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
-								  WMCheck, 0L, 1L, False, XA_WINDOW,
-								  &type, &form, &len, &remain,
-								  (unsigned char **)&list);
-								  
 	
-	if (s == Success)
+	const char* disable_netwm = getenv("IRR_DISABLE_NETWM");
+
+	if (!disable_netwm || strcmp(disable_netwm, "0") == 0)
 	{
-		XFree(list);
-		SupportsNetWM = (len > 0);
+		Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+		Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+									  WMCheck, 0L, 1L, False, XA_WINDOW,
+									  &type, &form, &len, &remain,
+									  (unsigned char **)&list);
+		
+		if (s == Success)
+		{
+			XFree(list);
+			SupportsNetWM = (len > 0);
+		}
 	}
 
 	changeResolution();
@@ -1131,6 +1147,9 @@ bool CIrrDeviceLinux::createWindow()
 			{
 				grabPointer(true);
 			}
+			
+			XSync(display, false);
+			sleep(100, false);
 		}
 			
 		if (!SupportsNetWM && CreationParams.Fullscreen)
@@ -1307,7 +1326,7 @@ void CIrrDeviceLinux::createDriver()
 		video::SExposedVideoData data;
 		data.OpenGLLinux.X11Window = window;
 		data.OpenGLLinux.X11Display = display;
-		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem, this);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
 		#endif
@@ -1547,6 +1566,7 @@ int CIrrDeviceLinux::getNumlockMask(Display* display)
 EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 {
 	int keyCode = 0;
+#ifdef _IRR_COMPILE_WITH_X11_
 	SKeyMap mp;
 	
 	// First check for numpad keys
@@ -1555,7 +1575,7 @@ EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 	{
 		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 1);
 		
-		if (mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9)
+		if ((mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9 ) || mp.X11Key == XK_KP_Decimal)
 			is_numpad_key = true;
 	}
 	
@@ -1586,6 +1606,7 @@ EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 		
 		os::Printer::log("EKEY_CODE is 0, fallback keycode", core::stringc(keyCode).c_str(), ELL_INFORMATION);
 	}
+#endif
 	return (EKEY_CODE)keyCode;
 }
 #endif
@@ -2323,9 +2344,9 @@ Returns the parent window of "window" (i.e. the ancestor of window
 that is a direct child of the root, or window itself if it is a direct child).
 If window is the root window, returns window.
 */
+#ifdef _IRR_COMPILE_WITH_X11_
 bool get_toplevel_parent(Display* display, Window window, Window* tp_window)
 {
-#ifdef _IRR_COMPILE_WITH_X11_
 	Window current_window = window;
 	Window parent;
 	Window root;
@@ -2358,10 +2379,9 @@ bool get_toplevel_parent(Display* display, Window window, Window* tp_window)
 			current_window = parent;
 		}
 	}
-#endif
-
 	return false;
 }
+#endif
 
 
 //! Move window to requested position

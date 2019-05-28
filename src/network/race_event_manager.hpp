@@ -49,7 +49,7 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    void update(int ticks);
+    void update(int ticks, bool fast_forward);
     // ------------------------------------------------------------------------
     void start(std::shared_ptr<GameEventsProtocol> gep)
     {

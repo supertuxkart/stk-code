@@ -30,16 +30,17 @@
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
+#include <array>
 #include <atomic>
+#include <condition_variable>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <vector>
 #include <thread>
 
 class Event;
 class STKPeer;
-
-#define TIME_TO_KEEP_EVENTS 1.0
 
 // ----------------------------------------------------------------------------
 /** \enum ProtocolRequestType
@@ -50,8 +51,6 @@ class STKPeer;
 enum ProtocolRequestType
 {
     PROTOCOL_REQUEST_START,     //!< Start a protocol
-    PROTOCOL_REQUEST_PAUSE,     //!< Pause a protocol
-    PROTOCOL_REQUEST_UNPAUSE,   //!< Unpause a protocol
     PROTOCOL_REQUEST_TERMINATE  //!< Terminate a protocol
 };   // ProtocolRequestType
 
@@ -144,7 +143,7 @@ private:
     class OneProtocolType
     {
     private:
-        Synchronised< std::vector<std::shared_ptr<Protocol> > > m_protocols;
+        std::vector<std::shared_ptr<Protocol> > m_protocols;
     public:
         void removeProtocol(std::shared_ptr<Protocol> p);
         void requestTerminateAll();
@@ -154,16 +153,15 @@ private:
         // --------------------------------------------------------------------
         /** Returns the first protocol of a given type. It is assumed that
          *  there is a protocol of that type. */
-        std::shared_ptr<Protocol> getFirstProtocol()
-                                           { return m_protocols.getData()[0]; }
+        std::shared_ptr<Protocol> getFirstProtocol() { return m_protocols[0]; }
         // --------------------------------------------------------------------
         /** Returns if this protocol class handles connect events. Protocols
          *  of the same class either all handle a connect event, or none, so
          *  only the first protocol is actually tested. */
         bool handleConnects() const
         {
-            return !m_protocols.getData().empty() &&
-                    m_protocols.getData()[0]->handleConnects();
+            return !m_protocols.empty() &&
+                    m_protocols[0]->handleConnects();
         }   // handleConnects
         // --------------------------------------------------------------------
         /** Returns if this protocol class handles disconnect events. Protocols
@@ -171,23 +169,14 @@ private:
         *  only the first protocol is actually tested. */
         bool handleDisconnects() const
         {
-            return !m_protocols.getData().empty() &&
-                m_protocols.getData()[0]->handleDisconnects();
+            return !m_protocols.empty() &&
+                m_protocols[0]->handleDisconnects();
         }   // handleDisconnects
         // --------------------------------------------------------------------
-        /** Locks access to this list of all protocols of a certain type. */
-        void lock() { m_protocols.lock(); }
-        // --------------------------------------------------------------------
-        /** Locks access to this list of all protocols of a certain type. */
-        void unlock() { m_protocols.unlock(); }
-        // --------------------------------------------------------------------
-        void addProtocol(std::shared_ptr<Protocol> p)
-        {
-            m_protocols.getData().push_back(p); 
-        }   // addProtocol
+        void addProtocol(std::shared_ptr<Protocol> p);
         // --------------------------------------------------------------------
         /** Returns if there are no protocols of this type registered. */
-        bool isEmpty() const { return m_protocols.getData().empty(); }
+        bool isEmpty() const { return m_protocols.empty(); }
         // --------------------------------------------------------------------
 
     };   // class OneProtocolType
@@ -196,7 +185,7 @@ private:
     
     /** The list of all protocol types, each one containing a (potentially
      *  empty) list of protocols. */
-    std::vector<OneProtocolType> m_all_protocols;
+    std::array<OneProtocolType, PROTOCOL_MAX> m_all_protocols;
 
     /** A list of network events - messages, disconnect and disconnects. */
     typedef std::list<Event*> EventList;
@@ -218,16 +207,25 @@ private:
     /*! Asynchronous update thread.*/
     std::thread m_asynchronous_update_thread;
 
+    /** Asynchronous game protocol thread to handle controller action as fast
+     *  as possible. */
+    std::thread m_game_protocol_thread;
+
+    std::condition_variable m_game_protocol_cv;
+
+    std::mutex m_game_protocol_mutex, m_protocols_mutex;
+
+    EventList m_controller_events_list;
+
     /*! Single instance of protocol manager.*/
     static std::weak_ptr<ProtocolManager> m_protocol_manager;
 
-    bool         sendEvent(Event* event);
+    bool sendEvent(Event* event,
+                   std::array<OneProtocolType, PROTOCOL_MAX>& protocols);
 
     virtual void startProtocol(std::shared_ptr<Protocol> protocol);
     virtual void terminateProtocol(std::shared_ptr<Protocol> protocol);
     virtual void asynchronousUpdate();
-    virtual void pauseProtocol(std::shared_ptr<Protocol> protocol);
-    virtual void unpauseProtocol(std::shared_ptr<Protocol> protocol);
 
 public:
     // ===========================================
@@ -238,8 +236,6 @@ public:
     void      propagateEvent(Event* event);
     std::shared_ptr<Protocol> getProtocol(ProtocolType type);
     void      requestStart(std::shared_ptr<Protocol> protocol);
-    void      requestPause(std::shared_ptr<Protocol> protocol);
-    void      requestUnpause(std::shared_ptr<Protocol> protocol);
     void      requestTerminate(std::shared_ptr<Protocol> protocol);
     void      findAndTerminate(ProtocolType type);
     void      update(int ticks);

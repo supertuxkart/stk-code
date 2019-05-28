@@ -23,9 +23,10 @@ export KARTS="all"
 export TRACKS="abyss arena_candela_city battleisland cave cornfield_crossing   \
                endcutscene featunlocked fortmagma gplose gpwin hacienda        \
                icy_soccer_field introcutscene introcutscene2 lasdunasarena     \
-               lasdunassoccer lighthouse mines olivermath overworld sandtrack  \
-               scotland snowmountain snowtuxpeak soccer_field stadium temple   \
-               tutorial zengarden"
+               lasdunassoccer lighthouse mines minigolf olivermath overworld   \
+               ravenbridge_mansion sandtrack scotland snowmountain snowtuxpeak \
+               soccer_field stadium stk_enterprise temple tutorial             \
+               volcano_island xr591 zengarden"
 
 export ASSETS_PATHS="../data                    \
                      ../../stk-assets           \
@@ -44,8 +45,7 @@ export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
 export CONVERT_TO_JPG=1
 
-export CONVERT_TO_JPG_BLACKLIST="data/karts/hexley/hexley_kart_diffuse.png \
-                                 data/models/traffic_light.png"
+export CONVERT_TO_JPG_BLACKLIST="data/models/traffic_light.png"
 
 export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 
@@ -568,7 +568,9 @@ fi
 if [ $CONVERT_TO_JPG -gt 0 ]; then
     rm -f "./converted_textures"
     
-    find assets/data -not -path "assets/data/textures/*" -iname "*.png" | while read f; do convert_to_jpg "$f"; done
+    find assets/data -not -path "assets/data/textures/*" \
+                     -not -path "assets/data/karts/*"    \
+                     -iname "*.png" | while read f; do convert_to_jpg "$f"; done
 
     find assets/data -iname "*.b3dz" | while read f; do convert_to_jpg_extract_b3dz "$f"; done
     find assets/data -iname "*.b3d" | while read f; do convert_to_jpg_update_b3d "$f"; done
@@ -607,7 +609,7 @@ fi
 
 # Generate directories list
 echo "Generate directories list"
-find assets/* -type d > assets/directories.txt
+find assets/* -type d | sort > assets/directories.txt
 sed -i s/'.\/assets\/'// assets/directories.txt
 sed -i s/'assets\/'// assets/directories.txt
 

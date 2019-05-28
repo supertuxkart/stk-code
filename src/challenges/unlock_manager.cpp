@@ -253,6 +253,9 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& karts,
                                         std::vector<const ChallengeData*>& unlocked)
 {
+    if (UserConfigParams::m_unlock_everything > 0)
+        return;
+
     ChallengeData* c = NULL;
 
     for (AllChallengesType::iterator it = m_all_challenges.begin();
@@ -275,8 +278,16 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
         }
     }
 
+
+
     for (unsigned int n = 0; n < unlocked.size(); n++)
     {
+        //FIXME : this is a quick hack to avoid an unlocked kart being shown
+        //        several times when completing different difficulties of
+        //        a single-race challenge unlocking a kart.
+        if ((points_now - points_before) <= 5)
+            break;
+
         std::vector<ChallengeData::UnlockableFeature> features = unlocked[n]->getFeatures();
 
         for (unsigned int i = 0; i < features.size(); i++)

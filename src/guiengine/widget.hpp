@@ -36,6 +36,7 @@ namespace GUIEngine
 {
 
     class DynamicRibbonWidget;
+    class Screen;
 
     enum WidgetType
     {
@@ -89,6 +90,8 @@ namespace GUIEngine
         PROP_CHILD_WIDTH,
         PROP_CHILD_HEIGHT,
         PROP_WORD_WRAP,
+        PROP_ALTERNATE_BG,
+        PROP_LINE_HEIGHT,
         //PROP_GROW_WITH_TEXT, // yet unused
         PROP_X,
         PROP_Y,
@@ -273,6 +276,12 @@ namespace GUIEngine
         bool m_has_tooltip;
         irr::core::stringw m_tooltip_text;
 
+        /** height of the widget before it was collapsed (only set if widget got collapsed) */
+        int m_uncollapsed_height;
+
+        /** A flag to indicate whether this widget got collapsed. */
+        bool m_is_collapsed;
+
     public:
 
         /**
@@ -344,8 +353,33 @@ namespace GUIEngine
          */
         virtual void setVisible(bool visible);
 
+        /**
+         * \brief Sets the widget (and its children, if any) collapsed or not.
+         * !!! Note: this has to be called inside beforeAddingWidget() !!!
+         * Pass in the screen to get (the necessary) calculate Layout automatically called.
+         * This will also set the widget invisible depending of collapsed state.
+         * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
+         * undefined behavior may ensue (like invisible but clickable buttons).
+         */
+        virtual void setCollapsed(bool collapsed, Screen* calling_screen = NULL);
+
+        /**
+         * \brief Sets the widget (and its children, if any) collapsed or not.
+         * !!! Note: this has to be called inside beforeAddingWidget() !!!
+         * Pass in the screen to get (the necessary) calculate Layout automatically called.
+         * This will also set the widget invisible depending of collapsed state.
+         * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
+         * undefined behavior may ensue (like invisible but clickable buttons).
+         */
+        virtual void setCollapsed(bool collapsed, int uncollapsed_height, Screen* calling_screen = NULL);
+
         /** Returns if the element is visible. */
         bool isVisible() const;
+
+        /** Returns whether the element is collapsed (through setCollapsed). */
+        bool isCollapsed() const { return  m_is_collapsed; }
 
         bool isActivated() const;
 
@@ -362,6 +396,7 @@ namespace GUIEngine
           * is kept)
           */
         bool isSelected(const int playerID) const { return m_selected[playerID]; }
+        void setSelected(const int playerID, bool state) { m_selected[playerID] = state;}
 
         bool isBottomBar() const { return m_bottom_bar; }
         bool isTopBar   () const { return m_top_bar;    }

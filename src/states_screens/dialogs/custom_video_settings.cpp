@@ -95,6 +95,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
+    getWidget<CheckBoxWidget>("lightscattering")->setState(UserConfigParams::m_light_scatter);
     if (CVS->isEXTTextureCompressionS3TCUsable())
     {
         getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
@@ -152,6 +153,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_bloom =
             advanced_pipeline && getWidget<CheckBoxWidget>("bloom")->getState();
 
+        UserConfigParams::m_light_scatter =
+            advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
+
         UserConfigParams::m_texture_compression =
             getWidget<CheckBoxWidget>("texture_compression")->getState();
 
@@ -197,6 +201,7 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("ibl")->setActive(light);
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);
+    getWidget<CheckBoxWidget>("lightscattering")->setActive(light);
 #endif
 }   // updateActivation
 

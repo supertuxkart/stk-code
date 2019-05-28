@@ -15,6 +15,10 @@
 
 using namespace irr;
 using namespace gui;
+namespace GUIEngine
+{
+    enum TextBoxType: int;
+}
 
     class CGUIEditBox : public IGUIEditBox
     {
@@ -119,6 +123,12 @@ using namespace gui;
         virtual irr::gui::IGUIFont* getActiveFont() const { return NULL; }
         virtual void setDrawBackground(bool) { }
 
+        void fromAndroidEditText(const core::stringw& text, int start, int end,
+                                 int composing_start, int composing_end);
+        void openScreenKeyboard();
+        s32 getCursorPosInBox() const { return CursorPos; }
+        s32 getTextCount() const { return (s32)Text.size(); }
+        void setTextBoxType(GUIEngine::TextBoxType t) { m_type = t; }
     protected:
         //! Breaks the single text line.
         void breakText();
@@ -152,6 +162,8 @@ using namespace gui;
         s32 MarkBegin;
         s32 MarkEnd;
 
+        GUIEngine::TextBoxType m_type;
+
         video::SColor OverrideColor;
         gui::IGUIFont *OverrideFont, *LastBreakFont;
         IOSOperator* Operator;
@@ -171,6 +183,13 @@ using namespace gui;
         core::array< s32 > BrokenTextPositions;
 
         core::rect<s32> CurrentTextRect, FrameRect; // temporary values
+
+        s32 m_composing_start;
+        s32 m_composing_end;
+
+        /* If true, this editbox will copy text and selection only from
+         * android edittext, and process only mouse event. */
+        bool m_from_android_edittext;
     };
 
 

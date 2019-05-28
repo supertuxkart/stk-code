@@ -52,6 +52,9 @@ private:
     /** In case of new items the position of the new item. */
     Vec3 m_xyz;
 
+    /** The normal of an item. */
+    Vec3 m_normal;
+
     /** Ticks for the item to return, atm used by collecting banana
      *  with bomb to delay the return for banana. */
     int16_t m_ticks_till_return;
@@ -76,9 +79,9 @@ public:
      *  need to encode the new item type.
      */
     ItemEventInfo(int ticks, ItemState::ItemType type, int index,
-                  int kart_id, const Vec3 &xyz)
+                  int kart_id, const Vec3 &xyz, const Vec3 &normal)
         : m_ticks(ticks), m_index(index), m_kart_id(kart_id), m_xyz(xyz),
-          m_ticks_till_return(0)
+          m_normal(normal), m_ticks_till_return(0)
     {
         m_type = IEI_NEW;
     }   // ItemEventInfo(new item)
@@ -124,6 +127,13 @@ public:
         assert(isNewItem());
         return m_xyz;
     }   // getXYZ
+    // --------------------------------------------------------------------
+    /** Returns the normal of a new item only. */
+    const Vec3& getNormal() const
+    {
+            assert(isNewItem());
+            return m_normal;
+    }   // getNormal
     // --------------------------------------------------------------------
     /** Returns the ticks till return, used only by collection events. */
     int getTicksTillReturn() const          { return m_ticks_till_return; }

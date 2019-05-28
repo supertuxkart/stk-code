@@ -47,7 +47,7 @@
 #include "states_screens/online/online_profile_achievements.hpp"
 #include "states_screens/online/online_profile_servers.hpp"
 #include "states_screens/online/online_screen.hpp"
-#include "states_screens/options/options_screen_video.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
 #if DEBUG_MENU_ITEM
@@ -79,7 +79,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(15);
+    w->setScrollSpeed(GUIEngine::getFontHeight() / 2);
     
     RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
     assert(rw_top != NULL);
@@ -401,11 +401,16 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "options")
     {
-        OptionsScreenVideo::getInstance()->push();
+        OptionsScreenGeneral::getInstance()->push();
     }
     else if (selection == "quit")
     {
+#ifdef ANDROID
+        GUIEngine::EventHandler::get()->setAcceptEvents(false);
+        ANativeActivity_finish(global_android_app->activity);
+#else
         StateManager::get()->popMenu();
+#endif
         return;
     }
     else if (selection == "about")
@@ -490,9 +495,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
         {
             new MessageDialog(_("You can not play online without internet access. "
-                                "If you want to play online, go to options, select "
-                                " tab 'User Interface', and edit "
-                                "\"Connect to the Internet\"."));
+                                "If you want to play online, go in the options menu, "
+                                "and check \"Connect to the Internet\"."));
             return;
         }
         OnlineScreen::getInstance()->push();
@@ -506,18 +510,16 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             if (!addons_manager->anyAddonsInstalled())
             {
                 new MessageDialog(_("You can not download addons without internet access. "
-                                    "If you want to download addons, go to options, select "
-                                    "the 'User Interface' tab, and check "
-                                    "\"Connect to the Internet\"."));
+                                    "If you want to download addons, go in the options menu, "
+                                    "and check \"Connect to the Internet\"."));
                 return;
             }
             else
             {
                 AddonsScreen::getInstance()->push();
                 new MessageDialog(_("You can not download addons without internet access. "
-                                    "If you want to download addons, go to options, select "
-                                    "the 'User Interface' tab, and check "
-                                    "\"Connect to the Internet\".\n\n"
+                                    "If you want to download addons, go in the options menu, "
+                                    "and check \"Connect to the Internet\".\n\n"
                                     "You can however delete already downloaded addons."));
                 return;
             }
@@ -567,3 +569,16 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
     }
 #endif
 }   // onDisabledItemClicked
+
+// ----------------------------------------------------------------------------
+
+bool MainMenuScreen::onEscapePressed()
+{
+#ifdef ANDROID
+    GUIEngine::EventHandler::get()->setAcceptEvents(false);
+    ANativeActivity_finish(global_android_app->activity);
+    return false;
+#endif
+
+    return true;
+}   // onEscapePressed

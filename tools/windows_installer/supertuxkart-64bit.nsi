@@ -32,8 +32,8 @@
   ; Version information
   ; TOOD get these from the source code directly
   !define VERSION_MAJOR 0
-  !define VERSION_MINOR 9
-  !define VERSION_REVISION 3
+  !define VERSION_MINOR 10
+  !define VERSION_REVISION 0
   ; Empty means stable, could be -git, -rc1
   !define VERSION_BUILD "-git"
   
@@ -300,6 +300,9 @@ Section "Uninstall" redist
   DELETE /REBOOTOK "$INSTDIR\libvorbis-0.dll"
   DELETE /REBOOTOK "$INSTDIR\libvorbisenc-2.dll"
   DELETE /REBOOTOK "$INSTDIR\libvorbisfile-3.dll"
+  DELETE /REBOOTOK "$INSTDIR\wiiuse.dll"
+  DELETE /REBOOTOK "$INSTDIR\wiiuse.ilk"
+  DELETE /REBOOTOK "$INSTDIR\wiiuse.pdb"
   DELETE /REBOOTOK "$INSTDIR\wrap_oal.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.pdb"

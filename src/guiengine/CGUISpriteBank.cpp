@@ -27,7 +27,7 @@ STKModifiedSpriteBank::STKModifiedSpriteBank(IGUIEnvironment* env) :
 
     m_scale = 1.0f;
     m_height = 0;
-
+    m_target_icon_size = core::dimension2du(0, 0);
     if (Environment)
     {
         Driver = Environment->getVideoDriver();
@@ -63,8 +63,19 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
 
     for (int n=0; n<(int)Rectangles.size(); n++)
     {
-        const int h = getScaledHeight(Rectangles[n].getHeight());
-        const int w = getScaledWidth(Rectangles[n].getWidth());
+        float icon_scale_x = 1.0f;
+        float icon_scale_y = 1.0f;
+        
+        if (m_target_icon_size.Width > 0 && m_target_icon_size.Height > 0)
+        {
+            icon_scale_x = (float)m_target_icon_size.Width /
+                           (float)Rectangles[n].getWidth();
+            icon_scale_y = (float)m_target_icon_size.Height /
+                           (float)Rectangles[n].getHeight();
+        }
+ 
+        const int h = getScaledHeight(Rectangles[n].getHeight()) * icon_scale_y;
+        const int w = getScaledWidth(Rectangles[n].getWidth()) * icon_scale_x;
         copy.push_back( core::rect<s32>(Rectangles[n].UpperLeftCorner,
                                        core::dimension2d<s32>(w,h) )
                        );
@@ -204,9 +215,20 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
 
     const core::dimension2d<s32>& dim = r.getSize();
 
-    core::rect<s32> dest( pos,
-                          core::dimension2d<s32>(getScaledWidth(dim.Width),
-                                                 getScaledHeight(dim.Height)));
+    float icon_scale_x = 1.0f;
+    float icon_scale_y = 1.0f;
+    if (m_target_icon_size.Width > 0 && m_target_icon_size.Height > 0 &&
+        tex->getSize() != m_target_icon_size)
+    {
+        icon_scale_x = (float)m_target_icon_size.Width /
+            (float)tex->getSize().Width;
+        icon_scale_y = (float)m_target_icon_size.Height /
+            (float)tex->getSize().Height;
+    }
+
+    core::rect<s32> dest(pos, core::dimension2d<s32>
+        (getScaledWidth(dim.Width) * icon_scale_x,
+        getScaledHeight(dim.Height) * icon_scale_y));
     if (center)
     {
         dest -= dest.getSize() / 2;

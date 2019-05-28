@@ -41,7 +41,7 @@
 #  include <ifaddrs.h>
 #endif
 
-const uint64_t SERVER_REFRESH_INTERVAL = 5000;
+const int64_t SERVER_REFRESH_INTERVAL = 5000;
 
 static ServersManager* g_manager_singleton(NULL);
 
@@ -64,8 +64,7 @@ void ServersManager::deallocate()
 // ----------------------------------------------------------------------------
 ServersManager::ServersManager()
 {
-    m_last_load_time.store(0);
-    m_list_updated = false;
+    reset();
 }   // ServersManager
 
 // ----------------------------------------------------------------------------
@@ -158,7 +157,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             char buffer[LEN];
             // Wait for up to 0.5 seconds to receive an answer from 
             // any local servers.
-            uint64_t start_time = StkTime::getRealTimeMs();
+            uint64_t start_time = StkTime::getMonoTimeMs();
             const uint64_t DURATION = 1000;
             const auto& servers = ServersManager::get()->getServers();
             int cur_server_id = (int)servers.size();
@@ -169,7 +168,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             // because e.g. a local client would answer as 127.0.0.1 and
             // 192.168.**.
             std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
-            while (StkTime::getRealTimeMs() - start_time < DURATION)
+            while (StkTime::getMonoTimeMs() - start_time < DURATION)
             {
                 TransportAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
@@ -194,10 +193,19 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     sender.setPort(port);
                     uint8_t password    = s.getUInt8();
                     uint8_t game_started = s.getUInt8();
+                    std::string current_track;
+                    try
+                    {
+                        s.decodeString(&current_track);
+                    }
+                    catch (std::exception& e)
+                    {
+                        (void)e;
+                    }
                     servers_now.insert(std::make_pair(name, 
                         std::make_shared<Server>(cur_server_id++, name, 
                         max_players, players, difficulty, mode, sender, 
-                        password == 1, game_started == 1)));
+                        password == 1, game_started == 1, current_track)));
                     //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
@@ -228,6 +236,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
 {
     m_servers.clear();
     for (auto i : servers) m_servers.emplace_back(i.second);
+    m_last_load_time.store(StkTime::getMonoTimeMs());
     m_list_updated = true;
 
 }
@@ -237,7 +246,7 @@ void ServersManager::setLanServers(const std::map<irr::core::stringw,
  */
 bool ServersManager::refresh(bool full_refresh)
 {
-    if (StkTime::getRealTimeMs() - m_last_load_time.load()
+    if ((int64_t)StkTime::getMonoTimeMs() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
@@ -246,7 +255,7 @@ bool ServersManager::refresh(bool full_refresh)
 
     cleanUpServers();
     m_list_updated = false;
-    
+
     if (NetworkConfig::get()->isWAN())
     {
         Online::RequestManager::get()->addRequest(getWANRefreshRequest());
@@ -296,7 +305,7 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
         }
         m_servers.emplace_back(std::make_shared<Server>(*s));
     }
-    m_last_load_time.store(StkTime::getRealTimeMs());
+    m_last_load_time.store(StkTime::getMonoTimeMs());
     m_list_updated = true;
 }   // refresh
 
@@ -412,10 +421,14 @@ void ServersManager::updateBroadcastAddresses()
 #else
     struct ifaddrs *addresses, *p;
 
-    getifaddrs(&addresses);
+    if (getifaddrs(&addresses) == -1)
+    {
+        Log::warn("ServerManager", "Error in getifaddrs");
+        return;
+    }
     for (p = addresses; p; p = p->ifa_next)
     {
-        if (p->ifa_addr->sa_family == AF_INET)
+        if (p->ifa_addr != NULL && p->ifa_addr->sa_family == AF_INET)
         {
             struct sockaddr_in *sa = (struct sockaddr_in *) p->ifa_addr;
             TransportAddress ta(htonl(sa->sin_addr.s_addr), 0);

@@ -31,15 +31,15 @@ void main()
     float stepsize = length(farthestpoint - closestpoint) / 16.;
     vec3 fog = vec3(0.);
     vec3 xpos = farthestpoint;
+    vec3 fog_factor = light_col * density * stepsize * energy * 20.;
+    vec3 xpos_step = eyedir * stepsize;
 
     for (int i = 0; i < 16; i++)
     {
         float d = distance(light_pos, xpos);
         float l = (16. - float(i)) * stepsize;
-        float att = energy * 20. / (1. + d * d);
-        att *= max((radius - d) / radius, 0.);
-        fog += density * light_col * att * exp(- density * d) * exp(- density * l) * stepsize;
-        xpos += stepsize * eyedir;
+        fog += fog_factor / (1. + d * d) * max((radius - d) / radius, 0.) * exp(- density * d) * exp(- density * l);
+        xpos += xpos_step;
     }
 
     Fog = vec4(fogcol * fog, 0.);

@@ -76,6 +76,9 @@ private:
         bool isImportant() const { return m_important; }
     };   // NewsMessage
 
+    /** The name of the news file on the remote server */
+    static std::string m_news_filename;
+
     mutable Synchronised< std::vector<NewsMessage> > m_news;
 
     /** Index of the current news message that is being displayed. */

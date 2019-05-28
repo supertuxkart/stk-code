@@ -49,7 +49,8 @@ AchievementsStatus::AchievementsStatus()
     }
 
     // Create one TrackStats instance for all existing tracks
-    const unsigned int track_amount = track_manager->getNumberOfTracks();
+    const unsigned int track_amount =
+        (unsigned int)track_manager->getNumberOfTracks();
 
     for (unsigned int n = 0; n < track_amount; n++)
     {
@@ -440,7 +441,7 @@ void AchievementsStatus::updateAchievementsProgress(UpdateType type, unsigned in
 {
     std::string goal_string[2];
     int max_across_tracks = -1;
-    int min_across_tracks = -1;
+    int min_across_tracks = INT_MAX;
     int max_kart_hits = 0;
     if (type == UP_ACHIEVEMENT_DATA)
     {

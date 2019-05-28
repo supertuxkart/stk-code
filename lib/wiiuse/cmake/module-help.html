@@ -1,0 +1,1818 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="Content-Type" content="text/html;charset=utf-8" /><title>module-help - cmake</title></head><body>
+<h2><a name="section_Index"></a>Master Index CMake 2.8.11.1</h2>
+<ul>
+  <li><a href="#section_Introduction"><b>Introduction</b></a></li>
+  <li><a href="#section_Description"><b>Description</b></a></li>
+  <li><a href="#section_CustomCMakeModules"><b>Custom CMake Modules</b></a></li>
+  <li><a href="#section_SeeAlso"><b>See Also</b></a></li>
+</ul>
+<h2><a name="section_Introduction"></a>Introduction</h2>
+<p>module-help - Reference of available CMake custom modules.</p>
+
+<h2><a name="section_Description"></a>Description</h2>
+<p>The "cmake" executable is the CMake command-line interface.  It may be used to configure projects in scripts.  Project configuration settings may be specified on the command line with the -D option.  The -i option will cause cmake to interactively prompt for such settings.</p>
+
+<p>CMake is a cross-platform build system generator.  Projects specify their build process with platform-independent CMake listfiles included in each directory of a source tree with the name CMakeLists.txt. Users build a project by using CMake to generate a build system for a native tool on their platform.</p>
+
+<h2><a name="section_CustomCMakeModules"></a>Custom CMake Modules</h2>
+<ul>
+    <li><a href="#module:AboutTheseModules"><b><code>AboutTheseModules</code></b></a></li>
+    <li><a href="#module:BoostTestTargets"><b><code>BoostTestTargets</code></b></a></li>
+    <li><a href="#module:BundleOSGPlugins"><b><code>BundleOSGPlugins</code></b></a></li>
+    <li><a href="#module:BundleOSGRuntime"><b><code>BundleOSGRuntime</code></b></a></li>
+    <li><a href="#module:BundleVRJ22Runtime"><b><code>BundleVRJ22Runtime</code></b></a></li>
+    <li><a href="#module:BundleVRJ30Runtime"><b><code>BundleVRJ30Runtime</code></b></a></li>
+    <li><a href="#module:CheckMacHIDAPI"><b><code>CheckMacHIDAPI</code></b></a></li>
+    <li><a href="#module:CheckVersion"><b><code>CheckVersion</code></b></a></li>
+    <li><a href="#module:CleanDirectoryList"><b><code>CleanDirectoryList</code></b></a></li>
+    <li><a href="#module:CleanLibraryList"><b><code>CleanLibraryList</code></b></a></li>
+    <li><a href="#module:CopyResourcesToBuildTree"><b><code>CopyResourcesToBuildTree</code></b></a></li>
+    <li><a href="#module:CppcheckTargets"><b><code>CppcheckTargets</code></b></a></li>
+    <li><a href="#module:CreateDashboardScripts"><b><code>CreateDashboardScripts</code></b></a></li>
+    <li><a href="#module:CreateImportedTarget"><b><code>CreateImportedTarget</code></b></a></li>
+    <li><a href="#module:CreateLaunchers"><b><code>CreateLaunchers</code></b></a></li>
+    <li><a href="#module:DoxygenTargets"><b><code>DoxygenTargets</code></b></a></li>
+    <li><a href="#module:EnableExtraCompilerWarnings"><b><code>EnableExtraCompilerWarnings</code></b></a></li>
+    <li><a href="#module:EnableProfiling"><b><code>EnableProfiling</code></b></a></li>
+    <li><a href="#module:FileCopyTargets"><b><code>FileCopyTargets</code></b></a></li>
+    <li><a href="#module:FindALUT"><b><code>FindALUT</code></b></a></li>
+    <li><a href="#module:FindAdrienne"><b><code>FindAdrienne</code></b></a></li>
+    <li><a href="#module:FindBluez"><b><code>FindBluez</code></b></a></li>
+    <li><a href="#module:FindCPPDOM"><b><code>FindCPPDOM</code></b></a></li>
+    <li><a href="#module:FindDCubed"><b><code>FindDCubed</code></b></a></li>
+    <li><a href="#module:FindDirectInput"><b><code>FindDirectInput</code></b></a></li>
+    <li><a href="#module:FindDirectShow"><b><code>FindDirectShow</code></b></a></li>
+    <li><a href="#module:FindDirectX"><b><code>FindDirectX</code></b></a></li>
+    <li><a href="#module:FindFlagpoll"><b><code>FindFlagpoll</code></b></a></li>
+    <li><a href="#module:FindGDB"><b><code>FindGDB</code></b></a></li>
+    <li><a href="#module:FindGHOST"><b><code>FindGHOST</code></b></a></li>
+    <li><a href="#module:FindGLUI"><b><code>FindGLUI</code></b></a></li>
+    <li><a href="#module:FindGLUT"><b><code>FindGLUT</code></b></a></li>
+    <li><a href="#module:FindGMTL"><b><code>FindGMTL</code></b></a></li>
+    <li><a href="#module:FindGPM"><b><code>FindGPM</code></b></a></li>
+    <li><a href="#module:FindGadgeteer12"><b><code>FindGadgeteer12</code></b></a></li>
+    <li><a href="#module:FindGadgeteer20"><b><code>FindGadgeteer20</code></b></a></li>
+    <li><a href="#module:FindGlove5DT"><b><code>FindGlove5DT</code></b></a></li>
+    <li><a href="#module:FindHIDAPI"><b><code>FindHIDAPI</code></b></a></li>
+    <li><a href="#module:FindIDLJ"><b><code>FindIDLJ</code></b></a></li>
+    <li><a href="#module:FindInterSense"><b><code>FindInterSense</code></b></a></li>
+    <li><a href="#module:FindJCCL12"><b><code>FindJCCL12</code></b></a></li>
+    <li><a href="#module:FindJCCL14"><b><code>FindJCCL14</code></b></a></li>
+    <li><a href="#module:FindJtTk"><b><code>FindJtTk</code></b></a></li>
+    <li><a href="#module:FindLAPACKLibs"><b><code>FindLAPACKLibs</code></b></a></li>
+    <li><a href="#module:FindLibusb1"><b><code>FindLibusb1</code></b></a></li>
+    <li><a href="#module:FindLuabind"><b><code>FindLuabind</code></b></a></li>
+    <li><a href="#module:FindLyX"><b><code>FindLyX</code></b></a></li>
+    <li><a href="#module:FindMacHID"><b><code>FindMacHID</code></b></a></li>
+    <li><a href="#module:FindMarkdown"><b><code>FindMarkdown</code></b></a></li>
+    <li><a href="#module:FindOpenCV"><b><code>FindOpenCV</code></b></a></li>
+    <li><a href="#module:FindOpenHaptics"><b><code>FindOpenHaptics</code></b></a></li>
+    <li><a href="#module:FindParasolid"><b><code>FindParasolid</code></b></a></li>
+    <li><a href="#module:FindPerformer"><b><code>FindPerformer</code></b></a></li>
+    <li><a href="#module:FindPerlModules"><b><code>FindPerlModules</code></b></a></li>
+    <li><a href="#module:FindQVRPN"><b><code>FindQVRPN</code></b></a></li>
+    <li><a href="#module:FindSonix12"><b><code>FindSonix12</code></b></a></li>
+    <li><a href="#module:FindSonix14"><b><code>FindSonix14</code></b></a></li>
+    <li><a href="#module:FindTR1"><b><code>FindTR1</code></b></a></li>
+    <li><a href="#module:FindTooN"><b><code>FindTooN</code></b></a></li>
+    <li><a href="#module:FindTooNtag"><b><code>FindTooNtag</code></b></a></li>
+    <li><a href="#module:FindTweek12"><b><code>FindTweek12</code></b></a></li>
+    <li><a href="#module:FindTweek14"><b><code>FindTweek14</code></b></a></li>
+    <li><a href="#module:FindVPR20"><b><code>FindVPR20</code></b></a></li>
+    <li><a href="#module:FindVPR22"><b><code>FindVPR22</code></b></a></li>
+    <li><a href="#module:FindVPS"><b><code>FindVPS</code></b></a></li>
+    <li><a href="#module:FindVRJ22"><b><code>FindVRJ22</code></b></a></li>
+    <li><a href="#module:FindVRJ30"><b><code>FindVRJ30</code></b></a></li>
+    <li><a href="#module:FindVRJOGL22"><b><code>FindVRJOGL22</code></b></a></li>
+    <li><a href="#module:FindVRJOGL30"><b><code>FindVRJOGL30</code></b></a></li>
+    <li><a href="#module:FindVRJuggler"><b><code>FindVRJuggler</code></b></a></li>
+    <li><a href="#module:FindVRJuggler22"><b><code>FindVRJuggler22</code></b></a></li>
+    <li><a href="#module:FindVRJuggler30"><b><code>FindVRJuggler30</code></b></a></li>
+    <li><a href="#module:FindVRPN"><b><code>FindVRPN</code></b></a></li>
+    <li><a href="#module:FindViewPoint"><b><code>FindViewPoint</code></b></a></li>
+    <li><a href="#module:FindVirtuoseAPI"><b><code>FindVirtuoseAPI</code></b></a></li>
+    <li><a href="#module:FindVirtuoseVPP"><b><code>FindVirtuoseVPP</code></b></a></li>
+    <li><a href="#module:FindWiiSCAAT"><b><code>FindWiiSCAAT</code></b></a></li>
+    <li><a href="#module:FindWiiUse"><b><code>FindWiiUse</code></b></a></li>
+    <li><a href="#module:FindWinHID"><b><code>FindWinHID</code></b></a></li>
+    <li><a href="#module:FindWindowsSDK"><b><code>FindWindowsSDK</code></b></a></li>
+    <li><a href="#module:Findargp"><b><code>Findargp</code></b></a></li>
+    <li><a href="#module:Findcppcheck"><b><code>Findcppcheck</code></b></a></li>
+    <li><a href="#module:Findcppunit"><b><code>Findcppunit</code></b></a></li>
+    <li><a href="#module:Findcutil"><b><code>Findcutil</code></b></a></li>
+    <li><a href="#module:Finddb2pdf"><b><code>Finddb2pdf</code></b></a></li>
+    <li><a href="#module:FindosgLua"><b><code>FindosgLua</code></b></a></li>
+    <li><a href="#module:Findquatlib"><b><code>Findquatlib</code></b></a></li>
+    <li><a href="#module:GetCPUDetails"><b><code>GetCPUDetails</code></b></a></li>
+    <li><a href="#module:GetCompilerInfoString"><b><code>GetCompilerInfoString</code></b></a></li>
+    <li><a href="#module:GetDirectoryList"><b><code>GetDirectoryList</code></b></a></li>
+    <li><a href="#module:GetFileList"><b><code>GetFileList</code></b></a></li>
+    <li><a href="#module:GetForceIncludeDefinitions"><b><code>GetForceIncludeDefinitions</code></b></a></li>
+    <li><a href="#module:GetGitRevisionDescription"><b><code>GetGitRevisionDescription</code></b></a></li>
+    <li><a href="#module:GetSubprojectStatus"><b><code>GetSubprojectStatus</code></b></a></li>
+    <li><a href="#module:Licensing"><b><code>Licensing</code></b></a></li>
+    <li><a href="#module:ListCombinations"><b><code>ListCombinations</code></b></a></li>
+    <li><a href="#module:ListFilter"><b><code>ListFilter</code></b></a></li>
+    <li><a href="#module:LuaTargets"><b><code>LuaTargets</code></b></a></li>
+    <li><a href="#module:MSVCMultipleProcessCompile"><b><code>MSVCMultipleProcessCompile</code></b></a></li>
+    <li><a href="#module:MSVCStaticRuntime"><b><code>MSVCStaticRuntime</code></b></a></li>
+    <li><a href="#module:MSVCVerboseLinking"><b><code>MSVCVerboseLinking</code></b></a></li>
+    <li><a href="#module:OptionRequires"><b><code>OptionRequires</code></b></a></li>
+    <li><a href="#module:PrefixListGlob"><b><code>PrefixListGlob</code></b></a></li>
+    <li><a href="#module:ProgramFilesGlob"><b><code>ProgramFilesGlob</code></b></a></li>
+    <li><a href="#module:ResetConfigurations"><b><code>ResetConfigurations</code></b></a></li>
+    <li><a href="#module:SearchProgramFilesForOpenSceneGraph"><b><code>SearchProgramFilesForOpenSceneGraph</code></b></a></li>
+    <li><a href="#module:SetDefaultBuildType"><b><code>SetDefaultBuildType</code></b></a></li>
+    <li><a href="#module:SplitLibraryList"><b><code>SplitLibraryList</code></b></a></li>
+    <li><a href="#module:StampSourcesWithVersion"><b><code>StampSourcesWithVersion</code></b></a></li>
+    <li><a href="#module:TCHARWorkaround"><b><code>TCHARWorkaround</code></b></a></li>
+    <li><a href="#module:UseBackportedModules"><b><code>UseBackportedModules</code></b></a></li>
+    <li><a href="#module:UseMarkdown"><b><code>UseMarkdown</code></b></a></li>
+    <li><a href="#module:UseTR1"><b><code>UseTR1</code></b></a></li>
+    <li><a href="#module:WarningDev"><b><code>WarningDev</code></b></a></li>
+</ul>
+<p>The following modules are also available for CMake. They can be used with INCLUDE(ModuleName).</p>
+
+<pre>  Custom CMake Modules - Additional Modules for CMake.</pre>
+    
+<p>This is the documentation for additional modules and scripts for CMake. Using these modules you can check the computer system for installed software packages, features of the compiler and the existance of headers to name just a few.</p>
+
+<ul>
+  <li>
+    <a name="module:AboutTheseModules"></a><b><code>AboutTheseModules</code></b>: Dummy module containing information about these modules for the HELP file<br />
+    <p>This file documents a snapshot of the cmake-modules available from <a href="http://github.com/rpavlik/cmake-modules/">http://github.com/rpavlik/cmake-modules/</a> The latest version of these modules can always be found there. Additionally, you can find instructions on how to integrate these modules into your own project either in the README.markdown file in this directory, or on the GitHub page listed above (scroll to the bottom to see the README rendered attractively).<br /></p>
+<p>In short: Modules of the form "FindSomeName.cmake" are considered to be "find modules", and are intended to be used indirectly by calling find_package, not by calling include.  Thus, you'll want to do something like:<br /></p>
+<pre>  find_package(SomeName)<br /></pre>
+    <p>They define a number of variables allowing you to use whatever software they search for, such as include directories and libraries. A few also define some functions for your use.<br /></p>
+<p>All other modules provide functionality, either immediately upon including them, or by defining functions that perform some task of varying utility that you can use any time after including them. Note that if a module has the filename, for example, cmake/BoostTestTargets.cmake, you only need to call:<br /></p>
+<pre>  include(BoostTestTargets)<br /></pre>
+    <p><br /></p>
+<p>For more information, see the documentation for individual modules, the cmake-modules github page, and/or the upstream CMake documentation at <a href="http://www.cmake.org/cmake/help/cmake-2-8-docs.html">http://www.cmake.org/cmake/help/cmake-2-8-docs.html</a><br /></p>
+<p><br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:BoostTestTargets"></a><b><code>BoostTestTargets</code></b>: Add tests using boost::test<br />
+    <p><br /></p>
+<p>Add this line to your test files in place of including a basic boost test header:<br /></p>
+<pre>  #include &lt;BoostTestTargetConfig.h&gt;<br /></pre>
+    <p><br /></p>
+<p>If you cannot do that and must use the included form for a given test, include the line<br /></p>
+<pre>  // OVERRIDE_BOOST_TEST_INCLUDED_WARNING<br /></pre>
+    <p>in the same file with the boost test include.<br /></p>
+<pre>  include(BoostTestTargets)<br />  add_boost_test(&lt;testdriver_name&gt; SOURCES &lt;source1&gt; [&lt;more sources...&gt;]<br />   [FAIL_REGULAR_EXPRESSION &lt;additional fail regex&gt;]<br />   [LAUNCHER &lt;generic launcher script&gt;]<br />   [LIBRARIES &lt;library&gt; [&lt;library&gt;...]]<br />   [RESOURCES &lt;resource&gt; [&lt;resource&gt;...]]<br />   [TESTS &lt;testcasename&gt; [&lt;testcasename&gt;...]])<br /></pre>
+    <p><br /></p>
+<pre>  If for some reason you need access to the executable target created,<br />  it can be found in ${${testdriver_name}_TARGET_NAME} as specified when<br />  you called add_boost_test<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Requires: 	GetForceIncludeDefinitions 	CopyResourcesToBuildTree<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:BundleOSGPlugins"></a><b><code>BundleOSGPlugins</code></b>: Provide access to the OpenSceneGraph runtime files for bundling in<br />
+    <p>an installation or package.<br /></p>
+<p>Sets these variables:<br /></p>
+<pre>  - OSGDB_PLUGINS_RELEASE<br />  - OSGDB_PLUGINS_DEBUG<br />  - OSGWRAPPER_PLUGINS_RELEASE<br />  - OSGWRAPPER_PLUGINS_DEBUG<br />  - OSG_RUNTIME_LIBRARY_DIR<br />  - OSG_PATH_TO_PLUGINS<br /></pre>
+    <p><br /></p>
+<p>Creates this function:<br /></p>
+<pre>  - install_osg_plugins( {varNameForOutputFilenames} )<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:BundleOSGRuntime"></a><b><code>BundleOSGRuntime</code></b>: Include the OpenSceneGraph runtime files in an installation or built package.<br />
+    <p><br /></p>
+<pre>  OSGRUNTIME_BUNDLE - Set to "yes" to enable this behavior<br />  OSGRUNTIME_zlib1dll - Must be set to the location of zlib1.dll on Windows<br />  OSGRUNTIME_zlib1ddll - Can be set to the location of zlib1d.dll (debug) on Windows.<br />                         If set, will be installed.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:BundleVRJ22Runtime"></a><b><code>BundleVRJ22Runtime</code></b>: Include the VR Juggler runtime files in an installation or built package.<br />
+    <p><br /></p>
+<pre>  VRJUGGLERRUNTIME_BUNDLE<br />  VRJUGGLERRUNTIME_BUNDLE_DEBUG - set to yes to include debug dll's as well<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindVRJuggler22 and its dependencies<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:BundleVRJ30Runtime"></a><b><code>BundleVRJ30Runtime</code></b>: Include the VR Juggler runtime files in an installation or built package.<br />
+    <p><br /></p>
+<pre>  VRJUGGLERRUNTIME_BUNDLE<br />  VRJUGGLERRUNTIME_BUNDLE_DEBUG - set to yes to include debug dll's as well<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindVRJuggler22 and its dependencies<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:CheckMacHIDAPI"></a><b><code>CheckMacHIDAPI</code></b>: Script to check if the signature for a mac HID callback uses UInt32 or uint32_t<br />
+    <p>Requires that the associated CPP file be present: CheckMacHIDAPI.cpp.<br /></p>
+<p>	MACOSX_HID_UINT32T, set according to the results of our test.<br /></p>
+<p>Use add_definitions(-DMACOSX_HID_UINT32T=${MACOSX_HID_UINT32T}) in your listfile and the following prototype for the function you'd like to register using setInterruptReportHandlerCallback:<br /></p>
+<pre>  void ReaderReportCallback(<br />                            void *target,<br />                            IOReturn result,<br />                            void *refcon,<br />                            void *sender,<br />                            MACOSX_HID_UINT32T size<br />                            )<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CheckVersion"></a><b><code>CheckVersion</code></b>: Utility function for Find modules considering multiple possible versions<br />
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CleanDirectoryList"></a><b><code>CleanDirectoryList</code></b>: Removes duplicate entries and non-directories from a provided list<br />
+    <p><br /></p>
+<pre>  clean_directory_list(&lt;listvar&gt; [&lt;additional list items&gt;...])<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CleanLibraryList"></a><b><code>CleanLibraryList</code></b>: A smarter replacement for list(REMOVE_DUPLICATES) for library lists<br />
+    <p><br /></p>
+<p>Note that, in the case of cyclic link dependencies, you _do_ actually need a library in a list multiple times. So, only use this function when you know that the dependency graph is acyclic.<br /></p>
+<pre>  clean_library_list(&lt;listvar&gt; [&lt;additional list items&gt;...]) - where<br />  listvar is the name of a destination variable, and also possibly a source, and<br />  it is followed by any number (including 0) of additional libraries to append<br />  to the list before processing.<br /></pre>
+    <p><br /></p>
+<p>Removes duplicates from the list, leaving only the last instance, while preserving the meaning of the "optimized", "debug", and "general" labeling. (Libraries listed as general are listed in the result instead as optimized and debug)<br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CopyResourcesToBuildTree"></a><b><code>CopyResourcesToBuildTree</code></b>: Copy the resources your app needs to the build tree.<br />
+    <p><br /></p>
+<pre>  copy_resources_to_build_tree(&lt;target_name&gt;)<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CppcheckTargets"></a><b><code>CppcheckTargets</code></b>: Run cppcheck on c++ source files as a custom target and a test<br />
+    <p><br /></p>
+<pre>  include(CppcheckTargets)<br />  add_cppcheck(&lt;target-name&gt; [UNUSED_FUNCTIONS] [STYLE] [POSSIBLE_ERROR] [FAIL_ON_WARNINGS]) -<br />    Create a target to check a target's sources with cppcheck and the indicated options<br />  add_cppcheck_sources(&lt;target-name&gt; [UNUSED_FUNCTIONS] [STYLE] [POSSIBLE_ERROR] [FAIL_ON_WARNINGS]) -<br />    Create a target to check standalone sources with cppcheck and the indicated options<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  Findcppcheck<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CreateDashboardScripts"></a><b><code>CreateDashboardScripts</code></b>: Create ctest -S scripts to use to run dashboard builds<br />
+    <p><br /></p>
+<pre>  include(CreateDashboardScripts)<br />  create_dashboard_scripts([&lt;initialcachetemplatefilename&gt;])<br /></pre>
+    <p><br /></p>
+<p>If you need additional settings to persist from the "parent" CMake instance to the initial cache created by the dashboard script, you may pass a filename which will be configured into the initial cache.<br /></p>
+<p>In the resulting DASHBOARDSCRIPT_BASE_DIRECTORY, an end-user may optionally create a file named<br /></p>
+<pre>  CustomInitialCache.${DASHBOARDSCRIPT_SCRIPT_NAME}<br /></pre>
+    <p>(by default, CustomInitialCache.go.cmake) containing set commands that use the CACHE option, to set up additional site-local cache variable values.<br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  GetCompilerInfoString<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CreateImportedTarget"></a><b><code>CreateImportedTarget</code></b>: A smarter replacement for list(REMOVE_DUPLICATES) for library lists<br />
+    <p><br /></p>
+<pre>  create_imported_target(&lt;libname&gt; [SHARED|STATIC|MODULE] [&lt;library dependency&gt;...]) - where<br />  ${libname}_LIBRARIES is set to this library's paths.<br /></pre>
+    <p><br /></p>
+<p>Removes duplicates from the list then sorts while preserving "optimized", "debug", and "general" labeling<br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:CreateLaunchers"></a><b><code>CreateLaunchers</code></b>: Create launchers to set working directory, env. vars, etc.<br />
+    <p><br /></p>
+<pre>  include(CreateLaunchers) - to make these available<br />  guess_runtime_library_dirs(&lt;outputvarname&gt; [&lt;extralibrary&gt; ...])<br />  create_default_target_launcher(&lt;targetname&gt;<br />    [ARGS &lt;args...&gt;]<br />    [FORWARD_ARGS]<br />    [RUNTIME_LIBRARY_DIRS &lt;dir...&gt;]<br />    [WORKING_DIRECTORY &lt;dir&gt;]<br />    [ENVIRONMENT &lt;VAR=value&gt; [&lt;VAR=value&gt;...]])<br /></pre>
+    <p><br /></p>
+<pre>  create_target_launcher(&lt;targetname&gt;<br />    [ARGS &lt;args...&gt;]<br />    [FORWARD_ARGS]<br />    [RUNTIME_LIBRARY_DIRS &lt;dir...&gt;]<br />    [WORKING_DIRECTORY &lt;dir&gt;]<br />    [ENVIRONMENT &lt;VAR=value&gt; [&lt;VAR=value&gt;...]])<br /></pre>
+    <p><br /></p>
+<pre>  create_generic_launcher(&lt;launchername&gt;<br />    [RUNTIME_LIBRARY_DIRS &lt;dir...&gt;]<br />    [WORKING_DIRECTORY &lt;dir&gt;]<br />    [ENVIRONMENT &lt;VAR=value&gt; [&lt;VAR=value&gt;...]])<br />    - sets GENERIC_LAUNCHER_COMMAND and GENERIC_LAUNCHER_FAIL_REGULAR_EXPRESSION<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  ListFilter<br />  ProgramFilesGlob<br />  CleanDirectoryList<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:DoxygenTargets"></a><b><code>DoxygenTargets</code></b>: Run doxygen on source files as a custom target<br />
+    <p><br /></p>
+<pre>  include(DoxygenTargets)<br />  add_doxygen(&lt;doxyfile&gt; [OUTPUT_DIRECTORY &lt;outputdir&gt;]<br />   [INSTALL_DESTINATION &lt;installdir&gt;<br />   [INSTALL_COMPONENT &lt;installcomponent&gt;]<br />   [INSTALL_PDF_NAME &lt;installpdfname&gt;] ]<br />   [DOC_TARGET &lt;targetname&gt;]<br />   [PROJECT_NUMBER &lt;versionnumber&gt;]<br />   [NO_WARNINGS]<br />   [NO_PDF])<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindDoxygen<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:EnableExtraCompilerWarnings"></a><b><code>EnableExtraCompilerWarnings</code></b>: Add flags to compile with extra warnings<br />
+    <p><br /></p>
+<pre>  enable_extra_compiler_warnings(&lt;targetname&gt;)<br />  globally_enable_extra_compiler_warnings() - to modify CMAKE_CXX_FLAGS, etc<br />    to change for all targets declared after the command, instead of per-command<br /></pre>
+    <p><br /></p>
+<p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:EnableProfiling"></a><b><code>EnableProfiling</code></b>: Add flags to compile with profiling support - currently only for GCC<br />
+    <p><br /></p>
+<pre>  enable_profiling(&lt;targetname&gt;)<br />  globally_enable_profiling() - to modify CMAKE_CXX_FLAGS, etc<br />    to change for all targets declared after the command, instead of per-command<br /></pre>
+    <p><br /></p>
+<p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FileCopyTargets"></a><b><code>FileCopyTargets</code></b>: Add a target for files that just need to be copied<br />
+    <p><br /></p>
+<pre>  include(FileCopyTargets)<br />  add_file_copy_target(&lt;target_name&gt; &lt;directory to copy to&gt; &lt;filename&gt; [&lt;filename&gt;...])<br />    Creates a custom target that copies the files to a directory, if needed.<br />    Relative paths for the destination directory are considered with<br />    with respect to CMAKE_CURRENT_BINARY_DIR<br />    You can use this target in all the usual ways, including<br />    add_dependencies(some_other_target this_target) to specify that another<br />    target depends on this.<br /></pre>
+    <p><br /></p>
+<pre>  install_file_copy_target(&lt;target_name&gt; [arguments to INSTALL(PROGRAMS ...) ])<br />    Works just the same as INSTALL(PROGRAMS ...) because it wraps it to install<br />    the files you specified in add_file_copy_target<br /></pre>
+    <p><br /></p>
+<p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindALUT"></a><b><code>FindALUT</code></b>: try to find the OpenAL ALUT library<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  ALUT_ROOT_DIR - a prefix to start searching.<br /></pre>
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  ALUT_INCLUDE_DIR<br />  ALUT_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  ALUT_FOUND<br />  ALUT_INCLUDE_DIRS<br />  ALUT_LIBRARIES<br />  ALUT_WORKAROUND_INCLUDE_DIRS - add these to your include path with<br />   include_directories(${ALUT_WORKAROUND_INCLUDE_DIRS} ${ALUT_INCLUDE_DIRS})<br />   so you can always #include &lt;AL/al.h&gt; and #include &lt;AL/alut.h&gt; even on<br />   Mac where the paths might differ.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindAdrienne"></a><b><code>FindAdrienne</code></b>: try to find Adrienne Electronics Corporation timecode card library<br />
+    <p><br /></p>
+<p>SDK available from the manufacturer: <a href="http://www.adrielec.com/">http://www.adrielec.com/</a><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  ADRIENNE_INCLUDE_DIR<br />  ADRIENNE_LIBRARY<br />  ADRIENNE_RUNTIME_LIBRARY<br />  ADRIENNE_INCLUDE_FILE<br /></pre>
+    <p><br /></p>
+<p>Variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  ADRIENNE_FOUND<br />  ADRIENNE_INCLUDE_DIRS<br />  ADRIENNE_LIBRARIES<br />  ADRIENNE_RUNTIME_LIBRARIES - the AEC_NTTC.dll file<br />  ADRIENNE_RUNTIME_LIBRARY_DIRS<br /></pre>
+    <p><br /></p>
+<pre>  ADRIENNE_INCLUDE_FILENAME - this is probably AEC_NTTC.h, but it might also<br />    be AECINTTC.H.<br /></pre>
+    <p><br /></p>
+<pre>  ADRIENNE_INCLUDE_HAS_EXTERN_C - Some (most) versions of the header already<br />    wrap their definitions in extern "C" { }, but some do not.<br /></pre>
+    <p><br /></p>
+<pre>  ADRIENNE_DEFINITIONS - defines a quoted ADRIENNE_INCLUDE_FILENAME as above,<br />    so you can write a line like #include ADRIENNE_INCLUDE_FILENAME<br />    Also defines ADRIENNE_BEFORE_INCLUDE and ADRIENNE_AFTER_INCLUDE to handle<br />    adding extern "C" { and } if the header file doesn't do so itself.<br /></pre>
+    <p><br /></p>
+<p>Variables that might be set by the user in the gui/command line to help find the library:<br /></p>
+<pre>  ADRIENNE_ROOT_DIR - root of an Adrienne CD, disk, or extracted/copied contents<br />    thereof.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindBluez"></a><b><code>FindBluez</code></b>: try to find Bluez<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  BLUEZ_INCLUDE_DIR<br />  BLUEZ_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  BLUEZ_FOUND<br />  BLUEZ_INCLUDE_DIRS<br />  BLUEZ_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindCPPDOM"></a><b><code>FindCPPDOM</code></b>: try to find CPPDOM library<br />
+    <p>Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<pre>  CPPDOM_LIBRARY_DIR, library search path<br />  CPPDOM_INCLUDE_DIR, include search path<br />  CPPDOM_LIBRARY, the library to link against<br />  CPPDOM_CXX_FLAGS<br />  CPPDOM_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  CPPDOM_ROOT_DIR - A directory prefix to search<br />                    (a path that contains include/ as a subdirectory)<br />  CPPDOM_ADDITIONAL_VERSIONS - Additional versions (outside of 0.7.8 to 1.2.0)<br />                               to use when constructing search names and paths<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>VR Juggler requires this package, so this Find script takes that into account when determining where to search for the desired files. The VJ_BASE_DIR environment variable is searched (preferentially) when searching for this package, so most sane VR Juggler build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindDCubed"></a><b><code>FindDCubed</code></b>: try to find DCUBED library<br />
+    <p><br /></p>
+<pre>  DCUBED_LIBRARY_DIR, library search path<br />  DCUBED_INCLUDE_DIR, include search path<br />  DCUBED_{component}_LIBRARY, the library to link against<br />  DCUBED_ENVIRONMENT<br />  DCUBED_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  DCUBED_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindDirectInput"></a><b><code>FindDirectInput</code></b>: try to find DirectInput library (part of DirectX SDK)<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  DIRECTINPUT_DXGUID_LIBRARY<br />  DIRECTINPUT_DXERR_LIBRARY<br />  DIRECTINPUT_DINPUT_LIBRARY<br />  DIRECTINPUT_INCLUDE_DIR<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you should use in your CMakeLists.txt:<br /></p>
+<pre>  DIRECTINPUT_LIBRARIES<br />  DIRECTINPUT_INCLUDE_DIRS<br />  DIRECTINPUT_FOUND - if this is not true, do not attempt to use this library<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2011 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2011. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindDirectShow"></a><b><code>FindDirectShow</code></b>: Find Microsoft DirectShow sample files, library, and headers.<br />
+    <p><br /></p>
+<pre>  DIRECTSHOW_INCLUDE_DIRS - where to find needed include file<br />  DIRECTSHOW_BASECLASS_DIR- Directory containing the DirectShow baseclass sample code.<br />  DIRECTSHOW_FOUND        - True if DirectShow found.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Initially in VRPN - Distributed under the Boost Software License, Version 1.0.<br /></p>
+<p>Almost entirely re-written by: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindDirectX"></a><b><code>FindDirectX</code></b>: try to find part of DirectX SDK<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  DIRECTX_INCLUDE_DIR<br /></pre>
+    <p><br /></p>
+<p>Variables you should use in your CMakeLists.txt:<br /></p>
+<pre>  DIRECTX_DXGUID_LIBRARY<br />  DIRECTX_DXERR_LIBRARY<br />  DIRECTX_DINPUT_LIBRARY<br />  DIRECTX_DINPUT_INCLUDE_DIR<br />  DIRECTX_D3D9_LIBRARY<br />  DIRECTX_D3DXOF_LIBRARY<br />  DIRECTX_D3DX9_LIBRARIES<br />  DIRECTX_INCLUDE_DIRS<br />  DIRECTX_FOUND - if this is not true, do not attempt to use this library<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br />  SelectLibraryConfigurations<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindFlagpoll"></a><b><code>FindFlagpoll</code></b>: try to find Flagpoll application, and offer package-finding services<br />
+    <pre>  FLAGPOLL, the executable: if not defined, do not try to use Flagpoll.<br /></pre>
+    <p><br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  FLAGPOLL_ROOT_DIR  - A directory prefix to search for the app<br />                       (a path that contains bin/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>VR Juggler requires this package, so this Find script takes that into account when determining where to search for the desired files. The VJ_BASE_DIR environment variable is searched (preferentially) when searching for this package, so most sane VR Juggler build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>You can use Flagpoll to provide directories to use as HINTS for find_* These are the provided macros:<br /></p>
+<pre>  flagpoll_get_include_dirs<br />  flagpoll_get_library_dirs<br />  flagpoll_get_library_names<br />  flagpoll_get_extra_libs<br /></pre>
+    <p>All take the name of the desired package, optionally NO_DEPS to pass --no-deps to Flagpoll, and return yourpkgname_FLAGPOLL_INCLUDE_DIRS(etc. for the other macros).<br /></p>
+<p>Example usage: 	flagpoll_get_include_dirs(vpr NO_DEPS) 	find_path(VPR20_INCLUDE_DIRS vpr/vpr.h<br /></p>
+<pre>   	  HINTS  ${vpr_FLAGPOLL_INCLUDE_DIRS})<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGDB"></a><b><code>FindGDB</code></b>: Try to find GDB<br />
+    <p><br /></p>
+<p>Once done, this will define:<br /></p>
+<pre>  GDB_FOUND - system has GDB<br />  GDB_COMMAND - the command to run<br />  GDB_VERSION - version<br />  GDB_HAS_RETURN_CHILD_RESULT - if the --return-child-result flag is supported<br /></pre>
+    <p><br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  GDB_ROOT_DIR - A directory prefix to search<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGHOST"></a><b><code>FindGHOST</code></b>: try to find Sensable GHOST library and include files<br />
+    <pre>  GHOST_INCLUDE_DIRS, where to find GL/glut.h, etc.<br />  GHOST_LIBRARIES, the libraries to link against<br />  GHOST_FOUND, If false, do not try to use GLUT.<br />  GHOST_RUNTIME_LIBRARY_DIRS, path to DLL on Windows for runtime use.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGLUI"></a><b><code>FindGLUI</code></b>: Try to find GLUI (GL User Interface)<br />
+    <p>Requires OpenGL and GLUT - searches for them using find_package Once done, this will define<br /></p>
+<p>	GLUI_INCLUDE_DIR, where to find GL/glui.h (or GLUI/glui.h on mac) 	GLUI_LIBRARY, the libraries to link against 	GLUI_FOUND, If false, do not try to use GLUI.<br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>   GLUI_ROOT_DIR - A directory prefix to search<br />                  (usually a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGLUT"></a><b><code>FindGLUT</code></b>: try to find glut library and include files<br />
+    <pre>  GLUT_INCLUDE_DIRS, where to find GL/glut.h, etc.<br />  GLUT_LIBRARIES, the libraries to link against<br />  GLUT_FOUND, If false, do not try to use GLUT.<br />  GLUT_RUNTIME_LIBRARY_DIRS, path to DLL on Windows for runtime use.<br />  GLUT_RUNTIME_LIBRARY, dll on Windows, for installation purposes<br /></pre>
+    <p><br /></p>
+<p>Also defined, but not for general use are:<br /></p>
+<pre>  GLUT_INCLUDE_DIR, where to find GL/glut.h, etc.<br />  GLUT_glut_LIBRARY = the full path to the glut library.<br /></pre>
+    
+  </li>
+  <li>
+    <a name="module:FindGMTL"></a><b><code>FindGMTL</code></b>: Try to find GMTL<br />
+    <p>Optionally uses Flagpoll and FindFlagpoll.cmake Once done, this will define<br /></p>
+<pre>  GMTL_FOUND - system has GMTL<br />  GMTL_INCLUDE_DIR - the GMTL include directory<br /></pre>
+    <p><br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  GMTL_ROOT_DIR - A directory prefix to search<br />                  (a path that contains include/ as a subdirectory)<br />  GMTL_ADDITIONAL_VERSIONS - Additional versions (outside of 0.5.1 to 0.7.0)<br />                             to use when constructing search names and paths<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>VR Juggler requires this package, so this Find script takes that into account when determining where to search for the desired files. The VJ_BASE_DIR environment variable is searched (preferentially) when searching for this package, so most sane VR Juggler build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGPM"></a><b><code>FindGPM</code></b>: try to find GPM library<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  GPM_INCLUDE_DIR<br />  GPM_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  GPM_FOUND<br />  GPM_INCLUDE_DIRS<br />  GPM_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGadgeteer12"></a><b><code>FindGadgeteer12</code></b>: try to find Gadgeteer 1.2 library<br />
+    <p>Requires JCCL 1.2 and VPR 2.0 (thus FindJCCL12.cmake and FindVPR20.cmake) Requires X11 if not on Mac or Windows. Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  GADGETEER12_LIBRARY_DIR, library search path<br />  GADGETEER12_INCLUDE_DIR, include search path<br />  GADGETEER12_LIBRARY, the library to link against<br />  GADGETEER12_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  GADGETEER12_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindGadgeteer20"></a><b><code>FindGadgeteer20</code></b>: try to find Gadgeteer 2.0 library<br />
+    <p>Requires JCCL 1.4 and VPR 2.2 (thus FindJCCL14.cmake and FindVPR22.cmake) Requires X11 if not on Mac or Windows. Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  GADGETEER20_LIBRARY_DIR, library search path<br />  GADGETEER20_INCLUDE_DIR, include search path<br />  GADGETEER20_LIBRARY, the library to link against<br />  GADGETEER20_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  GADGETEER20_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:FindGlove5DT"></a><b><code>FindGlove5DT</code></b>: try to find Glove5DT libraries<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  GLOVE5DT_INCLUDE_DIR<br />  GLOVE5DT_LIBRARY<br />  GLOVE5DT_LIBRARY_RELEASE<br />  GLOVE5DT_LIBRARY_DEBUG<br />  GLOVE5DT_RUNTIME_LIBRARY_RELEASE<br />  GLOVE5DT_RUNTIME_LIBRARY_DEBUG<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  GLOVE5DT_FOUND<br />  GLOVE5DT_INCLUDE_DIRS<br />  GLOVE5DT_LIBRARIES<br />  GLOVE5DT_RUNTIME_LIBRARY_DIRS<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  CleanDirectoryList<br />  CleanLibraryList<br />  ListCombinations<br />  ProgramFilesGlob<br />  SelectLibraryConfigurations (included with CMake &gt;=2.8.0)<br />  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindHIDAPI"></a><b><code>FindHIDAPI</code></b>: try to find HIDAPI library<br />
+    <p>from <a href="http://www.signal11.us/oss/hidapi/">http://www.signal11.us/oss/hidapi/</a><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  HIDAPI_INCLUDE_DIR<br />  HIDAPI_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  HIDAPI_FOUND<br />  HIDAPI_INCLUDE_DIRS<br />  HIDAPI_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindIDLJ"></a><b><code>FindIDLJ</code></b>: try to find Java's IDLJ Interface Definition Language compiler.<br />
+    <p><br /></p>
+<p>Ideally used with CMake 2.8.5 or newer for Java support using FindJava.cmake and UseJava.cmake<br /></p>
+<p>Variables:<br /></p>
+<pre>  Java_IDLJ_COMMAND, executable for idlj<br />  IDLJ_FOUND, If false, do not try to use this<br /></pre>
+    <p><br /></p>
+<p>Function:<br /></p>
+<pre>  java_idlj(varname idlfile [extra idlj args]) - Generates<br />    the Java source files from the IDL file you indicate, and<br />    appends filenames suitable to add to a add_jar() call to the<br />    variable you specified.<br /></pre>
+    <p><br /></p>
+<p>Because the files generated from an IDL file are not entirely predictable, java_idlj runs idlj in the cmake step, rather than the build step, and triggers a CMake re-run when an idl file is modified. Already up-to-date generated source is not re-generated, however.<br /></p>
+<p>Files are generated in a directory created specifically for the particular IDL file and the particular call, in the build directory - there should be no worries about overwriting files or picking up too much with the wildcard.<br /></p>
+<p>You may wish to add the IDL file to your list of sources if you want it to appear in your IDE, but it is not necessary.<br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindInterSense"></a><b><code>FindInterSense</code></b>: try to find InterSense library<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  INTERSENSE_INCLUDE_DIR<br />  INTERSENSE_ISENSEC_DIR - location of the isense.c "import library" substitute.<br />  INTERSENSE_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  INTERSENSE_FOUND<br />  INTERSENSE_INCLUDE_DIRS<br />  INTERSENSE_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Author: 2013 Eric Marsh &lt;bits@wemarsh.com&gt; <a href="http://wemarsh.com/">http://wemarsh.com/</a> Kognitiv Neuroinformatik, Universität Bremen<br /></p>
+<p>(building on Ryan Pavlik's templates)<br /></p>
+<p>2013 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindJCCL12"></a><b><code>FindJCCL12</code></b>: try to find JCCL 1.2 library<br />
+    <p>Requires VPR 2.0 (thus FindVPR20.cmake) Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  JCCL12_LIBRARY_DIR, library search path<br />  JCCL12_INCLUDE_DIR, include search path<br />  JCCL12_LIBRARY, the library to link against<br />  JCCL12_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  JCCL12_ROOT_DIR - A directory prefix to search<br />                    (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindJCCL14"></a><b><code>FindJCCL14</code></b>: try to find JCCL 1.4 library<br />
+    <p>Requires VPR 2.2 (thus FindVPR22.cmake) Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  JCCL14_LIBRARY_DIR, library search path<br />  JCCL14_INCLUDE_DIR, include search path<br />  JCCL14_LIBRARY, the library to link against<br />  JCCL14_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  JCCL14_ROOT_DIR - A directory prefix to search<br />                    (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:FindJtTk"></a><b><code>FindJtTk</code></b>: try to find JTTK library<br />
+    <p><br /></p>
+<pre>  JTTK_LIBRARY_DIRS, library search path<br />  JTTK_INCLUDE_DIRS, include search path<br />  JTTK_{component}_LIBRARY, the library to link against<br />  JTTK_ENVIRONMENT, environment variables to set<br />  JTTK_RUNTIME_LIBRARY_DIRS<br />  JTTK_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>If you have license issues, you might run this command on each JtTk-using target:<br /></p>
+<pre>  jttk_stamp_binary(&lt;targetname&gt;)<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  JTTK_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindLAPACKLibs"></a><b><code>FindLAPACKLibs</code></b>: Try to find LAPACK and BLAS libraries<br />
+    <p>Once done, this will define<br /></p>
+<pre>  LAPACKLIBS_LIBRARIES, all libraries to link against<br />  LAPACKLIBS_FOUND, If false, do not try to use LAPACK library features.<br /></pre>
+    <p><br /></p>
+<p>Users may wish to set:<br /></p>
+<pre>  LAPACKLIBS_ROOT_DIR, location to start searching for LAPACK libraries<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindLibusb1"></a><b><code>FindLibusb1</code></b>: try to find libusb-1 library<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  LIBUSB1_LIBRARY<br />  LIBUSB1_INCLUDE_DIR<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you should use in your CMakeLists.txt:<br /></p>
+<pre>  LIBUSB1_LIBRARIES<br />  LIBUSB1_INCLUDE_DIRS<br />  LIBUSB1_FOUND - if this is not true, do not attempt to use this library<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  ProgramFilesGlob<br />  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindLuabind"></a><b><code>FindLuabind</code></b>: try to find Luabind<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  LUABIND_ROOT_DIR - a prefix to start searching<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  LUABIND_FOUND<br />  LUABIND_DEFINITIONS<br />  LUABIND_INCLUDE_DIRS<br />  LUABIND_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindLyX"></a><b><code>FindLyX</code></b>: Try to find LyX, and define some custom commands to export from LyX<br />
+    <p><br /></p>
+<p>Once done, this will define:<br /></p>
+<pre>  LYX_FOUND - system has LyX<br />  LYX_COMMAND - the command to run<br /></pre>
+    <p><br /></p>
+<p>and the following new functions:<br /></p>
+<pre>  lyx_export(&lt;format&gt; &lt;extension-without-leading-dot&gt; &lt;output-variable&gt;<br />    INPUT &lt;lyx-file&gt; [...]<br />    [OUTPUT_TO_SOURCE_DIR]<br />    [ EXTRA_DEPS &lt;bibtex-or-other-file&gt; [...] ]) - the base function<br /></pre>
+    <p><br /></p>
+<p>These shortcut functions all have the same syntax:<br /></p>
+<pre>  lyx_export_to_XXX(&lt;output-variable&gt;<br />    INPUT &lt;lyx-file&gt; [...]<br />    [OUTPUT_TO_SOURCE_DIR]<br />    [ EXTRA_DEPS &lt;bibtex-or-other-file&gt; [...] ])<br /></pre>
+    <p><br /></p>
+<p>Available shortcuts:<br /></p>
+<pre>  lyx_export_to_docbook_xml<br />  lyx_export_to_docbook<br />  lyx_export_to_pdf<br />  lyx_export_to_pdf_via_pdflatex<br />  lyx_export_to_pdf_via_dvi<br /></pre>
+    <p><br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  LYX_ROOT_DIR - A directory prefix to search<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindMacHID"></a><b><code>FindMacHID</code></b>: try to find Mac HID frameworks<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  MACHID_CoreFoundation_LIBRARY<br />  MACHID_CoreFoundation_INCLUDE_DIR<br />  MACHID_IOKit_LIBRARY<br />  MACHID_IOKit_INCLUDE_DIR<br />  MACOSX_HID_UINT32T  (from CheckMacHIDAPI)<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you should use in your CMakeLists.txt:<br /></p>
+<pre>  MACHID_DEFINITIONS<br />  MACHID_LIBRARIES<br />  MACHID_INCLUDE_DIRS<br />  MACHID_FOUND - if this is not true, do not attempt to use this library<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  CheckMacHIDAPI<br />  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindMarkdown"></a><b><code>FindMarkdown</code></b>: try to find Markdown tool<br />
+    <p><br /></p>
+<p>Cache Variables:<br /></p>
+<pre>  MARKDOWN_EXECUTABLE<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  MARKDOWN_FOUND<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2011 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2011. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindOpenCV"></a><b><code>FindOpenCV</code></b>: ------------------------------<br />
+    <p>See <a href="http://sourceforge.net/projects/opencvlibrary/">http://sourceforge.net/projects/opencvlibrary/</a><br /></p>
+<p>The following variable is optionally searched for defaults<br /></p>
+<pre>  OPENCV_ROOT_DIR:            Base directory of OpenCv tree to use.<br /></pre>
+    <p><br /></p>
+<pre>  OPENCV_NEW_LIBRARY_NAMES   Set to YES before searching if you want to<br /></pre>
+    <p>The following are set after configuration is done:<br /></p>
+<pre>  OPENCV_FOUND<br />  OPENCV_INCLUDE_DIRS<br />  OPENCV_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>2004/05 Jan Woetzel, Friso, Daniel Grest 2006/01 complete rewrite by Jan Woetzel 2006/09 2nd rewrite introducing ROOT_DIR and PATH_SUFFIXES<br /></p>
+<pre>   to handle multiple installed versions gracefully by Jan Woetzel<br /></pre>
+    <p>2010/02 Ryan Pavlik (Iowa State University) - partial rewrite to standardize<br /></p>
+<p>tested with:<br /></p>
+<p>www.mip.informatik.uni-kiel.de/~jw academic.cleardefinition.com</p>
+
+  </li>
+  <li>
+    <a name="module:FindOpenHaptics"></a><b><code>FindOpenHaptics</code></b>: try to find OpenHaptics libraries<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  HDAPI_INCLUDE_DIR<br />  HDAPI_LIBRARY<br />  HDAPI_LIBRARY_RELEASE<br />  HDAPI_LIBRARY_DEBUG<br />  HDAPI_HDU_INCLUDE_DIR<br />  HDAPI_HDU_LIBRARY<br />  HDAPI_HDU_LIBRARY_RELEASE<br />  HDAPI_HDU_LIBRARY_DEBUG<br />  HLAPI_INCLUDE_DIR<br />  HLAPI_LIBRARY<br />  HLAPI_LIBRARY_RELEASE<br />  HLAPI_LIBRARY_DEBUG<br />  HLAPI_HLU_INCLUDE_DIR<br />  HLAPI_HLU_LIBRARY<br />  HLAPI_HLU_LIBRARY_RELEASE<br />  HLAPI_HLU_LIBRARY_DEBUG<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  OPENHAPTICS_FOUND<br />  HDAPI_INCLUDE_DIRS<br />  HDAPI_LIBRARIES<br />  HDAPI_HDU_INCLUDE_DIRS<br />  HDAPI_HDU_LIBRARIES<br />  HLAPI_INCLUDE_DIRS<br />  HLAPI_LIBRARIES<br />  HLAPI_HLU_INCLUDE_DIRS<br />  HLAPI_HLU_LIBRARIES<br />  OPENHAPTICS_LIBRARIES - includes HD, HDU, HL, HLU<br />  OPENHAPTICS_RUNTIME_LIBRARY_DIRS<br />  OPENHAPTICS_ENVIRONMENT<br />  OPENHAPTICS_LIBRARY_DIRS<br />  OPENHAPTICS_INCLUDE_DIRS<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  CleanDirectoryList<br />  CleanLibraryList<br />  ListCombinations<br />  ProgramFilesGlob<br />  SelectLibraryConfigurations (included with CMake &gt;=2.8.0)<br />  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br />  CMake 2.6.3 (uses "unset")<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindParasolid"></a><b><code>FindParasolid</code></b>: try to find PARASOLID library<br />
+    <p>Important note: If you are also using JtTk, do your<br /></p>
+<pre>  find_package(JtTk)<br /></pre>
+    <p>first, to avoid runtime PK_* errors!<br /></p>
+<pre>  PARASOLID_LIBRARY_DIR, library search path<br />  PARASOLID_INCLUDE_DIR, include search path<br />  PARASOLID_{component}_LIBRARY, the library to link against<br />  PARASOLID_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  CheckVersion<br />  ListCombinations<br />  ProgramFilesGlob<br />  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindPerformer"></a><b><code>FindPerformer</code></b>: try to find the OpenGL Performer library<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  PERFORMER_ROOT_DIR - a prefix to start searching.<br /></pre>
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  PERFORMER_INCLUDE_DIR<br />  PERFORMER_LIBRARY<br />  PERFORMER_PFUI_LIBRARY - doesn't get included in PERFORMER_LIBRARIES<br />  PERFORMER_PFDU_UTIL_LIBRARY - doesn't get included in PERFORMER_LIBRARIES<br />  PERFORMER_PFV_LIBRARY - doesn't get included in PERFORMER_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  PERFORMER_FOUND<br />  PERFORMER_INCLUDE_DIRS<br />  PERFORMER_LIBRARIES<br />  PERFORMER_RUNTIME_LIBRARY_DIRS<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindPerlModules"></a><b><code>FindPerlModules</code></b>: try to find perl modules, passed as COMPONENTS<br />
+    <p><br /></p>
+<p>Non-cache variable you might use in your CMakeLists.txt:<br /></p>
+<pre>  PERLMODULES_FOUND<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindQVRPN"></a><b><code>FindQVRPN</code></b>: try to find QVRPN library<br />
+    <p><br /></p>
+<p>Of course, you may also just choose to make QVRPN a submodule of your project itself.<br /></p>
+<p>Cache Variables:<br /></p>
+<pre>  QVRPN_LIBRARY<br />  QVRPN_INCLUDE_DIR<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  QVRPN_FOUND<br />  QVRPN_LIBRARIES<br />  QVRPN_INCLUDE_DIRS<br /></pre>
+    <p><br /></p>
+<p>QVRPN_ROOT_DIR is searched preferentially for these files<br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Refactored from FindVRPN.cmake by: Juan Sebastian Casallas &lt;casallas@iastate.edu&gt;<br /></p>
+<p>FindVRPN.cmake Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindSonix12"></a><b><code>FindSonix12</code></b>: try to find Sonix 1.2 library<br />
+    <p>Requires VPR 2.0 and GMTL (thus FindVPR20.cmake and FindGMTL.cmake) Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  SONIX12_LIBRARY_DIR, library search path<br />  SONIX12_INCLUDE_DIR, include search path<br />  SONIX12_LIBRARY, the library to link against<br />  SONIX12_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  SONIX12_ROOT_DIR - A directory prefix to search<br />                     (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindSonix14"></a><b><code>FindSonix14</code></b>: try to find Sonix 1.4 library<br />
+    <p>Requires VPR 2.2 and GMTL (thus FindVPR22.cmake and FindGMTL.cmake) Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  SONIX14_LIBRARY_DIR, library search path<br />  SONIX14_INCLUDE_DIR, include search path<br />  SONIX14_LIBRARY, the library to link against<br />  SONIX14_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  SONIX14_ROOT_DIR - A directory prefix to search<br />                     (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:FindTR1"></a><b><code>FindTR1</code></b>: Try to find C++ TR1 headers and libraries<br />
+    <p>Once done, this will define<br /></p>
+<pre>  TR1_USE_FILE, which you may "include" in your CMake file to be able<br />   to use TR1 features transparently<br />  TR1_INCLUDE_DIRS, any directories needed to access TR1 headers<br />  TR1_LIBRARY_DIRS, any directories needed to access (auto-link) TR1 libraries<br />  TR1_FOUND, If false, do not try to use TR1 features.<br /></pre>
+    <p><br /></p>
+<p>If TR1 features are not built-in, we will try to use Boost to substitute for them.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindTooN"></a><b><code>FindTooN</code></b>: try to find TooN headers<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  TOON_ROOT_DIR - a prefix to start searching for the toon headers.<br /></pre>
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  TOON_INCLUDE_DIR<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  TOON_FOUND<br />  TOON_INCLUDE_DIRS<br />  TOON_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindTooNtag"></a><b><code>FindTooNtag</code></b>: try to find tag algorithm library (built on TooN)<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  TAG_ROOT_DIR - a prefix to start searching for the toon headers.<br /></pre>
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  TAG_INCLUDE_DIR<br />  TAG_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  TOONTAG_FOUND<br />  TOONTAG_INCLUDE_DIRS<br />  TOONTAG_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindTweek12"></a><b><code>FindTweek12</code></b>: try to find Tweek 1.2 library<br />
+    <p>Requires VPR 2.0 (thus FindVPR20.cmake) Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  TWEEK12_LIBRARY_DIR, library search path<br />  TWEEK12_INCLUDE_DIR, include search path<br />  TWEEK12_LIBRARY, the library to link against<br />  TWEEK12_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  TWEEK12_ROOT_DIR - A directory prefix to search<br />                     (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindTweek14"></a><b><code>FindTweek14</code></b>: try to find Tweek 1.4 library<br />
+    <p>Requires VPR 2.2 (thus FindVPR22.cmake) Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  TWEEK14_LIBRARY_DIR, library search path<br />  TWEEK14_INCLUDE_DIR, include search path<br />  TWEEK14_LIBRARY, the library to link against<br />  TWEEK14_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  TWEEK14_ROOT_DIR - A directory prefix to search<br />                     (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:FindVPR20"></a><b><code>FindVPR20</code></b>: try to find VPR 2.0 library<br />
+    <p>Requires Boost 1.33.1 or greater (including filesystem and signals libraries) (and thus FindBoost.cmake from 2.8rc3 or newer, preferably) Requires NSPR4 (and PLC4) on Windows Requires pthreads on Unix (Mac or Linux) Requires libuuid on Linux Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  VPR20_LIBRARY_DIR, library search path<br />  VPR20_INCLUDE_DIR, include search path<br />  VPR20_LIBRARY, the library to link against<br />  VPR20_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VPR20_ROOT_DIR - A directory prefix to search<br />                   (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVPR22"></a><b><code>FindVPR22</code></b>: try to find VPR 2.2 library<br />
+    <p>Requires Boost 1.33.1 or greater (including filesystem and signals libraries) (and thus FindBoost.cmake from 2.8rc3 or newer, preferably) Requires NSPR4 (and PLC4) on Windows Requires pthreads on Unix (Mac or Linux) Requires libuuid on Linux Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  VPR22_LIBRARY_DIR, library search path<br />  VPR22_INCLUDE_DIR, include search path<br />  VPR22_LIBRARY, the library to link against<br />  VPR22_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VPR22_ROOT_DIR - A directory prefix to search<br />                   (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:FindVPS"></a><b><code>FindVPS</code></b>: try to find VPS library<br />
+    <p><br /></p>
+<pre>  VPS_LIBRARY_DIR, library search path<br />  VPS_INCLUDE_DIR, include search path<br />  VPS_{component}_LIBRARY, the library to link against<br />  VPS_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VPS_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJ22"></a><b><code>FindVRJ22</code></b>: try to find VR Juggler 2.2 core library<br />
+    <p>Requires JCCL 1.2, Gadgeteer 1.2, VPR 2.0, and Sonix 1.2 (thus FindJCCL12.cmake, FindGadgeteer12.cmake, FindVPR20.cmake, and FindSonix12.cmake) Requires X11 if not on Mac or Windows. Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  VRJ22_LIBRARY_DIR, library search path<br />  VRJ22_INCLUDE_DIR, include search path<br />  VRJ22_LIBRARY, the library to link against<br />  VRJ22_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VRJ22_ROOT_DIR - A directory prefix to search<br />                   (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJ30"></a><b><code>FindVRJ30</code></b>: try to find VR Juggler 3.0 core library<br />
+    <p>Requires JCCL 1.4, Gadgeteer 1.4, VPR 2.2, and Sonix 1.4 (thus FindJCCL14.cmake, FindGadgeteer20.cmake, FindVPR22.cmake, and FindSonix14.cmake) Requires X11 if not on Mac or Windows. Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  VRJ30_LIBRARY_DIR, library search path<br />  VRJ30_INCLUDE_DIR, include search path<br />  VRJ30_LIBRARY, the library to link against<br />  VRJ30_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VRJ30_ROOT_DIR - A directory prefix to search<br />                   (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJOGL22"></a><b><code>FindVRJOGL22</code></b>: try to find VRJuggler 2.2 OpenGL library<br />
+    <p>Requires VRJ core 2.2 (thus FindVRJ22.cmake) Requires OpenGL. Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 2.2 - you probably want to use find_package(VRJuggler22) instead, for an easy interface to this and related scripts.  See FindVRJuggler22.cmake for more information.<br /></p>
+<pre>  VRJOGL22_LIBRARY_DIR, library search path<br />  VRJOGL22_INCLUDE_DIRS, include search path for dependencies<br />  VRJOGL22_LIBRARY, the library to link against<br />  VRJOGL22_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VRJOGL22_ROOT_DIR - A directory prefix to search<br />                      (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJOGL30"></a><b><code>FindVRJOGL30</code></b>: try to find VRJuggler 3.0 OpenGL library<br />
+    <p>Requires VRJ core 3.0 (thus FindVRJ30.cmake) Requires OpenGL. Optionally uses Flagpoll and FindFlagpoll.cmake<br /></p>
+<p>This library is a part of VR Juggler 3.0 - you probably want to use find_package(VRJuggler30) instead, for an easy interface to this and related scripts.  See FindVRJuggler30.cmake for more information.<br /></p>
+<pre>  VRJOGL30_LIBRARY_DIR, library search path<br />  VRJOGL30_INCLUDE_DIRS, include search path for dependencies<br />  VRJOGL30_LIBRARY, the library to link against<br />  VRJOGL30_FOUND, If false, do not try to use this library.<br /></pre>
+    <p><br /></p>
+<p>Plural versions refer to this library and its dependencies, and are recommended to be used instead, unless you have a good reason.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  VRJOGL30_ROOT_DIR - A directory prefix to search<br />                      (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>This script will use Flagpoll, if found, to provide hints to the location of this library, but does not use the compiler flags returned by Flagpoll directly.<br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when searching for this component, so most sane build environments should "just work."  Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJuggler"></a><b><code>FindVRJuggler</code></b>: try to find VR Juggler-related packages (combined finder)<br />
+    <pre>  VRJUGGLER_INCLUDE_DIRS, include search paths<br />  VRJUGGLER_LIBRARIES, the libraries to link against<br />  VRJUGGLER_ENVIRONMENT<br />  VRJUGGLER_RUNTIME_LIBRARY_DIRS<br />  VRJUGGLER_CXX_FLAGS<br />  VRJUGGLER_DEFINITIONS<br />  VRJUGGLER_FOUND, If false, do not try to use VR Juggler.<br /></pre>
+    <p><br /></p>
+<p>Components available to search for (uses "VRJOGL" by default):<br /></p>
+<pre>  VRJOGL<br />  VRJ<br />  Gadgeteer<br />  JCCL<br />  VPR<br />  Sonix<br />  Tweek<br /></pre>
+    <p><br /></p>
+<p>Additionally, a full setup requires these packages and their Find_.cmake scripts<br /></p>
+<pre>  CPPDOM<br />  GMTL<br /></pre>
+    <p><br /></p>
+<p>Optionally uses Flagpoll (and FindFlagpoll.cmake)<br /></p>
+<p>Notes on components:<br /></p>
+<pre>  - All components automatically include their dependencies.<br />  - If you do not specify a component, VRJOGL (the OpenGL view manager)<br />    will be used by default.<br />  - Capitalization of component names does not matter, but it's best to<br />    pretend it does and use the above capitalization.<br />  - Since this script calls find_package for your requested components and<br />    their dependencies, you can use any of the variables specified in those<br />    files in addition to the "summary" ones listed here, for more finely<br />    controlled building and linking.<br /></pre>
+    <p><br /></p>
+<p>This CMake script requires all of the Find*.cmake scripts for the components listed above, as it is only a "meta-script" designed to make using those scripts more developer-friendly.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  (CAPS COMPONENT NAME)_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when seeking any of the above components, as well as Flagpoll, CPPDOM, and Boost (from within VPR), so most sane build environments should "just work."<br /></p>
+<p>IMPORTANT: Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt;<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJuggler22"></a><b><code>FindVRJuggler22</code></b>: try to find VRJuggler 2.2-related packages (main finder)<br />
+    <pre>  VRJUGGLER22_LIBRARY_DIRS, library search paths<br />  VRJUGGLER22_INCLUDE_DIRS, include search paths<br />  VRJUGGLER22_LIBRARIES, the libraries to link against<br />  VRJUGGLER22_ENVIRONMENT<br />  VRJUGGLER22_RUNTIME_LIBRARY_DIRS<br />  VRJUGGLER22_CXX_FLAGS<br />  VRJUGGLER22_DEFINITIONS<br />  VRJUGGLER22_FOUND, If false, do not try to use VR Juggler 2.2.<br /></pre>
+    <p><br /></p>
+<p>Components available to search for (uses "VRJOGL22" by default):<br /></p>
+<pre>  VRJOGL22<br />  VRJ22<br />  Gadgeteer12<br />  JCCL12<br />  VPR20<br />  Sonix12<br />  Tweek12<br /></pre>
+    <p><br /></p>
+<p>Additionally, a full setup requires these packages and their Find_.cmake scripts<br /></p>
+<pre>  CPPDOM<br />  GMTL<br /></pre>
+    <p><br /></p>
+<p>Optionally uses Flagpoll (and FindFlagpoll.cmake)<br /></p>
+<p>Notes on components:<br /></p>
+<pre>  - All components automatically include their dependencies.<br />  - You can search for the name above with or without the version suffix.<br />  - If you do not specify a component, VRJOGL22(the OpenGL view manager)<br />    will be used by default.<br />  - Capitalization of component names does not matter, but it's best to<br />    pretend it does and use the above capitalization.<br />  - Since this script calls find_package for your requested components and<br />    their dependencies, you can use any of the variables specified in those<br />    files in addition to the "summary" ones listed here, for more finely<br />    controlled building and linking.<br /></pre>
+    <p><br /></p>
+<p>This CMake script requires all of the Find*.cmake scripts for the components listed above, as it is only a "meta-script" designed to make using those scripts more developer-friendly.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  (CAPS COMPONENT NAME)_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when seeking any of the above components, as well as Flagpoll, CPPDOM, and Boost (from within VPR20), so most sane build environments should "just work."<br /></p>
+<p>IMPORTANT: Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRJuggler30"></a><b><code>FindVRJuggler30</code></b>: try to find VRJuggler 3.0-related packages (main finder)<br />
+    <pre>  VRJUGGLER30_LIBRARY_DIRS, library search paths<br />  VRJUGGLER30_INCLUDE_DIRS, include search paths<br />  VRJUGGLER30_LIBRARIES, the libraries to link against<br />  VRJUGGLER30_ENVIRONMENT<br />  VRJUGGLER30_RUNTIME_LIBRARY_DIRS<br />  VRJUGGLER30_CXX_FLAGS<br />  VRJUGGLER30_DEFINITIONS<br />  VRJUGGLER30_FOUND, If false, do not try to use VR Juggler 3.0.<br /></pre>
+    <p><br /></p>
+<p>Components available to search for (uses "VRJOGL30" by default):<br /></p>
+<pre>  VRJOGL30<br />  VRJ30<br />  Gadgeteer20<br />  JCCL14<br />  VPR22<br />  Sonix14<br />  Tweek14<br /></pre>
+    <p><br /></p>
+<p>Additionally, a full setup requires these packages and their Find_.cmake scripts<br /></p>
+<pre>  CPPDOM<br />  GMTL<br /></pre>
+    <p><br /></p>
+<p>Optionally uses Flagpoll (and FindFlagpoll.cmake)<br /></p>
+<p>Notes on components:<br /></p>
+<pre>  - All components automatically include their dependencies.<br />  - You can search for the name above with or without the version suffix.<br />  - If you do not specify a component, VRJOGL30(the OpenGL view manager)<br />    will be used by default.<br />  - Capitalization of component names does not matter, but it's best to<br />    pretend it does and use the above capitalization.<br />  - Since this script calls find_package for your requested components and<br />    their dependencies, you can use any of the variables specified in those<br />    files in addition to the "summary" ones listed here, for more finely<br />    controlled building and linking.<br /></pre>
+    <p><br /></p>
+<p>This CMake script requires all of the Find*.cmake scripts for the components listed above, as it is only a "meta-script" designed to make using those scripts more developer-friendly.<br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  (CAPS COMPONENT NAME)_ROOT_DIR - A directory prefix to search<br />                         (a path that contains include/ as a subdirectory)<br /></pre>
+    <p><br /></p>
+<p>The VJ_BASE_DIR environment variable is also searched (preferentially) when seeking any of the above components, as well as Flagpoll, CPPDOM, and Boost (from within VPR22), so most sane build environments should "just work."<br /></p>
+<p>IMPORTANT: Note that you need to manually re-run CMake if you change this environment variable, because it cannot auto-detect this change and trigger an automatic re-run.<br /></p>
+<p>Original Author: 2009-2011 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC Updated for VR Juggler 3.0 by: Brandon Newendorp &lt;brandon@newendorp.com&gt; and Ryan Pavlik<br /></p>
+<p>Copyright Iowa State University 2009-2011. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVRPN"></a><b><code>FindVRPN</code></b>: try to find VRPN library<br />
+    <p><br /></p>
+<p>Cache Variables:<br /></p>
+<pre>  VRPN_LIBRARY<br />  VRPN_SERVER_LIBRARY<br />  VRPN_INCLUDE_DIR<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  VRPN_FOUND<br />  VRPN_SERVER_LIBRARIES - server libraries<br />  VRPN_LIBRARIES - client libraries<br />  VRPN_CLIENT_DEFINITIONS - definitions if you only use the client library<br />  VRPN_DEFINITIONS - Client-only definition if all we found was the client library.<br />  VRPN_INCLUDE_DIRS<br /></pre>
+    <p><br /></p>
+<p>VRPN_ROOT_DIR is searched preferentially for these files<br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindViewPoint"></a><b><code>FindViewPoint</code></b>: try to find Arrington Research ViewPoint EyeTracker SDK<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  VIEWPOINT_INCLUDE_DIR<br />  VIEWPOINT_LIBRARY<br />  VIEWPOINT_RUNTIME_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  VIEWPOINT_FOUND<br />  VIEWPOINT_INCLUDE_DIRS<br />  VIEWPOINT_LIBRARIES<br />  VIEWPOINT_RUNTIME_LIBRARIES - aka the dll for installing<br />  VIEWPOINT_RUNTIME_LIBRARY_DIRS<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindVirtuoseAPI"></a><b><code>FindVirtuoseAPI</code></b>: try to find Haption VirtuoseAPI library and include files<br />
+    <p><br /></p>
+<pre>  VIRTUOSEAPI_INCLUDE_DIRS, where to find headers<br />  VIRTUOSEAPI_LIBRARIES, the libraries to link against<br />  VIRTUOSEAPI_FOUND, If false, do not try to use this library<br />  VIRTUOSEAPI_RUNTIME_LIBRARY_DIRS, path to DLL/SO for runtime use.<br />  VIRTUOSEAPI_RUNTIME_LIBRARIES, runtime libraries you might want to install<br /></pre>
+    
+  </li>
+  <li>
+    <a name="module:FindVirtuoseVPP"></a><b><code>FindVirtuoseVPP</code></b>: try to find Haption VirtuoseAPI C++ wrapper include files<br />
+    <p><br /></p>
+<p>Use of this header depends on the VirtuoseAPI, so we search for that too.<br /></p>
+<pre>  VIRTUOSEVPP_INCLUDE_DIRS, where to find headers<br />  VIRTUOSEVPP_LIBRARIES, the libraries to link against<br />  VIRTUOSEVPP_FOUND, If false, do not try to use this library<br />  VIRTUOSEVPP_RUNTIME_LIBRARY_DIRS, path to DLL/SO for runtime use.<br />  VIRTUOSEAPI_RUNTIME_LIBRARIES, runtime libraries you might want to install<br /></pre>
+    
+  </li>
+  <li>
+    <a name="module:FindWiiSCAAT"></a><b><code>FindWiiSCAAT</code></b>: try to find the Wii SCAAT library<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  WIISCAAT_ROOT_DIR - a prefix to start searching for the headers.<br /></pre>
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  WIISCAAT_INCLUDE_DIR<br />  WIISCAAT_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  WIISCAAT_FOUND<br />  WIISCAAT_INCLUDE_DIRS<br />  WIISCAAT_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindWiiUse"></a><b><code>FindWiiUse</code></b>: try to find WiiUse library<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  WIIUSE_INCLUDE_DIR<br />  WIIUSE_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  WIIUSE_FOUND<br />  WIIUSE_INCLUDE_DIRS<br />  WIIUSE_LIBRARIES<br />  WIIUSE_RUNTIME_LIBRARIES - aka the dll for installing<br />  WIIUSE_RUNTIME_LIBRARY_DIRS<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindWinHID"></a><b><code>FindWinHID</code></b>: try to find Windows HID support, part of the WDK/DDK<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  WINHID_INCLUDE_DIR<br />  WINHID_CRT_INCLUDE_DIR<br />  WINHID_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  WINHID_FOUND<br />  WINHID_INCLUDE_DIRS<br />  WINHID_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br />  PrefixListGlob<br />  CleanDirectoryList<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindWindowsSDK"></a><b><code>FindWindowsSDK</code></b>: Find the Windows SDK aka Platform SDK<br />
+    <p><br /></p>
+<p>Variables:<br /></p>
+<pre>  WINDOWSSDK_FOUND - if any version of the windows or platform SDK was found that is usable with the current version of visual studio<br />  WINDOWSSDK_LATEST_DIR<br />  WINDOWSSDK_LATEST_NAME<br />  WINDOWSSDK_FOUND_PREFERENCE - if we found an entry indicating a "preferred" SDK listed for this visual studio version<br />  WINDOWSSDK_PREFERRED_DIR<br />  WINDOWSSDK_PREFERRED_NAME<br /></pre>
+    <p><br /></p>
+<pre>  WINDOWSSDK_DIRS - contains no duplicates, ordered most recent first.<br />  WINDOWSSDK_PREFERRED_FIRST_DIRS - contains no duplicates, ordered with preferred first, followed by the rest in descending recency<br /></pre>
+    <p><br /></p>
+<p>Functions:<br /></p>
+<pre>  windowssdk_name_lookup(&lt;directory&gt; &lt;output variable&gt;) - Find the name corresponding with the SDK directory you pass in, or<br />     NOTFOUND if not recognized. Your directory must be one of WINDOWSSDK_DIRS for this to work.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2012 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Findargp"></a><b><code>Findargp</code></b>: try to find the argp library/component of glibc<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  ARGP_ROOT_DIR - a prefix to start searching.<br /></pre>
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  ARGP_INCLUDE_DIR<br />  ARGP_LIBRARY, only defined if linking to an extra library is required<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  ARGP_FOUND<br />  ARGP_INCLUDE_DIRS<br />  ARGP_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Findcppcheck"></a><b><code>Findcppcheck</code></b>: try to find cppcheck tool<br />
+    <p><br /></p>
+<p>Cache Variables:<br /></p>
+<pre>  CPPCHECK_EXECUTABLE<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  CPPCHECK_FOUND<br />  CPPCHECK_POSSIBLEERROR_ARG<br />  CPPCHECK_UNUSEDFUNC_ARG<br />  CPPCHECK_STYLE_ARG<br />  CPPCHECK_QUIET_ARG<br />  CPPCHECK_INCLUDEPATH_ARG<br />  CPPCHECK_FAIL_REGULAR_EXPRESSION<br />  CPPCHECK_WARN_REGULAR_EXPRESSION<br />  CPPCHECK_MARK_AS_ADVANCED - whether to mark our vars as advanced even<br />    if we don't find this program.<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Findcppunit"></a><b><code>Findcppunit</code></b>: try to find cppunit library<br />
+    <p><br /></p>
+<p>Cache Variables: (probably not for direct use in your scripts)<br /></p>
+<pre>  CPPUNIT_INCLUDE_DIR<br />  CPPUNIT_LIBRARY<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  CPPUNIT_FOUND<br />  CPPUNIT_INCLUDE_DIRS<br />  CPPUNIT_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  SelectLibraryConfigurations (included with CMake &gt;= 2.8.0)<br />  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2011 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2011. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Findcutil"></a><b><code>Findcutil</code></b>: find NVIDIA CUDA and source for the cutil library, building cutil if needed.<br />
+    <p><br /></p>
+<pre>  CUTIL_LIBRARIES - Libraries to link against to use CUTIL<br />  CUTIL_INCLUDE_DIRS - Include directories to add before building a CUTIL app.<br /></pre>
+    <p><br /></p>
+<p>Functions:<br /></p>
+<pre>  install_cutil({RUNTIME_LIBRARY_DESTINATION}) - Install the CUTIL shared lib if created.<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Finddb2pdf"></a><b><code>Finddb2pdf</code></b>: Try to find db2pdf, and define a custom command to turn docbook into pdf<br />
+    <p><br /></p>
+<p>Once done, this will define:<br /></p>
+<pre>  DB2PDF_FOUND - system has LyX<br />  DB2PDF_COMMAND - the command to run<br /></pre>
+    <p><br /></p>
+<p>and the following function:<br /></p>
+<pre>  docbook_to_pdf(&lt;output-variable&gt; &lt;docbook files&gt;)<br /></pre>
+    <p><br /></p>
+<p>Useful configuration variables you might want to add to your cache:<br /></p>
+<pre>  DB2PDF_ROOT_DIR - A directory prefix to search<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:FindosgLua"></a><b><code>FindosgLua</code></b>: try to find osgLua<br />
+    <p><br /></p>
+<p>Users may optionally supply:<br /></p>
+<pre>  OSGLUA_ROOT_DIR - a prefix to start searching<br /></pre>
+    <p><br /></p>
+<p>Non-cache variables you might use in your CMakeLists.txt:<br /></p>
+<pre>  OSGLUA_FOUND<br />  OSGLUA_INCLUDE_DIRS<br />  OSGLUA_LIBRARIES<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  FindPackageHandleStandardArgs (known included with CMake &gt;=2.6.2)<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Findquatlib"></a><b><code>Findquatlib</code></b>: Find quatlib<br />
+    <p>Find the quatlib headers and libraries.<br /></p>
+<pre>  QUATLIB_INCLUDE_DIRS - where to find quat.h<br />  QUATLIB_LIBRARIES    - List of libraries when using quatlib.<br />  QUATLIB_FOUND        - True if quatlib found.<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:GetCPUDetails"></a><b><code>GetCPUDetails</code></b>: Set a number of variables to indicate things about the current CPU and OS<br />
+    <p><br /></p>
+<pre>  CPU_COUNT<br />  CPU_INTEL<br />  CPU_EXE_64BIT<br />  CPU_EXE_32BIT<br />  CPU_HAS_SSE<br />  CPU_HAS_SSE2<br />  CPU_HAS_SSE3<br />  CPU_HAS_SSSE3<br />  CPU_HAS_SSE4_1<br />  CPU_HAS_SSE4_2<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)<br /></p>
+
+  </li>
+  <li>
+    <a name="module:GetCompilerInfoString"></a><b><code>GetCompilerInfoString</code></b>: Utility function to return a human-useful-only string ID'ing the compiler<br />
+    <p><br /></p>
+<pre>  get_compiler_info_string(&lt;resultvar&gt;)<br /></pre>
+    <p><br /></p>
+<p>and some helper functions:<br /></p>
+<pre>  get_gcc_version(&lt;resultvar&gt;)<br />  get_vs_short_version_string(&lt;generator&gt; &lt;resultvar&gt;)<br /></pre>
+    <p><br /></p>
+<p>You might consider using it when setting up CTest options, for example:<br /></p>
+<pre>  include(GetCompilerInfoString)<br />  get_compiler_info_string(COMPILERID)<br />  set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}-${CMAKE_SYSTEM_PROCESSOR}-${COMPILERID}")<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)<br /></p>
+<p>Some functions based on cmake-2.8.0 modules FindBoost.cmake and CTest.cmake ============================================================================= Copyright 2006-2009 Kitware, Inc. Copyright 2006-2008 Andreas Schneider &lt;mail@cynapses.org&gt; Copyright 2007      Wengo Copyright 2007      Mike Jackson Copyright 2008      Andreas Pakulat &lt;apaku@gmx.de&gt; Copyright 2008-2009 Philip Lowman &lt;philip@yhbt.com&gt; Copyright 2010      Iowa State University (Ryan Pavlik &lt;abiryan@ryand.net&gt;)<br /></p>
+<p>Distributed under the OSI-approved BSD License (the "License"); see accompanying file Copyright.txt for details.<br /></p>
+<p>This software is distributed WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the License for more information. ============================================================================= CMake - Cross Platform Makefile Generator Copyright 2000-2009 Kitware, Inc., Insight Software Consortium All rights reserved.<br /></p>
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:<br /></p>
+<p>* Redistributions of source code must retain the above copyright<br /></p>
+<pre>   notice, this list of conditions and the following disclaimer.<br /></pre>
+    <p><br /></p>
+<p>* Redistributions in binary form must reproduce the above copyright<br /></p>
+<pre>   notice, this list of conditions and the following disclaimer in the<br />   documentation and/or other materials provided with the distribution.<br /></pre>
+    <p><br /></p>
+<p>* Neither the names of Kitware, Inc., the Insight Software Consortium,<br /></p>
+<pre>   nor the names of their contributors may be used to endorse or promote<br />   products derived from this software without specific prior written<br />   permission.<br /></pre>
+    <p><br /></p>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. =============================================================================</p>
+
+  </li>
+  <li>
+    <a name="module:GetDirectoryList"></a><b><code>GetDirectoryList</code></b>: Returns a list of the parent directories of all files passed<br />
+    <p><br /></p>
+<pre>  get_directory_list(&lt;listvar&gt; &lt;file path&gt; [&lt;additional file paths&gt;...])<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:GetFileList"></a><b><code>GetFileList</code></b>: Returns a list of the file names of all files passed<br />
+    <p><br /></p>
+<pre>  get_file_list(&lt;listvar&gt; &lt;file path&gt; [&lt;additional file paths&gt;...])<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:GetForceIncludeDefinitions"></a><b><code>GetForceIncludeDefinitions</code></b>: Get the platform-appropriate flags to add to force inclusion of a file<br />
+    <p><br /></p>
+<p>The most common use of this is to use a generated config.h-type file placed out of the source tree in all files.<br /></p>
+<pre>  get_force_include_definitions(var forcedincludefiles...) -<br />   where var is the name of  your desired output variable, and everything<br />   else is a source file to forcibly include.<br />   a list item to be filtered.<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:GetGitRevisionDescription"></a><b><code>GetGitRevisionDescription</code></b>: Returns a version string from Git<br />
+    <p><br /></p>
+<p>These functions force a re-configure on each git commit so that you can trust the values of the variables in your build system.<br /></p>
+<pre>  get_git_head_revision(&lt;refspecvar&gt; &lt;hashvar&gt; [&lt;additional arguments to git describe&gt; ...])<br /></pre>
+    <p><br /></p>
+<p>Returns the refspec and sha hash of the current head revision<br /></p>
+<pre>  git_describe(&lt;var&gt; [&lt;additional arguments to git describe&gt; ...])<br /></pre>
+    <p><br /></p>
+<p>Returns the results of git describe on the source tree, and adjusting the output so that it tests false if an error occurs.<br /></p>
+<pre>  git_get_exact_tag(&lt;var&gt; [&lt;additional arguments to git describe&gt; ...])<br /></pre>
+    <p><br /></p>
+<p>Returns the results of git describe --exact-match on the source tree, and adjusting the output so that it tests false if there was no exact matching tag.<br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:GetSubprojectStatus"></a><b><code>GetSubprojectStatus</code></b>: Returns whether the current project is on its own or within another project's build<br />
+    <p><br /></p>
+<pre>  get_subproject_status(&lt;resultvar&gt;) - resultvar will be YES if we are<br />   included in another project, or NO if we are being built separately<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:Licensing"></a><b><code>Licensing</code></b>: Building a licensing description file<br />
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:ListCombinations"></a><b><code>ListCombinations</code></b>: Combine lists of prefixes and suffixes in all combinations<br />
+    <p><br /></p>
+<pre>  list_combinations(var PREFIXES listitems... SUFFIXES listitems...) -<br />   where var is the name of your desired output variable and PREFIXES<br />   and SUFFIXES are special arguments that indicate the start of your<br />   list of prefixes or suffixes respectively.<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:ListFilter"></a><b><code>ListFilter</code></b>: List filtering functions<br />
+    <p><br /></p>
+<pre>  list_filter(var regex listitems...) - where var is the name of<br />   your desired output variable, regex is the regex whose matching items<br />   WILL be put in the output variable, and everything else is considered<br />   a list item to be filtered.<br /></pre>
+    <p><br /></p>
+<pre>  list_filter_out(var regex listitems...) - where var is the name of<br />   your desired output variable, regex is the regex whose matching items<br />   will NOT be put in the output variable, and everything else is considered<br />   a list item to be filtered.<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:LuaTargets"></a><b><code>LuaTargets</code></b>: Copy/parse lua source files as a custom target<br />
+    <p><br /></p>
+<pre>  include(LuaTargets)<br />  add_lua_target(&lt;target_name&gt; &lt;directory to copy to&gt; [&lt;luafile&gt; &lt;luafile&gt;])<br />    Relative paths for the destination directory are considered with<br />    with respect to CMAKE_CURRENT_BINARY_DIR<br /></pre>
+    <p><br /></p>
+<pre>  install_lua_target(&lt;target_name&gt; [arguments to INSTALL(PROGRAMS ...) ])<br /></pre>
+    <p><br /></p>
+<p>Set this variable to specify location of luac, if it is not a target:<br /></p>
+<pre>  LUA_TARGET_LUAC_EXECUTABLE<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:MSVCMultipleProcessCompile"></a><b><code>MSVCMultipleProcessCompile</code></b>: Compile with multiple processes on MSVC<br />
+    <p><br /></p>
+<pre>  include(MSVCMultipleProcessCompile)<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  ListCombinations.cmake<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:MSVCStaticRuntime"></a><b><code>MSVCStaticRuntime</code></b>: Modify compile flags to use the static runtimes of MSVC<br />
+    <p><br /></p>
+<pre>  include(MSVCStaticRuntime)<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  ListCombinations.cmake<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:MSVCVerboseLinking"></a><b><code>MSVCVerboseLinking</code></b>: Add appropriate linker flags to show link details on Visual Studio<br />
+    <p><br /></p>
+<pre>  include(MSVCVerboseLinking) - to add the flags automaticlly if applicable<br /></pre>
+    <p><br /></p>
+<p>Be sure to include this module _BEFORE_ adding your targets, or the targets won't pick up the updated flags.<br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  - none<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:OptionRequires"></a><b><code>OptionRequires</code></b>: Add an option that depends on one or more variables being true.<br />
+    <p><br /></p>
+<pre>  option_requires(&lt;option_name&gt; &lt;description&gt; &lt;variable_name&gt; [&lt;variable_name&gt;...])<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:PrefixListGlob"></a><b><code>PrefixListGlob</code></b>: For each given prefix in a list, glob using the prefix+pattern<br />
+    <p><br /></p>
+<p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:ProgramFilesGlob"></a><b><code>ProgramFilesGlob</code></b>: Find bit-appropriate program files directories matching a given pattern<br />
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  CleanDirectoryList<br />  PrefixListGlob<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:ResetConfigurations"></a><b><code>ResetConfigurations</code></b>: Re-set the available configurations to just RelWithDebInfo, Release, and Debug<br />
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)<br /></p>
+
+  </li>
+  <li>
+    <a name="module:SearchProgramFilesForOpenSceneGraph"></a><b><code>SearchProgramFilesForOpenSceneGraph</code></b>: Use some smarts to try to find OpenSceneGraph in the Program Files dirs<br />
+    <p><br /></p>
+<p>Also uses the OSGHOME environment variable as OSG_DIR, if it's found.<br /></p>
+<p>Usage:<br /></p>
+<pre>  include(SearchProgramFilesForOpenSceneGraph OPTIONAL)<br /></pre>
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  ListFilter<br />  ProgramFilesGlob<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:SetDefaultBuildType"></a><b><code>SetDefaultBuildType</code></b>: Set a developer-chosen default build type<br />
+    <p><br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  no additional modules required<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)<br /></p>
+
+  </li>
+  <li>
+    <a name="module:SplitLibraryList"></a><b><code>SplitLibraryList</code></b>: Given a list of libraries with OPTIMIZED, DEBUG, etc.<br />
+    <p><br /></p>
+<pre>  split_library_list(_generalvar _releasevar _debugvar)<br /></pre>
+    <p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:StampSourcesWithVersion"></a><b><code>StampSourcesWithVersion</code></b>: It will only attempt a substitution within the first C-style comment block<br />
+    <p><br /></p>
+<p>To set up your source code for proper stamping, start your file with a Doxygen-style comment block, starting with /* and ending with */ On a line by itself, with unimportant whitespace, add the standard Doxygen "version" command:<br /></p>
+<pre>  @version xxx<br /></pre>
+    <p>or<br /></p>
+<pre>  \version xxx<br /></pre>
+    <p><br /></p>
+<p>To make sure it works, please do actually put xxx as the current version: when you save, add one of the command below to your cmake build, and run cmake, it should replace xxx with the current version. (It replaces anything between the end of the whitespace after \version and the end of the line with the version that you pass in your build script, so put nothing else on that line!)<br /></p>
+<p>For &lt;version&gt;, I recommend passing the value of a CMake variable like<br /></p>
+<pre>  ${CPACK_PACKAGE_VERSION}<br /></pre>
+    <p>Remember, reduced duplication of information means reduced errors!<br /></p>
+<p>WARNING! This does edit your source directory, but will only execute if the (hidden/advanced, default OFF) variable ENABLE_VERSION_STAMPING is on.<br /></p>
+<p>Additionally, it tries to be very careful: of your code (that is, the first /* */), but only if // is not found first<br /></p>
+<pre>  stamp_target_with_version(&lt;version&gt; &lt;target_name&gt; [HEADERS_ONLY | &lt;source&gt;...]) -<br />   If no source file is specified, all will be processed.<br /></pre>
+    <p><br /></p>
+<pre>  stamp_sources_with_version(&lt;version&gt; &lt;source&gt; [&lt;source&gt; ...]) -<br />   Use for files not directly associated with a target.<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:TCHARWorkaround"></a><b><code>TCHARWorkaround</code></b>: Script to compile Win32-developed sources using tchar without modifying the code<br />
+    <p>Requires that ${CMAKE_SOURCE_DIR}/cmake/workarounds/tchar/ be present.<br /></p>
+<p>	TCHAR_WORKAROUND, automatically set to on when not on win32 	TCHAR_INCLUDE_DIR, location of our fake tchar.h file<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:UseBackportedModules"></a><b><code>UseBackportedModules</code></b>: Do a version-dependent check and auto-include backported modules dirs<br />
+    <p><br /></p>
+<p>Name your module directories cmake-*-modules where * is the full (maj.min.patch) version number that they came from.  You can use subdirectories within those directories, if you like - all directories inside of a cmake-*-modules dir for a newer version of CMake that what we're running, that contain one or more .cmake files, will be appended to the CMAKE_MODULE_PATH.<br /></p>
+<p>When backporting modules, be sure to test them and follow copyright instructions (usually updating copyright notices)<br /></p>
+<p>Requires these CMake modules:<br /></p>
+<pre>  CleanDirectoryList<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:UseMarkdown"></a><b><code>UseMarkdown</code></b>: Convert markdown source files to HTML as a custom target<br />
+    <p><br /></p>
+<pre>  include(UseMarkdown)<br />  add_markdown_target(&lt;target_name&gt; &lt;directory to copy to&gt; &lt;markdownfile&gt; [&lt;markdownfile&gt;...] [RENAME &lt;newname&gt;])<br />    Relative paths for the destination directory are considered with<br />    with respect to CMAKE_CURRENT_BINARY_DIR. The RENAME argument is only<br />    valid with a single markdown file as input.<br /></pre>
+    <p><br /></p>
+<p><br /></p>
+<pre>  install_markdown_target(&lt;target_name&gt; [extra arguments to INSTALL(FILES ...) ])<br /></pre>
+    <p><br /></p>
+<p><br /></p>
+<p>Requires CMake 2.6 or newer (uses the 'function' command)<br /></p>
+<p>Original Author: 2011 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2011-2012. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:UseTR1"></a><b><code>UseTR1</code></b>: Use settings to enable access to C++ TR1<br />
+    <p><br /></p>
+<p>This calls include_directories and link_directories as needed to permit TR1 support.<br /></p>
+<p>Original Author: 2009-2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+  <li>
+    <a name="module:WarningDev"></a><b><code>WarningDev</code></b>: Print a developer warning, using author_warning if we have cmake 2.8<br />
+    <p><br /></p>
+<pre>  warning_dev("your desired message")<br /></pre>
+    <p><br /></p>
+<p>Original Author: 2010 Ryan Pavlik &lt;rpavlik@iastate.edu&gt; &lt;abiryan@ryand.net&gt; <a href="http://academic.cleardefinition.com">http://academic.cleardefinition.com</a> Iowa State University HCI Graduate Program/VRAC<br /></p>
+<p>Copyright Iowa State University 2009-2010. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)</p>
+
+  </li>
+</ul>
+<h2><a name="section_SeeAlso"></a>See Also</h2>
+<ul>
+    <li><a href="#see:HomePage"><b><code>Home Page</code></b></a></li>
+    <li><a href="#see:FrequentlyAskedQuestions"><b><code>Frequently Asked Questions</code></b></a></li>
+    <li><a href="#see:OnlineDocumentation"><b><code>Online Documentation</code></b></a></li>
+    <li><a href="#see:MailingList"><b><code>Mailing List</code></b></a></li>
+</ul>
+<p>.B ccmake(1), cpack(1), ctest(1), cmakecommands(1), cmakecompat(1), cmakemodules(1), cmakeprops(1), cmakevars(1)</p>
+
+<p>The following resources are available to get help using CMake:</p>
+
+<ul>
+  <li>
+    <a name="see:HomePage"></a><b><code>Home Page</code></b>: <a href="http://www.cmake.org">http://www.cmake.org</a><br />
+    <p>The primary starting point for learning about CMake.</p>
+
+  </li>
+  <li>
+    <a name="see:FrequentlyAskedQuestions"></a><b><code>Frequently Asked Questions</code></b>: <a href="http://www.cmake.org/Wiki/CMake_FAQ">http://www.cmake.org/Wiki/CMake_FAQ</a><br />
+    <p>A Wiki is provided containing answers to frequently asked questions. </p>
+
+  </li>
+  <li>
+    <a name="see:OnlineDocumentation"></a><b><code>Online Documentation</code></b>: <a href="http://www.cmake.org/HTML/Documentation.html">http://www.cmake.org/HTML/Documentation.html</a><br />
+    <p>Links to available documentation may be found on this web page.</p>
+
+  </li>
+  <li>
+    <a name="see:MailingList"></a><b><code>Mailing List</code></b>: <a href="http://www.cmake.org/HTML/MailingLists.html">http://www.cmake.org/HTML/MailingLists.html</a><br />
+    <p>For help and discussion about using cmake, a mailing list is provided at cmake@cmake.org. The list is member-post-only but one may sign up on the CMake web page. Please first read the full documentation at <a href="http://www.cmake.org">http://www.cmake.org</a> before posting questions to the list.</p>
+
+  </li>
+</ul>
+</body></html>

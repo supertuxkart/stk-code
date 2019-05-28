@@ -5,14 +5,14 @@
             <model id="model" width="100%" layout="horizontal-row" height="100%">
             </model>
         </div>
-        <div width="20%" height="fit" text-align="left" layout="horizontal-row" >
-            <checkbox id="toggle-slider" />
-            <spacer width="40"/>
-            <label id="toggle-text"/>
+        <div width="100%" height="fit" text-align="left" layout="horizontal-row" >
+            <spacer height="30" width="15%"/>
+            <spinner id="toggle-slider" width="70%" min_value="0" max_value="1" wrap_around="true"/>
+            <spacer height="30" width="15%"/>
         </div>
         <spacer height="30" width="10"/>
         <div height="fit" width="100%" layout="horizontal-row">
-            <gauge id="color-slider" min_value="1" max_value="100" proportion="1"/>
+            <gauge id="color-slider" min_value="1" max_value="100" proportion="1" wrap_around="true"/>
         </div>
         <spacer height="30" width="10"/>
         <button id="close" text="Apply" align="center"/>

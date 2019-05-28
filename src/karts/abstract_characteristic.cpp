@@ -89,6 +89,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case ENGINE_MAX_SPEED:
         return TYPE_FLOAT;
+    case ENGINE_GENERIC_MAX_SPEED:
+        return TYPE_FLOAT;
     case ENGINE_BRAKE_FACTOR:
         return TYPE_FLOAT;
     case ENGINE_BRAKE_TIME_INCREASE:
@@ -200,6 +202,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
     case NITRO_DURATION:
         return TYPE_FLOAT;
     case NITRO_ENGINE_FORCE:
+        return TYPE_FLOAT;
+    case NITRO_ENGINE_MULT:
         return TYPE_FLOAT;
     case NITRO_CONSUMPTION:
         return TYPE_FLOAT;
@@ -437,6 +441,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_DURATION";
     case NITRO_ENGINE_FORCE:
         return "NITRO_ENGINE_FORCE";
+    case NITRO_ENGINE_MULT:
+        return "NITRO_ENGINE_MULT";
     case NITRO_CONSUMPTION:
         return "NITRO_CONSUMPTION";
     case NITRO_SMALL_CONTAINER:
@@ -507,6 +513,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_REDUCE_TURN_MAX";
     case SKID_ENABLED:
         return "SKID_ENABLED";
+    case ENGINE_GENERIC_MAX_SPEED:
+        return "ENGINE_GENERIC_MAX_SPEED";
 
     /* <characteristics-end getName> */
     }   // switch (type)
@@ -722,6 +730,18 @@ float AbstractCharacteristic::getEngineMaxSpeed() const
                     getName(ENGINE_MAX_SPEED).c_str());
     return result;
 }  // getEngineMaxSpeed
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getEngineGenericMaxSpeed() const
+{
+    float result;
+    bool is_set = false;
+    process(ENGINE_GENERIC_MAX_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ENGINE_GENERIC_MAX_SPEED).c_str());
+    return result;
+}  // getEngineGenericMaxSpeed
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getEngineBrakeFactor() const
@@ -1394,6 +1414,18 @@ float AbstractCharacteristic::getNitroEngineForce() const
                     getName(NITRO_ENGINE_FORCE).c_str());
     return result;
 }  // getNitroEngineForce
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitroEngineMult() const
+{
+    float result;
+    bool is_set = false;
+    process(NITRO_ENGINE_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITRO_ENGINE_MULT).c_str());
+    return result;
+}  // getNitroEngineMult
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroConsumption() const

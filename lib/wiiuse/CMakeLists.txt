@@ -1,86 +1,146 @@
-# CMakeLists.txt - wiiuse
+# 2009-2011 Ryan Pavlik <rpavlik@iastate.edu>
+# http://academic.cleardefinition.com/
+# Iowa State University HCI Graduate Program/VRAC
 
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 2.8.0)
 
-# libbluetooth is required on Unix platforms
-if(UNIX AND (NOT APPLE))
-    include(FindPkgConfig)
-    pkg_check_modules(BLUETOOTH bluez)
-    if(NOT BLUETOOTH_FOUND)
-        message(FATAL_ERROR "Bluetooth library not found. "
-            "Either install libbluetooth or disable wiiuse support with -DUSE_WIIUSE=0")
-    endif()
+if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
+  cmake_policy(SET CMP0048 OLD)
 endif()
 
-set(WIIUSE_SOURCES
-    classic.c
-    dynamics.c
-    events.c
-    guitar_hero_3.c
-    io.c
-    ir.c
-    motion_plus.c
-    nunchuk.c
-    os_nix.c
-    os_win.c
-    util.c
-    wiiboard.c
-    wiiuse.c
-)
+# Set package properties
+project(WiiUse)
 
-if(APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
-    set(WIIUSE_SOURCES ${WIIUSE_SOURCES}
-        os_mac/os_mac_find.m
-        os_mac/os_mac_interface.m
-        os_mac/os_mac.m
-    )
+###
+# Set up options
+###
+
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+	set(SUBPROJECT YES)
+endif()
+
+include("./ParseVersion.cmake")
+message(STATUS "Configuring WiiUse version ${CPACK_PACKAGE_VERSION}")
+
+option(BUILD_EXAMPLE "Should we build the example app?" YES)
+option(BUILD_EXAMPLE_SDL "Should we build the SDL-based example app?" YES)
+option(BUILD_WIIUSE_SHARED_LIB "Should we build as a shared library (dll/so)?" NO)
+option(INSTALL_EXAMPLES "Should we install the example apps?" YES)
+
+option(CPACK_MONOLITHIC_INSTALL "Only produce a single component installer, rather than multi-component." NO)
+
+###
+# Perform build configuration of dependencies
+###
+
+# Locally-developed modules dist'ed with this app - always have this first.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(UseBackportedModules)
+include(DoxygenTargets)
+
+if(BUILD_WIIUSE_SHARED_LIB)
+	set(WIIUSE_LIB_TYPE SHARED)
+else()
+	set(WIIUSE_LIB_TYPE STATIC)
+	add_definitions(-DWIIUSE_STATIC)
+endif()
+
+if(NOT WIN32 AND NOT APPLE)
+	set(LINUX YES)
+	find_package(Bluez REQUIRED)
+	include_directories(${BLUEZ_INCLUDE_DIRS})
+
+        include("GNUInstallDirs")
+else()
+        set(LINUX NO)
+        set(CMAKE_INSTALL_LIBDIR "lib")
 endif()
 
 if(WIN32)
-    add_definitions("/DWIIUSE_STATIC")
-    add_library(wiiuse STATIC ${WIIUSE_SOURCES})
-else()
-    add_library(wiiuse ${WIIUSE_SOURCES})
+	find_package(WinHID REQUIRED)
+	include_directories(${WINHID_INCLUDE_DIRS})
+	if(MSVC)
+		# Minimum requirement is WinXP
+		add_definitions(-D_WIN32_WINNT=0x0501)
+	endif()
 endif()
 
-if(MSVC)
-    if(MSVC90)
-        set(WIIUSE_VS_INCLUDE_DIR "C:\\Program\ Files\ (x86)\\Microsoft\ Visual\ Studio\ 9.0\\VC\\include"
-            CACHE STRING "VS 9.0 include directory, see lib/wiiuse/README for details")
-    elseif(MSVC10)
-        set(WIIUSE_VS_INCLUDE_DIR "C:\\Program\ Files\ (x86)\\Microsoft\ Visual\ Studio\ 10.0\\VC\\include"
-            CACHE STRING "VS 10.0 include directory, see lib/wiiuse/README for details")
-    endif()
-    mark_as_advanced(WIIUSE_VS_INCLUDE_DIR)
- 
-    if(MSVC90 OR MSVC10)
-         # VS 9 does not have the windows device driver kit
-         # So the driver must be installed additionally. Also, 
-         # in order to avoid a compilation error, you have to
-         # specify the visual studio include path FIRST (google
-         # it, known issue). So in this case add appropriate
-         # variables that can be set.
-         set(WIIUSE_WINDDK_ROOT "C:/WinDDK" CACHE 
-             STRING "Install directory of Windows Driver Kits")
-         mark_as_advanced(WIIUSE_WINDDK_ROOT)
-         include_directories(${WIIUSE_VS_INCLUDE_DIR} ${WIIUSE_WINDDK_ROOT}/inc/api)
-    endif()
-    add_library(setupapi.lib STATIC IMPORTED)
-    add_library(hid.lib STATIC IMPORTED)
-    set_target_properties(setupapi.lib PROPERTIES 
-                          IMPORTED_LOCATION ${WIIUSE_WINDDK_ROOT}/lib/win7/i386/setupapi.lib)
-    set_target_properties(hid.lib PROPERTIES 
-                          IMPORTED_LOCATION ${WIIUSE_WINDDK_ROOT}/lib/win7/i386/hid.lib)
-    # This doesn't work for me with VS 11, which apparently finds its own
-    # copy of the libs
-    if(MSVC90 OR MSVC10)
-        set_target_properties(wiiuse PROPERTIES STATIC_LIBRARY_FLAGS 
-            "${WIIUSE_WINDDK_ROOT}/lib/win7/i386/setupapi.lib ${WIIUSE_WINDDK_ROOT}/lib/win7/i386/hid.lib")
-    else()
-        set_target_properties(wiiuse PROPERTIES STATIC_LIBRARY_FLAGS "setupapi.lib hid.lib")
-    endif()
-elseif(MINGW)
-    target_link_libraries(wiiuse hid setupapi)
+###
+# Build the project
+###
+
+# The lib is in the "src" subdirectory
+add_subdirectory(src)
+
+if(NOT SUBPROJECT)
+	# Example apps
+	if(BUILD_EXAMPLE)
+		add_subdirectory(example)
+	endif()
+
+	if(BUILD_EXAMPLE_SDL)
+		add_subdirectory(example-sdl)
+	endif()
+endif()
+
+if(SUBPROJECT)
+	set(WIIUSE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src" PARENT_SCOPE)
+	set(WIIUSE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src" PARENT_SCOPE)
+	set(WIIUSE_LIBRARY wiiuse PARENT_SCOPE)
+	set(WIIUSE_LIBRARIES wiiuse PARENT_SCOPE)
+	set(WIIUSE_FOUND ON PARENT_SCOPE)
+endif()
+
+if(NOT SUBPROJECT)
+###
+# Set packaging options (for CPack)
+###
+
+	if(WIN32)
+		set(DOC_DIR .)
+	else()
+		set(DOC_DIR share/doc/wiiuse)
+	endif()
+
+	# Documentation
+	add_doxygen(Doxyfile
+		INSTALL_DESTINATION ${DOC_DIR}
+		INSTALL_COMPONENT docs
+		NO_PDF)
+
+	install(FILES
+		CHANGELOG.mkd
+		LICENSE
+		README.mkd
+		DESTINATION ${DOC_DIR} COMPONENT docs)
+
+	if(INSTALL_EXAMPLES)
+		install(FILES example/example.c
+			DESTINATION ${DOC_DIR}/example COMPONENT examples)
+		install(FILES example-sdl/sdl.c
+			DESTINATION ${DOC_DIR}/example-sdl COMPONENT examples)
+	endif()
+
+	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+	set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.mkd")
+
+	include(GetCompilerInfoString)
+	get_compiler_info_string(_compiler)
+
+	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${_compiler}")
+
+	# Include the packaging system now that we have it all set up
+	include(CPack)
+
+	cpack_add_component(docs HIDDEN)
+
+	cpack_add_component(development
+		DISPLAY_NAME "Development Files")
+
+	cpack_add_component(examples
+		DISPLAY_NAME "Examples")
+
+	cpack_add_component(runtime
+		DISPLAY_NAME "Runtime Library"
+		REQUIRED)
 endif()

@@ -24,15 +24,12 @@
 #include "config/hardware_stats.hpp"
 
 #include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
 #include "utils/random_generator.hpp"
-
-#ifdef __APPLE__
-#  include <sys/sysctl.h>
-#endif
 
 #include <fstream>
 #include <set>
@@ -42,6 +39,10 @@
 #  include <sys/param.h>    // To get BSD macro
 #  include <sys/utsname.h>
 #endif
+#if defined(__APPLE__) || defined(BSD)
+#  include <sys/sysctl.h>
+#endif
+
 #include <vector>
 
 
@@ -82,7 +83,7 @@ int getRAM()
     return (int)ceil(memory_size/mbyte);
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(BSD)
     size_t memory_size = 0;
     size_t len = sizeof(memory_size);
     // Argh, the API doesn't seem to be const-correct
@@ -102,7 +103,7 @@ int getRAM()
  */
 int getNumProcessors()
 {
-#if defined(__linux__) || defined(__CYGWIN__)
+#if defined(__linux__) || defined(__CYGWIN__) || (defined(BSD) && !defined(__APPLE__))
     return sysconf(_SC_NPROCESSORS_CONF);
 #endif
 #ifdef WIN32
@@ -110,7 +111,7 @@ int getNumProcessors()
     GetSystemInfo(&si);	// guaranteed to succeed
     return si.dwNumberOfProcessors;
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__)
     // Mac OS X doesn't have sysconf(_SC_NPROCESSORS_CONF)
     int mib[] = { CTL_HW, HW_NCPU };
     int ncpus;
@@ -399,7 +400,8 @@ void reportHardwareStats()
     request->addParameter("type", "hwdetect");
     request->addParameter("version", report_version);
     request->addParameter("data", json.toString());
-    request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
+    const std::string request_url = stk_config->m_server_hardware_report + "/upload/v1/";
+    request->setURL(request_url);
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     request->queue();
 #endif   // !SERVER_ONLY

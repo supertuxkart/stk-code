@@ -20,8 +20,8 @@
                max="70"          />
     
     <!-- Size of the particles -->
-    <size      min="0.18"
-               max="0.18"         />
+    <size      min="0.13"
+               max="0.13"         />
     
     <color     min="254 254 254"
                max="255 255 255"  />

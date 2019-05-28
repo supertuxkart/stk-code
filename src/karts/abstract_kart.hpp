@@ -50,6 +50,7 @@ class RenderInfo;
 class SFXBuffer;
 class Skidding;
 class SlipStream;
+class Stars;
 class TerrainInfo;
 
 
@@ -74,8 +75,15 @@ private:
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 
-    btTransform m_starting_transform;
+    // ------------------------------------------------------------------------
+    void loadKartProperties(const std::string& new_ident,
+                            PerPlayerDifficulty difficulty,
+                            std::shared_ptr<RenderInfo> ri);
 protected:
+    btTransform m_starting_transform;
+
+    int m_live_join_util;
+
     /** The kart properties. */
     std::unique_ptr<KartProperties> m_kart_properties;
 
@@ -85,10 +93,10 @@ protected:
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
      *  is used more than once. */
-    KartModel*   m_kart_model;
+    std::unique_ptr<KartModel> m_kart_model;
 
     /** Handles the attachment the kart might have. */
-    Attachment  *m_attachment;
+    std::unique_ptr<Attachment> m_attachment;
 
     /** The kart controls (e.g. steering, fire, ...). */
     KartControl  m_controls;
@@ -126,7 +134,11 @@ public:
     /** Returns the kart properties of this kart. */
     const KartProperties* getKartProperties() const
                             { return m_kart_properties.get(); }
-
+    // ========================================================================
+    /** Change to new kart instancely (used in network live join). */
+    virtual void changeKart(const std::string& new_ident,
+                            PerPlayerDifficulty difficulty,
+                            std::shared_ptr<RenderInfo> ri);
     // ========================================================================
     // Access to the per-player difficulty.
     // ------------------------------------------------------------------------
@@ -159,16 +171,16 @@ public:
     // Attachment related functions.
     // ------------------------------------------------------------------------
     /** Returns the current attachment. */
-    const Attachment* getAttachment() const {return m_attachment; }
+    const Attachment* getAttachment() const {return m_attachment.get(); }
     // ------------------------------------------------------------------------
     /** Returns the current attachment, non-const version. */
-    Attachment*    getAttachment() {return m_attachment; }
+    Attachment*    getAttachment() {return m_attachment.get(); }
 
     // ========================================================================
     // Access to the graphical kart model.
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
-    KartModel* getKartModel() const { return m_kart_model;      }
+    KartModel* getKartModel() const { return m_kart_model.get();      }
     // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float getKartLength() const { return m_kart_length; }
@@ -260,8 +272,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const = 0;
-    // ------------------------------------------------------------------------
-    virtual float getGraphicalViewBlockedByPlunger() const = 0;
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
@@ -514,7 +524,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) = 0;
     // ------------------------------------------------------------------------
-    virtual bool isVisible() = 0;
+    virtual bool isVisible() const = 0;
     // ------------------------------------------------------------------------
     virtual void makeKartRest();
     // ------------------------------------------------------------------------
@@ -523,6 +533,12 @@ public:
     virtual float getStartupBoost() const = 0;
     // ------------------------------------------------------------------------
     virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
+    // ------------------------------------------------------------------------
+    virtual Stars* getStarsEffect() const = 0;
+    // ------------------------------------------------------------------------
+    int getLiveJoinUntilTicks() const              { return m_live_join_util; }
+    // ------------------------------------------------------------------------
+    void setLiveJoinKart(int util_ticks)     { m_live_join_util = util_ticks; }
 };   // AbstractKart
 
 

@@ -22,7 +22,7 @@ Developer
 Developer, modeller & animator
 - Soccer and battle mode AI, Shader, graphics
 - SPM file format definition, importer and exporter
-- Kiki
+- A lot of networking code
 - Other graphical improvements to karts and tracks
 
 = Dawid Gan (deveee) =
@@ -36,7 +36,7 @@ Developer
 Lead graphical artist
 - Art work:
 -   Cocoa temple, Grand Paradiso Island, Old Mine
--   BlackHill Mansion, Hacienda, Fort Magma, XR591
+-   Ravenbridge Mansion, Hacienda, Fort Magma, XR591
 -   Snow Peak, Zen Garden, Ligthouse, Sara
 - Thanks to my family and especially my father
 - Jean Claude Clemençon
@@ -44,8 +44,9 @@ Lead graphical artist
 = Alayan =
 
 Developer
-- Improved item distribution 
+- Story mode and gameplay improvements
 - AI improvements
+- General improvements and bugfixes
 
 = Magne Djupvik (Arthur) =
 
@@ -92,18 +93,19 @@ Bug fixes & misc contributions
 - Ward Muylaert
 - Fantasmos
 - QwertyChouskie
+- Dumaosen
 
 = Visual art =
 
 Tracks
-- Wolfs : Green Valley
+- Sven Andreas Belting : Black Forest
 - Mac_DMH : Minigolf
 - Rubberduck : STK Enterprise
 - Ponzino : Volcan Island
 
 Tracks
 - Canis Lupus : Original 'Northern Resort' & Scotland
-- Ivar ten Cate (Varivar) : Original 'Old Mine' &'Snow Peaks' Improvements
+- Ivar ten Cate (Varivar) : Original 'Old Mine' & 'Snow Peaks' Improvements
 - MacIO : Cave X
 - Steve and Oliver Baker : Oliver's Math Class
 
@@ -112,6 +114,7 @@ Karts
 - Minibjorn : Puffy
 - Cheleb : Nolok, Pidgin
 - Néd J. Édoire : Wilber, Hexley
+- Benau : Kiki
 
 Karts
 - Cédric Archambault : Suzanne
@@ -249,12 +252,25 @@ Software used
 = Donations =
 
 Donations
+- Trevor Hass, Thomas Belvin, Simona-A.-Petronela Crefelean
+- Schmidt Christian, Roberto Giuliani, Robert A Swearingen
+- Rene Genz, René Schubert, Pazurik Laszlo Adam, Oskar Vigren
+- M J Angove, Florian Lehebel, David E Scourfield, Michael Laube
+- Merlin Juusola, Matthias Wiege, Matthew Toppenberg, Martin Rejman
+- Mark Gannon, Lukas Palme, Lennart Mellqvist, Joshua Dye, Jan Havran
+- Jacqueline Brown, Igor Murzich, Guido Stehr, Gisela Ehresmann
+- Evaldas Granickas, Elisabeth Lambert, Edith Muijsers, DC Jaeger
+
+
+Donations
+- Damian Fajfer, Chase Williamson, Carsten Timm, Baptiste Dagneaux
+- Alexander Olkhovsky, Aleix Casamitjana, Adrián Chaves Fernández
 - Georgi Stoychev, Nuno Ferreira, Steven Anderson, Charalabos Frouzakis
 - Richard Qian, William Nakamura, Maree Glynn, David Carlier
 - Alistair Findlay, James Tobin, Ursula Belting, Stephan van den Akker
 - Ken McCall, Arnaud Maurin, James Tobin, Stefan Kiehne, David Efflandt
 - Gary Shearer, Stuart Gibb, Fran Casal, Piotr Karczemski, Florian Lehébel
-- Dominik Müller, Saverio Brancaccio, Florian Lehébel
+- Dominik Müller, Saverio Brancaccio, Florian Lehébel, Pietro Pizzo
 
 Donations
 - Alvaro Castañeda Mendoza, Simón Llinares Riestra, Radu Sofian

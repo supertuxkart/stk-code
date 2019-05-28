@@ -83,7 +83,9 @@ public:
 
     void      unloadAllTextures();
 
-    Material* getDefaultSPMaterial(const std::string& shader_name, const std::string& layer_one_lc = "");
+    Material* getDefaultSPMaterial(const std::string& shader_name,
+                                   const std::string& layer_one_lc = "",
+                                   bool full_path = false);
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
 };   // MaterialManager
 

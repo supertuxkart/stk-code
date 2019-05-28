@@ -36,6 +36,9 @@ private:
 
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
+    
+    /** True if dt is not decreased for low fps */
+    bool m_allow_large_dt;
 
     bool m_frame_before_loading_world;
 
@@ -47,7 +50,7 @@ private:
     uint64_t m_prev_time;
     unsigned m_parent_pid;
     float    getLimitedDt();
-    void     updateRace(int ticks);
+    void     updateRace(int ticks, bool fast_forward);
 public:
          MainLoop(unsigned parent_pid);
         ~MainLoop();
@@ -57,6 +60,8 @@ public:
     void abort() { m_abort = true; }
     void requestAbort() { m_request_abort = true; }
     void setThrottleFPS(bool throttle) { m_throttle_fps = throttle; }
+    void setAllowLargeDt(bool enable) { m_allow_large_dt = enable; }
+    void renderGUI(int phase, int loop_index=-1, int loop_size=-1);
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }

@@ -204,6 +204,8 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(child_width,    PROP_CHILD_WIDTH);
                 READ_PROPERTY(child_height,   PROP_CHILD_HEIGHT);
                 READ_PROPERTY(word_wrap,      PROP_WORD_WRAP);
+                READ_PROPERTY(alternate_bg,   PROP_ALTERNATE_BG);
+                READ_PROPERTY(line_height,    PROP_LINE_HEIGHT);
                 //READ_PROPERTY(grow_with_text, PROP_GROW_WITH_TEXT);
                 READ_PROPERTY(x,              PROP_X);
                 READ_PROPERTY(y,              PROP_Y);

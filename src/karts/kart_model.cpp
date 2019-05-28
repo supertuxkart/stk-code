@@ -1066,19 +1066,6 @@ void KartModel::update(float dt, float distance, float steer, float speed,
                  - suspension_length
                  - m_kart_lowest_point;
 
-        // Adjust the wheel position for lean: the lean can cause the 'leaned
-        // to' side to be partly in the ground - which looks ok (like the tyres
-        // being compressed), but the other side will be in the air. To avoid
-        // this, increase the position of the wheels on the side that are
-        // higher in the ground so that the wheel still touch the ground.
-        if(current_lean_angle > 0 && (i&1) == 1)   // i&1 == 0: left side
-        {
-            pos.Y -= 2*current_lean_angle;
-        }
-        else if (current_lean_angle < 0 && (i&1) == 0)   // i&1 == 1: right side
-        {
-            pos.Y += 2*current_lean_angle;
-        }
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360
@@ -1090,6 +1077,16 @@ void KartModel::update(float dt, float distance, float steer, float speed,
         if (i < 2)
             wheel_rotation += wheel_steer;
         m_wheel_node[i]->setRotation(wheel_rotation);
+
+        // Undo lean angle applied by parent
+        core::matrix4 parent_m;
+        parent_m.setInverseTranslation(core::vector3df
+            (0, fabsf(tanf(current_lean_angle)) * m_kart_width * 0.5f, 0));
+        parent_m.setInverseRotationRadians(core::vector3df
+            (0, 0, -current_lean_angle));
+
+        core::matrix4 final_m = parent_m * m_wheel_node[i]->getRelativeTransformation();
+        m_wheel_node[i]->setPosition(final_m.getTranslation());
     } // for (i < 4)
 
     // Update the speed-weighted objects' animations

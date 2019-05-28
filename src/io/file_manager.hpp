@@ -25,6 +25,7 @@
  * Contains generic utility classes for file I/O (especially XML handling).
  */
 
+#include <mutex>
 #include <string>
 #include <vector>
 #include <set>
@@ -66,6 +67,7 @@ public:
                     ASSET_COUNT};
 
 private:
+    mutable std::mutex m_file_system_lock;
 
     /** The names of the various subdirectories of the asset types. */
     std::vector< std::string > m_subdir_name;
@@ -84,7 +86,7 @@ private:
 
     /** Name of stdout file. */
     static std::string m_stdout_filename;
-    
+
     /** Directory of stdout file. */
     static std::string m_stdout_dir;
 
@@ -100,7 +102,8 @@ private:
     /** Directory where user-defined grand prix are stored. */
     std::string       m_gp_dir;
 
-    std::string       m_cert_location;
+    /** Location of the certificate bundle. */
+    std::string       m_cert_bundle_location;
 
     std::vector<TextureSearchPath> m_texture_search_path;
 
@@ -117,7 +120,6 @@ private:
                                const;
     void              makePath(std::string& path, const std::string& dir,
                                const std::string& fname) const;
-    bool              checkAndCreateDirectory(const std::string &path);
     io::path          createAbsoluteFilename(const std::string &f);
     void              checkAndCreateConfigDir();
     void              checkAndCreateAddonsDir();
@@ -148,6 +150,7 @@ public:
     std::string       getReplayDir() const;
     std::string       getCachedTexturesDir() const;
     std::string       getGPDir() const;
+    bool              checkAndCreateDirectory(const std::string &path);
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
@@ -175,7 +178,7 @@ public:
     std::string getUserConfigFile(const std::string& fname) const;
     bool        fileExists(const std::string& path) const;
     // ------------------------------------------------------------------------
-    /** Convenience function to save some typing in the 
+    /** Convenience function to save some typing in the
      *  file manager constructor. */
     bool        fileExists(const char *prefix, const std::string& path) const
     {
@@ -214,7 +217,7 @@ public:
         m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
     // ------------------------------------------------------------------------
-    /** Returns the full path to a shader (this function could be modified 
+    /** Returns the full path to a shader (this function could be modified
      *  later to allow track-specific shaders).
      *  \param name Name of the shader.
      */
@@ -223,12 +226,14 @@ public:
         return getAsset(SHADER, name);
 
     }   // getShader
-    
+
     std::string getShadersDir() const
     {
         return m_subdir_name[SHADER];
     }
-    const std::string& getCertLocation() const { return m_cert_location; }
+
+    const std::string& getCertBundleLocation() const { return m_cert_bundle_location; }
+
 };   // FileManager
 
 extern FileManager* file_manager;

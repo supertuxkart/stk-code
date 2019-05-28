@@ -3,7 +3,7 @@
     <unlock_list list="false"/>
     <track id="cocoa_temple" laps="3" reverse="false"/>
     <mode major="single" minor="timetrial"/>
-    <requirements trophies="0"/>
+    <requirements trophies="45"/>
 
     <best>
         <karts number="1"

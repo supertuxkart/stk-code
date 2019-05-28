@@ -31,7 +31,7 @@ void BoldFace::init()
 {
     FontWithFace::init();
     // Reserve some space for characters added later
-    m_font_max_height = m_glyph_max_height + 20;
+    m_font_max_height = m_glyph_max_height * 3 / 2;
 
     /* Use FT_Outline_Embolden for now, no more fallback font
     setFallbackFont(font_manager->getFont<RegularFace>());

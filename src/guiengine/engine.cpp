@@ -683,10 +683,13 @@ namespace GUIEngine
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "utils/debug.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
+#include <mutex>
 
 using namespace irr::gui;
 using namespace irr::video;
@@ -715,6 +718,10 @@ namespace GUIEngine
         int large_font_height;
         int small_font_height;
         int title_font_height;
+#ifdef ANDROID
+        std::mutex m_gui_functions_mutex;
+        std::vector<std::function<void()> > m_gui_functions;
+#endif
     }
     using namespace Private;
 
@@ -855,7 +862,7 @@ namespace GUIEngine
         {
             frame++;
             if (frame == 2)
-                GUIEngine::EventHandler::get()->startAcceptingEvents();
+                GUIEngine::EventHandler::get()->setAcceptEvents(true);
         }
     }
     // ------------------------------------------------------------------------
@@ -911,6 +918,7 @@ namespace GUIEngine
             return;
         }
 
+        Debug::closeDebugMenu();
         g_current_screen->beforeAddingWidget();
 
         // show screen
@@ -1143,8 +1151,21 @@ namespace GUIEngine
     }   // reloadSkin
 
     // -----------------------------------------------------------------------
+    void addGUIFunctionBeforeRendering(std::function<void()> func)
+    {
+#ifdef ANDROID
+        std::lock_guard<std::mutex> lock(m_gui_functions_mutex);
+        m_gui_functions.push_back(func);
+#endif
+    }   // addGUIFunctionBeforeRendering
 
-    void render(float elapsed_time)
+    // -----------------------------------------------------------------------
+    /** \brief called on every frame to trigger the rendering of the GUI.
+     *  \param elapsed_time Time since last rendering calls (in seconds).
+     *  \param is_loading True if the rendering is called during loading of world,
+     *         in which case world, physics etc must not be accessed.
+     */
+    void render(float elapsed_time, bool is_loading)
     {
 #ifndef SERVER_ONLY
         GUIEngine::dt = elapsed_time;
@@ -1152,15 +1173,30 @@ namespace GUIEngine
         // Not yet initialized, or already cleaned up
         if (g_skin == NULL) return;
 
+#ifdef ANDROID
+        // Run all GUI functions first (if any)
+        std::unique_lock<std::mutex> ul(m_gui_functions_mutex);
+        if (!m_gui_functions.empty())
+        {
+            std::vector<std::function<void()> > functions;
+            std::swap(functions, m_gui_functions);
+            ul.unlock();
+            for (auto& f : functions)
+                f();
+        }
+        else
+            ul.unlock();
+#endif
+
         // ---- menu drawing
 
         // draw background image and sections
 
         const GameState gamestate = g_state_manager->getGameState();
 
-        if (gamestate == MENU &&
-            GUIEngine::getCurrentScreen() != NULL &&
-            !GUIEngine::getCurrentScreen()->needs3D())
+        if ( (gamestate == MENU &&
+              GUIEngine::getCurrentScreen() != NULL &&
+             !GUIEngine::getCurrentScreen()->needs3D()  ) || is_loading)
         {
             g_skin->drawBgImage();
         }
@@ -1181,19 +1217,27 @@ namespace GUIEngine
         g_env->drawAll();
 
         // ---- some menus may need updating
-        if (gamestate != GAME)
+        if (gamestate != GAME || is_loading)
         {
+            bool dialog_opened = false;
+            
             if (ScreenKeyboard::isActive())
             {
                 ScreenKeyboard::getCurrent()->onUpdate(dt);
+                dialog_opened = true;
             }
             else if (ModalDialog::isADialogActive())
             {
                 ModalDialog::getCurrent()->onUpdate(dt);
+                dialog_opened = true;
             }
-            else
+            
+            Screen* screen = getCurrentScreen();
+
+            if (screen != NULL && 
+                (!dialog_opened || screen->getUpdateInBackground()))
             {
-                getCurrentScreen()->onUpdate(elapsed_time);
+                screen->onUpdate(elapsed_time);
             }
         }
         else
@@ -1333,7 +1377,7 @@ namespace GUIEngine
                            true/* center h */, false /* center v */ );
 
         const int icon_count = (int)g_loading_icons.size();
-        const int icon_size = (int)(screen_w / 16.0f);
+        const int icon_size = (int)(std::min(screen_w, screen_h) / 10.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;
         int y = screen_h - icon_size - ICON_MARGIN;

@@ -165,7 +165,7 @@ void CColorConverter::convert8BitTo32Bit(const u8* in, u8* out, s32 width, s32 h
 		out += lineWidth * height;
 
 	u32 x;
-	register u32 c;
+	u32 c;
 	for (u32 y=0; y < (u32) height; ++y)
 	{
 		if (flip)

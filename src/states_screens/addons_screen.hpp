@@ -73,15 +73,15 @@ private:
 
     bool             m_reloading;
 
+    bool             m_sort_desc;
+
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;
-
-    bool             m_show_tips;
 
 public:
 
     /** Load the addons into the main list.*/
-    void loadList(bool sort_desc = false);
+    void loadList();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

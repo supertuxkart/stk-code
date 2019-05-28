@@ -30,6 +30,7 @@
 class SelectChallengeDialog : public GUIEngine::ModalDialog
 {
 private:
+    bool  m_self_destroy = false;
     std::string m_challenge_id;
     void updateSolvedIcon(const ChallengeStatus* c, RaceManager::Difficulty diff,
                           const char* widget_name, const char* path);
@@ -40,6 +41,7 @@ public:
     virtual ~SelectChallengeDialog();
     
     virtual GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    virtual void onUpdate(float dt);
 };
 
 #endif

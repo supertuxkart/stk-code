@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="0" y="0" width="100%" height="fit" layout="vertical-row">
-        <button id="user-id" width="20%" height="fit" align="right"/>
-    </div>
-
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
         <icon id="logo" align="center" proportion="5" width="100%" icon="gui/icons/logo.png"/>
 
@@ -16,7 +12,7 @@
                          I18N="Main menu button" text="Singleplayer"/>
             <icon-button id="multiplayer" width="128" height="128"
                          icon="gui/icons/menu_multi.png" focus_icon="gui/icons/menu_multi_focus.png"
-                         I18N="Main menu button" text="Multiplayer"/>
+                         I18N="Main menu button" text="Local Multiplayer"/>
             <icon-button id="online" width="128" height="128"
                          icon="gui/icons/menu_online.png" focus_icon="gui/icons/menu_online_focus.png"
                          I18N="Main menu button" text="Online"/>
@@ -67,5 +63,9 @@
                              I18N="In the main screen" text="Quit" label_location="hover"/>
             </buttonbar>
         </bottombar>
+    </div>
+
+    <div x="0" y="0" width="100%" height="fit" layout="vertical-row">
+        <button id="user-id" width="12f" height="fit" align="right"/>
     </div>
 </stkgui>

@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <challenge version="3">
     <unlock_list list="false"/>
-    <track id="mansion" laps="3" reverse="false"/>
+    <track id="ravenbridge_mansion" laps="3" reverse="false"/>
     <mode major="single" minor="quickrace"/>
-		<requirements trophies="100"/>
+		<requirements trophies="0"/>
 
     <best>
-        <karts number="9"/>
-        <requirements position="1" time="100"/>
+        <karts number="8"/>
+        <requirements position="1" time="130"/>
     </best>
     <hard>
-        <karts number="8"/>
-        <requirements position="1" time="115"/>
+        <karts number="7"/>
+        <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="7"/>
-        <requirements time="140"/>
+        <karts number="6"/>
+        <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="6"/>
-        <requirements time="180"/>
+        <karts number="5"/>
+        <requirements position="1"/>
     </easy>
 </challenge>

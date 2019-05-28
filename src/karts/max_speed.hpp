@@ -19,6 +19,9 @@
 #ifndef HEADER_MAX_SPEED_HPP
 #define HEADER_MAX_SPEED_HPP
 
+#include "utils/types.hpp"
+#include <limits>
+
 /** \defgroup karts */
 
 class AbstractKart;
@@ -67,20 +70,19 @@ private:
     class SpeedIncrease
     {
     public:
-        /** The maximum additional speed allowed. */
-        float m_max_add_speed;
+        /** The maximum additional speed allowed, 3 digits precision. */
+        uint16_t m_max_add_speed;
         /** How long this speed will apply. This is used as a timer internally,
          *  to the duration will be decreased. When the duration is <0, the
          *  fade out time starts, and duration will go down to
          *  -m_fade_out_time before this speed increase stops. */
-        int m_duration;
+        int16_t m_duration;
         /** The fadeout time. */
-        int m_fade_out_time;
-        /** The current max speed increase value. */
+        int16_t m_fade_out_time;
+        /** The current max speed increase value, updated with duration. */
         float m_current_speedup;
-        /** Additional engine force. */
-        float m_engine_force;
-
+        /** Additional engine force, 1 digit precision. */
+        uint16_t m_engine_force;
         /** The constructor initialised the values with a no-increase
          *  entry, i.e. an entry that does affect top speed at all. */
         SpeedIncrease()
@@ -92,7 +94,7 @@ private:
         void reset()
         {
             m_max_add_speed   = 0;
-            m_duration        = -9999999;
+            m_duration        = std::numeric_limits<int16_t>::min();
             m_fade_out_time   = 0;
             m_current_speedup = 0;
             m_engine_force    = 0;
@@ -114,7 +116,7 @@ private:
         /** Returns the additional engine force for this speed increase. */
         float getEngineForce() const
         {
-            return m_duration > 0 ? m_engine_force : 0;
+            return m_duration > 0 ? (float)m_engine_force / 10.0f : 0;
         }   // getEngineForce
         // --------------------------------------------------------------------
         /** Returns if this speed increase is active atm. */
@@ -126,17 +128,18 @@ private:
     class SpeedDecrease
     {
     public:
-        /** The maximum slowdown to apply. */
-        float m_max_speed_fraction;
-        /** How long it should take for the full slowdown to take effect. */
-        int m_fade_in_ticks;
+        /** The maximum slowdown to apply, 3 digits precision. */
+        uint16_t m_max_speed_fraction;
         /** The current slowdown fraction, taking the fade-in time
          *  into account. */
         float m_current_fraction;
 
-        /** How long the effect should last. A -1.0f as value indicates
+        /** How long it should take for the full slowdown to take effect. */
+        int16_t m_fade_in_ticks;
+
+        /** How long the effect should last. A -1 as value indicates
          *  that this effect stays active till it is changed back. */
-        int m_duration;
+        int16_t m_duration;
 
         /** The constructor initialises the data with data that won't
          *  affect top speed at all. */
@@ -148,7 +151,7 @@ private:
         /** Resets the state to be inactive. */
         void reset()
         {
-            m_max_speed_fraction = 1.0f;
+            m_max_speed_fraction = 1000;
             m_current_fraction   = 1.0f;
             m_fade_in_ticks      = 0;
             m_duration           = 0;
@@ -192,6 +195,7 @@ public:
     void  setSlowdown(unsigned int category, float max_speed_fraction,
                       int fade_in_time, int duration=-1);
     int   getSpeedIncreaseTicksLeft(unsigned int category);
+    int   isSpeedIncreaseActive(unsigned int category);
     int   isSpeedDecreaseActive(unsigned int category);
     void  update(int ticks);
     void  reset();

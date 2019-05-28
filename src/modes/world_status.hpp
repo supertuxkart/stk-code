@@ -19,6 +19,7 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
+#include <atomic>
 
 class SFXBase;
 
@@ -48,6 +49,9 @@ public:
         // Used in network games only: wait for the server to broadcast
         // 'start'. This happens on a network client only
         WAIT_FOR_SERVER_PHASE,
+
+        // Used in network games only: server is ready
+        SERVER_READY_PHASE,
 
         // 'Ready' is displayed
         READY_PHASE,
@@ -82,9 +86,6 @@ public:
 
         // Undefined, used in asserts to catch incorrect states.
         UNDEFINED_PHASE,
-
-        //Goal scored phase
-        GOAL_PHASE
     };
 
 protected:
@@ -111,7 +112,7 @@ private:
 protected:
     bool            m_play_track_intro_sound;
     bool            m_play_ready_set_go_sounds;
-    Phase           m_phase;
+    std::atomic<Phase> m_phase;
 
 private:
 
@@ -126,11 +127,19 @@ private:
      */
     int             m_auxiliary_ticks;
 
+    int             m_start_music_ticks;
+
+    int             m_race_ticks;
+
+    int             m_live_join_ticks;
+
     /** Special counter to count ticks since start (in terms of physics
      *  timestep size). */
     int             m_count_up_ticks;
 
     bool            m_engines_started;
+
+    bool            m_live_join_world;
 
     void startEngines();
 
@@ -206,7 +215,18 @@ public:
     int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
     int getAuxiliaryTicks() const { return m_auxiliary_ticks; }
-
+    // ------------------------------------------------------------------------
+    bool isLiveJoinWorld() const { return m_live_join_world; }
+    // ------------------------------------------------------------------------
+    void setLiveJoinWorld(bool val) { m_live_join_world = val; }
+    // ------------------------------------------------------------------------
+    int getMusicDescriptionTicks() const
+    {
+        return m_live_join_ticks == -1 ?
+            m_count_up_ticks : m_count_up_ticks - m_live_join_ticks;
+    }
+    // ------------------------------------------------------------------------
+    void endLiveJoinWorld(int ticks_now);
 };   // WorldStatus
 
 

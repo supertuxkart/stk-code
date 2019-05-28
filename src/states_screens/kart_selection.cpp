@@ -73,9 +73,12 @@ FocusDispatcher::FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUT
     m_parent = parent;
     m_supports_multiplayer = true;
     m_is_initialised = false;
+    
+    Widget* kartsAreaWidget = parent->getWidget("playerskarts");
+    assert(kartsAreaWidget);
 
     m_x = 0;
-    m_y = 0;
+    m_y = kartsAreaWidget->m_y;
     m_w = 1;
     m_h = 1;
 
@@ -559,8 +562,8 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     // we need to select something for them
     w->setSelection(new_player_id, new_player_id, true);
 
-    newPlayerWidget->m_player_ident_spinner
-                   ->setFocusForPlayer(new_player_id);
+    //newPlayerWidget->m_player_ident_spinner
+    //               ->setFocusForPlayer(new_player_id);
 
     if (!m_multiplayer)
     {

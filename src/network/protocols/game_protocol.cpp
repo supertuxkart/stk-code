@@ -115,15 +115,21 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
 {
     if(!checkDataSize(event, 1)) return true;
 
+    // Ignore events arriving when client has already exited
+    auto lock = acquireWorldDeletingMutex();
+    if (!World::getWorld())
+        return true;
+
     NetworkString &data = event->data();
     uint8_t message_type = data.getUInt8();
     switch (message_type)
     {
     case GP_CONTROLLER_ACTION: handleControllerAction(event); break;
     case GP_STATE:             handleState(event);            break;
-    case GP_ADJUST_TIME:       handleAdjustTime(event);       break;
-    //case GP_ITEM_UPDATE:       handleItemUpdate(event);       break;
     case GP_ITEM_CONFIRMATION: handleItemEventConfirmation(event); break;
+    case GP_ADJUST_TIME:
+    case GP_ITEM_UPDATE:
+        break;
     default: Log::error("GameProtocol",
                         "Received unknown message type %d - ignored.",
                         message_type);                        break;
@@ -173,6 +179,10 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
  */
 void GameProtocol::handleControllerAction(Event *event)
 {
+    STKPeer* peer = event->getPeer();
+    if (NetworkConfig::get()->isServer() && (peer->isWaitingForGame() ||
+        peer->getAvailableKartIDs().empty()))
+        return;
     NetworkString &data = event->data();
     uint8_t count = data.getUInt8();
     bool will_trigger_rewind = false;
@@ -193,10 +203,10 @@ void GameProtocol::handleControllerAction(Event *event)
         }
         uint8_t kart_id = data.getUInt8();
         if (NetworkConfig::get()->isServer() &&
-            !event->getPeer()->availableKartID(kart_id))
+            !peer->availableKartID(kart_id))
         {
             Log::warn("GameProtocol", "Wrong kart id %d from %s.",
-                kart_id, event->getPeer()->getAddress().toString().c_str());
+                kart_id, peer->getAddress().toString().c_str());
             return;
         }
 
@@ -227,78 +237,12 @@ void GameProtocol::handleControllerAction(Event *event)
     {
         // Send update to all clients except the original sender if the event
         // is after the server time
+        peer->updateLastActivity();
         if (!will_trigger_rewind)
-            STKHost::get()->sendPacketExcept(event->getPeer(), &data, false);
-
-        // FIXME unless there is a network jitter more than 100ms (more than
-        // server delay), time adjust is not necessary
-        /*if (not_rewound == 0 ||
-            m_initial_ticks.find(event->getPeer()) == m_initial_ticks.end())
-            return;
-        int cur_diff = cur_ticks - not_rewound;
-        const int max_adjustment = 12;
-        const int ticks_difference = m_initial_ticks.at(event->getPeer());
-        if (will_trigger_rewind)
-        {
-            rewind_delta += max_adjustment;
-            Log::info("GameProtocol", "At %d %f %d requesting time adjust"
-                " (speed up) of %d for host %d",
-                World::getWorld()->getTicksSinceStart(), StkTime::getRealTime(),
-                not_rewound, rewind_delta, event->getPeer()->getHostId());
-            // This message from a client triggered a rewind in the server.
-            // To avoid this, signal to the client that it should speed up.
-            adjustTimeForClient(event->getPeer(), rewind_delta);
-            return;
-        }
-
-        if (cur_diff > 0 &&
-            cur_diff - ticks_difference > max_adjustment)
-        {
-            const int adjustment = ticks_difference - cur_diff;
-            Log::info("GameProtocol", "At %d %f %d requesting time adjust"
-                " (slow down) of %d for host %d",
-                World::getWorld()->getTicksSinceStart(), StkTime::getRealTime(),
-                not_rewound, adjustment, event->getPeer()->getHostId());
-            adjustTimeForClient(event->getPeer(), adjustment);
-        }*/
+            STKHost::get()->sendPacketExcept(peer, &data, false);
     }   // if server
 
 }   // handleControllerAction
-
-// ----------------------------------------------------------------------------
-/** The server might request that a client adjusts its world clock (in order to
- *  reduce rewinds). This function sends a a (unreliable) message to the 
- *  client.
- *  \param peer The peer that triggered the rewind.
- *  \param t Time that the peer needs to slowdown (<0) or speed up(>0).
- */
-void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
-{
-    assert(NetworkConfig::get()->isServer());
-
-    if (m_last_adjustments.find(peer) != m_last_adjustments.end() &&
-        StkTime::getRealTime() - m_last_adjustments.at(peer) < 3.0)
-        return;
-
-    NetworkString *ns = getNetworkString(5);
-    ns->addUInt8(GP_ADJUST_TIME).addUInt32(ticks);
-    // This message can be send unreliable, it's not critical if it doesn't
-    // get delivered, the server will request again later anyway.
-    peer->sendPacket(ns, /*reliable*/false);
-    m_last_adjustments[peer] = StkTime::getRealTime();
-    delete ns;
-}   // adjustTimeForClient
-
-// ----------------------------------------------------------------------------
-/** Called on a client when the server requests an adjustment of this client's
- *  world clock time (in order to reduce rewinds).
- */
-void GameProtocol::handleAdjustTime(Event *event)
-{
-    int ticks = event->data().getUInt32();
-    main_loop->setTicksAdjustment(ticks);
-    Log::verbose("GameProtocol", "%d ticks adjustment", ticks);
-}   // handleAdjustTime
 
 // ----------------------------------------------------------------------------
 /** Sends a confirmation to the server that all item events up to 'ticks'
@@ -393,11 +337,8 @@ void GameProtocol::sendState()
  */
 void GameProtocol::handleState(Event *event)
 {
-    // Ignore events arriving when client has already exited
-    if (!World::getWorld())
+    if (!NetworkConfig::get()->isClient())
         return;
-
-    assert(NetworkConfig::get()->isClient());
     NetworkString &data = event->data();
     int ticks          = data.getUInt32();
 
@@ -448,11 +389,3 @@ void GameProtocol::rewind(BareNetworkString *buffer)
             std::get<3>(a));
     }
 }   // rewind
-
-// ----------------------------------------------------------------------------
-void GameProtocol::addInitialTicks(STKPeer* p, int ticks)
-{
-    Log::verbose("GameProtocol", "Host %d with ticks difference %d",
-        p->getHostId(), ticks);
-    m_initial_ticks[p] = ticks;
-}   // addInitialTicks

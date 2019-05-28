@@ -120,7 +120,7 @@ void SoccerAI::update(int ticks)
     m_front_transform.setOrigin(m_kart->getFrontXYZ());
     m_front_transform.setBasis(m_kart->getTrans().getBasis());
 
-    if (m_world->getPhase() == World::GOAL_PHASE)
+    if (m_world->isGoalPhase())
     {
         resetAfterStop();
         m_controls->setBrake(false);
@@ -475,7 +475,7 @@ bool SoccerAI::determineOvertakePosition(const Vec3& ball_lc,
  */
 float SoccerAI::rotateSlope(float old_slope, bool rotate_up)
 {
-    const float theta = atan(old_slope) + (old_slope < 0 ? M_PI : 0);
+    const float theta = atanf(old_slope) + (old_slope < 0 ? M_PI : 0);
     float new_theta = theta + (rotate_up ? M_PI / 6 : -M_PI /6);
     if (new_theta > ((M_PI / 2) - 0.02f) && new_theta < ((M_PI / 2) + 0.02f))
     {
@@ -488,7 +488,7 @@ float SoccerAI::rotateSlope(float old_slope, bool rotate_up)
     else if (new_theta < 0)
         new_theta = 0.1f;
 
-    return tan(new_theta);
+    return tanf(new_theta);
 }   // rotateSlope
 
 //-----------------------------------------------------------------------------

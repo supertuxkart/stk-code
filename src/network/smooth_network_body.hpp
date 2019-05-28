@@ -68,20 +68,10 @@ private:
     bool m_adjust_vertical_offset;
 
     float m_min_adjust_length, m_max_adjust_length, m_min_adjust_speed,
-        m_max_adjust_time;
+        m_max_adjust_time, m_adjust_length_threshold;
 
 public:
-    SmoothNetworkBody(bool enable = false)
-    {
-        reset();
-        m_enabled = enable;
-        m_smooth_rotation = true;
-        m_adjust_vertical_offset = true;
-        m_min_adjust_length = 0.1f;
-        m_max_adjust_length = 4.0f;
-        m_min_adjust_speed = 0.3f;
-        m_max_adjust_time = 2.0f;
-    }
+    SmoothNetworkBody(bool enable = false);
     // ------------------------------------------------------------------------
     virtual ~SmoothNetworkBody() {}
     // ------------------------------------------------------------------------
@@ -97,6 +87,8 @@ public:
     }
     // ------------------------------------------------------------------------
     void setEnable(bool val)                               { m_enabled = val; }
+    // ------------------------------------------------------------------------
+    bool isEnabled() const                                { return m_enabled; }
     // ------------------------------------------------------------------------
     void setSmoothRotation(bool val)               { m_smooth_rotation = val; }
     // ------------------------------------------------------------------------
@@ -128,6 +120,9 @@ public:
     void setMinAdjustSpeed(float val)             { m_min_adjust_speed = val; }
     // ------------------------------------------------------------------------
     void setMaxAdjustTime(float val)               { m_max_adjust_time = val; }
+    // ------------------------------------------------------------------------
+    void setAdjustLengthThreshold(float val)
+                                           { m_adjust_length_threshold = val; }
 
 };
 

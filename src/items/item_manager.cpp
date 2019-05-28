@@ -86,7 +86,6 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
     item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
     item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
-    item_names[ItemState::ITEM_TRIGGER    ] = "trigger";
     item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
     item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
 
@@ -235,9 +234,18 @@ unsigned int ItemManager::insertItem(Item *item)
         m_all_items[index] = item;
     }
     item->setItemId(index);
-
+    insertItemInQuad(item);
     // Now insert into the appropriate quad list, if there is a quad list
     // (i.e. race mode has a quad graph).
+    return index;
+}   // insertItem
+
+//-----------------------------------------------------------------------------
+/** Insert into the appropriate quad list, if there is a quad list
+ *  (i.e. race mode has a quad graph).
+ */
+void ItemManager::insertItemInQuad(Item *item)
+{
     if(m_items_in_quads)
     {
         int graph_node = item->getGraphNode();
@@ -249,50 +257,49 @@ unsigned int ItemManager::insertItem(Item *item)
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
     }   // if m_items_in_quads
-    return index;
-}   // insertItem
+}   // insertItemInQuad
 
 //-----------------------------------------------------------------------------
 /** Creates a new item at the location of the kart (e.g. kart drops a
  *  bubblegum).
  *  \param type Type of the item.
  *  \param kart The kart that drops the new item.
- *  \param xyz Can be used to overwrite the item location (used in networking).
+ *  \param server_xyz Can be used to overwrite the item location.
+ *  \param server_normal The normal as seen on the server.
  */
 Item* ItemManager::dropNewItem(ItemState::ItemType type,
-                               const AbstractKart *kart, const Vec3 *xyz)
+                               const AbstractKart *kart, 
+                               const Vec3 *server_xyz,
+                               const Vec3 *server_normal)
 {
-    Vec3 hit_point;
-    Vec3 normal;
+    Vec3 normal, pos;
     const Material* material_hit;
-    Vec3 pos = xyz ? *xyz : kart->getXYZ();
-    Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
-    Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
-                                                        &hit_point,
-                                                        &material_hit,
-                                                        &normal);
-
-    // We will get no material if the kart is 'over nothing' when dropping
-    // the bubble gum. In most cases this means that the item does not need
-    // to be created (and we just return NULL). Only exception: if the server
-    // has sent a 'new item' event (which means its raycast found terrain),
-    // but the client does not have found a terrain (e.g. differences in
-    // position or more likely floating point differences). In this case, we
-    // must use the server position. In this and only this case xyz is not
-    // NULL (and then contains the server's position for the item).    
-    if (!material_hit && !xyz) return NULL;
-
-    if (!material_hit)
+    if (!server_xyz)
     {
-        // We are on a client which has received a new item event. Still
-        // create this item
-        normal.setValue(0, 1, 0);  // Arbitrary, we don't have a normal
-        pos = *xyz;
+        // We are doing a new drop locally, i.e. not based on
+        // server data. So we need a raycast to find the correct
+        // location and normal of the item:
+        pos = server_xyz ? *server_xyz : kart->getXYZ();
+        Vec3 to = pos + kart->getTrans().getBasis() * Vec3(0, -10000, 0);
+        Vec3 hit_point;
+        Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to,
+                                                            &hit_point,
+                                                            &material_hit,
+                                                            &normal);
+
+        // We will get no material if the kart is 'over nothing' when dropping
+        // the bubble gum. In most cases this means that the item does not need
+        // to be created (and we just return NULL). 
+        if (!material_hit) return NULL;
+        normal.normalize();
+        pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
     }
     else
     {
-        normal.normalize();
-        pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
+        // We are on a client which has received a new item event from the
+        // server. So use the server's data for the new item:
+        normal = *server_normal;
+        pos    = *server_xyz;
     }
 
     ItemState::ItemType mesh_type = type;
@@ -303,12 +310,14 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
-    insertItem(item);
+
+    // restoreState in NetworkItemManager will handle the insert item
+    if (!server_xyz)
+        insertItem(item);
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type],
-                       m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type);
     }
     return item;
 }   // dropNewItem
@@ -338,28 +347,10 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     if (m_switch_ticks >= 0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type, m_item_mesh[(int)new_type],
-                       m_item_lowres_mesh[(int)new_type]);
+        item->switchTo(new_type);
     }
     return item;
 }   // placeItem
-
-//-----------------------------------------------------------------------------
-/** Creates a new trigger item. This is not synched between client and 
- *  server, since the triggers are created at startup only and should
- *  therefore always be in sync.
- *  \param xyz  Position of the item.
- *  \param listener The listener object that gets called when a kart
- *         triggers this trigger.
- */
-Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
-                                TriggerItemListener* listener)
-{
-    Item* item = new Item(xyz, distance, listener);
-    insertItem(item);
-
-    return item;
-}   // placeTrigger
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
@@ -524,6 +515,18 @@ void ItemManager::updateGraphics(float dt)
 void ItemManager::deleteItem(ItemState *item)
 {
     // First check if the item needs to be removed from the items-in-quad list
+    deleteItemInQuad(item);
+    int index = item->getItemId();
+    m_all_items[index] = NULL;
+    delete item;
+}   // delete item
+
+//-----------------------------------------------------------------------------
+/** Removes an items from the items-in-quad list only
+ *  \param The item to delete.
+ */
+void ItemManager::deleteItemInQuad(ItemState* item)
+{
     if(m_items_in_quads)
     {
         int sector = item->getGraphNode();
@@ -535,11 +538,7 @@ void ItemManager::deleteItem(ItemState *item)
         assert(it!=items.end());
         items.erase(it);
     }   // if m_items_in_quads
-
-    int index = item->getItemId();
-    m_all_items[index] = NULL;
-    delete item;
-}   // delete item
+}   // deleteItemInQuad
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain
@@ -561,22 +560,12 @@ void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
     {
         if(!*i) continue;
 
-        if ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM ||
-             (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK)
-        {
-            if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
-            {
-                continue;
-            }
-        }
-
         ItemState::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if (new_type == (*i)->getType())
             continue;
         if(m_switch_ticks<0)
-            (*i)->switchTo(new_type, m_item_mesh[(int)new_type],
-                           m_item_lowres_mesh[(int)new_type]);
+            (*i)->switchTo(new_type);
         else
             (*i)->switchBack();
     }   // for all_items

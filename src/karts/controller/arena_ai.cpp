@@ -37,7 +37,6 @@ ArenaAI::ArenaAI(AbstractKart *kart)
     m_debug_sphere = NULL;
     m_debug_sphere_next = NULL;
     m_graph = ArenaGraph::get();
-    assert(m_graph != NULL);
 }   // ArenaAI
 
 //-----------------------------------------------------------------------------
@@ -78,6 +77,9 @@ void ArenaAI::reset()
  */
 void ArenaAI::update(int ticks)
 {
+    if (!m_graph)
+        return;
+
     // This is used to enable firing an item backwards.
     m_controls->setLookBack(false);
     m_controls->setNitro(false);
@@ -108,7 +110,7 @@ void ArenaAI::update(int ticks)
         m_kart->isOnGround()                                     )
     {
         m_ticks_since_off_road = 0;
-        new RescueAnimation(m_kart);
+        RescueAnimation::create(m_kart);
         AIBaseController::update(ticks);
         return;
     }

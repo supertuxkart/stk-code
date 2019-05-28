@@ -28,6 +28,7 @@
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "race/race_manager.hpp"
 
 #include "irrlicht.h"
@@ -190,17 +191,17 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
         result = m_ignore_height || 
                         (new_pos.getY()-m_min_height<m_over_min_height   &&
                          new_pos.getY()-m_min_height>-m_under_min_height     );
-        if(UserConfigParams::m_check_debug && !result)
+        if (UserConfigParams::m_check_debug && !result)
         {
-            if(World::getWorld()->getNumKarts()>0)
+            if (kart_index >= 0)
                 Log::info("CheckLine", "Kart %s crosses line, but wrong height "
                           "(%f vs %f).",
                           World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                           new_pos.getY(), m_min_height);
-            else
-                Log::info("CheckLine", "Kart %d crosses line, but wrong height "
+            else if (!result)
+                Log::info("CheckLine", "Object crosses line, but wrong height "
                           "(%f vs %f).",
-                          kart_index, new_pos.getY(), m_min_height);
+                          new_pos.getY(), m_min_height);
         }
     }
     else
@@ -218,3 +219,25 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     }
     return result;
 }   // isTriggered
+
+// ----------------------------------------------------------------------------
+void CheckLine::saveCompleteState(BareNetworkString* bns)
+{
+    CheckStructure::saveCompleteState(bns);
+    World* world = World::getWorld();
+    for (unsigned int i = 0; i < world->getNumKarts(); i++)
+        bns->addUInt8(m_previous_sign[i] ? 1 : 0);
+}   // saveCompleteState
+
+// ----------------------------------------------------------------------------
+void CheckLine::restoreCompleteState(const BareNetworkString& b)
+{
+    CheckStructure::restoreCompleteState(b);
+    m_previous_sign.clear();
+    World* world = World::getWorld();
+    for (unsigned int i = 0; i < world->getNumKarts(); i++)
+    {
+        bool previous_sign = b.getUInt8() == 1;
+        m_previous_sign.push_back(previous_sign);
+    }
+}   // restoreCompleteState

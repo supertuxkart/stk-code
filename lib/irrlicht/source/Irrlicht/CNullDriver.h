@@ -28,6 +28,7 @@
 
 namespace irr
 {
+class IrrlichtDevice;
 namespace io
 {
 	class IWriteFile;
@@ -384,6 +385,7 @@ namespace video
 		virtual void drawMeshBufferNormals(const scene::IMeshBuffer* mb, f32 length=10.f, SColor color=0xffffffff);
 
 	protected:
+		IrrlichtDevice* m_device;
 		struct SHWBufferLink
 		{
 			SHWBufferLink(const scene::IMeshBuffer *_MeshBuffer)

@@ -152,15 +152,15 @@ public:
     }
     std::map<T, U>& operator=(const std::map<T,U>& v)
     {
-        m_elements = std::map<T, U>(v); 
+        m_elements = std::map<T, U>(v);
         return m_elements;
     }
     std::map<T, U>& operator=(const MapUserConfigParam& v)
     {
-        m_elements = std::map<T,U>(v); 
+        m_elements = std::map<T,U>(v);
         return m_elements;
     }
-    U& operator[] (const T key) 
+    U& operator[] (const T key)
     {
         return m_elements[key];
     }
@@ -394,11 +394,11 @@ namespace UserConfigParams
             &m_audio_group,
             "Whether musics are enabled or not (true or false)") );
     PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.6f, "sfx_volume",
             &m_audio_group, "Volume for sound effects, see openal AL_GAIN "
                             "for interpretation") );
     PARAM_PREFIX FloatUserConfigParam       m_music_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.5f, "music_volume",
             &m_audio_group, "Music volume from 0.0 to 1.0") );
 
     // ---- Race setup
@@ -413,6 +413,12 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_num_laps
             PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps",
             &m_race_setup_group, "Default number of laps.") );
+    PARAM_PREFIX IntUserConfigParam          m_ffa_time_limit
+        PARAM_DEFAULT(IntUserConfigParam(3, "ffa-time-limit",
+            &m_race_setup_group, "Time limit in ffa mode."));
+    PARAM_PREFIX BoolUserConfigParam         m_use_ffa_mode
+        PARAM_DEFAULT(BoolUserConfigParam(false, "use-ffa-mode",
+            &m_race_setup_group, "Use ffa mode instead of 3 strikes battle."));
     PARAM_PREFIX IntUserConfigParam          m_num_goals
             PARAM_DEFAULT(  IntUserConfigParam(3, "numgoals",
             &m_race_setup_group, "Default number of goals in soccer mode.") );
@@ -443,7 +449,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
-    
+
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
@@ -478,15 +484,15 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
                                             "Settings for the multitouch device") );
 
-    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_active
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_active",
             &m_multitouch_group,
-            "Enable multitouch support.") );
-            
-    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
-            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+            "Enable multitouch support: 0 = disabled, 1 = if available, 2 = enabled") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_draw_gui
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_draw_gui",
             &m_multitouch_group,
-            "Steering mode: 0 = off, 1 = buttons"));
+            "Enable multitouch race GUI"));
 
     PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
             PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
@@ -498,18 +504,22 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope"));
 
-    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
-            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone",
             &m_multitouch_group,
             "A parameter in range [0, 0.5] that determines the zone that is "
             "considered as centered in steering button."));
 
-    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
-            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_x
+            PARAM_DEFAULT( FloatUserConfigParam(0.2f, "multitouch_sensitivity_x",
             &m_multitouch_group,
-            "A parameter in range [0, 0.5] that determines the zone that is "
-            "considered as max value in steering button."));
-            
+            "A parameter in range [0, 1.0] that determines the sensitivity for x axis."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_sensitivity_y
+            PARAM_DEFAULT( FloatUserConfigParam(0.65f, "multitouch_sensitivity_y",
+            &m_multitouch_group,
+            "A parameter in range [0, 1.0] that determines the sensitivity for y axis."));
+
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
             PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",
             &m_multitouch_group,
@@ -526,11 +536,6 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
             "keyboard, 2 = always enabled") );
-            
-    PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
-            PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
-            &m_multitouch_group,
-            "Enable high-DPI support.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
@@ -638,6 +643,9 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
+    PARAM_PREFIX FloatUserConfigParam         m_fonts_size
+        PARAM_DEFAULT(  FloatUserConfigParam(3, "fonts_size",
+        &m_video_group,"The size of fonts. 0 is the smallest and 6 is the biggest") );
 
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
@@ -724,7 +732,7 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
-    
+
     PARAM_PREFIX bool m_enable_sound PARAM_DEFAULT( true );
 
     /** True to test funky ambient/diffuse/specularity in RGB &
@@ -847,6 +855,10 @@ namespace UserConfigParams
             PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
+    PARAM_PREFIX BoolUserConfigParam         m_light_scatter
+            PARAM_DEFAULT(BoolUserConfigParam(true,
+                           "light_scatter", &m_graphics_quality,
+                           "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,
@@ -945,14 +957,8 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "random-identifier", &m_hw_report_group,
                                                   "A random number to avoid duplicated reports.") );
 
-    PARAM_PREFIX StringUserConfigParam      m_server_hw_report
-            PARAM_DEFAULT( StringUserConfigParam(   "http://addons.supertuxkart.net:8080",
-                                                     "hw-report-server",
-                                                     &m_hw_report_group,
-                                                    "The server used for reporting statistics to."));
-
     PARAM_PREFIX BoolUserConfigParam      m_hw_report_enable
-            PARAM_DEFAULT( BoolUserConfigParam(   true,
+            PARAM_DEFAULT( BoolUserConfigParam(   false,
                                                      "hw-report-enabled",
                                                      &m_hw_report_group,
                                                     "If HW reports are enabled."));
@@ -964,34 +970,10 @@ namespace UserConfigParams
           "Always show the login screen even if last player's session was saved."));
 
 
-    // ---- Online gameplay related
-    PARAM_PREFIX GroupUserConfigParam       m_online_group
-            PARAM_DEFAULT( GroupUserConfigParam("OnlineServer",
-                                          "Everything related to online play.") );
-
-    PARAM_PREFIX StringUserConfigParam      m_server_multiplayer
-            PARAM_DEFAULT( StringUserConfigParam(   "https://addons.supertuxkart.net/api/",
-                                                     "server_multiplayer",
-                                                     &m_online_group,
-                                                    "The server used for online multiplayer."));
-
-    PARAM_PREFIX IntUserConfigParam        m_server_version
-            PARAM_DEFAULT( IntUserConfigParam(   2,
-                                                 "server-version",
-                                                 &m_online_group,
-                                                    "Version of the server API to use."));
-
-
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
             PARAM_DEFAULT( GroupUserConfigParam("AddonServer",
                                           "Addon and news related settings") );
-
-    PARAM_PREFIX StringUserConfigParam      m_server_addons
-            PARAM_DEFAULT( StringUserConfigParam("http://addons.supertuxkart.net/dl/xml",
-                                                 "server_addons",
-                                                 &m_addon_group,
-                                                "The server used for addon."));
 
     PARAM_PREFIX TimeUserConfigParam        m_news_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "news_last_updated",
@@ -1032,10 +1014,11 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "debug_hide_gui",
             "Whether to hide the GUI (artist debug mode)"));
 
-    PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
-            PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
-                               "Enable all karts and tracks") );
-                               
+    PARAM_PREFIX IntUserConfigParam        m_unlock_everything
+            PARAM_DEFAULT( IntUserConfigParam(0, "unlock_everything",
+                        "Enable all karts and tracks: 0 = disabled, "
+                        "1 = everything except final race, 2 = everything") );
+
     PARAM_PREFIX StringUserConfigParam      m_commandline
             PARAM_DEFAULT( StringUserConfigParam("", "commandline",
                              "Allows to set commandline args in config file") );

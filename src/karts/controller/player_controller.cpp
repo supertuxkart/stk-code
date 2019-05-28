@@ -34,12 +34,13 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/network_string.hpp"
-#include "network/protocols/lobby_protocol.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
+
+#include <cstdlib>
 
 PlayerController::PlayerController(AbstractKart *kart)
                 : Controller(kart)
@@ -222,15 +223,21 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         break;
     case PA_DRIFT:
         if (value == 0)
+        {
             SET_OR_TEST_GETTER(SkidControl, KartControl::SC_NONE);
-        else
+        }
+        else if (m_controls->getSkidControl() == KartControl::SC_NONE)
         {
             if (m_steer_val == 0)
+            {
                 SET_OR_TEST_GETTER(SkidControl, KartControl::SC_NO_DIRECTION);
+            }
             else
+            {
                 SET_OR_TEST_GETTER(SkidControl, m_steer_val<0
                                                 ? KartControl::SC_RIGHT
                                                 : KartControl::SC_LEFT  );
+            }
         }
         break;
     case PA_PAUSE_RACE:
@@ -279,19 +286,13 @@ void PlayerController::steer(int ticks, int steer_val)
                      : dt/m_kart->getTimeFullSteer(fabsf(steer));
     if (steer_val < 0)
     {
-        // If we got analog values do not cumulate.
-        if (steer_val > -32767)
-            steer = -steer_val/32767.0f;
-        else
-            steer += STEER_CHANGE;
+        steer += STEER_CHANGE;
+        steer = std::min(steer, -steer_val/32767.0f);
     }
     else if(steer_val > 0)
     {
-        // If we got analog values do not cumulate.
-        if (steer_val < 32767)
-            steer = -steer_val/32767.0f;
-        else
-            steer -= STEER_CHANGE;
+        steer -= STEER_CHANGE;
+        steer = std::max(steer, -steer_val/32767.0f);
     }
     else
     {   // no key is pressed
@@ -329,8 +330,7 @@ void PlayerController::update(int ticks)
     if (World::getWorld()->isStartPhase())
     {
         if ((m_controls->getAccel() || m_controls->getBrake()||
-            m_controls->getFire() || m_controls->getNitro()) &&
-            !NetworkConfig::get()->isNetworking())
+            m_controls->getNitro()) && !NetworkConfig::get()->isNetworking())
         {
             // Only give penalty time in READY_PHASE.
             // Penalty time check makes sure it doesn't get rendered on every
@@ -359,7 +359,7 @@ void PlayerController::update(int ticks)
     // starting any other animation).
     if ( m_controls->getRescue() && !m_kart->getKartAnimation() )
     {
-        new RescueAnimation(m_kart);
+        RescueAnimation::create(m_kart);
         m_controls->setRescue(false);
     }
 }   // update
@@ -373,12 +373,14 @@ void PlayerController::handleZipper(bool play_sound)
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
-void PlayerController::saveState(BareNetworkString *buffer) const
+bool PlayerController::saveState(BareNetworkString *buffer) const
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    buffer->addUInt32(m_steer_val).addUInt16(m_prev_accel)
+    int steer_abs = std::abs(m_steer_val);
+    buffer->addUInt16((uint16_t)steer_abs).addUInt16(m_prev_accel)
         .addUInt8((m_prev_brake ? 1 : 0) | (m_prev_nitro ? 2 : 0));
+    return m_steer_val < 0;
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -386,7 +388,7 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
 {
     // NOTE: when the size changes, the AIBaseController::saveState and
     // restore state MUST be adjusted!!
-    m_steer_val  = buffer->getUInt32();
+    m_steer_val  = buffer->getUInt16();
     m_prev_accel = buffer->getUInt16();
     uint8_t c = buffer->getUInt8();
     m_prev_brake = (c & 1) != 0;
@@ -399,14 +401,11 @@ core::stringw PlayerController::getName() const
     core::stringw name = m_kart->getName();
     if (NetworkConfig::get()->isNetworking())
     {
-        auto& players = LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
-            ->getPlayers();
-        if (auto player = players.at(m_kart->getWorldKartId()).lock())
-        {
-            name = player->getName();
-            if (player->getPerPlayerDifficulty() == PLAYER_DIFFICULTY_HANDICAP)
-                name = _("%s (handicapped)", name);
-        }
+        const RemoteKartInfo& rki = race_manager->getKartInfo(
+            m_kart->getWorldKartId());
+        name = rki.getPlayerName();
+        if (rki.getDifficulty() == PLAYER_DIFFICULTY_HANDICAP)
+            name = _("%s (handicapped)", name);
     }
     return name;
 }   // getName

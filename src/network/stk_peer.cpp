@@ -37,11 +37,14 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
 {
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
-    m_connected_time      = StkTime::getRealTimeMs();
+    m_connected_time      = StkTime::getMonoTimeMs();
     m_validated.store(false);
     m_average_ping.store(0);
     m_waiting_for_game.store(true);
+    m_spectator.store(false);
     m_disconnected.store(false);
+    m_warned_for_high_ping.store(false);
+    m_last_activity.store((int64_t)StkTime::getMonoTimeMs());
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
@@ -52,6 +55,8 @@ STKPeer::~STKPeer()
 //-----------------------------------------------------------------------------
 void STKPeer::disconnect()
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
@@ -65,6 +70,8 @@ void STKPeer::disconnect()
  */
 void STKPeer::kick()
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
@@ -78,6 +85,8 @@ void STKPeer::kick()
  */
 void STKPeer::reset()
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
@@ -94,6 +103,8 @@ void STKPeer::reset()
  */
 void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
 {
+    if (m_disconnected.load())
+        return;
     TransportAddress a(m_enet_peer->address);
     // Enet will reuse a disconnected peer so we check here to avoid sending
     // to wrong peer
@@ -168,7 +179,8 @@ uint32_t STKPeer::getPing()
     if (NetworkConfig::get()->isServer())
     {
         // Average ping in 5 seconds
-        const unsigned ap = stk_config->m_network_state_frequeny * 5;
+        // Frequency is 10 packets per second as seen in STKHost
+        const unsigned ap = 10 * 5;
         m_previous_pings.push_back(m_enet_peer->roundTripTime);
         while (m_previous_pings.size() > ap)
         {

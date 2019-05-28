@@ -42,10 +42,11 @@ MessageDialog::MessageDialog(const irr::core::stringw &msg,
                              float width, float height)
              : ModalDialog(width, height)
 {
-    m_msg          = msg;
-    m_type         = type;
-    m_listener     = listener;
-    m_own_listener = own_listener;
+    m_msg             = msg;
+    m_type            = type;
+    m_listener        = listener;
+    m_own_listener    = own_listener;
+    m_focus_on_cancel = false;
     doInit(from_queue);
 }   // MessageDialog(stringw, type, listener, own_listener)
 
@@ -127,12 +128,17 @@ void MessageDialog::loadedFromFile()
     {
         IconButtonWidget* cancelbtn = getWidget<IconButtonWidget>("cancel");
         cancelbtn->setText(_("No"));
+        if(m_focus_on_cancel)
+            cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if (m_type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
     {
         // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
         IconButtonWidget* yesbtn = getWidget<IconButtonWidget>("confirm");
         yesbtn->setText(_("OK"));
+        IconButtonWidget* cancelbtn = getWidget<IconButtonWidget>("cancel");
+        if (m_focus_on_cancel)
+            cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }
 

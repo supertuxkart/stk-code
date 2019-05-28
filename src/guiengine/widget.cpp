@@ -76,6 +76,8 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_supports_multiplayer  = false;
     m_is_bounding_box_round = false;
     m_has_tooltip           = false;
+    m_uncollapsed_height    = 0;
+    m_is_collapsed          = false;
 
     m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
     m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
@@ -340,6 +342,36 @@ void Widget::setVisible(bool visible)
     {
         m_children[n].setVisible(visible);
     }
+}
+
+// -----------------------------------------------------------------------------
+
+void Widget::setCollapsed(const bool collapsed, Screen* calling_screen)
+{
+    if (!m_is_collapsed)
+        m_uncollapsed_height = m_h;
+
+    setCollapsed(collapsed, m_uncollapsed_height, calling_screen);
+}
+
+// -----------------------------------------------------------------------------
+//TODO : Support recalculating layout for dialogs
+
+void Widget::setCollapsed(const bool collapsed, const int uncollapsed_height, Screen* calling_screen)
+{
+    m_uncollapsed_height = uncollapsed_height;
+
+    setVisible(!collapsed);
+
+    if (collapsed)
+        m_properties[GUIEngine::PROP_HEIGHT] = "0";
+    else
+        m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_uncollapsed_height);
+
+    m_is_collapsed = collapsed;
+
+    if (calling_screen != NULL)
+        calling_screen->calculateLayout();
 }
 
 // -----------------------------------------------------------------------------

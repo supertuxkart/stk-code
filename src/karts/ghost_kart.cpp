@@ -162,12 +162,15 @@ void GhostKart::update(int ticks)
     else
         attach_ticks = 32767;
 
-    if ( attach_type == Attachment::ATTACH_NOTHING )
+    if (attach_type == Attachment::ATTACH_NOTHING)
         m_attachment->clear();
     // Setting again reinitialize the graphical size of the attachment,
     // so do so only if the type change
-    else if ( attach_type != m_attachment->getType())
-        m_attachment->set(attach_type,attach_ticks);
+    else if (attach_type != m_attachment->getType())
+    {
+        m_attachment->set(attach_type, attach_ticks, NULL,
+            /*set_by_rewind_parachute*/true);
+    }
 
     // So that the attachment's model size is updated
     m_attachment->update(ticks);

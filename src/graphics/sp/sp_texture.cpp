@@ -167,8 +167,8 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
     core::dimension2du img_size = image->getDimension();
     core::dimension2du tex_size = img_size.getOptimalSize
         (true/*requirePowerOfTwo*/, false/*requireSquare*/, false/*larger*/);
-    const core::dimension2du& max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    unsigned max = sp_max_texture_size.load();
+    core::dimension2du max_size = core::dimension2du(max, max);
 
     if (tex_size.Width > max_size.Width)
     {

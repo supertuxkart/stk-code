@@ -24,9 +24,10 @@
 #include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
 
-class XMLNode;
-class Track;
+class BareNetworkString;
 class CheckManager;
+class Track;
+class XMLNode;
 
 /**
  * \brief Virtual base class for a check structure.
@@ -58,13 +59,14 @@ public:
      *  CANNON:   Causes the kart to be shot to a specified point.
      *  GOAL:     Causes a point to be scored when a soccer ball crosses its line
      *  AMBIENT_SPHERE: Modifies the ambient color.
+     *  TRIGGER:  Run custom trigger function
      *  A combination of an activate and new_lap line are used to
      *  avoid shortcuts: a new_lap line is deactivated after crossing it, and
      *  you have to cross a corresponding activate structure to re-activate it,
      *  enabling you to count the lap again.
      */
     enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
-                    CT_GOAL, CT_AMBIENT_SPHERE};
+                    CT_GOAL, CT_AMBIENT_SPHERE, CT_TRIGGER};
 
 protected:
     /** Stores the previous position of all karts. This is needed to detect
@@ -81,6 +83,9 @@ protected:
      *  debugging (use --check-debug option). */
     unsigned int      m_index;
 
+    /** For CheckTrigger or CheckCylinder */
+    CheckStructure(unsigned index) : m_active_at_reset(true), m_index(index),
+        m_check_type(CT_TRIGGER) {}
 private:
     /** The type of this checkline. */
     CheckType         m_check_type;
@@ -105,7 +110,8 @@ public:
                 CheckStructure(const XMLNode &node, unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
-    virtual void resetAfterKartMove(unsigned int kart_index) {};
+    virtual void resetAfterKartMove(unsigned int kart_index) {}
+    virtual void resetAfterRewind(unsigned int kart_index) {}
     virtual void changeDebugColor(bool is_active) {}
     /** True if going from old_pos to new_pos crosses this checkline. This function
      *  is called from update (of the checkline structure).
@@ -125,9 +131,22 @@ public:
     // ------------------------------------------------------------------------
     /** Adds the index of a successor check structure which will get triggered
      *  by this check structure. */
-    void addSuccessor(unsigned int i) {
+    void addSuccessor(unsigned int i)
+    {
         m_check_structures_to_change_state.push_back(i);
     }   // addSuccessor
+    // ------------------------------------------------------------------------
+    virtual bool triggeringCheckline() const { return false; }
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns);
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& b);
+    // ------------------------------------------------------------------------
+    void saveIsActive(int kart_id, BareNetworkString* bns);
+    // ------------------------------------------------------------------------
+    void restoreIsActive(int kart_id, const BareNetworkString& b);
+    // ------------------------------------------------------------------------
+    int getIndex() const { return m_index; }
 };   // CheckStructure
 
 #endif

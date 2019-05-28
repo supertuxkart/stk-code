@@ -119,6 +119,7 @@ public:
     virtual      ~TrackObject();
     virtual void update(float dt);
     virtual void updateGraphics(float dt);
+    virtual void resetAfterRewind();
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
               const core::vector3df& scale, bool updateRigidBody,
               bool isAbsoluteCoord);
@@ -232,6 +233,8 @@ public:
     // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
     // ------------------------------------------------------------------------
+    void setInitiallyVisible(bool val)           { m_initially_visible = val; }
+    // ------------------------------------------------------------------------
     /** Returns if a kart can drive on this object. */
     bool isDriveable() const { return m_is_driveable; }
     // ------------------------------------------------------------------------
@@ -247,6 +250,8 @@ public:
     std::vector<TrackObject*>& getChildren() { return m_children; }
     // ------------------------------------------------------------------------
     void movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr);
+    // ------------------------------------------------------------------------
+    bool joinToMainTrack();
     LEAK_CHECK()
 };   // TrackObject
 

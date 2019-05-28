@@ -43,6 +43,7 @@ PowerupManager* powerup_manager=0;
 /** The constructor initialises everything to zero. */
 PowerupManager::PowerupManager()
 {
+    m_random_seed.store(0);
     for(int i=0; i<POWERUP_MAX; i++)
     {
         m_all_meshes[i] = NULL;
@@ -315,7 +316,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     // The last kart always uses the data for the last section
     if (rank == (int)m_num_karts)
     {
-        *prev = *next = m_weights_for_section.size() - 1;
+        *prev = *next = (int)m_weights_for_section.size() - 1;
         *weight = 1.0f;
         return;
     }
@@ -343,7 +344,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
     // and the last to the last kart, leaving two inner points defining
     // 3 sections, i.e. number_of_points - 3 + 1
     // In both cases the number of sections is:
-    int num_sections = (m_weights_for_section.size() - first_section_index);
+    int num_sections = ((int)m_weights_for_section.size() - first_section_index);
     float karts_per_fraction = (m_num_karts - first_section_index)
                              / float(num_sections);
 
@@ -407,7 +408,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
-        rank = m_summed_weights_for_rank.size()-1;
+        rank = (int)m_summed_weights_for_rank.size()-1;
     else if (rank<0) rank = 0;  // E.g. battle mode, which has rank -1
     const std::vector<unsigned> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
@@ -515,15 +516,17 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     std::string class_name="";
     switch (race_manager->getMinorMode())
     {
-    case RaceManager::MINOR_MODE_TIME_TRIAL:     /* fall through */
-    case RaceManager::MINOR_MODE_NORMAL_RACE:    class_name="race";     break;
-    case RaceManager::MINOR_MODE_FOLLOW_LEADER:  class_name="ftl";      break;
-    case RaceManager::MINOR_MODE_BATTLE:      class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TUTORIAL:       class_name="tutorial"; break;
-    case RaceManager::MINOR_MODE_EASTER_EGG:     /* fall through */
+    case RaceManager::MINOR_MODE_TIME_TRIAL:       /* fall through */
+    case RaceManager::MINOR_MODE_NORMAL_RACE:      class_name="race";     break;
+    case RaceManager::MINOR_MODE_FOLLOW_LEADER:    class_name="ftl";      break;
+    case RaceManager::MINOR_MODE_3_STRIKES:        class_name="battle";   break;
+    case RaceManager::MINOR_MODE_FREE_FOR_ALL:     class_name="battle";   break;
+    case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG: class_name="battle";   break;
+    case RaceManager::MINOR_MODE_TUTORIAL:         class_name="tutorial"; break;
+    case RaceManager::MINOR_MODE_EASTER_EGG:       /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:
     case RaceManager::MINOR_MODE_CUTSCENE:
-    case RaceManager::MINOR_MODE_SOCCER:         class_name="soccer";   break;
+    case RaceManager::MINOR_MODE_SOCCER:           class_name="soccer";   break;
     default:
         Log::fatal("PowerupManager", "Invalid minor mode %d - aborting.",
                     race_manager->getMinorMode());
@@ -599,6 +602,15 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     }
     else
         *n=1;
+
+    // Prevents early explosive items
+    if (World::getWorld() && 
+        stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
+                                      stk_config->m_no_explosive_items_timeout)
+    {
+        if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL)
+            powerup = POWERUP_BOWLING;
+    }
     return (PowerupType)powerup;
 }   // getRandomPowerup
 

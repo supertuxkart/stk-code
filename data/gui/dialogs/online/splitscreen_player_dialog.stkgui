@@ -4,33 +4,44 @@
         <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
         I18N="Splitscreen player in network" text="Add player"/>
 
-        <spacer height="20" width="50"/>
+        <spacer height="8%" width="10"/>
 
-        <div width="80%" align="center" layout="vertical-row" height="fit" >
-            <div width="100%" height="fit" layout="horizontal-row" >
-                <label id="name-text" proportion="1" text_align="left" I18N="Splitscreen player in network" text="Name"/>
-                <spinner id="name-spinner" width="50%" align="center" wrap_around="true" />
+        <div width="100%" align="center" layout="horizontal-row" height="fit" >
+            <div proportion="1" align="center" layout="horizontal-row" height="fit" >
+                <spacer proportion="1" height="10"/>
+                <spinner id="name-spinner" width="70%" align="center" wrap_around="true" />
+            </div>
+            <spacer width="5%" height="10"/>
+            <div proportion="1" align="center" layout="horizontal-row" height="fit" >
+                <label id="name-text" text_align="left" I18N="Splitscreen player in network" text="Name"/>
+                <spacer proportion="1" height="10"/>
             </div>
         </div>
 
-        <spacer height="20" width="50"/>
+        <spacer height="2%" width="10"/>
 
-        <div id="handicap-row" width="80%" align="center" layout="vertical-row" height="fit" >
-            <div width="100%" height="fit" layout="horizontal-row" >
-                <label id="handicap-text" proportion="1" text_align="left" I18N="Splitscreen player in network" text="Handicap"/>
+        <div id="handicap-row" width="100%" align="center" layout="horizontal-row" height="fit" >
+            <div proportion="1" align="center" layout="horizontal-row" height="fit" >
+                <spacer proportion="1" height="10"/>
                 <checkbox id="handicap" align="center" />
             </div>
+            <spacer width="5%" height="10"/>
+            <div proportion="1" align="center" layout="horizontal-row" height="fit" >
+                <label id="handicap-text" text_align="left" I18N="Splitscreen player in network" text="Handicap"/>
+                <spacer proportion="1" height="10"/>
+            </div>
         </div>
 
-        <spacer height="20" width="50"/>
+        <spacer proportion="2" width="10"/>
+
         <div width="80%" align="center" layout="vertical-row" height="fit" >
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label id="message-label" proportion="1" text_align="left" I18N="Splitscreen player in network"
+                <label id="message-label" proportion="1" text_align="center" word_wrap="true" I18N="Splitscreen player in network"
                     text="Press the 'All players ready' button after the player list is ready."/>
             </div>
         </div>
 
-        <spacer height="20" width="50"/>
+        <spacer proportion="3" width="10"/>
 
         <buttonbar id="options" width="90%" height="20%" align="center">
             <icon-button id="add" width="64" height="64" icon="gui/icons/blue_plus.png"
@@ -40,7 +51,9 @@
             <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
                          I18N="Splitscreen player in network" text="Cancel" label_location="bottom"/>
             <icon-button id="reset" width="64" height="64" icon="gui/icons/remove.png"
-                         I18N="Splitscreen player in network" text="Clear added player" label_location="bottom"/>
+                         I18N="Splitscreen player in network" text="Clear players" label_location="bottom"/>
         </buttonbar>
+
+        <spacer height="2%" width="10"/>
     </div>
 </stkgui>

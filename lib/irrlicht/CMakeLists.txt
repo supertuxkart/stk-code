@@ -53,7 +53,7 @@ if(NOT SERVER_ONLY)
     if(ENABLE_WAYLAND_DEVICE)
         find_package(Wayland)
         
-        if(WAYLAND_FOUND)
+        if(WAYLAND_FOUND AND NOT (WAYLAND_VERSION VERSION_LESS "1.14"))
             include_directories(${WAYLAND_INCLUDE_DIR})
             add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
         else()
@@ -580,10 +580,10 @@ include/vector2d.h
 include/vector3d.h
 )
 
-if(ENABLE_WAYLAND_DEVICE)
+if(NOT SERVER_ONLY AND ENABLE_WAYLAND_DEVICE)
     set(IRRLICHT_SOURCES 
         ${IRRLICHT_SOURCES}
-        source/Irrlicht/server_decoration_client_protocol.c
+        source/Irrlicht/xdg_decoration_unstable_v1_protocol.c
         source/Irrlicht/xdg_shell_protocol.c)
 endif()
 

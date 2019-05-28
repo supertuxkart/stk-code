@@ -27,6 +27,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 
 class STKPeer;
 
@@ -54,6 +55,9 @@ private:
     /** Time at which m_confirmed_state was taken. */
     int m_confirmed_state_time;
 
+    /** Allow remove or add peer live. */
+    std::mutex m_live_players_mutex;
+
     /** Stores on the server the latest confirmed tick from each client. */
     std::map<std::weak_ptr<STKPeer>, int32_t,
         std::owner_less<std::weak_ptr<STKPeer> > > m_last_confirmed_item_ticks;
@@ -71,17 +75,15 @@ public:
 
     static void create();
     virtual ~NetworkItemManager();
-
-    void sendItemUpdate();
-    void initClientConfirmState();
-
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                          int ticks) OVERRIDE;
     virtual void  collectedItem(ItemState *item, AbstractKart *kart) OVERRIDE;
     virtual void  switchItems() OVERRIDE;
-    virtual Item* dropNewItem(ItemState::ItemType type, const AbstractKart *kart,
-                              const Vec3 *xyz=NULL) OVERRIDE;
+    virtual Item* dropNewItem(ItemState::ItemType type,
+                              const AbstractKart *kart,
+                              const Vec3 *server_xyz = NULL,
+                              const Vec3 *server_normal = NULL) OVERRIDE;
     virtual BareNetworkString* saveState(std::vector<std::string>* ru)
         OVERRIDE;
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
@@ -95,6 +97,23 @@ public:
     virtual void undoState(BareNetworkString *buffer) OVERRIDE {};
     // ------------------------------------------------------------------------
     virtual void undoEvent(BareNetworkString*) OVERRIDE {};
+    // ------------------------------------------------------------------------
+    void addLiveJoinPeer(std::weak_ptr<STKPeer> peer)
+    {
+        std::lock_guard<std::mutex> lock(m_live_players_mutex);
+        m_last_confirmed_item_ticks[peer] = 0;
+    }
+    // ------------------------------------------------------------------------
+    void erasePeerInGame(std::weak_ptr<STKPeer> peer)
+    {
+        std::lock_guard<std::mutex> lock(m_live_players_mutex);
+        m_last_confirmed_item_ticks.erase(peer);
+    }
+    // ------------------------------------------------------------------------
+    void saveCompleteState(BareNetworkString* buffer) const;
+    // ------------------------------------------------------------------------
+    void restoreCompleteState(const BareNetworkString& buffer);
+
 };   // NetworkItemManager
 
 #endif

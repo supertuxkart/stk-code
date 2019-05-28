@@ -2,9 +2,13 @@
 
 ## Hosting server
 First of all, you can compile STK with `-DSERVER_ONLY=ON` which will produce a GUI-less STK binary optimized for size and memory usage, useful for situation like in VPS.
-
+The dependencies for RHEL/CentOS 7 are installed with:
+```bash
+yum install wget; cd /tmp; wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm; rpm -Uvh epel-release*rpm
+yum install gcc-c++ cmake openssl-devel libcurl-devel zlib-devel enet gcc-c++
+```
 ### Hosting WAN (public internet) server
-You are required to have an stk online account first, go [here](https://addons.supertuxkart.net/register.php) for registration.
+You are required to have an stk online account first, go [here](https://online.supertuxkart.net/register.php) for registration.
 
 It is recommended you have a saved user in your computer to allow hosting multiple servers simultaneously with the same account, if you have a fresh STK installation, first run:
 
@@ -21,7 +25,7 @@ It will create that xml configuration file if not found in current directory, yo
 The current server configuration xml looks like this:
 ```xml
 <?xml version="1.0"?>
-<server-config version="1" >
+<server-config version="6" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
     <server-name value="stk server" />
@@ -56,8 +60,14 @@ The current server configuration xml looks like this:
     <!-- Message of today shown in lobby, you can enter encoded XML words here or a file.txt and let STK load it. -->
     <motd value="" />
 
-    <!-- Timeout in seconds for voting tracks in server. -->
-    <voting-timeout value="20" />
+    <!-- If off this server will ignore chat message from all players. -->
+    <chat value="true" />
+
+    <!-- Allow players to vote track to play, if off server will pick next track to play randomly. -->
+    <track-voting value="true" />
+
+    <!-- Timeout in seconds for selecting karts and (or) voting tracks in server, you may want to use a lower value if you have track-voting off. -->
+    <voting-timeout value="30" />
 
     <!-- Timeout in seconds for validation of clients in wan, currently stk will use the stk-addons server to share AES key between client and server. -->
     <validation-timeout value="20" />
@@ -72,7 +82,13 @@ The current server configuration xml looks like this:
     <owner-less value="false" />
 
     <!-- Time to wait before entering kart selection screen if satisfied min-start-game-players below for owner less or ranked server. -->
-    <start-game-counter value="30" />
+    <start-game-counter value="60" />
+
+    <!-- Clients below this value will be rejected from joining this server. It's determined by number of official karts in client / number of official karts in server -->
+    <official-karts-threshold value="1" />
+
+    <!-- Clients below this value will be rejected from joining this server. It's determined by number of official tracks in client / number of official tracks in server, setting this value too high will prevent android players from joining this server, because STK android apk has some official tracks removed. -->
+    <official-tracks-threshold value="0.7" />
 
     <!-- Only auto start kart selection when number of connected player is larger than or equals this value, for owner less or ranked server, after start-game-counter reaches 0. -->
     <min-start-game-players value="2" />
@@ -80,51 +96,79 @@ The current server configuration xml looks like this:
     <!-- Automatically end linear race game after 1st player finished for some time (currently his finished time * 0.25 + 15.0). -->
     <auto-end value="false" />
 
-    <!-- Enable team choosing in lobby in team game (soccer and CTF). If owner-less is enabled, than this option is always disabled. -->
+    <!-- Enable team choosing in lobby in team game (soccer and CTF). If owner-less is enabled and live-players is not enabled, than this option is always disabled. -->
     <team-choosing value="true" />
 
-    <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end and owner-less will be turned on. -->
+    <!-- If strict-players is on, no duplicated online id or split screen players are allowed, which can prevent someone using more than 1 network AI with this server. -->
+    <strict-players value="false" />
+
+    <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end, strict-player and owner-less will be turned on. -->
     <ranked value="false" />
 
+    <!-- If true, the server owner can config the difficulty and game mode in the GUI of lobby. This option cannot be used with owner-less or grand prix server, and will be automatically turned on if the server was created using the in-game GUI. The changed difficulty and game mode will not be saved in this config file. -->
+    <server-configurable value="false" />
+
+    <!-- If true, players can live join or spectate the in-progress game. Currently live joining is only available if the current game mode used in server is FFA, CTF or soccer, also no addon karts will be available for players to choose, and official-karts-threshold will be made 1.0. -->
+    <live-players value="true" />
+
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
-    <flag-return-timemout value="20" />
+    <flag-return-timeout value="20" />
 
-    <!-- Value used to calculate hit limit in free for all, which is min(number of players * hit-limit-threshold, 40), negative value to disable hit limit. -->
-    <hit-limit-threshold value="5" />
+    <!-- Time in seconds to deactivate a flag when it's captured or returned to own base by players. -->
+    <flag-deactivated-time value="3" />
 
-    <!-- Value used to calculate time limit in free for all, which is max(number of players * time-limit-threshold-ffa, 3.0) * 60, negative value to disable time limit. -->
-    <time-limit-threshold-ffa value="0.7" />
+    <!-- Hit limit of free for all, zero to disable hit limit. -->
+    <hit-limit value="20" />
 
-    <!-- Value used to calculate capture limit in CTF, which is max(3.0, number of players * capture-limit-threshold), negative value to disable capture limit. -->
-    <capture-limit-threshold value="0.7" />
+    <!-- Time limit of free for all in seconds, zero to disable time limit. -->
+    <time-limit-ffa value="360" />
 
-    <!-- Value used to calculate time limit in CTF, which is max(3.0, number of players * (time-limit-threshold-ctf + flag-return-timemout / 60.0)) * 60.0, negative value to disable time limit. -->
-    <time-limit-threshold-ctf value="0.9" />
+    <!-- Capture limit of CTF, zero to disable capture limit. -->
+    <capture-limit value="5" />
 
-    <!-- Value used by server to automatically calculate lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-lap-ratio * default lap of that track). -->
-    <auto-lap-ratio value="-1" />
+    <!-- Time limit of CTF in seconds, zero to disable time limit. -->
+    <time-limit-ctf value="600" />
 
-    <!-- Maximum ping allowed for a player (in ms). -->
+    <!-- Value used by server to automatically estimate each game time. For races, it decides the lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-game-time-ratio * default lap of that track). For soccer if more than 0.0f, for time limit game it will be auto-game-time-ratio * soccer-time-limit in UserConfig, for goal limit game it will be auto-game-time-ratio * numgoals in UserConfig, -1 to disable for all. -->
+    <auto-game-time-ratio value="-1" />
+
+    <!-- Maximum ping allowed for a player (in ms), it's recommended to use default value if live-players is on. -->
     <max-ping value="300" />
 
-    <!-- Tolerance of jitter in network allowed (in ms). -->
+    <!-- Tolerance of jitter in network allowed (in ms), it's recommended to use default value if live-players is on. -->
     <jitter-tolerance value="100" />
 
     <!-- Kick players whose ping is above max-ping. -->
     <kick-high-ping-players value="false" />
 
-    <!-- ip: IP in X.X.X.X/Y (CIDR) format for banning, use Y of 32 for a specific ip, expired-time: unix timestamp to expire, if -1 (uint32_t max) than a permanent ban. -->
-    <server-ip-ban-list>
-        <ban ip="0.0.0.0/0" expired-time="0"/>
-    </server-ip-ban-list>
+    <!-- Kick idle player which has no network activity to server for more than some seconds during game, unless he has finished the race. Negative value to disable, and this option will always be disabled for LAN server. -->
+    <kick-idle-player-seconds value="60" />
 
-    <!-- online-id: online id for banning, expired-time: unix timestamp to expire, if -1 (uint32_t max) than a permanent ban. -->
-    <server-online-id-ban-list>
-        <ban online-id="0" expired-time="0"/>
-    </server-online-id-ban-list>
+    <!-- Set how many states the server will send per second, the higher this value, the more bandwidth requires, also each client will trigger more rewind, which clients with slow device may have problem playing this server, use the default value is recommended. -->
+    <state-frequency value="10" />
+
+    <!-- Use sql database for handling server stats and maintenance, STK needs to be compiled with sqlite3 supported. -->
+    <sql-management value="false" />
+
+    <!-- Database filename for sqlite to use, it can be shared for all servers created in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
+    <database-file value="stkservers.db" />
+
+    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <ip-ban-table value="ip_ban" />
+
+    <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <online-id-ban-table value="online_id_ban" />
+
+    <!-- Player reports table name, which will be written when a player reports player in the network user dialog, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <player-reports-table value="player_reports" />
+
+    <!-- Days to keep player reports, older than that will be auto cleared, 0 to keep them forever. -->
+    <player-reports-expired-days value="3" />
+
+    <!-- IP geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <ip-geolocation-table value="ip_mapping" />
 
 </server-config>
-
 
 ```
 
@@ -135,7 +179,7 @@ By default STK servers use port `2759`. For example, in Ubuntu based distributio
 
 You may also need to handle the server discovery port `2757` for connecting your WAN server in LAN / localhost.
 
-Notice: You don't need to make any firewall or router configuration changes if you connect to our official servers.
+Notice: You don't need to make any firewall or router configuration changes if you connect to the recommended servers (marked with ☆★STK★☆).
 
 ### Hosting LAN (local internet) server
 Everything is basically the same as WAN one, except you don't need an stk online account, just do:
@@ -158,9 +202,9 @@ There is a network AI tester in STK which can use AI on player controller for se
 
 x.x.x.x:y is your server ip address with its port, id is the id field of server-info in STK server xml list, omit it if you are testing LAN server, n is the number of AI you want to create.
 
-You can see STK server xml list [here](https://addons.supertuxkart.net/api/v2/server/get-all).
+You can see STK server xml list [here](https://online.supertuxkart.net/api/v2/server/get-all).
 
-The server you want to test must be able to be connected without NAT penetration. You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
+You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
 
 With the network AI tester, it's easier to for example simulate high-loaded servers or bad (high ping with packet loss) network.
 
@@ -168,4 +212,106 @@ Tested on a Raspberry Pi 3 Model B+, if you have 8 players connected to a server
 
 For bad network simulation, we recommend `network traffic control` by linux kernel, see [here](https://wiki.linuxfoundation.org/networking/netem) for details.
 
-You have the best gaming experience when choosing server less than 100ms ping with no packet loss.
+You have the best gaming experience when choosing server having all players less than 100ms ping with no packet loss.
+
+## Server management (Since 1.1)
+
+Currently STK uses sqlite (if building with sqlite3 on) for server management with the following functions at the moment:
+1. Server statistics
+2. IP / online ID ban list
+3. Player reports
+4. IP geolocation
+
+You need to create a database in sqlite first, run `sqlite3 stkservers.db` in the folder where (all) your server_config.xml(s) located.
+
+STK will automatically create a table named `v(server database version)_(your_server_config_filename_without_.xml_extension)_stats` in your database if not exists:
+```sql
+CREATE TABLE IF NOT EXISTS (table name above)
+(
+    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer
+    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host
+    port INTEGER UNSIGNED NOT NULL, -- Port of host
+    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)
+    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)
+    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player
+    country_code TEXT NULL DEFAULT NULL, -- 2-letter country code of the host
+    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)
+    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected
+    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)
+    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host
+) WITHOUT ROWID;
+```
+
+STK will also create the following default views from the stats table:
+
+`*_full_stats`
+Full stats with ip in human readable format and time played of each players in minutes.
+
+`*_current_players`
+Current players in server with ip in human readable format and time played of each players in minutes.
+
+`*_player_stats`
+All players with online id and username with their time played stats in this server since creation of this database.
+If sqlite supports window functions (since 3.25), it will include last session player info (ip, country, ping...).
+
+A empty table named `v(server database version)_countries` will also be created in your database if not exists:
+```sql
+CREATE TABLE IF NOT EXISTS (table name above)
+(
+    country_code TEXT NOT NULL PRIMARY KEY UNIQUE, -- Unique 2-letter country code
+    country_flag TEXT NOT NULL, -- Unicode country flag representation of 2-letter country code
+    country_name TEXT NOT NULL -- Readable name of this country
+) WITHOUT ROWID;
+```
+
+If you want to see flags and readable names of countries in the above views, you need to initialize `v(server database version)_countries` table, check [this script](tools/generate-countries-table.py).
+
+For IP and online ID ban list, player reports or IP mapping, you need to create one yourself:
+```sql
+CREATE TABLE ip_ban
+(
+    ip_start INTEGER UNSIGNED NOT NULL UNIQUE, -- Starting of ip decimal for banning (inclusive)
+    ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- Ending of ip decimal for banning (inclusive)
+    starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
+    expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
+    reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
+    description TEXT NOT NULL DEFAULT '', -- Private description for server admin
+    trigger_count INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
+);
+
+CREATE TABLE online_id_ban
+(
+    online_id INTEGER UNSIGNED NOT NULL UNIQUE, -- Online id from STK addons database for banning
+    starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
+    expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
+    reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
+    description TEXT NOT NULL DEFAULT '', -- Private description for server admin
+    trigger_count INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
+);
+
+CREATE TABLE player_reports
+(
+    server_uid TEXT NOT NULL, -- Report from which server unique id (config filename)
+    reporter_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player who reports
+    reporter_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player who reports, 0 for offline player
+    reporter_username TEXT NOT NULL, -- Player name who reports
+    reported_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time of reporting
+    info TEXT NOT NULL, -- Report info by reporter
+    reporting_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player being reported
+    reporting_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player being reported, 0 for offline player
+    reporting_username TEXT NOT NULL -- Player name being reported
+);
+
+CREATE TABLE ip_mapping
+(
+    ip_start INTEGER UNSIGNED NOT NULL PRIMARY KEY UNIQUE, -- IP decimal start
+    ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- IP decimal end
+    latitude REAL NOT NULL, -- Latitude of this IP range
+    longitude REAL NOT NULL, -- Longitude of this IP range
+    country_code TEXT NOT NULL -- 2-letter country code
+) WITHOUT ROWID;
+```
+
+For initialization of `ip_mapping` table, check [this script](tools/generate-ip-mappings.py).

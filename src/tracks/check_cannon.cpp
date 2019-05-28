@@ -32,7 +32,6 @@
 #include "karts/skidding.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "network/rewind_manager.hpp"
 
 /** Constructor for a check cannon.
  *  \param node XML node containing the parameters for this checkline.
@@ -126,76 +125,52 @@ void CheckCannon::changeDebugColor(bool is_active)
 }   // changeDebugColor
 
 // ----------------------------------------------------------------------------
-/** Adds a flyable to be tested for crossing a cannon checkline.
- *  \param flyable The flyable to be tested.
- */
-void CheckCannon::addFlyable(Flyable *flyable)
-{
-    m_all_flyables.push_back(flyable);
-    m_flyable_previous_position.push_back(flyable->getXYZ());
-}   // addFlyable
-
-// ----------------------------------------------------------------------------
-/** Removes a flyable from the tests if it crosses a checkline. Used when
- *  the flyable is removed (e.g. explodes).
- */
-void CheckCannon::removeFlyable(Flyable *flyable)
-{
-    std::vector<Flyable*>::iterator i = std::find(m_all_flyables.begin(),
-                                                  m_all_flyables.end(),
-                                                  flyable);
-    assert(i != m_all_flyables.end());
-    size_t index = i - m_all_flyables.begin();   // get the index
-    m_all_flyables.erase(i);
-    m_flyable_previous_position.erase(m_flyable_previous_position.begin() + index);
-}   // removeFlyable
-
-// ----------------------------------------------------------------------------
 /** Overriden to also check all flyables registered with the cannon.
  */
 void CheckCannon::update(float dt)
 {
-    CheckLine::update(dt);
-    for (unsigned int i = 0; i < m_all_flyables.size(); i++)
+    World* world = World::getWorld();
+    // When goal phase is happening karts is made stationary, so no animation
+    // will be created
+    if (world->isGoalPhase())
+        return;
+
+    for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
-        setIgnoreHeight(true);
-        if (m_all_flyables[i]->hasUndoneDestruction() ||
-            RewindManager::get()->isRewinding())
+        AbstractKart* kart = world->getKart(i);
+        if (kart->getKartAnimation() || kart->isGhostKart() ||
+            kart->isEliminated() || !m_is_active[i])
             continue;
-        bool triggered = isTriggered(m_flyable_previous_position[i],
-                                     m_all_flyables[i]->getXYZ(),
-                                     /*kart index - ignore*/ -1     );
+
+        const Vec3& xyz = world->getKart(i)->getFrontXYZ();
+        Vec3 prev_xyz = xyz - kart->getVelocity() * dt;
+        if (isTriggered(prev_xyz, xyz, /*kart index - ignore*/ -1))
+        {
+            // The constructor AbstractKartAnimation resets the skidding to 0.
+            // So in order to smooth rotate the kart, we need to keep the
+            // current visual rotation and pass it to the CannonAnimation.
+            float skid_rot = kart->getSkidding()->getVisualSkidRotation();
+            new CannonAnimation(kart, this, skid_rot);
+        }
+    }   // for i < getNumKarts
+
+    for (Flyable* flyable : m_all_flyables)
+    {
+        if (!flyable->hasServerState() || flyable->hasAnimation())
+            continue;
+
+        const Vec3 current_position = flyable->getXYZ();
+        Vec3 previous_position = current_position - flyable->getVelocity() * dt;
+
+        setIgnoreHeight(true);
+        bool triggered = isTriggered(previous_position, current_position,
+            /*kart index - ignore*/ -1);
         setIgnoreHeight(false);
-        m_flyable_previous_position[i] = m_all_flyables[i]->getXYZ();
-        if(!triggered) continue;
+        if (!triggered)
+            continue;
 
         // Cross the checkline - add the cannon animation
-        CannonAnimation* animation = new CannonAnimation(m_all_flyables[i],
-            m_curve->clone(), getLeftPoint(), getRightPoint(),
-            m_target_left, m_target_right);
-        m_all_flyables[i]->setAnimation(animation);
+        CannonAnimation* animation = new CannonAnimation(flyable, this);
+        flyable->setAnimation(animation);
     }   // for i in all flyables
 }   // update
-// ----------------------------------------------------------------------------
-/** Called when the check line is triggered. This function  creates a cannon
- *  animation object and attaches it to the kart.
- *  \param kart_index The index of the kart that triggered the check line.
- */
-void CheckCannon::trigger(unsigned int kart_index)
-{
-    AbstractKart *kart = World::getWorld()->getKart(kart_index);
-    if (kart->getKartAnimation() || kart->isGhostKart())
-    {
-        return;
-    }
-
-    // The constructor AbstractKartAnimation resets the skidding to 0. So in
-    // order to smooth rotate the kart, we need to keep the current visual
-    // rotation and pass it to the CannonAnimation.
-    float skid_rot = kart->getSkidding()->getVisualSkidRotation();
-    if (!RewindManager::get()->isRewinding())
-    {
-        new CannonAnimation(kart, m_curve->clone(), getLeftPoint(),
-            getRightPoint(), m_target_left, m_target_right, skid_rot);
-    }
-}   // CheckCannon

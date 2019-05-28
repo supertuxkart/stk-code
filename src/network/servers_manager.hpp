@@ -45,7 +45,7 @@ private:
     /** List of broadcast addresses to use. */
     std::vector<TransportAddress> m_broadcast_address;
 
-    std::atomic<uint64_t> m_last_load_time;
+    std::atomic<int64_t> m_last_load_time;
 
     std::atomic_bool m_list_updated;
     // ------------------------------------------------------------------------
@@ -81,6 +81,11 @@ public:
     bool listUpdated() const                         { return m_list_updated; }
     // ------------------------------------------------------------------------
     const std::vector<TransportAddress>& getBroadcastAddresses();
-
+    // ------------------------------------------------------------------------
+    void reset()
+    {
+        m_last_load_time.store(-5000);
+        m_list_updated = false;
+    }
 };   // class ServersManager
 #endif // HEADER_SERVERS_MANAGER_HPP

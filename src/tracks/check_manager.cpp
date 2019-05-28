@@ -23,6 +23,7 @@
 
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/world.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_goal.hpp"
 #include "tracks/check_lap.hpp"
@@ -130,6 +131,20 @@ void CheckManager::resetAfterKartMove(AbstractKart *kart)
     for (i = m_all_checks.begin(); i != m_all_checks.end(); i++)
         (*i)->resetAfterKartMove(kart->getWorldKartId());
 }   // resetAfterKartMove
+
+// ----------------------------------------------------------------------------
+/* After restoreState in rewind this is called to reset all positions of
+ * \ref CheckStructure to old position (for example check line).
+ */
+void CheckManager::resetAfterRewind()
+{
+    World* w = World::getWorld();
+    for (unsigned i = 0; i < w->getNumKarts(); i++)
+    {
+        for (unsigned j = 0; j < m_all_checks.size(); j++)
+            m_all_checks[j]->resetAfterRewind(w->getKart(i)->getWorldKartId());
+    }
+}   // resetAfterRewind
 
 // ----------------------------------------------------------------------------
 /** Adds a flyable object to be tested against cannons. This will allow

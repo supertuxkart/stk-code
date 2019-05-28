@@ -19,8 +19,10 @@
 #include "utils/log.hpp"
 
 #include "config/user_config.hpp"
+#include "network/network_config.hpp"
 
 #include <cstdio>
+#include <ctime>
 #include <stdio.h>
 
 #ifdef ANDROID
@@ -154,7 +156,21 @@ void Log::printMessage(int level, const char *component, const char *format,
         remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     }
 
-    index += snprintf (line + index, remaining, "[%s] %s: ", names[level], component);
+#ifndef ANDROID
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer())
+    {
+        std::time_t result = std::time(nullptr);
+        index += snprintf (line + index, remaining,
+            "%.24s [%s] %s: ", std::asctime(std::localtime(&result)),
+            names[level], component);
+    }
+    else
+#endif
+    {
+        index += snprintf (line + index, remaining,
+            "[%s] %s: ", names[level], component);
+    }
     remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     index += vsnprintf(line + index, remaining, format, args);
     remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;

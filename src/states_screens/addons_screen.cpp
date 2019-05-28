@@ -62,8 +62,6 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
     m_date_filters.push_back(filter_9m);
     m_date_filters.push_back(filter_1y);
     m_date_filters.push_back(filter_2y);
-
-    m_show_tips = true;
 }   // AddonsScreen
 
 // ----------------------------------------------------------------------------
@@ -94,11 +92,6 @@ void AddonsScreen::loadedFromFile()
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setColumnListener(this);
-
-    GUIEngine::LabelWidget* w_tips =
-        getWidget<GUIEngine::LabelWidget>("tips_label");
-    w_tips->setScrollSpeed(15);
-
 }   // loadedFromFile
 
 
@@ -140,6 +133,7 @@ void AddonsScreen::init()
 {
     Screen::init();
 
+    m_sort_desc = false;
     m_reloading = false;
 
     getWidget<GUIEngine::RibbonWidget>("category")->setActive(false);
@@ -150,29 +144,15 @@ void AddonsScreen::init()
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
 
-    m_icon_height = getHeight()/8.0f;
+    // This defines the row height !
+    m_icon_height = GUIEngine::getFontHeight() * 2;
     // 128 is the height of the image file
-    m_icon_bank->setScale(m_icon_height/128.0f);
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";
 
     bool ip = UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
-    //TODO : determine if the tips scrolling could be used
-    //       to display other useful messages or if it should be removed
-    if(true)
-    {
-        // Nothing to show in the tips label, disable it.
-
-        GUIEngine::LabelWidget *w_tips =
-            getWidget<GUIEngine::LabelWidget>("tips_label");
-
-        w_tips->setVisible(false);
-        w_tips->m_properties[GUIEngine::PROP_HEIGHT] = "0";
-        calculateLayout();
-        m_show_tips = false;
-    } // ip
-
     getWidget<GUIEngine::IconButtonWidget>("reload")->setActive(ip);
 
     // Reset filter.
@@ -208,9 +188,8 @@ void AddonsScreen::tearDown()
 // ----------------------------------------------------------------------------
 /** Loads the list of all addons of the given type. The gui element will be
  *  updated.
- *  \param type Must be 'kart' or 'track'.
  */
-void AddonsScreen::loadList(bool sort_desc)
+void AddonsScreen::loadList()
 {
 #ifndef SERVER_ONLY
     // Get the filter by words.
@@ -265,7 +244,7 @@ void AddonsScreen::loadList(bool sort_desc)
 
         sorted_list.push_back(&addon);
     }
-    sorted_list.insertionSort(/*start=*/0, sort_desc);
+    sorted_list.insertionSort(/*start=*/0, m_sort_desc);
 
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
@@ -411,7 +390,8 @@ void AddonsScreen::onColumnClicked(int column_id, bool sort_desc, bool sort_defa
     default: assert(0); break;
     }   // switch
     /** \brief Toggle the sort order after column click **/
-    loadList(sort_desc && !sort_default);
+    m_sort_desc = sort_desc && !sort_default;
+    loadList();
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
@@ -528,23 +508,6 @@ void AddonsScreen::onUpdate(float dt)
         else
         {
             // Addons manager is still initialising/downloading.
-        }
-    }
-
-
-    if(m_show_tips)
-    {
-        GUIEngine::LabelWidget *w_tips =
-            getWidget<GUIEngine::LabelWidget>("tips_label");
-    
-        w_tips->update(dt);
-        if(w_tips->scrolledOff())
-        {
-            // Tips have been shown once. Disable tips_label.
-            w_tips->setVisible(false);
-            w_tips->m_properties[GUIEngine::PROP_HEIGHT] = "0";
-            calculateLayout();
-            m_show_tips = false;
         }
     }
 #endif

@@ -188,6 +188,7 @@ void RegisterScreen::makeEntryFieldsVisible()
     getWidget<TextBoxWidget>("password_confirm")->setVisible(new_account);
     getWidget<LabelWidget  >("label_password_confirm")->setVisible(new_account);
     getWidget<TextBoxWidget>("email")->setVisible(new_account);
+    getWidget<TextBoxWidget>("email")->setTextBoxType(TBT_EMAIL);
     getWidget<LabelWidget  >("label_email")->setVisible(new_account);
     if(getWidget<TextBoxWidget>("email_confirm"))
     {

@@ -23,16 +23,25 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
-#include <linux/input.h>
 #include <sys/mman.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 #include <time.h>
+
+#ifdef __FreeBSD__
+#include <dev/evdev/input.h>
+#else
+#include <linux/input.h>
+#endif
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
+#ifdef __FreeBSD__
+#include <sys/joystick.h>
+#else
 #include <linux/joystick.h>
+#endif
 #endif
 
 #include "CColorConverter.h"
@@ -70,6 +79,7 @@ public:
     static const wl_pointer_listener pointer_listener;
     static const wl_seat_listener seat_listener;
     static const wl_keyboard_listener keyboard_listener;
+    static const wl_touch_listener touch_listener;
     static const wl_output_listener output_listener;
     static const wl_shell_surface_listener shell_surface_listener;
     static const wl_registry_listener registry_listener;
@@ -431,6 +441,85 @@ public:
         device->m_repeat_rate = rate == 0 ? 0 : 1000 / rate;
         device->m_repeat_delay = delay;
     }
+    
+    static void touch_handle_down(void* data, wl_touch* touch, uint32_t serial,
+                                  uint32_t time, wl_surface *surface,
+                                  int32_t id, wl_fixed_t x, wl_fixed_t y)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+
+        SEvent event;
+        event.EventType = EET_TOUCH_INPUT_EVENT;
+        event.TouchInput.Event = ETIE_PRESSED_DOWN;
+        event.TouchInput.ID = id;
+        event.TouchInput.X = wl_fixed_to_int(x);
+        event.TouchInput.Y = wl_fixed_to_int(y);
+        
+        device->signalEvent(event);
+             
+        if (device->m_touches_count == 0)
+        {
+            pointer_motion(data, NULL, 0, x, y);
+            pointer_button(data, NULL, 0, 0, BTN_LEFT, 
+                           WL_POINTER_BUTTON_STATE_PRESSED);
+        }
+
+        device->m_touches_count++;
+    }
+    
+    static void touch_handle_up(void* data, wl_touch* touch, uint32_t serial,
+                                uint32_t time, int32_t id)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        SEvent event;
+        event.EventType = EET_TOUCH_INPUT_EVENT;
+        event.TouchInput.Event = ETIE_LEFT_UP;
+        event.TouchInput.ID = id;
+        event.TouchInput.X = 0;
+        event.TouchInput.Y = 0;
+        
+        device->signalEvent(event);
+        
+        if (device->m_touches_count == 1)
+        {
+            pointer_button(data, NULL, 0, 0, BTN_LEFT, 
+                           WL_POINTER_BUTTON_STATE_RELEASED);
+        }
+
+        device->m_touches_count--;
+    }
+    
+    static void touch_handle_motion(void* data, wl_touch* touch, uint32_t time,
+                                  int32_t id, wl_fixed_t x, wl_fixed_t y)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        SEvent event;
+        event.EventType = EET_TOUCH_INPUT_EVENT;
+        event.TouchInput.Event = ETIE_MOVED;
+        event.TouchInput.ID = id;
+        event.TouchInput.X = wl_fixed_to_int(x);
+        event.TouchInput.Y = wl_fixed_to_int(y);
+        
+        device->signalEvent(event);
+        
+        if (device->m_touches_count == 1)
+        {
+            pointer_motion(data, NULL, 0, x, y);
+        }
+    }
+    
+    static void touch_handle_frame(void* data, wl_touch* touch)
+    {
+    }
+    
+    static void touch_handle_cancel(void* data, wl_touch* touch)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        device->m_touches_count = 0;
+    }
 
     static void seat_capabilities(void* data, wl_seat* seat, uint32_t caps)
     {
@@ -457,6 +546,19 @@ public:
         {
             wl_keyboard_destroy(device->m_keyboard);
             device->m_keyboard = NULL;
+        }
+        
+        if ((caps & WL_SEAT_CAPABILITY_TOUCH) && !device->m_touch)
+        {
+            device->m_has_touch_device = true;
+            device->m_touch = wl_seat_get_touch(seat);
+            wl_touch_add_listener(device->m_touch, &touch_listener,
+                                  device);
+        }
+        else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && device->m_touch)
+        {
+            wl_touch_destroy(device->m_touch);
+            device->m_touch = NULL;
         }
     }
 
@@ -602,12 +704,12 @@ public:
                                            
             wl_output_add_listener(device->m_output, &output_listener, device);
         }
-        else if (interface_str == "org_kde_kwin_server_decoration_manager")
+        else if (interface_str == "zxdg_decoration_manager_v1")
         {
             device->m_decoration_manager = 
-                        static_cast<org_kde_kwin_server_decoration_manager*>(
-                        wl_registry_bind(registry, name, 
-                        &org_kde_kwin_server_decoration_manager_interface, 1));
+                                    static_cast<zxdg_decoration_manager_v1*>(
+                                    wl_registry_bind(registry, name, 
+                                    &zxdg_decoration_manager_v1_interface, 1));
         }
         else if (interface_str == "xdg_wm_base")
         {
@@ -639,6 +741,15 @@ const wl_keyboard_listener WaylandCallbacks::keyboard_listener =
     WaylandCallbacks::keyboard_key,
     WaylandCallbacks::keyboard_modifiers,
     WaylandCallbacks::keyboard_repeat_info
+};
+
+const wl_touch_listener WaylandCallbacks::touch_listener =
+{
+    WaylandCallbacks::touch_handle_down,
+    WaylandCallbacks::touch_handle_up,
+    WaylandCallbacks::touch_handle_motion,
+    WaylandCallbacks::touch_handle_frame,
+    WaylandCallbacks::touch_handle_cancel
 };
 
 const wl_seat_listener WaylandCallbacks::seat_listener =
@@ -710,6 +821,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_display = NULL;
     m_egl_window = NULL;
     m_keyboard = NULL;
+    m_touch = NULL;
     m_output = NULL;
     m_pointer = NULL;
     m_registry = NULL;
@@ -756,6 +868,8 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_mouse_button_states = 0;
     m_width = params.WindowSize.Width;
     m_height = params.WindowSize.Height;
+    m_touches_count = 0;
+    m_has_touch_device = false;
     m_window_has_focus = false;
     m_window_minimized = false;
     
@@ -800,10 +914,10 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
     delete m_egl_context;
     
     if (m_decoration)
-        org_kde_kwin_server_decoration_destroy(m_decoration);
+        zxdg_toplevel_decoration_v1_destroy(m_decoration);
         
     if (m_decoration_manager)
-        org_kde_kwin_server_decoration_manager_destroy(m_decoration_manager);
+        zxdg_decoration_manager_v1_destroy(m_decoration_manager);
     
     if (m_keyboard)
         wl_keyboard_destroy(m_keyboard);
@@ -1027,6 +1141,18 @@ bool CIrrDeviceWayland::createWindow()
             wl_display_dispatch(m_display);
             usleep(1000);
         }
+        
+        if (m_decoration_manager != NULL)
+        {
+            m_decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(
+                                        m_decoration_manager, m_xdg_toplevel);
+        }
+                                                       
+        if (m_decoration != NULL)
+        {
+            zxdg_toplevel_decoration_v1_set_mode(m_decoration, 
+                                ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+        }
     }
     else if (m_shell != NULL)
     {
@@ -1050,18 +1176,6 @@ bool CIrrDeviceWayland::createWindow()
     {
         os::Printer::log("Cannot create shell surface.", ELL_ERROR);
         return false;
-    }
-
-    if (m_decoration_manager != NULL)
-    {
-        m_decoration = org_kde_kwin_server_decoration_manager_create(
-                                               m_decoration_manager, m_surface);
-    }
-                                                   
-    if (m_decoration != NULL)
-    {
-        org_kde_kwin_server_decoration_request_mode(m_decoration, 
-                                    ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER);
     }
 
     wl_region* region = wl_compositor_create_region(m_compositor);

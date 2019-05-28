@@ -82,6 +82,8 @@ public:
 
     uint32_t          getID()   const { return m_id; }
     AchievementInfo * getInfo() { return m_achievement_info; }
+    int               getFullfiledGoals();
+    int               getProgress();
 
     void setAchieved() { m_achieved = true; };
     bool isAchieved() const { return m_achieved;  }

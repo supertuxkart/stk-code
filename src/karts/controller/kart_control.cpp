@@ -19,18 +19,23 @@
 #include "karts/controller/kart_control.hpp"
 #include "network/network_string.hpp"
 
+#include "irrMath.h"
+#include <algorithm>
+
 // ------------------------------------------------------------------------
 /** Sets the current steering value. */
 void KartControl::setSteer(float f)
 {
-    m_steer         = f;
+    int steer = irr::core::clamp((int)(f * 32767.0f), -32767, 32767);
+    m_steer = (int16_t)steer;
 }   // setSteer
 
 // ----------------------------------------------------------------------------
 /** Sets the acceleration. */
 void KartControl::setAccel(float f)
 {
-    m_accel         = f; 
+    int accel = std::min((int)(f * 65535.0f), 65535);
+    m_accel = (uint16_t)accel;
 }   // setAccel
 
 // ----------------------------------------------------------------------------
@@ -78,8 +83,8 @@ void KartControl::setLookBack(bool b)
 /** Copies the important data from this objects into a memory buffer. */
 void KartControl::saveState(BareNetworkString *buffer) const
 {
-    buffer->add(m_steer);
-    buffer->add(m_accel);
+    buffer->addUInt16(m_steer);
+    buffer->addUInt16(m_accel);
     buffer->addChar(getButtonsCompressed());
 }   // saveState
 
@@ -87,7 +92,7 @@ void KartControl::saveState(BareNetworkString *buffer) const
 /** Restores this object from a previously saved memory  buffer. */
 void KartControl::rewindTo(BareNetworkString *buffer)
 {
-    m_steer = buffer->getFloat();
-    m_accel = buffer->getFloat();
+    m_steer = buffer->getUInt16();
+    m_accel = buffer->getUInt16();
     setButtonsCompressed(buffer->getUInt8());
 }   // setFromMemory

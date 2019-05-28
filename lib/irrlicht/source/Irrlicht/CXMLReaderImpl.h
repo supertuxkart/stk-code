@@ -225,7 +225,7 @@ private:
 		char_type* start = P;
 
 		// more forward until '<' found
-		while(*P != L'<' && *P)
+		while(*P && *P != L'<')
 			++P;
 
 		// not a node, so return false
@@ -239,7 +239,8 @@ private:
 				return true;
 		}
 
-		++P;
+		if (*P)
+			++P;
 
 		// based on current token, parse and report next element
 		switch(*P)
@@ -297,10 +298,11 @@ private:
 		CurrentNodeType = EXN_UNKNOWN;
 
 		// move until end marked with '>' reached
-		while(*P != L'>')
+		while(*P && *P != L'>')
 			++P;
 
-		++P;
+		if (*P)
+			++P;
 	}
 
 
@@ -308,14 +310,15 @@ private:
 	void parseComment()
 	{
 		CurrentNodeType = EXN_COMMENT;
-		P += 1;
+		if (*P)
+			P += 1;
 
 		char_type *pCommentBegin = P;
 
 		int count = 1;
 
 		// move until end of comment reached
-		while(count)
+		while(*P && count)
 		{
 			if (*P == L'>')
 				--count;
@@ -326,9 +329,16 @@ private:
 			++P;
 		}
 
-		P -= 3;
-		NodeName = core::string<char_type>(pCommentBegin+2, (int)(P - pCommentBegin-2));
-		P += 3;
+		if (*P)
+		{
+			P -= 3;
+			NodeName = core::string<char_type>(pCommentBegin+2, (int)(P - pCommentBegin-2));
+			P += 3;
+		}
+		else
+		{
+			NodeName = "";
+		}
 	}
 
 
@@ -343,13 +353,13 @@ private:
 		const char_type* startName = P;
 
 		// find end of element
-		while(*P != L'>' && !isWhiteSpace(*P))
+		while(*P && *P != L'>' && !isWhiteSpace(*P))
 			++P;
 
 		const char_type* endName = P;
 
 		// find Attributes
-		while(*P != L'>')
+		while(*P && *P != L'>')
 		{
 			if (isWhiteSpace(*P))
 				++P;
@@ -362,15 +372,16 @@ private:
 					// read the attribute names
 					const char_type* attributeNameBegin = P;
 
-					while(!isWhiteSpace(*P) && *P != L'=')
+					while(*P && !isWhiteSpace(*P) && *P != L'=')
 						++P;
 
 					const char_type* attributeNameEnd = P;
-					++P;
+					if (*P)
+						++P;
 
 					// read the attribute value
 					// check for quotes and single quotes, thx to murphy
-					while( (*P != L'\"') && (*P != L'\'') && *P)
+					while(*P && (*P != L'\"') && (*P != L'\''))
 						++P;
 
 					if (!*P) // malformatted xml file
@@ -378,17 +389,19 @@ private:
 
 					const char_type attributeQuoteChar = *P;
 
-					++P;
+					if (*P)
+						++P;
 					const char_type* attributeValueBegin = P;
 
-					while(*P != attributeQuoteChar && *P)
+					while(*P && *P != attributeQuoteChar)
 						++P;
 
 					if (!*P) // malformatted xml file
 						return;
 
 					const char_type* attributeValueEnd = P;
-					++P;
+					if (*P)
+						++P;
 
 					SAttribute attr;
 					attr.Name = core::string<char_type>(attributeNameBegin,
@@ -403,7 +416,8 @@ private:
 				else
 				{
 					// tag is closed directly
-					++P;
+					if (*P)
+						++P;
 					IsEmptyElement = true;
 					break;
 				}
@@ -420,7 +434,8 @@ private:
 
 		NodeName = core::string<char_type>(startName, (int)(endName - startName));
 
-		++P;
+		if (*P)
+			++P;
 	}
 
 
@@ -431,20 +446,23 @@ private:
 		IsEmptyElement = false;
 		Attributes.clear();
 
-		++P;
+		if (*P)
+			++P;
 		const char_type* pBeginClose = P;
 
-		while(*P != L'>')
+		while(*P && *P != L'>')
 			++P;
 
 		NodeName = core::string<char_type>(pBeginClose, (int)(P - pBeginClose));
-		++P;
+		
+		if (*P)
+			++P;
 	}
 
 	//! parses a possible CDATA section, returns false if begin was not a CDATA section
 	bool parseCDATA()
 	{
-		if (*(P+1) != L'[')
+		if (!*P || !*(P+1) || *(P+1) != L'[')
 			return false;
 
 		CurrentNodeType = EXN_CDATA;

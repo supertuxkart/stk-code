@@ -12,7 +12,7 @@
                         I18N="Tab in help menu" text="General"/>
                 <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
                         I18N="Tab in help menu" text="Game Modes"/>
-                <icon-button id="page3" width="128" height="128" icon="gui/icons/weapons.png"
+                <icon-button id="page3" width="128" height="128" icon="gui/icons/gift.png"
                         I18N="Tab in help menu" text="Powerups"/>
                 <icon-button id="page4" width="128" height="128" icon="gui/icons/banana.png"
                         I18N="Tab in help menu" text="Bananas"/>
@@ -21,7 +21,7 @@
                 <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
                         I18N="Tab in help menu" text="Kart classes"/>
                 <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
-                        I18N="Tab in help menu" text="Multi-player"/>
+                        I18N="Tab in help menu" text="Multiplayer"/>
             </vertical-tabs>
 
             <spacer width="2%" height="100%"/>

@@ -172,10 +172,12 @@ public:
     const unsigned int getNumGhostKart() const
     {
         assert(m_replay_file_list.size() > 0);
-        unsigned int num = m_replay_file_list.at(m_current_replay_file)
-                                               .m_kart_list.size();
-        unsigned int second_file_num = m_replay_file_list.at(m_second_replay_file)
-                                               .m_kart_list.size();
+        unsigned int num =
+            (unsigned int)m_replay_file_list.at(m_current_replay_file)
+                                            .m_kart_list.size();
+        unsigned int second_file_num =
+            (unsigned int)m_replay_file_list.at(m_second_replay_file)
+                                            .m_kart_list.size();
 
         num = (m_second_replay_enabled) ? num + second_file_num : num;
 
@@ -186,7 +188,9 @@ public:
     {
         assert(m_replay_file_list.size() > 0);
 
-        unsigned int fkn = m_replay_file_list.at(m_current_replay_file).m_kart_list.size();
+        unsigned int fkn =
+            (unsigned int)m_replay_file_list.at(m_current_replay_file)
+                                            .m_kart_list.size();
         if (n < fkn)
             return m_replay_file_list.at(m_current_replay_file).m_kart_list.at(n);
         else

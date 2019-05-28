@@ -27,6 +27,7 @@ namespace Debug
 {
     bool onEvent(const irr::SEvent &event);
     bool isOpen();
+    void closeDebugMenu();
     bool handleStaticAction(int key);
 }
 

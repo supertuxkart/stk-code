@@ -26,6 +26,7 @@
 using namespace irr;
 
 #include "tracks/check_structure.hpp"
+#include "utils/cpp2011.hpp"
 
 class XMLNode;
 class CheckManager;
@@ -80,19 +81,18 @@ private:
     /** How much a kart is allowed to be over the minimum height of a
      *  quad and still considered to be able to cross it. */
     static const int m_over_min_height  = 4;
-protected:
-    const Vec3 &getLeftPoint() const { return m_left_point;  }
-    const Vec3 &getRightPoint() const { return m_right_point; }
 
 public:
                  CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                             int indx);
-    virtual void reset(const Track &track);
-    virtual void resetAfterKartMove(unsigned int kart_index);
-    virtual void changeDebugColor(bool is_active);
-    virtual bool triggeringCheckline() const { return true; }
+                             int indx) OVERRIDE;
+    virtual void reset(const Track &track) OVERRIDE;
+    virtual void resetAfterKartMove(unsigned int kart_index) OVERRIDE;
+    virtual void resetAfterRewind(unsigned int kart_index) OVERRIDE
+                                            { resetAfterKartMove(kart_index); }
+    virtual void changeDebugColor(bool is_active) OVERRIDE;
+    virtual bool triggeringCheckline() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     /** Returns the actual line data for this checkpoint. */
     const core::line2df &getLine2D() const {return m_line;}
@@ -101,6 +101,15 @@ public:
      *  if a line is crossed. Used for basket calls in cannon (the ball can
      *  be too heigh to otherwise trigger he cannon). */
     void setIgnoreHeight(bool b) { m_ignore_height = b;  }
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
+    // ------------------------------------------------------------------------
+    const Vec3 &getLeftPoint() const { return m_left_point;  }
+    // ------------------------------------------------------------------------
+    const Vec3 &getRightPoint() const { return m_right_point; }
+
 };   // CheckLine
 
 #endif

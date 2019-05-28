@@ -35,12 +35,42 @@ struct GFXPreset
     bool glow;
     bool mlaa;
     bool ssao;
+    bool light_scatter;
     bool animatedCharacters;
     int particles;
     int image_quality;
     /** Depth of field */
     bool dof;
     bool degraded_ibl;
+};
+
+struct Resolution
+{
+    int width; 
+    int height;
+    bool fullscreen;
+
+    Resolution()
+    {
+        width = 0;
+        height = 0;
+    }
+
+    Resolution(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
+
+    bool operator< (Resolution r) const
+    {
+        return width < r.width || (width == r.width && height < r.height);
+    }
+
+    float getRatio() const
+    {
+        return (float) width / height;
+    }
 };
 
 /**
@@ -55,10 +85,12 @@ private:
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;
+    std::vector<Resolution> m_resolutions;
 
     void updateTooltip();
-
+    void updateResolutionsList();
     void initPresets();
+    static void onScrollResolutionsList(void* data);
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
 

@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <limits>
 #include <map>
 #include <memory>
 #include <vector>
@@ -40,6 +41,7 @@
 #include "LinearMath/btTransform.h"
 
 class AbstractKart;
+class BareNetworkString;
 class btRigidBody;
 class Controller;
 class ItemState;
@@ -193,8 +195,6 @@ protected:
      */
     virtual float estimateFinishTimeForKart(AbstractKart* kart)
                                         {return getTime(); }
-    /** Set the team arrow on karts if necessary*/
-    void initTeamArrows();
     void updateAchievementDataEndRace();
     void updateAchievementModeCounters(bool start);
 
@@ -327,6 +327,22 @@ public:
     unsigned int    getCurrentNumPlayers() const { return m_num_players -
                                                          m_eliminated_players;}
     // ------------------------------------------------------------------------
+    void resetElimination()
+    {
+        m_eliminated_karts = 0;
+        m_eliminated_players = 0;
+    }
+    // ------------------------------------------------------------------------
+    virtual void addReservedKart(int kart_id)
+    {
+        if (m_eliminated_karts > 0)
+            m_eliminated_karts--;
+    }
+    // ------------------------------------------------------------------------
+    virtual void saveCompleteState(BareNetworkString* bns) {}
+    // ------------------------------------------------------------------------
+    virtual void restoreCompleteState(const BareNetworkString& buffer) {}
+    // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const
@@ -359,9 +375,22 @@ public:
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
-
+    // ------------------------------------------------------------------------
     bool isNetworkWorld() const { return m_is_network_world; }
-    
+    // ------------------------------------------------------------------------
+    /** Set the team arrow on karts if necessary*/
+    void initTeamArrows(AbstractKart* k);
+    // ------------------------------------------------------------------------
+    /** Used by server to get the current started game progress in either or
+     *  both remaining time or progress in percent. uint32_t max for either or
+     *  both if not available.  */
+    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
+    {
+        return std::make_pair(std::numeric_limits<uint32_t>::max(),
+            std::numeric_limits<uint32_t>::max());
+    }
+    // ------------------------------------------------------------------------
+    virtual bool isGoalPhase() const { return false; }
 };   // World
 
 #endif

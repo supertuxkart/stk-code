@@ -142,7 +142,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         fgets(s, 1023, fd);
         if(sscanf(s, "stk_version: %s", s1) != 1)
         {
-            Log::warn("Replay", "No STK release version found in replay file.");
+            Log::warn("Replay", "No STK release version found in replay file, '%s'.", fn.c_str());
             fclose(fd);
             return false;
         }
@@ -191,7 +191,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
             fgets(s, 1023, fd);
             if(sscanf(s, "kart_color: %f", &f) != 1)
             {
-                Log::warn("Replay", "Kart color missing in replay file.");
+                Log::warn("Replay", "Kart color missing in replay file, '%s'.", fn.c_str());
                 fclose(fd);
                 return false;
             }
@@ -205,7 +205,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     fgets(s, 1023, fd);
     if(sscanf(s, "reverse: %d", &reverse) != 1)
     {
-        Log::warn("Replay", "No reverse info found in replay file.");
+        Log::warn("Replay", "No reverse info found in replay file, '%s'.", fn.c_str());
         fclose(fd);
         return false;
     }
@@ -214,7 +214,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     fgets(s, 1023, fd);
     if (sscanf(s, "difficulty: %u", &rd.m_difficulty) != 1)
     {
-        Log::warn("Replay", " No difficulty found in replay file.");
+        Log::warn("Replay", " No difficulty found in replay file, '%s'.", fn.c_str());
         fclose(fd);
         return false;
     }
@@ -224,7 +224,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         fgets(s, 1023, fd);
         if (sscanf(s, "mode: %s", s1) != 1)
         {
-            Log::warn("Replay", "Replay mode not found in replay file.");
+            Log::warn("Replay", "Replay mode not found in replay file, '%s'.", fn.c_str());
             fclose(fd);
             return false;
         }
@@ -238,7 +238,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     fgets(s, 1023, fd);
     if (sscanf(s, "track: %s", s1) != 1)
     {
-        Log::warn("Replay", "Track info not found in replay file.");
+        Log::warn("Replay", "Track info not found in replay file, '%s'.", fn.c_str());
         fclose(fd);
         return false;
     }
@@ -246,8 +246,8 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     Track* t = track_manager->getTrack(rd.m_track_name);
     if (t == NULL)
     {
-        Log::warn("Replay", "Track '%s' used in replay not found in STK!",
-        rd.m_track_name.c_str());
+        Log::warn("Replay", "Track '%s' used in replay '%s' not found in STK!",
+        rd.m_track_name.c_str(), fn.c_str());
         fclose(fd);
         return false;
     }
@@ -257,7 +257,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     fgets(s, 1023, fd);
     if (sscanf(s, "laps: %u", &rd.m_laps) != 1)
     {
-        Log::warn("Replay", "No number of laps found in replay file.");
+        Log::warn("Replay", "No number of laps found in replay file, '%s'.", fn.c_str());
         fclose(fd);
         return false;
     }
@@ -265,7 +265,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     fgets(s, 1023, fd);
     if (sscanf(s, "min_time: %f", &rd.m_min_time) != 1)
     {
-        Log::warn("Replay", "Finish time not found in replay file.");
+        Log::warn("Replay", "Finish time not found in replay file, '%s'.", fn.c_str());
         fclose(fd);
         return false;
     }
@@ -275,7 +275,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         fgets(s, 1023, fd);
         if (sscanf(s, "replay_uid: %" PRIu64, &rd.m_replay_uid) != 1)
         {
-            Log::warn("Replay", "Replay UID not found in replay file.");
+            Log::warn("Replay", "Replay UID not found in replay file, '%s'.", fn.c_str());
             fclose(fd);
             return false;
         }
@@ -323,15 +323,17 @@ void ReplayPlay::loadFile(bool second_replay)
     if(!fd)
     {
         Log::error("Replay", "Can't read '%s', ghost replay disabled.",
-               getReplayFilename(replay_file_number).c_str());
+                    getReplayFilename(replay_file_number).c_str());
         destroy();
         return;
     }
 
-    Log::info("Replay", "Reading replay file '%s'.", getReplayFilename(replay_file_number).c_str());
+    Log::info("Replay", "Reading replay file '%s'.",
+                    getReplayFilename(replay_file_number).c_str());
 
     ReplayData &rd = m_replay_file_list[replay_index];
-    unsigned int num_kart = m_replay_file_list.at(replay_index).m_kart_list.size();
+    unsigned int num_kart = (unsigned int)m_replay_file_list.at(replay_index)
+                                                            .m_kart_list.size();
     unsigned int lines_to_skip = (rd.m_replay_version == 3) ? 7 : 10;
     lines_to_skip += (rd.m_replay_version == 3) ? num_kart : 2*num_kart;
 
@@ -358,13 +360,15 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
 {
     char s[1024];
 
-    int replay_index = second_replay ? m_second_replay_file : m_current_replay_file;
+    int replay_index = second_replay ? m_second_replay_file
+                                     : m_current_replay_file;
 
-    const unsigned int kart_num = m_ghost_karts.size();
+    const unsigned int kart_num = (unsigned int)m_ghost_karts.size();
     unsigned int first_loaded_f_num = 0;
 
     if (!second_replay && m_second_replay_enabled)
-        first_loaded_f_num = m_replay_file_list.at(m_second_replay_file).m_kart_list.size();
+        first_loaded_f_num = (unsigned int)m_replay_file_list.at(m_second_replay_file)
+                                                             .m_kart_list.size();
 
     ReplayData &rd = m_replay_file_list[replay_index];
     m_ghost_karts.push_back(std::make_shared<GhostKart>

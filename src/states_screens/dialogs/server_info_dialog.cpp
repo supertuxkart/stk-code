@@ -28,6 +28,7 @@
 #include "network/stk_host.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IGUIEnvironment.h>
@@ -45,7 +46,7 @@ using namespace Online;
  *         server (i.e. while it is being created).
  */
 ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
-                : ModalDialog(0.8f,0.8f), m_server(server), m_password(NULL)
+                : ModalDialog(0.85f,0.85f), m_server(server), m_password(NULL)
 {
     Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
        server->getServerId(), server->getServerOwner());
@@ -70,8 +71,8 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     }
     else
     {
-        getWidget("label_password")->setVisible(false);
-        getWidget("password")->setVisible(false);
+        Widget* password_box = getWidget("password-box");
+        password_box->setCollapsed(true); // FIXME Doesn't reuse free space for other widgets
     }
 
     auto& players = m_server->getPlayers();
@@ -79,16 +80,46 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     core::stringw difficulty = race_manager->getDifficultyName(
         server->getDifficulty());
 
-    //I18N: In server info dialog
     core::stringw each_line = _("Difficulty: %s", difficulty);
+    //I18N: In server info dialog
     server_info += each_line;
     server_info += L"\n";
 
-    //I18N: In server info dialog
     core::stringw mode = ServerConfig::getModeName(server->getServerMode());
+    //I18N: In server info dialog
     each_line = _("Game mode: %s", mode);
     server_info += each_line;
     server_info += L"\n";
+
+    Track* t = server->getCurrentTrack();
+    if (t)
+    {
+        core::stringw track_name = t->getName();
+        //I18N: In server info dialog, showing the current track playing in
+        //server
+        each_line = _("Current track: %s", track_name);
+        server_info += each_line;
+        server_info += L"\n";
+    }
+    getWidget("server-info-1")->setVisible(true);
+    getWidget<LabelWidget>("server-info-1")->setText(server_info, true);
+
+    server_info = L"";
+    each_line = L"";
+#ifndef SERVER_ONLY
+    if (!server->getCountryCode().empty())
+    {
+        core::stringw country_name =
+            translations->getLocalizedCountryName(server->getCountryCode());
+        //I18N: In the server info dialog, show the server location with
+        //country name (based on IP geolocation)
+        each_line = _("Server location: %s", country_name);
+        server_info += each_line;
+        server_info += L"\n";
+    }
+#endif
+    getWidget("server-info-2")->setVisible(true);
+    getWidget<LabelWidget>("server-info-2")->setText(server_info, true);
 
     if (!players.empty())
     {
@@ -128,9 +159,6 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     {
         getWidget("player-list")->setVisible(false);
     }
-    getWidget("server-info")->setVisible(true);
-    getWidget<LabelWidget>("server-info")->setText(server_info, true);
-
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------

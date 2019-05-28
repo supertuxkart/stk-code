@@ -2,16 +2,18 @@
 <stkgui>
     <div x="1%" y="1%" width="98%" height="99%" layout="vertical-row" >
 
-        <header width="80%"
+        <header width="80%" height="7%"
                I18N="In the kart selection (player setup) screen"
                text="Choose a Kart"
                align="center" text_align="center" />
+
+        <spacer height="1%" width="25"/>
 
         <placeholder id="playerskarts" width="100%" align="center" proportion="4">
             <!-- Contents is added programatically -->
         </placeholder>
 
-        <spacer height="15" width="25"/>
+        <spacer height="1f" width="25"/>
 
         <box proportion="2" width="100%" layout="vertical-row" padding="2">
             <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"
@@ -19,7 +21,7 @@
         </box>
 
         <!-- Groups will be added dynamically at runtime -->
-        <tabs width="98%" x="1%" height="5%" id="kartgroups">
+        <tabs width="98%" x="1%" height="1f" id="kartgroups">
         </tabs>
         <spacer width="100%" height="2%"/>
     </div>

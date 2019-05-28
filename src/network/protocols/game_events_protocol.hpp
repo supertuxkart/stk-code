@@ -12,15 +12,16 @@ public:
     enum GameEventType : uint8_t
     {
         GE_KART_FINISHED_RACE = 1,
-        GE_PLAYER_DISCONNECT = 2,
-        GE_RESET_BALL = 3,
-        GE_PLAYER_GOAL = 4,
-        GE_BATTLE_KART_SCORE = 5,
-        GE_CTF_ATTACH = 6,
-        GE_CTF_RESET = 7,
-        GE_STARTUP_BOOST = 8,
+        GE_STARTUP_BOOST = 2,
+        GE_BATTLE_KART_SCORE = 3,
+        GE_CTF_SCORED = 4,
+        GE_RESET_BALL = 5,
+        GE_PLAYER_GOAL = 6,
+        GE_CHECK_LINE = 7
     };   // GameEventType
 private:
+    int m_last_finished_position;
+
     void eliminatePlayer(const NetworkString &ns);
 
 public:
@@ -32,10 +33,10 @@ public:
     void kartFinishedRace(const NetworkString &ns);
     void sendStartupBoost(uint8_t kart_id);
     virtual void setup() OVERRIDE {}
-    virtual void update(int ticks) OVERRIDE {};
-    virtual void asynchronousUpdate() OVERRIDE{}
+    virtual void update(int ticks) OVERRIDE {}
+    virtual void asynchronousUpdate() OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE 
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE
     {
         return false;
     }   // notifyEventAsynchronous

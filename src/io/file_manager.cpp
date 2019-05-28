@@ -120,7 +120,7 @@ FileManager* file_manager = 0;
 /** The constructor of the file manager creates an irrlicht file system and
  *  detects paths for the user config file and assets base directory (data).
  *  A second initialisation is done later once (see init()), once the user
- *  config file is read. This is necessary since part of discoverPaths 
+ *  config file is read. This is necessary since part of discoverPaths
  *  depend on artist debug mode.
  */
 
@@ -212,19 +212,19 @@ FileManager::FileManager()
 
     if (!m_file_system->existFile((root_dir + version).c_str()))
     {
-        Log::error("FileManager", "Could not file '%s'in any "
+        Log::error("FileManager", "Could not find file '%s'in any "
                    "standard location (esp. ../data).", version.c_str());
-        Log::error("FileManager", 
+        Log::error("FileManager",
                    "Last location checked '%s'.", root_dir.c_str());
-        Log::fatal("FileManager", 
+        Log::fatal("FileManager",
                    "Set $SUPERTUXKART_DATADIR to point to the data directory.");
         // fatal will exit the application
     }
-    
+
     addRootDirs(root_dir);
-    
+
     std::string assets_dir;
-    
+
     if (getenv("SUPERTUXKART_ASSETS_DIR") != NULL)
     {
         assets_dir = std::string(getenv("SUPERTUXKART_ASSETS_DIR"));
@@ -242,7 +242,7 @@ FileManager::FileManager()
         //is this needed?
         assets_dir = std::string(getenv("SUPERTUXKART_ROOT_PATH"));
     }
-    
+
     if (!assets_dir.empty() && assets_dir != root_dir)
     {
         addRootDirs(assets_dir);
@@ -354,8 +354,9 @@ void FileManager::init()
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
-    m_cert_location = m_file_system->getAbsolutePath(
-        getAsset("addons.supertuxkart.net.pem").c_str()).c_str();
+
+    m_cert_bundle_location = m_file_system->getAbsolutePath(
+        getAsset("cacert.pem").c_str()).c_str();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -421,6 +422,7 @@ FileManager::~FileManager()
  */
 bool FileManager::fileExists(const std::string& path) const
 {
+    std::lock_guard<std::mutex> lock(m_file_system_lock);
 #ifdef DEBUG
     bool exists = m_file_system->existFile(path.c_str());
     if(exists) return true;
@@ -523,6 +525,8 @@ io::path FileManager::createAbsoluteFilename(const std::string &f)
  */
 void FileManager::pushModelSearchPath(const std::string& path)
 {
+    std::lock_guard<std::mutex> lock(m_file_system_lock);
+
     m_model_search_path.push_back(path);
     const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
@@ -550,6 +554,8 @@ void FileManager::pushModelSearchPath(const std::string& path)
  */
 void FileManager::pushTextureSearchPath(const std::string& path, const std::string& container_id)
 {
+    std::lock_guard<std::mutex> lock(m_file_system_lock);
+
     m_texture_search_path.push_back(TextureSearchPath(path, container_id));
     const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
@@ -577,8 +583,9 @@ void FileManager::pushTextureSearchPath(const std::string& path, const std::stri
  */
 void FileManager::popTextureSearchPath()
 {
-    if(!m_texture_search_path.empty())
+    if (!m_texture_search_path.empty())
     {
+        std::lock_guard<std::mutex> lock(m_file_system_lock);
         TextureSearchPath dir = m_texture_search_path.back();
         m_texture_search_path.pop_back();
         m_file_system->removeFileArchive(createAbsoluteFilename(dir.m_texture_search_path));
@@ -590,8 +597,9 @@ void FileManager::popTextureSearchPath()
  */
 void FileManager::popModelSearchPath()
 {
-    if(!m_model_search_path.empty())
+    if (!m_model_search_path.empty())
     {
+        std::lock_guard<std::mutex> lock(m_file_system_lock);
         std::string dir = m_model_search_path.back();
         m_model_search_path.pop_back();
         m_file_system->removeFileArchive(createAbsoluteFilename(dir));
@@ -829,16 +837,14 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        Log::verbose("[FileManager]", "Checking for: '%s",
-                    current_path.c_str());
-        if (!m_file_system->existFile(io::path(current_path.c_str())))
+        //Log::verbose("[FileManager]", "Checking for: '%s",
+        //            current_path.c_str());
+
+        if (!checkAndCreateDirectory(current_path))
         {
-            if (!checkAndCreateDirectory(current_path))
-            {
-                Log::error("[FileManager]", "Can't create dir '%s'",
-                        current_path.c_str());
-                break;
-            }
+            Log::error("[FileManager]", "Can't create dir '%s'",
+                    current_path.c_str());
+            break;
         }
     }
     bool error = checkAndCreateDirectory(path);
@@ -938,19 +944,19 @@ void FileManager::checkAndCreateConfigDir()
     if(m_user_config_dir.size()>0 && *m_user_config_dir.rbegin()!='/')
         m_user_config_dir += "/";
 
-    m_user_config_dir +="0.10-git/";
+    m_user_config_dir += "config-0.10/";
     if(!checkAndCreateDirectoryP(m_user_config_dir))
     {
         Log::warn("FileManager", "Can not  create config dir '%s', "
                   "falling back to '.'.", m_user_config_dir.c_str());
         m_user_config_dir = "./";
     }
-    
+
     if (m_stdout_dir.empty())
     {
         m_stdout_dir = m_user_config_dir;
     }
-    
+
     return;
 }   // checkAndCreateConfigDir
 
@@ -1196,7 +1202,7 @@ void FileManager::setStdoutName(const std::string& filename)
 void FileManager::setStdoutDir(const std::string& dir)
 {
     m_stdout_dir = dir;
-    
+
     if (!m_stdout_dir.empty() && m_stdout_dir[m_stdout_dir.size() - 1] != '/')
     {
          m_stdout_dir += "/";
@@ -1400,8 +1406,8 @@ bool FileManager::removeDirectory(const std::string &name) const
 
     for (std::string file : files)
     {
-        if (file == "." || file == ".." || file == name + "/." || 
-            file == name + "/..") 
+        if (file == "." || file == ".." || file == name + "/." ||
+            file == name + "/..")
             continue;
 
         if (UserConfigParams::logMisc())
@@ -1425,7 +1431,7 @@ bool FileManager::removeDirectory(const std::string &name) const
             removeFile(file);
         }
     }
-    
+
 #if defined(WIN32)
     bool removed = RemoveDirectory(name.c_str())==TRUE;
 #else
@@ -1507,4 +1513,3 @@ bool FileManager::fileIsNewer(const std::string& f1, const std::string& f2) cons
     stat(f2.c_str(), &stat2);
     return stat1.st_mtime > stat2.st_mtime;
 }   // fileIsNewer
-

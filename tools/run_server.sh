@@ -7,7 +7,7 @@
 
 export SELF_PID=$$
 export BASENAME="$(basename "$0")"
-export DIRNAME="$(readlink -e "$(dirname "$0")")"
+export DIRNAME="$(dirname "$(readlink -f "$0")")"
 export DATETIME="$(date +%Y%m%d%H%M%S)"
 
 ############## General info ##############
@@ -220,9 +220,9 @@ check_servers()
         if [ $(echo $FILE_END | grep -c "Session not valid. Please sign in.") -gt 0 ]; then
             show_message "Error: Check server: Session not valid"
             SUCCESS=0
-        elif [ $(echo $FILE_END | grep curl_easy_perform | grep -c "Timeout was reached") -gt 0 ]; then
-            show_message "Error: Check server: Timeout was reached"
-            SUCCESS=0
+#        elif [ $(echo $FILE_END | grep curl_easy_perform | grep -c "Timeout was reached") -gt 0 ]; then
+#            show_message "Error: Check server: Timeout was reached"
+#            SUCCESS=0
         fi
     done
 

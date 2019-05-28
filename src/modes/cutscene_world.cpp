@@ -17,6 +17,7 @@
 
 #include "modes/cutscene_world.hpp"
 
+#include "main_loop.hpp"
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
 #include "audio/sfx_manager.hpp"
@@ -71,6 +72,9 @@ CutsceneWorld::CutsceneWorld() : World()
  */
 void CutsceneWorld::init()
 {
+    // Use real dt even if fps is low. It allows to keep everything synchronized
+    main_loop->setAllowLargeDt(true);
+    
     m_second_reset = false;
     World::init();
 
@@ -170,6 +174,7 @@ void CutsceneWorld::init()
  */
 CutsceneWorld::~CutsceneWorld()
 {
+    main_loop->setAllowLargeDt(false);
 }   // ~CutsceneWorld
 //-----------------------------------------------------------------------------
 void CutsceneWorld::reset(bool restart)

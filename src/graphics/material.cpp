@@ -96,7 +96,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     b = false;
     node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.4 style
     node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.5 style
-
+    node->get("tex-compression", &m_tex_compression);
 
     std::string s;
 
@@ -447,7 +447,7 @@ Material::Material(const std::string& fname, bool is_full_path,
             else
             {
                 Log::warn("Material", "Cannot determine texture full path: %s",
-                    m_sampler_path[0].c_str());
+                    fname.c_str());
             }
         }
     }
@@ -483,6 +483,7 @@ void Material::init()
     m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_colorizable               = false;
+    m_tex_compression           = true;
     m_colorization_factor       = 0.0f;
     m_colorization_mask         = "";
     m_max_speed_fraction        = 1.0f;
@@ -819,6 +820,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
     else if (m_shader_name == "grass")
     {
+#ifdef USE_GLES2
+        m->MaterialType = video::EMT_STK_GRASS;
+#else
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
 
 #ifndef SERVER_ONLY
@@ -831,6 +835,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->EmissiveColor = video::SColor(255, 150, 150, 150);
             m->SpecularColor = video::SColor(255, 150, 150, 150);
         }
+#endif
+
 #endif
     }
 

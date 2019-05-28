@@ -9,21 +9,21 @@
                 <textbox proportion="1" id="name" I18N="In the server creation screen"/>
             </div>
 
-            <spacer height="10" width="20"/>
+            <spacer height="2%" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of players"/>
                 <gauge id="max_players" proportion="1" min_value="2"/>
             </div>
 
-            <spacer height="10" width="20"/>
+            <spacer height="2%" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password for private server (optional)"/>
                 <textbox proportion="1" id="password" I18N="In the server creation screen"/>
             </div>
 
-            <spacer height="5" width="20"/>
+            <spacer height="1%" width="20"/>
 
             <label width="100%" height="fit" text_align="left" I18N="In the server creation screen" text="Difficulty"/>
             <ribbon id="difficulty" height="15%" width="90%" align="center">
@@ -48,7 +48,7 @@
                         I18N="Multiplayer game mode" text="Soccer"/>
             </ribbon>
 
-            <spacer height="10" width="20"/>
+            <spacer height="2%" width="20"/>
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label id="more-options"  proportion="1" text_align="left"/>
                 <spinner id="more-options-spinner" proportion="1" wrap_around="true"/>
@@ -56,16 +56,16 @@
 
             <label id="info" proportion="1" width="100%" align="center" text_align="center" word_wrap="true" text=""/>
 
-            <buttonbar id="options" x="0" y="0" width="25%" height="12%" align="center">
+            <buttonbar id="options" x="0" y="0" width="40%" height="12%" align="center">
                 <icon-button id="create" width="64" height="64" icon="gui/icons/green_check.png"
                              I18N="In the server creation screen" text="Create" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
                              I18N="In the server creation screen" text="Cancel" label_location="bottom"/>
             </buttonbar>
             
-            <spacer width="10" height="20"/>
+            <spacer width="10" height="1f"/>
 
         </box>
-        <spacer width="10" height="10"/>
+        <spacer width="10" height="2%"/>
     </div>
 </stkgui>

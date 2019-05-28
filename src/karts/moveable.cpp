@@ -33,9 +33,6 @@
 
 Moveable::Moveable()
 {
-    m_body            = 0;
-    m_motion_state    = 0;
-    m_mesh            = NULL;
     m_node            = NULL;
     m_heading         = 0;
 }   // Moveable
@@ -44,10 +41,7 @@ Moveable::Moveable()
 Moveable::~Moveable()
 {
     // The body is being removed from the world in kart/projectile
-    if(m_body)         delete m_body;
-    if(m_motion_state) delete m_motion_state;
     if(m_node) irr_driver->removeNode(m_node);
-    if(m_mesh) irr_driver->removeMeshFromCache(m_mesh);
 }   // ~Moveable
 
 //-----------------------------------------------------------------------------
@@ -191,16 +185,16 @@ void Moveable::createBody(float mass, btTransform& trans,
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
     m_transform = trans;
-    m_motion_state = new KartMotionState(trans);
+    m_motion_state.reset(new KartMotionState(trans));
 
-    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state,
+    btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state.get(),
                                                   shape, inertia);
     info.m_restitution = restitution;
     info.m_friction = stk_config->m_default_moveable_friction;
 
     // Then create a rigid body
     // ------------------------
-    m_body = new btRigidBody(info);
+    m_body.reset(new btRigidBody(info));
     if(mass==0)
     {
         // Create a kinematic object

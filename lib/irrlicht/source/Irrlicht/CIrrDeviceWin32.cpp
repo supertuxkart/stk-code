@@ -368,18 +368,26 @@ void pollJoysticks()
             DWORD result = XInputGetState(ActiveJoysticks[joystick].Index, &state);
             // XInput reports the buttons in a different order. So to keep
             // old configs to work as expected, remap the buttons.
+            // Map to 0x001 - 0x008
             int abxy     = (state.Gamepad.wButtons & (XINPUT_GAMEPAD_A | 
                                                       XINPUT_GAMEPAD_B |
                                                       XINPUT_GAMEPAD_X |
                                                       XINPUT_GAMEPAD_Y   )
                            ) >> 12;
+            // Map to 0x010 - 0x020
             int shoulder = (state.Gamepad.wButtons & (XINPUT_GAMEPAD_LEFT_SHOULDER|
                                                       XINPUT_GAMEPAD_RIGHT_SHOULDER)
                            ) >> 4;
+            // Map to 0x040
             int start    = (state.Gamepad.wButtons & XINPUT_GAMEPAD_START) << 3;
+            // Map to 0x080
             int back     = (state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK ) << 1;
+            // Map to 0x100 to 0x200
+            int stick_buttons = (state.Gamepad.wButtons & (XINPUT_GAMEPAD_LEFT_THUMB |
+                                                           XINPUT_GAMEPAD_RIGHT_THUMB)
+                                ) << 2;
 
-            event.JoystickEvent.ButtonStates = abxy | shoulder | start | back;
+            event.JoystickEvent.ButtonStates = abxy | shoulder | start | back | stick_buttons;
             int angle = 65535;
             if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
             {

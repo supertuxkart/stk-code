@@ -21,14 +21,17 @@ endif()
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
+option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
+option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
+option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
-CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF
-    "NOT APPLE" ON)
+option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
 CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
+    "NOT SERVER_ONLY" OFF)
+CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT MINGW;NOT CYGWIN" OFF)
@@ -246,8 +249,10 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(NOT SERVER_ONLY)
-    find_library(SQUISH_LIBRARY NAMES squish libsquish)
-    find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
+    if(USE_SYSTEM_SQUISH)
+        find_library(SQUISH_LIBRARY NAMES squish libsquish)
+        find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
+    endif()
     if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
         add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libsquish")
         include_directories("${PROJECT_SOURCE_DIR}/lib/libsquish")
@@ -267,10 +272,21 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 # (at least on VS) irrlicht will find wiiuse io.h file because
 # of the added include directory.
 if(USE_WIIUSE)
-    if(WIIUSE_BUILD)
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+    # Find system WiiUse library or build it if missing
+    if((UNIX AND NOT APPLE) AND USE_SYSTEM_WIIUSE)
+        find_package(WiiUse)
     endif()
-    include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+
+    if(WIIUSE_FOUND)
+        include_directories(${WIIUSE_INCLUDE_DIR})
+    else()
+        # Fallback to built-in version
+        if(WIIUSE_BUILD)
+            add_subdirectory("${PROJECT_SOURCE_DIR}/lib/wiiuse")
+        endif()
+        include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse/src")
+        set(WIIUSE_LIBRARIES "wiiuse" "bluetooth")
+    endif()
 endif()
 
 # Set include paths
@@ -349,6 +365,23 @@ if(USE_LIBBFD)
     else()
         set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
         message(WARNING "Libbfd not found, disable integrated stack trace.")
+    endif()
+endif()
+
+# SQLITE
+if(USE_SQLITE3)
+    find_library(SQLITE3_LIBRARY NAMES sqlite3 libsqlite3)
+    find_path(SQLITE3_INCLUDEDIR NAMES sqlite3.h PATHS)
+    if (NOT SQLITE3_LIBRARY OR NOT SQLITE3_INCLUDEDIR)
+#        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/sqlite3")
+#        include_directories("${PROJECT_SOURCE_DIR}/lib/sqlite3")
+#        SET(SQLITE3_LIBRARY sqlite3)
+        set(USE_SQLITE3 OFF CACHE BOOL "Use sqlite to manage server stats and ban list." FORCE)
+        message(WARNING "Sqlite3 not found, disable advanced server management.")
+    else()
+        add_definitions(-DENABLE_SQLITE3)
+        include_directories("${SQLITE3_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system libsqlite3: ${SQLITE3_LIBRARY}")
     endif()
 endif()
 
@@ -470,7 +503,7 @@ else()
     # find_package(CURL REQUIRED)
     # include_directories(${CURL_INCLUDE_DIRS})
 
-    find_path(NETTLE_INCLUDE_DIRS nettle/gcm.h nettle/sha.h nettle/base64.h nettle/version.h nettle/yarrow.h)
+    find_path(NETTLE_INCLUDE_DIRS nettle/version.h)
     find_library(NETTLE_LIBRARY NAMES nettle libnettle)
 
     if (NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL AND 0)
@@ -503,6 +536,10 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     # ${CURL_LIBRARIES}
     )
+
+if (USE_SQLITE3)
+    target_link_libraries(supertuxkart ${SQLITE3_LIBRARY})
+endif()
 
 if (USE_CRYPTO_OPENSSL)
     target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})
@@ -564,7 +601,7 @@ if(USE_WIIUSE)
             target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/wiiuse.lib)
         endif()
     else()
-        target_link_libraries(supertuxkart wiiuse bluetooth)
+        target_link_libraries(supertuxkart ${WIIUSE_LIBRARIES})
     endif()
     add_definitions(-DENABLE_WIIUSE)
 

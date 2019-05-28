@@ -3,6 +3,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/capture_the_flag.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
@@ -11,6 +12,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "race/race_manager.hpp"
 
 #include <stdint.h>
 
@@ -26,6 +28,7 @@
  */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 {
+    m_last_finished_position = 1;
 }   // GameEventsProtocol
 
 // ----------------------------------------------------------------------------
@@ -50,12 +53,11 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     switch (type)
     {
     case GE_KART_FINISHED_RACE:
         kartFinishedRace(data);     break;
-    case GE_PLAYER_DISCONNECT:
-        eliminatePlayer(data);      break;
     case GE_RESET_BALL:
     {
         if (!sw)
@@ -77,18 +79,17 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         ffa->setKartScoreFromServer(data);
         break;
     }
-    case GE_CTF_ATTACH:
+    case GE_CTF_SCORED:
     {
         if (!ctf)
             throw std::invalid_argument("No CTF world");
-        ctf->attachFlag(data);
-        break;
-    }
-    case GE_CTF_RESET:
-    {
-        if (!ctf)
-            throw std::invalid_argument("No CTF world");
-        ctf->resetFlag(data);
+        uint8_t kart_id = data.getUInt8();
+        bool red_team_scored = data.getUInt8() == 1;
+        int16_t new_kart_scores = data.getUInt16();
+        int new_red_scores = data.getUInt8();
+        int new_blue_scores = data.getUInt8();
+        ctf->ctfScored(kart_id, red_team_scored, new_kart_scores,
+            new_red_scores, new_blue_scores);
         break;
     }
     case GE_STARTUP_BOOST:
@@ -127,28 +128,20 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         }
         break;
     }
+    case GE_CHECK_LINE:
+    {
+        if (!lw)
+            throw std::invalid_argument("No linear world");
+        if (NetworkConfig::get()->isClient())
+            lw->updateCheckLinesClient(data);
+        break;
+    }
     default:
         Log::warn("GameEventsProtocol", "Unkown message type.");
         break;
     }
     return true;
 }   // notifyEvent
-
-// ----------------------------------------------------------------------------
-void GameEventsProtocol::eliminatePlayer(const NetworkString &data)
-{
-    assert(NetworkConfig::get()->isClient());
-    if (data.size() < 1)
-    {
-        Log::warn("GameEventsProtocol", "eliminatePlayer: Too short message.");
-    }
-    int kartid = data.getUInt8();
-    World::getWorld()->eliminateKart(kartid, false/*notify_of_elimination*/);
-    World::getWorld()->getKart(kartid)->setPosition(
-        World::getWorld()->getCurrentNumKarts() + 1);
-    World::getWorld()->getKart(kartid)->finishedRace(
-        World::getWorld()->getTime());
-}   // eliminatePlayer
 
 // ----------------------------------------------------------------------------
 /** This function is called from the server when a kart finishes a race. It
@@ -181,6 +174,11 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 
     uint8_t kart_id = ns.getUInt8();
     float time      = ns.getFloat();
+    if (race_manager->modeHasLaps())
+    {
+        World::getWorld()->getKart(kart_id)
+            ->setPosition(m_last_finished_position++);
+    }
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace

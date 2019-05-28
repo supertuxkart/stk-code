@@ -44,6 +44,7 @@
  */
 SlipStream::SlipStream(AbstractKart* kart)
 {
+    m_speed_increase_ticks = m_speed_increase_duration = -1;
     m_kart = kart;
     m_moving = NULL;
     m_moving_fast = NULL;
@@ -215,7 +216,7 @@ void SlipStream::reset()
     m_slipstream_mode = SS_NONE;
     m_slipstream_time = 0;
     m_bonus_time      = 0;
-
+    m_speed_increase_ticks = m_speed_increase_duration = -1;
     // Reset a potential max speed increase
     m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM, 0, 0, 0, 0);
 }   // reset
@@ -319,8 +320,8 @@ SP::SPMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
             video::S3DVertexSkinnedMesh v;
             // Offset every 2nd circle by one half segment to increase
             // the number of planes so it looks better.
-            v.m_position.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
-            v.m_position.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
+            v.m_position.X =  sinf((i+(j%2)*0.5f)*f)*radius[j];
+            v.m_position.Y = -cosf((i+(j%2)*0.5f)*f)*radius[j];
             v.m_position.Z = distance[j];
             // Enable texture matrix and dummy normal for visualization
             v.m_normal = 0x1FF << 10 | 1 << 30;
@@ -827,28 +828,8 @@ void SlipStream::update(int ticks)
 
         m_slipstream_time = 0.0f;
         m_bonus_active = true;
-        float speed_increase = kp->getSlipstreamMaxSpeedIncrease();
-        float add_power = kp->getSlipstreamAddPower();
-        int duration = stk_config->time2Ticks(m_bonus_time);
-        int fade_out = kp->getSlipstreamFadeOutTicks();
-        m_kart->instantSpeedIncrease(
-            MaxSpeed::MS_INCREASE_SLIPSTREAM, speed_increase,
-            speed_increase, add_power, duration, fade_out);
-
-        if (RewindManager::get()->useLocalEvent())
-        {
-            AbstractKart* kart = m_kart;
-            RewindManager::get()->addRewindInfoEventFunction(new
-                RewindInfoEventFunction(
-                World::getWorld()->getTicksSinceStart(),
-                [](){},
-                [kart, speed_increase, add_power, duration, fade_out]()
-                {
-                    kart->instantSpeedIncrease(
-                        MaxSpeed::MS_INCREASE_SLIPSTREAM, speed_increase,
-                        speed_increase, add_power, duration, fade_out);
-                }));
-        }
+        m_speed_increase_duration = stk_config->time2Ticks(m_bonus_time);
+        m_speed_increase_ticks = World::getWorld()->getTicksSinceStart();
     }
 
     if(!is_sstreaming)
@@ -913,3 +894,18 @@ void SlipStream::update(int ticks)
 #endif
     m_slipstream_mode = SS_COLLECT;
 }   // update
+
+// ----------------------------------------------------------------------------
+void SlipStream::updateSpeedIncrease()
+{
+    if (m_speed_increase_ticks == World::getWorld()->getTicksSinceStart())
+    {
+        const KartProperties* kp = m_kart->getKartProperties();
+        float speed_increase = kp->getSlipstreamMaxSpeedIncrease();
+        float add_power = kp->getSlipstreamAddPower();
+        int fade_out = kp->getSlipstreamFadeOutTicks();
+        m_kart->instantSpeedIncrease(
+            MaxSpeed::MS_INCREASE_SLIPSTREAM, speed_increase,
+            speed_increase, add_power, m_speed_increase_duration, fade_out);
+    }
+}   // updateSpeedIncrease

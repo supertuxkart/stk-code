@@ -17,6 +17,8 @@
 
 #include "guiengine/widgets/list_widget.hpp"
 
+#include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
@@ -110,6 +112,7 @@ void ListWidget::add()
         true,
         false);
 
+    list_box->setAlternatingDarkness(m_properties[PROP_ALTERNATE_BG] == "true");
     if (current_skin && current_skin->getSpriteBank())
     {
             list_box->setSpriteBank(current_skin->getSpriteBank());
@@ -157,8 +160,21 @@ void ListWidget::createHeader()
             name << "_column_";
             name << n;
 
-            ButtonWidget* header = new ButtonWidget();
-
+            Widget* header = NULL;
+            if (n == m_header.size() || m_header[n].m_texture == NULL)
+            {
+                ButtonWidget* button = new ButtonWidget();
+                if (n < m_header.size())
+                    button->setText(m_header[n].m_text);
+                header = button;
+            }
+            else
+            {
+                IconButtonWidget* icon = new IconButtonWidget(
+                    IconButtonWidget::SCALE_MODE_LIST_WIDGET, true, false);
+                icon->setImage(m_header[n].m_texture);
+                header = icon;
+            }
             header->m_reserved_id = getNewNoFocusID();
 
             header->m_y = m_y;
@@ -179,8 +195,6 @@ void ListWidget::createHeader()
 
             x += header->m_w;
 
-            if (n < m_header.size())
-                header->setText( m_header[n].m_text );
             header->m_properties[PROP_ID] = name.str();
 
             header->add();
@@ -226,7 +240,7 @@ void ListWidget::clearColumns()
 } //clearColumns
 
 // -----------------------------------------------------------------------------
-
+//FIXME : remove the code duplication of the two addItem functions
 void ListWidget::addItem(   const std::string& internal_name,
                             const irr::core::stringw &name,
                             const int icon,
@@ -240,6 +254,10 @@ void ListWidget::addItem(   const std::string& internal_name,
     newItem.m_internal_name = internal_name;
     newItem.m_contents.push_back(cell);
     newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+    newItem.m_line_height_scale = m_properties[PROP_LINE_HEIGHT] == "small"  ? 0.75f :
+                                  m_properties[PROP_LINE_HEIGHT] == "normal" ? 1.0f  :
+                                  m_properties[PROP_LINE_HEIGHT] == "big"    ? 1.25f : 1.0f;
+
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -268,6 +286,9 @@ void ListWidget::addItem(const std::string& internal_name,
         newItem.m_contents.push_back(contents[i]);
     }
     newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+    newItem.m_line_height_scale = m_properties[PROP_LINE_HEIGHT] == "small"  ? 0.75f :
+                                  m_properties[PROP_LINE_HEIGHT] == "normal" ? 1.0f  :
+                                  m_properties[PROP_LINE_HEIGHT] == "big"    ? 1.25f : 1.0f;
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);

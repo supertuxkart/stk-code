@@ -97,8 +97,8 @@ void Wiimote::update()
     const float sign = normalized_angle >= 0.0f ? 1.0f : -1.0f;
     const float normalized_angle_2 = w1 * normalized_angle
                                    + w2 * sign*normalized_angle*normalized_angle
-                                   + wa * asin(normalized_angle)*(2.0f/M_PI)
-                                   + ws * sin(normalized_angle*(M_PI/2.0f));
+                                   + wa * asinf(normalized_angle)*(2.0f/M_PI)
+                                   + ws * sinf(normalized_angle*(M_PI/2.0f));
 
     if(UserConfigParams::m_wiimote_debug)
     {

@@ -8,6 +8,8 @@
         <div width="100%" height="92%" layout="horizontal-row" >
 
             <vertical-tabs id="options_choice" height="100%" width="18%">
+                <icon-button id="tab_general" width="128" height="128" icon="gui/icons/options_general.png"
+                        I18N="Section in the settings menu" text="General"/>
                 <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
                         I18N="Section in the settings menu" text="Graphics"/>
                 <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
@@ -27,9 +29,9 @@
             <box width="80%" height="100%" layout="vertical-row">
 
                 <!-- Configuration name -->
-                 <spacer height="6" width="10"/>
+                 <spacer height="1%" width="10"/>
                  <label id="title" width="100%" text_align="center" />
-                 <spacer height="16" width="10"/>
+                 <spacer height="2%" width="10"/>
 
                  <!-- List of key bindings -->
                  <box proportion="10" width="75%" align="center" layout="vertical-row" padding="8">
@@ -38,20 +40,20 @@
 
                  <!-- Bottom buttons -->
 
-                 <spacer width="50" height="20" />
-                 <div proportion="3" width="100%"  layout="horizontal-row">
+                 <spacer width="50" height="2%" />
+                 <div height="4f" width="100%"  layout="horizontal-row">
                      <div height="100%" width="fit" layout="vertical-row">
                          <button id="delete"
                                  I18N="In the input configuration screen"  text="Delete Configuration"/>
-                         <spacer width="50" height="3%" />
+                         <spacer width="50" height="2%" />
                          <button id="disable_toggle"
                                  I18N="In the input configuration screen"  text="Disable Configuration"/>
-                         <spacer width="50" height="3%" />
+                         <spacer width="50" height="2%" />
                          <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
 
-                         <spacer width="50" height="3%" />
+                         <spacer width="50" height="2%" />
                      </div>
-                     <spacer width="20" height="10" />
+                     <spacer width="2%" height="10" />
                      <label id="conflict" proportion="1" text="" word_wrap="true" align="center"/>
                  </div>
             </box>

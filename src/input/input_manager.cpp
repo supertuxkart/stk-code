@@ -38,6 +38,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
@@ -82,7 +83,6 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_timer_in_use = false;
     m_master_player_only = false;
     m_timer = 0;
-    m_timer_use_count = 0;
 
 }
 // -----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void InputManager::handleStaticAction(int key, int value)
 
     // When no players... a cutscene
     if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
-        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN ||
+        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
         key == IRR_KEY_BUTTON_A))
     {
         world->onFirePressed(NULL);
@@ -303,7 +303,7 @@ void InputManager::handleStaticAction(int key, int value)
                 fgets(s, 256, stdin);
                 int t;
                 StringUtils::fromString(s,t);
-                RewindManager::get()->rewindTo(t, world->getTicksSinceStart());
+                RewindManager::get()->rewindTo(t, world->getTicksSinceStart(), false);
                 Log::info("Rewind", "Rewinding from %d to %d",
                           world->getTicksSinceStart(), t);
             }
@@ -397,7 +397,7 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 if(control_is_pressed && race_manager->getMinorMode()!=
-                                          RaceManager::MINOR_MODE_BATTLE)
+                                          RaceManager::MINOR_MODE_3_STRIKES)
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL,
                                      10000);
                 else
@@ -790,11 +790,16 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        bool is_nw_spectator = cl && cl->isSpectator() &&
+             StateManager::get()->getGameState() == GUIEngine::GAME &&
+             !GUIEngine::ModalDialog::isADialogActive();
+
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
              !GUIEngine::ModalDialog::isADialogActive()            &&
              !GUIEngine::ScreenKeyboard::isActive()                &&
-             !race_manager->isWatchingReplay() )
+             !race_manager->isWatchingReplay() && !is_nw_spectator)
         {
             if (player == NULL)
             {
@@ -824,11 +829,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // ... when in menus
         else
         {
+            // reset timer when released
+            if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
+            {
+                m_timer_in_use = false;
+                m_timer = 0;
+            }
 
             // When in master-only mode, we can safely assume that players
             // are set up, contrarly to early menus where we accept every
             // input because players are not set-up yet
-            if (m_master_player_only && player == NULL)
+            if (m_master_player_only && player == NULL && !is_nw_spectator)
             {
                 if (type == Input::IT_STICKMOTION ||
                     type == Input::IT_STICKBUTTON)
@@ -855,10 +866,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 if (abs(value) > Input::MAX_VALUE*2/3)
                 {
                     m_timer_in_use = true;
+                    m_timer = 0.25;
+                }
 
-                    // After three iterations of the timer, pick up the scrolling pace
-                    m_timer_use_count++;
-                    m_timer = m_timer_use_count > 3 ? 0.05 : 0.25;
+                if (is_nw_spectator)
+                {
+                    cl->changeSpectateTarget(action, abs(value), type);
+                    return;
                 }
 
                 // player may be NULL in early menus, before player setup has
@@ -884,14 +898,6 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 GUIEngine::EventHandler::get()
                     ->processGUIAction(action, deviceID, abs(value), type,
                                        playerID);
-            }
-
-            // reset timer when released
-            if (abs(value) == 0)
-            {
-                m_timer_in_use = false;
-                m_timer = 0;
-                m_timer_use_count = 0;
             }
         }
     }
@@ -970,11 +976,11 @@ EventPropagation InputManager::input(const SEvent& event)
             // *0.017453925f is to convert degrees to radians
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           Input::HAT_H_ID, Input::AD_NEUTRAL,
-                          (int)(cos(event.JoystickEvent.POV*0.017453925f/100.0f)
+                          (int)(cosf(event.JoystickEvent.POV*0.017453925f/100.0f)
                                 *Input::MAX_VALUE));
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           Input::HAT_V_ID, Input::AD_NEUTRAL,
-                          (int)(sin(event.JoystickEvent.POV*0.017453925f/100.0f)
+                          (int)(sinf(event.JoystickEvent.POV*0.017453925f/100.0f)
                                 *Input::MAX_VALUE));
         }
 
@@ -1036,7 +1042,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE ||
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
                     key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
@@ -1069,7 +1075,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE ||
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
                     key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
@@ -1191,30 +1197,32 @@ EventPropagation InputManager::input(const SEvent& event)
             }
         }
 
-        // Simulate touch event on non-android devices
-        #if !defined(ANDROID)
-        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-
-        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
-            type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
+        // Simulate touch events if there is no real device
+        if (UserConfigParams::m_multitouch_active > 1 && 
+            !irr_driver->getDevice()->supportsTouchDevice())
         {
-            device->m_events[0].id = 0;
-            device->m_events[0].x = event.MouseInput.X;
-            device->m_events[0].y = event.MouseInput.Y;
-
-            if (type == EMIE_LMOUSE_PRESSED_DOWN)
+            MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+    
+            if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
+                type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
             {
-                device->m_events[0].touched = true;
+                device->m_events[0].id = 0;
+                device->m_events[0].x = event.MouseInput.X;
+                device->m_events[0].y = event.MouseInput.Y;
+    
+                if (type == EMIE_LMOUSE_PRESSED_DOWN)
+                {
+                    device->m_events[0].touched = true;
+                }
+                else if (type == EMIE_LMOUSE_LEFT_UP)
+                {
+                    device->m_events[0].touched = false;
+                }
+    
+                m_device_manager->updateMultitouchDevice();
+                device->updateDeviceState(0);
             }
-            else if (type == EMIE_LMOUSE_LEFT_UP)
-            {
-                device->m_events[0].touched = false;
-            }
-
-            m_device_manager->updateMultitouchDevice();
-            device->updateDeviceState(0);
         }
-        #endif
 
         /*
         EMIE_LMOUSE_PRESSED_DOWN    Left mouse button was pressed down.
@@ -1241,7 +1249,8 @@ EventPropagation InputManager::input(const SEvent& event)
             factor = std::max(factor, 0.1f);
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {
-                device->updateOrientationFromAccelerometer(event.AccelerometerEvent.X, event.AccelerometerEvent.Y);
+                device->updateOrientationFromAccelerometer((float)event.AccelerometerEvent.X,
+                                                           (float)event.AccelerometerEvent.Y);
                 device->updateAxisX(device->getOrientation() * ORIENTATION_MULTIPLIER / factor);
             }
             else
@@ -1260,7 +1269,7 @@ EventPropagation InputManager::input(const SEvent& event)
 
             float factor = UserConfigParams::m_multitouch_tilt_factor;
             factor = std::max(factor, 0.1f);
-            device->updateOrientationFromGyroscope(event.GyroscopeEvent.Z);
+            device->updateOrientationFromGyroscope((float)event.GyroscopeEvent.Z);
             device->updateAxisX(device->getOrientation() * ORIENTATION_MULTIPLIER / factor);
         }
     }

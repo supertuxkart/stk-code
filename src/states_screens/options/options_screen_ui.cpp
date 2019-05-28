@@ -40,6 +40,7 @@
 #include "online/request_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_video.hpp"
@@ -121,9 +122,15 @@ void OptionsScreenUI::loadedFromFile()
     //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("Hidden")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0)
+
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+                               irr_driver->getDevice()->supportsTouchDevice()) ||
+                               UserConfigParams::m_multitouch_active > 1;
+
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui)
+    {
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+    }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
 }   // loadedFromFile
 
@@ -143,13 +150,22 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
 
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0 &&
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+                               irr_driver->getDevice()->supportsTouchDevice()) ||
+                               UserConfigParams::m_multitouch_active > 1;
+
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         UserConfigParams::m_minimap_display == 0)
     {
         UserConfigParams::m_minimap_display = 1;
     }
     minimap_options->setValue(UserConfigParams::m_minimap_display);
+    
+    GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
+    assert( font_size != NULL );
+    
+    font_size->setValue((int)roundf(UserConfigParams::m_fonts_size));
+    m_prev_font_size = UserConfigParams::m_fonts_size;
 
     // ---- video modes
     CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -163,39 +179,6 @@ void OptionsScreenUI::init()
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
-    CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
-    assert( news != NULL );
-    news->setState( UserConfigParams::m_internet_status
-                                     ==RequestManager::IPERM_ALLOWED );
-    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-    assert( stats != NULL );
-    LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
-    assert( stats_label );
-            stats->setState(UserConfigParams::m_hw_report_enable);
-
-    getWidget<CheckBoxWidget>("enable-lobby-chat")
-        ->setState(UserConfigParams::m_lobby_chat);
-
-    if(news->getState())
-    {
-        stats_label->setVisible(true);
-        stats->setVisible(true);
-        stats->setState(UserConfigParams::m_hw_report_enable);
-    }
-    else
-    {
-        stats_label->setVisible(false);
-        stats->setVisible(false);
-    }
-    CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
-    assert( difficulty != NULL );
-    difficulty->setState( UserConfigParams::m_per_player_difficulty );
-    // I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text fits the screen in low resolutions.
-    difficulty->setTooltip(_("In multiplayer mode, players can select handicapped\n(more difficult) profiles on the kart selection screen"));
-
-    CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
-    assert( show_login!= NULL );
-    show_login->setState( UserConfigParams::m_always_show_login_screen);
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
@@ -243,6 +226,8 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             screen = OptionsScreenInput::getInstance();
         //else if (selection == "tab_ui")
         //    screen = OptionsScreenUI::getInstance();
+        else if (selection == "tab_general")
+            screen = OptionsScreenGeneral::getInstance();
         else if (selection == "tab_language")
             screen = OptionsScreenLanguage::getInstance();
         if(screen)
@@ -269,6 +254,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( minimap_options != NULL );
         UserConfigParams::m_minimap_display = minimap_options->getValue();
     }
+    else if (name == "font_size")
+    {
+        GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
+        assert( font_size != NULL );
+        UserConfigParams::m_fonts_size = font_size->getValue();
+    }
     else if (name == "split_screen_horizontally")
     {
         CheckBoxWidget* split_screen_horizontally = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -282,65 +273,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( fps != NULL );
         UserConfigParams::m_display_fps = fps->getState();
     }
-    else if (name=="enable-internet")
-    {
-        CheckBoxWidget* internet = getWidget<CheckBoxWidget>("enable-internet");
-        assert( internet != NULL );
-        UserConfigParams::m_internet_status =
-            internet->getState() ? RequestManager::IPERM_ALLOWED
-                                 : RequestManager::IPERM_NOT_ALLOWED;
-        // If internet gets enabled, re-initialise the addon manager (which
-        // happens in a separate thread) so that news.xml etc can be
-        // downloaded if necessary.
-        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        LabelWidget* stats_label = getWidget<LabelWidget>("label-hw-report");
-        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
-        LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
-        if(internet->getState())
-        {
-            NewsManager::get()->init(false);
-            stats->setVisible(true);
-            stats_label->setVisible(true);
-            stats->setState(UserConfigParams::m_hw_report_enable);
-            chat->setVisible(true);
-            stats->setState(UserConfigParams::m_lobby_chat);
-            chat_label->setVisible(true);
-        }
-        else
-        {
-            chat->setVisible(false);
-            chat_label->setVisible(false);
-            stats->setVisible(false);
-            stats_label->setVisible(false);
-            PlayerProfile* profile = PlayerManager::getCurrentPlayer();
-            if (profile != NULL && profile->isLoggedIn())
-                profile->requestSignOut();
-        }
-    }
-    else if (name=="enable-hw-report")
-    {
-        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        UserConfigParams::m_hw_report_enable = stats->getState();
-        if(stats->getState())
-            HardwareStats::reportHardwareStats();
-    }
-    else if (name=="enable-lobby-chat")
-    {
-        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
-        UserConfigParams::m_lobby_chat = chat->getState();
-    }
-    else if (name=="show-login")
-    {
-        CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
-        assert( show_login != NULL );
-        UserConfigParams::m_always_show_login_screen = show_login->getState();
-    }
-    else if (name=="perPlayerDifficulty")
-    {
-        CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
-        assert( difficulty != NULL );
-        UserConfigParams::m_per_player_difficulty = difficulty->getState();
-    }
 #endif
 }   // eventCallback
 
@@ -348,6 +280,11 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
 void OptionsScreenUI::tearDown()
 {
+    if (m_prev_font_size != UserConfigParams::m_fonts_size)
+    {
+        irr_driver->sameRestart();
+    }
+    
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

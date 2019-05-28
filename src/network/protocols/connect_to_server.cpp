@@ -47,6 +47,7 @@ bool ConnectToServer::m_done_intecept = false;
 ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
+    m_quick_play_err_msg = _("No quick play server available.");
     if (server)
     {
         m_server         = server;
@@ -89,14 +90,14 @@ void ConnectToServer::getClientServerInfo()
     assert(m_server);
     // Allow up to 10 seconds for the separate process to fully start-up
     bool started = false;
-    uint64_t timeout = StkTime::getRealTimeMs() + 10000;
+    uint64_t timeout = StkTime::getMonoTimeMs() + 10000;
     const std::string& sid = NetworkConfig::get()->getServerIdFile();
     assert(!sid.empty());
     const std::string dir = StringUtils::getPath(sid);
     const std::string server_id_file = StringUtils::getBasename(sid);
     uint16_t port = 0;
     unsigned server_id = 0;
-    while (StkTime::getRealTimeMs() < timeout)
+    while (StkTime::getMonoTimeMs() < timeout)
     {
         std::set<std::string> files;
         file_manager->listFiles(files, dir);
@@ -179,12 +180,19 @@ void ConnectToServer::asynchronousUpdate()
 
                 if (!servers.empty())
                 {
-                    // For quick play we choose the server with the least player
+                    // For quick play we choose the server with the shortest
+                    // distance and not empty and full server
                     std::sort(servers.begin(), servers.end(), []
                         (const std::shared_ptr<Server> a,
                         const std::shared_ptr<Server> b)->bool
                         {
-                            return a->getCurrentPlayers() < b->getCurrentPlayers();
+                            return a->getDistance() < b->getDistance();
+                        });
+                    std::stable_partition(servers.begin(), servers.end(), []
+                        (const std::shared_ptr<Server> a)->bool
+                        {
+                            return a->getCurrentPlayers() != 0 &&
+                                a->getCurrentPlayers() != a->getMaxPlayers();
                         });
                     m_server = servers[0];
                     m_server_address = m_server->getAddress();
@@ -192,8 +200,7 @@ void ConnectToServer::asynchronousUpdate()
                 else
                 {
                     // Shutdown STKHost (go back to online menu too)
-                    STKHost::get()->setErrorMessage(
-                        _("No quick play server available."));
+                    STKHost::get()->setErrorMessage(m_quick_play_err_msg);
                     STKHost::get()->requestShutdown();
                     m_state = EXITING;
                     return;
@@ -270,8 +277,10 @@ void ConnectToServer::update(int ticks)
             {
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
+                NetworkConfig::get()->clearActivePlayersForClient();
                 auto cl = LobbyProtocol::create<ClientLobby>(m_server_address,
                     m_server);
+                STKHost::get()->startListening();
                 cl->requestStart();
             }
             if (STKHost::get()->getPeerCount() == 0)
@@ -336,30 +345,6 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port)
         /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
         true/*change_port_if_bound*/) : STKHost::get()->getNetwork();
     assert(nw);
-
-    if (m_server_address.getPort() == 0)
-    {
-        // Get the server port of server from (common) server discovery port
-        Log::info("ConnectToServer", "Detect port for server address.");
-        BareNetworkString s(std::string("stk-server-port"));
-        TransportAddress address(m_server_address.getIP(),
-            stk_config->m_server_discovery_port);
-        nw->sendRawPacket(s, address);
-        TransportAddress sender;
-        const int LEN = 2048;
-        char buffer[LEN];
-        int len = nw->receiveRawPacket(buffer, LEN, &sender, 2000);
-        if (len != 2)
-        {
-            Log::error("ConnectToServer", "Invalid port number");
-            if (another_port)
-                delete nw;
-            return false;
-        }
-        BareNetworkString server_port(buffer, len);
-        uint16_t port = server_port.getUInt16();
-        m_server_address.setPort(port);
-    }
 
     m_done_intecept = false;
     nw->getENetHost()->intercept = ConnectToServer::interceptCallback;

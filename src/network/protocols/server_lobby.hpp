@@ -28,11 +28,15 @@
 
 #include <array>
 #include <atomic>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <set>
-#include <tuple>
+
+#ifdef ENABLE_SQLITE3
+#include <sqlite3.h>
+#endif
 
 class BareNetworkString;
 class NetworkString;
@@ -64,16 +68,58 @@ private:
         std::string m_aes_key;
         std::string m_aes_iv;
         irr::core::stringw m_name;
+        std::string m_country_code;
         bool m_tried = false;
     };
+    bool m_player_reports_table_exists;
+
+#ifdef ENABLE_SQLITE3
+    sqlite3* m_db;
+
+    std::string m_server_stats_table;
+
+    bool m_ip_ban_table_exists;
+
+    bool m_online_id_ban_table_exists;
+
+    bool m_ip_geolocation_table_exists;
+
+    uint64_t m_last_cleanup_db_time;
+
+    void cleanupDatabase();
+
+    bool easySQLQuery(const std::string& query,
+        std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
+
+    void checkTableExists(const std::string& table, bool& result);
+
+    std::string ip2Country(const TransportAddress& addr) const;
+#endif
+    void initDatabase();
+
+    void destroyDatabase();
 
     std::atomic<ServerState> m_state;
+
+    /* The state used in multiple threads when reseting server. */
+    enum ResetState : unsigned int
+    {
+        RS_NONE, // Default state
+        RS_WAITING, // Waiting for reseting finished
+        RS_ASYNC_RESET // Finished reseting server in main thread, now async
+                       // thread
+    };
+
+    std::atomic<ResetState> m_rs_state;
 
     /** Hold the next connected peer for server owner if current one expired
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
 
     std::atomic<uint32_t> m_server_owner_id;
+
+    /** Official karts and tracks available in server. */
+    std::pair<std::set<std::string>, std::set<std::string> > m_official_kts;
 
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
@@ -82,15 +128,15 @@ private:
     /** Keeps track of the server state. */
     std::atomic_bool m_server_has_loaded_world;
 
+    bool m_has_created_server_id_file;
+
+    bool m_registered_for_once_only;
+
+    bool m_save_server_config;
+
     /** Counts how many peers have finished loading the world. */
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
-
-    /** Vote from each peer. */
-    std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
-        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
-
-    bool m_has_created_server_id_file;
 
     /** It indicates if this server is unregistered with the stk server. */
     std::weak_ptr<bool> m_server_unregistered;
@@ -99,18 +145,6 @@ private:
 
     /** Timeout counter for various state. */
     std::atomic<int64_t> m_timeout;
-
-    /** Lock this mutex whenever a client is connect / disconnect or
-     *  starting race. */
-    mutable std::mutex m_connection_mutex;
-
-    /** Ban list of ip ranges. */
-    std::map</*ip_start*/uint32_t, std::tuple</*ip_end*/uint32_t,
-        /*CIDR*/std::string, /*expired time epoch*/uint32_t> >
-        m_ip_ban_list;
-
-    /** Ban list of online user id. */
-    std::map<uint32_t, /*expired time epoch*/uint32_t> m_online_id_ban_list;
 
     TransportAddress m_server_address;
 
@@ -129,6 +163,7 @@ private:
     const double BASE_RANKING_POINTS   = 4000.0;
     const double MAX_SCALING_TIME      = 500.0;
     const double MAX_POINTS_PER_SECOND = 0.125;
+    const double HANDICAP_OFFSET       = 1000.0;
 
     /** Online id to profile map, handling disconnection in ranked server */
     std::map<uint32_t, std::weak_ptr<NetworkPlayerProfile> > m_ranked_players;
@@ -142,23 +177,35 @@ private:
     /** Number of ranked races done for each current players */
     std::map<uint32_t, unsigned> m_num_ranked_races;
 
-    bool m_waiting_for_reset;
-
+    /* Saved the last game result */
     NetworkString* m_result_ns;
 
-    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_waiting_players;
+    /* Used to make sure clients are having same item list at start */
+    BareNetworkString* m_items_complete_state;
 
-    std::atomic<uint32_t> m_waiting_players_counts;
+    std::atomic<uint32_t> m_server_id_online;
+
+    std::atomic<int> m_difficulty;
+
+    std::atomic<int> m_game_mode;
 
     std::atomic<uint64_t> m_last_success_poll_time;
 
     uint64_t m_server_started_at, m_server_delay;
 
-    std::atomic<uint32_t> m_server_id_online;
+    // Default game settings if no one has ever vote, and save inside here for
+    // final vote (for live join)
+    PeerVote* m_default_vote;
 
-    bool m_registered_for_once_only;
+    int m_battle_hit_capture_limit;
 
-    bool m_save_server_config;
+    float m_battle_time_limit;
+
+    unsigned m_item_seed;
+
+    uint32_t m_winner_peer_id;
+
+    uint64_t m_client_starting_time;
 
     // connection management
     void clientDisconnected(Event* event);
@@ -166,10 +213,11 @@ private:
     // kart selection
     void kartSelectionRequested(Event* event);
     // Track(s) votes
-    void playerVote(Event *event);
+    void handlePlayerVote(Event *event);
     void playerFinishedResult(Event *event);
     bool registerServer(bool now);
     void finishedLoadingWorldClient(Event *event);
+    void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
@@ -177,6 +225,8 @@ private:
     void createServerIdFile();
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
+    void handleServerConfiguration(Event* event);
+    void updateTracksForMode();
     bool checkPeersReady() const
     {
         bool all_ready = true;
@@ -207,7 +257,7 @@ private:
     }
     void addPeerConnection(const std::string& addr_str)
     {
-        m_pending_peer_connection[addr_str] = StkTime::getRealTimeMs();
+        m_pending_peer_connection[addr_str] = StkTime::getMonoTimeMs();
     }
     void removeExpiredPeerConnection()
     {
@@ -216,7 +266,7 @@ private:
         for (auto it = m_pending_peer_connection.begin();
              it != m_pending_peer_connection.end();)
         {
-            if (StkTime::getRealTimeMs() - it->second > 45000)
+            if (StkTime::getMonoTimeMs() - it->second > 45000)
                 it = m_pending_peer_connection.erase(it);
             else
                 it++;
@@ -231,14 +281,17 @@ private:
     void handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                                      BareNetworkString& data,
                                      uint32_t online_id,
-                                     const irr::core::stringw& online_name);
+                                     const irr::core::stringw& online_name,
+                                     bool is_pending_connection,
+                                     std::string country_code = "");
     bool decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
                                   BareNetworkString& data,
                                   const std::string& key,
                                   const std::string& iv,
                                   uint32_t online_id,
-                                  const irr::core::stringw& online_name);
-    std::tuple<std::string, uint8_t, bool, bool> handleVote();
+                                  const irr::core::stringw& online_name,
+                                  const std::string& country_code);
+    bool handleAllVotes(PeerVote* winner, uint32_t* winner_peer_id);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
@@ -247,14 +300,39 @@ private:
     double distributeBasePoints(uint32_t online_id);
     double getModeFactor();
     double getModeSpread();
+    double getTimeSpread(double time);
+    double getUncertaintySpread(uint32_t online_id);
     double scalingValueForTime(double time);
     void checkRaceFinished();
-    void sendBadConnectionMessageToPeer(std::shared_ptr<STKPeer> p);
-    std::pair<int, float> getHitCaptureLimit(float num_karts);
+    void getHitCaptureLimit();
     void configPeersStartTime();
-    void updateWaitingPlayers();
     void resetServer();
     void addWaitingPlayersToGame();
+    void changeHandicap(Event* event);
+    void handlePlayerDisconnection() const;
+    void addLiveJoinPlaceholder(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+    NetworkString* getLoadWorldMessage(
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
+        bool live_join) const;
+    void encodePlayers(BareNetworkString* bns,
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > getLivePlayers() const;
+    void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
+    void liveJoinRequest(Event* event);
+    void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
+    bool canLiveJoinNow() const;
+    bool worldIsActive() const;
+    int getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
+                      unsigned local_id) const;
+    void handleKartInfo(Event* event);
+    void clientInGameWantsToBackLobby(Event* event);
+    void clientSelectingAssetsWantsToBackLobby(Event* event);
+    void kickPlayerWithReason(STKPeer* peer, const char* reason) const;
+    void testBannedForIP(STKPeer* peer) const;
+    void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
+    void writeDisconnectInfoTable(STKPeer* peer);
+    void writePlayerReport(Event* event);
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -270,18 +348,19 @@ public:
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();
-    std::unique_lock<std::mutex> acquireConnectionMutex() const
-                   { return std::unique_lock<std::mutex>(m_connection_mutex); }
     bool waitingForPlayers() const;
-    uint32_t getWaitingPlayersCount() const
-                                    { return m_waiting_players_counts.load(); }
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
-    bool isBannedForIP(const TransportAddress& addr) const;
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
+    int getDifficulty() const                   { return m_difficulty.load(); }
+    int getGameMode() const                      { return m_game_mode.load(); }
+    void saveInitialItems();
+    void saveIPBanTable(const TransportAddress& addr);
+    void listBanTable();
+    void initServerStatsTable();
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP
