@@ -1086,6 +1086,13 @@ void CGUIEditBox::draw()
                     s32 underline_begin = font->getDimension(s.c_str()).Width;
                     core::rect<s32> underline = CurrentTextRect;
                     underline.UpperLeftCorner.X += underline_begin;
+                    s32 end_length = m_composing_end - m_composing_start;
+                    if (end_length > 0 && end_length != (s32)Text.size())
+                    {
+                        s = txtLine->subString(m_composing_start, end_length);
+                        s32 underline_end = font->getDimension(s.c_str()).Width;
+                        underline.LowerRightCorner.X = underline.UpperLeftCorner.X + underline_end;
+                    }
                     s32 height = underline.LowerRightCorner.Y - underline.UpperLeftCorner.Y;
                     underline.UpperLeftCorner.Y += s32(std::abs(height) * 0.9f);
                     underline.LowerRightCorner.Y -= s32(std::abs(height) * 0.08f);

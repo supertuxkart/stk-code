@@ -23,7 +23,7 @@ public class STKEditText extends EditText
     /* Used to prevent copying text to non focused widget in STK. */
     private int m_stk_widget_id;
 
-    STKInputConnection m_stk_input_connection;
+    private STKInputConnection m_stk_input_connection;
 
     /* Used to avoid infinite calling updateSTKEditBox if setText currently
      * by jni. */
