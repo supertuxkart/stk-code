@@ -22,12 +22,12 @@ public class SuperTuxKartActivity extends NativeActivity
     // ------------------------------------------------------------------------
     private native void saveKeyboardHeight(int height);
     // ------------------------------------------------------------------------
-    private void hideKeyboardNative()
+    private void hideKeyboardNative(final boolean clear_text)
     {
         if (m_stk_edittext == null)
             return;
 
-        m_stk_edittext.beforeHideKeyboard();
+        m_stk_edittext.beforeHideKeyboard(clear_text);
 
         InputMethodManager imm = (InputMethodManager)
             getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -118,7 +118,7 @@ public class SuperTuxKartActivity extends NativeActivity
     public void onPause()
     {
         super.onPause();
-        hideKeyboardNative();
+        hideKeyboardNative(false/*clear_text*/);
     }
     // ------------------------------------------------------------------------
     @Override
@@ -168,14 +168,14 @@ public class SuperTuxKartActivity extends NativeActivity
     }
     // ------------------------------------------------------------------------
     /* Called by STK in JNI. */
-    public void hideKeyboard()
+    public void hideKeyboard(final boolean clear_text)
     {
         runOnUiThread(new Runnable()
         {
             @Override
             public void run()
             {
-                hideKeyboardNative();
+                hideKeyboardNative(clear_text);
             }
         });
     }

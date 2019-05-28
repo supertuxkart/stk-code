@@ -26,7 +26,7 @@ public class STKEditText extends EditText
     private STKInputConnection m_stk_input_connection;
 
     /* Used to avoid infinite calling updateSTKEditBox if setText currently
-     * by jni. */
+     * by jni or clearing text when out focus. */
     private boolean m_from_stk_editbox;
     // ------------------------------------------------------------------------
     private native static void editText2STKEditbox(int widget_id,
@@ -89,7 +89,7 @@ public class STKEditText extends EditText
         // Always remove the focus on STKEdit when pressing back button in
         // phone, which hideSoftInputFromWindow is called by java itself
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
-            beforeHideKeyboard();
+            beforeHideKeyboard(false/*clear_text*/);
         return false;
     }
     // ------------------------------------------------------------------------
@@ -118,10 +118,27 @@ public class STKEditText extends EditText
             m_composing_end);
     }
     // ------------------------------------------------------------------------
-    public void beforeHideKeyboard()
+    public void beforeHideKeyboard(final boolean clear_text)
     {
-        clearFocus();
-        setVisibility(View.GONE);
+        try
+        {
+            if (clear_text)
+            {
+                // No need updating stk editbox on clearing text when out focus
+                m_from_stk_editbox = true;
+                {
+                    super.clearComposingText();
+                    super.getText().clear();
+                }
+                m_from_stk_editbox = false;
+            }
+            clearFocus();
+            setVisibility(View.GONE);
+        }
+        catch (Exception e)
+        {
+            m_from_stk_editbox = false;
+        }
     }
     // ------------------------------------------------------------------------
     /* Called by STK with JNI to set this view with new text (like user focus

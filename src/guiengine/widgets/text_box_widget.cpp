@@ -318,7 +318,9 @@ ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
             // First test for onEnterPressed, if true then close keyboard
             if (eb->handleEnterPressed())
             {
-                GUIEngine::getDevice()->toggleOnScreenKeyboard(false);
+                // Clear text like onEnterPressed callback
+                GUIEngine::getDevice()->toggleOnScreenKeyboard(false,
+                    1/*clear_text*/);
                 return;
             }
 

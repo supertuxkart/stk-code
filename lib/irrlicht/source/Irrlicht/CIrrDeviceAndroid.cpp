@@ -1229,7 +1229,7 @@ void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
     if (show)
         method_id = env->GetMethodID(class_native_activity, "showKeyboard", "(I)V");
     else
-        method_id = env->GetMethodID(class_native_activity, "hideKeyboard", "()V");
+        method_id = env->GetMethodID(class_native_activity, "hideKeyboard", "(Z)V");
 
     if (method_id == NULL)
     {
@@ -1244,7 +1244,7 @@ void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
     if (show)
         env->CallVoidMethod(native_activity, method_id, (jint)type);
     else
-        env->CallVoidMethod(native_activity, method_id);
+        env->CallVoidMethod(native_activity, method_id, (jboolean)(type != 0));
     if (was_detached)
     {
         Android->activity->vm->DetachCurrentThread();
