@@ -484,6 +484,9 @@ void MainLoop::tick_loop() {
                 PROFILER_POP_CPU_MARKER();
                 PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
                 SFXManager::get()->update();
+		#ifdef __EMSCRIPTEN__
+		SFXManager::get()->mainLoop(SFXManager::get());
+		#endif
                 PROFILER_POP_CPU_MARKER();
             }
             // Some protocols in network will use RequestManager
@@ -557,7 +560,7 @@ void MainLoop::tick_loop() {
                     // Reset the timer for correct time for cutscene
                     m_frame_before_loading_world = false;
                     m_curr_time = StkTime::getMonoTimeMs();
-                    left_over_time = 0.0f;
+                    m_left_over_time = 0.0f;
                     break;
                 }
 
@@ -585,7 +588,7 @@ void MainLoop::tick_loop() {
                     // irr_driver->getDevice()->run() loads the world
                     m_frame_before_loading_world = false;
                     m_curr_time = StkTime::getMonoTimeMs();
-                    left_over_time = 0.0f;
+                    m_left_over_time = 0.0f;
                 }
 
                 if (abort)

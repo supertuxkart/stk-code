@@ -113,9 +113,10 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
         return;
 
     ENetPacket* packet = NULL;
-    if (true && encrypted)
+#ifndef __EMSCRIPTEN__
+    if (m_crypto && encrypted)
     {
-      // packet = m_crypto->encryptSend(*data, reliable);
+        packet = m_crypto->encryptSend(*data, reliable);
     }
     else
     {
@@ -125,6 +126,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
             (ENET_PACKET_FLAG_UNSEQUENCED |
             ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT)));
     }
+#endif
 
     if (packet)
     {
@@ -196,5 +198,7 @@ uint32_t STKPeer::getPing()
 //-----------------------------------------------------------------------------
 void STKPeer::setCrypto(std::unique_ptr<Crypto>&& c)
 {
-  // m_crypto = std::move(c);
+    #ifndef __EMSCRIPTEN__
+    m_crypto = std::move(c);
+    #endif
 }   // setCrypto

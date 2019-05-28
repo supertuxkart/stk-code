@@ -28,7 +28,9 @@
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
-// #include <curl/curl.h>
+#ifndef __EMSCRIPTEN__
+#include <curl/curl.h>
+#endif
 #include <assert.h>
 #include <string>
 
@@ -63,10 +65,18 @@ namespace Online
         std::string m_filename;
 
         /** Pointer to the curl data structure for this request. */
+#ifdef __EMSCRIPTEN__
         void *m_curl_session = NULL;
+#else      
+        CURL *m_curl_session = NULL;
+#endif
 
         /** curl return code. */
+#ifdef __EMSCRIPTEN__
         int m_curl_code;
+#else
+      CURLCode m_curl_code;
+#endif
 
         /** String to store the received data in. */
         std::string m_string_buffer;
@@ -97,7 +107,9 @@ namespace Online
         {
             if (m_curl_session)
             {
-	        // curl_easy_cleanup(m_curl_session);
+#ifndef __EMSCRIPTEN__
+	        curl_easy_cleanup(m_curl_session);
+#endif
                 m_curl_session = NULL;
             }
         }
@@ -107,7 +119,11 @@ namespace Online
 
         // ------------------------------------------------------------------------
         /** Returns true if there was an error downloading the file. */
+#ifdef __EMSCRIPTEN__
         bool hadDownloadError() const { return true; }
+#else
+        bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
+#endif
 
         // ------------------------------------------------------------------------
         /** Returns the curl error message if an error has occurred.
@@ -116,7 +132,11 @@ namespace Online
         const char* getDownloadErrorMessage() const
         {
             assert(hadDownloadError());
-	    return "assertion error: mary != cute";
+#ifdef __EMSCRIPTEN__
+	    return "Emscripten builds don't support HTTP";
+#else
+	    return curl_easy_strerror(m_curl_code);
+#endif
         }   // getDownloadErrorMessage
 
         // ------------------------------------------------------------------------
@@ -157,11 +177,13 @@ namespace Online
             assert(isPreparing());
             std::string s = StringUtils::toString(value);
 
-            // char *s1 = "hi";
-            // char *s2 = "hi";
-            // m_parameters.append(std::string(s1) + "=" + s2 + "&");
-            // curl_free(s1);
-            // curl_free(s2);
+#ifndef __EMSCRIPTEN__
+            char *s1 = curl_easy_escape(m_curl_session, name.c_str(), (int)name.size());
+            char *s2 = curl_easy_escape(m_curl_session, s.c_str(), (int)s.size());
+            m_parameters.append(std::string(s1) + "=" + s2 + "&");
+            curl_free(s1);
+            curl_free(s2);
+#endif
         }   // addParameter
 
         // --------------------------------------------------------------------

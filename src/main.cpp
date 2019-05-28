@@ -1720,7 +1720,9 @@ void initRest()
     // The rest will be read later (since the rest needs the unlock- and
     // achievement managers to be created, which can only be created later).
     PlayerManager::create();
-    // Online::RequestManager::get()->startNetworkThread();
+#ifndef __EMSCRIPTEN__
+    Online::RequestManager::get()->startNetworkThread();
+#endif
 #ifndef SERVER_ONLY
     if (!ProfileWorld::isNoGraphics())
         NewsManager::get();   // this will create the news manager

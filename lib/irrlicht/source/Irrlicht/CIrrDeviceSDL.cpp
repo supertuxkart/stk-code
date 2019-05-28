@@ -49,7 +49,7 @@ namespace irr
 	  
 	        #ifdef _IRR_COMPILE_WITH_OGLES2_
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			video::SExposedVideoData& data, io::IFileSystem* io);
+						 video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* Device);
                 #endif
 	} // end namespace video
 
@@ -96,7 +96,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 	SDL_VERSION(&Info.version);
 
-	// SDL_GetWMInfo(&Info);
+#ifndef __EMSCRIPTEN__
+	SDL_GetWMInfo(&Info);
+#endif
 	core::stringc sdlversion = "SDL Version ";
 	sdlversion += Info.version.major;
 	sdlversion += ".";
@@ -227,7 +229,6 @@ bool CIrrDeviceSDL::createWindow()
 //! create the driver
 void CIrrDeviceSDL::createDriver()
 {
-  // CreationParams.DriverType = video::EDT_OPENGL;
 	switch(CreationParams.DriverType)
 	{
 	case video::EDT_DIRECT3D8:
@@ -282,7 +283,7 @@ void CIrrDeviceSDL::createDriver()
 		data.OpenGLLinux.X11Window = NULL;
 		data.OpenGLLinux.X11Display = NULL;
 	  
-                VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+                VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem, this);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
 		#endif

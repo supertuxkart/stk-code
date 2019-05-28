@@ -397,9 +397,11 @@ void ConnectToServer::registerWithSTKServer()
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
 
-    //Crypto::initClientAES();
-    //request->addParameter("aes-key", Crypto::getClientKey());
-    //request->addParameter("aes-iv", Crypto::getClientIV());
+#ifndef __EMSCRIPTEN__
+    Crypto::initClientAES();
+    request->addParameter("aes-key", Crypto::getClientKey());
+    request->addParameter("aes-iv", Crypto::getClientIV());
+#endif
 
     Log::info("ConnectToServer", "Registering addr %s",
         addr.toString().c_str());

@@ -378,7 +378,9 @@ void reportHardwareStats()
                 if(hadDownloadError())
                     Log::error("HW report", "%s", getDownloadErrorMessage());
                 else {
-                    // Log::error("HW report", "%s", getData().c_str());
+		    #ifndef __EMSCRIPTEN__
+                    Log::error("HW report", "%s", getData().c_str());
+		    #endif
 		}
             }
             else

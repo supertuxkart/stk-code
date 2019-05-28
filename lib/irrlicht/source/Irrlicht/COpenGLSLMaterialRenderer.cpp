@@ -697,7 +697,6 @@ IVideoDriver* COpenGLSLMaterialRenderer::getVideoDriver()
 } // end namespace video
 } // end namespace irr
 
-// #else
-// #error "NANI"
+
 #endif
 

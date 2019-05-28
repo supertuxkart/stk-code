@@ -705,8 +705,8 @@ else \
         } while (false)
         SDL_SysWMinfo wminfo;
         SDL_VERSION(&wminfo.version);
-	// SDL_GetWMInfo(&wminfo)
-        if (false && wminfo.subsystem == SDL_SYSWM_X11)
+#ifndef __EMSCRIPTEN__
+        if (SDL_GetWMInfo(&wminfo) && wminfo.subsystem == SDL_SYSWM_X11)
         {
             Display* dpy = wminfo.info.x11.gfxdisplay;
             int scrnum = DefaultScreen(dpy);
@@ -729,6 +729,7 @@ else \
                 GLXQCR_STRING(GLX_RENDERER_DEVICE_ID_MESA);
             }
         }
+#endif // __EMSCRIPTEN__
 #endif // SDL_VIDEO_DRIVER_X11
 
 #endif  // ifdef XX

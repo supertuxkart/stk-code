@@ -2912,8 +2912,7 @@ namespace irr
 namespace video
 {
 
-// #if defined(__EMSCRIPTEN__) || !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device)
 	{

@@ -3594,7 +3594,7 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
     uint32_t online_id, const core::stringw& online_name,
     const std::string& country_code)
 {
-    #ifndef EMSCRIPTEN
+    #ifndef __EMSCRIPTEN__
     auto crypto = std::unique_ptr<Crypto>(new Crypto(
         Crypto::decode64(key), Crypto::decode64(iv)));
     if (crypto->decryptConnectionRequest(data))

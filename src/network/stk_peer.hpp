@@ -90,7 +90,9 @@ protected:
     /** Available karts and tracks from this peer */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
-  // std::unique_ptr<Crypto> m_crypto;
+    #ifndef __EMSCRIPTEN__
+    std::unique_ptr<Crypto> m_crypto;
+    #endif
 
     std::deque<uint32_t> m_previous_pings;
 
@@ -186,7 +188,11 @@ public:
     // ------------------------------------------------------------------------
     uint32_t getPing();
     // ------------------------------------------------------------------------
+#ifdef __EMSCRIPTEN__
     void* getCrypto() const                        { return NULL; }
+#else
+    Crypto* getCrypto() const                        { return m_crypto.get(); }
+#endif
     // ------------------------------------------------------------------------
     void setCrypto(std::unique_ptr<Crypto>&& c);
     // ------------------------------------------------------------------------

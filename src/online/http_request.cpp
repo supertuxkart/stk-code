@@ -26,7 +26,9 @@
 #  include <winsock2.h>
 #endif
 
-// #include <curl/curl.h>
+#ifndef __EMSCRIPTEN__
+#include <curl/curl.h>
+#endif
 #include <assert.h>
 
 namespace Online
@@ -94,7 +96,7 @@ namespace Online
         m_string_buffer = "";
         m_filename      = "";
         m_parameters    = "";
-        #ifdef EMSCRIPTEN
+        #ifdef __EMSCRIPTEN__
         m_curl_code     = 200;
         #else
         m_curl_code     = CURLE_OK;
@@ -102,7 +104,7 @@ namespace Online
         m_progress.setAtomic(0);
         if (m_http_header == nullptr)
         {
-            #ifndef EMSCRIPTEN
+            #ifndef __EMSCRIPTEN__
             std::string Host = "Host: " + StringUtils::getHostNameFromURL(stk_config->m_server_api);
             m_http_header = curl_slist_append(m_http_header, Host.c_str());
             #endif
@@ -167,7 +169,7 @@ namespace Online
      */
     void HTTPRequest::prepareOperation()
     {
-	#ifndef EMSCRIPTEN
+	#ifndef __EMSCRIPTEN__
         m_curl_session = curl_easy_init();
         if (!m_curl_session)
         {
@@ -226,15 +228,19 @@ namespace Online
                            (m_filename+".part").c_str());
                 return;
             }
-            // // curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
-            // // curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
+#ifndef __EMSCRIPTEN__
+            curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
+            curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
+#endif
         }
         else
         {
-            // // curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA,
-            //                  &m_string_buffer);
-            // // curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION,
-            //                  &HTTPRequest::writeCallback);
+#ifndef __EMSCRIPTEN__
+            curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA,
+                          &m_string_buffer);
+            curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION,
+                          &HTTPRequest::writeCallback);
+#endif
         }
 
         // All parameters added have a '&' added
@@ -277,17 +283,29 @@ namespace Online
             Log::info("HTTPRequest", "Sending %s to %s", param.c_str(), m_url.c_str());
         } // end log http request
 
-        // // curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
+#ifndef __EMSCRIPTEN__
+        curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
+#endif
         const std::string& uagent = StringUtils::getUserAgentString();
-        // curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
+#ifndef __EMSCRIPTEN__
+         curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
+#endif
 
-        m_curl_code = 200; // curl_easy_perform(m_curl_session);
+#ifdef __EMSCRIPTEN__
+        m_curl_code = 200;
+#else
+	m_curl_code = curl_easy_perform(m_curl_session);
+#endif
         Request::operation();
 
         if (fout)
         {
             fclose(fout);
-            if (m_curl_code == 200)
+	    #ifdef __EMSCRIPTEN__
+	    if (m_curl_code == 200)
+	    #else
+            if (m_curl_code == CURLE_OK)
+	    #endif
             {
                 if(UserConfigParams::logAddons())
                     Log::info("HTTPRequest", "Download successful.");
@@ -299,7 +317,9 @@ namespace Online
                 {
                     Log::error("addons",
                                "Could not removed existing addons.xml file.");
-                    //m_curl_code = CURLE_WRITE_ERROR;
+#ifndef __EMSCRIPTEN__
+                    m_curl_code = CURLE_WRITE_ERROR;
+#endif
                 }
                 int ret = rename((m_filename+".part").c_str(),
                                  m_filename.c_str()           );
@@ -309,7 +329,9 @@ namespace Online
                 {
                     Log::error("addons",
                                "Could not rename downloaded addons.xml file!");
-                    //m_curl_code = CURLE_WRITE_ERROR;
+#ifndef __EMSCRIPTEN__
+                    m_curl_code = CURLE_WRITE_ERROR;
+#endif
                 }
             }   // m_curl_code ==200
         }   // if fout
@@ -322,7 +344,11 @@ namespace Online
      */
     void HTTPRequest::afterOperation()
     {
+#ifdef __EMSCRIPTEN__
         if (m_curl_code == 200)
+#else
+        if (m_curl_code == CURLE_OK)
+#endif
             setProgress(1.0f);
         else
             setProgress(-1.0f);
@@ -330,7 +356,9 @@ namespace Online
         Request::afterOperation();
         if (m_curl_session)
         {
-          // curl_easy_cleanup(m_curl_session);
+#ifndef __EMSCRIPTEN__
+            curl_easy_cleanup(m_curl_session);
+#endif
             m_curl_session = NULL;
         }
     }   // afterOperation

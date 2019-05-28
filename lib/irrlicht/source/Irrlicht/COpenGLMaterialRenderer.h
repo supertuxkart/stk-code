@@ -259,14 +259,14 @@ public:
 
 
 
-	// virtual s32 getVertexShaderConstantID(const c8* name);
-	// virtual s32 getPixelShaderConstantID(const c8* name);
-	// virtual void setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1);
-	// virtual void setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1);
-	// virtual bool setVertexShaderConstant(s32 index, const f32* floats, int count);
-	// virtual bool setVertexShaderConstant(s32 index, const s32* ints, int count);
-	// virtual bool setPixelShaderConstant(s32 index, const f32* floats, int count);
-	// virtual bool setPixelShaderConstant(s32 index, const s32* ints, int count);
+	virtual s32 getVertexShaderConstantID(const c8* name);
+	virtual s32 getPixelShaderConstantID(const c8* name);
+	virtual void setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1);
+	virtual void setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1);
+	virtual bool setVertexShaderConstant(s32 index, const f32* floats, int count);
+	virtual bool setVertexShaderConstant(s32 index, const s32* ints, int count);
+	virtual bool setPixelShaderConstant(s32 index, const f32* floats, int count);
+	virtual bool setPixelShaderConstant(s32 index, const s32* ints, int count);
 
 
 

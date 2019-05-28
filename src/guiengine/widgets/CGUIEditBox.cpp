@@ -123,7 +123,9 @@ CGUIEditBox::~CGUIEditBox()
     {
         CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
-        // dl->setIMEEnable(false);
+#ifndef __EMSCRIPTEN__
+        dl->setIMEEnable(false);
+#endif
     }
 #endif
     irr_driver->getDevice()->toggleOnScreenKeyboard(false);
@@ -277,7 +279,9 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
-                    // dl->setIMEEnable(false);
+#ifndef __EMSCRIPTEN__
+                    dl->setIMEEnable(false);
+#endif
                 }
 #endif
                 m_from_android_edittext = false;
@@ -292,8 +296,10 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
-                    // dl->setIMEEnable(true);
-                    // dl->setIMELocation(calculateICPos());
+#ifndef __EMSCRIPTEN__
+                    dl->setIMEEnable(true);
+                    dl->setIMELocation(calculateICPos());
+#endif
                 }
 #endif
 #ifdef ANDROID
@@ -1718,10 +1724,12 @@ void CGUIEditBox::calculateScrollPos()
     {
         CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
+#ifndef __EMSCRIPTEN__
         if (dl)
         {
-	  // dl->setIMELocation(calculateICPos());
+	  dl->setIMELocation(calculateICPos());
         }
+#endif // __EMSCRIPTEN__
     }
 #endif
 #endif   // SERVER_ONLY
