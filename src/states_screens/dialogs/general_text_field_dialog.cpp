@@ -18,8 +18,9 @@
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -59,18 +60,27 @@ GeneralTextFieldDialog::~GeneralTextFieldDialog()
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation GeneralTextFieldDialog::processEvent(const std::string& eventSource)
-{
-    if (eventSource == "cancel")
+{ 
+    GUIEngine::RibbonWidget* buttons_ribbon =
+        getWidget<GUIEngine::RibbonWidget>("buttons");
+    
+    if(eventSource == "buttons")
     {
-        dismiss();
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if (eventSource == "ok")
-    {
-        // If validation callback return true, dismiss the dialog
-        if (!m_self_destroy && m_val_cb(m_title, m_text_field))
-            m_self_destroy = true;
-        return GUIEngine::EVENT_BLOCK;
+        const std::string& button =
+	    buttons_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+	if (button == "cancel")
+        {
+            dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (button == "ok")
+        {
+	    // If validation callback return true, dismiss the dialog
+            if (!m_self_destroy && m_val_cb(m_title, m_text_field))
+                m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -79,7 +89,7 @@ GUIEngine::EventPropagation GeneralTextFieldDialog::processEvent(const std::stri
 void GeneralTextFieldDialog::onEnterPressedInternal()
 {
     // Cancel button pressed
-    ButtonWidget* cancel_button = getWidget<ButtonWidget>("cancel");
+    IconButtonWidget* cancel_button = getWidget<IconButtonWidget>("cancel");
     if (GUIEngine::isFocusedForPlayer(cancel_button, PLAYER_ID_GAME_MASTER))
     {
         std::string fake_event = "cancel";

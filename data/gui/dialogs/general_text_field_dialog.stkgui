@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
-        <label id="title" raw_text="Text" proportion="1"/>
+    <div x="2%" y="6%" width="96%" height="88%" layout="vertical-row" >
+        <label id="title" raw_text="Text" height="36%"/>
 
         <spacer height="7%" width="10" />
         <textbox id="textfield" width="75%"  align="center"/>
+        <spacer height="9%" width="10" />
+        
+        <buttonbar id="buttons" height="36%" width="30%" align="center">
 
-        <spacer height="7%" width="20" />
-        <button id="ok" I18N="In the general textfield dialog" text="OK" align="center" proportion="1"/>
+            <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="In the general textfield dialog" text="OK" align="center"/>
 
-        <spacer height="5%" width="20" />
-        <button id="cancel" I18N="In the general textfield dialog" text="Cancel" align="center" proportion="1"/>
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/remove.png"
+                I18N="In the general textfield dialog" text="Cancel" align="center"/>
+
+        </buttonbar>
     </div>
 </stkgui>
