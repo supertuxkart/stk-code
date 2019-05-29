@@ -42,7 +42,8 @@
 
 BEGIN_AS_NAMESPACE
 
-template <class T> class asCArray
+template <class T> 
+class asCArray
 {
 public:
 	asCArray();
@@ -83,7 +84,7 @@ public:
 	bool operator!=(const asCArray<T> &) const;
 
 protected:
-	T      *array;
+	T *array;
 	asUINT  length;                  // 32bits is enough for all uses of this array
 	asUINT  maxLength;
 	char    buf[2*4*AS_PTR_SIZE];    // Avoid dynamically allocated memory for tiny arrays
@@ -440,7 +441,7 @@ bool asCArray<T>::operator ==(const asCArray<T> &other) const
 template <class T>
 bool asCArray<T>::operator !=(const asCArray<T> &other) const
 {
-	return !(*this == other);
+	return (*this != other);
 }
 
 
