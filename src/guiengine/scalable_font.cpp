@@ -18,6 +18,7 @@
 
 #include "guiengine/scalable_font.hpp"
 
+#include "font/face_ttf.hpp"
 #include "font/font_settings.hpp"
 #include "font/font_with_face.hpp"
 #include "utils/translation.hpp"
@@ -143,7 +144,7 @@ IGUISpriteBank* ScalableFont::getSpriteBank() const
 // ------------------------------------------------------------------------
 u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
 {
-    const FontWithFace::FontArea& area =
+    const FontArea& area =
         m_face->getAreaFromCharacter(*c, NULL/*fallback_font*/);
     return area.spriteno;
 }   // getSpriteNoFromChar

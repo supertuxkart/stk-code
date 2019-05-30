@@ -37,7 +37,6 @@
 #include FT_FREETYPE_H
 #endif
 
-class FaceTTF;
 class FontWithFace;
 
 /** This class stores all font files required in STK.
@@ -52,13 +51,10 @@ private:
 #ifndef SERVER_ONLY
     /** A FreeType library, it holds the FT_Face internally inside freetype. */
     FT_Library                               m_ft_library;
+
+    /** List of ttf files loaded. */
+    std::vector<FT_Face>                     m_faces;
 #endif
-
-    /** TTF files used in \ref BoldFace and \ref RegularFace. */
-    FaceTTF*                                 m_normal_ttf;
-
-    /** TTF files used in \ref DigitFace. */
-    FaceTTF*                                 m_digit_ttf;
 
     /** Map type for each \ref FontWithFace with a index, save getting time in
      *  \ref getFont. */
@@ -101,6 +97,8 @@ public:
     // ------------------------------------------------------------------------
     /** Return the \ref m_ft_library. */
     FT_Library getFTLibrary() const                    { return m_ft_library; }
+    // ------------------------------------------------------------------------
+    std::vector<FT_Face> loadTTF(const std::vector<std::string>& ttf_list);
 #endif
     // ------------------------------------------------------------------------
     void loadFonts();

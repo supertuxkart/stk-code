@@ -22,7 +22,7 @@
 /** Constructor of BoldFace.
  *  \param ttf \ref FaceTTF for BoldFace to use.
  */
-BoldFace::BoldFace(FaceTTF* ttf) : FontWithFace("BoldFace", ttf)
+BoldFace::BoldFace() : FontWithFace("BoldFace")
 {
 }   // BoldFace
 

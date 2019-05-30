@@ -22,7 +22,7 @@
 /** Constructor of RegularFace.
  *  \param ttf \ref FaceTTF for RegularFace to use.
  */
-RegularFace::RegularFace(FaceTTF* ttf) : FontWithFace("RegularFace", ttf)
+RegularFace::RegularFace() : FontWithFace("RegularFace")
 {
 }   // RegularFace
 

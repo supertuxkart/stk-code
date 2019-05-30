@@ -39,7 +39,7 @@
  *  \param name The name of face, used by irrlicht to distinguish spritebank.
  *  \param ttf \ref FaceTTF for this face to use.
  */
-FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
+FontWithFace::FontWithFace(const std::string& name)
 {
     m_spritebank = irr_driver->getGUI()->addEmptySpriteBank(name.c_str());
 
@@ -49,7 +49,7 @@ FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
     m_glyph_max_height = 0;
-    m_face_ttf = ttf;
+    m_face_ttf = new FaceTTF();
 
 }   // FontWithFace
 // ----------------------------------------------------------------------------
@@ -65,9 +65,7 @@ FontWithFace::~FontWithFace()
     m_spritebank->drop();
     m_spritebank = NULL;
 
-    // To be deleted by font_manager
-    m_face_ttf = NULL;
-
+    delete m_face_ttf;
 }   // ~FontWithFace
 
 // ----------------------------------------------------------------------------
@@ -112,7 +110,6 @@ void FontWithFace::init()
 void FontWithFace::reset()
 {
     m_new_char_holder.clear();
-    m_character_area_map.clear();
     m_character_glyph_info_map.clear();
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
     {
@@ -120,6 +117,7 @@ void FontWithFace::reset()
             static_cast<STKTexture*>(m_spritebank->getTexture(i)));
     }
     m_spritebank->clear();
+    m_face_ttf->reset();
     createNewGlyphPage();
 }   // reset
 
@@ -138,12 +136,7 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
 
     unsigned int font_number = 0;
     unsigned int glyph_index = 0;
-    while (font_number < m_face_ttf->getTotalFaces())
-    {
-        glyph_index = FT_Get_Char_Index(m_face_ttf->getFace(font_number), c);
-        if (glyph_index > 0) break;
-        font_number++;
-    }
+    m_face_ttf->getFontAndGlyphFromChar(c, &font_number, &glyph_index);
     m_character_glyph_info_map[c] = GlyphInfo(font_number, glyph_index);
 #endif
 }   // loadGlyphInfo
@@ -179,10 +172,9 @@ void FontWithFace::createNewGlyphPage()
 
 // ----------------------------------------------------------------------------
 /** Render a glyph for a character into bitmap and save it into the glyph page.
- *  \param c The character to be loaded.
  *  \param c \ref GlyphInfo for the character.
  */
-void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
+void FontWithFace::insertGlyph(const GlyphInfo& gi)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())
@@ -280,7 +272,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     a.offset_y = m_glyph_max_height - cur_height + cur_offset_y;
     a.offset_y_bt = -cur_offset_y;
     a.spriteno = f.rectNumber;
-    m_character_area_map[c] = a;
+    m_face_ttf->insertFontArea(a, gi.font_number, gi.glyph_index);
 
     // Store used area
     m_used_width += texture_size.Width;
@@ -301,7 +293,7 @@ void FontWithFace::updateCharactersList()
     for (const wchar_t& c : m_new_char_holder)
     {
         const GlyphInfo& gi = getGlyphInfo(c);
-        insertGlyph(c, gi);
+        insertGlyph(gi);
     }
     m_new_char_holder.clear();
 
@@ -373,17 +365,23 @@ void FontWithFace::setDPI()
  *  \param c The character to get.
  *  \param[out] fallback_font Whether fallback font is used.
  */
-const FontWithFace::FontArea&
-    FontWithFace::getAreaFromCharacter(const wchar_t c,
-                                       bool* fallback_font) const
+const FontArea& FontWithFace::getAreaFromCharacter(const wchar_t c,
+                                                   bool* fallback_font) const
 {
-    std::map<wchar_t, FontArea>::const_iterator n =
-        m_character_area_map.find(c);
-    if (n != m_character_area_map.end())
+    std::map<wchar_t, GlyphInfo>::const_iterator n =
+        m_character_glyph_info_map.find(c);
+    // Not found, return the first font area, which is a white-space
+    if (n == m_character_glyph_info_map.end())
+        return *(m_face_ttf->getFirstFontArea());
+
+#ifndef SERVER_ONLY
+    const FontArea* area = m_face_ttf->getFontArea(n->second.font_number,
+        n->second.glyph_index);
+    if (area != NULL)
     {
         if (fallback_font != NULL)
             *fallback_font = false;
-        return n->second;
+        return *area;
     }
     else if (m_fallback_font != NULL && fallback_font != NULL)
     {
@@ -394,8 +392,9 @@ const FontWithFace::FontArea&
     // Not found, return the first font area, which is a white-space
     if (fallback_font != NULL)
         *fallback_font = false;
-    return m_character_area_map.begin()->second;
+#endif
 
+    return *(m_face_ttf->getFirstFontArea());
 }   // getAreaFromCharacter
 
 // ----------------------------------------------------------------------------
@@ -419,7 +418,6 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
     insertCharacters(text);
     updateCharactersList();
 
-    assert(m_character_area_map.size() > 0);
     core::dimension2d<float> dim(0.0f, 0.0f);
     core::dimension2d<float> this_line(0.0f, m_font_max_height * scale);
 
@@ -465,6 +463,7 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
 int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
                                       FontSettings* font_settings) const
 {
+#ifndef SERVER_ONLY
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
     float x = 0;
     int idx = 0;
@@ -482,7 +481,7 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
 
         ++idx;
     }
-
+#endif
     return -1;
 }   // getCharacterFromPos
 
@@ -759,3 +758,18 @@ void FontWithFace::render(const core::stringw& text,
     }
 #endif
 }   // render
+
+// ----------------------------------------------------------------------------
+/** Return a character width.
+ *  \param area \ref FontArea to get glyph metrics.
+ *  \param fallback If fallback font is used.
+ *  \param scale The scaling of the character.
+ *  \return The calculated width with suitable scaling. */
+float FontWithFace::getCharWidth(const FontArea& area, bool fallback,
+                                 float scale) const
+{
+    if (fallback)
+        return area.advance_x * m_fallback_font_scale;
+    else
+        return area.advance_x * scale;
+}   // getCharWidth

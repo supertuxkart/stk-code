@@ -22,7 +22,7 @@
 /** Constructor of DigitFace.
  *  \param ttf \ref FaceTTF for DigitFace to use.
  */
-DigitFace::DigitFace(FaceTTF* ttf) : FontWithFace("DigitFace", ttf)
+DigitFace::DigitFace() : FontWithFace("DigitFace")
 {
 }   // DigitFace
 

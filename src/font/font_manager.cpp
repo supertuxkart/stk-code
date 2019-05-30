@@ -19,6 +19,7 @@
 #include "font/font_manager.hpp"
 
 #include "config/stk_config.hpp"
+#include "io/file_manager.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
 #include "font/face_ttf.hpp"
@@ -51,44 +52,82 @@ FontManager::~FontManager()
         delete m_fonts[i];
     m_fonts.clear();
 
-    delete m_normal_ttf;
-    m_normal_ttf = NULL;
-    delete m_digit_ttf;
-    m_digit_ttf = NULL;
-
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())
         return;
 
+    for (unsigned int i = 0; i < m_faces.size(); i++)
+        checkFTError(FT_Done_Face(m_faces[i]), "removing faces");
     checkFTError(FT_Done_FreeType(m_ft_library), "removing freetype library");
 #endif
 }   // ~FontManager
+
+#ifndef SERVER_ONLY
+// ----------------------------------------------------------------------------
+/** Load all TTFs from a list to m_faces.
+ *  \param ttf_list List of TTFs to be loaded.
+ */
+std::vector<FT_Face>
+                 FontManager::loadTTF(const std::vector<std::string>& ttf_list)
+{
+    std::vector <FT_Face> ret;
+    if (ProfileWorld::isNoGraphics())
+        return ret;
+
+    for (const std::string& font : ttf_list)
+    {
+        FT_Face face = NULL;
+        const std::string loc = file_manager
+            ->getAssetChecked(FileManager::TTF, font.c_str(), true);
+        font_manager->checkFTError(FT_New_Face(
+            m_ft_library, loc.c_str(), 0, &face), loc + " is loaded");
+        ret.push_back(face);
+    }
+    return ret;
+}   // loadTTF
+#endif
 
 // ----------------------------------------------------------------------------
 /** Initialize all \ref FaceTTF and \ref FontWithFace members.
  */
 void FontManager::loadFonts()
 {
+#ifndef SERVER_ONLY
     // First load the TTF files required by each font
-    m_normal_ttf = new FaceTTF(stk_config->m_normal_ttf);
-    m_digit_ttf = new FaceTTF(stk_config->m_digit_ttf);
+    std::vector<FT_Face> normal_ttf = loadTTF(stk_config->m_normal_ttf);
+    std::vector<FT_Face> digit_ttf = loadTTF(stk_config->m_digit_ttf);
+#endif
 
     // Now load fonts with settings of ttf file
     unsigned int font_loaded = 0;
-    RegularFace* regular = new RegularFace(m_normal_ttf);
+    RegularFace* regular = new RegularFace();
+#ifndef SERVER_ONLY
+    regular->getFaceTTF()->loadFaces(normal_ttf);
+#endif
     regular->init();
     m_fonts.push_back(regular);
     m_font_type_map[std::type_index(typeid(RegularFace))] = font_loaded++;
 
-    BoldFace* bold = new BoldFace(m_normal_ttf);
+    BoldFace* bold = new BoldFace();
+#ifndef SERVER_ONLY
+    bold->getFaceTTF()->loadFaces(normal_ttf);
+#endif
     bold->init();
     m_fonts.push_back(bold);
     m_font_type_map[std::type_index(typeid(BoldFace))] = font_loaded++;
 
-    DigitFace* digit = new DigitFace(m_digit_ttf);
+    DigitFace* digit = new DigitFace();
+#ifndef SERVER_ONLY
+    digit->getFaceTTF()->loadFaces(digit_ttf);
+#endif
     digit->init();
     m_fonts.push_back(digit);
     m_font_type_map[std::type_index(typeid(DigitFace))] = font_loaded++;
+
+#ifndef SERVER_ONLY
+    m_faces.insert(m_faces.end(), normal_ttf.begin(), normal_ttf.end());
+    m_faces.insert(m_faces.end(), digit_ttf.begin(), digit_ttf.end());
+#endif
 }   // loadFonts
 
 // ----------------------------------------------------------------------------
@@ -115,6 +154,8 @@ void FontManager::unitTesting()
         translations = new Translations();
         Log::setLogLevel(cur_log_level);
         std::set<wchar_t> used_chars = translations->getCurrentAllChar();
+        // First FontWithFace is RegularFace
+        FaceTTF* ttf = m_fonts.front()->getFaceTTF();
         for (const wchar_t& c : used_chars)
         {
             // Skip non-printing characters
@@ -122,20 +163,13 @@ void FontManager::unitTesting()
 
             unsigned int font_number = 0;
             unsigned int glyph_index = 0;
-            while (font_number < m_normal_ttf->getTotalFaces())
-            {
-                glyph_index =
-                    FT_Get_Char_Index(m_normal_ttf->getFace(font_number), c);
-                if (glyph_index > 0) break;
-                font_number++;
-            }
-            if (glyph_index > 0)
+            if (ttf->getFontAndGlyphFromChar(c, &font_number, &glyph_index))
             {
                 Log::debug("UnitTest", "Character %s in language %s"
                     " use face %s",
                     StringUtils::wideToUtf8(core::stringw(&c, 1)).c_str(),
                     lang.c_str(),
-                    m_normal_ttf->getFace(font_number)->family_name);
+                    ttf->getFace(font_number)->family_name);
             }
             else
             {
