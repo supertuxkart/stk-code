@@ -29,23 +29,6 @@ float makeLinear(float f, float n, float z)
     return (2 * n) / (f + n - z * (f - n));
 }
 
-vec3 fastBlur(vec2 uv, float spread)
-{
-    vec4 sum = vec4(0.0);
-    float X = uv.x;
-    float Y = uv.y;
-    vec2 pixel = vec2(spread);
-    float biais = 1.0;
-
-    sum += textureLod(albedo, vec2(X - 3.0 * pixel.x, Y),    biais) * 0.03125;
-    sum += textureLod(albedo, vec2(X - 1.3333 * pixel.x, Y), biais) * 0.328125;
-    sum += textureLod(albedo, vec2(X, Y),                    biais) * 0.273438;
-    sum += textureLod(albedo, vec2(X + 1.3333 * pixel.x, Y), biais) * 0.328125;
-    sum += textureLod(albedo, vec2(X + 3.0 * pixel.x, Y),    biais) * 0.03125;
-
-    return sum.rgb;
-}
-
 vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 {
     // Combine UV & depth into XY & Z (NDC)
@@ -61,12 +44,6 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
     // Perform perspective divide and return
     return                          ViewPosition.xyz / ViewPosition.w;
 }
-
-float rand(vec2 co)
-{
-   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
-}
-
 
 vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback, float spread)
 {
@@ -86,10 +63,8 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
         {
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0))
             {
-                // Mix with fallback (black area should be dark anyway)
-                vec3 finalColor = textureLod(albedo, projectedCoord.xy, 1.0).rgb;
-                // FIXME, this is heavy, needs to be an option in the settings
-                //vec3 finalColor = fastBlur(projectedCoord.xy, spread);
+                // FIXME We need to generate mipmap to take into account the gloss map
+                vec3 finalColor = textureLod(albedo, projectedCoord.xy, spread).rgb;
                 if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
                 {
                     vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
@@ -110,11 +85,6 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
     }
 
     return fallback;
-}
-
-float rand2(vec2 co)
-{
-   return fract(sin(dot(co.xy,vec2(45.454545,5631.4))) * 43758.5453);
 }
 
 // Main ===================================================================
@@ -153,21 +123,15 @@ void main(void)
          View_Pos              /= View_Pos.w;
 
     // Reflection vector
-    vec3 eyedir2 = eyedir;
-    eyedir2.y *= clamp(rand(uv), 0.01, 2.7);
-    vec3 normal2 = normal;
-    normal2.y = 0.5; //clamp(rand2(uv), 0.01, 2.7);
     vec3 reflected              = normalize(reflect(eyedir, normal));
-    vec3 reflected2              = normalize(reflect(eyedir2, normal2));
 
     // Ray cast
     vec3 hitPos                 = View_Pos.xyz;
     float dDepth;
     float minRayStep            = 100.0f;
 
-    vec3 outColor = RayCast(mix(reflected, reflected2, 1.0 - specval) * max(minRayStep, -View_Pos.z),
-                            hitPos, dDepth, dtex, fallback, mix(0.001, 0.01, 1.0 - specval));
-
+    vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z),
+                            hitPos, dDepth, dtex, fallback, 0.0);
     Spec = vec4(outColor.rgb, 1.0);
 #endif
 
