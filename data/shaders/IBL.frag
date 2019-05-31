@@ -132,6 +132,10 @@ void main(void)
 
     vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z),
                             hitPos, dDepth, dtex, fallback, 0.0);
+    
+    // TODO temporary measure the lack of mipmaping for RTT albedo
+    // Implement it in proper way
+    outColor = mix(fallback, outColor, specval);
     Spec = vec4(outColor.rgb, 1.0);
 #endif
 
