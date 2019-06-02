@@ -310,7 +310,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
 
             color.setAlpha( alpha );
 
-            text_offset = (int)((1.0f - fade_in) * 100);
+            text_offset = (int)((1.0f - fade_in) * GUIEngine::getFontHeight());
         }
         // fade out
         else if (time_before_next_step >= m_time_element - ENTRIES_FADE_TIME)
@@ -324,7 +324,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
             else if(alpha > 255) alpha = 255;
             color.setAlpha( alpha );
 
-            text_offset = -(int)(fade_out * 100);
+            text_offset = -(int)(fade_out * GUIEngine::getFontHeight());
         }
 
 
@@ -347,9 +347,9 @@ void CreditsScreen::onUpdate(float elapsed_time)
             GUIEngine::getFont()->draw(m_sections[m_curr_section]
                                        .m_entries[m_curr_element]
                                        .m_subentries[i].c_str(),
-                                       core::recti( m_x + 32,
+                                       core::recti( m_x + GUIEngine::getFontHeight()/2,
                                                     suby + text_offset/(1+1),
-                                                    m_x + m_w + 32,
+                                                    m_x + m_w + GUIEngine::getFontHeight()/2,
                                                     suby + m_h/8
                                                          + text_offset/(1+1) ),
                                        color, false/* center h */,
