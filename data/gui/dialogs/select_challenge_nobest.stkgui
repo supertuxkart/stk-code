@@ -3,7 +3,12 @@
     <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
 
         <div width="100%" layout="horizontal-row" height="12%">
-            <icon-button id="back" width="12%" align="left" icon="gui/icons/back.png"/>
+            <div width="8%" layout="vertical-row" height="100%">
+
+                <spacer height="5%" width="1"/>
+                <icon-button id="back" width="100%" height="60%" align="left" icon="gui/icons/back.png"/>
+ 
+            </div>
 
             <header id="title" width="80%" text="Race Setup" align="center" text_align="center" />
 
@@ -18,34 +23,34 @@
             <label id="race_type_val" proportion="1"/>
         </div>
 
-        <spacer height="2%" width="1"/>
+        <spacer height="8%" width="1"/>
 
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="novice" icon="gui/icons/difficulty_easy.png"
-                    I18N="Difficulty" text="Novice" height="100%"/>
-            <spacer width="5%" height="1"/>
+                    width="192" height="192" I18N="Difficulty" text="Novice" height="100%"/>
+            <spacer width="2f" height="1"/>
             <label id="novice_label" proportion="1" height="100%"/>
         </div>
 
-        <spacer height="8%" width="1"/>
+        <spacer height="10%" width="1"/>
 
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="intermediate" icon="gui/icons/difficulty_medium.png"
-                    I18N="Difficulty" text="Intermediate" height="100%"/>
-            <spacer width="5%" height="1"/>
+                    width="192" height="192" I18N="Difficulty" text="Intermediate" height="100%"/>
+            <spacer width="2f" height="1"/>
             <label id="intermediate_label" proportion="1" height="100%"/>
         </div>
 
-        <spacer height="8%" width="1"/>
+        <spacer height="10%" width="1"/>
 
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="expert" icon="gui/icons/difficulty_hard.png"
-                    I18N="Difficulty" text="Expert" height="100%"/>
-            <spacer width="5%" height="1"/>
+                    width="192" height="192" I18N="Difficulty" text="Expert" height="100%"/>
+            <spacer width="2f" height="1"/>
             <label id="difficult_label" proportion="1" height="100%"/>
         </div>
 
-        <spacer height="8%" width="1"/>
+        <spacer height="10%" width="1"/>
 
     </div>
 </stkgui>
