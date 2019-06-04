@@ -102,7 +102,7 @@ MainLoop::~MainLoop()
 //-----------------------------------------------------------------------------
 /** Returns the current dt, which guarantees a limited frame rate. If dt is
  *  too low (the frame rate too high), the process will sleep to reach the
- *  maxium frame rate.
+ *  maximum frame rate.
  */
 float MainLoop::getLimitedDt()
 {

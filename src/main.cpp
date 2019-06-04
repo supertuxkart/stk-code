@@ -569,7 +569,7 @@ void cmdLineHelp()
     "                          for battle server and --soccer-timed / goals for soccer server\n"
     "                          to control verbosely, see below:\n"
     "       --difficulty=N     N=0 Beginner, N=1 Intermediate, N=2 Expert, N=3 SuperTux.\n"
-    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free-For-All and\n"
+    "       --battle-mode=n    Specify battle mode in network, 0 is Free-For-All and\n"
     "                          1 is Capture The Flag.\n"
     "       --soccer-timed     Use time limit mode in network soccer game.\n"
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"

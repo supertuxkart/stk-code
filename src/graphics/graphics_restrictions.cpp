@@ -430,7 +430,7 @@ public:
         else
         {
             m_version_tests.push_back(VERSION_IGNORE);
-            Log::warn("Graphics", "Invalid verison '%s' found - ignored.",
+            Log::warn("Graphics", "Invalid version '%s' found - ignored.",
                       version.c_str());
         }
         

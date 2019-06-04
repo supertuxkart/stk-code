@@ -394,7 +394,7 @@ int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
 // ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
  *  current maximum speed. Note that the function can be called with
- *  dt=0, in which case the maxium speed will be updated, but no
+ *  dt=0, in which case the maximum speed will be updated, but no
  *  change to any of the speed increase/decrease objects will be done.
  *  \param dt Time step size (dt=0 only updates the current maximum speed).
  */

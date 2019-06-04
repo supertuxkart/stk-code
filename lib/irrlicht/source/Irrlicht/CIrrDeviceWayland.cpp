@@ -997,7 +997,7 @@ bool CIrrDeviceWayland::initWayland()
     
     if (m_display == NULL)
     {
-        os::Printer::log("Coudn't open display.", ELL_ERROR);
+        os::Printer::log("Couldn't open display.", ELL_ERROR);
         return false;
     }
     
@@ -1005,7 +1005,7 @@ bool CIrrDeviceWayland::initWayland()
     
     if (m_xkb_context == NULL)
     {
-        os::Printer::log("Coudn't create xkb context.", ELL_ERROR);
+        os::Printer::log("Couldn't create xkb context.", ELL_ERROR);
         return false;
     }
     

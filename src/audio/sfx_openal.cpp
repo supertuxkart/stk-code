@@ -286,7 +286,7 @@ void SFXOpenAL::reallyStopNow()
         m_loop = false;
         alSourcei(m_sound_source, AL_LOOPING, AL_FALSE);
         alSourceStop(m_sound_source);
-        SFXManager::checkError("stoping");
+        SFXManager::checkError("stopping");
     }
 }   // reallyStopNow
 
