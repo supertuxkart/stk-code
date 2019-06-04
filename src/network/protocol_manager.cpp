@@ -415,7 +415,7 @@ void ProtocolManager::OneProtocolType::update(int ticks, bool async)
  *  This function processes the events queue, notifies the concerned
  *  protocols that they have events to process. Then asks all protocols
  *  to update themselves. Finally it processes stored requests about
- *  starting, stoping, pausing etc... protocols.
+ *  starting, stopping, pausing etc... protocols.
  *  This function is called by the main thread (i.e. from main_loop).
  *  This function IS FPS-dependant.
  */
@@ -475,7 +475,7 @@ void ProtocolManager::update(int ticks)
  *  This function processes the events queue, notifies the concerned
  *  protocols that they have events to process. Then ask all protocols
  *  to update themselves. Finally processes stored requests about
- *  starting, stoping, pausing etc... protocols.
+ *  starting, stopping, pausing etc... protocols.
  *  This function is called in a separate thread running in this instance.
  *  This function IS NOT FPS-dependant.
  */

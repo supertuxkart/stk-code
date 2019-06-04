@@ -638,7 +638,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             // If w's left/right-mosts points are between w_test's,
             // right_offset and left_offset will be 0.
             // If w_test's are between w's,
-            // we substract the smaller from the bigger
+            // we subtract the smaller from the bigger
             // else, the smaller is 0 and we keep the bigger
             int right_offset = std::max(0, w_test->m_x - w->m_x);
             int left_offset  = std::max(0, (w->m_x + w->m_w) - rightmost);

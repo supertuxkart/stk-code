@@ -5,11 +5,11 @@
         Older version will be ignored. -->
   <kart-version min="2" max="3"/>
 
-  <!-- Minimum and maxium track versions that be be read by this binary.
+  <!-- Minimum and maximum track versions that be be read by this binary.
        Older versions will be ignored. -->
   <track-version min="6" max="7"/>
 
-  <!-- Minimum and maxium server versions that be be read by this binary.
+  <!-- Minimum and maximum server versions that be be read by this binary.
        Older versions will be ignored. -->
   <server-version min="6" max="6"/>
 

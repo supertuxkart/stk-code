@@ -15,7 +15,7 @@
 
     ATTENTION: '-' is a special case if it is the first character of a number-
     string. It means that the number is negative and NOT that the following
-    float will be substracted from the base value. So if x = 10 and the string
+    float will be subtracted from the base value. So if x = 10 and the string
     "-5" is processed, the result will be -5 and not the same as "x-5", which
     would result in 10 - 5 = 5.
 -->

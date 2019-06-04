@@ -32,7 +32,7 @@
             <goal type="name_of_counter" operation="-"/>
         </goal>
         With the value of operation (+ or -) defining if the subgoal is added
-        or substracted from the total.
+        or subtracted from the total.
 
         Sub-goals can also have their own sub-goals,
         however a AND, AND-AT-ONCE or OR can't have a SUM goal for parent.

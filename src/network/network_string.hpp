@@ -143,7 +143,7 @@ public:
     }   // BareNetworkString
 
     // ------------------------------------------------------------------------
-    /** Allows to read a buffer from the beginning again. */
+    /** Allows one to read a buffer from the beginning again. */
     void reset() { m_current_offset = 0; }
     // ------------------------------------------------------------------------
     /** Encode string with max length of 16bit and utf32, used in motd or

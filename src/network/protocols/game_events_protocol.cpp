@@ -137,7 +137,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         break;
     }
     default:
-        Log::warn("GameEventsProtocol", "Unkown message type.");
+        Log::warn("GameEventsProtocol", "Unknown message type.");
         break;
     }
     return true;

@@ -278,7 +278,7 @@ namespace irr
 		*/
 		ELOG_LEVEL LoggingLevel;
 
-		//! Allows to select which graphic card is used for rendering when more than one card is in the system.
+		//! Allows one to select which graphic card is used for rendering when more than one card is in the system.
 		/** So far only supported on D3D */
 		u32 DisplayAdapter;
 
@@ -301,7 +301,7 @@ namespace irr
         bool ForceLegacyDevice;
         
         //! Specifies custom path for shaders directory.
-        /** Allows to overwrite IRR_OGLES2_SHADER_PATH constant
+        /** Allows one to overwrite IRR_OGLES2_SHADER_PATH constant
         */
         core::stringc ShadersPath;
 
