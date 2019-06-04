@@ -509,9 +509,9 @@ fi
 
 if [ "$BUILD_TOOL" = "gradle" ]; then
     export ANDROID_HOME="$SDK_PATH"
-    gradle -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
-           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
-           $GRADLE_BUILD_TYPE
+    ./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
+              -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
+              $GRADLE_BUILD_TYPE
 elif [ "$BUILD_TOOL" = "ant" ]; then
     ant -Dsdk.dir="$SDK_PATH"  \
         -Dtarget="android-$TARGET_SDK_VERSION" \

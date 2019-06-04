@@ -54,6 +54,8 @@ init_directories()
         ln -s ../android/AndroidManifest.xml
         ln -s ../android/banner.png
         ln -s ../android/build.gradle
+        ln -s ../android/gradle
+        ln -s ../android/gradlew
         ln -s ../android/icon.png
         ln -s ../android/icon-dbg.png
         ln -s ../android/make.sh
