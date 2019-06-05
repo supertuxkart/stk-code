@@ -351,7 +351,6 @@ private:
 
     /** The render target for the mini map, which is displayed in the race gui. */
     RenderTarget           *m_render_target;
-    core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
 
@@ -448,6 +447,7 @@ public:
 
     std::vector< std::vector<float> > buildHeightMap();
     void               drawMiniMap(const core::rect<s32>& dest_rect) const;
+    void               updateMiniMapScale();
     // ------------------------------------------------------------------------
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }

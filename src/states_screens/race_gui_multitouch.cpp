@@ -62,18 +62,8 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 
     m_device = input_manager->getDeviceManager()->getMultitouchDevice();
 
-    if (UserConfigParams::m_multitouch_scale > 1.6f)
-    {
-        UserConfigParams::m_multitouch_scale = 1.6f;
-    }
-    else if (UserConfigParams::m_multitouch_scale < 0.8f)
-    {
-        UserConfigParams::m_multitouch_scale = 0.8f;
-    }
-
     init();
 }   // RaceGUIMultitouch
-
 
 //-----------------------------------------------------------------------------
 /** The multitouch GUI destructor
@@ -82,7 +72,6 @@ RaceGUIMultitouch::~RaceGUIMultitouch()
 {
     close();
 }   // ~RaceGUIMultitouch
-
 
 //-----------------------------------------------------------------------------
 /** Sets the multitouch race gui to its initial state
@@ -94,6 +83,16 @@ void RaceGUIMultitouch::reset()
         m_device->reset();
     }
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Recreate multitouch race gui when config was changed
+ */
+void RaceGUIMultitouch::recreate()
+{
+    close();
+    reset();
+    init();
+}   // recreate
 
 
 //-----------------------------------------------------------------------------
@@ -122,19 +121,13 @@ void RaceGUIMultitouch::close()
  */
 void RaceGUIMultitouch::init()
 {
-    if (m_device == NULL)
-        return;
-      
-    auto cl = LobbyProtocol::get<ClientLobby>();
-    
-    if (cl && cl->isSpectator())
+    if (UserConfigParams::m_multitouch_scale > 1.6f)
     {
-        createSpectatorGUI();
-        m_is_spectator_mode = true;
+        UserConfigParams::m_multitouch_scale = 1.6f;
     }
-    else
+    else if (UserConfigParams::m_multitouch_scale < 0.8f)
     {
-        createRaceGUI();
+        UserConfigParams::m_multitouch_scale = 0.8f;
     }
     
     m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
@@ -157,6 +150,18 @@ void RaceGUIMultitouch::init()
     m_gui_action_tex = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
     m_up_tex = irr_driver->getTexture(FileManager::GUI_ICON, "up.png");
     m_down_tex = irr_driver->getTexture(FileManager::GUI_ICON, "down.png");
+    
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    
+    if (cl && cl->isSpectator())
+    {
+        createSpectatorGUI();
+        m_is_spectator_mode = true;
+    }
+    else
+    {
+        createRaceGUI();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -164,6 +169,9 @@ void RaceGUIMultitouch::init()
  */
 void RaceGUIMultitouch::createRaceGUI()
 {
+    if (m_device == NULL)
+        return;
+        
     if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         m_device->activateAccelerometer();
@@ -246,6 +254,9 @@ void RaceGUIMultitouch::createRaceGUI()
  */
 void RaceGUIMultitouch::createSpectatorGUI()
 {
+    if (m_device == NULL)
+        return;
+        
     const float scale = UserConfigParams::m_multitouch_scale;
 
     const int h = irr_driver->getActualScreenSize().Height;

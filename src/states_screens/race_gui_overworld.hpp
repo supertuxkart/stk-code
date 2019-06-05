@@ -87,8 +87,8 @@ private:
     /** Distance of map from left side of screen. */
     int              m_map_left;
 
-    /** True if this is the first time the renderer is called. */
-    bool             m_is_first_render_call;
+    /** True if the minimap is initialized */
+    bool             m_is_minimap_initialized;
 
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
@@ -125,7 +125,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const
-    { return core::dimension2du(m_map_width, m_map_height); }
+                       { return core::dimension2du(m_map_width, m_map_height); }
+    virtual void calculateMinimapSize();
 
 };   // RaceGUI
 

@@ -92,32 +92,6 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
-    float map_size_splitscreen = 1.0f;
-
-    // If there are four players or more in splitscreen
-    // and the map is in a player view, scale down the map
-    if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
-    {
-        // If the resolution is wider than 4:3, we don't have to scaledown the minimap as much
-        // Uses some margin, in case the game's screen is not exactly 4:3
-        if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
-             (4.1f/3.0f))
-        {
-            if (race_manager->getNumLocalPlayers() == 4)
-                map_size_splitscreen = 0.75f;
-            else
-                map_size_splitscreen = 0.5f;
-        }
-        else
-            map_size_splitscreen = 0.5f;
-    }
-
-    // Originally m_map_height was 100, and we take 480 as minimum res
-    float scaling = std::min(irr_driver->getFrameSize().Height,  
-                             irr_driver->getFrameSize().Width) / 480.0f;
-    const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
-    const float top_margin = 3.5f * m_font_height;
-
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
@@ -128,59 +102,7 @@ RaceGUI::RaceGUI()
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
     
-    // Check if we have enough space for minimap when touch steering is enabled
-    if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
-    {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
-                                         m_multitouch_gui->getHeight());
-        
-        if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
-        {
-            scaling = (map_bottom - top_margin) / (map_size + 20.0f);
-        }
-    }
-    
-    // Marker texture has to be power-of-two for (old) OpenGL compliance
-    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
-    m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
-    m_map_width             = (int)(map_size * scaling);
-    m_map_height            = (int)(map_size * scaling);
-
-    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
-       race_manager->getNumLocalPlayers() == 1)
-    {
-        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
-                                                        m_map_width - 10.0f*scaling);
-        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
-                                                        m_map_height);
-    }
-    else // default, map in the bottom-left corner
-    {
-        m_map_left          = (int)( 10.0f * scaling);
-        m_map_bottom        = (int)( 10.0f * scaling);
-    }
-
-    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
-    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
-    m_map_rendered_width    = map_texture;
-    m_map_rendered_height   = map_texture;
-
-
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getIfEmptyScreenSpaceExists())
-    {
-        m_map_left = irr_driver->getActualScreenSize().Width -
-                     m_map_width - (int)( 10.0f * scaling);
-        m_map_bottom        = (int)( 10.0f * scaling);
-    }
-    else if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
-    {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
-                                                        m_map_width) * 0.95f);
-        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
-                                                    top_margin - m_map_height);
-    }
+    calculateMinimapSize();
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
@@ -234,6 +156,96 @@ void RaceGUI::reset()
         m_last_ranks[i]       = i+1;
     }
 }  // reset
+
+//-----------------------------------------------------------------------------
+void RaceGUI::calculateMinimapSize()
+{
+    float map_size_splitscreen = 1.0f;
+
+    // If there are four players or more in splitscreen
+    // and the map is in a player view, scale down the map
+    if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
+    {
+        // If the resolution is wider than 4:3, we don't have to scaledown the minimap as much
+        // Uses some margin, in case the game's screen is not exactly 4:3
+        if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
+             (4.1f/3.0f))
+        {
+            if (race_manager->getNumLocalPlayers() == 4)
+                map_size_splitscreen = 0.75f;
+            else
+                map_size_splitscreen = 0.5f;
+        }
+        else
+            map_size_splitscreen = 0.5f;
+    }
+
+    // Originally m_map_height was 100, and we take 480 as minimum res
+    float scaling = std::min(irr_driver->getFrameSize().Height,  
+                             irr_driver->getFrameSize().Width) / 480.0f;
+    const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
+    const float top_margin = 3.5f * m_font_height;
+    
+    // Check if we have enough space for minimap when touch steering is enabled
+    if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
+    {
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+                                         m_multitouch_gui->getHeight());
+        
+        if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
+        {
+            scaling = (map_bottom - top_margin) / (map_size + 20.0f);
+        }
+        
+        // Use some reasonable minimum scale, because minimap size can be 
+        // changed during the race
+        scaling = std::max(scaling,
+                           irr_driver->getActualScreenSize().Height * 0.15f / 
+                           (map_size + 20.0f));
+    }
+    
+    // Marker texture has to be power-of-two for (old) OpenGL compliance
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
+    m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
+    m_map_width             = (int)(map_size * scaling);
+    m_map_height            = (int)(map_size * scaling);
+
+    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
+       race_manager->getNumLocalPlayers() == 1)
+    {
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width - 10.0f*scaling);
+        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
+                                                        m_map_height);
+    }
+    else // default, map in the bottom-left corner
+    {
+        m_map_left          = (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
+
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
+
+    // special case : when 3 players play, use available 4th space for such things
+    if (race_manager->getIfEmptyScreenSpaceExists())
+    {
+        m_map_left = irr_driver->getActualScreenSize().Width -
+                     m_map_width - (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
+    else if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
+    {
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width) * 0.95f);
+        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
+                                                    top_margin - m_map_height);
+    }
+}  // calculateMinimapSize
 
 //-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only

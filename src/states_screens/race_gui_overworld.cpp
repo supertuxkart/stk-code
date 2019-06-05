@@ -78,17 +78,13 @@ RaceGUIOverworld::RaceGUIOverworld()
     if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
         m_enabled = false;
 
-    m_is_first_render_call = true;
+    m_is_minimap_initialized = false;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
     m_trophy[0] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
     m_trophy[1] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_silver.png");
     m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
     m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
-
-    float scaling = std::min(irr_driver->getFrameSize().Height,  
-        irr_driver->getFrameSize().Width) / 420.0f;
-    const float map_size = 250.0f;
 
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
                                irr_driver->getDevice()->supportsTouchDevice()) ||
@@ -100,39 +96,7 @@ RaceGUIOverworld::RaceGUIOverworld()
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
 
-    // Check if we have enough space for minimap when touch steering is enabled
-    if (m_multitouch_gui != NULL)
-    {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
-                                         m_multitouch_gui->getHeight());
-        
-        if ((map_size + 20.0f) * scaling > map_bottom)
-        {
-            scaling = map_bottom / (map_size + 20.0f);
-        }
-    }
-
-    // Marker texture has to be power-of-two for (old) OpenGL compliance
-    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_challenge_size = (int)( 12.0f * scaling);
-    m_minimap_player_size    = (int)( 24.0f * scaling);
-    m_map_width              = (int)(map_size * scaling);
-    m_map_height             = (int)(map_size * scaling);
-
-    m_map_left   = 20;
-    m_map_bottom = irr_driver->getActualScreenSize().Height-10;
-
-    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
-    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
-    m_map_rendered_width    = map_texture;
-    m_map_rendered_height   = map_texture;
-
-    if (m_multitouch_gui != NULL)
-    {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
-                                                        m_map_width) * 0.9f);
-        m_map_bottom = m_map_height + int(10 * scaling);
-    }
+    calculateMinimapSize();
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
@@ -165,6 +129,56 @@ RaceGUIOverworld::~RaceGUIOverworld()
 }   // ~RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
+void RaceGUIOverworld::calculateMinimapSize()
+{
+    float scaling = std::min(irr_driver->getFrameSize().Height,  
+        irr_driver->getFrameSize().Width) / 420.0f;
+    const float map_size = 250.0f;
+    
+    // Check if we have enough space for minimap when touch steering is enabled
+    if (m_multitouch_gui != NULL)
+    {
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+                                         m_multitouch_gui->getHeight());
+        
+        if ((map_size + 20.0f) * scaling > map_bottom)
+        {
+            scaling = map_bottom / (map_size + 20.0f);
+        }
+        
+        // Use some reasonable minimum scale, because minimap size can be 
+        // changed during the race
+        scaling = std::max(scaling,
+                           irr_driver->getActualScreenSize().Height * 0.2f / 
+                           (map_size + 20.0f));
+    }
+
+    // Marker texture has to be power-of-two for (old) OpenGL compliance
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_challenge_size = (int)( 12.0f * scaling);
+    m_minimap_player_size    = (int)( 24.0f * scaling);
+    m_map_width              = (int)(map_size * scaling);
+    m_map_height             = (int)(map_size * scaling);
+
+    m_map_left   = 20;
+    m_map_bottom = irr_driver->getActualScreenSize().Height-10;
+
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
+    if (m_multitouch_gui != NULL)
+    {
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width) * 0.9f);
+        m_map_bottom = m_map_height + int(10 * scaling);
+    }
+    
+    m_is_minimap_initialized = false;
+}
+
+//-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only
  *  displayed once even in splitscreen.
  *  \param dt Timestep sized.
@@ -183,8 +197,6 @@ void RaceGUIOverworld::renderGlobal(float dt)
     }
 
     drawGlobalMiniMap();
-
-    m_is_first_render_call = false;
 #endif
 }   // renderGlobal
 
@@ -335,7 +347,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // This can't be done in the constructor of this object, since at
     // that time the scene.xml file has not been read (so the challenges
     // are not defined yet).
-    if(m_is_first_render_call)
+    if (!m_is_minimap_initialized)
     {
         float left_most = 0;
         float right_most = 0;
@@ -356,6 +368,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         {
             m_map_left -= (int)left_most;
         }
+        
+        m_is_minimap_initialized = true;
     }
 
     int upper_y = m_map_bottom - m_map_height;

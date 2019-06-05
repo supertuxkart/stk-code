@@ -24,6 +24,8 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
+#include "modes/world.hpp"
+#include "states_screens/race_gui_multitouch.hpp"
 #include "utils/translation.hpp"
 
 #ifdef ANDROID
@@ -79,6 +81,13 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
         CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
         assert(gyroscope != NULL);
         gyroscope->setActive(false);
+    }
+    
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
+        assert(buttons_en != NULL);
+        buttons_en->setActive(false);
     }
 
     updateValues();
@@ -143,6 +152,11 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         {
             touch_device->updateConfigParams();
         }
+        
+        if (World::getWorld() && World::getWorld()->getRaceGUI())
+        {
+            World::getWorld()->getRaceGUI()->recreateMultitouchGUI();
+        }
 
         user_config->saveConfig();
 
@@ -157,8 +171,6 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         UserConfigParams::m_multitouch_controls.revertToDefaults();
         
 #ifdef ANDROID
-        UserConfigParams::m_multitouch_draw_gui = true;
-
         int32_t screen_size = AConfiguration_getScreenSize(
                                                     global_android_app->config);
         
@@ -183,10 +195,18 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
             break;
         }
 #else
-        UserConfigParams::m_multitouch_draw_gui.revertToDefaults();
         UserConfigParams::m_multitouch_scale.revertToDefaults();
         UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
 #endif
+    
+        if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
+        {
+#ifdef ANDROID
+            UserConfigParams::m_multitouch_draw_gui = true;
+#else
+            UserConfigParams::m_multitouch_draw_gui.revertToDefaults();
+#endif
+        }
 
         updateValues();
 

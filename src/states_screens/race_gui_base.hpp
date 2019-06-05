@@ -245,6 +245,7 @@ public:
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du
                   getMiniMapSize() const = 0;
+    virtual void calculateMinimapSize() {};
     // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
 
@@ -258,6 +259,9 @@ public:
 
     void cleanupMessages(const float dt);
     void removeReferee();
+    
+    RaceGUIMultitouch* getMultitouchGUI() {return m_multitouch_gui;}
+    void recreateMultitouchGUI();
 
 };   // RaceGUIBase
 

@@ -70,6 +70,7 @@ public:
     bool isSpectatorMode() {return m_is_spectator_mode;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
     void reset();
+    void recreate();
                                  
 };   // RaceGUIMultitouch
 

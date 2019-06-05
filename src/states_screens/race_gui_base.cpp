@@ -182,6 +182,20 @@ RaceGUIBase::~RaceGUIBase()
 }   // ~RaceGUIBase
 
 //-----------------------------------------------------------------------------
+void RaceGUIBase::recreateMultitouchGUI()
+{
+    if (!m_multitouch_gui)
+        return;
+        
+    m_multitouch_gui->recreate();
+    calculateMinimapSize();
+    
+    Track* track = Track::getCurrentTrack();
+    assert(track != NULL);
+    track->updateMiniMapScale();
+}  // recreateMultitouchGUI
+
+//-----------------------------------------------------------------------------
 /** Creates the 2D vertices for a regular polygon. Adopted from Irrlicht.
  *  \param n Number of vertices to use.
  *  \param radius Radius of the polygon.

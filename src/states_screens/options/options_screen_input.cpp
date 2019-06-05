@@ -278,12 +278,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         }
         else if (selection.find("touch_device") != std::string::npos)
         {
-            // Don't edit multitouch settings during a race, because it needs
-            // to re-create all buttons to take an effect
-            if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
-            {
-                new MultitouchSettingsDialog(0.8f, 0.9f);
-            }
+            new MultitouchSettingsDialog(0.8f, 0.9f);
         }
         else
         {
