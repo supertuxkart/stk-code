@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Paride Barison\n"
 "Language-Team: Italian (http://www.transifex.com/supertuxkart/supertuxkart/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -816,7 +816,7 @@ msgstr "Tutti i giocatori pronti"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Clear players"
-msgstr ""
+msgstr "Rimuovi giocatori"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -1540,7 +1540,7 @@ msgid ""
 "options). Then, you can either create your own server with custom options, "
 "or search among a list of existing servers to join. Some of them are "
 "recommended servers with optionally ranked races."
-msgstr ""
+msgstr "Prima di tutto, seleziona l'icona \"online\" nel menù principale. Scegli se utilizzare la connessione locale o la rete globale (richiede che internet sia abilitato nelle opzioni). Dopodiché, puoi creare la tua stanza con delle opzioni personalizzate, o cercare all'interno della lista delle stanze dove entrare. Alcuni sono server affidabili con gare classificate opzionali."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -2433,32 +2433,32 @@ msgstr "Gara singola (Grand Prix)"
 
 #: src/challenges/challenge_data.cpp:303
 msgid "Time-Trial (Grand Prix)"
-msgstr ""
+msgstr "Prova a tempo (Grand Prix)"
 
 #: src/challenges/challenge_data.cpp:308
 msgid "Time-Trial - beat the replay"
-msgstr ""
+msgstr "Prova a tempo - sfida il replay"
 
 #: src/challenges/challenge_data.cpp:310
 msgid "Time-Trial - nitro challenge"
-msgstr ""
+msgstr "Prova a tempo - gara nitro"
 
 #: src/challenges/challenge_data.cpp:312
 msgid "Normal Race (single race)"
-msgstr ""
+msgstr "Gara normale (gara singola)"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Time-Trial (single race)"
-msgstr ""
+msgstr "Prova a tempo (gara singola)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Follow the Leader (single race)"
-msgstr ""
+msgstr "Segui il capo (gara singola)"
 
 #: src/challenges/challenge_data.cpp:322
 #: src/states_screens/dialogs/select_challenge.cpp:170
 msgid "Mode: Reverse"
-msgstr ""
+msgstr "Modalità: speculare"
 
 #: src/challenges/challenge_data.cpp:599
 #, c-format
@@ -3539,7 +3539,7 @@ msgstr "Premi <%s> o <%s> per cambiare giocatore o <%s> per la posizione della c
 #: src/network/protocols/client_lobby.cpp:1462
 #, c-format
 msgid "Successfully reported %s."
-msgstr ""
+msgstr "Riportato con successo %s."
 
 #: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
@@ -4343,20 +4343,20 @@ msgstr "Scegli un colore dalla ruota colori"
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:48
 msgid "Player info"
-msgstr ""
+msgstr "Informazioni giocatore"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:53
 #, c-format
 msgid "Player name: %s"
-msgstr ""
+msgstr "Nome giocatore: %s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
 #: src/states_screens/dialogs/network_player_dialog.cpp:62
 #, c-format
 msgid "Player location: %s"
-msgstr ""
+msgstr "Posizione giocatore: %s"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:105
@@ -4382,7 +4382,7 @@ msgstr "Disabilita handicap"
 #. report player about for example abusive behaviour in game
 #: src/states_screens/dialogs/network_player_dialog.cpp:156
 msgid "Report player"
-msgstr ""
+msgstr "Riporta giocatore"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -4396,7 +4396,7 @@ msgstr "Recupero delle informazioni per %s"
 #: src/states_screens/dialogs/network_player_dialog.cpp:186
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr ""
+msgstr "Informa l'amministratore del server a proposito di questo giocatore (%s):"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:93
 #: src/states_screens/online/networking_lobby.cpp:218
@@ -4491,7 +4491,7 @@ msgstr "Pista attuale: %s"
 #: src/states_screens/dialogs/server_info_dialog.cpp:116
 #, c-format
 msgid "Server location: %s"
-msgstr ""
+msgstr "Locazione server: %s"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Rank"
@@ -4528,7 +4528,7 @@ msgstr "Nessun giocatore disponibile per connettersi al server."
 #: src/states_screens/dialogs/user_info_dialog.cpp:54
 #, c-format
 msgid "Username: %s"
-msgstr ""
+msgstr "Nome utente: %s"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:58
 msgid "Cancel Request"

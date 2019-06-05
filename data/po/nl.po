@@ -6,6 +6,7 @@
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2016
 # Frans van Rijn <asciimonster@yahoo.co.uk>, 2015-2016
 # Heimen Stoffels <vistausss@outlook.com>, 2019
+# Steven van Tetering <steven.van.tetering@gmail.com>, 2019
 # Ward Muylaert <ward.muylaert@gmail.com>, 2015-2017
 # David Blaszyk <david@sudomail.ne.jp>, 2017
 msgid ""
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Steven van Tetering <steven.van.tetering@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,7 +29,7 @@ msgstr "Christoffel Columbus"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr "Speel elke officieel circuit minimaal één keer."
+msgstr "Speel elk officieel circuit minimaal één keer."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
@@ -70,7 +71,7 @@ msgstr "Goudzoeker"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Win van minimaal 3 computers in een normale race, tijdrit en zwaan-kleef-aan."
+msgstr "Win van minimaal 3 computerspelers in een normale race, tijdrit en zwaan-kleef-aan."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -88,7 +89,7 @@ msgstr "Onstuitbaar"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr "Win 5 races achter elkaar van minimaal 3 computers. Maar let op: een race herstarten staat gelijk aan verliezen."
+msgstr "Win 5 races achter elkaar van minimaal 3 computerspelers. Maar let op: een race herstarten staat gelijk aan verliezen."
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -100,11 +101,11 @@ msgstr "Verzamel minimaal 5 bananen binnen één race."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "Geheimtaal"
+msgstr "Geheim"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
-msgstr "Het is... een geheim."
+msgstr "Echt waar... een geheim."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
@@ -118,7 +119,7 @@ msgstr "Behandel je tegenstanders als muggen! Mep, gebruikmakend van de vliegenm
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
-msgstr "Teveel geluk"
+msgstr "Meer dan geluk"
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -343,12 +344,12 @@ msgstr "Gloeiing"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr "Lichtval (godenstralen)"
+msgstr "Lichtval (God rays)"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Ambient occlusion"
-msgstr "Omgevingsafsluiting"
+msgstr "Omgevingsocclusie"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -398,7 +399,7 @@ msgstr "Deeltjeseffecten"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Rendered image quality"
-msgstr "Gerenderde beeldkwaliteit"
+msgstr "Kwaliteit van gerenderde beelden"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -408,7 +409,7 @@ msgstr "Geometriedetails"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
-msgstr "* Herstart STK om de nieuwe instellingen toe te passen"
+msgstr "* Herstart STK om nieuwe instellingen toe te passen"
 
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
@@ -457,7 +458,7 @@ msgstr "Wedstrijd starten"
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
 msgid "Compare ghost"
-msgstr "Vergelijken met spook"
+msgstr "Vergelijk spook"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -488,7 +489,7 @@ msgstr "Terug naar wedstrijd"
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
 #. end spectating (for example)
 msgid "Back to lobby"
-msgstr "Terug naar foyer"
+msgstr "Terug naar lobby"
 
 #. I18N: ./data/gui/dialogs/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -801,12 +802,12 @@ msgstr "Handicap"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Press the 'All players ready' button after the player list is ready."
-msgstr "Druk op 'Alle spelers staan klaar' als de lijst is samengesteld."
+msgstr "Druk op 'Alle spelers zijn klaar' als de lijst met spelers is samengesteld."
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "All players ready"
-msgstr "Alle spelers staan klaar"
+msgstr "Alle spelers zijn klaar"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -821,7 +822,7 @@ msgstr "Gebruikersinformatie"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Add Friend"
-msgstr "Toevoegen als vriend"
+msgstr "Vriend toevoegen"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -856,7 +857,7 @@ msgstr "Terug naar menu"
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
 msgid "Press fully and release..."
-msgstr "Druk in en laat weer los..."
+msgstr "Druk helemaal in en laat weer los..."
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -891,7 +892,7 @@ msgstr "Wedstrijdregels"
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
 msgid "Type:"
-msgstr "Soort:"
+msgstr "Type:"
 
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
@@ -1065,7 +1066,7 @@ msgstr "Eieren zoeken"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show the best times"
-msgstr "Alleen beste tijden tonen"
+msgstr "Alleen de beste tijden tonen"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1085,7 +1086,7 @@ msgstr "Toon alleen herhalingen met dezelfde versie"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Hide multiplayer replays"
-msgstr "Herhalingen met meerdere spelers verbergen"
+msgstr "Multiplayer-herhalingen verbergen"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1095,7 +1096,7 @@ msgstr "Spookherhaling opnemen"
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Alle karts"
+msgstr "Computerspelers"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1105,7 +1106,7 @@ msgstr "Andersom"
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Track group"
-msgstr "Parcoursgroep"
+msgstr "Circuitgroep"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1278,14 +1279,14 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "Verzamel turbogas om extra snelheid te krijgen wanneer jij dat wilt door op de bijbehorende toets te drukken. Je turbometer, tijdens het spel rechts in beeld, geeft aan hoeveel je nog over hebt."
+msgstr "Verzamel turbogas om extra snelheid te krijgen wanneer jij dat wilt door op de bijbehorende toets te drukken. Je turbometer, tijdens het spel rechtsonder in beeld, geeft aan hoeveel je nog over hebt."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "Volbreng uitdagingen om hangsloten te openen."
+msgstr "Wanneer je een knop met een slot ziet zoals deze, moet je een uitdaging voltooien om hem te ontgrendelen."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1294,7 +1295,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "Slippen doe je met de bijbehorende toets. Korte slips helpen je scherpe bochten te nemen, gemiddelde slips geven je extra snelheid en lange slips geven je turbo. Tijdens het slippen kun je niet rechtuit rijden, dus oriënteer je kart zorgvuldig!"
+msgstr "Je kunt slippen door op een speciale toets of knop te drukken. Korte slips helpen je scherpe bochten te nemen, gemiddelde slips geven je extra snelheid en lange slips geven je nog meer snelheid. Tijdens het slippen kun je niet rechtuit rijden, dus oriënteer je kart zorgvuldig!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1339,7 +1340,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr "Er zijn 3 soorten gevechtsvormen:\n-Veldslag - Raak anderen met je wapens, net zolang tot ze al hun levens kwijt zijn.\n- Vrijheid, blijheid - Degene die anderen het vaakst heeft geraakt binnen het gestelde (tijds)limiet, wint.\n- Verover de vlag - Breng de vlag van de tegenstander naar jouw teambasis, maar zorg ervoor dat jouw teamvlag niet gepakt wordt!"
+msgstr "Er zijn 3 soorten gevechtsvormen: In 'Veldslag' raak je anderen met je wapens, net zolang tot ze al hun levens kwijt zijn. In 'Vrijheid, blijheid' wint degene die anderen het vaakst heeft geraakt binnen de gestelde (tijds)limiet. In 'Verover de vlag' breng je de vlag van de tegenstander naar jouw teambasis, maar zorg ervoor dat jouw teamvlag niet gepakt wordt!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1349,14 +1350,14 @@ msgstr "Voetbal: Gebruik je kart om de bal in het doel te duwen."
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Eieren zoeken: Zoek en vind alle verstopte eieren."
+msgstr "Eieren zoeken: Doorzoek banen en vind alle verstopte eieren."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and"
 " record your own!"
-msgstr "Spookherhaling: Race tegen spoken in tijdritten of tijdens het eieren zoeken, en neem ook je eigen herhaling op!"
+msgstr "Spookherhaling: Race tegen spookherhalingen in tijdritten of tijdens het eieren zoeken, en neem je eigen herhaling op!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -3843,7 +3844,7 @@ msgstr "Aantal gestarte wedstrijden voor deskundigen"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:191
 msgid "Expert races finished"
-msgstr "Aantal afgeronde wedstrijden voor deskundigen"
+msgstr "Aantal afgeronde wedstrijden in de spelvorm 'Deskundig'"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.

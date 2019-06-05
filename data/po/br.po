@@ -5,7 +5,7 @@
 # Translators:
 # Alan Monfort <alan.monfort@free.fr>, 2015-2016
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2013
-# Gwenn M <tornoz@laposte.net>, 2015
+# Gwenn M <tornoz@laposte.net>, 2015,2019
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2017-2018
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2016
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2016
@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Gwenn M <tornoz@laposte.net>\n"
 "Language-Team: Breton (http://www.transifex.com/supertuxkart/supertuxkart/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,7 +29,7 @@ msgstr "Kristobal Kolombus"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr "Lenn pep roudenn ofisiel ur wech da vihanañ."
+msgstr "C'hoari gant pep loabr kefridiel ur wech da vihanañ."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
@@ -37,15 +37,15 @@ msgstr "Strike!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
-msgstr "Stokit 10 kart gant ur voul vowling."
+msgstr "Stekiñ 10 kart gant ur voul vowling."
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
-msgstr "Enebour touet"
+msgstr "Enebour gwashañ"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
-msgstr "Stokit ar memes kart 5 gwech da vihanañ e-pad ur redadeg."
+msgstr "Stokit an hevelep kart 5 gwech da vihanañ e-pad ur redadeg."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
@@ -3194,7 +3194,7 @@ msgstr "Sevel biz meud Kleiz"
 #: src/input/input_manager.cpp:856
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
-msgstr "Na ober van ouzh '%s', Ezhomm ho poa emezelañ abretoc'h evit gellout c'hoari!"
+msgstr "Siwazh '%s', erruet out re ziwezhat da gemer perzh er c'hoari !"
 
 #: src/input/input_manager.cpp:892
 msgid "Only the Game Master may act at this point!"
@@ -3204,7 +3204,7 @@ msgstr "N'eus nemet Mestr ar c'hoari hag a c'hall ober un dra bennak bremañ!"
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr "Kevreit ho wiimote ouzh merouer ar Bluetooth ha klikit war Mat eo. Titouroù dre ar munud war supertuxkart.net/Wiimote"
+msgstr "Kennask da wiimote ouzh ardoer ar Bluetooth ha klik war Mat eo. Titouroù ouzhpenn e supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:391
 msgid ""
@@ -3224,7 +3224,7 @@ msgstr[4] "Kavet ez eus bet %d wiimote"
 
 #: src/input/wiimote_manager.cpp:419
 msgid "Could not detect any wiimote :/"
-msgstr "N'haller ket diguzhiñ wiimote ebet :/"
+msgstr "N'haller ket dinoiñ ur wiimote :/"
 
 #: src/karts/controller/local_player_controller.cpp:299
 msgid "Penalty time!!"
@@ -3236,11 +3236,11 @@ msgstr ""
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
-msgstr "Gellout a rit kaout 3/teir vuhez d'ar muiañ!"
+msgstr "Gellout a rit kaout 3 buhez d'ar muiañ!"
 
 #: src/karts/controller/spare_tire_ai.cpp:153
 msgid "+1 life."
-msgstr "+1/ur vuhez."
+msgstr "+1 vuhez."
 
 #: src/karts/kart.cpp:1028
 msgid "You won the race!"
@@ -3269,12 +3269,12 @@ msgstr ""
 
 #: src/main.cpp:2084
 msgid "Your screen resolution is too low to run STK."
-msgstr "Ho spisder skramm a zo re izel evit gellet loc'hañ STK."
+msgstr "Ho diarunusted a zo re izel evit gallout loc'hañ STK."
 
 #: src/main.cpp:2113
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
-msgstr "Ho stur a zo re gozh e stumm dezhañ. Stailhit ar sturioù video nevesañ, mar plij."
+msgstr "Re gozh eo handelv ho stur. Stailhit ar sturioù video nevesañ, mar plij."
 
 #: src/main.cpp:2131
 #, c-format
@@ -3613,27 +3613,27 @@ msgstr[0] "Bez ho peus %d goulenn mignon nevez!"
 msgstr[1] "Bez ho peus %d goulenn mignon nevez!"
 msgstr[2] "Bez ho peus %d goulenn mignon nevez!"
 msgstr[3] "Bez ho peus %d goulenn mignon nevez!"
-msgstr[4] "Bez ho peus %d goulenn mignon nevez!"
+msgstr[4] "%d a c'houlennoù a-berzh keneiled nevez hoc'h eus !"
 
 #: src/online/online_player_profile.cpp:535
 msgid "You have a new friend request!"
-msgstr "Bez ho peus goulenn mignon nevez!"
+msgstr "Ur goulenn hoc'h eus a-berzh ur c'heneil !"
 
 #: src/online/xml_request.cpp:84
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
-msgstr "N'haller ket kevreañ ouzh ar servijer. Gwiriit ho kevreadur ouzh Internet pe klaskit diwezhatoc'h."
+msgstr "N'haller ket kennaskañ ouzh an dafariad. Gwiriit ho kennask ouzh Internet pe glaskit diwezhatoc'h."
 
 #: src/race/grand_prix_data.hpp:174
 msgid "Random Grand Prix"
-msgstr "Grand Prix dre-zegouezh"
+msgstr "Grand Prix dargouezhek"
 
 #: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "Ar skoroù uhelañ a oa re gozh,\ndiverket int bet holl."
+msgstr "Re gozh e oa an eriñvoù uhelañ,\ndiverket int bet holl."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:191
@@ -3693,7 +3693,7 @@ msgstr "2 vloaz"
 
 #: src/states_screens/addons_screen.cpp:106
 msgid "Add-on name"
-msgstr "Anv al lugant"
+msgstr "Anv an askouezh"
 
 #: src/states_screens/addons_screen.cpp:107
 msgid "Updated date"
@@ -3708,7 +3708,7 @@ msgstr "%s gant %s"
 
 #: src/states_screens/addons_screen.cpp:419
 msgid "Please wait while addons are updated"
-msgstr "Gortozit e-pad ma vez hizivaet al lugantoù, mar plij"
+msgstr "Gortoz, mar plij, e-pad m'emañ an askouezhioù o vezañ hizivaet"
 
 #: src/states_screens/addons_screen.cpp:497
 #: src/states_screens/main_menu_screen.cpp:560
@@ -3716,7 +3716,7 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "Digarezit, degouezhet ez eus ur fazi e-pad ma oa o vont e darempred gant lec'hienn al lugantoù. Bezit sur da vezañ kevreet ouzh internet ha n'eo ket stanket SuperTuxKart gant un danvoger"
+msgstr "Digarez,, degouezhet ez eus ur fazi e-pad ma oa o kehentiñ gant lec'hienn an askouezhioù. Bez sur ez out kennasket ouzh internet ha n'eo ket gannet SuperTuxKart gant un danvoger"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -3727,7 +3727,7 @@ msgstr "Digarezit, degouezhet ez eus ur fazi e-pad ma oa o vont e darempred gant
 #: src/states_screens/kart_selection.cpp:291
 #: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
-msgstr "standard"
+msgstr "skoueriek"
 
 #: src/states_screens/arenas_screen.cpp:273
 #: src/states_screens/arenas_screen.cpp:325
@@ -3741,7 +3741,7 @@ msgstr "Morailhet: deuit a-benn eus an daeioù oberiat evit gellout tizhout muio
 
 #: src/states_screens/arenas_screen.cpp:337
 msgid "Random Arena"
-msgstr "Arena dre-zegouezh"
+msgstr "Arena dargouezhek"
 
 #: src/states_screens/arenas_screen.cpp:341
 #, c-format
@@ -3751,7 +3751,7 @@ msgstr[0] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
 msgstr[1] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
 msgstr[2] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
 msgstr[3] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
-msgstr[4] "%d arena zo dihegerz gant ar mod c'hoarier simpl."
+msgstr[4] "%d arena zo dihegerz gant ar mod c'hoarier eeun."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
@@ -4148,7 +4148,7 @@ msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
-msgstr "Evit ouzhpennañ dornelloù/bizhier c'hoari nevez, loc'hit ken eeun ha tra SuperTuxKart gant ho tornelloù kevreet ha mont a raint war-wel war al listenn.\n\nEvit ouzhpennañ ur c'hefluniadur evit ar c'hlavier, grit gant an bouton amañ dindan. KOULSKOUDE, arabat disoñjal ne vez ket gouzañvet kalz a bouezadurioù war ar memes tro ha neket ar pep gwellañ ur c'hlavier evit ar mod lies-c'hoarier. (Meur a glavier a c'hall bezañ kevreet daoust da-se. Evideoc'h da gaout soñj, boutonioù disheñvel a vo ezhomm evit pep c'hoarier en degouezh-mañ.)"
+msgstr "Evit ouzhpennañ dornelloù c'hoari nevez, loc'h SuperTuxKart gant da zornelloù kennasket ha war ar roll ez aint war-wel.\n\nEvit ouzhpennañ ur c'hefluniadur evit ar c'hlavier, gra gant an afell amañ dindan. KOULSKOUDE, arabat disoñjal ne vez ket gouzañvet kalz kenbouezadurioù ha ur c'hlavier n'eo ket a pep dereatañ evit ar mod liesc'hoarier. Meur a glavier a c'hall bezañ kennasket koulskoude. Blokadoù stokelloù disheñvel a vo ezhomm gant pep hini anezho)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
@@ -4167,7 +4167,7 @@ msgstr "Hizivaat"
 #: src/states_screens/dialogs/addons_loading.cpp:115
 #, c-format
 msgid "Version: %d"
-msgstr "Stumm: %d"
+msgstr "Handelv : %d"
 
 #: src/states_screens/dialogs/addons_loading.cpp:146
 msgid "featured"
@@ -4176,13 +4176,13 @@ msgstr "kinniget"
 #: src/states_screens/dialogs/addons_loading.cpp:172
 #, c-format
 msgid "%s MB"
-msgstr "%s MB"
+msgstr "%s Me"
 
 #: src/states_screens/dialogs/addons_loading.cpp:179
 #: src/states_screens/dialogs/addons_loading.cpp:183
 #, c-format
 msgid "%s KB"
-msgstr "%s KB"
+msgstr "%s Ke"
 
 #: src/states_screens/dialogs/addons_loading.cpp:184
 #, c-format
@@ -4196,7 +4196,7 @@ msgstr "Digarezit, c'hwitet eo bet war pellgargañ al lugantoù"
 #: src/states_screens/dialogs/addons_loading.cpp:376
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Kudennoù e-pad ma oa o staliañ al lugant '%s'."
+msgstr "Kudennoù e-pad ma oa o staliañ an askouezh '%s'."
 
 #: src/states_screens/dialogs/addons_loading.cpp:387
 #: src/states_screens/dialogs/addons_loading.cpp:426
@@ -4206,25 +4206,25 @@ msgstr "Klask en-dro"
 #: src/states_screens/dialogs/addons_loading.cpp:415
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr "Kudennoù e-pad ma oa o tilemel al lugant '%s'."
+msgstr "Kudennoù e-pad ma oa o tilemel an askouezh '%s'."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:134
 msgid "Current password invalid."
-msgstr "Didalvoud eo ar ger-tremen a-vremañ."
+msgstr "Didalvoud eo ar ger-tremen bremanel"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
 #: src/states_screens/online/register_screen.cpp:310
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr "Ar ger-tremen a rank bezañ etre 8 ha 30 arouezenn hirder!"
+msgstr "Etre 8 ha 30 arouezenn e rank bezañ gant ar gerioù-tremen !"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
 #: src/states_screens/online/register_screen.cpp:294
 msgid "Passwords don't match!"
-msgstr "Ne glot ket ar gerioù-tremen!"
+msgstr "Ne glot ket ar gerioù-tremen !"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:210
 msgid "Password successfully changed."
-msgstr "Cheñchet eo bet ar ger-tremen gant berzh."
+msgstr "Kemmet eo bet ar ger-tremen gant berzh."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
@@ -4242,7 +4242,7 @@ msgstr[0] "Kadarnaat ar spister a-benn %i segondenn"
 msgstr[1] "Kadarnaat ar spister a-benn %i segondenn"
 msgstr[2] "Kadarnaat ar spister a-benn %i segondenn"
 msgstr[3] "Kadarnaat ar spister a-benn %i segondenn"
-msgstr[4] "Kadarnaat ar spister a-benn %i segondenn"
+msgstr[4] "Kadarnaat an diarunusted a-benn %i eilenn"
 
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
 msgid ""
@@ -4259,7 +4259,7 @@ msgstr ""
 #: src/states_screens/online/create_server_screen.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:462
 msgid "Disabled"
-msgstr "Lazhet"
+msgstr "Diweredekaet"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:63
@@ -4434,7 +4434,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
-msgstr "Neket reizh an anv-implijer pe/hag ar chomlec'h."
+msgstr "Didalvoudek eo an anv arveriad pe/hag ar chomlec'h."
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
 #, c-format
@@ -4448,22 +4448,22 @@ msgstr "Lennit termenoù ha divizoù implij SuperTuxKart war '%s' mar plij. Rank
 #: src/states_screens/dialogs/select_challenge.cpp:52
 #, c-format
 msgid "Required Rank: %i"
-msgstr "Renk rekizet: %i"
+msgstr "Renk azgoulennet : %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:57
 #, c-format
 msgid "Required Time: %i"
-msgstr "Amzer rekizet: %i"
+msgstr "Amzer azgoulennet : %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:63
 #, c-format
 msgid "Required Nitro Points: %i"
-msgstr "Poentoù dre nitro rekizet: %i"
+msgstr "Poentoù dre nitro azgoulennet : %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:69
 #, c-format
 msgid "Number of AI Karts: %i"
-msgstr "Niver a gartoù AI: %i"
+msgstr "Niver a gartoù sturiet gant an urzhiataer : %i"
 
 #: src/states_screens/dialogs/select_challenge.cpp:158
 msgid "Nitro challenge"
@@ -4555,70 +4555,70 @@ msgstr "Hiziv"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:162
 msgid "Friend request sent!"
-msgstr "Goulenn mignoniezh kaset!"
+msgstr "Kaset eo bet goulenn ur c'heneil !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:219
 msgid "Friend request accepted!"
-msgstr "Reked mignoniezh asantet!"
+msgstr "Asantet eo bet goulenn ar c'heneil !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:271
 msgid "Friend request declined!"
-msgstr "Reked mignoniezh nac'het!"
+msgstr "Nac'het eo bet goulenn ar c'heneil !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:317
 msgid "Friend removed!"
-msgstr "Dilamet eo ar vignoniezh!"
+msgstr "Dilamet eo bet ar c'heneil !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:368
 msgid "Friend request cancelled!"
-msgstr "Nullet eo bet ar reked mignoniez!"
+msgstr "Dilezet eo bet goulenn ar c'heneil !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:478
 msgid "Processing"
-msgstr "O tretañ"
+msgstr "O keweriañ"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:172
 msgid "Fetching last vote"
-msgstr "Oc'h adpakañ ar votadenn diwezhañ"
+msgstr "O kerc'hat ar mouezhiañ diwezhañ"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:191
 msgid "You can adapt your previous rating by clicking the stars beneath."
-msgstr "Gellout a rit azasaat ho renkadur kent en ur glikañ war ar steredennoù amañ dindan."
+msgstr "Daskemm ar feur lakaet a-raok en ur glikañ war ar steredennoù amañ dindan."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:196
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
-msgstr "N'ho peus ket votet evit al lugant-mañ c'hoazh. Diuzit ar feur ho peus c'hoant en ur glikañ war ar steredennoù amañ dindan"
+msgstr "N'hoc'h eus ket mouezhiet evit an enlugellad-mañ c'hoazh. Diuzit ar feur a fell deoc'h en ur glikañ war ar steredennoù amañ dindan"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:231
 msgid "Vote successful! You can now close the window."
-msgstr "Votadenn graet gant berzh! Gellout a rit serriñ ar prenestr bremañ."
+msgstr "Mouezhiaet gant berzh ! Serriñ ar prenestr a c'hallit bremañ."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:248
 msgid "Performing vote"
-msgstr "O votiñ"
+msgstr "O vouezhiañ"
 
 #: src/states_screens/easter_egg_screen.cpp:269
 #: src/states_screens/online/tracks_screen.cpp:600
 #: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
-msgstr "Roudenn dre-zegouezh"
+msgstr "Loabr dargouezhek"
 
 #: src/states_screens/edit_gp_screen.cpp:116
 #: src/states_screens/ghost_replay_selection.cpp:507
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
-msgstr "Ha c'hoant ho peus da zilemel da vat '%s'?"
+msgstr "Ha fellout a ra deoc'h dilemel '%s' ?"
 
 #: src/states_screens/edit_gp_screen.cpp:133
 msgid "Do you want to save your changes?"
-msgstr "Ha c'hoant ho peus da enrollañ ho cheñchadurioù?"
+msgstr "Ha fellout a ra deoc'h enrollañ ho kemmoù ?"
 
 #: src/states_screens/edit_gp_screen.cpp:150
 msgid "Track"
-msgstr "Roudenn"
+msgstr "Loabr"
 
 #: src/states_screens/edit_gp_screen.cpp:151
 msgid "Laps"
@@ -4626,7 +4626,7 @@ msgstr "Troioù"
 
 #: src/states_screens/edit_gp_screen.cpp:152
 msgid "Reversed"
-msgstr "Eilpennet"
+msgstr "Tuginet"
 
 #. I18N: Indicate that the grand prix is modified and not saved
 #: src/states_screens/edit_gp_screen.cpp:289
@@ -4640,7 +4640,7 @@ msgstr "C'hoarvezet ez eus bet ur fazi e-pad ma oa oc'h enrollañ ar grand prix.
 
 #: src/states_screens/edit_track_screen.cpp:233
 msgid "Select a track"
-msgstr "Diuzañ ur roudenn"
+msgstr "Diuzañ ul loabr"
 
 #: src/states_screens/feature_unlocked.cpp:248
 #, c-format

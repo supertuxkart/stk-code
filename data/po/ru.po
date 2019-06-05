@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Andrei Stepanov <adem4ik@gmail.com>, 2015-2019
-# Benau, 2018
+# Benau, 2018-2019
 # Dmitry Dubrov <dimprogpro@hotmail.ru>, 2015
 # Mazur Bogdan <mazurbogd@yandex.ru>, 2018-2019
 # Oleg <laol-tomsk@mail.ru>, 2015
@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Andrei Stepanov <adem4ik@gmail.com>\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Russian (http://www.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3752,7 +3752,7 @@ msgstr[3] "%d арены недоступны в одиночном режиме
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Участники Launchpad:\n  AleXoundOS https://launchpad.net/~alexoundos\n  Alexander 'FONTER' Zinin https://launchpad.net/~spore-09\n  Andrey Olykainen https://launchpad.net/~andrey.olykainen\n  Denis Deryabin https://launchpad.net/~denis2010der\n  Dmitriy Koshel https://launchpad.net/~gaim4a\n  Dmitry https://launchpad.net/~dmitry-ashkadov\n  Dmitry Dubrov https://launchpad.net/~dimprogpro\n  Helen Antonova https://launchpad.net/~vigonett\n  Igor Shtompel https://launchpad.net/~i.shtompel\n  Kirill Babeev https://launchpad.net/~kirill-babeev\n  KroArtem https://launchpad.net/~kroartem\n  Maxim Kalinin https://launchpad.net/~kalinin-maxim\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  adem https://launchpad.net/~adem4ik\n  pingvin https://launchpad.net/~penguin-tux\n  Дмитрий https://launchpad.net/~starwars32\n  Олег https://launchpad.net/~laoltomsk\n  ☠Jay ZDLin☠ https://launchpad.net/~black-buddha666"
+msgstr "Участники Launchpad:\n  AleXoundOS https://launchpad.net/~alexoundos\n  Alexander 'FONTER' Zinin https://launchpad.net/~spore-09\n  Andrey Olykainen https://launchpad.net/~andrey.olykainen\n  Denis Deryabin https://launchpad.net/~denis2010der\n  Dmitriy Koshel https://launchpad.net/~gaim4a\n  Dmitry https://launchpad.net/~dmitry-ashkadov\n  Dmitry Dubrov https://launchpad.net/~dimprogpro\n  Helen Antonova https://launchpad.net/~vigonett\n  Igor Shtompel https://launchpad.net/~i.shtompel\n  Kirill Babeev https://launchpad.net/~kirill-babeev\n  KroArtem https://launchpad.net/~kroartem\n  Maxim Kalinin https://launchpad.net/~kalinin-maxim\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  adem https://launchpad.net/~adem4ik\n  pingvin https://launchpad.net/~penguin-tux\n  Дмитрий https://launchpad.net/~starwars32\n  Олег https://launchpad.net/~laoltomsk\n  Jay ZDLin https://launchpad.net/~black-buddha666"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:64
 msgctxt "achievement_info"

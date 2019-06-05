@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Jonas Kr <jonukas@gmail.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/supertuxkart/supertuxkart/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -359,7 +359,7 @@ msgstr "Matymo kampas"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Glow (Outlines)"
-msgstr ""
+msgstr "Suliejimas (krašt. linijų)"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1051,7 +1051,7 @@ msgstr "Priešinga kryptis"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr ""
+msgstr "Vaiduoklio peržiūros pasirinkimas"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1086,12 +1086,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Hide multiplayer replays"
-msgstr ""
+msgstr "Slėpti kelių žaidėjų peržiūras"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record a ghost replay"
-msgstr ""
+msgstr "Įrašyti vaiduoklio peržiūrą"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1185,7 +1185,7 @@ msgstr "Žaidimo režimai"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Powerups"
-msgstr "Pagreitinimai"
+msgstr "Dalykėliai"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1264,7 +1264,7 @@ msgstr "Pradėti pamoką"
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue gift boxes, they will give you powerups."
-msgstr ""
+msgstr "Rink mėlynas dovanėlės, ten rasi dalykėlius"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -2031,7 +2031,7 @@ msgstr "Siųsti anonimiškas įrangos statistikas"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable chatting in online games"
-msgstr ""
+msgstr "Įjungti pokalbius žaidimui tinkle"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2280,7 +2280,7 @@ msgstr "Kovų sala"
 
 #. I18N: ../stk-assets/tracks/black_forest/track.xml
 msgid "Black Forest"
-msgstr ""
+msgstr "Juodasis miškas"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -2363,7 +2363,7 @@ msgstr "Oliverio matematikos pamoka"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
-msgstr ""
+msgstr "Ravenbridge vila"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"

@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Myeongjin <aranet100@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/supertuxkart/supertuxkart/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1479,7 +1479,7 @@ msgstr "이 아이콘 아래에 나타난 점수를 얻을 때, 당신은 놀랄
 msgid ""
 "Not all karts drive the same! They belong to classes with several "
 "differences:"
-msgstr ""
+msgstr "모든 카트가 같은 주행을 하는 것은 아닙니다! 그들은 여러 차이가 있는 등급에 속해 있습니다:"
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1487,7 +1487,7 @@ msgid ""
 "Mass - there are three classes of karts, depending of their mass: light, "
 "medium and heavy. Heavier karts are less affected by parachutes and are more"
 " resistant to explosions."
-msgstr ""
+msgstr "중량 - 그들의 중량에 따라 세 가지 카트 등급으로 나뉩니다: 가벼움, 중간 및 무거움. 카트가 무거울수록 낙하산의 영향을 덜 받고 폭발에 더 견딥니다."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1495,7 +1495,7 @@ msgid ""
 "Acceleration - especially useful at start, after an accident, or in tracks "
 "with a lot of sharp curves. The lighter the kart, the faster it accelerates,"
 " especially at low speeds."
-msgstr ""
+msgstr "가속 - 시작할 때, 사고가 난 후, 또는 급커브가 많은 트랙에서 특히 유용합니다. 카트가 가벼울수록, 더 빨리, 특히 저속에서 가속됩니다."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1503,14 +1503,14 @@ msgid ""
 "Max speed - the higher it is, the faster the kart can go. Especially useful "
 "in tracks with straight lines and gentle curves. Heavier karts have a higher"
 " top speed."
-msgstr ""
+msgstr "최고 속도 - 속도가 높을수록, 카트가 더 빨리 갈 수 있습니다. 직선과 완만한 커브가 있는 트랙에서 특히 유용합니다. 카트가 무거울수록 최고 속도가 더 높습니다."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
 "Nitro consumption - the lower it is, the more speed you can get from a can "
 "of nitro. The lighter the kart, the lower its nitro consumption."
-msgstr ""
+msgstr "니트로 소비 - 그것이 더 낮을수록, 니트로 캔에서 더 빠른 속도를 얻을 수 있습니다. 카트가 가벼울수록, 니트로 소비가 더 낮습니다."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1518,7 +1518,7 @@ msgid ""
 "If you follow closely another kart for a few seconds, you'll get a "
 "slipstream speed bonus when you overtake it. The lighter your kart, the "
 "easier it is."
-msgstr ""
+msgstr "몇 초 동안 당신이 또다른 카트를 가까이서 따라가면, 당신은 카트를 추월할 때 슬립스트림 속도 보너스를 얻게 될 것입니다. 당신의 카트가 가벼울수록, 더 쉬워집니다."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -2315,7 +2315,7 @@ msgstr "뭐가 잘못 됐어, 꼬마 히피? 너의 위대한 그누 선생이 �
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "오 그래, 봐, 그는 내 성에 지금 있고 저녁 식사를 줄 것이지..."
+msgstr "오 그래, 봐, 그는 내 성에 지금 있고 저녁 식사로 줄 거야..."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2426,32 +2426,32 @@ msgstr "일반 경주 (그랑프리)"
 
 #: src/challenges/challenge_data.cpp:303
 msgid "Time-Trial (Grand Prix)"
-msgstr ""
+msgstr "타임 트라이얼 (그랑프리)"
 
 #: src/challenges/challenge_data.cpp:308
 msgid "Time-Trial - beat the replay"
-msgstr ""
+msgstr "타임 트라이얼 - 리플레이를 이기기"
 
 #: src/challenges/challenge_data.cpp:310
 msgid "Time-Trial - nitro challenge"
-msgstr ""
+msgstr "타임 트라이얼 - 니트로 도전"
 
 #: src/challenges/challenge_data.cpp:312
 msgid "Normal Race (single race)"
-msgstr ""
+msgstr "일반 경주 (단일 경주)"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Time-Trial (single race)"
-msgstr ""
+msgstr "타임 트라이얼 (단일 경주)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Follow the Leader (single race)"
-msgstr ""
+msgstr "대장 꼬리잡기 (단일 경주)"
 
 #: src/challenges/challenge_data.cpp:322
 #: src/states_screens/dialogs/select_challenge.cpp:170
 msgid "Mode: Reverse"
-msgstr ""
+msgstr "모드: 역방향"
 
 #: src/challenges/challenge_data.cpp:599
 #, c-format
@@ -3530,7 +3530,7 @@ msgstr "<%s> 또는 <%s>를 눌러 대상 플레이어를 변경하거나 <%s>�
 #: src/network/protocols/client_lobby.cpp:1462
 #, c-format
 msgid "Successfully reported %s."
-msgstr ""
+msgstr "성공적으로 %s를 신고했습니다."
 
 #: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
@@ -4330,20 +4330,20 @@ msgstr "슬라이더에서 색을 고릅니다"
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:48
 msgid "Player info"
-msgstr ""
+msgstr "플레이어 정보"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:53
 #, c-format
 msgid "Player name: %s"
-msgstr ""
+msgstr "플레이어 이름: %s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
 #: src/states_screens/dialogs/network_player_dialog.cpp:62
 #, c-format
 msgid "Player location: %s"
-msgstr ""
+msgstr "플레이어 위치: %s"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:105
@@ -4369,7 +4369,7 @@ msgstr "핸디캡 비활성화"
 #. report player about for example abusive behaviour in game
 #: src/states_screens/dialogs/network_player_dialog.cpp:156
 msgid "Report player"
-msgstr ""
+msgstr "플레이어 신고"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -4383,7 +4383,7 @@ msgstr "%s의 순위 정보를 얻는 중"
 #: src/states_screens/dialogs/network_player_dialog.cpp:186
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr ""
+msgstr "서버 관리자에게 이 플레이어(%s)에 대해 알려주세요:"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:93
 #: src/states_screens/online/networking_lobby.cpp:218
@@ -4478,7 +4478,7 @@ msgstr "현재 트랙: %s"
 #: src/states_screens/dialogs/server_info_dialog.cpp:116
 #, c-format
 msgid "Server location: %s"
-msgstr ""
+msgstr "서버 위치: %s"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Rank"
@@ -4515,7 +4515,7 @@ msgstr "서버에 연결 중인 사용 가능한 플레이어가 없습니다."
 #: src/states_screens/dialogs/user_info_dialog.cpp:54
 #, c-format
 msgid "Username: %s"
-msgstr ""
+msgstr "사용자 이름: %s"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:58
 msgid "Cancel Request"
@@ -5639,7 +5639,7 @@ msgstr "회전하는 중에 가속하고 <%s> 키를 눌러 스키드합니다. 
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr "몇 초동안 스키드하여 지나다닐 경우 당신은 보상으로 보너스 스피드업을 받게 될 것임을 참고하세요."
+msgstr "몇 초동안 스키드하여 지나다닐 경우 당신은 보상으로 보너스 스피드업을 받게 될 것임을 참고하세요!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:82
 #: ../stk-assets/tracks/tutorial/triggers.as:83

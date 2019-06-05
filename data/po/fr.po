@@ -12,6 +12,7 @@
 # Éfrit, 2015
 # nad0, 2015
 # PoorPockets McNewHold <poorpocketsmcnewhold@protonmail.ch>, 2019
+# Sylvain St-Amand, 2019
 # Sylvain St-Amand, 2018
 # 51251df01484cc547f4d59bd93cd7512, 2016-2018
 msgid ""
@@ -19,8 +20,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-14 15:17+0800\n"
-"PO-Revision-Date: 2019-05-15 08:31+0000\n"
-"Last-Translator: Benau\n"
+"PO-Revision-Date: 2019-06-05 02:14+0000\n"
+"Last-Translator: Sylvain St-Amand\n"
 "Language-Team: French (http://www.transifex.com/supertuxkart/supertuxkart/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2434,32 +2435,32 @@ msgstr "Course Normale (Grand Prix)"
 
 #: src/challenges/challenge_data.cpp:303
 msgid "Time-Trial (Grand Prix)"
-msgstr ""
+msgstr "Contre la montre (Grand Prix)"
 
 #: src/challenges/challenge_data.cpp:308
 msgid "Time-Trial - beat the replay"
-msgstr ""
+msgstr "Contre la montre - battre la reprise"
 
 #: src/challenges/challenge_data.cpp:310
 msgid "Time-Trial - nitro challenge"
-msgstr ""
+msgstr "Contre la montre - défi nitro"
 
 #: src/challenges/challenge_data.cpp:312
 msgid "Normal Race (single race)"
-msgstr ""
+msgstr "Course Normale (course simple)"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Time-Trial (single race)"
-msgstr ""
+msgstr "Contre la montre (course simple)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Follow the Leader (single race)"
-msgstr ""
+msgstr "Suivre le meneur (course simple)"
 
 #: src/challenges/challenge_data.cpp:322
 #: src/states_screens/dialogs/select_challenge.cpp:170
 msgid "Mode: Reverse"
-msgstr ""
+msgstr "Mode : Inversé"
 
 #: src/challenges/challenge_data.cpp:599
 #, c-format
@@ -3540,7 +3541,7 @@ msgstr "Presse <%s> ou <%s> pour changer le joueur visé ou <%s> pour la positio
 #: src/network/protocols/client_lobby.cpp:1462
 #, c-format
 msgid "Successfully reported %s."
-msgstr ""
+msgstr "Rapporté avec succès%s."
 
 #: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
@@ -4344,20 +4345,20 @@ msgstr "Choisir une couleur avec la barre de sélection"
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:48
 msgid "Player info"
-msgstr ""
+msgstr "Informations sur le joueur"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:53
 #, c-format
 msgid "Player name: %s"
-msgstr ""
+msgstr "Nom du joueur :%s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
 #: src/states_screens/dialogs/network_player_dialog.cpp:62
 #, c-format
 msgid "Player location: %s"
-msgstr ""
+msgstr "Emplacement du joueur : %s"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:105
@@ -4383,7 +4384,7 @@ msgstr "Désactiver l'handicap"
 #. report player about for example abusive behaviour in game
 #: src/states_screens/dialogs/network_player_dialog.cpp:156
 msgid "Report player"
-msgstr ""
+msgstr "Signaler un joueur"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -4397,7 +4398,7 @@ msgstr "Récupération des informations de classement pour %s"
 #: src/states_screens/dialogs/network_player_dialog.cpp:186
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr ""
+msgstr "Informer l'administrateur du serveur sur ce joueur (%s) :"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:93
 #: src/states_screens/online/networking_lobby.cpp:218
@@ -4492,7 +4493,7 @@ msgstr "Piste actuelle : %s"
 #: src/states_screens/dialogs/server_info_dialog.cpp:116
 #, c-format
 msgid "Server location: %s"
-msgstr ""
+msgstr "Emplacement du serveur : %s"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Rank"
@@ -4529,7 +4530,7 @@ msgstr "Aucun joueur disponible pour la connexion au serveur."
 #: src/states_screens/dialogs/user_info_dialog.cpp:54
 #, c-format
 msgid "Username: %s"
-msgstr ""
+msgstr "Nom d'utilisateur : %s"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:58
 msgid "Cancel Request"
