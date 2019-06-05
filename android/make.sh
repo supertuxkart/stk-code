@@ -152,7 +152,6 @@ if [ -z "$BUILD_TYPE" ]; then
 fi
 
 if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
-    export ANT_BUILD_TYPE="debug"
     export GRADLE_BUILD_TYPE="assembleDebug"
     export IS_DEBUG_BUILD=1
     export APP_NAME="$APP_NAME_DEBUG"
@@ -161,7 +160,6 @@ if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
     export APP_DIR_NAME="$APP_DIR_NAME_DEBUG"
     export APP_ICON="$APP_ICON_DEBUG"
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
-    export ANT_BUILD_TYPE="release"
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_RELEASE"
@@ -170,7 +168,6 @@ elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
 elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
-    export ANT_BUILD_TYPE="release"
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_BETA"
@@ -181,17 +178,6 @@ elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
          "debug, release"
-    exit
-fi
-
-# Check selected build tool
-if [ -z "$BUILD_TOOL" ]; then
-    BUILD_TOOL="gradle"
-fi
-
-if [ "$BUILD_TOOL" != "gradle" ] && [ "$BUILD_TOOL" != "ant" ]; then
-    echo "Unsupported BUILD_TOOL: $BUILD_TOOL. Possible values are: " \
-         "gradle, ant"
     exit
 fi
 
@@ -507,15 +493,9 @@ if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
     export PATH=$JAVA_HOME/bin:$PATH
 fi
 
-if [ "$BUILD_TOOL" = "gradle" ]; then
-    export ANDROID_HOME="$SDK_PATH"
-    gradle -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
-           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
-           $GRADLE_BUILD_TYPE
-elif [ "$BUILD_TOOL" = "ant" ]; then
-    ant -Dsdk.dir="$SDK_PATH"  \
-        -Dtarget="android-$TARGET_SDK_VERSION" \
-        $ANT_BUILD_TYPE
-fi
+export ANDROID_HOME="$SDK_PATH"
+./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
+          -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
+          $GRADLE_BUILD_TYPE
 
 check_error
