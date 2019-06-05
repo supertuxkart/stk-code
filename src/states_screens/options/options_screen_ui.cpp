@@ -161,11 +161,14 @@ void OptionsScreenUI::init()
     }
     minimap_options->setValue(UserConfigParams::m_minimap_display);
     
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
     
     font_size->setValue((int)roundf(UserConfigParams::m_fonts_size));
     m_prev_font_size = UserConfigParams::m_fonts_size;
+    font_size->setActive(!in_game);
 
     // ---- video modes
     CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -173,7 +176,6 @@ void OptionsScreenUI::init()
     splitscreen_method->setState(UserConfigParams::split_screen_horizontally);
 
     //Forbid changing this setting in game
-    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
     splitscreen_method->setActive(!in_game);
 
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
