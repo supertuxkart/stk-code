@@ -14,9 +14,7 @@
                         <label id="size"     width="100%" text="" />
                         <label id="revision" width="100%" text="" />
                     </div>
-                    <div width="50%" height="32" layout="vertical-row">
-                        <ratingbar id="rating" height="64" width="100%" />
-                    </div>
+                <ratingbar id="rating" height="1f" width="100%" />
                 </div>
                 <spacer height="10"/>
                 <label id="flags"    width="100%" text="" word_wrap="true" />
