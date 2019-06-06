@@ -20,5 +20,6 @@
         <button id="middle" align="center" width="60%"/>
         <spacer height="1%" width="96%"/>
         <button id="bottom" align="center" width="60%"/>
+        <spacer height="1%" width="96%"/>
     </div>
 </stkgui>
