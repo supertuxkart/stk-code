@@ -10,9 +10,7 @@
 
         <spacer height="2%" width="50"/>
 
-        <div width="90%" height="64" align="center" layout="vertical-row" >
-            <ratingbar id="rating" align="center" height="64" width="192"/>
-        </div>
+        <ratingbar id="rating" align="center" height="1f" width="3f"/>
 
         <spacer height="4%" width="50"/>
 
