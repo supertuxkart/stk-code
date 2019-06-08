@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="1%" y="2%" width="98%" height="96%" layout="vertical-row">
+    <div x="1%" y="4%" width="98%" height="92%" layout="vertical-row">
 
         <div width="100%" height="40%" layout="vertical-row">
             <div width="100%" height="25%" layout="vertical-row" >
@@ -21,17 +21,17 @@
                 <div width="95%" align="center" layout="vertical-row" height="50%">
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <checkbox width="fit" id="record-race" I18N="Ghost replay info action" text_align="left"/>
-                        <spacer width="10"/>
+                        <spacer width="1%"/>
                         <label proportion="1" id="record-race-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Record the race for ghost replay"/>
                     </div>
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <checkbox width="fit" id="watch-only" I18N="Ghost replay info action" text_align="left"/>
-                        <spacer width="10"/>
+                        <spacer width="1%"/>
                         <label proportion="1" id="watch-only-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Watch replay only"/>
                     </div>
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <checkbox width="fit" id="compare-ghost" I18N="Ghost replay info action" text_align="left"/>
-                        <spacer width="10"/>
+                        <spacer width="1%"/>
                         <label proportion="1" id="compare-ghost-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Compare to another ghost"/>
                     </div>
                 </div>

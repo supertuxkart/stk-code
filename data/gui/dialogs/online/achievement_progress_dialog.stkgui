@@ -39,6 +39,6 @@
                          icon="gui/icons/green_check.png" text="OK"
                          label_location="bottom"/>
         </buttonbar>
-        <spacer width="20" height="3%" />
+        <spacer width="20" height="1f" />
     </div>
 </stkgui>

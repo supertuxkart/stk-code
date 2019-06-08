@@ -78,6 +78,9 @@ Google Summer of Code Students
 - Lauri Kasanen
 - Daniel Butum
 - Bart Cools
+
+
+Google Summer of Code Students
 - Csaba Molnar
 - Sachith Seneviratne
 - Akshay Singhvi
@@ -90,6 +93,9 @@ Bug fixes & misc contributions
 - David (Work on flying items)
 - Stephen Dunn (Work on audio)
 - Patrick Ammann
+
+
+Bug fixes & misc contributions
 - Ward Muylaert
 - Fantasmos
 - QwertyChouskie
@@ -159,6 +165,8 @@ GUI Icons and Other Art
 - The Tango icon project, the Gnome icon set
 - Dakal : textures
 - Andy (Needer)
+
+GUI Icons and Other Art
 - Paul Elms (scifly)
 - Elisee : Checker background
 - Mariam Lamrani (may-panda): wallpaper and poster
@@ -242,6 +250,8 @@ Software used
 - curl
 - freetype2
 - OpenAL
+
+Software used
 - ogg
 - vorbis
 - fribidi
@@ -258,29 +268,35 @@ Donations
 - M J Angove, Florian Lehebel, David E Scourfield, Michael Laube
 - Merlin Juusola, Matthias Wiege, Matthew Toppenberg, Martin Rejman
 - Mark Gannon, Lukas Palme, Lennart Mellqvist, Joshua Dye, Jan Havran
-- Jacqueline Brown, Igor Murzich, Guido Stehr, Gisela Ehresmann
-- Evaldas Granickas, Elisabeth Lambert, Edith Muijsers, DC Jaeger
+
 
 
 Donations
+- Jacqueline Brown, Igor Murzich, Guido Stehr, Gisela Ehresmann
+- Evaldas Granickas, Elisabeth Lambert, Edith Muijsers, DC Jaeger
 - Damian Fajfer, Chase Williamson, Carsten Timm, Baptiste Dagneaux
 - Alexander Olkhovsky, Aleix Casamitjana, Adrián Chaves Fernández
 - Georgi Stoychev, Nuno Ferreira, Steven Anderson, Charalabos Frouzakis
 - Richard Qian, William Nakamura, Maree Glynn, David Carlier
+
+
+Donations
 - Alistair Findlay, James Tobin, Ursula Belting, Stephan van den Akker
 - Ken McCall, Arnaud Maurin, James Tobin, Stefan Kiehne, David Efflandt
 - Gary Shearer, Stuart Gibb, Fran Casal, Piotr Karczemski, Florian Lehébel
 - Dominik Müller, Saverio Brancaccio, Florian Lehébel, Pietro Pizzo
-
-Donations
 - Alvaro Castañeda Mendoza, Simón Llinares Riestra, Radu Sofian
 - Yevgeny Slusorenko, Joshua Dye, Chris Lukas, Gary Shearer, Gary Shearer
+
+
+Donations
 - Martin Lankes, Muchlis Polin, Peter Estes, Nuno Ferreira, Duncan Steele
 - Michael Kleinhans, Atomic Monks, Aleksandar Sokolovski, Brandon Hoeksema
 - Victor Gabillon, Tristan Reitter, Lupe Aguilar, Florian Pelz
 - Tanja Wiege, Gabriele Casetti, Andrea De Angelis, Saul Gutierrez
 - Csongor Ballay, Csongor Ballay, William Youstra, Peter Estes
 - Régis Hamann, Régis Hamann, Yuri Sucupira, Lucien Greefkes, Frank Sapone
+
 
 Donations
 - Peter Cundall, Michael Richards, Franz Ernst, Florian Lehébel
@@ -289,74 +305,86 @@ Donations
 - Guillaume Pointet, Dennis Holierhoek, Daniel Nelson, David Hibshman
 - Thomas Belvin, Erik Jahn, Susen Skotnik, Dennis McLaughlin, Bert De Mets
 - Jean-Gabriel Kammerer, Stefan Lukits, Martin Steigerwald
-- Adam Williamson, A Anton, Ville Kauppila, Gary Shearer
-- Peter Hausleitner, Philip Pfeifer, Christoph Baldauf, Jane Middlebrooke
+
 
 Donations
+- Adam Williamson, A Anton, Ville Kauppila, Gary Shearer
+- Peter Hausleitner, Philip Pfeifer, Christoph Baldauf, Jane Middlebrooke
 - roundof.org, Roman Marschall, Gary Shearer, Jonathan Banks
 - Nicolas Affolter, Mahendra Tallur, David Behnke, Mark Supper
 - Eric Cheminot, Jason Speechley, Michael Martin, Andrew Gilbert
 - Fabian Schach, michael orosov, Wendell Glick, Eugene Lemaitre
+
+Donations
+
 - Gerald Angus, Andrea De Angelis, Antonio Sala, Joshua Dye, roundof.org
 - Andreas Müller, Jose Miguel Bolorino Manzano, Troy Smith, Bernhard Motel
 - Bernhard Motel, Alexandre Bouhier, Thomas Preissler, Lubomír Saji
 - Eric Pedersen, Fabrice SAILLY-SIRGUE, Simon Dalsgaard, Joshua Dye
-
-Donations
 - Detlef Olp, João Pedro de Lima, Christopher Sweeney, Ryan Gervais
 - Laszlo Ast, Robert Yerke, Nuno Ferreira, Lachand Valentin, Arne Bernin
-- Carsten Carulli, Jeremy Kenny, Francisco Monteagudo, Marlow Marlow
+
+
+Donations
 - Kong Chun Ho, Jonathan Lee, Dominik Rösner, Andreas Frankl
 - Didier Delhaye, Gianluca Bonato, Ferdinand Ihringer, Mark Dougherty
 - Топоров Константин, Georges-Mickael Seguin, Jason Grindlay
 - Gordon Macleod, Anders Jonsson, Peter Estes, Marius Gripsgård,
 - FoosterNET, Daniel Sandman, David Ault, Matt DeVillier, Chris Leutwyler
+- Anthony Waxman, Rémi Verschelde, Alessandro Vitali, Katherine Freeman
+
 
 Donations
-- Anthony Waxman, Rémi Verschelde, Alessandro Vitali, Katherine Freeman
 - Roy Akselsen, Ingrid Becke, Jonathan Lee, Christoph Baldauf
 - Victor Gabillon, Yves Fourneau, Rubén Leal Coba, Andreas Müller
 - Santiago Hoyos Zea, Tobias Wenig, Nuno Ferreira, Fran Casal
 - Alexey Горохов, Luka Vievsky, Nathan Dykhuis, David , David Leschinsky
 - Sam Tygier, Алексей Казаков, Matthew Golliher
 - Karl Ove Hufthammer, Richard Stoltenberg, Niklas Anderson, Alfred Turner
-- Adrian Spirgi, Frank Abrignani, Lukasz Korpalski, Andea De Angelis
+
 
 Donations
+- Adrian Spirgi, Frank Abrignani, Lukasz Korpalski, Andea De Angelis
 - Pedro Freitas Fleck, Lachand Valentin, Cyrille Giquello, FoosterNet
 - Olivier C. Pageau, Bérenger Ossete Gombe, Michael Schönitzer
 - Daniel Martínez García, Joe Westcott, Patrik Nilsson, Will Hennegan
 - Philip Whitfield, Markus Hedetoft, Walt Zwierzycki, Jake Jarrett
 - Kyle Maggio, Richárd Ráthgéber, Gilles Wittezaele, Daniel Sandman
+
+
+Donations
 - Haldor Zaake-Hertling, Elvis Kandler, OPE Beckman Lapre
 - Esteban Monge Marin, Marcos Schnalke, Maximilian Rüdiger, Glenn Geenen
 - Michael Biller, Vincent Bermel, John Cordray, Jannik Heller
-
-Donations
 - Vincent Stavleu, Jairo Estefania Vilumbrales, Michal Klaus, Josh Dye
 - Carlos Solís Róger, James Vandermark, Wouter Reckman, Nuno Ferreira
 - Crefelean Nicolae, Mark Saliers, Issa Gorissen, Tom Reynolds
+
+Donations
 - James Dearing, Collin Blatt, Vincent Bermel, Nuno Ferreira
 - Jarl Frode Arntzen, Vladimir Tuboltsev, Attila Cseman
 - Frank Lauterbach, Mahendra Tallur, Matthijs Harmsen, Dietmar Wolf
 - Suwannee Massage, Fabio Molinari, Christian Ritzer
 - Gerard Vaas, Edgar Klenske, Georgi Stoychev, Daniel Reimann
+- Tibor Grasser, Robert Forster, Kelonye Mitchel, Dennis Shewmaker,
 
 Donations
-- Tibor Grasser, Robert Forster, Kelonye Mitchel, Dennis Shewmaker,
 - ProMission Projects, Inc.,  Ken McCall, Peter Estes, Markus Valkeapää
 - Victor Gabillon, Franz Schmid, Austin Williamson, Artūras Norkus
 - Roland Schoof, Borisenkov Alexey, Edvin Djupvik, Mikel Crespo,
 - Trevor Robertson, Sergej Engbrecht, Dylan Mahoney,
 - Joel Schaerer, Stephanie Theisz, Mokimoke, George Angelopoulos
 - Kharlamov Ivan, Cedric Briand, Christoph Baldauf, Marco Caiazza,
-- Volkov Alexandr, Evelyne Tenaerts, Thomas Salmhofer, Ralfe Gomes Ecard
 
 Donations
+- Volkov Alexandr, Evelyne Tenaerts, Thomas Salmhofer, Ralfe Gomes Ecard
 - Carlos Alonso Pena Osorio, Philip Delaney, Giorgio Cantoni,
 - Gabriel Stedtler, Alexander Sauter, Robert Premuž, Antonín Pilát
 - Sylvain St-Amand, Apostolos Apostolidis,  E. Cole, David Ault
 - Vinzenz Vietzke,Edgar Bennet, Ryan Lei, Sergey Spiridonov
+- Carsten Carulli, Jeremy Kenny, Francisco Monteagudo, Marlow Marlow
+
+Donations
 - Michal Sladek, Peter Lebbing, Roland Schoof, Lars Peter Mathiassen
 - Benjamin Gronke, Marc Coll, Peter Estes, John Yewell, Josh Dye
 - Sebastian Rode, OpenGameArt.org, Tux_penguin, Magne Djupvik
@@ -372,14 +400,16 @@ No longer active
 - Sam Clarke : Windows Installer
 - Hans "the farmer" Dzaack : Physics tuning
 - Maik Semder (Ikework) : Bug fixes
-- Xapantu : add-ons website
 
 No longer active
+- Xapantu : add-ons website
 - Lionel Fuentes (Funto) : Soccer mode and other contributions
 - Mohammad Al-Ghannam (Yasin) : Soccer mode
 - Johannesr1 : Bubble gum shield
 - Glenn De Jonghe (Unitraxx) : Grand Prix progress saving
 - MCMic : reverse mode
+
+No longer active
 - Yann Leprince (sciyann)
 - Xenux : Add-Ons filtering
 - jmimu

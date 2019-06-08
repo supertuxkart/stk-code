@@ -46,7 +46,7 @@
                              I18N="In the server configuration screen" text="Cancel" label_location="bottom"/>
             </buttonbar>
 
-            <spacer height="3%" width="20"/>
+            <spacer height="1f" width="20"/>
         </box>
     </div>
 </stkgui>
