@@ -7,14 +7,14 @@
 
             <spacer height="7%" width="10"/>
 
-            <buttonbar id="control_type" proportion="1" width="100%" align="center">
+            <ribbon id="control_type" proportion="1" width="100%" align="center">
                 <icon-button id="accelerometer" width="128" height="128"
                         icon="gui/icons/difficulty_medium.png" I18N="Control type" text="Accelerometer"/>
                 <icon-button id="gyroscope" width="128" height="128"
                         icon="gui/icons/difficulty_best.png" I18N="Control type" text="Gyroscope"/>
                 <icon-button id="steering_wheel" width="128" height="128" 
                         icon="gui/icons/difficulty_hard.png" I18N="Control type"  text="Steering wheel"/>
-            </buttonbar>
+            </ribbon>
 
             <spacer height="12%" width="10"/>
 
