@@ -30,6 +30,7 @@ addons:
     - libbluetooth-dev
     - libcurl4-gnutls-dev
     - libfreetype6-dev
+    - libharfbuzz-dev
     - libfribidi-dev
     - libgl1-mesa-dev
     - libjpeg-dev
@@ -46,7 +47,7 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew bundle; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo mkdir -p /usr/local/include/; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/:/usr/local/opt/harfbuzz/; fi
 
 script:
   - mkdir "build"

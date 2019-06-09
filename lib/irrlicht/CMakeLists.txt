@@ -2,7 +2,7 @@
 if(NOT SERVER_ONLY)
     find_package(PNG REQUIRED)
     find_package(JPEG REQUIRED)
-
+    find_package(ZLIB REQUIRED)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                         "${JPEG_INCLUDE_DIR}"
                         "${PNG_INCLUDE_DIRS}"
@@ -62,12 +62,8 @@ if(NOT SERVER_ONLY)
     endif()
 else()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
-    if(MSVC)
-        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/")
-    else()
-        find_package(ZLIB REQUIRED)
-        include_directories("${ZLIB_INCLUDE_DIR}")
-    endif()
+    find_package(ZLIB REQUIRED)
+    include_directories("${ZLIB_INCLUDE_DIR}")
     add_definitions(-DNO_IRR_COMPILE_WITH_LIBPNG_)
     add_definitions(-DNO_IRR_COMPILE_WITH_LIBJPEG_)
     add_definitions(-DNO_IRR_COMPILE_WITH_BMP_LOADER_)

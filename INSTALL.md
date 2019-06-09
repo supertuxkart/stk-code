@@ -18,6 +18,8 @@ To build SuperTuxKart from source, you'll need to install the following packages
   * Ogg (libogg-dev)
   * Vorbis (libvorbis-dev)
   * Freetype (libfreetype6-dev)
+  * Harfbuzz (libharfbuzz-dev)
+  * Fribidi (libfribidi-dev)
   * libcurl (libcurl-devel)
   * libbluetooth (bluez-devel)
   * libnettle (nettle-dev)
@@ -29,14 +31,14 @@ Fedora command:
 
 ```bash
 sudo dnf install @development-tools cmake bluez-libs-devel \
-openssl-devel libcurl-devel freetype-devel fribidi-devel mesa-libGL-devel \
+openssl-devel libcurl-devel freetype-devel harfbuzz-devel fribidi-devel mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
 ```
 Mageia 6 command:
 
 ```bash
-su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel \
+su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel harfbuzz-devel \
 fribidi-devel libjpeg-turbo-devel libogg-devel openal-soft-devel \
 libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
 mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
@@ -45,7 +47,7 @@ OpenSUSE command:
 
 ```bash
 sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
-freetype-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
+freetype-devel harfbuzz-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel libXrandr-devel pkgconf zlib-devel enet-devel glew-devel \
 libjpeg-devel bluez-devel freetype2-devel glu-devel
 ```
@@ -53,7 +55,7 @@ Ubuntu command:
 
 ```bash
 sudo apt-get install build-essential cmake libbluetooth-dev \
-libcurl4-openssl-dev libenet-dev libfreetype6-dev libfribidi-dev \
+libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev \
 libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
 libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
 ```

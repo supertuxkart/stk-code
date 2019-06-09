@@ -29,8 +29,6 @@ option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
-CMAKE_DEPENDENT_OPTION(USE_FRIBIDI "Support for right-to-left languages" ON
-    "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
@@ -42,6 +40,7 @@ if(APPLE)
     include_directories(/usr/local/opt/openssl@1.1/include/)
     include_directories(/usr/local/opt/openssl@1.1/include/openssl/)
     include_directories(/usr/local/opt/freetype/include/freetype2/)
+    include_directories(/usr/local/opt/harfbuzz/include/harfbuzz/)
 endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
@@ -187,17 +186,8 @@ elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
     endif()
 endif()
 
-if(MSVC)
-    # Build zlib library
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
-
-    set(ZLIB_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/zlib" "${PROJECT_BINARY_DIR}/lib/zlib/")
-    set(ZLIB_LIBRARY zlibstatic)
-endif()
-
 if (NOT SERVER_ONLY)
-    if(MSVC OR APPLE)
+    if (APPLE)
         # Build png library
         set(SKIP_INSTALL_ALL TRUE)
         set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
@@ -328,27 +318,50 @@ if(NOT SERVER_ONLY)
     add_definitions(-DENABLE_SOUND)
 endif()
 
-# Freetype
+# Text handling in STK (We use freetype, harfbuzz, fribidi and libraqm for i18n text handling)
 if (NOT SERVER_ONLY)
+    # Freetype
     find_package(Freetype)
     if(FREETYPE_FOUND)
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
         message(FATAL_ERROR "Freetype not found. "
-            "Freetype is required to display characters in SuperTuxKart. ")
+            "Freetype is required to display characters in SuperTuxKart.")
     endif()
-endif()
 
-# Fribidi
-if(USE_FRIBIDI)
+    # Harfbuzz
+    find_library(HARFBUZZ_LIBRARY NAMES harfbuzz libharfbuzz)
+    find_path(HARFBUZZ_INCLUDEDIR NAMES harfbuzz/hb.h hb.h PATHS)
+    if (NOT HARFBUZZ_LIBRARY OR NOT HARFBUZZ_INCLUDEDIR)
+        message(FATAL_ERROR "Harfbuzz not found. "
+            "Harfbuzz is required to display characters in SuperTuxKart.")
+    else()
+        include_directories("${HARFBUZZ_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system harfbuzz: ${HARFBUZZ_LIBRARY}")
+    endif()
+
+    # Fribidi
     find_package(Fribidi)
     if(FRIBIDI_FOUND)
         include_directories(${FRIBIDI_INCLUDE_DIRS})
     else()
         message(FATAL_ERROR "Fribidi not found. "
-            "Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 "
-            "(if you don't use a right-to-left language then you don't need this).")
+            "Fribidi is required to display characters in SuperTuxKart.")
     endif()
+
+    # Libraqm
+    find_library(RAQM_LIBRARY NAMES raqm libraqm)
+    find_path(RAQM_INCLUDEDIR NAMES raqm.h PATHS)
+    if (NOT RAQM_LIBRARY OR NOT RAQM_INCLUDEDIR)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libraqm")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/libraqm")
+        SET(RAQM_LIBRARY raqm)
+        message(STATUS "System libraqm not found, use the bundled one.")
+    else()
+        include_directories("${RAQM_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system libraqm: ${RAQM_LIBRARY}")
+    endif()
+
 endif()
 
 # OpenGL
@@ -559,10 +572,13 @@ if(NOT SERVER_ONLY)
 
     target_link_libraries(supertuxkart
         ${SQUISH_LIBRARY}
-        ${FREETYPE_LIBRARIES}
         ${JPEG_LIBRARIES}
         ${OGGVORBIS_LIBRARIES}
         ${OPENAL_LIBRARY}
+        ${RAQM_LIBRARY}
+        ${FRIBIDI_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        ${HARFBUZZ_LIBRARY}
         graphics_utils)
 endif()
 
@@ -583,11 +599,6 @@ endif()
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
 if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
-endif()
-
-if(USE_FRIBIDI)
-    target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
-    add_definitions(-DENABLE_BIDI)
 endif()
 
 # Wiiuse
