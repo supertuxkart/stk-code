@@ -19,6 +19,7 @@
 #include "utils/time.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 #include <ctime>

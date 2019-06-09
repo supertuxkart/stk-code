@@ -29,6 +29,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
+#include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 
 #include <fstream>

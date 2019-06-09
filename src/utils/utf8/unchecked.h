@@ -141,6 +141,23 @@ namespace utf8
             return result;
         }
 
+        template <typename u16bit_iterator, typename u32bit_iterator>
+        u32bit_iterator utf16to32 (u16bit_iterator start, u16bit_iterator end, u32bit_iterator result)
+        {
+            while (start != end)
+            {
+                uint32_t cp = internal::mask16(*start++);
+                // Take care of surrogate pairs first
+                if (internal::is_lead_surrogate(cp))
+                {
+                    uint32_t trail_surrogate = internal::mask16(*start++);
+                    cp = (cp << 10) + trail_surrogate + internal::SURROGATE_OFFSET;
+                }
+                (*result++) = cp;
+            }
+            return result;
+        }
+
         template <typename u16bit_iterator, typename octet_iterator>
         u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_iterator result)
         {
@@ -162,6 +179,24 @@ namespace utf8
             while (start != end)
                 result = append(*(start++), result);
 
+            return result;
+        }
+
+        template <typename u16bit_iterator, typename u32bit_iterator>
+        u16bit_iterator utf32to16 (u32bit_iterator start, u32bit_iterator end, u16bit_iterator result)
+        {
+            while (start != end)
+            {
+                uint32_t cp = start++;
+                if (cp > 0xffff)
+                {
+                    //make a surrogate pair
+                    *result++ = static_cast<uint16_t>((cp >> 10)   + internal::LEAD_OFFSET);
+                    *result++ = static_cast<uint16_t>((cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
+                }
+                else
+                    *result++ = static_cast<uint16_t>(cp);
+            }
             return result;
         }
 

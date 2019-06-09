@@ -23,6 +23,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
+#include "utils/log.hpp"
 #include "utils/time.hpp"
 
 #include <string.h>

@@ -160,6 +160,9 @@ private:
     /** The dpi of this font. */
     unsigned int                 m_face_dpi;
 
+    /** Used to undo the scale on text shaping, only need to take care of
+     *  width. */
+    float                        m_inverse_shaping;
     /** Store a list of loaded and tested character to a \ref GlyphInfo. */
     std::map<wchar_t, GlyphInfo> m_character_glyph_info_map;
 
@@ -213,8 +216,6 @@ private:
     /** Add a character into \ref m_new_char_holder for lazy loading later. */
     void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
     // ------------------------------------------------------------------------
-    void insertGlyph(const GlyphInfo& gi);
-    // ------------------------------------------------------------------------
     void setDPI();
     // ------------------------------------------------------------------------
     /** Override it if sub-class should not do lazy loading characters. */
@@ -232,6 +233,11 @@ private:
     // ------------------------------------------------------------------------
     /** Override it if sub-class has bold outline. */
     virtual bool isBold() const                               { return false; }
+    // ------------------------------------------------------------------------
+    const FontArea* getUnknownFontArea() const;
+    // ------------------------------------------------------------------------
+    std::vector<gui::GlyphLayout> text2GlyphsWithoutShaping(
+                                                       const core::stringw& t);
     // ------------------------------------------------------------------------
 #ifndef SERVER_ONLY
     /** Override it if any outline shaping is needed to be done before
@@ -251,17 +257,31 @@ public:
     // ------------------------------------------------------------------------
     virtual void reset();
     // ------------------------------------------------------------------------
-    core::dimension2d<u32> getDimension(const wchar_t* text,
-                                  FontSettings* font_settings = NULL);
+    virtual core::dimension2d<u32> getDimension(const core::stringw& text,
+                                           FontSettings* font_settings = NULL);
     // ------------------------------------------------------------------------
     int getCharacterFromPos(const wchar_t* text, int pixel_x,
                             FontSettings* font_settings = NULL) const;
     // ------------------------------------------------------------------------
-    void render(const core::stringw& text, const core::rect<s32>& position,
-                const video::SColor& color, bool hcenter, bool vcenter,
-                const core::rect<s32>* clip,
+    void render(const std::vector<gui::GlyphLayout>& gl,
+                const core::rect<s32>& position, const video::SColor& color,
+                bool hcenter, bool vcenter, const core::rect<s32>* clip,
                 FontSettings* font_settings,
                 FontCharCollector* char_collector = NULL);
+    // ------------------------------------------------------------------------
+    virtual void drawText(const core::stringw& text,
+                          const core::rect<s32>& position,
+                          const video::SColor& color, bool hcenter,
+                          bool vcenter, const core::rect<s32>* clip,
+                          FontSettings* font_settings,
+                          FontCharCollector* char_collector = NULL);
+    // ------------------------------------------------------------------------
+    void drawTextQuick(const core::stringw& text,
+                       const core::rect<s32>& position,
+                       const video::SColor& color, bool hcenter, bool vcenter,
+                       const core::rect<s32>* clip,
+                       FontSettings* font_settings,
+                       FontCharCollector* char_collector = NULL);
     // ------------------------------------------------------------------------
     void dumpGlyphPage(const std::string& name);
     // ------------------------------------------------------------------------
@@ -277,6 +297,14 @@ public:
     unsigned int getDPI() const                          { return m_face_dpi; }
     // ------------------------------------------------------------------------
     FaceTTF* getFaceTTF() const                          { return m_face_ttf; }
+    // ------------------------------------------------------------------------
+    void insertGlyph(unsigned font_number, unsigned glyph_index);
+    // ------------------------------------------------------------------------
+    int getFontMaxHeight() const                  { return m_font_max_height; }
+    // ------------------------------------------------------------------------
+    virtual bool disableTextShaping() const                   { return false; }
+    // ------------------------------------------------------------------------
+    float getInverseShaping() const               { return m_inverse_shaping; }
 };   // FontWithFace
 
 #endif

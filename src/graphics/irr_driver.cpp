@@ -1756,7 +1756,7 @@ void IrrDriver::displayFPS()
     gui::IGUIFont* font = GUIEngine::getSmallFont();
     core::rect<s32> position;
 
-    const int fheight = font->getDimension(L"X").Height;
+    const int fheight = font->getHeightPerLine();
     if (UserConfigParams::m_artist_debug_mode)
         position = core::rect<s32>(51, 0, 30*fheight+51, 2*fheight + fheight / 3);
     else
@@ -1795,7 +1795,7 @@ void IrrDriver::displayFPS()
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
+        font->drawQuick(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
             core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
@@ -1839,7 +1839,7 @@ void IrrDriver::displayFPS()
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
-    font->draw( fps_string.c_str(), position, fpsColor, false );
+    font->drawQuick( fps_string.c_str(), position, fpsColor, false );
 #endif
 }   // updateFPS
 
@@ -2030,16 +2030,16 @@ void IrrDriver::renderNetworkDebug()
         (int)d, (int)h, (int)m, (int)s, (int)f);
 
     gui::IGUIFont* font = GUIEngine::getFont();
-    unsigned height = font->getDimension(L"X").Height + 2;
+    unsigned height = font->getHeightPerLine() + 2;
     background_rect.UpperLeftCorner.X += 5;
     static video::SColor black = video::SColor(255, 0, 0, 0);
-    font->draw(StringUtils::insertValues(
+    font->drawQuick(StringUtils::insertValues(
         L"Server time: %s      Server state frequency: %d",
         str, NetworkConfig::get()->getStateFrequency()),
         background_rect, black, false);
 
     background_rect.UpperLeftCorner.Y += height;
-    font->draw(StringUtils::insertValues(
+    font->drawQuick(StringUtils::insertValues(
         L"Upload speed (KBps): %f      Download speed (KBps): %f",
         (float)STKHost::get()->getUploadSpeed() / 1024.0f,
         (float)STKHost::get()->getDownloadSpeed() / 1024.0f,
@@ -2047,7 +2047,7 @@ void IrrDriver::renderNetworkDebug()
         false);
 
     background_rect.UpperLeftCorner.Y += height;
-    font->draw(StringUtils::insertValues(
+    font->drawQuick(StringUtils::insertValues(
         L"Packet loss: %d      Packet loss variance: %d",
         peer->getENetPeer()->packetLoss,
         peer->getENetPeer()->packetLossVariance,

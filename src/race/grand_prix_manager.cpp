@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>

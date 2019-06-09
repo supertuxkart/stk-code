@@ -88,8 +88,8 @@ void STKTextBillboard::updateAbsolutePosition()
 void STKTextBillboard::init(core::stringw text, FontWithFace* face)
 {
     m_chars = new std::vector<STKTextBillboardChar>();
-    core::dimension2du size = face->getDimension(text.c_str());
-    face->render(text, core::rect<s32>(0, 0, size.Width, size.Height),
+    core::dimension2du size = face->getDimension(text);
+    face->drawText(text, core::rect<s32>(0, 0, size.Width, size.Height),
         video::SColor(255,255,255,255), false, false, NULL, NULL, this);
 
     const float scale = 0.02f;
@@ -258,8 +258,8 @@ void STKTextBillboard::init(core::stringw text, FontWithFace* face)
 void STKTextBillboard::initLegacy(core::stringw text, FontWithFace* face)
 {
     m_chars = new std::vector<STKTextBillboardChar>();
-    core::dimension2du size = face->getDimension(text.c_str());
-    face->render(text, core::rect<s32>(0, 0, size.Width, size.Height),
+    core::dimension2du size = face->getDimension(text);
+    face->drawText(text, core::rect<s32>(0, 0, size.Width, size.Height),
         video::SColor(255,255,255,255), false, false, NULL, NULL, this);
 
     const float scale = 0.02f;

@@ -30,7 +30,7 @@ class FaceTTF;
 class BoldFace : public FontWithFace
 {
 private:
-    virtual unsigned int getGlyphPageSize() const OVERRIDE     { return 1024; }
+    virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 512; }
     // ------------------------------------------------------------------------
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.3f; }
     // ------------------------------------------------------------------------

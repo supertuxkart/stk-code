@@ -19,7 +19,6 @@
 #ifndef HEADER_FACE_TTF_HPP
 #define HEADER_FACE_TTF_HPP
 
-#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 
 #include <cassert>
@@ -51,7 +50,7 @@ struct FontArea
 };
 
 /** This class will load a list of TTF files from \ref FontManager, and save
- *  them inside \ref m_faces for \ref FontWithFace to load glyph.
+ *  them inside \ref m_ft_faces for \ref FontWithFace to load glyph.
  *  \ingroup font
  */
 class FaceTTF : public NoCopy
@@ -60,7 +59,7 @@ class FaceTTF : public NoCopy
 private:
     /** Contains all FT_Face with a list of loaded glyph index with the
      *  \ref FontArea. */
-    std::vector<std::pair<FT_Face, std::map<unsigned, FontArea> > > m_faces;
+    std::vector<std::pair<FT_Face, std::map<unsigned, FontArea> > > m_ft_faces;
 #endif
 public:
     LEAK_CHECK()
@@ -72,55 +71,44 @@ public:
     void reset()
     {
 #ifndef SERVER_ONLY
-        for (unsigned int i = 0; i < m_faces.size(); i++)
-             m_faces[i].second.clear();
-#endif
-    }
-    // ------------------------------------------------------------------------
-    /* Return a white-space font area, which is the first glyph in ttf. */
-    const FontArea* getFirstFontArea() const
-    {
-#ifdef SERVER_ONLY
-        static FontArea area;
-        return &area;
-#else
-        if (m_faces.empty())
-            return NULL;
-        if (m_faces.front().second.empty())
-            return NULL;
-        return &(m_faces.front().second.begin()->second);
+        for (unsigned int i = 0; i < m_ft_faces.size(); i++)
+             m_ft_faces[i].second.clear();
 #endif
     }
 #ifndef SERVER_ONLY
     // ------------------------------------------------------------------------
-    void loadFaces(std::vector<FT_Face> faces)
+    void loadTTF(std::vector<FT_Face> faces)
     {
         for (unsigned int i = 0; i < faces.size(); i++)
-            m_faces.emplace_back(faces[i], std::map<unsigned, FontArea>());
+            m_ft_faces.emplace_back(faces[i], std::map<unsigned, FontArea>());
     }
     // ------------------------------------------------------------------------
-    /** Return a TTF in \ref m_faces.
-    *  \param i index of TTF file in \ref m_faces.
+    /** Return a TTF in \ref m_ft_faces.
+    *  \param i index of TTF file in \ref m_ft_faces.
     */
     FT_Face getFace(unsigned int i) const
     {
-        assert(i < m_faces.size());
-        return m_faces[i].first;
+        assert(i < m_ft_faces.size());
+        return m_ft_faces[i].first;
     }
     // ------------------------------------------------------------------------
     /** Return the total TTF files loaded. */
-    unsigned int getTotalFaces() const { return (unsigned int)m_faces.size(); }
+    unsigned int getTotalFaces() const
+                                    { return (unsigned int)m_ft_faces.size(); }
     // ------------------------------------------------------------------------
     void insertFontArea(const FontArea& a, unsigned font_index,
                         unsigned glyph_index)
     {
-        auto& ttf = m_faces.at(font_index).second;
+        auto& ttf = m_ft_faces.at(font_index).second;
         ttf[glyph_index] = a;
     }
     // ------------------------------------------------------------------------
+    bool enabledForFont(unsigned idx) const
+           { return m_ft_faces.size() > idx && m_ft_faces[idx].first != NULL; }
+    // ------------------------------------------------------------------------
     const FontArea* getFontArea(unsigned font_index, unsigned glyph_index)
     {
-        auto& ttf = m_faces.at(font_index).second;
+        auto& ttf = m_ft_faces.at(font_index).second;
         auto it = ttf.find(glyph_index);
         if (it != ttf.end())
             return &it->second;
@@ -129,9 +117,9 @@ public:
     // ------------------------------------------------------------------------
     bool getFontAndGlyphFromChar(uint32_t c, unsigned* font, unsigned* glyph)
     {
-        for (unsigned i = 0; i < m_faces.size(); i++)
+        for (unsigned i = 0; i < m_ft_faces.size(); i++)
         {
-            unsigned glyph_index = FT_Get_Char_Index(m_faces[i].first, c);
+            unsigned glyph_index = FT_Get_Char_Index(m_ft_faces[i].first, c);
             if (glyph_index > 0)
             {
                 *font = i;

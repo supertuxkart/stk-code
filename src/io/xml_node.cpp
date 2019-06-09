@@ -19,6 +19,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/interpolation_array.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include <stdexcept>

@@ -36,6 +36,7 @@ using namespace irr;
 #include "LinearMath/btTransform.h"
 
 #include "utils/aligned_array.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"

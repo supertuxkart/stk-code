@@ -10,10 +10,14 @@
 #include "rect.h"
 #include "irrString.h"
 
+#include <string>
+#include <vector>
+
 namespace irr
 {
 namespace gui
 {
+	struct GlyphLayout;
 
 //! An enum for the different types of GUI font.
 enum EGUI_FONT_TYPE
@@ -52,6 +56,23 @@ public:
 		video::SColor color, bool hcenter=false, bool vcenter=false,
 		const core::rect<s32>* clip=0) = 0;
 
+	//! Draws glyphs and clips it to the specified rectangle if wanted.
+	/** \param gls: List of GlyphLaout
+	\param position: Rectangle specifying position where to draw the text.
+	\param color: Color of the text
+	\param hcenter: Specifies if the text should be centered horizontally into the rectangle.
+	\param vcenter: Specifies if the text should be centered vertically into the rectangle.
+	\param clip: Optional pointer to a rectangle against which the text will be clipped.
+	If the pointer is null, no clipping will be done. */
+	virtual void draw(const std::vector<GlyphLayout>& gls, const core::rect<s32>& position,
+		video::SColor color, bool hcenter=false, bool vcenter=false,
+		const core::rect<s32>* clip=0) = 0;
+
+	//! Draws some text and clips it to the specified rectangle if wanted (without text shaping)
+	virtual void drawQuick(const core::stringw& text, const core::rect<s32>& position,
+			video::SColor color, bool hcenter=false,
+			bool vcenter=false, const core::rect<s32>* clip=0) = 0;
+
 	//! Calculates the width and height of a given string of text.
 	/** \return Returns width and height of the area covered by the text if
 	it would be drawn. */
@@ -89,12 +110,25 @@ public:
 	//! Returns the distance between letters
 	virtual s32 getKerningHeight() const = 0;
 
+	//! Returns the height per line (including padding between 2 lines)
+	virtual s32 getHeightPerLine() const = 0;
+
 	//! Define which characters should not be drawn by the font.
 	/** For example " " would not draw any space which is usually blank in
 	most fonts.
 	\param s String of symbols which are not send down to the videodriver
 	*/
 	virtual void setInvisibleCharacters( const wchar_t *s ) = 0;
+
+	//! Convert text to glyph layouts for fast rendering with caching enabled
+	/* If line_data is not null, each broken line u32string will be saved and
+	can be used for advanced glyph and text mapping, and cache will be disabled. */
+	virtual void initGlyphLayouts(const core::stringw& text,
+		std::vector<GlyphLayout>& gls, std::vector<std::u32string>* line_data = NULL) = 0;
+
+	virtual f32 getInverseShaping() const = 0;
+	virtual f32 getScale() const = 0;
+	virtual void setScale(f32 scale) = 0;
 };
 
 } // end namespace gui

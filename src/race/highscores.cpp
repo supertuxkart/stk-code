@@ -21,6 +21,7 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
+#include "utils/log.hpp"
 
 #include <stdexcept>
 #include <fstream>

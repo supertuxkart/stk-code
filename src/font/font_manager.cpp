@@ -28,6 +28,11 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#ifndef SERVER_ONLY
+#include <fribidi/fribidi.h>
+#include <raqm.h>
+#endif
+
 FontManager *font_manager = NULL;
 // ----------------------------------------------------------------------------
 /** Constructor. It will initialize the \ref m_ft_library.
@@ -36,6 +41,8 @@ FontManager::FontManager()
 {
 #ifndef SERVER_ONLY
     m_ft_library = NULL;
+    m_digit_face = NULL;
+    m_shaping_dpi = 128;
     if (ProfileWorld::isNoGraphics())
         return;
 
@@ -57,7 +64,9 @@ FontManager::~FontManager()
         return;
 
     for (unsigned int i = 0; i < m_faces.size(); i++)
-        checkFTError(FT_Done_Face(m_faces[i]), "removing faces");
+        checkFTError(FT_Done_Face(m_faces[i]), "removing faces for shaping");
+    if (m_digit_face != NULL)
+        checkFTError(FT_Done_Face(m_digit_face), "removing digit face");
     checkFTError(FT_Done_FreeType(m_ft_library), "removing freetype library");
 #endif
 }   // ~FontManager
@@ -85,6 +94,399 @@ std::vector<FT_Face>
     }
     return ret;
 }   // loadTTF
+
+// ============================================================================
+namespace LineBreakingRules
+{
+    // Here a list of characters that don't start or end a line for
+    // chinese/japanese/korean. Only commonly use and full width characters are
+    // included. You should use full width characters when writing CJK,
+    // like using "。"instead of a ".", you can add more characters if needed.
+    // For full list please visit:
+    // http://webapp.docx4java.org/OnlineDemo/ecma376/WordML/kinsoku.html
+    bool noStartingLine(char32_t c)
+    {
+        switch (c)
+        {
+            // ’
+            case 8217:
+                return true;
+            // ”
+            case 8221:
+                return true;
+            // 々
+            case 12293:
+                return true;
+            // 〉
+            case 12297:
+                return true;
+            // 》
+            case 12299:
+                return true;
+            // 」
+            case 12301:
+                return true;
+            // ｝
+            case 65373:
+                return true;
+            // 〕
+            case 12309:
+                return true;
+            // ）
+            case 65289:
+                return true;
+            // 』
+            case 12303:
+                return true;
+            // 】
+            case 12305:
+                return true;
+            // 〗
+            case 12311:
+                return true;
+            // ！
+            case 65281:
+                return true;
+            // ％
+            case 65285:
+                return true;
+            // ？
+            case 65311:
+                return true;
+            // ｀
+            case 65344:
+                return true;
+            // ，
+            case 65292:
+                return true;
+            // ：
+            case 65306:
+                return true;
+            // ；
+            case 65307:
+                return true;
+            // ．
+            case 65294:
+                return true;
+            // 。
+            case 12290:
+                return true;
+            // 、
+            case 12289:
+                return true;
+            default:
+                return false;
+        }
+    }   // noStartingLine
+    //-------------------------------------------------------------------------
+    bool noEndingLine(char32_t c)
+    {
+        switch (c)
+        {
+            // ‘
+            case 8216:
+                return true;
+            // “
+            case 8220:
+                return true;
+            // 〈
+            case 12296:
+                return true;
+            // 《
+            case 12298:
+                return true;
+            // 「
+            case 12300:
+                return true;
+            // ｛
+            case 65371:
+                return true;
+            // 〔
+            case 12308:
+                return true;
+            // （
+            case 65288:
+                return true;
+            // 『
+            case 12302:
+                return true;
+            // 【
+            case 12304:
+                return true;
+            // 〖
+            case 12310:
+                return true;
+            default:
+                return false;
+        }
+    }   // noEndingLine
+    //-------------------------------------------------------------------------
+    // Helper function
+    bool breakable(char32_t c)
+    {
+        if ((c > 12287 && c < 40960) || // Common CJK words
+            (c > 44031 && c < 55204)  || // Hangul
+            (c > 63743 && c < 64256)  || // More Chinese
+            c == 173 || c == 32 || // Soft hyphen and white space
+            c == 47 || c == 92) // Slash and blackslash
+            return true;
+        return false;
+    }   // breakable
+    //-------------------------------------------------------------------------
+    void insertBreakMark(const std::u32string& str, std::vector<bool>& result)
+    {
+        assert(str.size() == result.size());
+        for (unsigned i = 0; i < result.size(); i++)
+        {
+            char32_t c = str[i];
+            char32_t nextline_char = 20;
+            if (i < result.size() - 1)
+                nextline_char = str[i + 1];
+            if (breakable(c) && !noEndingLine(c) &&
+                !noStartingLine(nextline_char))
+            {
+                result[i] = true;
+            }
+        }
+    }   // insertBreakMark
+}   // namespace LineBreakingRules
+
+// ============================================================================
+namespace RTLRules
+{
+    //-------------------------------------------------------------------------
+    void insertRTLMark(const std::u32string& str, std::vector<bool>& line,
+                       std::vector<bool>& char_bool)
+    {
+        // Check if first character has strong RTL, then consider this line is
+        // RTL
+        std::vector<FriBidiCharType> types;
+        std::vector<FriBidiLevel> levels;
+        types.resize(str.size(), 0);
+        levels.resize(str.size(), 0);
+        FriBidiParType par_type = FRIBIDI_PAR_ON;
+        const FriBidiChar* fribidi_str = (const FriBidiChar*)str.c_str();
+        fribidi_get_bidi_types(fribidi_str, str.size(), types.data());
+#if FRIBIDI_MAJOR_VERSION >= 1
+        std::vector<FriBidiBracketType> btypes;
+        btypes.resize(str.size(), 0);
+        fribidi_get_bracket_types(fribidi_str, str.size(), types.data(),
+            btypes.data());
+        int max_level = fribidi_get_par_embedding_levels_ex(types.data(),
+            btypes.data(), str.size(), &par_type, levels.data());
+#else
+        int max_level = fribidi_get_par_embedding_levels(types.data(),
+            str.size(), &par_type, levels.data());
+#endif
+        (void)max_level;
+        bool cur_rtl = par_type == FRIBIDI_PAR_RTL;
+        if (cur_rtl)
+        {
+            for (unsigned i = 0; i < line.size(); i++)
+                line[i] = true;
+        }
+        int cur_level = levels[0];
+        for (unsigned i = 0; i < char_bool.size(); i++)
+        {
+            if (levels[i] != cur_level)
+            {
+                cur_rtl = !cur_rtl;
+                cur_level = levels[i];
+            }
+            char_bool[i] = cur_rtl;
+        }
+    }   // insertRTLMark
+}   // namespace RTLRules
+
+// ----------------------------------------------------------------------------
+/* Turn text into glyph layout for rendering by libraqm. */
+void FontManager::shape(const std::u32string& text,
+                        std::vector<irr::gui::GlyphLayout>& gls,
+                        std::vector<std::u32string>* line_data)
+
+{
+    if (text.empty())
+        return;
+
+    auto lines = StringUtils::split(text, U'\n');
+    // If the text end with and newline, it will miss a newline height, so we
+    // it back here
+    if (text.back() == U'\n')
+        lines.push_back(U"");
+
+    for (unsigned l = 0; l < lines.size(); l++)
+    {
+        if (l != 0)
+        {
+            gui::GlyphLayout gl = { 0 };
+            gl.flags = gui::GLF_NEWLINE;
+            gls.push_back(gl);
+        }
+
+        std::u32string& str = lines[l];
+        str.erase(std::remove(str.begin(), str.end(), U'\r'), str.end());
+        str.erase(std::remove(str.begin(), str.end(), U'\t'), str.end());
+        if (str.empty())
+        {
+            if (line_data)
+                line_data->push_back(str);
+            continue;
+        }
+
+        raqm_t* rq = raqm_create();
+        if (!rq)
+        {
+            Log::error("FontManager", "Failed to raqm_create.");
+            gls.clear();
+            if (line_data)
+                line_data->clear();
+            return;
+        }
+
+        const int length = (int)str.size();
+        const uint32_t* string_array = (const uint32_t*)str.c_str();
+
+        if (!raqm_set_text(rq, string_array, length))
+        {
+            Log::error("FontManager", "Failed to raqm_set_text.");
+            raqm_destroy(rq);
+            gls.clear();
+            if (line_data)
+                line_data->clear();
+            return;
+        }
+
+        for (int i = 0; i < length; i++)
+        {
+            FT_Face cur_face = m_faces.front();
+            for (unsigned j = 0; j < m_faces.size(); j++)
+            {
+                unsigned glyph_index = FT_Get_Char_Index(m_faces[j], str[i]);
+                if (glyph_index > 0)
+                {
+                    cur_face = m_faces[j];
+                    break;
+                }
+            }
+            checkFTError(FT_Set_Pixel_Sizes(cur_face, 0,
+                m_shaping_dpi), "setting DPI");
+            if (!raqm_set_freetype_face_range(rq, cur_face, i, 1))
+            {
+                Log::error("FontManager",
+                    "Failed to raqm_set_freetype_face_range.");
+                raqm_destroy(rq);
+                gls.clear();
+                if (line_data)
+                    line_data->clear();
+                return;
+            }
+        }
+
+        if (raqm_layout(rq))
+        {
+            std::vector<gui::GlyphLayout> cur_line;
+            std::vector<bool> rtl_line, rtl_char, breakable;
+            rtl_line.resize(str.size(), false);
+            rtl_char.resize(str.size(), false);
+            breakable.resize(str.size(), false);
+            LineBreakingRules::insertBreakMark(str, breakable);
+            RTLRules::insertRTLMark(str, rtl_line, rtl_char);
+            size_t count = 0;
+            raqm_glyph_t* glyphs = raqm_get_glyphs(rq, &count);
+            for (unsigned idx = 0; idx < (unsigned)count; idx++)
+            {
+                gui::GlyphLayout gl = { 0 };
+                gl.index = glyphs[idx].index;
+                gl.cluster.push_back(glyphs[idx].cluster);
+                gl.x_advance = glyphs[idx].x_advance / BEARING;
+                gl.x_offset = glyphs[idx].x_offset / BEARING;
+                gl.y_offset = glyphs[idx].y_offset / BEARING;
+                gl.face_idx = m_ft_faces_to_index.at(glyphs[idx].ftface);
+                gl.original_index = idx;
+                if (rtl_line[glyphs[idx].cluster])
+                    gl.flags |= gui::GLF_RTL_LINE;
+                if (rtl_char[glyphs[idx].cluster])
+                    gl.flags |= gui::GLF_RTL_CHAR;
+                if (breakable[glyphs[idx].cluster])
+                    gl.flags |= gui::GLF_BREAKABLE;
+                cur_line.push_back(gl);
+            }
+            // Sort glyphs in logical order
+            std::sort(cur_line.begin(), cur_line.end(), []
+                (const gui::GlyphLayout& a_gi, const gui::GlyphLayout& b_gi)
+                {
+                    return a_gi.cluster.front() < b_gi.cluster.front();
+                });
+            for (unsigned l = 0; l < cur_line.size(); l++)
+            {
+                const int cur_cluster = cur_line[l].cluster.front();
+                // Last cluster handling, add the remaining clusters if missing
+                if (l == cur_line.size() - 1)
+                {
+                    for (int extra_cluster = cur_cluster + 1;
+                        extra_cluster <= (int)str.size() - 1; extra_cluster++)
+                        cur_line[l].cluster.push_back(extra_cluster);
+                }
+                else
+                {
+                    // Make sure there is every cluster values appear in the
+                    // list at least once, it will be used for cursor
+                    // positioning later
+                    const int next_cluster = cur_line[l + 1].cluster.front();
+                    for (int extra_cluster = cur_cluster + 1;
+                        extra_cluster <= next_cluster - 1; extra_cluster++)
+                        cur_line[l].cluster.push_back(extra_cluster);
+                }
+            }
+            // Sort glyphs in visual order
+            std::sort(cur_line.begin(), cur_line.end(), []
+                (const gui::GlyphLayout& a_gi,
+                const gui::GlyphLayout& b_gi)
+                {
+                    return a_gi.original_index < b_gi.original_index;
+                });
+            gls.insert(gls.end(), cur_line.begin(), cur_line.end());
+            raqm_destroy(rq);
+            if (line_data)
+                line_data->push_back(str);
+        }
+        else
+        {
+            Log::error("FontManager", "Failed to raqm_layout.");
+            raqm_destroy(rq);
+            gls.clear();
+            if (line_data)
+                line_data->clear();
+            return;
+        }
+    }
+}   // shape
+
+// ----------------------------------------------------------------------------
+/** Convert text to glyph layouts for fast rendering with caching enabled
+ *  If line_data is not null, each broken line u32string will be saved and
+ *  can be used for advanced glyph and text mapping, and cache will be
+ *  disabled, no newline characters are allowed in text if line_data is not
+ *  NULL.
+ */
+void FontManager::initGlyphLayouts(const core::stringw& text,
+                                   std::vector<irr::gui::GlyphLayout>& gls,
+                                   std::vector<std::u32string>* line_data)
+{
+    if (ProfileWorld::isNoGraphics() || text.empty())
+        return;
+
+    if (line_data != NULL)
+    {
+        shape(StringUtils::wideToUtf32(text), gls, line_data);
+        return;
+    }
+
+    auto& cached_gls = m_cached_gls[text];
+    if (cached_gls.empty())
+        shape(StringUtils::wideToUtf32(text), cached_gls);
+    gls = cached_gls;
+}   // initGlyphLayouts
 #endif
 
 // ----------------------------------------------------------------------------
@@ -95,14 +497,22 @@ void FontManager::loadFonts()
 #ifndef SERVER_ONLY
     // First load the TTF files required by each font
     std::vector<FT_Face> normal_ttf = loadTTF(stk_config->m_normal_ttf);
+    // We use 16bit face idx in GlyphLayout class
+    if (normal_ttf.size() > 65535)
+        normal_ttf.resize(65535);
+    for (uint16_t i = 0; i < normal_ttf.size(); i++)
+        m_ft_faces_to_index[normal_ttf[i]] = i;
+
     std::vector<FT_Face> digit_ttf = loadTTF(stk_config->m_digit_ttf);
+    if (!digit_ttf.empty())
+        m_digit_face = digit_ttf.front();
 #endif
 
     // Now load fonts with settings of ttf file
     unsigned int font_loaded = 0;
     RegularFace* regular = new RegularFace();
 #ifndef SERVER_ONLY
-    regular->getFaceTTF()->loadFaces(normal_ttf);
+    regular->getFaceTTF()->loadTTF(normal_ttf);
 #endif
     regular->init();
     m_fonts.push_back(regular);
@@ -110,7 +520,7 @@ void FontManager::loadFonts()
 
     BoldFace* bold = new BoldFace();
 #ifndef SERVER_ONLY
-    bold->getFaceTTF()->loadFaces(normal_ttf);
+    bold->getFaceTTF()->loadTTF(normal_ttf);
 #endif
     bold->init();
     m_fonts.push_back(bold);
@@ -118,7 +528,7 @@ void FontManager::loadFonts()
 
     DigitFace* digit = new DigitFace();
 #ifndef SERVER_ONLY
-    digit->getFaceTTF()->loadFaces(digit_ttf);
+    digit->getFaceTTF()->loadTTF(digit_ttf);
 #endif
     digit->init();
     m_fonts.push_back(digit);
@@ -126,7 +536,6 @@ void FontManager::loadFonts()
 
 #ifndef SERVER_ONLY
     m_faces.insert(m_faces.end(), normal_ttf.begin(), normal_ttf.end());
-    m_faces.insert(m_faces.end(), digit_ttf.begin(), digit_ttf.end());
 #endif
 }   // loadFonts
 

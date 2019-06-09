@@ -45,7 +45,8 @@ public:
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    virtual bool disableTextShaping() const OVERRIDE           { return true; }
 };   // DigitFace
 
 #endif
