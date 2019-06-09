@@ -294,6 +294,7 @@ when the border that intersect at this corner are enabled.
 <color type="text_field" state="background" a="255" r="200" g="200" b="200" />
 <color type="text_field" state="background_focused" a="255" r="223" g="250" b="245" />
 <color type="text_field" state="background_deactivated" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="background_marked" a="128" r="30" g="80" b="40" />
 <color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
 <color type="text_field" state="focused" a="255" r="80" g="240" b="80" />
 <color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />

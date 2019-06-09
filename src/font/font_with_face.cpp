@@ -574,6 +574,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
     core::array<s32> indices(text_size);
     core::array<core::position2d<float>> offsets(text_size);
     std::vector<bool> fallback(text_size);
+    core::array<core::position2d<float>> gld_offsets;
+    gui::GlyphLayoutDraw df_used = gui::GLD_NONE;
 
     // Check if the line is RTL
     bool rtl = (gl[0].flags & gui::GLF_RTL_LINE) != 0;
@@ -596,7 +598,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         if (line_changed)
         {
             line_changed = false;
-            rtl = (gl[i].flags & gui::GLF_RTL_LINE) != 0;
+            rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
             offset.X = float(position.UpperLeftCorner.X);
             if (hcenter)
             {
@@ -680,8 +682,32 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         }
         else
         {
-            offset.X +=
-                (int)(glyph_layout.x_advance * m_inverse_shaping) * scale;
+            int width = (int)(glyph_layout.x_advance * m_inverse_shaping);
+            if (char_collector == NULL)
+            {
+                float each_size = width * scale /
+                    (float)glyph_layout.cluster.size();
+                float start = offset.X;
+                for (unsigned df = 0; df < glyph_layout.draw_flags.size();
+                     df++)
+                {
+                    if (glyph_layout.draw_flags[df] != gui::GLD_NONE)
+                    {
+                        if (df_used == gui::GLD_NONE)
+                        {
+                            if (glyph_layout.draw_flags[df] & gui::GLD_MARKED)
+                                df_used = gui::GLD_MARKED;
+                            else if (glyph_layout.draw_flags[df] &
+                                gui::GLD_COMPOSING)
+                                df_used = gui::GLD_COMPOSING;
+                        }
+                        gld_offsets.push_back({start, offset.Y});
+                        gld_offsets.push_back({start + each_size, offset.Y});
+                    }
+                    start += each_size;
+                }
+            }
+            offset.X += width * scale;
         }
     }   // for i < text_size
 
@@ -823,6 +849,27 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             {
                 draw2DImage(texture, dest, source, clip, color, true);
             }
+        }
+    }
+    for (unsigned i = 0; i < gld_offsets.size(); i += 2)
+    {
+        if (df_used == gui::GLD_MARKED)
+        {
+            core::rect<s32> gld((s32)gld_offsets[i].X, (s32)gld_offsets[i].Y,
+                (s32)gld_offsets[i + 1].X,
+                (s32)(gld_offsets[i + 1].Y + m_font_max_height * scale));
+            GL32_draw2DRectangle(GUIEngine::getSkin()->getColor(
+                "text_field::background_marked"), gld, clip);
+        }
+        else if (df_used == gui::GLD_COMPOSING)
+        {
+            float line1 = m_font_max_height * scale * 0.88f;
+            float line2 = m_font_max_height * scale * 0.92f;
+            core::rect<s32> gld((s32)gld_offsets[i].X, (s32)gld_offsets[i].Y + line1,
+                (s32)gld_offsets[i + 1].X,
+                (s32)(gld_offsets[i + 1].Y + line2));
+            GL32_draw2DRectangle(GUIEngine::getSkin()->getColor(
+                "text::neutral"), gld, clip);
         }
     }
 #endif

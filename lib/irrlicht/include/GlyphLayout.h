@@ -26,6 +26,13 @@ GLF_QUICK_DRAW = 8, /* This glyph is not created by libraqm, which get x_advance
 GLF_NEWLINE = 16 /* This glyph will start a newline. */
 };
 
+enum GlyphLayoutDraw
+{
+GLD_NONE = 0, /* Default flag. */
+GLD_MARKED = 1, /* This glyph will be drawn with background marked for marked text. */
+GLD_COMPOSING = 2 /* This glyph will be drawn with underline (for example composing text). */
+};
+
 //! GlyphLayout copied from libraqm.
 struct GlyphLayout
 {
@@ -37,6 +44,7 @@ s32 y_offset;
 /* Above variable is same for raqm_glyph_t */
 // If some characters share the same glyph
 std::vector<s32> cluster;
+std::vector<u8> draw_flags;
 //! used to sorting back the visual order after line breaking
 u32 original_index;
 u16 flags;

@@ -11,10 +11,14 @@
 #include "IOSOperator.h"
 #include "utils/leak_check.hpp"
 
-#include "utils/time.hpp"
+#include "GlyphLayout.h"
+
+#include <string>
+#include <vector>
 
 using namespace irr;
 using namespace gui;
+
 namespace GUIEngine
 {
     enum TextBoxType: int;
@@ -28,7 +32,7 @@ namespace GUIEngine
 
         //! constructor
         CGUIEditBox(const wchar_t* text, bool border, IGUIEnvironment* environment,
-            IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool is_rtl);
+            IGUIElement* parent, s32 id, const core::rect<s32>& rectangle);
 
         //! destructor
         virtual ~CGUIEditBox();
@@ -54,20 +58,20 @@ namespace GUIEngine
         virtual void setDrawBorder(bool border);
 
         //! Enables or disables word wrap for using the edit box as multiline text editor.
-        virtual void setWordWrap(bool enable);
+        virtual void setWordWrap(bool enable) {}
 
         //! Checks if word wrap is enabled
         //! \return true if word wrap is enabled, false otherwise
-        virtual bool isWordWrapEnabled() const;
+        virtual bool isWordWrapEnabled() const { return false; }
 
         //! Enables or disables newlines.
         /** \param enable: If set to true, the EGET_EDITBOX_ENTER event will not be fired,
         instead a newline character will be inserted. */
-        virtual void setMultiLine(bool enable);
+        virtual void setMultiLine(bool enable) {}
 
         //! Checks if multi line editing is enabled
         //! \return true if mult-line is enabled, false otherwise
-        virtual bool isMultiLineEnabled() const;
+        virtual bool isMultiLineEnabled() const { return false; }
 
         //! Enables or disables automatic scrolling with cursor position
         //! \param enable: If set to true, the text will move around with the cursor position
@@ -123,19 +127,15 @@ namespace GUIEngine
         virtual irr::gui::IGUIFont* getActiveFont() const { return NULL; }
         virtual void setDrawBackground(bool) { }
 
-        void fromAndroidEditText(const core::stringw& text, int start, int end,
+        void fromAndroidEditText(const std::u32string& text, int start, int end,
                                  int composing_start, int composing_end);
         void openScreenKeyboard();
-        s32 getCursorPosInBox() const { return CursorPos; }
-        s32 getTextCount() const { return (s32)Text.size(); }
+        s32 getCursorPosInBox() const { return m_cursor_pos; }
+        s32 getTextCount() const { return (s32)m_edit_text.size(); }
         void setTextBoxType(GUIEngine::TextBoxType t) { m_type = t; }
     protected:
-        //! Breaks the single text line.
-        void breakText();
         //! sets the area of the given line
         void setTextRect(s32 line);
-        //! returns the line number that the cursor is on
-        s32 getLineFromPos(s32 pos);
         //! adds a letter to the edit box
         void inputChar(wchar_t c);
         //! calculates the current scroll position
@@ -144,7 +144,7 @@ namespace GUIEngine
         void sendGuiEvent(EGUI_EVENT_TYPE type);
         //! set text markers
         void setTextMarkers(s32 begin, s32 end);
-
+        void updateCursorDistance();
         bool processKey(const SEvent& event);
         bool processMouse(const SEvent& event);
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
@@ -155,12 +155,13 @@ namespace GUIEngine
         core::position2di calculateICPos();
 #endif
         s32 getCursorPos(s32 x, s32 y);
+        void updateGlyphLayouts();
 
         bool MouseMarking;
         bool Border;
         bool OverrideColorEnabled;
-        s32 MarkBegin;
-        s32 MarkEnd;
+        s32 m_mark_begin;
+        s32 m_mark_end;
 
         GUIEngine::TextBoxType m_type;
 
@@ -168,19 +169,15 @@ namespace GUIEngine
         gui::IGUIFont *OverrideFont, *LastBreakFont;
         IOSOperator* Operator;
 
-        StkTime::TimeType BlinkStartTime;
-        s32 CursorPos;
-        s32 HScrollPos, VScrollPos; // scroll position in characters
-        u32 Max;
+        uint64_t m_force_show_cursor_time;
+        s32 m_cursor_pos;
+        s32 m_scroll_pos;
+        s32 m_cursor_distance;
+        u32 m_max_chars;
 
-        bool m_rtl;
-
-        bool WordWrap, MultiLine, AutoScroll, PasswordBox;
-        wchar_t PasswordChar;
+        bool AutoScroll, PasswordBox;
+        char32_t PasswordChar;
         EGUI_ALIGNMENT HAlign, VAlign;
-
-        core::array< core::stringw > BrokenText;
-        core::array< s32 > BrokenTextPositions;
 
         core::rect<s32> CurrentTextRect, FrameRect; // temporary values
 
@@ -190,6 +187,12 @@ namespace GUIEngine
         /* If true, this editbox will copy text and selection only from
          * android edittext, and process only mouse event. */
         bool m_from_android_edittext;
+
+        /* UTF32 string for shaping and editing to avoid wchar_t issue in
+         * windows */
+        std::u32string m_edit_text;
+        std::vector<GlyphLayout> m_glyph_layouts;
+        void correctCursor(s32& cursor_pos, bool left);
     };
 
 

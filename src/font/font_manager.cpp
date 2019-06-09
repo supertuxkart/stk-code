@@ -437,6 +437,8 @@ void FontManager::shape(const std::u32string& text,
                         extra_cluster <= next_cluster - 1; extra_cluster++)
                         cur_line[l].cluster.push_back(extra_cluster);
                 }
+                cur_line[l].draw_flags.resize(cur_line[l].cluster.size(),
+                    gui::GLD_NONE);
             }
             // Sort glyphs in visual order
             std::sort(cur_line.begin(), cur_line.end(), []
