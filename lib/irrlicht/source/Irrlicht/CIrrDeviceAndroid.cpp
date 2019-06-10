@@ -1300,13 +1300,16 @@ void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text,
         return;
     }
 
-    std::vector<char> utf8;
+    // Android use 32bit wchar_t and java use utf16 string
+    // We should not use the modified utf8 from java as it fails for emoji
+    // because it's larger than 16bit
+
+    std::vector<uint16_t> utf16;
     // Use utf32 for emoji later
     static_assert(sizeof(wchar_t) == sizeof(uint32_t), "wchar_t is not 32bit");
-    uint32_t* chars = (uint32_t*)text.c_str();
-    utf8::unchecked::utf32to8(chars, chars + text.size(), back_inserter(utf8));
-    utf8.push_back(0);
-    jstring jstring_text = env->NewStringUTF(utf8.data());
+    const uint32_t* chars = (const uint32_t*)text.c_str();
+    utf8::unchecked::utf32to16(chars, chars + text.size(), back_inserter(utf16));
+    jstring jstring_text = env->NewString((const jchar*)utf16.data(), utf16.size());
 
     env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end, (jint)type);
     if (was_detached)

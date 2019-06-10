@@ -22,6 +22,7 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
+#include "utils/utf8.h"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -264,13 +265,24 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     if (text == NULL)
         return;
 
-    const char* utf8_text = env->GetStringUTFChars(text, NULL);
-    if (utf8_text == NULL)
+    const uint16_t* utf16_text = (const uint16_t*)env->GetStringChars(text, NULL);
+    if (utf16_text == NULL)
         return;
-
-    // Android use 32bit wchar_t
-    std::u32string to_editbox = StringUtils::utf8ToUtf32(utf8_text);
-    env->ReleaseStringUTFChars(text, utf8_text);
+    const size_t len = env->GetStringLength(text);
+    // Android use 32bit wchar_t and java use utf16 string
+    // We should not use the modified utf8 from java as it fails for emoji
+    // because it's larger than 16bit
+    std::u32string to_editbox;
+    try
+    {
+        utf8::utf16to32(utf16_text, utf16_text + len,
+            back_inserter(to_editbox));
+    }
+    catch (std::exception& e)
+    {
+        (void)e;
+    }
+    env->ReleaseStringChars(text, utf16_text);
 
     GUIEngine::addGUIFunctionBeforeRendering([widget_id, to_editbox, start,
         end, composing_start, composing_end]()
