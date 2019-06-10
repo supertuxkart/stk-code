@@ -745,7 +745,7 @@ namespace StringUtils
      */
     irr::core::stringw xmlDecode(const std::string& input)
     {
-        irr::core::stringw output;
+        std::u32string output;
         std::string entity;
         bool isHex = false;
 
@@ -769,15 +769,15 @@ namespace StringUtils
                     }
                     else
                     {
-                        output += wchar_t(input[n]);
+                        output += char32_t(input[n]);
                     }
                     break;
 
                 case ENTITY_PREAMBLE:
                     if (input[n] != '#')
                     {
-                        output += L"&";
-                        output += wchar_t(input[n]);
+                        output += U"&";
+                        output += char32_t(input[n]);
                         // This is actually an error, but we can't print a
                         // warning here: irrxml replaces &amp; in (e.g.)
                         // attribute values with '&' - so we can have a single
@@ -805,7 +805,7 @@ namespace StringUtils
                         const char* format = (isHex ? "%x" : "%i");
                         if (sscanf(entity.c_str(), format, &c) == 1)
                         {
-                            output += wchar_t(c);
+                            output += char32_t(c);
                         }
                         else
                         {
@@ -817,13 +817,20 @@ namespace StringUtils
                     }
                     else
                     {
-                        entity += wchar_t(input[n]);
+                        entity += char32_t(input[n]);
                     }
                     break;
             }
         }
-
-        return output;
+        if (sizeof(wchar_t) == 2)
+        {
+            return utf32ToWide(output);
+        }
+        else
+        {
+            const wchar_t* ptr = (const wchar_t*)output.c_str();
+            return irr::core::stringw(ptr);
+        }
     }   // xmlDecode
 
     // ------------------------------------------------------------------------
@@ -834,16 +841,17 @@ namespace StringUtils
     std::string xmlEncode(const irr::core::stringw &s)
     {
         std::ostringstream output;
-        for(unsigned int i=0; i<s.size(); i++)
+        const std::u32string& utf32 = wideToUtf32(s);
+        for(unsigned i = 0; i < utf32.size(); i++)
         {
-            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' ||
-                s[i] == '\"' || s[i] == ' ')
+            if (utf32[i] >= 128 || utf32[i] == '&' || utf32[i] == '<' ||
+                utf32[i] == '>' || utf32[i] == '\"' || utf32[i] == ' ')
             {
-                output << "&#x" << std::hex << std::uppercase << s[i] << ";";
+                output << "&#x" << std::hex << std::uppercase << utf32[i] << ";";
             }
             else
             {
-                irr::c8 c = (char)(s[i]);
+                irr::c8 c = (char)(utf32[i]);
                 output << c;
             }
         }
