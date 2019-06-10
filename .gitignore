@@ -73,3 +73,5 @@ lib/libogg
 lib/libvorbis
 lib/openal
 lib/openssl
+lib/fribidi
+lib/harfbuzz

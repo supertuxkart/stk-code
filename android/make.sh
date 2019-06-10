@@ -278,22 +278,6 @@ fi
 
 echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
-# Freetype
-if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
-    echo "Compiling freetype"
-    mkdir -p "$DIRNAME/obj/freetype"
-    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
-
-    cd "$DIRNAME/obj/freetype"
-    ./configure --host=$HOST          \
-                --without-zlib        \
-                --without-png         \
-                --without-harfbuzz &&
-    make $@
-    check_error
-    touch "$DIRNAME/obj/freetype.stamp"
-fi
-
 # Zlib
 if [ ! -f "$DIRNAME/obj/zlib.stamp" ]; then
     echo "Compiling zlib"
@@ -324,6 +308,73 @@ if [ ! -f "$DIRNAME/obj/libpng.stamp" ]; then
     make $@
     check_error
     touch "$DIRNAME/obj/libpng.stamp"
+fi
+
+# Fribidi
+if [ ! -f "$DIRNAME/obj/fribidi.stamp" ]; then
+    echo "Compiling fribidi"
+    mkdir -p "$DIRNAME/obj/fribidi"
+    cp -a -f "$DIRNAME/../lib/fribidi/"* "$DIRNAME/obj/fribidi"
+
+    cd "$DIRNAME/obj/fribidi"
+    ./configure --host=$HOST --enable-static=yes &&
+    make $@
+    mkdir -p "$DIRNAME/obj/fribidi/include/fribidi"
+    cp $DIRNAME/obj/fribidi/lib/*.h "$DIRNAME/obj/fribidi/include/fribidi"
+    check_error
+    touch "$DIRNAME/obj/fribidi.stamp"
+fi
+
+# Freetype bootstrap
+if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
+    echo "Compiling freetype"
+    mkdir -p "$DIRNAME/obj/freetype"
+    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
+
+    cd "$DIRNAME/obj/freetype"
+    ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a"\
+    LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a"\
+    ./configure --host=$HOST --enable-shared=no \
+                --without-harfbuzz &&
+    make $@
+    check_error
+    # We need to rebuild freetype after harfbuzz is compiled
+    touch "$DIRNAME/obj/freetype_bootstrap.stamp"
+fi
+
+# Harfbuzz
+if [ ! -f "$DIRNAME/obj/harfbuzz.stamp" ]; then
+    echo "Compiling harfbuzz"
+    mkdir -p "$DIRNAME/obj/harfbuzz"
+    cp -a -f "$DIRNAME/../lib/harfbuzz/"* "$DIRNAME/obj/harfbuzz"
+
+    cd "$DIRNAME/obj/harfbuzz"
+    FREETYPE_CFLAGS="-I$DIRNAME/obj/freetype/include" \
+    FREETYPE_LIBS="$DIRNAME/obj/freetype/objs/.libs/libfreetype.a $DIRNAME/obj/zlib/libz.a $DIRNAME/obj/libpng/libpng.a"\
+    ./configure --host=$HOST --enable-shared=no \
+                --with-glib=no --with-gobject=no --with-cairo=no \
+                --with-fontconfig=no --with-icu=no --with-graphite2=no &&
+    make $@
+    mkdir -p "$DIRNAME/obj/harfbuzz/include/harfbuzz"
+    cp $DIRNAME/obj/harfbuzz/src/*.h "$DIRNAME/obj/harfbuzz/include/harfbuzz"
+    check_error
+    touch "$DIRNAME/obj/harfbuzz.stamp"
+fi
+
+# Freetype
+if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
+    echo "Compiling freetype"
+    mkdir -p "$DIRNAME/obj/freetype"
+    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
+
+    cd "$DIRNAME/obj/freetype"
+    ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
+    LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a" \
+    HARFBUZZ_CFLAGS="-I$DIRNAME/obj/harfbuzz/src/" HARFBUZZ_LIBS="$DIRNAME/obj/harfbuzz/src/.libs/libharfbuzz.a" \
+    ./configure --host=$HOST --enable-shared=no
+    make $@
+    check_error
+    touch "$DIRNAME/obj/freetype.stamp"
 fi
 
 # Openal
