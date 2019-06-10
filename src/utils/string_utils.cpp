@@ -1251,7 +1251,7 @@ namespace StringUtils
         if (sizeof(wchar_t) == 2)
         {
             const uint32_t* chars = (const uint32_t*)input.c_str();
-            utf8::utf16to32(chars, chars + input.size(),
+            utf8::utf32to16(chars, chars + input.size(),
                 back_inserter(wchar_line));
         }
         else if (sizeof(wchar_t) == sizeof(char32_t))

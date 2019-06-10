@@ -289,7 +289,7 @@ namespace utf8
     {
         while (start != end)
         {
-            uint32_t cp = start++;
+            uint32_t cp = *start++;
             if (cp > 0xffff)
             {
                 //make a surrogate pair
