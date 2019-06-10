@@ -17,6 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "font/bold_face.hpp"
+#include "font/font_manager.hpp"
+#include "font/regular_face.hpp"
 
 // ----------------------------------------------------------------------------
 /** Constructor of BoldFace.
@@ -33,10 +35,10 @@ void BoldFace::init()
     // Reserve some space for characters added later
     m_font_max_height = m_glyph_max_height * 3 / 2;
 
-    /* Use FT_Outline_Embolden for now, no more fallback font
-    setFallbackFont(font_manager->getFont<RegularFace>());
-    setFallbackFontScale(2.0f);*/
-
+    // Fallback font for emoji
+    RegularFace* rf = font_manager->getFont<RegularFace>();
+    setFallbackFont(rf);
+    setFallbackFontScale((float)getDPI() / (float)rf->getDPI());
 }   // init
 
 // ----------------------------------------------------------------------------

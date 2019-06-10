@@ -544,7 +544,8 @@
   using industry standard nowadays...
   -->
   <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf"
-              digit-ttf="SigmarOne.otf" />
+              digit-ttf="SigmarOne.otf"
+              color-emoji-ttf="NotoColorEmoji.ttf"/>
 
   <!-- Maximum bones from all animated meshes in each frame to be uploaded for
        hardware skinning, For gles 3.0 the specification guarantees at least 2048, for

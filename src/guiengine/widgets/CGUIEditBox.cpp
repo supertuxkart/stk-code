@@ -1031,6 +1031,7 @@ void CGUIEditBox::setText(const wchar_t* text)
     updateGlyphLayouts();
     m_mark_begin = m_mark_end = m_cursor_pos = getTextCount();
     m_scroll_pos = 0;
+    calculateScrollPos();
 #ifdef ANDROID
         if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
             irr_driver->getDevice()->hasOnScreenKeyboard() &&
@@ -1502,6 +1503,7 @@ void CGUIEditBox::fromAndroidEditText(const std::u32string& text, int start,
         m_composing_start = composing_start;
         m_composing_end = composing_end;
     }
+    calculateScrollPos();
 }
 
 void CGUIEditBox::updateGlyphLayouts()

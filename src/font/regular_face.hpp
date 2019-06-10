@@ -43,6 +43,8 @@ public:
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool useColorGlyphPage() const  OVERRIDE           { return true; }
 
 };   // RegularFace
 

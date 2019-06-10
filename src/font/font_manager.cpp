@@ -368,8 +368,11 @@ void FontManager::shape(const std::u32string& text,
                     break;
                 }
             }
-            checkFTError(FT_Set_Pixel_Sizes(cur_face, 0,
-                m_shaping_dpi), "setting DPI");
+            if (!FT_HAS_COLOR(cur_face))
+            {
+                checkFTError(FT_Set_Pixel_Sizes(cur_face, 0,
+                    m_shaping_dpi), "setting DPI");
+            }
             if (!raqm_set_freetype_face_range(rq, cur_face, i, 1))
             {
                 Log::error("FontManager",
@@ -409,6 +412,8 @@ void FontManager::shape(const std::u32string& text,
                     gl.flags |= gui::GLF_RTL_CHAR;
                 if (breakable[glyphs[idx].cluster])
                     gl.flags |= gui::GLF_BREAKABLE;
+                if (FT_HAS_COLOR(glyphs[idx].ftface))
+                    gl.flags |= gui::GLF_COLORED;
                 cur_line.push_back(gl);
             }
             // Sort glyphs in logical order
@@ -489,6 +494,33 @@ void FontManager::initGlyphLayouts(const core::stringw& text,
         shape(StringUtils::wideToUtf32(text), cached_gls);
     gls = cached_gls;
 }   // initGlyphLayouts
+
+// ----------------------------------------------------------------------------
+FT_Face FontManager::loadColorEmoji()
+{
+    if (stk_config->m_color_emoji_ttf.empty())
+        return NULL;
+    FT_Face face = NULL;
+    const std::string loc = file_manager->getAssetChecked(FileManager::TTF,
+        stk_config->m_color_emoji_ttf.c_str(), true);
+    font_manager->checkFTError(FT_New_Face(
+        m_ft_library, loc.c_str(), 0, &face), loc + " is loaded");
+
+    if (!FT_HAS_COLOR(face) || face->num_fixed_sizes == 0)
+    {
+        Log::error("FontManager", "Bad %s color emoji, ignored.",
+            stk_config->m_color_emoji_ttf.c_str());
+        checkFTError(FT_Done_Face(face), "removing faces for emoji");
+        return NULL;
+    }
+    // Use the largest size available, it will be scaled to regular face ttf
+    // when loading the glyph, so it can reduce the blurring effect
+    m_shaping_dpi = face->available_sizes[face->num_fixed_sizes - 1].height;
+    checkFTError(FT_Select_Size(face, face->num_fixed_sizes - 1),
+        "setting color emoji size");
+    return face;
+}   // loadColorEmoji
+
 #endif
 
 // ----------------------------------------------------------------------------
@@ -499,11 +531,25 @@ void FontManager::loadFonts()
 #ifndef SERVER_ONLY
     // First load the TTF files required by each font
     std::vector<FT_Face> normal_ttf = loadTTF(stk_config->m_normal_ttf);
-    // We use 16bit face idx in GlyphLayout class
-    if (normal_ttf.size() > 65535)
-        normal_ttf.resize(65535);
-    for (uint16_t i = 0; i < normal_ttf.size(); i++)
-        m_ft_faces_to_index[normal_ttf[i]] = i;
+    std::vector<FT_Face> bold_ttf = normal_ttf;
+    if (!ProfileWorld::isNoGraphics())
+    {
+        assert(!normal_ttf.empty());
+        FT_Face color_emoji = loadColorEmoji();
+        if (!normal_ttf.empty() && color_emoji != NULL)
+        {
+            // Put color emoji after 1st default font so can use it before wqy
+            // font
+            normal_ttf.insert(normal_ttf.begin() + 1, color_emoji);
+            // We don't use color emoji in bold font
+            bold_ttf.insert(bold_ttf.begin() + 1, NULL);
+        }
+        // We use 16bit face idx in GlyphLayout class
+        if (normal_ttf.size() > 65535)
+            normal_ttf.resize(65535);
+        for (uint16_t i = 0; i < normal_ttf.size(); i++)
+            m_ft_faces_to_index[normal_ttf[i]] = i;
+    }
 
     std::vector<FT_Face> digit_ttf = loadTTF(stk_config->m_digit_ttf);
     if (!digit_ttf.empty())
@@ -522,7 +568,7 @@ void FontManager::loadFonts()
 
     BoldFace* bold = new BoldFace();
 #ifndef SERVER_ONLY
-    bold->getFaceTTF()->loadTTF(normal_ttf);
+    bold->getFaceTTF()->loadTTF(bold_ttf);
 #endif
     bold->init();
     m_fonts.push_back(bold);

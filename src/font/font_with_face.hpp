@@ -305,6 +305,8 @@ public:
     virtual bool disableTextShaping() const                   { return false; }
     // ------------------------------------------------------------------------
     float getInverseShaping() const               { return m_inverse_shaping; }
+    // ------------------------------------------------------------------------
+    virtual bool useColorGlyphPage() const                    { return false; }
 };   // FontWithFace
 
 #endif

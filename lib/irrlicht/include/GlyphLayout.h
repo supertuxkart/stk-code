@@ -23,7 +23,8 @@ GLF_RTL_LINE = 1, /* This line from this glyph is RTL. */
 GLF_RTL_CHAR = 2, /* This character(s) from this glyph is RTL. */
 GLF_BREAKABLE = 4, /* This glyph is breakable when line breaking. */
 GLF_QUICK_DRAW = 8, /* This glyph is not created by libraqm, which get x_advance_x directly from font. */
-GLF_NEWLINE = 16 /* This glyph will start a newline. */
+GLF_NEWLINE = 16, /* This glyph will start a newline. */
+GLF_COLORED = 32 /* This glyph is a colored one (for example emoji). */
 };
 
 enum GlyphLayoutDraw
