@@ -232,6 +232,7 @@ void NetworkingLobby::init()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
+#ifndef SERVER_ONLY
     const unsigned box_width = m_text_bubble->getDimension().Width;
     const float box_height = m_text_bubble->getDimension().Height;
     // For future copy text from lobby chat
@@ -259,7 +260,7 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
         m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
     st->setUseGlyphLayoutsOnly(true);
     st->setGlyphLayouts(m_server_info);
-
+#endif
 }   // addMoreServerInfo
 
 // ----------------------------------------------------------------------------
