@@ -570,7 +570,6 @@ include/SVertexIndex.h
 include/SVertexManipulator.h
 include/SViewFrustum.h
 include/triangle3d.h
-include/utfwrapping.h
 include/vector2d.h
 include/vector3d.h
 )

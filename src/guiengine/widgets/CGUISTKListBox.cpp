@@ -176,7 +176,7 @@ void CGUISTKListBox::recalculateItemHeight()
         if (Font)
         {
             if ( 0 == ItemHeightOverride )
-                ItemHeight = Font->getDimension(L"A").Height + 4;
+                ItemHeight = Font->getHeightPerLine() + 4;
 
             Font->grab();
         }
@@ -580,40 +580,24 @@ void CGUISTKListBox::draw()
                     if ( i==Selected && hl )
                         font_color = EGUI_LBC_TEXT_HIGHLIGHT;
 
-                    if (!Items[i].m_contents[x].m_broken_text)
+                    if (!Items[i].m_contents[x].m_text.empty() &&
+                        Items[i].m_contents[x].m_glyph_layouts.empty())
                     {
                         int text_width = (textRect.LowerRightCorner.X - textRect.UpperLeftCorner.X);
-                        std::wstring cell_text = Items[i].m_contents[x].m_text.c_str();
-                        std::vector<std::wstring> cell_text_lines;
+                        Font->initGlyphLayouts(Items[i].m_contents[x].m_text,
+                            Items[i].m_contents[x].m_glyph_layouts);
                         if (Items[i].m_word_wrap)
-                            StringUtils::breakText(cell_text, cell_text_lines, text_width, Font);
-                        else
-                            cell_text_lines.push_back(cell_text);
-
-                        for (unsigned int j=0; j<cell_text_lines.size(); j++)
                         {
-                            irr::core::stringw text_line = cell_text_lines[j].c_str();
-                            Items[i].m_contents[x].m_text_lines.push_back(text_line);
+                            gui::breakGlyphLayouts(Items[i].m_contents[x].m_glyph_layouts,
+                                text_width, Font->getInverseShaping(), Font->getScale());
                         }
-                        Items[i].m_contents[x].m_broken_text = true;
                     }
 
-                    core::rect<s32> lineRect = textRect;
-                    int line_height = Font->getDimension(L"A").Height*Items[i].m_line_height_scale;
-                    int supp_lines = Items[i].m_contents[x].m_text_lines.size() - 1;
-                    lineRect.UpperLeftCorner.Y -= (line_height*supp_lines)/2;
-                    lineRect.LowerRightCorner.Y -= (line_height*supp_lines)/2;
-                    for (unsigned int j=0; j<Items[i].m_contents[x].m_text_lines.size(); j++)
-                    {
-                        Font->draw(
-                            Items[i].m_contents[x].m_text_lines[j],
-                            lineRect,
-                            hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
-                            Items[i].m_contents[x].m_center, true, &clientClip);
-
-                        lineRect.UpperLeftCorner.Y += line_height;
-                        lineRect.LowerRightCorner.Y += line_height;
-                    }
+                    Font->draw(
+                        Items[i].m_contents[x].m_glyph_layouts,
+                        textRect,
+                        hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),
+                        Items[i].m_contents[x].m_center, true, &clientClip);
 
                     //Position back to inital pos
                     if (IconBank && (Items[i].m_contents[x].m_icon > -1))
@@ -717,8 +701,7 @@ void CGUISTKListBox::setCell(u32 row_num, u32 col_num, const wchar_t* text, s32 
 
     Items[row_num].m_contents[col_num].m_text = text;
     Items[row_num].m_contents[col_num].m_icon = icon;
-    Items[row_num].m_contents[col_num].m_broken_text = false;
-    Items[row_num].m_contents[col_num].m_text_lines.clear();
+    Items[row_num].m_contents[col_num].m_glyph_layouts.clear();
 
     recalculateItemHeight();
     recalculateIconWidth();
