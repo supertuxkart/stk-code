@@ -32,8 +32,8 @@ BoldFace::BoldFace() : FontWithFace("BoldFace")
 void BoldFace::init()
 {
     FontWithFace::init();
-    // Reserve some space for characters added later
-    m_font_max_height = m_glyph_max_height * 3 / 2;
+    // Reserve some space for characters added later in the next line
+    m_font_max_height = m_glyph_max_height * 7 / 5;
 
     // Fallback font for emoji
     RegularFace* rf = font_manager->getFont<RegularFace>();
