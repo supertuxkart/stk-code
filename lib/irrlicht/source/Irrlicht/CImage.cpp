@@ -368,6 +368,11 @@ void CImage::copyToScalingBoxFilter(IImage* target, s32 bias, bool blend)
 	s32 fy = core::ceil32( sourceYStep );
 	f32 sx;
 	f32 sy;
+	// Color emoji scaled wrongly with overbright color if larger than 4
+	if (fx > 4)
+		fx = 4;
+	if (fy > 4)
+		fy = 4;
 
 	sy = 0.f;
 	for ( u32 y = 0; y != destSize.Height; ++y )
