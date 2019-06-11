@@ -23,6 +23,7 @@
 
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -50,8 +51,6 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
-
-#include <utfwrapping.h>
 
 using namespace Online;
 using namespace GUIEngine;
@@ -234,41 +233,33 @@ void NetworkingLobby::init()
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
     const unsigned box_width = m_text_bubble->getDimension().Width;
-    while (GUIEngine::getFont()->getDimension(info.c_str()).Width > box_width)
-    {
-        core::stringw brokentext = info;
-        while (brokentext.size() > 0)
-        {
-            brokentext.erase(brokentext.size() - 1);
-            if (GUIEngine::getFont()->getDimension(brokentext.c_str()).Width <
-                box_width && gui::breakable(brokentext.lastChar()))
-                break;
-        }
-        if (brokentext.size() == 0)
-            break;
-        m_server_info.push_back(brokentext);
-        info =
-            info.subString(brokentext.size(), info.size() - brokentext.size());
-    }
-    if (info.size() > 0)
-    {
-        m_server_info.push_back(info);
-    }
-    while ((int)m_server_info.size() * m_server_info_height >
-        m_text_bubble->getDimension().Height)
-    {
-        m_server_info.erase(m_server_info.begin());
-    }
+    const float box_height = m_text_bubble->getDimension().Height;
+    // For future copy text from lobby chat
+    std::vector<std::u32string> text_line;
+    std::vector<GlyphLayout> cur_info;
+    font_manager->initGlyphLayouts(info, cur_info, &text_line);
+    gui::IGUIFont* font = GUIEngine::getFont();
+    gui::breakGlyphLayouts(cur_info, box_width,
+        font->getInverseShaping(), font->getScale());
+    m_server_info.insert(m_server_info.end(), cur_info.begin(),
+        cur_info.end());
+    gui::eraseTopLargerThan(m_server_info, font->getHeightPerLine(),
+        box_height);
+
+    // Don't take the newly added newline marker int layouts for linebreaking
+    // height calculation
+    gui::GlyphLayout new_line = { 0 };
+    new_line.flags = gui::GLF_NEWLINE;
+    m_server_info.push_back(new_line);
 
     if (GUIEngine::getCurrentScreen() != this)
         return;
-    core::stringw total_msg;
-    for (auto& string : m_server_info)
-    {
-        total_msg += string;
-        total_msg += L"\n";
-    }
-    m_text_bubble->setText(total_msg, true);
+
+    gui::IGUIStaticText* st =
+        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
+    st->setUseGlyphLayoutsOnly(true);
+    st->setGlyphLayouts(m_server_info);
+
 }   // addMoreServerInfo
 
 // ----------------------------------------------------------------------------
@@ -451,6 +442,8 @@ void NetworkingLobby::onUpdate(float delta)
 
     if (m_state == LS_ADD_PLAYERS)
     {
+        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>()
+            ->setUseGlyphLayoutsOnly(false);
         m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
                                           "join the game"), false);
         m_start_button->setVisible(false);
@@ -465,6 +458,8 @@ void NetworkingLobby::onUpdate(float delta)
     m_start_button->setVisible(false);
     if (!cl || !cl->isLobbyReady())
     {
+        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>()
+            ->setUseGlyphLayoutsOnly(false);
         core::stringw connect_msg;
         if (m_joined_server)
         {

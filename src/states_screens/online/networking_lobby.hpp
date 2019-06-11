@@ -20,9 +20,9 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "GlyphLayout.h"
 #include <map>
 #include <memory>
-#include <tuple>
 #include <utility>
 
 class InputDevice;
@@ -69,7 +69,8 @@ private:
     uint64_t m_ping_update_timer;
     std::map<std::string, LobbyPlayer> m_player_names;
     std::shared_ptr<Server> m_joined_server;
-    std::vector<core::stringw> m_server_info;
+
+    std::vector<gui::GlyphLayout> m_server_info;
     int m_server_info_height;
 
     core::stringw m_start_text, m_ready_text, m_live_join_text,

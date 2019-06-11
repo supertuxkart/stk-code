@@ -59,6 +59,38 @@ namespace Private
         f32 inverse_shaping, f32 scale, std::vector<std::vector<GlyphLayout> >& result);
 }
 
+inline void eraseTopLargerThan(std::vector<GlyphLayout>& gls,
+    f32 height_per_line, f32 max_height)
+{
+    if (max_height < height_per_line * 2.0f)
+        return;
+
+    std::vector<u32> newline_positions;
+    for (unsigned i = 0; i < gls.size(); i++)
+    {
+        const GlyphLayout& glyph = gls[i];
+        if ((glyph.flags & GLF_NEWLINE) != 0)
+        {
+            newline_positions.push_back(i);
+            continue;
+        }
+    }
+
+    // Handle the first line
+    f32 total_height = height_per_line +
+        (f32)newline_positions.size() * height_per_line;
+    if (total_height > max_height)
+    {
+        u32 idx = (u32)((total_height - max_height) / height_per_line);
+        if (idx < newline_positions.size())
+        {
+            auto end_it = gls.begin() + newline_positions[idx] + 1;
+            if (end_it != gls.end())
+                gls.erase(gls.begin(), end_it);
+        }
+    }
+}
+
 inline core::dimension2d<u32> getGlyphLayoutsDimension(
     const std::vector<GlyphLayout>& gls, s32 height_per_line, f32 inverse_shaping,
     f32 scale, s32 cluster = -1)
