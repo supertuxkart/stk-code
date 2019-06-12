@@ -821,9 +821,11 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
                 m_fallback_font->m_spritebank->getTexture(tex_id) :
                 m_spritebank->getTexture(tex_id));
 
-            const bool thin_border = font_settings ?
+            bool thin_border = font_settings ?
                 font_settings->useThinBorder() : false;
 
+            if (fallback[n])
+                thin_border = true;
             int thickness = (thin_border) ? 1 : 2;
 
             for (int x_delta = -thickness; x_delta <= thickness; x_delta++)
