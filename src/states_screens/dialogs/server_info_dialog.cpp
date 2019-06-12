@@ -51,6 +51,7 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
        server->getServerId(), server->getServerOwner());
     m_self_destroy = false;
+    m_join_server = false;
 
     loadFromFile("online/server_info_dialog.stkgui");
     getWidget<LabelWidget>("title")->setText(server->getName(), true);
@@ -202,7 +203,7 @@ GUIEngine::EventPropagation
         }
         else if(selection == m_join_widget->m_properties[PROP_ID])
         {
-            requestJoin();
+            m_join_server = true;
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -219,7 +220,7 @@ void ServerInfoDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    requestJoin();
+    m_join_server = true;
 }   // onEnterPressedInternal
 
 // -----------------------------------------------------------------------------
@@ -245,4 +246,6 @@ void ServerInfoDialog::onUpdate(float dt)
         ModalDialog::dismiss();
         return;
     }
+    if (m_join_server)
+        requestJoin();
 }   // onUpdate
