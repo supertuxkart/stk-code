@@ -104,7 +104,8 @@ LOCAL_CFLAGS       := -Iobj/fribidi/include             \
                       -DHAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES \
                       -DHAVE_HB_BUFFER_SET_INVISIBLE_GLYPH \
                       -DHAVE_HB_FT_FONT_CREATE_REFERENCED \
-                      -DHAVE_HB_FT_FONT_SET_LOAD_FLAGS
+                      -DHAVE_HB_FT_FONT_SET_LOAD_FLAGS \
+                      -std=c99
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
