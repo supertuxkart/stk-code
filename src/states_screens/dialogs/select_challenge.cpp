@@ -117,12 +117,16 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     
     GUIEngine::RibbonWidget* difficulty =
         getWidget<GUIEngine::RibbonWidget>("difficulty");
-        
+    
     if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
         PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-        UserConfigParams::m_difficulty = 2;
-    
-    difficulty->setSelection(UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
+    {
+        difficulty->setSelection(RaceManager::DIFFICULTY_HARD, PLAYER_ID_GAME_MASTER);
+    }
+    else
+    {
+        difficulty->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
+    }
 
     const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                              ->getChallengeStatus(challenge_id);
@@ -140,7 +144,15 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             challenge_info->setText(getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
             break;
         case 3:
-            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_BEST,   c->getData()), false );
+            if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
+                PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+            {
+                challenge_info->setText(getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
+            }
+            else
+            {
+                challenge_info->setText(getLabel(RaceManager::DIFFICULTY_BEST,   c->getData()), false );
+            }
             break;
     }
     
