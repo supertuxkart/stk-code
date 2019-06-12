@@ -149,7 +149,16 @@ void ServerSelection::init()
     for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
     {
         Track* t = track_manager->getTrack(i);
-        video::ITexture* tex =irr_driver->getTexture(t->getScreenshotFile());
+        video::ITexture* tex = NULL;
+        if (t->isInternal())
+        {
+            tex = irr_driver->getTexture(file_manager
+                ->getAsset(FileManager::GUI_ICON, "main_help.png"));
+        }
+        else
+        {
+            tex = irr_driver->getTexture(t->getScreenshotFile());
+        }
         if (!tex)
         {
             tex = irr_driver->getTexture(file_manager
