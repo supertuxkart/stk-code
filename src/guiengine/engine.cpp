@@ -1188,11 +1188,36 @@ namespace GUIEngine
             ul.unlock();
 #endif
 
+        const GameState gamestate = g_state_manager->getGameState();
+
+        // ---- some menus may need updating
+        bool dialog_opened = false;
+        
+        if (ScreenKeyboard::isActive())
+        {
+            ScreenKeyboard::getCurrent()->onUpdate(dt);
+            dialog_opened = true;
+        }
+        else if (ModalDialog::isADialogActive())
+        {
+            ModalDialog::getCurrent()->onUpdate(dt);
+            dialog_opened = true;
+        }
+            
+        if (gamestate != GAME || is_loading)
+        {
+            Screen* screen = getCurrentScreen();
+
+            if (screen != NULL && 
+                (!dialog_opened || screen->getUpdateInBackground()))
+            {
+                screen->onUpdate(elapsed_time);
+            }
+        }
+
         // ---- menu drawing
 
         // draw background image and sections
-
-        const GameState gamestate = g_state_manager->getGameState();
 
         if ( (gamestate == MENU &&
               GUIEngine::getCurrentScreen() != NULL &&
@@ -1216,45 +1241,10 @@ namespace GUIEngine
         // further render)
         g_env->drawAll();
 
-        // ---- some menus may need updating
-        if (gamestate != GAME || is_loading)
+        if (gamestate == GAME && !is_loading && !dialog_opened)
         {
-            bool dialog_opened = false;
-            
-            if (ScreenKeyboard::isActive())
-            {
-                ScreenKeyboard::getCurrent()->onUpdate(dt);
-                dialog_opened = true;
-            }
-            else if (ModalDialog::isADialogActive())
-            {
-                ModalDialog::getCurrent()->onUpdate(dt);
-                dialog_opened = true;
-            }
-            
-            Screen* screen = getCurrentScreen();
-
-            if (screen != NULL && 
-                (!dialog_opened || screen->getUpdateInBackground()))
-            {
-                screen->onUpdate(elapsed_time);
-            }
-        }
-        else
-        {
-            if (ScreenKeyboard::isActive())
-            {
-                ScreenKeyboard::getCurrent()->onUpdate(dt);
-            }
-            else if (ModalDialog::isADialogActive())
-            {
-                ModalDialog::getCurrent()->onUpdate(dt);
-            }
-            else
-            {
-                RaceGUIBase* rg = World::getWorld()->getRaceGUI();
-                if (rg != NULL) rg->renderGlobal(elapsed_time);
-            }
+            RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+            if (rg != NULL) rg->renderGlobal(elapsed_time);
         }
 
         MessageQueue::update(elapsed_time);
