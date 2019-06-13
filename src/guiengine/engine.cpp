@@ -1255,10 +1255,7 @@ namespace GUIEngine
             if (rg != NULL) rg->renderGlobal(elapsed_time);
         }
 
-        if (gamestate == MENU || gamestate == INGAME_MENU)
-        {
-            g_skin->drawTooltips();
-        }
+        g_skin->drawTooltips();
 
         if (gamestate != GAME && !gui_messages.empty())
         {
