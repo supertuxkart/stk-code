@@ -885,10 +885,13 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
         if (info.m_text.size() > 0)
         {
-            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5,
-                                x+ICON_PLAYER_WIDTH, y+5);
+            core::dimension2du dim = font->getDimension(info.m_text.c_str());
+
+            core::rect<s32> pos(x + ICON_PLAYER_WIDTH, y + 5,
+                                x + ICON_PLAYER_WIDTH + dim.Width, y + 5 + dim.Height);
             if (info.m_outlined_font)
             {
+
                 GUIEngine::getOutlineFont()->draw(info.m_text, pos,
                     info.m_color, false, false, NULL, true/*ignore RTL*/);
             }
@@ -905,8 +908,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
         if (info.special_title.size() > 0)
         {
-            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5,
-                                x+ICON_PLAYER_WIDTH, y+5);
+            core::dimension2du dim = font->getDimension(info.special_title.c_str());
+
+            core::rect<s32> pos(x + ICON_PLAYER_WIDTH, y + 5,
+                x + ICON_PLAYER_WIDTH + dim.Width, y + 5 + dim.Height);
             core::stringw s(info.special_title.c_str());
             font->setBlackBorder(true);
             font->setThinBorder(true);

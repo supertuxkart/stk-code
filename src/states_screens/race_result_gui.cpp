@@ -1183,7 +1183,7 @@ void RaceResultGUI::displayCTFResults()
         // -------------
 
         core::recti pos_name(current_x, y,
-            UserConfigParams::m_width, y + m_distance_between_rows);
+            current_x + m_width_kart_name, y + m_distance_between_rows);
         m_font->draw(ri->m_kart_name, pos_name, color, false, false, NULL,
             true /* ignoreRTL */);
         current_x += m_width_kart_name + m_width_column_space;
