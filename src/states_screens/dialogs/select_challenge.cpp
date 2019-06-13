@@ -70,7 +70,7 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         }
     } // if !isGrandPrix
     
-    label = _("Type: %i", description);
+    label = _("Type: %s", description);
     
     if (c_data->getMaxPosition(difficulty) != -1)
     {
@@ -288,7 +288,15 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
                     c_data->setRace(RaceManager::DIFFICULTY_HARD);
                     break;
                 case 3:
-                    c_data->setRace(RaceManager::DIFFICULTY_BEST);
+                    if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
+                        PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+                    {
+                        c_data->setRace(RaceManager::DIFFICULTY_HARD);
+                    }
+                    else
+                    {
+                        c_data->setRace(RaceManager::DIFFICULTY_BEST);
+                    }
                     break;
             }
             race_manager->setupPlayerKartInfo();
