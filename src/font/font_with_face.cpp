@@ -598,12 +598,22 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
     if (width_per_line.empty())
         return;
 
+    bool too_long_broken_text = false;
+    float next_line_height = m_font_max_height * scale;
+    if (width_per_line.size() > 1 &&
+        width_per_line.size() * next_line_height > position.getHeight())
+    {
+        // Make too long broken text draw as fit as possible
+        next_line_height = (float)position.getHeight() / width_per_line.size();
+        too_long_broken_text = true;
+    }
+
     // The offset must be round to integer when setting the offests
     // or * m_inverse_shaping, so the glyph is drawn without blurring effects
     if (hcenter || vcenter || clip)
     {
         text_dimension = gui::getGlyphLayoutsDimension(
-            gl, m_font_max_height * scale, m_inverse_shaping, scale);
+            gl, next_line_height, m_inverse_shaping, scale);
 
         if (hcenter)
         {
@@ -612,8 +622,13 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         }
         if (vcenter)
         {
-            offset.Y += (s32)(
-                (position.getHeight() - text_dimension.Height) / 2.0f);
+            if (too_long_broken_text)
+                offset.Y -= (m_font_max_height - m_glyph_max_height) * scale;
+            else
+            {
+                offset.Y += (s32)(
+                    (position.getHeight() - text_dimension.Height) / 2.0f);
+            }
         }
         if (clip)
         {
@@ -645,7 +660,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         if ((glyph_layout.flags & gui::GLF_NEWLINE) != 0)
         {
             // Y doesn't matter because we don't use advance y in harfbuzz
-            offset.Y += m_font_max_height * scale;
+            offset.Y += next_line_height;
             cur_line++;
             line_changed = true;
             continue;
