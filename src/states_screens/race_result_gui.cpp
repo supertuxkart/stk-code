@@ -770,6 +770,12 @@ void RaceResultGUI::displayCTFResults()
         m_distance_between_rows = (int)(1.5f*r.Height);
         m_distance_between_meta_rows = m_distance_between_rows;
 
+        // If there are too many highscores, reduce size between rows
+        Highscores* scores = World::getWorld()->getHighscores();
+        if (scores != NULL &&
+            scores->getNumberEntries() * m_distance_between_meta_rows > height * 0.5f)
+            m_distance_between_meta_rows *= 0.8f;
+
         // If there are too many karts, reduce size between rows
         if (m_distance_between_rows * num_karts > height)
             m_distance_between_rows = height / num_karts;
@@ -1693,7 +1699,8 @@ void RaceResultGUI::displayCTFResults()
                     {
                         //I18N: is used to indicate who has the bast laptime (best laptime "by kart_name")
                         core::stringw best_lap_by_string = _("by %s", best_lap_by);
-                        current_y += int(m_distance_between_meta_rows * 0.6f);
+                        // Make it closer to the above line
+                        current_y += int(GUIEngine::getFontHeight() * 0.8f);
                         GUIEngine::getFont()->draw(best_lap_by_string,
                             // 0.96 from stkgui
                             core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
