@@ -405,16 +405,16 @@ void FontWithFace::setDPI()
                              irr_driver->getActualScreenSize().Width)  / 720.0f;
     int factorTwo = getScalingFactorTwo();
     
-    if (UserConfigParams::m_fonts_size < 0)
+    if (UserConfigParams::m_font_size < 0)
     {
-        UserConfigParams::m_fonts_size = 0;
+        UserConfigParams::m_font_size = 0;
     }
-    else if (UserConfigParams::m_fonts_size > 6)
+    else if (UserConfigParams::m_font_size > 6)
     {
-        UserConfigParams::m_fonts_size = 6;
+        UserConfigParams::m_font_size = 6;
     }
     
-    factorTwo += UserConfigParams::m_fonts_size * 5 - 10;
+    factorTwo += UserConfigParams::m_font_size * 5 - 10;
     m_face_dpi = int(factorTwo * getScalingFactorOne() * scale);
 #ifndef SERVER_ONLY
     if (!disableTextShaping())
