@@ -319,9 +319,9 @@ if [ ! -f "$DIRNAME/obj/fribidi.stamp" ]; then
     cd "$DIRNAME/obj/fribidi"
     ./configure --host=$HOST --enable-static=yes &&
     make $@
+    check_error
     mkdir -p "$DIRNAME/obj/fribidi/include/fribidi"
     cp $DIRNAME/obj/fribidi/lib/*.h "$DIRNAME/obj/fribidi/include/fribidi"
-    check_error
     touch "$DIRNAME/obj/fribidi.stamp"
 fi
 
@@ -355,9 +355,9 @@ if [ ! -f "$DIRNAME/obj/harfbuzz.stamp" ]; then
                 --with-glib=no --with-gobject=no --with-cairo=no \
                 --with-fontconfig=no --with-icu=no --with-graphite2=no &&
     make $@
+    check_error
     mkdir -p "$DIRNAME/obj/harfbuzz/include/harfbuzz"
     cp $DIRNAME/obj/harfbuzz/src/*.h "$DIRNAME/obj/harfbuzz/include/harfbuzz"
-    check_error
     touch "$DIRNAME/obj/harfbuzz.stamp"
 fi
 
