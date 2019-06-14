@@ -1535,9 +1535,11 @@ void RaceResultGUI::displayCTFResults()
         assert(result_table != NULL);
 
         video::SColor color = video::SColor(255, 255, 0, 0);
+        // 0.96 from stkgui
         core::recti dest_rect(
             result_table->m_x + result_table->m_w - m_font->getDimension(msg.c_str()).Width - 5,
-            m_top, 0, 0);
+            m_top, UserConfigParams::m_width * 0.96f,
+            m_top + GUIEngine::getFontHeight());
 
         m_font->draw(msg, dest_rect, color, false, false, NULL, true);
     }   // displayGPProgress
@@ -1574,7 +1576,8 @@ void RaceResultGUI::displayCTFResults()
         {
             // First draw title
             GUIEngine::getFont()->draw(_("Highscores"),
-                core::recti(x, y, 0, 0),
+                // 0.96 from stkgui
+                core::recti(x, y, UserConfigParams::m_width * 0.96f, y + GUIEngine::getFontHeight()),
                 white_color,
                 false, false, NULL, true /* ignoreRTL */);
 
@@ -1653,7 +1656,9 @@ void RaceResultGUI::displayCTFResults()
             {
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
                 current_y += int(m_distance_between_meta_rows * 0.8f * 2);
-                GUIEngine::getFont()->draw(laps, core::recti(x, current_y, 0, 0),
+                GUIEngine::getFont()->draw(laps,
+                    // 0.96 from stkgui
+                    core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
                     white_color, false, false, nullptr, true);
             }
             // display difficulty
@@ -1661,7 +1666,9 @@ void RaceResultGUI::displayCTFResults()
                 race_manager->getDifficultyName(race_manager->getDifficulty());
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
             current_y += int(m_distance_between_meta_rows * 0.8f);
-            GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
+            GUIEngine::getFont()->draw(difficulty_string,
+                // 0.96 from stkgui
+                core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
                 white_color, false, false, nullptr, true);
             // show fastest lap
             if (race_manager->modeHasLaps())
@@ -1675,7 +1682,9 @@ void RaceResultGUI::displayCTFResults()
                         StringUtils::timeToString(best_lap_time, time_precision).c_str());
                     current_y += int(m_distance_between_meta_rows * 0.8f);
                     GUIEngine::getFont()->draw(best_lap_string,
-                        core::recti(x, current_y, 0, 0), white_color, false, false,
+                        // 0.96 from stkgui
+                        core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
+                        white_color, false, false,
                         nullptr, true);
 
                     core::stringw best_lap_by = dynamic_cast<LinearWorld*>(World::getWorld())->getFastestLapKartName();
@@ -1686,7 +1695,9 @@ void RaceResultGUI::displayCTFResults()
                         core::stringw best_lap_by_string = _("by %s", best_lap_by);
                         current_y += int(m_distance_between_meta_rows * 0.6f);
                         GUIEngine::getFont()->draw(best_lap_by_string,
-                            core::recti(x, current_y, 0, 0), white_color, false, false,
+                            // 0.96 from stkgui
+                            core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
+                            white_color, false, false,
                             nullptr, true);
                     }
                 }
