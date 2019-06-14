@@ -133,6 +133,9 @@ void OptionsScreenUI::loadedFromFile()
     }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
     
+    GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
+    assert( font_size != NULL );
+    
     font_size->m_properties[PROP_WRAP_AROUND] = "true";
     font_size->clearLabels();
     font_size->addLabel( core::stringw(_("Very very small")));
