@@ -226,7 +226,7 @@ std::wstring ScreenKeyboard::getKeyName(std::string key_id)
     
     if (key_id == "Enter")
     {
-        key_name = L"\u23CE";
+        key_name = L"\u21B2";
     }
     else if (key_id == "Shift")
     {
@@ -234,7 +234,7 @@ std::wstring ScreenKeyboard::getKeyName(std::string key_id)
     }
     else if (key_id == "Back")
     {
-        key_name = L"\u232B";
+        key_name = L"\u21E6";
     }
     else if (key_id == "Space")
     {
