@@ -164,10 +164,22 @@ inline s32 getCurosrFromDimension(f32 x, f32 y,
         f32 cur_width = (s32)(glyph.x_advance * inverse_shaping) * scale;
         if (glyph.cluster.size() == 1)
         {
-            if (i == 0 && cur_width * 0.5 > x)
-                return 0;
-            if (total_width + cur_width * 0.5 > x)
-                return glyph.cluster.front();
+            // One more character threshold because we show the cursor position
+            // opposite side for RTL character
+            if (glyph.flags & GLF_RTL_CHAR)
+            {
+                if (i == 0 && cur_width * 0.5 > x)
+                    return glyph.cluster.front() + 1;
+                if (total_width + cur_width * 1.5 > x)
+                    return glyph.cluster.front();
+            }
+            else
+            {
+                if (i == 0 && cur_width * 0.5 > x)
+                    return 0;
+                if (total_width + cur_width * 0.5 > x)
+                    return glyph.cluster.front();
+            }
         }
         else if (total_width + cur_width > x)
         {
@@ -185,7 +197,8 @@ inline s32 getCurosrFromDimension(f32 x, f32 y,
         }
         total_width += cur_width;
     }
-    return gls.back().cluster.back() + 1;
+    return gls.back().flags & GLF_RTL_CHAR ?
+        0 : gls.back().cluster.back() + 1;
 }
 
 inline std::vector<f32> getGlyphLayoutsWidthPerLine(
