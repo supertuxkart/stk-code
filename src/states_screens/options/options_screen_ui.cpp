@@ -132,6 +132,18 @@ void OptionsScreenUI::loadedFromFile()
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    
+    font_size->m_properties[PROP_WRAP_AROUND] = "true";
+    font_size->clearLabels();
+    font_size->addLabel( core::stringw(_("Very very small")));
+    font_size->addLabel( core::stringw(_("Very small")));
+    font_size->addLabel( core::stringw(_("Small")));
+    font_size->addLabel( core::stringw(_("Medium")));
+    font_size->addLabel( core::stringw(_("Large")));
+    font_size->addLabel( core::stringw(_("Very large")));
+    font_size->addLabel( core::stringw(_("Very very large")));
+    font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+    font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -166,8 +178,8 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
     
-    font_size->setValue((int)roundf(UserConfigParams::m_fonts_size));
-    m_prev_font_size = UserConfigParams::m_fonts_size;
+    font_size->setValue((int)roundf(UserConfigParams::m_font_size));
+    m_prev_font_size = UserConfigParams::m_font_size;
     font_size->setActive(!in_game);
 
     // ---- video modes
@@ -260,7 +272,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
         assert( font_size != NULL );
-        UserConfigParams::m_fonts_size = font_size->getValue();
+        UserConfigParams::m_font_size = font_size->getValue();
     }
     else if (name == "split_screen_horizontally")
     {
@@ -282,7 +294,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
 void OptionsScreenUI::tearDown()
 {
-    if (m_prev_font_size != UserConfigParams::m_fonts_size)
+    if (m_prev_font_size != UserConfigParams::m_font_size)
     {
         irr_driver->sameRestart();
     }
