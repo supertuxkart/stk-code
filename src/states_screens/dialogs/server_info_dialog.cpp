@@ -76,37 +76,15 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         password_box->setCollapsed(true); // FIXME Doesn't reuse free space for other widgets
     }
 
-    auto& players = m_server->getPlayers();
-    core::stringw server_info;
     core::stringw difficulty = race_manager->getDifficultyName(
         server->getDifficulty());
-
-    core::stringw each_line = _("Difficulty: %s", difficulty);
     //I18N: In server info dialog
-    server_info += each_line;
-    server_info += L"\n";
+    getWidget<LabelWidget>("server-info-1")->setText(_("Difficulty: %s", difficulty), false);
 
     core::stringw mode = ServerConfig::getModeName(server->getServerMode());
     //I18N: In server info dialog
-    each_line = _("Game mode: %s", mode);
-    server_info += each_line;
-    server_info += L"\n";
+    getWidget<LabelWidget>("server-info-2")->setText(_("Game mode: %s", mode), false);
 
-    Track* t = server->getCurrentTrack();
-    if (t)
-    {
-        core::stringw track_name = t->getName();
-        //I18N: In server info dialog, showing the current track playing in
-        //server
-        each_line = _("Current track: %s", track_name);
-        server_info += each_line;
-        server_info += L"\n";
-    }
-    getWidget("server-info-1")->setVisible(true);
-    getWidget<LabelWidget>("server-info-1")->setText(server_info, true);
-
-    server_info = L"";
-    each_line = L"";
 #ifndef SERVER_ONLY
     if (!server->getCountryCode().empty())
     {
@@ -114,14 +92,19 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
             translations->getLocalizedCountryName(server->getCountryCode());
         //I18N: In the server info dialog, show the server location with
         //country name (based on IP geolocation)
-        each_line = _("Server location: %s", country_name);
-        server_info += each_line;
-        server_info += L"\n";
+        getWidget<LabelWidget>("server-info-3")->setText(_("Server location: %s", country_name), false);
     }
 #endif
-    getWidget("server-info-2")->setVisible(true);
-    getWidget<LabelWidget>("server-info-2")->setText(server_info, true);
 
+    Track* t = server->getCurrentTrack();
+    if (t)
+    {
+        core::stringw track_name = t->getName();
+        //I18N: In server info dialog, showing the current track playing in server
+        getWidget<LabelWidget>("server-info-4")->setText(_("Current track: %s", track_name), false);
+    }
+
+    auto& players = m_server->getPlayers();
     if (!players.empty())
     {
         // I18N: Show above the player list in server info dialog to
