@@ -1386,8 +1386,11 @@ void CGUIEditBox::calculateScrollPos()
 void CGUIEditBox::setTextMarkers(s32 begin, s32 end)
 {
     if (GUIEngine::ScreenKeyboard::isActive())
+    {
+        m_mark_begin = m_mark_end = 0;
         return;
-        
+    }
+
     if (begin != m_mark_begin || end != m_mark_end)
     {
         m_mark_begin = begin;
