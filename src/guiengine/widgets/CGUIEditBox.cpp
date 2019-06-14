@@ -245,7 +245,9 @@ CGUIEditBox::~CGUIEditBox()
         dl->setIMEEnable(false);
     }
 #endif
-    irr_driver->getDevice()->toggleOnScreenKeyboard(false);
+    if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
+        irr_driver->getDevice()->hasOnScreenKeyboard())
+        irr_driver->getDevice()->toggleOnScreenKeyboard(false);
 
 #endif
 }
@@ -675,7 +677,9 @@ bool CGUIEditBox::processKey(const SEvent& event)
         break;
     case IRR_KEY_RETURN:
         {
-            irr_driver->getDevice()->toggleOnScreenKeyboard(false);
+            if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
+                irr_driver->getDevice()->hasOnScreenKeyboard())
+                irr_driver->getDevice()->toggleOnScreenKeyboard(false);
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
         break;
