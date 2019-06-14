@@ -430,7 +430,7 @@ void TrackInfoScreen::updateHighScores()
                 }
             }
         
-            line = name + "\t" + core::stringw(time_string.c_str());
+            line = name + "    " + core::stringw(time_string.c_str());
         }
         else
         {
