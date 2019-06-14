@@ -1255,6 +1255,17 @@ namespace GUIEngine
             if (rg != NULL) rg->renderGlobal(elapsed_time);
         }
 
+        if (gamestate != GAME || is_loading)
+        {
+            Screen* screen = getCurrentScreen();
+
+            if (screen != NULL && 
+                (!dialog_opened || screen->getUpdateInBackground()))
+            {
+                screen->onDraw(elapsed_time);
+            }
+        }
+
         g_skin->drawTooltips();
 
         if (gamestate != GAME && !gui_messages.empty())

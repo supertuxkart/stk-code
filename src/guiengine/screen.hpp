@@ -275,6 +275,11 @@ namespace GUIEngine
         virtual void onUpdate(float dt) { };
 
         /**
+         * \brief optional callback you can override to be notified at every frame.
+         */
+        virtual void onDraw(float dt) { };
+
+        /**
          * \return which music to play at this screen
          */
         virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }

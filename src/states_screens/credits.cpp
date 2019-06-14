@@ -255,7 +255,7 @@ void CreditsScreen::reset()
 
 // ----------------------------------------------------------------------------
 
-void CreditsScreen::onUpdate(float elapsed_time)
+void CreditsScreen::onDraw(float elapsed_time)
 {
     // multiply by 0.8 to slow it down a bit as a whole
     time_before_next_step -= elapsed_time*0.8f;
