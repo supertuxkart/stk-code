@@ -55,7 +55,7 @@
                     <label proportion="1" I18N="In the ui settings" text="Font size" align="center"/>
                     <spacer width="2%" height="20"/>
                     <div layout="horizontal-row" proportion="5" height="100%">
-                        <gauge id="font_size" min_value="1" max_value="5" width="60%"/>
+                        <gauge id="font_size" width="60%"/>
                     </div>
                 </div>
 
