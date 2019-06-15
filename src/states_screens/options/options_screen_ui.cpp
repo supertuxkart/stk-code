@@ -136,7 +136,6 @@ void OptionsScreenUI::loadedFromFile()
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
     
-    font_size->m_properties[PROP_WRAP_AROUND] = "true";
     font_size->clearLabels();
     font_size->addLabel( core::stringw(_("Very very small")));
     font_size->addLabel( core::stringw(_("Very small")));
