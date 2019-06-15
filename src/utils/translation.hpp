@@ -22,6 +22,7 @@
 #include <irrString.h>
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
