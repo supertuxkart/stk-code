@@ -241,7 +241,41 @@ namespace StringUtils
     }   // parseString
 
     // ------------------------------------------------------------------------
+    /** Return country flag (in regional indicators) from 2-letter country
+     *  code. */
+    inline irr::core::stringw getCountryFlag(const std::string& country_code)
+    {
+        if (country_code.empty() || country_code.size() != 2)
+            return L"";
+        uint32_t flag[3] =
+        {
+            (uint32_t)(country_code[0]) + 127397,
+            (uint32_t)(country_code[1]) + 127397,
+            0
+        };
+        if (sizeof(wchar_t) == 4)
+        {
+            return (wchar_t*)flag;
+        }
+        else if (sizeof(wchar_t) == 2)
+        {
+            flag[0] -= 0x10000;
+            flag[1] -= 0x10000;
+            wchar_t u16[5] =
+            {
+                //make a surrogate pair
+                static_cast<wchar_t>((flag[0] >> 10) + 0xd800),
+                static_cast<wchar_t>((flag[0] & 0x3ff) + 0xdc00),
+                static_cast<wchar_t>((flag[1] >> 10) + 0xd800),
+                static_cast<wchar_t>((flag[1] & 0x3ff) + 0xdc00),
+                0
+            };
+            return u16;
+        }
+        return L"";
+    }   // getCountryFlag
 
+    // ------------------------------------------------------------------------
     irr::core::stringw utf8ToWide(const char* input);
     irr::core::stringw utf8ToWide(const std::string &input);
     std::u32string utf8ToUtf32(const std::string &input);
