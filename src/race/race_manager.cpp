@@ -61,6 +61,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 RaceManager* race_manager= NULL;
 

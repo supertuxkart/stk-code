@@ -30,6 +30,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
 

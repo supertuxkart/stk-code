@@ -50,6 +50,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>

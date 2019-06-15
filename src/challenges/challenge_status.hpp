@@ -32,7 +32,6 @@
 
 #include "race/race_manager.hpp"
 #include "utils/no_copy.hpp"
-#include "utils/translation.hpp"
 
 class ChallengeData;
 class UTFWriter;

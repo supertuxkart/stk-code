@@ -37,7 +37,6 @@ using namespace irr;
 
 #include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
-#include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"
 

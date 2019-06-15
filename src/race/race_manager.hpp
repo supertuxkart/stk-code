@@ -32,7 +32,6 @@
 
 #include "network/remote_kart_info.hpp"
 #include "race/grand_prix_data.hpp"
-#include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 
 class AbstractKart;

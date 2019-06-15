@@ -117,7 +117,6 @@ public:
     AbstractKart *getKart() const { return m_kart; }
 };   // Controller
 
-extern Translations* translations;
 #endif
 
 /* EOF */

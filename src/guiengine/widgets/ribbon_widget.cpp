@@ -269,7 +269,6 @@ void RibbonWidget::add()
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
-                label->setRightToLeft(translations->isRTLText(message));
                 m_labels.push_back(label);
 
                 subbtn->setTabStop(false);
@@ -367,7 +366,6 @@ void RibbonWidget::add()
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
-                label->setRightToLeft(translations->isRTLText(message));
                 m_labels.push_back(label);
 
                 subbtn->setTabStop(false);

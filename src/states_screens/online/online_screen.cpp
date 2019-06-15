@@ -45,6 +45,7 @@
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <string>
 

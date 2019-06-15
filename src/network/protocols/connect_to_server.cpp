@@ -35,6 +35,8 @@
 #include "states_screens/online/networking_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <algorithm>
 // ============================================================================

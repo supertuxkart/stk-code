@@ -23,6 +23,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 #include "io/file_manager.hpp"
 
 #include <IGUIEnvironment.h>
