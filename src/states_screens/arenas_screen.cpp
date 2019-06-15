@@ -276,7 +276,7 @@ void ArenasScreen::buildTrackList()
             }
             else
             {
-                w->addItem( translations->fribidize(curr->getName()), curr->getIdent(), curr->getScreenshotFile(), 0,
+                w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             }
         }
@@ -328,7 +328,7 @@ void ArenasScreen::buildTrackList()
             }
             else
             {
-                w->addItem( translations->fribidize(curr->getName()), curr->getIdent(), curr->getScreenshotFile(), 0,
+                w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             }
         }

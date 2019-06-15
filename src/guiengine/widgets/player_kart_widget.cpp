@@ -372,7 +372,7 @@ void PlayerKartWidget::add()
     irr::core::stringw name; // name of the player
     if (m_associated_player)
         name = m_associated_player->getProfile()->getName();
-    core::stringw label = translations->fribidize(name);
+    core::stringw label = name;
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -380,7 +380,7 @@ void PlayerKartWidget::add()
         for (int n=0; n<player_amount; n++)
         {
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
-            core::stringw label = translations->fribidize(name);
+            core::stringw label = name;
             m_player_ident_spinner->addLabel(label);
             if (UserConfigParams::m_per_player_difficulty)
             {
@@ -442,8 +442,6 @@ void PlayerKartWidget::markAsReady()
                                            m_player_ident_spinner->m_y),
                          core::dimension2di(m_player_ident_spinner->m_w,
                                             m_player_ident_spinner->m_h));
-    // 'playerNameString' is already fribidize, so we need to use
-    // 'insertValues' and not _("...", a) so it's not flipped again
     m_ready_text =
         GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString),
             rect);

@@ -1530,7 +1530,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         }
         else
         {
-            w->addItem(translations->fribidize(prop->getName()),
+            w->addItem(prop->getName(),
                        prop->getIdent(),
                        prop->getAbsoluteIconFile(), 0,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);

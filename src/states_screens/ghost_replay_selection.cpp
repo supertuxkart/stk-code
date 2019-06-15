@@ -381,8 +381,7 @@ void GhostReplaySelection::loadList()
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         //The third argument should match the numbers used in beforeAddingWidget
-        row.push_back(GUIEngine::ListWidget::ListCell
-            (translations->fribidize(track->getName()) , -1, 9));
+        row.push_back(GUIEngine::ListWidget::ListCell(track->getName() , -1, 9));
         if (m_active_mode_is_linear)
         {
             row.push_back(GUIEngine::ListWidget::ListCell

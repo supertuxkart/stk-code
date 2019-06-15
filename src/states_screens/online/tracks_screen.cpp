@@ -590,7 +590,7 @@ void TracksScreen::buildTrackList()
         }
         else
         {
-            tracks_widget->addItem(translations->fribidize(curr->getName()),
+            tracks_widget->addItem(curr->getName(),
                 curr->getIdent(),
                 curr->getScreenshotFile(), 0,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);

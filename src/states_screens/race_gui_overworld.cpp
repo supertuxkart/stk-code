@@ -546,7 +546,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(translations->fribidize(gp->getName()), pos, video::SColor(255,255,255,255),
+                font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
@@ -562,7 +562,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(translations->fribidize(track->getName()),
+                font->draw(track->getName(),
                            pos, video::SColor(255, 255, 255, 255),
                            false, true /* vcenter */, NULL);
             }

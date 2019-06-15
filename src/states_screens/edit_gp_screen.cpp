@@ -160,7 +160,7 @@ void EditGPScreen::init()
     {
         LabelWidget* header = getWidget<LabelWidget>("title");
         assert(header != NULL);
-        header->setText(translations->fribidize(m_gp->getName()), true);
+        header->setText(m_gp->getName(), true);
 
         IconButtonWidget* button = getWidget<IconButtonWidget>("save");
         assert(button != NULL);
