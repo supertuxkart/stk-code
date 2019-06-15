@@ -22,6 +22,7 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
+#include "utils/utf8/core.h"
 #include "utils/utf8.h"
 
 #include <IGUIElement.h>
@@ -273,6 +274,33 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     // We should not use the modified utf8 from java as it fails for emoji
     // because it's larger than 16bit
     std::u32string to_editbox;
+
+    std::vector<int> mappings;
+    int pos = 0;
+    mappings.push_back(pos++);
+    for (unsigned i = 0; i < len; i++)
+    {
+        if (utf8::internal::is_lead_surrogate(utf16_text[i]))
+        {
+            int duplicated_pos = pos++;
+            mappings.push_back(duplicated_pos);
+            mappings.push_back(duplicated_pos);
+            i++;
+        }
+        else
+            mappings.push_back(pos++);
+    }
+
+    // Correct start / end position for utf16
+    if (start < (int)mappings.size())
+        start = mappings[start];
+    if (end < (int)mappings.size())
+        end = mappings[end];
+    if (composing_start < (int)mappings.size())
+        composing_start = mappings[composing_start];
+    if (composing_end < (int)mappings.size())
+        composing_end = mappings[composing_end];
+
     try
     {
         utf8::utf16to32(utf16_text, utf16_text + len,

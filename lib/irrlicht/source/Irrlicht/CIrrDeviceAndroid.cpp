@@ -1309,6 +1309,28 @@ void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text,
     static_assert(sizeof(wchar_t) == sizeof(uint32_t), "wchar_t is not 32bit");
     const uint32_t* chars = (const uint32_t*)text.c_str();
     utf8::unchecked::utf32to16(chars, chars + text.size(), back_inserter(utf16));
+
+    std::vector<int> mappings;
+    int pos = 0;
+    mappings.push_back(pos++);
+    for (unsigned i = 0; i < utf16.size(); i++)
+    {
+        if (utf8::internal::is_lead_surrogate(utf16[i]))
+        {
+            pos++;
+            mappings.push_back(pos++);
+            i++;
+        }
+        else
+            mappings.push_back(pos++);
+    }
+
+    // Correct start / end position for utf16
+    if (selection_start < (int)mappings.size())
+        selection_start = mappings[selection_start];
+    if (selection_end < (int)mappings.size())
+        selection_end = mappings[selection_end];
+
     jstring jstring_text = env->NewString((const jchar*)utf16.data(), utf16.size());
 
     env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end, (jint)type);
