@@ -35,11 +35,6 @@
 #include <cwchar>
 #include <fstream>
 #include <iostream>
-#include <thread>
-
-#if ENABLE_BIDI
-#  include <fribidi/fribidi.h>
-#endif
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
@@ -75,110 +70,12 @@ using namespace tinygettext;
 typedef std::vector<std::string> LanguageList;
 static LanguageList g_language_list;
 
+// ============================================================================
 // Note : this method is not static because 'g_language_list' is initialized
 //        the first time Translations is constructed (despite being a global)
 const LanguageList* Translations::getLanguageList() const
 {
     return &g_language_list;
-}
-#endif
-
-// ----------------------------------------------------------------------------
-/** Frees the memory allocated for the result of toFribidiChar(). */
-#ifdef ENABLE_BIDI
-void freeFribidiChar(FriBidiChar *str)
-{
-#ifdef TEST_BIDI
-    delete[] str;
-#else
-    if (sizeof(wchar_t) != sizeof(FriBidiChar))
-        delete[] str;
-#endif
-}
-#endif
-
-/** Frees the memory allocated for the result of fromFribidiChar(). */
-#ifdef ENABLE_BIDI
-void freeFribidiChar(wchar_t *str)
-{
-    if (sizeof(wchar_t) != sizeof(FriBidiChar))
-        delete[] str;
-}
-#endif
-
-// ----------------------------------------------------------------------------
-/** Converts a wstring to a FriBidi-string.
-    The caller must take care to free (or not to free) the result after use.
-    Freeing should be done with freeFribidiChar().
-
-    On linux, the string doesn't need to be converted because wchar_t is
-    already UTF-32. On windows the string is converted from UTF-16 by this
-    function. */
-#ifdef ENABLE_BIDI
-FriBidiChar* toFribidiChar(const wchar_t* str)
-{
-    std::size_t length = wcslen(str);
-    FriBidiChar *result;
-    if (sizeof(wchar_t) == sizeof(FriBidiChar))
-        result = (FriBidiChar*) str;
-    else
-    {
-        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
-        // So we simply copy the characters over here (note that this
-        // is technically incorrect, all characters we use/support fit
-        // in 16 bits, which is what irrlicht supports atm).
-        result = new FriBidiChar[length + 1];
-        for (std::size_t i = 0; i <= length; i++)
-            result[i] = str[i];
-    }
-
-#ifdef TEST_BIDI
-    // Prepend a character in each line that forces RTL style
-    int lines = 1;
-    for (std::size_t i = 0; i <= length; i++)
-    {
-        if (str[i] == L'\n')
-            lines++;
-    }
-    FriBidiChar *tmp = result;
-    length += lines;
-    result = new FriBidiChar[length + 1];
-    lines = 1;
-    result[0] = L'\u202E';
-    for (std::size_t i = 1; i <= length; i++)
-    {
-        result[i] = tmp[i - lines];
-        if (str[i - lines] == L'\n')
-        {
-            lines++;
-            i++;
-            result[i] = L'\u202E';
-        }
-    }
-    if (sizeof(wchar_t) != sizeof(FriBidiChar))
-        delete[] tmp;
-#endif
-
-    return result;
-}
-
-wchar_t* fromFribidiChar(const FriBidiChar* str)
-{
-    wchar_t *result;
-    if (sizeof(wchar_t) == sizeof(FriBidiChar))
-        result = (wchar_t*) str;
-    else
-    {
-        std::size_t length = 0;
-        while (str[length])
-            length++;
-
-        // Copy back to wchar_t array
-        result = new wchar_t[length + 1];
-        for (std::size_t i = 0; i <= length; i++)
-            result[i] = str[i];
-    }
-    return result;
 }
 #endif
 
@@ -482,71 +379,15 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         m_dictionary = m_dictionary_manager.get_dictionary();
     }
 
-    // This is a silly but working hack I added to determine whether the
-    // current language is RTL or not, since gettext doesn't seem to provide
-    // this information
-
-    // This one is just for the xgettext parser to pick up
-#define ignore(X)
-
-    //I18N: Do NOT literally translate this string!! Please enter Y as the
-    //      translation if your language is a RTL (right-to-left) language,
-    //      N (or nothing) otherwise
-    ignore(_("   Is this a RTL language?"));
-
-    const std::string isRtl =
-        m_dictionary.translate("   Is this a RTL language?");
-
-    m_rtl = false;
-
-    for (unsigned int n=0; n < isRtl.size(); n++)
-    {
-        if (isRtl[n] == 'Y')
-        {
-            m_rtl = true;
-            break;
-        }
-    }
-#ifdef TEST_BIDI
-    m_rtl = true;
-#endif
-
 #endif
 }   // Translations
 
 // ----------------------------------------------------------------------------
-
 Translations::~Translations()
 {
 }   // ~Translations
 
 // ----------------------------------------------------------------------------
-bool Translations::isRTLText(const wchar_t *in_ptr)
-{
-#if ENABLE_BIDI
-    std::size_t length = wcslen(in_ptr);
-    FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
-
-    FriBidiCharType *types = new FriBidiCharType[length];
-    fribidi_get_bidi_types(fribidiInput, (FriBidiStrIndex)length, types);
-    freeFribidiChar(fribidiInput);
-
-    // Declare as RTL if one character is RTL
-    for (std::size_t i = 0; i < length; i++)
-    {
-        if (types[i] & FRIBIDI_MASK_RTL)
-        {
-            delete[] types;
-            return true;
-        }
-    }
-    delete[] types;
-    return false;
-#else
-    return false;
-#endif
-}
-
 /**
  * \param original Message to translate
  * \param context  Optional, can be set to differentiate 2 strings that are identical
@@ -556,8 +397,9 @@ irr::core::stringw Translations::w_gettext(const wchar_t* original, const char* 
 {
     std::string in = StringUtils::wideToUtf8(original);
     return w_gettext(in.c_str(), context);
-}
+}   // w_gettext
 
+// ----------------------------------------------------------------------------
 /**
  * \param original Message to translate
  * \param context  Optional, can be set to differentiate 2 strings that are identical
@@ -592,8 +434,9 @@ irr::core::stringw Translations::w_gettext(const char* original, const char* con
     return wide;
 #endif
 
-}
+}   // w_gettext
 
+// ----------------------------------------------------------------------------
 /**
  * \param singular Message to translate in singular form
  * \param plural   Message to translate in plural form (can be the same as the singular form)
@@ -606,8 +449,9 @@ irr::core::stringw Translations::w_ngettext(const wchar_t* singular, const wchar
     std::string in = StringUtils::wideToUtf8(singular);
     std::string in2 = StringUtils::wideToUtf8(plural);
     return w_ngettext(in.c_str(), in2.c_str(), num, context);
-}
+}   // w_ngettext
 
+// ----------------------------------------------------------------------------
 /**
  * \param singular Message to translate in singular form
  * \param plural   Message to translate in plural form (can be the same as the singular form)
@@ -637,32 +481,37 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
     return wide;
 #endif
 
-}
+}   // w_ngettext
 
+// ----------------------------------------------------------------------------
 #ifndef SERVER_ONLY
 std::set<wchar_t> Translations::getCurrentAllChar()
 {
     return m_dictionary.get_all_used_chars();
-}
+}   // getCurrentAllChar
 
+// ----------------------------------------------------------------------------
 std::string Translations::getCurrentLanguageName()
 {
     return m_current_language_name;
     //return m_dictionary_manager.get_language().get_name();
-}
+}   // getCurrentLanguageName
 
+// ----------------------------------------------------------------------------
 std::string Translations::getCurrentLanguageNameCode()
 {
     return m_current_language_name_code;
-}
+}   // getCurrentLanguageNameCode
 
+// ----------------------------------------------------------------------------
 const std::string& Translations::getLocalizedName(const std::string& str) const
 {
     std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
     assert (n != m_localized_name.end());
     return n->second;
-}
+}   // getLocalizedName
 
+// ----------------------------------------------------------------------------
 /* Convert 2-letter country code to localized readable name.
  */
 irr::core::stringw Translations::getLocalizedCountryName(const std::string& country_code) const
@@ -680,6 +529,6 @@ irr::core::stringw Translations::getLocalizedCountryName(const std::string& coun
         return name_itr->second;
     // Fallback
     return StringUtils::utf8ToWide(country_code);
-}
+}   // getLocalizedCountryName
 
 #endif

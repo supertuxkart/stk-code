@@ -17,7 +17,6 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
-#include "utils/translation.hpp"
 #include <algorithm>
 
 #include <IGUIStaticText.h>
@@ -53,7 +52,6 @@ void BubbleWidget::add()
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
-    irrwidget->setRightToLeft(translations->isRTLText(message));
 
     m_element = irrwidget;
     replaceText();
@@ -74,7 +72,6 @@ void BubbleWidget::replaceText()
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
-    else if (translations->isRTLText(message))          align = EGUIA_LOWERRIGHT;
 
     EGUI_ALIGNMENT valign = EGUIA_CENTER;
     if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
@@ -92,23 +89,11 @@ void BubbleWidget::replaceText()
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
 
         // reduce text to fit in the available space if it's too long
-        if (translations->isRTLText(message))
+        while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
         {
-            while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
-            {
-                message = core::stringw(L"...") + message.subString(10, message.size() - 10);
-                irrwidget->setText(message.c_str());
-                text_height = irrwidget->getTextHeight();
-            }
-        }
-        else
-        {
-            while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
-            {
-                message = message.subString(0, message.size() - 10) + "...";
-                irrwidget->setText(message.c_str());
-                text_height = irrwidget->getTextHeight();
-            }
+            message = message.subString(0, message.size() - 10) + "...";
+            irrwidget->setText(message.c_str());
+            text_height = irrwidget->getTextHeight();
         }
     }
     m_shrinked_text = message;
@@ -122,7 +107,6 @@ void BubbleWidget::setText(const irr::core::stringw &s)
     {
         //If add() has already been called (and thus m_element is set) we need to replace the text.
         replaceText();
-        getIrrlichtElement<IGUIStaticText>()->setRightToLeft(translations->isRTLText(getText()));
     }
 }
 

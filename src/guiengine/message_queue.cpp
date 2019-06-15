@@ -26,7 +26,6 @@
 #include "guiengine/skin.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/synchronised.hpp"
-#include "utils/translation.hpp"
 
 #include "IGUIElement.h"
 #include "IGUIEnvironment.h"
@@ -142,7 +141,6 @@ public:
         m_text =
             GUIEngine::getGUIEnv()->addStaticText(m_message.c_str(),
             core::recti(0, 0, max_width, height));
-        m_text->setRightToLeft(translations->isRTLText(m_message));
         core::dimension2du dim(m_text->getTextWidth(),
             m_text->getTextHeight());
         dim.Width += brp.m_left_border + brp.m_right_border;

@@ -50,8 +50,6 @@ private:
     tinygettext::DictionaryManager m_dictionary_manager;
     tinygettext::Dictionary        m_dictionary;
 
-    bool m_rtl;
-
     static std::map<std::string, std::string> m_localized_name;
     static std::map<std::string, std::map<std::string, irr::core::stringw> > m_localized_country_codes;
     std::string m_current_language_name;
@@ -68,17 +66,6 @@ public:
 
     irr::core::stringw w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context=NULL);
     irr::core::stringw w_ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
-    bool               isRTLLanguage() const
-    {
-#ifdef SERVER_ONLY
-        return false;
-#else
-        return m_rtl;
-#endif
-    }
-
-    bool               isRTLText(const wchar_t* in_ptr);
-    bool               isRTLText(const irr::core::stringw &str) { return isRTLText(str.c_str()); }
 
 #ifndef SERVER_ONLY
     const std::vector<std::string>* getLanguageList() const;
