@@ -85,6 +85,14 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
         player_info->get("rank", &std::get<0>(t));
         player_info->get("username", &username);
         std::get<1>(t) = StringUtils::utf8ToWide(username);
+        std::string country;
+        player_info->get("country-code", &country);
+        const core::stringw& flag = StringUtils::getCountryFlag(country);
+        if (!flag.empty())
+        {
+            std::get<1>(t) += L" ";
+            std::get<1>(t) += flag;
+        }
         m_lower_case_player_names += StringUtils::toLowerCase(username);
         player_info->get("scores", &std::get<2>(t));
         float time_played = 0.0f;
