@@ -75,6 +75,9 @@ private:
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 
+    /** Name of the kart with translation. */
+    core::stringw m_name;
+
     // ------------------------------------------------------------------------
     void loadKartProperties(const std::string& new_ident,
                             PerPlayerDifficulty difficulty,
@@ -113,7 +116,10 @@ public:
                                 PerPlayerDifficulty difficulty,
                                 std::shared_ptr<RenderInfo> ri);
     virtual       ~AbstractKart();
-    virtual core::stringw getName() const;
+    // ------------------------------------------------------------------------
+    /** Returns a name to be displayed for this kart. */
+    const core::stringw& getName() const                     { return m_name; }
+    // ------------------------------------------------------------------------
     virtual void   reset();
     virtual void   init(RaceManager::KartType type) = 0;
     // ========================================================================

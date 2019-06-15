@@ -19,6 +19,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include <iostream>
 #include <irrXML.h>

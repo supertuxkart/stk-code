@@ -228,3 +228,19 @@ void Addon::deleteInvalidIconFile()
     file_manager->removeFile(icon);
     m_installed = false;
 }   // redownloadIcon
+
+// ----------------------------------------------------------------------------
+/** A static function that checks if the given ID is an addon. This is
+ *  done by testing if the directory name is in the addons directory.
+ */
+bool Addon::isAddon(const std::string &directory)
+{
+    return StringUtils::startsWith(directory,file_manager->getAddonsDir());
+}   // isAddon
+
+// ----------------------------------------------------------------------------
+/** Returns the directory in which this addon is installed. */
+std::string Addon::getDataDir() const
+{
+    return file_manager->getAddonsFile(getTypeDirectory()+m_dir_name);
+}   // getDataDir

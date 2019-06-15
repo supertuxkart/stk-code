@@ -21,6 +21,7 @@
 
 #include "config/player_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "io/xml_node.hpp"
 #include "online/xml_request.hpp"
 
 #include <memory>

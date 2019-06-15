@@ -32,6 +32,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
+#include "utils/string_utils.hpp"
 
 #include <typeinfo>
 

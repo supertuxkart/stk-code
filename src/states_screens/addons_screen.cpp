@@ -30,8 +30,9 @@
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 

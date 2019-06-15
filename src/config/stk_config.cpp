@@ -28,6 +28,7 @@
 #include "items/item.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 STKConfig* stk_config=0;
 float STKConfig::UNDEFINED = -99.9f;

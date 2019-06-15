@@ -176,33 +176,7 @@ public:
     }   // getIconOf
 
     // ------------------------------------------------------------------------
-    /** Returns a (translated) name of a minor race mode.
-     *  \param mode Minor race mode.
-     */
-    static const core::stringw getNameOf(const MinorRaceModeType mode)
-    {
-        switch (mode)
-        {
-            //I18N: Game mode
-            case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
-            //I18N: Game mode
-            case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
-            //I18N: Game mode
-            case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
-            //I18N: Game mode
-            case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
-            //I18N: Game mode
-            case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
-            //I18N: Game mode
-            case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
-            //I18N: Game mode
-            case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
-            //I18N: Game mode
-            case MINOR_MODE_SOCCER:         return _("Soccer");
-            default: assert(false); return L"";
-        }
-    }   // getNameOf
-
+    static const core::stringw getNameOf(const MinorRaceModeType mode);
     // ------------------------------------------------------------------------
     /** Returns if the currently set minor game mode can be used by the AI. */
     bool hasAI()
@@ -601,19 +575,7 @@ public:
     }   // getDifficultyAsString
 
     // ------------------------------------------------------------------------
-    /** Returns the specified difficulty as a string. */
-    core::stringw getDifficultyName(Difficulty diff) const
-    {
-        switch (diff)
-        {
-        case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
-        case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
-        case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
-        case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
-        default:  assert(false);
-        }
-        return "";
-    }   // getDifficultyName
+    core::stringw getDifficultyName(Difficulty diff) const;
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------

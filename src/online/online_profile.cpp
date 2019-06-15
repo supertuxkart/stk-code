@@ -20,10 +20,12 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "io/xml_node.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 #include "utils/log.hpp"
-#include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
 #include <sstream>
 #include <stdlib.h>

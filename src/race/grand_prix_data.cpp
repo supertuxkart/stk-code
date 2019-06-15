@@ -609,4 +609,18 @@ void GrandPrixData::remove(const unsigned int track)
     m_reversed.erase(m_reversed.begin() + track);
 }
 
+// ----------------------------------------------------------------------------
+irr::core::stringw GrandPrixData::getRandomGPName()
+{
+    return _("Random Grand Prix");
+}
+
+// ----------------------------------------------------------------------------
+/** @return the (potentially translated) user-visible name of the Grand
+ *  Prix, m_editable is true if it's custom GP name. */
+irr::core::stringw GrandPrixData::getName() const
+{
+    return m_editable ? m_name.c_str() : _(m_name.c_str());
+}
+
 /* EOF */

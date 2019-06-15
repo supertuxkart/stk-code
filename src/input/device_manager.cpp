@@ -32,8 +32,8 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
 
 #define INPUT_MODE_DEBUG 0
 

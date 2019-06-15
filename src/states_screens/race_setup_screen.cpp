@@ -32,6 +32,7 @@
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_and_gp_screen.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 const int CONFIG_CODE_NORMAL    = 0;

@@ -24,11 +24,13 @@
 #include "achievements/achievements_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/utf_writer.hpp"
+#include "io/xml_node.hpp"
+#include "online/xml_request.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
-#include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
 #include <sstream>
 #include <fstream>

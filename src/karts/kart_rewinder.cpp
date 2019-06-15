@@ -36,6 +36,8 @@
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
 #include "physics/btKart.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 
 #include <ISceneNode.h>

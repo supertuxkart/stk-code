@@ -85,6 +85,7 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
         kp = kart_properties_manager->getKart(std::string("tux"));
     }
     m_kart_properties->copyForPlayer(kp, difficulty);
+    m_name = m_kart_properties->getName();
     m_difficulty = difficulty;
     m_kart_animation  = NULL;
     assert(m_kart_properties);
@@ -116,12 +117,6 @@ void AbstractKart::changeKart(const std::string& new_ident,
     loadKartProperties(new_ident, difficulty, ri);
 }   // changeKart
 
-// ----------------------------------------------------------------------------
-/** Returns a name to be displayed for this kart. */
-core::stringw AbstractKart::getName() const
-{
-    return m_kart_properties->getName();
-}   // getName;
 // ----------------------------------------------------------------------------
 /** Returns a unique identifier for this kart (name of the directory the
  *  kart was loaded from). */

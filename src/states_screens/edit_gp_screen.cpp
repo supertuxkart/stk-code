@@ -28,7 +28,8 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
@@ -253,7 +254,7 @@ void EditGPScreen::loadList(const int selected)
         m_icons.push_back(m_icon_bank->addTextureAsSprite(screenShot));
 
         row.push_back(GUIEngine::ListWidget::ListCell(
-            _LTR(m_gp->getTrackName(i).c_str()), m_icons[i], 3, false));
+            _(m_gp->getTrackName(i).c_str()), m_icons[i], 3, false));
         row.push_back(GUIEngine::ListWidget::ListCell(
             StringUtils::toWString<unsigned int>(m_gp->getLaps(i)), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell(

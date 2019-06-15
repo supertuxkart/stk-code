@@ -17,8 +17,10 @@
 #include "online/xml_request.hpp"
 
 #include "config/user_config.hpp"
-#include "online/request_manager.hpp"
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 #ifdef WIN32

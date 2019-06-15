@@ -37,6 +37,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 

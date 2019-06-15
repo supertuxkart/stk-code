@@ -22,7 +22,10 @@
 #include "achievements/achievement.hpp"
 #include "achievements/achievements_status.hpp"
 #include "config/player_manager.hpp"
+#include "io/xml_node.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -249,4 +252,10 @@ int AchievementInfo::recursiveProgressCount(goalTree &parent)
             return parent.children[0].value;
         }
     }
-} // recursiveProgressCount
+}  // recursiveProgressCount
+
+// ----------------------------------------------------------------------------
+irr::core::stringw AchievementInfo::getDescription() const
+{
+    return _(m_description.c_str());
+}  // recursiveProgressCount

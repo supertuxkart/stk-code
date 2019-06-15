@@ -684,6 +684,8 @@ namespace GUIEngine
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/debug.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <algorithm>
 #include <iostream>

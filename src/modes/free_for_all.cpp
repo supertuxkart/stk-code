@@ -23,6 +23,7 @@
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
 
 #include <algorithm>
 #include <utility>

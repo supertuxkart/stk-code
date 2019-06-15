@@ -432,7 +432,9 @@ public:
     void               reset();
     void               itemCommand(const XMLNode *node);
     Vec3               flagCommand(const XMLNode *node);
-    core::stringw      getName() const;
+    //-----------------------------------------------------------------------------
+    core::stringw getName() const;
+    //-----------------------------------------------------------------------------
     core::stringw      getSortName() const;
     bool               isInGroup(const std::string &group_name);
     const core::vector3df& getSunRotation();

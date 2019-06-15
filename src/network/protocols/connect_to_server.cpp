@@ -19,6 +19,8 @@
 #include "network/protocols/connect_to_server.hpp"
 
 #include "config/user_config.hpp"
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/network.hpp"

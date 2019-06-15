@@ -57,6 +57,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>

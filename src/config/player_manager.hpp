@@ -106,7 +106,6 @@ public:
     static Online::OnlineProfile* getCurrentOnlineProfile();
 
     static PlayerProfile::OnlineState getCurrentOnlineState();
-    static const irr::core::stringw& getCurrentOnlineUserName();
     static void requestOnlinePoll();
     static void resumeSavedSession();
     static void onSTKQuit();

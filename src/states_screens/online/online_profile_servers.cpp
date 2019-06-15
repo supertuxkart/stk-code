@@ -30,7 +30,6 @@
 #include "states_screens/online/create_server_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/server_selection.hpp"
-#include "utils/translation.hpp"
 
 #include <IGUIButton.h>
 

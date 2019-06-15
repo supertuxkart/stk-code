@@ -456,22 +456,22 @@ void OptionsScreenVideo::updateTooltip()
 
     //I18N: in the graphical options tooltip;
     // indicates a graphical feature is enabled
-    const core::stringw enabled = _LTR("Enabled");
+    const core::stringw enabled = _("Enabled");
     //I18N: in the graphical options tooltip;
     // indicates a graphical feature is disabled
-    const core::stringw disabled = _LTR("Disabled");
+    const core::stringw disabled = _("Disabled");
     //I18N: if only important particles effects is enabled
-    const core::stringw important_only = _LTR("Important only");
+    const core::stringw important_only = _("Important only");
 
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is very low
-    const core::stringw very_low = _LTR("Very Low");
+    const core::stringw very_low = _("Very Low");
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is low
-    const core::stringw low = _LTR("Low");
+    const core::stringw low = _("Low");
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is high
-    const core::stringw high = _LTR("High");
+    const core::stringw high = _("High");
 
     //I18N: in graphical options
     tooltip = _("Particles Effects: %s",

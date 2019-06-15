@@ -21,10 +21,8 @@
 #ifndef HEADER_REQUEST_MANAGER_HPP
 #define HEADER_REQUEST_MANAGER_HPP
 
-#include "io/xml_node.hpp"
 #include "online/request.hpp"
 #include "utils/can_be_deleted.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 
 #include <irrString.h>

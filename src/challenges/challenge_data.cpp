@@ -32,6 +32,8 @@
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
 {

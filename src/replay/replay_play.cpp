@@ -26,6 +26,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
 
 #include <irrlicht.h>
 #include <stdio.h>

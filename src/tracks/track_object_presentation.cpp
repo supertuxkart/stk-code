@@ -49,6 +49,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IBillboardSceneNode.h>
 #include <ICameraSceneNode.h>

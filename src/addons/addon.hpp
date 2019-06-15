@@ -24,14 +24,14 @@
   * Handles add-ons that can be downloaded
   */
 
-#include "io/file_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 
 #include <assert.h>
 #include <string>
+#include "irrString.h"
 
 class XMLNode;
+using namespace irr;
 
 /**
   * \ingroup addonsgroup
@@ -59,14 +59,7 @@ public:
     };
 
     // ------------------------------------------------------------------------
-    /** A static function that checks if the given ID is an addon. This is
-     *  done by testing if the directory name is in the addons directory.
-     */
-    static bool isAddon(const std::string &directory)
-    {
-        return StringUtils::startsWith(directory,file_manager->getAddonsDir());
-    }   // isAddon
-
+    static bool isAddon(const std::string &directory);
     // ------------------------------------------------------------------------
     /** Create an addon id by adding a 'addon_' prefix to the given id. */
     static std::string createAddonId(const std::string &id)
@@ -264,11 +257,7 @@ public:
     /** Returns if a certain status flag is set. */
     bool testStatus(AddonStatus n) const {return (m_status & n) !=0; }
     // ------------------------------------------------------------------------
-    /** Returns the directory in which this addon is installed. */
-    std::string getDataDir() const
-    {
-        return file_manager->getAddonsFile(getTypeDirectory()+m_dir_name);
-    }   // getDataDir
+    std::string getDataDir() const;
     // ------------------------------------------------------------------------
     bool filterByWords(const core::stringw words) const;
     // ------------------------------------------------------------------------

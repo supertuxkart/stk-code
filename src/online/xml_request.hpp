@@ -19,10 +19,8 @@
 #ifndef HEADER_XML_REQUEST_HPP
 #define HEADER_XML_REQUEST_HPP
 
-#include "io/file_manager.hpp"
 #include "online/http_request.hpp"
 #include "utils/cpp2011.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 
 #ifdef WIN32
@@ -33,6 +31,7 @@
 #include <memory>
 #include <string>
 
+class XMLNode;
 
 namespace Online
 {

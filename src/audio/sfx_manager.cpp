@@ -25,6 +25,7 @@
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "utils/profiler.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
 #include <pthread.h>

@@ -18,6 +18,7 @@
 
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
+#include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"

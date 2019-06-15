@@ -47,6 +47,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 /** The constructor for a loca player kart, i.e. a player that is playing

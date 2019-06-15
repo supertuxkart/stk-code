@@ -49,6 +49,8 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "online/online_profile.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
@@ -56,6 +58,8 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 // ============================================================================
 /** The protocol that manages starting a race with the server. It uses a 
@@ -397,7 +401,10 @@ void ClientLobby::update(int ticks)
         {
             ns->addUInt32(id).addUInt32(0);
             if (id != 0)
-                ns->encodeString(PlayerManager::getCurrentOnlineUserName());
+            {
+                ns->encodeString(
+                    PlayerManager::getCurrentOnlineProfile()->getUserName());
+            }
         }
 
         rest->encodeString(ServerConfig::m_private_server_password)
@@ -1333,7 +1340,7 @@ void ClientLobby::sendChat(irr::core::stringw text)
         PlayerProfile* player = PlayerManager::getCurrentPlayer();
         if (PlayerManager::getCurrentOnlineState() ==
             PlayerProfile::OS_SIGNED_IN)
-            name = PlayerManager::getCurrentOnlineUserName();
+            name = PlayerManager::getCurrentOnlineProfile()->getUserName();
         else
             name = player->getName();
         chat->encodeString16(name + L": " + text);

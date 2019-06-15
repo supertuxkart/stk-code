@@ -85,8 +85,10 @@
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
-#include "utils/vs.hpp"
 #include "utils/profiler.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 #include <ICameraSceneNode.h>
 #include <ISceneManager.h>

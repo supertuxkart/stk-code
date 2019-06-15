@@ -19,7 +19,6 @@
 #ifndef HEADER_HTTP_REQUEST_HPP
 #define HEADER_HTTP_REQUEST_HPP
 
-#include "io/file_manager.hpp"
 #include "online/request.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"

@@ -29,6 +29,8 @@
 #include "states_screens/online/online_profile_achievements.hpp"
 #include "states_screens/online/online_profile_servers.hpp"
 #include "states_screens/online/online_profile_settings.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 #include <sstream>

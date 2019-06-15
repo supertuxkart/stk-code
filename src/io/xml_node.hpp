@@ -33,7 +33,6 @@ using namespace irr;
 
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
 

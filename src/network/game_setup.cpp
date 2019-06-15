@@ -30,6 +30,7 @@
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #include <algorithm>
 #include <fstream>

@@ -37,6 +37,7 @@
 #include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
 #include "tracks/model_definition_loader.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IAnimatedMeshSceneNode.h>
 #include <ISceneManager.h>

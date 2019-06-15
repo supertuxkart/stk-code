@@ -60,6 +60,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/string_utils.hpp"
 
 RaceManager* race_manager= NULL;
 
@@ -1129,3 +1130,46 @@ void RaceManager::clearNetworkGrandPrixResult()
     m_reverse_track.clear();
 
 }   // clearNetworkGrandPrixResult
+
+//-----------------------------------------------------------------------------
+/** Returns a (translated) name of a minor race mode.
+ *  \param mode Minor race mode.
+ */
+const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
+{
+    switch (mode)
+    {
+        //I18N: Game mode
+        case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
+        //I18N: Game mode
+        case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
+        //I18N: Game mode
+        case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
+        //I18N: Game mode
+        case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+        //I18N: Game mode
+        case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
+        //I18N: Game mode
+        case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
+        //I18N: Game mode
+        case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
+        //I18N: Game mode
+        case MINOR_MODE_SOCCER:         return _("Soccer");
+        default: assert(false); return L"";
+    }
+}   // getNameOf
+
+//-----------------------------------------------------------------------------
+/** Returns the specified difficulty as a string. */
+core::stringw RaceManager::getDifficultyName(Difficulty diff) const
+{
+    switch (diff)
+    {
+        case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
+        case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
+        case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
+        case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
+        default:  assert(false);
+    }
+    return "";
+}   // getDifficultyName

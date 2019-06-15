@@ -29,6 +29,9 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/kart_selection.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
+
 #include <IGUIEnvironment.h>
 
 using namespace GUIEngine;

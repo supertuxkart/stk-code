@@ -209,11 +209,10 @@ bool Track::operator<(const Track &other) const
 }   // operator<
 
 //-----------------------------------------------------------------------------
-/** Returns the name of the track, which is e.g. displayed on the screen.
-    \note this is the LTR name, invoke fribidi as needed. */
+/** Returns the name of the track, which is e.g. displayed on the screen. */
 core::stringw Track::getName() const
 {
-    core::stringw translated = _LTR(m_name.c_str());
+    core::stringw translated = _(m_name.c_str());
     int index = translated.find("|");
     if(index>-1)
     {

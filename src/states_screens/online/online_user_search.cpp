@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "online/profile_manager.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"

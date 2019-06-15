@@ -28,6 +28,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "utils/string_utils.hpp"
 
 #include <angelscript.h>
 #include "scriptarray.hpp"

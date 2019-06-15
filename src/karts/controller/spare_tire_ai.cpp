@@ -27,6 +27,8 @@
 #include "tracks/arena_node.hpp"
 #include "physics/physics.hpp"
 #include "utils/random_generator.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <algorithm>
 

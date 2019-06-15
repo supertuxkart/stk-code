@@ -40,8 +40,9 @@
 #include "network/network_config.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "utils/log.hpp"
-#include "utils/translation.hpp"
 #include "utils/random_generator.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>

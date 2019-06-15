@@ -27,7 +27,6 @@
 #include <utility>
 #include <vector>
 
-#include "utils/string_utils.hpp"
 #ifndef SERVER_ONLY
 #include "tinygettext/tinygettext.hpp"
 #endif

@@ -29,6 +29,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
 
 // ----------------------------------------------------------------------------
 /** Constructor, loads the graph information for a given set of quads

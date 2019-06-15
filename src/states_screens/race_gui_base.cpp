@@ -48,6 +48,8 @@
 #include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <ICameraSceneNode.h>
 

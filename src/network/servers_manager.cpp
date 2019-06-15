@@ -20,6 +20,7 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "io/xml_node.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"

@@ -25,6 +25,8 @@
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <string>
 #include <vector>

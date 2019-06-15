@@ -161,19 +161,7 @@ public:
     // ------------------------------------------------------------------------
     void setSupportsEncryption(bool val)        { m_supports_encrytion = val; }
     // ------------------------------------------------------------------------
-    bool searchByName(const std::string& lower_case_word)
-    {
-        auto list = StringUtils::split(lower_case_word, ' ', false);
-        bool server_name_found = true;
-        for (auto& word : list)
-        {
-            const std::string& for_search = m_lower_case_name +
-                m_lower_case_player_names;
-            server_name_found = server_name_found &&
-                for_search.find(word) != std::string::npos;
-        }
-        return server_name_found;
-    }
+    bool searchByName(const std::string& lower_case_word);
     // ------------------------------------------------------------------------
     Track* getCurrentTrack() const;
     // ------------------------------------------------------------------------

@@ -24,6 +24,7 @@
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/online/online_user_search.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIButton.h>

@@ -45,6 +45,7 @@
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #ifdef ANDROID
 #include "main_android.hpp"

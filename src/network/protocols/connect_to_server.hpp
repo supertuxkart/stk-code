@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include "irrString.h"
+
 class Server;
 
 class ConnectToServer : public Protocol
