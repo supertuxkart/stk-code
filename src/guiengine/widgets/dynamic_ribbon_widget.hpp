@@ -310,7 +310,7 @@ namespace GUIEngine
         /** \brief callback from IRibbonListener */
         virtual void onSelectionChange(){}
 
-        virtual void setText(const wchar_t *text);
+        virtual void setText(const irr::core::stringw& text);
 
         virtual void update(float delta);
 

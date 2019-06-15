@@ -117,14 +117,15 @@ void LabelWidget::add()
 
 // ----------------------------------------------------------------------------
 
-void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
+void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
 {
     m_scroll_offset = 0;
 
     if (expandIfNeeded)
     {
         assert(m_element != NULL);
-        const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())->getDimension(text).Width;
+        const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())
+            ->getDimension(text.c_str()).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
 
         if (rect.getWidth() < fwidth)

@@ -88,7 +88,7 @@ namespace gui
 		virtual bool isWordWrapEnabled() const;
 
 		//! Sets the new caption of this element.
-		virtual void setText(const wchar_t* text);
+		virtual void setText(const core::stringw& text);
 
 		//! Returns the height of the text in pixels when it is drawn.
 		virtual s32 getTextHeight() const;

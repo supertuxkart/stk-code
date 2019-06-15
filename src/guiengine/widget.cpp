@@ -121,7 +121,7 @@ Widget::~Widget()
 }
 
 // -----------------------------------------------------------------------------
-void Widget::setText(const wchar_t *s)
+void Widget::setText(const irr::core::stringw &s)
 {
     m_text = s;
     if(m_element)

@@ -475,17 +475,7 @@ namespace GUIEngine
           * \note Changing the text property will only take effect the next time this widget
           *       is add()ed
           */
-        virtual void setText(const wchar_t *s);
-
-        /**
-          * Sets the text of a widget from a stringw.
-          * \note This method uses the virtual setText(wchar_t*) function, so only the latter
-          *       needs to be overwritten by other classes.
-          * \note Not all widgets use strings, so some widgets may ignore this text property
-          * \note Changing the text property will only take effect the next time this widget
-          *       is add()ed
-          */
-        virtual void setText(const irr::core::stringw &s) { setText(s.c_str()); }
+        virtual void setText(const irr::core::stringw &s);
 
         /** Returns the text of a widget. */
         const irr::core::stringw &getText() const {return m_text; }

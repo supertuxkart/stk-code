@@ -916,7 +916,7 @@ void CGUIEditBox::draw()
 
 
 //! Sets the new caption of this element.
-void CGUIEditBox::setText(const wchar_t* text)
+void CGUIEditBox::setText(const core::stringw& text)
 {
 	Text = text;
 	if (u32(CursorPos) > Text.size())

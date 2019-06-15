@@ -302,8 +302,10 @@ void CGUIStaticText::breakText()
 
 
 //! Sets the new caption of this element.
-void CGUIStaticText::setText(const wchar_t* text)
+void CGUIStaticText::setText(const core::stringw& text)
 {
+	if (text == Text)
+		return;
 	IGUIElement::setText(text);
 	breakText();
 }

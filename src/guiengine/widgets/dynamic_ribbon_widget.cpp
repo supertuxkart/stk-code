@@ -763,7 +763,7 @@ void DynamicRibbonWidget::onRibbonWidgetScroll(const int delta_x)
 
 // -----------------------------------------------------------------------------
 
-void DynamicRibbonWidget::setText(const wchar_t *text)
+void DynamicRibbonWidget::setText(const irr::core::stringw& text)
 {
     Widget::setText(text);
 
