@@ -137,13 +137,13 @@ void OptionsScreenUI::loadedFromFile()
     assert( font_size != NULL );
     
     font_size->clearLabels();
-    font_size->addLabel( core::stringw(_("Very very small")));
+    font_size->addLabel( core::stringw("Extremely small"));
     font_size->addLabel( core::stringw(_("Very small")));
     font_size->addLabel( core::stringw(_("Small")));
     font_size->addLabel( core::stringw(_("Medium")));
     font_size->addLabel( core::stringw(_("Large")));
     font_size->addLabel( core::stringw(_("Very large")));
-    font_size->addLabel( core::stringw(_("Very very large")));
+    font_size->addLabel( core::stringw("Extremely large"));
     font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     
