@@ -146,6 +146,12 @@ void OptionsScreenUI::loadedFromFile()
     font_size->addLabel( core::stringw(_("Very very large")));
     font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
+    
+    if(UserConfigParams::m_artist_debug_mode)
+    {
+        font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
+    }
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
