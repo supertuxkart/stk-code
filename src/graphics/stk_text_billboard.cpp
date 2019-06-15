@@ -85,7 +85,7 @@ void STKTextBillboard::updateAbsolutePosition()
 }   // updateAbsolutePosition
 
 // ----------------------------------------------------------------------------
-void STKTextBillboard::init(core::stringw text, FontWithFace* face)
+void STKTextBillboard::init(const core::stringw& text, FontWithFace* face)
 {
     m_chars = new std::vector<STKTextBillboardChar>();
     core::dimension2du size = face->getDimension(text);
@@ -255,7 +255,7 @@ void STKTextBillboard::init(core::stringw text, FontWithFace* face)
 }   // init
 
 // ----------------------------------------------------------------------------
-void STKTextBillboard::initLegacy(core::stringw text, FontWithFace* face)
+void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
 {
     m_chars = new std::vector<STKTextBillboardChar>();
     core::dimension2du size = face->getDimension(text);

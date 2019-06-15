@@ -44,7 +44,7 @@ namespace MessageQueue
     };
 
     void add(MessageType mt, const core::stringw &message);
-    void showProgressBar(int progress, const wchar_t* msg);
+    void showProgressBar(int progress, const core::stringw& msg);
     void updatePosition();
     void update(float dt);
 

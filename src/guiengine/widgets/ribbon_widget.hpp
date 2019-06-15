@@ -180,7 +180,7 @@ namespace GUIEngine
           * \pre only valid for ribbons that take text-only contents
           *       (e.g. tab bars)
           */
-        void addTextChild(const wchar_t* text, const std::string &id);
+        void addTextChild(const core::stringw& text, const std::string &id);
         
         
         /** \brief Dynamically (at runtime) add an icon item to this ribbon.
@@ -188,7 +188,7 @@ namespace GUIEngine
          *       is not yet displayed
          *  \pre only valid for ribbons that take icon contents
          */
-        void addIconChild(const wchar_t* text, const std::string &id,
+        void addIconChild(const core::stringw& text, const std::string &id,
                           const int w, const int h, const std::string &icon,
                           const IconButtonWidget::IconPathType iconPathType=
                                     IconButtonWidget::ICON_PATH_TYPE_RELATIVE);

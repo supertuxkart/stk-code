@@ -142,7 +142,7 @@ public:
 	virtual IGUIColorSelectDialog* addColorSelectDialog(const wchar_t* title = 0, bool modal=true, IGUIElement* parent=0, s32 id=-1);
 
 	//! adds a static text. The returned pointer must not be dropped.
-	virtual IGUIStaticText* addStaticText(const wchar_t* text, const core::rect<s32>& rectangle,
+	virtual IGUIStaticText* addStaticText(const core::stringw& text, const core::rect<s32>& rectangle,
 		bool border=false, bool wordWrap=true, IGUIElement* parent=0, s32 id=-1, bool drawBackground = false);
 
 	//! Adds an edit box. The returned pointer must not be dropped.

@@ -745,7 +745,7 @@ namespace GUIEngine
         irr::core::stringw m_message;
         float m_time;
 
-        MenuMessage(const wchar_t* message, const float time)
+        MenuMessage(const core::stringw& message, const float time)
                    : m_message(message), m_time(time)
         {
         }
@@ -754,7 +754,7 @@ namespace GUIEngine
     std::vector<MenuMessage> gui_messages;
 
     // ------------------------------------------------------------------------
-    void showMessage(const wchar_t* message, const float time)
+    void showMessage(const core::stringw& message, const float time)
     {
         // check for duplicates
         const int count = (int) gui_messages.size();

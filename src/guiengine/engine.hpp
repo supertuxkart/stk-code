@@ -40,6 +40,8 @@ namespace irr
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include "irrString.h"
+
 /**
  * \ingroup guiengine
  * \brief Contains all GUI engine related classes and functions
@@ -195,7 +197,7 @@ namespace GUIEngine
       * \param message  the message to display
       * \param time     the time to display the message, in seconds
       */
-    void showMessage(const wchar_t* message, const float time=5.0f);
+    void showMessage(const irr::core::stringw& message, const float time=5.0f);
 
     /** \brief Add a screen to the list of screens known by the gui engine */
     void  addScreenToList(Screen* screen);

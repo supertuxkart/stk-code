@@ -405,7 +405,7 @@ void RaceGUI::drawGlobalTimer()
         {
             sw = _("Challenge Failed");
             int string_width =
-                GUIEngine::getFont()->getDimension(_("Challenge Failed")).Width;
+                GUIEngine::getFont()->getDimension(sw.c_str()).Width;
             dist_from_right = 10 + string_width;
             time_color = video::SColor(255,255,0,0);
             use_digit_font = false;
@@ -429,7 +429,7 @@ void RaceGUI::drawGlobalTimer()
         font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->setBlackBorder(true);
-    font->draw(sw.c_str(), pos, time_color, false, false, NULL,
+    font->draw(sw, pos, time_color, false, false, NULL,
                true /* ignore RTL */);
     font->setBlackBorder(false);
 

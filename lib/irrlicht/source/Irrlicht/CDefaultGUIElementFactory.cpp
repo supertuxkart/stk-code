@@ -81,7 +81,7 @@ IGUIElement* CDefaultGUIElementFactory::addGUIElement(EGUI_ELEMENT_TYPE type, IG
 		case EGUIET_SCROLL_BAR:
 			return Environment->addScrollBar(false,core::rect<s32>(0,0,100,100),parent);
 		case EGUIET_STATIC_TEXT:
-			return Environment->addStaticText(0,core::rect<s32>(0,0,100,100),false,true,parent);
+			return Environment->addStaticText(L"",core::rect<s32>(0,0,100,100),false,true,parent);
 		case EGUIET_TAB:
 			return Environment->addTab(core::rect<s32>(0,0,100,100),parent);
 		case EGUIET_TAB_CONTROL:

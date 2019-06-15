@@ -543,7 +543,7 @@ public:
         return m_terrain_info;
     }
     // ------------------------------------------------------------------------
-    virtual void setOnScreenText(const wchar_t *text) OVERRIDE;
+    virtual void setOnScreenText(const core::stringw& text) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the normal of the terrain the kart is over atm. This is
      *  defined even if the kart is flying. */

@@ -405,7 +405,7 @@ public:
 	\return Pointer to the created static text. Returns 0 if an error
 	occurred. This pointer should not be dropped. See
 	IReferenceCounted::drop() for more information. */
-	virtual IGUIStaticText* addStaticText(const wchar_t* text, const core::rect<s32>& rectangle,
+	virtual IGUIStaticText* addStaticText(const core::stringw& text, const core::rect<s32>& rectangle,
 		bool border=false, bool wordWrap=true, IGUIElement* parent=0, s32 id=-1,
 		bool fillBackground = false) = 0;
 

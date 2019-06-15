@@ -125,9 +125,9 @@ public:
     // ------------------------------------------------------------------------
     virtual const core::aabbox3df& getBoundingBox() const    { return m_bbox; }
     // ------------------------------------------------------------------------
-    void init(core::stringw text, FontWithFace* face);
+    void init(const core::stringw& text, FontWithFace* face);
     // ------------------------------------------------------------------------
-    void initLegacy(core::stringw text, FontWithFace* face);
+    void initLegacy(const core::stringw& text, FontWithFace* face);
     // ------------------------------------------------------------------------
     void draw(video::ITexture* tex) const
     {

@@ -707,9 +707,9 @@ namespace StringUtils
      *  convenience function to type less in calls.
      *  \parameter s The string to which the loading dots are appended.
      */
-    irr::core::stringw loadingDots(const wchar_t *s)
+    irr::core::stringw loadingDots(const irr::core::stringw& s)
     {
-        return irr::core::stringw(s) + loadingDots();
+        return s + loadingDots();
     }   // loadingDots
 
     // ------------------------------------------------------------------------

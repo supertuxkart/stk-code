@@ -517,7 +517,7 @@ public:
     // -------------------------------------------------------------------------
     /** Set a text that is displayed on top of a kart.
      */
-    virtual void setOnScreenText(const wchar_t *text) = 0;
+    virtual void setOnScreenText(const core::stringw& text) = 0;
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const = 0;

@@ -31,13 +31,12 @@
 #include "tinygettext/tinygettext.hpp"
 #endif
 
-#  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
+#  define _(String, ...)        (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
 #undef _C
 #undef _P
-#  define _C(Ctx, String, ...)  (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__)))
-#  define _P(Singular, Plural, Num, ...) (translations->fribidize(StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num), Num, ##__VA_ARGS__)))
-#  define _CP(Ctx, Singular, Plural, Num, ...) (translations->fribidize(StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__)))
-#  define _LTR(String, ...)     (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
+#  define _C(Ctx, String, ...)  (StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__))
+#  define _P(Singular, Plural, Num, ...) (StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num), Num, ##__VA_ARGS__))
+#  define _CP(Ctx, Singular, Plural, Num, ...) (StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly
@@ -52,8 +51,6 @@ private:
     tinygettext::DictionaryManager m_dictionary_manager;
     tinygettext::Dictionary        m_dictionary;
 
-    /** A map that saves all fribidized strings: Original string, fribidized string */
-    std::map<const irr::core::stringw, const irr::core::stringw> m_fribidized_strings;
     bool m_rtl;
 
     static std::map<std::string, std::string> m_localized_name;
@@ -61,7 +58,7 @@ private:
     std::string m_current_language_name;
     std::string m_current_language_name_code;
     std::string m_current_language_tag;
-    std::mutex m_fribidized_mutex, m_gettext_mutex, m_ngettext_mutex;
+    std::mutex m_gettext_mutex, m_ngettext_mutex;
 #endif
 
 public:
@@ -101,9 +98,6 @@ public:
 
     irr::core::stringw       getLocalizedCountryName(const std::string& country_code) const;
 #endif
-
-private:
-    irr::core::stringw fribidizeLine(const irr::core::stringw &str);
 };   // Translations
 
 

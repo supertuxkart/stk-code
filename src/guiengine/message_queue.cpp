@@ -251,7 +251,7 @@ public:
         }
     }
     // ------------------------------------------------------------------------
-    void setProgress(int progress, const wchar_t* msg)
+    void setProgress(int progress, const core::stringw& msg)
     {
         if (progress < 0)
             return;
@@ -344,7 +344,7 @@ void update(float dt)
  *  used each time.
  *  \param progress Progress from 0 to 100.
  */
-void showProgressBar(int progress, const wchar_t* msg)
+void showProgressBar(int progress, const core::stringw& msg)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())

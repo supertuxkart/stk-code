@@ -31,7 +31,7 @@ using namespace GUIEngine;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-GeneralTextFieldDialog::GeneralTextFieldDialog(const wchar_t* title,
+GeneralTextFieldDialog::GeneralTextFieldDialog(const core::stringw& title,
                                                DismissCallback dm_cb,
                                                ValidationCallback val_cb)
                   : ModalDialog(0.95f, 0.4f,

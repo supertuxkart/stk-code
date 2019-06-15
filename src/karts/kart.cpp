@@ -3424,7 +3424,7 @@ btQuaternion Kart::getVisualRotation() const
  *  output.
  *  \param text The text to display
  */
-void Kart::setOnScreenText(const wchar_t *text)
+void Kart::setOnScreenText(const core::stringw& text)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())

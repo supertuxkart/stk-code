@@ -21,7 +21,7 @@ namespace gui
 	public:
 
 		//! constructor
-		CGUIStaticText(const wchar_t* text, bool border, IGUIEnvironment* environment,
+		CGUIStaticText(const core::stringw& text, bool border, IGUIEnvironment* environment,
 			IGUIElement* parent, s32 id, const core::rect<s32>& rectangle,
 			bool background = false);
 
