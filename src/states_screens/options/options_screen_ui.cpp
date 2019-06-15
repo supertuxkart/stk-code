@@ -132,25 +132,34 @@ void OptionsScreenUI::loadedFromFile()
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
-    
+
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
-    
+
     font_size->clearLabels();
-    font_size->addLabel( core::stringw("Extremely small"));
-    font_size->addLabel( core::stringw(_("Very small")));
-    font_size->addLabel( core::stringw(_("Small")));
-    font_size->addLabel( core::stringw(_("Medium")));
-    font_size->addLabel( core::stringw(_("Large")));
-    font_size->addLabel( core::stringw(_("Very large")));
-    font_size->addLabel( core::stringw("Extremely large"));
-    font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
-    font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
-    
-    if(UserConfigParams::m_artist_debug_mode)
+    font_size->addLabel(L"Extremely small");
+    //I18N: In the UI options, Very small font size
+    font_size->addLabel(_("Very small"));
+    //I18N: In the UI options, Small font size
+    font_size->addLabel(_("Small"));
+    //I18N: In the UI options, Medium font size
+    font_size->addLabel(_("Medium"));
+    //I18N: In the UI options, Large font size
+    font_size->addLabel(_("Large"));
+    //I18N: In the UI options, Very large font size
+    font_size->addLabel(_("Very large"));
+    font_size->addLabel(L"Extremely large");
+
+    if (UserConfigParams::m_artist_debug_mode)
     {
+        // Only show extreme size in artist debug mode
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
         font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
+    }
+    else
+    {
+        font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
 }   // loadedFromFile
 
@@ -185,9 +194,18 @@ void OptionsScreenUI::init()
     
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
-    
-    font_size->setValue((int)roundf(UserConfigParams::m_font_size));
+
     m_prev_font_size = UserConfigParams::m_font_size;
+    int size_int = (int)roundf(UserConfigParams::m_font_size);
+    if (size_int < 0 || size_int > 6)
+        size_int = 3;
+
+    if (!UserConfigParams::m_artist_debug_mode &&
+        (size_int < 1 || size_int > 5))
+        size_int = 3;
+
+    font_size->setValue(size_int);
+    UserConfigParams::m_font_size = font_size->getValue();
     font_size->setActive(!in_game);
 
     // ---- video modes
