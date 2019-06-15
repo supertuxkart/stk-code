@@ -21,7 +21,6 @@
 
 #include <irrString.h>
 #include <map>
-#include <mutex>
 #include <set>
 #include <string>
 #include <utility>
@@ -58,18 +57,17 @@ private:
     std::string m_current_language_name;
     std::string m_current_language_name_code;
     std::string m_current_language_tag;
-    std::mutex m_gettext_mutex, m_ngettext_mutex;
 #endif
 
 public:
                        Translations();
                       ~Translations();
 
-    const wchar_t     *w_gettext(const wchar_t* original, const char* context=NULL);
-    const wchar_t     *w_gettext(const char* original, const char* context=NULL);
+    irr::core::stringw w_gettext(const wchar_t* original, const char* context=NULL);
+    irr::core::stringw w_gettext(const char* original, const char* context=NULL);
 
-    const wchar_t     *w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context=NULL);
-    const wchar_t     *w_ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
+    irr::core::stringw w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context=NULL);
+    irr::core::stringw w_ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
     bool               isRTLLanguage() const
     {
 #ifdef SERVER_ONLY
@@ -78,9 +76,6 @@ public:
         return m_rtl;
 #endif
     }
-
-    const wchar_t*     fribidize(const wchar_t* in_ptr);
-    const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
     bool               isRTLText(const wchar_t* in_ptr);
     bool               isRTLText(const irr::core::stringw &str) { return isRTLText(str.c_str()); }

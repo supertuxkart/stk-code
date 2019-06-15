@@ -552,7 +552,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
+irr::core::stringw Translations::w_gettext(const wchar_t* original, const char* context)
 {
     std::string in = StringUtils::wideToUtf8(original);
     return w_gettext(in.c_str(), context);
@@ -563,13 +563,11 @@ const wchar_t* Translations::w_gettext(const wchar_t* original, const char* cont
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-const wchar_t* Translations::w_gettext(const char* original, const char* context)
+irr::core::stringw Translations::w_gettext(const char* original, const char* context)
 {
 
 #ifdef SERVER_ONLY
-    static irr::core::stringw dummy_for_server;
-    dummy_for_server = StringUtils::utf8ToWide(original);
-    return dummy_for_server.c_str();
+    return L"";
 #else
 
     if (original[0] == '\0') return L"";
@@ -583,20 +581,17 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
                                      m_dictionary.translate_ctxt(context, original));
     // print
     //for (int n=0;; n+=4)
-    std::lock_guard<std::mutex> lock(m_gettext_mutex);
-
-    static std::map<std::thread::id, core::stringw> original_tw;
-    original_tw[std::this_thread::get_id()] = StringUtils::utf8ToWide(original_t);
-
-    const wchar_t* out_ptr = original_tw.at(std::this_thread::get_id()).c_str();
+    const irr::core::stringw wide = StringUtils::utf8ToWide(original_t);
+    const wchar_t* out_ptr = wide.c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
-    return out_ptr;
+    return wide;
 #endif
+
 }
 
 /**
@@ -606,7 +601,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
+irr::core::stringw Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
 {
     std::string in = StringUtils::wideToUtf8(singular);
     std::string in2 = StringUtils::wideToUtf8(plural);
@@ -620,12 +615,10 @@ const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* 
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-const wchar_t* Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
+irr::core::stringw Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
 {
 #ifdef SERVER_ONLY
-    static core::stringw str_buffer;
-    str_buffer = StringUtils::utf8ToWide(singular);
-    return str_buffer.c_str();
+    return L"";
 
 #else
 
@@ -633,19 +626,15 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    std::lock_guard<std::mutex> lock(m_ngettext_mutex);
-
-    static std::map<std::thread::id, core::stringw> str_buffer;
-    str_buffer[std::this_thread::get_id()] = StringUtils::utf8ToWide(res);
-
-    const wchar_t* out_ptr = str_buffer.at(std::this_thread::get_id()).c_str();
+    const irr::core::stringw wide = StringUtils::utf8ToWide(res);
+    const wchar_t* out_ptr = wide.c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
-    return out_ptr;
+    return wide;
 #endif
 
 }
