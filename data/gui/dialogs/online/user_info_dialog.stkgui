@@ -6,9 +6,9 @@
 
         <spacer height="1f" width="50"/>
 
-        <div width="80%" align="center" layout="vertical-row" height="fit" >
-            <div width="100%" height="fit" layout="horizontal-row">
-                <label id="desc" proportion="2" text_align="left" word_wrap="true" text=""/>
+        <div width="80%" align="center" layout="vertical-row" height="20%" >
+            <div width="100%" height="100%" layout="horizontal-row">
+                <label id="desc" width="100%" height="100%" text_align="left" word_wrap="true" text=""/>
             </div>
         </div>
 
