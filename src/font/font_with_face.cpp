@@ -623,7 +623,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         if (vcenter)
         {
             if (too_long_broken_text)
-                offset.Y -= (m_font_max_height - m_glyph_max_height) * scale;
+                offset.Y -= (s32)
+                    ((m_font_max_height - m_glyph_max_height) * scale);
             else
             {
                 offset.Y += (s32)(
@@ -659,8 +660,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         const gui::GlyphLayout& glyph_layout = gl[i];
         if ((glyph_layout.flags & gui::GLF_NEWLINE) != 0)
         {
-            // Y doesn't matter because we don't use advance y in harfbuzz
-            offset.Y += next_line_height;
+            offset.Y += (s32)next_line_height;
             cur_line++;
             line_changed = true;
             continue;
