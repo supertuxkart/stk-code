@@ -48,7 +48,6 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
     
     if (c_data->isGrandPrix())
     {
-        // Doesn't work for RTL
         description += _("Grand Prix");
         description += L" - ";
         description += RaceManager::getNameOf(c_data->getMinorMode());
@@ -56,22 +55,30 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
     else
     {
         if (c_data->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
+        {
+            //I18N: In the Select challenge dialog
             description += _("Nitro challenge");
+        }
         else if (c_data->isGhostReplay())
+        {
+            //I18N: In the Select challenge dialog
             description += _("Ghost replay race");
+        }
         else
             description += RaceManager::getNameOf(c_data->getMinorMode());
 
         description += L" - ";
+        //I18N: In the Select challenge dialog
         description += _("Laps: %i", c_data->getNumLaps());
 
         if (c_data->getReverse())
         {
             description += L" - ";
+            //I18N: In the Select challenge dialog, tell user this challenge has reversed laps
             description += _("Mode: Reverse");
         }
     } // if !isGrandPrix
-    
+    //I18N: In the Select challenge dialog, type of this challenge
     label = _("Type: %s", description);
     
     if (c_data->getMaxPosition(difficulty) != -1)
@@ -79,22 +86,26 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         int r = c_data->getMaxPosition(difficulty);
         if (c_data->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
         label += L"\n";
+        //I18N: In the Select challenge dialog
         label += _("Required Rank: %i", r);
     }
     if (c_data->getTimeRequirement(difficulty) > 0)
     {
         label += L"\n";
+        //I18N: In the Select challenge dialog
         label += _("Required Time: %i",
                         StringUtils::timeToString(c_data->getTimeRequirement(difficulty)).c_str());
     }
     if (c_data->getEnergy(difficulty) > 0)
     {
         label += L"\n";
+        //I18N: In the Select challenge dialog
         label += _("Required Nitro Points: %i", c_data->getEnergy(difficulty));
     }
     if (!c_data->isGhostReplay())
     {
         label += L"\n";
+        //I18N: In the Select challenge dialog
         label += _("Number of AI Karts: %i", c_data->getNumKarts(difficulty) - 1);
     }
 
