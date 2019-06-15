@@ -875,7 +875,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
     video::SColor text_marked = GUIEngine::getSkin()->getColor(
         "text_field::background_marked");
     video::SColor text_neutral = GUIEngine::getSkin()->getColor(
-        "text_field::neutral");
+        "text::neutral");
 
     for (int n = 0; n < indice_amount; n++)
     {
