@@ -80,6 +80,7 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_chat_box = NULL;
     m_send_button = NULL;
     m_icon_bank = NULL;
+    m_reload_server_info = false;
 
     // Allows one to update chat and counter even if dialog window is opened
     setUpdateInBackground(true);
@@ -252,7 +253,12 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     gui::GlyphLayout new_line = { 0 };
     new_line.flags = gui::GLF_NEWLINE;
     m_server_info.push_back(new_line);
+    updateServerInfos();
+}   // addMoreServerInfo
 
+// ----------------------------------------------------------------------------
+void NetworkingLobby::updateServerInfos()
+{
     if (GUIEngine::getCurrentScreen() != this)
         return;
 
@@ -261,13 +267,19 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     st->setUseGlyphLayoutsOnly(true);
     st->setGlyphLayouts(m_server_info);
 #endif
-}   // addMoreServerInfo
+}   // updateServerInfos
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
     if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
+
+    if (m_reload_server_info)
+    {
+        m_reload_server_info = false;
+        updateServerInfos();
+    }
 
     if (m_has_auto_start_in_server)
     {
