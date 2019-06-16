@@ -40,11 +40,6 @@ ScalableFont::~ScalableFont()
 }   // ~ScalableFont
 
 // ----------------------------------------------------------------------------
-void ScalableFont::updateRTL()
-{
-}   // updateRTL
-
-// ----------------------------------------------------------------------------
 void ScalableFont::setShadow(const irr::video::SColor &col)
 {
     m_font_settings->setShadow(true);

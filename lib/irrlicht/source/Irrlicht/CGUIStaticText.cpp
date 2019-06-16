@@ -24,7 +24,7 @@ CGUIStaticText::CGUIStaticText(const core::stringw& text, bool border,
 : IGUIStaticText(environment, parent, id, rectangle),
 	HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_UPPERLEFT),
 	Border(border), OverrideColorEnabled(false), OverrideBGColorEnabled(false), WordWrap(false), Background(background),
-	RestrainTextInside(true), RightToLeft(false),
+	RestrainTextInside(true),
 	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)),
 	OverrideFont(0), LastBreakFont(0), m_use_glyph_layouts_only(false)
 {
@@ -263,22 +263,6 @@ bool CGUIStaticText::isWordWrapEnabled() const
 }
 
 
-void CGUIStaticText::setRightToLeft(bool rtl)
-{
-	if (RightToLeft != rtl)
-	{
-		RightToLeft = rtl;
-		breakText();
-	}
-}
-
-
-bool CGUIStaticText::isRightToLeft() const
-{
-	return RightToLeft;
-}
-
-
 //! Breaks the single text line.
 void CGUIStaticText::breakText()
 {
@@ -357,7 +341,6 @@ void CGUIStaticText::serializeAttributes(io::IAttributes* out, io::SAttributeRea
 	out->addBool	("OverrideBGColorEnabled",OverrideBGColorEnabled);
 	out->addBool	("WordWrap",		WordWrap);
 	out->addBool	("Background",          Background);
-	out->addBool	("RightToLeft",         RightToLeft);
 	out->addBool	("RestrainTextInside",  RestrainTextInside);
 	out->addColor	("OverrideColor",       OverrideColor);
 	out->addColor	("BGColor",       	BGColor);
@@ -378,7 +361,6 @@ void CGUIStaticText::deserializeAttributes(io::IAttributes* in, io::SAttributeRe
 	OverrideBGColorEnabled = in->getAttributeAsBool("OverrideBGColorEnabled");
 	setWordWrap(in->getAttributeAsBool("WordWrap"));
 	Background = in->getAttributeAsBool("Background");
-	RightToLeft = in->getAttributeAsBool("RightToLeft");
 	RestrainTextInside = in->getAttributeAsBool("RestrainTextInside");
 	OverrideColor = in->getAttributeAsColor("OverrideColor");
 	BGColor = in->getAttributeAsColor("BGColor");

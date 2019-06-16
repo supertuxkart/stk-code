@@ -99,17 +99,6 @@ namespace gui
 		//! Updates the absolute position, splits text if word wrap is enabled
 		virtual void updateAbsolutePosition();
 
-		//! Set whether the string should be interpreted as right-to-left (RTL) text
-		/** \note This component does not implement the Unicode bidi standard, the
-		text of the component should be already RTL if you call this. The
-		main difference when RTL is enabled is that the linebreaks for multiline
-		elements are performed starting from the end.
-		*/
-		virtual void setRightToLeft(bool rtl);
-
-		//! Checks if the text should be interpreted as right-to-left text
-		virtual bool isRightToLeft() const;
-
 		//! Writes attributes of the element.
 		virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
 
@@ -134,7 +123,6 @@ namespace gui
 		bool WordWrap;
 		bool Background;
 		bool RestrainTextInside;
-		bool RightToLeft;
 
 		video::SColor OverrideColor, BGColor;
 		gui::IGUIFont* OverrideFont;

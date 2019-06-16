@@ -65,8 +65,6 @@ public:
     // ------------------------------------------------------------------------
     void disableColoredBorder();
     // ------------------------------------------------------------------------
-    void updateRTL();
-    // ------------------------------------------------------------------------
     void draw(const core::stringw& text, const core::rect<s32>& position,
               const video::SColor& color, bool hcenter,
               bool vcenter, const core::rect<s32>* clip,
