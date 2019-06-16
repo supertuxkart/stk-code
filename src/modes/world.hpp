@@ -46,6 +46,7 @@ class btRigidBody;
 class Controller;
 class ItemState;
 class PhysicalObject;
+class STKPeer;
 
 namespace Scripting
 {
@@ -339,7 +340,7 @@ public:
             m_eliminated_karts--;
     }
     // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns) {}
+    virtual void saveCompleteState(BareNetworkString* bns, STKPeer* peer) {}
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& buffer) {}
     // ------------------------------------------------------------------------

@@ -157,7 +157,8 @@ public:
         return progress;
     }
     // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    virtual void saveCompleteState(BareNetworkString* bns,
+                                   STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 };   // CaptureTheFlag

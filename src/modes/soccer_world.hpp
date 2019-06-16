@@ -53,6 +53,8 @@ public:
         std::string   m_kart;
         /** Player name which scores. */
         core::stringw m_player;
+        /** Country flag of player (used in server only). */
+        core::stringw m_country_flag;
     };   // ScorerData
 
 private:
@@ -414,7 +416,8 @@ public:
         return progress;
     }
     // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    virtual void saveCompleteState(BareNetworkString* bns,
+                                   STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
     // ------------------------------------------------------------------------

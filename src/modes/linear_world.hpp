@@ -226,7 +226,8 @@ public:
     virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
         OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    virtual void saveCompleteState(BareNetworkString* bns,
+                                   STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
     // ------------------------------------------------------------------------

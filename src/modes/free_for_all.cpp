@@ -252,7 +252,7 @@ bool FreeForAll::getKartFFAResult(int kart_id) const
 }   // getKartFFAResult
 
 // ----------------------------------------------------------------------------
-void FreeForAll::saveCompleteState(BareNetworkString* bns)
+void FreeForAll::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
     for (unsigned i = 0; i < m_scores.size(); i++)
         bns->addUInt32(m_scores[i]);

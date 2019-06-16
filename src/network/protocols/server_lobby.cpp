@@ -1575,7 +1575,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     nim->saveCompleteState(ns);
     nim->addLiveJoinPeer(peer);
 
-    w->saveCompleteState(ns);
+    w->saveCompleteState(ns, peer.get());
     if (race_manager->supportsLiveJoining())
     {
         // Only needed in non-racing mode as no need players can added after

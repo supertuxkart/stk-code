@@ -32,6 +32,7 @@
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/graph.hpp"
@@ -40,6 +41,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IMeshSceneNode.h>
 #include <numeric>
@@ -275,7 +277,8 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
         sd.m_kart = getKart(m_ball_hitter)->getIdent();
         sd.m_player = getKart(m_ball_hitter)->getController()->getName();
-
+        sd.m_country_flag = StringUtils::getCountryFlag(
+            race_manager->getKartInfo(m_ball_hitter).getCountryCode());
         if (sd.m_correct_goal)
         {
             m_karts[m_ball_hitter]->getKartModel()
@@ -319,9 +322,32 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 .addUInt8((uint8_t)sd.m_id).addUInt8(sd.m_correct_goal)
                 .addUInt8(first_goal).addFloat(sd.m_time)
                 .addTime(m_ticks_back_to_own_goal)
-                .encodeString(sd.m_kart)
-                .encodeString(sd.m_player);
-            STKHost::get()->sendPacketToAllPeers(&p, true);
+                .encodeString(sd.m_kart);
+            core::stringw player_name = sd.m_player;
+            NetworkString p_with_flag = p;
+            p.encodeString(player_name);
+            if (!sd.m_country_flag.empty())
+            {
+                player_name += L" ";
+                player_name += sd.m_country_flag;
+            }
+            p_with_flag.encodeString(player_name);
+            auto peers = STKHost::get()->getPeers();
+            for (auto& peer : peers)
+            {
+                if (peer->isValidated() && !peer->isWaitingForGame())
+                {
+                    if (peer->getClientCapabilities().find("country_flag") !=
+                        peer->getClientCapabilities().end())
+                    {
+                        peer->sendPacket(&p_with_flag, true/*reliable*/);
+                    }
+                    else
+                    {
+                        peer->sendPacket(&p, true/*reliable*/);
+                    }
+                }
+            }
         }
     }
     for (unsigned i = 0; i < m_karts.size(); i++)
@@ -740,7 +766,7 @@ void SoccerWorld::enterRaceOverState()
 }   // enterRaceOverState
 
 // ----------------------------------------------------------------------------
-void SoccerWorld::saveCompleteState(BareNetworkString* bns)
+void SoccerWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
     const unsigned red_scorers = (unsigned)m_red_scorers.size();
     bns->addUInt32(red_scorers);
@@ -749,8 +775,15 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns)
         bns->addUInt8((uint8_t)m_red_scorers[i].m_id)
             .addUInt8(m_red_scorers[i].m_correct_goal)
             .addFloat(m_red_scorers[i].m_time)
-            .encodeString(m_red_scorers[i].m_kart)
-            .encodeString(m_red_scorers[i].m_player);
+            .encodeString(m_red_scorers[i].m_kart);
+        core::stringw player_name = m_red_scorers[i].m_player;
+        if (peer->getClientCapabilities().find("country_flag") !=
+            peer->getClientCapabilities().end())
+        {
+            player_name += L" ";
+            player_name += m_red_scorers[i].m_country_flag;
+        }
+        bns->encodeString(player_name);
     }
 
     const unsigned blue_scorers = (unsigned)m_blue_scorers.size();
@@ -760,8 +793,15 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns)
         bns->addUInt8((uint8_t)m_blue_scorers[i].m_id)
             .addUInt8(m_blue_scorers[i].m_correct_goal)
             .addFloat(m_blue_scorers[i].m_time)
-            .encodeString(m_blue_scorers[i].m_kart)
-            .encodeString(m_blue_scorers[i].m_player);
+            .encodeString(m_blue_scorers[i].m_kart);
+        core::stringw player_name = m_blue_scorers[i].m_player;
+        if (peer->getClientCapabilities().find("country_flag") !=
+            peer->getClientCapabilities().end())
+        {
+            player_name += L" ";
+            player_name += m_blue_scorers[i].m_country_flag;
+        }
+        bns->encodeString(player_name);
     }
     bns->addTime(m_reset_ball_ticks).addTime(m_ticks_back_to_own_goal);
 }   // saveCompleteState

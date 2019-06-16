@@ -80,7 +80,8 @@ public:
         m_scores.at(kart_id) = 0;
     }
     // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns) OVERRIDE;
+    virtual void saveCompleteState(BareNetworkString* bns,
+                                   STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 };   // FreeForAll

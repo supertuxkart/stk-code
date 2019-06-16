@@ -537,9 +537,9 @@ const std::string& CaptureTheFlag::getIdent() const
 }   // getIdent
 
 // ----------------------------------------------------------------------------
-void CaptureTheFlag::saveCompleteState(BareNetworkString* bns)
+void CaptureTheFlag::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
-    FreeForAll::saveCompleteState(bns);
+    FreeForAll::saveCompleteState(bns, peer);
     bns->addUInt32(m_red_scores).addUInt32(m_blue_scores);
 }   // saveCompleteState
 
