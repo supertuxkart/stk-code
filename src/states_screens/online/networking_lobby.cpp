@@ -495,6 +495,13 @@ void NetworkingLobby::updatePlayerPings()
     for (auto& p : m_player_names)
     {
         core::stringw name_with_ping = p.second.m_user_name;
+        const core::stringw& flag = StringUtils::getCountryFlag(
+            p.second.m_country_code);
+        if (!flag.empty())
+        {
+            name_with_ping += L" ";
+            name_with_ping += flag;
+        }
         auto host_online_ids = StringUtils::splitToUInt(p.first, '_');
         if (host_online_ids.size() != 3)
             continue;
@@ -669,7 +676,15 @@ void NetworkingLobby::updatePlayers()
             StringUtils::toString(player.m_host_id) + "_" +
             StringUtils::toString(player.m_online_id) + "_" +
             StringUtils::toString(player.m_local_player_id);
-        m_player_list->addItem(internal_name, player.m_user_name,
+        core::stringw player_name = player.m_user_name;
+        const core::stringw& flag = StringUtils::getCountryFlag(
+            player.m_country_code);
+        if (!flag.empty())
+        {
+            player_name += L" ";
+            player_name += flag;
+        }
+        m_player_list->addItem(internal_name, player_name,
             player.m_icon_id);
         // Don't show chosen team color for spectator
         if (player.isSpectator())
