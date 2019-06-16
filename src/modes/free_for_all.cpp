@@ -210,7 +210,15 @@ void FreeForAll::getKartsDisplayInfo(
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
         rank_info.m_color = getColor(i);
-        rank_info.m_text = getKart(i)->getController()->getName() + L" (" +
+        rank_info.m_text = getKart(i)->getController()->getName();
+        const core::stringw& flag = StringUtils::getCountryFlag(
+            race_manager->getKartInfo(i).getCountryCode());
+        if (!flag.empty())
+        {
+            rank_info.m_text += L" ";
+            rank_info.m_text += flag;
+        }
+        rank_info.m_text += core::stringw(L" (") +
             StringUtils::toWString(m_scores[i]) + L")";
     }
 }   // getKartsDisplayInfo

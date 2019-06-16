@@ -640,6 +640,13 @@ void LinearWorld::getKartsDisplayInfo(
         else if (kart->hasFinishedRace())
         {
             rank_info.m_text = kart->getController()->getName();
+            const core::stringw& flag = StringUtils::getCountryFlag(
+                race_manager->getKartInfo(i).getCountryCode());
+            if (!flag.empty())
+            {
+                rank_info.m_text += L" ";
+                rank_info.m_text += flag;
+            }
         }
         else
         {
