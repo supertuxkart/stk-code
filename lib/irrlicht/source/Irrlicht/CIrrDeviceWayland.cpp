@@ -538,6 +538,7 @@ public:
 
         if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !device->m_keyboard)
         {
+            device->m_has_hardware_keyboard = true;
             device->m_keyboard = wl_seat_get_keyboard(seat);
             wl_keyboard_add_listener(device->m_keyboard, &keyboard_listener,
                                      device);
@@ -870,6 +871,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_height = params.WindowSize.Height;
     m_touches_count = 0;
     m_has_touch_device = false;
+    m_has_hardware_keyboard = false;
     m_window_has_focus = false;
     m_window_minimized = false;
     
