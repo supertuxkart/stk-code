@@ -127,6 +127,22 @@ public:
     {
         CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
 
+        if (!device->m_decoration && !device->CreationParams.Fullscreen &&
+            state == WL_POINTER_BUTTON_STATE_PRESSED &&
+            device->m_xkb_alt_pressed)
+        {
+            if (device->m_xdg_toplevel)
+            {
+                xdg_toplevel_move(device->m_xdg_toplevel, device->m_seat, serial);
+            }
+            else if (device->m_shell_surface)
+            {
+                wl_shell_surface_move(device->m_shell_surface, device->m_seat, serial);
+            }
+            
+            return;
+        }
+        
         SEvent irrevent;
         irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
         irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
