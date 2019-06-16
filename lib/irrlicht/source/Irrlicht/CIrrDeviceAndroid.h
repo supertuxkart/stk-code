@@ -19,7 +19,7 @@
 #include "ICursorControl.h"
 
 #include <map>
-
+#include <string>
 
 namespace irr
 {
