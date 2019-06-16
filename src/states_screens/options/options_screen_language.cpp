@@ -183,11 +183,7 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
 
         font_manager->getFont<BoldFace>()->reset();
         font_manager->getFont<RegularFace>()->reset();
-        GUIEngine::getFont()->updateRTL();
-        GUIEngine::getTitleFont()->updateRTL();
-        GUIEngine::getSmallFont()->updateRTL();
-        GUIEngine::getLargeFont()->updateRTL();
-        GUIEngine::getOutlineFont()->updateRTL();
+        font_manager->clearCachedLayouts();
 
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();

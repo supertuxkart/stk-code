@@ -25,6 +25,7 @@
 #include "font/face_ttf.hpp"
 #include "font/regular_face.hpp"
 #include "modes/profile_world.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -470,6 +471,23 @@ void FontManager::shape(const std::u32string& text,
 }   // shape
 
 // ----------------------------------------------------------------------------
+/* Return the cached glyph layouts for writing, it will clear all layouts if
+ * not in-game and when the cached sized exceed a certain number. */
+std::vector<irr::gui::GlyphLayout>&
+                   FontManager::getCachedLayouts(const irr::core::stringw& str)
+{
+    const size_t MAX_LAYOUTS = 600;
+    if (StateManager::get()->getGameState() != GUIEngine::GAME &&
+        m_cached_gls.size() > MAX_LAYOUTS)
+    {
+        Log::debug("FontManager",
+            "Clearing cached glyph layouts because too many.");
+        clearCachedLayouts();
+    }
+    return m_cached_gls[str];
+}   // getCachedLayouts
+
+// ----------------------------------------------------------------------------
 /** Convert text to glyph layouts for fast rendering with caching enabled
  *  If line_data is not null, each broken line u32string will be saved and
  *  can be used for advanced glyph and text mapping, and cache will be
@@ -489,7 +507,7 @@ void FontManager::initGlyphLayouts(const core::stringw& text,
         return;
     }
 
-    auto& cached_gls = m_cached_gls[text];
+    auto& cached_gls = getCachedLayouts(text);
     if (cached_gls.empty())
         shape(StringUtils::wideToUtf32(text), cached_gls);
     gls = cached_gls;

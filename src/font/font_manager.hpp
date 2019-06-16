@@ -127,7 +127,9 @@ public:
                std::vector<std::u32string>* line_data = NULL);
     // ------------------------------------------------------------------------
     std::vector<irr::gui::GlyphLayout>& getCachedLayouts
-                  (const irr::core::stringw& str) { return m_cached_gls[str]; }
+                  (const irr::core::stringw& str);
+    // ------------------------------------------------------------------------
+    void clearCachedLayouts()                         { m_cached_gls.clear(); }
     // ------------------------------------------------------------------------
     void initGlyphLayouts(const irr::core::stringw& text,
                           std::vector<irr::gui::GlyphLayout>& gls,
