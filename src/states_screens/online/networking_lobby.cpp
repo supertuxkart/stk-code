@@ -254,11 +254,13 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     new_line.flags = gui::GLF_NEWLINE;
     m_server_info.push_back(new_line);
     updateServerInfos();
+#endif
 }   // addMoreServerInfo
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::updateServerInfos()
 {
+#ifndef SERVER_ONLY
     if (GUIEngine::getCurrentScreen() != this)
         return;
 

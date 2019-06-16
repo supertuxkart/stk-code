@@ -873,12 +873,15 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             pos_top.UpperLeftCorner.X  = x_base;
 
             static video::SColor color = video::SColor(255, 255, 255, 255);
-            pos_top.LowerRightCorner   = pos_top.UpperLeftCorner;
-
             //I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
+            core::stringw top_text = _("Top %i", position - 1);
+            core::dimension2du dim = font->getDimension(top_text.c_str());
+            pos_top.LowerRightCorner   = pos_top.UpperLeftCorner;
+            pos_top.LowerRightCorner.X += dim.Width;
+            pos_top.LowerRightCorner.Y += dim.Height;
             font->setBlackBorder(true);
             font->setThinBorder(true);
-            font->draw(_("Top %i", position-1 ), pos_top, color);
+            font->draw(top_text, pos_top, color);
             font->setThinBorder(false);
             font->setBlackBorder(false);
 
