@@ -229,7 +229,8 @@ namespace LineBreakingRules
             (c > 44031 && c < 55204)  || // Hangul
             (c > 63743 && c < 64256)  || // More Chinese
             c == 173 || c == 32 || // Soft hyphen and white space
-            c == 47 || c == 92) // Slash and blackslash
+            c == 47 || c == 92 || // Slash and blackslash
+            c == 8203) // Zero-width space
             return true;
         return false;
     }   // breakable
