@@ -1642,6 +1642,9 @@ bool CIrrDeviceAndroid::isGyroscopeAvailable()
 
 bool CIrrDeviceAndroid::hasHardwareKeyboard() const
 {
+    // This can happen when hosting server in android
+    if (!Android)
+        return true;
     int32_t keyboard = AConfiguration_getKeyboard(Android->config);
     return (keyboard == ACONFIGURATION_KEYBOARD_QWERTY);
 }
