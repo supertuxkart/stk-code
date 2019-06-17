@@ -1021,7 +1021,7 @@ void FontWithFace::drawTextQuick(const core::stringw& text,
 
 // ----------------------------------------------------------------------------
 /** Convert text to drawable GlyphLayout without text shaping, used in digit
- *  font or debugging message, it will only use the preloaded characters. */
+ *  font or debugging message. */
 std::vector<gui::GlyphLayout> FontWithFace::
     text2GlyphsWithoutShaping(const core::stringw& t)
 {
@@ -1042,7 +1042,18 @@ std::vector<gui::GlyphLayout> FontWithFace::
         }
         auto ret = m_character_glyph_info_map.find(c);
         if (ret == m_character_glyph_info_map.end())
-            continue;
+        {
+            unsigned font = 0;
+            unsigned glyph = 0;
+            if (!m_face_ttf->getFontAndGlyphFromChar(c, &font, &glyph))
+            {
+                m_character_glyph_info_map[c] = GlyphInfo(font, glyph);
+                continue;
+            }
+            m_character_glyph_info_map[c] = GlyphInfo(font, glyph);
+            ret = m_character_glyph_info_map.find(c);
+            insertGlyph(font, glyph);
+        }
         const FontArea* area = m_face_ttf->getFontArea
             (ret->second.font_number, ret->second.glyph_index);
         if (area == NULL)
