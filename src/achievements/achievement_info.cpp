@@ -258,4 +258,10 @@ int AchievementInfo::recursiveProgressCount(goalTree &parent)
 irr::core::stringw AchievementInfo::getDescription() const
 {
     return _(m_description.c_str());
-}  // recursiveProgressCount
+}  // getDescription
+
+// ----------------------------------------------------------------------------
+irr::core::stringw AchievementInfo::getName() const
+{
+    return _(m_name.c_str());
+}  // getName

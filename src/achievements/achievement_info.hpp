@@ -62,10 +62,10 @@ private:
     uint32_t           m_id;
 
     /** The title of this achievement. */
-    irr::core::stringw m_name;
+    std::string m_name;
 
     /** The description of this achievement. */
-    irr::core::stringw m_description;
+    std::string m_description;
 
     /** A secret achievement has its progress not shown. */
     bool m_is_secret;
@@ -92,7 +92,7 @@ public:
     int                getDepth()             { return getRecursiveDepth(m_goal_tree); }
     uint32_t           getID()          const { return m_id; }
     irr::core::stringw getDescription() const;
-    const irr::core::stringw& getName()        const { return m_name; }
+    irr::core::stringw getName()        const;
     bool               isSecret()       const { return m_is_secret; }
 
     // This function should not be called if copy already has children
