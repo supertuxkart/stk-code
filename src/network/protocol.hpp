@@ -123,8 +123,8 @@ public:
     void sendMessageToPeersInServer(NetworkString *message,
                                     bool reliable = true);
     void sendToServer(NetworkString *message, bool reliable = true);
-    void requestStart();
-    void requestTerminate();
+    virtual void requestStart();
+    virtual void requestTerminate();
     // ------------------------------------------------------------------------
     /** \brief Notify a protocol matching the Event type of that event.
      *  \param event : Pointer to the event.

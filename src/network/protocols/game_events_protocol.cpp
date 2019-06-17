@@ -28,6 +28,7 @@
  */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 {
+    m_self_terminated = false;
     m_last_finished_position = 1;
 }   // GameEventsProtocol
 
@@ -35,6 +36,13 @@ GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 GameEventsProtocol::~GameEventsProtocol()
 {
 }   // ~GameEventsProtocol
+
+// ----------------------------------------------------------------------------
+void GameEventsProtocol::update(int ticks)
+{
+    if (!World::getWorld())
+        requestTerminate();
+}   // update
 
 // ----------------------------------------------------------------------------
 bool GameEventsProtocol::notifyEvent(Event* event)

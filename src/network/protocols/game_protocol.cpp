@@ -57,7 +57,7 @@ GameProtocol::GameProtocol()
             : Protocol( PROTOCOL_CONTROLLER_EVENTS)
 {
     m_data_to_send = getNetworkString();
-
+    m_self_terminated = false;
 }   // GameProtocol
 
 //-----------------------------------------------------------------------------
@@ -389,3 +389,10 @@ void GameProtocol::rewind(BareNetworkString *buffer)
             std::get<3>(a));
     }
 }   // rewind
+
+// ----------------------------------------------------------------------------
+void GameProtocol::update(int ticks)
+{
+    if (!World::getWorld())
+        requestTerminate();
+}   // update

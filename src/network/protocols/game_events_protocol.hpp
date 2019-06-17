@@ -20,6 +20,8 @@ public:
         GE_CHECK_LINE = 7
     };   // GameEventType
 private:
+    bool m_self_terminated;
+
     int m_last_finished_position;
 
     void eliminatePlayer(const NetworkString &ns);
@@ -33,13 +35,21 @@ public:
     void kartFinishedRace(const NetworkString &ns);
     void sendStartupBoost(uint8_t kart_id);
     virtual void setup() OVERRIDE {}
-    virtual void update(int ticks) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE {}
     // ------------------------------------------------------------------------
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE
     {
         return false;
     }   // notifyEventAsynchronous
+    // ------------------------------------------------------------------------
+    virtual void requestTerminate() OVERRIDE
+    {
+        if (m_self_terminated)
+            return;
+        m_self_terminated = true;
+        Protocol::requestTerminate();
+    }
 
 
 };   // class GameEventsProtocol
