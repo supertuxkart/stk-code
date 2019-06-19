@@ -1268,7 +1268,7 @@ void CGUIEditBox::setTextRect(s32 line)
 }
 
 
-void CGUIEditBox::inputChar(wchar_t c)
+void CGUIEditBox::inputChar(char32_t c)
 {
     if (!isEnabled())
         return;
@@ -1476,7 +1476,8 @@ void CGUIEditBox::openScreenKeyboard()
     if (GUIEngine::ScreenKeyboard::getCurrent() != NULL)
         return;
 
-    new GUIEngine::ScreenKeyboard(1.0f, 0.40f, this);
+    GUIEngine::ScreenKeyboard* k = new GUIEngine::ScreenKeyboard(1.0f, 0.40f, this);
+    k->init();
 }
 
 // Real copying is happening in text_box_widget.cpp with static function

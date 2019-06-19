@@ -137,7 +137,7 @@ namespace GUIEngine
         //! sets the area of the given line
         void setTextRect(s32 line);
         //! adds a letter to the edit box
-        void inputChar(wchar_t c);
+        void inputChar(char32_t c);
         //! calculates the current scroll position
         void calculateScrollPos();
         //! send some gui event to parent

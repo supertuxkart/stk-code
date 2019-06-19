@@ -26,6 +26,7 @@
 #include "font/font_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
+#include "guiengine/emoji_keyboard.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -114,6 +115,9 @@ void NetworkingLobby::loadedFromFile()
     m_send_button = getWidget<ButtonWidget>("send");
     assert(m_send_button != NULL);
 
+    m_emoji_button = getWidget<ButtonWidget>("emoji");
+    assert(m_emoji_button != NULL);
+
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
@@ -191,6 +195,12 @@ void NetworkingLobby::init()
     m_chat_box->setTextBoxType(TBT_CAP_SENTENCES);
     m_send_button->setVisible(false);
     m_send_button->setActive(false);
+    // Unicode enter arrow
+    m_send_button->setText(L"\u21B2");
+    m_emoji_button->setVisible(false);
+    m_emoji_button->setActive(false);
+    // Unicode smile emoji
+    m_emoji_button->setText(L"\u263A");
 
     // Connect to server now if we have saved players and not disconnected
     if (!LobbyProtocol::get<LobbyProtocol>() &&
@@ -212,6 +222,8 @@ void NetworkingLobby::init()
             m_chat_box->setActive(true);
             m_send_button->setVisible(true);
             m_send_button->setActive(true);
+            m_emoji_button->setVisible(true);
+            m_emoji_button->setActive(true);
         }
         else
         {
@@ -221,6 +233,8 @@ void NetworkingLobby::init()
             m_chat_box->setActive(false);
             m_send_button->setVisible(true);
             m_send_button->setActive(false);
+            m_emoji_button->setVisible(true);
+            m_emoji_button->setActive(false);
         }
         if (auto cl = LobbyProtocol::get<ClientLobby>())
         {
@@ -315,11 +329,13 @@ void NetworkingLobby::onUpdate(float delta)
         {
             m_chat_box->setActive(true);
             m_send_button->setActive(true);
+            m_emoji_button->setActive(true);
         }
         else if (!cl->serverEnabledChat() && m_send_button->isActivated())
         {
             m_chat_box->setActive(false);
             m_send_button->setActive(false);
+            m_emoji_button->setActive(false);
         }
     }
     if (cl && cl->isWaitingForGame())
@@ -586,6 +602,13 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             cl->sendChat(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
+    else if (name == m_emoji_button->m_properties[PROP_ID] &&
+        !ScreenKeyboard::isActive())
+    {
+        EmojiKeyboard* ek = new EmojiKeyboard(1.0f, 0.40f,
+            m_chat_box->getIrrlichtElement<CGUIEditBox>());
+        ek->init();
+    }
     else if (name == m_start_button->m_properties[PROP_ID])
     {
         if (m_client_live_joinable)
@@ -747,6 +770,8 @@ void NetworkingLobby::finishAddingPlayers()
         m_chat_box->setActive(true);
         m_send_button->setVisible(true);
         m_send_button->setActive(true);
+        m_emoji_button->setVisible(true);
+        m_emoji_button->setActive(true);
     }
     else
     {
@@ -755,6 +780,8 @@ void NetworkingLobby::finishAddingPlayers()
         m_chat_box->setActive(false);
         m_send_button->setVisible(true);
         m_send_button->setActive(false);
+        m_emoji_button->setVisible(true);
+        m_emoji_button->setActive(false);
     }
 }   // finishAddingPlayers
 

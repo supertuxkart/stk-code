@@ -26,45 +26,75 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #include <algorithm>
 #include <string>
 
 using namespace GUIEngine;
+// ============================================================================
+ScreenKeyboard::KeyboardLayoutProportions
+                           ScreenKeyboard::getKeyboardLayoutProportions() const
+{
+    return
+        {
+            {2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+            {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+            {2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+            {3, 2, 10, 2, 3}
+        };
+}   // getKeyboardLayoutProportions
 
-typedef std::vector<std::vector<std::string> > KeyboardLayout;
-typedef std::vector<std::vector<int> > KeyboardLayoutProportions;
-          
-KeyboardLayout layout_lower = 
+// ============================================================================
+ScreenKeyboard::KeyboardLayout*
+                        ScreenKeyboard::getKeyboardLayout(ButtonsType bt) const
+{
+    static KeyboardLayout layout_lower =
             {{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p"},
              {"Separator", "a", "s", "d", "f", "g", "h", "j", "k", "l", "Separator"},
              {"Shift", "z", "x", "c", "v", "b", "n", "m", "?", "Back"},
              {"123", ",", "Space", ".", "Enter"}};
-             
-KeyboardLayout layout_upper = 
+
+    static KeyboardLayout layout_upper =
             {{"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"},
              {"Separator", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Separator"},
              {"Shift", "Z", "X", "C", "V", "B", "N", "M", "!", "Back"},
              {"123", ",", "Space", ".", "Enter"}};
-                          
-KeyboardLayout layout_digits = 
+
+    static KeyboardLayout layout_digits =
             {{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"},
              {"Separator", "@", "#", "$", "%", "^", "&", "*", "(", ")", "Separator"},
              {"Shift", "-", "+", ":", ";", "\"", "\'", "/", "?", "Back"},
              {"Text", ",", "Space", ".", "Enter"}};
 
-KeyboardLayout layout_digits2 = 
+    static KeyboardLayout layout_digits2 =
             {{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"},
              {"Separator", "@", "[", "]", "{", "}", "~", "`", "\\", "|", "Separator"},
              {"Shift", "_", "=", ":", ";", "<", ">", "/", "!", "Back"},
              {"Text", ",", "Space", ".", "Enter"}};
 
-KeyboardLayoutProportions layout_proportions = 
-            {{2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-             {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-             {2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-             {3, 2, 10, 2, 3}};
+    KeyboardLayout* keys = NULL;
+    switch (bt)
+    {
+    case BUTTONS_LOWER:
+        keys = &layout_lower;
+        break;
+    case BUTTONS_UPPER:
+        keys = &layout_upper;
+        break;
+    case BUTTONS_DIGITS:
+        keys = &layout_digits;
+        break;
+    case BUTTONS_DIGITS2:
+        keys = &layout_digits2;
+        break;
+    default:
+        break;
+    };
+    return keys;
+}   // getKeyboardLayout
 
+// ============================================================================
 ScreenKeyboard* ScreenKeyboard::m_screen_keyboard = NULL;
 
 // ----------------------------------------------------------------------------
@@ -95,8 +125,6 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
     m_repeat_time     = 0;
     m_back_button_pressed = false;
     m_schedule_close = false;
-    
-    init();
 }   // ScreenKeyboard
 
 // ----------------------------------------------------------------------------
@@ -115,7 +143,8 @@ ScreenKeyboard::~ScreenKeyboard()
 }   // ~ScreenKeyboard
 
 // ----------------------------------------------------------------------------
-/** Internal function that makes whole screen keyboard initialization
+/** Screen keyboard initialization, needs to be called after new to take into
+ *  account for runtime polymorphism
  */
 void ScreenKeyboard::init()
 {
@@ -148,7 +177,7 @@ void ScreenKeyboard::init()
     input_manager->setMode(InputManager::MENU);
     
     createButtons();
-    assignButtons(BUTTONS_LOWER);
+    assignButtons(getDefaultButtonsType());
     
     Widget* button_widget = getWidget<ButtonWidget>("Back");
     assert(button_widget != NULL);
@@ -160,6 +189,7 @@ void ScreenKeyboard::init()
  */
 void ScreenKeyboard::createButtons()
 {
+    const auto& layout_proportions = getKeyboardLayoutProportions();
     int rows_num = layout_proportions.size();
     int pos_y = 3;
 
@@ -219,11 +249,9 @@ void ScreenKeyboard::createButtons()
 }   // createButtons
 
 // ----------------------------------------------------------------------------
-
-std::wstring ScreenKeyboard::getKeyName(std::string key_id)
+core::stringw ScreenKeyboard::getKeyName(std::string key_id)
 {
-    std::wstring key_name;
-    
+    core::stringw key_name;
     if (key_id == "Enter")
     {
         key_name = L"\u21B2";
@@ -242,10 +270,8 @@ std::wstring ScreenKeyboard::getKeyName(std::string key_id)
     }
     else
     {
-        std::wstring tmp(key_id.begin(), key_id.end());
-        key_name = tmp;
+        key_name = StringUtils::utf8ToWide(key_id);
     }
-    
     return key_name;
 }
 
@@ -255,31 +281,12 @@ std::wstring ScreenKeyboard::getKeyName(std::string key_id)
  */
 void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
 {
+    const auto& layout_proportions = getKeyboardLayoutProportions();
     int rows_num = layout_proportions.size();
-    
+
     m_buttons_type = buttons_type;
-    
-    KeyboardLayout* keys = NULL;
-    
-    switch (buttons_type)
-    {
-    case BUTTONS_LOWER:
-        keys = &layout_lower;
-        break;
-    case BUTTONS_UPPER:
-        keys = &layout_upper;
-        break;
-    case BUTTONS_DIGITS:
-        keys = &layout_digits;
-        break;
-    case BUTTONS_DIGITS2:
-        keys = &layout_digits2;
-        break;
-    default:
-        keys = NULL;
-        break;
-    };
-    
+    KeyboardLayout* keys = getKeyboardLayout(buttons_type);
+
     unsigned int current_button_id = 0;
     
     for (int i = 0; i < rows_num; i++)
@@ -289,7 +296,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
         for (int j = 0; j < cols_num; j++)
         {
             std::string key = keys != NULL ? (*keys)[i][j] : "?";
-            std::wstring key_name = getKeyName(key);
+            const core::stringw& key_name = getKeyName(key);
 
             assert(current_button_id < m_buttons.size());
             ButtonWidget* button = m_buttons[current_button_id];
@@ -301,7 +308,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
             else
             {
                 button->setVisible(true);
-                button->setText(key_name.c_str());
+                button->setText(key_name);
                 button->m_properties[PROP_ID] = key;
             }
             
@@ -408,7 +415,8 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     SEvent event;
     bool send_event = false;
     bool close_keyboard = false;
-        
+    std::vector<char32_t> chars;
+
     if (eventSource == "Shift")
     {
         switch (m_buttons_type)
@@ -440,7 +448,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     else if (eventSource == "Enter")
     {
         event.KeyInput.Key = IRR_KEY_RETURN;
-        event.KeyInput.Char = 0;
+        chars.push_back(0);
         send_event = true;
         close_keyboard = true;
     }
@@ -452,13 +460,16 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     else if (eventSource == "Space")
     {
         event.KeyInput.Key = IRR_KEY_UNKNOWN;
-        event.KeyInput.Char = ' ';
+        chars.push_back(U' ');
         send_event = true;
     }
     else if (eventSource.size() > 0)
     {
         event.KeyInput.Key = IRR_KEY_UNKNOWN;
-        event.KeyInput.Char = eventSource.at(0);
+        // For possible emoji ligatures
+        const std::u32string& s = StringUtils::utf8ToUtf32(eventSource);
+        for (char32_t c : s)
+            chars.push_back(c);
         send_event = true;
     }
 
@@ -468,10 +479,13 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
         event.KeyInput.PressedDown = true;
         event.KeyInput.Control = false;
         event.KeyInput.Shift = false;
-
-        m_edit_box->OnEvent(event);
+        for (char32_t c : chars)
+        {
+            event.KeyInput.Char = c;
+            m_edit_box->OnEvent(event);
+        }
     }
-    
+
     if (close_keyboard)
     {
         dismiss();

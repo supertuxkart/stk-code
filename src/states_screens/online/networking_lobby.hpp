@@ -96,6 +96,7 @@ private:
     GUIEngine::ListWidget* m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
     GUIEngine::ButtonWidget* m_send_button;
+    GUIEngine::ButtonWidget* m_emoji_button;
 
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
 

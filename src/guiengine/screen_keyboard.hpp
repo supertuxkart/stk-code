@@ -47,16 +47,19 @@ namespace GUIEngine
     class ScreenKeyboard : public SkinWidgetContainer, 
                            public AbstractTopLevelContainer
     {
-    private:
+    protected:
+        typedef std::vector<std::vector<std::string> > KeyboardLayout;
+        typedef std::vector<std::vector<int> > KeyboardLayoutProportions;
         enum ButtonsType
         {
             BUTTONS_NONE,
             BUTTONS_LOWER,
             BUTTONS_UPPER,
             BUTTONS_DIGITS,
-            BUTTONS_DIGITS2
+            BUTTONS_DIGITS2,
+            BUTTONS_EMOJI
         };
-        
+    private:
         /** Global instance of the current screen keyboard */
         static ScreenKeyboard* m_screen_keyboard;
         
@@ -98,10 +101,9 @@ namespace GUIEngine
         /** Remembered input mode that was used before keyboard creation */
         InputManager::InputDriverMode m_previous_mode;
 
-        void init();
         void createButtons();
         void assignButtons(ButtonsType buttons_type);
-        std::wstring getKeyName(std::string key_id);
+        core::stringw getKeyName(std::string key_id);
 
     public:
         LEAK_CHECK()
@@ -110,8 +112,10 @@ namespace GUIEngine
                        CGUIEditBox* edit_box);
         ~ScreenKeyboard();
 
+        void init();
+
         virtual EventPropagation processEvent(const std::string& eventSource);
-        
+
         static void dismiss();
         static bool onEscapePressed();
         /** Returns pointer to the created keyboard or NULL if keyboard was
@@ -146,6 +150,15 @@ namespace GUIEngine
         
         /** Returns assigned edit box */
         CGUIEditBox* getEditBox() {return m_edit_box;}
+
+        virtual KeyboardLayoutProportions getKeyboardLayoutProportions() const;
+
+        virtual KeyboardLayout* getKeyboardLayout(ButtonsType bt) const;
+
+        virtual ButtonsType getDefaultButtonsType() const
+        {
+            return BUTTONS_LOWER;
+        }
     };
 }
 
