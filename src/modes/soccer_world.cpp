@@ -337,7 +337,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             {
                 if (peer->isValidated() && !peer->isWaitingForGame())
                 {
-                    if (peer->getClientCapabilities().find("country_flag") !=
+                    if (peer->getClientCapabilities().find("color_emoji") !=
                         peer->getClientCapabilities().end())
                     {
                         peer->sendPacket(&p_with_flag, true/*reliable*/);
@@ -777,7 +777,7 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
             .addFloat(m_red_scorers[i].m_time)
             .encodeString(m_red_scorers[i].m_kart);
         core::stringw player_name = m_red_scorers[i].m_player;
-        if (peer->getClientCapabilities().find("country_flag") !=
+        if (peer->getClientCapabilities().find("color_emoji") !=
             peer->getClientCapabilities().end())
         {
             player_name += L" ";
@@ -795,7 +795,7 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
             .addFloat(m_blue_scorers[i].m_time)
             .encodeString(m_blue_scorers[i].m_kart);
         core::stringw player_name = m_blue_scorers[i].m_player;
-        if (peer->getClientCapabilities().find("country_flag") !=
+        if (peer->getClientCapabilities().find("color_emoji") !=
             peer->getClientCapabilities().end())
         {
             player_name += L" ";

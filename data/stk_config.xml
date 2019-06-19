@@ -586,6 +586,6 @@
   -->
   <network-capabilities>
       <capabilities name="report_player"/>
-      <capabilities name="country_flag"/>
+      <capabilities name="color_emoji"/>
   </network-capabilities>
 </config>
