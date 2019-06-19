@@ -80,6 +80,8 @@ public:
     const std::string&       getLocalizedName(const std::string& str) const;
 
     irr::core::stringw       getLocalizedCountryName(const std::string& country_code) const;
+
+    void                     insertThaiBreakMark(const std::u32string& thai, std::vector<bool>& breakable);
 #endif
 };   // Translations
 

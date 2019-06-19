@@ -35,6 +35,8 @@
 #include <cwchar>
 #include <fstream>
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
@@ -62,6 +64,16 @@ Translations* translations = NULL;
 std::map<std::string, std::string> Translations::m_localized_name;
 std::map<std::string, std::map<std::string, irr::core::stringw> >
     Translations::m_localized_country_codes;
+// ============================================================================
+std::unordered_map<char32_t,
+    std::pair<std::unordered_set<std::u32string>, size_t> > g_thai_dict;
+// ============================================================================
+constexpr bool isThaiCP(char32_t c)
+{
+    return c >= 0x0e00 && c <= 0x0e7f;
+}   // isThaiCP
+
+// ============================================================================
 
 const bool REMOVE_BOM = false;
 using namespace tinygettext;
@@ -199,6 +211,50 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         catch (std::exception& e)
         {
             Log::error("translation", "error: failure extract localized country name.");
+            Log::error("translation", "%s", e.what());
+        }
+    }
+
+    if (g_thai_dict.empty())
+    {
+        const std::string file_name = file_manager->getAsset("thaidict.txt");
+        try
+        {
+            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
+            if (!in.get())
+            {
+                Log::error("translation", "error: failure opening: '%s'.",
+                    file_name.c_str());
+            }
+            else
+            {
+                std::string line;
+                while (!StringUtils::safeGetline(*in, line).eof())
+                {
+                    const std::u32string& u32line = StringUtils::utf8ToUtf32(line);
+                    char32_t thai = u32line[0];
+                    if (u32line.empty() || !isThaiCP(thai))
+                        continue;
+                    if (g_thai_dict.find(thai) == g_thai_dict.end())
+                    {
+                        g_thai_dict[thai] =
+                            {
+                                std::make_pair(
+                                    std::unordered_set<std::u32string>{u32line},
+                                    u32line.size())
+                            };
+                        continue;
+                    }
+                    auto& ret = g_thai_dict.at(thai);
+                    ret.first.insert(u32line);
+                    if (ret.second < u32line.size())
+                        ret.second = u32line.size();
+                }
+            }
+        }
+        catch (std::exception& e)
+        {
+            Log::error("translation", "error: failure extract Thai dictionary.");
             Log::error("translation", "%s", e.what());
         }
     }
@@ -530,5 +586,47 @@ irr::core::stringw Translations::getLocalizedCountryName(const std::string& coun
     // Fallback
     return StringUtils::utf8ToWide(country_code);
 }   // getLocalizedCountryName
+
+// ----------------------------------------------------------------------------
+/* Insert breakmark to thai sentence according to thai word dictionary, which
+ * adds a mark in the begining of a thai vocabulary
+ */
+void Translations::insertThaiBreakMark(const std::u32string& thai,
+                                       std::vector<bool>& breakable)
+{
+    if (thai.size() < 3)
+        return;
+    for (size_t i = 0; i < thai.size();)
+    {
+        char32_t t = thai[i];
+        if (i >= thai.size() - 2 || !isThaiCP(t))
+        {
+            i++;
+            continue;
+        }
+        auto ret = g_thai_dict.find(t);
+        if (ret == g_thai_dict.end())
+        {
+            i++;
+            continue;
+        }
+        size_t checked_word = 1;
+        const size_t max_checking_word = ret->second.second;
+        for (size_t j = i + 1;; j++)
+        {
+            if (j - i > max_checking_word || j > thai.size())
+                break;
+            const std::u32string& ss = thai.substr(i, j - i);
+            if (ret->second.first.find(ss) != ret->second.first.end())
+            {
+                if (ss.size() > checked_word)
+                    checked_word = ss.size();
+                if (i != 0)
+                    breakable[i - 1] = true;
+            }
+        }
+        i += checked_word;
+    }
+}   // insertThaiBreakMark
 
 #endif

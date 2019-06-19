@@ -395,6 +395,7 @@ void FontManager::shape(const std::u32string& text,
             rtl_char.resize(str.size(), false);
             breakable.resize(str.size(), false);
             LineBreakingRules::insertBreakMark(str, breakable);
+            translations->insertThaiBreakMark(str, breakable);
             RTLRules::insertRTLMark(str, rtl_line, rtl_char);
             size_t count = 0;
             raqm_glyph_t* glyphs = raqm_get_glyphs(rq, &count);
