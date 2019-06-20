@@ -22,8 +22,10 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
+#include "guiengine/emoji_keyboard.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/CGUIEditBox.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
@@ -64,7 +66,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     }
     else
     {
-        loadFromFile("network_ingame_dialog.stkgui");
+        loadFromFile("online/network_ingame_dialog.stkgui");
     }
 
     GUIEngine::RibbonWidget* back_btn = getWidget<RibbonWidget>("backbtnribbon");
@@ -76,16 +78,22 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         SFXManager::get()->pauseAll();
         m_text_box->clearListeners();
         m_text_box->setTextBoxType(TBT_CAP_SENTENCES);
+        // Unicode enter arrow
+        getWidget("send")->setText(L"\u21B2");
+        // Unicode smile emoji
+        getWidget("emoji")->setText(L"\u263A");
         if (UserConfigParams::m_lobby_chat)
         {
             m_text_box->setActive(true);
             getWidget("send")->setVisible(true);
+            getWidget("emoji")->setVisible(true);
             m_text_box->addListener(this);
             auto cl = LobbyProtocol::get<ClientLobby>();
             if (cl && !cl->serverEnabledChat())
             {
                 m_text_box->setActive(false);
                 getWidget("send")->setActive(false);
+                getWidget("emoji")->setActive(false);
             }
         }
         else
@@ -94,6 +102,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
             m_text_box->setText(
                 _("Chat is disabled, enable in options menu."));
             getWidget("send")->setVisible(false);
+            getWidget("emoji")->setVisible(false);
         }
     }
     else
@@ -173,6 +182,14 @@ GUIEngine::EventPropagation
     if (eventSource == "send" && m_text_box)
     {
         onEnterPressed(m_text_box->getText());
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "emoji" && m_text_box &&
+        !ScreenKeyboard::isActive())
+    {
+        EmojiKeyboard* ek = new EmojiKeyboard(1.0f, 0.40f,
+            m_text_box->getIrrlichtElement<CGUIEditBox>());
+        ek->init();
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "backbtnribbon")
