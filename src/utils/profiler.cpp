@@ -42,8 +42,8 @@ Profiler profiler;
 #define MARGIN_Y    0.02f    // top margin
 #define LINE_HEIGHT 0.030f   // height of a line representing a thread
 
-#define MARKERS_NAMES_POS      core::rect<s32>(50,100,150,200)
-#define GPU_MARKERS_NAMES_POS      core::rect<s32>(50,165,150,250)
+#define MARKERS_NAMES_POS     core::rect<s32>(50,100,150,600)
+#define GPU_MARKERS_NAMES_POS core::rect<s32>(50,165,150,300)
 
 // The width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 #define TIME_DRAWN_MS 30.0f 
@@ -463,14 +463,14 @@ void Profiler::draw()
             text += oss.str().c_str();
             hovered_markers.pop();
         }
-        font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+        font->drawQuick(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
 
         if (hovered_gpu_marker != Q_LAST)
         {
             std::ostringstream oss;
             oss << irr_driver->getGPUQueryPhaseName(hovered_gpu_marker) << " : "
                 << hovered_gpu_marker_elapsed << " us";
-            font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS,
+            font->drawQuick(oss.str().c_str(), GPU_MARKERS_NAMES_POS,
                        video::SColor(0xFF, 0xFF, 0x00, 0x00));
         }
     }
