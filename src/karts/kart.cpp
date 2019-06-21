@@ -3279,7 +3279,7 @@ void Kart::updateGraphics(float dt)
     else
         m_stars_effect->update(dt);
 
-    // Upate particle effects (creation rate, and emitter size
+    // Update particle effects (creation rate, and emitter size
     // depending on speed)
     m_kart_gfx->update(dt);
     if (m_collision_particles) m_collision_particles->update(dt);
