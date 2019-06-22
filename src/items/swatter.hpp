@@ -90,7 +90,7 @@ public:
              Swatter(AbstractKart *kart, int16_t bomb_ticks, int ticks,
                      Attachment* attachment);
     virtual ~Swatter();
-    void     updateGrahpics(float dt) OVERRIDE;
+    void     updateGraphics(float dt) OVERRIDE;
     bool     updateAndTestFinished(int ticks) OVERRIDE;
 
     // ------------------------------------------------------------------------

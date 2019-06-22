@@ -52,7 +52,7 @@ public:
 
     virtual ~AttachmentPlugin() {}
 
-    virtual void updateGrahpics(float dt) = 0;
+    virtual void updateGraphics(float dt) = 0;
 
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
