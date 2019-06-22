@@ -150,6 +150,17 @@ LOCAL_CFLAGS       := -I../lib/bullet/src/
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
+
+# Graphics utils
+LOCAL_MODULE       := graphics_utils
+LOCAL_PATH         := .
+LOCAL_CPP_FEATURES += rtti
+LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_utils/mipmap/*.c)
+LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap
+include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # Irrlicht
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
@@ -184,6 +195,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/ifaddrs                  \
                       -I../lib/irrlicht/include         \
                       -I../lib/irrlicht/source/Irrlicht \
+                      -I../lib/graphics_utils           \
                       -I../src                          \
                       -Iobj/curl/include                \
                       -Iobj/fribidi/include             \
@@ -205,7 +217,7 @@ LOCAL_CPPFLAGS     := -std=gnu++0x
 
 LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript  \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          gnustl_static raqm fribidi harfbuzz freetype
+                          gnustl_static raqm fribidi harfbuzz freetype graphics_utils
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)

@@ -36,6 +36,14 @@
 #include "GlyphLayout.h"
 #include <array>
 
+#ifndef SERVER_ONLY
+extern "C"
+{
+    #include <mipmap/img.h>
+    #include <mipmap/imgresize.h>
+}
+#endif
+
 // ----------------------------------------------------------------------------
 /** Constructor. It will initialize the \ref m_spritebank and TTF files to use.
  *  \param name The name of face, used by irrlicht to distinguish spritebank.
@@ -280,7 +288,27 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
                 ->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
                 { cur_glyph_width , cur_glyph_height});
             assert(scaled);
-            unscaled->copyToScalingBoxFilter(scaled);
+            if (cur_glyph_width >= bits->width ||
+                cur_glyph_height >= bits->rows)
+            {
+                unscaled->copyToScaling(scaled);
+            }
+            else
+            {
+                imReduceOptions options;
+                imReduceSetOptions(&options, IM_REDUCE_FILTER_LINEAR/*filter*/,
+                    3/*hopcount*/, 16.0f/*alpha*/, 1.0f/*amplifynormal*/,
+                    0.0f/*normalsustainfactor*/);
+                int ret = imReduceImageKaiserData((unsigned char*)scaled->lock(),
+                    (unsigned char*)unscaled->lock(), bits->width, bits->rows, 4,
+                    bits->width * 4, cur_glyph_width , cur_glyph_height,
+                    &options);
+                if (ret != 1)
+                {
+                    Log::error("FontWithFace",
+                        "Error reduce bitmap font size.");
+                }
+            }
             uint8_t* scaled_data = (uint8_t*)scaled->lock();
             for (unsigned int i = 0; i < cur_glyph_width * cur_glyph_height;
                  i++)
