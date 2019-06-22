@@ -103,7 +103,7 @@ Swatter::~Swatter()
 }   // ~Swatter
 
 // ----------------------------------------------------------------------------
-void Swatter::updateGrahpics(float dt)
+void Swatter::updateGraphics(float dt)
 {
 #ifndef SERVER_ONLY
     if (m_bomb_remaining != -1)
@@ -221,7 +221,7 @@ void Swatter::updateGrahpics(float dt)
         }
     }
 #endif
-}   // updateGrahpics
+}   // updateGraphics
 
 // ----------------------------------------------------------------------------
 /** Updates an armed swatter: it checks for any karts that are close enough

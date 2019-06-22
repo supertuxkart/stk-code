@@ -57,7 +57,7 @@ public:
     enum AttachmentType
     {
         ATTACH_FIRST = 0,
-        // It is importabt that parachute, bomb and anvil stay in this order,
+        // It is important that parachute, bomb and anvil stay in this order,
         // since the attachment type is mapped to a random integer (and bomb
         // must be last, since a bomb will not be given in battle mode).
         ATTACH_PARACHUTE = 0,

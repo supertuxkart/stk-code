@@ -23,7 +23,7 @@
 #include "utils/cpp2011.hpp"
 
 /**
- * \brief Dialog shown after a resolution switch sot he user may confirm if
+ * \brief Dialog shown after a resolution switch so the user may confirm if
  *        the resolution works.
  * \ingroup states_screens
  */

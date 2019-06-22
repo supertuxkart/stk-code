@@ -587,7 +587,7 @@ void Attachment::updateGraphics(float dt)
     }
 
     if (m_plugin)
-        m_plugin->updateGrahpics(dt);
+        m_plugin->updateGraphics(dt);
 
     if (m_type != ATTACH_NOTHING)
     {
