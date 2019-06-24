@@ -32,7 +32,7 @@ float makeLinear(float f, float n, float z)
 vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 {
     // Combine UV & depth into XY & Z (NDC)
-    float z = makeLinear(1000.0, 0.01, textureLod(DepthMap, TexCoord, 0.).x);
+    float z = makeLinear(1000.0, 1.0, textureLod(DepthMap, TexCoord, 0.).x);
     vec3 rawPosition                = vec3(TexCoord, z);
 
     // Convert from (0, 1) range to (-1, 1)
@@ -43,6 +43,13 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 
     // Perform perspective divide and return
     return                          ViewPosition.xyz / ViewPosition.w;
+}
+
+float GetVignette(float factor)
+{
+    vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
+    float vignette = 1. - dot(inside, inside) * 5;
+    return clamp(pow(vignette, factor), 0., 1.0);
 }
 
 vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback, float spread)
@@ -61,21 +68,25 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
 
         if(dDepth < 0.0)
         {
-            if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0))
+            // Texture wrapping to extand artifcially the range of the lookup texture
+            // FIXME can be improved to lessen the distortion
+            projectedCoord.y = min(.99, projectedCoord.y);
+            projectedCoord.x = min(.99, projectedCoord.x);
+            projectedCoord.x = max(.01, projectedCoord.x);
+
+            // We want only reflection on nearly horizontal surfaces
+            float cutout = dot(dir, vec3(0., 0., -1.));
+
+            if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
+                && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
+                && (cutout > 10)
+               )
             {
                 // FIXME We need to generate mipmap to take into account the gloss map
                 vec3 finalColor = textureLod(albedo, projectedCoord.xy, spread).rgb;
-                if ((finalColor.r + finalColor.g + finalColor.b) > 0.)
-                {
-                    vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
-                    float vignette = 1. - dot(inside, inside) * 5;
-                    vignette = clamp(pow(vignette, 10.0), 0., 1.0);
-                    return mix(fallback, finalColor, vignette);
-                }
-                else
-                {
-                    return fallback;
-                }
+                //return finalColor;
+                return mix(fallback, finalColor, GetVignette(4.));
+
             }
             else
             {
@@ -106,18 +117,14 @@ void main(void)
 #ifdef GL_ES
     Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval), 1.);
 #else
-    // Compute Space Screen Reflection =========================================================
+    // :::::::: Compute Space Screen Reflection ::::::::::::::::::::::::::::::::::::
 
     float lineardepth = textureLod(dtex, uv, 0.).x;
-    int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
-    vec3 FragPos = getXcYcZc(x, y, lineardepth);
 
-    // Fallback
+    // Fallback (if the ray can't find an intersection we display the sky)
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
 
-    // Better implementation: :::::::::::::::::::::::::::::::::::
-
-    float View_Depth            = makeLinear(1000.0, 0.001, lineardepth);
+    float View_Depth            = makeLinear(1000.0, 1.0, lineardepth);
     vec3 ScreenPos              = xpos.xyz;
     vec4 View_Pos               = u_inverse_projection_matrix * vec4(ScreenPos, 1.0f);
          View_Pos              /= View_Pos.w;
@@ -130,7 +137,7 @@ void main(void)
     float dDepth;
     float minRayStep            = 100.0f;
 
-    vec3 outColor = RayCast(reflected * max(minRayStep, -View_Pos.z),
+    vec3 outColor = RayCast(reflected * max(minRayStep, -xpos.z),
                             hitPos, dDepth, dtex, fallback, 0.0);
     
     // TODO temporary measure the lack of mipmaping for RTT albedo
