@@ -50,6 +50,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_forced_lod = -1;
     m_last_tick = 0;
+    m_area = 0;
 }
 
 LODNode::~LODNode()
@@ -284,8 +285,7 @@ void LODNode::autoComputeLevel(float scale)
 
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
-
-    
+    Box = node->getBoundingBox();
     m_area = Box.getArea();
 
     // samuncle suggested to put a slight randomisation in LOD
