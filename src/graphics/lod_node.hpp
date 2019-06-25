@@ -104,6 +104,11 @@ public:
       */
     void add(int level, scene::ISceneNode* node, bool reparent);
 
+    /**
+      * This method can be used to automatically compute LoD level
+      */
+    void autoComputeLevel(float scale);
+
     void forceLevelOfDetail(int n);
 
     /** Get the highest level of detail node */
