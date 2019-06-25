@@ -29,7 +29,12 @@ void main()
     vec3 SpecularComponent = texture(specular_map, tc).xyz;
 
     vec3 diffuse_color_for_mix = diffuseMatColor.xyz * 4.0;
-    vec3 metallicMatColor = mix(vec3(specMapValue), diffuse_color_for_mix, metallicMapValue);
+
+    // FIXME enable this once the fallback shader is properly done!!!
+    //vec3 metallicMatColor = mix(vec3(specMapValue), diffuse_color_for_mix, metallicMapValue);
+    vec3 metallicMatColor = mix(vec3(0.04), diffuse_color_for_mix, metallicMapValue);
+    // END FIXME
+    
     vec3 tmp = DiffuseComponent * mix(diffuseMatColor.xyz, vec3(0.0), metallicMapValue) + (metallicMatColor * SpecularComponent);
 
     vec3 emitCol = diffuseMatColor.xyz + (diffuseMatColor.xyz * diffuseMatColor.xyz * emitMapValue * emitMapValue * 10.0);
