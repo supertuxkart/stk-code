@@ -284,6 +284,10 @@ void LODNode::autoComputeLevel(float scale)
 
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
+
+    
+    m_area = Box.getArea();
+
     // samuncle suggested to put a slight randomisation in LOD
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
     // The last level should not be randomized because after that the object disappears,
