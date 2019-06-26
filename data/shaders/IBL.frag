@@ -26,7 +26,7 @@ vec3 getXcYcZc(int x, int y, float zC)
 
 float makeLinear(float f, float n, float z)
 {
-    return (2 * n) / (f + n - z * (f - n));
+    return (2.0f * n) / (f + n - z * (f - n));
 }
 
 vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
@@ -36,7 +36,7 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
     vec3 rawPosition                = vec3(TexCoord, z);
 
     // Convert from (0, 1) range to (-1, 1)
-    vec4 ScreenSpacePosition        = vec4( rawPosition * 2 - 1, 1);
+    vec4 ScreenSpacePosition        = vec4( rawPosition * 2.0 - 1.0, 1.0);
 
     // Undo Perspective transformation to bring into view space
     vec4 ViewPosition               = u_inverse_projection_matrix * ScreenSpacePosition;
@@ -48,7 +48,7 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
 float GetVignette(float factor)
 {
     vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
-    float vignette = 1. - dot(inside, inside) * 5;
+    float vignette = 1. - dot(inside, inside) * 5.0;
     return clamp(pow(vignette, factor), 0., 1.0);
 }
 
@@ -79,7 +79,7 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
 
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
                 && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
-                && (cutout > 10)
+                && (cutout > 10.0)
                )
             {
                 // FIXME We need to generate mipmap to take into account the gloss map
