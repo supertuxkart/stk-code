@@ -41,6 +41,6 @@
 
         </buttonbar>
 
-        <spacer width="20" height="35" />
+        <spacer width="20" height="5%" />
     </div>
 </stkgui>
