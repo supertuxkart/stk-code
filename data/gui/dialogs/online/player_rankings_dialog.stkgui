@@ -23,6 +23,6 @@
                          icon="gui/icons/restart.png"
                          text="Refresh" label_location="bottom"/>
         </buttonbar>
-        <spacer width="20" height="1f" />
+        <spacer height="1f" width="20"/>
     </div>
 </stkgui>

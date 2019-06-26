@@ -39,6 +39,6 @@
             <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
                 I18N="In the recovery dialog"  text="Cancel" label_location="none"/>
         </buttonbar>
-        <spacer width="20" height="1f" />
+        <spacer height="1f" width="20"/>
     </div>
 </stkgui>
