@@ -4,6 +4,8 @@
         <header id="title" width="100%" height="fit" text_align="center"
                 word_wrap="true" I18N="In player rankings dialog"
                 text="Top 10 players"/>
+        
+         <spacer height="1%" width="20" />
 
         <box x="2%" width="90%" height="60%" align="center" layout="vertical-row"
                 padding="6">
