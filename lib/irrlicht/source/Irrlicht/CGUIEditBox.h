@@ -124,7 +124,13 @@ namespace gui
 
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
-
+		virtual void setComposingText(const std::u32string& ct) {}
+		virtual void clearComposingText() {}
+		virtual const core::position2di& getICPos() const
+		{
+			static core::position2di unused;
+			return unused;
+		}
 	protected:
 		//! Breaks the single text line.
 		void breakText();

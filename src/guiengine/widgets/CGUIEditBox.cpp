@@ -223,7 +223,7 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
         FrameRect.LowerRightCorner.Y -= skin->getSize(EGDS_TEXT_DISTANCE_Y)+1;
     }
 
-    calculateScrollPos();
+    m_scroll_pos = m_cursor_distance = 0;
 }
 
 
@@ -242,6 +242,8 @@ CGUIEditBox::~CGUIEditBox()
                                                        irr_driver->getDevice());
         dl->setIMEEnable(false);
     }
+#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+    DestroyCaret();
 #endif
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
         irr_driver->getDevice()->hasOnScreenKeyboard())
@@ -350,31 +352,33 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
                 if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
                     dl->setIMEEnable(false);
                 }
+#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+                DestroyCaret();
 #endif
                 m_from_android_edittext = false;
                 m_composing_start = 0;
                 m_composing_end = 0;
+                m_composing_text.clear();
             }
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
                 m_mark_begin = m_mark_end = m_cursor_pos = getTextCount();
-                updateCursorDistance();
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
                 if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
                     dl->setIMEEnable(true);
-                    dl->setIMELocation(calculateICPos());
                 }
 #endif
+                calculateScrollPos();
 #ifdef ANDROID
                 if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
                     irr_driver->getDevice()->hasOnScreenKeyboard() &&
@@ -392,6 +396,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 {
                     m_from_android_edittext = false;
                 }
+                m_composing_text.clear();
             }
             break;
         case EET_KEY_INPUT_EVENT:
@@ -862,17 +867,6 @@ bool CGUIEditBox::processKey(const SEvent& event)
 }
 
 
-//! calculate the position of input composition window
-core::position2di CGUIEditBox::calculateICPos()
-{
-    core::position2di pos;
-    pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
-    //bug? The text is always drawn in the height of the center. SetTextAlignment() doesn't influence.
-    pos.Y = AbsoluteRect.getCenter().Y + (Border ? 3 : 0);
-    return pos;
-}
-
-
 //! draws the element and its children
 void CGUIEditBox::draw()
 {
@@ -880,7 +874,8 @@ void CGUIEditBox::draw()
     if (!IsVisible)
         return;
 
-    updateSurrogatePairText();
+    if (Environment->hasFocus(this))
+        updateSurrogatePairText();
     GUIEngine::ScreenKeyboard* screen_kbd = GUIEngine::ScreenKeyboard::getCurrent();
     bool has_screen_kbd = (screen_kbd && screen_kbd->getEditBox() == this);
     
@@ -933,31 +928,60 @@ void CGUIEditBox::draw()
     const s32 realcbgn = m_composing_start < m_composing_end ? m_composing_start : m_composing_end;
     const s32 realcend = m_composing_start < m_composing_end ? m_composing_end : m_composing_start;
 
-    for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
-    {
-        GlyphLayout& glyph = m_glyph_layouts[i];
-        auto& cluster = glyph.cluster;
-        for (unsigned c = 0; c < glyph.cluster.size(); c++)
-        {
-            if (realmbgn != realmend)
-            {
-                if (cluster[c] >= realmbgn && cluster[c] < realmend)
-                    glyph.draw_flags.at(c) = GLD_MARKED;
-            }
-            else if (!PasswordBox && realcbgn != realcend)
-            {
-                if (cluster[c] >= realcbgn && cluster[c] < realcend)
-                    glyph.draw_flags.at(c) = GLD_COMPOSING;
-            }
-            else
-                glyph.draw_flags.at(c) = GLD_NONE;
-        }
-    }
-
     // draw the text layout
-    font->draw(m_glyph_layouts, CurrentTextRect,
-        OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-        false, true, &localClipRect);
+    if (!m_composing_text.empty())
+    {
+        std::vector<gui::GlyphLayout> ct;
+        std::u32string total = m_edit_text;
+        const s32 realcbgn = m_cursor_pos;
+        const s32 realcend = m_cursor_pos + (s32)m_composing_text.size();
+        total.insert(m_cursor_pos, m_composing_text);
+        font_manager->shape(total, ct);
+        for (unsigned i = 0; i < ct.size(); i++)
+        {
+            GlyphLayout& glyph = ct[i];
+            auto& cluster = glyph.cluster;
+            for (unsigned c = 0; c < glyph.cluster.size(); c++)
+            {
+                if (realcbgn != realcend)
+                {
+                    if (cluster[c] >= realcbgn && cluster[c] < realcend)
+                        glyph.draw_flags.at(c) = GLD_COMPOSING;
+                }
+                else
+                    glyph.draw_flags.at(c) = GLD_NONE;
+            }
+        }
+        font->draw(ct, CurrentTextRect,
+            OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+            false, true, &localClipRect);
+    }
+    else
+    {
+        for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
+        {
+            GlyphLayout& glyph = m_glyph_layouts[i];
+            auto& cluster = glyph.cluster;
+            for (unsigned c = 0; c < glyph.cluster.size(); c++)
+            {
+                if (realmbgn != realmend)
+                {
+                    if (cluster[c] >= realmbgn && cluster[c] < realmend)
+                        glyph.draw_flags.at(c) = GLD_MARKED;
+                }
+                else if (!PasswordBox && realcbgn != realcend)
+                {
+                    if (cluster[c] >= realcbgn && cluster[c] < realcend)
+                        glyph.draw_flags.at(c) = GLD_COMPOSING;
+                }
+                else
+                    glyph.draw_flags.at(c) = GLD_NONE;
+            }
+        }
+        font->draw(m_glyph_layouts, CurrentTextRect,
+            OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+            false, true, &localClipRect);
+    }
 
     // Reset draw flags
     for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
@@ -1338,35 +1362,36 @@ void CGUIEditBox::calculateScrollPos()
         m_scroll_pos = 0;
 
     // todo: adjust scrollbar
-    core::position2di pos = calculateICPos();
+    // calculate the position of input composition window
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+    m_ic_pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
+    // bug? The text is always drawn in the height of the center. SetTextAlignment() doesn't influence.
+    m_ic_pos.Y = AbsoluteRect.getCenter().Y + (Border ? 3 : 0);
     if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
     {
         CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
         if (dl)
         {
-            dl->setIMELocation(pos);
+            dl->setIMELocation(m_ic_pos);
         }
     }
 #elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+    m_ic_pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
+    m_ic_pos.Y = CurrentTextRect.UpperLeftCorner.Y;
+
+    // We need a native windows api caret for ime language chooser
+    // positioning, we always hide it though and draw with our own
+    // opengl caret later
     CIrrDeviceWin32* win = NULL;
     if (irr_driver->getDevice()->getType() == irr::EIDT_WIN32)
         win = dynamic_cast<CIrrDeviceWin32*>(irr_driver->getDevice());
-    if (!win)
+    if (!isVisible() || !win)
         return;
 
-    COMPOSITIONFORM cf;
-    HIMC hIMC = ImmGetContext(win->getHandle());
-
-    if (hIMC)
-    {
-        cf.dwStyle = CFS_POINT;
-        cf.ptCurrentPos.x = pos.X;
-        cf.ptCurrentPos.y = pos.Y - font->getHeightPerLine();
-        ImmSetCompositionWindow(hIMC, &cf);
-        ImmReleaseContext(win->getHandle(), hIMC);
-    }
+    CreateCaret(win->getHandle(), NULL, 1, GUIEngine::getFontHeight());
+    SetCaretPos(m_ic_pos.X, m_ic_pos.Y);
+    HideCaret(win->getHandle());
 #endif
 
 #endif   // SERVER_ONLY

@@ -388,6 +388,10 @@ namespace irr
 
 		HWND getHandle() const { return HWnd; }
 
+		bool isIMEComposingStarted() const { return m_ime_composing_started; }
+
+		void setIMEComposingStarted(bool started) { m_ime_composing_started = started; }
+
 	private:
 
 		//! create the driver
@@ -400,6 +404,7 @@ namespace irr
 
 		void resizeIfNecessary();
 
+		bool m_ime_composing_started;
 		HWND HWnd;
 
 		bool ChangedToFullScreen;

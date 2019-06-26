@@ -133,6 +133,9 @@ namespace GUIEngine
         s32 getCursorPosInBox() const { return m_cursor_pos; }
         s32 getTextCount() const { return (s32)m_edit_text.size(); }
         void setTextBoxType(GUIEngine::TextBoxType t) { m_type = t; }
+        virtual void setComposingText(const std::u32string& ct) { m_composing_text = ct; }
+        virtual void clearComposingText() { m_composing_text.clear(); }
+        virtual const core::position2di& getICPos() const { return m_ic_pos; }
     protected:
         //! sets the area of the given line
         void setTextRect(s32 line);
@@ -147,8 +150,6 @@ namespace GUIEngine
         void updateCursorDistance();
         bool processKey(const SEvent& event);
         bool processMouse(const SEvent& event);
-        //! calculates the input composition position
-        core::position2di calculateICPos();
         s32 getCursorPos(s32 x, s32 y);
         void updateGlyphLayouts();
 
@@ -186,9 +187,13 @@ namespace GUIEngine
         /* UTF32 string for shaping and editing to avoid wchar_t issue in
          * windows */
         std::u32string m_edit_text;
+        /* Used in windows api for native composing text handling. */
+        std::u32string m_composing_text;
         std::vector<GlyphLayout> m_glyph_layouts;
         // Pre-edit surrogate chars
         std::vector<wchar_t> m_surrogate_chars;
+        // Position to show composition box in native window (linux / windows)
+        core::position2di m_ic_pos;
         void correctCursor(s32& cursor_pos, bool left);
         void updateSurrogatePairText();
     };

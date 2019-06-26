@@ -7,6 +7,10 @@
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 
 #include "CIrrDeviceWin32.h"
+#include "IGUIEditBox.h"
+#include "IGUIEnvironment.h"
+#include "IGUIFont.h"
+#include "IGUISkin.h"
 #include "IEventReceiver.h"
 #include "irrList.h"
 #include "os.h"
@@ -952,6 +956,15 @@ irr::CIrrDeviceWin32* getDeviceFromHWnd(HWND hWnd)
     return 0;
 }
 
+static void updateIMECompositonPosition(irr::core::position2di pos, HWND hwnd, HIMC himc)
+{
+    COMPOSITIONFORM cf;
+    cf.dwStyle = CFS_POINT;
+    cf.ptCurrentPos.x = pos.X;
+    cf.ptCurrentPos.y = pos.Y;
+    ImmSetCompositionWindow(himc, &cf);
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     #ifndef WM_MOUSEWHEEL
@@ -1043,7 +1056,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         dev = getDeviceFromHWnd(hWnd);
-        if (dev)
+        if (dev && !dev->isIMEComposingStarted())
         {
             dev->postEventFromUser(event);
 
@@ -1078,22 +1091,116 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_ERASEBKGND:
         return 0;
-
-    case WM_IME_CHAR:
+    case WM_SETFOCUS:
+    case WM_KILLFOCUS:
+        {
+            dev = getDeviceFromHWnd(hWnd);
+            if (dev)
+                dev->setIMEComposingStarted(false);
+            return 0;
+        }
+    case WM_IME_SETCONTEXT:
+        {
+            // application wants to draw composition text by itself.
+            lParam &= ~(ISC_SHOWUICOMPOSITIONWINDOW);
+            break;
+        }
+    case WM_IME_STARTCOMPOSITION:
+    case WM_IME_ENDCOMPOSITION:
         {
             dev = getDeviceFromHWnd(hWnd);
             if (!dev)
                 return 0;
-            event.EventType = irr::EET_KEY_INPUT_EVENT;
-            event.KeyInput.PressedDown = true;
-            event.KeyInput.Char = (char32_t)wParam;
-            event.KeyInput.Key = irr::IRR_KEY_UNKNOWN;
-            event.KeyInput.Shift = false;
-            event.KeyInput.Control = false;
-            dev->postEventFromUser(event);
+
+            irr::gui::IGUIEnvironment* env = dev->getGUIEnvironment();
+            if (!env)
+                return 0;
+
+            irr::gui::IGUISkin* skin = env->getSkin();
+            if (!skin)
+                return 0;
+
+            irr::gui::IGUIFont* font = skin->getFont();
+            if (!font)
+                return 0;
+
+            irr::gui::IGUIEditBox* box = dynamic_cast<irr::gui::IGUIEditBox*>(env->getFocus());
+            if (!box)
+                return 0;
+
+            box->clearComposingText();
+            dev->setIMEComposingStarted(message == WM_IME_STARTCOMPOSITION);
+            HIMC imc = ImmGetContext(hWnd);
+            if (!imc)
+                return 0;
+            if (message == WM_IME_STARTCOMPOSITION)
+            {
+                updateIMECompositonPosition(box->getICPos(), hWnd, imc);
+                // Same height as system font so the composition window is
+                // positioned correctly vertically
+                LOGFONT lFont = {0};
+                lFont.lfHeight = font->getHeightPerLine();
+                lFont.lfCharSet = OEM_CHARSET;
+                ImmSetCompositionFont(imc, &lFont);
+            }
+            ImmReleaseContext(hWnd, imc);
             return 0;
         }
+    case WM_IME_COMPOSITION:
+        {
+            dev = getDeviceFromHWnd(hWnd);
+            if (!dev)
+                return 0;
 
+            irr::gui::IGUIEnvironment* env = dev->getGUIEnvironment();
+            if (!env)
+                return 0;
+
+            irr::gui::IGUIEditBox* box = dynamic_cast<irr::gui::IGUIEditBox*>(env->getFocus());
+            if (!box)
+                return 0;
+            bool get_comp_str = (lParam & GCS_COMPSTR) != 0;
+            bool get_result_str = (lParam & GCS_RESULTSTR) != 0;
+            if (get_comp_str || get_result_str)
+            {
+                HIMC imc = ImmGetContext(hWnd);
+                if (!imc)
+                    return 0;
+                LONG vec_size = ImmGetCompositionString(imc, get_comp_str ? GCS_COMPSTR : GCS_RESULTSTR, (void*)NULL, 0);
+                if ((vec_size == IMM_ERROR_NODATA) ||
+                    (vec_size == IMM_ERROR_GENERAL))
+                {
+                    ImmReleaseContext(hWnd, imc);
+                    return 0;
+                }
+                std::vector<wchar_t> ct;
+                // NULL terminator
+                ct.resize(vec_size / sizeof(wchar_t) + 1, 0);
+                ImmGetCompositionString(imc, get_comp_str ? GCS_COMPSTR : GCS_RESULTSTR, ct.data(), vec_size);
+                std::u32string result = StringUtils::wideToUtf32(ct.data());
+                if (get_comp_str)
+                {
+                    box->setComposingText(result);
+                }
+                else
+                {
+                    for (char32_t c : result)
+                    {
+                        event.EventType = irr::EET_KEY_INPUT_EVENT;
+                        event.KeyInput.PressedDown = true;
+                        event.KeyInput.Char = (char32_t)c;
+                        event.KeyInput.Key = irr::IRR_KEY_UNKNOWN;
+                        event.KeyInput.Shift = false;
+                        event.KeyInput.Control = false;
+                        dev->postEventFromUser(event);
+                    }
+                }
+                if (get_result_str)
+                    updateIMECompositonPosition(box->getICPos(), hWnd, imc);
+                ImmReleaseContext(hWnd, imc);
+            }
+            return 0;
+        }
     case WM_SYSKEYDOWN:
     case WM_SYSKEYUP:
     case WM_KEYDOWN:
@@ -1139,7 +1246,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 event.KeyInput.Control = 0;
 
             dev = getDeviceFromHWnd(hWnd);
-            if (dev)
+            if (dev && !dev->isIMEComposingStarted())
             {
                 if (conversionResult >= 1)
                 {
@@ -1248,6 +1355,7 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
     setDebugName("CIrrDeviceWin32");
     #endif
 
+    m_ime_composing_started = false;
     // get windows version and create OS operator
     core::stringc winversion;
     getWindowsVersion(winversion);

@@ -8,6 +8,8 @@
 #include "IGUIElement.h"
 #include "SColor.h"
 
+#include <string>
+
 namespace irr
 {
 namespace gui
@@ -125,6 +127,9 @@ namespace gui
 
 		//! Returns maximum amount of characters, previously set by setMax();
 		virtual u32 getMax() const = 0;
+		virtual void setComposingText(const std::u32string& ct) = 0;
+		virtual void clearComposingText() = 0;
+		virtual const core::position2di& getICPos() const = 0;
 	};
 
 
