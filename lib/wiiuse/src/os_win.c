@@ -128,7 +128,7 @@ int wiiuse_os_find(struct wiimote_t **wm, int max_wiimotes, int timeout)
             if (attr.ProductID == WM_PRODUCT_ID_TR)
                 wm[found]->type = WIIUSE_WIIMOTE_MOTION_PLUS_INSIDE;
 
-            wm[found]->hid_overlap.hEvent     = CreateEvent(NULL, 1, 1, "");
+            wm[found]->hid_overlap.hEvent     = CreateEvent(NULL, 1, 1, L"");
             wm[found]->hid_overlap.Offset     = 0;
             wm[found]->hid_overlap.OffsetHigh = 0;
 

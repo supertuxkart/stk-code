@@ -96,7 +96,7 @@ inline core::dimension2d<u32> getGlyphLayoutsDimension(
     f32 scale, s32 cluster = -1)
 {
     core::dimension2d<f32> dim(0.0f, 0.0f);
-    core::dimension2d<f32> this_line(0.0f, height_per_line);
+    core::dimension2d<f32> this_line(0.0f, (f32)height_per_line);
 
     for (unsigned i = 0; i < gls.size(); i++)
     {
@@ -272,7 +272,7 @@ namespace Private
     inline f32 getGlyphLayoutsWidth(const std::vector<GlyphLayout>& gls,
                                     f32 inverse_shaping, f32 scale)
     {
-        return std::accumulate(gls.begin(), gls.end(), 0,
+        return std::accumulate(gls.begin(), gls.end(), 0.0f,
             [inverse_shaping, scale] (const f32 previous,
                 const irr::gui::GlyphLayout& cur_gi)
             {

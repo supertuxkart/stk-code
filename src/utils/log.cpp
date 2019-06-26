@@ -250,7 +250,9 @@ void Log::writeLine(const char *line, int level)
     }
 
 #if defined(_MSC_FULL_VER) && defined(_DEBUG)
-    if (m_buffer_size <= 1) OutputDebugString(line);
+    // We don't use utf8ToWide for performance, and debug message
+    // is mostly english anyway
+    if (m_buffer_size <= 1) OutputDebugStringA(line);
 #endif
 
     if (m_file_stdout) fprintf(m_file_stdout, "%s", line);

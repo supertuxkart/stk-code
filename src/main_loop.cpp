@@ -80,16 +80,16 @@ MainLoop::MainLoop(unsigned parent_pid)
 #ifdef WIN32
     if (parent_pid != 0)
     {
-        std::string class_name = "separate_process";
-        class_name += StringUtils::toString(GetCurrentProcessId());
+        core::stringw class_name = L"separate_process";
+        class_name += StringUtils::toWString(GetCurrentProcessId());
         WNDCLASSEX wx = {};
         wx.cbSize = sizeof(WNDCLASSEX);
         wx.lpfnWndProc = separateProcessProc;
         wx.hInstance = GetModuleHandle(0);
-        wx.lpszClassName = &class_name[0];
+        wx.lpszClassName = class_name.c_str();
         if (RegisterClassEx(&wx))
         {
-            CreateWindowEx(0, &class_name[0], "stk_server_only",
+            CreateWindowEx(0, class_name.c_str(), L"stk_server_only",
                 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
         }
     }

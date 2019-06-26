@@ -101,12 +101,12 @@ SeparateProcess::~SeparateProcess()
 {
     bool dead = false;
 #if defined(WIN32)
-    std::string class_name = "separate_process";
-    class_name += StringUtils::toString(m_child_pid);
-    HWND hwnd = FindWindowEx(HWND_MESSAGE, NULL, &class_name[0], NULL);
+    core::stringw class_name = "separate_process";
+    class_name += StringUtils::toWString(m_child_pid);
+    HWND hwnd = FindWindowEx(HWND_MESSAGE, NULL, class_name.c_str(), NULL);
     if (hwnd != NULL)
     {
-        PostMessage(hwnd, WM_DESTROY, NULL, NULL);
+        PostMessage(hwnd, WM_DESTROY, 0, 0);
         if (WaitForSingleObject(m_child_handle, 5000) != WAIT_TIMEOUT)
         {
             dead = true;
@@ -249,8 +249,9 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     // Create the child process.
     std::string cmd = exe + argument + " --parent-process=" +
         StringUtils::toString(GetCurrentProcessId());
+    core::stringw cmd_w = StringUtils::utf8ToWide(cmd);
     bool success = CreateProcess(NULL,
-        &cmd[0],               // command line
+        cmd_w.data(),          // command line
         NULL,                  // process security attributes
         NULL,                  // primary thread security attributes
         TRUE,                  // handles are inherited

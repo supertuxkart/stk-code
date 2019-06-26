@@ -90,7 +90,7 @@ namespace irr
 		IRR_KEY_X                = 0x58,  // X key
 		IRR_KEY_Y                = 0x59,  // Y key
 		IRR_KEY_Z                = 0x5A,  // Z key
-		IRR_KEY_LWIN             = 0x5B,  // Left Windows key (Microsoft® Natural® keyboard)
+		IRR_KEY_LWIN             = 0x5B,  // Left Windows key (Microsoft Natural keyboard)
 		IRR_KEY_RWIN             = 0x5C,  // Right Windows key (Natural keyboard)
 		IRR_KEY_APPS             = 0x5D,  // Applications key (Natural keyboard)
 		IRR_KEY_SLEEP            = 0x5F,  // Computer Sleep key

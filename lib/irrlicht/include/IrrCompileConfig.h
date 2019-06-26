@@ -153,7 +153,7 @@ so D3D8 support is now disabled by default.  If you really want to build
 with D3D8 support, then you will have to source a DXSDK with the appropriate
 headers, e.g. Summer 2004.  This is a Microsoft issue, not an Irrlicht one.
 */
-#if defined(_IRR_WINDOWS_API_) && (!defined(__GNUC__) || defined(IRR_COMPILE_WITH_DX9_DEV_PACK))
+#if defined(_IRR_WINDOWS_API_)
 
 //! Define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_ if you want to use DirectInput for joystick handling.
 /** This only applies to Windows devices, currently only supported under Win32 device.

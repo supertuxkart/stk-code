@@ -210,7 +210,7 @@ void determineOSVersion()
 
     HKEY hKey;
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                      "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0,
+                      L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0,
                       KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
     {
         m_os_version = "windows-unknown";
@@ -218,7 +218,7 @@ void determineOSVersion()
     }
     char windows_version_string[20];
     DWORD size = sizeof(windows_version_string);
-    RegQueryValueEx(hKey, "CurrentVersion", 0, 0, (LPBYTE)windows_version_string, &size);
+    RegQueryValueEx(hKey, L"CurrentVersion", 0, 0, (LPBYTE)windows_version_string, &size);
     unsigned major = 0, minor = 0;
 
     std::stringstream sstr(windows_version_string);

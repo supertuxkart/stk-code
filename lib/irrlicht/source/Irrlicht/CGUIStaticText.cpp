@@ -275,7 +275,7 @@ void CGUIStaticText::breakText()
 
 	LastBreakFont = font;
 
-	f32 elWidth = RelativeRect.getWidth();
+	f32 elWidth = (f32)RelativeRect.getWidth();
 	if (Border)
 		elWidth -= 2*skin->getSize(EGDS_TEXT_DISTANCE_X);
 	if (!m_use_glyph_layouts_only)

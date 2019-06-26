@@ -1420,7 +1420,7 @@ bool FileManager::removeDirectory(const std::string &name) const
     }
 
 #if defined(WIN32)
-    return RemoveDirectory(name.c_str())==TRUE;
+    return RemoveDirectory(StringUtils::utf8ToWide(name).c_str())==TRUE;
 #else
     return remove(name.c_str())==0;
 #endif

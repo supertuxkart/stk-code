@@ -208,7 +208,7 @@ static HGLRC getMeAGLContext(HDC HDc, bool force_legacy_context)
 bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 {
 	// Create a window to test antialiasing support
-	const fschar_t* ClassName = __TEXT("GLCIrrDeviceWin32");
+	const wchar_t* ClassName = L"GLCIrrDeviceWin32";
 	HINSTANCE lhInstance = GetModuleHandle(0);
 
 	// Register Class
@@ -246,7 +246,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 	const s32 windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
 	const s32 windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
 
-	HWND temporary_wnd=CreateWindow(ClassName, __TEXT(""), style, windowLeft,
+	HWND temporary_wnd=CreateWindow(ClassName, L"", style, windowLeft,
 			windowTop, realWidth, realHeight, NULL, NULL, lhInstance, NULL);
 
 	if (!temporary_wnd)
@@ -262,10 +262,10 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 	PIXELFORMATDESCRIPTOR pfd = {
 		sizeof(PIXELFORMATDESCRIPTOR),             // Size Of This Pixel Format Descriptor
 		1,                                         // Version Number
-		PFD_DRAW_TO_WINDOW |                       // Format Must Support Window
+		(DWORD)(PFD_DRAW_TO_WINDOW |               // Format Must Support Window
 		PFD_SUPPORT_OPENGL |                       // Format Must Support OpenGL
 		(Params.Doublebuffer?PFD_DOUBLEBUFFER:0) | // Must Support Double Buffering
-		(Params.Stereobuffer?PFD_STEREO:0),        // Must Support Stereo Buffer
+		(Params.Stereobuffer?PFD_STEREO:0)),       // Must Support Stereo Buffer
 		PFD_TYPE_RGBA,                             // Request An RGBA Format
 		Params.Bits,                               // Select Our Color Depth
 		0, 0, 0, 0, 0, 0,                          // Color Bits Ignored

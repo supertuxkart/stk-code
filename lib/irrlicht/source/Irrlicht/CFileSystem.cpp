@@ -21,6 +21,7 @@
 #include "irrList.h"
 
 #if defined (_IRR_WINDOWS_API_)
+	#include "utils/string_utils.hpp"
 	#if !defined ( _WIN32_WCE )
 		#include <direct.h> // for _chdir
 		#include <io.h> // for _access
@@ -831,14 +832,17 @@ IFileList* CFileSystem::createFileList(const io::path& directory)
 
 
 		intptr_t hFile;
-		io::path searchPath = Path;
-		searchPath.append('*');
+		std::string searchPath = Path.c_str();
+		searchPath += '*';
+		core::stringw search_path_w = StringUtils::utf8ToWide(searchPath);
 		struct _tfinddata_t c_file;
-		if( (hFile = _tfindfirst( _T(searchPath.c_str()), &c_file )) != -1L )
+		if( (hFile = _tfindfirst(search_path_w.c_str(), &c_file )) != -1L )
 		{
 			do
 			{
-				r->addItem(Path + c_file.name, 0, c_file.size, (_A_SUBDIR & c_file.attrib) != 0, 0);
+				std::string full_path = Path.c_str();
+				full_path += StringUtils::wideToUtf8(c_file.name);
+				r->addItem(full_path.c_str(), 0, c_file.size, (_A_SUBDIR & c_file.attrib) != 0, 0);
 			}
 			while( _tfindnext( hFile, &c_file ) == 0 );
 

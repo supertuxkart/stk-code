@@ -2310,7 +2310,7 @@ int main(int argc, char *argv[] )
 #ifdef WIN32
 //routine for running under windows
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                     LPTSTR lpCmdLine, int nCmdShow)
+                     LPSTR lpCmdLine, int nCmdShow)
 {
     return main(__argc, __argv);
 }

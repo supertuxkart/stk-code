@@ -11,6 +11,8 @@
 #include "irrList.h"
 #include "os.h"
 
+#include "utils/string_utils.hpp"
+
 #include "CTimer.h"
 #include "irrString.h"
 #include "COSOperator.h"
@@ -143,7 +145,7 @@ struct SJoystickWin32Control
     
         activeJoystick.Index=ActiveJoysticks.size();
         activeJoystick.guid=guid;
-        activeJoystick.Name=lpddi->tszProductName;
+        activeJoystick.Name=StringUtils::wideToUtf8(lpddi->tszProductName).c_str();
         if (FAILED(DirectInputDevice->CreateDevice(guid, &activeJoystick.lpdijoy, NULL)))
         {
             os::Printer::log("Could not create DirectInput device", ELL_WARNING);
@@ -593,39 +595,39 @@ void setJoystickName(int index, const JOYCAPS &caps, SJoystickInfo *joystick)
 {
     // As a default use the name given in the joystick structure
     // - though that is always the same name, independent of joystick :(
-    joystick->Name              = caps.szPname;
+    joystick->Name              = StringUtils::wideToUtf8(caps.szPname).c_str();
     joystick->HasGenericName = true;
 
-    core::stringc key = core::stringc(REGSTR_PATH_JOYCONFIG)+"\\"+caps.szRegKey
+    core::stringw key = core::stringw(REGSTR_PATH_JOYCONFIG)+"\\"+caps.szRegKey
                       + "\\"+REGSTR_KEY_JOYCURR;
     HKEY hTopKey = HKEY_LOCAL_MACHINE;
     HKEY hKey;
-    long regresult = RegOpenKeyExA(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
+    long regresult = RegOpenKeyEx(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
     if (regresult != ERROR_SUCCESS)
     {
         hTopKey = HKEY_CURRENT_USER;
-        regresult = RegOpenKeyExA(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
+        regresult = RegOpenKeyEx(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
     }
     if (regresult != ERROR_SUCCESS) return;
 
     /* find the registry key name for the joystick's properties */
-    char regname[256];
+    wchar_t regname[256];
     DWORD regsize = sizeof(regname);
-    core::stringc regvalue = core::stringc("Joystick")+core::stringc(index+1)
+    core::stringw regvalue = core::stringw(L"Joystick")+core::stringw(index+1)
                            + REGSTR_VAL_JOYOEMNAME;
-    regresult = RegQueryValueExA(hKey, regvalue.c_str(), 0, 0,
+    regresult = RegQueryValueEx(hKey, regvalue.c_str(), 0, 0,
                                  (LPBYTE)regname, &regsize);
     RegCloseKey(hKey);
     if (regresult != ERROR_SUCCESS) return;
 
     /* open that registry key */
-    core::stringc regkey = core::stringc(REGSTR_PATH_JOYOEM)+"\\"+regname;
-    regresult = RegOpenKeyExA(hTopKey, regkey.c_str(), 0, KEY_READ, &hKey);
+    core::stringw regkey = core::stringw(REGSTR_PATH_JOYOEM)+"\\"+regname;
+    regresult = RegOpenKeyEx(hTopKey, regkey.c_str(), 0, KEY_READ, &hKey);
     if (regresult != ERROR_SUCCESS) return;
 
     /* find the size for the OEM name text */
     regsize = sizeof(regvalue);
-    regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
+    regresult = RegQueryValueEx(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
                                  NULL, &regsize);
     if (regresult == ERROR_SUCCESS)
     {
@@ -635,7 +637,7 @@ void setJoystickName(int index, const JOYCAPS &caps, SJoystickInfo *joystick)
         if (name)
         {
             /* ... and read it from the registry */
-            regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
+            regresult = RegQueryValueEx(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
                                          (LPBYTE)name, &regsize            );
             joystick->Name = name;
             joystick->HasGenericName = false;
@@ -1323,7 +1325,7 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
     // create the window if we need to and we do not use the null device
     if (!CreationParams.WindowId && CreationParams.DriverType != video::EDT_NULL)
     {
-        const fschar_t* ClassName = __TEXT("CIrrDeviceWin32");
+        const wchar_t* ClassName = L"CIrrDeviceWin32";
 
         // Register Class
         WNDCLASSEX wcex;
@@ -1693,7 +1695,7 @@ void CIrrDeviceWin32::closeDevice()
     if (!ExternalWindow)
     {
         DestroyWindow(HWnd);
-        const fschar_t* ClassName = __TEXT("CIrrDeviceWin32");
+        const wchar_t* ClassName = L"CIrrDeviceWin32";
         HINSTANCE hInstance = GetModuleHandle(0);
         UnregisterClass(ClassName, hInstance);
     }
