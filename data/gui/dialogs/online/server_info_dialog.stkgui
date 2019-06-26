@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
-        <header id="title" width="96%" proportion="3" text_align="center" word_wrap="true"/>
+        <header id="title" width="100%" proportion="3" text_align="center" word_wrap="true"/>
         <spacer height="1%" width="5"/>
         <div width="100%" proportion="3" layout="horizontal-row" >
             <div width="48%" height="100%" layout="vertical-row" >
