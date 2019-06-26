@@ -61,14 +61,6 @@ namespace irr
 		user receiver then no text will be sent to the console. */
 		EET_LOG_TEXT_EVENT,
 
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-		//! A input method event
-		/** Input method events are created by the input method message and passed to IrrlichtDevice::postEventFromUser.
-		Windows: Implemented.
-		Linux / Other: Not yet implemented. */
-		EET_IMPUT_METHOD_EVENT,
-#endif
-
 		//! A user event with user data.
 		/** This is not used by Irrlicht and can be used to send user
 		specific data though the system. The Irrlicht 'window handle'
@@ -167,20 +159,6 @@ namespace irr
 
 		EMBSM_FORCE_32_BIT = 0x7fffffff
 	};
-
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	//! Enumeration for all input method events
-	enum EINPUT_METHOD_EVENT
-	{
-		//! a character from input method.
-		EIME_CHAR_INPUT = 0,
-
-		//! change position of composition window
-		EIME_CHANGE_POS,
-
-		EIME_FORCE_32_BIT = 0x7fffffff
-	};
-#endif
     
     //! Enumeration for all touch input events
 	enum ETOUCH_INPUT_EVENT
@@ -590,21 +568,6 @@ struct SEvent
 		EAPPLICATION_EVENT_TYPE EventType;
 	};
 
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	struct SInputMethodEvent
-	{
-		//! Parent window handle for IMM functions (Windows only)
-		void* Handle;
-
-		//! Character from Input Method
-		wchar_t Char;
-
-		//! Type of input method event
-		EINPUT_METHOD_EVENT Event;
-	};
-#endif
-
-
 	EEVENT_TYPE EventType;
 	union
 	{
@@ -620,9 +583,6 @@ struct SEvent
 		struct SUserEvent UserEvent;
 		struct SSystemEvent SystemEvent;
 		struct SApplicationEvent ApplicationEvent;
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-		struct SInputMethodEvent InputMethodEvent;
-#endif
 	};
 
 };

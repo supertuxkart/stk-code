@@ -12,6 +12,7 @@
 #include "os.h"
 
 #include "utils/string_utils.hpp"
+#include "utils/utf8.h"
 
 #include "CTimer.h"
 #include "irrString.h"
@@ -951,29 +952,6 @@ irr::CIrrDeviceWin32* getDeviceFromHWnd(HWND hWnd)
     return 0;
 }
 
-
-namespace irr
-{
-    void updateICPos(void* hWnd, s32 x, s32 y, s32 height)
-    {
-        COMPOSITIONFORM cf;
-        HWND hwnd = (HWND)hWnd;
-        HIMC hIMC = ImmGetContext(hwnd);
-
-        if(hIMC)
-        {
-            cf.dwStyle = CFS_POINT;
-            cf.ptCurrentPos.x = x;
-            cf.ptCurrentPos.y = y - height;
-
-            ImmSetCompositionWindow(hIMC, &cf);
-
-            ImmReleaseContext(hwnd, hIMC);
-        }
-    }
-} // end of namespace irr
-
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     #ifndef WM_MOUSEWHEEL
@@ -1085,15 +1063,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        if (m->irrMessage == irr::EMIE_LMOUSE_PRESSED_DOWN || m->irrMessage == irr::EMIE_LMOUSE_LEFT_UP)
-        {
-            event.EventType = irr::EET_IMPUT_METHOD_EVENT;
-            event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
-            event.InputMethodEvent.Handle = hWnd;
-
-            if (dev)
-                dev->postEventFromUser(event);
-        }
         return 0;
     }
 
@@ -1112,25 +1081,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_IME_CHAR:
         {
-            event.EventType = irr::EET_IMPUT_METHOD_EVENT;
-            event.InputMethodEvent.Event = irr::EIME_CHAR_INPUT;
-            event.InputMethodEvent.Handle = hWnd;
-
-            event.KeyInput.Char = 0;
-            event.KeyInput.Key = irr::IRR_KEY_OEM_CLEAR;
-            event.KeyInput.Shift = 0;
-            event.KeyInput.Control = 0;
-
-            char bits[2] = { (char)((wParam & 0xff00) >> 8), (char)(wParam & 0xff) };
-            if (bits[0] == 0)
-                event.InputMethodEvent.Char = (wchar_t)wParam;
-            else
-                MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, bits, 2, &event.InputMethodEvent.Char, 1);
-
             dev = getDeviceFromHWnd(hWnd);
-            if (dev)
-                dev->postEventFromUser(event);
-
+            if (!dev)
+                return 0;
+            event.EventType = irr::EET_KEY_INPUT_EVENT;
+            event.KeyInput.PressedDown = true;
+            event.KeyInput.Char = (char32_t)wParam;
+            event.KeyInput.Key = irr::IRR_KEY_UNKNOWN;
+            event.KeyInput.Shift = false;
+            event.KeyInput.Control = false;
+            dev->postEventFromUser(event);
             return 0;
         }
 
@@ -1169,41 +1129,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             event.KeyInput.Shift = ((allKeys[VK_SHIFT] & 0x80)!=0);
             event.KeyInput.Control = ((allKeys[VK_CONTROL] & 0x80)!=0);
+            event.KeyInput.Char = 0;
 
-            // Handle unicode and deadkeys in a way that works since Windows 95 and nt4.0
-            // Using ToUnicode instead would be shorter, but would to my knowledge not run on 95 and 98.
-            WORD keyChars[2];
+            wchar_t keyChars[10] = {0};
             UINT scanCode = HIWORD(lParam);
-            int conversionResult = ToAsciiEx(wParam,scanCode,allKeys,keyChars,0,KEYBOARD_INPUT_HKL);
-            if (conversionResult == 1)
-            {
-                WORD unicodeChar;
-                MultiByteToWideChar(
-                        KEYBOARD_INPUT_CODEPAGE,
-                        MB_PRECOMPOSED, // default
-                        (LPCSTR)keyChars,
-                        sizeof(keyChars),
-                        (WCHAR*)&unicodeChar,
-                        1 );
-                event.KeyInput.Char = unicodeChar;
-            }
-            else
-                event.KeyInput.Char = 0;
-
+            int conversionResult = ToUnicodeEx((UINT)wParam,scanCode,allKeys,keyChars,_countof(keyChars),0,KEYBOARD_INPUT_HKL);
             // allow composing characters like '@' with Alt Gr on non-US keyboards
             if ((allKeys[VK_MENU] & 0x80) != 0)
                 event.KeyInput.Control = 0;
 
             dev = getDeviceFromHWnd(hWnd);
             if (dev)
-                dev->postEventFromUser(event);
-
-            event.EventType = irr::EET_IMPUT_METHOD_EVENT;
-            event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
-            event.InputMethodEvent.Handle = hWnd;
-
-            if (dev)
-                dev->postEventFromUser(event);
+            {
+                if (conversionResult >= 1)
+                {
+                    for (int i = 0; i < conversionResult; i++)
+                    {
+                        event.KeyInput.Char = keyChars[i];
+                        dev->postEventFromUser(event);
+                    }
+                }
+                else
+                   dev->postEventFromUser(event);
+            }
 
             if (message == WM_SYSKEYDOWN || message == WM_SYSKEYUP)
                 return DefWindowProc(hWnd, message, wParam, lParam);
@@ -1255,12 +1203,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 dev->switchToFullScreen();
             }
         }
-        event.EventType = irr::EET_IMPUT_METHOD_EVENT;
-        event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
-        event.InputMethodEvent.Handle = hWnd;
-
-        if (dev)
-            dev->postEventFromUser(event);
         break;
 
     case WM_USER:
@@ -1445,8 +1387,6 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
     // inform driver about the window size etc.
     resizeIfNecessary();
 
-    // for reset the position of composition window
-    updateICPos(HWnd, 0, 0, 0);
 }
 
 

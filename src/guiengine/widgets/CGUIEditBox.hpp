@@ -147,13 +147,8 @@ namespace GUIEngine
         void updateCursorDistance();
         bool processKey(const SEvent& event);
         bool processMouse(const SEvent& event);
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-        bool processIMEEvent(const SEvent& event);
-#endif
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_DEVICE_)
         //! calculates the input composition position
         core::position2di calculateICPos();
-#endif
         s32 getCursorPos(s32 x, s32 y);
         void updateGlyphLayouts();
 
@@ -192,7 +187,10 @@ namespace GUIEngine
          * windows */
         std::u32string m_edit_text;
         std::vector<GlyphLayout> m_glyph_layouts;
+        // Pre-edit surrogate chars
+        std::vector<wchar_t> m_surrogate_chars;
         void correctCursor(s32& cursor_pos, bool left);
+        void updateSurrogatePairText();
     };
 
 

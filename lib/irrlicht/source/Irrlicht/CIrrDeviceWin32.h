@@ -307,7 +307,7 @@ namespace irr
             //! Return a system-specific size which is supported for cursors. Larger icons will fail, smaller icons might work.
 			virtual core::dimension2di getSupportedIconSize() const;
 
-            void update();
+			void update();
 
 		private:
 
@@ -385,6 +385,8 @@ namespace irr
 
 		//! returns the win32 cursor control
 		CCursorControl* getWin32CursorControl();
+
+		HWND getHandle() const { return HWnd; }
 
 	private:
 
