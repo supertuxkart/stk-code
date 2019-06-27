@@ -277,8 +277,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
         sd.m_kart = getKart(m_ball_hitter)->getIdent();
         sd.m_player = getKart(m_ball_hitter)->getController()->getName();
-        sd.m_country_flag = StringUtils::getCountryFlag(
-            race_manager->getKartInfo(m_ball_hitter).getCountryCode());
+        if (race_manager->getKartGlobalPlayerId(m_ball_hitter) > -1)
+        {
+            sd.m_country_flag = StringUtils::getCountryFlag(
+                race_manager->getKartInfo(m_ball_hitter).getCountryCode());
+        }
         if (sd.m_correct_goal)
         {
             m_karts[m_ball_hitter]->getKartModel()
@@ -711,7 +714,7 @@ void SoccerWorld::enterRaceOverState()
         for (const int &i : m_goal_frame)
             squared_sum = squared_sum + (double(i - mean) * double(i - mean));
 
-        // Use sample st. deviation (n−1) as the profiling can't be run forever
+        // Use sample st. deviation (n-1) as the profiling can't be run forever
         const int stdev = int(sqrt(squared_sum / (m_goal_frame.size() - 1)));
 
         int median = 0;

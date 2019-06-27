@@ -566,12 +566,15 @@ void RaceResultGUI::displayCTFResults()
         if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
             continue;
         result_text = kart->getController()->getName();
-        const core::stringw& flag = StringUtils::getCountryFlag(
-            race_manager->getKartInfo(i).getCountryCode());
-        if (!flag.empty())
+        if (race_manager->getKartGlobalPlayerId(i) > -1)
         {
-            result_text += L" ";
-            result_text += flag;
+            const core::stringw& flag = StringUtils::getCountryFlag(
+                race_manager->getKartInfo(i).getCountryCode());
+            if (!flag.empty())
+            {
+                result_text += L" ";
+                result_text += flag;
+            }
         }
         result_text.append("  ");
         if (kart->isEliminated())
@@ -611,12 +614,15 @@ void RaceResultGUI::displayCTFResults()
         if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
             continue;
         result_text = kart->getController()->getName();
-        const core::stringw& flag = StringUtils::getCountryFlag(
-            race_manager->getKartInfo(i).getCountryCode());
-        if (!flag.empty())
+        if (race_manager->getKartGlobalPlayerId(i) > -1)
         {
-            result_text += L" ";
-            result_text += flag;
+            const core::stringw& flag = StringUtils::getCountryFlag(
+                race_manager->getKartInfo(i).getCountryCode());
+            if (!flag.empty())
+            {
+                result_text += L" ";
+                result_text += flag;
+            }
         }
         result_text.append("  ");
         if (kart->isEliminated())
@@ -715,12 +721,15 @@ void RaceResultGUI::displayCTFResults()
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
             ri->m_kart_name = kart->getController()->getName();
-            const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(kart->getWorldKartId()).getCountryCode());
-            if (!flag.empty())
+            if (race_manager->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
             {
-                ri->m_kart_name += L" ";
-                ri->m_kart_name += flag;
+                const core::stringw& flag = StringUtils::getCountryFlag(
+                    race_manager->getKartInfo(kart->getWorldKartId()).getCountryCode());
+                if (!flag.empty())
+                {
+                    ri->m_kart_name += L" ";
+                    ri->m_kart_name += flag;
+                }
             }
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -1122,12 +1131,15 @@ void RaceResultGUI::displayCTFResults()
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
             ri->m_kart_name = kart->getController()->getName();
-            const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(kart->getWorldKartId()).getCountryCode());
-            if (!flag.empty())
+            if (race_manager->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
             {
-                ri->m_kart_name += L" ";
-                ri->m_kart_name += flag;
+                const core::stringw& flag = StringUtils::getCountryFlag(
+                    race_manager->getKartInfo(kart->getWorldKartId()).getCountryCode());
+                if (!flag.empty())
+                {
+                    ri->m_kart_name += L" ";
+                    ri->m_kart_name += flag;
+                }
             }
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated

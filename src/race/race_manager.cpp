@@ -222,6 +222,8 @@ int RaceManager::getLocalPlayerGPRank(const int player_id) const
  */
 void RaceManager::setNumPlayers(int players, int local_players)
 {
+    // Clear all previous game info (like country flags)
+    m_player_karts.clear();
     m_player_karts.resize(players);
     if(local_players>-1)
         m_num_local_players = local_players;
