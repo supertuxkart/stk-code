@@ -89,12 +89,19 @@ void RegisterScreen::init()
     }
     else if (PlayerManager::get()->getNumPlayers() == 0)
     {
-        if (getenv("USERNAME") != NULL)        // for windows
-            username = getenv("USERNAME");
-        else if (getenv("USER") != NULL)       // Linux, Macs
+#if defined(WIN32)
+        std::vector<wchar_t> env;
+        // An environment variable has a maximum size limit of 32,767 characters
+        env.resize(32767, 0);
+        DWORD length = GetEnvironmentVariable(L"USERNAME", env.data(), 32767);
+        if (length != 0)
+            username = env.data();
+#else
+        if (getenv("USER") != NULL)          // Linux, Macs
             username = getenv("USER");
-        else if (getenv("LOGNAME") != NULL)    // Linux, Macs
+        else if (getenv("LOGNAME") != NULL)  // Linux, Macs
             username = getenv("LOGNAME");
+#endif
     }
 
     TextBoxWidget* local_username = getWidget<TextBoxWidget>("local_username");

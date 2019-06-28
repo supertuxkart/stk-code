@@ -348,12 +348,19 @@ void PlayerManager::addDefaultPlayer()
 {
     std::string username = "Player";
 
-    if(getenv("USERNAME")!=NULL)        // for windows
-        username = getenv("USERNAME");
-    else if(getenv("USER")!=NULL)       // Linux, Macs
+#if defined(WIN32)
+    std::vector<wchar_t> env;
+    // An environment variable has a maximum size limit of 32,767 characters
+    env.resize(32767, 0);
+    DWORD length = GetEnvironmentVariable(L"USERNAME", env.data(), 32767);
+    if (length != 0)
+        username = StringUtils::wideToUtf8(env.data());
+#else
+    if (getenv("USER") != NULL)          // Linux, Macs
         username = getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
+    else if (getenv("LOGNAME") != NULL)  // Linux, Macs
         username = getenv("LOGNAME");
+#endif
 
     // Set the name as the default name, but don't mark it as 'default'
     // yet, since not having a default player forces the player selection

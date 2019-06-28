@@ -859,9 +859,13 @@ void FileManager::checkAndCreateConfigDir()
 
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
-        if (getenv("APPDATA") != NULL)
+        std::vector<wchar_t> env;
+        // An environment variable has a maximum size limit of 32,767 characters
+        env.resize(32767, 0);
+        DWORD length = GetEnvironmentVariable(L"APPDATA", env.data(), 32767);
+        if (length != 0)
         {
-            m_user_config_dir  = getenv("APPDATA");
+            m_user_config_dir = StringUtils::wideToUtf8(env.data());
             if (!checkAndCreateDirectory(m_user_config_dir))
             {
                 Log::error("[FileManager]", "Can't create config dir '%s"
