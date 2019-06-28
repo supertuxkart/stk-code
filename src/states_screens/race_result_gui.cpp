@@ -886,13 +886,9 @@ void RaceResultGUI::displayCTFResults()
     }   // filterActions
 
     //-----------------------------------------------------------------------------
-    /** Called once a frame, this now triggers the rendering of the actual
-     *  race result gui.
-     */
+    /** Called once a frame */
     void RaceResultGUI::onUpdate(float dt)
     {
-        renderGlobal(dt);
-
         // When the finish sound has been played, start the race over music.
         if (m_finish_sound && m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
         {
@@ -909,6 +905,16 @@ void RaceResultGUI::displayCTFResults()
             }
         }
     }   // onUpdate
+    
+    //-----------------------------------------------------------------------------
+    /** Called once a frame, this now triggers the rendering of the actual
+     *  race result gui.
+     */
+    void RaceResultGUI::onDraw(float dt)
+    {
+        renderGlobal(dt);
+    }   // onDraw
+
 
     //-----------------------------------------------------------------------------
     /** Render all global parts of the race gui, i.e. things that are only

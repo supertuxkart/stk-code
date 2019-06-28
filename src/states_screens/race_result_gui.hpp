@@ -230,6 +230,7 @@ public:
     virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual void onUpdate(float dt) OVERRIDE;
+    virtual void onDraw(float dt) OVERRIDE;
 
     /** No more messages need to be displayed, but the function might still be
      *  called (e.g. 'new lap' message if the end controller is used for more
