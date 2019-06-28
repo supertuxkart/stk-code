@@ -17,6 +17,7 @@
 
 #include "utils/separate_process.hpp"
 #include "io/file_manager.hpp"
+#include "utils/command_line.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -50,11 +51,8 @@
 std::string SeparateProcess::getCurrentExecutableLocation()
 {
 #ifdef WIN32
-    HMODULE moudle = GetModuleHandle(NULL);
-    char path[1024];
-    if (GetModuleFileNameA(moudle, path, 1024) < 1024)
-        return file_manager->getFileSystem()->getAbsolutePath(path).c_str();
-    return "";
+    // We already set the full path of exe name in windows
+    return CommandLine::getExecName();
 #elif defined (__APPLE__)
     char path[1024];
     unsigned buf_size = 1024;
