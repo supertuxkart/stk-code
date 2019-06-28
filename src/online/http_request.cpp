@@ -21,6 +21,7 @@
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/translation.hpp"
 
 #ifdef WIN32
@@ -210,7 +211,7 @@ namespace Online
         FILE *fout = NULL;
         if (m_filename.size() > 0)
         {
-            fout = fopen((m_filename+".part").c_str(), "wb");
+            fout = FileUtils::fopenU8Path(m_filename + ".part", "wb");
 
             if (!fout)
             {

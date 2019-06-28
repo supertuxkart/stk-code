@@ -23,6 +23,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
@@ -198,7 +199,7 @@ void Network::openLog()
     {
         std::string s = file_manager
             ->getUserConfigFile(FileManager::getStdoutName()+".packet");
-        m_log_file.setAtomic(fopen(s.c_str(), "w+"));
+        m_log_file.setAtomic(FileUtils::fopenU8Path(s, "w+"));
         if (!m_log_file.getData())
             Log::warn("STKHost", "Network packets won't be logged: no file.");
     }

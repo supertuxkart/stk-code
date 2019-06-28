@@ -30,6 +30,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 
 MusicOggStream::MusicOggStream(float loop_start)
@@ -58,7 +59,7 @@ bool MusicOggStream::load(const std::string& filename)
     m_fileName = filename;
     if(m_fileName=="") return false;
 
-    m_oggFile = fopen(m_fileName.c_str(), "rb");
+    m_oggFile = FileUtils::fopenU8Path(m_fileName, "rb");
 
     if(!m_oggFile)
     {

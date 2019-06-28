@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "network/network_config.hpp"
+#include "utils/file_utils.hpp"
 
 #include <cstdio>
 #include <ctime>
@@ -293,7 +294,7 @@ void Log::flushBuffers()
  */
 void Log::openOutputFiles(const std::string &logout)
 {
-    m_file_stdout = fopen(logout.c_str(), "w");
+    m_file_stdout = FileUtils::fopenU8Path(logout, "w");
     if (!m_file_stdout)
     {
         Log::error("main", "Can not open log file '%s'. Writing to "
