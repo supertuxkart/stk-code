@@ -41,6 +41,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -119,15 +120,15 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         const std::string file_name = file_manager->getAsset("localized_name.txt");
         try
         {
-            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
-            if (!in.get())
+            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
+            if (!in.is_open())
             {
                 Log::error("translation", "error: failure opening: '%s'.",
                     file_name.c_str());
             }
             else
             {
-                for (std::string line; std::getline(*in, line, ';'); )
+                for (std::string line; std::getline(in, line, ';'); )
                 {
                     line = StringUtils::removeWhitespaces(line);
 
@@ -166,8 +167,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         const std::string file_name = file_manager->getAsset("country_names.csv");
         try
         {
-            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
-            if (!in.get())
+            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
+            if (!in.is_open())
             {
                 Log::error("translation", "error: failure opening: '%s'.",
                     file_name.c_str());
@@ -176,7 +177,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             {
                 std::vector<std::string> header;
                 std::string line;
-                while (!StringUtils::safeGetline(*in, line).eof())
+                while (!StringUtils::safeGetline(in, line).eof())
                 {
                     std::vector<std::string> lists = StringUtils::split(line, ';');
                     if (lists.size() < 2)
@@ -220,8 +221,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         const std::string file_name = file_manager->getAsset("thaidict.txt");
         try
         {
-            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
-            if (!in.get())
+            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
+            if (!in.is_open())
             {
                 Log::error("translation", "error: failure opening: '%s'.",
                     file_name.c_str());
@@ -229,7 +230,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             else
             {
                 std::string line;
-                while (!StringUtils::safeGetline(*in, line).eof())
+                while (!StringUtils::safeGetline(in, line).eof())
                 {
                     const std::u32string& u32line = StringUtils::utf8ToUtf32(line);
                     char32_t thai = u32line[0];

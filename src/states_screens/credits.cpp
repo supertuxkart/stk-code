@@ -32,6 +32,7 @@ using irr::core::stringc;
 #include "online/link_helper.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -122,7 +123,8 @@ void CreditsScreen::loadedFromFile()
 
     std::string creditsfile = file_manager->getAsset("CREDITS");
 
-    std::ifstream file( creditsfile.c_str(), std::ios::binary ) ;
+    std::ifstream file(
+        FileUtils::getPortableReadingPath(creditsfile), std::ios::binary);
 
     if (file.fail() || !file.is_open() || file.eof())
     {

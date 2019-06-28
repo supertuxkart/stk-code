@@ -52,7 +52,7 @@ namespace FileUtils
     // ------------------------------------------------------------------------
     /* Return a path which can be opened in all systems, as long as u8_path
      * is unicode encoded. */
-    inline std::string getPortablePath(const std::string& u8_path)
+    inline std::string getPortableReadingPath(const std::string& u8_path)
     {
 #if defined(WIN32)
         return Private::getShortPath(u8_path);

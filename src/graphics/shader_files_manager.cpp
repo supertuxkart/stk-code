@@ -24,6 +24,7 @@
 #include "graphics/graphics_restrictions.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/file_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -42,7 +43,8 @@ const std::string& ShaderFilesManager::getHeader()
     // Only read file first time
     if (shader_header.empty())
     {
-        std::ifstream stream(file_manager->getShader("header.txt"), std::ios::in);
+        std::ifstream stream(FileUtils::getPortableReadingPath(
+            file_manager->getShader("header.txt")), std::ios::in);
         if (stream.is_open())
         {
             std::string line = "";
@@ -59,9 +61,12 @@ const std::string& ShaderFilesManager::getHeader()
 void ShaderFilesManager::readFile(const std::string& file, 
                                   std::ostringstream& code, bool not_header)
 {
-    std::ifstream stream(((file.find('/') != std::string::npos ||
+    std::string path = FileUtils::getPortableReadingPath(
+        ((file.find('/') != std::string::npos ||
         file.find('\\') != std::string::npos) && not_header) ?
-        file : file_manager->getShader(file), std::ios::in);
+        file : file_manager->getShader(file));
+
+    std::ifstream stream(path, std::ios::in);
 
     if (!stream.is_open())
     {

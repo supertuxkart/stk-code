@@ -29,6 +29,7 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -44,7 +45,7 @@ GameSetup::GameSetup()
     {
         const std::string& path = ServerConfig::getConfigDirectory() + "/" +
             motd;
-        std::ifstream message(path);
+        std::ifstream message(FileUtils::getPortableReadingPath(path));
         if (message.is_open())
         {
             for (std::string line; std::getline(message, line); )

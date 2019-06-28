@@ -18,6 +18,7 @@
 
 #include "guiengine/emoji_keyboard.hpp"
 #include "io/file_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/utf8.h"
 
@@ -57,8 +58,8 @@ ScreenKeyboard::KeyboardLayout*
         std::vector<std::string> emoji_chars;
         try
         {
-            std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
-            if (!in.get())
+            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
+            if (!in.is_open())
             {
                 Log::error("EmojiKeyboard", "Error: failure opening: '%s'.",
                     file_name.c_str());
@@ -66,7 +67,7 @@ ScreenKeyboard::KeyboardLayout*
             else
             {
                 std::string line;
-                while (!StringUtils::safeGetline(*in, line).eof())
+                while (!StringUtils::safeGetline(in, line).eof())
                 {
                     // Check for possible bom mark
                     if (line[0] == '#' ||
