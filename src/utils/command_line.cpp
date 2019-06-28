@@ -20,6 +20,11 @@
 
 #include "config/user_config.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+
+#if defined(WIN32)
+#include <windows.h>
+#endif
 
 std::vector<std::string>  CommandLine::m_argv;
 std::string               CommandLine::m_exec_name="";
@@ -31,11 +36,16 @@ std::string               CommandLine::m_exec_name="";
  */
 void CommandLine::init(unsigned int argc, char *argv[])
 {
+#if defined(WIN32)
+    wchar_t path[MAX_PATH] = {0};
+    GetModuleFileName(NULL, path, MAX_PATH);
+    m_exec_name = StringUtils::wideToUtf8(path);
+#else
     if (argc > 0)
     {
         m_exec_name = argv[0];
     }
-
+#endif
     for (unsigned int i = 1; i < argc; i++)
     {
         m_argv.push_back(argv[i]);
