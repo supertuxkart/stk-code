@@ -37,6 +37,7 @@ export ASSETS_DIRS="library models music sfx textures"
 export TEXTURE_SIZE=256
 export JPEG_QUALITY=85
 export PNG_QUALITY=95
+export PNGQUANT_QUALITY=90
 export SOUND_QUALITY=42
 export SOUND_MONO=1
 export SOUND_SAMPLE=32000
@@ -270,7 +271,7 @@ optimize_png()
         return
     fi
     
-    pngquant --force --skip-if-larger --output "$FILE" -- "$FILE"
+    pngquant --force --skip-if-larger --quality 0-$PNGQUANT_QUALITY --output "$FILE" -- "$FILE"
 }
 
 convert_to_jpg()
