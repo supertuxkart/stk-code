@@ -295,9 +295,7 @@ namespace Online
                                "Could not removed existing addons.xml file.");
                     m_curl_code = CURLE_WRITE_ERROR;
                 }
-                int ret = rename((m_filename+".part").c_str(),
-                                 m_filename.c_str()           );
-
+                int ret = FileUtils::renameU8Path(m_filename + ".part", m_filename);
                 // In case of an error, set the status to indicate this
                 if (ret != 0)
                 {
