@@ -1152,7 +1152,7 @@ void RaceResultGUI::displayCTFResults()
             {
                 float time = race_manager->getOverallTime(kart_id);
                 ri->m_finish_time_string
-                    = StringUtils::timeToString(time, time_precision, true, /*display hours*/ (max_time > 7199.99f)).c_str();
+                    = StringUtils::timeToString(time, time_precision, true, /*display hours*/ (max_time > 3599.99f)).c_str();
             }
             ri->m_start_at = m_time_between_rows * rank;
             ri->m_x_pos = (float)UserConfigParams::m_width;
