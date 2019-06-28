@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "utils/log.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -191,8 +192,8 @@ void writeServerConfigToDisk()
     const std::string& config_xml = getServerConfigXML();
     try
     {
-        std::ofstream configfile(g_server_config_path.c_str(),
-            std::ofstream::out);
+        std::ofstream configfile(FileUtils::getPortableWritingPath(
+            g_server_config_path), std::ofstream::out);
         configfile << config_xml;
         configfile.close();
     }

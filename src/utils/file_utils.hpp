@@ -21,12 +21,15 @@
 #include <stdio.h>
 #include <string>
 #include <sys/stat.h>
+#include "irrString.h"
 
 namespace FileUtils
 {
     namespace Private
     {
         std::string getShortPath(const std::string& u8_path);
+        std::string getShortPathW(const irr::core::stringw& w_path);
+        std::string getShortPathWriting(const std::string& u8_path);
     }
     // ------------------------------------------------------------------------
     FILE* fopenU8Path(const std::string& u8_path, const char* mode);
@@ -36,11 +39,22 @@ namespace FileUtils
     int renameU8Path(const std::string& u8_path_old,
                      const std::string& u8_path_new);
     // ------------------------------------------------------------------------
+    /* Return a path which can be opened for writing in all systems, as long as
+     * u8_path is unicode encoded. */
+    inline std::string getPortableWritingPath(const std::string& u8_path)
+    {
+#if defined(WIN32)
+        return Private::getShortPathWriting(u8_path);
+#else
+        return u8_path;
+#endif
+    }
+    // ------------------------------------------------------------------------
     /* Return a path which can be opened in all systems, as long as u8_path
      * is unicode encoded. */
     inline std::string getPortablePath(const std::string& u8_path)
     {
-#ifdef WIN32
+#if defined(WIN32)
         return Private::getShortPath(u8_path);
 #else
         return u8_path;

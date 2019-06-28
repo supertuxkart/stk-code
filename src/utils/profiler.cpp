@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
@@ -545,8 +546,8 @@ void Profiler::writeToFile()
     // First CPU data
     for (int thread_id = 0; thread_id < m_threads_used; thread_id++)
     {
-        std::ofstream f(base_name + ".profile-cpu-" +
-                        StringUtils::toString(thread_id) );
+        std::ofstream f(FileUtils::getPortableWritingPath(
+            base_name + ".profile-cpu-" + StringUtils::toString(thread_id)));
         ThreadData &td = m_all_threads_data[thread_id];
         f << "#  ";
         for (unsigned int i = 0; i < td.m_ordered_headings.size(); i++)
@@ -567,7 +568,7 @@ void Profiler::writeToFile()
         f.close();
     }   // for all thread_ids
 
-    std::ofstream f_gpu(base_name + ".profile-gpu");
+    std::ofstream f_gpu(FileUtils::getPortableWritingPath(base_name + ".profile-gpu"));
     f_gpu << "# ";
 
     for (unsigned i = 0; i < Q_LAST; i++)

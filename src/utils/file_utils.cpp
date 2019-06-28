@@ -26,24 +26,40 @@
 // ----------------------------------------------------------------------------
 #if defined(WIN32)
 #include <windows.h>
+// ----------------------------------------------------------------------------
+namespace u8checker
+{
+    bool hasUnicode(const std::string& u8_path)
+    {
+        bool has_unicode = false;
+        for (char c : u8_path)
+        {
+            if (static_cast<unsigned char>(c) > 127)
+            {
+                has_unicode = true;
+                break;
+            }
+        }
+        return has_unicode;
+    }   // hasUnicode
+}   // namespace u8checker
+
+// ----------------------------------------------------------------------------
 /** Return a 8.3 filename if u8_path contains unicode character
  */
 std::string FileUtils::Private::getShortPath(const std::string& u8_path)
 {
-    bool has_unicode = false;
-    for (char c : u8_path)
-    {
-        if (static_cast<unsigned char>(c) > 127)
-        {
-            has_unicode = true;
-            break;
-        }
-    }
-    if (!has_unicode)
+    if (!u8checker::hasUnicode(u8_path))
         return u8_path;
 
-    irr::core::stringw wpath = StringUtils::utf8ToWide(u8_path);
-    size_t length = GetShortPathNameW(wpath.c_str(), NULL, 0);
+    irr::core::stringw w_path = StringUtils::utf8ToWide(u8_path);
+    return FileUtils::Private::getShortPathW(w_path);
+}   // getShortPath
+
+// ----------------------------------------------------------------------------
+std::string FileUtils::Private::getShortPathW(const irr::core::stringw& w_path)
+{
+    size_t length = GetShortPathNameW(w_path.c_str(), NULL, 0);
     if (length == 0)
     {
         Log::error("FileUtils",
@@ -52,7 +68,8 @@ std::string FileUtils::Private::getShortPath(const std::string& u8_path)
     }
     std::vector<wchar_t> short_path;
     short_path.resize(length);
-    length = GetShortPathNameW(wpath.c_str(), short_path.data(), length);
+    length = GetShortPathNameW(w_path.c_str(), short_path.data(),
+        (DWORD)length);
     if (length == 0)
     {
         Log::error("FileUtils",
@@ -65,12 +82,34 @@ std::string FileUtils::Private::getShortPath(const std::string& u8_path)
     // Reserve enough space for conversion
     result.resize(length * 4);
     length = WideCharToMultiByte(CP_ACP, 0, short_path.data(), -1, &result[0],
-        result.size(), NULL, NULL);
+        (int)result.size(), NULL, NULL);
     // Passing -1 as input string length will null terminated the output, so
     // length written included a null terminator
     result.resize(length - 1);
     return result;
-}   // getShortPath
+}   // getShortPathW
+
+// ----------------------------------------------------------------------------
+std::string FileUtils::Private::getShortPathWriting(const std::string& u8_path)
+{
+    if (!u8checker::hasUnicode(u8_path))
+        return u8_path;
+
+    // Create an empty file first if not exist so we can get the short path
+    irr::core::stringw w_path = StringUtils::utf8ToWide(u8_path);
+    if (_waccess(w_path.c_str(), 0) == -1)
+    {
+        FILE* fp = _wfopen(w_path.c_str(), L"wb");
+        if (!fp)
+        {
+            Log::error("FileUtils",
+                "Failed to create empty file before writing.");
+            return "";
+        }
+        fclose(fp);
+    }
+    return FileUtils::Private::getShortPathW(w_path);
+}   // getShortPathWriting
 #endif
 
 // ----------------------------------------------------------------------------

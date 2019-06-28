@@ -34,6 +34,7 @@
 #include "states_screens/kart_selection.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -605,7 +606,8 @@ void AddonsManager::saveInstalled()
 {
     // Put the addons in the xml file
     // Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
-    std::ofstream xml_installed(m_file_installed.c_str());
+    std::ofstream xml_installed(
+        FileUtils::getPortableWritingPath(m_file_installed));
 
     // Write the header of the xml file
     xml_installed << "<?xml version=\"1.0\"?>" << std::endl;

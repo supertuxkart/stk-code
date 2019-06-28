@@ -31,6 +31,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -634,8 +635,7 @@ void DeviceManager::save()
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serializing input.xml...");
 
 
-    std::ofstream configfile;
-    configfile.open (filepath.c_str());
+    std::ofstream configfile(FileUtils::getPortableWritingPath(filepath));
 
     if(!configfile.is_open())
     {
