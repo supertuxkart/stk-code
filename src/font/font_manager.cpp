@@ -555,8 +555,13 @@ FT_Face FontManager::loadColorEmoji()
     FT_Face face = NULL;
     const std::string loc = file_manager->getAssetChecked(FileManager::TTF,
         stk_config->m_color_emoji_ttf.c_str(), true);
-    font_manager->checkFTError(FT_New_Face(
-        m_ft_library, loc.c_str(), 0, &face), loc + " is loaded");
+    FT_Error err = FT_New_Face(m_ft_library, loc.c_str(), 0, &face);
+    if (err > 0)
+    {
+        Log::error("FontManager", "Something wrong when loading color emoji! "
+            "The error code was %d.", err);
+        return NULL;
+    }
 
     if (!FT_HAS_COLOR(face) || face->num_fixed_sizes == 0)
     {
