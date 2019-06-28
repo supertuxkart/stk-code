@@ -4,6 +4,7 @@
 
 #include "CReadFile.h"
 
+#include "utils/file_utils.hpp"
 namespace irr
 {
 namespace io
@@ -73,11 +74,7 @@ void CReadFile::openFile()
 		return;
 	}
 
-#if defined ( _IRR_WCHAR_FILESYSTEM )
-	File = _wfopen(Filename.c_str(), L"rb");
-#else
-	File = fopen(Filename.c_str(), "rb");
-#endif
+	File = FileUtils::fopenU8Path(Filename.c_str(), "rb");
 
 	if (File)
 	{

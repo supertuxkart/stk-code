@@ -26,6 +26,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -385,7 +386,7 @@ FileManager::~FileManager()
             continue;
         }
         struct stat mystat;
-        stat(full_path.c_str(), &mystat);
+        FileUtils::statU8Path(full_path, &mystat);
         StkTime::TimeType current = StkTime::getTimeSinceEpoch();
         if(current - mystat.st_ctime <24*3600)
         {
@@ -797,7 +798,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
-    bool error = _mkdir(path.c_str()) != 0;
+    bool error = _wmkdir(StringUtils::utf8ToWide(path).c_str()) != 0;
 #else
     bool error = mkdir(path.c_str(), 0755) != 0;
 #endif
@@ -1192,8 +1193,8 @@ void FileManager::setStdoutDir(const std::string& dir)
 
     if (!m_stdout_dir.empty() && m_stdout_dir[m_stdout_dir.size() - 1] != '/')
     {
-         m_stdout_dir += "/";
-     }
+        m_stdout_dir += "/";
+    }
 }   // setStdoutDir
 
 //-----------------------------------------------------------------------------
@@ -1215,7 +1216,7 @@ void FileManager::redirectOutput()
         out_new << logoutfile << "." << i-1;
         if(fileExists(out_new.str()))
         {
-            rename(out_new.str().c_str(), out_old.str().c_str());
+            FileUtils::renameU8Path(out_new.str(), out_old.str());
         }
     }   // for i in NUM_BACKUPS
 
@@ -1224,7 +1225,7 @@ void FileManager::redirectOutput()
         std::ostringstream out;
         out << logoutfile<<".1";
         // No good place to log error messages when log is not yet initialised
-        rename(logoutfile.c_str(), out.str().c_str());
+        FileUtils::renameU8Path(logoutfile, out.str());
     }
 
     //Enable logging of stdout and stderr to logfile
@@ -1313,7 +1314,7 @@ bool FileManager::isDirectory(const std::string &path) const
     // a '/' at the end of the path.
     if(s[s.size()-1]=='/')
         s.erase(s.end()-1, s.end());
-    if(stat(s.c_str(), &mystat) < 0) return false;
+    if(FileUtils::statU8Path(s, &mystat) < 0) return false;
     return S_ISDIR(mystat.st_mode);
 }   // isDirectory
 
@@ -1373,9 +1374,15 @@ bool FileManager::removeFile(const std::string &name) const
        return true;
 
     struct stat mystat;
-    if(stat(name.c_str(), &mystat) < 0) return false;
+    if(FileUtils::statU8Path(name, &mystat) < 0) return false;
     if( S_ISREG(mystat.st_mode))
-        return remove(name.c_str())==0;
+    {
+#if defined(WIN32)
+        return _wremove(StringUtils::utf8ToWide(name).c_str()) == 0;
+#else
+        return remove(name.c_str()) == 0;
+#endif
+    }
     return false;
 }   // removeFile
 
@@ -1434,10 +1441,10 @@ bool FileManager::removeDirectory(const std::string &name) const
  */
 bool FileManager::copyFile(const std::string &source, const std::string &dest)
 {
-    FILE *f_source = fopen(source.c_str(), "rb");
+    FILE *f_source = FileUtils::fopenU8Path(source, "rb");
     if(!f_source) return false;
 
-    FILE *f_dest = fopen(dest.c_str(), "wb");
+    FILE *f_dest = FileUtils::fopenU8Path(dest, "wb");
     if(!f_dest)
     {
         fclose(f_source);
@@ -1472,6 +1479,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
     fclose(f_dest);
     return true;
 }   // copyFile
+
 // ----------------------------------------------------------------------------
 /** Returns true if the first file is newer than the second. The comparison is
 *   based on the modification time of the two files.
@@ -1480,7 +1488,7 @@ bool FileManager::fileIsNewer(const std::string& f1, const std::string& f2) cons
 {
     struct stat stat1;
     struct stat stat2;
-    stat(f1.c_str(), &stat1);
-    stat(f2.c_str(), &stat2);
+    FileUtils::statU8Path(f1, &stat1);
+    FileUtils::statU8Path(f2, &stat2);
     return stat1.st_mtime > stat2.st_mtime;
 }   // fileIsNewer
