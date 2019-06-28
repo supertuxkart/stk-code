@@ -26,6 +26,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 
 #include <irrlicht.h>
@@ -108,8 +109,8 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
 
     char s[1024], s1[1024];
     if (StringUtils::getExtension(fn) != "replay") return false;
-    FILE *fd = fopen(custom_replay ? fn.c_str() :
-        (file_manager->getReplayDir() + fn).c_str(), "r");
+    FILE* fd = FileUtils::fopenU8Path(custom_replay ? fn :
+        file_manager->getReplayDir() + fn, "r");
     if (fd == NULL) return false;
     ReplayData rd;
 
