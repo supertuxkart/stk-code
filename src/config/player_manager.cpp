@@ -346,7 +346,7 @@ void PlayerManager::enforceCurrentPlayer()
  */
 void PlayerManager::addDefaultPlayer()
 {
-    std::string username = "Player";
+    core::stringw username = "Player";
 
 #if defined(WIN32)
     std::vector<wchar_t> env;
@@ -354,7 +354,7 @@ void PlayerManager::addDefaultPlayer()
     env.resize(32767, 0);
     DWORD length = GetEnvironmentVariable(L"USERNAME", env.data(), 32767);
     if (length != 0)
-        username = StringUtils::wideToUtf8(env.data());
+        username = env.data();
 #else
     if (getenv("USER") != NULL)          // Linux, Macs
         username = getenv("USER");
@@ -365,7 +365,7 @@ void PlayerManager::addDefaultPlayer()
     // Set the name as the default name, but don't mark it as 'default'
     // yet, since not having a default player forces the player selection
     // screen to be shown.
-    m_all_players.push_back(new Online::OnlinePlayerProfile(username.c_str()) );
+    m_all_players.push_back(new Online::OnlinePlayerProfile(username));
 
 }   // addDefaultPlayer
 
