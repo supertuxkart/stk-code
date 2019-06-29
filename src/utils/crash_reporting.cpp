@@ -16,17 +16,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "crash_reporting.hpp"
-
+#include "utils/crash_reporting.hpp"
+#include "utils/command_line.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
 #include <string.h>
 
-#if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__)
+#if defined(WIN32) && !defined(DEBUG)
     // --------------------- Windows version -----------------
-    #include <Windows.h>
-    #include <DbgHelp.h>
+    #include <windows.h>
+    #include <dbghelp.h>
     #include <stdlib.h>
     #include <signal.h>
     #include <new.h>
@@ -54,9 +54,9 @@
         _Out_opt_ PDWORD64 pdwDisplacement,
         _Inout_ PIMAGEHLP_SYMBOL64  Symbol
     );
-    typedef BOOL  (__stdcall *tSymInitialize)(
+    typedef BOOL  (__stdcall *tSymInitializeW)(
         _In_ HANDLE hProcess,
-        _In_opt_ PCSTR UserSearchPath,
+        _In_opt_ PCWSTR UserSearchPath,
         _In_ BOOL fInvadeProcess
     );
     typedef DWORD (__stdcall *tSymSetOptions)(
@@ -150,9 +150,13 @@
             SetUnhandledExceptionFilter(sehHandler);    // Top-level SEH handler
             _set_purecall_handler(pureCallHandler);     // Pure virtual function calls handler
 
+            // Disable in mingw because it requires ucrtbase.dll which only
+            // bundled in windows 10
+#if !defined(__MINGW32__)
             // Catch new operator memory allocation exceptions
             _set_new_mode(1); // Force malloc() to call new handler too
             _set_new_handler(newHandler);
+#endif
 
             _set_invalid_parameter_handler(invalidParameterHandler);     // Catch invalid parameter exceptions.
             //_set_security_error_handler(securityHandler);              // Catch buffer overrun exceptions
@@ -168,7 +172,7 @@
         // --------------------------------------------------------------------
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext)
         {
-            HINSTANCE hDbgHelpDll = LoadLibraryA("DbgHelp.dll");
+            HINSTANCE hDbgHelpDll = LoadLibrary(L"DbgHelp.dll");
             if (!hDbgHelpDll)
             {
                 Log::warn("CrashReporting", "Failed to load DLL dbghelp.dll");
@@ -192,7 +196,7 @@
                 GET_FUNC_PTR(SymGetLineFromAddr64)
                 GET_FUNC_PTR(SymGetModuleBase64)
                 GET_FUNC_PTR(SymGetSymFromAddr64)
-                GET_FUNC_PTR(SymInitialize)
+                GET_FUNC_PTR(SymInitializeW)
                 GET_FUNC_PTR(SymSetOptions)
                 GET_FUNC_PTR(UnDecorateSymbolName)
                 GET_FUNC_PTR(SymFromAddr);
@@ -210,25 +214,14 @@
             if (first_time)
             {
                 // Get the file path of the executable
-                char filepath[512];
-                GetModuleFileNameA(NULL, filepath, sizeof(filepath));
-                if (!filepath)
-                {
-                    Log::warn("CrashReporting", "GetModuleFileNameA failed");
-                    FreeLibrary(hDbgHelpDll);
-                    return;
-                }
-                // Only keep the directory
-                std::string s(filepath);
-                std::string path = StringUtils::getPath(s);
-
+                std::string path = StringUtils::getPath(CommandLine::getExecName());
+                irr::core::stringw w_path = StringUtils::utf8ToWide(path);
                 // Finally initialize the symbol handler.
-                BOOL bOk = _SymInitialize(hProcess,
-                                          path.empty() ? NULL : path.c_str(),
-                                          TRUE);
+                BOOL bOk = _SymInitializeW(hProcess,
+                    w_path.empty() ? NULL : w_path.c_str(), TRUE);
                 if (!bOk)
                 {
-                    Log::warn("CrashReporting", "SymInitialize() failed");
+                    Log::warn("CrashReporting", "SymInitializeW() failed");
                     FreeLibrary(hDbgHelpDll);
                     return;
                 }
