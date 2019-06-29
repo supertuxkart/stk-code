@@ -863,17 +863,27 @@ namespace StringUtils
     std::string wideToUtf8(const wchar_t* input)
     {
         std::vector<char> utf8line;
-        if (sizeof(wchar_t) == 2)
+        try
         {
-            utf8::utf16to8(input, input + wcslen(input),
-                back_inserter(utf8line));
+            if (sizeof(wchar_t) == 2)
+            {
+                utf8::utf16to8(input, input + wcslen(input),
+                    back_inserter(utf8line));
+            }
+            else if (sizeof(wchar_t) == 4)
+            {
+                utf8::utf32to8(input, input + wcslen(input),
+                    back_inserter(utf8line));
+            }
+            utf8line.push_back(0);
         }
-        else if (sizeof(wchar_t) == 4)
+        catch (std::exception& e)
         {
-            utf8::utf32to8(input, input + wcslen(input),
-                back_inserter(utf8line));
+            utf8line.push_back(0);
+            Log::error("StringUtils",
+                "wideToUtf8 error: %s, incompleted string: %s", e.what(),
+                utf8line.data());
         }
-        utf8line.push_back(0);
         return std::string(&utf8line[0]);
     }   // wideToUtf8
 
@@ -890,17 +900,26 @@ namespace StringUtils
     irr::core::stringw utf8ToWide(const char* input)
     {
         std::vector<wchar_t> wchar_line;
-        if (sizeof(wchar_t) == 2)
+        try
         {
-            utf8::utf8to16(input, input + strlen(input),
-                back_inserter(wchar_line));
+            if (sizeof(wchar_t) == 2)
+            {
+                utf8::utf8to16(input, input + strlen(input),
+                    back_inserter(wchar_line));
+            }
+            else if (sizeof(wchar_t) == 4)
+            {
+                utf8::utf8to32(input, input + strlen(input),
+                    back_inserter(wchar_line));
+            }
+            wchar_line.push_back(0);
         }
-        else if (sizeof(wchar_t) == 4)
+        catch (std::exception& e)
         {
-            utf8::utf8to32(input, input + strlen(input),
-                back_inserter(wchar_line));
+            wchar_line.push_back(0);
+            Log::error("StringUtils",
+                "wideToUtf8 error: %s, input string: %s", e.what(), input);
         }
-        wchar_line.push_back(0);
         return irr::core::stringw(&wchar_line[0]);
     }   // utf8ToWide
 
@@ -1256,19 +1275,27 @@ namespace StringUtils
     irr::core::stringw utf32ToWide(const std::u32string& input)
     {
         std::vector<wchar_t> wchar_line;
-        if (sizeof(wchar_t) == 2)
+        try
         {
-            const uint32_t* chars = (const uint32_t*)input.c_str();
-            utf8::utf32to16(chars, chars + input.size(),
-                back_inserter(wchar_line));
+            if (sizeof(wchar_t) == 2)
+            {
+                const uint32_t* chars = (const uint32_t*)input.c_str();
+                utf8::utf32to16(chars, chars + input.size(),
+                    back_inserter(wchar_line));
+            }
+            else if (sizeof(wchar_t) == sizeof(char32_t))
+            {
+                wchar_line.resize(input.size());
+                memcpy(wchar_line.data(), input.c_str(),
+                    input.size() * sizeof(char32_t));
+            }
+            wchar_line.push_back(0);
         }
-        else if (sizeof(wchar_t) == sizeof(char32_t))
+        catch (std::exception& e)
         {
-            wchar_line.resize(input.size());
-            memcpy(wchar_line.data(), input.c_str(),
-                input.size() * sizeof(char32_t));
+            wchar_line.push_back(0);
+            Log::error("StringUtils", "utf32ToWide error: %s", e.what());
         }
-        wchar_line.push_back(0);
         return irr::core::stringw(&wchar_line[0]);
     }   // utf32ToWide
 
@@ -1276,8 +1303,17 @@ namespace StringUtils
     std::u32string utf8ToUtf32(const std::string &input)
     {
         std::u32string result;
-        utf8::utf8to32(input.c_str(), input.c_str() + input.size(),
-            back_inserter(result));
+        try
+        {
+            utf8::utf8to32(input.c_str(), input.c_str() + input.size(),
+                back_inserter(result));
+        }
+        catch (std::exception& e)
+        {
+            Log::error("StringUtils",
+                "utf8ToUtf32 error: %s, input string: %s", e.what(),
+                input.c_str());
+        }
         return result;
     }   // utf8ToUtf32
 
@@ -1285,8 +1321,17 @@ namespace StringUtils
     std::string utf32ToUtf8(const std::u32string& input)
     {
         std::string result;
-        utf8::utf32to8(input.c_str(), input.c_str() + input.size(),
-            back_inserter(result));
+        try
+        {
+            utf8::utf32to8(input.c_str(), input.c_str() + input.size(),
+                back_inserter(result));
+        }
+        catch (std::exception& e)
+        {
+            Log::error("StringUtils",
+                "utf32ToUtf8 error: %s, incompleted string: %s", e.what(),
+                result.c_str());
+        }
         return result;
     }   // utf32ToUtf8
 
@@ -1294,14 +1339,21 @@ namespace StringUtils
     std::u32string wideToUtf32(const irr::core::stringw& input)
     {
         std::u32string utf32_line;
-        if (sizeof(wchar_t) != sizeof(char32_t))
+        try
         {
-            const uint16_t* chars = (const uint16_t*)input.c_str();
-            utf8::utf16to32(chars, chars + input.size(),
-                back_inserter(utf32_line));
+            if (sizeof(wchar_t) != sizeof(char32_t))
+            {
+                const uint16_t* chars = (const uint16_t*)input.c_str();
+                utf8::utf16to32(chars, chars + input.size(),
+                    back_inserter(utf32_line));
+            }
+            else if (sizeof(wchar_t) == sizeof(char32_t))
+                utf32_line = (const char32_t*)input.c_str();
         }
-        else if (sizeof(wchar_t) == sizeof(char32_t))
-            utf32_line = (const char32_t*)input.c_str();
+        catch (std::exception& e)
+        {
+            Log::error("StringUtils", "wideToUtf32 error: %s", e.what());
+        }
         return utf32_line;
     }   // wideToUtf32
 
