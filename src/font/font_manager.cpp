@@ -308,7 +308,8 @@ void FontManager::shape(const std::u32string& text,
                         std::vector<std::u32string>* line_data)
 
 {
-    if (text.empty())
+    // m_faces can be empty in null device
+    if (text.empty() || m_faces.empty())
         return;
 
     auto lines = StringUtils::split(text, U'\n');
