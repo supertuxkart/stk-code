@@ -261,7 +261,7 @@ public:
                                           const std::string &filename,
                                           bool               positional,
                                           float              rolloff,
-                                          float              max_width,
+                                          float              max_dist,
                                           float              gain,
                                           const bool         load = true);
 

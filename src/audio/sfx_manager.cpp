@@ -627,13 +627,13 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     const std::string &sfx_file,
                                     bool               positional,
                                     float              rolloff,
-                                    float              max_width,
+                                    float              max_dist,
                                     float              gain,
                                     const bool         load)
 {
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, 
-                                      max_width, gain);
+                                      max_dist, gain);
 
     m_all_sfx_types[sfx_name] = buffer;
 

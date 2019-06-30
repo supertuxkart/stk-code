@@ -442,7 +442,33 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         std::string s;
         sounds_node->get("engine", &s);
-        if      (s == "large") m_engine_sfx_type = "engine_large";
+        if (s == "custom")
+        {
+            sounds_node->get("file", &s);
+            std::string full_path = m_root + s;
+            if (file_manager->fileExists(full_path) &&
+                StringUtils::getExtension(s) == "ogg")
+            {
+                m_engine_sfx_type = m_ident + "_engine";
+                // Default values for engine sound if not found
+                float rolloff = 0.2;
+                float max_dist = 300.0f;
+                float gain = 0.4;
+                sounds_node->get("rolloff", &rolloff);
+                sounds_node->get("max_dist", &max_dist);
+                sounds_node->get("volume", &gain);
+                SFXManager::get()->addSingleSfx(m_engine_sfx_type, full_path,
+                    true/*positional*/, rolloff, max_dist, gain);
+            }
+            else
+            {
+                Log::error("[KartProperties]",
+                    "Kart '%s' has an invalid custom engine file '%s'.",
+                    m_name.c_str(), full_path.c_str());
+                m_engine_sfx_type = "engine_small";
+            }
+        }
+        else if (s == "large") m_engine_sfx_type = "engine_large";
         else if (s == "small") m_engine_sfx_type = "engine_small";
         else
         {
