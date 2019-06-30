@@ -2701,7 +2701,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		returnInfo.Buttons = info.buttons;
 
 #if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
-		char name[80];
+		char name[80] = {0};
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;
 #endif
