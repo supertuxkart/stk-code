@@ -73,6 +73,8 @@ private:
     /** Text drawn to glyph layouts cache. */
     std::map<irr::core::stringw,
         std::vector<irr::gui::GlyphLayout> > m_cached_gls;
+
+    bool m_has_color_emoji;
 #endif
 
     /** Map type for each \ref FontWithFace with a index, save getting time in
@@ -112,6 +114,8 @@ public:
                 "code was %d.", desc.c_str(), err);
         }
     }
+    // ------------------------------------------------------------------------
+    bool hasColorEmoji() const                    { return m_has_color_emoji; }
     // ------------------------------------------------------------------------
     /** Return the \ref m_ft_library. */
     FT_Library getFTLibrary() const                    { return m_ft_library; }

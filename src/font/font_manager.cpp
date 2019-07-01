@@ -42,6 +42,7 @@ FontManager *font_manager = NULL;
 FontManager::FontManager()
 {
 #ifndef SERVER_ONLY
+    m_has_color_emoji = false;
     m_ft_library = NULL;
     m_digit_face = NULL;
     m_shaping_dpi = 128;
@@ -364,7 +365,7 @@ void FontManager::shape(const std::u32string& text,
         for (int i = 0; i < length; i++)
         {
             FT_Face cur_face = m_faces.front();
-            bool use_prev_face = false;
+            bool override_face = false;
             if (prev_face != NULL && i != 0)
             {
                 hb_script_t prev_script = hb_unicode_script(
@@ -380,10 +381,21 @@ void FontManager::shape(const std::u32string& text,
                     // join marks), try to use the previous face so it is not
                     // hb_shape separately
                     cur_face = prev_face;
-                    use_prev_face = true;
+                    override_face = true;
                 }
             }
-            if (!use_prev_face)
+            FT_Face emoji_face = m_faces.size() > 1 ? m_faces[1] : NULL;
+            if (m_has_color_emoji && !override_face &&
+                length > 1 && i < length - 1 &&
+                emoji_face != NULL && str[i + 1] == 0xfe0f)
+            {
+                // Rule for variation selector-16 (emoji presentation)
+                // It is used in for example Keycap Digit One
+                // (U+31, U+FE0F, U+20E3)
+                cur_face = emoji_face;
+                override_face = true;
+            }
+            if (!override_face)
             {
                 for (unsigned j = 0; j < m_faces.size(); j++)
                 {
@@ -576,6 +588,7 @@ FT_Face FontManager::loadColorEmoji()
     m_shaping_dpi = face->available_sizes[face->num_fixed_sizes - 1].height;
     checkFTError(FT_Select_Size(face, face->num_fixed_sizes - 1),
         "setting color emoji size");
+    m_has_color_emoji = true;
     return face;
 }   // loadColorEmoji
 
