@@ -120,10 +120,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
                                              std::string challenge_id) :
     ModalDialog(percentWidth, percentHeight)
 {
-    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-        loadFromFile("select_challenge_nobest.stkgui");
-    else
-        loadFromFile("select_challenge.stkgui");
+    loadFromFile("select_challenge.stkgui");
     
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
@@ -184,6 +181,19 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         const core::stringw track_name =
             track_manager->getTrack(c->getData()->getTrackId())->getName();
         getWidget<LabelWidget>("title")->setText(track_name, true);
+    }
+    
+    
+    
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+    {
+        getWidget<IconButtonWidget>("supertux")->setBadge(LOCKED_BADGE);
+        getWidget<IconButtonWidget>("supertux")->setActive(false);
+    }
+    else
+    {
+        getWidget<IconButtonWidget>("supertux")->unsetBadge(LOCKED_BADGE);
+        getWidget<IconButtonWidget>("supertux")->setActive(true);
     }
 }
 
