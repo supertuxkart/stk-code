@@ -44,6 +44,7 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
@@ -1075,8 +1076,8 @@ void ClientLobby::raceFinished(Event* event)
 
     // stop race protocols
     RaceEventManager::getInstance()->stop();
-    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
-    GameProtocol::lock()->requestTerminate();
+    ProtocolManager::lock()->findAndTerminate(PROTOCOL_GAME_EVENTS);
+    ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
     m_state.store(RACE_FINISHED);
 }   // raceFinished
 
@@ -1098,16 +1099,13 @@ void ClientLobby::backToLobby(Event *event)
     if (RaceEventManager::getInstance())
     {
         RaceEventManager::getInstance()->stop();
-        auto gep = RaceEventManager::getInstance()->getProtocol();
-        // Game events protocol is main thread event only
-        if (gep)
-            gep->requestTerminate();
+        ProtocolManager::lock()->findAndTerminate(PROTOCOL_GAME_EVENTS);
     }
     auto gp = GameProtocol::lock();
     if (gp)
     {
         auto lock = gp->acquireWorldDeletingMutex();
-        gp->requestTerminate();
+        ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
         RaceResultGUI::getInstance()->backToLobby();
     }
     else

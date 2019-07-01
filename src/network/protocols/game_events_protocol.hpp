@@ -20,8 +20,6 @@ public:
         GE_CHECK_LINE = 7
     };   // GameEventType
 private:
-    bool m_self_terminated;
-
     int m_last_finished_position;
 
     void eliminatePlayer(const NetworkString &ns);
@@ -42,15 +40,6 @@ public:
     {
         return false;
     }   // notifyEventAsynchronous
-    // ------------------------------------------------------------------------
-    virtual void requestTerminate() OVERRIDE
-    {
-        if (m_self_terminated)
-            return;
-        m_self_terminated = true;
-        Protocol::requestTerminate();
-    }
-
 
 };   // class GameEventsProtocol
 
