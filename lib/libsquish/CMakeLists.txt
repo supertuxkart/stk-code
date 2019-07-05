@@ -5,7 +5,6 @@
 # features:
 #   uses -fopenmp when available
 #    use BUILD_SQUISH_WITH_OPENMP to override
-#   Xcode: builds universal binaries, uses SSE2 on i386 and Altivec on ppc
 #   Unix and VS: SSE2 support is enabled by default
 #    use BUILD_SQUISH_WITH_SSE2 and BUILD_SQUISH_WITH_ALTIVEC to override
 
@@ -40,8 +39,7 @@ IF (BUILD_SQUISH_WITH_OPENMP)
 ENDIF()
 
 IF (CMAKE_GENERATOR STREQUAL "Xcode")
-    SET(CMAKE_OSX_ARCHITECTURES "i386;ppc")
-ELSE (CMAKE_GENERATOR STREQUAL "Xcode")
+    SET(CMAKE_OSX_ARCHITECTURES "x86_64")
     IF (BUILD_SQUISH_WITH_SSE2 AND WIN32)
         ADD_DEFINITIONS(-DSQUISH_USE_SSE=2)
     ENDIF (BUILD_SQUISH_WITH_SSE2 AND WIN32)
