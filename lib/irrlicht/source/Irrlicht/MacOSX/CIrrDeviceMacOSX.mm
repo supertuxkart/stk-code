@@ -643,7 +643,7 @@ bool CIrrDeviceMacOSX::createWindow()
 						NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
 						NSOpenGLPFADoubleBuffer,
 						NSOpenGLPFAOpenGLProfile, (NSOpenGLPixelFormatAttribute)NSOpenGLProfileVersion3_2Core,
-						(NSOpenGLPixelFormatAttribute)nil
+						(NSOpenGLPixelFormatAttribute)0
 					};
 
 					if (CreationParams.AntiAlias<2)
@@ -669,7 +669,7 @@ bool CIrrDeviceMacOSX::createWindow()
 						{
 							// Third try without Doublebuffer
 							os::Printer::log("No doublebuffering available.", ELL_WARNING);
-							windowattribs[14]=(NSOpenGLPixelFormatAttribute)nil;
+							windowattribs[14]=(NSOpenGLPixelFormatAttribute)0;
 						}
 
 						format = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowattribs];
