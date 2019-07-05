@@ -75,3 +75,5 @@ lib/openal
 lib/openssl
 lib/fribidi
 lib/harfbuzz
+
+.DS_Store
