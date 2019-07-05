@@ -54,10 +54,9 @@ std::shared_ptr<GameProtocol> GameProtocol::createInstance()
 //-----------------------------------------------------------------------------
 /** Constructor. Allocates the buffer for events to send to the server. */
 GameProtocol::GameProtocol()
-            : Protocol( PROTOCOL_CONTROLLER_EVENTS)
+            : Protocol(PROTOCOL_CONTROLLER_EVENTS)
 {
     m_data_to_send = getNetworkString();
-    m_self_terminated = false;
 }   // GameProtocol
 
 //-----------------------------------------------------------------------------
@@ -394,5 +393,5 @@ void GameProtocol::rewind(BareNetworkString *buffer)
 void GameProtocol::update(int ticks)
 {
     if (!World::getWorld())
-        requestTerminate();
+        ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
 }   // update

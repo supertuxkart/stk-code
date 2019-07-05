@@ -1369,7 +1369,6 @@ void Kart::update(int ticks)
         m_saved_controller = NULL;
     }
 
-#ifndef ANDROID
     auto cl = LobbyProtocol::get<ClientLobby>();
     // Enable spectate mode after 2 seconds which allow player to
     // release left / right button if they keep pressing it during
@@ -1385,16 +1384,26 @@ void Kart::update(int ticks)
         m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f) &&
         !m_enabled_network_spectator)
     {
+        m_enabled_network_spectator = true;
+        cl->setSpectator(true);
+
         static bool msg_shown = false;
         if (!msg_shown)
         {
             msg_shown = true;
-            cl->addSpectateHelperMessage();
+
+            RaceGUIBase* m = World::getWorld()->getRaceGUI();
+
+            if (m->getMultitouchGUI() != NULL)
+            {
+                m->recreateMultitouchGUI();
+            }
+            else
+            {
+                cl->addSpectateHelperMessage();
+            }
         }
-        m_enabled_network_spectator = true;
-        cl->setSpectator(true);
     }
-#endif
 
     m_powerup->update(ticks);
 

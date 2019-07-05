@@ -42,46 +42,6 @@
 class Event;
 class STKPeer;
 
-// ----------------------------------------------------------------------------
-/** \enum ProtocolRequestType
- *  \brief Defines actions that can be done about protocols.
- *  This enum is used essentially to keep the manager thread-safe and
- *  to avoid protocols modifying directly their state.
- */
-enum ProtocolRequestType
-{
-    PROTOCOL_REQUEST_START,     //!< Start a protocol
-    PROTOCOL_REQUEST_TERMINATE  //!< Terminate a protocol
-};   // ProtocolRequestType
-
-// ----------------------------------------------------------------------------
-/** \struct ProtocolRequest
- *  \brief Represents a request to do an action about a protocol, e.g. to
- *         start, pause, unpause or terminate a protocol.
- */
-class ProtocolRequest
-{
-public:
-    /** The type of request. */
-    ProtocolRequestType m_type;
-
-    /** The concerned protocol information. */
-    std::shared_ptr<Protocol> m_protocol;
-
-public:
-    ProtocolRequest(ProtocolRequestType type, std::shared_ptr<Protocol> protocol)
-    {
-        m_type     = type;
-        m_protocol = protocol;
-    }   // ProtocolRequest
-    // ------------------------------------------------------------------------
-    /** Returns the request type. */
-    ProtocolRequestType getType() const { return m_type;  }
-    // ------------------------------------------------------------------------
-    /** Returns the protocol for this request. */
-    std::shared_ptr<Protocol> getProtocol() { return m_protocol;  }
-};   // class ProtocolRequest;
-
 // ============================================================================
 /** \class ProtocolManager
  *  \brief Manages the protocols at runtime.
@@ -146,7 +106,6 @@ private:
         std::vector<std::shared_ptr<Protocol> > m_protocols;
     public:
         void removeProtocol(std::shared_ptr<Protocol> p);
-        void requestTerminateAll();
         bool notifyEvent(Event *event);
         void update(int ticks, bool async);
         void abort();
@@ -198,9 +157,6 @@ private:
     *  (i.e. from the separate ProtocolManager thread). */
     Synchronised<EventList> m_async_events_to_process;
 
-    /** Contains the requests to start/pause etc... protocols. */
-    Synchronised< std::vector<ProtocolRequest> > m_requests;
-
     /** When set to true, the main thread will exit. */
     std::atomic_bool m_exit;
 
@@ -223,15 +179,13 @@ private:
     bool sendEvent(Event* event,
                    std::array<OneProtocolType, PROTOCOL_MAX>& protocols);
 
-    virtual void startProtocol(std::shared_ptr<Protocol> protocol);
-    virtual void terminateProtocol(std::shared_ptr<Protocol> protocol);
-    virtual void asynchronousUpdate();
+    void asynchronousUpdate();
 
 public:
     // ===========================================
     // Public constructor is required for shared_ptr
               ProtocolManager();
-    virtual  ~ProtocolManager();
+             ~ProtocolManager();
     void      abort();
     void      propagateEvent(Event* event);
     std::shared_ptr<Protocol> getProtocol(ProtocolType type);

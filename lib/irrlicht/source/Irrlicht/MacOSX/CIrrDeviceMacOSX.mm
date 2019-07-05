@@ -643,7 +643,7 @@ bool CIrrDeviceMacOSX::createWindow()
 						NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
 						NSOpenGLPFADoubleBuffer,
 						NSOpenGLPFAOpenGLProfile, (NSOpenGLPixelFormatAttribute)NSOpenGLProfileVersion3_2Core,
-						(NSOpenGLPixelFormatAttribute)nil
+						(NSOpenGLPixelFormatAttribute)0
 					};
 
 					if (CreationParams.AntiAlias<2)
@@ -669,7 +669,7 @@ bool CIrrDeviceMacOSX::createWindow()
 						{
 							// Third try without Doublebuffer
 							os::Printer::log("No doublebuffering available.", ELL_WARNING);
-							windowattribs[14]=(NSOpenGLPixelFormatAttribute)nil;
+							windowattribs[14]=(NSOpenGLPixelFormatAttribute)0;
 						}
 
 						format = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowattribs];
@@ -1194,68 +1194,109 @@ bool CIrrDeviceMacOSX::isWindowMinimized() const
 }
 
 
+static irr::u32 irrKeyCodeFromChar(irr::u32 character)
+{
+	switch (character)
+	{
+		case 'a': case 'A': return irr::IRR_KEY_A;
+		case 'b': case 'B': return irr::IRR_KEY_B;
+		case 'c': case 'C': return irr::IRR_KEY_C;
+		case 'd': case 'D': return irr::IRR_KEY_D;
+		case 'e': case 'E': return irr::IRR_KEY_E;
+		case 'f': case 'F': return irr::IRR_KEY_F;
+		case 'g': case 'G': return irr::IRR_KEY_G;
+		case 'h': case 'H': return irr::IRR_KEY_H;
+		case 'i': case 'I': return irr::IRR_KEY_I;
+		case 'j': case 'J': return irr::IRR_KEY_J;
+		case 'k': case 'K': return irr::IRR_KEY_K;
+		case 'l': case 'L': return irr::IRR_KEY_L;
+		case 'm': case 'M': return irr::IRR_KEY_M;
+		case 'n': case 'N': return irr::IRR_KEY_N;
+		case 'o': case 'O': return irr::IRR_KEY_O;
+		case 'p': case 'P': return irr::IRR_KEY_P;
+		case 'q': case 'Q': return irr::IRR_KEY_Q;
+		case 'r': case 'R': return irr::IRR_KEY_R;
+		case 's': case 'S': return irr::IRR_KEY_S;
+		case 't': case 'T': return irr::IRR_KEY_T;
+		case 'u': case 'U': return irr::IRR_KEY_U;
+		case 'v': case 'V': return irr::IRR_KEY_V;
+		case 'w': case 'W': return irr::IRR_KEY_W;
+		case 'x': case 'X': return irr::IRR_KEY_X;
+		case 'y': case 'Y': return irr::IRR_KEY_Y;
+		case 'z': case 'Z': return irr::IRR_KEY_Z;
+		// This is for U.S. keyboard mapping, and doesn't necessarily make sense for different keyboard layouts.
+		// For example, '"' on Windows Russian layout is VK_2, not VK_OEM_7.
+		case ';': case ':': return irr::IRR_KEY_OEM_1;
+		case '=': case '+': return irr::IRR_KEY_PLUS;
+		case ',': case '<': return irr::IRR_KEY_COMMA;
+		case '-': case '_': return irr::IRR_KEY_MINUS;
+		case '.': case '>': return irr::IRR_KEY_PERIOD;
+		case '/': case '?': return irr::IRR_KEY_OEM_2;
+		case '`': case '~': return irr::IRR_KEY_OEM_3;
+		case '[': case '{': return irr::IRR_KEY_OEM_4;
+		case '\\': case '|': return irr::IRR_KEY_OEM_5;
+		case ']': case '}': return irr::IRR_KEY_OEM_6;
+		case '\'': case '"': return irr::IRR_KEY_OEM_7;
+	}
+	return 0;
+}
+
+
+void CIrrDeviceMacOSX::charToKeys(void* str, irr::u32& character, irr::u32& key_code)
+{
+	u32 cur_character = [(NSString*) str characterAtIndex:0];
+	int cur_key = irrKeyCodeFromChar(cur_character);
+	if (cur_key != irr::IRR_KEY_UNKNOWN)
+	{
+		key_code = cur_key;
+		character = cur_character;
+	}
+}
+
+
 void CIrrDeviceMacOSX::postKeyEvent(void *event,irr::SEvent &ievent,bool pressed)
 {
-	NSString *str;
+	NSString* str;
+	NSString* str_im;
 	std::map<int,int>::const_iterator iter;
-	unsigned int result,c,mkey,mchar;
-	const unsigned char *cStr;
-	BOOL skipCommand;
+	unsigned int mkey, mchar;
+	mkey = mchar = 0;
 
+	ievent.KeyInput.PressedDown = pressed;
+	ievent.KeyInput.Shift = ([(NSEvent *)event modifierFlags] & NSShiftKeyMask) != 0;
+	ievent.KeyInput.Control = ([(NSEvent *)event modifierFlags] & NSControlKeyMask) != 0;
 	str = [(NSEvent *)event characters];
+	str_im = [(NSEvent *)event charactersIgnoringModifiers];
 	if ((str != nil) && ([str length] > 0))
 	{
-		mkey = mchar = 0;
-		skipCommand = false;
-		c = [str characterAtIndex:0];
-		mchar = c;
-
+		// First check keycode from characeter
+		charToKeys(str, mchar, mkey);
+		if (mkey == irr::IRR_KEY_UNKNOWN)
+		{
+			// Ctrl+A on an AZERTY keyboard would get Q keyCode if we relied on str below.
+			if (ievent.KeyInput.Control && (str_im != nil) && ([str_im length] > 0))
+				charToKeys(str_im, mchar, mkey);
+		}
+	}
+	if (mkey == irr::IRR_KEY_UNKNOWN)
+	{
+		// Get keycodes directly if not found above
+		if ((str != nil) && ([str length] > 0))
+			mchar = [str characterAtIndex:0];
 		iter = KeyCodes.find([(NSEvent *)event keyCode]);
 		if (iter != KeyCodes.end())
 			mkey = (*iter).second;
-		else if ((iter = KeyCodes.find(c))  != KeyCodes.end())
-			mkey = (*iter).second;
-		else
-		{
-			// workaround for period character
-			if (c == 0x2E)
-			{
-				mkey = irr::IRR_KEY_PERIOD;
-				mchar = '.';
-			}
-			else
-			{
-				cStr = (unsigned char *)[str cStringUsingEncoding:NSWindowsCP1252StringEncoding];
-				if (cStr != NULL && strlen((char*)cStr) > 0)
-				{
-					mchar = cStr[0];
-					mkey = toupper(mchar);
-					if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
-					{
-						if (mkey == 'C' || mkey == 'V' || mkey == 'X')
-						{
-							mchar = 0;
-							skipCommand = true;
-						}
-					}
-				}
-			}
-		}
-
-		ievent.EventType = irr::EET_KEY_INPUT_EVENT;
-		ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
-		ievent.KeyInput.PressedDown = pressed;
-		ievent.KeyInput.Shift = ([(NSEvent *)event modifierFlags] & NSShiftKeyMask) != 0;
-		ievent.KeyInput.Control = ([(NSEvent *)event modifierFlags] & NSControlKeyMask) != 0;
-		ievent.KeyInput.Char = mchar;
-
-		if (skipCommand)
-			ievent.KeyInput.Control = true;
-		else if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
-			[NSApp sendEvent:(NSEvent *)event];
-
-		postEventFromUser(ievent);
 	}
+
+	ievent.EventType = irr::EET_KEY_INPUT_EVENT;
+	ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
+	ievent.KeyInput.Char = mchar;
+
+	if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
+		[NSApp sendEvent:(NSEvent *)event];
+
+	postEventFromUser(ievent);
+
 }
 
 
@@ -1423,33 +1464,6 @@ void CIrrDeviceMacOSX::initKeycodes()
 	KeyCodes[kVK_Shift] = irr::IRR_KEY_SHIFT;
 	KeyCodes[kVK_RightShift] = irr::IRR_KEY_RSHIFT;
 	KeyCodes[kVK_Space] = irr::IRR_KEY_SPACE;
-
-	KeyCodes[kVK_ANSI_A] = irr::IRR_KEY_A;
-	KeyCodes[kVK_ANSI_B] = irr::IRR_KEY_B;
-	KeyCodes[kVK_ANSI_C] = irr::IRR_KEY_C;
-	KeyCodes[kVK_ANSI_D] = irr::IRR_KEY_D;
-	KeyCodes[kVK_ANSI_E] = irr::IRR_KEY_E;
-	KeyCodes[kVK_ANSI_F] = irr::IRR_KEY_F;
-	KeyCodes[kVK_ANSI_G] = irr::IRR_KEY_G;
-	KeyCodes[kVK_ANSI_H] = irr::IRR_KEY_H;
-	KeyCodes[kVK_ANSI_I] = irr::IRR_KEY_I;
-	KeyCodes[kVK_ANSI_J] = irr::IRR_KEY_J;
-	KeyCodes[kVK_ANSI_K] = irr::IRR_KEY_K;
-	KeyCodes[kVK_ANSI_L] = irr::IRR_KEY_L;
-	KeyCodes[kVK_ANSI_M] = irr::IRR_KEY_M;
-	KeyCodes[kVK_ANSI_N] = irr::IRR_KEY_N;
-	KeyCodes[kVK_ANSI_O] = irr::IRR_KEY_O;
-	KeyCodes[kVK_ANSI_P] = irr::IRR_KEY_P;
-	KeyCodes[kVK_ANSI_Q] = irr::IRR_KEY_Q;
-	KeyCodes[kVK_ANSI_R] = irr::IRR_KEY_R;
-	KeyCodes[kVK_ANSI_S] = irr::IRR_KEY_S;
-	KeyCodes[kVK_ANSI_T] = irr::IRR_KEY_T;
-	KeyCodes[kVK_ANSI_U] = irr::IRR_KEY_U;
-	KeyCodes[kVK_ANSI_V] = irr::IRR_KEY_V;
-	KeyCodes[kVK_ANSI_W] = irr::IRR_KEY_W;
-	KeyCodes[kVK_ANSI_X] = irr::IRR_KEY_X;
-	KeyCodes[kVK_ANSI_Y] = irr::IRR_KEY_Y;
-	KeyCodes[kVK_ANSI_Z] = irr::IRR_KEY_Z;
 
 	KeyCodes[kVK_ANSI_0] = irr::IRR_KEY_0;
 	KeyCodes[kVK_ANSI_1] = irr::IRR_KEY_1;

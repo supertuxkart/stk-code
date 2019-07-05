@@ -153,7 +153,7 @@ void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki
 {
     m_player_karts[player_id] = ki;
 }   // setPlayerKart
-    
+
 // ----------------------------------------------------------------------------
 void RaceManager::setPlayerKart(unsigned int player_id,
                                  const std::string &kart_name)
@@ -222,8 +222,10 @@ int RaceManager::getLocalPlayerGPRank(const int player_id) const
  */
 void RaceManager::setNumPlayers(int players, int local_players)
 {
-    // Clear all previous game info (like country flags)
-    m_player_karts.clear();
+    // Clear all previous game info from network (like country code atm)
+    // The rest info need to be store for overworld, see #3980
+    for (RemoteKartInfo& rki : m_player_karts)
+        rki.setCountryCode("");
     m_player_karts.resize(players);
     if(local_players>-1)
         m_num_local_players = local_players;

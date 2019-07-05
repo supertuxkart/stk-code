@@ -1393,7 +1393,17 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
         wcex.hIconSm        = 0;
 
         // if there is an icon, load it
-        wcex.hIcon = (HICON)LoadImage(hInstance, __TEXT("irrlicht.ico"), IMAGE_ICON, 0,0, LR_LOADFROMFILE);
+        // Check icon_rc.template in tools/windows_installer for define
+        HICON icon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(100),
+            IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CXICON),
+            LR_DEFAULTCOLOR);
+        if (icon != NULL)
+            wcex.hIcon = icon;
+        HICON icon_sm = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(100),
+            IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CXSMICON),
+            LR_DEFAULTCOLOR);
+        if (icon_sm != NULL)
+            wcex.hIconSm = icon_sm;
 
         RegisterClassEx(&wcex);
 

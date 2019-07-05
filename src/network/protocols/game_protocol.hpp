@@ -59,7 +59,6 @@ private:
      *  to reduce number of rollbacks. */
     std::vector<int8_t> m_adjust_time;
 
-    bool m_self_terminated;
     // Dummy data structure to save all kart actions.
     struct Action
     {
@@ -140,14 +139,7 @@ public:
     // ------------------------------------------------------------------------
     std::unique_lock<std::mutex> acquireWorldDeletingMutex() const
                { return std::unique_lock<std::mutex>(m_world_deleting_mutex); }
-    // ------------------------------------------------------------------------
-    virtual void requestTerminate() OVERRIDE
-    {
-        if (m_self_terminated)
-            return;
-        m_self_terminated = true;
-        Protocol::requestTerminate();
-    }
+
 };   // class GameProtocol
 
 #endif // GAME_PROTOCOL_HPP

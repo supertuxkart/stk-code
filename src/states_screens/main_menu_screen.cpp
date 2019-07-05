@@ -483,7 +483,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();
                 next->setMultiplayer(false);
-                StateManager::get()->resetAndGoToScreen(next);
+                next->push();
                 return;
             }
             OverWorld::enterOverWorld();

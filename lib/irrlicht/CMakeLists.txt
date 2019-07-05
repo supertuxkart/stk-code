@@ -13,7 +13,7 @@ if(NOT SERVER_ONLY)
         include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
     endif()
 
-    if(MSVC OR APPLE)
+    if(MSVC)
         include_directories("${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
     endif()
 

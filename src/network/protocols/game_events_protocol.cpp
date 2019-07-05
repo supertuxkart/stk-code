@@ -9,6 +9,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -28,7 +29,6 @@
  */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 {
-    m_self_terminated = false;
     m_last_finished_position = 1;
 }   // GameEventsProtocol
 
@@ -41,7 +41,7 @@ GameEventsProtocol::~GameEventsProtocol()
 void GameEventsProtocol::update(int ticks)
 {
     if (!World::getWorld())
-        requestTerminate();
+        ProtocolManager::lock()->findAndTerminate(PROTOCOL_GAME_EVENTS);
 }   // update
 
 // ----------------------------------------------------------------------------
