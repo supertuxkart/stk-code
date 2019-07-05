@@ -852,7 +852,9 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (w == NULL) break;
                 if (!w->isActivated())
                 {
-                    GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
+                    // Some dialog in overworld could have deactivated widget, and no current screen in overworld
+                    if (GUIEngine::getCurrentScreen())
+                        GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
                     return EVENT_BLOCK;
                 }
 
