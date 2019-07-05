@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config/user_config.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen_keyboard.hpp"
@@ -529,4 +530,15 @@ bool ScreenKeyboard::shouldUseScreenKeyboard()
     }
 
     return always_use_screen_keyboard;
+}
+
+// ----------------------------------------------------------------------------
+/** Returns true if system screen keyboard is available
+ */
+bool ScreenKeyboard::hasSystemScreenKeyboard()
+{
+    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_SYSTEM_SCREEN_KEYBOARD))
+        return false;
+        
+    return irr_driver->getDevice()->hasOnScreenKeyboard();
 }

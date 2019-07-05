@@ -246,7 +246,7 @@ CGUIEditBox::~CGUIEditBox()
     DestroyCaret();
 #endif
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-        irr_driver->getDevice()->hasOnScreenKeyboard())
+        GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         irr_driver->getDevice()->toggleOnScreenKeyboard(false);
 
 #endif
@@ -381,7 +381,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 calculateScrollPos();
 #ifdef ANDROID
                 if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-                    irr_driver->getDevice()->hasOnScreenKeyboard() &&
+                    GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
                     irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
                 {
                     // If user toggle with hacker keyboard with arrows, keep
@@ -675,7 +675,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
     case IRR_KEY_RETURN:
         {
             if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-                irr_driver->getDevice()->hasOnScreenKeyboard())
+                GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
                 irr_driver->getDevice()->toggleOnScreenKeyboard(false);
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
@@ -1021,7 +1021,7 @@ void CGUIEditBox::setText(const core::stringw& text)
     calculateScrollPos();
 #ifdef ANDROID
         if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-            irr_driver->getDevice()->hasOnScreenKeyboard() &&
+            GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
             irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
@@ -1144,7 +1144,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             
             if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
-                if (irr_driver->getDevice()->hasOnScreenKeyboard())
+                if (GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
                     irr_driver->getDevice()->toggleOnScreenKeyboard(true, m_type);
                 else
                     openScreenKeyboard();
@@ -1413,7 +1413,7 @@ void CGUIEditBox::setTextMarkers(s32 begin, s32 end)
         sendGuiEvent(EGET_EDITBOX_MARKING_CHANGED);
 #ifdef ANDROID
         if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-            irr_driver->getDevice()->hasOnScreenKeyboard() &&
+            GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
             irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
         {
             CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
@@ -1485,7 +1485,7 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
 void CGUIEditBox::openScreenKeyboard()
 {
     // If the device has native on screen keyboard, always use it
-    if (irr_driver->getDevice()->hasOnScreenKeyboard())
+    if (GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         return;
 
     if (GUIEngine::ScreenKeyboard::getCurrent() != NULL)

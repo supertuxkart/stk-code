@@ -126,6 +126,7 @@ namespace GUIEngine
         static bool isActive() {return m_screen_keyboard != NULL;}
 
         static bool shouldUseScreenKeyboard();
+        static bool hasSystemScreenKeyboard();
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);

@@ -209,7 +209,7 @@ EventPropagation BaseUserScreen::filterActions(PlayerAction action,
 {
     if (action == PA_MENU_SELECT &&
         (!ScreenKeyboard::shouldUseScreenKeyboard() ||
-        GUIEngine::getDevice()->hasOnScreenKeyboard()))
+        GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard()))
     {
         if ((m_username_tb != NULL && m_username_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
