@@ -549,6 +549,7 @@ CIrrDeviceMacOSX::~CIrrDeviceMacOSX()
 
 void CIrrDeviceMacOSX::closeDevice()
 {
+#ifndef SERVER_ONLY
 	if (Window != NULL)
 	{
 		[Window setIsVisible:FALSE];
@@ -586,7 +587,7 @@ void CIrrDeviceMacOSX::closeDevice()
 			}
 		}
 	}
-
+#endif
 	IsFullscreen = false;
 	IsActive = false;
 	CGLContext = NULL;
@@ -594,8 +595,9 @@ void CIrrDeviceMacOSX::closeDevice()
 
 bool CIrrDeviceMacOSX::createWindow()
 {
-	CGDisplayErr error;
 	bool result=false;
+#ifndef SERVER_ONLY
+	CGDisplayErr error;
 	CGDirectDisplayID display=CGMainDisplayID();
 	CGLPixelFormatObj pixelFormat;
 	CGRect displayRect;
@@ -905,7 +907,7 @@ bool CIrrDeviceMacOSX::createWindow()
 			CGLSetParameter(CGLContext,kCGLCPSwapInterval,&newSwapInterval);
 		}
 	}
-
+#endif
 	return (result);
 }
 
@@ -980,11 +982,13 @@ void CIrrDeviceMacOSX::createDriver()
 
 void CIrrDeviceMacOSX::flush()
 {
+#ifndef SERVER_ONLY
 	if (CGLContext != NULL)
 	{
 		glFinish();
 		CGLFlushDrawable(CGLContext);
 	}
+#endif
 }
 
 bool CIrrDeviceMacOSX::run()
