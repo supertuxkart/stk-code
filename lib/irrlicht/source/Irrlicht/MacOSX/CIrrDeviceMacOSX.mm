@@ -488,7 +488,7 @@ CIrrDeviceMacOSX::CIrrDeviceMacOSX(const SIrrlichtCreationParameters& param)
 	setDebugName("CIrrDeviceMacOSX");
 	#endif
 
-	if (firstLaunch)
+	if (CreationParams.DriverType != video::EDT_NULL && firstLaunch)
 	{
 		firstLaunch = false;
 
@@ -512,11 +512,12 @@ CIrrDeviceMacOSX::CIrrDeviceMacOSX(const SIrrlichtCreationParameters& param)
 
 	initKeycodes();
 
-	VideoModeList.setDesktop(CreationParams.Bits, core::dimension2d<u32>([[NSScreen mainScreen] frame].size.width, [[NSScreen mainScreen] frame].size.height));
-
 	bool success = true;
 	if (CreationParams.DriverType != video::EDT_NULL)
+	{
+		VideoModeList.setDesktop(CreationParams.Bits, core::dimension2d<u32>([[NSScreen mainScreen] frame].size.width, [[NSScreen mainScreen] frame].size.height));
 		success = createWindow();
+	}
 
 	// in case of failure, one can check VideoDriver for initialization
 	if (!success)
