@@ -90,7 +90,7 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL,
                                                         kCFURLPOSIXPathStyle);
     assert(cf_string_ref);
-    CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
+    CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingUTF8);
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
 
