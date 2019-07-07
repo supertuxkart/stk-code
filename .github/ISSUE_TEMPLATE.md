@@ -31,10 +31,9 @@ Gamepads/keyboards models if related to the issue:
 ## Additional information
 <!--
 Please provide stdout.log, it is located in:
-* %appdata%\supertuxkart\0.8.2 (Windows)
-* ~/Library/Application Support/supertuxkart/0.8.2 (mac)
-* $XDG_CONFIG_HOME/supertuxkart/0.8.2 or ~/.config/supertuxkart/0.8.2 (Linux and other unix based systems)
-Note that in the Git/beta version the folder is 0.10-git rather than 0.8.2.
+* %appdata%\supertuxkart\config-0.10 (Windows)
+* ~/Library/Application Support/supertuxkart/config-0.10 (mac)
+* $XDG_CONFIG_HOME/supertuxkart/config-0.10 or ~/.config/supertuxkart/config-0.10 (Linux and other unix based systems)
 -->
 stdout.log:
 ```
