@@ -191,8 +191,8 @@ void ServerLobby::initDatabase()
     }
     sqlite3_busy_handler(m_db, [](void* data, int retry)
         {
-            // Maximum 1 second total retry time
-            if (retry < 10)
+            int retry_count = ServerConfig::m_database_timeout / 100;
+            if (retry < retry_count)
             {
                 sqlite3_sleep(100);
                 // Return non-zero to let caller retry again

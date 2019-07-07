@@ -153,6 +153,9 @@ The current server configuration xml looks like this:
     <!-- Database filename for sqlite to use, it can be shared for all servers created in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
     <database-file value="stkservers.db" />
 
+    <!-- Specified in millisecond for maximum time waiting in sqlite3_busy_handler. You may need a higher value if your database is shared by many servers or having a slow hard disk. -->
+    <database-timeout value="1000" />
+
     <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <ip-ban-table value="ip_ban" />
 

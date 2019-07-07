@@ -333,6 +333,13 @@ namespace ServerConfig
         "for each server. You need to create the database yourself first, see "
         "NETWORKING.md for details"));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_database_timeout
+        SERVER_CFG_DEFAULT(IntServerConfigParam(1000,
+        "database-timeout",
+        "Specified in millisecond for maximum time waiting in "
+        "sqlite3_busy_handler. You may need a higher value if your database "
+        "is shared by many servers or having a slow hard disk."));
+
     SERVER_CFG_PREFIX StringServerConfigParam m_ip_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("ip_ban",
         "ip-ban-table",
