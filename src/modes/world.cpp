@@ -502,7 +502,7 @@ std::shared_ptr<AbstractKart> World::createKart
     }
 
     new_kart->setController(controller);
-
+    race_manager->setKartColor(index, ri->getHue());
     return new_kart;
 }   // createKart
 

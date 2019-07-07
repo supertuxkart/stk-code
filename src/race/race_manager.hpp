@@ -270,7 +270,8 @@ public:
         bool        m_boosted_ai;
         /** The difficulty for this player. */
         PerPlayerDifficulty m_difficulty;
-
+        /** Kart color of player (used in gp win / lose screen). */
+        float       m_color;
         KartStatus(const std::string& ident, const int& prev_finish_pos,
                    int local_player_id, int global_player_id,
                    int init_gp_rank, KartType kt,
@@ -281,7 +282,7 @@ public:
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
-                { m_boosted_ai = false; }
+                { m_boosted_ai = false; m_color = 0.0f; }
 
     };   // KartStatus
 private:
@@ -635,6 +636,16 @@ public:
     {
         return m_kart_status[kart].m_boosted_ai;
     }   // getKartRaceTime
+    // ------------------------------------------------------------------------
+    void setKartColor(int kart, float color)
+    {
+        m_kart_status[kart].m_color = color;
+    }   // setKartColor
+    // ------------------------------------------------------------------------
+    float getKartColor(int kart) const
+    {
+        return m_kart_status[kart].m_color;
+    }   // getKartColor
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }
     // ------------------------------------------------------------------------
