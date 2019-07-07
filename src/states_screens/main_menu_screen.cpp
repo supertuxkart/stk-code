@@ -280,7 +280,12 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
-        const std::string winners[] = { "kiki", "nolok", "pidgin" };
+        const std::pair<std::string, float> winners[] =
+            {
+                { "kiki", 0.6f },
+                { "nolok", 1.0f },
+                { "pidgin", 0.0f },
+            };
         scene->setKarts(winners);
     }
     else if (selection == "test_gplose")
@@ -293,9 +298,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
         scene->push();
-        std::vector<std::string> losers;
-        losers.push_back("nolok");
-        losers.push_back("kiki");
+        std::vector<std::pair<std::string, float> > losers;
+        losers.emplace_back("nolok", 1.0f);
+        losers.emplace_back("kiki", 0.6f);
         //losers.push_back("wilber");
         //losers.push_back("tux");
         scene->setKarts(losers);

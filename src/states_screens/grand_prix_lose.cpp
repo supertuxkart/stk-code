@@ -24,6 +24,8 @@
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/lod_node.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -159,7 +161,7 @@ void GrandPrixLose::onUpdate(float dt)
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
+void GrandPrixLose::setKarts(std::vector<std::pair<std::string, float> > ident_arg)
 {
     TrackObjectManager* tobjman = Track::getCurrentTrack()->getTrackObjectManager();
 
@@ -179,10 +181,10 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
     const int count = (int)ident_arg.size();
     for (int n=0; n<count; n++)
     {
-        const KartProperties* kart = kart_properties_manager->getKart(ident_arg[n]);
+        const KartProperties* kart = kart_properties_manager->getKart(ident_arg[n].first);
         if (kart != NULL)
         {
-            KartModel* kart_model = kart->getKartModelCopy();
+            KartModel* kart_model = kart->getKartModelCopy(std::make_shared<RenderInfo>(ident_arg[n].second));
             m_all_kart_models.push_back(kart_model);
             scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
             LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
@@ -225,7 +227,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         else
         {
             Log::warn("GrandPrixLose", "A kart named '%s' could not be found\n",
-                      ident_arg[n].c_str());
+                      ident_arg[n].first.c_str());
             m_kart_node[n] = NULL;
         } // if kart != NULL
     }

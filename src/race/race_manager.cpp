@@ -823,9 +823,9 @@ void RaceManager::exitRace(bool delete_world)
 
         const int loserThreshold = 3;
 
-        std::string winners[3];
+        std::pair<std::string, float> winners[3];
         // because we don't care about AIs that lost
-        std::vector<std::string> humanLosers;
+        std::vector<std::pair<std::string, float> > humanLosers;
         for (unsigned int i=0; i < kart_status_count; ++i)
         {
             if(UserConfigParams::logMisc())
@@ -837,7 +837,8 @@ void RaceManager::exitRace(bool delete_world)
             const int rank = m_kart_status[i].m_gp_rank;
             if (rank >= 0 && rank < loserThreshold)
             {
-                winners[rank] = m_kart_status[i].m_ident;
+                winners[rank].first = m_kart_status[i].m_ident;
+                winners[rank].second = m_kart_status[i].m_color;
                 if (m_kart_status[i].m_kart_type == KT_PLAYER ||
                     m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
                 {
@@ -851,7 +852,7 @@ void RaceManager::exitRace(bool delete_world)
                 if (m_kart_status[i].m_kart_type == KT_PLAYER ||
                     m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
                 {
-                    humanLosers.push_back(m_kart_status[i].m_ident);
+                    humanLosers.emplace_back(m_kart_status[i].m_ident, m_kart_status[i].m_color);
                 }
             }
         }
@@ -892,8 +893,8 @@ void RaceManager::exitRace(bool delete_world)
             {
                 Log::error("RaceManager", "There are no winners and no losers."
                            "This should have never happened\n");
-                std::vector<std::string> karts;
-                karts.push_back(UserConfigParams::m_default_kart);
+                std::vector<std::pair<std::string, float> > karts;
+                karts.emplace_back(UserConfigParams::m_default_kart, 0.0f);
                 scene->setKarts(karts);
             }
         }
