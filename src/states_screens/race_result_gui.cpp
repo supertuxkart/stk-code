@@ -566,10 +566,10 @@ void RaceResultGUI::displayCTFResults()
         if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
             continue;
         result_text = kart->getController()->getName();
-        if (race_manager->getKartGlobalPlayerId(i) > -1)
+        if (race_manager->getKartGlobalPlayerId(kart_id) > -1)
         {
             const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(i).getCountryCode());
+                race_manager->getKartInfo(kart_id).getCountryCode());
             if (!flag.empty())
             {
                 result_text += L" ";
@@ -614,10 +614,10 @@ void RaceResultGUI::displayCTFResults()
         if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
             continue;
         result_text = kart->getController()->getName();
-        if (race_manager->getKartGlobalPlayerId(i) > -1)
+        if (race_manager->getKartGlobalPlayerId(kart_id) > -1)
         {
             const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(i).getCountryCode());
+                race_manager->getKartInfo(kart_id).getCountryCode());
             if (!flag.empty())
             {
                 result_text += L" ";
