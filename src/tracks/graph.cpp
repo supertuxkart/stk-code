@@ -757,9 +757,10 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
 
     if(min_sector==UNKNOWN_SECTOR)
     {
-        Log::info("Graph", "unknown sector found.");
+        Log::warn("Graph", "unknown sector found.");
     }
-    return min_sector;
+    // Avoid crashing in TrackSector
+    return 0;
 }   // findOutOfRoadSector
 
 //-----------------------------------------------------------------------------
