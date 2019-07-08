@@ -2001,7 +2001,8 @@ void Kart::handleMaterialSFX()
     // FIXME: if there are already two sfx playing, don't add another
     // one. This should reduce the performance impact when driving 
     // on the bridge in Cocoa.
-    const Material *material = m_terrain_info->getMaterial();
+    const Material* material =
+        isOnGround() ? m_terrain_info->getMaterial() : NULL;
 
     // We can not use getLastMaterial() since, since the last material might
     // be updated several times during the physics updates, not indicating
