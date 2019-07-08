@@ -83,13 +83,15 @@ private:
 
     core::aabbox3df m_bbox;
 
+    // ------------------------------------------------------------------------
+    float getDefaultScale(FontWithFace* face);
 public:
     // ------------------------------------------------------------------------
     STKTextBillboard(const video::SColor& color_top,
                      const video::SColor& color_bottom, ISceneNode* parent,
                      ISceneManager* mgr, s32 id,
                      const core::vector3df& position,
-                     const core::vector3df& size);
+                     const core::vector3df& scale = core::vector3df(1, 1, 1));
     // ------------------------------------------------------------------------
     ~STKTextBillboard()
     {

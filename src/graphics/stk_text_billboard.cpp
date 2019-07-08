@@ -29,9 +29,9 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
                                    ISceneNode* parent, ISceneManager* mgr,
                                    s32 id,
                                    const core::vector3df& position,
-                                   const core::vector3df& size)
+                                   const core::vector3df& scale)
                 : ISceneNode(parent, mgr, id, position,
-                             core::vector3df(0.0f, 0.0f, 0.0f), size)
+                             core::vector3df(0.0f, 0.0f, 0.0f), scale)
 {
     using namespace SP;
     m_color_top = color_top;
@@ -51,6 +51,12 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
     }
     static_assert(sizeof(GLTB) == 20, "Wrong compiler padding");
 }   // STKTextBillboard
+
+// ----------------------------------------------------------------------------
+float STKTextBillboard::getDefaultScale(FontWithFace* face)
+{
+    return 1.0f / (float)face->getDPI();
+}   // getDefaultScale
 
 // ----------------------------------------------------------------------------
 void STKTextBillboard::updateAbsolutePosition()
@@ -92,7 +98,7 @@ void STKTextBillboard::init(const core::stringw& text, FontWithFace* face)
     face->drawText(text, core::rect<s32>(0, 0, size.Width, size.Height),
         video::SColor(255,255,255,255), false, false, NULL, NULL, this);
 
-    const float scale = 0.02f;
+    const float scale = getDefaultScale(face);
     float max_x = 0;
     float min_y = 0;
     float max_y = 0;
@@ -262,7 +268,7 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
     face->drawText(text, core::rect<s32>(0, 0, size.Width, size.Height),
         video::SColor(255,255,255,255), false, false, NULL, NULL, this);
 
-    const float scale = 0.02f;
+    const float scale = getDefaultScale(face);
     float max_x = 0;
     float min_y = 0;
     float max_y = 0;

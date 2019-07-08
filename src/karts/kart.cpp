@@ -3446,7 +3446,7 @@ void Kart::setOnScreenText(const core::stringw& text)
         GUIEngine::getSkin()->getColor("font::top"),
         getNode(), irr_driver->getSceneManager(), -1,
         core::vector3df(0.0f, 1.5f, 0.0f),
-        core::vector3df(0.35f, 0.35f, 0.35f));
+        core::vector3df(0.5f, 0.5f, 0.5f));
     if (CVS->isGLSL())
         tb->init(text, bold_face);
     else
