@@ -229,10 +229,13 @@ when the border that intersect at this corner are enabled.
 <!-- Scrollbars. Background and thumb have no state (always neutral state).
      The buttons are the top and bottom arrows. Image must be top arrow, will
      be mirrorred for bottom. Buttons can be in neutral or down state.
-     Advanced stretching is not used here.
-      -->
-<element type="scrollbar_background"          image="common/scrollbar_bg.png" />
-<element type="scrollbar_thumb"               image="coal/scrollbar_thumb.png" />
+     Advanced stretching is only used for the background and thumb. -->
+<element type="scrollbar_background"          image="common/scrollbar_bg.png"
+    left_border="7" right_border="7" top_border="7" bottom_border="7"
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
+<element type="scrollbar_thumb"               image="coal/scrollbar_thumb.png"
+    left_border="7" right_border="7" top_border="7" bottom_border="7"
+    hborder_out_portion="-1.0" vborder_out_portion="-1.0" />
 <element type="scrollbar_button"              image="common/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="coal/scrollbar_btn_down.png" />
 
