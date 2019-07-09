@@ -372,7 +372,7 @@ void Skin::drawBgImage()
         const int clipped_x_space = (texture_w - screen_w);
 
         dest = core::recti(-clipped_x_space/2, 0,
-                               screen_w+clipped_x_space/2, texture_h);
+                               screen_w+clipped_x_space/2, screen_h);
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
