@@ -185,6 +185,14 @@ namespace SkinConfig
     }   // loadFromFile
 };   // SkinConfig
 
+namespace GUIEngine
+{
+    /** The widget used to hold the scrollbar BG */
+    SkinWidgetContainer* g_bg_container = NULL;
+    /** The widget used to hold the scrollbar thumb */
+    SkinWidgetContainer* g_thumb_container = NULL;
+}
+
 // ============================================================================
 #if 0
 #pragma mark -
@@ -1851,10 +1859,10 @@ void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_background::neutral"];
 
-    draw2DImage(p.getImage(), rect2,
-                                        p.m_source_area_center,
-                                        0 /* no clipping */, 0,
-                                        true /* alpha */);
+    if (!g_bg_container)
+        g_bg_container = new SkinWidgetContainer();
+
+    drawBoxFromStretchableTexture(g_bg_container, rect2, p, false);
 #endif
 }   // drawScrollbarBackground
 
@@ -1865,10 +1873,10 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_thumb::neutral"];
 
-    draw2DImage(p.getImage(), rect,
-                                        p.m_source_area_center,
-                                        0 /* no clipping */, 0,
-                                        true /* alpha */);
+    if (!g_thumb_container)
+        g_thumb_container = new SkinWidgetContainer();
+
+    drawBoxFromStretchableTexture(g_thumb_container, rect, p, false);
 #endif
 }   // drawScrollbarThumb
 
