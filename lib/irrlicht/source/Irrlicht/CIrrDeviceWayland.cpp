@@ -1285,7 +1285,7 @@ bool CIrrDeviceWayland::run()
 
     if (wl_display_dispatch_pending(m_display) == -1)
     {
-	closeDevice();
+        closeDevice();
     }
 
     for (unsigned int i = 0; i < m_events.size(); i++)
