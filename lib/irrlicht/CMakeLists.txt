@@ -35,13 +35,13 @@ if(NOT SERVER_ONLY)
         endif()
     endif()
 
-    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+    if(NOT APPLE AND (USE_GLES2 OR ENABLE_WAYLAND_DEVICE))
         find_package(EGL)
         
         if(EGL_FOUND)
             include_directories(${EGL_INCLUDE_DIR})
         else()
-            if(USE_GLES2)
+            if(USE_GLES2 AND NOT APPLE)
                 message(FATAL_ERROR "EGL not found.")
             elseif(ENABLE_WAYLAND_DEVICE)
                 message(WARNING "EGL not found. Disable wayland support.")
@@ -79,7 +79,7 @@ else()
     add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 endif()
 
-if(APPLE)
+if(APPLE AND NOT IOS)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
@@ -584,7 +584,7 @@ if(NOT SERVER_ONLY AND ENABLE_WAYLAND_DEVICE)
 endif()
 
 
-if(APPLE)
+if(APPLE AND NOT IOS)
     set(IRRLICHT_SOURCES
         ${IRRLICHT_SOURCES}
         source/Irrlicht/MacOSX/AppDelegate.mm
@@ -614,7 +614,7 @@ if(NOT SERVER_ONLY)
         target_link_libraries(stkirrlicht ${X11_X11_LIB} ${X11_Xrandr_LIB})
     endif()
         
-    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+    if(NOT APPLE AND (USE_GLES2 OR ENABLE_WAYLAND_DEVICE))
         target_link_libraries(stkirrlicht ${EGL_LIBRARY})
     endif()
     
