@@ -207,6 +207,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Iobj/openal/include              \
                       -Iobj/openssl/include             \
                       -DUSE_GLES2      \
+                      -DMOBILE_STK     \
                       -DENABLE_SOUND   \
                       -DENABLE_CRYPTO_OPENSSL           \
                       -DNDEBUG         \

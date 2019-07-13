@@ -90,8 +90,10 @@ namespace irr
 
 }
 
+#define _IRR_COMPILE_WITH_IOS_BUILTIN_MAIN_
 #ifdef _IRR_COMPILE_WITH_IOS_BUILTIN_MAIN_
-extern void irrlicht_main();
+extern int ios_main(int argc, char *argv[]);
+extern void override_default_params_for_mobile();
 #endif
 
 #endif

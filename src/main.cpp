@@ -1858,7 +1858,11 @@ void main_abort()
 #endif
 
 // ----------------------------------------------------------------------------
-int main(int argc, char *argv[] )
+#ifdef IOS_STK
+int ios_main(int argc, char *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
 {
     CommandLine::init(argc, argv);
 

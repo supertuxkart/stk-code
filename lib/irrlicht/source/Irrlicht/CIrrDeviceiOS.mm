@@ -56,7 +56,7 @@ namespace irr
     Active = true;
     Focus = false;
 
-    [self performSelectorOnMainThread:@selector(runIrrlicht) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(runSTK) withObject:nil waitUntilDone:NO];
 
     return YES;
 }
@@ -143,9 +143,10 @@ namespace irr
     Focus = true;
 }
 
-- (void)runIrrlicht
+- (void)runSTK
 {
-    irrlicht_main();
+    override_default_params_for_mobile();
+    ios_main(0, {});
 }
 
 - (void)setDevice:(irr::CIrrDeviceiOS*)device
