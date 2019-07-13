@@ -135,8 +135,14 @@ bool CEAGLManager::generateContext()
     switch (Params.DriverType)
     {
     case EDT_OGLES2:
-        OpenGLESVersion = kEAGLRenderingAPIOpenGLES2;
+    {
+        // For IOS we use 64bit only and all 64bit ios devices support GLES3 anyway
+        if (!Params.ForceLegacyDevice)
+            OpenGLESVersion = kEAGLRenderingAPIOpenGLES3;
+        else
+            OpenGLESVersion = kEAGLRenderingAPIOpenGLES2;
         break;
+    }
     default:
         break;
     }
