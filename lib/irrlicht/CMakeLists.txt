@@ -604,6 +604,20 @@ if(APPLE AND NOT IOS)
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()
 
+if(IOS)
+    set(IRRLICHT_SOURCES
+        ${IRRLICHT_SOURCES}
+        source/Irrlicht/CEAGLManager.mm
+        source/Irrlicht/CIrrDeviceiOS.mm)
+
+    set_source_files_properties(source/Irrlicht/CEAGLManager.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
+    set_source_files_properties(source/Irrlicht/CEAGLManager.mm PROPERTIES LANGUAGE C)
+
+    set_source_files_properties(source/Irrlicht/CIrrDeviceiOS.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
+    set_source_files_properties(source/Irrlicht/CIrrDeviceiOS.mm PROPERTIES LANGUAGE C)
+endif()
+
+
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 
 target_link_libraries(stkirrlicht ${ZLIB_LIBRARY})

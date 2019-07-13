@@ -39,7 +39,7 @@ namespace Online
     {
 #if defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) && !defined(IOS_STK)
         std::string command = std::string("open ").append(url);
         if (system(command.c_str()))
         {

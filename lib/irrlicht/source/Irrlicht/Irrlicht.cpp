@@ -34,6 +34,10 @@
 #include "CIrrDeviceSDL.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
+#include "CIrrDeviceiOS.h"
+#endif
+
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 #include "CIrrDeviceAndroid.h"
 #include <android/log.h>
@@ -115,6 +119,11 @@ namespace irr
 		
 		SIrrlichtCreationParameters creation_params = params;
 		overrideDeviceType(creation_params.DeviceType);
+
+#ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
+        if (creation_params.DeviceType == EIDT_IOS || (!dev && creation_params.DeviceType == EIDT_BEST))
+            dev = new CIrrDeviceiOS(creation_params);
+#endif
 
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 		if (creation_params.DeviceType == EIDT_WIN32 || (!dev && creation_params.DeviceType == EIDT_BEST))

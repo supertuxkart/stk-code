@@ -8,6 +8,7 @@
 #include "COGLES2Driver.h"
 // needed here also because of the create methods' parameters
 #include "CNullDriver.h"
+#include "IContextManager.h"
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 
@@ -22,7 +23,7 @@
 #include "os.h"
 #include "IrrlichtDevice.h"
 
-#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
@@ -40,14 +41,28 @@ namespace video
 	bool useCoreContext = true;
 
 //! constructor and init code
+#ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
-			const SExposedVideoData& data, io::IFileSystem* io
-#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-			, CIrrDeviceIPhone* device
+				  io::IFileSystem* io, IrrlichtDevice* device, IContextManager* context)
+		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
+		RenderTargetTexture(0), CurrentRendertargetSize(0, 0),
+		ColorFormat(ECF_R8G8B8), Params(params)
+	{
+		m_eagl_context = context;
+		m_eagl_context->grab();
+		m_eagl_context->generateSurface();
+		m_eagl_context->generateContext();
+		ExposedData = m_eagl_context->getContext();
+		m_eagl_context->activateContext(ExposedData);
+		m_device = device;
+		genericDriverInit(params.WindowSize, params.Stencilbuffer);
+	}
 #else
-			, IrrlichtDevice* device
-#endif
-	)
+	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
+			const SExposedVideoData& data, io::IFileSystem* io,
+			IrrlichtDevice* device)
 		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
@@ -55,10 +70,6 @@ namespace video
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		, EglContext(0)
 		, EglContextExternal(false)
-#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-		, ViewFramebuffer(0)
-		, ViewRenderbuffer(0)
-		, ViewDepthRenderbuffer(0)
 #endif
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		, HDc(0)
@@ -94,56 +105,24 @@ namespace video
 		egl_params.window = ((struct android_app *)(params.PrivateData))->window;
 		egl_params.display = NULL;
 #endif
-		
+
 		EglContext->init(egl_params);
 		useCoreContext = !EglContext->isLegacyDevice();
 
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
-		
+
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 		int width = 0;
 		int height = 0;
 		EglContext->getSurfaceDimensions(&width, &height);
-        CNullDriver::ScreenSize = core::dimension2d<u32>(width, height);
+		CNullDriver::ScreenSize = core::dimension2d<u32>(width, height);
 #endif
 
-#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-		Device = device;
-
-        glGenFramebuffers(1, &ViewFramebuffer);
-        glGenRenderbuffers(1, &ViewRenderbuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
-
-        ExposedData.OGLESIPhone.AppDelegate = Device;
-        Device->displayInitialize(&ExposedData.OGLESIPhone.Context, &ExposedData.OGLESIPhone.View);
-
-        GLint backingWidth;
-        GLint backingHeight;
-        glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
-        glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
-
-        glGenRenderbuffers(1, &ViewDepthRenderbuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, ViewDepthRenderbuffer);
-
-        GLenum depthComponent = GL_DEPTH_COMPONENT16;
-
-        if(params.ZBufferBits >= 24)
-            depthComponent = GL_DEPTH_COMPONENT24_OES;
-
-        glRenderbufferStorage(GL_RENDERBUFFER, depthComponent, backingWidth, backingHeight);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, ViewFramebuffer);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ViewRenderbuffer);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ViewDepthRenderbuffer);
-
-        core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
-        CNullDriver::ScreenSize = WindowSize;
-        CNullDriver::ViewPort = core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(WindowSize));
-
-        genericDriverInit(WindowSize, params.Stencilbuffer);
 #endif
 		m_device = device;
 	}
+
+#endif
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params, 
@@ -182,23 +161,13 @@ namespace video
 			ReleaseDC((ExposedData.OpenGLWin32.HWnd, HDc);
 #endif
 
+#endif
 
-#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-        if (0 != ViewFramebuffer)
-        {
-            glDeleteFramebuffers(1,&ViewFramebuffer);
-            ViewFramebuffer = 0;
-        }
-        if (0 != ViewRenderbuffer)
-        {
-            glDeleteRenderbuffers(1,&ViewRenderbuffer);
-            ViewRenderbuffer = 0;
-        }
-        if (0 != ViewDepthRenderbuffer)
-        {
-            glDeleteRenderbuffers(1,&ViewDepthRenderbuffer);
-            ViewDepthRenderbuffer = 0;
-        }
+#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+		m_eagl_context->destroyContext();
+		m_eagl_context->destroySurface();
+		m_eagl_context->terminate();
+		m_eagl_context->drop();
 #endif
 	}
 
@@ -514,10 +483,8 @@ namespace video
 			os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
 			return false;
 		}
-#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-		glFlush();
-		glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
-		Device->displayEnd();
+#elif defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+		m_eagl_context->swapBuffers();
 #endif
 
 		return true;
@@ -529,6 +496,9 @@ namespace video
 			const SExposedVideoData& videoData, core::rect<s32>* sourceRect)
 	{
 		CNullDriver::beginScene(backBuffer, zBuffer, color);
+#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+		m_eagl_context->activateContext(videoData);
+#endif
 
 		GLbitfield mask = 0;
 
@@ -2909,7 +2879,7 @@ namespace irr
 namespace video
 {
 
-#if !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
+#if !defined(_IRR_COMPILE_WITH_IOS_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device)
 	{
@@ -2951,22 +2921,6 @@ namespace video
 #endif // _IRR_COMPILE_WITH_OGLES2_
 	}
 #endif // _IRR_COMPILE_WITH_OSX_DEVICE_
-
-// -----------------------------------
-// IPHONE VERSION
-// -----------------------------------
-#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			video::SExposedVideoData& data, io::IFileSystem* io,
-			CIrrDeviceIPhone* device)
-	{
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, data, io, device);
-#else
-		return 0;
-#endif // _IRR_COMPILE_WITH_OGLES2_
-	}
-#endif // _IRR_COMPILE_WITH_IPHONE_DEVICE_
 
 } // end namespace
 } // end namespace

@@ -24,7 +24,7 @@
 //! _IRR_LINUX_PLATFORM_ for Linux (it is defined here if no other os is defined)
 //! _IRR_SOLARIS_PLATFORM_ for Solaris
 //! _IRR_OSX_PLATFORM_ for Apple systems running OSX
-//! _IRR_IPHONE_PLATFORM_ for Apple devices running iOS
+//! _IRR_IOS_PLATFORM_ for Apple devices running iOS
 //! _IRR_ANDROID_PLATFORM_ for devices running Android
 //! _IRR_POSIX_API_ for Posix compatible systems
 //! Note: PLATFORM defines the OS specific layer, API can group several platforms
@@ -66,14 +66,14 @@
 
 // XBox only suppots the native Window stuff
 #if defined(_XBOX)
-	#undef _IRR_WINDOWS_
-	#define _IRR_XBOX_PLATFORM_
-	#define _IRR_WINDOWS_API_
-	//#define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-	#undef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-	//#define _IRR_COMPILE_WITH_SDL_DEVICE_
+    #undef _IRR_WINDOWS_
+    #define _IRR_XBOX_PLATFORM_
+    #define _IRR_WINDOWS_API_
+    //#define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+    #undef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+    //#define _IRR_COMPILE_WITH_SDL_DEVICE_
 
-	#include <xtl.h>
+    #include <xtl.h>
 #endif
 
 #if defined(__APPLE__) || defined(MACOSX)
@@ -83,8 +83,8 @@
 #define _IRR_OSX_PLATFORM_ // we only support OSX on these systems
 
 #if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
-#define _IRR_IPHONE_PLATFORM_
-#define _IRR_COMPILE_WITH_IPHONE_DEVICE_
+#define _IRR_IOS_PLATFORM_
+#define _IRR_COMPILE_WITH_IOS_DEVICE_
 #define _IRR_COMPILE_WITH_OGLES2_
 #else
 #define _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -107,7 +107,7 @@
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
-#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 #define _IRR_COMPILE_WITH_EGL_
 #endif
 
@@ -172,7 +172,7 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 //! Define _IRR_COMPILE_WITH_OPENGL_ to compile the Irrlicht engine with OpenGL.
 /** If you do not wish the engine to be compiled with OpenGL, comment this
 define out. */
-#if !defined(_IRR_IPHONE_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
+#if !defined(_IRR_IOS_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #define _IRR_COMPILE_WITH_OPENGL_
 #endif
 #ifdef NO_IRR_COMPILE_WITH_OPENGL_
@@ -191,7 +191,7 @@ define out. */
 #undef _IRR_COMPILE_WITH_OGLES2_
 #endif
 #ifndef IRR_OGLES2_SHADER_PATH
-#ifdef _IRR_COMPILE_WITH_IPHONE_DEVICE_
+#ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
 #define IRR_OGLES2_SHADER_PATH ""
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 #define IRR_OGLES2_SHADER_PATH "media/Shaders/"
@@ -211,7 +211,7 @@ define out. */
 
 //! Define _IRR_OPENGL_USE_EXTPOINTER_ if the OpenGL renderer should use OpenGL extensions via function pointers.
 /** On some systems there is no support for the dynamic extension of OpenGL
-	via function pointers such that this has to be undef'ed. */
+    via function pointers such that this has to be undef'ed. */
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #if !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_SOLARIS_PLATFORM_)
 #define _IRR_OPENGL_USE_EXTPOINTER_
@@ -223,7 +223,7 @@ define out. */
  architecture. You can simply uncomment the define and recompile.
  */
 #ifdef _IRR_COMPILE_WITH_OGLES2_
-#if !defined(_IRR_IPHONE_PLATFORM_)
+#if !defined(_IRR_IOS_PLATFORM_)
 #define _IRR_OGLES2_USE_EXTPOINTER_
 #endif
 #endif
@@ -283,7 +283,7 @@ the engine will no longer read .jpeg images. */
 
 //! Define _IRR_USE_NON_SYSTEM_JPEG_LIB_ to let irrlicht use the jpeglib which comes with irrlicht.
 /** If this is commented out, Irrlicht will try to compile using the jpeg lib installed in the system.
-	This is only used when _IRR_COMPILE_WITH_LIBJPEG_ is defined. */
+    This is only used when _IRR_COMPILE_WITH_LIBJPEG_ is defined. */
 //#define _IRR_USE_NON_SYSTEM_JPEG_LIB_
 #ifdef NO_IRR_USE_NON_SYSTEM_JPEG_LIB_
 #undef _IRR_USE_NON_SYSTEM_JPEG_LIB_
@@ -299,7 +299,7 @@ the engine will no longer read .png images. */
 
 //! Define _IRR_USE_NON_SYSTEM_LIBPNG_ to let irrlicht use the libpng which comes with irrlicht.
 /** If this is commented out, Irrlicht will try to compile using the libpng installed in the system.
-	This is only used when _IRR_COMPILE_WITH_LIBPNG_ is defined. */
+    This is only used when _IRR_COMPILE_WITH_LIBPNG_ is defined. */
 //#define _IRR_USE_NON_SYSTEM_LIB_PNG_
 #ifdef NO_IRR_USE_NON_SYSTEM_LIB_PNG_
 #undef _IRR_USE_NON_SYSTEM_LIB_PNG_
@@ -327,7 +327,7 @@ B3D, MS3D or X meshes */
 #ifdef NO_IRR_COMPILE_WITH_B3D_LOADER_
 #undef _IRR_COMPILE_WITH_B3D_LOADER_
 #endif
-#endif	// _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_
+#endif    // _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_
 
 //! Define _IRR_COMPILE_WITH_BMP_LOADER_ if you want to load .bmp files
 //! Disabling this loader will also disable the built-in font
@@ -408,10 +408,10 @@ defined. */
 precision will be lower but speed higher. currently X86 only
 */
 #if !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_SOLARIS_PLATFORM_)
-	//#define IRRLICHT_FAST_MATH
-	#ifdef NO_IRRLICHT_FAST_MATH
-	#undef IRRLICHT_FAST_MATH
-	#endif
+    //#define IRRLICHT_FAST_MATH
+    #ifdef NO_IRRLICHT_FAST_MATH
+    #undef IRRLICHT_FAST_MATH
+    #endif
 #endif
 
 // Some cleanup and standard stuff
@@ -462,7 +462,7 @@ precision will be lower but speed higher. currently X86 only
 #endif
 
 #ifndef _IRR_WINDOWS_API_
-	#undef _IRR_WCHAR_FILESYSTEM
+    #undef _IRR_WCHAR_FILESYSTEM
 #endif
 
 #if defined(__sparc__) || defined(__sun__)
@@ -470,7 +470,7 @@ precision will be lower but speed higher. currently X86 only
 #endif
 
 #if defined(_IRR_SOLARIS_PLATFORM_)
-	#undef _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
+    #undef _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #endif
 
 //! Define __IRR_HAS_S64 if the irr::s64 type should be enable (needs long long, available on most platforms, but not part of ISO C++ 98)
