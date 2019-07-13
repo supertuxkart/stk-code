@@ -12,8 +12,8 @@ else
     echo "==== Performing initial checkout ===="
     mkdir -p transifex
     cd transifex
-    tx init
-    tx set --auto-remote http://www.transifex.net/projects/p/supertuxkart/
+    tx init --skipsetup
+    tx config --auto-remote https://www.transifex.com/projects/p/supertuxkart/
 fi
 
 echo "==== Pulling all translations ===="
