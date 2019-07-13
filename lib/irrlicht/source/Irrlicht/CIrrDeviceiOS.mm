@@ -12,6 +12,7 @@
 #include "CTimer.h"
 #include "CEAGLManager.h"
 #include "COGLES2Driver.h"
+#include "MobileCursorControl.h"
 
 #import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
@@ -329,6 +330,7 @@ namespace irr
             return;
 
         createGUIAndScene();
+        CursorControl = new gui::MobileCursorControl();
     }
 
     CIrrDeviceiOS::~CIrrDeviceiOS()

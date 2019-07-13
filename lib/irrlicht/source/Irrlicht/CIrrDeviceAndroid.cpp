@@ -15,6 +15,7 @@
 #include "CContextEGL.h"
 #include "CFileSystem.h"
 #include "COGLES2Driver.h"
+#include "MobileCursorControl.h"
 #include "../../../../src/utils/utf8/unchecked.h"
 
 // Call when android keyboard is opened or close, and save its height for
@@ -83,7 +84,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 
     createKeyMap();
 
-    CursorControl = new CCursorControl();
+    CursorControl = new gui::MobileCursorControl();
 
     Android = (android_app*)(param.PrivateData);
     
