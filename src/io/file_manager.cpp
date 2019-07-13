@@ -94,13 +94,22 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
 
-    std::string contents = std::string(path) + std::string("/Contents");
+    // IOS version of stk store data folder directly inside supertuxkart.app
+    std::string contents = std::string(path) + "/";
+#ifndef IOS_STK
+    contents += std::string("Contents");
+#endif
     if(contents.find(".app") != std::string::npos)
     {
+#ifdef IOS_STK
+        data_dir = contents;
+        return true;
+#else
         Log::debug("[FileManager]", "yes");
         // executable is inside an app bundle, use app bundle-relative paths
         data_dir = contents + std::string("/Resources/");
         return true;
+#endif
     }
     else
     {
