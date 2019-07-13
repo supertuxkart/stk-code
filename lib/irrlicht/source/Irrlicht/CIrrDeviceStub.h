@@ -151,9 +151,8 @@ namespace irr
 		//! Remove all messages pending in the system message loop
 		virtual void clearSystemMessages();
 
-
+		void simulateMouse(const SEvent& event, core::position2d<s32>& mouse_pos);
 	protected:
-
 		void createGUIAndScene();
 
 		//! checks version of SDK and prints warning if there might be a problem
@@ -193,7 +192,7 @@ namespace irr
 		SMouseMultiClicks MouseMultiClicks;
 		video::CVideoModeList VideoModeList;
 		SIrrlichtCreationParameters CreationParams;
-		bool Close;
+		bool Close, IsMousePressed;
 	};
 
 } // end namespace irr

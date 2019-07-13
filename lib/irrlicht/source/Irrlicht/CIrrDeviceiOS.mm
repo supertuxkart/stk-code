@@ -206,9 +206,13 @@ namespace irr
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_PRESSED_DOWN;
 
+    irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
+    bool simulate_mouse = false;
+    size_t id = 0;
+
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = (size_t)touch;
+        ev.TouchInput.ID = id++;
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -216,7 +220,15 @@ namespace irr
         ev.TouchInput.Y = touchPoint.y*Scale;
 
         Device->postEventFromUser(ev);
+        if (ev.TouchInput.ID == 0)
+        {
+            simulate_mouse = true;
+            mouse_pos.X = ev.TouchInput.X;
+            mouse_pos.Y = ev.TouchInput.Y;
+        }
     }
+    if (simulate_mouse)
+        Device->simulateMouse(ev, mouse_pos);
 }
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
@@ -225,9 +237,13 @@ namespace irr
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_MOVED;
 
+    irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
+    bool simulate_mouse = false;
+    size_t id = 0;
+
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = (size_t)touch;
+        ev.TouchInput.ID = id++;
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -235,7 +251,15 @@ namespace irr
         ev.TouchInput.Y = touchPoint.y*Scale;
 
         Device->postEventFromUser(ev);
+        if (ev.TouchInput.ID == 0)
+        {
+            simulate_mouse = true;
+            mouse_pos.X = ev.TouchInput.X;
+            mouse_pos.Y = ev.TouchInput.Y;
+        }
     }
+    if (simulate_mouse)
+        Device->simulateMouse(ev, mouse_pos);
 }
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
@@ -244,9 +268,13 @@ namespace irr
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_LEFT_UP;
 
+    irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
+    bool simulate_mouse = false;
+    size_t id = 0;
+
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = (size_t)touch;
+        ev.TouchInput.ID = id++;
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -254,7 +282,15 @@ namespace irr
         ev.TouchInput.Y = touchPoint.y*Scale;
 
         Device->postEventFromUser(ev);
+        if (ev.TouchInput.ID == 0)
+        {
+            simulate_mouse = true;
+            mouse_pos.X = ev.TouchInput.X;
+            mouse_pos.Y = ev.TouchInput.Y;
+        }
     }
+    if (simulate_mouse)
+        Device->simulateMouse(ev, mouse_pos);
 }
 
 - (void)touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
@@ -263,9 +299,13 @@ namespace irr
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_LEFT_UP;
 
+    irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
+    bool simulate_mouse = false;
+    size_t id = 0;
+
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = (size_t)touch;
+        ev.TouchInput.ID = id++;
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -273,7 +313,15 @@ namespace irr
         ev.TouchInput.Y = touchPoint.y*Scale;
 
         Device->postEventFromUser(ev);
+        if (ev.TouchInput.ID == 0)
+        {
+            simulate_mouse = true;
+            mouse_pos.X = ev.TouchInput.X;
+            mouse_pos.Y = ev.TouchInput.Y;
+        }
     }
+    if (simulate_mouse)
+        Device->simulateMouse(ev, mouse_pos);
 }
 
 @end

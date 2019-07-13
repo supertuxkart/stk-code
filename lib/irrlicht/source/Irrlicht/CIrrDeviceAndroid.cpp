@@ -70,7 +70,6 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     AccelerometerActive(false),
     GyroscopeActive(false),
     HasTouchDevice(false),
-    IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
     DefaultOrientation(ORIENTATION_UNKNOWN)
@@ -637,44 +636,8 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
     // Simulate mouse event for first finger on multitouch device.
     // This allows to click on GUI elements.        
     if (simulate_mouse)
-    {
-        CursorControl->setPosition(mouse_pos);
+        simulateMouse(event, mouse_pos);
 
-        SEvent irrevent;
-        bool send_event = true;
-        
-        switch (event.TouchInput.Event)
-        {
-        case ETIE_PRESSED_DOWN:
-            irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
-            IsMousePressed = true;
-            break;
-        case ETIE_LEFT_UP:
-            irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
-            IsMousePressed = false;
-            break;
-        case ETIE_MOVED:
-            irrevent.MouseInput.Event = EMIE_MOUSE_MOVED;
-            break;
-        default:
-            send_event = false;
-            break;
-        }
-        
-        if (send_event)
-        {
-            irrevent.MouseInput.Control = false;
-            irrevent.MouseInput.Shift = false;
-            irrevent.MouseInput.ButtonStates = IsMousePressed ? 
-                                                            irr::EMBSM_LEFT : 0;
-            irrevent.EventType = EET_MOUSE_INPUT_EVENT;
-            irrevent.MouseInput.X = mouse_pos.X;
-            irrevent.MouseInput.Y = mouse_pos.Y + adjusted_height;
-
-            postEventFromUser(irrevent);
-        }
-    }
-    
     return status;
 }
 

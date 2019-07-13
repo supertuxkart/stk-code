@@ -118,7 +118,6 @@ namespace irr
         
         TouchEventData TouchEventsData[32];
         bool HasTouchDevice;
-        bool IsMousePressed;
         float GamepadAxisX;
         float GamepadAxisY;
         DeviceOrientation DefaultOrientation;
