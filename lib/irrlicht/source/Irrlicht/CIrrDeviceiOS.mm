@@ -173,23 +173,22 @@ namespace irr
 @interface CIrrViewiOS : UIView
 
 - (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device;
+@property (nonatomic) float Scale;
 
 @end
 
 @implementation CIrrViewiOS
 {
     irr::CIrrDeviceiOS* Device;
-    float Scale;
 }
 
 - (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device;
 {
     self = [super initWithFrame:frame];
-
+    self.Scale = 1.0f;
     if (self)
     {
         Device = device;
-        Scale = ([self respondsToSelector:@selector(setContentScaleFactor:)]) ? [[UIScreen mainScreen] scale] : 1.f;
     }
 
     return self;
@@ -216,8 +215,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x*Scale;
-        ev.TouchInput.Y = touchPoint.y*Scale;
+        ev.TouchInput.X = touchPoint.x * self.Scale;
+        ev.TouchInput.Y = touchPoint.y * self.Scale;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -247,8 +246,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x*Scale;
-        ev.TouchInput.Y = touchPoint.y*Scale;
+        ev.TouchInput.X = touchPoint.x * self.Scale;
+        ev.TouchInput.Y = touchPoint.y * self.Scale;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -278,8 +277,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x*Scale;
-        ev.TouchInput.Y = touchPoint.y*Scale;
+        ev.TouchInput.X = touchPoint.x * self.Scale;
+        ev.TouchInput.Y = touchPoint.y * self.Scale;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -309,8 +308,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x*Scale;
-        ev.TouchInput.Y = touchPoint.y*Scale;
+        ev.TouchInput.X = touchPoint.x * self.Scale;
+        ev.TouchInput.Y = touchPoint.y * self.Scale;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -797,8 +796,13 @@ namespace irr
 #ifdef _IRR_COMPILE_WITH_OGLES2_
                 {
                     CIrrViewEAGLiOS* view = [[CIrrViewEAGLiOS alloc] initWithFrame:resolution forDevice:this];
-                    CreationParams.WindowSize = core::dimension2d<u32>(view.frame.size.width, view.frame.size.height);
-
+                    view.contentScaleFactor = dataStorage->Window.screen.nativeScale;
+                    view.Scale = view.contentScaleFactor;
+                    CreationParams.WindowSize =
+                        {
+                            view.frame.size.width * view.contentScaleFactor,
+                            view.frame.size.height * view.contentScaleFactor
+                        };
                     dataStorage->View = view;
                     data.OpenGLiOS.View = (__bridge void*)view;
 

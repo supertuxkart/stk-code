@@ -67,6 +67,7 @@ bool CEAGLManager::initialize(const SIrrlichtCreationParameters& params, const S
     }
 
     dataStorage->Layer = (CAEAGLLayer*)[view layer];
+    dataStorage->Layer.contentsScale = view.contentScaleFactor;
 
     return true;
 }
