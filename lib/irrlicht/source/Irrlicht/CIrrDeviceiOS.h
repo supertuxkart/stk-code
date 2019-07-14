@@ -73,7 +73,7 @@ namespace irr
         virtual bool supportsTouchDevice() const { return true; }
 
         //! Returns true if system has hardware keyboard attached
-        virtual bool hasHardwareKeyboard() const { return true; }
+        virtual bool hasHardwareKeyboard() const { return false; }
 
         //! Returns true if system has native on screen keyboard
         virtual bool hasOnScreenKeyboard() const  { return false; }
