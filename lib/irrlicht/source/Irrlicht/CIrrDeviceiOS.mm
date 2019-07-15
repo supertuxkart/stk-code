@@ -192,8 +192,7 @@ namespace irr
     self = [super initWithFrame:(frame) context:(eagl_context)];
     if (self)
     {
-        self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-        self.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+        self.drawableDepthFormat = GLKViewDrawableDepthFormat16;
         self.multipleTouchEnabled = YES;
         Device = device;
     }
