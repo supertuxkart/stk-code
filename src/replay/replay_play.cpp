@@ -142,7 +142,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     if (version >= 4)
     {
         fgets(s, 1023, fd);
-        if(sscanf(s, "stk_version: %s", s1) != 1)
+        if(sscanf(s, "stk_version: %1023s", s1) != 1)
         {
             Log::warn("Replay", "No STK release version found in replay file, '%s'.", fn.c_str());
             fclose(fd);
@@ -162,7 +162,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         char s1[1024];
         char display_name_encoded[1024];
 
-        int scanned = sscanf(s,"kart: %s %[^\n]", s1, display_name_encoded);
+        int scanned = sscanf(s,"kart: %1023s %1023[^\n]", s1, display_name_encoded);
         if (scanned < 1)
         {
             Log::warn("Replay", "Could not read ghost karts info!");
@@ -224,7 +224,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     if (version >= 4)
     {
         fgets(s, 1023, fd);
-        if (sscanf(s, "mode: %s", s1) != 1)
+        if (sscanf(s, "mode: %1023s", s1) != 1)
         {
             Log::warn("Replay", "Replay mode not found in replay file, '%s'.", fn.c_str());
             fclose(fd);
@@ -238,7 +238,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
 
 
     fgets(s, 1023, fd);
-    if (sscanf(s, "track: %s", s1) != 1)
+    if (sscanf(s, "track: %1023s", s1) != 1)
     {
         Log::warn("Replay", "Track info not found in replay file, '%s'.", fn.c_str());
         fclose(fd);
