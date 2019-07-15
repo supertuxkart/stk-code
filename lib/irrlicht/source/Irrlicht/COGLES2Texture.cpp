@@ -634,7 +634,7 @@ void COGLES2FBOTexture::bindRTT()
 void COGLES2FBOTexture::unbindRTT()
 {
 	if (ColorFrameBuffer != 0)
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, Driver->getDefaultFramebuffer());
 }
 
 

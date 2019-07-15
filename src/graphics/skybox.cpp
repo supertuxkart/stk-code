@@ -297,7 +297,7 @@ void Skybox::generateSpecularCubemap()
         glDeleteTextures(1, &sample_texture);
         glDeleteBuffers(1, &sample_buffer);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
     glDeleteFramebuffers(1, &fbo);
     glActiveTexture(GL_TEXTURE0);
 #endif

@@ -671,6 +671,7 @@ namespace video
 				const c8* name=0);
 
 		virtual bool checkDriverReset() {return false;}
+		virtual u32 getDefaultFramebuffer() const { return 0; }
 	protected:
 
 		//! deletes all textures

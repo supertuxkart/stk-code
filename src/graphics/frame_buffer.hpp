@@ -21,6 +21,7 @@
 #define HEADER_FRAME_BUFFER_HPP
 
 #include "graphics/gl_headers.hpp"
+#include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -141,11 +142,11 @@ public:
             return;
         }
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
         glBlitFramebuffer(0, 0, (int)m_width, (int)m_height, (int)x0, (int)y0,
             (int)x1, (int)y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
     }
 
 };

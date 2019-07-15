@@ -309,12 +309,12 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
 }
 
 RTT::~RTT()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
     glDeleteTextures(RTT_COUNT, m_render_target_textures);
     for (FrameBuffer* fb : m_frame_buffers)
     {

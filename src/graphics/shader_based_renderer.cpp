@@ -64,7 +64,7 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDepthMask(GL_TRUE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
     glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
         clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -564,7 +564,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
     }
     else if (irr_driver->getSSAOViz())
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
         if (first_cam)
         {
              glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -578,7 +578,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
     }
     else
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
         if (first_cam)
         {
              glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -873,7 +873,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 

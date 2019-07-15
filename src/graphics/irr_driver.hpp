@@ -530,7 +530,9 @@ public:
 
     void uploadLightingData();
     void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }
-
+    // ------------------------------------------------------------------------
+    u32 getDefaultFramebuffer() const
+                            { return m_video_driver->getDefaultFramebuffer(); }
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;
