@@ -90,6 +90,7 @@ namespace irr
 {
     if (Device != nil)
     {
+        Device->clearAllTouchIds();
         irr::SEvent ev;
         ev.EventType = irr::EET_APPLICATION_EVENT;
         ev.ApplicationEvent.EventType = irr::EAET_WILL_PAUSE;
@@ -104,6 +105,7 @@ namespace irr
 {
     if (Device != nil)
     {
+        Device->clearAllTouchIds();
         irr::SEvent ev;
         ev.EventType = irr::EET_APPLICATION_EVENT;
         ev.ApplicationEvent.EventType = irr::EAET_DID_PAUSE;
@@ -118,6 +120,7 @@ namespace irr
 {
     if (Device != nil)
     {
+        Device->clearAllTouchIds();
         irr::SEvent ev;
         ev.EventType = irr::EET_APPLICATION_EVENT;
         ev.ApplicationEvent.EventType = irr::EAET_WILL_RESUME;
@@ -132,6 +135,7 @@ namespace irr
 {
     if (Device != nil)
     {
+        Device->clearAllTouchIds();
         irr::SEvent ev;
         ev.EventType = irr::EET_APPLICATION_EVENT;
         ev.ApplicationEvent.EventType = irr::EAET_DID_RESUME;
@@ -178,6 +182,7 @@ namespace irr
 @implementation CIrrViewiOS
 {
     irr::CIrrDeviceiOS* Device;
+    std::map<void*, size_t> m_touch_id_map;
 }
 
 - (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device forContext:(EAGLContext*)eagl_context
@@ -187,16 +192,13 @@ namespace irr
     {
         self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
         self.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+        self.multipleTouchEnabled = YES;
         Device = device;
     }
 
     return self;
 }
 
-- (BOOL)isMultipleTouchEnabled
-{
-    return YES;
-}
 
 - (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
@@ -206,11 +208,10 @@ namespace irr
 
     irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
     bool simulate_mouse = false;
-    size_t id = 0;
 
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = id++;
+        ev.TouchInput.ID = Device->getTouchId(touch);
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -237,11 +238,10 @@ namespace irr
 
     irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
     bool simulate_mouse = false;
-    size_t id = 0;
 
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = id++;
+        ev.TouchInput.ID = Device->getTouchId(touch);
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -268,11 +268,11 @@ namespace irr
 
     irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
     bool simulate_mouse = false;
-    size_t id = 0;
 
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = id++;
+        ev.TouchInput.ID = Device->getTouchId(touch);
+        Device->removeTouchId(touch);
 
         CGPoint touchPoint = [touch locationInView:self];
 
@@ -299,11 +299,11 @@ namespace irr
 
     irr::core::position2d<irr::s32> mouse_pos = irr::core::position2d<irr::s32>(0, 0);
     bool simulate_mouse = false;
-    size_t id = 0;
 
     for (UITouch* touch in touches)
     {
-        ev.TouchInput.ID = id++;
+        ev.TouchInput.ID = Device->getTouchId(touch);
+        Device->removeTouchId(touch);
 
         CGPoint touchPoint = [touch locationInView:self];
 

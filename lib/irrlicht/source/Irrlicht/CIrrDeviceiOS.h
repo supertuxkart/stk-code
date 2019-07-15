@@ -14,6 +14,8 @@
 #include "CIrrDeviceStub.h"
 #include "IrrlichtDevice.h"
 #include "IImagePresenter.h"
+#include <map>
+#include <set>
 
 namespace irr
 {
@@ -75,6 +77,40 @@ namespace irr
 
         //! Returns true if system has native on screen keyboard
         virtual bool hasOnScreenKeyboard() const  { return false; }
+
+        //! Get a unique touch id per touch, create one if it's a new touch
+        size_t getTouchId(void* touch)
+        {
+            auto it = m_touch_id_map.find(touch);
+            if (it == m_touch_id_map.end())
+            {
+                std::set<size_t> ids;
+                for (auto& p : m_touch_id_map)
+                    ids.insert(p.second);
+                size_t cur_id = 0;
+                while (true)
+                {
+                    if (ids.find(cur_id) == ids.end())
+                        break;
+                    cur_id++;
+                }
+                m_touch_id_map[touch] = cur_id;
+                return cur_id;
+            }
+            return it->second;
+        }
+
+        //! Remove a unique touch id, free it for future usage
+        void removeTouchId(void* touch)
+        {
+            m_touch_id_map.erase(touch);
+        }
+
+        //! Clear all unique touch ids, used when the app out focused
+        void clearAllTouchIds()
+        {
+            m_touch_id_map.clear();
+        }
     private:
         void createWindow();
         void createViewAndDriver();
@@ -82,6 +118,8 @@ namespace irr
         void* DataStorage;
 
         bool Close;
+
+        std::map<void*, size_t> m_touch_id_map;
     };
 
 }
