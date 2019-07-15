@@ -302,6 +302,18 @@ namespace irr
 		virtual void toggleOnScreenKeyboard(bool show, s32 type = 0) = 0;
 		virtual void registerGetMovedHeightFunction(HeightFunc) = 0;
 
+		virtual bool activateAccelerometer(float updateInterval) { return false; }
+		virtual bool deactivateAccelerometer() { return false; }
+		virtual bool isAccelerometerActive() { return false; }
+		virtual bool isAccelerometerAvailable() { return false; }
+		virtual bool activateGyroscope(float updateInterval) { return false; }
+		virtual bool deactivateGyroscope() { return false; }
+		virtual bool isGyroscopeActive() { return false; }
+		virtual bool isGyroscopeAvailable() { return false; }
+		virtual bool activateDeviceMotion(float updateInterval) { return false; }
+		virtual bool deactivateDeviceMotion() { return false; }
+		virtual bool isDeviceMotionActive() { return false; }
+		virtual bool isDeviceMotionAvailable() { return false; }
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available
 		for a configuration requested when creating the device. */

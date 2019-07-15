@@ -37,11 +37,7 @@ MultitouchDevice::MultitouchDevice()
     m_name          = "Multitouch";
     m_player        = NULL;
     m_controller    = NULL;
-#ifdef ANDROID
-    m_android_device = dynamic_cast<CIrrDeviceAndroid*>(
-                                                    irr_driver->getDevice());
-    assert(m_android_device != NULL);
-#endif
+    m_irrlicht_device = irr_driver->getDevice();
 
     reset();
     updateConfigParams();
@@ -185,12 +181,10 @@ void MultitouchDevice::reset()
  */
 void MultitouchDevice::activateAccelerometer()
 {
-#ifdef ANDROID
-    if (!m_android_device->isAccelerometerActive())
+    if (!m_irrlicht_device->isAccelerometerActive())
     {
-        m_android_device->activateAccelerometer(1.0f / 30);
+        m_irrlicht_device->activateAccelerometer(1.0f / 30);
     }
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -198,12 +192,10 @@ void MultitouchDevice::activateAccelerometer()
  */
 void MultitouchDevice::deactivateAccelerometer()
 {
-#ifdef ANDROID
-    if (m_android_device->isAccelerometerActive())
+    if (m_irrlicht_device->isAccelerometerActive())
     {
-        m_android_device->deactivateAccelerometer();
+        m_irrlicht_device->deactivateAccelerometer();
     }
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -212,11 +204,7 @@ void MultitouchDevice::deactivateAccelerometer()
  */
 bool MultitouchDevice::isAccelerometerActive()
 {
-#ifdef ANDROID
-    return m_android_device->isAccelerometerActive();
-#endif
-
-    return false;
+    return m_irrlicht_device->isAccelerometerActive();
 }
 
 // ----------------------------------------------------------------------------
@@ -224,14 +212,12 @@ bool MultitouchDevice::isAccelerometerActive()
  */
 void MultitouchDevice::activateGyroscope()
 {
-#ifdef ANDROID
-    if (!m_android_device->isGyroscopeActive())
+    if (!m_irrlicht_device->isGyroscopeActive())
     {
         // Assume 60 FPS, some phones can do 90 and 120 FPS but we won't handle 
         // them now
-        m_android_device->activateGyroscope(1.0f / 60); 
+        m_irrlicht_device->activateGyroscope(1.0f / 60);
     }
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -239,12 +225,10 @@ void MultitouchDevice::activateGyroscope()
  */
 void MultitouchDevice::deactivateGyroscope()
 {
-#ifdef ANDROID
-    if (m_android_device->isGyroscopeActive())
+    if (m_irrlicht_device->isGyroscopeActive())
     {
-        m_android_device->deactivateGyroscope();
+        m_irrlicht_device->deactivateGyroscope();
     }
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -253,11 +237,7 @@ void MultitouchDevice::deactivateGyroscope()
  */
 bool MultitouchDevice::isGyroscopeActive()
 {
-#ifdef ANDROID
-    return m_android_device->isGyroscopeActive();
-#endif
-
-    return false;
+    return m_irrlicht_device->isGyroscopeActive();
 }
 
 // ----------------------------------------------------------------------------

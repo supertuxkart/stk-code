@@ -28,10 +28,6 @@
 #include "states_screens/race_gui_multitouch.hpp"
 #include "utils/translation.hpp"
 
-#ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#endif
-
 #include <IGUIEnvironment.h>
 
 
@@ -61,13 +57,10 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
     bool accelerometer_available = false;
     bool gyroscope_available = false;
     
-#ifdef ANDROID
-    CIrrDeviceAndroid* android_device = dynamic_cast<CIrrDeviceAndroid*>(
-                                                    irr_driver->getDevice());
-    assert(android_device != NULL);
-    accelerometer_available = android_device->isAccelerometerAvailable();
-    gyroscope_available = android_device->isGyroscopeAvailable() && accelerometer_available;
-#endif
+    IrrlichtDevice* irrlicht_device = irr_driver->getDevice();
+    assert(irrlicht_device != NULL);
+    accelerometer_available = irrlicht_device->isAccelerometerAvailable();
+    gyroscope_available = irrlicht_device->isGyroscopeAvailable() && accelerometer_available;
 
     if (!accelerometer_available)
     {
@@ -201,7 +194,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
     
         if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
         {
-#ifdef ANDROID
+#ifdef MOBILE_STK
             UserConfigParams::m_multitouch_draw_gui = true;
 #else
             UserConfigParams::m_multitouch_draw_gui.revertToDefaults();

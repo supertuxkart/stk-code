@@ -26,10 +26,6 @@
 #include "utils/types.hpp"
 #include "IEventReceiver.h"
 
-#ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#endif
-
 #define NUMBER_OF_MULTI_TOUCHES 10
 
 enum MultitouchButtonType
@@ -96,10 +92,8 @@ private:
     float m_orientation;
     uint64_t m_gyro_time;
 
-#ifdef ANDROID
-    /** Pointer to the Android irrlicht device */
-    CIrrDeviceAndroid* m_android_device;
-#endif
+    /** Pointer to the irrlicht device */
+    IrrlichtDevice* m_irrlicht_device;
 
     float getSteeringFactor(float value, float sensitivity);
     void handleControls(MultitouchButton* button);
