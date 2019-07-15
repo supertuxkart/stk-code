@@ -77,7 +77,8 @@ namespace video
 
 #if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 		COGLES2Driver(const SIrrlichtCreationParameters& params, io::IFileSystem* io,
-					IrrlichtDevice* device, IContextManager* context);
+					IrrlichtDevice* device, u32 default_fb);
+		virtual u32 getDefaultFramebuffer() const { return m_default_fb; }
 #endif
 
 		//! destructor
@@ -473,7 +474,7 @@ namespace video
 		bool EglContextExternal;
 #endif
 #if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		IContextManager* m_eagl_context;
+		u32 m_default_fb;
 #endif
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 		HDC HDc;

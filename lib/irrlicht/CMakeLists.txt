@@ -607,11 +607,8 @@ endif()
 if(IOS)
     set(IRRLICHT_SOURCES
         ${IRRLICHT_SOURCES}
-        source/Irrlicht/CEAGLManager.mm
-        source/Irrlicht/CIrrDeviceiOS.mm)
-
-    set_source_files_properties(source/Irrlicht/CEAGLManager.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
-    set_source_files_properties(source/Irrlicht/CEAGLManager.mm PROPERTIES LANGUAGE C)
+        source/Irrlicht/CIrrDeviceiOS.mm
+        source/Irrlicht/CIrrDeviceiOS.h)
 
     set_source_files_properties(source/Irrlicht/CIrrDeviceiOS.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
     set_source_files_properties(source/Irrlicht/CIrrDeviceiOS.mm PROPERTIES LANGUAGE C)

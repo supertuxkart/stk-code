@@ -10,12 +10,11 @@
 
 #include "IFileSystem.h"
 #include "CTimer.h"
-#include "CEAGLManager.h"
 #include "COGLES2Driver.h"
 #include "MobileCursorControl.h"
 
-#import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
+#import <GLKit/GLKView.h>
 
 /* Important information */
 
@@ -170,10 +169,9 @@ namespace irr
 
 /* CIrrViewiOS */
 
-@interface CIrrViewiOS : UIView
+@interface CIrrViewiOS : GLKView
 
-- (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device;
-@property (nonatomic) float Scale;
+- (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device forContext:(EAGLContext*)eagl_context;
 
 @end
 
@@ -182,12 +180,13 @@ namespace irr
     irr::CIrrDeviceiOS* Device;
 }
 
-- (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device;
+- (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device forContext:(EAGLContext*)eagl_context
 {
-    self = [super initWithFrame:frame];
-    self.Scale = 1.0f;
+    self = [super initWithFrame:(frame) context:(eagl_context)];
     if (self)
     {
+        self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+        self.drawableStencilFormat = GLKViewDrawableStencilFormat8;
         Device = device;
     }
 
@@ -215,8 +214,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x * self.Scale;
-        ev.TouchInput.Y = touchPoint.y * self.Scale;
+        ev.TouchInput.X = touchPoint.x * self.contentScaleFactor;
+        ev.TouchInput.Y = touchPoint.y * self.contentScaleFactor;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -246,8 +245,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x * self.Scale;
-        ev.TouchInput.Y = touchPoint.y * self.Scale;
+        ev.TouchInput.X = touchPoint.x * self.contentScaleFactor;
+        ev.TouchInput.Y = touchPoint.y * self.contentScaleFactor;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -277,8 +276,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x * self.Scale;
-        ev.TouchInput.Y = touchPoint.y * self.Scale;
+        ev.TouchInput.X = touchPoint.x * self.contentScaleFactor;
+        ev.TouchInput.Y = touchPoint.y * self.contentScaleFactor;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -308,8 +307,8 @@ namespace irr
 
         CGPoint touchPoint = [touch locationInView:self];
 
-        ev.TouchInput.X = touchPoint.x * self.Scale;
-        ev.TouchInput.Y = touchPoint.y * self.Scale;
+        ev.TouchInput.X = touchPoint.x * self.contentScaleFactor;
+        ev.TouchInput.Y = touchPoint.y * self.contentScaleFactor;
 
         Device->postEventFromUser(ev);
         if (ev.TouchInput.ID == 0)
@@ -325,20 +324,7 @@ namespace irr
 
 @end
 
-/* CIrrViewEAGLiOS */
 
-@interface CIrrViewEAGLiOS : CIrrViewiOS
-
-@end
-
-@implementation CIrrViewEAGLiOS
-
-+ (Class)layerClass
-{
-    return [CAEAGLLayer class];
-}
-
-@end
 
 namespace irr
 {
@@ -347,16 +333,26 @@ namespace irr
         SIrrDeviceiOSDataStorage() : Window(0), ViewController(0), View(0), MotionManager(0), ReferenceAttitude(0)
         {
             MotionManager = [[CMMotionManager alloc] init];
+            m_eagl_context = 0;
         }
-
+        ~SIrrDeviceiOSDataStorage()
+        {
+            [Window release];
+            [ViewController release];
+            [View release];
+            [MotionManager release];
+            [EAGLContext setCurrentContext:0];
+            [m_eagl_context release];
+        }
         UIWindow* Window;
         UIViewController* ViewController;
         CIrrViewiOS* View;
         CMMotionManager* MotionManager;
         CMAttitude* ReferenceAttitude;
+        EAGLContext* m_eagl_context;
     };
 
-    CIrrDeviceiOS::CIrrDeviceiOS(const SIrrlichtCreationParameters& params) : CIrrDeviceStub(params), ContextManager(0), DataStorage(0), Close(false)
+    CIrrDeviceiOS::CIrrDeviceiOS(const SIrrlichtCreationParameters& params) : CIrrDeviceStub(params), DataStorage(0), Close(false)
     {
 #ifdef _DEBUG
         setDebugName("CIrrDeviceiOS");
@@ -393,8 +389,6 @@ namespace irr
         CIrrDelegateiOS* delegate = [UIApplication sharedApplication].delegate;
         [delegate setDevice:nil];
 #endif
-        if (ContextManager)
-            ContextManager->drop();
     }
 
     bool CIrrDeviceiOS::run()
@@ -736,45 +730,10 @@ namespace irr
         if (CreationParams.DriverType != video::EDT_NULL)
         {
             SIrrDeviceiOSDataStorage* dataStorage = static_cast<SIrrDeviceiOSDataStorage*>(DataStorage);
-
-            UIView* externalView = (__bridge UIView*)CreationParams.WindowId;
-
-            if (externalView == nil)
-            {
-                dataStorage->Window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-                dataStorage->ViewController = [[UIViewController alloc] init];
-                dataStorage->Window.rootViewController = dataStorage->ViewController;
-
-                [dataStorage->Window makeKeyAndVisible];
-            }
-            else
-            {
-                dataStorage->Window = externalView.window;
-
-                UIResponder* currentResponder = externalView.nextResponder;
-
-                do
-                {
-                    if ([currentResponder isKindOfClass:[UIViewController class]])
-                    {
-                        dataStorage->ViewController = (UIViewController*)currentResponder;
-
-                        currentResponder = nil;
-                    }
-                    else if ([currentResponder isKindOfClass:[UIView class]])
-                    {
-                        currentResponder = currentResponder.nextResponder;
-                    }
-                    else
-                    {
-                        currentResponder = nil;
-
-                        // Could not find view controller.
-                        _IRR_DEBUG_BREAK_IF(true);
-                    }
-                }
-                while (currentResponder != nil);
-            }
+            dataStorage->Window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+            dataStorage->ViewController = [[UIViewController alloc] init];
+            dataStorage->Window.rootViewController = dataStorage->ViewController;
+            [dataStorage->Window makeKeyAndVisible];
         }
     }
 
@@ -782,34 +741,36 @@ namespace irr
     {
         SIrrDeviceiOSDataStorage* dataStorage = static_cast<SIrrDeviceiOSDataStorage*>(DataStorage);
 
-        video::SExposedVideoData data;
-        data.OpenGLiOS.Window = (__bridge void*)dataStorage->Window;
-        data.OpenGLiOS.ViewController = (__bridge void*)dataStorage->ViewController;
-
-        UIView* externalView = (__bridge UIView*)CreationParams.WindowId;
-
-        CGRect resolution = (externalView == nil) ? [[UIScreen mainScreen] bounds] : externalView.bounds;
-
         switch (CreationParams.DriverType)
         {
             case video::EDT_OGLES2:
 #ifdef _IRR_COMPILE_WITH_OGLES2_
                 {
-                    CIrrViewEAGLiOS* view = [[CIrrViewEAGLiOS alloc] initWithFrame:resolution forDevice:this];
+                    EAGLRenderingAPI OpenGLESVersion = kEAGLRenderingAPIOpenGLES2;
+                    // For IOS we use 64bit only and all 64bit ios devices support GLES3 anyway
+                    if (!CreationParams.ForceLegacyDevice)
+                        OpenGLESVersion = kEAGLRenderingAPIOpenGLES3;
+                    else
+                        OpenGLESVersion = kEAGLRenderingAPIOpenGLES2;
+                    dataStorage->m_eagl_context = [[EAGLContext alloc] initWithAPI:OpenGLESVersion];
+                    [EAGLContext setCurrentContext:dataStorage->m_eagl_context];
+
+                    CIrrViewiOS* view = [[CIrrViewiOS alloc] initWithFrame:[[UIScreen mainScreen] bounds]
+                        forDevice:this forContext:dataStorage->m_eagl_context];
+                    dataStorage->View = view;
                     view.contentScaleFactor = dataStorage->Window.screen.nativeScale;
-                    view.Scale = view.contentScaleFactor;
+                    // This will initialize the default framebuffer, which bind its valus to GL_FRAMEBUFFER_BINDING
+                    beginScene();
+                    GLint default_fb = 0;
+                    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_fb);
+
                     CreationParams.WindowSize =
                         {
-                            view.frame.size.width * view.contentScaleFactor,
-                            view.frame.size.height * view.contentScaleFactor
+                            (u32)view.drawableWidth,
+                            (u32)view.drawableHeight
                         };
-                    dataStorage->View = view;
-                    data.OpenGLiOS.View = (__bridge void*)view;
-
-                    ContextManager = new irr::video::CEAGLManager();
-                    ContextManager->initialize(CreationParams, data);
-
-                    VideoDriver = new video::COGLES2Driver(CreationParams, FileSystem, this, ContextManager);
+                    [dataStorage->Window addSubview:view];
+                    VideoDriver = new video::COGLES2Driver(CreationParams, FileSystem, this, default_fb);
 
                     if (!VideoDriver)
                         os::Printer::log("Could not create OpenGL ES 2.x driver.", ELL_ERROR);
@@ -835,10 +796,15 @@ namespace irr
                 break;
         }
 
-        if (externalView == nil)
-            dataStorage->ViewController.view = dataStorage->View;
-        else
-            [externalView addSubview:dataStorage->View];
+        dataStorage->ViewController.view = dataStorage->View;
+    }
+    void CIrrDeviceiOS::beginScene()
+    {
+        [static_cast<SIrrDeviceiOSDataStorage*>(DataStorage)->View bindDrawable];
+    }
+    void CIrrDeviceiOS::swapBuffers()
+    {
+        [static_cast<SIrrDeviceiOSDataStorage*>(DataStorage)->View display];
     }
 }
 

@@ -566,7 +566,11 @@ if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
         target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     elseif (IOS)
-        target_link_libraries(supertuxkart "-framework OpenGLES -framework UIKit -framework CoreMotion -framework Foundation -framework QuartzCore")
+        target_link_libraries(supertuxkart "-framework OpenGLES
+                                            -framework UIKit
+                                            -framework CoreMotion
+                                            -framework Foundation
+                                            -framework GLKit")
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()

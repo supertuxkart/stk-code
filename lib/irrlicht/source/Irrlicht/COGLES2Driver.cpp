@@ -8,7 +8,6 @@
 #include "COGLES2Driver.h"
 // needed here also because of the create methods' parameters
 #include "CNullDriver.h"
-#include "IContextManager.h"
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 
@@ -43,19 +42,13 @@ namespace video
 //! constructor and init code
 #ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
-				  io::IFileSystem* io, IrrlichtDevice* device, IContextManager* context)
+				  io::IFileSystem* io, IrrlichtDevice* device, u32 default_fb)
 		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0),
-		ColorFormat(ECF_R8G8B8), Params(params)
+		ColorFormat(ECF_R8G8B8), Params(params), m_default_fb(default_fb)
 	{
-		m_eagl_context = context;
-		m_eagl_context->grab();
-		m_eagl_context->generateSurface();
-		m_eagl_context->generateContext();
-		ExposedData = m_eagl_context->getContext();
-		m_eagl_context->activateContext(ExposedData);
 		m_device = device;
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
 	}
@@ -161,13 +154,6 @@ namespace video
 			ReleaseDC((ExposedData.OpenGLWin32.HWnd, HDc);
 #endif
 
-#endif
-
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		m_eagl_context->destroyContext();
-		m_eagl_context->destroySurface();
-		m_eagl_context->terminate();
-		m_eagl_context->drop();
 #endif
 	}
 
@@ -484,7 +470,7 @@ namespace video
 			return false;
 		}
 #elif defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		m_eagl_context->swapBuffers();
+		static_cast<CIrrDeviceiOS*>(m_device)->swapBuffers();
 #endif
 
 		return true;
@@ -497,7 +483,7 @@ namespace video
 	{
 		CNullDriver::beginScene(backBuffer, zBuffer, color);
 #if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		m_eagl_context->activateContext(videoData);
+		static_cast<CIrrDeviceiOS*>(m_device)->beginScene();
 #endif
 
 		GLbitfield mask = 0;

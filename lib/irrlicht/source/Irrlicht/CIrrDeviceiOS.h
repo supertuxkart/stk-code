@@ -17,14 +17,12 @@
 
 namespace irr
 {
-    namespace video
-    {
-        class IContextManager;
-    }
     class CIrrDeviceiOS : public CIrrDeviceStub, public video::IImagePresenter
     {
     public:
         CIrrDeviceiOS(const SIrrlichtCreationParameters& params);
+        void swapBuffers();
+        void beginScene();
         virtual ~CIrrDeviceiOS();
 
         virtual bool run();
@@ -80,8 +78,6 @@ namespace irr
     private:
         void createWindow();
         void createViewAndDriver();
-
-        video::IContextManager* ContextManager;
 
         void* DataStorage;
 
