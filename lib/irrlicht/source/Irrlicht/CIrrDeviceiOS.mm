@@ -150,6 +150,8 @@ namespace irr
 {
     override_default_params_for_mobile();
     ios_main(0, {});
+    // App store may not like this
+    exit(0);
 }
 
 - (void)setDevice:(irr::CIrrDeviceiOS*)device
