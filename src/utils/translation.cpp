@@ -371,6 +371,9 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         Log::verbose("translation", "Env var LANGUAGE = '%s'.",
                      language.c_str());
 
+        // Hong Kong use tranditional chinese, not zh_CN which C > T
+        language = StringUtils::findAndReplace(language, "zh_HK", "zh_TW");
+
         if (language.find(":") != std::string::npos)
         {
             std::vector<std::string> langs = StringUtils::split(language, ':');
