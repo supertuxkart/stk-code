@@ -291,11 +291,18 @@ void reportHardwareStats()
 #else
     json.add("os_win", 0);
 #endif
-#ifdef __APPLE__
+
+#ifdef IOS_STK
+    json.add("os_ios", 1);
+    json.add("os_macosx", 0);
+#elif defined(__APPLE__)
+    json.add("os_ios", 0);
     json.add("os_macosx", 1);
 #else
+    json.add("os_ios", 0);
     json.add("os_macosx", 0);
 #endif
+
 #ifdef ANDROID
     json.add("os_android", 1);
 #else
