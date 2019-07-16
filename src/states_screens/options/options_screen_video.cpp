@@ -272,7 +272,7 @@ void OptionsScreenVideo::init()
             }
         } // next found resolution
 
-#ifndef ANDROID
+#ifndef MOBILE_STK
         // Add default resolutions that were not found by irrlicht
         if (!found_1024_768)
         {
@@ -356,7 +356,7 @@ void OptionsScreenVideo::init()
     gfx->setActive(!in_game);
     getWidget<ButtonWidget>("custom")->setActive(!in_game);
     
-#if defined(ANDROID)
+#if defined(MOBILE_STK)
     applyBtn->setVisible(false);
     full->setVisible(false);
     getWidget<LabelWidget>("fullscreenText")->setVisible(false);

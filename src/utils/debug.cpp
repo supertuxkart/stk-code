@@ -881,7 +881,7 @@ bool onEvent(const SEvent &event)
             return true;
             
         // Create the menu (only one menu at a time)
-        #ifdef ANDROID
+        #ifdef MOBILE_STK
         if (event.MouseInput.X < 30 && event.MouseInput.Y < 30 &&
         #else
         if (event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&

@@ -274,7 +274,7 @@ void WorldStatus::updateTime(int ticks)
                     auto cl = LobbyProtocol::get<ClientLobby>();
                     assert(cl);
                     cl->finishedLoadingWorld();
-#ifndef ANDROID
+#ifndef MOBILE_STK
                     static bool helper_msg_shown = false;
                     if (!helper_msg_shown && cl->isSpectator())
                     {
