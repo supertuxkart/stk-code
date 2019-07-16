@@ -1412,6 +1412,13 @@ namespace GUIEngine
                     ->beginScene(true, true, video::SColor(255,100,101,140));
             renderLoading(false);
             g_device->getVideoDriver()->endScene();
+#ifdef IOS_STK
+            // Apple will only update render buffer if you poll the event
+            // loop, we do this only in iOS so you don't get esc event when
+            // you press esc button in other OS, this will allow showing
+            // loading icon in iOS
+            g_device->run();
+#endif
         }
         else
         {
