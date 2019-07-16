@@ -750,16 +750,13 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
             }
             current_sector = next_sector;
         }   // for j
-        // Leave in phase 0 if any sector was found.
+        // If any sector was found after a phase, return it.
         if(min_sector!=UNKNOWN_SECTOR)
             return min_sector;
     }   // phase
-
-    if(min_sector==UNKNOWN_SECTOR)
-    {
-        Log::warn("Graph", "unknown sector found.");
-    }
-    // Avoid crashing in TrackSector
+    
+    // We can only reach this point if min_sector==UNKNOWN_SECTOR
+    Log::warn("Graph", "unknown sector found.");
     return 0;
 }   // findOutOfRoadSector
 
