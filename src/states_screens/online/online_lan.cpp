@@ -45,6 +45,9 @@ OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
 
 void OnlineLanScreen::beforeAddingWidget()
 {
+#ifdef IOS_STK
+    getWidget("create_lan_server")->setVisible(false);
+#endif
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
@@ -70,17 +73,19 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
         std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (selection == "create_lan_server")
-        {
-            NetworkConfig::get()->setIsLAN();
-            CreateServerScreen::getInstance()->push();
-        }
-        else if (selection == "find_lan_server")
+        if (selection == "find_lan_server")
         {
             NetworkConfig::get()->setIsLAN();
             NetworkConfig::get()->setIsServer(false);
             ServerSelection::getInstance()->push();
         }
+#ifndef IOS_STK
+        else if (selection == "create_lan_server")
+        {
+            NetworkConfig::get()->setIsLAN();
+            CreateServerScreen::getInstance()->push();
+        }
+#endif
     }
     
 }   // eventCallback

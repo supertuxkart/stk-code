@@ -50,6 +50,9 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 // -----------------------------------------------------------------------------
 void OnlineProfileServers::beforeAddingWidget()
 {
+#ifdef IOS_STK
+    getWidget("create_wan_server")->setVisible(false);
+#endif
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
@@ -60,13 +63,17 @@ void OnlineProfileServers::init()
     {
         getWidget("back")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
+#ifndef IOS_STK
         getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
+#endif
         getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
     }
     else
     {
         getWidget<IconButtonWidget>("find_wan_server")->setActive(true);
+#ifndef IOS_STK
         getWidget<IconButtonWidget>("create_wan_server")->setActive(true);
+#endif
         getWidget<IconButtonWidget>("quick_wan_play")->setActive(true);
         RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
         assert(ribbon != NULL);
@@ -94,11 +101,13 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
             NetworkConfig::get()->setIsServer(false);
             ServerSelection::getInstance()->push();
         }
+#ifndef IOS_STK
         else if (selection == "create_wan_server")
         {
             NetworkConfig::get()->setIsWAN();
             CreateServerScreen::getInstance()->push();
         }
+#endif
         else if (selection == "quick_wan_play")
         {
             NetworkConfig::get()->setIsWAN();
