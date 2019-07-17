@@ -368,6 +368,20 @@ namespace irr
 
         FileSystem->changeWorkingDirectoryTo([[[NSBundle mainBundle] resourcePath] UTF8String]);
 
+        if (VideoModeList.getVideoModeCount() == 0)
+        {
+            // Add current screen size
+            CGRect screen_bounds = [[UIScreen mainScreen] nativeBounds];
+            // nativeBounds is the size in a portrait-up orientation, so reverse width and height
+            core::dimension2du screen_size =
+            {
+                (u32)screen_bounds.size.height,
+                (u32)screen_bounds.size.width
+            };
+            VideoModeList.addMode(screen_size, 32);
+            VideoModeList.setDesktop(32, screen_size);
+
+        }
         createWindow();
         createViewAndDriver();
 
