@@ -174,8 +174,8 @@ void GhostReplaySelection::init()
     Screen::init();
     m_cur_difficulty = race_manager->getDifficulty();
     
-    int icon_height = GUIEngine::getFontHeight() * 3 / 2;
-    int row_height = GUIEngine::getFontHeight() * 2;
+    int icon_height = GUIEngine::getFontHeight();
+    int row_height = GUIEngine::getFontHeight() * 5 / 4;
                                                         
     // 128 is the height of the image file
     m_icon_bank->setScale(icon_height/128.0f);
