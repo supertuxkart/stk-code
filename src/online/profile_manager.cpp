@@ -177,7 +177,7 @@ void ProfileManager::updateFriendFlagsInCache(const ProfilesMap &cache,
                                               uint32_t profile_id)
 {
     ProfilesMap::const_iterator i;
-    for(i=cache.begin(); i!=cache.end(); i++)
+    for(i=cache.begin(); i!=cache.end(); ++i)
     {
         // Profile has no friends fetched, no need to test
         if(!(*i).second->hasFetchedFriends()) continue;

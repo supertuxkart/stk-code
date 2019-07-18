@@ -202,7 +202,7 @@ ItemManager::~ItemManager()
     if(m_items_in_quads)
         delete m_items_in_quads;
     for(AllItemTypes::iterator i =m_all_items.begin();
-                               i!=m_all_items.end();  i++)
+                               i!=m_all_items.end();  ++i)
     {
         if(*i)
             delete *i;
@@ -391,7 +391,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     if ( dynamic_cast<SpareTireAI*>(kart->getController()) ) return;
 
     for(AllItemTypes::iterator i =m_all_items.begin();
-                               i!=m_all_items.end();  i++)
+                               i!=m_all_items.end();  ++i)
     {
         // Ignore items that have been collected or are not available atm
         if ((!*i) || !(*i)->isAvailable() || (*i)->isUsedUp()) continue;
@@ -424,7 +424,7 @@ void ItemManager::reset()
     if(m_switch_ticks>=0)
     {
         for(AllItemTypes::iterator i =m_all_items.begin();
-                                   i!=m_all_items.end(); i++)
+                                   i!=m_all_items.end(); ++i)
         {
             if(*i) (*i)->switchBack();
         }
@@ -472,7 +472,7 @@ void ItemManager::update(int ticks)
         if(m_switch_ticks<0)
         {
             for(AllItemTypes::iterator i = m_all_items.begin();
-                                       i!= m_all_items.end();  i++)
+                                       i!= m_all_items.end();  ++i)
             {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
@@ -480,7 +480,7 @@ void ItemManager::update(int ticks)
     }   // m_switch_ticks>=0
 
     for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+        i!=m_all_items.end();  ++i)
     {
         if(*i)
         {
@@ -500,7 +500,7 @@ void ItemManager::update(int ticks)
 void ItemManager::updateGraphics(float dt)
 {
     for (AllItemTypes::iterator i  = m_all_items.begin();
-                                i != m_all_items.end();  i++)
+                                i != m_all_items.end();  ++i)
     {
         if (*i) (*i)->updateGraphics(dt);
     }   // for m_all_items
@@ -556,7 +556,7 @@ void ItemManager::switchItems()
 void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
 {
     for(AllItemTypes::iterator i  = all_items.begin();
-                               i != all_items.end();  i++)
+                               i != all_items.end();  ++i)
     {
         if(!*i) continue;
 

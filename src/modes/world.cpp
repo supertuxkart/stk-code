@@ -766,7 +766,7 @@ void World::resetAllKarts()
 
     //Project karts onto track from above. This will lower each kart so
     //that at least one of its wheel will be on the surface of the track
-    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
+    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); ++i)
     {
         if ((*i)->isGhostKart()) continue;
         Vec3 xyz = (*i)->getXYZ();
@@ -798,7 +798,7 @@ void World::resetAllKarts()
     // Do a longer initial simulation, which should be long enough for all
     // karts to be firmly on ground.
     float g = Track::getCurrentTrack()->getGravity();
-    for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); i++)
+    for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); ++i)
     {
         if ((*i)->isGhostKart()) continue;
         (*i)->getBody()->setGravity(
@@ -808,7 +808,7 @@ void World::resetAllKarts()
     for(int i=0; i<stk_config->getPhysicsFPS(); i++) 
         Physics::getInstance()->update(1);
 
-    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
+    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); ++i)
     {
         (*i)->kartIsInRestNow();
     }

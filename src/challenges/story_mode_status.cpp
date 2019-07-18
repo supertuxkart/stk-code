@@ -51,7 +51,7 @@ StoryModeStatus::StoryModeStatus(const XMLNode *node)
 StoryModeStatus::~StoryModeStatus()
 {
     std::map<std::string, ChallengeStatus*>::iterator it;
-    for (it = m_challenges_state.begin();it != m_challenges_state.end();it++)
+    for (it = m_challenges_state.begin();it != m_challenges_state.end();++it)
     {
         delete it->second;
     }
@@ -91,7 +91,7 @@ void StoryModeStatus::computeActive(bool first_call)
 
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
-        i != m_challenges_state.end();  i++)
+        i != m_challenges_state.end();  ++i)
     {
         // Lock features from unsolved challenges
         if(!(i->second)->isSolvedAtAnyDifficulty())
@@ -151,7 +151,7 @@ void StoryModeStatus::computeActive(bool first_call)
     unlockFeatureByList();
 
     //Actually lock the tracks
-    for (i = m_challenges_state.begin(); i != m_challenges_state.end();  i++)
+    for (i = m_challenges_state.begin(); i != m_challenges_state.end();  ++i)
     {
         if (m_points < i->second->getData()->getNumTrophies())
         {
@@ -175,7 +175,7 @@ void StoryModeStatus::unlockFeatureByList()
     // test if we have unlocked a feature requiring a certain number of points
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
-        i != m_challenges_state.end();  i++)
+        i != m_challenges_state.end();  ++i)
     {
         if (i->second->isUnlockList())
         {
@@ -322,7 +322,7 @@ void StoryModeStatus::save(UTFWriter &out)
     out << "      <story-mode first-time=\"" << m_first_time  << L"\">\n";
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
-        i != m_challenges_state.end();  i++)
+        i != m_challenges_state.end();  ++i)
     {
         if (i->second != NULL)
             i->second->save(out);

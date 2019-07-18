@@ -263,7 +263,7 @@ void ProfileWorld::enterRaceOverState()
     // Determine maximum length of group name
     unsigned int max_len=4;   // for 'name' heading
     for(std::set<std::string>::iterator it = all_groups.begin();
-        it !=all_groups.end(); it++)
+        it !=all_groups.end(); ++it)
     {
         if(it->size()>max_len) max_len = (unsigned int) it->size();
     }
@@ -275,7 +275,7 @@ void ProfileWorld::enterRaceOverState()
        << "Strt End  Time    AvSp  Top   Skid  Resc Rsc Brake Expl Exp Itm Ban SNitLNit Bub Off Energy";
     Log::verbose("profile", ss.str().c_str());
     for(std::set<std::string>::iterator it = all_groups.begin();
-        it !=all_groups.end(); it++)
+        it !=all_groups.end(); ++it)
     {
         int   count         = 0,    position_gain   = 0,    rescue_count = 0;
         int   brake_count   = 0,    bonus_count     = 0,    banana_count = 0;

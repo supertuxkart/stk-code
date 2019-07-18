@@ -517,7 +517,7 @@ void ShaderBasedRenderer::debugPhysics()
             line->use();
             line->bindVertexArray();
             line->bindBuffer();
-            for (it = lines.begin(); it != lines.end(); it++)
+            for (it = lines.begin(); it != lines.end(); ++it)
             {
                 line->setUniforms(it->first);
                 const std::vector<float> &vertex = it->second;

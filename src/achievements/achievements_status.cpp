@@ -296,7 +296,7 @@ void AchievementsStatus::save(UTFWriter &out)
 {
     out << "      <achievements online=\"" << m_online << "\"> \n";
     std::map<uint32_t, Achievement*>::const_iterator i;
-    for(i = m_achievements.begin(); i != m_achievements.end();  i++)
+    for(i = m_achievements.begin(); i != m_achievements.end();  ++i)
     {
         if (i->second != NULL)
             i->second->saveProgress(out);
@@ -356,7 +356,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
     // String to collect all local ids that are not synched
     // to the online account
     std::string ids;
-    for(i=m_achievements.begin(); i!=m_achievements.end(); i++)
+    for(i=m_achievements.begin(); i!=m_achievements.end(); ++i)
     {
         unsigned int id = i->second->getID();
         if(i->second->isAchieved() && (id>=done.size() || !done[id]) )
@@ -482,7 +482,7 @@ void AchievementsStatus::updateAchievementsProgress(UpdateType type, unsigned in
     // Now that we know what string to look for, call an Achievement function
     // which will look throughout the progress goalTree to update it
     std::map<uint32_t, Achievement*>::const_iterator i;
-    for(i=m_achievements.begin(); i!=m_achievements.end(); i++)
+    for(i=m_achievements.begin(); i!=m_achievements.end(); ++i)
     {
         // Don't bother checking again already completed achievements
         if (i->second->isAchieved())

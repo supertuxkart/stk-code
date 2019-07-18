@@ -70,7 +70,7 @@ MaterialManager::~MaterialManager()
 
     for (std::map<std::string, Material*> ::iterator it =
          m_default_sp_materials.begin(); it != m_default_sp_materials.end();
-         it++)
+         ++it)
     {
         delete it->second;
     }

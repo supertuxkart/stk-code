@@ -85,7 +85,7 @@ void CheckManager::load(const XMLNode &node)
             check_node->get("other-id", &check_structures_to_change_state);
         std::vector<int>::iterator it;
         for(it=check_structures_to_change_state.begin();
-            it != check_structures_to_change_state.end(); it++)
+            it != check_structures_to_change_state.end(); ++it)
         {
             if(DriveGraph::get()->isReverse())
                 m_all_checks[*it]->addSuccessor(i);
@@ -115,7 +115,7 @@ CheckManager::~CheckManager()
 void CheckManager::reset(const Track &track)
 {
     std::vector<CheckStructure*>::iterator i;
-    for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
+    for(i=m_all_checks.begin(); i!=m_all_checks.end(); ++i)
         (*i)->reset(track);
 }   // reset
 
@@ -128,7 +128,7 @@ void CheckManager::reset(const Track &track)
 void CheckManager::resetAfterKartMove(AbstractKart *kart)
 {
     std::vector<CheckStructure*>::iterator i;
-    for (i = m_all_checks.begin(); i != m_all_checks.end(); i++)
+    for (i = m_all_checks.begin(); i != m_all_checks.end(); ++i)
         (*i)->resetAfterKartMove(kart->getWorldKartId());
 }   // resetAfterKartMove
 
@@ -184,7 +184,7 @@ void CheckManager::removeFlyableFromCannons(Flyable *flyable)
 void CheckManager::update(float dt)
 {
     std::vector<CheckStructure*>::iterator i;
-    for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
+    for(i=m_all_checks.begin(); i!=m_all_checks.end(); ++i)
         (*i)->update(dt);
 }   // update
 

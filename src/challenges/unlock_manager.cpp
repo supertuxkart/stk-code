@@ -60,7 +60,7 @@ UnlockManager::UnlockManager()
     std::string challenge_dir = file_manager->getAsset(FileManager::CHALLENGE, "");
     file_manager->listFiles(result, challenge_dir);
     for(std::set<std::string>::iterator i  = result.begin();
-                                        i != result.end()  ; i++)
+                                        i != result.end()  ; ++i)
     {
         if (StringUtils::hasSuffix(*i, ".challenge"))
             addChallenge(file_manager->getAsset("challenges/"+*i));
@@ -86,7 +86,7 @@ UnlockManager::UnlockManager()
 UnlockManager::~UnlockManager()
 {
     for(AllChallengesType::iterator i =m_all_challenges.begin();
-        i!=m_all_challenges.end();  i++)
+        i!=m_all_challenges.end();  ++i)
     {
         delete i->second;
     }
@@ -98,13 +98,13 @@ UnlockManager::~UnlockManager()
 void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_dirs)
 {
     for(std::vector<std::string>::const_iterator dir = all_dirs->begin();
-        dir != all_dirs->end(); dir++)
+        dir != all_dirs->end(); ++dir)
     {
         std::set<std::string> all_files;
         file_manager->listFiles(all_files, *dir);
 
         for(std::set<std::string>::iterator file = all_files.begin();
-            file != all_files.end(); file++)
+            file != all_files.end(); ++file)
         {
             if (!StringUtils::hasSuffix(*file,".challenge")) continue;
 
@@ -214,7 +214,7 @@ StoryModeStatus* UnlockManager::createStoryModeStatus(const XMLNode *node)
     StoryModeStatus *status = new StoryModeStatus(node);
 
     for(AllChallengesType::iterator i = m_all_challenges.begin();
-                                    i!=m_all_challenges.end();  i++)
+                                    i!=m_all_challenges.end();  ++i)
     {
         ChallengeData* cd = i->second;
         ChallengeStatus *challenge_status = new ChallengeStatus(cd);
@@ -260,7 +260,7 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
     ChallengeData* c = NULL;
 
     for (AllChallengesType::iterator it = m_all_challenges.begin();
-         it != m_all_challenges.end(); it++)
+         it != m_all_challenges.end(); ++it)
     {
         c = it->second;
         if (c->getNumTrophies() > points_before &&

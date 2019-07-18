@@ -172,7 +172,7 @@ void determineOSVersion()
     std::set<std::string> file_list;
     file_manager->listFiles(file_list, "./", true);
     for(std::set<std::string>::iterator i  = file_list.begin();
-                                        i != file_list.end(); i++)
+                                        i != file_list.end(); ++i)
     {
         // Only try reading /etc/*-release files
         if(StringUtils::hasSuffix(*i, "-release"))

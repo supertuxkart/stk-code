@@ -373,7 +373,7 @@ FileManager::~FileManager()
     std::string tmp=getAddonsFile("tmp");
     listFiles(allfiles, tmp);
     for(std::set<std::string>::iterator i=allfiles.begin();
-        i!=allfiles.end(); i++)
+        i!=allfiles.end(); ++i)
     {
         if((*i)=="." || (*i)=="..") continue;
         // For now there should be only zip files or .part files
