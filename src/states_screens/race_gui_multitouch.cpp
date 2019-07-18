@@ -216,7 +216,8 @@ void RaceGUIMultitouch::createRaceGUI()
 
     m_height = (unsigned int)(2 * col_size + margin / 2);
     
-    if (m_device->isAccelerometerActive() || m_device->isGyroscopeActive())
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
+        UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
         m_device->addButton(BUTTON_UP_DOWN,
                     int(steering_accel_x), int(steering_accel_y),
