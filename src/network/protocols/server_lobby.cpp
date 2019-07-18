@@ -2009,7 +2009,7 @@ void ServerLobby::startSelection(const Event *event)
             it = official_tracks.erase(it);
         }
         else
-            it++;
+            ++it;
     }
     if (official_tracks.empty())
     {

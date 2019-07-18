@@ -85,7 +85,7 @@ void XmlCharacteristic::process(CharacteristicType type, Value value,
                         value.fv->clear();
                         break;
                     }
-                    fit++;
+                    ++fit;
                 }
             }
         }
@@ -108,7 +108,7 @@ void XmlCharacteristic::process(CharacteristicType type, Value value,
                     value.fv->clear();
                     break;
                 }
-                fit++;
+                ++fit;
             }
         }
         break;

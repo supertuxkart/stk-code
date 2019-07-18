@@ -350,7 +350,7 @@ void CutsceneWorld::update(int ticks)
         }
         else
         {
-            it++;
+            ++it;
         }
      }
 
@@ -368,7 +368,7 @@ void CutsceneWorld::update(int ticks)
         }
         else
         {
-            it++;
+            ++it;
         }
      }
 
@@ -385,7 +385,7 @@ void CutsceneWorld::update(int ticks)
         }
         else
         {
-            it++;
+            ++it;
         }
     }
 

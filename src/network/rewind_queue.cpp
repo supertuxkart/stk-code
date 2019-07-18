@@ -99,7 +99,7 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
     while (i != m_all_rewind_info.begin())
     {
         AllRewindInfo::iterator i_prev = i;
-        i_prev--;
+        --i_prev;
         // Now test if 'ri' needs to be inserted after the
         // previous element, i.e. before the current element:
         if ((*i_prev)->getTicks() < ri->getTicks()) break;
@@ -224,7 +224,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // time step is world_ticks.
         if ((*i)->getTicks() > world_ticks)
         {
-            i++;
+            ++i;
             continue;
         }
         // Any state of event that is received before the latest confirmed
@@ -444,7 +444,7 @@ void RewindQueue::unitTesting()
     assert(q0.m_all_rewind_info.size() == 2);
     AllRewindInfo::iterator rii = q0.m_all_rewind_info.begin();
     assert((*rii)->isState());
-    rii++;
+    ++rii;
     assert((*rii)->isEvent());
 
     // Another state must be sorted before the event:
@@ -454,9 +454,9 @@ void RewindQueue::unitTesting()
     assert(q0.m_all_rewind_info.size() == 3);
     rii = q0.m_all_rewind_info.begin();
     assert((*rii)->isState());
-    rii++;
+    ++rii;
     assert((*rii)->isState());
-    rii++;
+    ++rii;
     assert((*rii)->isEvent());
 
     // Test time base comparisons: adding an event to the end
@@ -465,9 +465,9 @@ void RewindQueue::unitTesting()
     q0.addLocalEvent(dummy_rewinder.get(), NULL, false, 1);
     // rii points to the 3rd element, the ones added just now
     // should be elements4 and 5:
-    rii++;
+    ++rii;
     assert((*rii)->getTicks()==1);
-    rii++;
+    ++rii;
     assert((*rii)->getTicks()==4);
 
     // Now test inserting an event first, then the state
@@ -476,7 +476,7 @@ void RewindQueue::unitTesting()
     q1.addLocalState(NULL, true, 5);
     rii = q1.m_all_rewind_info.begin();
     assert((*rii)->isState());
-    rii++;
+    ++rii;
     assert((*rii)->isEvent());
 
     // Bugs seen before

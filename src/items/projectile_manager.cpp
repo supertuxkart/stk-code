@@ -99,7 +99,7 @@ void ProjectileManager::update(int ticks)
             he = next;
         }   // if hit effect finished
         else  // hit effect not finished, go to next one.
-            he++;
+            ++he;
     }   // while hit effect != end
 }   // update
 

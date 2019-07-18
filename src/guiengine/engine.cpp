@@ -1298,7 +1298,7 @@ namespace GUIEngine
                                           true /* hcenter */,
                                           true /* vcenter */);
                     count++;
-                    it++;
+                    ++it;
                 }
                 else
                 {

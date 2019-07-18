@@ -440,18 +440,18 @@ void ItemManager::reset()
     {
         if(!*i)
         {
-            i++;
+            ++i;
             continue;
         }
         if((*i)->canBeUsedUp() || (*i)->getType()==ItemState::ITEM_BUBBLEGUM)
         {
             deleteItem( *i );
-            i++;
+            ++i;
         }
         else
         {
             (*i)->reset();
-            i++;
+            ++i;
         }
     }  // whilem_all_items.end() i
 
