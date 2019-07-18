@@ -146,8 +146,32 @@ namespace irr
     Focus = true;
 }
 
+- (void)orientationChanged:(NSNotification*)note
+{
+    UIDevice* device = note.object;
+    switch(device.orientation)
+    {
+        case UIDeviceOrientationLandscapeLeft:
+            Device->setUpsideDown(true);
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            Device->setUpsideDown(false);
+            break;
+        case UIDeviceOrientationPortrait:
+        case UIDeviceOrientationPortraitUpsideDown:
+            break;
+        default:
+            break;
+    };
+}
+
 - (void)runSTK
 {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self selector:@selector(orientationChanged:)
+     name:UIDeviceOrientationDidChangeNotification
+     object:[UIDevice currentDevice]];
     override_default_params_for_mobile();
     ios_main(0, {});
     // App store may not like this
@@ -353,7 +377,8 @@ namespace irr
         EAGLContext* m_eagl_context;
     };
 
-    CIrrDeviceiOS::CIrrDeviceiOS(const SIrrlichtCreationParameters& params) : CIrrDeviceStub(params), DataStorage(0), Close(false)
+    CIrrDeviceiOS::CIrrDeviceiOS(const SIrrlichtCreationParameters& params)
+                 : CIrrDeviceStub(params), DataStorage(0), Close(false), m_upside_down(false)
     {
 #ifdef _DEBUG
         setDebugName("CIrrDeviceiOS");
@@ -432,10 +457,11 @@ namespace irr
             {
                 irr::SEvent ev;
                 ev.EventType = irr::EET_ACCELEROMETER_EVENT;
-                ev.AccelerometerEvent.X = motionManager.accelerometerData.acceleration.x;
-                ev.AccelerometerEvent.Y = motionManager.accelerometerData.acceleration.y;
-                ev.AccelerometerEvent.Z = motionManager.accelerometerData.acceleration.z;
-
+                ev.AccelerometerEvent.X = motionManager.accelerometerData.acceleration.x * 9.81;
+                ev.AccelerometerEvent.Y = motionManager.accelerometerData.acceleration.y * 9.81;
+                ev.AccelerometerEvent.Z = motionManager.accelerometerData.acceleration.z * 9.81;
+                if (m_upside_down)
+                    ev.AccelerometerEvent.Y = -ev.AccelerometerEvent.Y;
                 postEventFromUser(ev);
             }
 
