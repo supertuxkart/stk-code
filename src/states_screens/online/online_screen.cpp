@@ -235,7 +235,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         core::stringw instruction =
-            _("Enter the server address with IP (optional) followed by : and"
+            _("Enter the server address with IP optionally followed by : and"
             " then port.");
         auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
             [] (const irr::core::stringw& text) {},

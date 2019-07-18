@@ -36,7 +36,7 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Mass - there are three classes of karts, depending of their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
+                            text="Mass - there are three classes of karts, depending on their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
                 </div>
                 
                 <div width="100%" proportion="4" layout="horizontal-row">
