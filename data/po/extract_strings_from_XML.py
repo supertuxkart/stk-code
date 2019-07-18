@@ -86,7 +86,7 @@ for file in filenames:
         isAchievements = True
         
     try:
-        doc = defusedxml.minidom.parse(file)
+        doc = xml.dom.minidom.parse(file)
     except Exception as ex:
         print "============================================"
         print "/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")"
