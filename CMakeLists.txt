@@ -492,7 +492,9 @@ else()
         add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS} ${IOS_ASSETS_FILES})
         set_target_properties(supertuxkart PROPERTIES
             MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/data/SuperTuxKart-Info-iOS.plist
-            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 9.0)
+            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 9.0
+            XCODE_ATTRIBUTE_INSTALL_PATH /Applications
+            XCODE_ATTRIBUTE_SKIP_INSTALL No)
     else()
         add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
     endif()
