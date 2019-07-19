@@ -50,6 +50,7 @@ namespace video
 		ColorFormat(ECF_R8G8B8), Params(params), m_default_fb(default_fb)
 	{
 		m_device = device;
+		useCoreContext = !params.ForceLegacyDevice;
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
 	}
 #else
