@@ -787,5 +787,12 @@ bool checkGLError()
     return err != GL_NO_ERROR;
 }
 
+#ifdef WIN32
+// Tell system that it should use nvidia on optimus devices
+extern "C" {
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+#endif
+
 #endif   // !SERVER_ONLY
 
