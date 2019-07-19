@@ -30,6 +30,18 @@ namespace irr
     class CIrrDeviceiOS;
 }
 
+@interface HideStatusBarView : UIViewController
+-(BOOL)prefersStatusBarHidden;
+@end
+
+@implementation HideStatusBarView {}
+
+-(BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+@end
+
 /* CIrrDelegateiOS */
 
 @interface CIrrDelegateiOS : NSObject<UIApplicationDelegate>
@@ -208,7 +220,6 @@ namespace irr
 @implementation CIrrViewiOS
 {
     irr::CIrrDeviceiOS* Device;
-    std::map<void*, size_t> m_touch_id_map;
 }
 
 - (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device forContext:(EAGLContext*)eagl_context
@@ -772,7 +783,7 @@ namespace irr
         {
             SIrrDeviceiOSDataStorage* dataStorage = static_cast<SIrrDeviceiOSDataStorage*>(DataStorage);
             dataStorage->Window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-            dataStorage->ViewController = [[UIViewController alloc] init];
+            dataStorage->ViewController = [[HideStatusBarView alloc] init];
             dataStorage->Window.rootViewController = dataStorage->ViewController;
             [dataStorage->Window makeKeyAndVisible];
         }
