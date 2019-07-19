@@ -451,6 +451,8 @@ public:
         {
 #if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
+#elif defined(IOS_STK)
+            if(m_os!="ios") return false;
 #elif defined(WIN32)
             if(m_os!="windows") return false;
 #elif defined(__APPLE__)
