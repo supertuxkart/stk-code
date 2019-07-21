@@ -808,7 +808,8 @@ void RaceResultGUI::displayCTFResults()
         if (m_distance_between_rows * num_karts > height)
             m_distance_between_rows = height / num_karts;
 
-        m_width_icon = table_area->m_h / 18;
+        m_width_icon = std::min((int)(table_area->m_h / num_karts),
+                                   GUIEngine::getFontHeight());
 
         m_width_column_space = 10;
 
