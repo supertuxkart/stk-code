@@ -31,7 +31,7 @@ Fedora command:
 
 ```bash
 sudo dnf install @development-tools angelscript-devel \ 
-bluez-libs-devel cmake desktop-file-utils fontpackages-devel \
+bluez-libs-devel cmake desktop-file-utils  \
 freealut-devel freeglut-devel freetype-devel fribidi-devel \
 gcc-c++ git-core libXrandr-devel libcurl-devel libjpeg-turbo-devel \ 
 libpng-devel libsquish-devel libtool libvorbis-devel mesa-libEGL-devel \ 
