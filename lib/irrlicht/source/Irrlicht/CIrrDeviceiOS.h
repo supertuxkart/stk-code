@@ -16,6 +16,7 @@
 #include "IImagePresenter.h"
 #include <map>
 #include <set>
+#include <string>
 
 namespace irr
 {
@@ -112,6 +113,7 @@ namespace irr
             m_touch_id_map.clear();
         }
         void setUpsideDown(bool val) { m_upside_down = val; }
+        static std::string getSystemLanguageCode();
     private:
         void createWindow();
         void createViewAndDriver();

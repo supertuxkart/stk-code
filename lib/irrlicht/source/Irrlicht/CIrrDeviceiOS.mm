@@ -858,6 +858,11 @@ namespace irr
     {
         [static_cast<SIrrDeviceiOSDataStorage*>(DataStorage)->View display];
     }
+    std::string CIrrDeviceiOS::getSystemLanguageCode()
+    {
+        NSString* language = [[NSLocale preferredLanguages] firstObject];
+        return std::string([language UTF8String]);
+    }
 }
 
 #ifdef _IRR_COMPILE_WITH_IOS_BUILTIN_MAIN_

@@ -49,6 +49,9 @@
 #include "main_android.hpp"
 #endif
 
+#ifdef IOS_STK
+#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
+#endif
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
@@ -322,7 +325,14 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             language = p_lang;
         else
         {
-#ifdef WIN32
+#ifdef IOS_STK
+            language = irr::CIrrDeviceiOS::getSystemLanguageCode();
+            if (language.find("zh-Hans") != std::string::npos)
+                language = "zh_CN";
+            else if (language.find("zh-Hant") != std::string::npos)
+                language = "zh_TW";
+            language = StringUtils::findAndReplace(language, "-", "_");
+#elif defined(WIN32)
             // Thanks to the frogatto developer for this code snippet:
             char c[1024];
             GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME,
