@@ -160,6 +160,8 @@ namespace irr
 
 - (void)orientationChanged:(NSNotification*)note
 {
+    if (Device == nil)
+        return;
     UIDevice* device = note.object;
     switch(device.orientation)
     {
@@ -214,6 +216,7 @@ namespace irr
 @interface CIrrViewiOS : GLKView
 
 - (id)initWithFrame:(CGRect)frame forDevice:(irr::CIrrDeviceiOS*)device forContext:(EAGLContext*)eagl_context;
+- (void)setDevice:(irr::CIrrDeviceiOS*)device;
 
 @end
 
@@ -235,9 +238,16 @@ namespace irr
     return self;
 }
 
+- (void)setDevice:(irr::CIrrDeviceiOS*)device
+{
+    Device = device;
+}
 
 - (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
+    if (Device == nil)
+        return;
+
     irr::SEvent ev;
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_PRESSED_DOWN;
@@ -268,6 +278,9 @@ namespace irr
 
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
+    if (Device == nil)
+        return;
+
     irr::SEvent ev;
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_MOVED;
@@ -298,6 +311,9 @@ namespace irr
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
+    if (Device == nil)
+        return;
+
     irr::SEvent ev;
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_LEFT_UP;
@@ -329,6 +345,9 @@ namespace irr
 
 - (void)touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
 {
+    if (Device == nil)
+        return;
+
     irr::SEvent ev;
     ev.EventType = irr::EET_TOUCH_INPUT_EVENT;
     ev.TouchInput.Event = irr::ETIE_LEFT_UP;
@@ -375,6 +394,8 @@ namespace irr
         {
             [Window release];
             [ViewController release];
+            if (View != nil)
+                [View setDevice:nil];
             [View release];
             [MotionManager release];
             [EAGLContext setCurrentContext:0];
