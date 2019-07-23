@@ -146,7 +146,10 @@ void DownloadAssets::eventCallback(Widget* widget, const std::string& name,
                                     "Failed to create extract ok file.");
                             }
                             else
+                            {
                                 fclose(fp);
+                                file_manager->reinitAfterDownloadAssets();
+                            }
                         }
                         file_manager->removeFile(zip);
                     }

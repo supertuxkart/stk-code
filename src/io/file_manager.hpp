@@ -131,6 +131,7 @@ private:
     void              checkAndCreateCachedTexturesDir();
     void              checkAndCreateGPDir();
     void              discoverPaths();
+    void              addAssetsSearchPath();
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
     std::string       checkAndCreateLinuxDir(const char *env_name,
                                              const char *dir_name,
@@ -142,6 +143,7 @@ public:
                       FileManager();
                      ~FileManager();
     void              init();
+    void              reinitAfterDownloadAssets();
     static void       addRootDirs(const std::string &roots);
     static void       setStdoutName(const std::string &name);
     static void       setStdoutDir(const std::string &dir);

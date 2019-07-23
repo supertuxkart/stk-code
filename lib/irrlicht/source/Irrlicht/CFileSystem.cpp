@@ -426,6 +426,14 @@ bool CFileSystem::addFileArchive(IFileArchive* archive)
 }
 
 
+void CFileSystem::removeAllFileArchives()
+{
+    for (u32 index = 0; index < FileArchives.size(); index++)
+        FileArchives[index]->drop();
+    FileArchives.clear();
+}
+
+
 //! removes an archive from the file system.
 bool CFileSystem::removeFileArchive(u32 index)
 {

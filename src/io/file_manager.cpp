@@ -359,6 +359,14 @@ void FileManager::discoverPaths()
 void FileManager::init()
 {
     discoverPaths();
+    addAssetsSearchPath();
+    m_cert_bundle_location = m_file_system->getAbsolutePath(
+        getAsset("cacert.pem").c_str()).c_str();
+}   // init
+
+//-----------------------------------------------------------------------------
+void FileManager::addAssetsSearchPath()
+{
     // Note that we can't push the texture search path in the constructor
     // since this also adds a file archive to the file system - and
     // m_file_system is deleted (in irr_driver)
@@ -379,10 +387,17 @@ void FileManager::init()
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
+}   // addAssetsSearchPath
 
-    m_cert_bundle_location = m_file_system->getAbsolutePath(
-        getAsset("cacert.pem").c_str()).c_str();
-}   // init
+//-----------------------------------------------------------------------------
+void FileManager::reinitAfterDownloadAssets()
+{
+    m_file_system->removeAllFileArchives();
+    m_texture_search_path.clear();
+    m_model_search_path.clear();
+    m_music_search_path.clear();
+    addAssetsSearchPath();
+}   // reinitAfterDownloadAssets
 
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()

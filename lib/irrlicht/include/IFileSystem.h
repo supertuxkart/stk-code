@@ -159,6 +159,8 @@ public:
 	//! Get the number of archives currently attached to the file system
 	virtual u32 getFileArchiveCount() const =0;
 
+	virtual void removeAllFileArchives() =0;
+
 	//! Removes an archive from the file system.
 	/** This will close the archive and free any file handles, but will not
 	close resources which have already been loaded and are now cached, for
