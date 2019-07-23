@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
         <header id="title" text_align="center" width="80%" align="center" I18N="In the server configuration screen" text="Server Configuration"/>
+        <spacer height="1%" width="20"/>
         <box proportion="1" width="90%" layout="vertical-row" align="center">
 
             <label width="100%" height="8%" text_align="left" I18N="In the server configuration screen" text="Difficulty"/>

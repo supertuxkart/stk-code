@@ -740,11 +740,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         return;
 
     // -2 because that's the spacing further on
-    int ICON_PLAYER_WIDTH = std::max(y_space / (num_karts) - 2,
-                                    (unsigned)GUIEngine::getFontHeight());
+    int ICON_PLAYER_WIDTH = y_space / num_karts - 2;
 
     int icon_width_max = (int)(60*(irr_driver->getActualScreenSize().Width/1024.0f));
-    int icon_width_min = (int)(35*((irr_driver->getActualScreenSize().Height - (y_base+10))/720.0f));
+    int icon_width_min = GUIEngine::getFontHeight();
     if (icon_width_min < 35) icon_width_min = 35;
     if (icon_width_min > icon_width_max)
     {
