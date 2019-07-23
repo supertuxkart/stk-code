@@ -1745,7 +1745,13 @@ void initRest()
 #ifndef SERVER_ONLY
     addons_manager = NULL;
     if (!ProfileWorld::isNoGraphics())
+    {
+        // Need to load shader after downloading assets as it reads prefilled
+        // textures
+        if (CVS->isGLSL())
+            SP::loadShaders();
         addons_manager = new AddonsManager();
+    }
 #endif
     Online::ProfileManager::create();
 

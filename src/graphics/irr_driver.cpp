@@ -994,6 +994,8 @@ void IrrDriver::applyResolutionSettings()
     {
         m_perf_query[i]->reset();
     }
+    if (CVS->isGLSL())
+        SP::loadShaders();
 #endif
 
     font_manager = new FontManager();
