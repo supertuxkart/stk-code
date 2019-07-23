@@ -51,7 +51,9 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 void OnlineProfileServers::beforeAddingWidget()
 {
 #ifdef IOS_STK
-    getWidget("create_wan_server")->setVisible(false);
+    Widget* w = getWidget("create_wan_server");
+    if (w)
+        w->setVisible(false);
 #endif
 }   // beforeAddingWidget
 

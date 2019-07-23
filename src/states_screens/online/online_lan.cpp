@@ -46,7 +46,9 @@ OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
 void OnlineLanScreen::beforeAddingWidget()
 {
 #ifdef IOS_STK
-    getWidget("create_lan_server")->setVisible(false);
+    Widget* w = getWidget("create_lan_server");
+    if (w)
+        w->setVisible(false);
 #endif
 }   // beforeAddingWidget
 
