@@ -246,7 +246,8 @@ private:
     /** Default FPS rate for physics. */
     int m_physics_fps;
 
-
+    std::string m_title_music_file;
+    std::string m_default_music_file;
 public:
     STKConfig();
     ~STKConfig();
@@ -255,7 +256,7 @@ public:
     void load(const std::string &filename);
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
-
+    void initMusicFiles();
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------
     /** Returns the default kart properties for each kart. */

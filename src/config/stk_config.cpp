@@ -41,6 +41,7 @@ STKConfig::STKConfig()
 {
     m_has_been_loaded         = false;
     m_title_music             = NULL;
+    m_default_music           = NULL;
     m_default_kart_properties = new KartProperties();
 }   // STKConfig
 //-----------------------------------------------------------------------------
@@ -392,21 +393,13 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *music_node = root->getNode("music"))
     {
-        std::string title_music;
-        music_node->get("title", &title_music);
-        assert(title_music.size() > 0);
-        title_music = file_manager->getAsset(FileManager::MUSIC, title_music);
-        m_title_music = MusicInformation::create(title_music);
-        if(!m_title_music)
-            Log::error("StkConfig", "Cannot load title music : %s", title_music.c_str());
+        music_node->get("title", &m_title_music_file);
+        assert(m_title_music_file.size() > 0);
+        m_title_music_file = file_manager->getAsset(FileManager::MUSIC, m_title_music_file);
 
-        std::string default_music;
-        music_node->get("default", &default_music);
-        assert(default_music.size() > 0);
-        default_music = file_manager->getAsset(FileManager::MUSIC, default_music);
-        m_default_music = MusicInformation::create(default_music);
-        if (!m_default_music)
-            Log::error("StkConfig", "Cannot load default music : %s", default_music.c_str());
+        music_node->get("default", &m_default_music_file);
+        assert(m_default_music_file.size() > 0);
+        m_default_music_file = file_manager->getAsset(FileManager::MUSIC, m_default_music_file);
     }
 
     if(const XMLNode *skidmarks_node = root->getNode("skid-marks"))
@@ -574,6 +567,26 @@ void STKConfig::getAllData(const XMLNode * root)
         m_kart_properties[type->getName()]->getAllData(type);
     }
 }   // getAllData
+
+// ----------------------------------------------------------------------------
+/** Init the music files after downloading assets
+ */
+void STKConfig::initMusicFiles()
+{
+    m_title_music = MusicInformation::create(m_title_music_file);
+    if (!m_title_music)
+    {
+        Log::error("StkConfig", "Cannot load title music: %s.",
+            m_title_music_file.c_str());
+    }
+
+    m_default_music = MusicInformation::create(m_default_music_file);
+    if (!m_default_music)
+    {
+        Log::error("StkConfig", "Cannot load default music: %s.",
+            m_default_music_file.c_str());
+    }
+}   // initMusicFiles
 
 // ----------------------------------------------------------------------------
 /** Defines the points for each position for a race with a given number

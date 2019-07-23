@@ -1739,6 +1739,7 @@ void initRest()
     }
 #endif
 
+    stk_config->initMusicFiles();
     // This only initialises the non-network part of the add-ons manager. The
     // online section of the add-ons manager will be initialised from a
     // separate thread running in network HTTP.
