@@ -90,7 +90,8 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 void InputManager::update(float dt)
 {
 #ifdef ENABLE_WIIUSE
-    wiimote_manager->update();
+    if (wiimote_manager)
+        wiimote_manager->update();
 #endif
 
     if(m_timer_in_use)
@@ -117,7 +118,8 @@ void InputManager::handleStaticAction(int key, int value)
     World *world = World::getWorld();
 
     // When no players... a cutscene
-    if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
+    if (race_manager &&
+        race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
         (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
         key == IRR_KEY_BUTTON_A))
     {
@@ -821,7 +823,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
         }
-        else if (race_manager->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
+        else if (race_manager &&
+            race_manager->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Get the first ghost kart
             World::getWorld()->getKart(0)

@@ -33,7 +33,6 @@
 
 namespace Online
 {
-    struct curl_slist* HTTPRequest::m_http_header = NULL;
     const std::string API::USER_PATH = "user/";
     const std::string API::SERVER_PATH = "server/";
 
@@ -98,11 +97,6 @@ namespace Online
         m_parameters    = "";
         m_curl_code     = CURLE_OK;
         m_progress.setAtomic(0);
-        if (m_http_header == nullptr)
-        {
-            std::string Host = "Host: " + StringUtils::getHostNameFromURL(stk_config->m_server_api);
-            m_http_header = curl_slist_append(m_http_header, Host.c_str());
-        }
         m_disable_sending_log = false;
     }   // init
 
@@ -193,7 +187,8 @@ namespace Online
             Log::error("HTTPRequest", "Error: '%s'.", error,
                 curl_easy_strerror(error));
         }
-
+        std::string host = "Host: " + StringUtils::getHostNameFromURL(m_url);
+        m_http_header = curl_slist_append(m_http_header, host.c_str());
         assert(m_http_header != nullptr);
         curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, m_http_header);
         curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
@@ -271,7 +266,11 @@ namespace Online
             Log::info("HTTPRequest", "Sending %s to %s", param.c_str(), m_url.c_str());
         } // end log http request
 
-        curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
+        if (!m_download_assets_request)
+        {
+            curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS,
+                m_parameters.c_str());
+        }
         const std::string& uagent = StringUtils::getUserAgentString();
         curl_easy_setopt(m_curl_session, CURLOPT_USERAGENT, uagent.c_str());
 
@@ -320,6 +319,11 @@ namespace Online
             setProgress(-1.0f);
 
         Request::afterOperation();
+        if (m_http_header)
+        {
+            curl_slist_free_all(m_http_header);
+            m_http_header = NULL;
+        }
         if (m_curl_session)
         {
             curl_easy_cleanup(m_curl_session);
@@ -360,7 +364,8 @@ namespace Online
 
         // Check if we are asked to abort the download. If so, signal this
         // back to libcurl by returning a non-zero status.
-        if ((RequestManager::get()->getAbort() || request->isCancelled()) &&
+        if (RequestManager::isRunning() &&
+            (RequestManager::get()->getAbort() || request->isCancelled()) &&
              request->isAbortable()                                     )
         {
             // Indicates to abort the current download, which means that this

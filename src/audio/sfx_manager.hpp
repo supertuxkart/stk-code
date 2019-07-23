@@ -247,7 +247,6 @@ public:
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
     {
-        assert(m_sfx_manager);
         return m_sfx_manager;
     }   // get
 

@@ -228,7 +228,28 @@ FileManager::FileManager()
     addRootDirs(root_dir);
 
     std::string assets_dir;
-
+#ifdef MOBILE_STK
+    // Check if the bundled data includes stk-assets, if not download it later
+    // Check only 1 entry for now (karts)
+    if (!fileExists(root_dir + "/karts"))
+    {
+        assets_dir = getenv("HOME");
+#ifdef IOS_STK
+        assets_dir += "/Library/Application Support/SuperTuxKart/stk-assets";
+#elif defined (ANDROID)
+        assets_dir += "/stk-assets";
+#endif
+        m_stk_assets_download_dir = assets_dir;
+        // Those will be filled with real data later
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/karts");
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/library");
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/models");
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/music");
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/sfx");
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/textures");
+        checkAndCreateDirectoryP(m_stk_assets_download_dir + "/tracks");
+    }
+#else
     if (getenv("SUPERTUXKART_ASSETS_DIR") != NULL)
     {
         assets_dir = std::string(getenv("SUPERTUXKART_ASSETS_DIR"));
@@ -246,7 +267,7 @@ FileManager::FileManager()
         //is this needed?
         assets_dir = std::string(getenv("SUPERTUXKART_ROOT_PATH"));
     }
-
+#endif
     if (!assets_dir.empty() && assets_dir != root_dir)
     {
         addRootDirs(assets_dir);
@@ -1429,7 +1450,7 @@ bool FileManager::removeDirectory(const std::string &name) const
             // We need to remove whole data directory on Android though, i.e.
             // when we install newer STK version and new assets are extracted.
             // So enable it only for Android for now.
-            #ifdef ANDROID
+            #ifdef MOBILE_STK
             removeDirectory(file);
             #endif
         }

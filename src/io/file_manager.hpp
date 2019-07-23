@@ -105,6 +105,9 @@ private:
     /** Location of the certificate bundle. */
     std::string       m_cert_bundle_location;
 
+    /** Mobile stk specific to download stk-assets in the first. */
+    std::string       m_stk_assets_download_dir;
+
     std::vector<TextureSearchPath> m_texture_search_path;
 
     std::vector<std::string>
@@ -231,8 +234,12 @@ public:
     {
         return m_subdir_name[SHADER];
     }
-
-    const std::string& getCertBundleLocation() const { return m_cert_bundle_location; }
+    // ------------------------------------------------------------------------
+    const std::string& getSTKAssetsDownloadDir() const
+                                          { return m_stk_assets_download_dir; }
+    // ------------------------------------------------------------------------
+    const std::string& getCertBundleLocation() const
+                                             { return m_cert_bundle_location; }
 
 };   // FileManager
 

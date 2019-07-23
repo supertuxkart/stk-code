@@ -68,7 +68,7 @@ LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
 #endif
 
 // ----------------------------------------------------------------------------
-MainLoop::MainLoop(unsigned parent_pid)
+MainLoop::MainLoop(unsigned parent_pid, bool download_assets)
         : m_abort(false), m_request_abort(false), m_ticks_adjustment(0), 
           m_parent_pid(parent_pid)
 {
@@ -77,6 +77,7 @@ MainLoop::MainLoop(unsigned parent_pid)
     m_throttle_fps    = true;
     m_allow_large_dt  = false;
     m_frame_before_loading_world = false;
+    m_download_assets = download_assets;
 #ifdef WIN32
     if (parent_pid != 0)
     {
@@ -395,7 +396,7 @@ void MainLoop::run()
             }
 
 #ifndef SERVER_ONLY
-            if (CVS->isGLSL())
+            if (CVS->isGLSL() && !m_download_assets)
             {
                 // Flush all command before delete world, avoid later access
                 SP::SPTextureManager::get()
@@ -453,14 +454,20 @@ void MainLoop::run()
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
-                PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
-                SFXManager::get()->update();
-                PROFILER_POP_CPU_MARKER();
+                if (!m_download_assets)
+                {
+                    PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
+                    SFXManager::get()->update();
+                    PROFILER_POP_CPU_MARKER();
+                }
             }
             // Some protocols in network will use RequestManager
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(frame_duration);
-            PROFILER_POP_CPU_MARKER();
+            if (!m_download_assets)
+            {
+                PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+                Online::RequestManager::get()->update(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+            }
 
             m_ticks_adjustment.lock();
             if (m_ticks_adjustment.getData() != 0)

@@ -205,6 +205,7 @@ public:
     /* URLs for donating and reseting the password */
     std::string m_donate_url;
     std::string m_password_reset_url;
+    std::string m_assets_download_url;
 
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;

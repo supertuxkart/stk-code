@@ -73,6 +73,9 @@ void ItemManager::destroy()
  */
 void ItemManager::loadDefaultItemMeshes()
 {
+    m_item_mesh.clear();
+    m_item_lowres_mesh.clear();
+    m_glow_color.clear();
     m_item_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
     m_glow_color.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1,
                         video::SColorf(255.0f, 255.0f, 255.0f) );
@@ -136,6 +139,8 @@ void ItemManager::loadDefaultItemMeshes()
  */
 void ItemManager::removeTextures()
 {
+    if (m_item_mesh.empty() && m_item_lowres_mesh.empty())
+        return;
     for(unsigned int i=0; i<ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1; i++)
     {
         if(m_item_mesh[i])

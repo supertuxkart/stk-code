@@ -31,16 +31,18 @@ class MainLoop
 private:
     /** True if the main loop should exit. */
     std::atomic_bool m_abort;
-    
+
     std::atomic_bool m_request_abort;
 
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
-    
+
     /** True if dt is not decreased for low fps */
     bool m_allow_large_dt;
 
     bool m_frame_before_loading_world;
+
+    bool m_download_assets;
 
     Synchronised<int> m_ticks_adjustment;
 
@@ -50,7 +52,7 @@ private:
     float    getLimitedDt();
     void     updateRace(int ticks, bool fast_forward);
 public:
-         MainLoop(unsigned parent_pid);
+         MainLoop(unsigned parent_pid, bool download_assets = false);
         ~MainLoop();
     void run();
     /** Set the abort flag, causing the mainloop to be left. */

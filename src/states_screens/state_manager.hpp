@@ -210,7 +210,7 @@ public:
     // singleton
     static StateManager* get();
     static void deallocate();
-
+    void clearMenuStack() { m_menu_stack.clear(); }
 private:
     /**
      * A list of all currently playing players.

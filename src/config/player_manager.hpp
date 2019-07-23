@@ -82,7 +82,6 @@ public:
     // ------------------------------------------------------------------------
     static void destroy()
     {
-        assert(m_player_manager);
         delete m_player_manager;
         m_player_manager = NULL;
     }   // destroy

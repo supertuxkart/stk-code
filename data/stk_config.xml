@@ -177,7 +177,8 @@
   <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
   <urls donate="https://supertuxkart.net/Donate"
-        password-reset="https://online.supertuxkart.net/password-reset.php" />
+        password-reset="https://online.supertuxkart.net/password-reset.php"
+        assets-download="https://downloads.sourceforge.net/project/supertuxkart/stk-assets-mobile/"/>
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over

@@ -496,10 +496,11 @@ void STKConfig::getAllData(const XMLNode * root)
         replay_node->get("player-icon", &m_minimap_player_icon  );
     }
 
-    if(const XMLNode *replay_node = root->getNode("urls"))
+    if (const XMLNode *urls = root->getNode("urls"))
     {
-        replay_node->get("donate",         &m_donate_url         );
-        replay_node->get("password-reset", &m_password_reset_url );
+        urls->get("donate", &m_donate_url);
+        urls->get("password-reset", &m_password_reset_url);
+        urls->get("assets-download", &m_assets_download_url);
     }
 
     if (const XMLNode *fonts_list = root->getNode("fonts-list"))

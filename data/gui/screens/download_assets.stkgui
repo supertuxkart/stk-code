@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="1%" y="1%" width="100%" height="100%" layout="vertical-row">
+        <header id="title" text_align="center" width="80%" height="8%" align="center"
+        I18N="In the download assets screen" text="Download game assets"/>
+        <icon id="logo" align="center" proportion="1" height="30%" icon="gui/icons/logo.png"/>
+        <box width="80%" height="fit" layout="vertical-row" align="center">
+            <spacer height="20"/>
+            <div width="100%" height="fit" layout="horizontal-row">
+                <label I18N="In the download assets screen" align="center" width="fit" word_wrap="true"
+                    text="SuperTuxKart needs to download assets required to play the game now, this will use your mobile data if you don't have a wifi connection."/>
+            </div>
+            <spacer height="40"/>
+            <div width="100%" height="fit" layout="horizontal-row">
+                <label I18N="In the download assets screen, download options of assets" align="center" width="fit"
+                    text="Include all tracks"/>
+                <spacer width="10"/>
+                <checkbox id="all-tracks" width="fit"/>
+            </div>
+            <spacer height="10"/>
+            <div width="100%" height="fit" layout="horizontal-row">
+                <label I18N="In the download assets screen, download options of assets" align="center" width="fit"
+                    text="Use high quality textures and music"/>
+                <spacer width="10"/>
+                <checkbox id="hd-textures" width="fit"/>
+            </div>
+        </box>
+        <spacer height="5%"/>
+        <progressbar height="1f" id="progress" width="80%" align="center"></progressbar>
+        <spacer height="5%"/>
+        <buttonbar id="buttons" height="15%" width="100%" align="center">
+            <icon-button id="ok" width="15%" height="15%" icon="gui/icons/green_check.png" text="OK" align="center"/>
+        </buttonbar>
+        <spacer height="2%"/>
+    </div>
+</stkgui>

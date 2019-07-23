@@ -234,6 +234,7 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
+#include "states_screens/download_assets.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/register_screen.hpp"
@@ -1668,6 +1669,19 @@ void initUserConfig()
 }   // initUserConfig
 
 //=============================================================================
+void clearGlobalVariables()
+{
+    // In android sometimes global variables is not reset when restart the app
+    // we clear it here as much as possible
+    race_manager = NULL;
+    music_manager = NULL;
+    irr_driver = NULL;
+#ifdef ENABLE_WIIUSE
+    wiimote_manager = NULL;
+#endif
+}   // clearGlobalVariables
+
+//=============================================================================
 void initRest()
 {
     SP::setMaxTextureSize();
@@ -1696,6 +1710,34 @@ void initRest()
     font_manager = new FontManager();
     font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
+    input_manager = new InputManager();
+    // Get into menu mode initially.
+    input_manager->setMode(InputManager::MENU);
+#ifdef MOBILE_STK
+    if (DownloadAssets::getInstance()->needDownloadAssets())
+    {
+        // The screen tell user it will use wifi / cellular data to download already
+        int prev_state = UserConfigParams::m_internet_status;
+        UserConfigParams::m_internet_status = Online::RequestManager::IPERM_ALLOWED;
+        DownloadAssets::getInstance()->push();
+        main_loop = new MainLoop(0, true/*download_assets*/);
+        main_loop->run();
+        delete main_loop;
+        main_loop = NULL;
+        // Reset after finish download
+        UserConfigParams::m_internet_status = prev_state;
+        if (DownloadAssets::getInstance()->needDownloadAssets())
+            throw std::runtime_error("User doesn't want to download assets");
+        else
+        {
+            // Clean the download assets screen after downloading
+            GUIEngine::clear();
+            GUIEngine::cleanUp();
+            GUIEngine::clearScreenCache();
+            GUIEngine::init(device, driver, StateManager::get());
+        }
+    }
+#endif
 
     // This only initialises the non-network part of the add-ons manager. The
     // online section of the add-ons manager will be initialised from a
@@ -1864,6 +1906,7 @@ int ios_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
+    clearGlobalVariables();
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
@@ -1964,14 +2007,10 @@ int main(int argc, char *argv[])
             profiler.init();
         initRest();
 
-        input_manager = new InputManager ();
-
 #ifdef ENABLE_WIIUSE
         wiimote_manager = new WiimoteManager();
 #endif
 
-        // Get into menu mode initially.
-        input_manager->setMode(InputManager::MENU);
         int parent_pid;
         bool has_parent_process = false;
         if (CommandLine::has("--parent-process", &parent_pid))
@@ -2336,8 +2375,10 @@ static void cleanSuperTuxKart()
 
     // Stop music (this request will go into the sfx manager queue, so it needs
     // to be done before stopping the thread).
-    music_manager->stopMusic();
-    SFXManager::get()->stopThread();
+    if (music_manager)
+        music_manager->stopMusic();
+    if (SFXManager::get())
+        SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
@@ -2376,7 +2417,8 @@ static void cleanSuperTuxKart()
     if (!ProfileWorld::isNoGraphics())
     {
         if (UserConfigParams::m_internet_status == Online::RequestManager::
-            IPERM_ALLOWED && !NewsManager::get()->waitForReadyToDeleted(2.0f))
+            IPERM_ALLOWED && NewsManager::isRunning() &&
+            !NewsManager::get()->waitForReadyToDeleted(2.0f))
         {
             Log::info("Thread", "News manager not stopping, exiting anyway.");
         }
@@ -2384,16 +2426,20 @@ static void cleanSuperTuxKart()
     }
 #endif
 
-    if (Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
+    if (Online::RequestManager::isRunning())
     {
-        Online::RequestManager::deallocate();
-    }
-    else
-    {
-        Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
+        if (Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
+        {
+            Online::RequestManager::deallocate();
+        }
+        else
+        {
+            Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
+        }
     }
 
-    if (!SFXManager::get()->waitForReadyToDeleted(2.0f))
+    if (SFXManager::get() &&
+        !SFXManager::get()->waitForReadyToDeleted(2.0f))
     {
         Log::info("Thread", "SFXManager not stopping, exiting anyway.");
     }

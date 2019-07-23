@@ -176,7 +176,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         if (cmd == APP_CMD_PAUSE || cmd == APP_CMD_LOST_FOCUS)
         {
             // Make sure that pause/unpause is executed only once
-            if (device->isWindowMinimized() == device->isWindowFocused())
+            if (music_manager && device->isWindowMinimized() == device->isWindowFocused())
             {
                 music_manager->pauseMusic();
                 SFXManager::get()->pauseAll();
@@ -184,7 +184,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         }
         else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)
         {
-            if (device->isWindowActive())
+            if (music_manager && device->isWindowActive())
             {
                 music_manager->resumeMusic();
                 SFXManager::get()->resumeAll();

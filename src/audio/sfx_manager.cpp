@@ -76,7 +76,6 @@ void SFXManager::create()
  */
 void SFXManager::destroy()
 {
-    assert(m_sfx_manager);
     delete m_sfx_manager;
     m_sfx_manager = NULL;
 }    // destroy

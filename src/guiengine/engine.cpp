@@ -880,6 +880,7 @@ namespace GUIEngine
 
     void clearScreenCache()
     {
+        StateManager::get()->clearMenuStack();
         Screen* screen;
         for_in (screen, g_loaded_screens)
         {

@@ -117,6 +117,8 @@ public:
         return m_news_manager;
     }   // get
     // ------------------------------------------------------------------------
+    static bool isRunning() { return m_news_manager != NULL; }
+    // ------------------------------------------------------------------------
     static void deallocate()
     {
         if(m_news_manager)
