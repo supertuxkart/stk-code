@@ -201,7 +201,7 @@ void DownloadAssets::onUpdate(float dt)
             // Reset the download buttons so user can redownload if needed
             // I18N: Shown when there is download error for assets download
             // in the first run
-            core::stringw msg = _("Failed to download assets, please try again later.");
+            core::stringw msg = _("Failed to download assets, check your storage space or internet connection and try again later.");
             MessageQueue::add(MessageQueue::MT_ERROR, msg);
             DownloadAssets::init();
         }
