@@ -19,32 +19,33 @@
 
 ################################################################################
 
-export KARTS="all"
-export TRACKS="abyss arena_candela_city battleisland cave cornfield_crossing   \
-               endcutscene featunlocked fortmagma gplose gpwin hacienda        \
-               icy_soccer_field introcutscene introcutscene2 lasdunasarena     \
-               lasdunassoccer lighthouse mines minigolf olivermath overworld   \
-               ravenbridge_mansion sandtrack scotland snowmountain snowtuxpeak \
-               soccer_field stadium stk_enterprise temple tutorial             \
-               volcano_island xr591 zengarden"
+export KARTS_DEFAULT="all"
+export TRACKS_DEFAULT="abyss arena_candela_city battleisland cave              \
+                       cornfield_crossing endcutscene featunlocked fortmagma   \
+                       gplose gpwin hacienda icy_soccer_field introcutscene    \
+                       introcutscene2 lasdunasarena lasdunassoccer lighthouse  \
+                       mines minigolf olivermath overworld ravenbridge_mansion \
+                       sandtrack scotland snowmountain snowtuxpeak             \
+                       soccer_field stadium stk_enterprise temple tutorial     \
+                       volcano_island xr591 zengarden"
+
+export TEXTURE_SIZE_DEFAULT=256
+export JPEG_QUALITY_DEFAULT=85
+export PNG_QUALITY_DEFAULT=95
+export PNGQUANT_QUALITY_DEFAULT=90
+export SOUND_QUALITY_DEFAULT=42
+export SOUND_MONO_DEFAULT=1
+export SOUND_SAMPLE_DEFAULT=32000
+
+export RUN_OPTIMIZE_SCRIPT_DEFAULT=0
+export DECREASE_QUALITY_DEFAULT=1
+export CONVERT_TO_JPG_DEFAULT=1
 
 export ASSETS_PATHS="../data                    \
                      ../../stk-assets           \
                      ../../supertuxkart-assets"
 
 export ASSETS_DIRS="library models music sfx textures"
-
-export TEXTURE_SIZE=256
-export JPEG_QUALITY=85
-export PNG_QUALITY=95
-export PNGQUANT_QUALITY=90
-export SOUND_QUALITY=42
-export SOUND_MONO=1
-export SOUND_SAMPLE=32000
-
-export RUN_OPTIMIZE_SCRIPT=0
-export DECREASE_QUALITY=1
-export CONVERT_TO_JPG=1
 
 export CONVERT_TO_JPG_BLACKLIST="data/models/traffic_light.png"
 
@@ -55,6 +56,55 @@ export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 export LANG=C
 
 cd "`dirname "$0"`"
+
+# Set default configuration if not changed outside of the script
+if [ -z "$KARTS" ]; then
+    export KARTS="$KARTS_DEFAULT"
+fi
+
+if [ -z "$TRACKS" ]; then
+    export TRACKS="$TRACKS_DEFAULT"
+fi
+
+if [ -z "$TEXTURE_SIZE" ]; then
+    export TEXTURE_SIZE="$TEXTURE_SIZE_DEFAULT"
+fi
+
+if [ -z "$JPEG_QUALITY" ]; then
+    export JPEG_QUALITY="$JPEG_QUALITY_DEFAULT"
+fi
+
+if [ -z "$PNG_QUALITY" ]; then
+    export PNG_QUALITY="$PNG_QUALITY_DEFAULT"
+fi
+
+if [ -z "$PNGQUANT_QUALITY" ]; then
+    export PNGQUANT_QUALITY="$PNGQUANT_QUALITY_DEFAULT"
+fi
+
+if [ -z "$SOUND_QUALITY" ]; then
+    export SOUND_QUALITY="$SOUND_QUALITY_DEFAULT"
+fi
+
+if [ -z "$SOUND_MONO" ]; then
+    export SOUND_MONO="$SOUND_MONO_DEFAULT"
+fi
+
+if [ -z "$SOUND_SAMPLE" ]; then
+    export SOUND_SAMPLE="$SOUND_SAMPLE_DEFAULT"
+fi
+
+if [ -z "$RUN_OPTIMIZE_SCRIPT" ]; then
+    export RUN_OPTIMIZE_SCRIPT="$RUN_OPTIMIZE_SCRIPT_DEFAULT"
+fi
+
+if [ -z "$DECREASE_QUALITY" ]; then
+    export DECREASE_QUALITY="$DECREASE_QUALITY_DEFAULT"
+fi
+
+if [ -z "$CONVERT_TO_JPG" ]; then
+    export CONVERT_TO_JPG="$CONVERT_TO_JPG_DEFAULT"
+fi
 
 # Find assets path
 for ASSETS_PATH in $ASSETS_PATHS; do
