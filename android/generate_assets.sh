@@ -310,21 +310,21 @@ convert_to_jpg()
     
     if [ $BLACKLISTED -eq 1 ]; then
         #echo "  File is blacklisted. Ignore..."
-        continue
+        return
     fi
 
     FILE_EXTENSION=`echo "$FILE" | tail -c 5`
 
     if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
         #echo "  Unsupported file extension. Ignore..."
-        continue
+        return
     fi
 
     FILE_FORMAT=`identify -format %m "$FILE"`
 
     if [ "$FILE_FORMAT" = "JPEG" ]; then
         #echo "  File is already JPEG. Ignore..."
-        continue
+        return
     fi
 
     IS_OPAQUE=`identify -format '%[opaque]' "$FILE"`
@@ -332,7 +332,7 @@ convert_to_jpg()
 
     if [ "$IS_OPAQUE" = "False" ] || [ "$IS_OPAQUE" = "false" ]; then
         #echo "  File has alpha channel. Ignore..."
-        continue
+        return
     fi
 
     DIRNAME="`dirname "$FILE"`"
@@ -342,14 +342,14 @@ convert_to_jpg()
     
     if [ $IS_GLOSS_MAP -gt 0 ]; then
         #echo "  File is a gloss-map. Ignore..."
-        continue
+        return
     fi
 
     NEW_FILE="`echo $FILE | head -c -5`.jpg"
 
     if [ -f "$NEW_FILE" ]; then
         #echo "  There is already a file with .jpg extension. Ignore..."
-        continue
+        return
     fi
 
     # We can check if new file is smaller
