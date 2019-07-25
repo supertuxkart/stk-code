@@ -60,6 +60,8 @@ private:
     Online::HTTPRequest* m_download_request;
 
     std::thread m_download_thread;
+
+    void updateDownloadSize();
 public:
     friend class GUIEngine::ScreenSingleton<DownloadAssets>;
 

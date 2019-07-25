@@ -26,6 +26,7 @@
 #include "io/file_manager.hpp"
 #include "online/http_request.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/download_assets_size.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "main_loop.hpp"
@@ -46,10 +47,25 @@ void DownloadAssets::beforeAddingWidget()
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
+void DownloadAssets::updateDownloadSize()
+{
+    m_progress->setValue(0);
+    core::stringw unit="";
+    unsigned n = getDownloadAssetsSize(m_all_tracks->getState(),
+        m_hd_textures->getState());
+    float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
+    char s[32];
+    sprintf(s, "%.1f", f);
+    unit = _("%s MB", s);
+    // I18N: File size of game assets or addons downloading
+    core::stringw size = _("Size: %s", unit.c_str());
+    m_progress->setText(size);
+}   // updateDownloadSize
+
+// -----------------------------------------------------------------------------
 void DownloadAssets::init()
 {
     m_progress = getWidget<ProgressBarWidget>("progress");
-    m_progress->setVisible(false);
     m_all_tracks = getWidget<CheckBoxWidget>("all-tracks");
     m_all_tracks->setActive(true);
     m_all_tracks->setVisible(true);
@@ -58,6 +74,7 @@ void DownloadAssets::init()
     m_hd_textures->setActive(true);
     m_hd_textures->setVisible(true);
     m_hd_textures->setState(false);
+    updateDownloadSize();
     m_ok = getWidget<IconButtonWidget>("ok");
     m_ok->setActive(true);
     m_ok->setVisible(true);
@@ -89,7 +106,9 @@ void DownloadAssets::eventCallback(Widget* widget, const std::string& name,
 {
     if (m_downloading_now)
         return;
-    if (name == "buttons")
+    if (name == "all-tracks" || name == "hd-textures")
+        updateDownloadSize();
+    else if (name == "buttons")
     {
         const std::string& button = getWidget<GUIEngine::RibbonWidget>("buttons")
             ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -97,8 +116,8 @@ void DownloadAssets::eventCallback(Widget* widget, const std::string& name,
         {
             m_downloading_now = true;
             m_ok->setActive(false);
+            m_progress->setText("");
             m_progress->setValue(0);
-            m_progress->setVisible(true);
             m_all_tracks->setActive(false);
             m_hd_textures->setActive(false);
             std::string download_url = stk_config->m_assets_download_url;
