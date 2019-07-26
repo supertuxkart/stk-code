@@ -58,9 +58,16 @@ typedef int socklen_t;
 
 static enet_uint32 timeBase = 0;
 
+#ifdef IOS_STK
+extern void iOSInitialize(void);
+#endif
+
 int
 enet_initialize (void)
 {
+#ifdef IOS_STK
+    iOSInitialize();
+#endif
     return 0;
 }
 

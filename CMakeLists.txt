@@ -48,6 +48,7 @@ if (IOS)
     ADD_DEFINITIONS(-DIOS_STK)
     set(CMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
     option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
+    find_library(RESOLV_LIBRARY NAMES resolv libresolv)
 endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
@@ -577,7 +578,7 @@ if(NOT SERVER_ONLY)
                                             -framework UIKit
                                             -framework CoreMotion
                                             -framework Foundation
-                                            -framework GLKit")
+                                            -framework GLKit ${RESOLV_LIBRARY}")
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
