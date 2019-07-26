@@ -386,7 +386,7 @@ void STKHost::setPublicAddress()
     std::shuffle(untried_server.begin() + (untried_server.size() / 2),
         untried_server.end(), g);
 
-    while (!untried_server.empty())
+    while (!untried_server.empty() && !ProtocolManager::lock()->isExiting())
     {
         // Pick last element in untried servers
         std::string server_name = untried_server.back().first.c_str();
