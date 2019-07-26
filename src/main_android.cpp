@@ -78,10 +78,6 @@ void override_default_params_for_mobile()
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
     
-    // Make sure that user can play every track even if there are installed
-    // only few tracks and it's impossible to finish overworld challenges
-    UserConfigParams::m_unlock_everything = 1;
-    
     // Create default user istead of showing login screen to make life easier
     UserConfigParams::m_enforce_current_player = true;
 }
