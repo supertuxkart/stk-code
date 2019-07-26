@@ -105,7 +105,12 @@ void MainMenuScreen::loadedFromFile()
 
 void MainMenuScreen::beforeAddingWidget()
 {
-
+#ifdef IOS_STK
+    // iOS app doesn't like quit button in UI
+    Widget* w = getWidget("quit");
+    if (w)
+        w->setVisible(false);
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -167,6 +172,12 @@ void MainMenuScreen::init()
         IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 #endif
 
+#ifdef IOS_STK
+    // iOS app doesn't like quit button in UI
+    Widget* quit = getWidget("quit");
+    if (quit)
+        quit->setVisible(false);
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------
