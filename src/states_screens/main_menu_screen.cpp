@@ -61,6 +61,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <set>
 #include <string>
 
 
@@ -72,6 +73,37 @@ using namespace Online;
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
 }   // MainMenuScreen
+
+// ----------------------------------------------------------------------------
+
+bool MainMenuScreen::checkChallenge()
+{
+    std::set<std::string> result;
+    std::string challenge_dir = file_manager->getAsset(FileManager::CHALLENGE, "");
+    file_manager->listFiles(result, challenge_dir);
+
+    ChallengeData* new_challenge = NULL;
+    std::string filename;
+
+    for(std::set<std::string>::iterator i  = result.begin();
+                                        i != result.end()  ; i++)
+    {
+        if (StringUtils::hasSuffix(*i, ".challenge"))
+        {
+            filename = file_manager->getAsset("challenges/"+*i);
+            try
+            {
+                new_challenge = new ChallengeData(filename);
+                new_challenge->check();
+            }
+            catch (std::runtime_error& ex)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}   //checkChallenge
 
 // ----------------------------------------------------------------------------
 
@@ -144,6 +176,14 @@ void MainMenuScreen::init()
         w->setActive(false);
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
+    }
+    
+    if (!checkChallenge())
+    {
+        m_full_challenge = false;
+        IconButtonWidget* w2 = getWidget<IconButtonWidget>("story");
+        w2->resetAllBadges();
+        w2->setBadge(LOCKED_BADGE);
     }
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
@@ -462,36 +502,44 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        NetworkConfig::get()->unsetNetworking();
-        PlayerProfile *player = PlayerManager::getCurrentPlayer();
-        if (player->isFirstTime())
+        if (!m_full_challenge)
         {
-            CutsceneWorld::setUseDuration(true);
-            StateManager::get()->enterGameState();
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-            race_manager->setNumKarts( 0 );
-            race_manager->setNumPlayers(0);
-            race_manager->startSingleRace("introcutscene", 999, false);
-
-            std::vector<std::string> parts;
-            parts.push_back("introcutscene");
-            parts.push_back("introcutscene2");
-            ((CutsceneWorld*)World::getWorld())->setParts(parts);
-            //race_manager->startSingleRace("introcutscene2", 999, false);
-            return;
+            new MessageDialog(
+                _("Non-full assets found. You can't play story mode without full assets."));
         }
         else
         {
-            const std::string default_kart = UserConfigParams::m_default_kart;
-            if (player->isLocked(default_kart))
+            NetworkConfig::get()->unsetNetworking();
+            PlayerProfile *player = PlayerManager::getCurrentPlayer();
+            if (player->isFirstTime())
             {
-                KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
-                next->setGoToOverworldNext();
-                next->setMultiplayer(false);
-                next->push();
+                CutsceneWorld::setUseDuration(true);
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts( 0 );
+                race_manager->setNumPlayers(0);
+                race_manager->startSingleRace("introcutscene", 999, false);
+
+                std::vector<std::string> parts;
+                parts.push_back("introcutscene");
+                parts.push_back("introcutscene2");
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+                //race_manager->startSingleRace("introcutscene2", 999, false);
                 return;
             }
-            OverWorld::enterOverWorld();
+            else
+            {
+                const std::string default_kart = UserConfigParams::m_default_kart;
+                if (player->isLocked(default_kart))
+                {
+                    KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
+                    next->setGoToOverworldNext();
+                    next->setMultiplayer(false);
+                    next->push();
+                    return;
+                }
+                OverWorld::enterOverWorld();
+            }
         }
     }
     else if (selection == "online")

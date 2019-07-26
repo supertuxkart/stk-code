@@ -35,9 +35,15 @@ private:
     /** Keep the widget to to the user name. */
     GUIEngine::ButtonWidget *m_user_id;
 
+    /** The result of checkChallenge. */
+    bool m_full_challenge = true;
+
     MainMenuScreen();
 
 public:
+    /** check all challenge files exist. */
+    bool checkChallenge();
+
     virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
