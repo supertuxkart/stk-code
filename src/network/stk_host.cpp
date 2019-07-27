@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
+#include "network/ios_ipv6.hpp"
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_player_profile.hpp"
@@ -369,6 +370,16 @@ void STKHost::shutdown()
  */
 void STKHost::setPublicAddress()
 {
+#ifdef IOS_STK
+    if (isIPV6Only())
+    {
+        // IPV6 only in iOS doesn't support connection to firewalled server,
+        // so no need to test STUN
+        Log::info("STKHost", "IPV6 only environment detected.");
+        m_public_address = TransportAddress("169.254.0.0:65535");
+        return;
+    }
+#endif
     std::vector<std::pair<std::string, uint32_t> > untried_server;
     for (auto& p : UserConfigParams::m_stun_servers)
         untried_server.push_back(p);
